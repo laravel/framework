@@ -146,7 +146,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	{
 		$pattern = $this->createMatcher('extends');
 
-		$lines[] = preg_replace($pattern, '$1@include$2', $lines[0]);
+		$lines[] = preg_replace($pattern, '@include$1', $lines[0]);
 
 		return $lines;
 	}
@@ -262,7 +262,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	{
 		$pattern = $this->createMatcher('unless');
 
-		return preg_replace($pattern, '$1<?php if ( !$2): ?>', $value);
+		return preg_replace($pattern, '<?php if ( ! $1): ?>', $value);
 	}
 
 	/**
@@ -275,7 +275,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	{
 		$pattern = $this->createPlainMatcher('endunless');
 
-		return preg_replace($pattern, '$1<?php endif; ?>$2', $value);
+		return preg_replace($pattern, '$1<?php endif; ?>$1', $value);
 	}
 
 	/**
@@ -303,7 +303,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	{
 		$pattern = $this->createMatcher('each');
 
-		return preg_replace($pattern, '$1<?php echo $__env->renderEach$2; ?>', $value);
+		return preg_replace($pattern, '<?php echo $__env->renderEach$1; ?>', $value);
 	}
 
 	/**
@@ -316,7 +316,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	{
 		$pattern = $this->createMatcher('yield');
 
-		return preg_replace($pattern, '$1<?php echo $__env->yieldContent$2; ?>', $value);
+		return preg_replace($pattern, '<?php echo $__env->yieldContent$1; ?>', $value);
 	}
 
 	/**
@@ -342,11 +342,11 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	{
 		$pattern = $this->createMatcher('lang');
 
-		$value = preg_replace($pattern, '$1<?php echo \Illuminate\Support\Facades\Lang::get$2; ?>', $value);
+		$value = preg_replace($pattern, '<?php echo \Illuminate\Support\Facades\Lang::get$1; ?>', $value);
 
 		$pattern = $this->createMatcher('choice');
 
-		return preg_replace($pattern, '$1<?php echo \Illuminate\Support\Facades\Lang::choice$2; ?>', $value);
+		return preg_replace($pattern, '<?php echo \Illuminate\Support\Facades\Lang::choice$1; ?>', $value);
 	}
 
 	/**
@@ -359,7 +359,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	{
 		$pattern = $this->createMatcher('section');
 
-		return preg_replace($pattern, '$1<?php $__env->startSection$2; ?>', $value);
+		return preg_replace($pattern, '<?php $__env->startSection$1; ?>', $value);
 	}
 
 	/**
@@ -400,7 +400,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	public function createMatcher($function)
 	{
-		return '/(?<!\w)(\s*)@'.$function.'(\s*\(.*\))/';
+		return '/@'.$function.'\s?(\(.+?\)+)/is';
 	}
 
 	/**
