@@ -2,10 +2,10 @@
 
 class MySqlConnector extends Connector implements ConnectorInterface {
 
-	/**
+  /**
 	 * Establish a database connection.
 	 *
-	 * @param  array  $options
+	 * @param  array  $config
 	 * @return PDO
 	 */
 	public function connect(array $config)
@@ -18,6 +18,13 @@ class MySqlConnector extends Connector implements ConnectorInterface {
 		$options = $this->getOptions($config);
 
 		$connection = $this->createConnection($dsn, $config, $options);
+
+		// We need to explicitly exec the 'use' mysql command in case the 
+		// unix_socket option is used in the dsn.
+		if (isset($config['unix_socket']))
+		{
+			$connection->exec("use {$config['database']};");
+		}
 
 		$collation = $config['collation'];
 
@@ -41,25 +48,30 @@ class MySqlConnector extends Connector implements ConnectorInterface {
 	 */
 	protected function getDsn(array $config)
 	{
-		// First we will create the basic DSN setup as well as the port if it is in
-		// in the configuration options. This will give us the basic DSN we will
-		// need to establish the PDO connections and return them back for use.
 		extract($config);
 
-		$dsn = "mysql:host={$host};dbname={$database}";
-
-		if (isset($config['port']))
-		{
-			$dsn .= ";port={$port}";
-		}
-
-		// Sometimes the developer may specify the specific UNIX socket that should
-		// be used. If that is the case we will add that option to the string we
-		// have created so that it gets utilized while the connection is made.
+		// Sometimes the developer may specify the specific UNIX socket that should be used
 		if (isset($config['unix_socket']))
 		{
-			$dsn .= ";unix_socket={$config['unix_socket']}";
+			$dsn = "unix_socket={$config['unix_socket']}";
 		}
+		else
+		{
+			// But more often a single hostname is supplied with an optionnal port number.
+			// Warning : when 'localhost' is used, the mysql driver will use the default 
+			//			unix socket value, use '127.0.0.1' instead.
+			// Note :	according to the PHP documentation the unix_socket option and the 
+			//			host[port] option should not be used together.
+			$dsn = "host={$host}";
+
+			if (isset($config['port']))
+			{
+				$dsn .= ";port={$port}";
+			}
+		}
+
+		// Finally, the 'mysql:' prefix as well as the database name are added
+		$dsn = "mysql:{$dsn};dbname={$database}";
 
 		return $dsn;
 	}
