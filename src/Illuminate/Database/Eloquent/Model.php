@@ -700,15 +700,14 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			$relation = $caller['function'];
 		}
 
-		// If no foreign key was supplied, we can use a backtrace to guess the proper
-		// foreign key name by using the name of the relationship function, which
-		// when combined with an "_id" should conventionally match the columns.
+		$instance = new $related;
+
+		// If no foreign key is supplied, we will get the foreign key of the related
+		// model and use that as the local key for a belongsTo relationship.
 		if (is_null($foreignKey))
 		{
-			$foreignKey = snake_case($relation).'_id';
+			$foreignKey = $instance->getForeignKey();
 		}
-
-		$instance = new $related;
 
 		// Once we have the foreign key names, we'll just create a new Eloquent query
 		// for the related models and returns the relationship instance which will
