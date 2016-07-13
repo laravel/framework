@@ -2413,8 +2413,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		if ( ! $relations instanceof Relation)
 		{
-			throw new LogicException('Relationship method must return an object of type '
-				. 'Illuminate\Database\Eloquent\Relations\Relation');
+			$class = get_class($this);
+			$message = "Assumed relationship method {$class}::{$camelKey} must return an "
+				."object of type Illuminate\Database\Eloquent\Relations\Relation";
+			throw new LogicException($message);
 		}
 
 		return $this->relations[$key] = $relations->getResults();
