@@ -432,6 +432,18 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('all must be required!', $v->messages()->first('name.1'));
     }
 
+    public function testIfRulesAreSuccessfullyAdded()
+    {
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, [], ['foo' => 'Required']);
+        // foo has required rule
+        $this->assertTrue($v->hasRule('foo', 'Required'));
+        // foo doesn't have array rule
+        $this->assertFalse($v->hasRule('foo', 'Array'));
+        // bar doesn't exists
+        $this->assertFalse($v->hasRule('bar', 'Required'));
+    }
+
     public function testValidateArray()
     {
         $trans = $this->getRealTranslator();

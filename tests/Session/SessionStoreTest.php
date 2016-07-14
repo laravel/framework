@@ -108,7 +108,7 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase
                 '_token' => $session->token(),
                 'foo' => 'bar',
                 'baz' => 'boom',
-                'flash' => [
+                '_flash' => [
                     'new' => [],
                     'old' => ['baz'],
                 ],
@@ -182,24 +182,24 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase
         $session = $this->getSession();
         $session->flash('foo', 'bar');
         $session->set('fu', 'baz');
-        $session->set('flash.old', ['qu']);
-        $this->assertNotFalse(array_search('foo', $session->get('flash.new')));
-        $this->assertFalse(array_search('fu', $session->get('flash.new')));
+        $session->set('_flash.old', ['qu']);
+        $this->assertNotFalse(array_search('foo', $session->get('_flash.new')));
+        $this->assertFalse(array_search('fu', $session->get('_flash.new')));
         $session->keep(['fu', 'qu']);
-        $this->assertNotFalse(array_search('foo', $session->get('flash.new')));
-        $this->assertNotFalse(array_search('fu', $session->get('flash.new')));
-        $this->assertNotFalse(array_search('qu', $session->get('flash.new')));
-        $this->assertFalse(array_search('qu', $session->get('flash.old')));
+        $this->assertNotFalse(array_search('foo', $session->get('_flash.new')));
+        $this->assertNotFalse(array_search('fu', $session->get('_flash.new')));
+        $this->assertNotFalse(array_search('qu', $session->get('_flash.new')));
+        $this->assertFalse(array_search('qu', $session->get('_flash.old')));
     }
 
     public function testReflash()
     {
         $session = $this->getSession();
         $session->flash('foo', 'bar');
-        $session->set('flash.old', ['foo']);
+        $session->set('_flash.old', ['foo']);
         $session->reflash();
-        $this->assertNotFalse(array_search('foo', $session->get('flash.new')));
-        $this->assertFalse(array_search('foo', $session->get('flash.old')));
+        $this->assertNotFalse(array_search('foo', $session->get('_flash.new')));
+        $this->assertFalse(array_search('foo', $session->get('_flash.old')));
     }
 
     public function testReflashWithNow()
@@ -207,8 +207,8 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase
         $session = $this->getSession();
         $session->now('foo', 'bar');
         $session->reflash();
-        $this->assertNotFalse(array_search('foo', $session->get('flash.new')));
-        $this->assertFalse(array_search('foo', $session->get('flash.old')));
+        $this->assertNotFalse(array_search('foo', $session->get('_flash.new')));
+        $this->assertFalse(array_search('foo', $session->get('_flash.old')));
     }
 
     public function testReplace()

@@ -36,6 +36,30 @@ abstract class Facade
     }
 
     /**
+     * Convert the facade into a Mockery spy.
+     *
+     * @return void
+     */
+    public static function spy()
+    {
+        $name = static::getFacadeAccessor();
+
+        if (static::isMock()) {
+            $mock = static::$resolvedInstance[$name];
+        } else {
+            $class = static::getMockableClass($name);
+
+            $mock = $class ? Mockery::spy($class) : Mockery::spy();
+
+            static::$resolvedInstance[$name] = $mock;
+
+            if (isset(static::$app)) {
+                static::$app->instance($name, $mock);
+            }
+        }
+    }
+
+    /**
      * Initiate a mock expectation on the facade.
      *
      * @param  mixed
@@ -95,7 +119,8 @@ abstract class Facade
     {
         $name = static::getFacadeAccessor();
 
-        return isset(static::$resolvedInstance[$name]) && static::$resolvedInstance[$name] instanceof MockInterface;
+        return isset(static::$resolvedInstance[$name]) &&
+               static::$resolvedInstance[$name] instanceof MockInterface;
     }
 
     /**
