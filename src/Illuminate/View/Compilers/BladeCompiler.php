@@ -323,7 +323,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
             if (Str::contains($match[1], '@')) {
                 $match[0] = isset($match[3]) ? $match[1].$match[3] : $match[1];
             } elseif (isset($this->customDirectives[$match[1]])) {
-                $match[0] = call_user_func($this->customDirectives[$match[1]], Arr::get($match, 3));
+                $match[0] = $this->callCustomDirective($match[1], Arr::get($match, 3));
             } elseif (method_exists($this, $method = 'compile'.ucfirst($match[1]))) {
                 $match[0] = $this->$method(Arr::get($match, 3));
             }
@@ -958,6 +958,22 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function extend(callable $compiler)
     {
         $this->extensions[] = $compiler;
+    }
+
+    /**
+     * Call the given directive with the given value.
+     *
+     * @param  string  $name
+     * @param  string|null  $value
+     * @return string
+     */
+    protected function callCustomDirective($name, $value)
+    {
+        if (Str::startsWith($value, '(') && Str::endsWith($value, ')')) {
+            $value = Str::substr($value, 1, -1);
+        }
+
+        return call_user_func($this->customDirectives[$name], trim($value));
     }
 
     /**
