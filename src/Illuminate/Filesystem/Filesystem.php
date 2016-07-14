@@ -34,7 +34,7 @@ class Filesystem
      *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
-    public function get($path, $lock = false, $offset = false, $limit = false)
+    public function get($path, $lock = false, $offset = NULL, $limit = NULL)
     {
         if ($this->isFile($path)) {
             $params = [$path, null, null];
