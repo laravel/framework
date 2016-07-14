@@ -28,8 +28,8 @@ class Filesystem
      *
      * @param  string  $path
      * @param  bool  $lock
-     * @param  int $offset
-     * @param  int $limit
+     * @param  bool|int $offset
+     * @param  bool|int $limit
      * @return string
      *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
@@ -52,8 +52,8 @@ class Filesystem
      * Get contents of a file with shared access.
      *
      * @param  string  $path
-     * @param  int $offset
-     * @param  int $limit
+     * @param  bool|int $offset
+     * @param  bool|int $limit
      * @return string
      */
     public function sharedGet($path, $offset, $limit)
