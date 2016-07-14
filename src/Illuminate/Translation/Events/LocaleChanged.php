@@ -21,4 +21,5 @@ class LocaleChanged
     {
         $this->locale = $locale;
     }
+    
 }
