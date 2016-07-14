@@ -10,7 +10,7 @@ trait SendsPasswordResetEmails
     /**
      * Display the form to request a password reset link.
      *
-     * @return Response
+     * @return \Illuminate\Http\Response
      */
     public function showLinkRequestForm()
     {
@@ -59,7 +59,7 @@ trait SendsPasswordResetEmails
     /**
      * Get the broker to be used during password reset.
      *
-     * @return PasswordBroker
+     * @return \Illuminate\Contracts\Auth\PasswordBroker
      */
     public function broker()
     {
