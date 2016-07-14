@@ -60,7 +60,7 @@ class MakeAuthCommand extends Command
             $this->info('Updated Routes File.');
 
             file_put_contents(
-                app_path('Http/routes.php'),
+                base_path('routes/web.php'),
                 file_get_contents(__DIR__.'/stubs/make/routes.stub'),
                 FILE_APPEND
             );
