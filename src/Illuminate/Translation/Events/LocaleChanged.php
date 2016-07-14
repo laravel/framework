@@ -4,10 +4,11 @@ namespace Illuminate\Translation\Events;
 
 class LocaleChanged
 {
+
     /**
      * The changed locale.
      *
-     * @var $locale
+     * @var string
      */
     public $locale;
 
@@ -21,5 +22,5 @@ class LocaleChanged
     {
         $this->locale = $locale;
     }
-    
+
 }
