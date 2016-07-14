@@ -38,11 +38,11 @@ class Filesystem
     {
         if ($this->isFile($path)) {
             $params = [$path, null, null];
-            if($limit){
+            if ($limit) {
                 $params[] = $offset;
                 $params[] = $limit;
             }
-            return $lock ? $this->sharedGet($path, $offset, $limit) : call_user_func_array('file_get_contents',$params);
+            return $lock ? $this->sharedGet($path, $offset, $limit) : call_user_func_array('file_get_contents', $params);
         }
 
         throw new FileNotFoundException("File does not exist at path {$path}");
@@ -60,7 +60,7 @@ class Filesystem
     {
         $contents = '';
 
-        if(!$limit){
+        if (!$limit) {
             $offest = 0;
             $limit = 1048576;
         }
@@ -80,7 +80,7 @@ class Filesystem
             }
         }
 
-        return substr($contents,$offset,$limit);
+        return substr($contents, $offset, $limit);
     }
 
     /**
