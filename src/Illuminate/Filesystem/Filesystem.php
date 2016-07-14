@@ -60,7 +60,7 @@ class Filesystem
     {
         $contents = '';
 
-        if (!$limit) {
+        if (! $limit) {
             $offest = 0;
             $limit = 1048576;
         }
