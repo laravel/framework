@@ -28,6 +28,7 @@ class DatabaseNotification extends Model
     protected $casts = [
         'intro' => 'array',
         'outro' => 'array',
+        'payload' => 'array',
         'read' => 'boolean',
     ];
 
