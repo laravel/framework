@@ -82,7 +82,7 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase
         $pivot = new Pivot($parent, ['foo' => 'bar'], 'table');
         $pivot->setPivotKeys('foreign', 'other');
 
-        $this->assertEquals('foreign', $pivot->getForeignKey());
+        $this->assertEquals('foreign', $pivot->getForeignKeyName());
         $this->assertEquals('other', $pivot->getOtherKey());
     }
 

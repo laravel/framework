@@ -725,7 +725,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function hasOne($related, $foreignKey = null, $localKey = null)
     {
-        $foreignKey = $foreignKey ?: $this->getForeignKey();
+        $foreignKey = $foreignKey ?: $this->getForeignKeyName();
 
         $instance = new $related;
 
@@ -861,7 +861,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function hasMany($related, $foreignKey = null, $localKey = null)
     {
-        $foreignKey = $foreignKey ?: $this->getForeignKey();
+        $foreignKey = $foreignKey ?: $this->getForeignKeyName();
 
         $instance = new $related;
 
@@ -884,7 +884,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $through = new $through;
 
-        $firstKey = $firstKey ?: $this->getForeignKey();
+        $firstKey = $firstKey ?: $this->getForeignKeyName();
 
         $secondKey = $secondKey ?: $through->getForeignKey();
 
@@ -941,7 +941,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // First, we'll need to determine the foreign key and "other key" for the
         // relationship. Once we have determined the keys we'll make the query
         // instances as well as the relationship instances we need for this.
-        $foreignKey = $foreignKey ?: $this->getForeignKey();
+        $foreignKey = $foreignKey ?: $this->getForeignKeyName();
 
         $instance = new $related;
 
@@ -1011,7 +1011,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function morphedByMany($related, $name, $table = null, $foreignKey = null, $otherKey = null)
     {
-        $foreignKey = $foreignKey ?: $this->getForeignKey();
+        $foreignKey = $foreignKey ?: $this->getForeignKeyName();
 
         // For the inverse of the polymorphic many-to-many relations, we will change
         // the way we determine the foreign and other keys, as it is the opposite
@@ -1740,9 +1740,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function setCreatedAt($value)
     {
-        $this->{static::CREATED_AT} = $value;
-
-        return $this;
+        return $this->setAttribute($this->getCreatedAtColumn(), $value);
     }
 
     /**
@@ -1753,9 +1751,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function setUpdatedAt($value)
     {
-        $this->{static::UPDATED_AT} = $value;
-
-        return $this;
+        return $this->setAttribute($this->getUpdatedAtColumn(), $value);
     }
 
     /**
@@ -2066,8 +2062,19 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Get the default foreign key name for the model.
      *
      * @return string
+     * @deprecated 5.3
      */
     public function getForeignKey()
+    {
+        return $this->getForeignKeyName();
+    }
+
+    /**
+     * Get the default foreign key name for the model.
+     *
+     * @return string
+     */
+    public function getForeignKeyName()
     {
         return Str::snake(class_basename($this)).'_id';
     }
@@ -2190,11 +2197,23 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  array  $fillable
      * @return $this
      */
-    public function fillable(array $fillable)
+    public function setFillable(array $fillable)
     {
         $this->fillable = $fillable;
 
         return $this;
+    }
+
+    /**
+     * Set the fillable attributes for the model.
+     *
+     * @param  array  $fillable
+     * @return $this
+     * @deprecated 5.3
+     */
+    public function fillable(array $fillable)
+    {
+        return $this->setFillable($fillable);
     }
 
     /**
@@ -2213,11 +2232,23 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  array  $guarded
      * @return $this
      */
-    public function guard(array $guarded)
+    public function setGuarded(array $guarded)
     {
         $this->guarded = $guarded;
 
         return $this;
+    }
+
+    /**
+     * Set the guarded attributes for the model.
+     *
+     * @param  array  $guarded
+     * @return $this
+     * @deprecated 5.3
+     */
+    public function guard(array $guarded)
+    {
+        return $this->setGuarded($guarded);
     }
 
     /**
