@@ -4,6 +4,7 @@ namespace Illuminate\Notifications\Channels;
 
 use Illuminate\Support\Arr;
 use Illuminate\Contracts\Mail\Mailer;
+use Illuminate\Contracts\Notifications\MailNotification;
 
 class MailChannel
 {
@@ -50,6 +51,10 @@ class MailChannel
                         ? $m->to($emails) : $m->bcc($emails);
 
             $m->subject($notification->subject);
+
+            if ($notification instanceof MailNotification) {
+                $notification->buildMessage($m);
+            }
         });
     }
 
