@@ -42,7 +42,7 @@ class Filesystem
                 $params[] = $offset;
                 $params[] = $limit;
             }
-            
+
             return $lock ? $this->sharedGet($path, $offset, $limit) : call_user_func_array('file_get_contents', $params);
         }
 
