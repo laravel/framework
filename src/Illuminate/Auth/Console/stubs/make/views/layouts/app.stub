@@ -11,8 +11,11 @@
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:300,400,600' rel='stylesheet' type='text/css'>
 
     <!-- Styles -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-    <!-- <link href="/css/app.css" rel="stylesheet"> -->
+    @if (file_exists(public_path('css/app.css')))
+        <link href="/css/app.css" rel="stylesheet">
+    @else
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    @endif
 </head>
 <body id="app-layout">
     <nav class="navbar navbar-default navbar-static-top">
@@ -52,7 +55,15 @@
                             </a>
 
                             <ul class="dropdown-menu" role="menu">
-                                <li><a href="{{ url('/logout') }}">Logout</a></li>
+                                <li>
+                                    <form action="{{ url('/logout') }}" method="POST">
+                                        {{ csrf_field() }}
+
+                                        <button type="submit" class="btn btn-link">
+                                            Logout
+                                        </button>
+                                    </form>
+                                </li>
                             </ul>
                         </li>
                     @endif
