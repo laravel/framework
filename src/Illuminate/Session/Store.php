@@ -234,7 +234,7 @@ class Store implements SessionInterface
 
         $this->setExists(false);
 
-        $this->id = $this->generateSessionId();
+        $this->setId($this->generateSessionId());
 
         return true;
     }
@@ -700,7 +700,7 @@ class Store implements SessionInterface
      */
     public function setPreviousUrl($url)
     {
-        return $this->put('_previous.url', $url);
+        $this->put('_previous.url', $url);
     }
 
     /**
