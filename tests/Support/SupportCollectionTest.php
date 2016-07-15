@@ -404,18 +404,14 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['#foo', '#bar', ['#baz'], '#zap'], $c->flatten(2)->all());
     }
 
-    public function testFlattenWithDepthAndKeys()
+    public function testFlattenIgnoresKeys()
     {
-        // No depth flattens recursively
+        // No depth ignores keys
         $c = new Collection(['#foo', ['key' => '#bar'], ['key' => '#baz'], 'key' => '#zap']);
         $this->assertEquals(['#foo', '#bar', '#baz', '#zap'], $c->flatten()->all());
 
-        // With a depth of 1 it suddenly cares about keys
+        // Depth of 1 ignores keys
         $c = new Collection(['#foo', ['key' => '#bar'], ['key' => '#baz'], 'key' => '#zap']);
-        $this->assertEquals(['#foo', '#bar', '#baz', '#zap'], $c->flatten(1)->all());
-
-        // Without keys
-        $c = new Collection(['#foo', ['#bar'], ['#baz'], 'key' => '#zap']);
         $this->assertEquals(['#foo', '#bar', '#baz', '#zap'], $c->flatten(1)->all());
     }
 
