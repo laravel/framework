@@ -176,7 +176,7 @@ class Arr
             $item = $item instanceof Collection ? $item->all() : $item;
 
             if ($depth === 1 || ! is_array($item)) {
-                return array_merge($result, (array) $item);
+                return array_merge($result, array_values((array) $item));
             }
 
             return array_merge($result, static::flatten($item, $depth - 1));
