@@ -1365,11 +1365,20 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($result);
     }
 
-    public function testIsWIthAnotherModel()
+    public function testIsWithAnotherTable()
     {
         $firstInstance = new EloquentModelStub(['id' => 1]);
         $secondInstance = new EloquentModelStub(['id' => 1]);
         $secondInstance->setTable('foo');
+        $result = $firstInstance->is($secondInstance);
+        $this->assertFalse($result);
+    }
+
+    public function testIsWithAnotherConnection()
+    {
+        $firstInstance = new EloquentModelStub(['id' => 1]);
+        $secondInstance = new EloquentModelStub(['id' => 1]);
+        $secondInstance->setConnection('foo');
         $result = $firstInstance->is($secondInstance);
         $this->assertFalse($result);
     }
