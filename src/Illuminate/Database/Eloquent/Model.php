@@ -3043,7 +3043,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function is(Model $model)
     {
         return $this->getKey() === $model->getKey() &&
-               $this->getTable() === $model->getTable();
+               $this->getTable() === $model->getTable() &&
+               $this->getConnectionName() === $model->getConnectionName();
     }
 
     /**
