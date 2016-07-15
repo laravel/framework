@@ -133,7 +133,8 @@ class BusDispatcherTestBasicCommand
 
 class BusDispatcherTestArgumentMapping implements Illuminate\Contracts\Bus\SelfHandling
 {
-    public $flag, $emptyString;
+    public $flag;
+    public $emptyString;
 
     public function __construct($flag, $emptyString)
     {
@@ -149,7 +150,8 @@ class BusDispatcherTestArgumentMapping implements Illuminate\Contracts\Bus\SelfH
 
 class BusDispatcherTestSelfHandlingCommand implements Illuminate\Contracts\Bus\SelfHandling
 {
-    public $firstName, $lastName;
+    public $firstName;
+    public $lastName;
 
     public function __construct($firstName, $lastName)
     {
