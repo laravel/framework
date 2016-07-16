@@ -552,6 +552,32 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         $this->assertNull($factory->getLoopStack()[0]['last']);
     }
 
+    public function testEvenAndOddIncrementingLoopIndices()
+    {
+        $factory = $this->getFactory();
+
+        $factory->addLoop([1, 2, 3, 4, 5]);
+        $factory->incrementLoopIndices();
+        $this->assertEquals(1, $factory->getLoopStack()[0]['index']);
+        $this->assertFalse($factory->getLoopStack()[0]['even']);
+        $this->assertTrue($factory->getLoopStack()[0]['odd']);
+
+        $factory->incrementLoopIndices();
+        $this->assertEquals(2, $factory->getLoopStack()[0]['index']);
+        $this->assertTrue($factory->getLoopStack()[0]['even']);
+        $this->assertFalse($factory->getLoopStack()[0]['odd']);
+
+        $factory->incrementLoopIndices();
+        $this->assertEquals(3, $factory->getLoopStack()[0]['index']);
+        $this->assertFalse($factory->getLoopStack()[0]['even']);
+        $this->assertTrue($factory->getLoopStack()[0]['odd']);
+
+        $factory->incrementLoopIndices();
+        $this->assertEquals(4, $factory->getLoopStack()[0]['index']);
+        $this->assertTrue($factory->getLoopStack()[0]['even']);
+        $this->assertFalse($factory->getLoopStack()[0]['odd']);
+    }
+
     protected function getFactory()
     {
         return new Factory(
