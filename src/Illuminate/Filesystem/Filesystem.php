@@ -28,14 +28,22 @@ class Filesystem
      *
      * @param  string  $path
      * @param  bool  $lock
+     * @param  bool|int $offset
+     * @param  bool|int $limit
      * @return string
      *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
-    public function get($path, $lock = false)
+    public function get($path, $lock = false, $offset = null, $limit = null)
     {
         if ($this->isFile($path)) {
-            return $lock ? $this->sharedGet($path) : file_get_contents($path);
+            $params = [$path, null, null];
+            if ($limit) {
+                $params[] = $offset;
+                $params[] = $limit;
+            }
+
+            return $lock ? $this->sharedGet($path, $offset, $limit) : call_user_func_array('file_get_contents', $params);
         }
 
         throw new FileNotFoundException("File does not exist at path {$path}");
@@ -45,11 +53,19 @@ class Filesystem
      * Get contents of a file with shared access.
      *
      * @param  string  $path
+     * @param  bool|int $offset
+     * @param  bool|int $limit
      * @return string
      */
-    public function sharedGet($path)
+    public function sharedGet($path, $offset, $limit)
     {
         $contents = '';
+
+        if (! $limit) {
+            $offest = 0;
+            $limit = 1048576;
+        }
+        $len = $offset + $limit;
 
         $handle = fopen($path, 'r');
 
@@ -57,7 +73,7 @@ class Filesystem
             try {
                 if (flock($handle, LOCK_SH)) {
                     while (! feof($handle)) {
-                        $contents .= fread($handle, 1048576);
+                        $contents .= fread($handle, $len);
                     }
                 }
             } finally {
@@ -65,7 +81,7 @@ class Filesystem
             }
         }
 
-        return $contents;
+        return substr($contents, $offset, $limit);
     }
 
     /**
