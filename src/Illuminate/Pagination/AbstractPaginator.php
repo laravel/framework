@@ -289,6 +289,19 @@ abstract class AbstractPaginator implements Htmlable
     {
         return ! ($this->currentPage() == 1 && ! $this->hasMorePages());
     }
+    
+    /**
+     * Transform each item in the collection using a callback.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function transform(callable $callback)
+    {
+        $this->items = $this->items->transform($callback);
+
+        return $this;
+    }
 
     /**
      * Resolve the current request path or return the default value.
