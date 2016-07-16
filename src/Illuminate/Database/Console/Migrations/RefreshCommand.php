@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Console\Migrations;
 
-use Illuminate\Support\Arr;
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Symfony\Component\Console\Input\InputOption;
@@ -45,9 +44,7 @@ class RefreshCommand extends Command
         // If the "step" option is specified it means we only want to rollback a small
         // number of migrations before migrating again. For example, the user might
         // only rollback and remigrate the latest four migrations instead of all.
-        $step = Arr::get(
-            $this->getOptions(), $this->input->getOption('step'), 0
-        );
+        $step = $this->input->getOption('step') ?: 0;
 
         if ($step > 0) {
             $this->call('migrate:rollback', [
