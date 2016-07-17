@@ -96,7 +96,7 @@ class PasswordBroker implements PasswordBrokerContract
         // Once we have called this callback, we will remove this token row from the
         // table and return the response from this callback so the user gets sent
         // to the destination given by the developers from the callback return.
-        call_user_func($callback, $user, $pass);
+        $callback($user, $pass);
 
         $this->tokens->delete($credentials['token']);
 
