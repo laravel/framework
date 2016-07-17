@@ -373,6 +373,8 @@ class Gate implements GateContract
             // call the policy method with either a class or model name consistently.
             if (isset($arguments[0]) && is_string($arguments[0])) {
                 $ability = $ability.'Any';
+
+                array_shift($arguments);
             }
 
             if (! is_callable([$instance, $ability])) {
