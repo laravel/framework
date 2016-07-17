@@ -335,13 +335,13 @@ class Builder
     public function collect($collection)
     {
         if (isset($this->onCollect)) {
-           return call_user_func($this->onCollect, $collection);
-       }
+            return call_user_func($this->onCollect, $collection);
+        }
 
         return $collection;
     }
 
-     /**
+    /**
      * Register a callback on new collections.
      *
      * @param  \Closure  $callback
