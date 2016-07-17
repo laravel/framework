@@ -168,7 +168,6 @@ trait InteractsWithDatabase
         return $this;
     }
 
-
     /**
      * Returns the count for a given where condition in the database.
      *
