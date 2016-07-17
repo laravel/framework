@@ -404,6 +404,17 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['#foo', '#bar', ['#baz'], '#zap'], $c->flatten(2)->all());
     }
 
+    public function testFlattenIgnoresKeys()
+    {
+        // No depth ignores keys
+        $c = new Collection(['#foo', ['key' => '#bar'], ['key' => '#baz'], 'key' => '#zap']);
+        $this->assertEquals(['#foo', '#bar', '#baz', '#zap'], $c->flatten()->all());
+
+        // Depth of 1 ignores keys
+        $c = new Collection(['#foo', ['key' => '#bar'], ['key' => '#baz'], 'key' => '#zap']);
+        $this->assertEquals(['#foo', '#bar', '#baz', '#zap'], $c->flatten(1)->all());
+    }
+
     public function testMergeNull()
     {
         $c = new Collection(['name' => 'Hello']);
