@@ -166,7 +166,7 @@ class Kernel implements KernelContract
      *
      * @param  string  $signature
      * @param  Closure  $callback
-     * @return ClosureCommand
+     * @return \Illuminate\Foundation\Console\ClosureCommand
      */
     public function command($signature, Closure $callback)
     {

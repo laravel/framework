@@ -72,6 +72,7 @@ class UploadedFile extends SymfonyUploadedFile
      * Store the uploaded file on a filesystem disk.
      *
      * @param  string  $path
+     * @param  string  $name
      * @param  string|null  $disk
      * @return string|false
      */

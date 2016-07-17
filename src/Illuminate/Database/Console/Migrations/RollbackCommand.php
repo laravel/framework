@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Console\Migrations;
 
-use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Database\Migrations\Migrator;
 use Symfony\Component\Console\Input\InputOption;

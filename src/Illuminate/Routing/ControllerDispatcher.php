@@ -50,7 +50,7 @@ class ControllerDispatcher
     /**
      * Get the middleware for the controller instance.
      *
-     * @param  \Illuminate\Routing\Controller  $instance
+     * @param  \Illuminate\Routing\Controller  $controller
      * @param  string  $method
      * @return array
      */
