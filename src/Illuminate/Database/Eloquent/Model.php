@@ -2389,7 +2389,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function transform(callable $callback)
     {
-        return (new Fluent($this->toArray()))->transform($callback);
+        return new Fluent($callback($this));
     }
 
     /**
