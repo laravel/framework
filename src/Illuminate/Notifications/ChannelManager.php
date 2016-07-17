@@ -25,7 +25,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      * Create a new notification for the given notifiable entities.
      *
      * @param  array  $notifiables
-     * @return \Illuminate\Notifications\Notification
+     * @return \Illuminate\Notifications\Channels\Notification
      */
     public function to($notifiables)
     {
@@ -105,7 +105,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     /**
      * Get a channel instance.
      *
-     * @param  string  $driver
+     * @param  string|null  $name
      * @return mixed
      */
     public function channel($name = null)
@@ -152,7 +152,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     /**
      * Create an instance of the Slack driver.
      *
-     * @return \Illuminate\Notifications\Channels\SlackChannel
+     * @return \Illuminate\Notifications\Channels\SlackWebhookChannel
      */
     protected function createSlackDriver()
     {
