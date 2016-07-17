@@ -172,25 +172,15 @@ class Arr
      */
     public static function flatten($array, $depth = INF)
     {
-        $result = [];
-
-        foreach ($array as $item) {
+        return array_reduce($array, function ($result, $item) use ($depth) {
             $item = $item instanceof Collection ? $item->all() : $item;
 
-            if (is_array($item)) {
-                if ($depth === 1) {
-                    $result = array_merge($result, $item);
-                    continue;
-                }
-
-                $result = array_merge($result, static::flatten($item, $depth - 1));
-                continue;
+            if ($depth === 1 || ! is_array($item)) {
+                return array_merge($result, array_values((array) $item));
             }
 
-            $result[] = $item;
-        }
-
-        return $result;
+            return array_merge($result, static::flatten($item, $depth - 1));
+        }, []);
     }
 
     /**
