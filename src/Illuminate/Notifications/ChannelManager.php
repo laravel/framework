@@ -105,7 +105,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     /**
      * Get a channel instance.
      *
-     * @param  string  $driver
+     * @param  string  $name
      * @return mixed
      */
     public function channel($name = null)

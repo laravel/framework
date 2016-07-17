@@ -89,7 +89,7 @@ trait ThrottlesLogins
     /**
      * Get the rate limiter instance.
      *
-     * @return RateLimiter
+     * @return \Illuminate\Cache\RateLimiter
      */
     protected function limiter()
     {
