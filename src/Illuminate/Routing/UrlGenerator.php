@@ -130,15 +130,17 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Get the URL for the previous request.
      *
+     * @param  mixed  $fallback
      * @return string
      */
-    public function previous()
+    public function previous($fallback = false)
     {
         $referrer = $this->request->headers->get('referer');
 
         $url = $referrer ? $this->to($referrer) : $this->getPreviousUrlFromSession();
+        $fallback = value($fallback) ?: $this->to('/');
 
-        return $url ?: $this->to('/');
+        return $url ?: $fallback;
     }
 
     /**
