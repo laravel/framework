@@ -11,7 +11,7 @@ class ClearCommandTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-    public function testClearWithNoStoreOption()
+    public function testClearWithNoStoreArgument()
     {
         $command = new ClearCommandTestStub(
             $cacheManager = m::mock('Illuminate\Cache\CacheManager')
@@ -28,7 +28,7 @@ class ClearCommandTest extends PHPUnit_Framework_TestCase
         $this->runCommand($command);
     }
 
-    public function testClearWithStoreOption()
+    public function testClearWithStoreArgument()
     {
         $command = new ClearCommandTestStub(
             $cacheManager = m::mock('Illuminate\Cache\CacheManager')
@@ -48,7 +48,7 @@ class ClearCommandTest extends PHPUnit_Framework_TestCase
     /**
      * @expectedException InvalidArgumentException
      */
-    public function testClearWithInvalidStoreOption()
+    public function testClearWithInvalidStoreArgument()
     {
         $command = new ClearCommandTestStub(
             $cacheManager = m::mock('Illuminate\Cache\CacheManager')
@@ -63,6 +63,42 @@ class ClearCommandTest extends PHPUnit_Framework_TestCase
         $cacheRepository->shouldReceive('flush')->never();
 
         $this->runCommand($command, ['store' => 'bar']);
+    }
+
+    public function testClearWithTagsOption()
+    {
+        $command = new ClearCommandTestStub(
+            $cacheManager = m::mock('Illuminate\Cache\CacheManager')
+        );
+
+        $cacheRepository = m::mock('Illuminate\Contracts\Cache\Repository');
+
+        $app = new Application();
+        $command->setLaravel($app);
+
+        $cacheManager->shouldReceive('store')->once()->with(null)->andReturn($cacheRepository);
+        $cacheRepository->shouldReceive('tags')->once()->with(['foo', 'bar'])->andReturn($cacheRepository);
+        $cacheRepository->shouldReceive('flush')->once();
+
+        $this->runCommand($command, ['--tags' => 'foo,bar']);
+    }
+
+    public function testClearWithStoreArgumentAndTagsOption()
+    {
+        $command = new ClearCommandTestStub(
+            $cacheManager = m::mock('Illuminate\Cache\CacheManager')
+        );
+
+        $cacheRepository = m::mock('Illuminate\Contracts\Cache\Repository');
+
+        $app = new Application();
+        $command->setLaravel($app);
+
+        $cacheManager->shouldReceive('store')->once()->with('redis')->andReturn($cacheRepository);
+        $cacheRepository->shouldReceive('tags')->once()->with(['foo'])->andReturn($cacheRepository);
+        $cacheRepository->shouldReceive('flush')->once();
+
+        $this->runCommand($command, ['store' => 'redis', '--tags' => 'foo']);
     }
 
     protected function runCommand($command, $input = [])
