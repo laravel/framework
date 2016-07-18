@@ -89,56 +89,54 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function median($key = null)
     {
         $count = $this->count();
+
         if ($count == 0) {
             return;
         }
 
-        $collection = isset($key) ? $this->map(function ($value) use ($key) {
-            return $value->{$key};
-        }) : $this;
+        $values = with(isset($key) ? $this->pluck($key) : $this)
+                    ->values()->sort();
 
-        $values = $collection->values()->sort();
-        $middlePosition = (int) floor($count / 2);
-        $hasAnOddQuantity = $count % 2;
+        $middle = (int) floor($count / 2);
 
-        if ($hasAnOddQuantity) {
-            return $values->get($middlePosition);
+        if ($count % 2) {
+            return $values->get($middle);
         }
 
-        $start = $values->get($middlePosition - 1);
-        $end = $values->get($middlePosition);
-
-        return (new static([$start, $end]))->average();
+        return (new static([
+            $values->get($middle - 1), $values->get($middle)
+        ]))->average();
     }
 
     /**
      * Get the mode of a given key.
      *
      * @param  null $key
-     * @return static|null
+     * @return array
      */
     public function mode($key = null)
     {
         $count = $this->count();
+
         if ($count == 0) {
             return;
         }
 
-        $collection = isset($key) ? $this->map(function ($value) use ($key) {
-            return $value->{$key};
-        }) : $this;
+        $collection = isset($key) ? $this->pluck($key) : $this;
 
-        $set = new static;
-        $collection->each(function ($value) use (&$set) {
-            $set[$value] = isset($set[$value]) ? $set[$value] + 1 : 1;
+        $counts = new self;
+
+        $collection->each(function ($value) use ($counts) {
+            $counts[$value] = isset($counts[$value]) ? $counts[$value] + 1 : 1;
         });
 
-        $sorted = $set->sort();
+        $sorted = $counts->sort();
+
         $highestValue = $sorted->last();
 
         return $sorted->filter(function ($value) use ($highestValue) {
             return $value == $highestValue;
-        })->sort()->keys();
+        })->sort()->keys()->all();
     }
 
     /**
