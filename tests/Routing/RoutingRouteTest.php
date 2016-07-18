@@ -176,7 +176,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
             'uses' => 'RouteTestClosureMiddlewareController@index',
             'middleware' => 'foo',
         ]);
-        $router->middleware('foo', function ($request, $next) {
+        $router->aliasMiddleware('foo', function ($request, $next) {
             $request['foo-middleware'] = 'foo-middleware';
 
             return $next($request);
