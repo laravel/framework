@@ -3,6 +3,7 @@
 namespace Illuminate\Redis;
 
 use Predis\Command\CommandInterface;
+use Predis\Connection\ConnectionException;
 use Predis\Connection\ConnectionInterface;
 
 class Connection implements ConnectionInterface
@@ -58,7 +59,11 @@ class Connection implements ConnectionInterface
      */
     public function writeRequest(CommandInterface $command)
     {
-        return $this->connection->writeRequest($command);
+        try {
+            return $this->connection->writeRequest($command);
+        } (catch ConnectionException $e) {
+            return $this->connection->writeRequest($command);
+        }
     }
 
     /**
@@ -66,7 +71,11 @@ class Connection implements ConnectionInterface
      */
     public function readResponse(CommandInterface $command)
     {
-        return $this->connection->readResponse($command);
+        try {
+            return $this->connection->readResponse($command);
+        } (catch ConnectionException $e) {
+            return $this->connection->readResponse($command);
+        }
     }
 
     /**
@@ -74,6 +83,10 @@ class Connection implements ConnectionInterface
      */
     public function executeCommand(CommandInterface $command)
     {
-        return $this->connection->executeCommand($command);
+        try {
+            return $this->connection->executeCommand($command);
+        } (catch ConnectionException $e) {
+            return $this->connection->executeCommand($command);
+        }
     }
 }
