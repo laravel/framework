@@ -196,7 +196,13 @@ class ResourceRegistrar
     {
         $name = $this->getResourceName($resource, $method, $options);
 
-        return ['as' => $name, 'uses' => $controller.'@'.$method];
+        $action = ['as' => $name, 'uses' => $controller.'@'.$method];
+
+        if (isset($options['middleware'])) {
+            $action['middleware'] = $options['middleware'];
+        }
+
+        return $action;
     }
 
     /**
