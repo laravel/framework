@@ -61,7 +61,7 @@ class AuthorizesResourcesTest extends PHPUnit_Framework_TestCase
     {
         $router = new Router(new Illuminate\Events\Dispatcher);
 
-        $router->middleware('can', 'AuthorizesResourcesMiddleware');
+        $router->aliasMiddleware('can', 'AuthorizesResourcesMiddleware');
         $router->get($method)->uses('AuthorizesResourcesController@'.$method);
 
         $this->assertEquals(
