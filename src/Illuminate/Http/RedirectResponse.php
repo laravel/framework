@@ -72,15 +72,30 @@ class RedirectResponse extends BaseRedirectResponse
     {
         $input = $input ?: $this->request->input();
 
-        $this->session->flashInput($data = array_filter($input, $callback = function (&$value) use (&$callback) {
-            if (is_array($value)) {
-                $value = array_filter($value, $callback);
-            }
-
-            return ! $value instanceof SymfonyUploadedFile;
-        }));
+        $this->session->flashInput($this->removeFilesFromInput($input));
 
         return $this;
+    }
+
+    /**
+     * Remove all uploaded files form the given input array.
+     *
+     * @param  array  $input
+     * @return array
+     */
+    protected function removeFilesFromInput(array $input)
+    {
+        foreach ($input as $key => $value) {
+            if (is_array($value)) {
+                $input[$key] = $this->removeFilesFromInput($value);
+            }
+
+            if ($value instanceof SymfonyUploadedFile) {
+                unset($input[$key]);
+            }
+        }
+
+        return $input;
     }
 
     /**
