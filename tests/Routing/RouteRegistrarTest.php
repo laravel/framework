@@ -116,6 +116,7 @@ class RouteRegistrarTest extends PHPUnit_Framework_TestCase
         $this->seeMiddleware('group-middleware');
     }
 
+
     public function testCanRegisterGroupWithNamespace()
     {
         $this->router->namespace('App\Http\Controllers')->group(function ($router) {
@@ -227,5 +228,10 @@ class RouteRegistrarControllerStub
     public function index()
     {
         return 'controller';
+    }
+
+    public function destroy()
+    {
+        return 'deleted';
     }
 }

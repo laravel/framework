@@ -55,6 +55,19 @@ class RouteRegistrar
     }
 
     /**
+     * Route a resource to a controller.
+     *
+     * @param  string  $name
+     * @param  string  $controller
+     * @param  array  $options
+     * @return void
+     */
+    public function resource($name, $controller, array $options = [])
+    {
+        $this->router->resource($name, $controller, $this->attributes + $options);
+    }
+
+    /**
      * Create a route group with shared attributes.
      *
      * @param  \Closure  $callback
