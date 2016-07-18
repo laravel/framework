@@ -76,6 +76,7 @@ trait AuthorizesRequests
      * @param  string  $model
      * @param  string|null  $parameter
      * @param  array  $options
+     * @param  \Illuminate\Http\Request|null  $request
      * @return void
      */
     public function authorizeResource($model, $parameter = null, array $options = [], $request = null)

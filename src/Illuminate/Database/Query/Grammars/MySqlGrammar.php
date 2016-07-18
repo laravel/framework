@@ -143,7 +143,7 @@ class MySqlGrammar extends Grammar
      * Prepares a JSON column being updated using the JSON_SET function.
      *
      * @param  string  $key
-     * @param  \Illuminate\Database\JsonExpression  $value
+     * @param  \Illuminate\Database\Query\JsonExpression  $value
      * @return string
      */
     protected function compileJsonUpdateColumn($key, JsonExpression $value)

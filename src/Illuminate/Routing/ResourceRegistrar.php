@@ -386,6 +386,7 @@ class ResourceRegistrar
     /**
      * Set or unset the unmapped global parameters to singular.
      *
+     * @param  bool  $singular
      * @return void
      */
     public static function singularParameters($singular = true)
