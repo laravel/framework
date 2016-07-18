@@ -199,6 +199,8 @@ if (! function_exists('cache')) {
      *
      * @param  dynamic  key|key,default|data,expiration|null
      * @return mixed
+     *
+     * @throws \Exception
      */
     function cache()
     {
@@ -758,7 +760,7 @@ if (! function_exists('url')) {
      * @param  string  $path
      * @param  mixed   $parameters
      * @param  bool    $secure
-     * @return Illuminate\Contracts\Routing\UrlGenerator|string
+     * @return \Illuminate\Contracts\Routing\UrlGenerator|string
      */
     function url($path = null, $parameters = [], $secure = null)
     {

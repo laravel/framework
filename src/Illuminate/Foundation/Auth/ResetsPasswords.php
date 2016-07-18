@@ -115,7 +115,7 @@ trait ResetsPasswords
     /**
      * Get the broker to be used during password reset.
      *
-     * @return PasswordBroker
+     * @return \Illuminate\Contracts\Auth\PasswordBroker
      */
     public function broker()
     {
