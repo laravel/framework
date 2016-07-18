@@ -81,6 +81,67 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Get the median of a given key.
+     *
+     * @param  null $key
+     * @return mixed|null
+     */
+    public function median($key = null)
+    {
+        $count = $this->count();
+        if ($count == 0) {
+            return;
+        }
+
+        $collection = isset($key) ? $this->map(function ($value) use ($key) {
+            return $value->{$key};
+        }) : $this;
+
+        $values = $collection->values()->sort();
+        $middlePosition = (int) floor($count / 2);
+        $hasAnOddQuantity = $count % 2;
+
+        if ($hasAnOddQuantity) {
+            return $values->get($middlePosition);
+        }
+
+        $start = $values->get($middlePosition - 1);
+        $end = $values->get($middlePosition);
+
+        return (new static([$start, $end]))->average();
+    }
+
+    /**
+     * Get the mode of a given key.
+     *
+     * @param  null $key
+     * @return static|null
+     */
+    public function mode($key = null)
+    {
+        $count = $this->count();
+        if ($count == 0) {
+            return;
+        }
+
+        $collection = isset($key) ? $this->map(function ($value) use ($key) {
+            return $value->{$key};
+        }) : $this;
+
+        $set = new static;
+        $collection->each(function ($value) use (&$set) {
+            $set[$value] = isset($set[$value]) ? $set[$value] + 1 : 1;
+        });
+
+        $sorted = $set->sort();
+        $highestValue = $sorted->last();
+
+        return $sorted->filter(function ($value) use ($highestValue) {
+            return $value == $highestValue;
+        })->sort()->keys();
+    }
+
+    /**
      * Collapse the collection of items into a single array.
      *
      * @return static
