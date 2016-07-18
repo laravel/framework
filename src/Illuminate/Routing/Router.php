@@ -639,7 +639,7 @@ class Router implements RegistrarContract
                         ->through($middleware)
                         ->then(function ($request) use ($route) {
                             return $this->prepareResponse(
-                                $request, $route->run($request)
+                                $request, $route->run()
                             );
                         });
     }
