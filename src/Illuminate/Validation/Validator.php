@@ -596,7 +596,7 @@ class Validator implements ValidatorContract
     /**
      * Determine if the attribute fails the nullable check.
      *
-     * @param  string  $rule
+     * @param  string  $attribute
      * @param  mixed  $value
      * @return bool
      */

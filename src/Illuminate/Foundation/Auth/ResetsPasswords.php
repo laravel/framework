@@ -115,7 +115,7 @@ trait ResetsPasswords
     /**
      * Get the broker to be used during password reset.
      *
-     * @return PasswordBroker
+     * @return \Illuminate\Contracts\Auth\PasswordBroker
      */
     public function broker()
     {
@@ -125,7 +125,7 @@ trait ResetsPasswords
     /**
      * Get the guard to be used during password reset.
      *
-     * @return \Illuminate\Contracts\Auth\Guard
+     * @return \Illuminate\Contracts\Auth\StatefulGuard
      */
     protected function guard()
     {
