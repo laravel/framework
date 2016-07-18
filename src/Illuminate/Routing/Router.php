@@ -846,7 +846,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  string  $class
      * @return $this
      */
-    public function middleware($name, $class)
+    public function aliasMiddleware($name, $class)
     {
         $this->middleware[$name] = $class;
 
