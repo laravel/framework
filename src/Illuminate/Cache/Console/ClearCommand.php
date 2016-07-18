@@ -50,7 +50,7 @@ class ClearCommand extends Command
      */
     public function handle()
     {
-        $tags = (array) explode(',', $this->option('tags'));
+        $tags = array_filter(explode(',', $this->option('tags')));
 
         $cache = $this->cache->store($store = $this->argument('store'));
 
