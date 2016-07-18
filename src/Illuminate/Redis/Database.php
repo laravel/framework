@@ -17,7 +17,7 @@ class Database implements DatabaseContract
     protected $clients;
 
     /**
-     * Create a new Redis connection instance.
+     * Create a new Redis database instance.
      *
      * @param  array  $servers
      * @return void
