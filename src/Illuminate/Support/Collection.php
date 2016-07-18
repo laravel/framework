@@ -104,7 +104,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         return (new static([
-            $values->get($middle - 1), $values->get($middle)
+            $values->get($middle - 1), $values->get($middle),
         ]))->average();
     }
 
