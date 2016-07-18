@@ -33,7 +33,7 @@ abstract class Compiler
     public function __construct(Filesystem $files, $cachePath)
     {
         if (! $cachePath) {
-            throw new InvalidArgumentException('The cache path must be non-empty.');
+            throw new InvalidArgumentException('Please provide a valid cache path.');
         }
 
         $this->files = $files;
