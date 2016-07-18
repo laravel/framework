@@ -61,7 +61,7 @@ class Connection implements ConnectionInterface
     {
         try {
             return $this->connection->writeRequest($command);
-        } (catch ConnectionException $e) {
+        } catch (ConnectionException $e) {
             return $this->connection->writeRequest($command);
         }
     }
@@ -73,7 +73,7 @@ class Connection implements ConnectionInterface
     {
         try {
             return $this->connection->readResponse($command);
-        } (catch ConnectionException $e) {
+        } catch (ConnectionException $e) {
             return $this->connection->readResponse($command);
         }
     }
@@ -85,7 +85,7 @@ class Connection implements ConnectionInterface
     {
         try {
             return $this->connection->executeCommand($command);
-        } (catch ConnectionException $e) {
+        } catch (ConnectionException $e) {
             return $this->connection->executeCommand($command);
         }
     }
