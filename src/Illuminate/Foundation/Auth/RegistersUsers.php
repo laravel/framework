@@ -37,7 +37,7 @@ trait RegistersUsers
     /**
      * Get the guard to be used during registration.
      *
-     * @return \Illuminate\Contracts\Auth\Guard
+     * @return \Illuminate\Contracts\Auth\StatefulGuard
      */
     protected function guard()
     {
