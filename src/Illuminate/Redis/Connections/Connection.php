@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Redis;
+namespace Illuminate\Redis\Connections;
 
 use Predis\Command\CommandInterface;
 use Predis\Connection\ConnectionException;
