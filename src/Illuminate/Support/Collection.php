@@ -95,7 +95,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         $values = with(isset($key) ? $this->pluck($key) : $this)
-                    ->values()->sort();
+                    ->sort()->values();
 
         $middle = (int) floor($count / 2);
 
