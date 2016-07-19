@@ -404,8 +404,6 @@ class Filesystem
             if (! $this->deleteDirectory($to)) {
                 return false;
             }
-
-            return @rename($from, $to) === true;
         }
 
         return @rename($from, $to) === true;
