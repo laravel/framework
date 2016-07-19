@@ -483,7 +483,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     protected function getStringParameters(array $parameters)
     {
-        return Arr::where($parameters, function ($k) {
+        return Arr::where($parameters, function ($v, $k) {
             return is_string($k);
         });
     }
@@ -496,7 +496,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     protected function getNumericParameters(array $parameters)
     {
-        return Arr::where($parameters, function ($k) {
+        return Arr::where($parameters, function ($v, $k) {
             return is_numeric($k);
         });
     }
