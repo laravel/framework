@@ -3,7 +3,6 @@
 namespace Illuminate\Redis\Connections;
 
 use Predis\Command\CommandInterface;
-use Predis\Connection\ConnectionException;
 use Predis\Connection\NodeConnectionInterface;
 use Predis\Connection\AggregateConnectionInterface;
 

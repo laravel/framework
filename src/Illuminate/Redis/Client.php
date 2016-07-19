@@ -3,8 +3,6 @@
 namespace Illuminate\Redis;
 
 use Predis\Client as BaseClient;
-use Predis\Connection\AggregateConnection;
-use Predis\Connection\CompositeConnection;
 use Predis\Connection\NodeConnectionInterface;
 use Predis\Connection\Aggregate\ClusterInterface;
 use Predis\Connection\Aggregate\ReplicationInterface;
@@ -31,6 +29,6 @@ class Client extends BaseClient
                 return new Connections\NodeConnection($connection);
             default:
                 return new Connections\Connection($connection);
-        }  
+        }
     }
 }
