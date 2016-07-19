@@ -1508,7 +1508,7 @@ class Validator implements ValidatorContract
             (/?|/\S+|\?\S*|\#\S*)                   # a /, nothing, a / with something, a query or a fragment
         $~ixu';
 
-        return preg_match($pattern, $value) === 1;
+        return preg_match($pattern, $value) > 0;
     }
 
     /**
@@ -1669,7 +1669,7 @@ class Validator implements ValidatorContract
             return false;
         }
 
-        return preg_match('/^[\pL\pM\pN]+$/u', $value);
+        return preg_match('/^[\pL\pM\pN]+$/u', $value) > 0;
     }
 
     /**
@@ -1685,7 +1685,7 @@ class Validator implements ValidatorContract
             return false;
         }
 
-        return preg_match('/^[\pL\pM\pN_-]+$/u', $value);
+        return preg_match('/^[\pL\pM\pN_-]+$/u', $value) > 0;
     }
 
     /**
@@ -1704,7 +1704,7 @@ class Validator implements ValidatorContract
 
         $this->requireParameterCount(1, $parameters, 'regex');
 
-        return preg_match($parameters[0], $value);
+        return preg_match($parameters[0], $value) > 0;
     }
 
     /**
