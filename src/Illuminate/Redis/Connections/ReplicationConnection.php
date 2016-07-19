@@ -10,7 +10,7 @@ class ReplicationConnection extends AggregateConnection implements ReplicationIn
     /**
      * {@inheritdoc}
      */
-    public function switchTo($connection);
+    public function switchTo($connection)
     {
         try {
             return $this->connection->switchTo($connection);

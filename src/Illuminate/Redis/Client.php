@@ -5,6 +5,8 @@ namespace Illuminate\Redis;
 use Predis\Client as BaseClient;
 use Predis\Connection\NodeConnectionInterface;
 use Predis\Connection\Aggregate\ClusterInterface;
+use Predis\Connection\AggregateConnectionInterface;
+use Predis\Connection\CompositeConnectionInterface;
 use Predis\Connection\Aggregate\ReplicationInterface;
 
 class Client extends BaseClient
