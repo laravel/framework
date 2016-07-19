@@ -30,6 +30,15 @@ class RouteRegistrar
     ];
 
     /**
+     * The attributes that are aliased.
+     *
+     * @var array
+     */
+    protected $aliases = [
+        'name' => 'as',
+    ];
+
+    /**
      * Create a new route registrar instance.
      *
      * @param  \Illuminate\Routing\Router  $router
@@ -49,7 +58,7 @@ class RouteRegistrar
      */
     public function attribute($key, $value)
     {
-        $this->attributes[$key] = $value;
+        $this->attributes[array_get($this->aliases, $key, $key)] = $value;
 
         return $this;
     }
