@@ -961,7 +961,7 @@ class Validator implements ValidatorContract
 
         $attributeData = $this->extractDataFromPath($explicitPath);
 
-        $otherValues = Arr::where(Arr::dot($attributeData), function ($key) use ($parameters) {
+        $otherValues = Arr::where(Arr::dot($attributeData), function ($value, $key) use ($parameters) {
             return Str::is($parameters[0], $key);
         });
 
@@ -1282,7 +1282,7 @@ class Validator implements ValidatorContract
 
         $attributeData = $this->extractDataFromPath($explicitPath);
 
-        $data = Arr::where(Arr::dot($attributeData), function ($key) use ($attribute, $attributeName) {
+        $data = Arr::where(Arr::dot($attributeData), function ($value, $key) use ($attribute, $attributeName) {
             return $key != $attribute && Str::is($attributeName, $key);
         });
 

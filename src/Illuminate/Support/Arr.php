@@ -488,7 +488,7 @@ class Arr
         $filtered = [];
 
         foreach ($array as $key => $value) {
-            if (call_user_func($callback, $key, $value)) {
+            if (call_user_func($callback, $value, $key)) {
                 $filtered[$key] = $value;
             }
         }
