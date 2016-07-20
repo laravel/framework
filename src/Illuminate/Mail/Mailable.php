@@ -2,7 +2,11 @@
 
 namespace Illuminate\Mail;
 
+use ReflectionClass;
+use ReflectionProperty;
 use Illuminate\Support\Str;
+use Illuminate\Support\Collection;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Queue\Factory as Queue;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
@@ -14,78 +18,77 @@ class Mailable implements MailableContract
      *
      * @var array
      */
-
-    public $from = [];
+    protected $from = [];
 
     /**
      * The "to" recipients of the message.
      *
      * @var array
      */
-    public $to = [];
+    protected $to = [];
 
     /**
      * The "cc" recipients of the message.
      *
      * @var array
      */
-    public $cc = [];
+    protected $cc = [];
 
     /**
      * The "bcc" recipients of the message.
      *
      * @var array
      */
-    public $bcc = [];
+    protected $bcc = [];
 
     /**
      * The "reply to" recipients of the message.
      *
      * @var array
      */
-    public $replyTo = [];
+    protected $replyTo = [];
 
     /**
      * The subject of the message.
      *
      * @var string
      */
-    public $subject;
+    protected $subject;
 
     /**
      * The view to use for the message.
      *
      * @var string
      */
-    public $view;
+    protected $view;
 
     /**
      * The view data for the message.
      *
      * @var array
      */
-    public $viewData = [];
+    protected $viewData = [];
 
     /**
      * The attachments for the message.
      *
      * @var array
      */
-    public $attachments = [];
+    protected $attachments = [];
 
     /**
      * The raw attachments for the message.
      *
      * @var array
      */
-    public $rawAttachments = [];
+    protected $rawAttachments = [];
 
     /**
      * The callbacks for the message.
      *
      * @var array
      */
-    public $callbacks = [];
+    protected $callbacks = [];
 
     /**
      * Send the message using the given mailer.
@@ -95,9 +98,9 @@ class Mailable implements MailableContract
      */
     public function send(Mailer $mailer)
     {
-        $this->build();
+        Container::getInstance()->call([$this, 'build']);
 
-        $mailer->send($this->view, $this->viewData, function ($message) {
+        $mailer->send($this->view, $this->buildViewData(), function ($message) {
             $this->buildFrom($message)
                  ->buildRecipients($message)
                  ->buildSubject($message)
@@ -127,6 +130,22 @@ class Mailable implements MailableContract
                 new SendQueuedMailable($this)
             );
         }
+    }
+
+    /**
+     * Build the view data for the message.
+     *
+     * @return array
+     */
+    protected function buildViewData()
+    {
+        $data = $this->viewData;
+
+        foreach ((new ReflectionClass($this))->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
+            $data[$property->getName()] = $property->getValue($this);
+        }
+
+        return $data;
     }
 
     /**
@@ -283,11 +302,11 @@ class Mailable implements MailableContract
      */
     protected function setAddress($address, $name = null, $property = 'to')
     {
-        if (is_object($address)) {
+        if (is_object($address) && ! $address instanceof Collection) {
             $address = [$address];
         }
 
-        if (is_array($address)) {
+        if ($address instanceof Collection || is_array($address)) {
             foreach ($address as $user) {
                 $this->{$property}($user->email, $user->name);
             }
