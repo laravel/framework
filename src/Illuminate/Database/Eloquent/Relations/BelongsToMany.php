@@ -47,11 +47,18 @@ class BelongsToMany extends Relation
     protected $pivotColumns = [];
 
     /**
-     * Any pivot table restrictions.
+     * Any pivot table restrictions for where.
      *
      * @var array
      */
     protected $pivotWheres = [];
+
+    /**
+     * Any pivot table restrictions for whereIn.
+     *
+     * @var array
+     */
+    protected $pivotWhereIns = [];
 
     /**
      * The custom pivot table column for the created_at timestamp.
@@ -132,7 +139,7 @@ class BelongsToMany extends Relation
      */
     public function wherePivotIn($column, $values, $boolean = 'and', $not = false)
     {
-        $this->pivotWheres[] = func_get_args();
+        $this->pivotWhereIns[] = func_get_args();
 
         return $this->whereIn($this->table.'.'.$column, $values, $boolean, $not);
     }
@@ -1134,6 +1141,10 @@ class BelongsToMany extends Relation
 
         foreach ($this->pivotWheres as $whereArgs) {
             call_user_func_array([$query, 'where'], $whereArgs);
+        }
+
+        foreach ($this->pivotWhereIns as $whereArgs) {
+            call_user_func_array([$query, 'whereIn'], $whereArgs);
         }
 
         return $query->where($this->foreignKey, $this->parent->getKey());
