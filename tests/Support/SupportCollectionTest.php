@@ -1310,6 +1310,16 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1.5, $collection->median('foo'));
     }
 
+    public function testMedianOutOfOrderCollection()
+    {
+        $collection = new Collection([
+            (object) ['foo' => 0],
+            (object) ['foo' => 5],
+            (object) ['foo' => 3],
+        ]);
+        $this->assertEquals(3, $collection->median('foo'));
+    }
+
     public function testMedianOnEmptyCollectionReturnsNull()
     {
         $collection = new Collection();
