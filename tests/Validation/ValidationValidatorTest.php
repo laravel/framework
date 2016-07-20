@@ -2425,6 +2425,23 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testParsingArrayKeysWithDot()
+    {
+        $trans = $this->getRealTranslator();
+
+        $v = new Validator($trans, ['foo' => ['bar' => ''], 'foo.bar' => 'valid'], ['foo.bar' => 'required']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => ['bar' => 'valid'], 'foo.bar' => ''], ['foo\.bar' => 'required']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => ['bar.baz' => '']], ['foo.bar\.baz' => 'required']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => [['bar.baz' => ''], ['bar.baz' => '']]], ['foo.*.bar\.baz' => 'required']);
+        $this->assertTrue($v->fails());
+    }
+
     public function testImplicitEachWithAsterisksWithArrayValues()
     {
         $trans = $this->getRealTranslator();
