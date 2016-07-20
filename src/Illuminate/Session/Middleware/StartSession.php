@@ -57,6 +57,8 @@ class StartSession
             $session = $this->startSession($request);
 
             $request->setSession($session);
+
+            $this->collectGarbage($session);
         }
 
         $response = $next($request);
@@ -66,8 +68,6 @@ class StartSession
         // add the session identifier cookie to the application response headers now.
         if ($this->sessionConfigured()) {
             $this->storeCurrentUrl($request, $session);
-
-            $this->collectGarbage($session);
 
             $this->addCookieToResponse($response, $session);
         }
