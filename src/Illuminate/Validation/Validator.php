@@ -191,7 +191,7 @@ class Validator implements ValidatorContract
     {
         $this->translator = $translator;
         $this->customMessages = $messages;
-        $this->data = $this->parseData($data);
+        $this->data = $this->hydrateFiles($this->parseData($data));
         $this->customAttributes = $customAttributes;
         $this->initialRules = $rules;
 
@@ -199,13 +199,38 @@ class Validator implements ValidatorContract
     }
 
     /**
-     * Parse the data and hydrate the files array.
+     * Parse the data array.
+     *
+     * @param  array  $data
+     * @return array
+     */
+    public function parseData(array $data)
+    {
+        $newData = [];
+
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                $value = $this->parseData($value);
+            }
+
+            if (Str::contains($key, '.')) {
+                $newData[str_replace('.', '->', $key)] = $value;
+            } else {
+                $newData[$key] = $value;
+            }
+        }
+
+        return $newData;
+    }
+
+    /**
+     * Hydrate the files array.
      *
      * @param  array   $data
      * @param  string  $arrayKey
      * @return array
      */
-    protected function parseData(array $data, $arrayKey = null)
+    protected function hydrateFiles(array $data, $arrayKey = null)
     {
         if (is_null($arrayKey)) {
             $this->files = [];
@@ -222,7 +247,7 @@ class Validator implements ValidatorContract
 
                 unset($data[$key]);
             } elseif (is_array($value)) {
-                $this->parseData($value, $key);
+                $this->hydrateFiles($value, $key);
             }
         }
 
@@ -420,6 +445,8 @@ class Validator implements ValidatorContract
         // rule. Any error messages will be added to the containers with each of
         // the other error messages, returning true if we don't have messages.
         foreach ($this->rules as $attribute => $rules) {
+            $attribute = str_replace('\.', '->', $attribute);
+
             foreach ($rules as $rule) {
                 $this->validateAttribute($attribute, $rule);
 
