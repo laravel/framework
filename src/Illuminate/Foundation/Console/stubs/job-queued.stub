@@ -2,14 +2,14 @@
 
 namespace DummyNamespace;
 
-use DummyRootNamespaceJobs\Job;
+use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class DummyClass extends Job implements ShouldQueue
+class DummyClass implements ShouldQueue
 {
-    use InteractsWithQueue, SerializesModels;
+    use InteractsWithQueue, Queueable, SerializesModels;
 
     /**
      * Create a new job instance.

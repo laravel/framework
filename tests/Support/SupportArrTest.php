@@ -419,7 +419,7 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
     {
         $array = [100, '200', 300, '400', 500];
 
-        $array = Arr::where($array, function ($key, $value) {
+        $array = Arr::where($array, function ($value, $key) {
             return is_string($value);
         });
 

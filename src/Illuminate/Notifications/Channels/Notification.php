@@ -247,7 +247,7 @@ class Notification implements Arrayable
     }
 
     /**
-     * Build a new channel notification from the given object.
+     * Build new channel notifications from the given object.
      *
      * @param  mixed  $notifiable
      * @param  mixed  $instance
@@ -263,24 +263,39 @@ class Notification implements Arrayable
         $channels = $channels ?: app(ChannelManager::class)->deliversVia();
 
         foreach ($channels as $channel) {
-            $notifications[] = $notification = new static([$notifiable]);
-
-            $notification->via($channel)
-                         ->subject($instance->subject())
-                         ->level($instance->level());
-
-            $method = static::messageMethod($instance, $channel);
-
-            foreach ($instance->{$method}($notifiable)->elements as $element) {
-                $notification->with($element);
-            }
-
-            $method = static::optionsMethod($instance, $channel);
-
-            $notification->options($instance->{$method}($notifiable));
+            $notifications[] = static::buildNotification($notifiable, $instance, $channel);
         }
 
         return $notifications;
+    }
+
+    /**
+     * Build a new channel notification.
+     *
+     * @param  mixed  $notifiable
+     * @param  mixed  $instance
+     * @param  string  $channel
+     * @return static
+     */
+    protected static function buildNotification($notifiable, $instance, $channel)
+    {
+        $notification = new static([$notifiable]);
+
+        $notification->via($channel)
+                     ->subject($instance->subject())
+                     ->level($instance->level());
+
+        $method = static::messageMethod($instance, $channel);
+
+        foreach ($instance->{$method}($notifiable)->elements as $element) {
+            $notification->with($element);
+        }
+
+        $method = static::optionsMethod($instance, $channel);
+
+        $notification->options($instance->{$method}($notifiable));
+
+        return $notification;
     }
 
     /**
