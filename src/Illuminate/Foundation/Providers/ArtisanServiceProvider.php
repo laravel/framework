@@ -16,6 +16,7 @@ use Illuminate\Foundation\Console\JobMakeCommand;
 use Illuminate\Foundation\Console\AppNameCommand;
 use Illuminate\Foundation\Console\OptimizeCommand;
 use Illuminate\Foundation\Console\TestMakeCommand;
+use Illuminate\Foundation\Console\MailMakeCommand;
 use Illuminate\Foundation\Console\RouteListCommand;
 use Illuminate\Foundation\Console\EventMakeCommand;
 use Illuminate\Foundation\Console\ModelMakeCommand;
@@ -88,6 +89,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'EventMake' => 'command.event.make',
         'JobMake' => 'command.job.make',
         'ListenerMake' => 'command.listener.make',
+        'MailMake' => 'command.mail.make',
         'MiddlewareMake' => 'command.middleware.make',
         'ModelMake' => 'command.model.make',
         'NotificationMake' => 'command.notification.make',
@@ -321,6 +323,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.listener.make', function ($app) {
             return new ListenerMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerMailMakeCommand()
+    {
+        $this->app->singleton('command.mail.make', function ($app) {
+            return new MailMakeCommand($app['files']);
         });
     }
 

@@ -2,12 +2,11 @@
 
 namespace DummyNamespace;
 
-use DummyRootNamespaceEvents\Event;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class DummyClass extends Event
+class DummyClass
 {
     use InteractsWithSockets, SerializesModels;
 

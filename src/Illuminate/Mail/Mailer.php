@@ -12,8 +12,9 @@ use InvalidArgumentException;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Container\Container;
-use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
+use Illuminate\Contracts\Queue\Factory as QueueContract;
+use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Contracts\Mail\MailQueue as MailQueueContract;
 
 class Mailer implements MailerContract, MailQueueContract
@@ -146,8 +147,12 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  \Closure|string  $callback
      * @return void
      */
-    public function send($view, array $data, $callback)
+    public function send($view, array $data = [], $callback = null)
     {
+        if ($view instanceof MailableContract) {
+            return $view->send($this);
+        }
+
         // First we need to parse the view, which could either be a string or an array
         // containing both an HTML and plain text versions of the view which should
         // be used when sending an e-mail. We will extract both of them out here.
@@ -180,8 +185,12 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  string|null  $queue
      * @return mixed
      */
-    public function queue($view, array $data, $callback, $queue = null)
+    public function queue($view, array $data = [], $callback = null, $queue = null)
     {
+        if ($view instanceof MailableContract) {
+            return $view->queue($this->queue);
+        }
+
         $callback = $this->buildQueueCallable($callback);
 
         return $this->queue->push(
