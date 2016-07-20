@@ -14,7 +14,6 @@ class Mailable implements MailableContract
      *
      * @var array
      */
-
     public $from = [];
 
     /**
