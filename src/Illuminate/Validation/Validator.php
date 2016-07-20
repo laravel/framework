@@ -189,23 +189,48 @@ class Validator implements ValidatorContract
      */
     public function __construct(TranslatorInterface $translator, array $data, array $rules, array $messages = [], array $customAttributes = [])
     {
+        $this->initialRules = $rules;
         $this->translator = $translator;
         $this->customMessages = $messages;
-        $this->data = $this->parseData($data);
         $this->customAttributes = $customAttributes;
-        $this->initialRules = $rules;
+        $this->data = $this->hydrateFiles($this->parseData($data));
 
         $this->setRules($rules);
     }
 
     /**
-     * Parse the data and hydrate the files array.
+     * Parse the data array.
+     *
+     * @param  array  $data
+     * @return array
+     */
+    public function parseData(array $data)
+    {
+        $newData = [];
+
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                $value = $this->parseData($value);
+            }
+
+            if (Str::contains($key, '.')) {
+                $newData[str_replace('.', '->', $key)] = $value;
+            } else {
+                $newData[$key] = $value;
+            }
+        }
+
+        return $newData;
+    }
+
+    /**
+     * Hydrate the files array.
      *
      * @param  array   $data
      * @param  string  $arrayKey
      * @return array
      */
-    protected function parseData(array $data, $arrayKey = null)
+    protected function hydrateFiles(array $data, $arrayKey = null)
     {
         if (is_null($arrayKey)) {
             $this->files = [];
@@ -222,7 +247,7 @@ class Validator implements ValidatorContract
 
                 unset($data[$key]);
             } elseif (is_array($value)) {
-                $this->parseData($value, $key);
+                $this->hydrateFiles($value, $key);
             }
         }
 
@@ -420,6 +445,8 @@ class Validator implements ValidatorContract
         // rule. Any error messages will be added to the containers with each of
         // the other error messages, returning true if we don't have messages.
         foreach ($this->rules as $attribute => $rules) {
+            $attribute = str_replace('\.', '->', $attribute);
+
             foreach ($rules as $rule) {
                 $this->validateAttribute($attribute, $rule);
 
@@ -961,7 +988,7 @@ class Validator implements ValidatorContract
 
         $attributeData = $this->extractDataFromPath($explicitPath);
 
-        $otherValues = Arr::where(Arr::dot($attributeData), function ($key) use ($parameters) {
+        $otherValues = Arr::where(Arr::dot($attributeData), function ($value, $key) use ($parameters) {
             return Str::is($parameters[0], $key);
         });
 
@@ -1282,7 +1309,7 @@ class Validator implements ValidatorContract
 
         $attributeData = $this->extractDataFromPath($explicitPath);
 
-        $data = Arr::where(Arr::dot($attributeData), function ($key) use ($attribute, $attributeName) {
+        $data = Arr::where(Arr::dot($attributeData), function ($value, $key) use ($attribute, $attributeName) {
             return $key != $attribute && Str::is($attributeName, $key);
         });
 

@@ -2,10 +2,12 @@
 
 namespace DummyNamespace;
 
-use DummyRootNamespaceJobs\Job;
+use Illuminate\Bus\Queueable;
 
-class DummyClass extends Job
+class DummyClass
 {
+    use Queueable;
+
     /**
      * Create a new job instance.
      *
