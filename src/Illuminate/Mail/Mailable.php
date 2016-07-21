@@ -63,6 +63,13 @@ class Mailable implements MailableContract
     protected $view;
 
     /**
+     * The plain text view to use for the message.
+     *
+     * @var string
+     */
+    protected $textView;
+
+    /**
      * The view data for the message.
      *
      * @var array
@@ -100,7 +107,7 @@ class Mailable implements MailableContract
     {
         Container::getInstance()->call([$this, 'build']);
 
-        $mailer->send($this->view, $this->buildViewData(), function ($message) {
+        $mailer->send($this->buildView(), $this->buildViewData(), function ($message) {
             $this->buildFrom($message)
                  ->buildRecipients($message)
                  ->buildSubject($message)
@@ -129,6 +136,22 @@ class Mailable implements MailableContract
             return $queue->connection($connection)->push(
                 new SendQueuedMailable($this)
             );
+        }
+    }
+
+    /**
+     * Build the view for the message.
+     *
+     * @return array|string
+     */
+    protected function buildView()
+    {
+        if (isset($this->view, $this->textView)) {
+            return [$this->view, $this->textView];
+        } elseif (isset($this->textView)) {
+            return ['text' => $this->textView];
+        } else {
+            return $this->view;
         }
     }
 
@@ -340,6 +363,34 @@ class Mailable implements MailableContract
     public function view($view, array $data = [])
     {
         $this->view = $view;
+        $this->viewData = $data;
+
+        return $this;
+    }
+
+    /**
+     * Set the plain text view for the message.
+     *
+     * @param  string  $view
+     * @param  array  $data
+     * @return $this
+     */
+    public function text($textView, array $data = [])
+    {
+        $this->textView = $textView;
+        $this->viewData = $data;
+
+        return $this;
+    }
+
+    /**
+     * Set the view data for the message.
+     *
+     * @param  array  $data
+     * @return $this
+     */
+    public function with(array $data)
+    {
         $this->viewData = $data;
 
         return $this;
