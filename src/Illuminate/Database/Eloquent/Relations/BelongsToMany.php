@@ -1061,14 +1061,18 @@ class BelongsToMany extends Relation
     /**
      * Detach models from the relationship.
      *
-     * @param  int|array  $ids
+     * @param  mixed  $ids
      * @param  bool  $touch
      * @return int
      */
     public function detach($ids = [], $touch = true)
     {
         if ($ids instanceof Model) {
-            $ids = (array) $ids->getKey();
+            $ids = $ids->getKey();
+        }
+
+        if ($ids instanceof Collection) {
+            $ids = $ids->modelKeys();
         }
 
         $query = $this->newPivotQuery();
@@ -1079,7 +1083,7 @@ class BelongsToMany extends Relation
         $ids = (array) $ids;
 
         if (count($ids) > 0) {
-            $query->whereIn($this->otherKey, (array) $ids);
+            $query->whereIn($this->otherKey, $ids);
         }
 
         // Once we have all of the conditions set on the statement, we are ready
