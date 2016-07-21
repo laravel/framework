@@ -1,5 +1,15 @@
 # Release Notes
 
+## v5.2.41 (2016-07-20)
+
+### Changed
+- Run session garbage collection before response is returned ([#14386](https://github.com/laravel/framework/pull/14386))
+
+### Fixed
+- Fixed pagination bug introduced in [#14188](https://github.com/laravel/framework/pull/14188) ([#14389](https://github.com/laravel/framework/pull/14389))
+- Fixed `median()` issue when collection is out of order ([#14381](https://github.com/laravel/framework/pull/14381))
+
+
 ## v5.2.40 (2016-07-19)
 
 ### Added
