@@ -99,6 +99,15 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($container->has(['foo', 'baz']));
     }
 
+    public function testHasIndicatesNoneExistence()
+    {
+        $container = new MessageBag;
+        $container->setFormat(':message');
+
+        $this->assertFalse($container->has('foo'));
+        $this->assertFalse($container->has());
+    }
+
     public function testAllReturnsAllMessages()
     {
         $container = new MessageBag;
