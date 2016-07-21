@@ -12,6 +12,8 @@ class FoundationExpectsModelEventsTest extends TestCase
 {
     public function createApplication()
     {
+        Model::clearBootedModels();
+
         $app = new Application;
 
         $db = new DB;
@@ -36,7 +38,7 @@ class FoundationExpectsModelEventsTest extends TestCase
 
         $this->assertNotInstanceOf(Mock::class, Model::getEventDispatcher());
 
-        $this->expectsModelEvents([]);
+        $this->expectsModelEvents(EloquentTestModel::class, []);
 
         $this->assertNotInstanceOf(Dispatcher::class, Model::getEventDispatcher());
         $this->assertInstanceOf(Mock::class, Model::getEventDispatcher());
@@ -53,21 +55,21 @@ class FoundationExpectsModelEventsTest extends TestCase
     /** @test */
     public function fired_events_can_be_checked_for()
     {
-        $this->expectsModelEvents([
-            'eloquent.booting: EloquentTestModel',
-            'eloquent.booted: EloquentTestModel',
+        $this->expectsModelEvents(EloquentTestModel::class, [
+            'booting',
+            'booted',
 
-            'eloquent.creating: EloquentTestModel',
-            'eloquent.created: EloquentTestModel',
+            'creating',
+            'created',
 
-            'eloquent.saving: EloquentTestModel',
-            'eloquent.saved: EloquentTestModel',
+            'saving',
+            'saved',
 
-            'eloquent.updating: EloquentTestModel',
-            'eloquent.updated: EloquentTestModel',
+            'updating',
+            'updated',
 
-            'eloquent.deleting: EloquentTestModel',
-            'eloquent.deleted: EloquentTestModel',
+            'deleting',
+            'deleted',
         ]);
 
         $model = EloquentTestModel::create(['field' => 1]);
@@ -77,11 +79,81 @@ class FoundationExpectsModelEventsTest extends TestCase
     }
 
     /** @test */
+    public function using_expects_model_events_multiple_times_works()
+    {
+        $this->expectsModelEvents(EloquentTestModel::class, [
+            'booting',
+            'booted',
+        ]);
+
+        $this->expectsModelEvents(EloquentTestModel::class, [
+            'creating',
+            'created',
+        ]);
+
+        $model = EloquentTestModel::create(['field' => 1]);
+        $model->field = 2;
+        $model->save();
+        $model->delete();
+    }
+
+    /** @test */
+    public function expects_model_events_can_take_a_string_as_the_event_name()
+    {
+        $this->expectsModelEvents(EloquentTestModel::class, "booting");
+
+        EloquentTestModel::create(['field' => 1]);
+    }
+
+    /** @test */
+    public function unfired_events_can_be_checked_for()
+    {
+        $this->doesntExpectModelEvents(EloquentTestModel::class, [
+            'updating',
+            'updated',
+
+            'deleting',
+            'deleted',
+        ]);
+
+        EloquentTestModel::create(['field' => 1]);
+    }
+
+    /** @test */
+    public function using_doesnt_expect_model_events_multiple_times_works()
+    {
+        $this->doesntExpectModelEvents(EloquentTestModel::class, [
+            'updating',
+            'updated',
+        ]);
+
+        $this->doesntExpectModelEvents(EloquentTestModel::class, [
+            'deleting',
+            'deleted',
+        ]);
+
+        EloquentTestModel::create(['field' => 1]);
+    }
+
+    /** @test */
+    public function doesnt_expect_model_events_can_take_a_string_as_the_event_name()
+    {
+        $this->doesntExpectModelEvents(EloquentTestModel::class, "deleting");
+
+        EloquentTestModel::create(['field' => 1]);
+    }
+
+    /** @test */
     public function observers_do_not_fire_when_mocking_events()
     {
-        $this->expectsModelEvents([
-            'eloquent.saving: EloquentTestModel',
-            'eloquent.saved: EloquentTestModel',
+        $this->expectsModelEvents(EloquentTestModel::class, [
+            'saving',
+            'saved',
+        ]);
+
+        $this->doesntExpectModelEvents(EloquentTestModel::class, [
+            'deleting',
+            'deleted',
         ]);
 
         EloquentTestModel::observe(new EloquentTestModelFailingObserver);
@@ -135,5 +207,15 @@ class EloquentTestModelFailingObserver
     public function saved()
     {
         PHPUnit_Framework_Assert::fail('The [saved] method should not be called on '.static::class);
+    }
+
+    public function deleting()
+    {
+        PHPUnit_Framework_Assert::fail('The [deleting] method should not be called on '.static::class);
+    }
+
+    public function deleted()
+    {
+        PHPUnit_Framework_Assert::fail('The [deleted] method should not be called on '.static::class);
     }
 }
