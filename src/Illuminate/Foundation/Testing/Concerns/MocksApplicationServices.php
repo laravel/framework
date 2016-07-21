@@ -196,7 +196,7 @@ trait MocksApplicationServices
     }
 
     /**
-     * Turn a model and a list of events into the format used by eloquent
+     * Convert a model and a list of events into the format used by eloquent.
      *
      * @param  string  $model
      * @param  array|string  $events
