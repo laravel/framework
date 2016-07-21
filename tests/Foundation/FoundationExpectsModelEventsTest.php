@@ -100,7 +100,7 @@ class FoundationExpectsModelEventsTest extends TestCase
     /** @test */
     public function expects_model_events_can_take_a_string_as_the_event_name()
     {
-        $this->expectsModelEvents(EloquentTestModel::class, "booting");
+        $this->expectsModelEvents(EloquentTestModel::class, 'booting');
 
         EloquentTestModel::create(['field' => 1]);
     }
@@ -138,7 +138,7 @@ class FoundationExpectsModelEventsTest extends TestCase
     /** @test */
     public function doesnt_expect_model_events_can_take_a_string_as_the_event_name()
     {
-        $this->doesntExpectModelEvents(EloquentTestModel::class, "deleting");
+        $this->doesntExpectModelEvents(EloquentTestModel::class, 'deleting');
 
         EloquentTestModel::create(['field' => 1]);
     }
