@@ -53,8 +53,7 @@ class Connector
         $password = Arr::get($config, 'password');
 
         try {
-            $pdoClass = $this->getPdoClass();
-            $pdo = new $pdoClass($dsn, $username, $password, $options);
+            $pdo = $this->createPdoConnection($dsn, $username, $password, $options);
         } catch (Exception $e) {
             $pdo = $this->tryAgainIfCausedByLostConnection(
                 $e, $dsn, $username, $password, $options
@@ -86,23 +85,6 @@ class Connector
     }
 
     /**
-     * Returns the class name for the PDO connection to use.
-     *
-     * If doctrine/dbal is installed it will be `\Doctrine\DBAL\Driver\PDOConnection`,
-     * else `PDO`.
-     *
-     * @return string
-     */
-    protected function getPdoClass()
-    {
-        if (class_exists(PDOConnection::class)) {
-            return PDOConnection::class;
-        }
-
-        return PDO::class;
-    }
-
-    /**
      * Handle a exception that occurred during connect execution.
      *
      * @param  \Exception  $e
@@ -117,11 +99,23 @@ class Connector
     protected function tryAgainIfCausedByLostConnection(Exception $e, $dsn, $username, $password, $options)
     {
         if ($this->causedByLostConnection($e)) {
-            $pdoClass = $this->getPdoClass();
-
-            return new $pdoClass($dsn, $username, $password, $options);
+            return $this->createPdoConnection($dsn, $username, $password, $options);
         }
 
         throw $e;
+    }
+
+    /**
+     * Create a new PDO connection instance.
+     *
+     * @return \PDO
+     */
+    protected function createPdoConnection($dsn, $username, $password, $options)
+    {
+        if (class_exists(PDOConnection::class)) {
+            return new PDOConnection($dsn, $username, $password, $options);
+        }
+
+        return new PDO($dsn, $username, $password, $options);
     }
 }
