@@ -5,6 +5,7 @@ namespace Illuminate\Database\Connectors;
 use PDO;
 use Exception;
 use Illuminate\Support\Arr;
+use Doctrine\DBAL\Driver\PDOConnection;
 use Illuminate\Database\DetectsLostConnections;
 
 class Connector
@@ -52,7 +53,8 @@ class Connector
         $password = Arr::get($config, 'password');
 
         try {
-            $pdo = new PDO($dsn, $username, $password, $options);
+            $pdoClass = $this->getPdoClass();
+            $pdo = new $pdoClass($dsn, $username, $password, $options);
         } catch (Exception $e) {
             $pdo = $this->tryAgainIfCausedByLostConnection(
                 $e, $dsn, $username, $password, $options
@@ -84,6 +86,23 @@ class Connector
     }
 
     /**
+     * Returns the class name for the PDO connection to use.
+     *
+     * If doctrine/dbal is installed it will be `\Doctrine\DBAL\Driver\PDOConnection`,
+     * else `PDO`.
+     *
+     * @return string
+     */
+    protected function getPdoClass()
+    {
+        if (class_exists(PDOConnection::class)) {
+            return PDOConnection::class;
+        }
+
+        return PDO::class;
+    }
+
+    /**
      * Handle a exception that occurred during connect execution.
      *
      * @param  \Exception  $e
@@ -98,7 +117,9 @@ class Connector
     protected function tryAgainIfCausedByLostConnection(Exception $e, $dsn, $username, $password, $options)
     {
         if ($this->causedByLostConnection($e)) {
-            return new PDO($dsn, $username, $password, $options);
+            $pdoClass = $this->getPdoClass();
+
+            return new $pdoClass($dsn, $username, $password, $options);
         }
 
         throw $e;
