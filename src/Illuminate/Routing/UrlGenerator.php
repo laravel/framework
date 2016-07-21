@@ -176,7 +176,7 @@ class UrlGenerator implements UrlGeneratorContract
         // Once we have the scheme we will compile the "tail" by collapsing the values
         // into a single string delimited by slashes. This just makes it convenient
         // for passing the array of parameters to this URL as a list of segments.
-        $root = $this->getRootUrl($scheme);
+        $root = $this->removeIndex($this->getRootUrl($scheme));
 
         if (($queryPosition = strpos($path, '?')) !== false) {
             $query = mb_substr($path, $queryPosition);
