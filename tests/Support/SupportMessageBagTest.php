@@ -72,6 +72,7 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase
         $container->add('foo', 'bar');
         $this->assertTrue($container->has('foo'));
         $this->assertFalse($container->has('bar'));
+        $this->assertTrue($container->has());
     }
 
     public function testHasAnyIndicatesExistence()
