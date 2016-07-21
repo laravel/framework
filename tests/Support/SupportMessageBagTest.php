@@ -72,6 +72,7 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase
         $container->add('foo', 'bar');
         $this->assertTrue($container->has('foo'));
         $this->assertFalse($container->has('bar'));
+        $this->assertTrue($container->has());
     }
 
     public function testHasAnyIndicatesExistence()
@@ -96,6 +97,15 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($container->has(['foo', 'bar', 'boom']));
         $this->assertFalse($container->has(['foo', 'bar', 'boom', 'baz']));
         $this->assertFalse($container->has(['foo', 'baz']));
+    }
+
+    public function testHasIndicatesNoneExistence()
+    {
+        $container = new MessageBag;
+        $container->setFormat(':message');
+
+        $this->assertFalse($container->has('foo'));
+        $this->assertFalse($container->has());
     }
 
     public function testAllReturnsAllMessages()
