@@ -42,6 +42,22 @@ class AuthTokenGuardTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, $user->id);
     }
 
+    public function testUserCanBeRetrievedByApiTokenInHeaders()
+    {
+        $provider = Mockery::mock(UserProvider::class);
+        $provider->shouldReceive('retrieveByCredentials')->once()->with(['api_token' => 'foo'])->andReturn((object) ['id' => 1]);
+        $request = Request::create('/', 'GET', [], [], [], ['api_token' => 'foo']);
+
+        $guard = new TokenGuard($provider, $request);
+
+        $user = $guard->user();
+
+        $this->assertEquals(1, $user->id);
+        $this->assertTrue($guard->check());
+        $this->assertFalse($guard->guest());
+        $this->assertEquals(1, $guard->id());
+    }
+
     public function testUserCanBeRetrievedByBearerToken()
     {
         $provider = Mockery::mock(UserProvider::class);
