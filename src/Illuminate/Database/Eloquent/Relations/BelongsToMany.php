@@ -47,14 +47,14 @@ class BelongsToMany extends Relation
     protected $pivotColumns = [];
 
     /**
-     * Any pivot table restrictions for where.
+     * Any pivot table restrictions for where clauses.
      *
      * @var array
      */
     protected $pivotWheres = [];
 
     /**
-     * Any pivot table restrictions for whereIn.
+     * Any pivot table restrictions for whereIn clauses.
      *
      * @var array
      */
