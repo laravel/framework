@@ -27,8 +27,6 @@ class DummyClass extends Mailable
      */
     public function build()
     {
-        return $this->to('example@example.com')
-                    ->subject('Message Subject')
-                    ->view('view.name');
+        return $this->view('view.name');
     }
 }
