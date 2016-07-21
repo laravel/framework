@@ -142,14 +142,15 @@ trait MocksApplicationServices
      *
      * These events will be mocked, so that handlers will not actually be executed.
      *
+     * @param  string  $model
      * @param  array|string  $events
      * @return $this
      *
      * @throws \Exception
      */
-    public function expectsModelEvents($events)
+    public function expectsModelEvents($model, $events)
     {
-        $events = is_array($events) ? $events : func_get_args();
+        $events = $this->formatModelEvents($model, $events);
 
         $this->withoutModelEvents();
 
@@ -171,12 +172,15 @@ trait MocksApplicationServices
      *
      * These events will be mocked, so that handlers will not actually be executed.
      *
+     * @param  string  $model
      * @param  array|string  $events
      * @return $this
+     *
+     * @throws \Exception
      */
-    public function doesntExpectModelEvents($events)
+    public function doesntExpectModelEvents($model, $events)
     {
-        $events = is_array($events) ? $events : func_get_args();
+        $events = $this->formatModelEvents($model, $events);
 
         $this->withoutModelEvents();
 
@@ -189,6 +193,24 @@ trait MocksApplicationServices
         });
 
         return $this;
+    }
+
+    /**
+     * Turn a model and a list of events into the format used by eloquent
+     *
+     * @param  string  $model
+     * @param  array|string  $events
+     * @return string[]
+     *
+     * @throws \Exception
+     */
+    private function formatModelEvents($model, $events)
+    {
+        $events = (array) $events;
+
+        return array_map(function ($event) use ($model) {
+            return "eloquent.{$event}: {$model}";
+        }, (array) $events);
     }
 
     /**
