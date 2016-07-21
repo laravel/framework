@@ -260,8 +260,12 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  string|null  $queue
      * @return mixed
      */
-    public function later($delay, $view, array $data, $callback, $queue = null)
+    public function later($delay, $view, array $data = [], $callback = null, $queue = null)
     {
+        if ($view instanceof MailableContract) {
+            return $view->later($delay, $this->queue);
+        }
+
         $callback = $this->buildQueueCallable($callback);
 
         return $this->queue->later(
