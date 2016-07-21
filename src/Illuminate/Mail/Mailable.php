@@ -140,6 +140,30 @@ class Mailable implements MailableContract
     }
 
     /**
+     * Deliver the queued message after the given delay.
+     *
+     * @param  \DateTime|int  $delay
+     * @param  Queue  $queue
+     * @return mixed
+     */
+    public function later($delay, Queue $queue)
+    {
+        $connection = property_exists($this, 'connection') ? $this->connection : null;
+
+        $queueName = property_exists($this, 'queue') ? $this->queue : null;
+
+        if ($queueName) {
+            return $queue->connection($connection)->laterOn(
+                $queueName, $delay, new SendQueuedMailable($this)
+            );
+        } else {
+            return $queue->connection($connection)->later(
+                $delay, new SendQueuedMailable($this)
+            );
+        }
+    }
+
+    /**
      * Build the view for the message.
      *
      * @return array|string
