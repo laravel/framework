@@ -21,7 +21,7 @@ interface Mailer
      * @param  \Closure|string  $callback
      * @return void
      */
-    public function send($view, array $data, $callback);
+    public function send($view, array $data = [], $callback = null);
 
     /**
      * Get the array of failed recipients.
