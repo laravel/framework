@@ -1,5 +1,66 @@
 # Release Notes
 
+## v5.2.41 (2016-07-20)
+
+### Changed
+- Run session garbage collection before response is returned ([#14386](https://github.com/laravel/framework/pull/14386))
+
+### Fixed
+- Fixed pagination bug introduced in [#14188](https://github.com/laravel/framework/pull/14188) ([#14389](https://github.com/laravel/framework/pull/14389))
+- Fixed `median()` issue when collection is out of order ([#14381](https://github.com/laravel/framework/pull/14381))
+
+
+## v5.2.40 (2016-07-19)
+
+### Added
+- Added `--tags` option to `cache:clear` command ([#13927](https://github.com/laravel/framework/pull/13927))
+- Added `scopes()` method to Eloquent query builder ([#14049](https://github.com/laravel/framework/pull/14049))
+- Added `hasAny()` method to `MessageBag` ([#14151](https://github.com/laravel/framework/pull/14151))
+- Allowing passing along transmission options to SparkPost ([#14166](https://github.com/laravel/framework/pull/14166))
+- Added `Filesystem::moveDirectory()` ([#14198](https://github.com/laravel/framework/pull/14198))
+- Added `increment()` and `decrement()` methods to session store ([#14196](https://github.com/laravel/framework/pull/14196))
+- Added `pipe()` method to `Collection` ([#13899](https://github.com/laravel/framework/pull/13899))
+- Added additional PostgreSQL operators ([#14224](https://github.com/laravel/framework/pull/14224))
+- Support `::` expressions in Blade directive names ([#14265](https://github.com/laravel/framework/pull/14265))
+- Added `median()` and `mode()` methods to collections ([#14305](https://github.com/laravel/framework/pull/14305))
+- Add `tightenco/collect` to Composer `replace` list ([#14118](https://github.com/laravel/framework/pull/14118), [#14127](https://github.com/laravel/framework/pull/14127))
+
+### Changed
+- Don't release jobs that have been reserved too long ([#13833](https://github.com/laravel/framework/pull/13833))
+- Throw `Exception` if `Queue` has no encrypter ([#14038](https://github.com/laravel/framework/pull/14038))
+- Cast `unique` validation rule `id` to integer ([#14076](https://github.com/laravel/framework/pull/14076))
+- Ensure database transaction count is not negative ([#14085](https://github.com/laravel/framework/pull/14085))
+- Use `session.lifetime` for CSRF cookie ([#14080](https://github.com/laravel/framework/pull/14080))
+- Allow the `shuffle()` method to be seeded ([#14099](https://github.com/laravel/framework/pull/14099))
+- Allow passing of multiple keys to `MessageBag::has()` ([a0cd0ae](https://github.com/laravel/framework/commit/a0cd0aea9a475f76baf968ef2f53aeb71fcda4c0))
+- Allow model connection in `newFromBuilder()` to be overridden ([#14194](https://github.com/laravel/framework/pull/14194))
+- Only load pagination results if `$total` is greater than zero ([#14188](https://github.com/laravel/framework/pull/14188))
+- Accept fallback parameter in `UrlGenerator::previous` ([#14207](https://github.com/laravel/framework/pull/14207))
+- Only do `use` call if `database` is not empty ([#14225](https://github.com/laravel/framework/pull/14225))
+- Removed unnecessary nesting in the `Macroable` trait ([#14222](https://github.com/laravel/framework/pull/14222))
+- Refactored `DatabaseQueue::getNextAvailableJob()` ([cffcd34](https://github.com/laravel/framework/commit/cffcd347901617b19e8eca05be55cda280e0d262))
+- Look for `getUrl()` method on Filesystem adapter before throwing exception ([#14246](https://github.com/laravel/framework/pull/14246))
+- Make `seeIsSelected()` work with `<option>` elements without `value` attributes ([#14279](https://github.com/laravel/framework/pull/14279))
+- Improved performance of `Filesystem::sharedGet()` ([#14319](https://github.com/laravel/framework/pull/14319))
+- Throw exception if view cache path is empty ([#14291](https://github.com/laravel/framework/pull/14291))
+- Changes several validation methods return type from integers to booleans ([#14373](https://github.com/laravel/framework/pull/14373))
+- Remove files from input in `withInput()` method ([85249be](https://github.com/laravel/framework/commit/85249beed1e4512d71f7ae52474b9a59a80381d2))
+
+### Fixed
+- Require file instance for `dimensions` validation rule ([#14025](https://github.com/laravel/framework/pull/14025))
+- Fixes for SQL Server `processInsertGetId()` with ODBC ([#14121](https://github.com/laravel/framework/pull/14121))
+- Fixed PostgreSQL `processInsertGetId()` with `PDO::FETCH_CLASS` ([#14115](https://github.com/laravel/framework/pull/14115))
+- Fixed `PDO::FETCH_CLASS` support in `Connection::cursor()` ([#14052](https://github.com/laravel/framework/pull/14052))
+- Fixed eager loading of multi-level `morphTo` relationships ([#14190](https://github.com/laravel/framework/pull/14190))
+- Fixed MySQL multiple-table DELETE ([#14179](https://github.com/laravel/framework/pull/14179))
+- Always cast `vendor:publish` tags to array ([#14228](https://github.com/laravel/framework/pull/14228))
+- Fixed translation capitalization when replacements are a numerical array ([#14249](https://github.com/laravel/framework/pull/14249))
+- Fixed double `urldecode()` on route parameters ([#14370](https://github.com/laravel/framework/pull/14370))
+
+### Removed
+- Remove method overwrites in `PostgresGrammar` ([#14372](https://github.com/laravel/framework/pull/14372))
+
+
 ## v5.2.39 (2016-06-17)
 
 ### Added
