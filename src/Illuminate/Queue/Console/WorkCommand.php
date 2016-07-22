@@ -54,7 +54,7 @@ class WorkCommand extends Command
      */
     public function fire()
     {
-        if ($this->downForMaintenance() && ! $this->option('daemon')) {
+        if ($this->downForMaintenance() && $this->option('once')) {
             return $this->worker->sleep($this->option('sleep'));
         }
 
@@ -80,7 +80,7 @@ class WorkCommand extends Command
         $queue = $this->getQueue($connection);
 
         $response = $this->runWorker(
-            $connection, $queue, $delay, $memory, $this->option('daemon')
+            $connection, $queue, $delay, $memory, ! $this->option('once')
         );
     }
 
@@ -131,7 +131,7 @@ class WorkCommand extends Command
      * @param  bool  $daemon
      * @return array
      */
-    protected function runWorker($connection, $queue, $delay, $memory, $daemon = false)
+    protected function runWorker($connection, $queue, $delay, $memory, $daemon = true)
     {
         $this->worker->setExceptionHandler(
             $this->laravel['Illuminate\Contracts\Debug\ExceptionHandler']
@@ -204,7 +204,7 @@ class WorkCommand extends Command
         return [
             ['queue', null, InputOption::VALUE_OPTIONAL, 'The queue to listen on'],
 
-            ['daemon', null, InputOption::VALUE_NONE, 'Run the worker in daemon mode'],
+            ['once', null, InputOption::VALUE_NONE, 'Only process the next job on the queue'],
 
             ['delay', null, InputOption::VALUE_OPTIONAL, 'Amount of time to delay failed jobs', 0],
 
@@ -214,7 +214,7 @@ class WorkCommand extends Command
 
             ['sleep', null, InputOption::VALUE_OPTIONAL, 'Number of seconds to sleep when no job is available', 3],
 
-            ['timeout', null, InputOption::VALUE_OPTIONAL, 'The number of seconds a daemon child process can run', 60],
+            ['timeout', null, InputOption::VALUE_OPTIONAL, 'The number of seconds a child process can run', 60],
 
             ['tries', null, InputOption::VALUE_OPTIONAL, 'Number of times to attempt a job before logging it failed', 0],
         ];
