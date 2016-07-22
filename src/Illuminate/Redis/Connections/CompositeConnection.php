@@ -23,6 +23,8 @@ class CompositeConnection extends NodeConnection implements CompositeConnectionI
         try {
             return $this->connection->writeBuffer($buffer);
         } catch (ConnectionException $e) {
+            $this->connection->disconnect();
+
             return $this->connection->writeBuffer($buffer);
         }
     }
@@ -35,6 +37,8 @@ class CompositeConnection extends NodeConnection implements CompositeConnectionI
         try {
             return $this->connection->readBuffer($length);
         } catch (ConnectionException $e) {
+            $this->connection->disconnect();
+
             return $this->connection->readBuffer($length);
         }
     }
@@ -47,6 +51,8 @@ class CompositeConnection extends NodeConnection implements CompositeConnectionI
         try {
             return $this->connection->readLine();
         } catch (ConnectionException $e) {
+            $this->connection->disconnect();
+
             return $this->connection->readLine();
         }
     }

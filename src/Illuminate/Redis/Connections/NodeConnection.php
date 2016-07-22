@@ -24,6 +24,8 @@ class NodeConnection extends Connection implements NodeConnectionInterface
         try {
             return $this->connection->getResource();
         } catch (ConnectionException $e) {
+            $this->connection->disconnect();
+
             return $this->connection->getResource();
         }
     }
@@ -52,6 +54,8 @@ class NodeConnection extends Connection implements NodeConnectionInterface
         try {
             return $this->connection->read();
         } catch (ConnectionException $e) {
+            $this->connection->disconnect();
+
             return $this->connection->read();
         }
     }

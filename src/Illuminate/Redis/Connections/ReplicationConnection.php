@@ -15,6 +15,8 @@ class ReplicationConnection extends AggregateConnection implements ReplicationIn
         try {
             return $this->connection->switchTo($connection);
         } catch (ConnectionException $e) {
+            $this->connection->disconnect();
+
             return $this->connection->switchTo($connection);
         }
     }
