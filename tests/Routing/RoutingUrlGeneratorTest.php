@@ -42,49 +42,6 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('https://www.foo.com/foo/bar', $url->asset('foo/bar', true));
     }
 
-    public function testIndexHandling()
-    {
-        $url = new UrlGenerator(
-            $routes = new RouteCollection,
-            $request = Request::create('http://www.foo.com/index.php', 'GET', [], [], [], [
-                'SCRIPT_FILENAME' => 'index.php',
-                'SCRIPT_NAME' => 'index.php',
-            ])
-        );
-
-        $this->assertEquals('http://www.foo.com/foo/bar', $url->to('foo/bar'));
-        $this->assertEquals('https://www.foo.com/foo/bar', $url->to('foo/bar', [], true));
-        $this->assertEquals('https://www.foo.com/foo/bar/baz/boom', $url->to('foo/bar', ['baz', 'boom'], true));
-        $this->assertEquals('https://www.foo.com/foo/bar/baz?foo=bar', $url->to('foo/bar?foo=bar', ['baz'], true));
-
-        /*
-         * Test HTTPS request URL generation...
-         */
-        $url = new UrlGenerator(
-            $routes = new RouteCollection,
-            $request = Request::create('https://www.foo.com/index.php', 'GET', [], [], [], [
-                'SCRIPT_FILENAME' => 'index.php',
-                'SCRIPT_NAME' => 'index.php',
-            ])
-        );
-
-        $this->assertEquals('https://www.foo.com/foo/bar', $url->to('foo/bar'));
-
-        /*
-         * Test asset URL generation...
-         */
-        $url = new UrlGenerator(
-            $routes = new RouteCollection,
-            $request = Request::create('http://www.foo.com/index.php', 'GET', [], [], [], [
-                'SCRIPT_FILENAME' => 'index.php',
-                'SCRIPT_NAME' => 'index.php',
-            ])
-        );
-
-        $this->assertEquals('http://www.foo.com/foo/bar', $url->asset('foo/bar'));
-        $this->assertEquals('https://www.foo.com/foo/bar', $url->asset('foo/bar', true));
-    }
-
     public function testBasicRouteGeneration()
     {
         $url = new UrlGenerator(
