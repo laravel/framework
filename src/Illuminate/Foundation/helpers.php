@@ -5,7 +5,6 @@ use Illuminate\Support\HtmlString;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Auth\Access\Gate;
-use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Contracts\View\Factory as ViewFactory;
@@ -730,10 +729,10 @@ if (! function_exists('url')) {
     function url($path = null, $parameters = [], $secure = null)
     {
         if (is_null($path)) {
-            return app(UrlGenerator::class);
+            return app('url');
         }
 
-        return app(UrlGenerator::class)->to($path, $parameters, $secure);
+        return app('url')->to($path, $parameters, $secure);
     }
 }
 
