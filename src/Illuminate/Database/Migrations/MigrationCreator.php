@@ -41,9 +41,16 @@ class MigrationCreator
      * @param  string  $table
      * @param  bool    $create
      * @return string
+     * @throws \Exception 
      */
     public function create($name, $path, $table = null, $create = false)
     {
+        // Prevent creating a duplicate class name.
+        $className = $this->getClassName($name);
+        if (class_exists($className)) {
+            throw new \Exception("$className already exists");
+        }
+
         $path = $this->getPath($name, $path);
 
         // First we will get the stub file for the migration, which serves as a type
