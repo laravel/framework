@@ -290,8 +290,7 @@ abstract class HasOneOrMany extends Relation
      */
     public function firstOrCreateWithValues(array $attributes, array $values)
     {
-        if (is_null($instance = $this->where($attributes)->first()))
-        {
+        if (is_null($instance = $this->where($attributes)->first())) {
             $instance = $this->create(array_merge($attributes, $values));
         }
 

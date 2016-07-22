@@ -379,9 +379,9 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
         $relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', ['where', 'create'], $this->getRelationArguments());
         $relation->expects($this->once())->method('where')->with(['foo'])->will($this->returnValue($relation->getQuery()));
         $relation->getQuery()->shouldReceive('first')->once()->andReturn($model = m::mock('StdClass'));
-        $relation->expects($this->never())->method('create')->with(array_merge(['foo'],['bar']))->will($this->returnValue(null));
+        $relation->expects($this->never())->method('create')->with(array_merge(['foo'], ['bar']))->will($this->returnValue(null));
 
-        $this->assertInstanceOf(StdClass::class, $relation->firstOrCreateWithValues(['foo'],['bar']));
+        $this->assertInstanceOf(StdClass::class, $relation->firstOrCreateWithValues(['foo'], ['bar']));
     }
 
     public function testFirstOrCreateWithValuesMethodReturnsNewModel()
@@ -389,9 +389,9 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
         $relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', ['where', 'create'], $this->getRelationArguments());
         $relation->expects($this->once())->method('where')->with(['foo'])->will($this->returnValue($relation->getQuery()));
         $relation->getQuery()->shouldReceive('first')->once()->andReturn(null);
-        $relation->expects($this->once())->method('create')->with(array_merge(['foo'],['bar']))->will($this->returnValue($model = m::mock('StdClass')));
+        $relation->expects($this->once())->method('create')->with(array_merge(['foo'], ['bar']))->will($this->returnValue($model = m::mock('StdClass')));
 
-        $this->assertInstanceOf(StdClass::class, $relation->firstOrCreateWithValues(['foo'],['bar']));
+        $this->assertInstanceOf(StdClass::class, $relation->firstOrCreateWithValues(['foo'], ['bar']));
     }
 
     public function testUpdateOrCreateMethodFindsFirstModelAndUpdates()
