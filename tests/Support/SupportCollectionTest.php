@@ -916,7 +916,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $collection = new Collection([
             ['Blastoise', 'Water'],
             ['Charmander', 'Fire'],
-            ['Dragonair', 'Dragon']
+            ['Dragonair', 'Dragon'],
         ]);
         $this->assertEquals(
             ['Blastoise' => 'Water', 'Charmander' => 'Fire', 'Dragonair' => 'Dragon'],

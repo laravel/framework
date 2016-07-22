@@ -601,7 +601,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
     /**
      * Run map over each items and
-     * returns associative array
+     * returns associative array.
      *
      * @param callable $callback
      *
@@ -1180,7 +1180,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Return an associative array
+     * Returns an associative array.
      *
      * @return array
      */
