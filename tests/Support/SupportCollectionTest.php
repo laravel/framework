@@ -895,6 +895,35 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['programming', 'basketball', 'music', 'powerlifting'], $data->all());
     }
 
+    public function testMapToAssoc()
+    {
+        $data = new Collection([
+            ['name' => 'Blastoise', 'type' => 'Water', 'idx' => 9],
+            ['name' => 'Charmander', 'type' => 'Fire', 'idx' => 4],
+            ['name' => 'Dragonair', 'type' => 'Dragon', 'idx' => 148],
+        ]);
+        $data = $data->mapToAssoc(function ($pokemon) {
+            return [$pokemon['name'], $pokemon['type']];
+        });
+        $this->assertEquals(
+            ['Blastoise' => 'Water', 'Charmander' => 'Fire', 'Dragonair' => 'Dragon'],
+            $data
+        );
+    }
+
+    public function testToAssoc()
+    {
+        $collection = new Collection([
+            ['Blastoise', 'Water'],
+            ['Charmander', 'Fire'],
+            ['Dragonair', 'Dragon']
+        ]);
+        $this->assertEquals(
+            ['Blastoise' => 'Water', 'Charmander' => 'Fire', 'Dragonair' => 'Dragon'],
+            $collection->toAssoc()
+        );
+    }
+
     public function testTransform()
     {
         $data = new Collection(['first' => 'taylor', 'last' => 'otwell']);
