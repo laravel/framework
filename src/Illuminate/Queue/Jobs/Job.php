@@ -5,7 +5,6 @@ namespace Illuminate\Queue\Jobs;
 use DateTime;
 use Throwable;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 
 abstract class Job
 {
