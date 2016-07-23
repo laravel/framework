@@ -44,11 +44,14 @@ class RedisQueue extends Queue implements QueueContract
      * @param  \Illuminate\Redis\Database  $redis
      * @param  string  $default
      * @param  string  $connection
+     * @param  int  $expire
      * @return void
      */
-    public function __construct(Database $redis, $default = 'default', $connection = null)
+    public function __construct(Database $redis, $default = 'default',
+                                $connection = null, $expire = 60)
     {
         $this->redis = $redis;
+        $this->expire = $expire;
         $this->default = $default;
         $this->connection = $connection;
     }
@@ -94,9 +97,9 @@ class RedisQueue extends Queue implements QueueContract
     {
         $payload = $this->createPayload($job, $data);
 
-        $delay = $this->getSeconds($delay);
-
-        $this->getConnection()->zadd($this->getQueue($queue).':delayed', $this->getTime() + $delay, $payload);
+        $this->getConnection()->zadd(
+            $this->getQueue($queue).':delayed', $this->getTime() + $this->getSeconds($delay), $payload
+        );
 
         return Arr::get(json_decode($payload, true), 'id');
     }
@@ -119,20 +122,8 @@ class RedisQueue extends Queue implements QueueContract
             $this->migrateExpiredJobs($queue.':reserved', $queue);
         }
 
-        $script = <<<'LUA'
-local job = redis.call('lpop', KEYS[1])
-local reserved = false
-if(job ~= false) then
-    reserved = cjson.decode(job)
-    reserved['attempts'] = reserved['attempts'] + 1
-    reserved = cjson.encode(reserved)
-    redis.call('zadd', KEYS[2], KEYS[3], reserved)
-end
-return {job, reserved}
-LUA;
-
         list($job, $reserved) = $this->getConnection()->eval(
-            $script, 3, $queue, $queue.':reserved', $this->getTime() + $this->expire
+            LuaScripts::pop(), 3, $queue, $queue.':reserved', $this->getTime() + $this->expire
         );
 
         if ($reserved) {
@@ -164,13 +155,8 @@ LUA;
     {
         $queue = $this->getQueue($queue);
 
-        $script = <<<'LUA'
-redis.call('zrem', KEYS[2], KEYS[3])
-redis.call('zadd', KEYS[1], KEYS[4], KEYS[3])
-return true
-LUA;
         $this->getConnection()->eval(
-            $script, 4, $queue.':delayed', $queue.':reserved',
+            LuaScripts::release(), 4, $queue.':delayed', $queue.':reserved',
             $job, $this->getTime() + $delay
         );
     }
@@ -184,20 +170,9 @@ LUA;
      */
     public function migrateExpiredJobs($from, $to)
     {
-        $redis = $this->getConnection();
-
-        $script = <<<'LUA'
-local val = redis.call('zrangebyscore', KEYS[1], '-inf', KEYS[3])
-if(next(val) ~= nil) then
-    redis.call('zremrangebyrank', KEYS[1], 0, #val - 1)
-    for i = 1, #val, 100 do
-        redis.call('rpush', KEYS[2], unpack(val, i, math.min(i+99, #val)))
-    end
-end
-return true
-LUA;
-
-        $redis->eval($script, 3, $from, $to, $this->getTime());
+        $this->getConnection()->eval(
+            LuaScripts::migrateExpiredJobs(), 3, $from, $to, $this->getTime()
+        );
     }
 
     /**
@@ -210,9 +185,9 @@ LUA;
      */
     protected function createPayload($job, $data = '', $queue = null)
     {
-        $payload = parent::createPayload($job, $data);
-
-        $payload = $this->setMeta($payload, 'id', $this->getRandomId());
+        $payload = $this->setMeta(
+            parent::createPayload($job, $data), 'id', $this->getRandomId()
+        );
 
         return $this->setMeta($payload, 'attempts', 1);
     }
@@ -256,26 +231,5 @@ LUA;
     public function getRedis()
     {
         return $this->redis;
-    }
-
-    /**
-     * Get the expiration time in seconds.
-     *
-     * @return int|null
-     */
-    public function getExpire()
-    {
-        return $this->expire;
-    }
-
-    /**
-     * Set the expiration time in seconds.
-     *
-     * @param  int|null  $seconds
-     * @return void
-     */
-    public function setExpire($seconds)
-    {
-        $this->expire = $seconds;
     }
 }
