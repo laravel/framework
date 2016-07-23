@@ -26,10 +26,7 @@
     "autoload": {
         "psr-4": {
             "Illuminate\\Queue\\": ""
-        },
-        "classmap": [
-            "IlluminateQueueClosure.php"
-        ]
+        }
     },
     "extra": {
         "branch-alias": {

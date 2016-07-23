@@ -31,20 +31,28 @@ class SyncQueue extends Queue implements QueueContract
 
             $this->raiseAfterJobEvent($queueJob);
         } catch (Exception $e) {
-            $this->raiseExceptionOccurredJobEvent($queueJob, $e);
-
-            $this->handleFailedJob($queueJob, $e);
-
-            throw $e;
+            $this->handleSyncException($queueJob, $e);
         } catch (Throwable $e) {
-            $this->raiseExceptionOccurredJobEvent($queueJob, $e);
-
-            $this->handleFailedJob($queueJob, $e);
-
-            throw $e;
+            $this->handleSyncException($queueJob, $e);
         }
 
         return 0;
+    }
+
+    /**
+     * Handle an exception that occured while processing a job.
+     *
+     * @param  \Illuminate\Queue\Jobs\Job  $queueJob
+     * @param  \Throwable  $e
+     * @return void
+     */
+    protected function handleSyncException($queueJob, Throwable $e)
+    {
+        $this->raiseExceptionOccurredJobEvent($queueJob, $e);
+
+        $this->handleFailedJob($queueJob, $e);
+
+        throw $e;
     }
 
     /**
