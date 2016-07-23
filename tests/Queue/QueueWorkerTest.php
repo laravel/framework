@@ -7,7 +7,6 @@ use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Queue\Events\JobExceptionOccurred;
-use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 class QueueWorkerTest extends PHPUnit_Framework_TestCase
 {
