@@ -21,7 +21,7 @@ class JobExceptionOccurred
     /**
      * The exception instance.
      *
-     * @var \Throwable
+     * @var \Exception
      */
     public $exception;
 
@@ -30,7 +30,7 @@ class JobExceptionOccurred
      *
      * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  \Throwable  $exception
+     * @param  \Exception  $exception
      * @return void
      */
     public function __construct($connectionName, $job, $exception)
