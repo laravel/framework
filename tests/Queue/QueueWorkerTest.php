@@ -22,7 +22,7 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
     public function test_job_can_be_fired()
     {
         $worker = $this->getWorker('default', ['queue' => [$job = new WorkerFakeJob]]);
-        $worker->runNextJob('default', 'queue');
+        $worker->runNextJob('default', 'queue', new WorkerOptions);
         $this->assertTrue($job->fired);
         $this->events->shouldHaveReceived('fire')->with(Mockery::type(JobProcessing::class))->once();
         $this->events->shouldHaveReceived('fire')->with(Mockery::type(JobProcessed::class))->once();
@@ -34,16 +34,16 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
             'high' => [$highJob = new WorkerFakeJob, $secondHighJob = new WorkerFakeJob], 'low' => [$lowJob = new WorkerFakeJob],
         ]);
 
-        $worker->runNextJob('default', 'high,low');
+        $worker->runNextJob('default', 'high,low', new WorkerOptions);
         $this->assertTrue($highJob->fired);
         $this->assertFalse($secondHighJob->fired);
         $this->assertFalse($lowJob->fired);
 
-        $worker->runNextJob('default', 'high,low');
+        $worker->runNextJob('default', 'high,low', new WorkerOptions);
         $this->assertTrue($secondHighJob->fired);
         $this->assertFalse($lowJob->fired);
 
-        $worker->runNextJob('default', 'high,low');
+        $worker->runNextJob('default', 'high,low', new WorkerOptions);
         $this->assertTrue($lowJob->fired);
     }
 
