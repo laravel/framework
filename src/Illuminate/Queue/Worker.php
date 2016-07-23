@@ -222,10 +222,10 @@ class Worker
      * @param  WorkerOptions  $options
      * @param  \Throwable  $e
      * @return void
-     *
-     * @throws \Throwable
+     *Throwable
+     * @throws \
      */
-    protected function handleJobException($connectionName, $job, WorkerOptions $options, Throwable $e)
+    protected function handleJobException($connectionName, $job, WorkerOptions $options, $e)
     {
         // If we catch an exception, we will attempt to release the job back onto the queue
         // so it is not lost entirely. This'll let the job be retried at a later time by
@@ -257,7 +257,7 @@ class Worker
      * @return void
      */
     protected function markJobAsFailedIfHasExceededMaxAttempts(
-        $connectionName, $job, $maxTries, Throwable $e
+        $connectionName, $job, $maxTries, $e
     ) {
         if ($maxTries === 0 || $job->attempts() < $maxTries) {
             return;
@@ -309,7 +309,7 @@ class Worker
      * @param  \Throwable  $e
      * @return void
      */
-    protected function raiseExceptionOccurredJobEvent($connectionName, $job, Throwable $e)
+    protected function raiseExceptionOccurredJobEvent($connectionName, $job, $e)
     {
         $this->events->fire(new Events\JobExceptionOccurred(
             $connectionName, $job, $e
@@ -324,7 +324,7 @@ class Worker
      * @param  \Throwable  $e
      * @return void
      */
-    protected function raiseFailedJobEvent($connectionName, $job, Throwable $e)
+    protected function raiseFailedJobEvent($connectionName, $job, $e)
     {
         $this->events->fire(new Events\JobFailed(
             $connectionName, $job, $e

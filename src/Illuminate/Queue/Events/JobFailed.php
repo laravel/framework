@@ -2,8 +2,6 @@
 
 namespace Illuminate\Queue\Events;
 
-use Throwable;
-
 class JobFailed
 {
     /**
@@ -35,7 +33,7 @@ class JobFailed
      * @param  \Throwable  $throwable
      * @return void
      */
-    public function __construct($connectionName, $job, Throwable $throwable)
+    public function __construct($connectionName, $job, $throwable)
     {
         $this->job = $job;
         $this->throwable = $throwable;
