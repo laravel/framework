@@ -1021,6 +1021,21 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Rotate the array transforming rows into columns
+     * and vice-versa.
+     *
+     * @return static
+     */
+    public function transpose()
+    {
+        $items = array_map(function (...$items) {
+            return $items;
+        }, ...$this->values());
+
+        return new static($items);
+    }
+
+    /**
      * Return only unique items from the collection array.
      *
      * @param  string|callable|null  $key

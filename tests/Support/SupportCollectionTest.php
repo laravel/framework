@@ -865,6 +865,21 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['first' => 'first-rolyat', 'last' => 'last-llewto'], $data->all());
     }
 
+    public function testTranspose()
+    {
+        $data = new Collection([
+            'name' => ['Tyrion Lannister', 'Daenerys Targaryen', 'Meera Reed'],
+            'house' => ['Lannister', 'Targaryen', 'Stark'],
+            'actor' => ['Peter Dinklage', 'Emilia Clarke', 'Ellie Kendrick'],
+        ]);
+        $expected = [
+            ['Tyrion Lannister', 'Lannister', 'Peter Dinklage'],
+            ['Daenerys Targaryen', 'Targaryen', 'Emilia Clarke'],
+            ['Meera Reed', 'Stark', 'Ellie Kendrick'],
+        ];
+        $this->assertEquals($expected, $data->transpose()->toArray());
+    }
+
     public function testFirstWithCallback()
     {
         $data = new Collection(['foo', 'bar', 'baz']);
