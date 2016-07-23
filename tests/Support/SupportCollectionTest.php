@@ -995,6 +995,36 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($c->contains('foo'));
     }
 
+    public function testStrictContains()
+    {
+        $c = new Collection([1, 3, 5]);
+
+        $this->assertTrue($c->strictContains(1));
+        $this->assertFalse($c->strictContains('01'));
+
+        $this->assertTrue($c->strictContains(function ($value) {
+            return $value < 5;
+        }));
+        $this->assertFalse($c->strictContains(function ($value) {
+            return $value > 5;
+        }));
+
+        $c = new Collection([['v' => 1], ['v' => 3], ['v' => 5]]);
+
+        $this->assertTrue($c->strictContains('v', 1));
+        $this->assertFalse($c->strictContains('v', '01'));
+        $this->assertFalse($c->strictContains('v', 2));
+
+        $c = new Collection(['date', '01', 'class', (object) ['foo' => 50]]);
+
+        $this->assertTrue($c->strictContains('date'));
+        $this->assertTrue($c->strictContains('class'));
+        $this->assertTrue($c->strictContains('01'));
+        $this->assertFalse($c->strictContains(1));
+        $this->assertTrue($c->contains(1));
+        $this->assertFalse($c->strictContains('foo'));
+    }
+
     public function testGettingSumFromCollection()
     {
         $c = new Collection([(object) ['foo' => 50], (object) ['foo' => 50]]);
