@@ -9,7 +9,6 @@ use Illuminate\Support\Arr;
 use SuperClosure\Serializer;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Encryption\Encrypter;
-use Illuminate\Contracts\Queue\QueueableEntity;
 
 abstract class Queue
 {
