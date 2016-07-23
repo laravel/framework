@@ -112,16 +112,6 @@ class RedisJob extends Job implements JobContract
     }
 
     /**
-     * Get the IoC container instance.
-     *
-     * @return \Illuminate\Container\Container
-     */
-    public function getContainer()
-    {
-        return $this->container;
-    }
-
-    /**
      * Get the underlying queue driver instance.
      *
      * @return \Illuminate\Redis\Database

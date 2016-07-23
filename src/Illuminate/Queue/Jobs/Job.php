@@ -71,7 +71,18 @@ abstract class Job
 
         $this->instance = $this->resolve($class);
 
-        $this->instance->{$method}($this, $this->resolveQueueableEntities($payload['data']));
+        $this->instance->{$method}($this, $payload['data']);
+    }
+
+    /**
+     * Resolve the given job handler.
+     *
+     * @param  string  $class
+     * @return mixed
+     */
+    protected function resolve($class)
+    {
+        return $this->container->make($class);
     }
 
     /**
@@ -126,82 +137,6 @@ abstract class Job
     }
 
     /**
-     * Get the decoded body of the job.
-     *
-     * @return array
-     */
-    public function payload()
-    {
-        return json_decode($this->getRawBody(), true);
-    }
-
-    /**
-     * Parse the job declaration into class and method.
-     *
-     * @param  string  $job
-     * @return array
-     */
-    protected function parseJob($job)
-    {
-        $segments = explode('@', $job);
-
-        return count($segments) > 1 ? $segments : [$segments[0], 'fire'];
-    }
-
-    /**
-     * Resolve the given job handler.
-     *
-     * @param  string  $class
-     * @return mixed
-     */
-    protected function resolve($class)
-    {
-        return $this->container->make($class);
-    }
-
-    /**
-     * Resolve all of the queueable entities in the given payload.
-     *
-     * @param  mixed  $data
-     * @return mixed
-     */
-    protected function resolveQueueableEntities($data)
-    {
-        if (is_string($data)) {
-            return $this->resolveQueueableEntity($data);
-        }
-
-        if (is_array($data)) {
-            $data = array_map(function ($d) {
-                if (is_array($d)) {
-                    return $this->resolveQueueableEntities($d);
-                }
-
-                return $this->resolveQueueableEntity($d);
-            }, $data);
-        }
-
-        return $data;
-    }
-
-    /**
-     * Resolve a single queueable entity from the resolver.
-     *
-     * @param  mixed  $value
-     * @return \Illuminate\Contracts\Queue\QueueableEntity
-     */
-    protected function resolveQueueableEntity($value)
-    {
-        if (is_string($value) && Str::startsWith($value, '::entity::')) {
-            list($marker, $type, $id) = explode('|', $value, 3);
-
-            return $this->getEntityResolver()->resolve($type, $id);
-        }
-
-        return $value;
-    }
-
-    /**
      * Call the failed method on the job instance.
      *
      * @param  \Throwable  $e
@@ -216,18 +151,21 @@ abstract class Job
         $this->instance = $this->resolve($class);
 
         if (method_exists($this->instance, 'failed')) {
-            $this->instance->failed($this->resolveQueueableEntities($payload['data']), $e);
+            $this->instance->failed($payload['data'], $e);
         }
     }
 
     /**
-     * Get an entity resolver instance.
+     * Parse the job declaration into class and method.
      *
-     * @return \Illuminate\Contracts\Queue\EntityResolver
+     * @param  string  $job
+     * @return array
      */
-    protected function getEntityResolver()
+    protected function parseJob($job)
     {
-        return $this->container->make('Illuminate\Contracts\Queue\EntityResolver');
+        $segments = explode('@', $job);
+
+        return count($segments) > 1 ? $segments : [$segments[0], 'fire'];
     }
 
     /**
@@ -288,6 +226,16 @@ abstract class Job
     }
 
     /**
+     * Get the decoded body of the job.
+     *
+     * @return array
+     */
+    public function payload()
+    {
+        return json_decode($this->getRawBody(), true);
+    }
+
+    /**
      * Get the name of the queue the job belongs to.
      *
      * @return string
@@ -295,5 +243,15 @@ abstract class Job
     public function getQueue()
     {
         return $this->queue;
+    }
+
+    /**
+     * Get the service container instance.
+     *
+     * @return \Illuminate\Container\Container
+     */
+    public function getContainer()
+    {
+        return $this->container;
     }
 }
