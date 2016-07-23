@@ -6,9 +6,7 @@ use Closure;
 use DateTime;
 use Exception;
 use Illuminate\Support\Arr;
-use SuperClosure\Serializer;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Encryption\Encrypter;
 
 abstract class Queue
 {
@@ -78,10 +76,6 @@ abstract class Queue
      */
     protected function createPayload($job, $data = '', $queue = null)
     {
-        if ($job instanceof Closure) {
-            return json_encode($this->createClosurePayload($job, $data));
-        }
-
         if (is_object($job)) {
             return json_encode([
                 'job' => 'Illuminate\Queue\CallQueuedHandler@call',
@@ -105,20 +99,6 @@ abstract class Queue
     protected function createPlainPayload($job, $data)
     {
         return ['job' => $job, 'data' => $data];
-    }
-
-    /**
-     * Create a payload string for the given Closure job.
-     *
-     * @param  \Closure  $job
-     * @param  mixed     $data
-     * @return array
-     */
-    protected function createClosurePayload($job, $data)
-    {
-        $closure = $this->getEncrypter()->encrypt((new Serializer)->serialize($job));
-
-        return ['job' => 'IlluminateQueueClosure', 'data' => compact('closure')];
     }
 
     /**
@@ -170,32 +150,5 @@ abstract class Queue
     public function setContainer(Container $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * Get the encrypter implementation.
-     *
-     * @return  \Illuminate\Contracts\Encryption\Encrypter
-     *
-     * @throws \Exception
-     */
-    protected function getEncrypter()
-    {
-        if (is_null($this->encrypter)) {
-            throw new Exception('No encrypter has been set on the Queue.');
-        }
-
-        return $this->encrypter;
-    }
-
-    /**
-     * Set the encrypter implementation.
-     *
-     * @param  \Illuminate\Contracts\Encryption\Encrypter  $encrypter
-     * @return void
-     */
-    public function setEncrypter(Encrypter $encrypter)
-    {
-        $this->encrypter = $encrypter;
     }
 }
