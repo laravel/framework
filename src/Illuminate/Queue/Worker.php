@@ -62,7 +62,7 @@ class Worker
      *
      * @param  string  $connectionName
      * @param  string  $queue
-     * @param  WorkerOptions  $options
+     * @param  \Illuminate\Queue\WorkerOptions  $options
      * @return void
      */
     public function daemon($connectionName, $queue, WorkerOptions $options)
@@ -98,7 +98,7 @@ class Worker
      *
      * @param  string  $connectionName
      * @param  string  $queue
-     * @param  WorkerOptions  $options
+     * @param  \Illuminate\Queue\WorkerOptions  $options
      * @return void
      */
     protected function runNextJobForDaemon($connectionName, $queue, WorkerOptions $options)
@@ -141,7 +141,7 @@ class Worker
      *
      * @param  string  $connectionName
      * @param  string  $queue
-     * @param  WorkerOptions  $options
+     * @param  \Illuminate\Queue\WorkerOptions  $options
      * @return void
      */
     public function runNextJob($connectionName, $queue, WorkerOptions $options = null)
@@ -191,7 +191,7 @@ class Worker
      *
      * @param  string  $connection
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  WorkerOptions  $options
+     * @param  \Illuminate\Queue\WorkerOptions  $options
      * @return void
      *
      * @throws \Throwable
@@ -210,7 +210,9 @@ class Worker
         } catch (Exception $e) {
             $this->handleJobException($connectionName, $job, $options, $e);
         } catch (Throwable $e) {
-            $this->handleJobException($connectionName, $job, $options, $e);
+            $this->handleJobException(
+                $connectionName, $job, $options, new FatalThrowableError($e)
+            );
         }
     }
 
@@ -219,11 +221,11 @@ class Worker
      *
      * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  WorkerOptions  $options
-     * @param  \Throwable  $e
+     * @param  \Illuminate\Queue\WorkerOptions  $options
+     * @param  \Exception  $e
      * @return void
-     *Throwable
-     * @throws \
+     *
+     * @throws \Exception
      */
     protected function handleJobException($connectionName, $job, WorkerOptions $options, $e)
     {
@@ -253,7 +255,7 @@ class Worker
      * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  int  $maxTries
-     * @param  \Throwable  $e
+     * @param  \Exception  $e
      * @return void
      */
     protected function markJobAsFailedIfHasExceededMaxAttempts(
@@ -321,7 +323,7 @@ class Worker
      *
      * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  \Throwable  $e
+     * @param  \Exception  $e
      * @return void
      */
     protected function raiseFailedJobEvent($connectionName, $job, $e)
