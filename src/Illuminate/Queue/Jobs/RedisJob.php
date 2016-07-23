@@ -53,17 +53,7 @@ class RedisJob extends Job implements JobContract
         $this->queue = $queue;
         $this->reserved = $reserved;
         $this->container = $container;
-        $this->decoded = json_decode($job, true);
-    }
-
-    /**
-     * Fire the job.
-     *
-     * @return void
-     */
-    public function fire()
-    {
-        $this->resolveAndFire($this->decoded);
+        $this->decoded = $this->payload();
     }
 
     /**
@@ -119,16 +109,6 @@ class RedisJob extends Job implements JobContract
     public function getJobId()
     {
         return Arr::get($this->decoded, 'id');
-    }
-
-    /**
-     * Get the IoC container instance.
-     *
-     * @return \Illuminate\Container\Container
-     */
-    public function getContainer()
-    {
-        return $this->container;
     }
 
     /**

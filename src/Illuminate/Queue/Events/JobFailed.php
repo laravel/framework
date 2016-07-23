@@ -2,6 +2,8 @@
 
 namespace Illuminate\Queue\Events;
 
+use Throwable;
+
 class JobFailed
 {
     /**
@@ -19,33 +21,24 @@ class JobFailed
     public $job;
 
     /**
-     * The data given to the job.
+     * The exception / throwable that caused the job to fail.
      *
-     * @var array
+     * @var \Throwable
      */
-    public $data;
-
-    /**
-     * The ID of the entry in the failed jobs table.
-     *
-     * @var int|null
-     */
-    public $failedId;
+    public $exception;
 
     /**
      * Create a new event instance.
      *
      * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  array  $data
-     * @param  int|null  $failedId
+     * @param  \Throwable  $exception
      * @return void
      */
-    public function __construct($connectionName, $job, $data, $failedId = null)
+    public function __construct($connectionName, $job, Throwable $exception)
     {
         $this->job = $job;
-        $this->data = $data;
-        $this->failedId = $failedId;
+        $this->exception = $exception;
         $this->connectionName = $connectionName;
     }
 }
