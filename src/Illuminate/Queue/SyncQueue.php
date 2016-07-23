@@ -7,6 +7,7 @@ use Throwable;
 use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
+use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 class SyncQueue extends Queue implements QueueContract
 {
@@ -33,7 +34,7 @@ class SyncQueue extends Queue implements QueueContract
         } catch (Exception $e) {
             $this->handleSyncException($queueJob, $e);
         } catch (Throwable $e) {
-            $this->handleSyncException($queueJob, $e);
+            $this->handleSyncException($queueJob, new FatalThrowableError($e));
         }
 
         return 0;
@@ -43,7 +44,7 @@ class SyncQueue extends Queue implements QueueContract
      * Handle an exception that occured while processing a job.
      *
      * @param  \Illuminate\Queue\Jobs\Job  $queueJob
-     * @param  \Throwable  $e
+     * @param  \Exceptino  $e
      * @return void
      */
     protected function handleSyncException($queueJob, $e)
@@ -134,7 +135,7 @@ class SyncQueue extends Queue implements QueueContract
      * Raise the exception occurred queue job event.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  \Throwable  $e
+     * @param  \Exceptino  $e
      * @return void
      */
     protected function raiseExceptionOccurredJobEvent(Job $job, $e)
@@ -148,7 +149,7 @@ class SyncQueue extends Queue implements QueueContract
      * Handle the failed job.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  \Throwable  $e
+     * @param  \Exceptino  $e
      * @return array
      */
     protected function handleFailedJob(Job $job, $e)
@@ -162,7 +163,7 @@ class SyncQueue extends Queue implements QueueContract
      * Raise the failed queue job event.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  \Throwable  $e
+     * @param  \Exceptino  $e
      * @return void
      */
     protected function raiseFailedJobEvent(Job $job, $e)
