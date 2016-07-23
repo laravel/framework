@@ -479,6 +479,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
                 'id' => '00',
                 'name' => 'double zero',
             ],
+        ], $c->unique('id', true)->all());
+
+        $this->assertEquals([
+            [
+                'id' => '0',
+                'name' => 'zero',
+            ],
         ], $c->unique('id')->all());
     }
 
