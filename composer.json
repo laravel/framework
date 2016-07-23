@@ -80,9 +80,6 @@
         "symfony/dom-crawler": "3.2.*"
     },
     "autoload": {
-        "classmap": [
-            "src/Illuminate/Queue/IlluminateQueueClosure.php"
-        ],
         "files": [
             "src/Illuminate/Foundation/helpers.php",
             "src/Illuminate/Support/helpers.php"
