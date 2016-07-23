@@ -32,7 +32,7 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
     public function test_job_can_be_fired_based_on_priority()
     {
         $worker = $this->getWorker('default', [
-            'high' => [$highJob = new WorkerFakeJob, $secondHighJob = new WorkerFakeJob], 'low' => [$lowJob = new WorkerFakeJob]
+            'high' => [$highJob = new WorkerFakeJob, $secondHighJob = new WorkerFakeJob], 'low' => [$lowJob = new WorkerFakeJob],
         ]);
 
         $worker->runNextJob('default', 'high,low');
@@ -120,11 +120,9 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
         $this->events->shouldNotHaveReceived('fire', [Mockery::type(JobProcessed::class)]);
     }
 
-
     /**
      * Helpers...
      */
-
     private function getWorker($connectionName = 'default', $jobs = [])
     {
         return new InsomniacWorker(
@@ -147,18 +145,20 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
         foreach ($overrides as $key => $value) {
             $options->{$key} = $value;
         }
+
         return $options;
     }
 }
 
 /**
- * Fakes
+ * Fakes.
  */
-
 class InsomniacWorker extends Illuminate\Queue\Worker
 {
     public $sleptFor = null;
-    public function sleep($seconds) {
+
+    public function sleep($seconds)
+    {
         $this->sleptFor = $seconds;
     }
 }
@@ -166,10 +166,14 @@ class InsomniacWorker extends Illuminate\Queue\Worker
 class WorkerFakeManager extends Illuminate\Queue\QueueManager
 {
     public $connections = [];
-    public function __construct($name, $connection) {
+
+    public function __construct($name, $connection)
+    {
         $this->connections[$name] = $connection;
     }
-    public function connection($name = null) {
+
+    public function connection($name = null)
+    {
         return $this->connections[$name];
     }
 }
@@ -177,10 +181,14 @@ class WorkerFakeManager extends Illuminate\Queue\QueueManager
 class WorkerFakeConnection
 {
     public $jobs = [];
-    public function __construct($jobs) {
+
+    public function __construct($jobs)
+    {
         $this->jobs = $jobs;
     }
-    public function pop($queue) {
+
+    public function pop($queue)
+    {
         return array_shift($this->jobs[$queue]);
     }
 }
@@ -188,10 +196,14 @@ class WorkerFakeConnection
 class BrokenQueueConnection
 {
     public $exception;
-    public function __construct($exception) {
+
+    public function __construct($exception)
+    {
         $this->exception = $exception;
     }
-    public function pop($queue) {
+
+    public function pop($queue)
+    {
         throw $this->exception;
     }
 }
@@ -205,16 +217,20 @@ class WorkerFakeJob
     public $attempts = 0;
     public $failedWith;
 
-    public function __construct($callback = null) {
-        $this->callback = $callback ?: function () {};
+    public function __construct($callback = null)
+    {
+        $this->callback = $callback ?: function () {
+        };
     }
 
-    public function fire() {
+    public function fire()
+    {
         $this->fired = true;
         $this->callback->__invoke();
     }
 
-    public function payload() {
+    public function payload()
+    {
         return [];
     }
 
@@ -223,19 +239,23 @@ class WorkerFakeJob
         $this->deleted = true;
     }
 
-    public function isDeleted() {
+    public function isDeleted()
+    {
         return $this->deleted;
     }
 
-    public function release($delay) {
+    public function release($delay)
+    {
         $this->releaseAfter = $delay;
     }
 
-    public function attempts() {
+    public function attempts()
+    {
         return $this->attempts;
     }
 
-    public function failed($e) {
+    public function failed($e)
+    {
         $this->failedWith = $e;
     }
 }
