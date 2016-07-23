@@ -137,7 +137,7 @@ abstract class Job
     /**
      * Call the failed method on the job instance.
      *
-     * @param  \Throwable  $e
+     * @param  \Exception  $e
      * @return void
      */
     public function failed($e)
