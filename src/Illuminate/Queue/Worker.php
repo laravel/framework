@@ -7,7 +7,6 @@ use Throwable;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Queue\Failed\FailedJobProviderInterface;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 
@@ -259,8 +258,7 @@ class Worker
      */
     protected function markJobAsFailedIfHasExceededMaxAttempts(
         $connectionName, $job, $maxTries, Throwable $e
-    )
-    {
+    ) {
         if ($maxTries === 0 || $job->attempts() < $maxTries) {
             return;
         }
