@@ -60,6 +60,13 @@ class Factory implements FactoryContract
     protected $fallbackMessages = [];
 
     /**
+     * All of the custom rules that are dependent on other fields.
+     *
+     * @var array
+     */
+    protected $dependentRules = [];
+
+    /**
      * The Validator resolver instance.
      *
      * @var Closure
@@ -131,6 +138,8 @@ class Factory implements FactoryContract
         $validator->addReplacers($this->replacers);
 
         $validator->setFallbackMessages($this->fallbackMessages);
+
+        $validator->addDependentRules($this->dependentRules);
     }
 
     /**
@@ -157,14 +166,19 @@ class Factory implements FactoryContract
      * @param  string  $rule
      * @param  \Closure|string  $extension
      * @param  string  $message
+     * @param  bool    $dependent
      * @return void
      */
-    public function extend($rule, $extension, $message = null)
+    public function extend($rule, $extension, $message = null, $dependent = false)
     {
         $this->extensions[$rule] = $extension;
 
         if ($message) {
             $this->fallbackMessages[Str::snake($rule)] = $message;
+        }
+
+        if ($dependent) {
+            $this->dependentRules[] = Str::studly($rule);
         }
     }
 
@@ -174,14 +188,19 @@ class Factory implements FactoryContract
      * @param  string   $rule
      * @param  \Closure|string  $extension
      * @param  string  $message
+     * @param  bool    $dependent
      * @return void
      */
-    public function extendImplicit($rule, $extension, $message = null)
+    public function extendImplicit($rule, $extension, $message = null, $dependent = false)
     {
         $this->implicitExtensions[$rule] = $extension;
 
         if ($message) {
             $this->fallbackMessages[Str::snake($rule)] = $message;
+        }
+
+        if ($dependent) {
+            $this->dependentRules[] = Str::studly($rule);
         }
     }
 

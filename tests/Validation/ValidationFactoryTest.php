@@ -43,6 +43,17 @@ class ValidationFactoryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['foo' => $noop1, 'implicit' => $noop2], $validator->getExtensions());
         $this->assertEquals(['foo' => 'foo!', 'implicit' => 'implicit!'], $validator->getFallbackMessages());
         $this->assertEquals($presence, $validator->getPresenceVerifier());
+
+        $presence = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+        $factory->extend('foo', $noop1, 'foo!', true);
+        $factory->extendImplicit('implicit', $noop2, 'implicit!', true);
+        $factory->setPresenceVerifier($presence);
+        $validator = $factory->make([], []);
+        $this->assertEquals(['foo' => $noop1, 'implicit' => $noop2], $validator->getExtensions());
+        $this->assertEquals(['foo' => 'foo!', 'implicit' => 'implicit!'], $validator->getFallbackMessages());
+        $this->assertEquals($presence, $validator->getPresenceVerifier());
+        $this->assertContains('Foo', $validator->getDependentRules());
+        $this->assertContains('Implicit', $validator->getDependentRules());
     }
 
     public function testCustomResolverIsCalled()
