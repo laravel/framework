@@ -1033,7 +1033,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $exists = [];
 
         return $this->reject(function ($item) use ($key, &$exists) {
-            if (in_array($id = $key($item), $exists)) {
+            if (in_array($id = $key($item), $exists, true)) {
                 return true;
             }
 
