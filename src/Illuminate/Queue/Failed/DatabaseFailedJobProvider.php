@@ -2,7 +2,6 @@
 
 namespace Illuminate\Queue\Failed;
 
-use Throwable;
 use Carbon\Carbon;
 use Illuminate\Database\ConnectionResolverInterface;
 
@@ -53,7 +52,7 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface
      * @param  \Throwable  $exception
      * @return int|null
      */
-    public function log($connection, $queue, $payload, Throwable $exception)
+    public function log($connection, $queue, $payload, $exception)
     {
         $failed_at = Carbon::now();
 

@@ -3,7 +3,6 @@
 namespace Illuminate\Queue\Jobs;
 
 use DateTime;
-use Throwable;
 use Illuminate\Support\Arr;
 
 abstract class Job
@@ -141,7 +140,7 @@ abstract class Job
      * @param  \Throwable  $e
      * @return void
      */
-    public function failed(Throwable $e)
+    public function failed($e)
     {
         $payload = $this->payload();
 

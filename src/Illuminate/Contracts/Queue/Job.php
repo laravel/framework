@@ -2,8 +2,6 @@
 
 namespace Illuminate\Contracts\Queue;
 
-use Throwable;
-
 interface Job
 {
     /**
@@ -62,7 +60,7 @@ interface Job
      * @param  \Throwable  $e
      * @return void
      */
-    public function failed(Throwable $e);
+    public function failed($e);
 
     /**
      * Get the name of the queue the job belongs to.
