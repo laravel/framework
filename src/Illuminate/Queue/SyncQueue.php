@@ -46,7 +46,7 @@ class SyncQueue extends Queue implements QueueContract
      * @param  \Throwable  $e
      * @return void
      */
-    protected function handleSyncException($queueJob, Throwable $e)
+    protected function handleSyncException($queueJob, $e)
     {
         $this->raiseExceptionOccurredJobEvent($queueJob, $e);
 
@@ -137,7 +137,7 @@ class SyncQueue extends Queue implements QueueContract
      * @param  \Throwable  $e
      * @return void
      */
-    protected function raiseExceptionOccurredJobEvent(Job $job, Throwable $e)
+    protected function raiseExceptionOccurredJobEvent(Job $job, $e)
     {
         if ($this->container->bound('events')) {
             $this->container['events']->fire(new Events\JobExceptionOccurred('sync', $job, $e));
@@ -151,7 +151,7 @@ class SyncQueue extends Queue implements QueueContract
      * @param  \Throwable  $e
      * @return array
      */
-    protected function handleFailedJob(Job $job, Throwable $e)
+    protected function handleFailedJob(Job $job, $e)
     {
         $job->failed($e);
 
@@ -165,7 +165,7 @@ class SyncQueue extends Queue implements QueueContract
      * @param  \Throwable  $e
      * @return void
      */
-    protected function raiseFailedJobEvent(Job $job, Throwable $e)
+    protected function raiseFailedJobEvent(Job $job, $e)
     {
         if ($this->container->bound('events')) {
             $this->container['events']->fire(new Events\JobFailed('sync', $job, $e));

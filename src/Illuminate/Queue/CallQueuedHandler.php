@@ -71,7 +71,7 @@ class CallQueuedHandler
      * @param  \Throwable  $e
      * @return void
      */
-    public function failed(array $data, Throwable $e)
+    public function failed(array $data, $e)
     {
         $command = unserialize($data['command']);
 
