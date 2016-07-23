@@ -2,7 +2,6 @@
 
 namespace Illuminate\Events;
 
-use Throwable;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Container\Container;
 
@@ -70,10 +69,10 @@ class CallQueuedHandler
      * The event instance and the exception will be passed.
      *
      * @param  array  $data
-     * @param  \Throwable  $e
+     * @param  \Exception  $e
      * @return void
      */
-    public function failed(array $data, Throwable $e)
+    public function failed(array $data, $e)
     {
         $handler = $this->container->make($data['class']);
 
