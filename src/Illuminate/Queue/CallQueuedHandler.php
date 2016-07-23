@@ -2,7 +2,6 @@
 
 namespace Illuminate\Queue;
 
-use Throwable;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Bus\Dispatcher;
 
