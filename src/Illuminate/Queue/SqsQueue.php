@@ -68,7 +68,7 @@ class SqsQueue extends Queue implements QueueContract
     public function pushRaw($payload, $queue = null, array $options = [])
     {
         $response = $this->sqs->sendMessage([
-            'QueueUrl' => $this->getQueue($queue), 'MessageBody' => $payload
+            'QueueUrl' => $this->getQueue($queue), 'MessageBody' => $payload,
         ]);
 
         return $response->get('MessageId');
@@ -108,7 +108,7 @@ class SqsQueue extends Queue implements QueueContract
 
         $response = $this->sqs->receiveMessage([
             'QueueUrl' => $queue,
-            'AttributeNames' => ['ApproximateReceiveCount']
+            'AttributeNames' => ['ApproximateReceiveCount'],
         ]);
 
         if (count($response['Messages']) > 0) {
