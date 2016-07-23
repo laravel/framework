@@ -38,7 +38,7 @@ class DatabaseConnector implements ConnectorInterface
             $this->connections->connection(Arr::get($config, 'connection')),
             $config['table'],
             $config['queue'],
-            Arr::get($config, 'expire', 60)
+            Arr::get($config, 'retry_after', 60)
         );
     }
 }

@@ -24,9 +24,9 @@ class QueueBeanstalkdJobTest extends PHPUnit_Framework_TestCase
         $job = $this->getJob();
         $job->getPheanstalkJob()->shouldReceive('getData')->once()->andReturn(json_encode(['job' => 'foo', 'data' => ['data']]));
         $job->getContainer()->shouldReceive('make')->once()->with('foo')->andReturn($handler = m::mock('BeanstalkdJobTestFailedTest'));
-        $handler->shouldReceive('failed')->once()->with(['data']);
+        $handler->shouldReceive('failed')->once()->with(['data'], m::type('Throwable'));
 
-        $job->failed();
+        $job->failed(new Exception);
     }
 
     public function testDeleteRemovesTheJobFromBeanstalkd()

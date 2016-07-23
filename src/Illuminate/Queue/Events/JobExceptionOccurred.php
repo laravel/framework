@@ -19,13 +19,6 @@ class JobExceptionOccurred
     public $job;
 
     /**
-     * The data given to the job.
-     *
-     * @var array
-     */
-    public $data;
-
-    /**
      * The exception instance.
      *
      * @var \Throwable
@@ -37,14 +30,12 @@ class JobExceptionOccurred
      *
      * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  array  $data
      * @param  \Throwable  $exception
      * @return void
      */
-    public function __construct($connectionName, $job, $data, $exception)
+    public function __construct($connectionName, $job, $exception)
     {
         $this->job = $job;
-        $this->data = $data;
         $this->exception = $exception;
         $this->connectionName = $connectionName;
     }
