@@ -78,7 +78,10 @@ class QueueServiceProvider extends ServiceProvider
         $this->registerRestartCommand();
 
         $this->app->singleton('queue.worker', function ($app) {
-            return new Worker($app['queue'], $app['queue.failer'], $app['events']);
+            return new Worker(
+                $app['queue'], $app['events'],
+                $app['Illuminate\Contracts\Debug\ExceptionHandler']
+            );
         });
     }
 

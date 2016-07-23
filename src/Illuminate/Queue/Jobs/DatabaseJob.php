@@ -40,16 +40,6 @@ class DatabaseJob extends Job implements JobContract
     }
 
     /**
-     * Fire the job.
-     *
-     * @return void
-     */
-    public function fire()
-    {
-        $this->resolveAndFire(json_decode($this->job->payload, true));
-    }
-
-    /**
      * Delete the job from the queue.
      *
      * @return void

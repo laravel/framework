@@ -44,16 +44,6 @@ class BeanstalkdJob extends Job implements JobContract
     }
 
     /**
-     * Fire the job.
-     *
-     * @return void
-     */
-    public function fire()
-    {
-        $this->resolveAndFire(json_decode($this->getRawBody(), true));
-    }
-
-    /**
      * Get the raw body string for the job.
      *
      * @return string
