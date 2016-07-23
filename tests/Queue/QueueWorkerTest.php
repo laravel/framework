@@ -61,19 +61,6 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
         $this->exceptionHandler->shouldHaveReceived('report')->with($e);
     }
 
-    public function test_exception_is_reported_if_connection_throws_fatal_throwable_on_job_pop()
-    {
-        $worker = new InsomniacWorker(
-            new WorkerFakeManager('default', new BrokenQueueConnection($e = new Error('something'))),
-            $this->events,
-            $this->exceptionHandler
-        );
-
-        $worker->runNextJob('default', 'queue', $this->workerOptions());
-
-        $this->exceptionHandler->shouldHaveReceived('report')->with(Mockery::type(FatalThrowableError::class));
-    }
-
     public function test_worker_sleeps_when_queue_is_empty()
     {
         $worker = $this->getWorker('default', ['queue' => []]);
