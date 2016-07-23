@@ -3,6 +3,7 @@
 namespace Illuminate\Queue\Jobs;
 
 use DateTime;
+use Throwable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
@@ -44,11 +45,34 @@ abstract class Job
     protected $released = false;
 
     /**
+     * Get the number of times the job has been attempted.
+     *
+     * @return int
+     */
+    abstract public function attempts();
+
+    /**
+     * Get the raw body string for the job.
+     *
+     * @return string
+     */
+    abstract public function getRawBody();
+
+    /**
      * Fire the job.
      *
      * @return void
      */
-    abstract public function fire();
+    public function fire()
+    {
+        $payload = $this->payload();
+
+        list($class, $method) = $this->parseJob($payload['job']);
+
+        $this->instance = $this->resolve($class);
+
+        $this->instance->{$method}($this, $this->resolveQueueableEntities($payload['data']));
+    }
 
     /**
      * Delete the job from the queue.
@@ -102,32 +126,13 @@ abstract class Job
     }
 
     /**
-     * Get the number of times the job has been attempted.
+     * Get the decoded body of the job.
      *
-     * @return int
+     * @return array
      */
-    abstract public function attempts();
-
-    /**
-     * Get the raw body string for the job.
-     *
-     * @return string
-     */
-    abstract public function getRawBody();
-
-    /**
-     * Resolve and fire the job handler method.
-     *
-     * @param  array  $payload
-     * @return void
-     */
-    protected function resolveAndFire(array $payload)
+    public function payload()
     {
-        list($class, $method) = $this->parseJob($payload['job']);
-
-        $this->instance = $this->resolve($class);
-
-        $this->instance->{$method}($this, $this->resolveQueueableEntities($payload['data']));
+        return json_decode($this->getRawBody(), true);
     }
 
     /**
@@ -199,18 +204,19 @@ abstract class Job
     /**
      * Call the failed method on the job instance.
      *
+     * @param  \Throwable  $e
      * @return void
      */
-    public function failed()
+    public function failed(Throwable $e)
     {
-        $payload = json_decode($this->getRawBody(), true);
+        $payload = $this->payload();
 
         list($class, $method) = $this->parseJob($payload['job']);
 
         $this->instance = $this->resolve($class);
 
         if (method_exists($this->instance, 'failed')) {
-            $this->instance->failed($this->resolveQueueableEntities($payload['data']));
+            $this->instance->failed($this->resolveQueueableEntities($payload['data']), $e);
         }
     }
 
@@ -256,7 +262,7 @@ abstract class Job
      */
     public function getName()
     {
-        return json_decode($this->getRawBody(), true)['job'];
+        return $this->payload()['job'];
     }
 
     /**
@@ -268,7 +274,7 @@ abstract class Job
     {
         $name = $this->getName();
 
-        $payload = json_decode($this->getRawBody(), true);
+        $payload = $this->payload();
 
         if ($name === 'Illuminate\Queue\CallQueuedHandler@call') {
             return Arr::get($payload, 'data.commandName', $name);

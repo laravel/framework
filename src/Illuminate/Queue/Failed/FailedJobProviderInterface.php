@@ -2,6 +2,8 @@
 
 namespace Illuminate\Queue\Failed;
 
+use Throwable;
+
 interface FailedJobProviderInterface
 {
     /**
@@ -10,9 +12,10 @@ interface FailedJobProviderInterface
      * @param  string  $connection
      * @param  string  $queue
      * @param  string  $payload
+     * @param  \Throwable  $exception
      * @return int|null
      */
-    public function log($connection, $queue, $payload);
+    public function log($connection, $queue, $payload, Throwable $exception);
 
     /**
      * Get a list of all of the failed jobs.
