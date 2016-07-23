@@ -19,24 +19,24 @@ class JobFailed
     public $job;
 
     /**
-     * The exception / throwable that caused the job to fail.
+     * The exception that caused the job to fail.
      *
-     * @var \Throwable
+     * @var \Exception
      */
-    public $throwable;
+    public $exception;
 
     /**
      * Create a new event instance.
      *
      * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  \Throwable  $throwable
+     * @param  \Exception  $exception
      * @return void
      */
-    public function __construct($connectionName, $job, $throwable)
+    public function __construct($connectionName, $job, $exception)
     {
         $this->job = $job;
-        $this->throwable = $throwable;
+        $this->exception = $exception;
         $this->connectionName = $connectionName;
     }
 }
