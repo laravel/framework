@@ -44,7 +44,7 @@ class SyncQueue extends Queue implements QueueContract
      * Handle an exception that occured while processing a job.
      *
      * @param  \Illuminate\Queue\Jobs\Job  $queueJob
-     * @param  \Exceptino  $e
+     * @param  \Exception  $e
      * @return void
      */
     protected function handleSyncException($queueJob, $e)
@@ -135,7 +135,7 @@ class SyncQueue extends Queue implements QueueContract
      * Raise the exception occurred queue job event.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  \Exceptino  $e
+     * @param  \Exception  $e
      * @return void
      */
     protected function raiseExceptionOccurredJobEvent(Job $job, $e)
@@ -149,7 +149,7 @@ class SyncQueue extends Queue implements QueueContract
      * Handle the failed job.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  \Exceptino  $e
+     * @param  \Exception  $e
      * @return array
      */
     protected function handleFailedJob(Job $job, $e)
@@ -163,7 +163,7 @@ class SyncQueue extends Queue implements QueueContract
      * Raise the failed queue job event.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  \Exceptino  $e
+     * @param  \Exception  $e
      * @return void
      */
     protected function raiseFailedJobEvent(Job $job, $e)
