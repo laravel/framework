@@ -2,9 +2,7 @@
 
 namespace Illuminate\Queue;
 
-use Closure;
 use DateTime;
-use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Container\Container;
 
