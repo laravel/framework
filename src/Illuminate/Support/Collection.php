@@ -156,7 +156,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  mixed  $value
      * @return bool
      */
-    public function contains($key, $value = null, $strict = false)
+    public function contains($key, $value = null)
     {
         if (func_num_args() == 2) {
             return $this->contains(function ($k, $item) use ($key, $value) {
