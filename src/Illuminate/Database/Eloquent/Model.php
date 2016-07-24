@@ -3155,6 +3155,33 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Determine if the model or given attribute(s) have been remained the same.
+     *
+     * @param  array|string|null  $attributes
+     * @return bool
+     */
+    public function isPristine($attributes = null)
+    {
+        $dirty = $this->getDirty();
+
+        if (is_null($attributes)) {
+            return count($dirty) === 0;
+        }
+
+        if (! is_array($attributes)) {
+            $attributes = func_get_args();
+        }
+
+        foreach ($attributes as $attribute) {
+            if (array_key_exists($attribute, $dirty)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Get the attributes that have been changed since last sync.
      *
      * @return array
