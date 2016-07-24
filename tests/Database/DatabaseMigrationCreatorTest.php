@@ -55,6 +55,7 @@ class DatabaseMigrationCreatorTest extends PHPUnit_Framework_TestCase
             $creator->create('migration_creator_fake_migration', 'foo');
         } catch (\Exception $e) {
             $this->assertEquals($e->getMessage(), 'A MigrationCreatorFakeMigration migration already exists.');
+
             return;
         }
 
@@ -69,4 +70,6 @@ class DatabaseMigrationCreatorTest extends PHPUnit_Framework_TestCase
     }
 }
 
-class MigrationCreatorFakeMigration {}
+class MigrationCreatorFakeMigration
+{
+}
