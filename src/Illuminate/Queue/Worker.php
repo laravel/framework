@@ -144,10 +144,8 @@ class Worker
      * @param  \Illuminate\Queue\WorkerOptions  $options
      * @return void
      */
-    public function runNextJob($connectionName, $queue, WorkerOptions $options = null)
+    public function runNextJob($connectionName, $queue, WorkerOptions $options)
     {
-        $options = $options ?: new WorkerOptions;
-
         try {
             $job = $this->getNextJob(
                 $this->manager->connection($connectionName), $queue
@@ -308,7 +306,7 @@ class Worker
      *
      * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  \Throwable  $e
+     * @param  \Exception  $e
      * @return void
      */
     protected function raiseExceptionOccurredJobEvent($connectionName, $job, $e)
