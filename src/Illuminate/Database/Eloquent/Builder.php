@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use BadMethodCallException;
 use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -677,7 +678,11 @@ class Builder
         // not have to remove these where clauses manually which gets really hacky
         // and is error prone while we remove the developer's own where clauses.
         $relation = Relation::noConstraints(function () use ($name) {
-            return $this->getModel()->$name();
+            try {
+                return $this->getModel()->$name();
+            } catch (BadMethodCallException $e) {
+                throw new RelationNotFoundException("Call to undefined relationship {$name} on Model {$this->getModel()}");
+            }
         });
 
         $nested = $this->nestedRelations($name);
