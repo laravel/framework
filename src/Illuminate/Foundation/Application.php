@@ -63,6 +63,13 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     protected $bootedCallbacks = [];
 
     /**
+     * The array of deferred booted callbacks.
+     *
+     * @var array
+     */
+    protected $deferredBootedCallbacks = [];
+
+    /**
      * The array of terminating callbacks.
      *
      * @var array
@@ -628,6 +635,8 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         }
 
         $this->deferredServices = [];
+
+        $this->fireAppCallbacks($this->deferredBootedCallbacks);
     }
 
     /**
@@ -782,6 +791,17 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         if ($this->isBooted()) {
             $this->fireAppCallbacks([$callback]);
         }
+    }
+
+    /**
+     * Register a new "deferredBooted" listener.
+     *
+     * @param  mixed  $callback
+     * @return void
+     */
+    public function deferredBooted($callback)
+    {
+        $this->deferredBootedCallbacks[] = $callback;
     }
 
     /**
