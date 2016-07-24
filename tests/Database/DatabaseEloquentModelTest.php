@@ -46,6 +46,21 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($model->isDirty(['foo', 'bar']));
     }
 
+    public function testPristineAttributes()
+    {
+        $model = new EloquentModelStub(['foo' => '1', 'bar' => 2, 'baz' => 3]);
+        $model->syncOriginal();
+        $model->foo = 1;
+        $model->bar = 20;
+        $model->baz = 30;
+
+        $this->assertFalse($model->isPristine());
+        $this->assertTrue($model->isPristine('foo'));
+        $this->assertFalse($model->isPristine('bar'));
+        $this->assertFalse($model->isPristine('foo', 'bar'));
+        $this->assertFalse($model->isPristine(['foo', 'bar']));
+    }
+
     public function testCalculatedAttributes()
     {
         $model = new EloquentModelStub;
