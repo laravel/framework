@@ -373,7 +373,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $builder = $this->getBuilder();
         $builder->setModel($this->getMockModel());
 
-        $builder->getRelation( 'invalid' );
+        $builder->getRelation('invalid');
     }
 
     public function testEagerLoadParsingSetsProperRelationships()
