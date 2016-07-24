@@ -315,25 +315,4 @@ class DatabaseQueue extends Queue implements QueueContract
     {
         return $this->database;
     }
-
-    /**
-     * Get the expiration time in seconds.
-     *
-     * @return int|null
-     */
-    public function getExpire()
-    {
-        return $this->expire;
-    }
-
-    /**
-     * Set the expiration time in seconds.
-     *
-     * @param  int|null  $seconds
-     * @return void
-     */
-    public function setExpire($seconds)
-    {
-        $this->expire = $seconds;
-    }
 }

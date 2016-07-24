@@ -116,7 +116,8 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
 
     public function testPopPopsDelayedJobOffOfRedisWhenExpireNull()
     {
-        $this->queue->setExpire(null);
+        $this->queue = new RedisQueue($this->redis, 'default', null, null);
+        $this->queue->setContainer(m::mock(Container::class));
 
         // Push an item into queue
         $job = new RedisQueueIntegrationTestJob(10);
@@ -139,7 +140,8 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
 
     public function testNotExpireJobsWhenExpireNull()
     {
-        $this->queue->setExpire(null);
+        $this->queue = new RedisQueue($this->redis, 'default', null, null);
+        $this->queue->setContainer(m::mock(Container::class));
 
         // Make an expired reserved job
         $failed = new RedisQueueIntegrationTestJob(-20);
@@ -177,7 +179,8 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
 
     public function testExpireJobsWhenExpireSet()
     {
-        $this->queue->setExpire(30);
+        $this->queue = new RedisQueue($this->redis, 'default', null, 30);
+        $this->queue->setContainer(m::mock(Container::class));
 
         // Push an item into queue
         $job = new RedisQueueIntegrationTestJob(10);

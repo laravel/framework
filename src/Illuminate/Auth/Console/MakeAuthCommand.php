@@ -35,7 +35,6 @@ class MakeAuthCommand extends Command
         'auth/passwords/reset.stub' => 'auth/passwords/reset.blade.php',
         'layouts/app.stub' => 'layouts/app.blade.php',
         'home.stub' => 'home.blade.php',
-        'welcome.stub' => 'welcome.blade.php',
     ];
 
     /**
@@ -50,14 +49,10 @@ class MakeAuthCommand extends Command
         $this->exportViews();
 
         if (! $this->option('views')) {
-            $this->info('Installed HomeController.');
-
             file_put_contents(
                 app_path('Http/Controllers/HomeController.php'),
                 $this->compileControllerStub()
             );
-
-            $this->info('Updated Routes File.');
 
             file_put_contents(
                 base_path('routes/web.php'),
@@ -66,7 +61,7 @@ class MakeAuthCommand extends Command
             );
         }
 
-        $this->comment('Authentication scaffolding generated successfully!');
+        $this->info('Authentication scaffolding generated successfully.');
     }
 
     /**
@@ -97,11 +92,10 @@ class MakeAuthCommand extends Command
     protected function exportViews()
     {
         foreach ($this->views as $key => $value) {
-            $path = base_path('resources/views/'.$value);
-
-            $this->line('<info>Created View:</info> '.$path);
-
-            copy(__DIR__.'/stubs/make/views/'.$key, $path);
+            copy(
+                __DIR__.'/stubs/make/views/'.$key,
+                base_path('resources/views/'.$value)
+            );
         }
     }
 
