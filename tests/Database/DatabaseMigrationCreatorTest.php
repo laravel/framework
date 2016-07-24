@@ -70,4 +70,6 @@ class DatabaseMigrationCreatorTest extends PHPUnit_Framework_TestCase
     }
 }
 
-class MigrationCreatorFakeMigration {}
+class MigrationCreatorFakeMigration
+{
+}
