@@ -1358,7 +1358,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
     public function testKeyMapUsingKeysOnly()
     {
         $data = new Collection(['foo' => 'something', 'bar' => 'else']);
-        $data = $data->keyMap(function ($key) {
+        $data = $data->mapKeys(function ($key) {
             return '-'.$key.'-';
         });
         $this->assertEquals(['-foo-' => 'something', '-bar-' => 'else'], $data->all());
@@ -1367,7 +1367,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
     public function testKeyMapUsingKeysAndValues()
     {
         $data = new Collection(['foo' => 'something', 'bar' => 'else']);
-        $data = $data->keyMap(function ($key, $item) {
+        $data = $data->mapKeys(function ($key, $item) {
             return $key.'-'.$item;
         });
         $this->assertEquals(['foo-something' => 'something', 'bar-else' => 'else'], $data->all());
