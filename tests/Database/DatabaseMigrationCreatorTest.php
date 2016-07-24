@@ -50,12 +50,13 @@ class DatabaseMigrationCreatorTest extends PHPUnit_Framework_TestCase
     public function testTableUpdateMigrationWontCreateDuplicateClass()
     {
         $creator = $this->getCreator();
-        eval("class UpdateBar{}");
+        eval('class UpdateBar{}');
 
         try {
             $creator->create('update_bar', 'foo');
-        } catch(\Exception $e) {
-            $this->assertEquals($e->getMessage(), "UpdateBar already exists");
+        } catch (\Exception $e) {
+            $this->assertEquals($e->getMessage(), 'UpdateBar already exists');
+
             return;
         }
 
