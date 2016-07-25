@@ -3162,7 +3162,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function isPristine($attributes = null)
     {
-        return ! $this->isDirty(...func_get_args());
+        return ! call_user_func_array([$this, 'isDirty'], func_get_args());
     }
 
     /**
