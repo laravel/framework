@@ -1640,11 +1640,9 @@ class Validator implements ValidatorContract
         }
 
         if (isset($parameters['ratio'])) {
-            $ratioParam = array_filter(sscanf($parameters['ratio'], '%d/%d'));
+            list($numerator, $denominator) = array_replace([1, 1], array_filter(sscanf($parameters['ratio'], '%f/%d')));
 
-            $ratio = count($ratioParam) > 1 ? $ratioParam[0] / $ratioParam[1] : floatval($parameters['ratio']);
-
-            return bccomp($ratio, $width / $height, 8) === 0;
+            return $numerator / $denominator == $width / $height;
         }
 
         return true;
