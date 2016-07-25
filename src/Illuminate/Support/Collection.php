@@ -1029,7 +1029,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function transpose()
     {
         $items = array_map(function (...$items) {
-            return $items;
+            return new static($items);
         }, ...$this->values());
 
         return new static($items);
