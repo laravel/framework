@@ -573,20 +573,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Run a map over each key of the items.
-     *
-     * @param  callable  $callback
-     * @return static
-     */
-    public function mapKeys(callable $callback)
-    {
-        return new static(array_combine(
-            array_map($callback, array_keys($this->items), $this->items),
-            array_values($this->items)
-        ));
-    }
-
-    /**
      * Map a collection and flatten the result by a single level.
      *
      * @param  callable  $callback
