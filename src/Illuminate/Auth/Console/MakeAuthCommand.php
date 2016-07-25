@@ -78,10 +78,6 @@ class MakeAuthCommand extends Command
         if (! is_dir(base_path('resources/views/auth/passwords'))) {
             mkdir(base_path('resources/views/auth/passwords'), 0755, true);
         }
-
-        if (! is_dir(base_path('resources/views/auth/emails'))) {
-            mkdir(base_path('resources/views/auth/emails'), 0755, true);
-        }
     }
 
     /**
