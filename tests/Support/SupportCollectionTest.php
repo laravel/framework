@@ -868,16 +868,46 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
     public function testTranspose()
     {
         $data = new Collection([
-            'name' => ['Tyrion Lannister', 'Daenerys Targaryen', 'Meera Reed'],
-            'house' => ['Lannister', 'Targaryen', 'Stark'],
-            'actor' => ['Peter Dinklage', 'Emilia Clarke', 'Ellie Kendrick'],
+            ['Tyrion Lannister', 'Daenerys Targaryen', 'Meera Reed'],
+            ['Lannister', 'Targaryen', 'Stark'],
+            ['Peter Dinklage', 'Emilia Clarke', 'Ellie Kendrick'],
         ]);
-        $expected = [
-            ['Tyrion Lannister', 'Lannister', 'Peter Dinklage'],
-            ['Daenerys Targaryen', 'Targaryen', 'Emilia Clarke'],
-            ['Meera Reed', 'Stark', 'Ellie Kendrick'],
-        ];
-        $this->assertEquals($expected, $data->transpose()->toArray());
+        $expected = new Collection([
+            new Collection(['Tyrion Lannister', 'Lannister', 'Peter Dinklage']),
+            new Collection(['Daenerys Targaryen', 'Targaryen', 'Emilia Clarke']),
+            new Collection(['Meera Reed', 'Stark', 'Ellie Kendrick']),
+        ]);
+        $this->assertEquals($expected, $data->transpose());
+    }
+
+    public function testTransposeFillWithNull()
+    {
+        $data = new Collection([
+            ['Jack O\'neill', 'Daniel Jackson'],
+            ['USAF Colonel', 'Archaeologist', 'USAF Captain'],
+            ['Richard Dean Anderson'],
+        ]);
+        $expected = new Collection([
+            new Collection(['Jack O\'neill', 'USAF Colonel', 'Richard Dean Anderson']),
+            new Collection(['Daniel Jackson', 'Archaeologist', null]),
+            new Collection([null, 'USAF Captain', null]),
+        ]);
+        $this->assertEquals($expected, $data->transpose());
+    }
+
+    public function testTransposeRemovesExistingKeys()
+    {
+        $data = new Collection([
+            'names' => ['Henrique', 'Isabela', 'Gabriel'],
+            'ages' => [8, 7, 2],
+            'toys' => ['HotWheels', 'Barbie', 'Lego'],
+        ]);
+        $expected = new Collection([
+            new Collection(['Henrique', 8, 'HotWheels']),
+            new Collection(['Isabela', 7, 'Barbie']),
+            new Collection(['Gabriel', 2, 'Lego']),
+        ]);
+        $this->assertEquals($expected, $data->transpose());
     }
 
     public function testFirstWithCallback()
