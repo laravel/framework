@@ -21,6 +21,16 @@ trait AuthenticatesUsers
     }
 
     /**
+     * Show the application's logout form (used when JavaScript is disabled).
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function showLogoutForm()
+    {
+        return view('auth.logout');
+    }
+
+    /**
      * Handle a login request to the application.
      *
      * @param  \Illuminate\Http\Request  $request
