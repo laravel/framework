@@ -183,13 +183,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected $with = [];
 
     /**
-     * The class name to be used in polymorphic relations.
-     *
-     * @var string
-     */
-    protected $morphClass;
-
-    /**
      * Indicates if the model exists.
      *
      * @var bool
@@ -2036,7 +2029,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return array_search($class, $morphMap, true);
         }
 
-        return $this->morphClass ?: $class;
+        return $class;
     }
 
     /**
