@@ -2,8 +2,12 @@
 
 namespace Illuminate\Notifications;
 
+use Illuminate\Support\Traits\Macroable;
+
 class MessageBuilder
 {
+    use Macroable;
+
     /**
      * All of the message elements.
      *
