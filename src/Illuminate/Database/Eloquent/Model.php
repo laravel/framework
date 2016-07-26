@@ -2739,8 +2739,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $parent_reflection = $reflection->getParentClass();
 
         // Get names of all methods on the current (child) and parent classes.
-        $reflection_list = array_map(function($v) {return $v->name;}, $reflection->getMethods());
-        $parent_reflection_list = array_map(function($v) {return $v->name;}, $parent_reflection->getMethods());
+        $reflection_list = array_map(function($v) {
+            return $v->name;
+        }, $reflection->getMethods());
+
+        $parent_reflection_list = array_map(function($v) {
+            return $v->name;
+        }, $parent_reflection->getMethods());
 
         // Remove the parent method names from the child method names.
         $methods = array_diff($reflection_list, $parent_reflection_list);
@@ -2753,14 +2758,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // Check each method to see if it is a relation.
         foreach ($methods as $method) {
             // Do not call this method. Avoid self-recursive loop.
-            if ($method == $this_func_name) continue;
+            if ($method == $this_func_name) {
+                continue;
+            }
 
             try {
                 $result = $model->$method();
                 if ($result instanceof Relation) {
                     // Record the method.
                     $relations_map[$method] = [
-                        'class' => get_class($result->getRelated())
+                        'class' => get_class($result->getRelated()),
                     ];
                 }
             } catch (\Exception $e) {
@@ -3168,7 +3175,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             // Ensure results are in a collection.
             $collection = new BaseCollection();
 
-            if ($result instanceof Model) {
+            if ($result instanceof self) {
                 $collection->push($result);
             } elseif ($result instanceof BaseCollection) {
                 $collection = $result;
