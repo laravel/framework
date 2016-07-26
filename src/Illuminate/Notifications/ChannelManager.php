@@ -29,7 +29,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      */
     public function to($notifiables)
     {
-        return new Channels\Notification($this, $notifiables);
+        return new Channels\Notification($notifiables);
     }
 
     /**
