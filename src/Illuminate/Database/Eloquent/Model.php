@@ -697,6 +697,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public static function withAll()
     {
         $relations = array_keys((new static)->getRelationsMap());
+
         return static::with($relations);
     }
 
@@ -2727,6 +2728,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         if ($map) {
             // Set to provided relations map.
             $this->relationsMap = $map;
+
             return $this;
         }
 
