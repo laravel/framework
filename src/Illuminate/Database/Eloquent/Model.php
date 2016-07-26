@@ -676,7 +676,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function load($relations = null)
     {
-        if (null == $relations) {
+        if (null === $relations) {
             $relations = array_keys($this->getRelationsMap());
         } elseif (is_string($relations)) {
             $relations = func_get_args();
