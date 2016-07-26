@@ -1801,7 +1801,15 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v->setFiles(['x' => $uploadedFile]);
         $this->assertTrue($v->passes());
 
+        $v = new Validator($trans, [], ['x' => 'dimensions:ratio=1.5']);
+        $v->setFiles(['x' => $uploadedFile]);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, [], ['x' => 'dimensions:ratio=1/1']);
+        $v->setFiles(['x' => $uploadedFile]);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, [], ['x' => 'dimensions:ratio=1']);
         $v->setFiles(['x' => $uploadedFile]);
         $this->assertTrue($v->fails());
     }
