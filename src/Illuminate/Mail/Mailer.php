@@ -41,6 +41,13 @@ class Mailer implements MailerContract, MailQueueContract
     protected $events;
 
     /**
+     * The super closure serializer instance.
+     *
+     * @var \SuperClosure\Serializer|null
+     */
+    protected $serializer;
+
+    /**
      * The global from address and name.
      *
      * @var array
@@ -81,13 +88,15 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  \Illuminate\Contracts\View\Factory  $views
      * @param  \Swift_Mailer  $swift
      * @param  \Illuminate\Contracts\Events\Dispatcher|null  $events
+     * @param  \SuperClosure\Serializer  $serializer
      * @return void
      */
-    public function __construct(Factory $views, Swift_Mailer $swift, Dispatcher $events = null)
+    public function __construct(Factory $views, Swift_Mailer $swift, Dispatcher $events = null, Serializer $serializer)
     {
         $this->views = $views;
         $this->swift = $swift;
         $this->events = $events;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -301,7 +310,7 @@ class Mailer implements MailerContract, MailQueueContract
             return $callback;
         }
 
-        return (new Serializer)->serialize($callback);
+        return ($this->serializer ?: new Serializer)->serialize($callback);
     }
 
     /**
@@ -327,7 +336,7 @@ class Mailer implements MailerContract, MailQueueContract
     protected function getQueuedCallable(array $data)
     {
         if (Str::contains($data['callback'], 'SerializableClosure')) {
-            return (new Serializer)->unserialize($data['callback']);
+            return ($this->serializer ?: new Serializer)->unserialize($data['callback']);
         }
 
         return $data['callback'];

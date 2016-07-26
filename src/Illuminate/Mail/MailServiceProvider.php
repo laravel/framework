@@ -3,6 +3,7 @@
 namespace Illuminate\Mail;
 
 use Swift_Mailer;
+use SuperClosure\Serializer;
 use Illuminate\Support\ServiceProvider;
 
 class MailServiceProvider extends ServiceProvider
@@ -24,11 +25,13 @@ class MailServiceProvider extends ServiceProvider
         $this->registerSwiftMailer();
 
         $this->app->singleton('mailer', function ($app) {
+            $serializer = class_exists(Serializer::class) ? new Serializer(null, $app['config']['app.key']) : null;
+
             // Once we have create the mailer instance, we will set a container instance
             // on the mailer. This allows us to resolve mailer classes via containers
             // for maximum testability on said classes instead of passing Closures.
             $mailer = new Mailer(
-                $app['view'], $app['swift.mailer'], $app['events']
+                $app['view'], $app['swift.mailer'], $app['events'], $serializer
             );
 
             $this->setMailerDependencies($mailer, $app);
