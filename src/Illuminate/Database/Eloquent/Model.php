@@ -470,6 +470,19 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Fill the columns defined by keys with the value.
+     *
+     * @param array $keys
+     * @param null  $val
+     *
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function massFill(array $keys, $val = null)
+    {
+        return $this->fill(array_fill_keys($keys, $val));
+    }
+
+    /**
      * Get the fillable attributes of a given array.
      *
      * @param  array  $attributes
