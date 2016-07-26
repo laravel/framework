@@ -473,7 +473,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Fill the columns defined by keys with the value.
      *
      * @param array $keys
-     * @param null  $val
+     * @param mixed  $val
      *
      * @return \Illuminate\Database\Eloquent\Model
      */
