@@ -1640,7 +1640,9 @@ class Validator implements ValidatorContract
         }
 
         if (isset($parameters['ratio'])) {
-            list($numerator, $denominator) = array_replace([1, 1], array_filter(sscanf($parameters['ratio'], '%f/%d')));
+            list($numerator, $denominator) = array_replace(
+                [1, 1], array_filter(sscanf($parameters['ratio'], '%f/%d'))
+            );
 
             return $numerator / $denominator == $width / $height;
         }
