@@ -235,7 +235,7 @@ class Notification implements Arrayable
      */
     public function via($channels)
     {
-        $this->via = (array) $channels;
+        $this->via = is_string($channels) ? func_get_args() : (array) $channels;
 
         return $this;
     }
