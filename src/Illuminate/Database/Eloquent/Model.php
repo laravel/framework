@@ -2739,11 +2739,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $parent_reflection = $reflection->getParentClass();
 
         // Get names of all methods on the current (child) and parent classes.
-        $reflection_list = array_map(function($v) {
+        $reflection_list = array_map(function ($v) {
             return $v->name;
         }, $reflection->getMethods());
 
-        $parent_reflection_list = array_map(function($v) {
+        $parent_reflection_list = array_map(function ($v) {
             return $v->name;
         }, $parent_reflection->getMethods());
 
