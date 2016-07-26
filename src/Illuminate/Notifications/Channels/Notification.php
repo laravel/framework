@@ -92,11 +92,15 @@ class Notification implements Arrayable
     /**
      * Create a new notification instance.
      *
-     * @param  array  $notifiables
+     * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
      * @return void
      */
     public function __construct($notifiables)
     {
+        if (is_object($notifiables) && ! $notifiables instanceof Collection) {
+            $notifiables = [$notifiables];
+        }
+
         $this->notifiables = Collection::make($notifiables);
     }
 
@@ -243,7 +247,7 @@ class Notification implements Arrayable
      */
     public function send()
     {
-        return Container::getInstance(ChannelManager::class)->send($this);
+        return Container::getInstance()->make(ChannelManager::class)->send($this);
     }
 
     /**
