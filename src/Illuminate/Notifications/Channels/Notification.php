@@ -189,8 +189,27 @@ class Notification implements Arrayable
     public function with($line)
     {
         if ($line instanceof Action) {
-            $this->action($line->text, $line->url);
-        } elseif (! $this->actionText) {
+            return $this->action($line->text, $line->url);
+        }
+
+        if (is_scalar($line) || (is_object($line) && method_exists($line, '__toString'))) {
+            if ($line = (string) $line) {
+                return $this->append($line);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Append string to notification lines.
+     *
+     * @param  string  $line
+     * @return $this
+     */
+    protected function append($line)
+    {
+        if (! $this->actionText) {
             $this->introLines[] = trim($line);
         } else {
             $this->outroLines[] = trim($line);
