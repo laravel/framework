@@ -88,10 +88,10 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  \Illuminate\Contracts\View\Factory  $views
      * @param  \Swift_Mailer  $swift
      * @param  \Illuminate\Contracts\Events\Dispatcher|null  $events
-     * @param  \SuperClosure\Serializer  $serializer
+     * @param  \SuperClosure\Serializer|null  $serializer
      * @return void
      */
-    public function __construct(Factory $views, Swift_Mailer $swift, Dispatcher $events = null, Serializer $serializer)
+    public function __construct(Factory $views, Swift_Mailer $swift, Dispatcher $events = null, Serializer $serializer = null)
     {
         $this->views = $views;
         $this->swift = $swift;
