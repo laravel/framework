@@ -183,7 +183,7 @@ class Notification implements Arrayable
     /**
      * Add a line of text to the notification.
      *
-     * @param  \Illuminate\Notifications\Action|string  $line
+     * @param  \Illuminate\Notifications\Action|string|array  $line
      * @return $this
      */
     public function with($line)
@@ -202,11 +202,15 @@ class Notification implements Arrayable
     /**
      * Format the given line of text.
      *
-     * @param  string  $line
+     * @param  string|array  $line
      * @return string
      */
     protected function formatLine($line)
     {
+        if (is_array($line)) {
+            return implode(' ', array_map('trim', $line));
+        }
+
         return trim(implode(' ', array_map('trim', explode(PHP_EOL, $line))));
     }
 
