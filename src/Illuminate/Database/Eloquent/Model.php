@@ -1276,6 +1276,24 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             static::$dispatcher->forget("eloquent.{$event}: ".static::class);
         }
     }
+    
+    /**
+     * Remove a specific event listener for the model.
+     *
+     * @param string $event
+     * @return void
+     */
+    public static function flushEventListener(string $event)
+    {
+        if ( ! isset(static::$dispatcher)) {
+            return;
+        }
+        $instance = new static;
+        if ( ! in_array($event, $instance->getObservableEvents())) {
+            return;
+        }
+        static::$dispatcher->forget("eloquent.{$event}: " . static::class);
+    }
 
     /**
      * Register a model event with the dispatcher.
