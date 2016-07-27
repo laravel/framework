@@ -191,12 +191,23 @@ class Notification implements Arrayable
         if ($line instanceof Action) {
             $this->action($line->text, $line->url);
         } elseif (! $this->actionText) {
-            $this->introLines[] = trim($line);
+            $this->introLines[] = $this->formatLine($line);
         } else {
-            $this->outroLines[] = trim($line);
+            $this->outroLines[] = $this->formatLine($line);
         }
 
         return $this;
+    }
+
+    /**
+     * Format the given line of text.
+     *
+     * @param  string  $line
+     * @return string
+     */
+    protected function formatLine($line)
+    {
+        return trim(implode(' ', array_map('trim', explode(PHP_EOL, $line))));
     }
 
     /**
