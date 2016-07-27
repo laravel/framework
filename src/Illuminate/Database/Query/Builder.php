@@ -1763,13 +1763,14 @@ class Builder
         $lastId = null;
 
         $results = $this->forPageAfterId($count, 0, $column)->get();
+        $columnSuffix = last(explode('.', $column));
 
         while (! empty($results)) {
             if (call_user_func($callback, $results) === false) {
                 return false;
             }
 
-            $lastId = last($results)->{$column};
+            $lastId = last($results)->{$columnSuffix};
 
             $results = $this->forPageAfterId($count, $lastId, $column)->get();
         }
