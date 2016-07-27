@@ -15,19 +15,7 @@ trait RoutesNotifications
      */
     public function notify($instance)
     {
-        app(Dispatcher::class)->dispatch($this, $instance);
-    }
-
-    /**
-     * Send the given notification via the given channels.
-     *
-     * @param  array|string  $channels
-     * @param  mixed  $instance
-     * @return void
-     */
-    public function notifyVia($channels, $instance)
-    {
-        app(Dispatcher::class)->dispatch($this, $instance, $channels);
+        app(Dispatcher::class)->send([$this], $instance);
     }
 
     /**

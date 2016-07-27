@@ -17,23 +17,10 @@ class NotificationRoutesNotificationsTest extends PHPUnit_Framework_TestCase
         $container->instance(Dispatcher::class, $factory);
         $notifiable = new RoutesNotificationsTestInstance;
         $instance = new StdClass;
-        $factory->shouldReceive('dispatch')->with($notifiable, $instance);
+        $factory->shouldReceive('send')->with([$notifiable], $instance);
         Container::setInstance($container);
 
         $notifiable->notify($instance);
-    }
-
-    public function testNotificationCanBeDispatchedToGivenChannels()
-    {
-        $container = new Container;
-        $factory = Mockery::mock(Dispatcher::class);
-        $container->instance(Dispatcher::class, $factory);
-        $notifiable = new RoutesNotificationsTestInstance;
-        $instance = new StdClass;
-        $factory->shouldReceive('dispatch')->with($notifiable, $instance, ['channel']);
-        Container::setInstance($container);
-
-        $notifiable->notifyVia(['channel'], $instance);
     }
 
     public function testNotificationOptionRouting()

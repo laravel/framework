@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Notifications\Channels\Notification;
+use Illuminate\Notifications\Notification;
 
 class NotificationNexmoChannelTest extends PHPUnit_Framework_TestCase
 {
@@ -11,7 +11,8 @@ class NotificationNexmoChannelTest extends PHPUnit_Framework_TestCase
 
     public function testSmsIsSentViaNexmo()
     {
-        $notification = new Notification([
+        $notification = new Notification;
+        $notifiables = collect([
             $notifiable = new NotificationNexmoChannelTestNotifiable,
         ]);
 
@@ -34,7 +35,7 @@ Text: url
 line 2',
         ]);
 
-        $channel->send($notification);
+        $channel->send($notifiables, $notification);
     }
 }
 

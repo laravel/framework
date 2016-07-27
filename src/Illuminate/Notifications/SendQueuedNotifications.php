@@ -3,28 +3,38 @@
 namespace Illuminate\Notifications;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
 class SendQueuedNotifications implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, SerializesModels;
 
     /**
-     * The notifications to be sent.
+     * The notifiable entities that should receive the notification.
      *
-     * @var array
+     * @var \Illuminate\Support\Collection
      */
-    protected $notifications;
+    protected $notifiables;
+
+    /**
+     * The notification to be sent.
+     *
+     * @var \Illuminate\Notifications\Notification
+     */
+    protected $notification;
 
     /**
      * Create a new job instance.
      *
-     * @param  array[\Illuminate\Notifications\Channels\Notification]  $notifications
+     * @param  \Illuminate\Support\Collection  $notifiables
+     * @param  \Illuminate\Notifications\Notification  $notification
      * @return void
      */
-    public function __construct(array $notifications)
+    public function __construct($notifiables, $notification)
     {
-        $this->notifications = $notifications;
+        $this->notifiables = $notifiables;
+        $this->notification = $notification;
     }
 
     /**
@@ -35,8 +45,6 @@ class SendQueuedNotifications implements ShouldQueue
      */
     public function handle(ChannelManager $manager)
     {
-        foreach ($this->notifications as $notification) {
-            $manager->send($notification);
-        }
+        $manager->sendNow($this->notifiables, $this->notification);
     }
 }
