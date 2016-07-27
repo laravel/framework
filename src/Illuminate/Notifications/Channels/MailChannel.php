@@ -3,7 +3,9 @@
 namespace Illuminate\Notifications\Channels;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Contracts\Mail\Mailer;
+use Illuminate\Notifications\Notification;
 
 class MailChannel
 {
@@ -28,14 +30,15 @@ class MailChannel
     /**
      * Send the given notification.
      *
-     * @param  \Illuminate\Notifications\Channels\Notification  $notification
+     * @param  \Illuminate\Support\Collection  $notifiables
+     * @param  \Illuminate\Notifications\Notification  $notification
      * @return void
      */
-    public function send(Notification $notification)
+    public function send($notifiables, Notification $notification)
     {
         $data = $this->prepareNotificationData($notification);
 
-        $emails = $notification->notifiables->map(function ($n) {
+        $emails = $notifiables->map(function ($n) {
             return $n->routeNotificationFor('mail');
         })->filter()->all();
 
@@ -45,18 +48,20 @@ class MailChannel
 
         $view = data_get($notification, 'options.view', 'notifications::email');
 
-        $this->mailer->send($view, $data, function ($m) use ($notification, $emails) {
-            count($notification->notifiables) === 1
+        $this->mailer->send($view, $data, function ($m) use ($notifiables, $notification, $emails) {
+            count($notifiables) === 1
                         ? $m->to($emails) : $m->bcc($emails);
 
-            $m->subject($notification->subject);
+            $m->subject($notification->subject ?: Str::title(
+                Str::snake(class_basename($notification), ' ')
+            ));
         });
     }
 
     /**
      * Prepare the data from the given notification.
      *
-     * @param  \Illuminate\Notifications\Channels\Notification  $notification
+     * @param  \Illuminate\Notifications\Notification  $notification
      * @return array
      */
     protected function prepareNotificationData($notification)

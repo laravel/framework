@@ -2,17 +2,20 @@
 
 namespace Illuminate\Notifications\Channels;
 
+use Illuminate\Notifications\Notification;
+
 class DatabaseChannel
 {
     /**
      * Send the given notification.
      *
-     * @param  \Illuminate\Notifications\Channels\Notification  $notification
+     * @param  \Illuminate\Support\Collection  $notifiables
+     * @param  \Illuminate\Notifications\Notification  $notification
      * @return void
      */
-    public function send(Notification $notification)
+    public function send($notifiables, Notification $notification)
     {
-        foreach ($notification->notifiables as $notifiable) {
+        foreach ($notifiables as $notifiable) {
             $notifiable->routeNotificationFor('database')->create([
                 'level' => $notification->level,
                 'intro' => $notification->introLines,

@@ -22,70 +22,32 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     protected $defaultChannels = ['mail', 'database'];
 
     /**
-     * Create a new notification for the given notifiable entities.
+     * Send the given notification to the given notifiable entities.
      *
-     * @param  array  $notifiables
-     * @return \Illuminate\Notifications\Channels\Notification
+     * @param  \Illuminate\Support\Collection|array  $notifiables
+     * @param  mixed  $notification
+     * @return void
      */
-    public function to($notifiables)
+    public function send($notifiables, $notification)
     {
-        return new Channels\Notification($notifiables);
+        if ($notification instanceof ShouldQueue) {
+            return $this->queueNotification($notifiables, $notification);
+        }
+
+        return $this->sendNow($notifiables, $notification);
     }
 
     /**
-     * Dispatch the given notification instance to the given notifiable.
+     * Send the given notification immtediately.
      *
-     * @param  mixed  $notifiable
-     * @param  mixed  $instance
-     * @param  array  $channels
+     * @param  \Illuminate\Support\Collection|array  $notifiables
+     * @param  mixed  $notification
      * @return void
      */
-    public function dispatch($notifiable, $instance, array $channels = [])
+    public function sendNow($notifiables, $notification)
     {
-        $notifications = $this->notificationsFromInstance(
-            $notifiable, $instance
-        );
+        $notification->message();
 
-        if (count($channels) > 0) {
-            foreach ($notifications as $notification) {
-                $notification->via((array) $channels);
-            }
-        }
-
-        if ($instance instanceof ShouldQueue) {
-            return $this->queueNotifications($instance, $notifications);
-        }
-
-        foreach ($notifications as $notification) {
-            $this->send($notification);
-        }
-    }
-
-    /**
-     * Queue the given notification instances.
-     *
-     * @param  mixed  $instance
-     * @param  array[\Illuminate\Notifcations\Channels\Notification]
-     * @return void
-     */
-    protected function queueNotifications($instance, array $notifications)
-    {
-        $this->app->make(Bus::class)->dispatch(
-            (new SendQueuedNotifications($notifications))
-                    ->onConnection($instance->connection)
-                    ->onQueue($instance->queue)
-                    ->delay($instance->delay)
-        );
-    }
-
-    /**
-     * Send the given notification.
-     *
-     * @param  \Illuminate\Notifications\Channels\Notification  $notification
-     * @return void
-     */
-    public function send(Channels\Notification $notification)
-    {
         if (! $notification->application) {
             $notification->application(
                 $this->app['config']['app.name'],
@@ -93,12 +55,31 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
             );
         }
 
-        foreach ($notification->via ?: $this->deliversVia() as $channel) {
-            $this->driver($channel)->send($notification);
-        }
+        foreach ($notifiables as $notifiable) {
+            foreach ($notification->via($notifiable) as $channel) {
+                $this->driver($channel)->send(collect([$notifiable]), $notification);
 
-        $this->app->make('events')->fire(
-            new Events\NotificationSent($notification)
+                $this->app->make('events')->fire(
+                    new Events\NotificationSent($notifiable, $notification)
+                );
+            }
+        }
+    }
+
+    /**
+     * Queue the given notification instances.
+     *
+     * @param  mixed  $notification
+     * @param  array[\Illuminate\Notifcations\Channels\Notification]
+     * @return void
+     */
+    protected function queueNotification($notifiables, $notification)
+    {
+        $this->app->make(Bus::class)->dispatch(
+            (new SendQueuedNotifications($notifiables, $notification))
+                    ->onConnection($notification->connection)
+                    ->onQueue($notification->queue)
+                    ->delay($notification->delay)
         );
     }
 
