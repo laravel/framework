@@ -79,7 +79,7 @@ class Notification
      */
     public function line($line)
     {
-        return new MessageBuilder($line);
+        return new MessageBuilder($this, $line);
     }
 
     /**
