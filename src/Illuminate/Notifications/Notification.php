@@ -7,13 +7,44 @@ use Illuminate\Support\Str;
 class Notification
 {
     /**
+     * The notification priority level.
+     *
+     * @var string
+     */
+    protected $level = 'info';
+
+    /**
      * Get the "level" of the notification.
      *
      * @return string
      */
     public function level()
     {
-        return property_exists($this, 'level') ? $this->level : 'info';
+        return $this->level;
+    }
+
+    /**
+     * Indicate that the notification gives information about a successful operation.
+     *
+     * @return $this
+     */
+    public function success()
+    {
+        $this->level = 'success';
+
+        return $this;
+    }
+
+    /**
+     * Indicate that the notification gives information about an error.
+     *
+     * @return $this
+     */
+    public function error()
+    {
+        $this->level = 'error';
+
+        return $this;
     }
 
     /**
