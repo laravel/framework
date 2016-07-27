@@ -2,7 +2,6 @@
 
 namespace Illuminate\Notifications;
 
-use Illuminate\Support\Str;
 use Illuminate\Queue\SerializesModels;
 
 class Notification
