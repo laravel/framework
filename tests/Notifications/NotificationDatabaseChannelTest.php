@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Notifications\Channels\Notification;
+use Illuminate\Notifications\Notification;
 
 class NotificationDatabaseChannelTest extends PHPUnit_Framework_TestCase
 {
@@ -11,9 +11,8 @@ class NotificationDatabaseChannelTest extends PHPUnit_Framework_TestCase
 
     public function testDatabaseChannelCreatesDatabaseRecordWithProperData()
     {
-        $notification = new Notification([
-            $notifiable = Mockery::mock(),
-        ]);
+        $notification = new Notification;
+        $notification->notifiables = collect([$notifiable = Mockery::mock()]);
 
         $notifiable->shouldReceive('routeNotificationFor->create')->with([
             'level' => 'info',

@@ -3,31 +3,100 @@
 namespace Illuminate\Notifications;
 
 use Illuminate\Support\Str;
+use Illuminate\Queue\SerializesModels;
 
 class Notification
 {
+    use SerializesModels;
+
     /**
-     * The notification priority level.
+     * The entities that should receive the notification.
+     *
+     * @var \Illuminate\Support\Collection
+     */
+    public $notifiables;
+
+    /**
+     * The channels that the notification should be sent through.
+     */
+    public $via = [];
+
+    /**
+     * The name of the application sending the notification.
      *
      * @var string
      */
-    protected $level = 'info';
+    public $application;
 
     /**
-     * The notification's subject.
+     * The URL to the application's logo.
      *
-     * @var string|null
+     * @var string
      */
-    protected $subject;
+    public $logoUrl;
 
     /**
-     * Get the "level" of the notification.
+     * The "level" of the notification (info, success, error).
      *
-     * @return string
+     * @var string
      */
-    public function level()
+    public $level = 'info';
+
+    /**
+     * The subject of the notification.
+     *
+     * @var string
+     */
+    public $subject;
+
+    /**
+     * The "intro" lines of the notification.
+     *
+     * @var array
+     */
+    public $introLines = [];
+
+    /**
+     * The "outro" lines of the notification.
+     *
+     * @var array
+     */
+    public $outroLines = [];
+
+    /**
+     * The text / label for the action.
+     *
+     * @var string
+     */
+    public $actionText;
+
+    /**
+     * The action URL.
+     *
+     * @var string
+     */
+    public $actionUrl;
+
+    /**
+     * The notification's options.
+     *
+     * @var array
+     */
+    public $options = [];
+
+    /**
+     * Specify the name of the application sending the notification.
+     *
+     * @param  string  $application
+     * @param  string  $logoUrl
+     * @return $this
+     */
+    public function application($application, $logoUrl = null)
     {
-        return $this->level;
+        $this->application = $application;
+        $this->logoUrl = $logoUrl;
+
+        return $this;
     }
 
     /**
@@ -55,40 +124,121 @@ class Notification
     }
 
     /**
-     * Get or set the subject of the notification.
+     * Set the "level" of the notification (success, error, etc.).
      *
-     * @param  string|null  $subject
-     * @return string
+     * @param  string  $level
+     * @return $this
      */
-    public function subject($subject = null)
+    public function level($level)
     {
-        if (is_null($subject)) {
-            return $this->subject ?: Str::title(Str::snake(class_basename($this), ' '));
-        }
+        $this->level = $level;
 
+        return $this;
+    }
+
+    /**
+     * Set the subject of the notification.
+     *
+     * @param  string  $subject
+     * @return $this
+     */
+    public function subject($subject)
+    {
         $this->subject = $subject;
 
         return $this;
     }
 
     /**
-     * Create a new message builder instance.
+     * Add a line of text to the notification.
      *
-     * @param  string  $line
-     * @return \Illuminate\Notifications\MessageBuilder
+     * @param  \Illuminate\Notifications\Action|string  $line
+     * @return $this
      */
     public function line($line)
     {
-        return new MessageBuilder($this, $line);
+        return $this->with($line);
     }
 
     /**
-     * Get the notification's options.
+     * Add a line of text to the notification.
+     *
+     * @param  \Illuminate\Notifications\Action|string|array  $line
+     * @return $this
+     */
+    public function with($line)
+    {
+        if ($line instanceof Action) {
+            $this->action($line->text, $line->url);
+        } elseif (! $this->actionText) {
+            $this->introLines[] = $this->formatLine($line);
+        } else {
+            $this->outroLines[] = $this->formatLine($line);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Format the given line of text.
+     *
+     * @param  string|array  $line
+     * @return string
+     */
+    protected function formatLine($line)
+    {
+        if (is_array($line)) {
+            return implode(' ', array_map('trim', $line));
+        }
+
+        return trim(implode(' ', array_map('trim', explode(PHP_EOL, $line))));
+    }
+
+    /**
+     * Set the notification's options.
+     *
+     * @param  array  $options
+     * @return $this
+     */
+    public function options(array $options)
+    {
+        $this->options = $options;
+
+        return $this;
+    }
+
+    /**
+     * Configure the "call to action" button.
+     *
+     * @param  string  $text
+     * @param  string  $url
+     * @return $this
+     */
+    public function action($text, $url)
+    {
+        $this->actionText = $text;
+        $this->actionUrl = $url;
+
+        return $this;
+    }
+
+    /**
+     * Get the instance as an array.
      *
      * @return array
      */
-    public function options()
+    public function toArray()
     {
-        return property_exists($this, 'options') ? $this->options : [];
+        return [
+            'notifiables' => $this->notifiables,
+            'application' => $this->application,
+            'logoUrl' => $this->logoUrl,
+            'level' => $this->level,
+            'subject' => $this->subject,
+            'introLines' => $this->introLines,
+            'outroLines' => $this->outroLines,
+            'actionText' => $this->actionText,
+            'actionUrl' => $this->actionUrl,
+        ];
     }
 }
