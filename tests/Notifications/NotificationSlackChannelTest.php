@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Notifications\Channels\Notification;
+use Illuminate\Notifications\Notification;
 
 class NotificationSlackChannelTest extends PHPUnit_Framework_TestCase
 {
@@ -11,7 +11,8 @@ class NotificationSlackChannelTest extends PHPUnit_Framework_TestCase
 
     public function testCorrectPayloadIsSentToSlack()
     {
-        $notification = new Notification([
+        $notification = new Notification;
+        $notifiables = collect([
             $notifiable = new NotificationSlackChannelTestNotifiable,
         ]);
 
@@ -43,7 +44,7 @@ line 2',
             ],
         ]);
 
-        $channel->send($notification);
+        $channel->send($notifiables, $notification);
     }
 }
 

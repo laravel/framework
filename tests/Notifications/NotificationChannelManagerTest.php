@@ -20,18 +20,16 @@ class NotificationChannelManagerTest extends PHPUnit_Framework_TestCase
         Container::setInstance($container);
         $manager = Mockery::mock(ChannelManager::class.'[driver]', [$container]);
         $manager->shouldReceive('driver')->andReturn($driver = Mockery::mock());
-        $driver->shouldReceive('send')->andReturnUsing(function ($notification) {
+        $driver->shouldReceive('send')->andReturnUsing(function ($notifiables, $notification) {
             $this->assertEquals('Name', $notification->application);
             $this->assertEquals('Logo', $notification->logoUrl);
-            $this->assertEquals(['test'], $notification->via);
-            $this->assertEquals('Notification Channel Manager Test Notification', $notification->subject);
             $this->assertEquals('test', $notification->introLines[0]);
             $this->assertEquals('Text', $notification->actionText);
             $this->assertEquals('url', $notification->actionUrl);
         });
         $events->shouldReceive('fire')->with(Mockery::type(Illuminate\Notifications\Events\NotificationSent::class));
 
-        $manager->dispatch(new NotificationChannelManagerTestNotifiable, new NotificationChannelManagerTestNotification);
+        $manager->send([new NotificationChannelManagerTestNotifiable], new NotificationChannelManagerTestNotification);
     }
 
     public function testNotificationCanBeQueued()
@@ -43,7 +41,7 @@ class NotificationChannelManagerTest extends PHPUnit_Framework_TestCase
         Container::setInstance($container);
         $manager = Mockery::mock(ChannelManager::class.'[driver]', [$container]);
 
-        $manager->dispatch(new NotificationChannelManagerTestNotifiable, new NotificationChannelManagerTestQueuedNotification);
+        $manager->send([new NotificationChannelManagerTestNotifiable], new NotificationChannelManagerTestQueuedNotification);
     }
 }
 
