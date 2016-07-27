@@ -23,6 +23,7 @@ class DummyClass extends Notification
     /**
      * Get the notification channels.
      *
+     * @param  mixed  $notifiable
      * @return array|string
      */
     public function via($notifiable)
@@ -33,9 +34,10 @@ class DummyClass extends Notification
     /**
      * Get the notification message.
      *
+     * @param  mixed  $notifiable
      * @return \Illuminate\Notifications\MessageBuilder
      */
-    public function message()
+    public function message($notifiable)
     {
         return $this->line('The introduction to the notification.')
                     ->action('Notification Action', 'https://laravel.com')

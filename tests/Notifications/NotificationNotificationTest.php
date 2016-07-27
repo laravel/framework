@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\Channels\Notification as ChannelNotification;
 
 class NotificationNotificationTest extends PHPUnit_Framework_TestCase
 {
@@ -26,6 +27,17 @@ class NotificationNotificationTest extends PHPUnit_Framework_TestCase
     {
         $notification = new Notification;
         $this->assertInstanceOf('Illuminate\Notifications\MessageBuilder', $notification->line('Something'));
+    }
+
+    public function testChannelNotificationFormatsMultiLineText()
+    {
+        $notification = new ChannelNotification([]);
+        $notification->with('
+            This is a
+            single line of text.
+        ');
+
+        $this->assertEquals('This is a single line of text.', $notification->introLines[0]);
     }
 }
 
