@@ -9,6 +9,13 @@ class MessageBuilder
     use Macroable;
 
     /**
+     * The underlying notfication instance.
+     *
+     * @var mixed
+     */
+    protected $instance;
+
+    /**
      * All of the message elements.
      *
      * @var array
@@ -18,10 +25,11 @@ class MessageBuilder
     /**
      * Create a new message builder instance.
      *
+     * @param  mixed  $instance
      * @param  string  $line
      * @return void
      */
-    public function __construct($line)
+    public function __construct($instance, $line)
     {
         $this->elements[] = $line;
     }
@@ -49,6 +57,56 @@ class MessageBuilder
     public function action($text, $url)
     {
         $this->elements[] = new Action($text, $url);
+
+        return $this;
+    }
+
+    /**
+     * Set the "level" of the notification (success, error, etc.).
+     *
+     * @param  string  $level
+     * @return $this
+     */
+    public function level($level)
+    {
+        $this->instance->level($level);
+
+        return $this;
+    }
+
+    /**
+     * Indicate that the notification gives information about a successful operation.
+     *
+     * @return $this
+     */
+    public function success()
+    {
+        $this->instance->level('success');
+
+        return $this;
+    }
+
+    /**
+     * Indicate that the notification gives information about an error.
+     *
+     * @return $this
+     */
+    public function error()
+    {
+        $this->instance->level('error');
+
+        return $this;
+    }
+
+    /**
+     * Set the subject of the notification.
+     *
+     * @param  string  $subject
+     * @return $this
+     */
+    public function subject($subject)
+    {
+        $this->instance->subject($subject);
 
         return $this;
     }
