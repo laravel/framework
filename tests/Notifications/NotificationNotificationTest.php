@@ -38,6 +38,14 @@ class NotificationNotificationTest extends PHPUnit_Framework_TestCase
         ');
 
         $this->assertEquals('This is a single line of text.', $notification->introLines[0]);
+
+        $notification = new ChannelNotification([]);
+        $notification->with([
+            'This is a',
+            'single line of text.',
+        ]);
+
+        $this->assertEquals('This is a single line of text.', $notification->introLines[0]);
     }
 }
 
