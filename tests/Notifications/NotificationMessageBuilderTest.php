@@ -6,7 +6,7 @@ class MessageBuilderTest extends PHPUnit_Framework_TestCase
 {
     public function testMessageBuilderAddsActionsCorrectly()
     {
-        $builder = new MessageBuilder('line 1');
+        $builder = new MessageBuilder(new StdClass, 'line 1');
         $builder->action('Text', 'url');
         $builder->line('line 2');
 
