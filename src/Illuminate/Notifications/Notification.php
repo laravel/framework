@@ -14,6 +14,13 @@ class Notification
     protected $level = 'info';
 
     /**
+     * The notification's subject.
+     *
+     * @var string|null
+     */
+    protected $subject;
+
+    /**
      * Get the "level" of the notification.
      *
      * @return string
@@ -48,15 +55,20 @@ class Notification
     }
 
     /**
-     * Get the subject of the notification.
+     * Get or set the subject of the notification.
      *
+     * @param  string|null  $subject
      * @return string
      */
-    public function subject()
+    public function subject($subject = null)
     {
-        return property_exists($this, 'subject')
-                        ? $this->subject
-                        : Str::title(Str::snake(class_basename($this), ' '));
+        if (is_null($subject)) {
+            return $this->subject ?: Str::title(Str::snake(class_basename($this), ' '));
+        }
+
+        $this->subject = $subject;
+
+        return $this;
     }
 
     /**
