@@ -11,7 +11,7 @@ class BcryptHasherTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($hasher->needsRehash($value));
         $this->assertTrue($hasher->needsRehash($value, ['rounds' => 1]));
     }
-    
+
     public function testIsHash()
     {
         $hasher = new Illuminate\Hashing\BcryptHasher;

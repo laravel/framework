@@ -13,7 +13,7 @@ class BcryptHasher implements HasherContract
      * @var int
      */
     protected $rounds = 10;
-    
+
     /**
      * Hash the given value.
      *
@@ -26,16 +26,16 @@ class BcryptHasher implements HasherContract
     public function make($value, array $options = [])
     {
         $cost = isset($options['rounds']) ? $options['rounds'] : $this->rounds;
-        
+
         $hash = password_hash($value, PASSWORD_BCRYPT, ['cost' => $cost]);
-        
+
         if ($hash === false) {
             throw new RuntimeException('Bcrypt hashing not supported.');
         }
-        
+
         return $hash;
     }
-    
+
     /**
      * Check the given plain value against a hash.
      *
@@ -49,10 +49,10 @@ class BcryptHasher implements HasherContract
         if (strlen($hashedValue) === 0) {
             return false;
         }
-        
+
         return password_verify($value, $hashedValue);
     }
-    
+
     /**
      * Check if the given hash has been hashed using the given options.
      *
@@ -63,10 +63,10 @@ class BcryptHasher implements HasherContract
     public function needsRehash($hashedValue, array $options = [])
     {
         $cost = isset($options['rounds']) ? $options['rounds'] : $this->rounds;
-        
+
         return password_needs_rehash($hashedValue, PASSWORD_BCRYPT, ['cost' => $cost]);
     }
-    
+
     /**
      * Set the default password work factor.
      *
@@ -75,11 +75,11 @@ class BcryptHasher implements HasherContract
      */
     public function setRounds($rounds)
     {
-        $this->rounds = (int)$rounds;
-        
+        $this->rounds = (int) $rounds;
+
         return $this;
     }
-    
+
     /**
      * Check if the given string is a hash produced by this hasher.
      *
@@ -93,17 +93,17 @@ class BcryptHasher implements HasherContract
         if (strlen($value) === 0) {
             return false;
         }
-        
+
         $info = password_get_info($value);
-        
+
         if ($info['algo'] !== PASSWORD_BCRYPT) {
             return false;
         }
-        
+
         if ($strict && count(array_diff_assoc($options, $info['options']))) {
             return false;
         }
-        
+
         return true;
     }
 }
