@@ -2860,7 +2860,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // Support ArrayAccess set relations value
         if (isset($this->relations[$key])) {
             $this->relations[$key] = $value;
-        }else{
+        } else {
             $this->attributes[$key] = $value;
         }
 
