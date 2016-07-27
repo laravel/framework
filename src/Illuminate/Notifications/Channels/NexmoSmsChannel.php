@@ -4,6 +4,7 @@ namespace Illuminate\Notifications\Channels;
 
 use Illuminate\Support\Arr;
 use Nexmo\Client as NexmoClient;
+use Illuminate\Notifications\Notification;
 
 class NexmoSmsChannel
 {
@@ -36,12 +37,13 @@ class NexmoSmsChannel
     /**
      * Send the given notification.
      *
-     * @param  \Illuminate\Notifications\Channels\Notification  $notification
+     * @param  \Illuminate\Support\Collection  $notifiables
+     * @param  \Illuminate\Notifications\Notification  $notification
      * @return void
      */
-    public function send(Notification $notification)
+    public function send($notifiables, Notification $notification)
     {
-        foreach ($notification->notifiables as $notifiable) {
+        foreach ($notifiables as $notifiable) {
             if (! $to = $notifiable->routeNotificationFor('nexmo')) {
                 continue;
             }
@@ -57,7 +59,7 @@ class NexmoSmsChannel
     /**
      * Format the given notification to a single string.
      *
-     * @param  \Illuminate\Notifications\Channels\Notification  $notification
+     * @param  \Illuminate\Notifications\Notification  $notification
      * @return string
      */
     protected function formatNotification(Notification $notification)
