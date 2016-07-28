@@ -125,7 +125,7 @@ class Worker
             pcntl_signal(SIGALRM, function () use ($processId) {
                 posix_kill($processId, SIGKILL);
 
-                $this->exceptions->report(new Exception('Queue child process timed out.'));
+                $this->exceptions->report(new TimeoutException("Queue child process timed out after {$timeout} seconds."));
             }, true);
 
             pcntl_alarm($timeout);
