@@ -2,8 +2,8 @@
 
 namespace Illuminate\Hashing;
 
-use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use RuntimeException;
+use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 
 class BcryptHasher implements HasherContract
 {
@@ -17,8 +17,8 @@ class BcryptHasher implements HasherContract
     /**
      * Hash the given value.
      *
-     * @param  string $value
-     * @param  array $options
+     * @param  string  $value
+     * @param  array   $options
      * @return string
      *
      * @throws \RuntimeException
@@ -39,9 +39,9 @@ class BcryptHasher implements HasherContract
     /**
      * Check the given plain value against a hash.
      *
-     * @param  string $value
-     * @param  string $hashedValue
-     * @param  array $options
+     * @param  string  $value
+     * @param  string  $hashedValue
+     * @param  array   $options
      * @return bool
      */
     public function check($value, $hashedValue, array $options = [])
@@ -56,8 +56,8 @@ class BcryptHasher implements HasherContract
     /**
      * Check if the given hash has been hashed using the given options.
      *
-     * @param  string $hashedValue
-     * @param  array $options
+     * @param  string  $hashedValue
+     * @param  array   $options
      * @return bool
      */
     public function needsRehash($hashedValue, array $options = [])
@@ -70,7 +70,7 @@ class BcryptHasher implements HasherContract
     /**
      * Set the default password work factor.
      *
-     * @param  int $rounds
+     * @param  int  $rounds
      * @return $this
      */
     public function setRounds($rounds)
@@ -83,9 +83,9 @@ class BcryptHasher implements HasherContract
     /**
      * Check if the given string is a hash produced by this hasher.
      *
-     * @param  string $value
-     * @param  array $options
-     * @param  bool $strict
+     * @param  string  $value
+     * @param  array   $options
+     * @param  bool    $strict
      * @return bool
      */
     public function isHash($value, array $options = [], $strict = false)
