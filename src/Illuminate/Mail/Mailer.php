@@ -5,6 +5,7 @@ namespace Illuminate\Mail;
 use Closure;
 use Swift_Mailer;
 use Swift_Message;
+use RuntimeException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use SuperClosure\Serializer;
@@ -310,7 +311,7 @@ class Mailer implements MailerContract, MailQueueContract
             return $callback;
         }
 
-        return ($this->serializer ?: new Serializer)->serialize($callback);
+        return $this->getSerializer()->serialize($callback);
     }
 
     /**
@@ -336,7 +337,7 @@ class Mailer implements MailerContract, MailQueueContract
     protected function getQueuedCallable(array $data)
     {
         if (Str::contains($data['callback'], 'SerializableClosure')) {
-            return ($this->serializer ?: new Serializer)->unserialize($data['callback']);
+            return $this->getSerializer()->unserialize($data['callback']);
         }
 
         return $data['callback'];
@@ -508,6 +509,26 @@ class Mailer implements MailerContract, MailQueueContract
     public function getSwiftMailer()
     {
         return $this->swift;
+    }
+
+    /**
+     * Get the super closure serializer instance.
+     *
+     * @return \SuperClosure\Serializer
+     *
+     * @throws \RuntimeException
+     */
+    public function getSerializer()
+    {
+        if ($this->serializer) {
+            return $this->serializer;
+        }
+
+        if (!class_exists(Serializer::class)) {
+            return $this->serializer = new Serializer;
+        }
+
+        throw new RuntimeException('SuperClosure is required to serialize closures.');
     }
 
     /**
