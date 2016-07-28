@@ -8,8 +8,7 @@ use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 
 /**
- * Class Fluent
- * @package Illuminate\Support
+ * Class Fluent.
  *
  * @see https://laravel.com/docs/master/migrations
  *
