@@ -568,15 +568,12 @@ if (! function_exists('image_data_uri')) {
      */
     function image_data_uri($image)
     {
-        $data_uri = null;
-
         if (file_exists($image) && ($image_type = exif_imagetype($image))) {
             $mime_type = image_type_to_mime_type($image_type);
             $data = base64_encode(file_get_contents($image));
-            $data_uri = "data:$mime_type;base64,$data";
+            
+            return "data:$mime_type;base64,$data";
         }
-
-        return $data_uri;
     }
 }
 
