@@ -751,6 +751,16 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(21, $model->id);
     }
 
+    public function testMassFill()
+    {
+        $model = new EloquentModelStub;
+        $keys = ['name', 'age'];
+        $model->fillable($keys);
+        $model->massFill($keys, 'Yoo');
+        $this->assertEquals('Yoo', $model->name);
+        $this->assertEquals('Yoo', $model->age);
+    }
+
     public function testUnguardAllowsAnythingToBeSet()
     {
         $model = new EloquentModelStub;
