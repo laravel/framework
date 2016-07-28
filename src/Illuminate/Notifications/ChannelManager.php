@@ -56,12 +56,18 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
         }
 
         foreach ($notifiables as $notifiable) {
-            foreach ($notification->via($notifiable) as $channel) {
-                $this->driver($channel)->send(collect([$notifiable]), $notification);
+            $channels = $notification->via($notifiable);
 
-                $this->app->make('events')->fire(
-                    new Events\NotificationSent($notifiable, $notification)
-                );
+            if (empty($channels)) {
+                continue;
+            }
+
+            $this->app->make('events')->fire(
+                new Events\NotificationSent($notifiable, $notification)
+            );
+
+            foreach ($channels as $channel) {
+                $this->driver($channel)->send(collect([$notifiable]), $notification);
             }
         }
     }
