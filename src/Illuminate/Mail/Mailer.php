@@ -524,7 +524,7 @@ class Mailer implements MailerContract, MailQueueContract
             return $this->serializer;
         }
 
-        if (!class_exists(Serializer::class)) {
+        if (! class_exists(Serializer::class)) {
             return $this->serializer = new Serializer;
         }
 
