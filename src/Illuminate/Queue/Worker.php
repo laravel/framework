@@ -122,7 +122,7 @@ class Worker
     protected function waitForChildProcess($processId, $timeout)
     {
         declare(ticks=1) {
-            pcntl_signal(SIGALRM, function () use ($processId) {
+            pcntl_signal(SIGALRM, function () use ($processId, $timeout) {
                 posix_kill($processId, SIGKILL);
 
                 $this->exceptions->report(new TimeoutException("Queue child process timed out after {$timeout} seconds."));
