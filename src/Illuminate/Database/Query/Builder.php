@@ -1091,6 +1091,7 @@ class Builder
     {
        return $this->addDateBasedWhere('Time', $column, $operator, $value, $boolean);
     }
+
     /**
      * Add an "or where time" statement to the query.
      *
