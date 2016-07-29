@@ -1421,6 +1421,42 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $collection = new Collection([1, 2, 2, 1]);
         $this->assertEquals([1, 2], $collection->mode());
     }
+
+    public function testSliceOffset()
+    {
+        $collection = new Collection([1, 2, 3, 4, 5, 6, 7, 8]);
+        $this->assertEquals([4, 5, 6, 7, 8], $collection->slice(3)->values()->toArray());
+    }
+
+    public function testSliceNegativeOffset()
+    {
+        $collection = new Collection([1, 2, 3, 4, 5, 6, 7, 8]);
+        $this->assertEquals([6, 7, 8], $collection->slice(-3)->values()->toArray());
+    }
+
+    public function testSliceOffsetAndLength()
+    {
+        $collection = new Collection([1, 2, 3, 4, 5, 6, 7, 8]);
+        $this->assertEquals([4, 5, 6], $collection->slice(3, 3)->values()->toArray());
+    }
+
+    public function testSliceOffsetAndNegativeLength()
+    {
+        $collection = new Collection([1, 2, 3, 4, 5, 6, 7, 8]);
+        $this->assertEquals([4, 5, 6, 7], $collection->slice(3, -1)->values()->toArray());
+    }
+
+    public function testSliceNegativeOffsetAndLength()
+    {
+        $collection = new Collection([1, 2, 3, 4, 5, 6, 7, 8]);
+        $this->assertEquals([4, 5, 6], $collection->slice(-5, 3)->values()->toArray());
+    }
+
+    public function testSliceNegativeOffsetAndNegativeLength()
+    {
+        $collection = new Collection([1, 2, 3, 4, 5, 6, 7, 8]);
+        $this->assertEquals([3, 4, 5, 6], $collection->slice(-6, -2)->values()->toArray());
+    }
 }
 
 class TestAccessorEloquentTestStub
