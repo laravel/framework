@@ -69,6 +69,25 @@ class ConsoleScheduledEventTest extends PHPUnit_Framework_TestCase
 
         $event = new Event('php foo');
         $this->assertEquals('0 15 4 * * *', $event->monthlyOn(4, '15:00')->getExpression());
+
+        $event = new Event('php foo');
+        $this->assertEquals('0 0 * * 1-5 *', $event->weekdays()->daily()->getExpression());
+
+        $event = new Event('php foo');
+        $this->assertEquals('0 * * * 1-5 *', $event->weekdays()->hourly()->getExpression());
+
+        // chained rules should be commutative
+        $eventA = new Event('php foo');
+        $eventB = new Event('php foo');
+        $this->assertEquals(
+            $eventA->daily()->hourly()->getExpression(),
+            $eventB->hourly()->daily()->getExpression());
+
+        $eventA = new Event('php foo');
+        $eventB = new Event('php foo');
+        $this->assertEquals(
+            $eventA->weekdays()->hourly()->getExpression(),
+            $eventB->hourly()->weekdays()->getExpression());
     }
 
     public function testEventIsDueCheck()
