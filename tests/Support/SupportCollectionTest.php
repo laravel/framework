@@ -1421,6 +1421,42 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $collection = new Collection([1, 2, 2, 1]);
         $this->assertEquals([1, 2], $collection->mode());
     }
+
+    public function testSingle()
+    {
+        $collection = new Collection(['foo', 'bar', 'baz']);
+
+        $result = $collection->single(function ($item) {
+            return $item === 'bar';
+        });
+        $this->assertEquals('bar', $result);
+    }
+
+    /**
+     * @expectedException        InvalidArgumentException
+     * @expectedExceptionMessage This sequence contains more than one matching element
+     */
+    public function testSingleThrowsAnErrorWhenMoreThanOneMatchingValueIsFound()
+    {
+        $collection = new Collection(['foo', 'foo', 'bar']);
+
+        $result = $collection->single(function ($item) {
+            return $item === 'foo';
+        });
+    }
+
+    /**
+     * @expectedException        InvalidArgumentException
+     * @expectedExceptionMessage This sequence contains no matching element
+     */
+    public function testSingleThrowsAnErrorWhenNoMatcingValueIsFound()
+    {
+        $collection = new Collection(['foo', 'bar']);
+
+        $result = $collection->single(function ($item) {
+            return $item === 'baz';
+        });
+    }
 }
 
 class TestAccessorEloquentTestStub

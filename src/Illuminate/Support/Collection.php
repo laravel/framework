@@ -664,6 +664,37 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Return a single item from the collection from a callback.
+     *
+     * @param  callable  $callback
+     * @return mixed
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function single(callable $callback)
+    {
+        $items = $this->items;
+        $resultCount = 0;
+
+        foreach ($items as $value) {
+            if ($callback($value)) {
+                $result = $value;
+                $resultCount += 1;
+            }
+        }
+
+        if ($resultCount === 0) {
+            throw new InvalidArgumentException('This sequence contains no matching element');
+        }
+
+        if ($resultCount > 1) {
+            throw new InvalidArgumentException('This sequence contains more than one matching element');
+        }
+
+        return $result;
+    }
+
+    /**
      * "Paginate" the collection by slicing it into a smaller collection.
      *
      * @param  int  $page
