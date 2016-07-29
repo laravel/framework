@@ -1177,6 +1177,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Dynamically retrieve items on the collection.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    public function __get($key)
+    {
+        return $this->get($key);
+    }
+
+    /**
      * Determine if an item exists at an offset.
      *
      * @param  mixed  $key
