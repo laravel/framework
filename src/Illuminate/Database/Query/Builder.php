@@ -1089,7 +1089,7 @@ class Builder
      */
     public function whereTime($column, $operator, $value, $boolean = 'and')
     {
-       return $this->addDateBasedWhere('Time', $column, $operator, $value, $boolean);
+        return $this->addDateBasedWhere('Time', $column, $operator, $value, $boolean);
     }
 
     /**
@@ -1102,7 +1102,7 @@ class Builder
      */
     public function orWhereTime($column, $operator, $value)
     {
-       return $this->whereTime($column, $operator, $value, 'or');
+        return $this->whereTime($column, $operator, $value, 'or');
     }
 
     /**
