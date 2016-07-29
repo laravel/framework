@@ -32,6 +32,7 @@ class Pluralizer
         'nutrition',
         'offspring',
         'plankton',
+        'pokemon',
         'police',
         'rice',
         'series',
