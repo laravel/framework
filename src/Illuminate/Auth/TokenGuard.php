@@ -80,7 +80,7 @@ class TokenGuard implements Guard
      */
     protected function getTokenForRequest()
     {
-        $token = $this->request->input($this->inputKey);
+        $token = $this->request->hasHeader($this->inputKey) ? $this->request->header($this->inputKey) : $this->request->input($this->inputKey);
 
         if (empty($token)) {
             $token = $this->request->bearerToken();
