@@ -29,7 +29,7 @@ class SlackWebhookChannel
      * Send the given notification.
      *
      * @param  \Illuminate\Support\Collection  $notifiables
-     * @param  \Illuminate\Notifications\Channels\Notification  $notification
+     * @param  \Illuminate\Notifications\Notification  $notification
      * @return void
      */
     public function send($notifiables, Notification $notification)
@@ -57,7 +57,7 @@ class SlackWebhookChannel
     /**
      * Format the given notification.
      *
-     * @param  \Illuminate\Notifications\Channels\Notification  $notification
+     * @param  \Illuminate\Notifications\Notification  $notification
      * @return string
      */
     protected function format(Notification $notification)
@@ -76,7 +76,7 @@ class SlackWebhookChannel
     /**
      * Get the color that should be applied to the notification.
      *
-     * @param  \Illuminate\Notifications\Channels\Notification  $notification
+     * @param  \Illuminate\Notifications\Notification  $notification
      * @return string|null
      */
     protected function color(Notification $notification)
