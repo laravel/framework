@@ -7,7 +7,7 @@ use ReflectionProperty;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Mail\Mailer;
+use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Contracts\Queue\Factory as Queue;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
 
@@ -100,10 +100,10 @@ class Mailable implements MailableContract
     /**
      * Send the message using the given mailer.
      *
-     * @param  Mailer  $mailer
+     * @param  MailerContract  $mailer
      * @return void
      */
-    public function send(Mailer $mailer)
+    public function send(MailerContract $mailer)
     {
         Container::getInstance()->call([$this, 'build']);
 
