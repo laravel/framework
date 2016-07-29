@@ -341,7 +341,7 @@ class Event
      */
     public function hourly()
     {
-        return $this->cron('0 * * * * *');
+        return $this->spliceIntoPosition(1, 0);
     }
 
     /**
@@ -351,7 +351,8 @@ class Event
      */
     public function daily()
     {
-        return $this->cron('0 0 * * * *');
+        return $this->spliceIntoPosition(1, 0)
+                    ->spliceIntoPosition(2, 0);
     }
 
     /**
@@ -481,7 +482,9 @@ class Event
      */
     public function weekly()
     {
-        return $this->cron('0 0 * * 0 *');
+        return $this->spliceIntoPosition(1, 0)
+                    ->spliceIntoPosition(2, 0)
+                    ->spliceIntoPosition(5, 0);
     }
 
     /**
@@ -505,7 +508,9 @@ class Event
      */
     public function monthly()
     {
-        return $this->cron('0 0 1 * * *');
+        return $this->spliceIntoPosition(1, 0)
+                    ->spliceIntoPosition(2, 0)
+                    ->spliceIntoPosition(3, 1);
     }
 
     /**
@@ -529,7 +534,10 @@ class Event
      */
     public function quarterly()
     {
-        return $this->cron('0 0 1 */3 *');
+        return $this->spliceIntoPosition(1, 0)
+                    ->spliceIntoPosition(2, 0)
+                    ->spliceIntoPosition(3, 1)
+                    ->spliceIntoPosition(4, '*/3');
     }
 
     /**
@@ -539,7 +547,10 @@ class Event
      */
     public function yearly()
     {
-        return $this->cron('0 0 1 1 * *');
+        return $this->spliceIntoPosition(1, 0)
+                    ->spliceIntoPosition(2, 0)
+                    ->spliceIntoPosition(3, 1)
+                    ->spliceIntoPosition(4, 1);
     }
 
     /**
@@ -549,7 +560,7 @@ class Event
      */
     public function everyMinute()
     {
-        return $this->cron('* * * * * *');
+        return $this->spliceIntoPosition(1, '*');
     }
 
     /**
@@ -559,7 +570,7 @@ class Event
      */
     public function everyFiveMinutes()
     {
-        return $this->cron('*/5 * * * * *');
+        return $this->spliceIntoPosition(1, '*/5');
     }
 
     /**
@@ -569,7 +580,7 @@ class Event
      */
     public function everyTenMinutes()
     {
-        return $this->cron('*/10 * * * * *');
+        return $this->spliceIntoPosition(1, '*/10');
     }
 
     /**
@@ -579,7 +590,7 @@ class Event
      */
     public function everyThirtyMinutes()
     {
-        return $this->cron('0,30 * * * * *');
+        return $this->spliceIntoPosition(1, '0,30');
     }
 
     /**
