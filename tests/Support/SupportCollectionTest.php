@@ -1421,6 +1421,18 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $collection = new Collection([1, 2, 2, 1]);
         $this->assertEquals([1, 2], $collection->mode());
     }
+
+    public function testSlice()
+    {
+        $collection = new Collection([1, 2, 3, 4]);
+        $this->assertEquals([3, 4], $collection->slice(2)->values()->toArray());
+    }
+
+    public function testSliceWithLength()
+    {
+        $collection = new Collection([1, 2, 3, 4]);
+        $this->assertEquals([2, 3], $collection->slice(1, 2)->values()->toArray());
+    }
 }
 
 class TestAccessorEloquentTestStub
