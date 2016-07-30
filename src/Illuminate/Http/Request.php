@@ -923,14 +923,14 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function fingerprint()
     {
-        if (! $this->route()) {
+        if (! $route = $this->route()) {
             throw new RuntimeException('Unable to generate fingerprint. Route unavailable.');
         }
 
         return sha1(
-            implode('|', $this->route()->methods()).
-            '|'.$this->route()->domain().
-            '|'.$this->route()->uri().
+            implode('|', $route->methods()).
+            '|'.$route->domain().
+            '|'.$route->uri().
             '|'.$this->ip()
         );
     }
