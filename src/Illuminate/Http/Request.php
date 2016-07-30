@@ -119,9 +119,11 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function fullUrlWithQuery(array $query)
     {
+        $question = $this->getBaseUrl().$this->getPathInfo() == '/' ? '/?' : '?';
+
         return count($this->query()) > 0
-                        ? $this->url().'/?'.http_build_query(array_merge($this->query(), $query))
-                        : $this->fullUrl().'?'.http_build_query($query);
+            ? $this->url().$question.http_build_query(array_merge($this->query(), $query))
+            : $this->fullUrl().$question.http_build_query($query);
     }
 
     /**
@@ -694,6 +696,16 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     public function isJson()
     {
         return Str::contains($this->header('CONTENT_TYPE'), ['/json', '+json']);
+    }
+
+    /**
+     * Determine if the current request probably expects a JSON response.
+     *
+     * @return bool
+     */
+    public function expectsJson()
+    {
+        return ($this->ajax() && ! $this->pjax()) || $this->wantsJson();
     }
 
     /**

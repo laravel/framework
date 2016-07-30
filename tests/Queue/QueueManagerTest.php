@@ -28,7 +28,6 @@ class QueueManagerTest extends PHPUnit_Framework_TestCase
             return $connector;
         });
         $queue->shouldReceive('setContainer')->once()->with($app);
-        $queue->shouldReceive('setEncrypter')->once()->with($encrypter);
 
         $this->assertSame($queue, $manager->connection('sync'));
     }
@@ -51,7 +50,6 @@ class QueueManagerTest extends PHPUnit_Framework_TestCase
             return $connector;
         });
         $queue->shouldReceive('setContainer')->once()->with($app);
-        $queue->shouldReceive('setEncrypter')->once()->with($encrypter);
 
         $this->assertSame($queue, $manager->connection('foo'));
     }
@@ -73,7 +71,6 @@ class QueueManagerTest extends PHPUnit_Framework_TestCase
             return $connector;
         });
         $queue->shouldReceive('setContainer')->once()->with($app);
-        $queue->shouldReceive('setEncrypter')->once()->with($encrypter);
 
         $this->assertSame($queue, $manager->connection('null'));
     }

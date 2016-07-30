@@ -164,7 +164,6 @@ class Validator implements ValidatorContract
     protected $implicitRules = [
         'Required', 'Filled', 'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll',
         'RequiredIf', 'RequiredUnless', 'Accepted', 'Present',
-        // 'Array', 'Boolean', 'Integer', 'Numeric', 'String',
     ];
 
     /**
@@ -190,23 +189,48 @@ class Validator implements ValidatorContract
      */
     public function __construct(TranslatorInterface $translator, array $data, array $rules, array $messages = [], array $customAttributes = [])
     {
+        $this->initialRules = $rules;
         $this->translator = $translator;
         $this->customMessages = $messages;
-        $this->data = $this->parseData($data);
         $this->customAttributes = $customAttributes;
-        $this->initialRules = $rules;
+        $this->data = $this->hydrateFiles($this->parseData($data));
 
         $this->setRules($rules);
     }
 
     /**
-     * Parse the data and hydrate the files array.
+     * Parse the data array.
+     *
+     * @param  array  $data
+     * @return array
+     */
+    public function parseData(array $data)
+    {
+        $newData = [];
+
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                $value = $this->parseData($value);
+            }
+
+            if (Str::contains($key, '.')) {
+                $newData[str_replace('.', '->', $key)] = $value;
+            } else {
+                $newData[$key] = $value;
+            }
+        }
+
+        return $newData;
+    }
+
+    /**
+     * Hydrate the files array.
      *
      * @param  array   $data
      * @param  string  $arrayKey
      * @return array
      */
-    protected function parseData(array $data, $arrayKey = null)
+    protected function hydrateFiles(array $data, $arrayKey = null)
     {
         if (is_null($arrayKey)) {
             $this->files = [];
@@ -223,7 +247,7 @@ class Validator implements ValidatorContract
 
                 unset($data[$key]);
             } elseif (is_array($value)) {
-                $this->parseData($value, $key);
+                $this->hydrateFiles($value, $key);
             }
         }
 
@@ -421,8 +445,10 @@ class Validator implements ValidatorContract
         // rule. Any error messages will be added to the containers with each of
         // the other error messages, returning true if we don't have messages.
         foreach ($this->rules as $attribute => $rules) {
+            $attribute = str_replace('\.', '->', $attribute);
+
             foreach ($rules as $rule) {
-                $this->validate($attribute, $rule);
+                $this->validateAttribute($attribute, $rule);
 
                 if ($this->shouldStopValidating($attribute)) {
                     break;
@@ -451,13 +477,27 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Run the validator's rules against its data.
+     *
+     * @return void
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function validate()
+    {
+        if ($this->fails()) {
+            throw new ValidationException($this);
+        }
+    }
+
+    /**
      * Validate a given attribute against a rule.
      *
      * @param  string  $attribute
      * @param  string  $rule
      * @return void
      */
-    protected function validate($attribute, $rule)
+    protected function validateAttribute($attribute, $rule)
     {
         list($rule, $parameters) = $this->parseRule($rule);
 
@@ -542,6 +582,7 @@ class Validator implements ValidatorContract
     {
         return $this->presentOrRuleIsImplicit($rule, $attribute, $value) &&
                $this->passesOptionalCheck($attribute) &&
+               $this->isNotNullIfMarkedAsNullable($attribute, $value) &&
                $this->hasNotFailedPreviousRuleIfPresenceRule($rule, $attribute);
     }
 
@@ -555,7 +596,11 @@ class Validator implements ValidatorContract
      */
     protected function presentOrRuleIsImplicit($rule, $attribute, $value)
     {
-        return $this->validateRequired($attribute, $value) || $this->isImplicit($rule);
+        if (is_string($value) && trim($value) === '') {
+            return $this->isImplicit($rule);
+        }
+
+        return $this->validatePresent($attribute, $value) || $this->isImplicit($rule);
     }
 
     /**
@@ -573,6 +618,22 @@ class Validator implements ValidatorContract
         }
 
         return true;
+    }
+
+    /**
+     * Determine if the attribute fails the nullable check.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    protected function isNotNullIfMarkedAsNullable($attribute, $value)
+    {
+        if (! $this->hasRule($attribute, ['Nullable'])) {
+            return true;
+        }
+
+        return ! is_null($value);
     }
 
     /**
@@ -646,6 +707,18 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * "Indicate" validation should pass if value is null.
+     *
+     * Always returns true, just lets us put "nullable" in rules.
+     *
+     * @return bool
+     */
+    protected function validateNullable()
+    {
+        return true;
+    }
+
+    /**
      * "Break" on first validation fail.
      *
      * Always returns true, just lets us put "bail" in rules.
@@ -703,7 +776,7 @@ class Validator implements ValidatorContract
      */
     protected function validatePresent($attribute, $value)
     {
-        return Arr::has($this->data, $attribute);
+        return Arr::has(array_merge($this->data, $this->files), $attribute);
     }
 
     /**
@@ -915,7 +988,7 @@ class Validator implements ValidatorContract
 
         $attributeData = $this->extractDataFromPath($explicitPath);
 
-        $otherValues = Arr::where(Arr::dot($attributeData), function ($key) use ($parameters) {
+        $otherValues = Arr::where(Arr::dot($attributeData), function ($value, $key) use ($parameters) {
             return Str::is($parameters[0], $key);
         });
 
@@ -993,11 +1066,7 @@ class Validator implements ValidatorContract
      */
     protected function validateArray($attribute, $value)
     {
-        if (! $this->hasAttribute($attribute)) {
-            return true;
-        }
-
-        return is_null($value) || is_array($value);
+        return is_array($value);
     }
 
     /**
@@ -1009,13 +1078,9 @@ class Validator implements ValidatorContract
      */
     protected function validateBoolean($attribute, $value)
     {
-        if (! $this->hasAttribute($attribute)) {
-            return true;
-        }
-
         $acceptable = [true, false, 0, 1, '0', '1'];
 
-        return is_null($value) || in_array($value, $acceptable, true);
+        return in_array($value, $acceptable, true);
     }
 
     /**
@@ -1027,11 +1092,7 @@ class Validator implements ValidatorContract
      */
     protected function validateInteger($attribute, $value)
     {
-        if (! $this->hasAttribute($attribute)) {
-            return true;
-        }
-
-        return is_null($value) || filter_var($value, FILTER_VALIDATE_INT) !== false;
+        return filter_var($value, FILTER_VALIDATE_INT) !== false;
     }
 
     /**
@@ -1043,11 +1104,7 @@ class Validator implements ValidatorContract
      */
     protected function validateNumeric($attribute, $value)
     {
-        if (! $this->hasAttribute($attribute)) {
-            return true;
-        }
-
-        return is_null($value) || is_numeric($value);
+        return is_numeric($value);
     }
 
     /**
@@ -1059,11 +1116,7 @@ class Validator implements ValidatorContract
      */
     protected function validateString($attribute, $value)
     {
-        if (! $this->hasAttribute($attribute)) {
-            return true;
-        }
-
-        return is_null($value) || is_string($value);
+        return is_string($value);
     }
 
     /**
@@ -1256,7 +1309,7 @@ class Validator implements ValidatorContract
 
         $attributeData = $this->extractDataFromPath($explicitPath);
 
-        $data = Arr::where(Arr::dot($attributeData), function ($key) use ($attribute, $attributeName) {
+        $data = Arr::where(Arr::dot($attributeData), function ($value, $key) use ($attribute, $attributeName) {
             return $key != $attribute && Str::is($attributeName, $key);
         });
 
@@ -1587,7 +1640,9 @@ class Validator implements ValidatorContract
         }
 
         if (isset($parameters['ratio'])) {
-            list($numerator, $denominator) = array_pad(sscanf($parameters['ratio'], '%d/%d'), 2, 1);
+            list($numerator, $denominator) = array_replace(
+                [1, 1], array_filter(sscanf($parameters['ratio'], '%f/%d'))
+            );
 
             return $numerator / $denominator == $width / $height;
         }
@@ -2530,7 +2585,7 @@ class Validator implements ValidatorContract
      * @param  string|array  $rules
      * @return bool
      */
-    protected function hasRule($attribute, $rules)
+    public function hasRule($attribute, $rules)
     {
         return ! is_null($this->getRule($attribute, $rules));
     }

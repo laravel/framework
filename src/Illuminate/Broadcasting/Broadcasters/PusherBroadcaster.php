@@ -3,9 +3,10 @@
 namespace Illuminate\Broadcasting\Broadcasters;
 
 use Pusher;
-use Illuminate\Contracts\Broadcasting\Broadcaster;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
-class PusherBroadcaster implements Broadcaster
+class PusherBroadcaster extends Broadcaster
 {
     /**
      * The Pusher SDK instance.
@@ -26,11 +27,31 @@ class PusherBroadcaster implements Broadcaster
     }
 
     /**
+     * Return the valid Pusher authentication response.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  mixed  $result
+     * @return mixed
+     */
+    protected function validAuthenticationResponse($request, $result)
+    {
+        if (Str::startsWith($request->channel_name, 'private')) {
+            return $this->pusher->socket_auth($request->channel_name, $request->socket_id);
+        } else {
+            return $this->pusher->presence_auth(
+                $request->channel_name, $request->socket_id, $request->user()->id, $result
+            );
+        }
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function broadcast(array $channels, $event, array $payload = [])
     {
-        $this->pusher->trigger($channels, $event, $payload);
+        $socket = Arr::pull($payload, 'socket');
+
+        $this->pusher->trigger($channels, $event, $payload, $socket);
     }
 
     /**

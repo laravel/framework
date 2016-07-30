@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Controller;
-use Illuminate\Foundation\Auth\Access\AuthorizesResources;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class AuthorizesResourcesTest extends PHPUnit_Framework_TestCase
 {
@@ -91,7 +91,7 @@ class AuthorizesResourcesTest extends PHPUnit_Framework_TestCase
 
 class AuthorizesResourcesController extends Controller
 {
-    use AuthorizesResources;
+    use AuthorizesRequests;
 
     public function __construct(Request $request)
     {

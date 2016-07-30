@@ -7,6 +7,7 @@ use Throwable;
 use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
+use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 class SyncQueue extends Queue implements QueueContract
 {
@@ -31,20 +32,28 @@ class SyncQueue extends Queue implements QueueContract
 
             $this->raiseAfterJobEvent($queueJob);
         } catch (Exception $e) {
-            $this->raiseExceptionOccurredJobEvent($queueJob, $e);
-
-            $this->handleFailedJob($queueJob);
-
-            throw $e;
+            $this->handleSyncException($queueJob, $e);
         } catch (Throwable $e) {
-            $this->raiseExceptionOccurredJobEvent($queueJob, $e);
-
-            $this->handleFailedJob($queueJob);
-
-            throw $e;
+            $this->handleSyncException($queueJob, new FatalThrowableError($e));
         }
 
         return 0;
+    }
+
+    /**
+     * Handle an exception that occured while processing a job.
+     *
+     * @param  \Illuminate\Queue\Jobs\Job  $queueJob
+     * @param  \Exception  $e
+     * @return void
+     */
+    protected function handleSyncException($queueJob, $e)
+    {
+        $this->raiseExceptionOccurredJobEvent($queueJob, $e);
+
+        $this->handleFailedJob($queueJob, $e);
+
+        throw $e;
     }
 
     /**
@@ -104,10 +113,8 @@ class SyncQueue extends Queue implements QueueContract
      */
     protected function raiseBeforeJobEvent(Job $job)
     {
-        $data = json_decode($job->getRawBody(), true);
-
         if ($this->container->bound('events')) {
-            $this->container['events']->fire(new Events\JobProcessing('sync', $job, $data));
+            $this->container['events']->fire(new Events\JobProcessing('sync', $job));
         }
     }
 
@@ -119,10 +126,8 @@ class SyncQueue extends Queue implements QueueContract
      */
     protected function raiseAfterJobEvent(Job $job)
     {
-        $data = json_decode($job->getRawBody(), true);
-
         if ($this->container->bound('events')) {
-            $this->container['events']->fire(new Events\JobProcessed('sync', $job, $data));
+            $this->container['events']->fire(new Events\JobProcessed('sync', $job));
         }
     }
 
@@ -130,15 +135,13 @@ class SyncQueue extends Queue implements QueueContract
      * Raise the exception occurred queue job event.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  \Throwable  $exception
+     * @param  \Exception  $e
      * @return void
      */
-    protected function raiseExceptionOccurredJobEvent(Job $job, $exception)
+    protected function raiseExceptionOccurredJobEvent(Job $job, $e)
     {
-        $data = json_decode($job->getRawBody(), true);
-
         if ($this->container->bound('events')) {
-            $this->container['events']->fire(new Events\JobExceptionOccurred('sync', $job, $data, $exception));
+            $this->container['events']->fire(new Events\JobExceptionOccurred('sync', $job, $e));
         }
     }
 
@@ -146,27 +149,27 @@ class SyncQueue extends Queue implements QueueContract
      * Handle the failed job.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  \Exception  $e
      * @return array
      */
-    protected function handleFailedJob(Job $job)
+    protected function handleFailedJob(Job $job, $e)
     {
-        $job->failed();
+        $job->failed($e);
 
-        $this->raiseFailedJobEvent($job);
+        $this->raiseFailedJobEvent($job, $e);
     }
 
     /**
      * Raise the failed queue job event.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  \Exception  $e
      * @return void
      */
-    protected function raiseFailedJobEvent(Job $job)
+    protected function raiseFailedJobEvent(Job $job, $e)
     {
-        $data = json_decode($job->getRawBody(), true);
-
         if ($this->container->bound('events')) {
-            $this->container['events']->fire(new Events\JobFailed('sync', $job, $data));
+            $this->container['events']->fire(new Events\JobFailed('sync', $job, $e));
         }
     }
 }

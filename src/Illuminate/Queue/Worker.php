@@ -7,7 +7,6 @@ use Throwable;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Queue\Failed\FailedJobProviderInterface;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 
@@ -19,13 +18,6 @@ class Worker
      * @var \Illuminate\Queue\QueueManager
      */
     protected $manager;
-
-    /**
-     * The failed job provider implementation.
-     *
-     * @var \Illuminate\Queue\Failed\FailedJobProviderInterface
-     */
-    protected $failer;
 
     /**
      * The event dispatcher instance.
@@ -52,17 +44,17 @@ class Worker
      * Create a new queue worker.
      *
      * @param  \Illuminate\Queue\QueueManager  $manager
-     * @param  \Illuminate\Queue\Failed\FailedJobProviderInterface  $failer
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
+     * @param  \Illuminate\Contracts\Debug\ExceptionHandler  $exceptions
      * @return void
      */
     public function __construct(QueueManager $manager,
-                                FailedJobProviderInterface $failer = null,
-                                Dispatcher $events = null)
+                                Dispatcher $events,
+                                ExceptionHandler $exceptions)
     {
-        $this->failer = $failer;
         $this->events = $events;
         $this->manager = $manager;
+        $this->exceptions = $exceptions;
     }
 
     /**
@@ -70,52 +62,23 @@ class Worker
      *
      * @param  string  $connectionName
      * @param  string  $queue
-     * @param  int     $delay
-     * @param  int     $memory
-     * @param  int     $sleep
-     * @param  int     $maxTries
-     * @return array
+     * @param  \Illuminate\Queue\WorkerOptions  $options
+     * @return void
      */
-    public function daemon($connectionName, $queue = null, $delay = 0, $memory = 128, $sleep = 3, $maxTries = 0)
+    public function daemon($connectionName, $queue, WorkerOptions $options)
     {
         $lastRestart = $this->getTimestampOfLastQueueRestart();
 
         while (true) {
             if ($this->daemonShouldRun()) {
-                $this->runNextJobForDaemon(
-                    $connectionName, $queue, $delay, $sleep, $maxTries
-                );
+                $this->runNextJobForDaemon($connectionName, $queue, $options);
             } else {
-                $this->sleep($sleep);
+                $this->sleep($options->sleep);
             }
 
-            if ($this->memoryExceeded($memory) || $this->queueShouldRestart($lastRestart)) {
+            if ($this->memoryExceeded($options->memory) ||
+                $this->queueShouldRestart($lastRestart)) {
                 $this->stop();
-            }
-        }
-    }
-
-    /**
-     * Run the next job for the daemon worker.
-     *
-     * @param  string  $connectionName
-     * @param  string  $queue
-     * @param  int  $delay
-     * @param  int  $sleep
-     * @param  int  $maxTries
-     * @return void
-     */
-    protected function runNextJobForDaemon($connectionName, $queue, $delay, $sleep, $maxTries)
-    {
-        try {
-            $this->pop($connectionName, $queue, $delay, $sleep, $maxTries);
-        } catch (Exception $e) {
-            if ($this->exceptions) {
-                $this->exceptions->report($e);
-            }
-        } catch (Throwable $e) {
-            if ($this->exceptions) {
-                $this->exceptions->report(new FatalThrowableError($e));
             }
         }
     }
@@ -127,44 +90,82 @@ class Worker
      */
     protected function daemonShouldRun()
     {
-        return $this->manager->isDownForMaintenance()
-                    ? false : $this->events->until('illuminate.queue.looping') !== false;
+        return ! $this->manager->isDownForMaintenance();
     }
 
     /**
-     * Listen to the given queue.
+     * Run the next job for the daemon worker.
      *
      * @param  string  $connectionName
      * @param  string  $queue
-     * @param  int     $delay
-     * @param  int     $sleep
-     * @param  int     $maxTries
-     * @return array
+     * @param  \Illuminate\Queue\WorkerOptions  $options
+     * @return void
      */
-    public function pop($connectionName, $queue = null, $delay = 0, $sleep = 3, $maxTries = 0)
+    protected function runNextJobForDaemon($connectionName, $queue, WorkerOptions $options)
+    {
+        if ($processId = pcntl_fork()) {
+            $this->waitForChildProcess($processId, $options->timeout);
+        } else {
+            $this->runNextJob($connectionName, $queue, $options);
+
+            exit;
+        }
+    }
+
+    /**
+     * Wait for the given child process to finish.
+     *
+     * @param  int  $processId
+     * @param  int  $timeout
+     * @return void
+     */
+    protected function waitForChildProcess($processId, $timeout)
+    {
+        declare(ticks=1) {
+            pcntl_signal(SIGALRM, function () use ($processId, $timeout) {
+                posix_kill($processId, SIGKILL);
+
+                $this->exceptions->report(new TimeoutException("Queue child process timed out after {$timeout} seconds."));
+            }, true);
+
+            pcntl_alarm($timeout);
+
+            pcntl_waitpid($processId, $status);
+
+            pcntl_alarm(0);
+        }
+    }
+
+    /**
+     * Process the next job on the queue.
+     *
+     * @param  string  $connectionName
+     * @param  string  $queue
+     * @param  \Illuminate\Queue\WorkerOptions  $options
+     * @return void
+     */
+    public function runNextJob($connectionName, $queue, WorkerOptions $options)
     {
         try {
-            $connection = $this->manager->connection($connectionName);
+            $job = $this->getNextJob(
+                $this->manager->connection($connectionName), $queue
+            );
 
-            $job = $this->getNextJob($connection, $queue);
-
-            // If we're able to pull a job off of the stack, we will process it and
-            // then immediately return back out. If there is no job on the queue
-            // we will "sleep" the worker for the specified number of seconds.
-            if (! is_null($job)) {
+            // If we're able to pull a job off of the stack, we will process it and then return
+            // from this method. If there is no job on the queue, we will "sleep" the worker
+            // for the specified number of seconds, then keep processing jobs after sleep.
+            if ($job) {
                 return $this->process(
-                    $this->manager->getName($connectionName), $job, $maxTries, $delay
+                    $connectionName, $job, $options
                 );
             }
         } catch (Exception $e) {
-            if ($this->exceptions) {
-                $this->exceptions->report($e);
-            }
+            $this->exceptions->report($e);
+        } catch (Throwable $e) {
+            $this->exceptions->report(new FatalThrowableError($e));
         }
 
-        $this->sleep($sleep);
-
-        return ['job' => null, 'failed' => false];
+        $this->sleep($options->sleep);
     }
 
     /**
@@ -176,10 +177,6 @@ class Worker
      */
     protected function getNextJob($connection, $queue)
     {
-        if (is_null($queue)) {
-            return $connection->pop();
-        }
-
         foreach (explode(',', $queue) as $queue) {
             if (! is_null($job = $connection->pop($queue))) {
                 return $job;
@@ -192,59 +189,58 @@ class Worker
      *
      * @param  string  $connection
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  int  $maxTries
-     * @param  int  $delay
-     * @return array|null
+     * @param  \Illuminate\Queue\WorkerOptions  $options
+     * @return void
      *
      * @throws \Throwable
      */
-    public function process($connection, Job $job, $maxTries = 0, $delay = 0)
+    public function process($connectionName, $job, WorkerOptions $options)
     {
-        if ($maxTries > 0 && $job->attempts() > $maxTries) {
-            return $this->logFailedJob($connection, $job);
-        }
-
         try {
-            $this->raiseBeforeJobEvent($connection, $job);
+            $this->raiseBeforeJobEvent($connectionName, $job);
 
-            // First we will fire off the job. Once it is done we will see if it will be
-            // automatically deleted after processing and if so we'll fire the delete
-            // method on the job. Otherwise, we will just keep on running our jobs.
+            // Here we will fire off the job and let it process. We will catch any exceptions so
+            // they can be reported to the developers logs, etc. Once the job is finished the
+            // proper events will be fired to let any listeners know this job has finished.
             $job->fire();
 
-            $this->raiseAfterJobEvent($connection, $job);
-
-            return ['job' => $job, 'failed' => false];
+            $this->raiseAfterJobEvent($connectionName, $job);
         } catch (Exception $e) {
-            $this->handleJobException($connection, $job, $delay, $e);
+            $this->handleJobException($connectionName, $job, $options, $e);
         } catch (Throwable $e) {
-            $this->handleJobException($connection, $job, $delay, $e);
+            $this->handleJobException(
+                $connectionName, $job, $options, new FatalThrowableError($e)
+            );
         }
     }
 
     /**
      * Handle an exception that occurred while the job was running.
      *
-     * @param  string  $connection
+     * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  int  $delay
-     * @param  \Throwable  $e
+     * @param  \Illuminate\Queue\WorkerOptions  $options
+     * @param  \Exception  $e
      * @return void
      *
-     * @throws \Throwable
+     * @throws \Exception
      */
-    protected function handleJobException($connection, Job $job, $delay, $e)
+    protected function handleJobException($connectionName, $job, WorkerOptions $options, $e)
     {
-        // If we catch an exception, we will attempt to release the job back onto
-        // the queue so it is not lost. This will let is be retried at a later
-        // time by another listener (or the same one). We will do that here.
+        // If we catch an exception, we will attempt to release the job back onto the queue
+        // so it is not lost entirely. This'll let the job be retried at a later time by
+        // another listener (or this same one). We will re-throw this exception after.
         try {
+            $this->markJobAsFailedIfHasExceededMaxAttempts(
+                $connectionName, $job, $options->maxTries, $e
+            );
+
             $this->raiseExceptionOccurredJobEvent(
-                $connection, $job, $e
+                $connectionName, $job, $e
             );
         } finally {
             if (! $job->isDeleted()) {
-                $job->release($delay);
+                $job->release($options->delay);
             }
         }
 
@@ -252,91 +248,87 @@ class Worker
     }
 
     /**
+     * Mark the given job as failed if it has exceeded the maximum allowed attempts.
+     *
+     * @param  string  $connectionName
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  int  $maxTries
+     * @param  \Exception  $e
+     * @return void
+     */
+    protected function markJobAsFailedIfHasExceededMaxAttempts(
+        $connectionName, $job, $maxTries, $e
+    ) {
+        if ($maxTries === 0 || $job->attempts() < $maxTries) {
+            return;
+        }
+
+        // If the job has failed, we will delete it, call the "failed" method and then call
+        // an event indicating the job has failed so it can be logged if needed. This is
+        // to allow every developer to better keep monitor of their failed queue jobs.
+        $job->delete();
+
+        $job->failed($e);
+
+        $this->raiseFailedJobEvent($connectionName, $job, $e);
+    }
+
+    /**
      * Raise the before queue job event.
      *
-     * @param  string  $connection
+     * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @return void
      */
-    protected function raiseBeforeJobEvent($connection, Job $job)
+    protected function raiseBeforeJobEvent($connectionName, $job)
     {
-        if ($this->events) {
-            $data = json_decode($job->getRawBody(), true);
-
-            $this->events->fire(new Events\JobProcessing($connection, $job, $data));
-        }
+        $this->events->fire(new Events\JobProcessing(
+            $connectionName, $job
+        ));
     }
 
     /**
      * Raise the after queue job event.
      *
-     * @param  string  $connection
+     * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @return void
      */
-    protected function raiseAfterJobEvent($connection, Job $job)
+    protected function raiseAfterJobEvent($connectionName, $job)
     {
-        if ($this->events) {
-            $data = json_decode($job->getRawBody(), true);
-
-            $this->events->fire(new Events\JobProcessed($connection, $job, $data));
-        }
+        $this->events->fire(new Events\JobProcessed(
+            $connectionName, $job
+        ));
     }
 
     /**
      * Raise the exception occurred queue job event.
      *
-     * @param  string  $connection
+     * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  \Throwable  $exception
+     * @param  \Exception  $e
      * @return void
      */
-    protected function raiseExceptionOccurredJobEvent($connection, Job $job, $exception)
+    protected function raiseExceptionOccurredJobEvent($connectionName, $job, $e)
     {
-        if ($this->events) {
-            $data = json_decode($job->getRawBody(), true);
-
-            $this->events->fire(new Events\JobExceptionOccurred($connection, $job, $data, $exception));
-        }
-    }
-
-    /**
-     * Log a failed job into storage.
-     *
-     * @param  string  $connection
-     * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @return array
-     */
-    protected function logFailedJob($connection, Job $job)
-    {
-        if ($this->failer) {
-            $failedId = $this->failer->log($connection, $job->getQueue(), $job->getRawBody());
-
-            $job->delete();
-
-            $job->failed();
-
-            $this->raiseFailedJobEvent($connection, $job, $failedId);
-        }
-
-        return ['job' => $job, 'failed' => true];
+        $this->events->fire(new Events\JobExceptionOccurred(
+            $connectionName, $job, $e
+        ));
     }
 
     /**
      * Raise the failed queue job event.
      *
-     * @param  string  $connection
+     * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  int|null  $failedId
+     * @param  \Exception  $e
      * @return void
      */
-    protected function raiseFailedJobEvent($connection, Job $job, $failedId)
+    protected function raiseFailedJobEvent($connectionName, $job, $e)
     {
-        if ($this->events) {
-            $data = json_decode($job->getRawBody(), true);
-
-            $this->events->fire(new Events\JobFailed($connection, $job, $data, $failedId));
-        }
+        $this->events->fire(new Events\JobFailed(
+            $connectionName, $job, $e
+        ));
     }
 
     /**
@@ -394,17 +386,6 @@ class Worker
     protected function queueShouldRestart($lastRestart)
     {
         return $this->getTimestampOfLastQueueRestart() != $lastRestart;
-    }
-
-    /**
-     * Set the exception handler to use in Daemon mode.
-     *
-     * @param  \Illuminate\Contracts\Debug\ExceptionHandler  $handler
-     * @return void
-     */
-    public function setDaemonExceptionHandler(ExceptionHandler $handler)
-    {
-        $this->exceptions = $handler;
     }
 
     /**

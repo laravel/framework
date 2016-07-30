@@ -77,7 +77,7 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
     {
         $array = [100, 200, 300];
 
-        $value = Arr::first($array, function ($key, $value) {
+        $value = Arr::first($array, function ($value) {
             return $value >= 150;
         });
 
@@ -88,10 +88,17 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
     public function testLast()
     {
         $array = [100, 200, 300];
-        $last = Arr::last($array, function () {
-            return true;
+
+        $last = Arr::last($array, function ($value) {
+            return $value < 250;
         });
-        $this->assertEquals(300, $last);
+        $this->assertEquals(200, $last);
+
+        $last = Arr::last($array, function ($value, $key) {
+            return $key < 2;
+        });
+        $this->assertEquals(200, $last);
+
         $this->assertEquals(300, Arr::last($array));
     }
 
@@ -105,6 +112,10 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $array = [['#foo', '#bar'], '#baz'];
         $this->assertEquals(['#foo', '#bar', '#baz'], Arr::flatten($array));
 
+        // Flattened array includes "null" items
+        $array = [['#foo', null], '#baz', null];
+        $this->assertEquals(['#foo', null, '#baz', null], Arr::flatten($array));
+
         // Sets of nested arrays are flattened
         $array = [['#foo', '#bar'], ['#baz']];
         $this->assertEquals(['#foo', '#bar', '#baz'], Arr::flatten($array));
@@ -113,19 +124,19 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $array = [['#foo', ['#bar']], ['#baz']];
         $this->assertEquals(['#foo', '#bar', '#baz'], Arr::flatten($array));
 
-        // Nested collections are flattened alongside arrays
+        // Nested arrays are flattened alongside arrays
         $array = [new Collection(['#foo', '#bar']), ['#baz']];
         $this->assertEquals(['#foo', '#bar', '#baz'], Arr::flatten($array));
 
-        // Nested collections containing plain arrays are flattened
+        // Nested arrays containing plain arrays are flattened
         $array = [new Collection(['#foo', ['#bar']]), ['#baz']];
         $this->assertEquals(['#foo', '#bar', '#baz'], Arr::flatten($array));
 
-        // Nested arrays containing collections are flattened
+        // Nested arrays containing arrays are flattened
         $array = [['#foo', new Collection(['#bar'])], ['#baz']];
         $this->assertEquals(['#foo', '#bar', '#baz'], Arr::flatten($array));
 
-        // Nested arrays containing collections containing arrays are flattened
+        // Nested arrays containing arrays containing arrays are flattened
         $array = [['#foo', new Collection(['#bar', ['#zap']])], ['#baz']];
         $this->assertEquals(['#foo', '#bar', '#zap', '#baz'], Arr::flatten($array));
     }
@@ -408,11 +419,22 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
     {
         $array = [100, '200', 300, '400', 500];
 
-        $array = Arr::where($array, function ($key, $value) {
+        $array = Arr::where($array, function ($value, $key) {
             return is_string($value);
         });
 
         $this->assertEquals([1 => 200, 3 => 400], $array);
+    }
+
+    public function testWhereKey()
+    {
+        $array = ['10' => 1, 'foo' => 3, 20 => 2];
+
+        $array = Arr::where($array, function ($value, $key) {
+            return is_numeric($key);
+        });
+
+        $this->assertEquals(['10' => 1, 20 => 2], $array);
     }
 
     public function testForget()

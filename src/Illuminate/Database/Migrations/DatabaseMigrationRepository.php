@@ -50,7 +50,20 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
         return $this->table()
                 ->orderBy('batch', 'asc')
                 ->orderBy('migration', 'asc')
-                ->pluck('migration');
+                ->pluck('migration')->all();
+    }
+
+    /**
+     * Get list of migrations.
+     *
+     * @param  int  $steps
+     * @return array
+     */
+    public function getMigrations($steps)
+    {
+        $query = $this->table()->where('batch', '>=', '1');
+
+        return $query->orderBy('migration', 'desc')->take($steps)->get()->all();
     }
 
     /**
@@ -62,7 +75,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     {
         $query = $this->table()->where('batch', $this->getLastBatchNumber());
 
-        return $query->orderBy('migration', 'desc')->get();
+        return $query->orderBy('migration', 'desc')->get()->all();
     }
 
     /**

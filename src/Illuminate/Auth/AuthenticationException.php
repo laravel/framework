@@ -7,31 +7,12 @@ use Exception;
 class AuthenticationException extends Exception
 {
     /**
-     * The guard instance.
-     *
-     * @var \Illuminate\Contracts\Auth\Guard
-     */
-    protected $guard;
-
-    /**
      * Create a new authentication exception.
      *
-     * @param \Illuminate\Contracts\Auth\Guard|null  $guard
+     * @param string  $message
      */
-    public function __construct($guard = null)
+    public function __construct($message = 'Unauthenticated.')
     {
-        $this->guard = $guard;
-
-        parent::__construct('Unauthenticated.');
-    }
-
-    /**
-     * Get the guard instance.
-     *
-     * @return \Illuminate\Contracts\Auth\Guard|null
-     */
-    public function guard()
-    {
-        return $this->guard;
+        parent::__construct($message);
     }
 }

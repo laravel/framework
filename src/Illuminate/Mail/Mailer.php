@@ -12,8 +12,9 @@ use InvalidArgumentException;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Container\Container;
-use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
+use Illuminate\Contracts\Queue\Factory as QueueContract;
+use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Contracts\Mail\MailQueue as MailQueueContract;
 
 class Mailer implements MailerContract, MailQueueContract
@@ -114,6 +115,28 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
+     * Begin the process of mailing a mailable class instance.
+     *
+     * @param  mixed  $users
+     * @return MailableMailer
+     */
+    public function to($users)
+    {
+        return (new MailableMailer($this))->to($users);
+    }
+
+    /**
+     * Begin the process of mailing a mailable class instance.
+     *
+     * @param  mixed  $users
+     * @return MailableMailer
+     */
+    public function bcc($users)
+    {
+        return (new MailableMailer($this))->bcc($users);
+    }
+
+    /**
      * Send a new message when only a raw text part.
      *
      * @param  string  $text
@@ -146,8 +169,12 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  \Closure|string  $callback
      * @return void
      */
-    public function send($view, array $data, $callback)
+    public function send($view, array $data = [], $callback = null)
     {
+        if ($view instanceof MailableContract) {
+            return $view->send($this);
+        }
+
         // First we need to parse the view, which could either be a string or an array
         // containing both an HTML and plain text versions of the view which should
         // be used when sending an e-mail. We will extract both of them out here.
@@ -168,7 +195,7 @@ class Mailer implements MailerContract, MailQueueContract
 
         $message = $message->getSwiftMessage();
 
-        return $this->sendSwiftMessage($message);
+        $this->sendSwiftMessage($message);
     }
 
     /**
@@ -180,11 +207,17 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  string|null  $queue
      * @return mixed
      */
-    public function queue($view, array $data, $callback, $queue = null)
+    public function queue($view, array $data = [], $callback = null, $queue = null)
     {
+        if ($view instanceof MailableContract) {
+            return $view->queue($this->queue);
+        }
+
         $callback = $this->buildQueueCallable($callback);
 
-        return $this->queue->push('mailer@handleQueuedMessage', compact('view', 'data', 'callback'), $queue);
+        return $this->queue->push(
+            'mailer@handleQueuedMessage', compact('view', 'data', 'callback'), $queue
+        );
     }
 
     /**
@@ -227,11 +260,18 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  string|null  $queue
      * @return mixed
      */
-    public function later($delay, $view, array $data, $callback, $queue = null)
+    public function later($delay, $view, array $data = [], $callback = null, $queue = null)
     {
+        if ($view instanceof MailableContract) {
+            return $view->later($delay, $this->queue);
+        }
+
         $callback = $this->buildQueueCallable($callback);
 
-        return $this->queue->later($delay, 'mailer@handleQueuedMessage', compact('view', 'data', 'callback'), $queue);
+        return $this->queue->later(
+            $delay, 'mailer@handleQueuedMessage',
+            compact('view', 'data', 'callback'), $queue
+        );
     }
 
     /**
