@@ -113,13 +113,11 @@ class FilesystemManager implements FactoryContract
             return $this->callCustomCreator($config);
         }
 
-        $driverMethod = 'create'.ucfirst($config['driver']).'Driver';
-
-        if (method_exists($this, $driverMethod)) {
-            return $this->{$driverMethod}($config);
-        } else {
+        if (! method_exists($this, $driverMethod = 'create'.ucfirst($config['driver']).'Driver')) {
             throw new InvalidArgumentException("Driver [{$config['driver']}] is not supported.");
         }
+
+        return $this->{$driverMethod}($config);
     }
 
     /**

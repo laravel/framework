@@ -90,23 +90,19 @@ class BroadcastManager implements FactoryContract
      */
     protected function resolve($name)
     {
-        $config = $this->getConfig($name);
-
-        if (is_null($config)) {
+        if (is_null($config = $this->getConfig($name))) {
             throw new InvalidArgumentException("Broadcaster [{$name}] is not defined.");
         }
 
         if (isset($this->customCreators[$config['driver']])) {
             return $this->callCustomCreator($config);
-        } else {
-            $driverMethod = 'create'.ucfirst($config['driver']).'Driver';
-
-            if (method_exists($this, $driverMethod)) {
-                return $this->{$driverMethod}($config);
-            } else {
-                throw new InvalidArgumentException("Driver [{$config['driver']}] is not supported.");
-            }
         }
+
+        if (! method_exists($this, $driverMethod = 'create'.ucfirst($config['driver']).'Driver')) {
+            throw new InvalidArgumentException("Driver [{$config['driver']}] is not supported.");
+        }
+
+        return $this->{$driverMethod}($config);
     }
 
     /**

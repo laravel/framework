@@ -80,23 +80,19 @@ class AuthManager implements FactoryContract
      */
     protected function resolve($name)
     {
-        $config = $this->getConfig($name);
-
-        if (is_null($config)) {
+        if (is_null($config = $this->getConfig($name))) {
             throw new InvalidArgumentException("Auth guard [{$name}] is not defined.");
         }
 
         if (isset($this->customCreators[$config['driver']])) {
             return $this->callCustomCreator($name, $config);
-        } else {
-            $driverMethod = 'create'.ucfirst($config['driver']).'Driver';
-
-            if (method_exists($this, $driverMethod)) {
-                return $this->{$driverMethod}($name, $config);
-            } else {
-                throw new InvalidArgumentException("Auth guard driver [{$name}] is not defined.");
-            }
         }
+
+        if (! method_exists($this, $driverMethod = 'create'.ucfirst($config['driver']).'Driver')) {
+            throw new InvalidArgumentException("Auth guard driver [{$name}] is not defined.");
+        }
+
+        return $this->{$driverMethod}($name, $config);
     }
 
     /**
