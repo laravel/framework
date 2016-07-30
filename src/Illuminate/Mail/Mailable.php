@@ -100,7 +100,7 @@ class Mailable implements MailableContract
     /**
      * Send the message using the given mailer.
      *
-     * @param  MailerContract  $mailer
+     * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
      * @return void
      */
     public function send(MailerContract $mailer)
@@ -119,7 +119,7 @@ class Mailable implements MailableContract
     /**
      * Queue the message for sending.
      *
-     * @param  Queue  $queue
+     * @param  \Illuminate\Contracts\Queue\Factory  $queue
      * @return mixed
      */
     public function queue(Queue $queue)
@@ -283,8 +283,8 @@ class Mailable implements MailableContract
     /**
      * Set the sender of the message.
      *
-     * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param  mixed  $address
+     * @param  mixed  $name
      * @return $this
      */
     public function from($address, $name = null)
@@ -295,8 +295,8 @@ class Mailable implements MailableContract
     /**
      * Set the recipients of the message.
      *
-     * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param  mixed  $address
+     * @param  mixed  $name
      * @return $this
      */
     public function to($address, $name = null)
@@ -307,8 +307,8 @@ class Mailable implements MailableContract
     /**
      * Set the recipients of the message.
      *
-     * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param  mixed  $address
+     * @param  mixed  $name
      * @return $this
      */
     public function cc($address, $name = null)
@@ -319,8 +319,8 @@ class Mailable implements MailableContract
     /**
      * Set the recipients of the message.
      *
-     * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param  mixed  $address
+     * @param  mixed  $name
      * @return $this
      */
     public function bcc($address, $name = null)
@@ -331,8 +331,8 @@ class Mailable implements MailableContract
     /**
      * Set the "reply to" address of the message.
      *
-     * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param  mixed  $address
+     * @param  mixed  $name
      * @return $this
      */
     public function replyTo($address, $name = null)
@@ -343,8 +343,8 @@ class Mailable implements MailableContract
     /**
      * Set the recipients of the message.
      *
-     * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param  mixed  $address
+     * @param  mixed  $name
      * @return $this
      */
     protected function setAddress($address, $name = null, $property = 'to')
@@ -395,7 +395,7 @@ class Mailable implements MailableContract
     /**
      * Set the plain text view for the message.
      *
-     * @param  string  $view
+     * @param  string  $textView
      * @param  array  $data
      * @return $this
      */
