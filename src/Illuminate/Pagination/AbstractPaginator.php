@@ -81,6 +81,13 @@ abstract class AbstractPaginator implements Htmlable
     protected static $presenterResolver;
 
     /**
+     * Render the paginator.
+     *
+     * @return mixed
+     */
+    abstract public function render();
+
+    /**
      * Determine if the given value is a valid page number.
      *
      * @param  int  $page
