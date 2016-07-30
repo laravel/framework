@@ -100,7 +100,7 @@ class Mailable implements MailableContract
     /**
      * Send the message using the given mailer.
      *
-     * @param  MailerContract  $mailer
+     * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
      * @return void
      */
     public function send(MailerContract $mailer)
@@ -119,7 +119,7 @@ class Mailable implements MailableContract
     /**
      * Queue the message for sending.
      *
-     * @param  Queue  $queue
+     * @param  \Illuminate\Contracts\Queue\Factory  $queue
      * @return mixed
      */
     public function queue(Queue $queue)
@@ -395,7 +395,7 @@ class Mailable implements MailableContract
     /**
      * Set the plain text view for the message.
      *
-     * @param  string  $view
+     * @param  string  $textView
      * @param  array  $data
      * @return $this
      */
