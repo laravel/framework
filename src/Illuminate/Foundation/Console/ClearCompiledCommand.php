@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Foundation\ComposerScripts;
 
 class ClearCompiledCommand extends Command
 {
@@ -27,15 +28,6 @@ class ClearCompiledCommand extends Command
      */
     public function fire()
     {
-        $compiledPath = $this->laravel->getCachedCompilePath();
-        $servicesPath = $this->laravel->getCachedServicesPath();
-
-        if (file_exists($compiledPath)) {
-            @unlink($compiledPath);
-        }
-
-        if (file_exists($servicesPath)) {
-            @unlink($servicesPath);
-        }
+        ComposerScripts::clearCompiled();
     }
 }
