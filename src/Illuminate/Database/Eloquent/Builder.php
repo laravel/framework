@@ -681,7 +681,8 @@ class Builder
             try {
                 return $this->getModel()->$name();
             } catch (BadMethodCallException $e) {
-                throw new RelationNotFoundException("Call to undefined relationship {$name} on Model {$this->getModel()}");
+                $className = get_class($this->getModel());
+                throw new RelationNotFoundException("Call to undefined relationship {$name} on Model {$className}");
             }
         });
 
