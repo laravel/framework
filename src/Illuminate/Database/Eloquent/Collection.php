@@ -5,6 +5,7 @@ namespace Illuminate\Database\Eloquent;
 use LogicException;
 use Illuminate\Support\Arr;
 use Illuminate\Contracts\Queue\QueueableCollection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection as BaseCollection;
 
 class Collection extends BaseCollection implements QueueableCollection
@@ -112,6 +113,25 @@ class Collection extends BaseCollection implements QueueableCollection
         }
 
         return new static(array_values($dictionary));
+    }
+
+    /**
+     * Run a map over each of the items.
+     *
+     * @param  callable  $callback
+     * @return static
+     */
+    public function map(callable $callback)
+    {
+        $keys = array_keys($this->items);
+
+        $items = array_map($callback, $this->items, $keys);
+
+        $result = new static(array_combine($keys, $items));
+
+        return $result->contains(function ($_, $item) {
+            return !($item instanceof Model);
+        }) ? $result->toBase() : $result;
     }
 
     /**
