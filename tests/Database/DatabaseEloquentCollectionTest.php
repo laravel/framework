@@ -153,7 +153,7 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
 
         $c = new Collection([$one, $two]);
 
-        $cAfterMap = $c->map(function($item) {
+        $cAfterMap = $c->map(function ($item) {
             return $item;
         });
 
@@ -168,7 +168,7 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
 
         $c = new Collection([$one, $two]);
 
-        $cAfterMap = $c->map(function($item) {
+        $cAfterMap = $c->map(function ($item) {
             return [];
         });
 
