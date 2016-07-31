@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Exception;
 use Illuminate\Console\Command;
 use Symfony\Component\Process\ProcessUtils;
 use Symfony\Component\Console\Input\InputOption;
