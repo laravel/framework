@@ -178,7 +178,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @return static
      */
     public function diff($items)
-    {   
+    {
         return new static(array_diff($this->items, $this->getArrayableItems($items)));
     }
 
