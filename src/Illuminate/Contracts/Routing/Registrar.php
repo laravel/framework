@@ -2,8 +2,6 @@
 
 namespace Illuminate\Contracts\Routing;
 
-use Closure;
-
 interface Registrar
 {
     /**
@@ -83,9 +81,9 @@ interface Registrar
     /**
      * Create a route group with shared attributes.
      *
-     * @param  array     $attributes
-     * @param  \Closure  $callback
+     * @param  array  $attributes
+     * @param  \Closure|string  $routes
      * @return void
      */
-    public function group(array $attributes, Closure $callback);
+    public function group(array $attributes, $routes);
 }
