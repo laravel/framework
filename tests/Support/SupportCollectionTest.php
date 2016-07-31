@@ -1457,6 +1457,12 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $collection = new Collection([1, 2, 3, 4, 5, 6, 7, 8]);
         $this->assertEquals([3, 4, 5, 6], $collection->slice(-6, -2)->values()->toArray());
     }
+
+    public function testToBase()
+    {
+        $collection = new Collection([1, 2, 3]);
+        $this->assertSame($collection, $collection->toBase());
+    }
 }
 
 class TestAccessorEloquentTestStub
