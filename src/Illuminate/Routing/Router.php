@@ -320,17 +320,23 @@ class Router implements RegistrarContract, BindingRegistrar
      * Create a route group with shared attributes.
      *
      * @param  array  $attributes
-     * @param  \Closure  $callback
+     * @param  \Closure|string  $routes
      * @return void
      */
-    public function group(array $attributes, Closure $callback)
+    public function group(array $attributes, $routes)
     {
         $this->updateGroupStack($attributes);
 
-        // Once we have updated the group stack, we will execute the user Closure and
-        // merge in the groups attributes when the route is created. After we have
-        // run the callback, we will pop the attributes off of this group stack.
-        call_user_func($callback, $this);
+        // Once we have updated the group stack, we'll load the provided routes and
+        // merge in the group's attributes when the routes are created. After we
+        // have created the routes, we will pop the attributes off the stack.
+        if ($routes instanceof Closure) {
+            $routes($this);
+        } else {
+            $router = $this;
+
+            require $routes;
+        }
 
         array_pop($this->groupStack);
     }
