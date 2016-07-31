@@ -125,21 +125,29 @@ class FactoryBuilder
      */
     protected function makeInstance(array $attributes = [])
     {
-        return Model::unguarded(function () use ($attributes) {
-            if (! isset($this->definitions[$this->class][$this->name])) {
-                throw new InvalidArgumentException("Unable to locate factory with name [{$this->name}] [{$this->class}].");
-            }
+        $attributes = array_merge($this->buildDefinition($attributes), $attributes);
 
-            $definition = call_user_func(
+        return new $this->class($this->callClosureAttributes($attributes));
+    }
+
+    /**
+     * Build the definition from the registered factory..
+     *
+     * @return array
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function buildDefinition(array $attributes)
+    {
+        if (! isset($this->definitions[$this->class][$this->name])) {
+            throw new InvalidArgumentException("Unable to locate factory with name [{$this->name}] [{$this->class}].");
+        }
+
+        return Model::unguarded(function () use ($attributes) {
+            return call_user_func(
                 $this->definitions[$this->class][$this->name],
                 $this->faker, $attributes
             );
-
-            $evaluated = $this->callClosureAttributes(
-                array_merge($definition, $attributes)
-            );
-
-            return new $this->class($evaluated);
         });
     }
 
@@ -151,11 +159,8 @@ class FactoryBuilder
      */
     protected function callClosureAttributes(array $attributes)
     {
-        foreach ($attributes as &$attribute) {
-            $attribute = $attribute instanceof Closure
-                            ? $attribute($attributes) : $attribute;
-        }
-
-        return $attributes;
+        return array_map(function ($attribute) use ($attributes) {
+            return value($attribute, $attributes);
+        }, $attributes);
     }
 }
