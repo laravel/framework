@@ -123,11 +123,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function map(callable $callback)
     {
-        $keys = array_keys($this->items);
-
-        $items = array_map($callback, $this->items, $keys);
-
-        $result = new static(array_combine($keys, $items));
+        $result = parent::map($callback);
 
         return $result->contains(function ($_, $item) {
             return !($item instanceof Model);
