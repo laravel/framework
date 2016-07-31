@@ -5,7 +5,6 @@ namespace Illuminate\Database\Eloquent;
 use LogicException;
 use Illuminate\Support\Arr;
 use Illuminate\Contracts\Queue\QueueableCollection;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection as BaseCollection;
 
 class Collection extends BaseCollection implements QueueableCollection
