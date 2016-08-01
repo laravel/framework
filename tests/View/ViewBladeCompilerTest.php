@@ -439,6 +439,18 @@ test
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
+    public function testForeachStatementsAreCompileWithUppercaseSyntax()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@foreach ($this->getUsers() AS $user)
+test
+@endforeach';
+        $expected = '<?php $__currentLoopData = $this->getUsers(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getFirstLoop(); ?>
+test
+<?php endforeach; $__env->popLoop(); $loop = $__env->getFirstLoop(); ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
     public function testNestedForeachStatementsAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
