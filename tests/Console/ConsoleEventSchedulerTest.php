@@ -42,7 +42,7 @@ class ConsoleEventSchedulerTest extends PHPUnit_Framework_TestCase
         $schedule->command('queue:listen', ['--tries' => 3]);
 
         $events = $schedule->events();
-        $binary = $escape.PHP_BINARY.$escape.(defined('HHVM_VERSION') ? ' --php' : '');
+        $binary = $escape.PHP_BINARY.$escape;
         $this->assertEquals($binary.' artisan queue:listen', $events[0]->command);
         $this->assertEquals($binary.' artisan queue:listen --tries=3', $events[1]->command);
         $this->assertEquals($binary.' artisan queue:listen --tries=3', $events[2]->command);
