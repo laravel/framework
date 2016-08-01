@@ -1095,16 +1095,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Return self to allow compatibility with Illuminate\Database\Eloquent\Collection.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function toBase()
-    {
-        return $this;
-    }
-
-    /**
      * Get the collection of items as a plain array.
      *
      * @return array
