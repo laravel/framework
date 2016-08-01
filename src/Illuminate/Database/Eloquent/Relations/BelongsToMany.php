@@ -817,7 +817,7 @@ class BelongsToMany extends Relation
         // if they exist in the array of current ones, and if not we will insert.
         $current = $this->newPivotQuery()->pluck($this->otherKey)->all();
 
-        $records = $this->formatSyncList($ids);
+        $records = $this->formatRecordsList($ids);
 
         $detach = array_diff($current, array_keys($records));
 
@@ -847,12 +847,12 @@ class BelongsToMany extends Relation
     }
 
     /**
-     * Format the sync list so that it is keyed by ID.
+     * Format the sync/toggle list so that it is keyed by ID.
      *
      * @param  array  $records
      * @return array
      */
-    protected function formatSyncList(array $records)
+    protected function formatRecordsList(array $records)
     {
         $results = [];
 
@@ -1122,6 +1122,63 @@ class BelongsToMany extends Relation
     protected function touchingParent()
     {
         return $this->getRelated()->touches($this->guessInverseRelation());
+    }
+
+    /**
+     * Toggles a model (or models) from the parent.
+     *
+     * Each existing model is detached, and non existing ones are attached.
+     *
+     * @param  mixed  $ids
+     * @return array
+     */
+    public function toggle($ids)
+    {
+        $changes = [
+            'attached' => [], 'detached' => [],
+        ];
+
+        if ($ids instanceof Model) {
+            $ids = $ids->getKey();
+        }
+
+        if ($ids instanceof Collection) {
+            $ids = $ids->modelKeys();
+        }
+
+        // First, we need to know which are the currently associated models.
+        $current = $this->newPivotQuery()->pluck($this->otherKey)->all();
+
+        $records = $this->formatRecordsList((array) $ids);
+
+        // Next, we will take the intersection of the currents and given records,
+        // and detach all of the entities that are in the common in "current"
+        // array and in the array of the new records.
+        $detach = array_values(array_intersect($current, array_keys($records)));
+
+        if (count($detach) > 0) {
+            $this->detach($detach, false);
+
+            $changes['detached'] = (array) array_map(function ($v) {
+                return is_numeric($v) ? (int) $v : (string) $v;
+            }, $detach);
+        }
+
+        // Finally, we attach the remaining records (those have not been detached
+        // and not are in the "current" array)
+        $attach = array_diff_key($records, array_flip($detach));
+
+        if (count($attach) > 0) {
+            $this->attach($attach, [], false);
+
+            $changes['attached'] = array_keys($attach);
+        }
+
+        if (count($changes['attached']) || count($changes['detached'])) {
+            $this->touchIfTouching();
+        }
+
+        return $changes;
     }
 
     /**
