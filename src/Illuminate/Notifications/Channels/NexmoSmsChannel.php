@@ -26,6 +26,7 @@ class NexmoSmsChannel
      * Create a new Nexmo channel instance.
      *
      * @param  \Nexmo\Client  $nexmo
+     * @param  string  $from
      * @return void
      */
     public function __construct(NexmoClient $nexmo, $from)
