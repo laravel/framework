@@ -23,6 +23,7 @@ class Action
      *
      * @param  string  $text
      * @param  string  $url
+     * @return void
      */
     public function __construct($text, $url)
     {
