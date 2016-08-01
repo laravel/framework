@@ -1667,6 +1667,22 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         }, 'someIdField');
     }
 
+    public function testChunkPaginatesUsingIdWithCompositeColumnName()
+    {
+        $builder = $this->getMockQueryBuilder();
+
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'table.id')->andReturn($builder);
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 10, 'table.id')->andReturn($builder);
+
+        $builder->shouldReceive('get')->times(2)->andReturn(
+            [(object) ['id' => 1], (object) ['id' => 10]],
+            []
+        );
+
+        $builder->chunkById(2, function ($results) {
+        }, 'table.id');
+    }
+
     public function testPaginate()
     {
         $perPage = 16;
