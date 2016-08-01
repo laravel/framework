@@ -3140,6 +3140,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Determine if the model or given attribute(s) have been remained the same.
+     *
+     * @param  array|string|null  $attributes
+     * @return bool
+     */
+    public function isClean($attributes = null)
+    {
+        return ! $this->isDirty(...func_get_args());
+    }
+
+    /**
      * Get the attributes that have been changed since last sync.
      *
      * @return array
