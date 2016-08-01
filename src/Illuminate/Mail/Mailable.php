@@ -289,7 +289,7 @@ class Mailable implements MailableContract
      */
     public function from($address, $name = null)
     {
-        $this->setAddress($address, $name, 'from');
+        return $this->setAddress($address, $name, 'from');
     }
 
     /**
