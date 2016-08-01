@@ -927,11 +927,9 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
             throw new RuntimeException('Unable to generate fingerprint. Route unavailable.');
         }
 
-        $values = array_merge(
+        return sha1(implode('|', array_merge(
             $route->methods(), [$route->domain(), $route->uri(), $this->ip()]
-        );
-
-        return sha1(implode('|', $values));
+        )));
     }
 
     /**
