@@ -923,16 +923,13 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function fingerprint()
     {
-        if (! $this->route()) {
+        if (! $route = $this->route()) {
             throw new RuntimeException('Unable to generate fingerprint. Route unavailable.');
         }
 
-        return sha1(
-            implode('|', $this->route()->methods()).
-            '|'.$this->route()->domain().
-            '|'.$this->route()->uri().
-            '|'.$this->ip()
-        );
+        return sha1(implode('|', array_merge(
+            $route->methods(), [$route->domain(), $route->uri(), $this->ip()]
+        )));
     }
 
     /**
@@ -1026,7 +1023,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function offsetSet($offset, $value)
     {
-        return $this->getInputSource()->set($offset, $value);
+        $this->getInputSource()->set($offset, $value);
     }
 
     /**
@@ -1037,7 +1034,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function offsetUnset($offset)
     {
-        return $this->getInputSource()->remove($offset);
+        $this->getInputSource()->remove($offset);
     }
 
     /**
@@ -1059,12 +1056,10 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function __get($key)
     {
-        $all = $this->all();
-
-        if (array_key_exists($key, $all)) {
-            return $all[$key];
-        } else {
-            return $this->route($key);
+        if ($this->offsetExists($key)) {
+            return $this->offsetGet($key);
         }
+
+        return $this->route($key);
     }
 }

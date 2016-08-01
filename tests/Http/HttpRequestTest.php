@@ -594,6 +594,28 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('user', $request->user());
     }
 
+    public function testFingerprintMethod()
+    {
+        $request = Request::create('/', 'GET', [], [], [], []);
+        $request->setRouteResolver(function () use ($request) {
+            $route = new Route('GET', '/foo/bar/{id}', []);
+            $route->bind($request);
+
+            return $route;
+        });
+
+        $this->assertEquals(40, mb_strlen($request->fingerprint()));
+    }
+
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testFingerprintWithoutRoute()
+    {
+        $request = Request::create('/', 'GET', [], [], [], []);
+        $request->fingerprint();
+    }
+
     public function testCreateFromBase()
     {
         $body = [
