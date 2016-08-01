@@ -91,25 +91,4 @@ class EncrypterTest extends PHPUnit_Framework_TestCase
         $b = new Encrypter(str_repeat('b', 16));
         $b->decrypt($a->encrypt('baz'));
     }
-<<<<<<< HEAD
-=======
-
-    public function testOpenSslEncrypterCanDecryptMcryptedData()
-    {
-        if (! extension_loaded('mcrypt')) {
-            $this->markTestSkipped('Mcrypt module not installed');
-        }
-
-        if (version_compare(PHP_VERSION, '7.1') > 0) {
-            $this->markTestSkipped('Not compatable with PHP 7.1+');
-        }
-
-        $key = Str::random(32);
-        $encrypter = new McryptEncrypter($key);
-        $encrypted = $encrypter->encrypt('foo');
-        $openSslEncrypter = new Encrypter($key, 'AES-256-CBC');
-
-        $this->assertEquals('foo', $openSslEncrypter->decrypt($encrypted));
-    }
->>>>>>> 5.2
 }
