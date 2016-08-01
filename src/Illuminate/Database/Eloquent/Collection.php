@@ -124,7 +124,7 @@ class Collection extends BaseCollection implements QueueableCollection
     {
         $result = parent::map($callback);
 
-        return $result->contains(function ($_, $item) {
+        return $result->contains(function ($item) {
             return ! ($item instanceof Model);
         }) ? $result->toBase() : $result;
     }
