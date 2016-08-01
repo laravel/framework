@@ -159,7 +159,7 @@ class DatabaseStore implements Store
             }
 
             $current = $this->encrypter->decrypt($cache->value);
-            $new = $callback($current, $value);
+            $new = $callback((int) $current, $value);
 
             if (! is_numeric($current)) {
                 return false;
