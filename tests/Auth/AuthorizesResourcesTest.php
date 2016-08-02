@@ -11,49 +11,49 @@ class AuthorizesResourcesTest extends PHPUnit_Framework_TestCase
     {
         $controller = new AuthorizesResourcesController($this->request('index'));
 
-        $this->assertHasMiddleware($controller, 'can:view,App\User');
+        $this->assertHasMiddleware($controller, 'index', 'can:view,App\User');
     }
 
     public function testCreateMethod()
     {
         $controller = new AuthorizesResourcesController($this->request('create'));
 
-        $this->assertHasMiddleware($controller, 'can:create,App\User');
+        $this->assertHasMiddleware($controller, 'create', 'can:create,App\User');
     }
 
     public function testStoreMethod()
     {
         $controller = new AuthorizesResourcesController($this->request('store'));
 
-        $this->assertHasMiddleware($controller, 'can:create,App\User');
+        $this->assertHasMiddleware($controller, 'store', 'can:create,App\User');
     }
 
     public function testShowMethod()
     {
         $controller = new AuthorizesResourcesController($this->request('show'));
 
-        $this->assertHasMiddleware($controller, 'can:view,user');
+        $this->assertHasMiddleware($controller, 'show', 'can:view,user');
     }
 
     public function testEditMethod()
     {
         $controller = new AuthorizesResourcesController($this->request('edit'));
 
-        $this->assertHasMiddleware($controller, 'can:update,user');
+        $this->assertHasMiddleware($controller, 'edit', 'can:update,user');
     }
 
     public function testUpdateMethod()
     {
         $controller = new AuthorizesResourcesController($this->request('update'));
 
-        $this->assertHasMiddleware($controller, 'can:update,user');
+        $this->assertHasMiddleware($controller, 'update', 'can:update,user');
     }
 
     public function testDestroyMethod()
     {
         $controller = new AuthorizesResourcesController($this->request('destroy'));
 
-        $this->assertHasMiddleware($controller, 'can:delete,user');
+        $this->assertHasMiddleware($controller, 'destroy', 'can:delete,user');
     }
 
     /**
@@ -63,10 +63,11 @@ class AuthorizesResourcesTest extends PHPUnit_Framework_TestCase
      * @param  string  $middleware
      * @return void
      */
-    protected function assertHasMiddleware($controller, $middleware)
+    protected function assertHasMiddleware($controller, $method, $middleware)
     {
         $this->assertTrue(
-            in_array($middleware, array_keys($controller->getMiddleware())),
+            in_array($middleware, array_keys($controller->getMiddleware()))
+            && in_array($method, $controller->getMiddleware()[$middleware]['only']),
             "The [{$middleware}] middleware was not registered"
         );
     }
