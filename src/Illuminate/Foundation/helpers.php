@@ -599,7 +599,11 @@ if (! function_exists('request')) {
             return app('request');
         }
 
-        return app('request')->input($key, $default);
+        if (is_array($key)) {
+            return app('request')->only($key);
+        } else {
+            return app('request')->input($key, $default);
+        }
     }
 }
 
