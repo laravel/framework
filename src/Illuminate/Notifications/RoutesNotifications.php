@@ -10,12 +10,14 @@ trait RoutesNotifications
     /**
      * Send the given notification.
      *
-     * @param  mixed  $instance
+     * @param  Notification  $instance
      * @return void
      */
-    public function notify($instance)
+    public function notify(Notification $instance)
     {
-        app(Dispatcher::class)->send([$this], $instance);
+        if ($instance->enabled($this)) {
+            app(Dispatcher::class)->send([$this], $instance);
+        }
     }
 
     /**
