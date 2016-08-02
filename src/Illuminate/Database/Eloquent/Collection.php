@@ -115,6 +115,21 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Run a map over each of the items.
+     *
+     * @param  callable  $callback
+     * @return static
+     */
+    public function map(callable $callback)
+    {
+        $result = parent::map($callback);
+
+        return $result->contains(function ($item) {
+            return ! ($item instanceof Model);
+        }) ? $result->toBase() : $result;
+    }
+
+    /**
      * Diff the collection with the given items.
      *
      * @param  \ArrayAccess|array  $items
