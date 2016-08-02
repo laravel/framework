@@ -2,6 +2,7 @@
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Notifications\Dispatcher;
+use Illuminate\Notifications\Notification;
 
 class NotificationRoutesNotificationsTest extends PHPUnit_Framework_TestCase
 {
@@ -16,8 +17,21 @@ class NotificationRoutesNotificationsTest extends PHPUnit_Framework_TestCase
         $factory = Mockery::mock(Dispatcher::class);
         $container->instance(Dispatcher::class, $factory);
         $notifiable = new RoutesNotificationsTestInstance;
-        $instance = new StdClass;
+        $instance = new Notification();
         $factory->shouldReceive('send')->with([$notifiable], $instance);
+        Container::setInstance($container);
+
+        $notifiable->notify($instance);
+    }
+
+    public function testNotificationCanBeDisabled()
+    {
+        $container = new Container;
+        $factory = Mockery::mock(Dispatcher::class);
+        $container->instance(Dispatcher::class, $factory);
+        $notifiable = new RoutesNotificationsTestInstance;
+        $instance = new DisabledNotification;
+        $factory->shouldNotReceive('send')->with([$notifiable], $instance);
         Container::setInstance($container);
 
         $notifiable->notify($instance);
@@ -42,5 +56,13 @@ class RoutesNotificationsTestInstance
     public function routeNotificationForFoo()
     {
         return 'bar';
+    }
+}
+
+class DisabledNotification extends Notification
+{
+    public function enabled()
+    {
+        return false;
     }
 }

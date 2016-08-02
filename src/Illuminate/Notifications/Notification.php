@@ -99,6 +99,16 @@ class Notification
     }
 
     /**
+     * Specify if the notification is enabled and can be sent.
+     *
+     * @return bool
+     */
+    public function enabled()
+    {
+        return true;
+    }
+
+    /**
      * Indicate that the notification gives information about a successful operation.
      *
      * @return $this
