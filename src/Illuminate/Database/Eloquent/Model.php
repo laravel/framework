@@ -3133,7 +3133,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Determine if the model or given attribute(s) have been remained the same.
+     * Determine if the model or given attribute(s) have remained the same.
      *
      * @param  array|string|null  $attributes
      * @return bool
