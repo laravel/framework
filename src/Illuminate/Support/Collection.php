@@ -1169,6 +1169,18 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Get a base Support collection instance from this collection.
+     *
+     * Provided for API compatibility with Eloquent collections.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function toBase()
+    {
+        return $this;
+    }
+
+    /**
      * Determine if an item exists at an offset.
      *
      * @param  mixed  $key
