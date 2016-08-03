@@ -161,18 +161,16 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf(Collection::class, $cAfterMap);
     }
 
-    public function testCollectionChangesToBaseCollectionIfMapLosesModels()
+    public function testMappingToNonModelsReturnsABaseCollection()
     {
         $one = m::mock('Illuminate\Database\Eloquent\Model');
         $two = m::mock('Illuminate\Database\Eloquent\Model');
 
-        $c = new Collection([$one, $two]);
-
-        $cAfterMap = $c->map(function ($item) {
-            return [];
+        $c = (new Collection([$one, $two]))->map(function ($item) {
+            return 'not-a-model';
         });
 
-        $this->assertInstanceOf(BaseCollection::class, $cAfterMap);
+        $this->assertEquals(BaseCollection::class, get_class($c));
     }
 
     public function testCollectionDiffsWithGivenCollection()
