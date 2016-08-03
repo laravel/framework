@@ -1221,6 +1221,14 @@ class Validator implements ValidatorContract
     protected function validateIn($attribute, $value, $parameters)
     {
         if (is_array($value) && $this->hasRule($attribute, 'Array')) {
+
+            // Avoid performing validation on multi dimensional array
+            foreach ($value as $element) {
+                if (is_array($element)) {
+                    return false;
+                }
+            }
+
             return count(array_diff($value, $parameters)) == 0;
         }
 
