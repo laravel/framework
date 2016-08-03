@@ -78,8 +78,8 @@ class QueueTableCommandTest extends PHPUnit_Framework_TestCase
                     'database' => ['table' => 'jobs_test'],
                 ],
                 'failed' => [
-                    'table' => 'failed_test'
-                ]
+                    'table' => 'failed_test',
+                ],
             ],
         ]);
     }
