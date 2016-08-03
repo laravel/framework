@@ -191,6 +191,8 @@ class WorkCommand extends Command
         return [
             ['queue', null, InputOption::VALUE_OPTIONAL, 'The queue to listen on'],
 
+            ['daemon', null, InputOption::VALUE_NONE, 'Run the worker in daemon mode (Deprecated)'],
+
             ['once', null, InputOption::VALUE_NONE, 'Only process the next job on the queue'],
 
             ['delay', null, InputOption::VALUE_OPTIONAL, 'Amount of time to delay failed jobs', 0],
