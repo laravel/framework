@@ -38,7 +38,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     }
 
     /**
-     * Send the given notification immtediately.
+     * Send the given notification immediately.
      *
      * @param  \Illuminate\Support\Collection|array  $notifiables
      * @param  mixed  $notification
