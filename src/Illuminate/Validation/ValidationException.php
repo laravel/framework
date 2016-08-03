@@ -9,22 +9,22 @@ class ValidationException extends Exception
     /**
      * The validator instance.
      *
-     * @var \Illuminate\Validation\Validator
+     * @var \Illuminate\Contracts\Validation\Validator
      */
     public $validator;
 
     /**
      * The recommended response to send to the client.
      *
-     * @var \Illuminate\Http\Response|null
+     * @var \Symfony\Component\HttpFoundation\Response|null
      */
     public $response;
 
     /**
      * Create a new exception instance.
      *
-     * @param  \Illuminate\Validation\Validator  $validator
-     * @param  \Illuminate\Http\Response  $response
+     * @param  \Illuminate\Contracts\Validation\Validator  $validator
+     * @param  \Symfony\Component\HttpFoundation\Response  $response
      * @return void
      */
     public function __construct($validator, $response = null)
@@ -38,7 +38,7 @@ class ValidationException extends Exception
     /**
      * Get the underlying response instance.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\Response|null
      */
     public function getResponse()
     {

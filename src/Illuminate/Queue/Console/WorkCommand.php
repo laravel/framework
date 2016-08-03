@@ -5,6 +5,7 @@ namespace Illuminate\Queue\Console;
 use Carbon\Carbon;
 use Illuminate\Queue\Worker;
 use Illuminate\Console\Command;
+use Illuminate\Queue\WorkerOptions;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
@@ -54,7 +55,7 @@ class WorkCommand extends Command
      */
     public function fire()
     {
-        if ($this->downForMaintenance() && ! $this->option('daemon')) {
+        if ($this->downForMaintenance() && $this->option('once')) {
             return $this->worker->sleep($this->option('sleep'));
         }
 
@@ -63,19 +64,50 @@ class WorkCommand extends Command
         // which jobs are coming through a queue and be informed on its progress.
         $this->listenForEvents();
 
-        $queue = $this->option('queue');
+        $connection = $this->argument('connection')
+                        ?: $this->laravel['config']['queue.default'];
 
-        $delay = $this->option('delay');
+        // We need to get the right queue for the connection which is set in the queue
+        // configuration file for the application. We will pull it based on the set
+        // connection being run for the queue operation currently being executed.
+        $queue = $this->option('queue') ?: $this->laravel['config']->get(
+            "queue.connections.{$connection}.queue", 'default'
+        );
 
-        // The memory limit is the amount of memory we will allow the script to occupy
-        // before killing it and letting a process manager restart it for us, which
-        // is to protect us against any memory leaks that will be in the scripts.
-        $memory = $this->option('memory');
+        $response = $this->runWorker(
+            $connection, $queue
+        );
+    }
 
-        $connection = $this->argument('connection');
+    /**
+     * Run the worker instance.
+     *
+     * @param  string  $connection
+     * @param  string  $queue
+     * @return array
+     */
+    protected function runWorker($connection, $queue)
+    {
+        $this->worker->setCache($this->laravel['cache']->driver());
 
-        $this->runWorker(
-            $connection, $queue, $delay, $memory, $this->option('daemon')
+        $method = $this->option('once') ? 'runNextJob' : 'daemon';
+
+        return $this->worker->{$method}(
+            $connection, $queue, $this->gatherWorkerOptions()
+        );
+    }
+
+    /**
+     * Gather all of the queue worker options as a single object.
+     *
+     * @return \Illuminate\Queue\WorkerOptions
+     */
+    protected function gatherWorkerOptions()
+    {
+        return new WorkerOptions(
+            $this->option('delay'), $this->option('memory'),
+            $this->option('timeout', 60), $this->option('sleep'),
+            $this->option('tries')
         );
     }
 
@@ -92,38 +124,9 @@ class WorkCommand extends Command
 
         $this->laravel['events']->listen(JobFailed::class, function ($event) {
             $this->writeOutput($event->job, true);
+
+            $this->logFailedJob($event);
         });
-    }
-
-    /**
-     * Run the worker instance.
-     *
-     * @param  string  $connection
-     * @param  string  $queue
-     * @param  int  $delay
-     * @param  int  $memory
-     * @param  bool  $daemon
-     * @return array
-     */
-    protected function runWorker($connection, $queue, $delay, $memory, $daemon = false)
-    {
-        $this->worker->setDaemonExceptionHandler(
-            $this->laravel['Illuminate\Contracts\Debug\ExceptionHandler']
-        );
-
-        if ($daemon) {
-            $this->worker->setCache($this->laravel['cache']->driver());
-
-            return $this->worker->daemon(
-                $connection, $queue, $delay, $memory,
-                $this->option('sleep'), $this->option('tries')
-            );
-        }
-
-        return $this->worker->pop(
-            $connection, $queue, $delay,
-            $this->option('sleep'), $this->option('tries')
-        );
     }
 
     /**
@@ -143,17 +146,27 @@ class WorkCommand extends Command
     }
 
     /**
+     * Store a failed job event.
+     *
+     * @param  JobFailed  $event
+     * @return void
+     */
+    protected function logFailedJob(JobFailed $event)
+    {
+        $this->laravel['queue.failer']->log(
+            $event->connectionName, $event->job->getQueue(),
+            $event->job->getRawBody(), $event->exception
+        );
+    }
+
+    /**
      * Determine if the worker should run in maintenance mode.
      *
      * @return bool
      */
     protected function downForMaintenance()
     {
-        if ($this->option('force')) {
-            return false;
-        }
-
-        return $this->laravel->isDownForMaintenance();
+        return $this->option('force') ? false : $this->laravel->isDownForMaintenance();
     }
 
     /**
@@ -178,7 +191,7 @@ class WorkCommand extends Command
         return [
             ['queue', null, InputOption::VALUE_OPTIONAL, 'The queue to listen on'],
 
-            ['daemon', null, InputOption::VALUE_NONE, 'Run the worker in daemon mode'],
+            ['once', null, InputOption::VALUE_NONE, 'Only process the next job on the queue'],
 
             ['delay', null, InputOption::VALUE_OPTIONAL, 'Amount of time to delay failed jobs', 0],
 
@@ -187,6 +200,8 @@ class WorkCommand extends Command
             ['memory', null, InputOption::VALUE_OPTIONAL, 'The memory limit in megabytes', 128],
 
             ['sleep', null, InputOption::VALUE_OPTIONAL, 'Number of seconds to sleep when no job is available', 3],
+
+            ['timeout', null, InputOption::VALUE_OPTIONAL, 'The number of seconds a child process can run', 60],
 
             ['tries', null, InputOption::VALUE_OPTIONAL, 'Number of times to attempt a job before logging it failed', 0],
         ];

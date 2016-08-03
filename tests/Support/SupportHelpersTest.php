@@ -10,13 +10,6 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-    public function testArrayBuild()
-    {
-        $this->assertEquals(['foo' => 'bar'], array_build(['foo' => 'bar'], function ($key, $value) {
-            return [$key, $value];
-        }));
-    }
-
     public function testArrayDot()
     {
         $array = array_dot(['name' => 'taylor', 'languages' => ['php' => true]]);
@@ -143,7 +136,7 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
     public function testArrayFirst()
     {
         $array = ['name' => 'taylor', 'otherDeveloper' => 'dayle'];
-        $this->assertEquals('dayle', array_first($array, function ($key, $value) {
+        $this->assertEquals('dayle', array_first($array, function ($value) {
             return $value == 'dayle';
         }));
     }
@@ -151,7 +144,7 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
     public function testArrayLast()
     {
         $array = [100, 250, 290, 320, 500, 560, 670];
-        $this->assertEquals(670, array_last($array, function ($key, $value) {
+        $this->assertEquals(670, array_last($array, function ($value) {
             return $value > 320;
         }));
     }
@@ -641,7 +634,7 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $array = ['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5, 'f' => 6, 'g' => 7, 'h' => 8];
         $this->assertEquals(['b' => 2, 'd' => 4, 'f' => 6, 'h' => 8], array_where(
             $array,
-            function ($key, $value) {
+            function ($value, $key) {
                 return $value % 2 === 0;
             }
         ));
@@ -679,6 +672,14 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $developer = ['firstname' => 'Ferid', 'surname' => 'Mövsümov'];
         $this->assertEquals('Mövsümov', array_pull($developer, 'surname'));
         $this->assertEquals(['firstname' => 'Ferid'], $developer);
+    }
+
+    public function testTap()
+    {
+        $object = (object) ['id' => 1];
+        $this->assertEquals(2, tap($object, function ($object) {
+            $object->id = 2;
+        })->id);
     }
 }
 

@@ -78,7 +78,7 @@ abstract class PageConstraint extends PHPUnit_Framework_Constraint
         );
 
         if (! empty($description)) {
-            $failureDescription .= ": $description";
+            $failureDescription .= ": {$description}";
         }
 
         if (trim($html) != '') {
@@ -98,6 +98,16 @@ abstract class PageConstraint extends PHPUnit_Framework_Constraint
     protected function getFailureDescription()
     {
         return 'the page contains '.$this->toString();
+    }
+
+    /**
+     * Returns the reversed description of the failure.
+     *
+     * @return string
+     */
+    protected function getReverseFailureDescription()
+    {
+        return 'the page does not contain '.$this->toString();
     }
 
     /**

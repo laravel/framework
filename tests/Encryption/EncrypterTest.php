@@ -1,8 +1,6 @@
 <?php
 
-use Illuminate\Support\Str;
 use Illuminate\Encryption\Encrypter;
-use Illuminate\Encryption\McryptEncrypter;
 
 class EncrypterTest extends PHPUnit_Framework_TestCase
 {
@@ -92,23 +90,5 @@ class EncrypterTest extends PHPUnit_Framework_TestCase
         $a = new Encrypter(str_repeat('a', 16));
         $b = new Encrypter(str_repeat('b', 16));
         $b->decrypt($a->encrypt('baz'));
-    }
-
-    public function testOpenSslEncrypterCanDecryptMcryptedData()
-    {
-        if (! extension_loaded('mcrypt')) {
-            $this->markTestSkipped('Mcrypt module not installed');
-        }
-
-        if (version_compare(PHP_VERSION, '7.1') > 0) {
-            $this->markTestSkipped('Not compatable with PHP 7.1+');
-        }
-
-        $key = Str::random(32);
-        $encrypter = new McryptEncrypter($key);
-        $encrypted = $encrypter->encrypt('foo');
-        $openSslEncrypter = new Encrypter($key, 'AES-256-CBC');
-
-        $this->assertEquals('foo', $openSslEncrypter->decrypt($encrypted));
     }
 }

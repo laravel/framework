@@ -3,6 +3,7 @@
 namespace Illuminate\Pipeline;
 
 use Closure;
+use RuntimeException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Pipeline\Pipeline as PipelineContract;
 
@@ -39,10 +40,10 @@ class Pipeline implements PipelineContract
     /**
      * Create a new class instance.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @param  \Illuminate\Contracts\Container\Container|null  $container
      * @return void
      */
-    public function __construct(Container $container)
+    public function __construct(Container $container = null)
     {
         $this->container = $container;
     }
@@ -123,7 +124,7 @@ class Pipeline implements PipelineContract
                     // If the pipe is a string we will parse the string and resolve the class out
                     // of the dependency injection container. We can then build a callable and
                     // execute the pipe function giving in the parameters that are required.
-                    $pipe = $this->container->make($name);
+                    $pipe = $this->getContainer()->make($name);
 
                     $parameters = array_merge([$passable, $stack], $parameters);
                 } else {
@@ -166,5 +167,20 @@ class Pipeline implements PipelineContract
         }
 
         return [$name, $parameters];
+    }
+
+    /**
+     * Get the container instance.
+     *
+     * @return \Illuminate\Contracts\Container\Container
+     * @throws \RuntimeException
+     */
+    protected function getContainer()
+    {
+        if (! $this->container) {
+            throw new RuntimeException('A container instance has not been passed to the Pipeline.');
+        }
+
+        return $this->container;
     }
 }

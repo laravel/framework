@@ -114,4 +114,17 @@ class IsSelected extends FormFieldConstraint
             $this->selector, $this->value
         );
     }
+
+    /**
+     * Returns the reversed description of the failure.
+     *
+     * @return string
+     */
+    protected function getReverseFailureDescription()
+    {
+        return sprintf(
+            'the element [%s] does not have the selected value [%s]',
+            $this->selector, $this->value
+        );
+    }
 }

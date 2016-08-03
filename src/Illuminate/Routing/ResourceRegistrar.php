@@ -39,7 +39,7 @@ class ResourceRegistrar
      *
      * @var bool
      */
-    protected static $singularParameters = false;
+    protected static $singularParameters = true;
 
     /**
      * Create a new resource registrar instance.
@@ -235,13 +235,7 @@ class ResourceRegistrar
      */
     protected function getGroupResourceName($prefix, $resource, $method)
     {
-        $group = trim(str_replace('/', '.', $this->router->getLastGroupPrefix()), '.');
-
-        if (empty($group)) {
-            return trim("{$prefix}{$resource}.{$method}", '.');
-        }
-
-        return trim("{$prefix}{$group}.{$resource}.{$method}", '.');
+        return trim("{$prefix}{$resource}.{$method}", '.');
     }
 
     /**
@@ -392,6 +386,7 @@ class ResourceRegistrar
     /**
      * Set or unset the unmapped global parameters to singular.
      *
+     * @param  bool  $singular
      * @return void
      */
     public static function singularParameters($singular = true)

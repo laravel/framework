@@ -29,7 +29,7 @@ class RateLimiter
      *
      * @param  string  $key
      * @param  int  $maxAttempts
-     * @param  int  $decayMinutes
+     * @param  float|int  $decayMinutes
      * @return bool
      */
     public function tooManyAttempts($key, $maxAttempts, $decayMinutes = 1)
@@ -53,7 +53,7 @@ class RateLimiter
      * Increment the counter for a given key for a given decay time.
      *
      * @param  string  $key
-     * @param  int  $decayMinutes
+     * @param  float|int  $decayMinutes
      * @return int
      */
     public function hit($key, $decayMinutes = 1)

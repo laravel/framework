@@ -82,11 +82,11 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
         $mockModel2->shouldReceive('getKey')->andReturn(2);
         $c = new Collection([$mockModel1, $mockModel2]);
 
-        $this->assertTrue($c->contains(function ($k, $m) {
-            return $m->getKey() < 2;
+        $this->assertTrue($c->contains(function ($model) {
+            return $model->getKey() < 2;
         }));
-        $this->assertFalse($c->contains(function ($k, $m) {
-            return $m->getKey() > 2;
+        $this->assertFalse($c->contains(function ($model) {
+            return $model->getKey() > 2;
         }));
     }
 
@@ -102,7 +102,7 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
 
     public function testLoadMethodEagerLoadsGivenRelationships()
     {
-        $c = $this->getMock('Illuminate\Database\Eloquent\Collection', ['first'], [['foo']]);
+        $c = $this->getMockBuilder('Illuminate\Database\Eloquent\Collection')->setMethods(['first'])->setConstructorArgs([['foo']])->getMock();
         $mockItem = m::mock('StdClass');
         $c->expects($this->once())->method('first')->will($this->returnValue($mockItem));
         $mockItem->shouldReceive('newQuery')->once()->andReturn($mockItem);
@@ -144,6 +144,35 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
         $c2 = new Collection([$two, $three]);
 
         $this->assertEquals(new Collection([$one, $two, $three]), $c1->merge($c2));
+    }
+
+    public function testMap()
+    {
+        $one = m::mock('Illuminate\Database\Eloquent\Model');
+        $two = m::mock('Illuminate\Database\Eloquent\Model');
+
+        $c = new Collection([$one, $two]);
+
+        $cAfterMap = $c->map(function ($item) {
+            return $item;
+        });
+
+        $this->assertEquals($c->all(), $cAfterMap->all());
+        $this->assertInstanceOf(Collection::class, $cAfterMap);
+    }
+
+    public function testCollectionChangesToBaseCollectionIfMapLosesModels()
+    {
+        $one = m::mock('Illuminate\Database\Eloquent\Model');
+        $two = m::mock('Illuminate\Database\Eloquent\Model');
+
+        $c = new Collection([$one, $two]);
+
+        $cAfterMap = $c->map(function ($item) {
+            return [];
+        });
+
+        $this->assertInstanceOf(BaseCollection::class, $cAfterMap);
     }
 
     public function testCollectionDiffsWithGivenCollection()
