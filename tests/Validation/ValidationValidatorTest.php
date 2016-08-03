@@ -1221,6 +1221,9 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
         $v = new Validator($trans, ['name' => ['foo', 'bar']], ['name' => 'Alpha|In:foo,bar']);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['name' => ['foo', []]], ['name' => 'Array|In:foo,bar']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateNotIn()
