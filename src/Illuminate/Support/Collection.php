@@ -311,6 +311,18 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Filter items by the given key value pair using strict comparison.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return static
+     */
+    public function whereStrict($key, $value)
+    {
+        return $this->where($key, '===', $value);
+    }
+
+    /**
      * Filter items by the given key value pair.
      *
      * @param  string  $key
