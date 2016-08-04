@@ -9,6 +9,17 @@ trait HasDatabaseNotifications
      */
     public function notifications()
     {
-        return $this->morphMany(DatabaseNotification::class, 'notifiable');
+        return $this->morphMany(DatabaseNotification::class, 'notifiable')
+                            ->orderBy('created_at', 'desc');
+    }
+
+    /**
+     * Get the entity's unread notifications.
+     */
+    public function unreadNotifications()
+    {
+        return $this->morphMany(DatabaseNotification::class, 'notifiable')
+                            ->where('read', false)
+                            ->orderBy('created_at', 'desc');
     }
 }
