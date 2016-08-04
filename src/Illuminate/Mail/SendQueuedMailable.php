@@ -2,7 +2,7 @@
 
 namespace Illuminate\Mail;
 
-use Illuminate\Contracts\Mail\Mailer;
+use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
 
 class SendQueuedMailable
@@ -28,10 +28,10 @@ class SendQueuedMailable
     /**
      * Handle the queued job.
      *
-     * @param  Mailer  $mailer
+     * @param  MailerContract  $mailer
      * @return void
      */
-    public function handle(Mailer $mailer)
+    public function handle(MailerContract $mailer)
     {
         $mailer->send($this->mailable);
     }

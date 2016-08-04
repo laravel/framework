@@ -38,7 +38,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     }
 
     /**
-     * Send the given notification immtediately.
+     * Send the given notification immediately.
      *
      * @param  \Illuminate\Support\Collection|array  $notifiables
      * @param  mixed  $notification
@@ -196,18 +196,5 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     public function deliverVia($channels)
     {
         $this->defaultChannels = (array) $channels;
-    }
-
-    /**
-     * Build a new channel notification from the given object.
-     *
-     * @param  mixed  $notifiable
-     * @param  mixed  $notification
-     * @param  array|null  $channels
-     * @return array
-     */
-    public function notificationsFromInstance($notifiable, $notification, $channels = null)
-    {
-        return Channels\Notification::notificationsFromInstance($notifiable, $notification, $channels);
     }
 }

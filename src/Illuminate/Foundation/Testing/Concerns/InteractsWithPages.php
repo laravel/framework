@@ -173,6 +173,18 @@ trait InteractsWithPages
     }
 
     /**
+     * Assert that the current page matches a given named route.
+     *
+     * @param  string  $route
+     * @param  array  $parameters
+     * @return $this
+     */
+    protected function seeRouteIs($route, $parameters = [])
+    {
+        return $this->seePageIs(route($route, $parameters));
+    }
+
+    /**
      * Assert that a given page successfully loaded.
      *
      * @param  string  $uri
