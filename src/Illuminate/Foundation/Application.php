@@ -119,6 +119,13 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     protected $environmentPath;
 
     /**
+     * The custom public path defined by the developer.
+     *
+     * @var string
+     */
+    protected $publicPath;
+
+    /**
      * The environment file to load during bootstrapping.
      *
      * @var string
@@ -354,7 +361,22 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function publicPath()
     {
-        return $this->basePath.DIRECTORY_SEPARATOR.'public';
+        return $this->publicPath ?: $this->basePath.DIRECTORY_SEPARATOR.'public';
+    }
+
+    /**
+     * Set the public directory.
+     *
+     * @param  string  $path
+     * @return $this
+     */
+    public function usePublicPath($path)
+    {
+        $this->publicPath = $path;
+
+        $this->instance('path.public', $path);
+
+        return $this;
     }
 
     /**
