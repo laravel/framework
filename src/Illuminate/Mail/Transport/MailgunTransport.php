@@ -46,8 +46,8 @@ class MailgunTransport extends Transport
      */
     public function __construct(ClientInterface $client, $key, $domain)
     {
-        $this->client = $client;
         $this->key = $key;
+        $this->client = $client;
         $this->setDomain($domain);
     }
 
@@ -69,9 +69,9 @@ class MailgunTransport extends Transport
             ];
         } else {
             $options['body'] = [
-                'to'      => $this->getTo($message),
-                'cc'      => $this->getCc($message),
-                'bcc'     => $this->getBcc($message),
+                'to' => $this->getTo($message),
+                'cc' => $this->getCc($message),
+                'bcc' => $this->getBcc($message),
                 'message' => new PostFile('message', $message->toString()),
             ];
         }
