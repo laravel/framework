@@ -62,6 +62,18 @@ trait InteractsWithPages
     }
 
     /**
+     * Visit the given named route with a GET request.
+     *
+     * @param  string  $route
+     * @param  array  $parameters
+     * @return $this
+     */
+    public function visitRoute($route, $parameters = [])
+    {
+        return $this->makeRequest('GET', route($route, $parameters));
+    }
+
+    /**
      * Make a request to the application and create a Crawler instance.
      *
      * @param  string  $method
