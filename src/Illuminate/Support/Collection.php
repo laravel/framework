@@ -1183,13 +1183,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Get a base Support collection instance from this collection.
      *
-     * Provided for API compatibility with Eloquent collections.
-     *
      * @return \Illuminate\Support\Collection
      */
     public function toBase()
     {
-        return $this;
+        return is_subclass_of($this, self::class) ? new self($this) : $this;
     }
 
     /**
