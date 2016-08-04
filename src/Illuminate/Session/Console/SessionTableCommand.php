@@ -2,7 +2,7 @@
 
 namespace Illuminate\Session\Console;
 
-use Illuminate\Database\Console\MigrationCreatorCommand;
+use Illuminate\Console\MigrationCreatorCommand;
 
 class SessionTableCommand extends MigrationCreatorCommand
 {

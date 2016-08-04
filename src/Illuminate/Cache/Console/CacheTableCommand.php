@@ -2,7 +2,7 @@
 
 namespace Illuminate\Cache\Console;
 
-use Illuminate\Database\Console\MigrationCreatorCommand;
+use Illuminate\Console\MigrationCreatorCommand;
 
 class CacheTableCommand extends MigrationCreatorCommand
 {

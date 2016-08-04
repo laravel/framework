@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Database\Console;
+namespace Illuminate\Console;
 
 use Illuminate\Support\Str;
 use Illuminate\Console\Command;

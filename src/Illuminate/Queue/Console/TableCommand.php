@@ -2,7 +2,7 @@
 
 namespace Illuminate\Queue\Console;
 
-use Illuminate\Database\Console\MigrationCreatorCommand;
+use Illuminate\Console\MigrationCreatorCommand;
 
 class TableCommand extends MigrationCreatorCommand
 {
