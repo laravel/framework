@@ -181,11 +181,7 @@ trait InteractsWithPages
      */
     protected function seeRouteIs($route, $parameters = [])
     {
-        $uri = route($route, $parameters);
-
-        $this->seePageIs($uri);
-
-        return $this;
+        return $this->seePageIs(route($route, $parameters));
     }
 
     /**
