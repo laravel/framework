@@ -213,10 +213,8 @@ class Mailer implements MailerContract, MailQueueContract
             return $view->queue($this->queue);
         }
 
-        $callback = $this->buildQueueCallable($callback);
-
         return $this->queue->push(
-            'mailer@handleQueuedMessage', compact('view', 'data', 'callback'), $queue
+            new SendQueuedMail($view, $data, $callback), '', $queue
         );
     }
 
@@ -266,11 +264,8 @@ class Mailer implements MailerContract, MailQueueContract
             return $view->later($delay, $this->queue);
         }
 
-        $callback = $this->buildQueueCallable($callback);
-
         return $this->queue->later(
-            $delay, 'mailer@handleQueuedMessage',
-            compact('view', 'data', 'callback'), $queue
+            $delay, new SendQueuedMail($view, $data, $callback), '', $queue
         );
     }
 
