@@ -3,7 +3,6 @@
 namespace Illuminate\Mail;
 
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
-use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Str;
 use SuperClosure\Serializer;
