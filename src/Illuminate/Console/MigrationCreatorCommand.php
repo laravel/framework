@@ -3,7 +3,6 @@
 namespace Illuminate\Console;
 
 use Illuminate\Support\Str;
-use Illuminate\Console\Command;
 use Illuminate\Support\Composer;
 use Illuminate\Filesystem\Filesystem;
 
