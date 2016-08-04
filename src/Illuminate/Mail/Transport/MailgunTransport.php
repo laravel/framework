@@ -46,8 +46,8 @@ class MailgunTransport extends Transport
      */
     public function __construct(ClientInterface $client, $key, $domain)
     {
-        $this->client = $client;
         $this->key = $key;
+        $this->client = $client;
         $this->setDomain($domain);
     }
 
@@ -60,18 +60,18 @@ class MailgunTransport extends Transport
 
         $options = ['auth' => ['api', $this->key]];
 
-        $to = $this->getTo($message);
-
-        $message->setBcc([]);
-
         if (version_compare(ClientInterface::VERSION, '6') === 1) {
             $options['multipart'] = [
-                ['name' => 'to', 'contents' => $to],
+                ['name' => 'to', 'contents' => $this->getTo($message)],
+                ['name' => 'cc', 'contents' => $this->getCc($message)],
+                ['name' => 'bcc', 'contents' => $this->getBcc($message)],
                 ['name' => 'message', 'contents' => $message->toString(), 'filename' => 'message.mime'],
             ];
         } else {
             $options['body'] = [
-                'to' => $to,
+                'to' => $this->getTo($message),
+                'cc' => $this->getCc($message),
+                'bcc' => $this->getBcc($message),
                 'message' => new PostFile('message', $message->toString()),
             ];
         }
@@ -83,15 +83,44 @@ class MailgunTransport extends Transport
      * Get the "to" payload field for the API request.
      *
      * @param  \Swift_Mime_Message  $message
-     * @return array
+     * @return string
      */
     protected function getTo(Swift_Mime_Message $message)
     {
-        $formatted = [];
+        return $this->formatAddress($message->getTo());
+    }
 
-        $contacts = array_merge(
-            (array) $message->getTo(), (array) $message->getCc(), (array) $message->getBcc()
-        );
+    /**
+     * Get the "cc" payload field for the API request.
+     *
+     * @param  \Swift_Mime_Message  $message
+     * @return string
+     */
+    protected function getCc(Swift_Mime_Message $message)
+    {
+        return $this->formatAddress($message->getCc());
+    }
+
+    /**
+     * Get the "bcc" payload field for the API request.
+     *
+     * @param  \Swift_Mime_Message  $message
+     * @return string
+     */
+    protected function getBcc(Swift_Mime_Message $message)
+    {
+        return $this->formatAddress($message->getBcc());
+    }
+
+    /**
+     * Get Comma-Separated Address (with name, if available) for the API request.
+     *
+     * @param  array $contacts
+     * @return string
+     */
+    protected function formatAddress($contacts)
+    {
+        $formatted = [];
 
         foreach ($contacts as $address => $display) {
             $formatted[] = $display ? $display." <$address>" : $address;
