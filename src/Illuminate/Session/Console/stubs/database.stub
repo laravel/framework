@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateSessionsTable extends Migration
+class Create{{tableClassName}}Table extends Migration
 {
     /**
      * Run the migrations.
@@ -12,7 +12,7 @@ class CreateSessionsTable extends Migration
      */
     public function up()
     {
-        Schema::create('sessions', function (Blueprint $table) {
+        Schema::create('{{table}}', function (Blueprint $table) {
             $table->string('id')->unique();
             $table->integer('user_id')->nullable();
             $table->string('ip_address', 45)->nullable();
@@ -29,6 +29,6 @@ class CreateSessionsTable extends Migration
      */
     public function down()
     {
-        Schema::drop('sessions');
+        Schema::drop('{{table}}');
     }
 }

@@ -1,8 +1,9 @@
 <?php
 
-use Illuminate\Session\Console\SessionTableCommand;
-use Illuminate\Foundation\Application;
 use Mockery as m;
+use Illuminate\Foundation\Application;
+use Illuminate\Config\Repository as Config;
+use Illuminate\Session\Console\SessionTableCommand;
 
 class SessionTableCommandTest extends PHPUnit_Framework_TestCase
 {
@@ -20,11 +21,15 @@ class SessionTableCommandTest extends PHPUnit_Framework_TestCase
         $creator = m::mock('Illuminate\Database\Migrations\MigrationCreator')->shouldIgnoreMissing();
 
         $app = new Application();
+        $app->singleton('config', function () {
+            return $this->createConfig();
+        });
+
         $app->useDatabasePath(__DIR__);
         $app['migration.creator'] = $creator;
         $command->setLaravel($app);
         $path = __DIR__.'/migrations';
-        $creator->shouldReceive('create')->once()->with('create_sessions_table', $path)->andReturn($path);
+        $creator->shouldReceive('create')->once()->with('create_sessions_test_table', $path)->andReturn($path);
         $files->shouldReceive('get')->once()->andReturn('foo');
         $files->shouldReceive('put')->once()->with($path, 'foo');
         $composer->shouldReceive('dumpAutoloads')->once();
@@ -35,6 +40,20 @@ class SessionTableCommandTest extends PHPUnit_Framework_TestCase
     protected function runCommand($command, $input = [])
     {
         return $command->run(new Symfony\Component\Console\Input\ArrayInput($input), new Symfony\Component\Console\Output\NullOutput);
+    }
+
+    /**
+     * Create a new config repository instance.
+     *
+     * @return \Illuminate\Config\Repository
+     */
+    protected function createConfig()
+    {
+        return new Config([
+            'session' => [
+                'table' => 'sessions_test',
+            ],
+        ]);
     }
 }
 
