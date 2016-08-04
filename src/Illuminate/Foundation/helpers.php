@@ -601,9 +601,9 @@ if (! function_exists('request')) {
 
         if (is_array($key)) {
             return app('request')->only($key);
-        } else {
-            return app('request')->input($key, $default);
         }
+
+        return app('request')->input($key, $default);
     }
 }
 
