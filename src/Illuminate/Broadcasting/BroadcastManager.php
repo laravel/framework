@@ -51,15 +51,17 @@ class BroadcastManager implements FactoryContract
      * @param  array  $attributes
      * @return void
      */
-    public function route(array $attributes = [])
+    public function routes()
     {
         if ($this->app->routesAreCached()) {
             return;
         }
 
-        $this->app['router']->group($attributes, function () {
-            $this->app['router']->post('/broadcasting/auth', BroadcastController::class.'@authenticate');
-            $this->app['router']->post('/broadcasting/socket', BroadcastController::class.'@rememberSocket');
+        $router = $this->app['router'];
+
+        $router->group(['middleware' => ['web']], function () {
+            $router->post('/broadcasting/auth', BroadcastController::class.'@authenticate');
+            $router->post('/broadcasting/socket', BroadcastController::class.'@rememberSocket');
         });
     }
 
