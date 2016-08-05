@@ -11,17 +11,6 @@ class DummyClass
     use HandlesAuthorization;
 
     /**
-     * Determine whether the user can view dummyPluralModelName.
-     *
-     * @param  DummyRootNamespaceUser  $user
-     * @return mixed
-     */
-    public function viewAny(User $user)
-    {
-        //
-    }
-
-    /**
      * Determine whether the user can view the dummyModelName.
      *
      * @param  DummyRootNamespaceUser  $user
@@ -39,7 +28,7 @@ class DummyClass
      * @param  DummyRootNamespaceUser  $user
      * @return mixed
      */
-    public function createAny(User $user)
+    public function create(User $user)
     {
         //
     }
