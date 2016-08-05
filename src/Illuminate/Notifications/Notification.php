@@ -16,11 +16,6 @@ class Notification
     public $notifiables;
 
     /**
-     * The channels that the notification should be sent through.
-     */
-    public $via = [];
-
-    /**
      * The name of the application sending the notification.
      *
      * @var string
