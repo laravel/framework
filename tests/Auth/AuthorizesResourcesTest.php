@@ -7,13 +7,6 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class AuthorizesResourcesTest extends PHPUnit_Framework_TestCase
 {
-    public function testIndexMethod()
-    {
-        $controller = new AuthorizesResourcesController();
-
-        $this->assertHasMiddleware($controller, 'index', 'can:view,App\User');
-    }
-
     public function testCreateMethod()
     {
         $controller = new AuthorizesResourcesController();

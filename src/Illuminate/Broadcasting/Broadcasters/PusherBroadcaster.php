@@ -51,7 +51,7 @@ class PusherBroadcaster extends Broadcaster
     {
         $socket = Arr::pull($payload, 'socket');
 
-        $this->pusher->trigger($channels, $event, $payload, $socket);
+        $this->pusher->trigger($this->formatChannels($channels), $event, $payload, $socket);
     }
 
     /**
