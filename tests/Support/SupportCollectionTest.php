@@ -1393,14 +1393,14 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 
     public function testCollectonFromTraversable()
     {
-        $collection = new Collection(new \ArrayObject([1 , 2, 3]));
-        $this->assertEquals([1 , 2, 3], $collection->toArray());
+        $collection = new Collection(new \ArrayObject([1, 2, 3]));
+        $this->assertEquals([1, 2, 3], $collection->toArray());
     }
 
     public function testCollectonFromTraversableWithKeys()
     {
-        $collection = new Collection(new \ArrayObject(['foo' => 1 , 'bar' => 2, 'baz' => 3]));
-        $this->assertEquals(['foo' => 1 , 'bar' => 2, 'baz' => 3], $collection->toArray());
+        $collection = new Collection(new \ArrayObject(['foo' => 1, 'bar' => 2, 'baz' => 3]));
+        $this->assertEquals(['foo' => 1, 'bar' => 2, 'baz' => 3], $collection->toArray());
     }
 }
 
