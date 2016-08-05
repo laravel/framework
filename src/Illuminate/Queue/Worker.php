@@ -196,15 +196,13 @@ class Worker
      */
     public function process($connectionName, $job, WorkerOptions $options)
     {
-        try {
-            $this->raiseBeforeJobEvent($connectionName, $job);
+        $this->raiseBeforeJobEvent($connectionName, $job);
 
+        try {
             // Here we will fire off the job and let it process. We will catch any exceptions so
             // they can be reported to the developers logs, etc. Once the job is finished the
             // proper events will be fired to let any listeners know this job has finished.
             $job->fire();
-
-            $this->raiseAfterJobEvent($connectionName, $job);
         } catch (Exception $e) {
             $this->handleJobException($connectionName, $job, $options, $e);
         } catch (Throwable $e) {
@@ -212,6 +210,8 @@ class Worker
                 $connectionName, $job, $options, new FatalThrowableError($e)
             );
         }
+
+        $this->raiseAfterJobEvent($connectionName, $job);
     }
 
     /**
@@ -243,6 +243,8 @@ class Worker
                 $job->release($options->delay);
             }
         }
+
+        $this->raiseAfterJobEvent($connectionName, $job);
 
         throw $e;
     }
