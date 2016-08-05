@@ -345,6 +345,7 @@ class Mailable implements MailableContract
      *
      * @param  object|array|string  $address
      * @param  string|null  $name
+     * @param  string  $property
      * @return $this
      */
     protected function setAddress($address, $name = null, $property = 'to')
