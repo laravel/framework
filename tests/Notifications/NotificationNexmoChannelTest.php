@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Notifications\Message;
 use Illuminate\Notifications\Notification;
 
 class NotificationNexmoChannelTest extends PHPUnit_Framework_TestCase
@@ -11,15 +12,15 @@ class NotificationNexmoChannelTest extends PHPUnit_Framework_TestCase
 
     public function testSmsIsSentViaNexmo()
     {
-        $notification = new Notification;
         $notifiables = collect([
             $notifiable = new NotificationNexmoChannelTestNotifiable,
         ]);
+        $message = new Message($notifiable, new Notification);
 
-        $notification->introLines = ['line 1'];
-        $notification->actionText = 'Text';
-        $notification->actionUrl = 'url';
-        $notification->outroLines = ['line 2'];
+        $message->introLines = ['line 1'];
+        $message->actionText = 'Text';
+        $message->actionUrl = 'url';
+        $message->outroLines = ['line 2'];
 
         $channel = new Illuminate\Notifications\Channels\NexmoSmsChannel(
             $nexmo = Mockery::mock(Nexmo\Client::class), '4444444444'
@@ -35,7 +36,7 @@ Text: url
 line 2',
         ]);
 
-        $channel->send($notifiables, $notification);
+        $channel->send($notifiables, $message);
     }
 }
 

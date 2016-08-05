@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Notifications\Message;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Channels\DatabaseChannel;
 
@@ -12,8 +13,8 @@ class NotificationDatabaseChannelTest extends PHPUnit_Framework_TestCase
 
     public function testDatabaseChannelCreatesDatabaseRecordWithProperData()
     {
-        $notification = new Notification;
         $notifiables = collect([$notifiable = Mockery::mock()]);
+        $message = new Message($notifiable, new Notification);
 
         $notifiable->shouldReceive('routeNotificationFor->create')->with([
             'type' => get_class($notification),
@@ -26,6 +27,6 @@ class NotificationDatabaseChannelTest extends PHPUnit_Framework_TestCase
         ]);
 
         $channel = new DatabaseChannel;
-        $channel->send($notifiables, $notification);
+        $channel->send($notifiables, $message);
     }
 }

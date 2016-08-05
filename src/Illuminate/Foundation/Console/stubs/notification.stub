@@ -3,6 +3,7 @@
 namespace DummyNamespace;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Message;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
@@ -34,12 +35,13 @@ class DummyClass extends Notification
     /**
      * Get the notification message.
      *
-     * @return void
+     * @param  \Illuminate\Notifications\Message  $message
+     * @return \Illuminate\Notifications\Message
      */
-    public function message()
+    public function message(Message $message)
     {
-        $this->line('The introduction to the notification.')
-             ->action('Notification Action', 'https://laravel.com')
-             ->line('Thank you for using our application!');
+        return $message->line('The introduction to the notification.')
+                 ->action('Notification Action', 'https://laravel.com')
+                 ->line('Thank you for using our application!');
     }
 }

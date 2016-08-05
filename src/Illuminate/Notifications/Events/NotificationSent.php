@@ -14,22 +14,22 @@ class NotificationSent
     public $notifiable;
 
     /**
-     * The notification instance.
+     * The notification message instance.
      *
-     * @var \Illuminate\Notifications\Notification
+     * @var \Illuminate\Notifications\Message
      */
-    public $notification;
+    public $message;
 
     /**
      * Create a new event instance.
      *
      * @param  mixed  $notifiable
-     * @param  \Illuminate\Notifications\Notification  $notification
+     * @param  \Illuminate\Notifications\Message  $message
      * @return void
      */
-    public function __construct($notifiable, $notification)
+    public function __construct($notifiable, $message)
     {
         $this->notifiable = $notifiable;
-        $this->notification = $notification;
+        $this->message = $message;
     }
 }

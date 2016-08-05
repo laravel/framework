@@ -4,7 +4,7 @@ namespace Illuminate\Notifications\Channels;
 
 use Illuminate\Support\Arr;
 use Nexmo\Client as NexmoClient;
-use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\Message;
 
 class NexmoSmsChannel
 {
@@ -39,10 +39,10 @@ class NexmoSmsChannel
      * Send the given notification.
      *
      * @param  \Illuminate\Support\Collection  $notifiables
-     * @param  \Illuminate\Notifications\Notification  $notification
+     * @param  \Illuminate\Notifications\Message  $message
      * @return void
      */
-    public function send($notifiables, Notification $notification)
+    public function send($notifiables, Message $message)
     {
         foreach ($notifiables as $notifiable) {
             if (! $to = $notifiable->routeNotificationFor('nexmo')) {
@@ -52,7 +52,7 @@ class NexmoSmsChannel
             $this->nexmo->message()->send([
                 'from' => $this->from,
                 'to' => $to,
-                'text' => $this->formatNotification($notification),
+                'text' => $this->formatNotification($message),
             ]);
         }
     }
@@ -60,15 +60,15 @@ class NexmoSmsChannel
     /**
      * Format the given notification to a single string.
      *
-     * @param  \Illuminate\Notifications\Notification  $notification
+     * @param  \Illuminate\Notifications\Message  $message
      * @return string
      */
-    protected function formatNotification(Notification $notification)
+    protected function formatNotification(Message $message)
     {
-        $data = $notification->toArray();
+        $data = $message->toArray();
 
-        $actionText = $notification->actionText
-                    ? $notification->actionText.': ' : '';
+        $actionText = $message->actionText
+                    ? $message->actionText.': ' : '';
 
         return trim(implode(PHP_EOL.PHP_EOL, array_filter([
             implode(' ', Arr::get($data, 'introLines', [])),

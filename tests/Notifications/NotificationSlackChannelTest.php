@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Notifications\Message;
 use Illuminate\Notifications\Notification;
 
 class NotificationSlackChannelTest extends PHPUnit_Framework_TestCase
@@ -11,17 +12,17 @@ class NotificationSlackChannelTest extends PHPUnit_Framework_TestCase
 
     public function testCorrectPayloadIsSentToSlack()
     {
-        $notification = new Notification;
         $notifiables = collect([
             $notifiable = new NotificationSlackChannelTestNotifiable,
         ]);
+        $message = new Message($notifiable, new Notification);
 
-        $notification->subject = 'Subject';
-        $notification->level = 'success';
-        $notification->introLines = ['line 1'];
-        $notification->actionText = 'Text';
-        $notification->actionUrl = 'url';
-        $notification->outroLines = ['line 2'];
+        $message->subject = 'Subject';
+        $message->success();
+        $message->introLines = ['line 1'];
+        $message->actionText = 'Text';
+        $message->actionUrl = 'url';
+        $message->outroLines = ['line 2'];
 
         $channel = new Illuminate\Notifications\Channels\SlackWebhookChannel(
             $http = Mockery::mock('GuzzleHttp\Client')
@@ -44,7 +45,7 @@ line 2',
             ],
         ]);
 
-        $channel->send($notifiables, $notification);
+        $channel->send($notifiables, $message);
     }
 }
 
