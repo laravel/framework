@@ -9,13 +9,6 @@ class Notification
     use SerializesModels;
 
     /**
-     * The entities that should receive the notification.
-     *
-     * @var \Illuminate\Support\Collection
-     */
-    public $notifiables;
-
-    /**
      * The name of the application sending the notification.
      *
      * @var string
@@ -224,7 +217,6 @@ class Notification
     public function toArray()
     {
         return [
-            'notifiables' => $this->notifiables,
             'application' => $this->application,
             'logoUrl' => $this->logoUrl,
             'level' => $this->level,
