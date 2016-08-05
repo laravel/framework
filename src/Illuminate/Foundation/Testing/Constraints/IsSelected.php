@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Testing\Constraints;
 
+use DOMElement;
 use Symfony\Component\DomCrawler\Crawler;
 
 class IsSelected extends FormFieldConstraint
@@ -60,15 +61,30 @@ class IsSelected extends FormFieldConstraint
             if ($option->nodeName === 'optgroup') {
                 foreach ($option->childNodes as $child) {
                     if ($child->hasAttribute('selected')) {
-                        $selected[] = $child->getAttribute('value');
+                        $selected[] = $this->getOptionValue($child);
                     }
                 }
             } elseif ($option->hasAttribute('selected')) {
-                $selected[] = $option->getAttribute('value');
+                $selected[] = $this->getOptionValue($option);
             }
         }
 
         return $selected;
+    }
+
+    /**
+     * Get the selected value from an option element.
+     *
+     * @param  \DOMElement  $option
+     * @return string
+     */
+    protected function getOptionValue(DOMElement $option)
+    {
+        if ($option->hasAttribute('value')) {
+            return $option->getAttribute('value');
+        }
+
+        return $option->textContent;
     }
 
     /**

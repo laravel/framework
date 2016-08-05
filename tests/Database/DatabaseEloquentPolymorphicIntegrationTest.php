@@ -104,6 +104,18 @@ class DatabaseEloquentPolymorphicIntegrationTest extends PHPUnit_Framework_TestC
         $this->assertEquals(TestUser::first(), $like->likeable->owner);
     }
 
+    public function testItLoadsNestedRelationshipsOnDemand()
+    {
+        $this->seedData();
+
+        $like = TestLike::with('likeable.owner')->first();
+
+        $this->assertTrue($like->relationLoaded('likeable'));
+        $this->assertTrue($like->likeable->relationLoaded('owner'));
+
+        $this->assertEquals(TestUser::first(), $like->likeable->owner);
+    }
+
     /**
      * Helpers...
      */

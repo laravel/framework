@@ -1,8 +1,10 @@
 <?php
 
+use Illuminate\Pagination\LengthAwarePaginator;
 use Mockery as m;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression as Raw;
+use Illuminate\Pagination\AbstractPaginator as Paginator;
 
 class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
 {
@@ -170,6 +172,14 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $builder->select('*')->from('users')->whereYear('created_at', '=', 2014);
         $this->assertEquals('select * from `users` where year(`created_at`) = ?', $builder->toSql());
         $this->assertEquals([0 => 2014], $builder->getBindings());
+    }
+
+    public function testWhereTimeMySql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereTime('created_at', '>=', '22:00');
+        $this->assertEquals('select * from `users` where time(`created_at`) >= ?', $builder->toSql());
+        $this->assertEquals([0 => '22:00'], $builder->getBindings());
     }
 
     public function testWhereDatePostgres()
@@ -1217,18 +1227,23 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" where "id" = ?', [1])->andReturn(1);
         $result = $builder->from('users')->delete(1);
         $this->assertEquals(1, $result);
+
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('delete')->once()->with('delete from `users` where `email` = ? order by `id` asc limit 1', ['foo'])->andReturn(1);
+        $result = $builder->from('users')->where('email', '=', 'foo')->orderBy('id')->take(1)->delete();
+        $this->assertEquals(1, $result);
     }
 
     public function testDeleteWithJoinMethod()
     {
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete `users` from `users` inner join `contacts` on `users`.`id` = `contacts`.`id` where `email` = ?', ['foo'])->andReturn(1);
-        $result = $builder->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->where('email', '=', 'foo')->delete();
+        $result = $builder->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->where('email', '=', 'foo')->orderBy('id')->limit(1)->delete();
         $this->assertEquals(1, $result);
 
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete `users` from `users` inner join `contacts` on `users`.`id` = `contacts`.`id` where `id` = ?', [1])->andReturn(1);
-        $result = $builder->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->delete(1);
+        $result = $builder->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->orderBy('id')->take(1)->delete(1);
         $this->assertEquals(1, $result);
     }
 
@@ -1652,6 +1667,95 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         }, 'someIdField');
     }
 
+    public function testPaginate()
+    {
+        $perPage = 16;
+        $columns = ['test'];
+        $pageName = 'page-name';
+        $page = 1;
+        $builder = $this->getMockQueryBuilder();
+        $path = 'http://foo.bar?page=3';
+
+        $results = collect([['test' => 'foo'], ['test' => 'bar']]);
+
+        $builder->shouldReceive('getCountForPagination')->once()->with($columns)->andReturn(2);
+        $builder->shouldReceive('forPage')->once()->with($page, $perPage)->andReturn($builder);
+        $builder->shouldReceive('get')->once()->andReturn($results);
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->paginate($perPage, $columns, $pageName, $page);
+
+        $this->assertEquals(new LengthAwarePaginator($results, 2, $perPage, $page, [
+            'path' => $path,
+            'pageName' => $pageName,
+        ]), $result);
+    }
+
+    public function testPaginateWithDefaultArguments()
+    {
+        $perPage = 15;
+        $columns = ['*'];
+        $pageName = 'page';
+        $page = 1;
+        $builder = $this->getMockQueryBuilder();
+        $path = 'http://foo.bar?page=3';
+
+        $results = collect([['test' => 'foo'], ['test' => 'bar']]);
+
+        $builder->shouldReceive('getCountForPagination')->once()->with($columns)->andReturn(2);
+        $builder->shouldReceive('forPage')->once()->with($page, $perPage)->andReturn($builder);
+        $builder->shouldReceive('get')->once()->andReturn($results);
+
+        Paginator::currentPageResolver(function () use ($path) {
+            return 1;
+        });
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->paginate();
+
+        $this->assertEquals(new LengthAwarePaginator($results, 2, $perPage, $page, [
+            'path' => $path,
+            'pageName' => $pageName,
+        ]), $result);
+    }
+
+    public function testPaginateWhenNoResults()
+    {
+        $perPage = 15;
+        $columns = ['*'];
+        $pageName = 'page';
+        $page = 1;
+        $builder = $this->getMockQueryBuilder();
+        $path = 'http://foo.bar?page=3';
+
+        $results = [];
+
+        $builder->shouldReceive('getCountForPagination')->once()->with($columns)->andReturn(0);
+        $builder->shouldNotReceive('forPage');
+        $builder->shouldNotReceive('get');
+
+        Paginator::currentPageResolver(function () use ($path) {
+            return 1;
+        });
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->paginate();
+
+        $this->assertEquals(new LengthAwarePaginator($results, 0, $perPage, $page, [
+            'path' => $path,
+            'pageName' => $pageName,
+        ]), $result);
+    }
+
     protected function getBuilder()
     {
         $grammar = new Illuminate\Database\Query\Grammars\Grammar;
@@ -1705,11 +1809,11 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
      */
     protected function getMockQueryBuilder()
     {
-        $builder = m::mock('Illuminate\Database\Query\Builder[forPageAfterId,get]', [
+        $builder = m::mock('Illuminate\Database\Query\Builder', [
             m::mock('Illuminate\Database\ConnectionInterface'),
             new Illuminate\Database\Query\Grammars\Grammar,
             m::mock('Illuminate\Database\Query\Processors\Processor'),
-        ]);
+        ])->makePartial();
 
         return $builder;
     }

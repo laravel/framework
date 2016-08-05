@@ -10,7 +10,7 @@
     "authors": [
         {
             "name": "Taylor Otwell",
-            "email": "taylorotwell@gmail.com"
+            "email": "taylor@laravel.com"
         }
     ],
     "require": {
@@ -19,6 +19,9 @@
         "doctrine/inflector": "~1.0",
         "illuminate/contracts": "5.2.*",
         "paragonie/random_compat": "~1.4"
+    },
+    "replace": {
+        "tightenco/collect": "self.version"
     },
     "autoload": {
         "psr-4": {

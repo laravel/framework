@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use Countable;
 use ArrayAccess;
+use Traversable;
 use ArrayIterator;
 use CachingIterator;
 use JsonSerializable;
@@ -78,6 +79,65 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function average($key = null)
     {
         return $this->avg($key);
+    }
+
+    /**
+     * Get the median of a given key.
+     *
+     * @param  null $key
+     * @return mixed|null
+     */
+    public function median($key = null)
+    {
+        $count = $this->count();
+
+        if ($count == 0) {
+            return;
+        }
+
+        $values = with(isset($key) ? $this->pluck($key) : $this)
+                    ->sort()->values();
+
+        $middle = (int) floor($count / 2);
+
+        if ($count % 2) {
+            return $values->get($middle);
+        }
+
+        return (new static([
+            $values->get($middle - 1), $values->get($middle),
+        ]))->average();
+    }
+
+    /**
+     * Get the mode of a given key.
+     *
+     * @param  null $key
+     * @return array
+     */
+    public function mode($key = null)
+    {
+        $count = $this->count();
+
+        if ($count == 0) {
+            return;
+        }
+
+        $collection = isset($key) ? $this->pluck($key) : $this;
+
+        $counts = new self;
+
+        $collection->each(function ($value) use ($counts) {
+            $counts[$value] = isset($counts[$value]) ? $counts[$value] + 1 : 1;
+        });
+
+        $sorted = $counts->sort();
+
+        $highestValue = $sorted->last();
+
+        return $sorted->filter(function ($value) use ($highestValue) {
+            return $value == $highestValue;
+        })->sort()->keys()->all();
     }
 
     /**
@@ -605,6 +665,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Pass the collection to the given callback and return the result.
+     *
+     * @param  callable $callback
+     * @return mixed
+     */
+    public function pipe(callable $callback)
+    {
+        return $callback($this);
+    }
+
+    /**
      * Get and remove the last item from the collection.
      *
      * @return mixed
@@ -766,13 +837,22 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Shuffle the items in the collection.
      *
+     * @param int $seed
      * @return static
      */
-    public function shuffle()
+    public function shuffle($seed = null)
     {
         $items = $this->items;
 
-        shuffle($items);
+        if (is_null($seed)) {
+            shuffle($items);
+        } else {
+            srand($seed);
+
+            usort($items, function () {
+                return rand(-1, 1);
+            });
+        }
 
         return new static($items);
     }
@@ -1162,6 +1242,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return json_decode($items->toJson(), true);
         } elseif ($items instanceof JsonSerializable) {
             return $items->jsonSerialize();
+        } elseif ($items instanceof Traversable) {
+            return iterator_to_array($items);
         }
 
         return (array) $items;
