@@ -111,6 +111,16 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     }
 
     /**
+     * Create an instance of the broadcast driver.
+     *
+     * @return \Illuminate\Notifications\Channels\BroadcastChannel
+     */
+    protected function createBroadcastDriver()
+    {
+        return $this->app->make(Channels\BroadcastChannel::class);
+    }
+
+    /**
      * Create an instance of the mail driver.
      *
      * @return \Illuminate\Notifications\Channels\MailChannel
