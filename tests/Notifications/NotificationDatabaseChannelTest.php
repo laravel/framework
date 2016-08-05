@@ -24,7 +24,10 @@ class NotificationDatabaseChannelTest extends PHPUnit_Framework_TestCase
             'read' => false,
         ]);
 
-        $channel = new DatabaseChannel;
+        $events = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
+        $events->shouldReceive('fire')->once()->with('Illuminate\Notifications\Events\DatabaseNotificationCreated');
+
+        $channel = new DatabaseChannel($events);
         $channel->send($notifiables, $notification);
     }
 }
