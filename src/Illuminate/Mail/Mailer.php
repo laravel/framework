@@ -283,7 +283,7 @@ class Mailer implements MailerContract, MailQueueContract
     {
         return $this->later($delay, $view, $data, $callback, $queue);
     }
-    
+
     /**
      * Handle a queued e-mail message job.
      *
