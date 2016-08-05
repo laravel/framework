@@ -1663,16 +1663,16 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
             ['https://google.com'],
             ['http://illuminate.dev'],
             ['http://localhost'],
-            ['http://laravel.com/?'],
+            ['https://laravel.com/?'],
             ['http://президент.рф/'],
             ['http://스타벅스코리아.com'],
             ['http://xn--d1abbgf6aiiy.xn--p1ai/'],
-            ['http://laravel.com?'],
-            ['http://laravel.com?q=1'],
-            ['http://laravel.com/?q=1'],
-            ['http://laravel.com#'],
-            ['http://laravel.com#fragment'],
-            ['http://laravel.com/#fragment'],
+            ['https://laravel.com?'],
+            ['https://laravel.com?q=1'],
+            ['https://laravel.com/?q=1'],
+            ['https://laravel.com#'],
+            ['https://laravel.com#fragment'],
+            ['https://laravel.com/#fragment'],
         ];
     }
 

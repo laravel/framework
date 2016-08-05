@@ -67,4 +67,4 @@ class User extends Illuminate\Database\Eloquent\Model {}
 $users = User::where('votes', '>', 1)->get();
 ```
 
-For further documentation on using the various database facilities this library provides, consult the [Laravel framework documentation](http://laravel.com/docs).
+For further documentation on using the various database facilities this library provides, consult the [Laravel framework documentation](https://laravel.com/docs).
