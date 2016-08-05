@@ -17,7 +17,7 @@ class NotificationDatabaseChannelTest extends PHPUnit_Framework_TestCase
         $message = new Message($notifiable, new Notification);
 
         $notifiable->shouldReceive('routeNotificationFor->create')->with([
-            'type' => get_class($notification),
+            'type' => get_class($message->notification),
             'level' => 'info',
             'intro' => [],
             'outro' => [],

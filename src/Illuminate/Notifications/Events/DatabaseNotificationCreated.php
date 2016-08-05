@@ -20,11 +20,11 @@ class DatabaseNotificationCreated implements ShouldBroadcast
     public $notifiable;
 
     /**
-     * The notification instance.
+     * The notification message instance.
      *
-     * @var \Illuminate\Notifications\Notification
+     * @var \Illuminate\Notifications\Message
      */
-    public $notification;
+    public $message;
 
     /**
      * The database notification instance.
@@ -37,14 +37,14 @@ class DatabaseNotificationCreated implements ShouldBroadcast
      * Create a new event instance.
      *
      * @param  mixed  $notifiable
-     * @param  \Illuminate\Notifications\Notification  $notification
+     * @param  \Illuminate\Notifications\Message  $message
      * @param  \Illuminate\Notifications\DatabaseNotification  $databaseNotification
      * @return void
      */
-    public function __construct($notifiable, $notification, $databaseNotification)
+    public function __construct($notifiable, $message, $databaseNotification)
     {
         $this->notifiable = $notifiable;
-        $this->notification = $notification;
+        $this->message = $message;
         $this->databaseNotification = $databaseNotification;
     }
 
