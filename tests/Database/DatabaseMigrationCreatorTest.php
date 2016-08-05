@@ -47,10 +47,29 @@ class DatabaseMigrationCreatorTest extends PHPUnit_Framework_TestCase
         $creator->create('create_bar', 'foo', 'baz', true);
     }
 
+    public function testTableUpdateMigrationWontCreateDuplicateClass()
+    {
+        $creator = $this->getCreator();
+
+        try {
+            $creator->create('migration_creator_fake_migration', 'foo');
+        } catch (\Exception $e) {
+            $this->assertEquals($e->getMessage(), 'A MigrationCreatorFakeMigration migration already exists.');
+
+            return;
+        }
+
+        $this->fail();
+    }
+
     protected function getCreator()
     {
         $files = m::mock('Illuminate\Filesystem\Filesystem');
 
         return $this->getMock('Illuminate\Database\Migrations\MigrationCreator', ['getDatePrefix'], [$files]);
     }
+}
+
+class MigrationCreatorFakeMigration
+{
 }

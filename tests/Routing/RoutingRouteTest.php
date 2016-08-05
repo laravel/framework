@@ -94,6 +94,12 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($router->is('bar'));
 
         $router = $this->getRouter();
+        $route = $router->get('foo/{file}', function ($file) {
+            return $file;
+        });
+        $this->assertEquals('oxygen%20', $router->dispatch(Request::create('http://test.com/foo/oxygen%2520', 'GET'))->getContent());
+
+        $router = $this->getRouter();
         $router->patch('foo/bar', ['as' => 'foo', function () {
             return 'bar';
         }]);

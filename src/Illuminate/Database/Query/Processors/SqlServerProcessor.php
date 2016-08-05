@@ -39,13 +39,15 @@ class SqlServerProcessor extends Processor
      */
     protected function processInsertGetIdForOdbc($connection)
     {
-        $result = $connection->select('SELECT CAST(COALESCE(SCOPE_IDENTITY(), @@IDENTITY) AS int) AS insertid');
+        $result = $connection->selectFromWriteConnection('SELECT CAST(COALESCE(SCOPE_IDENTITY(), @@IDENTITY) AS int) AS insertid');
 
         if (! $result) {
             throw new Exception('Unable to retrieve lastInsertID for ODBC.');
         }
 
-        return $result[0]->insertid;
+        $row = $result[0];
+
+        return is_object($row) ? $row->insertid : $row['insertid'];
     }
 
     /**

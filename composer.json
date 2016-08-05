@@ -68,7 +68,8 @@
         "illuminate/support": "self.version",
         "illuminate/translation": "self.version",
         "illuminate/validation": "self.version",
-        "illuminate/view": "self.version"
+        "illuminate/view": "self.version",
+        "tightenco/collect": "self.version"
     },
     "require-dev": {
         "aws/aws-sdk-php": "~3.0",

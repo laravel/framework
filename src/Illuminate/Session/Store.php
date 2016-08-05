@@ -414,6 +414,34 @@ class Store implements SessionInterface
     }
 
     /**
+     * Increment the value of an item in the session.
+     *
+     * @param  string  $key
+     * @param  int  $amount
+     * @return mixed
+     */
+    public function increment($key, $amount = 1)
+    {
+        $value = $this->get($key, 0) + $amount;
+
+        $this->put($key, $value);
+
+        return $value;
+    }
+
+    /**
+     * Decrement the value of an item in the session.
+     *
+     * @param  string  $key
+     * @param  int  $amount
+     * @return int
+     */
+    public function decrement($key, $amount = 1)
+    {
+        return $this->increment($key, $amount * -1);
+    }
+
+    /**
      * Flash a key / value pair to the session.
      *
      * @param  string  $key

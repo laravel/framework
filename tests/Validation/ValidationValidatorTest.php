@@ -1135,6 +1135,9 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
         $v = new Validator($trans, ['name' => ['foo', 'bar']], ['name' => 'Alpha|In:foo,bar']);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['name' => ['foo', []]], ['name' => 'Array|In:foo,bar']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateNotIn()
@@ -1665,8 +1668,11 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
     public function testValidateImageDimensions()
     {
         // Knowing that demo image.gif has width = 3 and height = 2
-        $uploadedFile = new \Symfony\Component\HttpFoundation\File\UploadedFile(__DIR__.'/fixtures/image.gif', '');
+        $uploadedFile = new \Symfony\Component\HttpFoundation\File\UploadedFile(__DIR__.'/fixtures/image.gif', '', null, null, null, true);
         $trans = $this->getRealTranslator();
+
+        $v = new Validator($trans, ['x' => 'file'], ['x' => 'dimensions']);
+        $this->assertTrue($v->fails());
 
         $v = new Validator($trans, [], ['x' => 'dimensions:min_width=1']);
         $v->setFiles(['x' => $uploadedFile]);

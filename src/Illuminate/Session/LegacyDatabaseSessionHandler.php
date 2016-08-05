@@ -79,6 +79,8 @@ class LegacyDatabaseSessionHandler implements SessionHandlerInterface, Existence
 
         if (isset($session->last_activity)) {
             if ($session->last_activity < Carbon::now()->subMinutes($this->minutes)->getTimestamp()) {
+                $this->exists = true;
+
                 return;
             }
         }

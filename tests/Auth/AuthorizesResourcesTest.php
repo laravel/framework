@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
-use Illuminate\Routing\Route;
+use Illuminate\Routing\Router;
 use Illuminate\Routing\Controller;
 use Illuminate\Foundation\Auth\Access\AuthorizesResources;
 
@@ -9,83 +9,73 @@ class AuthorizesResourcesTest extends PHPUnit_Framework_TestCase
 {
     public function testIndexMethod()
     {
-        $controller = new AuthorizesResourcesController($this->request('index'));
+        $controller = new AuthorizesResourcesController();
 
-        $this->assertHasMiddleware($controller, 'can:view,App\User');
+        $this->assertHasMiddleware($controller, 'index', 'can:view,App\User');
     }
 
     public function testCreateMethod()
     {
-        $controller = new AuthorizesResourcesController($this->request('create'));
+        $controller = new AuthorizesResourcesController();
 
-        $this->assertHasMiddleware($controller, 'can:create,App\User');
+        $this->assertHasMiddleware($controller, 'create', 'can:create,App\User');
     }
 
     public function testStoreMethod()
     {
-        $controller = new AuthorizesResourcesController($this->request('store'));
+        $controller = new AuthorizesResourcesController();
 
-        $this->assertHasMiddleware($controller, 'can:create,App\User');
+        $this->assertHasMiddleware($controller, 'store', 'can:create,App\User');
     }
 
     public function testShowMethod()
     {
-        $controller = new AuthorizesResourcesController($this->request('show'));
+        $controller = new AuthorizesResourcesController();
 
-        $this->assertHasMiddleware($controller, 'can:view,user');
+        $this->assertHasMiddleware($controller, 'show', 'can:view,user');
     }
 
     public function testEditMethod()
     {
-        $controller = new AuthorizesResourcesController($this->request('edit'));
+        $controller = new AuthorizesResourcesController();
 
-        $this->assertHasMiddleware($controller, 'can:update,user');
+        $this->assertHasMiddleware($controller, 'edit', 'can:update,user');
     }
 
     public function testUpdateMethod()
     {
-        $controller = new AuthorizesResourcesController($this->request('update'));
+        $controller = new AuthorizesResourcesController();
 
-        $this->assertHasMiddleware($controller, 'can:update,user');
+        $this->assertHasMiddleware($controller, 'update', 'can:update,user');
     }
 
     public function testDestroyMethod()
     {
-        $controller = new AuthorizesResourcesController($this->request('destroy'));
+        $controller = new AuthorizesResourcesController();
 
-        $this->assertHasMiddleware($controller, 'can:delete,user');
+        $this->assertHasMiddleware($controller, 'destroy', 'can:delete,user');
     }
 
     /**
-     * Assert that the given middleware has been registered on the given controller.
+     * Assert that the given middleware has been registered on the given controller for the given method.
      *
      * @param  \Illuminate\Routing\Controller  $controller
+     * @param  string  $method
      * @param  string  $middleware
      * @return void
      */
-    protected function assertHasMiddleware($controller, $middleware)
+    protected function assertHasMiddleware($controller, $method, $middleware)
     {
-        $this->assertTrue(
-            in_array($middleware, array_keys($controller->getMiddleware())),
-            "The [{$middleware}] middleware was not registered"
+        $router = new Router(new Illuminate\Events\Dispatcher);
+
+        $router->middleware('can', 'AuthorizesResourcesMiddleware');
+        $router->get($method)->uses('AuthorizesResourcesController@'.$method);
+
+        $this->assertEquals(
+            'caught '.$middleware,
+            $router->dispatch(Request::create($method, 'GET'))->getContent(),
+            "The [{$middleware}] middleware was not registered for method [{$method}]"
         );
-    }
-
-    /**
-     * Get a request object, with the route pointing to the given method on the controller.
-     *
-     * @param  string  $method
-     * @return \Illuminate\Http\Request
-     */
-    protected function request($method)
-    {
-        return Request::create('foo', 'GET')->setRouteResolver(function () use ($method) {
-            $action = ['uses' => 'AuthorizesResourcesController@'.$method];
-
-            $action['controller'] = $action['uses'];
-
-            return new Route('GET', 'foo', $action);
-        });
     }
 }
 
@@ -93,8 +83,51 @@ class AuthorizesResourcesController extends Controller
 {
     use AuthorizesResources;
 
-    public function __construct(Request $request)
+    public function __construct()
     {
-        $this->authorizeResource('App\User', 'user', [], $request);
+        $this->authorizeResource('App\User', 'user');
+    }
+
+    public function index()
+    {
+        //
+    }
+
+    public function create()
+    {
+        //
+    }
+
+    public function store()
+    {
+        //
+    }
+
+    public function show()
+    {
+        //
+    }
+
+    public function edit()
+    {
+        //
+    }
+
+    public function update()
+    {
+        //
+    }
+
+    public function destroy()
+    {
+        //
+    }
+}
+
+class AuthorizesResourcesMiddleware
+{
+    public function handle($request, Closure $next, $method, $parameter)
+    {
+        return "caught can:{$method},{$parameter}";
     }
 }

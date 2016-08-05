@@ -96,14 +96,43 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
     }
 
     /**
-     * Determine if messages exist for a given key.
+     * Determine if messages exist for all of the given keys.
      *
-     * @param  string  $key
+     * @param  array|string  $key
      * @return bool
      */
     public function has($key = null)
     {
-        return $this->first($key) !== '';
+        if (is_null($key)) {
+            return $this->any();
+        }
+
+        $keys = is_array($key) ? $key : func_get_args();
+
+        foreach ($keys as $key) {
+            if ($this->first($key) === '') {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Determine if messages exist for any of the given keys.
+     *
+     * @param  array  $keys
+     * @return bool
+     */
+    public function hasAny($keys = [])
+    {
+        foreach ($keys as $key) {
+            if ($this->has($key)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

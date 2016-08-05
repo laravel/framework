@@ -33,7 +33,7 @@ class Manager
 
         // Once we have the container setup, we will setup the default configuration
         // options in the container "config" binding. This will make the database
-        // manager behave correctly since all the correct binding are in place.
+        // manager work correctly out of the box without extreme configuration.
         $this->setupDefaultConfiguration();
 
         $this->setupManager();
@@ -135,7 +135,7 @@ class Manager
 
         // If we have an event dispatcher instance, we will go ahead and register it
         // with the Eloquent ORM, allowing for model callbacks while creating and
-        // updating "model" instances; however, if it not necessary to operate.
+        // updating "model" instances; however, it is not necessary to operate.
         if ($dispatcher = $this->getEventDispatcher()) {
             Eloquent::setEventDispatcher($dispatcher);
         }
