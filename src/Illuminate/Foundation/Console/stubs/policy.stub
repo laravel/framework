@@ -45,17 +45,6 @@ class DummyClass
     }
 
     /**
-     * Determine whether the user can update dummyPluralModelName.
-     *
-     * @param  DummyRootNamespaceUser  $user
-     * @return mixed
-     */
-    public function updateAny(User $user)
-    {
-        //
-    }
-
-    /**
      * Determine whether the user can update the dummyModelName.
      *
      * @param  DummyRootNamespaceUser  $user
