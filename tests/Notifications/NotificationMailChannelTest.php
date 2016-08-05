@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Notifications\Message;
 use Illuminate\Notifications\Notification;
 
 class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
@@ -11,12 +12,12 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
 
     public function testMailIsSentByChannel()
     {
-        $notification = new Notification;
         $notifiables = collect([
             $notifiable = new NotificationMailChannelTestNotifiable,
         ]);
+        $message = new Message($notifiable, new Notification);
 
-        $array = $notification->toArray();
+        $array = $message->toArray();
         $array['actionColor'] = 'blue';
 
         $channel = new Illuminate\Notifications\Channels\MailChannel(
@@ -25,7 +26,7 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
 
         $mailer->shouldReceive('send')->with('notifications::email', $array, Mockery::type('Closure'));
 
-        $channel->send($notifiables, $notification);
+        $channel->send($notifiables, $message);
     }
 }
 

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Container\Container;
+use Illuminate\Notifications\Message;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\ChannelManager;
 use Illuminate\Contracts\Bus\Dispatcher as Bus;
@@ -20,12 +21,12 @@ class NotificationChannelManagerTest extends PHPUnit_Framework_TestCase
         Container::setInstance($container);
         $manager = Mockery::mock(ChannelManager::class.'[driver]', [$container]);
         $manager->shouldReceive('driver')->andReturn($driver = Mockery::mock());
-        $driver->shouldReceive('send')->andReturnUsing(function ($notifiables, $notification) {
-            $this->assertEquals('Name', $notification->application);
-            $this->assertEquals('Logo', $notification->logoUrl);
-            $this->assertEquals('test', $notification->introLines[0]);
-            $this->assertEquals('Text', $notification->actionText);
-            $this->assertEquals('url', $notification->actionUrl);
+        $driver->shouldReceive('send')->andReturnUsing(function ($notifiables, $message) {
+            $this->assertEquals('Name', $message->notification->application);
+            $this->assertEquals('Logo', $message->notification->logoUrl);
+            $this->assertEquals('test', $message->introLines[0]);
+            $this->assertEquals('Text', $message->actionText);
+            $this->assertEquals('url', $message->actionUrl);
         });
         $events->shouldReceive('fire')->with(Mockery::type(Illuminate\Notifications\Events\NotificationSent::class));
 
@@ -57,9 +58,9 @@ class NotificationChannelManagerTestNotification extends Notification
         return ['test'];
     }
 
-    public function message()
+    public function message(Message $message)
     {
-        return $this->line('test')->action('Text', 'url');
+        return $message->line('test')->action('Text', 'url');
     }
 }
 
@@ -72,8 +73,8 @@ class NotificationChannelManagerTestQueuedNotification extends Notification impl
         return ['test'];
     }
 
-    public function message()
+    public function message(Message $message)
     {
-        return $this->line('test')->action('Text', 'url');
+        return $message->line('test')->action('Text', 'url');
     }
 }

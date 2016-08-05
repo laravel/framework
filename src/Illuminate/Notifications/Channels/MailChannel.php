@@ -5,7 +5,7 @@ namespace Illuminate\Notifications\Channels;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Mail\Mailer;
-use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\Message;
 
 class MailChannel
 {
@@ -31,12 +31,12 @@ class MailChannel
      * Send the given notification.
      *
      * @param  \Illuminate\Support\Collection  $notifiables
-     * @param  \Illuminate\Notifications\Notification  $notification
+     * @param  \Illuminate\Notifications\Message  $message
      * @return void
      */
-    public function send($notifiables, Notification $notification)
+    public function send($notifiables, Message $message)
     {
-        $data = $this->prepareNotificationData($notification);
+        $data = $this->prepareNotificationData($message);
 
         $emails = $notifiables->map(function ($n) {
             return $n->routeNotificationFor('mail');
@@ -46,14 +46,14 @@ class MailChannel
             return;
         }
 
-        $view = data_get($notification, 'options.view', 'notifications::email');
+        $view = data_get($message, 'options.view', 'notifications::email');
 
-        $this->mailer->send($view, $data, function ($m) use ($notifiables, $notification, $emails) {
+        $this->mailer->send($view, $data, function ($m) use ($notifiables, $message, $emails) {
             count($notifiables) === 1
                         ? $m->to($emails) : $m->bcc($emails);
 
-            $m->subject($notification->subject ?: Str::title(
-                Str::snake(class_basename($notification), ' ')
+            $m->subject($message->subject ?: Str::title(
+                Str::snake(class_basename($message->notification), ' ')
             ));
         });
     }
@@ -61,12 +61,12 @@ class MailChannel
     /**
      * Prepare the data from the given notification.
      *
-     * @param  \Illuminate\Notifications\Notification  $notification
+     * @param  \Illuminate\Notifications\Message  $message
      * @return array
      */
-    protected function prepareNotificationData($notification)
+    protected function prepareNotificationData(Message $message)
     {
-        $data = $notification->toArray();
+        $data = $message->toArray();
 
         return Arr::set($data, 'actionColor', $this->actionColorForLevel($data['level']));
     }

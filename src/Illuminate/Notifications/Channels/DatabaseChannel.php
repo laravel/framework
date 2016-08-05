@@ -2,7 +2,7 @@
 
 namespace Illuminate\Notifications\Channels;
 
-use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\Message;
 
 class DatabaseChannel
 {
@@ -10,13 +10,13 @@ class DatabaseChannel
      * Send the given notification.
      *
      * @param  \Illuminate\Support\Collection  $notifiables
-     * @param  \Illuminate\Notifications\Notification  $notification
+     * @param  \Illuminate\Notifications\Message  $message
      * @return void
      */
-    public function send($notifiables, Notification $notification)
+    public function send($notifiables, Message $message)
     {
         foreach ($notifiables as $notifiable) {
-            $this->createNotification($notifiable, $notification);
+            $this->createNotification($notifiable, $message);
         }
     }
 
@@ -24,18 +24,18 @@ class DatabaseChannel
      * Create a database notification record for the notifiable.
      *
      * @param  mixed  $notifiable
-     * @param  \Illuminate\Notifications\Notification  $notification
+     * @param  \Illuminate\Notifications\Message  $message
      * @return \Illuminate\Notifications\DatabaseNotification
      */
-    protected function createNotification($notifiable, Notification $notification)
+    protected function createNotification($notifiable, Message $message)
     {
         return $notifiable->routeNotificationFor('database')->create([
-            'type' => get_class($notification),
-            'level' => $notification->level,
-            'intro' => $notification->introLines,
-            'outro' => $notification->outroLines,
-            'action_text' => $notification->actionText,
-            'action_url' => $notification->actionUrl,
+            'type' => get_class($message->notification),
+            'level' => $message->notification->level,
+            'intro' => $message->introLines,
+            'outro' => $message->outroLines,
+            'action_text' => $message->actionText,
+            'action_url' => $message->actionUrl,
             'read' => false,
         ]);
     }
