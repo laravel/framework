@@ -437,7 +437,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         foreach ($this->items as $key => $item) {
             $key = $keyBy($item, $key);
 
-            if(array_key_exists($key, $results) && ! is_null($results[$key]) && ! is_null($callback)) {
+            if (array_key_exists($key, $results) && ! is_null($results[$key]) && ! is_null($callback)) {
                 $item = $callback($results[$key], $item);
             }
 
