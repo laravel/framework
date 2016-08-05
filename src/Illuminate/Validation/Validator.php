@@ -488,6 +488,22 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Generate a key map to determine the valid
+     * and invalid data
+     * @return array
+     */
+    protected function getMessagesKeyMap()
+    {
+        $map = [];
+
+        foreach($this->messages()->toArray() as $key => $message){
+            $map []= explode('.', $key)[0];
+        }
+
+        return array_flip(array_unique($map));
+    }
+
+    /**
      * Returns the data which was valid.
      *
      * @return array
@@ -498,7 +514,7 @@ class Validator implements ValidatorContract
             $this->passes();
         }
 
-        return array_diff_key($this->data, $this->messages()->toArray());
+        return array_diff_key($this->data, $this->getMessagesKeyMap());
     }
 
     /**
@@ -512,7 +528,7 @@ class Validator implements ValidatorContract
             $this->passes();
         }
 
-        return array_intersect_key($this->data, $this->messages()->toArray());
+        return array_intersect_key($this->data, $this->getMessagesKeyMap());
     }
 
     /**
