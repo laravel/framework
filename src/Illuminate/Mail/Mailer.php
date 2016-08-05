@@ -283,22 +283,7 @@ class Mailer implements MailerContract, MailQueueContract
     {
         return $this->later($delay, $view, $data, $callback, $queue);
     }
-
-    /**
-     * Build the callable for a queued e-mail job.
-     *
-     * @param  \Closure|string  $callback
-     * @return string
-     */
-    protected function buildQueueCallable($callback)
-    {
-        if (! $callback instanceof Closure) {
-            return $callback;
-        }
-
-        return (new Serializer)->serialize($callback);
-    }
-
+    
     /**
      * Handle a queued e-mail message job.
      *

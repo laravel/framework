@@ -3,6 +3,7 @@
 namespace Illuminate\Mail;
 
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
+use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Str;
 use SuperClosure\Serializer;
@@ -11,6 +12,11 @@ class SendQueuedMail
 {
     use SerializesModels;
 
+    /**
+     * View for main
+     *
+     * @var string
+     */
     protected $view;
     protected $data;
     protected $callback;
@@ -27,7 +33,7 @@ class SendQueuedMail
     {
         $this->view = $view;
         $this->data = $data;
-        $this->callback = $callback;
+        $this->callback = $this->buildQueueCallable($callback);
     }
 
     /**
@@ -41,6 +47,27 @@ class SendQueuedMail
         $mailer->send($this->view, $this->data, $this->getQueuedCallable($this->callback));
     }
 
+    /**
+     * Build the callable for a queued e-mail job.
+     *
+     * @param  \Closure|string  $callback
+     * @return string
+     */
+    protected function buildQueueCallable($callback)
+    {
+        if (! $callback instanceof \Closure) {
+            return $callback;
+        }
+
+        return (new Serializer)->serialize($callback);
+    }
+
+    /**
+     * Get the true callable for a queued e-mail message.
+     *
+     * @param  string $callback
+     * @return \Closure|string
+     */
     protected function getQueuedCallable($callback)
     {
         if (Str::contains($callback, 'SerializableClosure')) {
