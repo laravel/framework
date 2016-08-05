@@ -41,17 +41,17 @@ class Authorize
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
      * @param  string  $ability
-     * @param  string|null  $model
+     * @param  array|null  $models
      * @return mixed
      *
      * @throws \Illuminate\Auth\Access\AuthenticationException
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function handle($request, Closure $next, $ability, $model = null)
+    public function handle($request, Closure $next, $ability, ...$models)
     {
         $this->auth->authenticate();
 
-        $this->gate->authorize($ability, $this->getGateArguments($request, $model));
+        $this->gate->authorize($ability, $this->getGateArguments($request, $models));
 
         return $next($request);
     }
@@ -60,12 +60,21 @@ class Authorize
      * Get the arguments parameter for the gate.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  string|null  $model
+     * @param  array|null  $models
      * @return array|string|\Illuminate\Database\Eloquent\Model
      */
-    protected function getGateArguments($request, $model)
+    protected function getGateArguments($request, $models)
     {
-        return is_null($model) ? [] : $this->getModel($request, $model);
+        if (is_null($models)) {
+            return [];
+        }
+
+        $gate_args = [];
+        foreach ($models as $model) {
+            $gate_args[] = $this->getModel($request, $model);
+        }
+
+        return $gate_args;
     }
 
     /**
