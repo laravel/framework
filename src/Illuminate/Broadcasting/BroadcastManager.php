@@ -59,7 +59,7 @@ class BroadcastManager implements FactoryContract
 
         $router = $this->app['router'];
 
-        $router->group(['middleware' => ['web']], function () {
+        $router->group(['middleware' => ['web']], function ($router) {
             $router->post('/broadcasting/auth', BroadcastController::class.'@authenticate');
             $router->post('/broadcasting/socket', BroadcastController::class.'@rememberSocket');
         });
