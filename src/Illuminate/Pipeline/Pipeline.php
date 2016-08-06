@@ -116,7 +116,7 @@ class Pipeline implements PipelineContract
                     // If the pipe is an instance of a Closure, we will just call it directly but
                     // otherwise we'll resolve the pipes out of the container and call it with
                     // the appropriate method and arguments, returning the results back out.
-                    return call_user_func($pipe, $passable, $stack);
+                    return $pipe($passable, $stack);
                 } elseif (! is_object($pipe)) {
                     list($name, $parameters) = $this->parsePipeString($pipe);
 
@@ -133,14 +133,7 @@ class Pipeline implements PipelineContract
                     $parameters = [$passable, $stack];
                 }
 
-                switch (count($parameters)) {
-                    case 0: return $pipe->{$this->method}();
-                    case 1: return $pipe->{$this->method}($parameters[0]);
-                    case 2: return $pipe->{$this->method}($parameters[0], $parameters[1]);
-                    case 3: return $pipe->{$this->method}($parameters[0], $parameters[1], $parameters[2]);
-                    case 4: return $pipe->{$this->method}($parameters[0], $parameters[1], $parameters[2], $parameters[3]);
-                    default: return call_user_func_array([$pipe, $this->method], $parameters);
-                }
+                return $pipe->{$this->method}(...$parameters);
             };
         };
     }
@@ -154,7 +147,7 @@ class Pipeline implements PipelineContract
     protected function getInitialSlice(Closure $destination)
     {
         return function ($passable) use ($destination) {
-            return call_user_func($destination, $passable);
+            return $destination($passable);
         };
     }
 
