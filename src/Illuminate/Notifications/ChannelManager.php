@@ -46,8 +46,6 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      */
     public function sendNow($notifiables, $notification)
     {
-        $notification->message();
-
         if (! $notification->application) {
             $notification->application(
                 $this->app['config']['app.name'],

@@ -34,12 +34,12 @@ class DummyClass extends Notification
     /**
      * Get the notification message.
      *
-     * @return void
+     * @return \Illuminate\Notifications\Message
      */
-    public function message()
+    public function message($notifiable)
     {
-        $this->line('The introduction to the notification.')
-             ->action('Notification Action', 'https://laravel.com')
-             ->line('Thank you for using our application!');
+        return $this->line('The introduction to the notification.')
+                    ->action('Notification Action', 'https://laravel.com')
+                    ->line('Thank you for using our application!');
     }
 }
