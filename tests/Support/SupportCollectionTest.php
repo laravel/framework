@@ -570,7 +570,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
                 'name' => 'double zero',
             ],
         ], $c->uniqueStrict('id')->all());
-    }    
+    }
 
     public function testCollapse()
     {
