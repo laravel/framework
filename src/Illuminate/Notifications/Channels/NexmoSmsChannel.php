@@ -2,7 +2,6 @@
 
 namespace Illuminate\Notifications\Channels;
 
-use Illuminate\Support\Arr;
 use Nexmo\Client as NexmoClient;
 use Illuminate\Notifications\Notification;
 
