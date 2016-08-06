@@ -234,7 +234,7 @@ class Builder
     public function firstOrNew(array $attributes)
     {
         $mutatedAttributes = $this->model->newInstance($attributes);
-        
+
         if (! is_null($instance = $this->where($mutatedAttributes)->first())) {
             return $instance;
         }
