@@ -29,6 +29,7 @@ class Pipeline extends BasePipeline
                 try {
                     $slice = parent::getSlice();
                     $callable = $slice($stack, $pipe);
+
                     return $callable($passable);
                 } catch (Exception $e) {
                     return $this->handleException($passable, $e);
