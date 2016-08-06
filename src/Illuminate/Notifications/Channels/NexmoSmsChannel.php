@@ -52,7 +52,7 @@ class NexmoSmsChannel
             $this->nexmo->message()->send([
                 'from' => $this->from,
                 'to' => $to,
-                'text' => $this->formatNotification($notification),
+                'text' => $this->formatNotification($notifiable, $notification),
             ]);
         }
     }
@@ -60,20 +60,21 @@ class NexmoSmsChannel
     /**
      * Format the given notification to a single string.
      *
+     * @param  mixed  $notifiable
      * @param  \Illuminate\Notifications\Notification  $notification
      * @return string
      */
-    protected function formatNotification(Notification $notification)
+    protected function formatNotification($notifiable, $notification)
     {
-        $data = $notification->toArray();
+        $message = $notification->message($notifiable);
 
-        $actionText = $notification->actionText
-                    ? $notification->actionText.': ' : '';
+        $actionText = $message->actionText
+                    ? $message->actionText.': ' : '';
 
         return trim(implode(PHP_EOL.PHP_EOL, array_filter([
-            implode(' ', Arr::get($data, 'introLines', [])),
-            $actionText.Arr::get($data, 'actionUrl'),
-            implode(' ', Arr::get($data, 'outroLines', [])),
+            implode(' ', $message->introLines),
+            $actionText.$message->actionUrl,
+            implode(' ', $message->outroLines),
         ])));
     }
 
