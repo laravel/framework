@@ -489,7 +489,7 @@ class Validator implements ValidatorContract
 
     /**
      * Generate a key map to determine the valid
-     * and invalid data
+     * and invalid data.
      * @return array
      */
     protected function getMessagesKeyMap()
@@ -497,7 +497,7 @@ class Validator implements ValidatorContract
         $map = [];
 
         foreach($this->messages()->toArray() as $key => $message){
-            $map []= explode('.', $key)[0];
+            $map [] = explode('.', $key)[0];
         }
 
         return array_flip(array_unique($map));
