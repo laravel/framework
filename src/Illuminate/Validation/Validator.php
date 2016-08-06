@@ -496,7 +496,7 @@ class Validator implements ValidatorContract
     {
         $map = [];
 
-        foreach ($this->messages()->toArray() as $key => $message){
+        foreach ($this->messages()->toArray() as $key => $message) {
             $map [] = explode('.', $key)[0];
         }
 
