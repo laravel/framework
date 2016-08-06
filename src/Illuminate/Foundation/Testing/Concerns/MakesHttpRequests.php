@@ -100,6 +100,7 @@ trait MakesHttpRequests
      * Visit the given URI with a GET request.
      *
      * @param  string  $uri
+     * @param  array  $data
      * @param  array  $headers
      * @return $this
      */
