@@ -707,6 +707,8 @@ class BelongsToMany extends Relation
      */
     public function firstOrNew(array $attributes)
     {
+        $attributes = $this->getParent()->newInstance()->fill($attributes)->attributesToArray();
+
         if (is_null($instance = $this->where($attributes)->first())) {
             $instance = $this->related->newInstance($attributes);
         }
@@ -724,6 +726,8 @@ class BelongsToMany extends Relation
      */
     public function firstOrCreate(array $attributes, array $joining = [], $touch = true)
     {
+        $attributes = $this->getParent()->newInstance()->fill($attributes)->attributesToArray();
+
         if (is_null($instance = $this->where($attributes)->first())) {
             $instance = $this->create($attributes, $joining, $touch);
         }
