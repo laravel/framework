@@ -23,9 +23,6 @@ class NotificationChannelManagerTest extends PHPUnit_Framework_TestCase
         $driver->shouldReceive('send')->andReturnUsing(function ($notifiables, $notification) {
             $this->assertEquals('Name', $notification->application);
             $this->assertEquals('Logo', $notification->logoUrl);
-            $this->assertEquals('test', $notification->introLines[0]);
-            $this->assertEquals('Text', $notification->actionText);
-            $this->assertEquals('url', $notification->actionUrl);
         });
         $events->shouldReceive('fire')->with(Mockery::type(Illuminate\Notifications\Events\NotificationSent::class));
 

@@ -11,7 +11,7 @@ class NotificationNexmoChannelTest extends PHPUnit_Framework_TestCase
 
     public function testSmsIsSentViaNexmo()
     {
-        $notification = new Notification;
+        $notification = new NotificationNexmoChannelTestNotification;
         $notifiables = collect([
             $notifiable = new NotificationNexmoChannelTestNotifiable,
         ]);
@@ -43,4 +43,14 @@ class NotificationNexmoChannelTestNotifiable
 {
     use Illuminate\Notifications\Notifiable;
     public $phone_number = '5555555555';
+}
+
+class NotificationNexmoChannelTestNotification extends Notification
+{
+    public function message($notifiable)
+    {
+        return $this->line('line 1')
+                    ->action('Text', 'url')
+                    ->line('line 2');
+    }
 }
