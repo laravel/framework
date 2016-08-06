@@ -235,7 +235,7 @@ class Builder
     {
         $instance = $this->model->newInstance($attributes);
 
-        if (! is_null($this->where($newInstance->attributesToArray())->first())) {
+        if (! is_null($this->where($instance->attributesToArray())->first())) {
             return $instance;
         }
 
