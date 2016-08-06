@@ -29,13 +29,15 @@ class DatabaseChannel
      */
     protected function createNotification($notifiable, Notification $notification)
     {
+        $message = $notification->message($notifiable);
+
         return $notifiable->routeNotificationFor('database')->create([
             'type' => get_class($notification),
-            'level' => $notification->level,
-            'intro' => $notification->introLines,
-            'outro' => $notification->outroLines,
-            'action_text' => $notification->actionText,
-            'action_url' => $notification->actionUrl,
+            'level' => $message->level,
+            'intro' => $message->introLines,
+            'outro' => $message->outroLines,
+            'action_text' => $message->actionText,
+            'action_url' => $message->actionUrl,
             'read' => false,
         ]);
     }

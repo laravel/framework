@@ -11,17 +11,10 @@ class NotificationSlackChannelTest extends PHPUnit_Framework_TestCase
 
     public function testCorrectPayloadIsSentToSlack()
     {
-        $notification = new Notification;
+        $notification = new NotificationSlackChannelTestNotification;
         $notifiables = collect([
             $notifiable = new NotificationSlackChannelTestNotifiable,
         ]);
-
-        $notification->subject = 'Subject';
-        $notification->level = 'success';
-        $notification->introLines = ['line 1'];
-        $notification->actionText = 'Text';
-        $notification->actionUrl = 'url';
-        $notification->outroLines = ['line 2'];
 
         $channel = new Illuminate\Notifications\Channels\SlackWebhookChannel(
             $http = Mockery::mock('GuzzleHttp\Client')
@@ -57,5 +50,17 @@ class NotificationSlackChannelTestNotifiable
     public function routeNotificationForSlack()
     {
         return 'url';
+    }
+}
+
+class NotificationSlackChannelTestNotification extends Notification
+{
+    public function message($notifiable)
+    {
+        return $this->subject('Subject')
+                    ->success()
+                    ->line('line 1')
+                    ->action('Text', 'url')
+                    ->line('line 2');
     }
 }

@@ -1016,6 +1016,12 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, ['foo' => '123'], ['foo' => 'Digits:200']);
         $this->assertFalse($v->passes());
 
+        $v = new Validator($trans, ['foo' => '+2.37'], ['foo' => 'Digits:5']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => '2e7'], ['foo' => 'Digits:3']);
+        $this->assertTrue($v->fails());
+
         $trans = $this->getRealTranslator();
         $v = new Validator($trans, ['foo' => '12345'], ['foo' => 'digits_between:1,6']);
         $this->assertTrue($v->passes());
@@ -1024,6 +1030,9 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['foo' => '123'], ['foo' => 'digits_between:4,5']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '+12.3'], ['foo' => 'digits_between:1,6']);
         $this->assertFalse($v->passes());
     }
 
