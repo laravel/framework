@@ -2,11 +2,13 @@
 
 namespace Illuminate\Notifications\Channels;
 
+use Illuminate\Support\Collection;
 use GuzzleHttp\Client as HttpClient;
 use Illuminate\Notifications\Message;
 use Illuminate\Notifications\Notification;
+use Illuminate\Contracts\Notifications\Channel as ChannelContract;
 
-class SlackWebhookChannel
+class SlackWebhookChannel implements ChannelContract
 {
     /**
      * The HTTP client instance.
@@ -33,7 +35,7 @@ class SlackWebhookChannel
      * @param  \Illuminate\Notifications\Notification  $notification
      * @return void
      */
-    public function send($notifiables, Notification $notification)
+    public function send(Collection $notifiables, Notification $notification)
     {
         foreach ($notifiables as $notifiable) {
             if (! $url = $notifiable->routeNotificationFor('slack')) {

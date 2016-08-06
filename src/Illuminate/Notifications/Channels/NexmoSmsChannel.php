@@ -3,9 +3,11 @@
 namespace Illuminate\Notifications\Channels;
 
 use Nexmo\Client as NexmoClient;
+use Illuminate\Support\Collection;
 use Illuminate\Notifications\Notification;
+use Illuminate\Contracts\Notifications\Channel as ChannelContract;
 
-class NexmoSmsChannel
+class NexmoSmsChannel implements ChannelContract
 {
     /**
      * The Nexmo client instance.
@@ -41,7 +43,7 @@ class NexmoSmsChannel
      * @param  \Illuminate\Notifications\Notification  $notification
      * @return void
      */
-    public function send($notifiables, Notification $notification)
+    public function send(Collection $notifiables, Notification $notification)
     {
         foreach ($notifiables as $notifiable) {
             if (! $to = $notifiable->routeNotificationFor('nexmo')) {

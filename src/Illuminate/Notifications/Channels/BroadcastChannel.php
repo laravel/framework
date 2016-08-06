@@ -2,6 +2,7 @@
 
 namespace Illuminate\Notifications\Channels;
 
+use Illuminate\Support\Collection;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Notifications\Events\DatabaseNotificationCreated;
@@ -33,7 +34,7 @@ class BroadcastChannel extends DatabaseChannel
      * @param  \Illuminate\Notifications\Notification  $notification
      * @return void
      */
-    public function send($notifiables, Notification $notification)
+    public function send(Collection $notifiables, Notification $notification)
     {
         foreach ($notifiables as $notifiable) {
             $databaseNotification = $this->createNotification($notifiable, $notification);

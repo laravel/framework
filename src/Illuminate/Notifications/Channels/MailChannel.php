@@ -4,10 +4,12 @@ namespace Illuminate\Notifications\Channels;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Collection;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Notifications\Notification;
+use Illuminate\Contracts\Notifications\Channel as ChannelContract;
 
-class MailChannel
+class MailChannel implements ChannelContract
 {
     /**
      * The mailer implementation.
@@ -34,7 +36,7 @@ class MailChannel
      * @param  \Illuminate\Notifications\Notification  $notification
      * @return void
      */
-    public function send($notifiables, Notification $notification)
+    public function send(Collection $notifiables, Notification $notification)
     {
         $view = data_get($notification, 'options.view', 'notifications::email');
 
