@@ -301,7 +301,7 @@ class Arr
      */
     public static function has($array, $key)
     {
-        if (! $array) {
+        if (! static::accessible($array)) {
             return false;
         }
 
