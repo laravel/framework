@@ -34,6 +34,7 @@ class DummyClass extends Notification
     /**
      * Get the notification message.
      *
+     * @param  mixed  $notifiable
      * @return \Illuminate\Notifications\Message
      */
     public function message($notifiable)
