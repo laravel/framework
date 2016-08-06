@@ -3,6 +3,7 @@
 namespace Illuminate\Notifications\Channels;
 
 use GuzzleHttp\Client as HttpClient;
+use Illuminate\Notifications\Message;
 use Illuminate\Notifications\Notification;
 
 class SlackWebhookChannel
@@ -39,14 +40,16 @@ class SlackWebhookChannel
                 continue;
             }
 
+            $message = $notification->message($notifiable);
+
             $this->http->post($url, [
                 'json' => [
                     'attachments' => [
                         array_filter([
-                            'color' => $this->color($notification),
-                            'title' => $notification->subject,
-                            'title_link' => $notification->actionUrl ?: null,
-                            'text' => $this->format($notification),
+                            'color' => $this->color($message->level),
+                            'title' => $message->subject,
+                            'title_link' => $message->actionUrl ?: null,
+                            'text' => $this->format($message),
                         ]),
                     ],
                 ],
@@ -55,33 +58,33 @@ class SlackWebhookChannel
     }
 
     /**
-     * Format the given notification.
+     * Format the given notification message.
      *
-     * @param  \Illuminate\Notifications\Notification  $notification
+     * @param  \Illuminate\Notifications\Message  $message
      * @return string
      */
-    protected function format(Notification $notification)
+    protected function format(Message $message)
     {
-        $message = trim(implode(PHP_EOL.PHP_EOL, $notification->introLines));
+        $text = trim(implode(PHP_EOL.PHP_EOL, $message->introLines));
 
-        if ($notification->actionText) {
-            $message .= PHP_EOL.PHP_EOL.'<'.$notification->actionUrl.'|'.$notification->actionText.'>';
+        if ($message->actionText) {
+            $text .= PHP_EOL.PHP_EOL.'<'.$message->actionUrl.'|'.$message->actionText.'>';
         }
 
-        $message .= PHP_EOL.PHP_EOL.trim(implode(PHP_EOL.PHP_EOL, $notification->outroLines));
+        $text .= PHP_EOL.PHP_EOL.trim(implode(PHP_EOL.PHP_EOL, $message->outroLines));
 
-        return trim($message);
+        return trim($text);
     }
 
     /**
      * Get the color that should be applied to the notification.
      *
-     * @param  \Illuminate\Notifications\Notification  $notification
+     * @param  string  $level
      * @return string|null
      */
-    protected function color(Notification $notification)
+    protected function color($level)
     {
-        switch ($notification->level) {
+        switch ($level) {
             case 'success':
                 return 'good';
             case 'error':
