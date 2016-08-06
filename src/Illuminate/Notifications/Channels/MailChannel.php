@@ -5,6 +5,7 @@ namespace Illuminate\Notifications\Channels;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Mail\Mailer;
+use Illuminate\Notifications\Message;
 use Illuminate\Notifications\Notification;
 
 class MailChannel
@@ -36,39 +37,25 @@ class MailChannel
      */
     public function send($notifiables, Notification $notification)
     {
-        $data = $this->prepareNotificationData($notification);
-
-        $emails = $notifiables->map(function ($n) {
-            return $n->routeNotificationFor('mail');
-        })->filter()->all();
-
-        if (empty($emails)) {
-            return;
-        }
-
         $view = data_get($notification, 'options.view', 'notifications::email');
 
-        $this->mailer->send($view, $data, function ($m) use ($notifiables, $notification, $emails) {
-            count($notifiables) === 1
-                        ? $m->to($emails) : $m->bcc($emails);
+        foreach ($notifiables as $notifiable) {
+            if (! $notifiable->routeNotificationFor('mail')) {
+                continue;
+            }
 
-            $m->subject($notification->subject ?: Str::title(
-                Str::snake(class_basename($notification), ' ')
-            ));
-        });
-    }
+            $data = $notification->toArray($notifiable);
 
-    /**
-     * Prepare the data from the given notification.
-     *
-     * @param  \Illuminate\Notifications\Notification  $notification
-     * @return array
-     */
-    protected function prepareNotificationData($notification)
-    {
-        $data = $notification->toArray();
+            Arr::set($data, 'actionColor', $this->actionColorForLevel($data['level']));
 
-        return Arr::set($data, 'actionColor', $this->actionColorForLevel($data['level']));
+            $this->mailer->send($view, $data, function ($m) use ($notifiable, $notification) {
+                $m->to($notifiable->routeNotificationFor('mail'));
+
+                $m->subject($notification->message($notifiable)->subject ?: Str::title(
+                    Str::snake(class_basename($notification), ' ')
+                ));
+            });
+        }
     }
 
     /**
