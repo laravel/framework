@@ -238,6 +238,7 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
 
         $this->assertFalse(Arr::has(null, 'foo'));
         $this->assertFalse(Arr::has(false, 'foo'));
+        $this->assertFalse(Arr::has(true, 'foo'));
 
         $this->assertFalse(Arr::has(null, null));
         $this->assertFalse(Arr::has([], null));
