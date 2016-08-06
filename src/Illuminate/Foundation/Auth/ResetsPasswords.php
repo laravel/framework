@@ -108,7 +108,7 @@ trait ResetsPasswords
     protected function sendResetFailedResponse($response)
     {
         return redirect()->back()
-                    ->withInput($request->only('email'))
+                    ->withInput(\Request::only('email'))
                     ->withErrors(['email' => trans($response)]);
     }
 
