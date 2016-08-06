@@ -1065,7 +1065,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 
     public function testContainsStrict()
     {
-        $c = new Collection([1, 3, 5,'02']);
+        $c = new Collection([1, 3, 5, '02']);
 
         $this->assertTrue($c->containsStrict(1));
         $this->assertFalse($c->containsStrict(2));
