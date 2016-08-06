@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database\Eloquent;
 
-use BadMethodCallException;
 use Closure;
+use BadMethodCallException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Pagination\Paginator;
