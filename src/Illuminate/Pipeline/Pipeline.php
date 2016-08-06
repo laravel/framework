@@ -99,9 +99,8 @@ class Pipeline implements PipelineContract
 
         $pipes = array_reverse($this->pipes);
 
-        return call_user_func(
-            array_reduce($pipes, $this->getSlice(), $firstSlice), $this->passable
-        );
+        $callable = array_reduce($pipes, $this->getSlice(), $firstSlice);
+        return $callable($this->passable);
     }
 
     /**
@@ -134,7 +133,14 @@ class Pipeline implements PipelineContract
                     $parameters = [$passable, $stack];
                 }
 
-                return call_user_func_array([$pipe, $this->method], $parameters);
+                switch (count($parameters)) {
+                    case 0: return $pipe->{$this->method}();
+                    case 1: return $pipe->{$this->method}($parameters[0]);
+                    case 2: return $pipe->{$this->method}($parameters[0], $parameters[1]);
+                    case 3: return $pipe->{$this->method}($parameters[0], $parameters[1], $parameters[2]);
+                    case 4: return $pipe->{$this->method}($parameters[0], $parameters[1], $parameters[2], $parameters[3]);
+                    default: return call_user_func_array([$pipe, $this->method], $parameters);
+                }
             };
         };
     }
