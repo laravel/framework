@@ -38,7 +38,7 @@ class ResetPassword extends Notification
     /**
      * Build the notification message.
      *
-     * @return $this
+     * @return \Illuminate\Notifications\Message
      */
     public function message()
     {
