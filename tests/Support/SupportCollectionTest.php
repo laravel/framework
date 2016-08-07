@@ -543,6 +543,35 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         })->all());
     }
 
+    public function testUniqueStrict()
+    {
+        $c = new Collection([
+            [
+                'id' => '0',
+                'name' => 'zero',
+            ],
+            [
+                'id' => '00',
+                'name' => 'double zero',
+            ],
+            [
+                'id' => '0',
+                'name' => 'again zero',
+            ],
+        ]);
+
+        $this->assertEquals([
+            [
+                'id' => '0',
+                'name' => 'zero',
+            ],
+            [
+                'id' => '00',
+                'name' => 'double zero',
+            ],
+        ], $c->uniqueStrict('id')->all());
+    }
+
     public function testCollapse()
     {
         $data = new Collection([[$object1 = new StdClass], [$object2 = new StdClass]]);
