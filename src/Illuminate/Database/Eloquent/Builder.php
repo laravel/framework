@@ -233,7 +233,7 @@ class Builder
      */
     public function firstOrNew(array $attributes)
     {
-        $mutatedAttributes = $this->model->newInstance($attributes);
+        $mutatedAttributes = $this->model->newInstance($attributes)->attributesToArray();
 
         if (! is_null($instance = $this->where($mutatedAttributes)->first())) {
             return $instance;
@@ -250,7 +250,7 @@ class Builder
      */
     public function firstOrCreate(array $attributes)
     {
-        $mutatedAttributes = $this->model->newInstance($attributes);
+        $mutatedAttributes = $this->model->newInstance($attributes)->attributesToArray();
 
         if (! is_null($instance = $this->where($mutatedAttributes)->first())) {
             return $instance;
