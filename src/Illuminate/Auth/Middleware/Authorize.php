@@ -69,12 +69,9 @@ class Authorize
             return [];
         }
 
-        $gate_args = [];
-        foreach ($models as $model) {
-            $gate_args[] = $this->getModel($request, $model);
-        }
-
-        return $gate_args;
+        return collect($models)->map(function ($model) use ($request) {
+            return $this->getModel($request, $model);
+        })->all();
     }
 
     /**
