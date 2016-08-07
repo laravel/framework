@@ -171,7 +171,9 @@ class Route
             $this->parametersWithoutNulls(), new ReflectionFunction($this->action['uses'])
         );
 
-        return call_user_func_array($this->action['uses'], $parameters);
+        $callable = $this->action['uses'];
+
+        return $callable(...array_values($parameters));
     }
 
     /**
