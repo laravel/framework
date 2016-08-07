@@ -12,6 +12,17 @@ use Symfony\Component\Debug\Exception\FatalThrowableError;
 class SyncQueue extends Queue implements QueueContract
 {
     /**
+     * Get the size of the queue.
+     *
+     * @param  string  $queue
+     * @return int
+     */
+    public function size($queue = null)
+    {
+        return 0;
+    }
+
+    /**
      * Push a new job onto the queue.
      *
      * @param  string  $job
@@ -92,17 +103,6 @@ class SyncQueue extends Queue implements QueueContract
     public function pop($queue = null)
     {
         //
-    }
-
-    /**
-     * Get the size of the queue.
-     *
-     * @param  string  $queue
-     * @return int
-     */
-    public function size($queue = null)
-    {
-        return 0;
     }
 
     /**
