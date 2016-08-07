@@ -51,11 +51,11 @@ class Builder
      */
     protected $bindings = [
         'select' => [],
-        'join' => [],
-        'where' => [],
+        'join'   => [],
+        'where'  => [],
         'having' => [],
-        'order' => [],
-        'union' => [],
+        'order'  => [],
+        'union'  => [],
     ];
 
     /**
