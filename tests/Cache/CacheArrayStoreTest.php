@@ -16,14 +16,14 @@ class CacheArrayStoreTest extends PHPUnit_Framework_TestCase
         $store = new ArrayStore;
         $store->put('foo', 'bar', 10);
         $store->putMany([
-            'fizz' => 'buz',
-            'quz' => 'baz',
+            'fizz'  => 'buz',
+            'quz'   => 'baz',
         ], 10);
         $this->assertEquals([
-            'foo' => 'bar',
-            'fizz' => 'buz',
-            'quz' => 'baz',
-            'norf' => null,
+            'foo'   => 'bar',
+            'fizz'  => 'buz',
+            'quz'   => 'baz',
+            'norf'  => null,
         ], $store->many(['foo', 'fizz', 'quz', 'norf']));
     }
 
