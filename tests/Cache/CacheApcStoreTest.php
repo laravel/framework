@@ -28,9 +28,9 @@ class CacheApcStoreTest extends PHPUnit_Framework_TestCase
         ]);
         $store = new Illuminate\Cache\ApcStore($apc);
         $this->assertEquals([
-            'foo' => 'qux',
-            'bar' => null,
-            'baz' => 'norf',
+            'foo'   => 'qux',
+            'bar'   => null,
+            'baz'   => 'norf',
         ], $store->many(['foo', 'bar', 'baz']));
     }
 
@@ -54,9 +54,9 @@ class CacheApcStoreTest extends PHPUnit_Framework_TestCase
         ]);
         $store = new Illuminate\Cache\ApcStore($apc);
         $store->putMany([
-            'foo' => 'bar',
-            'baz' => 'qux',
-            'bar' => 'norf',
+            'foo'   => 'bar',
+            'baz'   => 'qux',
+            'bar'   => 'norf',
         ], 1);
     }
 

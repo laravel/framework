@@ -19,8 +19,8 @@ class DatabaseMigratorIntegrationTest extends PHPUnit_Framework_TestCase
         $this->db = $db = new DB;
 
         $db->addConnection([
-            'driver' => 'sqlite',
-            'database' => ':memory:',
+            'driver'    => 'sqlite',
+            'database'  => ':memory:',
         ]);
 
         $db->setAsGlobal();
