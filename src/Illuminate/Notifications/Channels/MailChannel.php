@@ -5,7 +5,6 @@ namespace Illuminate\Notifications\Channels;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Mail\Mailer;
-use Illuminate\Notifications\Message;
 use Illuminate\Notifications\Notification;
 
 class MailChannel

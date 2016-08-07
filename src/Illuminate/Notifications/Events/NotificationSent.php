@@ -2,8 +2,6 @@
 
 namespace Illuminate\Notifications\Events;
 
-use Illuminate\Notifications\Notification;
-
 class NotificationSent
 {
     /**
