@@ -2930,6 +2930,76 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testInvalidMethod()
+    {
+        $trans = $this->getRealTranslator();
+
+        $v = new Validator($trans,
+            [
+                ['name' => 'John'],
+                ['name' => null],
+                ['name' => '']
+            ],
+            [
+                '*.name' => 'required',
+            ]);
+
+        $this->assertEquals($v->invalid(), [
+            1 => ['name' => null],
+            2 => ['name' => '']
+        ]);
+
+        $v = new Validator($trans,
+            [
+                'name' => ''
+            ],
+            [
+                'name' => 'required',
+            ]);
+
+        $this->assertEquals($v->invalid(), [
+            'name' => ''
+        ]);
+    }
+
+    public function testValidMethod()
+    {
+        $trans = $this->getRealTranslator();
+
+        $v = new Validator($trans,
+            [
+                ['name' => 'John'],
+                ['name' => null],
+                ['name' => ''],
+                ['name' => 'Doe']
+            ],
+            [
+                '*.name' => 'required',
+            ]);
+
+        $this->assertEquals($v->valid(), [
+            0 => ['name' => 'John'],
+            3 => ['name' => 'Doe']
+        ]);
+
+        $v = new Validator($trans,
+            [
+                'name' => 'Carlos',
+                'age' => 'unknown',
+                'gender' => 'male'
+            ],
+            [
+                'name' => 'required',
+                'gernder' => 'in:male,female',
+                'age' => 'required|int'
+            ]);
+
+        $this->assertEquals($v->valid(), [
+            'name' => 'Carlos',
+            'gender' => 'male'
+        ]);
+    }
+
     protected function getTranslator()
     {
         return m::mock('Symfony\Component\Translation\TranslatorInterface');
