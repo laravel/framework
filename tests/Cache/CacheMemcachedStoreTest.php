@@ -35,9 +35,9 @@ class CacheMemcachedStoreTest extends PHPUnit_Framework_TestCase
         $memcache->expects($this->once())->method('getResultCode')->will($this->returnValue(0));
         $store = new Illuminate\Cache\MemcachedStore($memcache, 'foo');
         $this->assertEquals([
-            'foo'   => 'fizz',
-            'bar'   => 'buzz',
-            'baz'   => 'norf',
+            'foo' => 'fizz',
+            'bar' => 'buzz',
+            'baz' => 'norf',
         ], $store->many([
             'foo', 'bar', 'baz',
         ]));
