@@ -109,10 +109,10 @@ class RouteListCommand extends Command
     protected function getRouteInformation(Route $route)
     {
         return $this->filterRoute([
-            'host'   => $route->domain(),
+            'host' => $route->domain(),
             'method' => implode('|', $route->methods()),
-            'uri'    => $route->uri(),
-            'name'   => $route->getName(),
+            'uri' => $route->uri(),
+            'name' => $route->getName(),
             'action' => $route->getActionName(),
             'middleware' => $this->getMiddleware($route),
         ]);
