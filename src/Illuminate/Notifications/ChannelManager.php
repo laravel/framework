@@ -2,6 +2,7 @@
 
 namespace Illuminate\Notifications;
 
+use Codebird as TwitterClient;
 use InvalidArgumentException;
 use Illuminate\Support\Manager;
 use Nexmo\Client as NexmoClient;
@@ -152,6 +153,23 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     protected function createSlackDriver()
     {
         return new Channels\SlackWebhookChannel(new HttpClient);
+    }
+
+    /**
+     * Create an instance of the Twitter driver.
+     *
+     * @return \Illuminate\Notifications\Channels\TwitterChannel
+     */
+    protected function createTwitterDriver()
+    {
+        $codebird = new TwitterClient;
+
+        $codebird->setToken(
+            $this->app['config']['services.twitter.token'],
+            $this->app['config']['services.twitter.secret']
+        );
+
+        return new Channels\TwitterChannel($codebird);
     }
 
     /**
