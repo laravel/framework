@@ -21,11 +21,18 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
     public function setUp()
     {
         parent::setUp();
+        
+        $host = getenv('REDIS_HOST');
+        $port = getenv('REDIS_PORT');
+        if (!$host) {
+            $this->markTestSkipped('Set environment variable REDIS_HOST & REDIS_PORT to enable ' . __CLASS__);
+            return;
+        }
         $this->redis = new Database([
             'cluster' => false,
             'default' => [
-                'host' => '127.0.0.1',
-                'port' => 6379,
+                'host' => $host,
+                'port' => $port,
                 'database' => 5,
             ],
         ]);
@@ -39,7 +46,10 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
     {
         parent::tearDown();
         m::close();
-        $this->redis->connection()->flushdb();
+        if ($this->redis) {
+            $this->redis->connection()->flushdb();            
+        }
+
     }
 
     public function testExpiredJobsArePopped()
