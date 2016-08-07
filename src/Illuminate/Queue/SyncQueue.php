@@ -95,6 +95,17 @@ class SyncQueue extends Queue implements QueueContract
     }
 
     /**
+     * Get the size of the queue.
+     *
+     * @param  string  $queue
+     * @return int
+     */
+    public function size($queue = null)
+    {
+        return 0;
+    }
+
+    /**
      * Resolve a Sync job instance.
      *
      * @param  string  $payload

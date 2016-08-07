@@ -109,6 +109,19 @@ class BeanstalkdQueue extends Queue implements QueueContract
     }
 
     /**
+     * Get the size of the queue.
+     *
+     * @param  string  $queue
+     * @return int
+     */
+    public function size($queue = null)
+    {
+        $queue = $this->getQueue($queue);
+
+        return (int) $this->pheanstalk->statsTube($queue)->total_jobs;
+    }
+
+    /**
      * Delete a message from the Beanstalk queue.
      *
      * @param  string  $queue
