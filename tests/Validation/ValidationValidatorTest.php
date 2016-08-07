@@ -249,7 +249,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $trans->addResource('array', ['validation.in' => ':attribute must be included in :values.'], 'en', 'messages');
         $customValues = [
             'type' => [
-                '5'   => 'Short',
+                '5' => 'Short',
                 '300' => 'Long',
             ],
         ];
@@ -264,7 +264,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $trans->addResource('array', ['validation.in' => ':attribute must be included in :values.'], 'en', 'messages');
         $customValues = [
             'type' => [
-                '5'   => 'Short',
+                '5' => 'Short',
                 '300' => 'Long',
             ],
         ];
@@ -2938,7 +2938,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
             [
                 ['name' => 'John'],
                 ['name' => null],
-                ['name' => '']
+                ['name' => ''],
             ],
             [
                 '*.name' => 'required',
@@ -2946,19 +2946,19 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals($v->invalid(), [
             1 => ['name' => null],
-            2 => ['name' => '']
+            2 => ['name' => ''],
         ]);
 
         $v = new Validator($trans,
             [
-                'name' => ''
+                'name' => '',
             ],
             [
                 'name' => 'required',
             ]);
 
         $this->assertEquals($v->invalid(), [
-            'name' => ''
+            'name' => '',
         ]);
     }
 
@@ -2971,7 +2971,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
                 ['name' => 'John'],
                 ['name' => null],
                 ['name' => ''],
-                ['name' => 'Doe']
+                ['name' => 'Doe'],
             ],
             [
                 '*.name' => 'required',
@@ -2979,24 +2979,24 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals($v->valid(), [
             0 => ['name' => 'John'],
-            3 => ['name' => 'Doe']
+            3 => ['name' => 'Doe'],
         ]);
 
         $v = new Validator($trans,
             [
                 'name' => 'Carlos',
                 'age' => 'unknown',
-                'gender' => 'male'
+                'gender' => 'male',
             ],
             [
                 'name' => 'required',
                 'gernder' => 'in:male,female',
-                'age' => 'required|int'
+                'age' => 'required|int',
             ]);
 
         $this->assertEquals($v->valid(), [
             'name' => 'Carlos',
-            'gender' => 'male'
+            'gender' => 'male',
         ]);
     }
 
