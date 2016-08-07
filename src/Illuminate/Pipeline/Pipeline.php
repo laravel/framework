@@ -97,8 +97,9 @@ class Pipeline implements PipelineContract
     {
         $firstSlice = $this->getInitialSlice($destination);
 
-        $pipes = array_reverse($this->pipes);
-        $callable = array_reduce($pipes, $this->getSlice(), $firstSlice);
+        $callable = array_reduce(
+            array_reverse($this->pipes), $this->getSlice(), $firstSlice
+        );
 
         return $callable($this->passable);
     }
