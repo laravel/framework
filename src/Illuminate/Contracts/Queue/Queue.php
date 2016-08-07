@@ -63,4 +63,12 @@ interface Queue
      * @return \Illuminate\Contracts\Queue\Job|null
      */
     public function pop($queue = null);
+
+    /**
+     * Get the size of the queue.
+     *
+     * @param  string  $queue
+     * @return int
+     */
+    public function size($queue = null);
 }

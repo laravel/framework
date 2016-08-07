@@ -175,6 +175,19 @@ class DatabaseQueue extends Queue implements QueueContract
     }
 
     /**
+     * Get the size of the queue.
+     *
+     * @param  string  $queue
+     * @return int
+     */
+    public function size($queue = null)
+    {
+        return $this->database->table($this->table)
+                    ->where('queue', $this->getQueue($queue))
+                    ->count();
+    }
+
+    /**
      * Get the next available job for the queue.
      *
      * @param  string|null  $queue
