@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent;
 
 use Closure;
+use BadMethodCallException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Pagination\Paginator;
@@ -677,7 +678,12 @@ class Builder
         // not have to remove these where clauses manually which gets really hacky
         // and is error prone while we remove the developer's own where clauses.
         $relation = Relation::noConstraints(function () use ($name) {
-            return $this->getModel()->$name();
+            try {
+                return $this->getModel()->$name();
+            } catch (BadMethodCallException $e) {
+                $className = get_class($this->getModel());
+                throw new RelationNotFoundException("Call to undefined relationship {$name} on Model {$className}");
+            }
         });
 
         $nested = $this->nestedRelations($name);
