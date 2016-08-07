@@ -1092,6 +1092,36 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($c->contains('foo'));
     }
 
+    public function testContainsStrict()
+    {
+        $c = new Collection([1, 3, 5, '02']);
+
+        $this->assertTrue($c->containsStrict(1));
+        $this->assertFalse($c->containsStrict(2));
+        $this->assertTrue($c->containsStrict('02'));
+        $this->assertTrue($c->containsStrict(function ($value) {
+            return $value < 5;
+        }));
+        $this->assertFalse($c->containsStrict(function ($value) {
+            return $value > 5;
+        }));
+
+        $c = new Collection([['v' => 1], ['v' => 3], ['v' => '04'], ['v' => 5]]);
+
+        $this->assertTrue($c->containsStrict('v', 1));
+        $this->assertFalse($c->containsStrict('v', 2));
+        $this->assertFalse($c->containsStrict('v', 4));
+        $this->assertTrue($c->containsStrict('v', '04'));
+
+        $c = new Collection(['date', 'class', (object) ['foo' => 50], '']);
+
+        $this->assertTrue($c->containsStrict('date'));
+        $this->assertTrue($c->containsStrict('class'));
+        $this->assertFalse($c->containsStrict('foo'));
+        $this->assertFalse($c->containsStrict(null));
+        $this->assertTrue($c->containsStrict(''));
+    }
+
     public function testGettingSumFromCollection()
     {
         $c = new Collection([(object) ['foo' => 50], (object) ['foo' => 50]]);
