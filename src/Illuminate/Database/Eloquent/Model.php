@@ -2150,9 +2150,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $this->visible = array_diff($this->visible, (array) $attributes);
 
-        if (! empty($this->hidden)) {
-            $this->addHidden($attributes);
-        }
+        $this->hidden = array_unique(array_merge($this->hidden, $attributes));
 
         return $this;
     }
@@ -2612,10 +2610,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected function getArrayableItems(array $values)
     {
         if (count($this->getVisible()) > 0) {
-            return array_intersect_key($values, array_flip($this->getVisible()));
+            $values = array_intersect_key($values, array_flip($this->getVisible()));
         }
 
-        return array_diff_key($values, array_flip($this->getHidden()));
+        if (count($this->getHidden()) > 0) {
+            $values = array_diff_key($values, array_flip($this->getHidden()));
+        }
+
+        return $values;
     }
 
     /**
