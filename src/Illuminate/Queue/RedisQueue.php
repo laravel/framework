@@ -64,11 +64,7 @@ class RedisQueue extends Queue implements QueueContract
      */
     public function size($queue = null)
     {
-        $queue = $this->getQueue($queue);
-
-        return $this->getConnection()->llen($queue)
-            + $this->getConnection()->llen($queue.':delayed')
-            + $this->getConnection()->llen($queue.':reserved');
+        return (int) $this->getConnection()->llen($this->getQueue($queue));
     }
 
     /**

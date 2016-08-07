@@ -323,7 +323,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $trans->addResource('array', ['validation.in' => ':attribute must be included in :values.'], 'en', 'messages');
         $customValues = [
             'type' => [
-                '5' => 'Short',
+                '5'   => 'Short',
                 '300' => 'Long',
             ],
         ];
@@ -338,7 +338,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $trans->addResource('array', ['validation.in' => ':attribute must be included in :values.'], 'en', 'messages');
         $customValues = [
             'type' => [
-                '5' => 'Short',
+                '5'   => 'Short',
                 '300' => 'Long',
             ],
         ];
