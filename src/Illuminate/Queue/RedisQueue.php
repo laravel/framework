@@ -57,6 +57,17 @@ class RedisQueue extends Queue implements QueueContract
     }
 
     /**
+     * Get the size of the queue.
+     *
+     * @param  string  $queue
+     * @return int
+     */
+    public function size($queue = null)
+    {
+        return (int) $this->getConnection()->llen($this->getQueue($queue));
+    }
+
+    /**
      * Push a new job onto the queue.
      *
      * @param  string  $job
@@ -129,17 +140,6 @@ class RedisQueue extends Queue implements QueueContract
         if ($reserved) {
             return new RedisJob($this->container, $this, $job, $reserved, $original);
         }
-    }
-
-    /**
-     * Get the size of the queue.
-     *
-     * @param  string  $queue
-     * @return int
-     */
-    public function size($queue = null)
-    {
-        return (int) $this->getConnection()->llen($this->getQueue($queue));
     }
 
     /**
