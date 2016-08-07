@@ -91,7 +91,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      * Get a channel instance.
      *
      * @param  string|null  $name
-     * @return mixed
+     * @return \Illuminate\Contracts\Notifications\Channel
      */
     public function channel($name = null)
     {

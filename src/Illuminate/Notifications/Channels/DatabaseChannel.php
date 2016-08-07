@@ -2,9 +2,11 @@
 
 namespace Illuminate\Notifications\Channels;
 
+use Illuminate\Support\Collection;
 use Illuminate\Notifications\Notification;
+use Illuminate\Contracts\Notifications\Channel as ChannelContract;
 
-class DatabaseChannel
+class DatabaseChannel implements ChannelContract
 {
     /**
      * Send the given notification.
@@ -13,7 +15,7 @@ class DatabaseChannel
      * @param  \Illuminate\Notifications\Notification  $notification
      * @return void
      */
-    public function send($notifiables, Notification $notification)
+    public function send(Collection $notifiables, Notification $notification)
     {
         foreach ($notifiables as $notifiable) {
             $this->createNotification($notifiable, $notification);
