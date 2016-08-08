@@ -46,13 +46,6 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      */
     public function sendNow($notifiables, $notification)
     {
-        if (! $notification->application) {
-            $notification->application(
-                $this->app['config']['app.name'],
-                $this->app['config']['app.logo']
-            );
-        }
-
         foreach ($notifiables as $notifiable) {
             $channels = $notification->via($notifiable);
 

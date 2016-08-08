@@ -20,10 +20,7 @@ class NotificationChannelManagerTest extends PHPUnit_Framework_TestCase
         Container::setInstance($container);
         $manager = Mockery::mock(ChannelManager::class.'[driver]', [$container]);
         $manager->shouldReceive('driver')->andReturn($driver = Mockery::mock());
-        $driver->shouldReceive('send')->andReturnUsing(function ($notifiables, $notification) {
-            $this->assertEquals('Name', $notification->application);
-            $this->assertEquals('Logo', $notification->logoUrl);
-        });
+        $driver->shouldReceive('send')->once();
         $events->shouldReceive('fire')->with(Mockery::type(Illuminate\Notifications\Events\NotificationSent::class));
 
         $manager->send([new NotificationChannelManagerTestNotifiable], new NotificationChannelManagerTestNotification);
