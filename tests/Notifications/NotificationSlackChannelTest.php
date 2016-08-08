@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\Messages\SlackMessage;
 
 class NotificationSlackChannelTest extends PHPUnit_Framework_TestCase
 {
@@ -55,9 +56,10 @@ class NotificationSlackChannelTestNotifiable
 
 class NotificationSlackChannelTestNotification extends Notification
 {
-    public function message($notifiable)
+    public function toSlack($notifiable)
     {
-        return $this->subject('Subject')
+        return (new SlackMessage)
+                    ->subject('Subject')
                     ->success()
                     ->line('line 1')
                     ->action('Text', 'url')

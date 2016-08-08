@@ -40,7 +40,7 @@ class MailChannel
                 continue;
             }
 
-            $message = $notification->asMail($notifiable);
+            $message = $notification->toMail($notifiable);
 
             $this->mailer->send($message->view, $message->toArray(), function ($m) use ($notifiable, $notification, $message) {
                 $m->to($notifiable->routeNotificationFor('mail'));
