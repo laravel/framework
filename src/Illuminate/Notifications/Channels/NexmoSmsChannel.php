@@ -65,7 +65,7 @@ class NexmoSmsChannel
      */
     protected function formatNotification($notifiable, $notification)
     {
-        $message = $notification->message($notifiable);
+        $message = $notification->toNexmo($notifiable);
 
         $actionText = $message->actionText
                     ? $message->actionText.': ' : '';

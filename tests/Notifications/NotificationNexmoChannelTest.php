@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\Messages\NexmoMessage;
 
 class NotificationNexmoChannelTest extends PHPUnit_Framework_TestCase
 {
@@ -47,9 +48,10 @@ class NotificationNexmoChannelTestNotifiable
 
 class NotificationNexmoChannelTestNotification extends Notification
 {
-    public function message($notifiable)
+    public function toNexmo($notifiable)
     {
-        return $this->line('line 1')
+        return (new NexmoMessage)
+                    ->line('line 1')
                     ->action('Text', 'url')
                     ->line('line 2');
     }

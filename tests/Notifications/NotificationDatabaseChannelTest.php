@@ -1,8 +1,9 @@
 <?php
 
-use Illuminate\Notifications\Message;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Channels\DatabaseChannel;
+use Illuminate\Notifications\Messages\DatabaseMessage;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 class NotificationDatabaseChannelTest extends PHPUnit_Framework_TestCase
 {
@@ -17,24 +18,49 @@ class NotificationDatabaseChannelTest extends PHPUnit_Framework_TestCase
         $notifiables = collect([$notifiable = Mockery::mock()]);
 
         $notifiable->shouldReceive('routeNotificationFor->create')->with([
+            'id' => 1,
             'type' => get_class($notification),
-            'level' => 'info',
-            'intro' => [],
-            'outro' => [],
-            'action_text' => null,
-            'action_url' => null,
+            'data' => ['invoice_id' => 1],
             'read' => false,
         ]);
 
-        $channel = new DatabaseChannel;
+        $events = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
+        $channel = new DatabaseChannel($events);
+        $channel->send($notifiables, $notification);
+    }
+
+    public function testDatabaseNotificationCreationCanBeBroadcasted()
+    {
+        $notification = new NotificationDatabaseChannelTestBroadcastNotification;
+        $notifiables = collect([$notifiable = Mockery::mock()]);
+
+        $notifiable->shouldReceive('routeNotificationFor->create')->with([
+            'id' => 1,
+            'type' => get_class($notification),
+            'data' => ['invoice_id' => 1],
+            'read' => false,
+        ]);
+
+        $events = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
+        $events->shouldReceive('fire')->once()->with('Illuminate\Notifications\Events\DatabaseNotificationCreated');
+
+        $channel = new DatabaseChannel($events);
         $channel->send($notifiables, $notification);
     }
 }
 
 class NotificationDatabaseChannelTestNotification extends Notification
 {
-    public function message($notifiable)
+    public function toDatabase($notifiable)
     {
-        return new Message;
+        return new DatabaseMessage(['id' => 1, 'invoice_id' => 1]);
+    }
+}
+
+class NotificationDatabaseChannelTestBroadcastNotification extends Notification implements ShouldBroadcast
+{
+    public function toDatabase($notifiable)
+    {
+        return new DatabaseMessage(['id' => 1, 'invoice_id' => 1]);
     }
 }
