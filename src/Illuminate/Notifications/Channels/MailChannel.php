@@ -29,26 +29,24 @@ class MailChannel
     /**
      * Send the given notification.
      *
-     * @param  \Illuminate\Support\Collection  $notifiables
+     * @param  mixed  $notifiable
      * @param  \Illuminate\Notifications\Notification  $notification
      * @return void
      */
-    public function send($notifiables, Notification $notification)
+    public function send($notifiable, Notification $notification)
     {
-        foreach ($notifiables as $notifiable) {
-            if (! $notifiable->routeNotificationFor('mail')) {
-                continue;
-            }
-
-            $message = $notification->toMail($notifiable);
-
-            $this->mailer->send($message->view, $message->toArray(), function ($m) use ($notifiable, $notification, $message) {
-                $m->to($notifiable->routeNotificationFor('mail'));
-
-                $m->subject($message->subject ?: Str::title(
-                    Str::snake(class_basename($notification), ' ')
-                ));
-            });
+        if (! $notifiable->routeNotificationFor('mail')) {
+            return;
         }
+
+        $message = $notification->toMail($notifiable);
+
+        $this->mailer->send($message->view, $message->toArray(), function ($m) use ($notifiable, $notification, $message) {
+            $m->to($notifiable->routeNotificationFor('mail'));
+
+            $m->subject($message->subject ?: Str::title(
+                Str::snake(class_basename($notification), ' ')
+            ));
+        });
     }
 }
