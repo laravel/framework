@@ -47,44 +47,12 @@ class NexmoSmsChannel
             return;
         }
 
-        $this->nexmo->message()->send([
-            'from' => $this->from,
-            'to' => $to,
-            'text' => $this->formatNotification($notifiable, $notification),
-        ]);
-    }
-
-    /**
-     * Format the given notification to a single string.
-     *
-     * @param  mixed  $notifiable
-     * @param  \Illuminate\Notifications\Notification  $notification
-     * @return string
-     */
-    protected function formatNotification($notifiable, $notification)
-    {
         $message = $notification->toNexmo($notifiable);
 
-        $actionText = $message->actionText
-                    ? $message->actionText.': ' : '';
-
-        return trim(implode(PHP_EOL.PHP_EOL, array_filter([
-            implode(' ', $message->introLines),
-            $actionText.$message->actionUrl,
-            implode(' ', $message->outroLines),
-        ])));
-    }
-
-    /**
-     * Set the phone number that should be used to send notification.
-     *
-     * @param  string  $from
-     * @return $this
-     */
-    public function sendNotificationsFrom($from)
-    {
-        $this->from = $from;
-
-        return $this;
+        $this->nexmo->message()->send([
+            'from' => $message->from ?: $this->from,
+            'to' => $to,
+            'text' => trim($message->content),
+        ]);
     }
 }

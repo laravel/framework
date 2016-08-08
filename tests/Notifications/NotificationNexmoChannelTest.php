@@ -15,11 +15,6 @@ class NotificationNexmoChannelTest extends PHPUnit_Framework_TestCase
         $notification = new NotificationNexmoChannelTestNotification;
         $notifiable = new NotificationNexmoChannelTestNotifiable;
 
-        $notification->introLines = ['line 1'];
-        $notification->actionText = 'Text';
-        $notification->actionUrl = 'url';
-        $notification->outroLines = ['line 2'];
-
         $channel = new Illuminate\Notifications\Channels\NexmoSmsChannel(
             $nexmo = Mockery::mock(Nexmo\Client::class), '4444444444'
         );
@@ -27,11 +22,25 @@ class NotificationNexmoChannelTest extends PHPUnit_Framework_TestCase
         $nexmo->shouldReceive('message->send')->with([
             'from' => '4444444444',
             'to' => '5555555555',
-            'text' => 'line 1
+            'text' => 'this is my message',
+        ]);
 
-Text: url
+        $channel->send($notifiable, $notification);
+    }
 
-line 2',
+    public function testSmsIsSentViaNexmoWithCustomFrom()
+    {
+        $notification = new NotificationNexmoChannelTestCustomFromNotification;
+        $notifiable = new NotificationNexmoChannelTestNotifiable;
+
+        $channel = new Illuminate\Notifications\Channels\NexmoSmsChannel(
+            $nexmo = Mockery::mock(Nexmo\Client::class), '4444444444'
+        );
+
+        $nexmo->shouldReceive('message->send')->with([
+            'from' => '5554443333',
+            'to' => '5555555555',
+            'text' => 'this is my message',
         ]);
 
         $channel->send($notifiable, $notification);
@@ -48,9 +57,14 @@ class NotificationNexmoChannelTestNotification extends Notification
 {
     public function toNexmo($notifiable)
     {
-        return (new NexmoMessage)
-                    ->line('line 1')
-                    ->action('Text', 'url')
-                    ->line('line 2');
+        return new NexmoMessage('this is my message');
+    }
+}
+
+class NotificationNexmoChannelTestCustomFromNotification extends Notification
+{
+    public function toNexmo($notifiable)
+    {
+        return (new NexmoMessage('this is my message'))->from('5554443333');
     }
 }
