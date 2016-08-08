@@ -2,31 +2,12 @@
 
 namespace Illuminate\Notifications\Channels;
 
-use GuzzleHttp\Client as HttpClient;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\SlackMessage;
 use Illuminate\Notifications\Messages\SlackAttachment;
 
-class SlackWebhookChannel
+class SlackWebhookChannel extends HttpChannel
 {
-    /**
-     * The HTTP client instance.
-     *
-     * @var \GuzzleHttp\Client
-     */
-    protected $http;
-
-    /**
-     * Create a new Slack channel instance.
-     *
-     * @param  \GuzzleHttp\Client  $http
-     * @return void
-     */
-    public function __construct(HttpClient $http)
-    {
-        $this->http = $http;
-    }
-
     /**
      * Send the given notification.
      *
