@@ -2,8 +2,6 @@
 
 namespace Illuminate\Notifications\Messages;
 
-use Illuminate\Support\Arr;
-
 class DatabaseMessage
 {
     /**
