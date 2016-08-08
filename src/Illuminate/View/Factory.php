@@ -823,7 +823,7 @@ class Factory implements FactoryContract
         $loop = &$this->loopsStack[count($this->loopsStack) - 1];
 
         $loop['iteration']++;
-        $loop['index'] = $loop['iteration']-1;
+        $loop['index'] = $loop['iteration'] - 1;
 
         $loop['first'] = $loop['iteration'] == 1;
 
