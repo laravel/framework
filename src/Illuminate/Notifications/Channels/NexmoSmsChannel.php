@@ -4,6 +4,7 @@ namespace Illuminate\Notifications\Channels;
 
 use Nexmo\Client as NexmoClient;
 use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\Messages\NexmoMessage;
 
 class NexmoSmsChannel
 {
@@ -48,6 +49,10 @@ class NexmoSmsChannel
         }
 
         $message = $notification->toNexmo($notifiable);
+
+        if (is_string($message)) {
+            $message = new NexmoMessage($message);
+        }
 
         $this->nexmo->message()->send([
             'from' => $message->from ?: $this->from,
