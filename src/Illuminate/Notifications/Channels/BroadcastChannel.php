@@ -57,7 +57,7 @@ class BroadcastChannel
         }
 
         throw new RuntimeException(
-            "Notification is missing toArray method."
+            'Notification is missing toArray method.'
         );
     }
 }
