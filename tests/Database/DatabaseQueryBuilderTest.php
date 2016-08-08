@@ -1245,7 +1245,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $builder->shouldReceive('exists')->once()->andReturn(false);
         $builder->shouldReceive('insert')->once()->with(['email' => 'foo', 'name' => 'bar'])->andReturn(true);
 
-        $this->assertEquals(true, $builder->updateOrInsert(['email' => 'foo'], ['name' => 'bar']));
+        $this->assertTrue($builder->updateOrInsert(['email' => 'foo'], ['name' => 'bar']));
 
         $builder = m::mock('Illuminate\Database\Query\Builder[where,exists,update]', [
             m::mock('Illuminate\Database\ConnectionInterface'),
@@ -1258,7 +1258,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $builder->shouldReceive('take')->andReturnSelf();
         $builder->shouldReceive('update')->once()->with(['name' => 'bar'])->andReturn(1);
 
-        $this->assertEquals(true, $builder->updateOrInsert(['email' => 'foo'], ['name' => 'bar']));
+        $this->assertTrue($builder->updateOrInsert(['email' => 'foo'], ['name' => 'bar']));
     }
 
     public function testDeleteMethod()

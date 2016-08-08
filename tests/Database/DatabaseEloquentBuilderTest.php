@@ -365,6 +365,17 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $relation = $builder->getRelation('ordersGroups');
     }
 
+    /**
+     * @expectedException Illuminate\Database\Eloquent\RelationNotFoundException
+     */
+    public function testGetRelationThrowsException()
+    {
+        $builder = $this->getBuilder();
+        $builder->setModel($this->getMockModel());
+
+        $builder->getRelation('invalid');
+    }
+
     public function testEagerLoadParsingSetsProperRelationships()
     {
         $builder = $this->getBuilder();
