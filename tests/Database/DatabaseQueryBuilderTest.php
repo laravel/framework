@@ -133,6 +133,10 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->when(false, $callback)->where('email', 'foo');
         $this->assertEquals('select * from "users" where "email" = ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->when(true, 'age', '>', 30)->where('email', 'foo');
+        $this->assertEquals('select * from "users" where "age" > ? and "email" = ?', $builder->toSql());
     }
 
     public function testBasicWheres()

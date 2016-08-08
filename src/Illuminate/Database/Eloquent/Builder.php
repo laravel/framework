@@ -736,16 +736,20 @@ class Builder
     /**
      * Apply the callback's query changes if the given "value" is true.
      *
-     * @param  bool  $value
-     * @param  \Closure  $callback
-     * @return $this
+     * @param  bool  $condition
+     * @param  \Closure|string  $callback
+     * @param  string  $operator
+     * @param  string  $value
+     * @return \Illuminate\Database\Query\Builder
      */
-    public function when($value, $callback)
+    public function when($condition, $callback, $operator = null, $value = null)
     {
         $builder = $this;
 
-        if ($value) {
-            $builder = call_user_func($callback, $builder);
+        if ($condition) {
+            $builder = is_callable($callback)
+                ? call_user_func($callback, $builder)
+                : $this->where($callback, $operator, $value);
         }
 
         return $builder;
