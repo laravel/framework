@@ -22,7 +22,7 @@ class DummyClass extends Notification
     }
 
     /**
-     * Get the notification channels.
+     * Get the notification's delivery channels.
      *
      * @param  mixed  $notifiable
      * @return array|string
