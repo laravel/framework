@@ -17,7 +17,7 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
             $notifiable = new NotificationMailChannelTestNotifiable,
         ]);
 
-        $message = $notification->asMail($notifiable);
+        $message = $notification->toMail($notifiable);
         $data = $message->toArray();
 
         $channel = new Illuminate\Notifications\Channels\MailChannel(
@@ -39,7 +39,7 @@ class NotificationMailChannelTestNotifiable
 
 class NotificationMailChannelTestNotification extends Notification
 {
-    public function asMail($notifiable)
+    public function toMail($notifiable)
     {
         return new MailMessage;
     }

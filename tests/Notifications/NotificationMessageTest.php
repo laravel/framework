@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Notifications\Message;
+use Illuminate\Notifications\Messages\SimpleMessage as Message;
 
 class NotificationMessageTest extends PHPUnit_Framework_TestCase
 {
