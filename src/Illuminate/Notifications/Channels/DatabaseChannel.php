@@ -42,7 +42,7 @@ class DatabaseChannel
         }
 
         throw new RuntimeException(
-            "Notification is missing toDatabase / toArray method."
+            'Notification is missing toDatabase / toArray method.'
         );
     }
 }
