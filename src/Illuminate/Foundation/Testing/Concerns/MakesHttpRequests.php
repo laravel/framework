@@ -100,14 +100,15 @@ trait MakesHttpRequests
      * Visit the given URI with a GET request.
      *
      * @param  string  $uri
+     * @param  array  $data
      * @param  array  $headers
      * @return $this
      */
-    public function get($uri, array $headers = [])
+    public function get($uri, array $data = [], array $headers = [])
     {
         $server = $this->transformHeadersToServerVars($headers);
 
-        $this->call('GET', $uri, [], [], [], $server);
+        $this->call('GET', $uri, $data, [], [], $server);
 
         return $this;
     }
