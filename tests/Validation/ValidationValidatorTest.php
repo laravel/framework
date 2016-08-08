@@ -2990,7 +2990,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
             ],
             [
                 'name' => 'required',
-                'gernder' => 'in:male,female',
+                'gender' => 'in:male,female',
                 'age' => 'required|int',
             ]);
 
