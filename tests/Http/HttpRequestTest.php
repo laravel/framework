@@ -204,6 +204,10 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $request = Request::create('/', 'GET', ['foo' => '', 'bar' => null]);
         $this->assertTrue($request->exists('foo'));
         $this->assertTrue($request->exists('bar'));
+
+        $request = Request::create('/', 'GET', ['foo' => ['bar' => null, 'baz' => '']]);
+        $this->assertTrue($request->exists('foo.bar'));
+        $this->assertTrue($request->exists('foo.baz'));
     }
 
     public function testHasMethod()
@@ -220,6 +224,9 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         //test arrays within query string
         $request = Request::create('/', 'GET', ['foo' => ['bar', 'baz']]);
         $this->assertTrue($request->has('foo'));
+
+        $request = Request::create('/', 'GET', ['foo' => ['bar' => 'baz']]);
+        $this->assertTrue($request->has('foo.bar'));
     }
 
     public function testInputMethod()

@@ -5,6 +5,14 @@ namespace Illuminate\Contracts\Queue;
 interface Queue
 {
     /**
+     * Get the size of the queue.
+     *
+     * @param  string  $queue
+     * @return int
+     */
+    public function size($queue = null);
+
+    /**
      * Push a new job onto the queue.
      *
      * @param  string  $job
