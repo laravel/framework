@@ -263,6 +263,21 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
 
         $this->assertNull($this->queue->pop());
     }
+
+    public function testSize()
+    {
+        $this->assertEquals(0, $this->queue->size());
+        $this->queue->push(new RedisQueueIntegrationTestJob(1));
+        $this->assertEquals(1, $this->queue->size());
+        $this->queue->later(60, new RedisQueueIntegrationTestJob(2));
+        $this->assertEquals(2, $this->queue->size());
+        $this->queue->push(new RedisQueueIntegrationTestJob(3));
+        $this->assertEquals(3, $this->queue->size());
+        $job = $this->queue->pop();
+        $this->assertEquals(3, $this->queue->size());
+        $job->delete();
+        $this->assertEquals(2, $this->queue->size());
+    }
 }
 
 class RedisQueueIntegrationTestJob
