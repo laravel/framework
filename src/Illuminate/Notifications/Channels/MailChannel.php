@@ -2,10 +2,8 @@
 
 namespace Illuminate\Notifications\Channels;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Mail\Mailer;
-use Illuminate\Notifications\Message;
 use Illuminate\Notifications\Notification;
 
 class MailChannel
@@ -37,42 +35,20 @@ class MailChannel
      */
     public function send($notifiables, Notification $notification)
     {
-        $view = data_get($notification, 'options.view', 'notifications::email');
-
         foreach ($notifiables as $notifiable) {
             if (! $notifiable->routeNotificationFor('mail')) {
                 continue;
             }
 
-            $data = $notification->toArray($notifiable);
+            $message = $notification->asMail($notifiable);
 
-            Arr::set($data, 'actionColor', $this->actionColorForLevel($data['level']));
-
-            $this->mailer->send($view, $data, function ($m) use ($notifiable, $notification) {
+            $this->mailer->send($message->view, $message->toArray(), function ($m) use ($notifiable, $notification, $message) {
                 $m->to($notifiable->routeNotificationFor('mail'));
 
-                $m->subject($notification->message($notifiable)->subject ?: Str::title(
+                $m->subject($message->subject ?: Str::title(
                     Str::snake(class_basename($notification), ' ')
                 ));
             });
-        }
-    }
-
-    /**
-     * Get the action color for the given notification "level".
-     *
-     * @param  string  $level
-     * @return string
-     */
-    protected function actionColorForLevel($level)
-    {
-        switch ($level) {
-            case 'success':
-                return 'green';
-            case 'error':
-                return 'red';
-            default:
-                return 'blue';
         }
     }
 }

@@ -1,8 +1,8 @@
 <?php
 
-namespace Illuminate\Notifications;
+namespace Illuminate\Notifications\Messages;
 
-class Message
+class SimpleMessage
 {
     /**
      * The "level" of the notification (info, success, error).
@@ -45,13 +45,6 @@ class Message
      * @var string
      */
     public $actionUrl;
-
-    /**
-     * The notification's options.
-     *
-     * @var array
-     */
-    public $options = [];
 
     /**
      * Indicate that the notification gives information about a successful operation.
@@ -149,19 +142,6 @@ class Message
     }
 
     /**
-     * Set the notification's options.
-     *
-     * @param  array  $options
-     * @return $this
-     */
-    public function options(array $options)
-    {
-        $this->options = $options;
-
-        return $this;
-    }
-
-    /**
      * Configure the "call to action" button.
      *
      * @param  string  $text
@@ -174,5 +154,22 @@ class Message
         $this->actionUrl = $url;
 
         return $this;
+    }
+
+    /**
+     * Get an array representation of the message.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return [
+            'level' => $this->level,
+            'subject' => $this->subject,
+            'introLines' => $this->introLines,
+            'outroLines' => $this->outroLines,
+            'actionText' => $this->actionText,
+            'actionUrl' => $this->actionUrl,
+        ];
     }
 }
