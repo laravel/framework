@@ -2934,9 +2934,6 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $uploadedFile = $this->getTestImage();
         $trans = $this->getRealTranslator();
 
-        $v = new Validator($trans, ['x' => 'file'], ['x' => 'orientation']);
-        $this->assertTrue($v->fails());
-
         $v = new Validator($trans, [], ['x' => 'orientation:portrait']);
         $v->setFiles(['x' => $uploadedFile]);
         $this->assertTrue($v->fails());
