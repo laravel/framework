@@ -31,7 +31,8 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
         $port = getenv('REDIS_PORT') ?: 6379;
 
         if (static::$connectionFailedOnceWithDefaultsSkip) {
-            $this->markTestSkipped('Trying default host/port failed, please set environment variable REDIS_HOST & REDIS_PORT to enable ' . __CLASS__);
+            $this->markTestSkipped('Trying default host/port failed, please set environment variable REDIS_HOST & REDIS_PORT to enable '.__CLASS__);
+
             return;
         }
 
@@ -41,7 +42,7 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
                 'host' => $host,
                 'port' => $port,
                 'database' => 5,
-                'timeout' => 0.5
+                'timeout' => 0.5,
             ],
         ]);
 
@@ -49,8 +50,9 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
             $this->redis->connection()->flushdb();
         } catch (\Exception $e) {
             if ($host === '127.0.0.1' && $port === 6379 && getenv('REDIS_HOST') === false) {
-                $this->markTestSkipped('Trying default host/port failed, please set environment variable REDIS_HOST & REDIS_PORT to enable ' . __CLASS__);
+                $this->markTestSkipped('Trying default host/port failed, please set environment variable REDIS_HOST & REDIS_PORT to enable '.__CLASS__);
                 static::$connectionFailedOnceWithDefaultsSkip = true;
+
                 return;
             }
         }
@@ -64,9 +66,8 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
         parent::tearDown();
         m::close();
         if ($this->redis) {
-            $this->redis->connection()->flushdb();            
+            $this->redis->connection()->flushdb();
         }
-
     }
 
     public function testExpiredJobsArePopped()
