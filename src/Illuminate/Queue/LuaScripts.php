@@ -56,4 +56,11 @@ end
 return true
 LUA;
     }
+
+    public static function size()
+    {
+        return <<<'LUA'
+return redis.call('llen', KEYS[1]) + redis.call('zcard', KEYS[1]..':delayed') + redis.call('zcard', KEYS[1]..':reserved')
+LUA;
+    }
 }
