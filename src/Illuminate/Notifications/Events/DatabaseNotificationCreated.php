@@ -55,7 +55,11 @@ class DatabaseNotificationCreated implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return [new PrivateChannel($this->channelName())];
+        if (! empty($channels = $this->notification->broadcastOn())) {
+            return $channels;
+        } else {
+            return [new PrivateChannel($this->channelName())];
+        }
     }
 
     /**
