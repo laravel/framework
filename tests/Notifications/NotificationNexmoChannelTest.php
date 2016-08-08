@@ -13,9 +13,7 @@ class NotificationNexmoChannelTest extends PHPUnit_Framework_TestCase
     public function testSmsIsSentViaNexmo()
     {
         $notification = new NotificationNexmoChannelTestNotification;
-        $notifiables = collect([
-            $notifiable = new NotificationNexmoChannelTestNotifiable,
-        ]);
+        $notifiable = new NotificationNexmoChannelTestNotifiable;
 
         $notification->introLines = ['line 1'];
         $notification->actionText = 'Text';
@@ -36,7 +34,7 @@ Text: url
 line 2',
         ]);
 
-        $channel->send($notifiables, $notification);
+        $channel->send($notifiable, $notification);
     }
 }
 

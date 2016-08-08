@@ -5,10 +5,9 @@ namespace Illuminate\Notifications\Events;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Notifications\Notification;
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class DatabaseNotificationCreated implements ShouldBroadcast
+class BroadcastNotificationCreated implements ShouldBroadcast
 {
     use SerializesModels;
 
@@ -27,25 +26,25 @@ class DatabaseNotificationCreated implements ShouldBroadcast
     public $notification;
 
     /**
-     * The database notification instance.
+     * The notification data.
      *
-     * @var \Illuminate\Notifications\DatabaseNotification
+     * @var array
      */
-    public $databaseNotification;
+    public $data = [];
 
     /**
      * Create a new event instance.
      *
      * @param  mixed  $notifiable
      * @param  \Illuminate\Notifications\Notification  $notification
-     * @param  \Illuminate\Notifications\DatabaseNotification  $databaseNotification
+     * @param  array  $data
      * @return void
      */
-    public function __construct($notifiable, $notification, $databaseNotification)
+    public function __construct($notifiable, $notification, $data)
     {
+        $this->data = $data;
         $this->notifiable = $notifiable;
         $this->notification = $notification;
-        $this->databaseNotification = $databaseNotification;
     }
 
     /**
@@ -55,11 +54,7 @@ class DatabaseNotificationCreated implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        if (! empty($channels = $this->notification->broadcastOn())) {
-            return $channels;
-        } else {
-            return [new PrivateChannel($this->channelName())];
-        }
+        return [new PrivateChannel($this->channelName())];
     }
 
     /**
@@ -69,7 +64,7 @@ class DatabaseNotificationCreated implements ShouldBroadcast
      */
     public function broadcastWith()
     {
-        return ['notification' => $this->databaseNotification];
+        return array_merge($this->data, ['id' => $this->notification->id]);
     }
 
     /**

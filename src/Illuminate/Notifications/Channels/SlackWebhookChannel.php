@@ -29,32 +29,30 @@ class SlackWebhookChannel
     /**
      * Send the given notification.
      *
-     * @param  \Illuminate\Support\Collection  $notifiables
+     * @param  mixed  $notifiable
      * @param  \Illuminate\Notifications\Notification  $notification
      * @return void
      */
-    public function send($notifiables, Notification $notification)
+    public function send($notifiable, Notification $notification)
     {
-        foreach ($notifiables as $notifiable) {
-            if (! $url = $notifiable->routeNotificationFor('slack')) {
-                continue;
-            }
-
-            $message = $notification->toSlack($notifiable);
-
-            $this->http->post($url, [
-                'json' => [
-                    'attachments' => [
-                        array_filter([
-                            'color' => $this->color($message->level),
-                            'title' => $message->subject,
-                            'title_link' => $message->actionUrl ?: null,
-                            'text' => $this->format($message),
-                        ]),
-                    ],
-                ],
-            ]);
+        if (! $url = $notifiable->routeNotificationFor('slack')) {
+            return;
         }
+
+        $message = $notification->toSlack($notifiable);
+
+        $this->http->post($url, [
+            'json' => [
+                'attachments' => [
+                    array_filter([
+                        'color' => $this->color($message->level),
+                        'title' => $message->subject,
+                        'title_link' => $message->actionUrl ?: null,
+                        'text' => $this->format($message),
+                    ]),
+                ],
+            ],
+        ]);
     }
 
     /**
