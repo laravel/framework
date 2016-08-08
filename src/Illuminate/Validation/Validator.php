@@ -1913,9 +1913,7 @@ class Validator implements ValidatorContract
             return false;
         }
 
-        if (empty($parameters)) {
-            throw new InvalidArgumentException('Validation rule orientation requires 1 parameter.');
-        }
+        $this->requireParameterCount(1, $parameters, 'orientation');
 
         list($width, $height) = $sizeDetails;
 
