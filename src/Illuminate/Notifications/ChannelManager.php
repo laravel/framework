@@ -2,6 +2,7 @@
 
 namespace Illuminate\Notifications;
 
+use Ramsey\Uuid\Uuid;
 use InvalidArgumentException;
 use Illuminate\Support\Manager;
 use Nexmo\Client as NexmoClient;
@@ -47,6 +48,10 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     public function sendNow($notifiables, $notification)
     {
         foreach ($notifiables as $notifiable) {
+            $notification = clone $notification;
+
+            $notification->id = Uuid::uuid4();
+
             $channels = $notification->via($notifiable);
 
             if (empty($channels)) {
@@ -58,7 +63,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
             );
 
             foreach ($channels as $channel) {
-                $this->driver($channel)->send(collect([$notifiable]), $notification);
+                $this->driver($channel)->send($notifiable, $notification);
             }
         }
     }

@@ -6,8 +6,6 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Messages\DatabaseMessage;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 class DummyClass extends Notification
 {
@@ -49,15 +47,15 @@ class DummyClass extends Notification
     }
 
     /**
-     * Get the database representation of the notification.
+     * Get the array representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\DatabaseMessage
+     * @return array
      */
-    public function toDatabase($notifiable)
+    public function toArray($notifiable)
     {
-        return new DatabaseMessage([
+        return [
             //
-        ]);
+        ];
     }
 }

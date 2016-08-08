@@ -37,23 +37,21 @@ class NexmoSmsChannel
     /**
      * Send the given notification.
      *
-     * @param  \Illuminate\Support\Collection  $notifiables
+     * @param  mixed  $notifiable
      * @param  \Illuminate\Notifications\Notification  $notification
      * @return void
      */
-    public function send($notifiables, Notification $notification)
+    public function send($notifiable, Notification $notification)
     {
-        foreach ($notifiables as $notifiable) {
-            if (! $to = $notifiable->routeNotificationFor('nexmo')) {
-                continue;
-            }
-
-            $this->nexmo->message()->send([
-                'from' => $this->from,
-                'to' => $to,
-                'text' => $this->formatNotification($notifiable, $notification),
-            ]);
+        if (! $to = $notifiable->routeNotificationFor('nexmo')) {
+            return;
         }
+
+        $this->nexmo->message()->send([
+            'from' => $this->from,
+            'to' => $to,
+            'text' => $this->formatNotification($notifiable, $notification),
+        ]);
     }
 
     /**
