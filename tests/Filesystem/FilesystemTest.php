@@ -316,7 +316,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
             $this->markTestSkipped('Skip HHVM test due to bug: https://github.com/facebook/hhvm/issues/5657');
         }
 
-        if (!function_exists('pcntl_fork')) {
+        if (! function_exists('pcntl_fork')) {
             $this->markTestSkipped('Skipping since the pcntl extension is not available');
         }
 
