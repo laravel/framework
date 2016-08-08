@@ -3,8 +3,8 @@
 namespace Illuminate\Notifications\Channels;
 
 use GuzzleHttp\Client as HttpClient;
-use Illuminate\Notifications\Message;
 use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\Messages\SlackMessage;
 
 class SlackWebhookChannel
 {
@@ -40,7 +40,7 @@ class SlackWebhookChannel
                 continue;
             }
 
-            $message = $notification->message($notifiable);
+            $message = $notification->toSlack($notifiable);
 
             $this->http->post($url, [
                 'json' => [
@@ -60,10 +60,10 @@ class SlackWebhookChannel
     /**
      * Format the given notification message.
      *
-     * @param  \Illuminate\Notifications\Message  $message
+     * @param  \Illuminate\Notifications\Messages\SlackMessage  $message
      * @return string
      */
-    protected function format(Message $message)
+    protected function format(SlackMessage $message)
     {
         $text = trim(implode(PHP_EOL.PHP_EOL, $message->introLines));
 
