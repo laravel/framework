@@ -7,6 +7,7 @@ use Closure;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Illuminate\Broadcasting\Broadcasters\LogBroadcaster;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Broadcasting\Broadcasters\NullBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\RedisBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
@@ -82,6 +83,34 @@ class BroadcastManager implements FactoryContract
         if ($request->hasHeader('X-Socket-ID')) {
             return $request->header('X-Socket-ID');
         }
+    }
+
+    /**
+     * Begin broadcasting an event.
+     *
+     * @param  mixed  $event
+     * @return \Illuminate\Broadcasting\PendingBroadcast
+     */
+    public function event($event)
+    {
+        return new PendingBroadcast($this->app->make('events'), $event);
+    }
+
+    /**
+     * Queue the given event for broadcast.
+     *
+     * @param  mixed  $event
+     * @return void
+     */
+    public function queue($event)
+    {
+        $connection = $event instanceof ShouldBroadcastNow ? 'sync' : null;
+
+        $queue = method_exists($event, 'onQueue') ? $event->onQueue() : null;
+
+        $this->app->make('queue')->connection($connection)->pushOn(
+            $queue, BroadcastEvent::class, ['event' => serialize(clone $event)]
+        );
     }
 
     /**
