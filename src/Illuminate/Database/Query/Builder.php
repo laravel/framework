@@ -1709,7 +1709,17 @@ class Builder
             return count($results);
         }
 
-        return isset($results[0]) ? (int) array_change_key_case((array) $results[0])['aggregate'] : 0;
+        if (! isset($results[0])) {
+            return 0;
+        }
+
+        $item = $results[0];
+
+        if (is_object($item)) {
+            return (int) $item->aggregate;
+        }
+
+        return (int) array_change_key_case((array) $item)['aggregate'];
     }
 
     /**

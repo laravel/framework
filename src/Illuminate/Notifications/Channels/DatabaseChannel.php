@@ -36,7 +36,9 @@ class DatabaseChannel
     protected function getData($notifiable, Notification $notification)
     {
         if (method_exists($notification, 'toDatabase')) {
-            return $notification->toDatabase($notifiable)->data;
+            $data = $notification->toDatabase($notifiable);
+
+            return is_array($data) ? $data : $data->data;
         } elseif (method_exists($notification, 'toArray')) {
             return $notification->toArray($notifiable);
         }
