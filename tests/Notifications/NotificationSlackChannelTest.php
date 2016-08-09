@@ -21,16 +21,19 @@ class NotificationSlackChannelTest extends PHPUnit_Framework_TestCase
 
         $http->shouldReceive('post')->with('url', [
             'json' => [
+                'text' => 'Content',
                 'attachments' => [
                     [
-                        'color' => 'good',
-                        'title' => 'Subject',
-                        'title_link' => 'url',
-                        'text' => 'line 1
-
-<url|Text>
-
-line 2',
+                        'title' => 'Laravel',
+                        'title_link' => 'https://laravel.com',
+                        'text' => 'Attachment Content',
+                        'fields' => [
+                            [
+                                'title' => 'Project',
+                                'value' => 'Laravel',
+                                'short' => true,
+                            ],
+                        ],
                     ],
                 ],
             ],
@@ -44,8 +47,6 @@ class NotificationSlackChannelTestNotifiable
 {
     use Illuminate\Notifications\Notifiable;
 
-    public $phone_number = '5555555555';
-
     public function routeNotificationForSlack()
     {
         return 'url';
@@ -57,10 +58,13 @@ class NotificationSlackChannelTestNotification extends Notification
     public function toSlack($notifiable)
     {
         return (new SlackMessage)
-                    ->subject('Subject')
-                    ->success()
-                    ->line('line 1')
-                    ->action('Text', 'url')
-                    ->line('line 2');
+                    ->content('Content')
+                    ->attachment(function ($attachment) {
+                        $attachment->title('Laravel', 'https://laravel.com')
+                                   ->content('Attachment Content')
+                                   ->fields([
+                                        'Project' => 'Laravel',
+                                    ]);
+                    });
     }
 }
