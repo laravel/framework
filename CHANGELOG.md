@@ -1,5 +1,34 @@
 # Release Notes
 
+## v5.2.42 (2016-08-08)
+
+### Added
+- Allow `BelongsToMany::detach()` to accept a collection ([#14412](https://github.com/laravel/framework/pull/14412))
+- Added `whereTime()` and `orWhereTime()` to query builder ([#14528](https://github.com/laravel/framework/pull/14528))
+- Added PHP 7.1 support ([#14549](https://github.com/laravel/framework/pull/14549))
+- Allow collections to be created from objects that implement `Traversable` ([#14628](https://github.com/laravel/framework/pull/14628))
+- Support dot notation in `Request::exists()` ([#14660](https://github.com/laravel/framework/pull/14660))
+- Added missing `Model::makeHidden()` method ([#14641](https://github.com/laravel/framework/pull/14641))
+
+### Changed
+- Return `true` when `$key` is empty in `MessageBag::has()` ([#14409](https://github.com/laravel/framework/pull/14409))
+- Optimized `Filesystem::moveDirectory` ([#14362](https://github.com/laravel/framework/pull/14362))
+- Convert `$count` to integer in `Str::plural()` ([#14502](https://github.com/laravel/framework/pull/14502))
+- Handle arrays in `validateIn()` method ([#14607](https://github.com/laravel/framework/pull/14607))
+
+### Fixed
+- Fixed an issue with `wherePivotIn()` ([#14397](https://github.com/laravel/framework/issues/14397))
+- Fixed PDO connection on HHVM ([#14429](https://github.com/laravel/framework/pull/14429))
+- Prevent `make:migration` from creating duplicate classes ([#14432](https://github.com/laravel/framework/pull/14432))
+- Fixed lazy eager loading issue in `LengthAwarePaginator` collection ([#14476](https://github.com/laravel/framework/pull/14476))
+- Fixed plural form of Pokémon ([#14525](https://github.com/laravel/framework/pull/14525))
+- Fixed authentication bug in `TokenGuard::validate()` ([#14568](https://github.com/laravel/framework/pull/14568))
+- Fix missing middleware parameters when using `authorizeResource()` ([#14592](https://github.com/laravel/framework/pull/14592))
+
+### Removed
+- Removed duplicate interface implementation in `Dispatcher` ([#14515](https://github.com/laravel/framework/pull/14515))
+
+
 ## v5.2.41 (2016-07-20)
 
 ### Changed
