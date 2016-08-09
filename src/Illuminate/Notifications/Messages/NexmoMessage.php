@@ -30,7 +30,7 @@ class NexmoMessage
     }
 
     /**
-     * Set the message contnet.
+     * Set the message content.
      *
      * @param  string  $content
      * @return $this
