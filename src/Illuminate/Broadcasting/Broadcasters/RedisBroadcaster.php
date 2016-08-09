@@ -4,6 +4,7 @@ namespace Illuminate\Broadcasting\Broadcasters;
 
 use Illuminate\Support\Arr;
 use Illuminate\Contracts\Redis\Database as RedisDatabase;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class RedisBroadcaster extends Broadcaster
 {
@@ -35,7 +36,49 @@ class RedisBroadcaster extends Broadcaster
     }
 
     /**
-     * {@inheritdoc}
+     * Authenticate the incoming request for a given channel.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return mixed
+     */
+    public function check($request)
+    {
+        if (Str::startsWith($request->channel_name, ['private-', 'presence-']) &&
+            ! $request->user()) {
+            throw new HttpException(403);
+        }
+
+        return parent::verifyUserCanAccessChannel(
+            $request, str_replace(['private-', 'presence-'], '', $request->channel_name)
+        );
+    }
+
+    /**
+     * Return the valid authentication response.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  mixed  $result
+     * @return mixed
+     */
+    protected function validAuthenticationResponse($request, $result)
+    {
+        if (is_bool($result)) {
+            return json_encode($result);
+        }
+
+        return json_encode(['channel_data' => [
+            'user_id' => $request->user()->getKey(),
+            'user_info' => $result,
+        ]]);
+    }
+
+    /**
+     * Broadcast the given event.
+     *
+     * @param  array  $channels
+     * @param  string  $event
+     * @param  array  $payload
+     * @return void
      */
     public function broadcast(array $channels, $event, array $payload = [])
     {
