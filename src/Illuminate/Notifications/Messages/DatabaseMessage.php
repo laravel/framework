@@ -12,13 +12,15 @@ class DatabaseMessage
     public $data = [];
 
     /**
-     * Create a new database message.
+     * Set the message data.
      *
      * @param  array  $data
-     * @return void
+     * @return $this
      */
-    public function __construct(array $data = [])
+    public function data($data)
     {
         $this->data = $data;
+
+        return $this;
     }
 }
