@@ -312,6 +312,10 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
      */
     public function testSharedGet()
     {
+        if (! function_exists('pcntl_fork')) {
+            $this->markTestSkipped('Skipping since the pcntl extension is not available');
+        }
+
         $content = '';
         for ($i = 0; $i < 1000000; ++$i) {
             $content .= $i;

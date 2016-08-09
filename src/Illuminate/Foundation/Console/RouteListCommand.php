@@ -159,7 +159,8 @@ class RouteListCommand extends Command
         $segments = explode('@', $actionName);
 
         return $this->getControllerMiddlewareFromInstance(
-            $this->laravel->make($segments[0]), $segments[1]
+            $this->laravel->make($segments[0]),
+            isset($segments[1]) ? $segments[1] : null
         );
     }
 
@@ -167,7 +168,7 @@ class RouteListCommand extends Command
      * Get the middlewares for the given controller instance and method.
      *
      * @param  \Illuminate\Routing\Controller  $controller
-     * @param  string  $method
+     * @param  string|null  $method
      * @return array
      */
     protected function getControllerMiddlewareFromInstance($controller, $method)
@@ -177,7 +178,7 @@ class RouteListCommand extends Command
         $results = [];
 
         foreach ($controller->getMiddleware() as $name => $options) {
-            if (! $this->methodExcludedByOptions($method, $options)) {
+            if (! $method || ! $this->methodExcludedByOptions($method, $options)) {
                 $results[] = Arr::get($middleware, $name, $name);
             }
         }
