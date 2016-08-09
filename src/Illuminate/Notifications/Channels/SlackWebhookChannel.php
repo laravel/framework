@@ -5,6 +5,7 @@ namespace Illuminate\Notifications\Channels;
 use GuzzleHttp\Client as HttpClient;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\SlackMessage;
+use Illuminate\Notifications\Messages\SlackAttachment;
 
 class SlackWebhookChannel
 {
@@ -43,50 +44,41 @@ class SlackWebhookChannel
 
         $this->http->post($url, [
             'json' => [
-                'attachments' => [
-                    array_filter([
-                        'color' => $this->color($message->level),
-                        'title' => $message->subject,
-                        'title_link' => $message->actionUrl ?: null,
-                        'text' => $this->format($message),
-                    ]),
-                ],
+                'text' => $message->content,
+                'attachments' => $this->attachments($message),
             ],
         ]);
     }
 
     /**
-     * Format the given notification message.
+     * Format the message's attachments.
      *
      * @param  \Illuminate\Notifications\Messages\SlackMessage  $message
-     * @return string
+     * @return array
      */
-    protected function format(SlackMessage $message)
+    protected function attachments(SlackMessage $message)
     {
-        $text = trim(implode(PHP_EOL.PHP_EOL, $message->introLines));
-
-        if ($message->actionText) {
-            $text .= PHP_EOL.PHP_EOL.'<'.$message->actionUrl.'|'.$message->actionText.'>';
-        }
-
-        $text .= PHP_EOL.PHP_EOL.trim(implode(PHP_EOL.PHP_EOL, $message->outroLines));
-
-        return trim($text);
+        return collect($message->attachments)->map(function ($attachment) use ($message) {
+            return array_filter([
+                'color' => $message->color(),
+                'title' => $attachment->title,
+                'text' => $attachment->content,
+                'title_link' => $attachment->url,
+                'fields' => $this->fields($attachment),
+            ]);
+        })->all();
     }
 
     /**
-     * Get the color that should be applied to the notification.
+     * Format the attachment's fields.
      *
-     * @param  string  $level
-     * @return string|null
+     * @param  \Illuminate\Notifications\Messages\SlackAttachment  $attachment
+     * @return array
      */
-    protected function color($level)
+    protected function fields(SlackAttachment $attachment)
     {
-        switch ($level) {
-            case 'success':
-                return 'good';
-            case 'error':
-                return 'danger';
-        }
+        return collect($attachment->fields)->map(function ($value, $key) {
+            return ['title' => $key, 'value' => $value, 'short' => true];
+        })->values()->all();
     }
 }
