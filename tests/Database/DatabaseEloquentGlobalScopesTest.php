@@ -25,6 +25,18 @@ class DatabaseEloquentGlobalScopesTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([], $query->getBindings());
     }
 
+    public function testGlobalScopeCanBeTotallyRemoved()
+    {
+        $model = new EloquentGlobalScopesTestModel();
+        $model::removeGlobalScope(ActiveScope::class);
+        $query = $model->newQuery();
+        $this->assertEquals('select * from "table"', $query->toSql());
+        $this->assertEquals([], $query->getBindings());
+
+        // Re-add the global scope for the next tests
+        $model::addGlobalScope(new ActiveScope);
+    }
+
     public function testClosureGlobalScopeIsApplied()
     {
         $model = new EloquentClosureGlobalScopesTestModel();
