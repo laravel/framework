@@ -14,41 +14,24 @@ class PendingBroadcast
     protected $events;
 
     /**
-     * The event instance.
-     *
-     * @var mixed
-     */
-    protected $event;
-
-    /**
      * Create a new pending broadcast instance.
      *
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
-     * @param
-     */
-    public function __construct(Dispatcher $events, $event)
-    {
-        $this->event = $event;
-        $this->events = $events;
-    }
-
-    /**
-     * Broadcast the event to all listeners.
-     *
      * @return void
      */
-    public function all()
+    public function __construct(Dispatcher $events)
     {
-        $this->events->fire($this->event->broadcastToEveryone());
+        $this->events = $events;
     }
 
     /**
      * Broadcast the event to everyone except the current user.
      *
+     * @param  mixed  $event
      * @return void
      */
-    public function others()
+    public function toOthers($event)
     {
-        $this->events->fire($this->event->dontBroadcastToCurrentUser());
+        $this->events->fire($event->dontBroadcastToCurrentUser());
     }
 }

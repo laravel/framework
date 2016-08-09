@@ -196,10 +196,10 @@ if (! function_exists('broadcast')) {
     /**
      * Begin broadcasting an event.
      *
-     * @param  mixed  $event
-     * @return \Illuminate\Broadcasting\PendingBroadcast
+     * @param  mixed|null  $event
+     * @return \Illuminate\Broadcasting\PendingBroadcast|void
      */
-    function broadcast($event)
+    function broadcast($event = null)
     {
         return app(BroadcastFactory::class)->event($event);
     }
