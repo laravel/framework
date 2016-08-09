@@ -7,6 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class DatabaseNotification extends Model
 {
     /**
+     * Indicates if the IDs are auto-incrementing.
+     *
+     * @var bool
+     */
+    public $incrementing = false;
+
+    /**
      * The table associated with the model.
      *
      * @var string
@@ -26,8 +33,7 @@ class DatabaseNotification extends Model
      * @var array
      */
     protected $casts = [
-        'intro' => 'array',
-        'outro' => 'array',
+        'data' => 'array',
         'read' => 'boolean',
     ];
 

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\Messages\SlackMessage;
 
 class NotificationSlackChannelTest extends PHPUnit_Framework_TestCase
 {
@@ -12,9 +13,7 @@ class NotificationSlackChannelTest extends PHPUnit_Framework_TestCase
     public function testCorrectPayloadIsSentToSlack()
     {
         $notification = new NotificationSlackChannelTestNotification;
-        $notifiables = collect([
-            $notifiable = new NotificationSlackChannelTestNotifiable,
-        ]);
+        $notifiable = new NotificationSlackChannelTestNotifiable;
 
         $channel = new Illuminate\Notifications\Channels\SlackWebhookChannel(
             $http = Mockery::mock('GuzzleHttp\Client')
@@ -22,30 +21,31 @@ class NotificationSlackChannelTest extends PHPUnit_Framework_TestCase
 
         $http->shouldReceive('post')->with('url', [
             'json' => [
+                'text' => 'Content',
                 'attachments' => [
                     [
-                        'color' => 'good',
-                        'title' => 'Subject',
-                        'title_link' => 'url',
-                        'text' => 'line 1
-
-<url|Text>
-
-line 2',
+                        'title' => 'Laravel',
+                        'title_link' => 'https://laravel.com',
+                        'text' => 'Attachment Content',
+                        'fields' => [
+                            [
+                                'title' => 'Project',
+                                'value' => 'Laravel',
+                                'short' => true,
+                            ],
+                        ],
                     ],
                 ],
             ],
         ]);
 
-        $channel->send($notifiables, $notification);
+        $channel->send($notifiable, $notification);
     }
 }
 
 class NotificationSlackChannelTestNotifiable
 {
     use Illuminate\Notifications\Notifiable;
-
-    public $phone_number = '5555555555';
 
     public function routeNotificationForSlack()
     {
@@ -55,12 +55,16 @@ class NotificationSlackChannelTestNotifiable
 
 class NotificationSlackChannelTestNotification extends Notification
 {
-    public function message($notifiable)
+    public function toSlack($notifiable)
     {
-        return $this->subject('Subject')
-                    ->success()
-                    ->line('line 1')
-                    ->action('Text', 'url')
-                    ->line('line 2');
+        return (new SlackMessage)
+                    ->content('Content')
+                    ->attachment(function ($attachment) {
+                        $attachment->title('Laravel', 'https://laravel.com')
+                                   ->content('Attachment Content')
+                                   ->fields([
+                                        'Project' => 'Laravel',
+                                    ]);
+                    });
     }
 }

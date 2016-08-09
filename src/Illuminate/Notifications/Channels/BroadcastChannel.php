@@ -2,11 +2,12 @@
 
 namespace Illuminate\Notifications\Channels;
 
+use RuntimeException;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Notifications\Events\DatabaseNotificationCreated;
+use Illuminate\Notifications\Events\BroadcastNotificationCreated;
 
-class BroadcastChannel extends DatabaseChannel
+class BroadcastChannel
 {
     /**
      * The event dispatcher.
@@ -29,18 +30,34 @@ class BroadcastChannel extends DatabaseChannel
     /**
      * Send the given notification.
      *
-     * @param  \Illuminate\Support\Collection  $notifiables
+     * @param  mixed  $notifiable
      * @param  \Illuminate\Notifications\Notification  $notification
      * @return void
      */
-    public function send($notifiables, Notification $notification)
+    public function send($notifiable, Notification $notification)
     {
-        foreach ($notifiables as $notifiable) {
-            $databaseNotification = $this->createNotification($notifiable, $notification);
+        $this->events->fire(new BroadcastNotificationCreated(
+            $notifiable, $notification, $this->getData($notifiable, $notification)
+        ));
+    }
 
-            $this->events->fire(new DatabaseNotificationCreated(
-                $notifiable, $notification, $databaseNotification
-            ));
+    /**
+     * Get the data for the notification.
+     *
+     * @param  mixed  $notifiable
+     * @param  \Illuminate\Notifications\Notification  $notification
+     * @return array
+     *
+     * @throws \RuntimeException
+     */
+    protected function getData($notifiable, Notification $notification)
+    {
+        if (method_exists($notification, 'toArray')) {
+            return $notification->toArray($notifiable);
         }
+
+        throw new RuntimeException(
+            'Notification is missing toArray method.'
+        );
     }
 }
