@@ -41,6 +41,7 @@ use Illuminate\Foundation\Console\EventGenerateCommand;
 use Illuminate\Foundation\Console\VendorPublishCommand;
 use Illuminate\Database\Console\Seeds\SeederMakeCommand;
 use Illuminate\Foundation\Console\NotificationMakeCommand;
+use Illuminate\Notifications\Console\NotificationTableCommand;
 
 class ArtisanServiceProvider extends ServiceProvider
 {
@@ -93,6 +94,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'MiddlewareMake' => 'command.middleware.make',
         'ModelMake' => 'command.model.make',
         'NotificationMake' => 'command.notification.make',
+        'NotificationTable' => 'command.notification.table',
         'PolicyMake' => 'command.policy.make',
         'ProviderMake' => 'command.provider.make',
         'QueueFailedTable' => 'command.queue.failed-table',
@@ -587,6 +589,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.policy.make', function ($app) {
             return new PolicyMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerNotificationTableCommand()
+    {
+        $this->app->singleton('command.notification.table', function ($app) {
+            return new NotificationTableCommand($app['files'], $app['composer']);
         });
     }
 
