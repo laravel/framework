@@ -39,7 +39,7 @@ class PendingBroadcast
      */
     public function all()
     {
-        $this->events->fire($event->broadcastToEveryone());
+        $this->events->fire($this->event->broadcastToEveryone());
     }
 
     /**
@@ -49,6 +49,6 @@ class PendingBroadcast
      */
     public function others()
     {
-        $this->events->fire($event->dontBroadcastToCurrentUser());
+        $this->events->fire($this->event->dontBroadcastToCurrentUser());
     }
 }
