@@ -1718,7 +1718,7 @@ class Builder
         if (is_object($item)) {
             return (int) $item->aggregate;
         }
-    
+
         return (int) array_change_key_case((array) $item)['aggregate'];
     }
 
