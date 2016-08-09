@@ -17,7 +17,8 @@ class BroadcastController extends Controller
      */
     public function authenticate(Request $request)
     {
-        if (Str::startsWith($request->channel_name, 'presence-') && ! $request->user()) {
+        if (Str::startsWith($request->channel_name, ['private-', 'presence-']) &&
+            ! $request->user()) {
             abort(403);
         }
 
