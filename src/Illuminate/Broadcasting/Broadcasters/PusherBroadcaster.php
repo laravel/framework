@@ -5,6 +5,7 @@ namespace Illuminate\Broadcasting\Broadcasters;
 use Pusher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class PusherBroadcaster extends Broadcaster
 {
@@ -27,7 +28,25 @@ class PusherBroadcaster extends Broadcaster
     }
 
     /**
-     * Return the valid Pusher authentication response.
+     * Authenticate the incoming request for a given channel.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return mixed
+     */
+    public function check($request)
+    {
+        if (Str::startsWith($request->channel_name, ['private-', 'presence-']) &&
+            ! $request->user()) {
+            throw new HttpException(403);
+        }
+
+        return parent::verifyUserCanAccessChannel(
+            $request, str_replace(['private-', 'presence-'], '', $request->channel_name)
+        );
+    }
+
+    /**
+     * Return the valid authentication response.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  mixed  $result
@@ -45,7 +64,12 @@ class PusherBroadcaster extends Broadcaster
     }
 
     /**
-     * {@inheritdoc}
+     * Broadcast the given event.
+     *
+     * @param  array  $channels
+     * @param  string  $event
+     * @param  array  $payload
+     * @return void
      */
     public function broadcast(array $channels, $event, array $payload = [])
     {
