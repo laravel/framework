@@ -2,7 +2,6 @@
 
 namespace Illuminate\Broadcasting;
 
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Broadcast;
