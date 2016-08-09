@@ -251,20 +251,7 @@
                                                 <tr>
                                                     <td align="center">
                                                         <div>
-                                                            <?php
-                                                                switch ($level) {
-                                                                    case 'success':
-                                                                        $actionColor = 'green';
-                                                                        break;
-                                                                    case 'error':
-                                                                        $actionColor = 'red';
-                                                                        break;
-                                                                    default:
-                                                                        $actionColor = 'blue';
-                                                                }
-                                                            ?>
-
-                                                            <a href="{{ $actionUrl }}" class="button button--{{ $actionColor }}" target="_blank">
+                                                            <a href="{{ $actionUrl }}" class="button button--{{ array_get(['success' => 'green', 'error' => 'red'], $level, 'blue') }}" target="_blank">
                                                                 {{ $actionText }}
                                                             </a>
                                                         </div>
