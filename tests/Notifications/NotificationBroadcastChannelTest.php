@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Notifications\Message;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Channels\BroadcastChannel;
 
@@ -11,33 +10,23 @@ class NotificationBroadcastChannelTest extends PHPUnit_Framework_TestCase
         Mockery::close();
     }
 
-    public function testBroadcastChannelCreatesDatabaseRecordWithProperData()
+    public function testDatabaseChannelCreatesDatabaseRecordWithProperData()
     {
         $notification = new NotificationBroadcastChannelTestNotification;
-        $notifiables = collect([$notifiable = Mockery::mock()]);
-
-        $notifiable->shouldReceive('routeNotificationFor->create')->with([
-            'type' => get_class($notification),
-            'level' => 'info',
-            'intro' => [],
-            'outro' => [],
-            'action_text' => null,
-            'action_url' => null,
-            'read' => false,
-        ]);
+        $notification->id = 1;
+        $notifiable = Mockery::mock();
 
         $events = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
-        $events->shouldReceive('fire')->once()->with('Illuminate\Notifications\Events\DatabaseNotificationCreated');
-
+        $events->shouldReceive('fire')->once()->with(Mockery::type('Illuminate\Notifications\Events\BroadcastNotificationCreated'));
         $channel = new BroadcastChannel($events);
-        $channel->send($notifiables, $notification);
+        $channel->send($notifiable, $notification);
     }
 }
 
 class NotificationBroadcastChannelTestNotification extends Notification
 {
-    public function message($notifiable)
+    public function toArray($notifiable)
     {
-        return new Message;
+        return ['invoice_id' => 1];
     }
 }

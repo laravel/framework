@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Notifications\Message;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Channels\DatabaseChannel;
+use Illuminate\Notifications\Messages\DatabaseMessage;
 
 class NotificationDatabaseChannelTest extends PHPUnit_Framework_TestCase
 {
@@ -14,27 +14,25 @@ class NotificationDatabaseChannelTest extends PHPUnit_Framework_TestCase
     public function testDatabaseChannelCreatesDatabaseRecordWithProperData()
     {
         $notification = new NotificationDatabaseChannelTestNotification;
-        $notifiables = collect([$notifiable = Mockery::mock()]);
+        $notification->id = 1;
+        $notifiable = Mockery::mock();
 
         $notifiable->shouldReceive('routeNotificationFor->create')->with([
+            'id' => 1,
             'type' => get_class($notification),
-            'level' => 'info',
-            'intro' => [],
-            'outro' => [],
-            'action_text' => null,
-            'action_url' => null,
+            'data' => ['invoice_id' => 1],
             'read' => false,
         ]);
 
         $channel = new DatabaseChannel;
-        $channel->send($notifiables, $notification);
+        $channel->send($notifiable, $notification);
     }
 }
 
 class NotificationDatabaseChannelTestNotification extends Notification
 {
-    public function message($notifiable)
+    public function toDatabase($notifiable)
     {
-        return new Message;
+        return new DatabaseMessage(['invoice_id' => 1]);
     }
 }

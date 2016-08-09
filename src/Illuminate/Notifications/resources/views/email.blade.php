@@ -218,11 +218,7 @@
                     <tr>
                         <td class="email-masthead">
                             <a class="email-masthead_name" href="{{ url('/') }}" target="_blank">
-                                @if (isset($logoUrl))
-                                    <img src="{{ $logoUrl }}" class="email-logo" />
-                                @else
-                                    {{ $application }}
-                                @endif
+                                {{ config('app.name') }}
                             </a>
                         </td>
                     </tr>
@@ -255,6 +251,19 @@
                                                 <tr>
                                                     <td align="center">
                                                         <div>
+                                                            <?php
+                                                                switch ($level) {
+                                                                    case 'success':
+                                                                        $actionColor = 'green';
+                                                                        break;
+                                                                    case 'error':
+                                                                        $actionColor = 'red';
+                                                                        break;
+                                                                    default:
+                                                                        $actionColor = 'blue';
+                                                                }
+                                                            ?>
+
                                                             <a href="{{ $actionUrl }}" class="button button--{{ $actionColor }}" target="_blank">
                                                                 {{ $actionText }}
                                                             </a>
@@ -273,7 +282,7 @@
 
                                         <!-- Salutation -->
                                         <p>
-                                            Regards,<br>{{ $application }}
+                                            Regards,<br>{{ config('app.name') }}
                                         </p>
 
                                         <!-- Sub Copy -->
@@ -309,7 +318,7 @@
                                     <td class="content-cell">
                                         <p class="sub center">
                                             &copy; {{ date('Y') }}
-                                            <a href="{{ url('/') }}" target="_blank">{{ $application }}</a>.
+                                            <a href="{{ url('/') }}" target="_blank">{{ config('app.name') }}</a>.
                                             All rights reserved.
                                         </p>
                                     </td>
