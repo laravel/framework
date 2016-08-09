@@ -459,7 +459,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      *
      * @param  string  $key
      * @param  mixed  $default
-     * @return \Symfony\Component\HttpFoundation\File\UploadedFile|array|null
+     * @return \Illuminate\Http\UploadedFile|array|null
      */
     public function file($key = null, $default = null)
     {
