@@ -802,6 +802,7 @@ class Factory implements FactoryContract
         $parent = Arr::last($this->loopsStack);
 
         $this->loopsStack[] = [
+            'iteration' => 0,
             'index' => 0,
             'remaining' => isset($length) ? $length : null,
             'count' => $length,
@@ -821,14 +822,15 @@ class Factory implements FactoryContract
     {
         $loop = &$this->loopsStack[count($this->loopsStack) - 1];
 
-        $loop['index']++;
+        $loop['iteration']++;
+        $loop['index'] = $loop['iteration'] - 1;
 
-        $loop['first'] = $loop['index'] == 1;
+        $loop['first'] = $loop['iteration'] == 1;
 
         if (isset($loop['count'])) {
             $loop['remaining']--;
 
-            $loop['last'] = $loop['index'] == $loop['count'];
+            $loop['last'] = $loop['iteration'] == $loop['count'];
         }
     }
 
