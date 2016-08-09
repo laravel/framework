@@ -7,8 +7,8 @@ use ReflectionClass;
 use Illuminate\Support\Str;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 
 class Dispatcher implements DispatcherContract
@@ -252,15 +252,7 @@ class Dispatcher implements DispatcherContract
      */
     protected function broadcastEvent($event)
     {
-        if ($this->queueResolver) {
-            $connection = $event instanceof ShouldBroadcastNow ? 'sync' : null;
-
-            $queue = method_exists($event, 'onQueue') ? $event->onQueue() : null;
-
-            $this->resolveQueue()->connection($connection)->pushOn($queue, 'Illuminate\Broadcasting\BroadcastEvent', [
-                'event' => serialize(clone $event),
-            ]);
-        }
+        $this->container->make(BroadcastFactory::class)->queue($event);
     }
 
     /**
