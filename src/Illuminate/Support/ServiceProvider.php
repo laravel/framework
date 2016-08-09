@@ -80,7 +80,7 @@ abstract class ServiceProvider
 
         $this->app['config']->set($key, array_merge_recursive($config, require $path));
     }
-    
+
     /**
      * Register a view file namespace.
      *
