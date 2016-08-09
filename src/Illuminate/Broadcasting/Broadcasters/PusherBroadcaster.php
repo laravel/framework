@@ -52,7 +52,7 @@ class PusherBroadcaster extends Broadcaster
      * @param  mixed  $result
      * @return mixed
      */
-    protected function validAuthenticationResponse($request, $result)
+    public function validAuthenticationResponse($request, $result)
     {
         if (Str::startsWith($request->channel_name, 'private')) {
             return $this->pusher->socket_auth($request->channel_name, $request->socket_id);
