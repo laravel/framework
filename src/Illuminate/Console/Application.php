@@ -35,15 +35,16 @@ class Application extends SymfonyApplication implements ApplicationContract
      * @param  string  $version
      * @return void
      */
-    public function __construct(Container $laravel, Dispatcher $events, $version)
+    public function __construct(Container $laravel, Dispatcher $events = null, $version)
     {
         parent::__construct('Laravel Framework', $version);
 
         $this->laravel = $laravel;
         $this->setAutoExit(false);
         $this->setCatchExceptions(false);
-
-        $events->fire(new Events\ArtisanStarting($this));
+        if($events){
+            $events->fire(new Events\ArtisanStarting($this));
+        }
     }
 
     /**
