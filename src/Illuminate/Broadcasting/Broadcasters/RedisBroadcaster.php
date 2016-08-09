@@ -60,7 +60,7 @@ class RedisBroadcaster extends Broadcaster
      * @param  mixed  $result
      * @return mixed
      */
-    protected function validAuthenticationResponse($request, $result)
+    public function validAuthenticationResponse($request, $result)
     {
         if (is_bool($result)) {
             return json_encode($result);
