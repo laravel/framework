@@ -16,11 +16,6 @@ abstract class Broadcaster implements BroadcasterContract
     protected $channels = [];
 
     /**
-     * {@inheritdoc}
-     */
-    abstract public function broadcast(array $channels, $event, array $payload = []);
-
-    /**
      * Register a channel authenticator.
      *
      * @param  string  $channel
@@ -38,12 +33,11 @@ abstract class Broadcaster implements BroadcasterContract
      * Authenticate the incoming request for a given channel.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param  string  $channel
      * @return mixed
      */
-    public function check($request)
+    protected function verifyUserCanAccessChannel($request, $channel)
     {
-        $channel = str_replace(['private-', 'presence-'], '', $request->channel_name);
-
         foreach ($this->channels as $pattern => $callback) {
             if (! Str::is($pattern, $channel)) {
                 continue;
@@ -81,25 +75,6 @@ abstract class Broadcaster implements BroadcasterContract
         }
 
         return [];
-    }
-
-    /**
-     * Return the valid Pusher authentication response.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  mixed  $result
-     * @return mixed
-     */
-    protected function validAuthenticationResponse($request, $result)
-    {
-        if (is_bool($result)) {
-            return json_encode($result);
-        }
-
-        return json_encode(['channel_data' => [
-            'user_id' => $request->user()->getKey(),
-            'user_info' => $result,
-        ]]);
     }
 
     /**
