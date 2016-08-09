@@ -60,11 +60,8 @@ class BroadcastManager implements FactoryContract
 
         $attributes = $attributes ?: ['middleware' => ['web']];
 
-        $router = $this->app['router'];
-
-        $router->group($attributes, function ($router) {
+        $this->app['router']->group($attributes, function ($router) {
             $router->post('/broadcasting/auth', BroadcastController::class.'@authenticate');
-            $router->post('/broadcasting/socket', BroadcastController::class.'@rememberSocket');
         });
     }
 
@@ -82,36 +79,9 @@ class BroadcastManager implements FactoryContract
 
         $request = $request ?: $this->app['request'];
 
-        if ($request->hasHeader('X-Socket-Id')) {
-            return $request->header('X-Socket-Id');
+        if ($request->hasHeader('X-Socket-ID')) {
+            return $request->header('X-Socket-ID');
         }
-
-        if (! $request->hasSession()) {
-            return;
-        }
-
-        return $this->app['cache']->get(
-            'broadcast:socket:'.$request->session()->getId()
-        );
-    }
-
-    /**
-     * Remember the socket for the given request.
-     *
-     * @param  \Illuminate\Http\Request|null  $request
-     * @return void
-     */
-    public function rememberSocket($request = null)
-    {
-        if (! $request && ! $this->app->bound('request')) {
-            return;
-        }
-
-        $request = $request ?: $this->app['request'];
-
-        $this->app['cache']->forever(
-            'broadcast:socket:'.$request->session()->getId(), $request->socket_id
-        );
     }
 
     /**
