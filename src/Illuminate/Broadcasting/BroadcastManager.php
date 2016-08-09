@@ -88,12 +88,18 @@ class BroadcastManager implements FactoryContract
     /**
      * Begin broadcasting an event.
      *
-     * @param  mixed  $event
-     * @return \Illuminate\Broadcasting\PendingBroadcast
+     * @param  mixed|null  $event
+     * @return \Illuminate\Broadcasting\PendingBroadcast|void
      */
-    public function event($event)
+    public function event($event = null)
     {
-        return new PendingBroadcast($this->app->make('events'), $event);
+        $events = $this->app->make('events');
+
+        if (is_null($event)) {
+            return new PendingBroadcast($events);
+        } else {
+            $events->fire($event->broadcastToEveryone());
+        }
     }
 
     /**
