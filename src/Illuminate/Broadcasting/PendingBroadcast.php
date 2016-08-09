@@ -32,6 +32,10 @@ class PendingBroadcast
      */
     public function toOthers($event)
     {
-        $this->events->fire($event->dontBroadcastToCurrentUser());
+        if (method_exists($event, 'dontBroadcastToCurrentUser')) {
+            $event->dontBroadcastToCurrentUser();
+        }
+
+        $this->events->fire($event);
     }
 }

@@ -97,9 +97,13 @@ class BroadcastManager implements FactoryContract
 
         if (is_null($event)) {
             return new PendingBroadcast($events);
-        } else {
-            $events->fire($event->broadcastToEveryone());
         }
+
+        if (method_exists($event, 'broadcastToEveryone')) {
+            $event->broadcastToEveryone();
+        }
+
+        $events->fire($event);
     }
 
     /**
