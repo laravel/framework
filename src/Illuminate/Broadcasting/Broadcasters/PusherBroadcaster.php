@@ -33,7 +33,7 @@ class PusherBroadcaster extends Broadcaster
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
-    public function check($request)
+    public function auth($request)
     {
         if (Str::startsWith($request->channel_name, ['private-', 'presence-']) &&
             ! $request->user()) {
