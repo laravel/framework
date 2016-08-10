@@ -338,7 +338,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Get a subset of the items from the input data.
+     * Get a subset containing the provided keys with values from the input data.
      *
      * @param  array|mixed  $keys
      * @return array
