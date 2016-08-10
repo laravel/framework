@@ -1898,6 +1898,41 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Validate that an image is a valid orientation.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @param  array   $parameters
+     * @return bool
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function validateOrientation($attribute, $value, $parameters)
+    {
+        if (! $this->isAValidFileInstance($value) || ! $sizeDetails = getimagesize($value->getRealPath())) {
+            return false;
+        }
+
+        $this->requireParameterCount(1, $parameters, 'orientation');
+
+        list($width, $height) = $sizeDetails;
+
+        switch ($orientation = strtolower($parameters[0])) {
+            case 'landscape':
+                return $width > $height;
+
+            case 'portrait':
+                return $width < $height;
+
+            case 'square':
+                return $width === $height;
+
+            default:
+                throw new InvalidArgumentException("Invalid orientation [$orientation]");
+        }
+    }
+
+    /**
      * Get the date format for an attribute if it has one.
      *
      * @param  string  $attribute
@@ -2506,6 +2541,20 @@ class Validator implements ValidatorContract
     protected function replaceAfter($message, $attribute, $rule, $parameters)
     {
         return $this->replaceBefore($message, $attribute, $rule, $parameters);
+    }
+
+    /**
+     * Replace all place-holders for the orientation rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
+     */
+    protected function replaceOrientation($message, $attribute, $rule, $parameters)
+    {
+        return str_replace(':orientation', $parameters[0], $message);
     }
 
     /**

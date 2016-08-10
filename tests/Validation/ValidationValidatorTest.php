@@ -1667,8 +1667,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
     public function testValidateImageDimensions()
     {
-        // Knowing that demo image.gif has width = 3 and height = 2
-        $uploadedFile = new \Symfony\Component\HttpFoundation\File\UploadedFile(__DIR__.'/fixtures/image.gif', '', null, null, null, true);
+        $uploadedFile = $this->getTestImage();
         $trans = $this->getRealTranslator();
 
         $v = new Validator($trans, ['x' => 'file'], ['x' => 'dimensions']);
@@ -2930,6 +2929,24 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidateImageOrientation()
+    {
+        $uploadedFile = $this->getTestImage();
+        $trans = $this->getRealTranslator();
+
+        $v = new Validator($trans, [], ['x' => 'orientation:portrait']);
+        $v->setFiles(['x' => $uploadedFile]);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, [], ['x' => 'orientation:landscape']);
+        $v->setFiles(['x' => $uploadedFile]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, [], ['x' => 'orientation:square']);
+        $v->setFiles(['x' => $uploadedFile]);
+        $this->assertTrue($v->fails());
+    }
+
     protected function getTranslator()
     {
         return m::mock('Symfony\Component\Translation\TranslatorInterface');
@@ -2941,6 +2958,11 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $trans->addLoader('array', new Symfony\Component\Translation\Loader\ArrayLoader);
 
         return $trans;
+    }
+
+    protected function getTestImage()
+    {
+        return new \Symfony\Component\HttpFoundation\File\UploadedFile(__DIR__.'/fixtures/image.gif', '', null, null, null, true);
     }
 
     public function getIlluminateArrayTranslator()
