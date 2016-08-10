@@ -65,4 +65,14 @@ class HasInElement extends PageConstraint
     {
         return sprintf('[%s] contains %s', $this->element, $this->text);
     }
+
+    /**
+     * Returns the reversed description of the failure.
+     *
+     * @return string
+     */
+    protected function getReverseFailureDescription()
+    {
+        return sprintf('[%s] does not contain %s', $this->element, $this->text);
+    }
 }

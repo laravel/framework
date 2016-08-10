@@ -32,7 +32,7 @@ class HasSource extends PageConstraint
     {
         $pattern = $this->getEscapedPattern($this->source);
 
-        return preg_match("/$pattern/i", $this->html($crawler));
+        return preg_match("/{$pattern}/i", $this->html($crawler));
     }
 
     /**

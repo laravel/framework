@@ -70,6 +70,18 @@ class PipelineTest extends PHPUnit_Framework_TestCase
             });
         $this->assertEquals('data', $result);
     }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testPipelineThrowsExceptionOnResolveWithoutContainer()
+    {
+        (new Pipeline)->send('data')
+            ->through('PipelineTestPipeOne')
+            ->then(function ($piped) {
+                return $piped;
+            });
+    }
 }
 
 class PipelineTestPipeOne

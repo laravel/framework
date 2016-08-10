@@ -17,11 +17,25 @@ class RedisJob extends Job implements JobContract
     protected $redis;
 
     /**
-     * The Redis job payload.
+     * The Redis raw job payload.
      *
      * @var string
      */
     protected $job;
+
+    /**
+     * The JSON decoded version of "$job".
+     *
+     * @var array
+     */
+    protected $decoded;
+
+    /**
+     * The Redis job payload inside the reserved queue.
+     *
+     * @var string
+     */
+    protected $reserved;
 
     /**
      * Create a new job instance.
@@ -29,25 +43,17 @@ class RedisJob extends Job implements JobContract
      * @param  \Illuminate\Container\Container  $container
      * @param  \Illuminate\Queue\RedisQueue  $redis
      * @param  string  $job
+     * @param  string  $reserved
      * @param  string  $queue
-     * @return void
      */
-    public function __construct(Container $container, RedisQueue $redis, $job, $queue)
+    public function __construct(Container $container, RedisQueue $redis, $job, $reserved, $queue)
     {
         $this->job = $job;
         $this->redis = $redis;
         $this->queue = $queue;
+        $this->reserved = $reserved;
         $this->container = $container;
-    }
-
-    /**
-     * Fire the job.
-     *
-     * @return void
-     */
-    public function fire()
-    {
-        $this->resolveAndFire(json_decode($this->getRawBody(), true));
+        $this->decoded = $this->payload();
     }
 
     /**
@@ -69,7 +75,7 @@ class RedisJob extends Job implements JobContract
     {
         parent::delete();
 
-        $this->redis->deleteReserved($this->queue, $this->job);
+        $this->redis->deleteReserved($this->queue, $this->reserved);
     }
 
     /**
@@ -82,9 +88,7 @@ class RedisJob extends Job implements JobContract
     {
         parent::release($delay);
 
-        $this->delete();
-
-        $this->redis->release($this->queue, $this->job, $delay, $this->attempts() + 1);
+        $this->redis->deleteAndRelease($this->queue, $this->reserved, $delay);
     }
 
     /**
@@ -94,7 +98,7 @@ class RedisJob extends Job implements JobContract
      */
     public function attempts()
     {
-        return Arr::get(json_decode($this->job, true), 'attempts');
+        return Arr::get($this->decoded, 'attempts');
     }
 
     /**
@@ -104,17 +108,7 @@ class RedisJob extends Job implements JobContract
      */
     public function getJobId()
     {
-        return Arr::get(json_decode($this->job, true), 'id');
-    }
-
-    /**
-     * Get the IoC container instance.
-     *
-     * @return \Illuminate\Container\Container
-     */
-    public function getContainer()
-    {
-        return $this->container;
+        return Arr::get($this->decoded, 'id');
     }
 
     /**
@@ -128,12 +122,12 @@ class RedisJob extends Job implements JobContract
     }
 
     /**
-     * Get the underlying Redis job.
+     * Get the underlying reserved Redis job.
      *
      * @return string
      */
-    public function getRedisJob()
+    public function getReservedJob()
     {
-        return $this->job;
+        return $this->reserved;
     }
 }

@@ -56,6 +56,19 @@ class DatabaseQueue extends Queue implements QueueContract
     }
 
     /**
+     * Get the size of the queue.
+     *
+     * @param  string  $queue
+     * @return int
+     */
+    public function size($queue = null)
+    {
+        return $this->database->table($this->table)
+                    ->where('queue', $this->getQueue($queue))
+                    ->count();
+    }
+
+    /**
      * Push a new job onto the queue.
      *
      * @param  string  $job
@@ -204,7 +217,7 @@ class DatabaseQueue extends Queue implements QueueContract
     protected function isAvailable($query)
     {
         $query->where(function ($query) {
-            $query->where('reserved', 0);
+            $query->whereNull('reserved_at');
             $query->where('available_at', '<=', $this->getTime());
         });
     }
@@ -220,7 +233,6 @@ class DatabaseQueue extends Queue implements QueueContract
         $expiration = Carbon::now()->subSeconds($this->expire)->getTimestamp();
 
         $query->orWhere(function ($query) use ($expiration) {
-            $query->where('reserved', 1);
             $query->where('reserved_at', '<=', $expiration);
         });
     }
@@ -233,12 +245,10 @@ class DatabaseQueue extends Queue implements QueueContract
      */
     protected function markJobAsReserved($job)
     {
-        $job->reserved = 1;
         $job->attempts = $job->attempts + 1;
         $job->reserved_at = $this->getTime();
 
         $this->database->table($this->table)->where('id', $job->id)->update([
-            'reserved' => $job->reserved,
             'reserved_at' => $job->reserved_at,
             'attempts' => $job->attempts,
         ]);
@@ -291,7 +301,6 @@ class DatabaseQueue extends Queue implements QueueContract
         return [
             'queue' => $queue,
             'attempts' => $attempts,
-            'reserved' => 0,
             'reserved_at' => null,
             'available_at' => $availableAt,
             'created_at' => $this->getTime(),
@@ -318,26 +327,5 @@ class DatabaseQueue extends Queue implements QueueContract
     public function getDatabase()
     {
         return $this->database;
-    }
-
-    /**
-     * Get the expiration time in seconds.
-     *
-     * @return int|null
-     */
-    public function getExpire()
-    {
-        return $this->expire;
-    }
-
-    /**
-     * Set the expiration time in seconds.
-     *
-     * @param  int|null  $seconds
-     * @return void
-     */
-    public function setExpire($seconds)
-    {
-        $this->expire = $seconds;
     }
 }

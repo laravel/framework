@@ -3,17 +3,10 @@
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Routing\Controller;
-use Illuminate\Foundation\Auth\Access\AuthorizesResources;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class AuthorizesResourcesTest extends PHPUnit_Framework_TestCase
 {
-    public function testIndexMethod()
-    {
-        $controller = new AuthorizesResourcesController();
-
-        $this->assertHasMiddleware($controller, 'index', 'can:view,App\User');
-    }
-
     public function testCreateMethod()
     {
         $controller = new AuthorizesResourcesController();
@@ -81,7 +74,7 @@ class AuthorizesResourcesTest extends PHPUnit_Framework_TestCase
 
 class AuthorizesResourcesController extends Controller
 {
-    use AuthorizesResources;
+    use AuthorizesRequests;
 
     public function __construct()
     {

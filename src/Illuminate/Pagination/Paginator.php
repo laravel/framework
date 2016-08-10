@@ -6,10 +6,10 @@ use Countable;
 use ArrayAccess;
 use JsonSerializable;
 use IteratorAggregate;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Pagination\Presenter;
 use Illuminate\Contracts\Pagination\Paginator as PaginatorContract;
 
 class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate, JsonSerializable, Jsonable, PaginatorContract
@@ -82,6 +82,19 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
     }
 
     /**
+     * Manually indicate that the paginator does have more pages.
+     *
+     * @param  bool  $value
+     * @return $this
+     */
+    public function hasMorePagesWhen($value = true)
+    {
+        $this->hasMore = $value;
+
+        return $this;
+    }
+
+    /**
      * Determine if there are more items in the data source.
      *
      * @return bool
@@ -92,31 +105,29 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
     }
 
     /**
-     * Render the paginator using the given presenter.
+     * Render the paginator using the given view.
      *
-     * @param  \Illuminate\Contracts\Pagination\Presenter|null  $presenter
+     * @param  string|null  $view
      * @return string
      */
-    public function links(Presenter $presenter = null)
+    public function links($view = null)
     {
-        return $this->render($presenter);
+        return $this->render($view);
     }
 
     /**
-     * Render the paginator using the given presenter.
+     * Render the paginator using the given view.
      *
-     * @param  \Illuminate\Contracts\Pagination\Presenter|null  $presenter
+     * @param  string|null  $view
      * @return string
      */
-    public function render(Presenter $presenter = null)
+    public function render($view = null)
     {
-        if (is_null($presenter) && static::$presenterResolver) {
-            $presenter = call_user_func(static::$presenterResolver, $this);
-        }
-
-        $presenter = $presenter ?: new SimpleBootstrapThreePresenter($this);
-
-        return $presenter->render();
+        return new HtmlString(
+            static::viewFactory()->make($view ?: static::$defaultSimpleView, [
+                'paginator' => $this,
+            ])->render()
+        );
     }
 
     /**
@@ -127,9 +138,12 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
     public function toArray()
     {
         return [
-            'per_page' => $this->perPage(), 'current_page' => $this->currentPage(),
-            'next_page_url' => $this->nextPageUrl(), 'prev_page_url' => $this->previousPageUrl(),
-            'from' => $this->firstItem(), 'to' => $this->lastItem(),
+            'per_page' => $this->perPage(),
+            'current_page' => $this->currentPage(),
+            'next_page_url' => $this->nextPageUrl(),
+            'prev_page_url' => $this->previousPageUrl(),
+            'from' => $this->firstItem(),
+            'to' => $this->lastItem(),
             'data' => $this->items->toArray(),
         ];
     }

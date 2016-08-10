@@ -44,6 +44,13 @@ class Route
     protected $action;
 
     /**
+     * The controller instance.
+     *
+     * @var mixed
+     */
+    protected $controller;
+
+    /**
      * The default values for the route.
      *
      * @var array
@@ -133,45 +140,80 @@ class Route
         $this->container = $this->container ?: new Container;
 
         try {
-            if (! is_string($this->action['uses'])) {
-                return $this->runCallable($request);
+            if ($this->isControllerAction()) {
+                return $this->runController();
             }
 
-            return $this->runController($request);
+            return $this->runCallable();
         } catch (HttpResponseException $e) {
             return $e->getResponse();
         }
     }
 
     /**
-     * Run the route action and return the response.
+     * Checks whether the route's action is a controller.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return mixed
+     * @return bool
      */
-    protected function runCallable(Request $request)
+    protected function isControllerAction()
     {
-        $parameters = $this->resolveMethodDependencies(
-            $this->parametersWithoutNulls(), new ReflectionFunction($this->action['uses'])
-        );
-
-        return call_user_func_array($this->action['uses'], $parameters);
+        return is_string($this->action['uses']);
     }
 
     /**
      * Run the route action and return the response.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @return mixed
+     */
+    protected function runCallable()
+    {
+        $parameters = $this->resolveMethodDependencies(
+            $this->parametersWithoutNulls(), new ReflectionFunction($this->action['uses'])
+        );
+
+        $callable = $this->action['uses'];
+
+        return $callable(...array_values($parameters));
+    }
+
+    /**
+     * Run the route action and return the response.
+     *
      * @return mixed
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    protected function runController(Request $request)
+    protected function runController()
     {
-        list($class, $method) = explode('@', $this->action['uses']);
+        return (new ControllerDispatcher($this->container))->dispatch(
+            $this, $this->getController(), $this->getControllerMethod()
+        );
+    }
 
-        return (new ControllerDispatcher($this->router, $this->container))
-                    ->dispatch($this, $request, $class, $method);
+    /**
+     * Get the controller instance for the route.
+     *
+     * @return mixed
+     */
+    protected function getController()
+    {
+        list($class) = explode('@', $this->action['uses']);
+
+        if (! $this->controller) {
+            $this->controller = $this->container->make($class);
+        }
+
+        return $this->controller;
+    }
+
+    /**
+     * Get the controller method used for the route.
+     *
+     * @return string
+     */
+    protected function getControllerMethod()
+    {
+        return explode('@', $this->action['uses'])[1];
     }
 
     /**
@@ -227,6 +269,16 @@ class Route
     }
 
     /**
+     * Get all middleware, including the ones from the controller.
+     *
+     * @return array
+     */
+    public function gatherMiddleware()
+    {
+        return array_merge($this->middleware(), $this->controllerMiddleware());
+    }
+
+    /**
      * Get or set the middlewares attached to the route.
      *
      * @param  array|string|null $middleware
@@ -239,7 +291,7 @@ class Route
         }
 
         if (is_string($middleware)) {
-            $middleware = [$middleware];
+            $middleware = func_get_args();
         }
 
         $this->action['middleware'] = array_merge(
@@ -250,18 +302,19 @@ class Route
     }
 
     /**
-     * Get the controller middleware for the route.
+     * Get the middleware for the route's controller.
      *
      * @return array
      */
-    protected function controllerMiddleware()
+    public function controllerMiddleware()
     {
-        list($class, $method) = explode('@', $this->action['uses']);
+        if (! $this->isControllerAction()) {
+            return [];
+        }
 
-        $controller = $this->container->make($class);
-
-        return (new ControllerDispatcher($this->router, $this->container))
-            ->getMiddleware($controller, $method);
+        return ControllerDispatcher::getMiddleware(
+            $this->getController(), $this->getControllerMethod()
+        );
     }
 
     /**
@@ -562,9 +615,7 @@ class Route
         }
 
         if (is_string($action['uses']) && ! Str::contains($action['uses'], '@')) {
-            throw new UnexpectedValueException(sprintf(
-                'Invalid route action: [%s]', $action['uses']
-            ));
+            $action['uses'] = $this->makeInvokableAction($action['uses']);
         }
 
         return $action;
@@ -578,9 +629,26 @@ class Route
      */
     protected function findCallable(array $action)
     {
-        return Arr::first($action, function ($key, $value) {
+        return Arr::first($action, function ($value, $key) {
             return is_callable($value) && is_numeric($key);
         });
+    }
+
+    /**
+     * Make an action for an invokable controller.
+     *
+     * @param  string $action
+     * @return string
+     */
+    protected function makeInvokableAction($action)
+    {
+        if (! method_exists($action, '__invoke')) {
+            throw new UnexpectedValueException(sprintf(
+                'Invalid route action: [%s]', $action
+            ));
+        }
+
+        return $action.'@__invoke';
     }
 
     /**

@@ -174,6 +174,16 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('create index "baz" on "users" ("foo", "bar")', $statements[0]);
     }
 
+    public function testAddingIndexWithAlgorithm()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->index(['foo', 'bar'], 'baz', 'hash');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('create index "baz" on "users" using hash ("foo", "bar")', $statements[0]);
+    }
+
     public function testAddingIncrementingID()
     {
         $blueprint = new Blueprint('users');

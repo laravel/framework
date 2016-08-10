@@ -12,6 +12,7 @@ use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Contracts\Cookie\Factory as CookieFactory;
 use Illuminate\Database\Eloquent\Factory as EloquentFactory;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
+use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
 
 if (! function_exists('abort')) {
     /**
@@ -188,6 +189,54 @@ if (! function_exists('bcrypt')) {
     function bcrypt($value, $options = [])
     {
         return app('hash')->make($value, $options);
+    }
+}
+
+if (! function_exists('broadcast')) {
+    /**
+     * Begin broadcasting an event.
+     *
+     * @param  mixed|null  $event
+     * @return \Illuminate\Broadcasting\PendingBroadcast|void
+     */
+    function broadcast($event = null)
+    {
+        return app(BroadcastFactory::class)->event($event);
+    }
+}
+
+if (! function_exists('cache')) {
+    /**
+     * Get / set the specified cache value.
+     *
+     * If an array is passed, we'll assume you want to put to the cache.
+     *
+     * @param  dynamic  key|key,default|data,expiration|null
+     * @return mixed
+     *
+     * @throws \Exception
+     */
+    function cache()
+    {
+        $arguments = func_get_args();
+
+        if (empty($arguments)) {
+            return app('cache');
+        }
+
+        if (is_string($arguments[0])) {
+            return app('cache')->get($arguments[0], isset($arguments[1]) ? $arguments[1] : null);
+        }
+
+        if (is_array($arguments[0])) {
+            if (! isset($arguments[1])) {
+                throw new Exception(
+                    'You must set an expiration time when putting to the cache.'
+                );
+            }
+
+            return app('cache')->put(key($arguments[0]), reset($arguments[0]), $arguments[1]);
+        }
     }
 }
 
@@ -554,7 +603,7 @@ if (! function_exists('request')) {
     /**
      * Get an instance of the current request or an input item from the request.
      *
-     * @param  string  $key
+     * @param  array|string  $key
      * @param  mixed   $default
      * @return \Illuminate\Http\Request|string|array
      */
@@ -562,6 +611,10 @@ if (! function_exists('request')) {
     {
         if (is_null($key)) {
             return app('request');
+        }
+
+        if (is_array($key)) {
+            return app('request')->only($key);
         }
 
         return app('request')->input($key, $default);
@@ -725,7 +778,7 @@ if (! function_exists('url')) {
      * @param  string  $path
      * @param  mixed   $parameters
      * @param  bool    $secure
-     * @return Illuminate\Contracts\Routing\UrlGenerator|string
+     * @return \Illuminate\Contracts\Routing\UrlGenerator|string
      */
     function url($path = null, $parameters = [], $secure = null)
     {

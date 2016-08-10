@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Query\Processors;
 
 use Exception;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
 
 class SqlServerProcessor extends Processor
@@ -36,8 +37,9 @@ class SqlServerProcessor extends Processor
      *
      * @param  \Illuminate\Database\Connection  $connection
      * @return int
+     * @throws \Exception
      */
-    protected function processInsertGetIdForOdbc($connection)
+    protected function processInsertGetIdForOdbc(Connection $connection)
     {
         $result = $connection->selectFromWriteConnection('SELECT CAST(COALESCE(SCOPE_IDENTITY(), @@IDENTITY) AS int) AS insertid');
 

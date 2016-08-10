@@ -3,6 +3,7 @@
 namespace Illuminate\View;
 
 use Closure;
+use Countable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -10,6 +11,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\View\Engines\EngineResolver;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Contracts\View\Factory as FactoryContract;
 
 class Factory implements FactoryContract
@@ -90,6 +92,13 @@ class Factory implements FactoryContract
      * @var array
      */
     protected $sectionStack = [];
+
+    /**
+     * The stack of in-progress loops.
+     *
+     * @var array
+     */
+    protected $loopsStack = [];
 
     /**
      * All of the finished, captured push sections.
@@ -321,7 +330,7 @@ class Factory implements FactoryContract
     {
         $extensions = array_keys($this->extensions);
 
-        return Arr::first($extensions, function ($key, $value) use ($path) {
+        return Arr::first($extensions, function ($value) use ($path) {
             return Str::endsWith($path, '.'.$value);
         });
     }
@@ -505,7 +514,7 @@ class Factory implements FactoryContract
      * @param  \Illuminate\Contracts\View\View  $view
      * @return void
      */
-    public function callComposer(View $view)
+    public function callComposer(ViewContract $view)
     {
         $this->events->fire('composing: '.$view->getName(), [$view]);
     }
@@ -516,7 +525,7 @@ class Factory implements FactoryContract
      * @param  \Illuminate\Contracts\View\View  $view
      * @return void
      */
-    public function callCreator(View $view)
+    public function callCreator(ViewContract $view)
     {
         $this->events->fire('creating: '.$view->getName(), [$view]);
     }
@@ -778,6 +787,81 @@ class Factory implements FactoryContract
     public function doneRendering()
     {
         return $this->renderCount == 0;
+    }
+
+    /**
+     * Add new loop to the stack.
+     *
+     * @param  array|\Countable  $data
+     * @return void
+     */
+    public function addLoop($data)
+    {
+        $length = is_array($data) || $data instanceof Countable ? count($data) : null;
+
+        $parent = Arr::last($this->loopsStack);
+
+        $this->loopsStack[] = [
+            'iteration' => 0,
+            'index' => 0,
+            'remaining' => isset($length) ? $length : null,
+            'count' => $length,
+            'first' => true,
+            'last' => isset($length) ? $length == 1 : null,
+            'depth' => count($this->loopsStack) + 1,
+            'parent' => $parent ? (object) $parent : null,
+        ];
+    }
+
+    /**
+     * Increment the top loop's indices.
+     *
+     * @return void
+     */
+    public function incrementLoopIndices()
+    {
+        $loop = &$this->loopsStack[count($this->loopsStack) - 1];
+
+        $loop['iteration']++;
+        $loop['index'] = $loop['iteration'] - 1;
+
+        $loop['first'] = $loop['iteration'] == 1;
+
+        if (isset($loop['count'])) {
+            $loop['remaining']--;
+
+            $loop['last'] = $loop['iteration'] == $loop['count'];
+        }
+    }
+
+    /**
+     * Pop a loop from the top of the loop stack.
+     *
+     * @return void
+     */
+    public function popLoop()
+    {
+        array_pop($this->loopsStack);
+    }
+
+    /**
+     * Get an instance of the first loop in the stack.
+     *
+     * @return array
+     */
+    public function getFirstLoop()
+    {
+        return ($last = Arr::last($this->loopsStack)) ? (object) $last : null;
+    }
+
+    /**
+     * Get the entire loop stack.
+     *
+     * @return array
+     */
+    public function getLoopStack()
+    {
+        return $this->loopsStack;
     }
 
     /**
