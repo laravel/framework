@@ -24,7 +24,7 @@ class DummyClass
     }
 
     /**
-     * Get the channels the event should be broadcast on.
+     * Get the channels the event should broadcast on.
      *
      * @return Channel|array
      */
