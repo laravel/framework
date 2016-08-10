@@ -61,7 +61,7 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
-        $this->assertEquals('drop index foo', $statements[0]);
+        $this->assertEquals('drop index "foo"', $statements[0]);
     }
 
     public function testDropIndex()
@@ -71,7 +71,7 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
-        $this->assertEquals('drop index foo', $statements[0]);
+        $this->assertEquals('drop index "foo"', $statements[0]);
     }
 
     public function testRenameTable()
@@ -115,7 +115,7 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
-        $this->assertEquals('create unique index bar on "users" ("foo")', $statements[0]);
+        $this->assertEquals('create unique index "bar" on "users" ("foo")', $statements[0]);
     }
 
     public function testAddingIndex()
@@ -125,7 +125,7 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
-        $this->assertEquals('create index baz on "users" ("foo", "bar")', $statements[0]);
+        $this->assertEquals('create index "baz" on "users" ("foo", "bar")', $statements[0]);
     }
 
     public function testAddingIncrementingID()
@@ -479,6 +479,26 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase
     {
         $blueprint = new Blueprint('users');
         $blueprint->uuid('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table "users" add column "foo" varchar not null', $statements[0]);
+    }
+
+    public function testAddingIpAddress()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->ipAddress('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table "users" add column "foo" varchar not null', $statements[0]);
+    }
+
+    public function testAddingMacAddress()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->macAddress('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));

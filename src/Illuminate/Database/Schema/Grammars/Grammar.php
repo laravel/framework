@@ -82,6 +82,8 @@ abstract class Grammar extends BaseGrammar
     {
         $table = $this->wrapTable($blueprint);
 
+        $index = $this->wrap($command->index);
+
         $on = $this->wrapTable($command->on);
 
         // We need to prepare several of the elements of the foreign key definition
@@ -91,7 +93,7 @@ abstract class Grammar extends BaseGrammar
 
         $onColumns = $this->columnize((array) $command->references);
 
-        $sql = "alter table {$table} add constraint {$command->index} ";
+        $sql = "alter table {$table} add constraint {$index} ";
 
         $sql .= "foreign key ({$columns}) references {$on} ({$onColumns})";
 
@@ -202,7 +204,6 @@ abstract class Grammar extends BaseGrammar
     {
         return array_map(function ($value) use ($prefix) {
             return $prefix.' '.$value;
-
         }, $values);
     }
 
@@ -414,10 +415,8 @@ abstract class Grammar extends BaseGrammar
         switch ($type) {
             case 'mediumText':
                 return 65535 + 1;
-
             case 'longText':
                 return 16777215 + 1;
-
             default:
                 return 255 + 1;
         }
@@ -435,16 +434,12 @@ abstract class Grammar extends BaseGrammar
             case 'type':
             case 'name':
                 return;
-
             case 'nullable':
                 return 'notnull';
-
             case 'total':
                 return 'precision';
-
             case 'places':
                 return 'scale';
-
             default:
                 return $attribute;
         }

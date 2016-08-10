@@ -59,7 +59,7 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * Compile a create table command.
+     * Compile a column addition table command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
@@ -87,7 +87,9 @@ class SqlServerGrammar extends Grammar
 
         $table = $this->wrapTable($blueprint);
 
-        return "alter table {$table} add constraint {$command->index} primary key ({$columns})";
+        $index = $this->wrap($command->index);
+
+        return "alter table {$table} add constraint {$index} primary key ({$columns})";
     }
 
     /**
@@ -103,7 +105,9 @@ class SqlServerGrammar extends Grammar
 
         $table = $this->wrapTable($blueprint);
 
-        return "create unique index {$command->index} on {$table} ({$columns})";
+        $index = $this->wrap($command->index);
+
+        return "create unique index {$index} on {$table} ({$columns})";
     }
 
     /**
@@ -119,7 +123,9 @@ class SqlServerGrammar extends Grammar
 
         $table = $this->wrapTable($blueprint);
 
-        return "create index {$command->index} on {$table} ({$columns})";
+        $index = $this->wrap($command->index);
+
+        return "create index {$index} on {$table} ({$columns})";
     }
 
     /**
@@ -143,7 +149,7 @@ class SqlServerGrammar extends Grammar
      */
     public function compileDropIfExists(Blueprint $blueprint, Fluent $command)
     {
-        return 'if exists (select * from INFORMATION_SCHEMA.TABLES where TABLE_NAME = \''.$blueprint->getTable().'\') drop table '.$blueprint->getTable();
+        return 'if exists (select * from INFORMATION_SCHEMA.TABLES where TABLE_NAME = \''.$blueprint->getTable().'\') drop table ['.$blueprint->getTable().']';
     }
 
     /**
@@ -173,7 +179,9 @@ class SqlServerGrammar extends Grammar
     {
         $table = $this->wrapTable($blueprint);
 
-        return "alter table {$table} drop constraint {$command->index}";
+        $index = $this->wrap($command->index);
+
+        return "alter table {$table} drop constraint {$index}";
     }
 
     /**
@@ -187,7 +195,9 @@ class SqlServerGrammar extends Grammar
     {
         $table = $this->wrapTable($blueprint);
 
-        return "drop index {$command->index} on {$table}";
+        $index = $this->wrap($command->index);
+
+        return "drop index {$index} on {$table}";
     }
 
     /**
@@ -201,7 +211,9 @@ class SqlServerGrammar extends Grammar
     {
         $table = $this->wrapTable($blueprint);
 
-        return "drop index {$command->index} on {$table}";
+        $index = $this->wrap($command->index);
+
+        return "drop index {$index} on {$table}";
     }
 
     /**
@@ -215,7 +227,9 @@ class SqlServerGrammar extends Grammar
     {
         $table = $this->wrapTable($blueprint);
 
-        return "alter table {$table} drop constraint {$command->index}";
+        $index = $this->wrap($command->index);
+
+        return "alter table {$table} drop constraint {$index}";
     }
 
     /**
@@ -230,6 +244,26 @@ class SqlServerGrammar extends Grammar
         $from = $this->wrapTable($blueprint);
 
         return "sp_rename {$from}, ".$this->wrapTable($command->to);
+    }
+
+    /**
+     * Compile the command to enable foreign key constraints.
+     *
+     * @return string
+     */
+    public function compileEnableForeignKeyConstraints()
+    {
+        return 'EXEC sp_msforeachtable @command1="print \'?\'", @command2="ALTER TABLE ? WITH CHECK CHECK CONSTRAINT all";';
+    }
+
+    /**
+     * Compile the command to disable foreign key constraints.
+     *
+     * @return string
+     */
+    public function compileDisableForeignKeyConstraints()
+    {
+        return 'EXEC sp_msforeachtable "ALTER TABLE ? NOCHECK CONSTRAINT all";';
     }
 
     /**
@@ -526,6 +560,28 @@ class SqlServerGrammar extends Grammar
     protected function typeUuid(Fluent $column)
     {
         return 'uniqueidentifier';
+    }
+
+    /**
+     * Create the column definition for an IP address type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeIpAddress(Fluent $column)
+    {
+        return 'nvarchar(45)';
+    }
+
+    /**
+     * Create the column definition for a MAC address type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeMacAddress(Fluent $column)
+    {
+        return 'nvarchar(17)';
     }
 
     /**

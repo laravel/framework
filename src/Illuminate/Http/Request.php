@@ -119,9 +119,11 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function fullUrlWithQuery(array $query)
     {
+        $question = $this->getBaseUrl().$this->getPathInfo() == '/' ? '/?' : '?';
+
         return count($this->query()) > 0
-                        ? $this->url().'/?'.http_build_query(array_merge($this->query(), $query))
-                        : $this->fullUrl().'?'.http_build_query($query);
+            ? $this->url().$question.http_build_query(array_merge($this->query(), $query))
+            : $this->fullUrl().$question.http_build_query($query);
     }
 
     /**
@@ -271,7 +273,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         $input = $this->all();
 
         foreach ($keys as $value) {
-            if (! array_key_exists($value, $input)) {
+            if (! Arr::has($input, $value)) {
                 return false;
             }
         }
@@ -376,6 +378,17 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Intersect an array of items with the input data.
+     *
+     * @param  array|mixed  $keys
+     * @return array
+     */
+    public function intersect($keys)
+    {
+        return array_filter($this->only(is_array($keys) ? $keys : func_get_args()));
+    }
+
+    /**
      * Retrieve a query string item from the request.
      *
      * @param  string  $key
@@ -448,7 +461,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      *
      * @param  string  $key
      * @param  mixed  $default
-     * @return \Symfony\Component\HttpFoundation\File\UploadedFile|array|null
+     * @return \Illuminate\Http\UploadedFile|array|null
      */
     public function file($key = null, $default = null)
     {
@@ -485,6 +498,17 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     protected function isValidFile($file)
     {
         return $file instanceof SplFileInfo && $file->getPath() != '';
+    }
+
+    /**
+     * Determine if a header is set on the request.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function hasHeader($key)
+    {
+        return ! is_null($this->header($key));
     }
 
     /**
@@ -661,11 +685,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 
         $split = explode('/', $actual);
 
-        if (isset($split[1]) && preg_match('/'.$split[0].'\/.+\+'.$split[1].'/', $type)) {
-            return true;
-        }
-
-        return false;
+        return isset($split[1]) && preg_match('#'.preg_quote($split[0], '#').'/.+\+'.preg_quote($split[1], '#').'#', $type);
     }
 
     /**
@@ -676,6 +696,16 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     public function isJson()
     {
         return Str::contains($this->header('CONTENT_TYPE'), ['/json', '+json']);
+    }
+
+    /**
+     * Determine if the current request probably expects a JSON response.
+     *
+     * @return bool
+     */
+    public function expectsJson()
+    {
+        return ($this->ajax() && ! $this->pjax()) || $this->wantsJson();
     }
 
     /**
@@ -893,16 +923,13 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function fingerprint()
     {
-        if (! $this->route()) {
+        if (! $route = $this->route()) {
             throw new RuntimeException('Unable to generate fingerprint. Route unavailable.');
         }
 
-        return sha1(
-            implode('|', $this->route()->methods()).
-            '|'.$this->route()->domain().
-            '|'.$this->route()->uri().
-            '|'.$this->ip()
-        );
+        return sha1(implode('|', array_merge(
+            $route->methods(), [$route->domain(), $route->uri(), $this->ip()]
+        )));
     }
 
     /**
@@ -996,7 +1023,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function offsetSet($offset, $value)
     {
-        return $this->getInputSource()->set($offset, $value);
+        $this->getInputSource()->set($offset, $value);
     }
 
     /**
@@ -1007,7 +1034,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function offsetUnset($offset)
     {
-        return $this->getInputSource()->remove($offset);
+        $this->getInputSource()->remove($offset);
     }
 
     /**
@@ -1029,12 +1056,10 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function __get($key)
     {
-        $all = $this->all();
-
-        if (array_key_exists($key, $all)) {
-            return $all[$key];
-        } else {
-            return $this->route($key);
+        if ($this->offsetExists($key)) {
+            return $this->offsetGet($key);
         }
+
+        return $this->route($key);
     }
 }

@@ -38,31 +38,9 @@ class Arr
     }
 
     /**
-     * Build a new array using a callback.
-     *
-     * @param  array  $array
-     * @param  callable  $callback
-     * @return array
-     *
-     * @deprecated since version 5.2.
-     */
-    public static function build($array, callable $callback)
-    {
-        $results = [];
-
-        foreach ($array as $key => $value) {
-            list($innerKey, $innerValue) = call_user_func($callback, $key, $value);
-
-            $results[$innerKey] = $innerValue;
-        }
-
-        return $results;
-    }
-
-    /**
      * Collapse an array of arrays into a single array.
      *
-     * @param  \ArrayAccess|array  $array
+     * @param  array  $array
      * @return array
      */
     public static function collapse($array)
@@ -70,11 +48,13 @@ class Arr
         $results = [];
 
         foreach ($array as $values) {
-            if (! static::accessible($values)) {
+            if ($values instanceof Collection) {
+                $values = $values->all();
+            } elseif (! is_array($values)) {
                 continue;
             }
 
-            $results = array_merge($results, $values instanceof Collection ? $values->all() : $values);
+            $results = array_merge($results, $values);
         }
 
         return $results;
@@ -103,7 +83,7 @@ class Arr
         $results = [];
 
         foreach ($array as $key => $value) {
-            if (is_array($value)) {
+            if (is_array($value) && ! empty($value)) {
                 $results = array_merge($results, static::dot($value, $prepend.$key.'.'));
             } else {
                 $results[$prepend.$key] = $value;
@@ -136,25 +116,29 @@ class Arr
      */
     public static function exists($array, $key)
     {
-        if (is_array($array)) {
-            return array_key_exists($key, $array);
+        if ($array instanceof ArrayAccess) {
+            return $array->offsetExists($key);
         }
 
-        return $array->offsetExists($key);
+        return array_key_exists($key, $array);
     }
 
     /**
      * Return the first element in an array passing a given truth test.
      *
      * @param  array  $array
-     * @param  callable  $callback
+     * @param  callable|null  $callback
      * @param  mixed  $default
      * @return mixed
      */
-    public static function first($array, callable $callback, $default = null)
+    public static function first($array, callable $callback = null, $default = null)
     {
+        if (is_null($callback)) {
+            return empty($array) ? value($default) : reset($array);
+        }
+
         foreach ($array as $key => $value) {
-            if (call_user_func($callback, $key, $value)) {
+            if (call_user_func($callback, $value, $key)) {
                 return $value;
             }
         }
@@ -166,13 +150,17 @@ class Arr
      * Return the last element in an array passing a given truth test.
      *
      * @param  array  $array
-     * @param  callable  $callback
+     * @param  callable|null  $callback
      * @param  mixed  $default
      * @return mixed
      */
-    public static function last($array, callable $callback, $default = null)
+    public static function last($array, callable $callback = null, $default = null)
     {
-        return static::first(array_reverse($array), $callback, $default);
+        if (is_null($callback)) {
+            return empty($array) ? value($default) : end($array);
+        }
+
+        return static::first(array_reverse($array, true), $callback, $default);
     }
 
     /**
@@ -184,25 +172,17 @@ class Arr
      */
     public static function flatten($array, $depth = INF)
     {
-        $result = [];
-
-        foreach ($array as $item) {
+        return array_reduce($array, function ($result, $item) use ($depth) {
             $item = $item instanceof Collection ? $item->all() : $item;
 
-            if (is_array($item)) {
-                if ($depth === 1) {
-                    $result = array_merge($result, $item);
-                    continue;
-                }
-
-                $result = array_merge($result, static::flatten($item, $depth - 1));
-                continue;
+            if (! is_array($item)) {
+                return array_merge($result, [$item]);
+            } elseif ($depth === 1) {
+                return array_merge($result, array_values($item));
+            } else {
+                return array_merge($result, static::flatten($item, $depth - 1));
             }
-
-            $result[] = $item;
-        }
-
-        return $result;
+        }, []);
     }
 
     /**
@@ -223,6 +203,13 @@ class Arr
         }
 
         foreach ($keys as $key) {
+            // if the exact key exists in the top-level, remove it
+            if (static::exists($array, $key)) {
+                unset($array[$key]);
+
+                continue;
+            }
+
             $parts = explode('.', $key);
 
             // clean up before each pass
@@ -245,28 +232,31 @@ class Arr
     /**
      * Get an item from an array using "dot" notation.
      *
-     * @param  \ArrayAccess|array   $array
+     * @param  \ArrayAccess|array  $array
      * @param  string  $key
      * @param  mixed   $default
      * @return mixed
      */
     public static function get($array, $key, $default = null)
     {
+        if (! static::accessible($array)) {
+            return value($default);
+        }
+
         if (is_null($key)) {
             return $array;
         }
 
-        if (isset($array[$key])) {
+        if (static::exists($array, $key)) {
             return $array[$key];
         }
 
         foreach (explode('.', $key) as $segment) {
-            if ((! is_array($array) || ! array_key_exists($segment, $array)) &&
-                (! $array instanceof ArrayAccess || ! $array->offsetExists($segment))) {
+            if (static::accessible($array) && static::exists($array, $segment)) {
+                $array = $array[$segment];
+            } else {
                 return value($default);
             }
-
-            $array = $array[$segment];
         }
 
         return $array;
@@ -275,26 +265,30 @@ class Arr
     /**
      * Check if an item exists in an array using "dot" notation.
      *
-     * @param  array   $array
+     * @param  \ArrayAccess|array  $array
      * @param  string  $key
      * @return bool
      */
     public static function has($array, $key)
     {
-        if (empty($array) || is_null($key)) {
+        if (! $array) {
             return false;
         }
 
-        if (array_key_exists($key, $array)) {
+        if (is_null($key)) {
+            return false;
+        }
+
+        if (static::exists($array, $key)) {
             return true;
         }
 
         foreach (explode('.', $key) as $segment) {
-            if (! is_array($array) || ! array_key_exists($segment, $array)) {
+            if (static::accessible($array) && static::exists($array, $segment)) {
+                $array = $array[$segment];
+            } else {
                 return false;
             }
-
-            $array = $array[$segment];
         }
 
         return true;
@@ -330,7 +324,7 @@ class Arr
     /**
      * Pluck an array of values from an array.
      *
-     * @param  \ArrayAccess|array  $array
+     * @param  array  $array
      * @param  string|array  $value
      * @param  string|array|null  $key
      * @return array
@@ -491,14 +485,6 @@ class Arr
      */
     public static function where($array, callable $callback)
     {
-        $filtered = [];
-
-        foreach ($array as $key => $value) {
-            if (call_user_func($callback, $key, $value)) {
-                $filtered[$key] = $value;
-            }
-        }
-
-        return $filtered;
+        return array_filter($array, $callback, ARRAY_FILTER_USE_BOTH);
     }
 }

@@ -16,6 +16,7 @@ use Illuminate\Foundation\Console\JobMakeCommand;
 use Illuminate\Foundation\Console\AppNameCommand;
 use Illuminate\Foundation\Console\OptimizeCommand;
 use Illuminate\Foundation\Console\TestMakeCommand;
+use Illuminate\Foundation\Console\MailMakeCommand;
 use Illuminate\Foundation\Console\RouteListCommand;
 use Illuminate\Foundation\Console\EventMakeCommand;
 use Illuminate\Foundation\Console\ModelMakeCommand;
@@ -24,6 +25,7 @@ use Illuminate\Session\Console\SessionTableCommand;
 use Illuminate\Foundation\Console\PolicyMakeCommand;
 use Illuminate\Foundation\Console\RouteCacheCommand;
 use Illuminate\Foundation\Console\RouteClearCommand;
+use Illuminate\Foundation\Console\StorageLinkCommand;
 use Illuminate\Routing\Console\ControllerMakeCommand;
 use Illuminate\Routing\Console\MiddlewareMakeCommand;
 use Illuminate\Foundation\Console\ConfigCacheCommand;
@@ -38,6 +40,7 @@ use Illuminate\Foundation\Console\ClearCompiledCommand;
 use Illuminate\Foundation\Console\EventGenerateCommand;
 use Illuminate\Foundation\Console\VendorPublishCommand;
 use Illuminate\Database\Console\Seeds\SeederMakeCommand;
+use Illuminate\Foundation\Console\NotificationMakeCommand;
 
 class ArtisanServiceProvider extends ServiceProvider
 {
@@ -65,6 +68,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'RouteCache' => 'command.route.cache',
         'RouteClear' => 'command.route.clear',
         'RouteList' => 'command.route.list',
+        'StorageLink' => 'command.storage.link',
         'Tinker' => 'command.tinker',
         'Up' => 'command.up',
         'ViewClear' => 'command.view.clear',
@@ -85,8 +89,10 @@ class ArtisanServiceProvider extends ServiceProvider
         'EventMake' => 'command.event.make',
         'JobMake' => 'command.job.make',
         'ListenerMake' => 'command.listener.make',
+        'MailMake' => 'command.mail.make',
         'MiddlewareMake' => 'command.middleware.make',
         'ModelMake' => 'command.model.make',
+        'NotificationMake' => 'command.notification.make',
         'PolicyMake' => 'command.policy.make',
         'ProviderMake' => 'command.provider.make',
         'QueueFailedTable' => 'command.queue.failed-table',
@@ -108,9 +114,7 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->registerCommands($this->commands);
 
-        //if (! $this->app->environment('production')) {
-            $this->registerCommands($this->devCommands);
-        //}
+        $this->registerCommands($this->devCommands);
     }
 
     /**
@@ -327,6 +331,18 @@ class ArtisanServiceProvider extends ServiceProvider
      *
      * @return void
      */
+    protected function registerMailMakeCommand()
+    {
+        $this->app->singleton('command.mail.make', function ($app) {
+            return new MailMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
     protected function registerMiddlewareMakeCommand()
     {
         $this->app->singleton('command.middleware.make', function ($app) {
@@ -343,6 +359,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.model.make', function ($app) {
             return new ModelMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerNotificationMakeCommand()
+    {
+        $this->app->singleton('command.notification.make', function ($app) {
+            return new NotificationMakeCommand($app['files']);
         });
     }
 
@@ -427,6 +455,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.session.table', function ($app) {
             return new SessionTableCommand($app['files'], $app['composer']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerStorageLinkCommand()
+    {
+        $this->app->singleton('command.storage.link', function () {
+            return new StorageLinkCommand;
         });
     }
 

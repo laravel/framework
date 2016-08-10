@@ -28,7 +28,7 @@ class Message
     /**
      * Add a "from" address to the message.
      *
-     * @param  string  $address
+     * @param  string|array  $address
      * @param  string|null  $name
      * @return $this
      */
@@ -42,7 +42,7 @@ class Message
     /**
      * Set the "sender" of the message.
      *
-     * @param  string  $address
+     * @param  string|array  $address
      * @param  string|null  $name
      * @return $this
      */
@@ -88,7 +88,7 @@ class Message
     /**
      * Add a carbon copy to the message.
      *
-     * @param  string  $address
+     * @param  string|array  $address
      * @param  string|null  $name
      * @return $this
      */
@@ -100,7 +100,7 @@ class Message
     /**
      * Add a blind carbon copy to the message.
      *
-     * @param  string  $address
+     * @param  string|array  $address
      * @param  string|null  $name
      * @return $this
      */
@@ -112,7 +112,7 @@ class Message
     /**
      * Add a reply to address to the message.
      *
-     * @param  string  $address
+     * @param  string|array  $address
      * @param  string|null  $name
      * @return $this
      */

@@ -110,6 +110,23 @@ trait InteractsWithSession
     }
 
     /**
+     * Assert that the session does not have a given key.
+     *
+     * @param  string|array  $key
+     * @return void
+     */
+    public function assertSessionMissing($key)
+    {
+        if (is_array($key)) {
+            foreach ($key as $k) {
+                $this->assertSessionMissing($k);
+            }
+        } else {
+            PHPUnit::assertFalse($this->app['session.store']->has($key), "Session has unexpected key: $key");
+        }
+    }
+
+    /**
      * Assert that the session has errors bound.
      *
      * @param  string|array  $bindings

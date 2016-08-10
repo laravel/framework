@@ -35,7 +35,7 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * The default number of minutes to store items.
      *
-     * @var int
+     * @var float|int
      */
     protected $default = 60;
 
@@ -191,12 +191,12 @@ class Repository implements CacheContract, ArrayAccess
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  \DateTime|int  $minutes
+     * @param  \DateTime|float|int  $minutes
      * @return void
      */
     public function put($key, $value, $minutes = null)
     {
-        if (is_array($key) && filter_var($value, FILTER_VALIDATE_INT) !== false) {
+        if (is_array($key)) {
             return $this->putMany($key, $value);
         }
 
@@ -213,7 +213,7 @@ class Repository implements CacheContract, ArrayAccess
      * Store multiple items in the cache for a given number of minutes.
      *
      * @param  array  $values
-     * @param  int  $minutes
+     * @param  float|int  $minutes
      * @return void
      */
     public function putMany(array $values, $minutes)
@@ -234,7 +234,7 @@ class Repository implements CacheContract, ArrayAccess
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  \DateTime|int  $minutes
+     * @param  \DateTime|float|int  $minutes
      * @return bool
      */
     public function add($key, $value, $minutes)
@@ -259,6 +259,30 @@ class Repository implements CacheContract, ArrayAccess
     }
 
     /**
+     * Increment the value of an item in the cache.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return int|bool
+     */
+    public function increment($key, $value = 1)
+    {
+        return $this->store->increment($key, $value);
+    }
+
+    /**
+     * Decrement the value of an item in the cache.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return int|bool
+     */
+    public function decrement($key, $value = 1)
+    {
+        return $this->store->decrement($key, $value);
+    }
+
+    /**
      * Store an item in the cache indefinitely.
      *
      * @param  string  $key
@@ -276,7 +300,7 @@ class Repository implements CacheContract, ArrayAccess
      * Get an item from the cache, or store the default value.
      *
      * @param  string  $key
-     * @param  \DateTime|int  $minutes
+     * @param  \DateTime|float|int  $minutes
      * @param  \Closure  $callback
      * @return mixed
      */
@@ -330,7 +354,7 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * Remove an item from the cache.
      *
-     * @param  string $key
+     * @param  string  $key
      * @return bool
      */
     public function forget($key)
@@ -381,7 +405,7 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * Get the default cache time.
      *
-     * @return int
+     * @return float|int
      */
     public function getDefaultCacheTime()
     {
@@ -391,7 +415,7 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * Set the default cache time in minutes.
      *
-     * @param  int   $minutes
+     * @param  float|int  $minutes
      * @return void
      */
     public function setDefaultCacheTime($minutes)
@@ -457,18 +481,16 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * Calculate the number of minutes with the given duration.
      *
-     * @param  \DateTime|int  $duration
-     * @return int|null
+     * @param  \DateTime|float|int  $duration
+     * @return float|int|null
      */
     protected function getMinutes($duration)
     {
         if ($duration instanceof DateTime) {
-            $fromNow = Carbon::now()->diffInMinutes(Carbon::instance($duration), false);
-
-            return $fromNow > 0 ? $fromNow : null;
+            $duration = Carbon::now()->diffInSeconds(Carbon::instance($duration), false) / 60;
         }
 
-        return is_string($duration) ? (int) $duration : $duration;
+        return (int) ($duration * 60) > 0 ? $duration : null;
     }
 
     /**

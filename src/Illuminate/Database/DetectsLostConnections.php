@@ -28,6 +28,7 @@ trait DetectsLostConnections
             'SSL connection has been closed unexpectedly',
             'Deadlock found when trying to get lock',
             'Error writing data to the connection',
+            'Resource deadlock avoided',
         ]);
     }
 }

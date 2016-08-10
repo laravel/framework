@@ -47,11 +47,18 @@ class BelongsToMany extends Relation
     protected $pivotColumns = [];
 
     /**
-     * Any pivot table restrictions.
+     * Any pivot table restrictions for where clauses.
      *
      * @var array
      */
     protected $pivotWheres = [];
+
+    /**
+     * Any pivot table restrictions for whereIn clauses.
+     *
+     * @var array
+     */
+    protected $pivotWhereIns = [];
 
     /**
      * The custom pivot table column for the created_at timestamp.
@@ -66,6 +73,13 @@ class BelongsToMany extends Relation
      * @var string
      */
     protected $pivotUpdatedAt;
+
+    /**
+     * The count of self joins.
+     *
+     * @var int
+     */
+    protected static $selfJoinCount = 0;
 
     /**
      * Create a new belongs to many relationship instance.
@@ -115,7 +129,23 @@ class BelongsToMany extends Relation
     }
 
     /**
-     * Set an or where clause for a pivot table column.
+     * Set a "where in" clause for a pivot table column.
+     *
+     * @param  string  $column
+     * @param  mixed   $values
+     * @param  string  $boolean
+     * @param  bool    $not
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function wherePivotIn($column, $values, $boolean = 'and', $not = false)
+    {
+        $this->pivotWhereIns[] = func_get_args();
+
+        return $this->whereIn($this->table.'.'.$column, $values, $boolean, $not);
+    }
+
+    /**
+     * Set an "or where" clause for a pivot table column.
      *
      * @param  string  $column
      * @param  string  $operator
@@ -125,6 +155,18 @@ class BelongsToMany extends Relation
     public function orWherePivot($column, $operator = null, $value = null)
     {
         return $this->wherePivot($column, $operator, $value, 'or');
+    }
+
+    /**
+     * Set an "or where in" clause for a pivot table column.
+     *
+     * @param  string  $column
+     * @param  mixed   $values
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function orWherePivotIn($column, $values)
+    {
+        return $this->wherePivotIn($column, $values, 'or');
     }
 
     /**
@@ -154,7 +196,7 @@ class BelongsToMany extends Relation
             return $model;
         }
 
-        throw new ModelNotFoundException;
+        throw (new ModelNotFoundException)->setModel(get_class($this->parent));
     }
 
     /**
@@ -348,7 +390,7 @@ class BelongsToMany extends Relation
      */
     public function getRelationCountHash()
     {
-        return 'self_'.md5(microtime(true));
+        return 'laravel_reserved_'.static::$selfJoinCount++;
     }
 
     /**
@@ -754,6 +796,67 @@ class BelongsToMany extends Relation
     }
 
     /**
+     * Toggles a model (or models) from the parent.
+     *
+     * Each existing model is detached, and non existing ones are attached.
+     *
+     * @param  mixed  $ids
+     * @return array
+     */
+    public function toggle($ids)
+    {
+        $changes = [
+            'attached' => [], 'detached' => [],
+        ];
+
+        if ($ids instanceof Model) {
+            $ids = $ids->getKey();
+        }
+
+        if ($ids instanceof Collection) {
+            $ids = $ids->modelKeys();
+        }
+
+        // First we will execute a query to get all of the current attached IDs for
+        // the relationship, which will allow us to determine which of them will
+        // be attached and which of them will be detached from the join table.
+        $current = $this->newPivotQuery()
+                    ->pluck($this->otherKey)->all();
+
+        $records = $this->formatRecordsList((array) $ids);
+
+        // Next, we will determine which IDs should get removed from the join table
+        // by checking which of the given ID / records is in the list of current
+        // records. We will then remove all those rows from the joining table.
+        $detach = array_values(array_intersect(
+            $current, array_keys($records)
+        ));
+
+        if (count($detach) > 0) {
+            $this->detach($detach, false);
+
+            $changes['detached'] = $this->castKeys($detach);
+        }
+
+        // Finally, for all of the records that were not detached, we'll attach the
+        // records into the intermediate table. Then we'll add those attaches to
+        // the change list and be ready to return these results to the caller.
+        $attach = array_diff_key($records, array_flip($detach));
+
+        if (count($attach) > 0) {
+            $this->attach($attach, [], false);
+
+            $changes['attached'] = array_keys($attach);
+        }
+
+        if (count($changes['attached']) || count($changes['detached'])) {
+            $this->touchIfTouching();
+        }
+
+        return $changes;
+    }
+
+    /**
      * Sync the intermediate tables with a list of IDs or collection of models.
      *
      * @param  \Illuminate\Database\Eloquent\Collection|array  $ids
@@ -773,21 +876,19 @@ class BelongsToMany extends Relation
         // First we need to attach any of the associated models that are not currently
         // in this joining table. We'll spin through the given IDs, checking to see
         // if they exist in the array of current ones, and if not we will insert.
-        $current = $this->newPivotQuery()->pluck($this->otherKey);
+        $current = $this->newPivotQuery()->pluck($this->otherKey)->all();
 
-        $records = $this->formatSyncList($ids);
+        $records = $this->formatRecordsList($ids);
 
         $detach = array_diff($current, array_keys($records));
 
         // Next, we will take the differences of the currents and given IDs and detach
         // all of the entities that exist in the "current" array but are not in the
-        // the array of the IDs given to the method which will complete the sync.
+        // array of the new IDs given to the method which will complete the sync.
         if ($detaching && count($detach) > 0) {
             $this->detach($detach);
 
-            $changes['detached'] = (array) array_map(function ($v) {
-                return is_numeric($v) ? (int) $v : (string) $v;
-            }, $detach);
+            $changes['detached'] = $this->castKeys($detach);
         }
 
         // Now we are finally ready to attach the new records. Note that we'll disable
@@ -805,12 +906,12 @@ class BelongsToMany extends Relation
     }
 
     /**
-     * Format the sync list so that it is keyed by ID.
+     * Format the sync/toggle list so that it is keyed by ID.
      *
      * @param  array  $records
      * @return array
      */
-    protected function formatSyncList(array $records)
+    protected function formatRecordsList(array $records)
     {
         $results = [];
 
@@ -857,6 +958,19 @@ class BelongsToMany extends Relation
         }
 
         return $changes;
+    }
+
+    /**
+     * Cast the given keys to integers if they are numeric and string otherwise.
+     *
+     * @param  arary  $keys
+     * @return array
+     */
+    protected function castKeys(array $keys)
+    {
+        return (array) array_map(function ($v) {
+            return is_numeric($v) ? (int) $v : (string) $v;
+        }, $keys);
     }
 
     /**
@@ -1019,14 +1133,18 @@ class BelongsToMany extends Relation
     /**
      * Detach models from the relationship.
      *
-     * @param  int|array  $ids
+     * @param  mixed  $ids
      * @param  bool  $touch
      * @return int
      */
     public function detach($ids = [], $touch = true)
     {
         if ($ids instanceof Model) {
-            $ids = (array) $ids->getKey();
+            $ids = $ids->getKey();
+        }
+
+        if ($ids instanceof Collection) {
+            $ids = $ids->modelKeys();
         }
 
         $query = $this->newPivotQuery();
@@ -1037,7 +1155,7 @@ class BelongsToMany extends Relation
         $ids = (array) $ids;
 
         if (count($ids) > 0) {
-            $query->whereIn($this->otherKey, (array) $ids);
+            $query->whereIn($this->otherKey, $ids);
         }
 
         // Once we have all of the conditions set on the statement, we are ready
@@ -1099,6 +1217,10 @@ class BelongsToMany extends Relation
 
         foreach ($this->pivotWheres as $whereArgs) {
             call_user_func_array([$query, 'where'], $whereArgs);
+        }
+
+        foreach ($this->pivotWhereIns as $whereArgs) {
+            call_user_func_array([$query, 'whereIn'], $whereArgs);
         }
 
         return $query->where($this->foreignKey, $this->parent->getKey());
@@ -1207,7 +1329,7 @@ class BelongsToMany extends Relation
      */
     public function getRelatedFreshUpdate()
     {
-        return [$this->related->getUpdatedAtColumn() => $this->related->freshTimestamp()];
+        return [$this->related->getUpdatedAtColumn() => $this->related->freshTimestampString()];
     }
 
     /**

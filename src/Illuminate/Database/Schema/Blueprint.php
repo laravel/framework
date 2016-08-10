@@ -342,11 +342,12 @@ class Blueprint
      *
      * @param  string|array  $columns
      * @param  string  $name
+     * @param  string|null  $algorithm
      * @return \Illuminate\Support\Fluent
      */
-    public function primary($columns, $name = null)
+    public function primary($columns, $name = null, $algorithm = null)
     {
-        return $this->indexCommand('primary', $columns, $name);
+        return $this->indexCommand('primary', $columns, $name, $algorithm);
     }
 
     /**
@@ -354,11 +355,12 @@ class Blueprint
      *
      * @param  string|array  $columns
      * @param  string  $name
+     * @param  string|null  $algorithm
      * @return \Illuminate\Support\Fluent
      */
-    public function unique($columns, $name = null)
+    public function unique($columns, $name = null, $algorithm = null)
     {
-        return $this->indexCommand('unique', $columns, $name);
+        return $this->indexCommand('unique', $columns, $name, $algorithm);
     }
 
     /**
@@ -366,11 +368,12 @@ class Blueprint
      *
      * @param  string|array  $columns
      * @param  string  $name
+     * @param  string|null  $algorithm
      * @return \Illuminate\Support\Fluent
      */
-    public function index($columns, $name = null)
+    public function index($columns, $name = null, $algorithm = null)
     {
-        return $this->indexCommand('index', $columns, $name);
+        return $this->indexCommand('index', $columns, $name, $algorithm);
     }
 
     /**
@@ -775,15 +778,17 @@ class Blueprint
     /**
      * Add nullable creation and update timestamps to the table.
      *
+     * Alias for self::timestamps().
+     *
      * @return void
      */
     public function nullableTimestamps()
     {
-        return $this->timestamps();
+        $this->timestamps();
     }
 
     /**
-     * Add creation and update timestamps to the table.
+     * Add nullable creation and update timestamps to the table.
      *
      * @return void
      */
@@ -836,6 +841,28 @@ class Blueprint
     public function uuid($column)
     {
         return $this->addColumn('uuid', $column);
+    }
+
+    /**
+     * Create a new IP address column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Support\Fluent
+     */
+    public function ipAddress($column)
+    {
+        return $this->addColumn('ipAddress', $column);
+    }
+
+    /**
+     * Create a new MAC address column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Support\Fluent
+     */
+    public function macAddress($column)
+    {
+        return $this->addColumn('macAddress', $column);
     }
 
     /**
@@ -894,9 +921,10 @@ class Blueprint
      * @param  string        $type
      * @param  string|array  $columns
      * @param  string        $index
+     * @param  string|null   $algorithm
      * @return \Illuminate\Support\Fluent
      */
-    protected function indexCommand($type, $columns, $index)
+    protected function indexCommand($type, $columns, $index, $algorithm = null)
     {
         $columns = (array) $columns;
 
@@ -907,7 +935,7 @@ class Blueprint
             $index = $this->createIndexName($type, $columns);
         }
 
-        return $this->addCommand($type, compact('index', 'columns'));
+        return $this->addCommand($type, compact('index', 'columns', 'algorithm'));
     }
 
     /**

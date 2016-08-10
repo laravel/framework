@@ -69,6 +69,10 @@ class DatabaseEloquentGlobalScopesTest extends PHPUnit_Framework_TestCase
     {
         $model = new EloquentClosureGlobalScopesWithOrTestModel();
 
+        $query = $model->newQuery();
+        $this->assertEquals('select "email", "password" from "table" where ("email" = ? or "email" = ?) and "active" = ? order by "name" asc', $query->toSql());
+        $this->assertEquals(['taylor@gmail.com', 'someone@else.com', 1], $query->getBindings());
+
         $query = $model->newQuery()->where('col1', 'val1')->orWhere('col2', 'val2');
         $this->assertEquals('select "email", "password" from "table" where ("col1" = ? or "col2" = ?) and ("email" = ? or "email" = ?) and "active" = ? order by "name" asc', $query->toSql());
         $this->assertEquals(['val1', 'val2', 'taylor@gmail.com', 'someone@else.com', 1], $query->getBindings());
@@ -79,6 +83,14 @@ class DatabaseEloquentGlobalScopesTest extends PHPUnit_Framework_TestCase
         $query = EloquentClosureGlobalScopesTestModel::withoutGlobalScopes()->where('foo', 'foo')->orWhere('bar', 'bar')->approved();
 
         $this->assertEquals('select * from "table" where ("foo" = ? or "bar" = ?) and ("approved" = ? or "should_approve" = ?)', $query->toSql());
+        $this->assertEquals(['foo', 'bar', 1, 0], $query->getBindings());
+    }
+
+    public function testScopesStartingWithOrBooleanArePreserved()
+    {
+        $query = EloquentClosureGlobalScopesTestModel::withoutGlobalScopes()->where('foo', 'foo')->orWhere('bar', 'bar')->orApproved();
+
+        $this->assertEquals('select * from "table" where ("foo" = ? or "bar" = ?) or ("approved" = ? or "should_approve" = ?)', $query->toSql());
         $this->assertEquals(['foo', 'bar', 1, 0], $query->getBindings());
     }
 
@@ -114,6 +126,11 @@ class EloquentClosureGlobalScopesTestModel extends Illuminate\Database\Eloquent\
     public function scopeApproved($query)
     {
         return $query->where('approved', 1)->orWhere('should_approve', 0);
+    }
+
+    public function scopeOrApproved($query)
+    {
+        return $query->orWhere('approved', 1)->orWhere('should_approve', 0);
     }
 }
 

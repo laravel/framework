@@ -13,7 +13,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
     public function testMailerSendSendsMessageWithProperViewContent()
     {
         unset($_SERVER['__mailer.test']);
-        $mailer = $this->getMock('Illuminate\Mail\Mailer', ['createMessage'], $this->getMocks());
+        $mailer = $this->getMockBuilder('Illuminate\Mail\Mailer')->setMethods(['createMessage'])->setConstructorArgs($this->getMocks())->getMock();
         $message = m::mock('Swift_Mime_Message');
         $mailer->expects($this->once())->method('createMessage')->will($this->returnValue($message));
         $view = m::mock('StdClass');
@@ -24,14 +24,16 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
         $this->setSwiftMailer($mailer);
         $message->shouldReceive('getSwiftMessage')->once()->andReturn($message);
         $mailer->getSwiftMailer()->shouldReceive('send')->once()->with($message, []);
-        $mailer->send('foo', ['data'], function ($m) { $_SERVER['__mailer.test'] = $m; });
+        $mailer->send('foo', ['data'], function ($m) {
+            $_SERVER['__mailer.test'] = $m;
+        });
         unset($_SERVER['__mailer.test']);
     }
 
     public function testMailerSendSendsMessageWithProperPlainViewContent()
     {
         unset($_SERVER['__mailer.test']);
-        $mailer = $this->getMock('Illuminate\Mail\Mailer', ['createMessage'], $this->getMocks());
+        $mailer = $this->getMockBuilder('Illuminate\Mail\Mailer')->setMethods(['createMessage'])->setConstructorArgs($this->getMocks())->getMock();
         $message = m::mock('Swift_Mime_Message');
         $mailer->expects($this->once())->method('createMessage')->will($this->returnValue($message));
         $view = m::mock('StdClass');
@@ -44,14 +46,16 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
         $this->setSwiftMailer($mailer);
         $message->shouldReceive('getSwiftMessage')->once()->andReturn($message);
         $mailer->getSwiftMailer()->shouldReceive('send')->once()->with($message, []);
-        $mailer->send(['foo', 'bar'], ['data'], function ($m) { $_SERVER['__mailer.test'] = $m; });
+        $mailer->send(['foo', 'bar'], ['data'], function ($m) {
+            $_SERVER['__mailer.test'] = $m;
+        });
         unset($_SERVER['__mailer.test']);
     }
 
     public function testMailerSendSendsMessageWithProperPlainViewContentWhenExplicit()
     {
         unset($_SERVER['__mailer.test']);
-        $mailer = $this->getMock('Illuminate\Mail\Mailer', ['createMessage'], $this->getMocks());
+        $mailer = $this->getMockBuilder('Illuminate\Mail\Mailer')->setMethods(['createMessage'])->setConstructorArgs($this->getMocks())->getMock();
         $message = m::mock('Swift_Mime_Message');
         $mailer->expects($this->once())->method('createMessage')->will($this->returnValue($message));
         $view = m::mock('StdClass');
@@ -64,7 +68,9 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
         $this->setSwiftMailer($mailer);
         $message->shouldReceive('getSwiftMessage')->once()->andReturn($message);
         $mailer->getSwiftMailer()->shouldReceive('send')->once()->with($message, []);
-        $mailer->send(['html' => 'foo', 'text' => 'bar'], ['data'], function ($m) { $_SERVER['__mailer.test'] = $m; });
+        $mailer->send(['html' => 'foo', 'text' => 'bar'], ['data'], function ($m) {
+            $_SERVER['__mailer.test'] = $m;
+        });
         unset($_SERVER['__mailer.test']);
     }
 
@@ -72,7 +78,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
     {
         list($view, $swift) = $this->getMocks();
         $mailer = new Illuminate\Mail\Mailer($view, $swift);
-        $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Queue'));
+        $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Factory'));
         $queue->shouldReceive('push')->once()->with('mailer@handleQueuedMessage', ['view' => 'foo', 'data' => [1], 'callback' => 'callable'], null);
 
         $mailer->queue('foo', [1], 'callable');
@@ -82,7 +88,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
     {
         list($view, $swift) = $this->getMocks();
         $mailer = new Illuminate\Mail\Mailer($view, $swift);
-        $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Queue'));
+        $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Factory'));
         $queue->shouldReceive('push')->once()->with('mailer@handleQueuedMessage', ['view' => 'foo', 'data' => [1], 'callback' => 'callable'], 'queue');
 
         $mailer->queueOn('queue', 'foo', [1], 'callable');
@@ -92,8 +98,9 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
     {
         list($view, $swift) = $this->getMocks();
         $mailer = new Illuminate\Mail\Mailer($view, $swift);
-        $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Queue'));
-        $serialized = (new Serializer)->serialize($closure = function () {});
+        $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Factory'));
+        $serialized = (new Serializer)->serialize($closure = function () {
+        });
         $queue->shouldReceive('push')->once()->with('mailer@handleQueuedMessage', ['view' => 'foo', 'data' => [1], 'callback' => $serialized], null);
 
         $mailer->queue('foo', [1], $closure);
@@ -103,7 +110,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
     {
         list($view, $swift) = $this->getMocks();
         $mailer = new Illuminate\Mail\Mailer($view, $swift);
-        $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Queue'));
+        $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Factory'));
         $queue->shouldReceive('later')->once()->with(10, 'mailer@handleQueuedMessage', ['view' => 'foo', 'data' => [1], 'callback' => 'callable'], null);
 
         $mailer->later(10, 'foo', [1], 'callable');
@@ -113,7 +120,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
     {
         list($view, $swift) = $this->getMocks();
         $mailer = new Illuminate\Mail\Mailer($view, $swift);
-        $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Queue'));
+        $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Factory'));
         $queue->shouldReceive('later')->once()->with(10, 'mailer@handleQueuedMessage', ['view' => 'foo', 'data' => [1], 'callback' => 'callable'], 'queue');
 
         $mailer->laterOn('queue', 10, 'foo', [1], 'callable');
@@ -121,7 +128,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
 
     public function testMailerCanResolveMailerClasses()
     {
-        $mailer = $this->getMock('Illuminate\Mail\Mailer', ['createMessage'], $this->getMocks());
+        $mailer = $this->getMockBuilder('Illuminate\Mail\Mailer')->setMethods(['createMessage'])->setConstructorArgs($this->getMocks())->getMock();
         $message = m::mock('Swift_Mime_Message');
         $mailer->expects($this->once())->method('createMessage')->will($this->returnValue($message));
         $view = m::mock('StdClass');
@@ -154,7 +161,8 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
         $mailer->getSwiftMailer()->shouldReceive('send')->once()->with(m::type('Swift_Message'), [])->andReturnUsing(function ($message) {
             $this->assertEquals(['taylorotwell@gmail.com' => 'Taylor Otwell'], $message->getFrom());
         });
-        $mailer->send('foo', ['data'], function ($m) {});
+        $mailer->send('foo', ['data'], function ($m) {
+        });
     }
 
     public function testFailedRecipientsAreAppendedAndCanBeRetrieved()
@@ -169,7 +177,8 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
         $swift = new FailingSwiftMailerStub;
         $mailer->setSwiftMailer($swift);
 
-        $mailer->send('foo', ['data'], function ($m) {});
+        $mailer->send('foo', ['data'], function ($m) {
+        });
 
         $this->assertEquals(['taylorotwell@gmail.com'], $mailer->failures());
     }

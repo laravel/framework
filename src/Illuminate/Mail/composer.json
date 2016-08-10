@@ -2,7 +2,7 @@
     "name": "illuminate/mail",
     "description": "The Illuminate Mail package.",
     "license": "MIT",
-    "homepage": "http://laravel.com",
+    "homepage": "https://laravel.com",
     "support": {
         "issues": "https://github.com/laravel/framework/issues",
         "source": "https://github.com/laravel/framework"
@@ -10,14 +10,14 @@
     "authors": [
         {
             "name": "Taylor Otwell",
-            "email": "taylorotwell@gmail.com"
+            "email": "taylor@laravel.com"
         }
     ],
     "require": {
-        "php": ">=5.5.9",
-        "illuminate/container": "5.2.*",
-        "illuminate/contracts": "5.2.*",
-        "illuminate/support": "5.2.*",
+        "php": ">=5.6.4",
+        "illuminate/container": "5.3.*",
+        "illuminate/contracts": "5.3.*",
+        "illuminate/support": "5.3.*",
         "psr/log": "~1.0",
         "swiftmailer/swiftmailer": "~5.1"
     },
@@ -28,12 +28,13 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.2-dev"
+            "dev-master": "5.3-dev"
         }
     },
     "suggest": {
         "aws/aws-sdk-php": "Required to use the SES mail driver (~3.0).",
-        "guzzlehttp/guzzle": "Required to use the Mailgun and Mandrill mail drivers (~5.3|~6.0)."
+        "guzzlehttp/guzzle": "Required to use the Mailgun and Mandrill mail drivers (~5.3|~6.0).",
+        "jeremeamia/superclosure": "Required to be able to serialize closures (~2.0)."
     },
     "minimum-stability": "dev"
 }

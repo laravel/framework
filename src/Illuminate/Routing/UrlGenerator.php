@@ -130,15 +130,22 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Get the URL for the previous request.
      *
+     * @param  mixed  $fallback
      * @return string
      */
-    public function previous()
+    public function previous($fallback = false)
     {
         $referrer = $this->request->headers->get('referer');
 
         $url = $referrer ? $this->to($referrer) : $this->getPreviousUrlFromSession();
 
-        return $url ?: $this->to('/');
+        if ($url) {
+            return $url;
+        } elseif ($fallback) {
+            return $this->to($fallback);
+        } else {
+            return $this->to('/');
+        }
     }
 
     /**
@@ -383,7 +390,6 @@ class UrlGenerator implements UrlGeneratorContract
     {
         return preg_replace_callback('/\{(.*?)\??\}/', function ($m) use (&$parameters) {
             return isset($parameters[$m[1]]) ? Arr::pull($parameters, $m[1]) : $m[0];
-
         }, $path);
     }
 
@@ -396,7 +402,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     protected function addQueryString($uri, array $parameters)
     {
-        // If the URI has a fragment, we will move it to the end of the URI since it will
+        // If the URI has a fragment, we will move it to the end of this URI since it will
         // need to come after any query string that may be added to the URL else it is
         // not going to be available. We will remove it then append it back on here.
         if (! is_null($fragment = parse_url($uri, PHP_URL_FRAGMENT))) {
@@ -477,9 +483,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     protected function getStringParameters(array $parameters)
     {
-        return Arr::where($parameters, function ($k) {
-            return is_string($k);
-        });
+        return array_filter($parameters, 'is_string', ARRAY_FILTER_USE_KEY);
     }
 
     /**
@@ -490,9 +494,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     protected function getNumericParameters(array $parameters)
     {
-        return Arr::where($parameters, function ($k) {
-            return is_numeric($k);
-        });
+        return array_filter($parameters, 'is_numeric', ARRAY_FILTER_USE_KEY);
     }
 
     /**

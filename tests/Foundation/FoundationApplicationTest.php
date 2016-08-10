@@ -25,9 +25,20 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase
 
     public function testServiceProvidersAreCorrectlyRegistered()
     {
-        $provider = m::mock('Illuminate\Support\ServiceProvider');
+        $provider = m::mock('ApplicationBasicServiceProviderStub');
         $class = get_class($provider);
         $provider->shouldReceive('register')->once();
+        $app = new Application;
+        $app->register($provider);
+
+        $this->assertTrue(in_array($class, $app->getLoadedProviders()));
+    }
+
+    public function testServiceProvidersAreCorrectlyRegisteredWhenRegisterMethodIsNotPresent()
+    {
+        $provider = m::mock('Illuminate\Support\ServiceProvider');
+        $class = get_class($provider);
+        $provider->shouldReceive('register')->never();
         $app = new Application;
         $app->register($provider);
 
@@ -58,7 +69,9 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase
     {
         $app = new Application;
         $app->setDeferredServices(['foo' => 'ApplicationDeferredServiceProviderStub']);
-        $app->extend('foo', function ($instance, $container) { return $instance.'bar'; });
+        $app->extend('foo', function ($instance, $container) {
+            return $instance.'bar';
+        });
         $this->assertEquals('foobar', $app->make('foo'));
     }
 
@@ -79,7 +92,9 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase
         $app->setDeferredServices(['foo' => 'ApplicationDeferredServiceProviderStub']);
         $this->assertTrue($app->bound('foo'));
         $this->assertFalse(ApplicationDeferredServiceProviderStub::$initialized);
-        $app->extend('foo', function ($instance, $container) { return $instance.'bar'; });
+        $app->extend('foo', function ($instance, $container) {
+            return $instance.'bar';
+        });
         $this->assertFalse(ApplicationDeferredServiceProviderStub::$initialized);
         $this->assertEquals('foobar', $app->make('foo'));
         $this->assertTrue(ApplicationDeferredServiceProviderStub::$initialized);
@@ -127,7 +142,8 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase
     public function testMethodAfterLoadingEnvironmentAddsClosure()
     {
         $app = new Application;
-        $closure = function () {};
+        $closure = function () {
+        };
         $app->afterLoadingEnvironment($closure);
         $this->assertArrayHasKey(0, $app['events']->getListeners('bootstrapped: Illuminate\Foundation\Bootstrap\DetectEnvironment'));
         $this->assertSame($closure, $app['events']->getListeners('bootstrapped: Illuminate\Foundation\Bootstrap\DetectEnvironment')[0]);
@@ -136,7 +152,8 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase
     public function testBeforeBootstrappingAddsClosure()
     {
         $app = new Application;
-        $closure = function () {};
+        $closure = function () {
+        };
         $app->beforeBootstrapping('Illuminate\Foundation\Bootstrap\RegisterFacades', $closure);
         $this->assertArrayHasKey(0, $app['events']->getListeners('bootstrapping: Illuminate\Foundation\Bootstrap\RegisterFacades'));
         $this->assertSame($closure, $app['events']->getListeners('bootstrapping: Illuminate\Foundation\Bootstrap\RegisterFacades')[0]);
@@ -145,10 +162,24 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase
     public function testAfterBootstrappingAddsClosure()
     {
         $app = new Application;
-        $closure = function () {};
+        $closure = function () {
+        };
         $app->afterBootstrapping('Illuminate\Foundation\Bootstrap\RegisterFacades', $closure);
         $this->assertArrayHasKey(0, $app['events']->getListeners('bootstrapped: Illuminate\Foundation\Bootstrap\RegisterFacades'));
         $this->assertSame($closure, $app['events']->getListeners('bootstrapped: Illuminate\Foundation\Bootstrap\RegisterFacades')[0]);
+    }
+}
+
+class ApplicationBasicServiceProviderStub extends Illuminate\Support\ServiceProvider
+{
+    public function boot()
+    {
+        //
+    }
+
+    public function register()
+    {
+        //
     }
 }
 
@@ -208,7 +239,11 @@ class ApplicationMultiProviderStub extends Illuminate\Support\ServiceProvider
 
     public function register()
     {
-        $this->app->singleton('foo', function () { return 'foo'; });
-        $this->app->singleton('bar', function ($app) { return $app['foo'].'bar'; });
+        $this->app->singleton('foo', function () {
+            return 'foo';
+        });
+        $this->app->singleton('bar', function ($app) {
+            return $app['foo'].'bar';
+        });
     }
 }

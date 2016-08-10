@@ -14,6 +14,8 @@ class ModelIdentifier
     /**
      * The unique identifier of the model.
      *
+     * This may be either a single ID or an array of IDs.
+     *
      * @var mixed
      */
     public $id;

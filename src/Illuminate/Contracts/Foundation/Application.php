@@ -92,7 +92,7 @@ interface Application extends Container
     public function getCachedCompilePath();
 
     /**
-     * Get the path to the cached services.json file.
+     * Get the path to the cached services.php file.
      *
      * @return string
      */

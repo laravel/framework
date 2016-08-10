@@ -2,6 +2,8 @@
 
 namespace Illuminate\Http;
 
+use Illuminate\Http\Exception\HttpResponseException;
+
 trait ResponseTrait
 {
     /**
@@ -28,13 +30,13 @@ trait ResponseTrait
      * Set a header on the Response.
      *
      * @param  string  $key
-     * @param  string  $value
+     * @param  array|string  $values
      * @param  bool    $replace
      * @return $this
      */
-    public function header($key, $value, $replace = true)
+    public function header($key, $values, $replace = true)
     {
-        $this->headers->set($key, $value, $replace);
+        $this->headers->set($key, $values, $replace);
 
         return $this;
     }
@@ -80,5 +82,15 @@ trait ResponseTrait
         $this->headers->setCookie($cookie);
 
         return $this;
+    }
+
+    /**
+     * Throws the response in a HttpResponseException instance.
+     *
+     * @throws \Illuminate\Http\Exception\HttpResponseException;
+     */
+    public function throwResponse()
+    {
+        throw new HttpResponseException($this);
     }
 }

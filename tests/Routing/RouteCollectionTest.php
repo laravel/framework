@@ -47,7 +47,7 @@ class RouteCollectionTest extends PHPUnit_Framework_TestCase
             'uses' => 'FooController@index',
             'as' => 'foo_index',
         ]));
-        $this->assertSame(1, $this->routeCollection->count());
+        $this->assertCount(1, $this->routeCollection);
     }
 
     public function testRouteCollectionIsCountable()
@@ -90,7 +90,7 @@ class RouteCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf(ArrayIterator::class, $this->routeCollection->getIterator());
     }
 
-    public function testRouteCollectionCanGetIteratorWhenEMpty()
+    public function testRouteCollectionCanGetIteratorWhenEmpty()
     {
         $this->assertCount(0, $this->routeCollection);
         $this->assertInstanceOf(ArrayIterator::class, $this->routeCollection->getIterator());

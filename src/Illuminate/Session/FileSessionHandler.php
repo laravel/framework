@@ -2,6 +2,7 @@
 
 namespace Illuminate\Session;
 
+use Carbon\Carbon;
 use SessionHandlerInterface;
 use Symfony\Component\Finder\Finder;
 use Illuminate\Filesystem\Filesystem;
@@ -23,16 +24,25 @@ class FileSessionHandler implements SessionHandlerInterface
     protected $path;
 
     /**
+     * The number of minutes the session should be valid.
+     *
+     * @var int
+     */
+    protected $minutes;
+
+    /**
      * Create a new file driven handler instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  string  $path
+     * @param  int  $minutes
      * @return void
      */
-    public function __construct(Filesystem $files, $path)
+    public function __construct(Filesystem $files, $path, $minutes)
     {
         $this->path = $path;
         $this->files = $files;
+        $this->minutes = $minutes;
     }
 
     /**
@@ -57,7 +67,9 @@ class FileSessionHandler implements SessionHandlerInterface
     public function read($sessionId)
     {
         if ($this->files->exists($path = $this->path.'/'.$sessionId)) {
-            return $this->files->get($path);
+            if (filemtime($path) >= Carbon::now()->subMinutes($this->minutes)->getTimestamp()) {
+                return $this->files->get($path);
+            }
         }
 
         return '';

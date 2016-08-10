@@ -112,6 +112,22 @@ class Factory implements FactoryContract
     }
 
     /**
+     * Validate the given data against the provided rules.
+     *
+     * @param  array  $data
+     * @param  array  $rules
+     * @param  array  $messages
+     * @param  array  $customAttributes
+     * @return void
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function validate(array $data, array $rules, array $messages = [], array $customAttributes = [])
+    {
+        $this->make($data, $rules, $messages, $customAttributes)->validate();
+    }
+
+    /**
      * Add the extensions to a validator instance.
      *
      * @param  \Illuminate\Validation\Validator  $validator

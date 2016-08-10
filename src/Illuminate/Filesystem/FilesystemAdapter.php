@@ -117,6 +117,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      *
      * @param  string  $path
      * @param  string  $data
+     * @param  string  $separator
      * @return int
      */
     public function prepend($path, $data, $separator = PHP_EOL)
@@ -133,6 +134,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      *
      * @param  string  $path
      * @param  string  $data
+     * @param  string  $separator
      * @return int
      */
     public function append($path, $data, $separator = PHP_EOL)
@@ -155,7 +157,11 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
         $paths = is_array($paths) ? $paths : func_get_args();
 
         foreach ($paths as $path) {
-            $this->driver->delete($path);
+            try {
+                $this->driver->delete($path);
+            } catch (FileNotFoundException $e) {
+                //
+            }
         }
 
         return true;
@@ -234,6 +240,8 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
             return $adapter->getClient()->getObjectUrl($adapter->getBucket(), $path);
         } elseif ($adapter instanceof LocalAdapter) {
             return '/storage/'.$path;
+        } elseif (method_exists($adapter, 'getUrl')) {
+            return $adapter->getUrl($path);
         } else {
             throw new RuntimeException('This driver does not support retrieving URLs.');
         }
@@ -354,7 +362,6 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
         switch ($visibility) {
             case FilesystemContract::VISIBILITY_PUBLIC:
                 return AdapterInterface::VISIBILITY_PUBLIC;
-
             case FilesystemContract::VISIBILITY_PRIVATE:
                 return AdapterInterface::VISIBILITY_PRIVATE;
         }

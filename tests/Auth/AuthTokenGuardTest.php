@@ -80,6 +80,18 @@ class AuthTokenGuardTest extends PHPUnit_Framework_TestCase
 
         $this->assertFalse($guard->validate(['api_token' => 'foo']));
     }
+
+    public function testValidateIfApiTokenIsEmpty()
+    {
+        $provider = Mockery::mock(UserProvider::class);
+        $user = new AuthTokenGuardTestUser;
+        $user->id = 1;
+        $request = Request::create('/', 'GET', ['api_token' => '']);
+
+        $guard = new TokenGuard($provider, $request);
+
+        $this->assertFalse($guard->validate(['api_token' => '']));
+    }
 }
 
 class AuthTokenGuardTestUser
