@@ -1186,10 +1186,10 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function toAssoc()
     {
-        return $this->reduce(function ($assoc, $pair) {
-            list($key, $value) = $pair;
+        return $this->reduce(function ($assoc, $item) {
+            $key = key($item);
 
-            $assoc[$key] = $value;
+            $assoc[$key] = $item[$key];
 
             return $assoc;
         });

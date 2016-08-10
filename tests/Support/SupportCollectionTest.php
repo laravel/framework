@@ -903,7 +903,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
             ['name' => 'Dragonair', 'type' => 'Dragon', 'idx' => 148],
         ]);
         $data = $data->mapToAssoc(function ($pokemon) {
-            return [$pokemon['name'], $pokemon['type']];
+            return [$pokemon['name'] => $pokemon['type']];
         });
         $this->assertEquals(
             ['Blastoise' => 'Water', 'Charmander' => 'Fire', 'Dragonair' => 'Dragon'],
@@ -914,9 +914,9 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
     public function testToAssoc()
     {
         $collection = new Collection([
-            ['Blastoise', 'Water'],
-            ['Charmander', 'Fire'],
-            ['Dragonair', 'Dragon'],
+            ['Blastoise' => 'Water'],
+            ['Charmander' => 'Fire'],
+            ['Dragonair' => 'Dragon'],
         ]);
         $this->assertEquals(
             ['Blastoise' => 'Water', 'Charmander' => 'Fire', 'Dragonair' => 'Dragon'],
