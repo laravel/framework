@@ -833,7 +833,6 @@ if (! function_exists('view')) {
     }
 }
 
-
 if(! function_exists('csrf_json_token')) {
     /**
      * CSRF Token to json.
