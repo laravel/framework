@@ -16,6 +16,6 @@ class BroadcastController extends Controller
      */
     public function authenticate(Request $request)
     {
-        return Broadcast::check($request);
+        return Broadcast::auth($request);
     }
 }
