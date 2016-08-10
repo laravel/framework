@@ -22,7 +22,7 @@ abstract class Broadcaster implements BroadcasterContract
      * @param  callable  $callback
      * @return $this
      */
-    public function auth($channel, callable $callback)
+    public function channel($channel, callable $callback)
     {
         $this->channels[$channel] = $callback;
 
