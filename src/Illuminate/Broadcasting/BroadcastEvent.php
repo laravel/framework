@@ -42,8 +42,14 @@ class BroadcastEvent
         $name = method_exists($event, 'broadcastAs')
                 ? $event->broadcastAs() : get_class($event);
 
+        $channels = $event->broadcastOn();
+
+        if (! is_array($channels)) {
+            $channels = [$channels];
+        }
+
         $this->broadcaster->broadcast(
-            $event->broadcastOn(), $name, $this->getPayloadFromEvent($event)
+            $channels, $name, $this->getPayloadFromEvent($event)
         );
 
         $job->delete();
