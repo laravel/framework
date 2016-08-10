@@ -833,12 +833,13 @@ if (! function_exists('view')) {
     }
 }
 
-/**
- * CSRF Token to json.
- * 
- * @return \Illuminate\Support\HtmlString
- */
-if(!function_exists('csrf_json_token')) {
+
+if(! function_exists('csrf_json_token')) {
+     /**
+     * CSRF Token to json.
+     * 
+     * @return \Illuminate\Support\HtmlString
+     */
     function csrf_json_token()
     {
         return json_encode(['csrfToken' => csrf_token()]);
