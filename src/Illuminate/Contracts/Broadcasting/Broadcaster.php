@@ -10,7 +10,7 @@ interface Broadcaster
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
-    public function check($request);
+    public function auth($request);
 
     /**
      * Return the valid authentication response.
