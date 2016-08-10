@@ -1847,7 +1847,7 @@ class Builder
     public function increment($column, $amount = 1, array $extra = [])
     {
         if (! is_numeric($amount)) {
-            throw new InvalidArgumentException("Non-numeric value passed to increment method.");
+            throw new InvalidArgumentException('Non-numeric value passed to increment method.');
         }
 
         $wrapped = $this->grammar->wrap($column);
@@ -1868,7 +1868,7 @@ class Builder
     public function decrement($column, $amount = 1, array $extra = [])
     {
         if (! is_numeric($amount)) {
-            throw new InvalidArgumentException("Non-numeric value passed to decrement method.");
+            throw new InvalidArgumentException('Non-numeric value passed to decrement method.');
         }
 
         $wrapped = $this->grammar->wrap($column);
