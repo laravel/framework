@@ -6,6 +6,7 @@ use Countable;
 use ArrayAccess;
 use ArrayIterator;
 use CachingIterator;
+use LengthException;
 use JsonSerializable;
 use IteratorAggregate;
 use InvalidArgumentException;
@@ -1025,12 +1026,23 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * and vice-versa.
      *
      * @return static
+     *
+     * @throws \LengthException
      */
     public function transpose()
     {
+        $values = $this->values();
+
+        $expectedLength = count(reset($values));
+        $minimumLength = count(array_intersect_key(...$values));
+
+        if ($minimumLength !== $expectedLength) {
+            throw new LengthException("Element size differs ({$minimumLength} should be {$expectedLength})");
+        }
+
         $items = array_map(function (...$items) {
             return new static($items);
-        }, ...$this->values());
+        }, ...$values);
 
         return new static($items);
     }

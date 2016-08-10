@@ -880,19 +880,18 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $data->transpose());
     }
 
-    public function testTransposeFillWithNull()
+    /**
+     * @expectedException LengthException
+     * @expectedExceptionMessage Element size differs (2 should be 3)
+     */
+    public function testTransposeWillEnforceLengthEquality()
     {
         $data = new Collection([
-            ['Jack O\'neill', 'Daniel Jackson'],
+            ['Jack O\'neill', 'Daniel Jackson', 'Samantha Carter'],
             ['USAF Colonel', 'Archaeologist', 'USAF Captain'],
-            ['Richard Dean Anderson'],
+            ['Richard Dean Anderson', 'Michael Shanks'],
         ]);
-        $expected = new Collection([
-            new Collection(['Jack O\'neill', 'USAF Colonel', 'Richard Dean Anderson']),
-            new Collection(['Daniel Jackson', 'Archaeologist', null]),
-            new Collection([null, 'USAF Captain', null]),
-        ]);
-        $this->assertEquals($expected, $data->transpose());
+        $data->transpose();
     }
 
     public function testTransposeRemovesExistingKeys()
