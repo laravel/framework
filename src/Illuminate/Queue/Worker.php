@@ -103,7 +103,9 @@ class Worker
      */
     protected function runNextJobForDaemon($connectionName, $queue, WorkerOptions $options)
     {
-        if ($processId = pcntl_fork()) {
+        if (! $options->timeout) {
+            $this->runNextJob($connectionName, $queue, $options);
+        } elseif ($processId = pcntl_fork()) {
             $this->waitForChildProcess($processId, $options->timeout);
         } else {
             $this->runNextJob($connectionName, $queue, $options);
