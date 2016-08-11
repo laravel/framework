@@ -5,8 +5,9 @@ namespace DummyNamespace;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
-class DummyClass extends Mailable
+class DummyClass extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 

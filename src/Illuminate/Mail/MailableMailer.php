@@ -2,6 +2,8 @@
 
 namespace Illuminate\Mail;
 
+use Illuminate\Contracts\Queue\ShouldQueue;
+
 class MailableMailer
 {
     /**
@@ -90,41 +92,49 @@ class MailableMailer
      */
     public function send(Mailable $mailable)
     {
-        $mailable = $mailable->to($this->to)
-                 ->cc($this->cc)
-                 ->bcc($this->bcc);
+        if ($mailable instanceof ShouldQueue) {
+            return $this->queue($this->fill($mailable));
+        }
 
-        return $this->mailer->send($mailable);
+        return $this->mailer->send($this->fill($mailable));
     }
 
     /**
-     * Queue a mailable message for sending.
+     * Send a mailable message immediately.
      *
      * @param  Mailable  $mailable
      * @return mixed
      */
-    public function queue(Mailable $mailable)
+    public function sendNow(Mailable $mailable)
     {
-        $mailable = $mailable->to($this->to)
-                 ->cc($this->cc)
-                 ->bcc($this->bcc);
+        return $this->mailer->send($this->fill($mailable));
+    }
+
+    /**
+     * Populate the mailable with the addresses.
+     *
+     * @param  Mailable  $mailable
+     * @return Mailable
+     */
+    protected function fill(Mailable $mailable)
+    {
+        return $mailable->to($this->to)
+                        ->cc($this->cc)
+                        ->bcc($this->bcc);
+    }
+
+    /**
+     * Push the given mailable onto the queue.
+     *
+     * @param  Mailable  $mailable
+     * @return mixed
+     */
+    protected function queue(Mailable $mailable)
+    {
+        if (isset($mailable->delay)) {
+            return $this->mailer->later($mailable->delay, $mailable);
+        }
 
         return $this->mailer->queue($mailable);
-    }
-
-    /**
-     * Deliver the queued message after the given delay.
-     *
-     * @param  \DateTime|int  $delay
-     * @param  Mailable  $mailable
-     * @return mixed
-     */
-    public function later($delay, Mailable $mailable)
-    {
-        $mailable = $mailable->to($this->to)
-                 ->cc($this->cc)
-                 ->bcc($this->bcc);
-
-        return $this->mailer->later($delay, $mailable);
     }
 }
