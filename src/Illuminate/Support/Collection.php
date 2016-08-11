@@ -1224,9 +1224,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         return $this->toJson();
     }
 
-    public function newInstance( $items )
+    public function newInstance($items)
     {
-        return new static( $items );
+        return new static($items);
     }
 
     /**
