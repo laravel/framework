@@ -107,7 +107,7 @@ class WorkCommand extends Command
     {
         $timeout = $this->option('timeout', 60);
 
-        if ($timeout && ! function_exist('pcntl_fork')) {
+        if ($timeout && ! function_exists('pcntl_fork')) {
             throw new RuntimeException('The pcntl extension is required in order to specify job timeouts.');
         }
 
