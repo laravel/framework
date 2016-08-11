@@ -7,9 +7,6 @@ use Illuminate\Support\Str;
 use SuperClosure\Serializer;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Mail\Mailer;
-use Illuminate\Contracts\Queue\QueueableEntity;
-use Illuminate\Contracts\Database\ModelIdentifier;
-use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Queue\SerializesAndRestoresModelIdentifiers;
 
 class HandleQueuedMessage
