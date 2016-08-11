@@ -411,12 +411,17 @@ class Mailable implements MailableContract
     /**
      * Set the view data for the message.
      *
-     * @param  array  $data
+     * @param  string|array  $key
+     * @param  mixed   $value
      * @return $this
      */
-    public function with(array $data)
+    public function with($key, $value = null)
     {
-        $this->viewData = $data;
+        if (is_array($key)) {
+            $this->viewData = array_merge($this->viewData, $key);
+        } else {
+            $this->viewData[$key] = $value;
+        }
 
         return $this;
     }
