@@ -1,7 +1,6 @@
 <?php
 
 use Mockery as m;
-use SuperClosure\Serializer;
 
 class MailMailerTest extends PHPUnit_Framework_TestCase
 {
