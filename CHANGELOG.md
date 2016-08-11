@@ -1,5 +1,11 @@
 # Release Notes
 
+## v5.2.43 (2016-08-10)
+
+### Changed
+- Throw exception if `$amount` is not numeric in `increment()` and `decrement()` ([915cb84](https://github.com/laravel/framework/commit/915cb843981ad434b10709425d968bf2db37cb1a))
+
+
 ## v5.2.42 (2016-08-08)
 
 ### Added
