@@ -1034,10 +1034,10 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $values = $this->values();
 
         $expectedLength = count(reset($values));
-        $minimumLength = count(array_intersect_key(...$values));
+        $diffLength = count(array_intersect_key(...$values));
 
-        if ($minimumLength !== $expectedLength) {
-            throw new LengthException("Element size differs ({$minimumLength} should be {$expectedLength})");
+        if ($diffLength !== $expectedLength) {
+            throw new LengthException("Element size differs ({$diffLength} should be {$expectedLength})");
         }
 
         $items = array_map(function (...$items) {
