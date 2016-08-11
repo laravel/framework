@@ -213,10 +213,8 @@ class Mailer implements MailerContract, MailQueueContract
             return $view->queue($this->queue);
         }
 
-        $callback = $this->buildQueueCallable($callback);
-
-        return $this->queue->push(
-            'mailer@handleQueuedMessage', compact('view', 'data', 'callback'), $queue
+        return $this->queue->pushOn(
+            $queue, new Jobs\HandleQueuedMessage($view, $data, $callback)
         );
     }
 
@@ -266,11 +264,8 @@ class Mailer implements MailerContract, MailQueueContract
             return $view->later($delay, $this->queue);
         }
 
-        $callback = $this->buildQueueCallable($callback);
-
-        return $this->queue->later(
-            $delay, 'mailer@handleQueuedMessage',
-            compact('view', 'data', 'callback'), $queue
+        return $this->queue->laterOn(
+            $queue, $delay, new Jobs\HandleQueuedMessage($view, $data, $callback)
         );
     }
 
@@ -287,50 +282,6 @@ class Mailer implements MailerContract, MailQueueContract
     public function laterOn($queue, $delay, $view, array $data, $callback)
     {
         return $this->later($delay, $view, $data, $callback, $queue);
-    }
-
-    /**
-     * Build the callable for a queued e-mail job.
-     *
-     * @param  \Closure|string  $callback
-     * @return string
-     */
-    protected function buildQueueCallable($callback)
-    {
-        if (! $callback instanceof Closure) {
-            return $callback;
-        }
-
-        return (new Serializer)->serialize($callback);
-    }
-
-    /**
-     * Handle a queued e-mail message job.
-     *
-     * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  array  $data
-     * @return void
-     */
-    public function handleQueuedMessage($job, $data)
-    {
-        $this->send($data['view'], $data['data'], $this->getQueuedCallable($data));
-
-        $job->delete();
-    }
-
-    /**
-     * Get the true callable for a queued e-mail message.
-     *
-     * @param  array  $data
-     * @return \Closure|string
-     */
-    protected function getQueuedCallable(array $data)
-    {
-        if (Str::contains($data['callback'], 'SerializableClosure')) {
-            return (new Serializer)->unserialize($data['callback']);
-        }
-
-        return $data['callback'];
     }
 
     /**
