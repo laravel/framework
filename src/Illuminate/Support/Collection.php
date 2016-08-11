@@ -1226,7 +1226,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
     public function newInstance($items)
     {
-        return new static($items);
+        return self::make($items);
     }
 
     /**
