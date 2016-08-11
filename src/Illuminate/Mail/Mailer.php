@@ -213,10 +213,8 @@ class Mailer implements MailerContract, MailQueueContract
             return $view->queue($this->queue);
         }
 
-        $callback = $this->buildQueueCallable($callback);
-
         return $this->queue->push(
-            'mailer@handleQueuedMessage', compact('view', 'data', 'callback'), $queue
+            new SendQueuedMail($view, $data, $callback), '', $queue
         );
     }
 
@@ -266,11 +264,8 @@ class Mailer implements MailerContract, MailQueueContract
             return $view->later($delay, $this->queue);
         }
 
-        $callback = $this->buildQueueCallable($callback);
-
         return $this->queue->later(
-            $delay, 'mailer@handleQueuedMessage',
-            compact('view', 'data', 'callback'), $queue
+            $delay, new SendQueuedMail($view, $data, $callback), '', $queue
         );
     }
 
@@ -287,21 +282,6 @@ class Mailer implements MailerContract, MailQueueContract
     public function laterOn($queue, $delay, $view, array $data, $callback)
     {
         return $this->later($delay, $view, $data, $callback, $queue);
-    }
-
-    /**
-     * Build the callable for a queued e-mail job.
-     *
-     * @param  \Closure|string  $callback
-     * @return string
-     */
-    protected function buildQueueCallable($callback)
-    {
-        if (! $callback instanceof Closure) {
-            return $callback;
-        }
-
-        return (new Serializer)->serialize($callback);
     }
 
     /**
