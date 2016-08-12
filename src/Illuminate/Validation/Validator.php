@@ -2834,7 +2834,7 @@ class Validator implements ValidatorContract
 
     /**
      * Set a custom validator extension as a dependent rule.
-     * 
+     *
      * @param array $rules
      */
     public function addDependentRules(array $rules)

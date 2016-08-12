@@ -47,7 +47,7 @@ class Factory implements FactoryContract
 
     /**
      * All of the custom validator rules to be depedent.
-     * 
+     *
      * @var array
      */
     protected $dependentRules = [];
@@ -206,7 +206,7 @@ class Factory implements FactoryContract
 
     /**
      * Add a custom rule as dependent rule.
-     * 
+     *
      * @param string $rule
      */
     protected function addDependentRule($rule)
