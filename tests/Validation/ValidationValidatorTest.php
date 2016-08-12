@@ -249,7 +249,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $trans->addResource('array', ['validation.in' => ':attribute must be included in :values.'], 'en', 'messages');
         $customValues = [
             'type' => [
-                '5'   => 'Short',
+                '5' => 'Short',
                 '300' => 'Long',
             ],
         ];
@@ -264,7 +264,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $trans->addResource('array', ['validation.in' => ':attribute must be included in :values.'], 'en', 'messages');
         $customValues = [
             'type' => [
-                '5'   => 'Short',
+                '5' => 'Short',
                 '300' => 'Long',
             ],
         ];
@@ -2928,6 +2928,76 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, ['foo' => ['a', 'b', 'c']], ['foo.*' => 'string']);
         $v->setRules(['foo.*' => 'integer']);
         $this->assertFalse($v->passes());
+    }
+
+    public function testInvalidMethod()
+    {
+        $trans = $this->getRealTranslator();
+
+        $v = new Validator($trans,
+            [
+                ['name' => 'John'],
+                ['name' => null],
+                ['name' => ''],
+            ],
+            [
+                '*.name' => 'required',
+            ]);
+
+        $this->assertEquals($v->invalid(), [
+            1 => ['name' => null],
+            2 => ['name' => ''],
+        ]);
+
+        $v = new Validator($trans,
+            [
+                'name' => '',
+            ],
+            [
+                'name' => 'required',
+            ]);
+
+        $this->assertEquals($v->invalid(), [
+            'name' => '',
+        ]);
+    }
+
+    public function testValidMethod()
+    {
+        $trans = $this->getRealTranslator();
+
+        $v = new Validator($trans,
+            [
+                ['name' => 'John'],
+                ['name' => null],
+                ['name' => ''],
+                ['name' => 'Doe'],
+            ],
+            [
+                '*.name' => 'required',
+            ]);
+
+        $this->assertEquals($v->valid(), [
+            0 => ['name' => 'John'],
+            3 => ['name' => 'Doe'],
+        ]);
+
+        $v = new Validator($trans,
+            [
+                'name' => 'Carlos',
+                'age' => 'unknown',
+                'gender' => 'male',
+            ],
+            [
+                'name' => 'required',
+                'gender' => 'in:male,female',
+                'age' => 'required|int',
+            ]);
+
+        $this->assertEquals($v->valid(), [
+            'name' => 'Carlos',
+            'gender' => 'male',
+        ]);
     }
 
     protected function getTranslator()
