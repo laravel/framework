@@ -302,7 +302,8 @@ class Dispatcher implements DispatcherContract
         // If listeners exist for the given event, we will sort them by the priority
         // so that we can call them in the correct order. We will cache off these
         // sorted event listeners so we do not have to re-sort on every events.
-        $listeners = isset($this->listeners[$eventName]) ? $this->listeners[$eventName] : [];
+        $listeners = isset($this->listeners[$eventName])
+                            ? $this->listeners[$eventName] : [];
 
         if (class_exists($eventName, false)) {
             foreach (class_implements($eventName) as $interface) {
@@ -314,6 +315,7 @@ class Dispatcher implements DispatcherContract
 
         if ($listeners) {
             krsort($listeners);
+
             $this->sorted[$eventName] = call_user_func_array('array_merge', $listeners);
         } else {
             $this->sorted[$eventName] = [];
