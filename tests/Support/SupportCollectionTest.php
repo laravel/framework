@@ -907,7 +907,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         });
         $this->assertEquals(
             ['Blastoise' => 'Water', 'Charmander' => 'Fire', 'Dragonair' => 'Dragon'],
-            $data
+            $data->all()
         );
     }
 
