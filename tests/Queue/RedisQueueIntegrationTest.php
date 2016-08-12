@@ -9,6 +9,11 @@ use Illuminate\Queue\Jobs\RedisJob;
 class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
 {
     /**
+     * @var bool
+     */
+    private static $connectionFailedOnceWithDefaultsSkip = false;
+
+    /**
      * @var Database
      */
     private $redis;
@@ -21,15 +26,36 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
     public function setUp()
     {
         parent::setUp();
+
+        $host = getenv('REDIS_HOST') ?: '127.0.0.1';
+        $port = getenv('REDIS_PORT') ?: 6379;
+
+        if (static::$connectionFailedOnceWithDefaultsSkip) {
+            $this->markTestSkipped('Trying default host/port failed, please set environment variable REDIS_HOST & REDIS_PORT to enable '.__CLASS__);
+
+            return;
+        }
+
         $this->redis = new Database([
             'cluster' => false,
             'default' => [
-                'host' => '127.0.0.1',
-                'port' => 6379,
+                'host' => $host,
+                'port' => $port,
                 'database' => 5,
+                'timeout' => 0.5,
             ],
         ]);
-        $this->redis->connection()->flushdb();
+
+        try {
+            $this->redis->connection()->flushdb();
+        } catch (\Exception $e) {
+            if ($host === '127.0.0.1' && $port === 6379 && getenv('REDIS_HOST') === false) {
+                $this->markTestSkipped('Trying default host/port failed, please set environment variable REDIS_HOST & REDIS_PORT to enable '.__CLASS__);
+                static::$connectionFailedOnceWithDefaultsSkip = true;
+
+                return;
+            }
+        }
 
         $this->queue = new RedisQueue($this->redis);
         $this->queue->setContainer(m::mock(Container::class));
@@ -39,7 +65,9 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
     {
         parent::tearDown();
         m::close();
-        $this->redis->connection()->flushdb();
+        if ($this->redis) {
+            $this->redis->connection()->flushdb();
+        }
     }
 
     public function testExpiredJobsArePopped()
