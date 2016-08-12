@@ -6,8 +6,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
     <style type="text/css" rel="stylesheet" media="all">
-        /* Media Queries ------------------------------ */
-
+        /* Media Queries */
         @media only screen and (max-width: 500px) {
             .button {
                 width: 100% !important;
@@ -16,8 +15,9 @@
     </style>
 </head>
 
-@php($style = [
+<?php
 
+$style = [
     /* Layout ------------------------------ */
 
     'body' => 'margin: 0; padding: 0; width: 100%; background-color: #F2F4F6;',
@@ -42,23 +42,25 @@
 
     /* Type ------------------------------ */
 
+    'anchor' => 'color: #3869D4;',
     'header-1' => 'margin-top: 0; color: #2F3133; font-size: 19px; font-weight: bold; text-align: left;',
     'paragraph' => 'margin-top: 0; color: #74787E; font-size: 16px; line-height: 1.5em;',
     'paragraph-sub' => 'margin-top: 0; color: #74787E; font-size: 12px; line-height: 1.5em;',
     'paragraph-center' => 'text-align: center;',
-    'anchor' => 'color: #3869D4;',
 
     /* Buttons ------------------------------ */
 
     'button' => 'display: block; display: inline-block; width: 200px; min-height: 20px; padding: 10px;
-        background-color: #3869D4; border-radius: 3px; color: #ffffff; font-size: 15px; line-height: 25px;
-        text-align: center; text-decoration: none; -webkit-text-size-adjust: none;',
+                 background-color: #3869D4; border-radius: 3px; color: #ffffff; font-size: 15px; line-height: 25px;
+                 text-align: center; text-decoration: none; -webkit-text-size-adjust: none;',
+
     'button--green' => 'background-color: #22BC66;',
     'button--red' => 'background-color: #dc4d2f;',
     'button--blue' => 'background-color: #3869D4;',
-])
+];
+?>
 
-@php($fontFaimly = 'font-family: Arial, \'Helvetica Neue\', Helvetica, sans-serif;')
+<?php $fontFamily = 'font-family: Arial, \'Helvetica Neue\', Helvetica, sans-serif;'; ?>
 
 <body style="{{ $style['body'] }}">
     <table width="100%" cellpadding="0" cellspacing="0">
@@ -68,7 +70,7 @@
                     <!-- Logo -->
                     <tr>
                         <td style="{{ $style['email-masthead'] }}">
-                            <a style="{{ $fontFaimly }} {{ $style['email-masthead_name'] }}" href="{{ url('/') }}" target="_blank">
+                            <a style="{{ $fontFamily }} {{ $style['email-masthead_name'] }}" href="{{ url('/') }}" target="_blank">
                                 {{ config('app.name') }}
                             </a>
                         </td>
@@ -79,7 +81,7 @@
                         <td style="{{ $style['email-body'] }}" width="100%">
                             <table style="{{ $style['email-body_inner'] }}" align="center" width="570" cellpadding="0" cellspacing="0">
                                 <tr>
-                                    <td style="{{ $fontFaimly }} {{ $style['email-body_cell'] }}">
+                                    <td style="{{ $fontFamily }} {{ $style['email-body_cell'] }}">
                                         <!-- Greeting -->
                                         <h1 style="{{ $style['header-1'] }}">
                                             @if ($level == 'error')
@@ -115,7 +117,7 @@
                                                         ?>
 
                                                         <a href="{{ $actionUrl }}"
-                                                            style="{{ $fontFaimly }} {{ $style['button'] }} {{ $style[$actionColor] }}"
+                                                            style="{{ $fontFamily }} {{ $style['button'] }} {{ $style[$actionColor] }}"
                                                             class="button"
                                                             target="_blank">
                                                             {{ $actionText }}
@@ -141,7 +143,7 @@
                                         @if (isset($actionText))
                                             <table style="{{ $style['body_sub'] }}">
                                                 <tr>
-                                                    <td style="{{ $fontFaimly }}">
+                                                    <td style="{{ $fontFamily }}">
                                                         <p style="{{ $style['paragraph-sub'] }}">
                                                             If you’re having trouble clicking the "{{ $actionText }}" button,
                                                             copy and paste the URL below into your web browser:
@@ -167,7 +169,7 @@
                         <td>
                             <table style="{{ $style['email-footer'] }}" align="center" width="570" cellpadding="0" cellspacing="0">
                                 <tr>
-                                    <td style="{{ $fontFaimly }} {{ $style['email-footer_cell'] }}">
+                                    <td style="{{ $fontFamily }} {{ $style['email-footer_cell'] }}">
                                         <p style="{{ $style['paragraph-sub'] }}">
                                             &copy; {{ date('Y') }}
                                             <a style="{{ $style['anchor'] }}" href="{{ url('/') }}" target="_blank">{{ config('app.name') }}</a>.
