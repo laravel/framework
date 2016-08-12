@@ -54,4 +54,15 @@ class DatabaseNotification extends Model
     {
         $this->forceFill(['read' => true])->save();
     }
+
+    /**
+     * Create a new database notification collection instance.
+     *
+     * @param  array  $models
+     * @return \Illuminate\Notifications\DatabaseNotificationCollection
+     */
+    public function newCollection(array $models = [])
+    {
+        return new DatabaseNotificationCollection($models);
+    }
 }
