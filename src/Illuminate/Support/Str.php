@@ -240,11 +240,17 @@ class Str
      *
      * Should not be considered sufficient for cryptography, etc.
      *
+     * @deprecated since version 5.3. Use the "random" method directly.
+     *
      * @param  int  $length
      * @return string
      */
     public static function quickRandom($length = 16)
     {
+        if (PHP_MAJOR_VERSION > 5) {
+            return static::random($length);
+        }
+
         $pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
         return static::substr(str_shuffle(str_repeat($pool, $length)), 0, $length);
