@@ -1749,20 +1749,31 @@ class Builder
         $this->bindings['select'] = $previousSelectBindings;
 
         if (isset($results[0])) {
-            $result = array_change_key_case((array) $results[0]);
-
-            if (is_int($result['aggregate']) || is_float($result['aggregate'])) {
-                return $result['aggregate'];
-            }
-
-            if (strpos((string) $result['aggregate'], '.') !== false) {
-                return (int) $result['aggregate'];
-            }
-
-            return (float) $result['aggregate'];
+            return $this->formatAggregate($results);
         }
 
         return 0;
+    }
+
+    /**
+     * Format the return value of an aggregate function.
+     *
+     * @param  array  $results
+     * @return float|int
+     */
+    protected function formatAggregate($results)
+    {
+        $result = array_change_key_case((array) $results[0])['aggregate'];
+
+        if (is_int($result) || is_float($result)) {
+            return $result;
+        }
+
+        if (strpos((string) $result, '.') === false) {
+            return (int) $result;
+        }
+
+        return (float) $result;
     }
 
     /**
