@@ -1751,8 +1751,14 @@ class Builder
         if (isset($results[0])) {
             $result = array_change_key_case((array) $results[0]);
 
-            return $result['aggregate'];
+            if (strpos($result['aggregate'], '.') !== false) {
+                return (int) $result['aggregate'];
+            }
+
+            return (float) $result['aggregate'];
         }
+
+        return 0;
     }
 
     /**
