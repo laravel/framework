@@ -35,14 +35,14 @@ class MailChannel
      */
     public function send($notifiable, Notification $notification)
     {
-        if (! $notifiable->routeNotificationFor('mail')) {
+        if (! $notifiable->routeNotificationFor('mail', 'email')) {
             return;
         }
 
         $message = $notification->toMail($notifiable);
 
         $this->mailer->send($message->view, $message->toArray(), function ($m) use ($notifiable, $notification, $message) {
-            $m->to($notifiable->routeNotificationFor('mail'));
+            $m->to($notifiable->routeNotificationFor('mail', 'email'));
 
             $m->subject($message->subject ?: Str::title(
                 Str::snake(class_basename($notification), ' ')
