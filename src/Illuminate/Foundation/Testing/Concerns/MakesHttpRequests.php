@@ -321,14 +321,14 @@ trait MakesHttpRequests
 
         $actual = json_encode(Arr::sortRecursive(
             (array) $this->decodeResponseJson()
-        ));
+        ), JSON_PRETTY_PRINT);
 
         foreach (Arr::sortRecursive($data) as $key => $value) {
             $expected = $this->formatToExpectedJson($key, $value);
 
             $this->{$method}(
                 Str::contains($actual, $expected),
-                ($negate ? 'Found unexpected' : 'Unable to find')." JSON fragment [{$expected}] within [{$actual}]."
+                ($negate ? 'Found unexpected' : 'Unable to find').' JSON fragment'.PHP_EOL."[{$expected}]".PHP_EOL.'within'.PHP_EOL."[{$actual}]."
             );
         }
 
@@ -373,7 +373,7 @@ trait MakesHttpRequests
      */
     protected function formatToExpectedJson($key, $value)
     {
-        $expected = json_encode([$key => $value]);
+        $expected = json_encode([$key => $value], JSON_PRETTY_PRINT);
 
         if (Str::startsWith($expected, '{')) {
             $expected = substr($expected, 1);
