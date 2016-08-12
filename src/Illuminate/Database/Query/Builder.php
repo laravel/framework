@@ -1824,11 +1824,14 @@ class Builder
      * @param  int  $count
      * @param  callable  $callback
      * @param  string  $column
+     * @param  string  $alias
      * @return bool
      */
-    public function chunkById($count, callable $callback, $column = 'id')
+    public function chunkById($count, callable $callback, $column = 'id', $alias = null)
     {
         $lastId = null;
+
+        $alias = $alias ?: $column;
 
         $results = $this->forPageAfterId($count, 0, $column)->get();
 
@@ -1837,7 +1840,7 @@ class Builder
                 return false;
             }
 
-            $lastId = $results->last()->{$column};
+            $lastId = $results->last()->{$alias};
 
             $results = $this->forPageAfterId($count, $lastId, $column)->get();
         }
