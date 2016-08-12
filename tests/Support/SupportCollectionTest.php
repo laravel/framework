@@ -911,19 +911,6 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         );
     }
 
-    public function testToAssoc()
-    {
-        $collection = new Collection([
-            ['Blastoise' => 'Water'],
-            ['Charmander' => 'Fire'],
-            ['Dragonair' => 'Dragon'],
-        ]);
-        $this->assertEquals(
-            ['Blastoise' => 'Water', 'Charmander' => 'Fire', 'Dragonair' => 'Dragon'],
-            $collection->toAssoc()
-        );
-    }
-
     public function testTransform()
     {
         $data = new Collection(['first' => 'taylor', 'last' => 'otwell']);
