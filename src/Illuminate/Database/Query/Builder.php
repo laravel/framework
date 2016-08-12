@@ -1668,7 +1668,7 @@ class Builder
      */
     public function min($column)
     {
-        return $this->formatedAggregate(__FUNCTION__, [$column]);
+        return $this->numericAggregate(__FUNCTION__, [$column]);
     }
 
     /**
@@ -1679,7 +1679,7 @@ class Builder
      */
     public function max($column)
     {
-        return $this->formatedAggregate(__FUNCTION__, [$column]);
+        return $this->numericAggregate(__FUNCTION__, [$column]);
     }
 
     /**
@@ -1690,7 +1690,7 @@ class Builder
      */
     public function sum($column)
     {
-        return $this->formatedAggregate(__FUNCTION__, [$column]);
+        return $this->numericAggregate(__FUNCTION__, [$column]);
     }
 
     /**
@@ -1701,7 +1701,7 @@ class Builder
      */
     public function avg($column)
     {
-        return $this->formatedAggregate(__FUNCTION__, [$column]);
+        return $this->numericAggregate(__FUNCTION__, [$column]);
     }
 
     /**
@@ -1752,13 +1752,13 @@ class Builder
     }
 
     /**
-     * Execute and format an aggregate function on the database.
+     * Execute a numeric aggregate function on the database.
      *
      * @param  string  $function
      * @param  array   $columns
-     * @return mixed
+     * @return float|int
      */
-    public function formatedAggregate($function, $columns = ['*'])
+    public function numericAggregate($function, $columns = ['*'])
     {
         $result = $this->aggregate($function, $columns);
 
