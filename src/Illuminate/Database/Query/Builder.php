@@ -1668,7 +1668,7 @@ class Builder
      */
     public function min($column)
     {
-        return $this->aggregate(__FUNCTION__, [$column]);
+        return $this->formatedAggregate(__FUNCTION__, [$column]);
     }
 
     /**
@@ -1679,7 +1679,7 @@ class Builder
      */
     public function max($column)
     {
-        return $this->aggregate(__FUNCTION__, [$column]);
+        return $this->formatedAggregate(__FUNCTION__, [$column]);
     }
 
     /**
@@ -1690,9 +1690,7 @@ class Builder
      */
     public function sum($column)
     {
-        $result = $this->aggregate(__FUNCTION__, [$column]);
-
-        return $result ?: 0;
+        return $this->formatedAggregate(__FUNCTION__, [$column]);
     }
 
     /**
@@ -1703,7 +1701,7 @@ class Builder
      */
     public function avg($column)
     {
-        return $this->aggregate(__FUNCTION__, [$column]);
+        return $this->formatedAggregate(__FUNCTION__, [$column]);
     }
 
     /**
@@ -1722,7 +1720,7 @@ class Builder
      *
      * @param  string  $function
      * @param  array   $columns
-     * @return float|int
+     * @return mixed
      */
     public function aggregate($function, $columns = ['*'])
     {
@@ -1749,21 +1747,24 @@ class Builder
         $this->bindings['select'] = $previousSelectBindings;
 
         if (isset($results[0])) {
-            return $this->formatAggregate($results);
+            return array_change_key_case((array) $results[0])['aggregate'];
         }
-
-        return 0;
     }
 
     /**
-     * Format the return value of an aggregate function.
+     * Execute and format an aggregate function on the database.
      *
-     * @param  array  $results
-     * @return float|int
+     * @param  string  $function
+     * @param  array   $columns
+     * @return mixed
      */
-    protected function formatAggregate($results)
+    public function formatedAggregate($function, $columns = ['*'])
     {
-        $result = array_change_key_case((array) $results[0])['aggregate'];
+        $result = $this->aggregate($function, $columns);
+
+        if (! $result) {
+            return 0;
+        }
 
         if (is_int($result) || is_float($result)) {
             return $result;
