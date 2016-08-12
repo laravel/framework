@@ -27,8 +27,8 @@ class NotificationRoutesNotificationsTest extends PHPUnit_Framework_TestCase
     {
         $instance = new RoutesNotificationsTestInstance;
         $this->assertEquals('bar', $instance->routeNotificationFor('foo'));
-        $this->assertEquals('taylor@laravel.com', $instance->routeNotificationFor('mail'));
-        $this->assertEquals('5555555555', $instance->routeNotificationFor('nexmo'));
+        $this->assertEquals('taylor@laravel.com', $instance->routeNotificationFor('mail', 'email'));
+        $this->assertEquals('5555555555', $instance->routeNotificationFor('nexmo', 'phone_number'));
     }
 }
 

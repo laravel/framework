@@ -22,21 +22,21 @@ trait RoutesNotifications
      * Get the notification routing information for the given driver.
      *
      * @param  string  $driver
+     * @param  string|\Closure|null  $attribute
      * @return mixed
      */
-    public function routeNotificationFor($driver)
+    public function routeNotificationFor($driver, $attribute = null)
     {
         if (method_exists($this, $method = 'routeNotificationFor'.Str::studly($driver))) {
             return $this->{$method}();
         }
 
-        switch ($driver) {
-            case 'database':
-                return $this->notifications();
-            case 'mail':
-                return $this->email;
-            case 'nexmo':
-                return $this->phone_number;
+        if (is_string($attribute)) {
+            return $this->$attribute;
+        }
+
+        if ($attribute instanceof \Closure) {
+            return $attribute($this);
         }
     }
 }
