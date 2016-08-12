@@ -600,6 +600,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Run map over each items and
+     * returns associative array.
+     *
+     * @param callable $callback
+     *
+     * @return array
+     */
+    public function mapToAssoc(callable $callback)
+    {
+        return $this->map($callback)->toAssoc();
+    }
+
+    /**
      * Map a collection and flatten the result by a single level.
      *
      * @param  callable  $callback
@@ -1152,6 +1165,22 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         return array_map(function ($value) {
             return $value instanceof Arrayable ? $value->toArray() : $value;
         }, $this->items);
+    }
+
+    /**
+     * Returns an associative array.
+     *
+     * @return array
+     */
+    public function toAssoc()
+    {
+        return $this->reduce(function ($assoc, $item) {
+            $key = key($item);
+
+            $assoc[$key] = $item[$key];
+
+            return $assoc;
+        });
     }
 
     /**
