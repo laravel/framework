@@ -8,6 +8,6 @@
 .nitpick.json export-ignore
 .php_cs export-ignore
 .travis.yml export-ignore
-phpunit.xml export-ignore
+phpunit.xml.dist export-ignore
 CHANGELOG.md export-ignore
 CONTRIBUTING.md export-ignore
