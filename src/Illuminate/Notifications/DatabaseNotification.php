@@ -2,7 +2,6 @@
 
 namespace Illuminate\Notifications;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class DatabaseNotification extends Model
@@ -53,7 +52,7 @@ class DatabaseNotification extends Model
      */
     public function markAsRead()
     {
-        $this->forceFill(['read' => Carbon::now()])->save();
+        $this->forceFill(['read' => $this->freshTimestamp()])->save();
     }
 
     /**
