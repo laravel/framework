@@ -8,7 +8,7 @@ use Traversable;
 use ArrayIterator;
 use CachingIterator;
 use JsonSerializable;
-use IteratorAggregate;m
+use IteratorAggregate;
 use InvalidArgumentException;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Jsonable;
