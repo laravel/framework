@@ -13,25 +13,18 @@ class NullBroadcaster extends Broadcaster
     }
 
     /**
-     * Authenticate the incoming request for a given channel.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @return mixed
+     * {@inheritdoc}
      */
     public function auth($request)
     {
-
+        //
     }
 
     /**
-     * Return the valid authentication response.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @param  mixed $result
-     * @return mixed
+     * {@inheritdoc}
      */
     public function validAuthenticationResponse($request, $result)
     {
-
+        //
     }
 }
