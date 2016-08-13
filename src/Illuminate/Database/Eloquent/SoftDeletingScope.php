@@ -129,7 +129,7 @@ class SoftDeletingScope implements Scope
     {
         $builder->macro('withoutTrashed', function (Builder $builder) {
             $model = $builder->getModel();
-            
+
             $builder->withoutGlobalScope($this)->whereNull(
                 $model->getQualifiedDeletedAtColumn()
             );
