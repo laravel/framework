@@ -8,7 +8,7 @@ use Traversable;
 use ArrayIterator;
 use CachingIterator;
 use JsonSerializable;
-use IteratorAggregate;
+use IteratorAggregate;m
 use InvalidArgumentException;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Jsonable;
@@ -602,12 +602,12 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Run an associative map over each of the items.
      *
-     * The callback should return an associative array with a single key/value pair.
+     * Map a collection persisting any changes made to keys.
      *
      * @param  callable  $callback
      * @return static
      */
-    public function mapToAssoc(callable $callback)
+    public function mapWithKeys(callable $callback)
     {
         return $this->flatMap($callback);
     }
