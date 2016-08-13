@@ -257,10 +257,10 @@ class Factory implements FactoryContract
     /**
      * Get the rendered contents of a partial from a loop.
      *
-     * @param  string  $view
-     * @param  array   $data
-     * @param  string  $iterator
-     * @param  string  $empty
+     * @param  sting|array  $view
+     * @param  array        $data
+     * @param  string       $iterator
+     * @param  string       $empty
      * @return string
      */
     public function renderEach($view, $data, $iterator, $empty = 'raw|')
