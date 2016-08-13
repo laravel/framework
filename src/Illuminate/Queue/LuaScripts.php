@@ -18,7 +18,7 @@ if(job ~= false) then
     reserved = cjson.decode(job)
     reserved['attempts'] = reserved['attempts'] + 1
     reserved = cjson.encode(reserved)
-    redis.call('zadd', KEYS[2], KEYS[3], reserved)
+    redis.call('zadd', KEYS[2], ARGV[1], reserved)
 end
 return {job, reserved}
 LUA;
@@ -32,8 +32,8 @@ LUA;
     public static function release()
     {
         return <<<'LUA'
-redis.call('zrem', KEYS[2], KEYS[3])
-redis.call('zadd', KEYS[1], KEYS[4], KEYS[3])
+redis.call('zrem', KEYS[2], ARGV[1])
+redis.call('zadd', KEYS[1], ARGV[2], ARGV[1])
 return true
 LUA;
     }
@@ -46,7 +46,7 @@ LUA;
     public static function migrateExpiredJobs()
     {
         return <<<'LUA'
-local val = redis.call('zrangebyscore', KEYS[1], '-inf', KEYS[3])
+local val = redis.call('zrangebyscore', KEYS[1], '-inf', ARGV[1])
 if(next(val) ~= nil) then
     redis.call('zremrangebyrank', KEYS[1], 0, #val - 1)
     for i = 1, #val, 100 do
@@ -65,7 +65,7 @@ LUA;
     public static function size()
     {
         return <<<'LUA'
-return redis.call('llen', KEYS[1]) + redis.call('zcard', KEYS[1]..':delayed') + redis.call('zcard', KEYS[1]..':reserved')
+return redis.call('llen', KEYS[1]) + redis.call('zcard', KEYS[2]) + redis.call('zcard', KEYS[3])
 LUA;
     }
 }

@@ -66,7 +66,7 @@ class RedisQueue extends Queue implements QueueContract
     {
         $queue = $this->getQueue($queue);
 
-        return $this->getConnection()->eval(LuaScripts::size(), 1, $queue);
+        return $this->getConnection()->eval(LuaScripts::size(), 3, $queue, $queue.':delayed', $queue.':reserved');
     }
 
     /**
@@ -136,7 +136,7 @@ class RedisQueue extends Queue implements QueueContract
         }
 
         list($job, $reserved) = $this->getConnection()->eval(
-            LuaScripts::pop(), 3, $queue, $queue.':reserved', $this->getTime() + $this->expire
+            LuaScripts::pop(), 2, $queue, $queue.':reserved', $this->getTime() + $this->expire
         );
 
         if ($reserved) {
@@ -169,7 +169,7 @@ class RedisQueue extends Queue implements QueueContract
         $queue = $this->getQueue($queue);
 
         $this->getConnection()->eval(
-            LuaScripts::release(), 4, $queue.':delayed', $queue.':reserved',
+            LuaScripts::release(), 2, $queue.':delayed', $queue.':reserved',
             $job, $this->getTime() + $delay
         );
     }
@@ -184,7 +184,7 @@ class RedisQueue extends Queue implements QueueContract
     public function migrateExpiredJobs($from, $to)
     {
         $this->getConnection()->eval(
-            LuaScripts::migrateExpiredJobs(), 3, $from, $to, $this->getTime()
+            LuaScripts::migrateExpiredJobs(), 2, $from, $to, $this->getTime()
         );
     }
 
