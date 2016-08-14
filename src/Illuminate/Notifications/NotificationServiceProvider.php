@@ -9,13 +9,6 @@ use Illuminate\Contracts\Notifications\Dispatcher as DispatcherContract;
 class NotificationServiceProvider extends ServiceProvider
 {
     /**
-     * Indicates if loading of the provider is deferred.
-     *
-     * @var bool
-     */
-    protected $defer = true;
-
-    /**
      * Boot the application services.
      *
      * @return void
@@ -49,17 +42,5 @@ class NotificationServiceProvider extends ServiceProvider
         $this->app->alias(
             ChannelManager::class, FactoryContract::class
         );
-    }
-
-    /**
-     * Get the services provided by the provider.
-     *
-     * @return array
-     */
-    public function provides()
-    {
-        return [
-            ChannelManager::class, DispatcherContract::class, FactoryContract::class,
-        ];
     }
 }
