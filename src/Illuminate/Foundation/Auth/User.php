@@ -18,7 +18,7 @@ class User extends Model implements
     use Authenticatable, Authorizable, CanResetPassword;
 
     /**
-     * Set Bcrypt hashed password
+     * Set Bcrypt hashed password.
      *
      * @param  string $value
      */
