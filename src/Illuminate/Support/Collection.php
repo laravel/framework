@@ -600,15 +600,16 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Run map over each items and return an associative array.
+     * Run an associative map over each of the items.
      *
-     * @param callable $callback
+     * The callback should return an associative array with a single key/value pair.
      *
-     * @return array
+     * @param  callable  $callback
+     * @return static
      */
     public function mapToAssoc(callable $callback)
     {
-        return $this->flatMap($callback)->all();
+        return $this->flatMap($callback);
     }
 
     /**
