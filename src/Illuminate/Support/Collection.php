@@ -600,7 +600,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Map a collection persisting any changes made to keys.
+     * Run an associative map over each of the items.
      *
      * The callback should return an associative array with a single key/value pair.
      *
