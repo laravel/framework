@@ -294,8 +294,8 @@ class Writer implements LogContract, PsrLoggerInterface
         // that aggregate all of the log messages for a given "request" cycle.
         if (isset($this->dispatcher)) {
             $reslut = $this->dispatcher->fire('illuminate.log', compact('level', 'message', 'context'));
-            if(!empty($result['message'])){
-                $message  =  $result['message'];
+            if (! empty($result['message'])) {
+                $message = $result['message'];
             }
         }
     }
