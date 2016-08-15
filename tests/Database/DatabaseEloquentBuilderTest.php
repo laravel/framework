@@ -404,6 +404,15 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($builder, $result);
     }
 
+    public function testQueryOrWhereScope()
+    {
+        $model = new EloquentBuilderTestScopeStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+        $query = $model->newQuery()->orIsUp()->orIsDown();
+        $this->assertEquals('select * from "eloquent_builder_test_scope_stubs" where "status" = ? or "status" = ?', $query->toSql());
+        $this->assertEquals(['up', 'down'], $query->getBindings());
+    }
+
     public function testNestedWhere()
     {
         $nestedQuery = m::mock('Illuminate\Database\Eloquent\Builder');
@@ -690,6 +699,16 @@ class EloquentBuilderTestScopeStub extends Illuminate\Database\Eloquent\Model
     public function scopeApproved($query)
     {
         $query->where('foo', 'bar');
+    }
+
+    public function scopeOrIsDown($query)
+    {
+        return $query->orWhere('status', 'down');
+    }
+
+    public function scopeOrIsUp($query)
+    {
+        return $query->orWhere('status', 'up');
     }
 }
 
