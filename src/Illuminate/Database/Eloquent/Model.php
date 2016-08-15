@@ -1428,7 +1428,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         return $this->fill($attributes)->save($options);
     }
-    
+
     /**
      * Returns a bool based on if the values for "created at"
      * and "updated at" are different or not.
