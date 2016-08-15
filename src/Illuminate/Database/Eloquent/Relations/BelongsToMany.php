@@ -795,7 +795,7 @@ class BelongsToMany extends Relation
         return $instances;
     }
 
-    /*
+    /**
      * Toggles a model (or models) from the parent.
      *
      * Each existing model is detached, and non existing ones are attached.
