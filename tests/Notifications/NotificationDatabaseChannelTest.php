@@ -21,7 +21,7 @@ class NotificationDatabaseChannelTest extends PHPUnit_Framework_TestCase
             'id' => 1,
             'type' => get_class($notification),
             'data' => ['invoice_id' => 1],
-            'read' => null,
+            'read_at' => null,
         ]);
 
         $channel = new DatabaseChannel;

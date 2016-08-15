@@ -20,7 +20,7 @@ class DatabaseChannel
             'id' => $notification->id,
             'type' => get_class($notification),
             'data' => $this->getData($notifiable, $notification),
-            'read' => null,
+            'read_at' => null,
         ]);
     }
 
