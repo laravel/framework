@@ -39,7 +39,7 @@ class ControllerDispatcher
         $parameters = $this->resolveClassMethodDependencies(
             $route->parametersWithoutNulls(), $controller, $method
         );
-        
+
         if (method_exists($controller, 'boot')) {
             $controller->boot();
         }
