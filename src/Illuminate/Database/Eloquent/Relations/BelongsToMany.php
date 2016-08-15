@@ -795,7 +795,7 @@ class BelongsToMany extends Relation
         return $instances;
     }
 
-    /**
+    /*
      * Toggles a model (or models) from the parent.
      *
      * Each existing model is detached, and non existing ones are attached.
@@ -854,6 +854,17 @@ class BelongsToMany extends Relation
         }
 
         return $changes;
+    }
+
+    /*
+     * Sync the intermediate tables with a list of IDs without detaching.
+     *
+     * @param  \Illuminate\Database\Eloquent\Collection|array  $ids
+     * @return array
+     */
+    public function syncWithoutDetaching($ids)
+    {
+        return $this->sync($ids, false);
     }
 
     /**
