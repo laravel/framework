@@ -354,7 +354,7 @@ class ResourceRegistrar
      * @param  string  $base
      * @param  string  $controller
      * @param  array   $options
-     * @return void
+     * @return \Illuminate\Routing\Route
      */
     protected function addResourceUpdate($name, $base, $controller, $options)
     {
