@@ -35,8 +35,8 @@ class NotificationSending
      */
     public function __construct($notifiable, $notification, $channel)
     {
+        $this->channel = $channel;
         $this->notifiable = $notifiable;
         $this->notification = $notification;
-        $this->channel = $channel;
     }
 }
