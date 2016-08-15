@@ -59,13 +59,32 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
             }
 
             foreach ($channels as $channel) {
-                $this->driver($channel)->send($notifiable, $notification);
-            }
+                if (! $this->shouldSendNotification($notifiable, $notification, $channel)) {
+                    continue;
+                }
 
-            $this->app->make('events')->fire(
-                new Events\NotificationSent($notifiable, $notification)
-            );
+                $this->driver($channel)->send($notifiable, $notification);
+
+                $this->app->make('events')->fire(
+                    new Events\NotificationSent($notifiable, $notification, $channel)
+                );
+            }
         }
+    }
+
+    /**
+     * Determines if the notification can be sent.
+     *
+     * @param  mixed  $notifiable
+     * @param  mixed  $notification
+     * @param  string  $channel
+     * @return bool
+     */
+    protected function shouldSendNotification($notifiable, $notification, $channel)
+    {
+        return $this->app->make('events')->until(
+            new Events\NotificationSending($notifiable, $notification, $channel)
+        ) !== false;
     }
 
     /**
