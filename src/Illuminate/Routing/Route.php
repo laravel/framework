@@ -199,11 +199,7 @@ class Route
     {
         list($class) = explode('@', $this->action['uses']);
 
-        if (! $this->controller) {
-            $this->controller = $this->container->make($class);
-        }
-
-        return $this->controller;
+        return $this->controller = $this->container->make($class);
     }
 
     /**
