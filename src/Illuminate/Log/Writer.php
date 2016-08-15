@@ -197,7 +197,7 @@ class Writer implements LogContract, PsrLoggerInterface
      */
     protected function writeLog($level, $message, $context)
     {
-        $message = $this->formatMessage($message)
+        $message = $this->formatMessage($message);
         $this->fireLogEvent($level, $message, $context);
 
         $this->monolog->{$level}($message, $context);
