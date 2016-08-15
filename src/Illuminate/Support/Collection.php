@@ -600,9 +600,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Run an associative map over each of the items.
-     *
      * Map a collection persisting any changes made to keys.
+     *
+     * The callback should return an associative array with a single key/value pair.
      *
      * @param  callable  $callback
      * @return static
