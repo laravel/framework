@@ -29,6 +29,13 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
     protected $lastPage;
 
     /**
+     * The default presenter resolver.
+     *
+     * @var \Closure
+     */
+    protected static $presenterResolver;
+
+    /**
      * Create a new paginator instance.
      *
      * @param  mixed  $items
@@ -127,13 +134,28 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
      */
     public function render(Presenter $presenter = null)
     {
-        if (is_null($presenter) && static::$presenterResolver) {
-            $presenter = call_user_func(static::$presenterResolver, $this);
-        }
-
-        $presenter = $presenter ?: new BootstrapThreePresenter($this);
+        $presenter = $presenter ?: $this->getDefaultPresenter();
 
         return $presenter->render();
+    }
+
+    /**
+     * Get default pagination presenter.
+     *
+     * @return \Illuminate\Contracts\Pagination\Presenter|SimpleBootstrapThreePresenter
+     */
+    protected function getDefaultPresenter()
+    {
+        $presenter = null;
+
+        if (static::$presenterResolver) {
+            $presenter = call_user_func(static::$presenterResolver, $this);
+        }
+        if (is_null($presenter) && AbstractPaginator::$presenterResolver) {
+            $presenter = call_user_func(AbstractPaginator::$presenterResolver, $this);
+        }
+
+        return $presenter ?: new SimpleBootstrapThreePresenter($this);
     }
 
     /**

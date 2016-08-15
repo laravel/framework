@@ -129,6 +129,22 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
     {
         $p = new LengthAwarePaginator([], 1, 1, 1);
         $presenter = m::mock('StdClass');
+        LengthAwarePaginator::presenter(function () use ($presenter) {
+            return $presenter;
+        });
+        $presenter->shouldReceive('render')->andReturn('presenter');
+
+        $this->assertEquals('presenter', $p->render());
+
+        LengthAwarePaginator::presenter(function () {
+            //
+        });
+    }
+
+    public function testCustomDefaultPresenter()
+    {
+        $p = new LengthAwarePaginator([], 1, 1, 1);
+        $presenter = m::mock('StdClass');
         AbstractPaginator::presenter(function () use ($presenter) {
             return $presenter;
         });
@@ -137,6 +153,35 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('presenter', $p->render());
 
         AbstractPaginator::presenter(function () {
+            //
+        });
+    }
+
+    public function testDifferentCustomPresentersForDifferentPaginatorTypes()
+    {
+        $simplePresenter = m::mock('StdClass');
+        $simplePresenter->shouldReceive('render')->andReturn('simple');
+
+        Paginator::presenter(function () use ($simplePresenter) {
+            return $simplePresenter;
+        });
+
+        $presenter = m::mock('StdClass');
+        $presenter->shouldReceive('render')->andReturn('presenter');
+        LengthAwarePaginator::presenter(function () use ($presenter) {
+            return $presenter;
+        });
+
+        $p = new LengthAwarePaginator([], 1, 1, 1);
+        $s = new Paginator([], 1, 1);
+
+        $this->assertEquals('presenter', $p->render());
+        $this->assertEquals('simple', $s->render());
+
+        Paginator::presenter(function () {
+            //
+        });
+        LengthAwarePaginator::presenter(function () {
             //
         });
     }
