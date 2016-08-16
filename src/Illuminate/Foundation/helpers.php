@@ -463,9 +463,9 @@ if (! function_exists('event')) {
      * @param  bool  $halt
      * @return array|null
      */
-    function event($event, $payload = [], $halt = false)
+    function event(...$args)
     {
-        return app('events')->fire($event, $payload, $halt);
+        return app('events')->fire(...$args);
     }
 }
 
@@ -618,6 +618,20 @@ if (! function_exists('request')) {
         }
 
         return app('request')->input($key, $default);
+    }
+}
+
+if (! function_exists('resolve')) {
+    /**
+     * Resolve a service from the container.
+     *
+     * @param  string  $name
+     * @param  array  $parameters
+     * @return mixed
+     */
+    function resolve($name, $parameters = [])
+    {
+        return app($name, $parameters);
     }
 }
 

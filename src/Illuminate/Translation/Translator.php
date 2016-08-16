@@ -5,12 +5,15 @@ namespace Illuminate\Translation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\NamespacedItemResolver;
 use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class Translator extends NamespacedItemResolver implements TranslatorInterface
 {
+    use Macroable;
+
     /**
      * The loader implementation.
      *
