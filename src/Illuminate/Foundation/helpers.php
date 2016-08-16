@@ -463,9 +463,9 @@ if (! function_exists('event')) {
      * @param  bool  $halt
      * @return array|null
      */
-    function event($event, $payload = [], $halt = false)
+    function event(...$args)
     {
-        return app('events')->fire($event, $payload, $halt);
+        return app('events')->fire(...$args);
     }
 }
 
