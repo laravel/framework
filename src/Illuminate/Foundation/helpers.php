@@ -621,6 +621,20 @@ if (! function_exists('request')) {
     }
 }
 
+if (! function_exists('resolve')) {
+    /**
+     * Resolve a service from the container.
+     *
+     * @param  string  $name
+     * @param  array  $parameters
+     * @return mixed
+     */
+    function resolve($name, $parameters = [])
+    {
+        return app($name, $parameters);
+    }
+}
+
 if (! function_exists('resource_path')) {
     /**
      * Get the path to the resources folder.
