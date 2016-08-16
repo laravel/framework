@@ -19,7 +19,7 @@ trait HasDatabaseNotifications
     public function unreadNotifications()
     {
         return $this->morphMany(DatabaseNotification::class, 'notifiable')
-                            ->where('read', false)
+                            ->whereNull('read_at')
                             ->orderBy('created_at', 'desc');
     }
 }

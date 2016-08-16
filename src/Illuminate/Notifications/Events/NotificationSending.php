@@ -2,7 +2,7 @@
 
 namespace Illuminate\Notifications\Events;
 
-class NotificationSent
+class NotificationSending
 {
     /**
      * The notifiable entity who received the notification.

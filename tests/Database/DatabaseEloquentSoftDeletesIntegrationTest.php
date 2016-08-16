@@ -192,6 +192,21 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
         $this->assertEquals(1, $users->first()->id);
     }
 
+    public function testOnlyWithoutTrashedOnlyReturnsTrashedRecords()
+    {
+        $this->createUsers();
+
+        $users = SoftDeletesTestUser::withoutTrashed()->get();
+
+        $this->assertCount(1, $users);
+        $this->assertEquals(2, $users->first()->id);
+
+        $users = SoftDeletesTestUser::withTrashed()->withoutTrashed()->get();
+
+        $this->assertCount(1, $users);
+        $this->assertEquals(2, $users->first()->id);
+    }
+
     public function testFirstOrNew()
     {
         $this->createUsers();
