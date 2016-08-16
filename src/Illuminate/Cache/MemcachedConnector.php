@@ -24,7 +24,7 @@ class MemcachedConnector
         // servers we'll verify the connection is successful and return it back.
         foreach ($servers as $server) {
             $memcached->addServer(
-                $server['host'], $server['port'], $server['weight']
+                $server['host'], $server['port'], true, $server['weight']
             );
         }
 
