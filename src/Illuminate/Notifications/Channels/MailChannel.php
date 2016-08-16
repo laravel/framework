@@ -53,6 +53,14 @@ class MailChannel
             $m->subject($message->subject ?: Str::title(
                 Str::snake(class_basename($notification), ' ')
             ));
+
+            foreach ($message->attachments as $attachment) {
+                $m->attach($attachment['file'], $attachment['options']);
+            }
+
+            foreach ($message->rawAttachments as $attachment) {
+                $m->attachData($attachment['data'], $attachment['name'], $attachment['options']);
+            }
         });
     }
 }
