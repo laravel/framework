@@ -173,6 +173,10 @@ class RouteListCommand extends Command
      */
     protected function getControllerMiddlewareFromInstance($controller, $method)
     {
+        if (! method_exists($controller, 'getMiddleware')) {
+            return [];
+        }
+
         $middleware = $this->router->getMiddleware();
 
         $results = [];
