@@ -12,6 +12,13 @@ class MailMessage extends SimpleMessage
     public $view = 'notifications::email';
 
     /**
+     * The view data for the message.
+     *
+     * @var array
+     */
+    public $viewData = [];
+
+    /**
      * The attachments for the message.
      *
      * @var array
@@ -29,11 +36,13 @@ class MailMessage extends SimpleMessage
      * Set the view for the mail message.
      *
      * @param  string  $view
+     * @param  array  $data
      * @return $this
      */
-    public function view($view)
+    public function view($view, array $data = [])
     {
         $this->view = $view;
+        $this->viewData = $data;
 
         return $this;
     }
@@ -65,5 +74,15 @@ class MailMessage extends SimpleMessage
         $this->rawAttachments[] = compact('data', 'name', 'options');
 
         return $this;
+    }
+
+    /**
+     * Get the data array for the mail message.
+     *
+     * @return array
+     */
+    public function data()
+    {
+        return array_merge($this->toArray(), $this->viewData);
     }
 }
