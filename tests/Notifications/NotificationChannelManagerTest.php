@@ -24,7 +24,7 @@ class NotificationChannelManagerTest extends PHPUnit_Framework_TestCase
         $driver->shouldReceive('send')->once();
         $events->shouldReceive('fire')->with(Mockery::type(Illuminate\Notifications\Events\NotificationSent::class));
 
-        $manager->send([new NotificationChannelManagerTestNotifiable], new NotificationChannelManagerTestNotification);
+        $manager->send(new NotificationChannelManagerTestNotifiable, new NotificationChannelManagerTestNotification);
     }
 
     public function testNotificationNotSentOnHalt()
