@@ -90,8 +90,6 @@ abstract class Facade
 
         $mock->shouldAllowMockingProtectedMethods();
 
-        $mock->shouldIgnoreMissing();
-
         if (isset(static::$app)) {
             static::$app->instance($name, $mock);
         }
