@@ -34,7 +34,7 @@ class DatabaseNotification extends Model
      */
     protected $casts = [
         'data' => 'array',
-        'read' => 'boolean',
+        'read_at' => 'datetime',
     ];
 
     /**
@@ -52,7 +52,7 @@ class DatabaseNotification extends Model
      */
     public function markAsRead()
     {
-        $this->forceFill(['read' => true])->save();
+        $this->forceFill(['read_at' => $this->freshTimestamp()])->save();
     }
 
     /**
