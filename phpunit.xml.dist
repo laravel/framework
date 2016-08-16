@@ -26,4 +26,10 @@
             </exclude>
         </whitelist>
     </filter>
+    <php>
+      <!--
+      <env name="REDIS_HOST" value="127.0.0.1" />
+      <env name="REDIS_PORT" value="6379" />
+      -->
+    </php>
 </phpunit>

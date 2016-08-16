@@ -538,7 +538,9 @@ class Validator implements ValidatorContract
             $this->passes();
         }
 
-        return array_diff_key($this->data, $this->messages()->toArray());
+        return array_diff_key(
+            $this->data, $this->attributesThatHaveMessages()
+        );
     }
 
     /**
@@ -552,7 +554,25 @@ class Validator implements ValidatorContract
             $this->passes();
         }
 
-        return array_intersect_key($this->data, $this->messages()->toArray());
+        return array_intersect_key(
+            $this->data, $this->attributesThatHaveMessages()
+        );
+    }
+
+    /**
+     * Generate an array of all attributes that have messages.
+     *
+     * @return array
+     */
+    protected function attributesThatHaveMessages()
+    {
+        $results = [];
+
+        foreach ($this->messages()->toArray() as $key => $message) {
+            $results[] = explode('.', $key)[0];
+        }
+
+        return array_flip(array_unique($results));
     }
 
     /**
@@ -1149,7 +1169,7 @@ class Validator implements ValidatorContract
     {
         $this->requireParameterCount(1, $parameters, 'digits');
 
-        return $this->validateNumeric($attribute, $value)
+        return ! preg_match('/[^0-9]/', $value)
             && strlen((string) $value) == $parameters[0];
     }
 
@@ -1167,7 +1187,7 @@ class Validator implements ValidatorContract
 
         $length = strlen((string) $value);
 
-        return $this->validateNumeric($attribute, $value)
+        return ! preg_match('/[^0-9]/', $value)
           && $length >= $parameters[0] && $length <= $parameters[1];
     }
 
@@ -1274,6 +1294,12 @@ class Validator implements ValidatorContract
     protected function validateIn($attribute, $value, $parameters)
     {
         if (is_array($value) && $this->hasRule($attribute, 'Array')) {
+            foreach ($value as $element) {
+                if (is_array($element)) {
+                    return false;
+                }
+            }
+
             return count(array_diff($value, $parameters)) == 0;
         }
 

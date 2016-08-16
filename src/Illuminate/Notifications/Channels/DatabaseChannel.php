@@ -2,25 +2,49 @@
 
 namespace Illuminate\Notifications\Channels;
 
+use RuntimeException;
+use Illuminate\Notifications\Notification;
+
 class DatabaseChannel
 {
     /**
      * Send the given notification.
      *
-     * @param  \Illuminate\Notifications\Channels\Notification  $notification
+     * @param  mixed  $notifiable
+     * @param  \Illuminate\Notifications\Notification  $notification
      * @return void
      */
-    public function send(Notification $notification)
+    public function send($notifiable, Notification $notification)
     {
-        foreach ($notification->notifiables as $notifiable) {
-            $notifiable->routeNotificationFor('database')->create([
-                'level' => $notification->level,
-                'intro' => $notification->introLines,
-                'outro' => $notification->outroLines,
-                'action_text' => $notification->actionText,
-                'action_url' => $notification->actionUrl,
-                'read' => false,
-            ]);
+        $notifiable->routeNotificationFor('database')->create([
+            'id' => $notification->id,
+            'type' => get_class($notification),
+            'data' => $this->getData($notifiable, $notification),
+            'read_at' => null,
+        ]);
+    }
+
+    /**
+     * Get the data for the notification.
+     *
+     * @param  mixed  $notifiable
+     * @param  \Illuminate\Notifications\Notification  $notification
+     * @return array
+     *
+     * @throws \RuntimeException
+     */
+    protected function getData($notifiable, Notification $notification)
+    {
+        if (method_exists($notification, 'toDatabase')) {
+            $data = $notification->toDatabase($notifiable);
+
+            return is_array($data) ? $data : $data->data;
+        } elseif (method_exists($notification, 'toArray')) {
+            return $notification->toArray($notifiable);
         }
+
+        throw new RuntimeException(
+            'Notification is missing toDatabase / toArray method.'
+        );
     }
 }

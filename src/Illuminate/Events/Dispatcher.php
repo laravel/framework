@@ -7,8 +7,8 @@ use ReflectionClass;
 use Illuminate\Support\Str;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 
 class Dispatcher implements DispatcherContract
@@ -252,15 +252,7 @@ class Dispatcher implements DispatcherContract
      */
     protected function broadcastEvent($event)
     {
-        if ($this->queueResolver) {
-            $connection = $event instanceof ShouldBroadcastNow ? 'sync' : null;
-
-            $queue = method_exists($event, 'onQueue') ? $event->onQueue() : null;
-
-            $this->resolveQueue()->connection($connection)->pushOn($queue, 'Illuminate\Broadcasting\BroadcastEvent', [
-                'event' => serialize(clone $event),
-            ]);
-        }
+        $this->container->make(BroadcastFactory::class)->queue($event);
     }
 
     /**
@@ -303,21 +295,30 @@ class Dispatcher implements DispatcherContract
      * Sort the listeners for a given event by priority.
      *
      * @param  string  $eventName
-     * @return array
+     * @return void
      */
     protected function sortListeners($eventName)
     {
-        $this->sorted[$eventName] = [];
-
         // If listeners exist for the given event, we will sort them by the priority
         // so that we can call them in the correct order. We will cache off these
         // sorted event listeners so we do not have to re-sort on every events.
-        if (isset($this->listeners[$eventName])) {
-            krsort($this->listeners[$eventName]);
+        $listeners = isset($this->listeners[$eventName])
+                            ? $this->listeners[$eventName] : [];
 
-            $this->sorted[$eventName] = call_user_func_array(
-                'array_merge', $this->listeners[$eventName]
-            );
+        if (class_exists($eventName, false)) {
+            foreach (class_implements($eventName) as $interface) {
+                if (isset($this->listeners[$interface])) {
+                    $listeners = array_merge_recursive($listeners, $this->listeners[$interface]);
+                }
+            }
+        }
+
+        if ($listeners) {
+            krsort($listeners);
+
+            $this->sorted[$eventName] = call_user_func_array('array_merge', $listeners);
+        } else {
+            $this->sorted[$eventName] = [];
         }
     }
 

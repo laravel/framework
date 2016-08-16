@@ -3,6 +3,7 @@
 namespace Illuminate\Auth\Notifications;
 
 use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\Messages\MailMessage;
 
 class ResetPassword extends Notification
 {
@@ -36,15 +37,18 @@ class ResetPassword extends Notification
     }
 
     /**
-     * Get the notification message.
+     * Build the mail representation of the notification.
      *
-     * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\MessageBuilder
+     * @return \Illuminate\Notifications\Messages\MailMessage
      */
-    public function message($notifiable)
+    public function toMail()
     {
-        return $this->line('You are receiving this email because we received a password reset request for your account. Click the button below to reset your password:')
-                    ->action('Reset Password', url('password/reset', $this->token).'?email='.urlencode($notifiable->email))
-                    ->line('If you did not request a password reset, no further action is required.');
+        return (new MailMessage)
+            ->line([
+                'You are receiving this email because we received a password reset request for your account.',
+                'Click the button below to reset your password:',
+            ])
+            ->action('Reset Password', url('password/reset', $this->token))
+            ->line('If you did not request a password reset, no further action is required.');
     }
 }

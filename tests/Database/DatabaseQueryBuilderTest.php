@@ -193,6 +193,14 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([0 => 2014], $builder->getBindings());
     }
 
+    public function testWhereTimeMySql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereTime('created_at', '>=', '22:00');
+        $this->assertEquals('select * from `users` where time(`created_at`) >= ?', $builder->toSql());
+        $this->assertEquals([0 => '22:00'], $builder->getBindings());
+    }
+
     public function testWhereDatePostgres()
     {
         $builder = $this->getPostgresBuilder();
@@ -1237,7 +1245,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $builder->shouldReceive('exists')->once()->andReturn(false);
         $builder->shouldReceive('insert')->once()->with(['email' => 'foo', 'name' => 'bar'])->andReturn(true);
 
-        $this->assertEquals(true, $builder->updateOrInsert(['email' => 'foo'], ['name' => 'bar']));
+        $this->assertTrue($builder->updateOrInsert(['email' => 'foo'], ['name' => 'bar']));
 
         $builder = m::mock('Illuminate\Database\Query\Builder[where,exists,update]', [
             m::mock('Illuminate\Database\ConnectionInterface'),
@@ -1250,7 +1258,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $builder->shouldReceive('take')->andReturnSelf();
         $builder->shouldReceive('update')->once()->with(['name' => 'bar'])->andReturn(1);
 
-        $this->assertEquals(true, $builder->updateOrInsert(['email' => 'foo'], ['name' => 'bar']));
+        $this->assertTrue($builder->updateOrInsert(['email' => 'foo'], ['name' => 'bar']));
     }
 
     public function testDeleteMethod()
@@ -1702,6 +1710,19 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
 
         $builder->chunkById(2, function ($results) {
         }, 'someIdField');
+    }
+
+    public function testChunkPaginatesUsingIdWithAlias()
+    {
+        $builder = $this->getMockQueryBuilder();
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'table.id')->andReturn($builder);
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 10, 'table.id')->andReturn($builder);
+        $builder->shouldReceive('get')->times(2)->andReturn(
+            collect([(object) ['table_id' => 1], (object) ['table_id' => 10]]),
+            collect([])
+        );
+        $builder->chunkById(2, function ($results) {
+        }, 'table.id', 'table_id');
     }
 
     public function testPaginate()

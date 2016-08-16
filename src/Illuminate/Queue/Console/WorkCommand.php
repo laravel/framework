@@ -3,6 +3,7 @@
 namespace Illuminate\Queue\Console;
 
 use Carbon\Carbon;
+use RuntimeException;
 use Illuminate\Queue\Worker;
 use Illuminate\Console\Command;
 use Illuminate\Queue\WorkerOptions;
@@ -104,9 +105,15 @@ class WorkCommand extends Command
      */
     protected function gatherWorkerOptions()
     {
+        $timeout = $this->option('timeout', 60);
+
+        if ($timeout && ! function_exists('pcntl_fork')) {
+            throw new RuntimeException('The pcntl extension is required in order to specify job timeouts.');
+        }
+
         return new WorkerOptions(
             $this->option('delay'), $this->option('memory'),
-            $this->option('timeout', 60), $this->option('sleep'),
+            $timeout, $this->option('sleep'),
             $this->option('tries')
         );
     }
@@ -190,6 +197,8 @@ class WorkCommand extends Command
     {
         return [
             ['queue', null, InputOption::VALUE_OPTIONAL, 'The queue to listen on'],
+
+            ['daemon', null, InputOption::VALUE_NONE, 'Run the worker in daemon mode (Deprecated)'],
 
             ['once', null, InputOption::VALUE_NONE, 'Only process the next job on the queue'],
 

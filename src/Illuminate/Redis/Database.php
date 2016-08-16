@@ -26,7 +26,7 @@ class Database implements DatabaseContract
     {
         $cluster = Arr::pull($servers, 'cluster');
 
-        $options = (array) Arr::pull($servers, 'options');
+        $options = array_merge(['timeout' => 10.0], (array) Arr::pull($servers, 'options'));
 
         if ($cluster) {
             $this->clients = $this->createAggregateClient($servers, $options);

@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use Countable;
 use ArrayAccess;
+use Traversable;
 use ArrayIterator;
 use CachingIterator;
 use JsonSerializable;
@@ -172,6 +173,28 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Determine if an item exists in the collection using strict comparison.
+     *
+     * @param  mixed  $key
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function containsStrict($key, $value = null)
+    {
+        if (func_num_args() == 2) {
+            return $this->contains(function ($item) use ($key, $value) {
+                return data_get($item, $key) === $value;
+            });
+        }
+
+        if ($this->useAsCallable($key)) {
+            return ! is_null($this->first($key));
+        }
+
+        return in_array($key, $this->items, true);
+    }
+
+    /**
      * Get the items in the collection that are not present in the given items.
      *
      * @param  mixed  $items
@@ -256,15 +279,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function filter(callable $callback = null)
     {
         if ($callback) {
-            $return = [];
-
-            foreach ($this->items as $key => $value) {
-                if ($callback($value, $key)) {
-                    $return[$key] = $value;
-                }
-            }
-
-            return new static($return);
+            return new static(Arr::where($this->items, $callback));
         }
 
         return new static(array_filter($this->items));
@@ -316,6 +331,18 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
                 case '!==': return $retrieved !== $value;
             }
         };
+    }
+
+    /**
+     * Filter items by the given key value pair using strict comparison.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return static
+     */
+    public function whereStrict($key, $value)
+    {
+        return $this->where($key, '===', $value);
     }
 
     /**
@@ -570,6 +597,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $items = array_map($callback, $this->items, $keys);
 
         return new static(array_combine($keys, $items));
+    }
+
+    /**
+     * Run an associative map over each of the items.
+     *
+     * The callback should return an associative array with a single key/value pair.
+     *
+     * @param  callable  $callback
+     * @return static
+     */
+    public function mapToAssoc(callable $callback)
+    {
+        return $this->flatMap($callback);
     }
 
     /**
@@ -1032,9 +1072,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Return only unique items from the collection array.
      *
      * @param  string|callable|null  $key
+     * @param  bool  $strict
+     *
      * @return static
      */
-    public function unique($key = null)
+    public function unique($key = null, $strict = false)
     {
         if (is_null($key)) {
             return new static(array_unique($this->items, SORT_REGULAR));
@@ -1044,13 +1086,24 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         $exists = [];
 
-        return $this->reject(function ($item) use ($key, &$exists) {
-            if (in_array($id = $key($item), $exists)) {
+        return $this->reject(function ($item) use ($key, $strict, &$exists) {
+            if (in_array($id = $key($item), $exists, $strict)) {
                 return true;
             }
 
             $exists[] = $id;
         });
+    }
+
+    /**
+     * Return only unique items from the collection array using strict comparison.
+     *
+     * @param  string|callable|null  $key
+     * @return static
+     */
+    public function uniqueStrict($key = null)
+    {
+        return $this->unique($key, true);
     }
 
     /**
@@ -1177,6 +1230,16 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Get a base Support collection instance from this collection.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function toBase()
+    {
+        return is_subclass_of($this, self::class) ? new self($this) : $this;
+    }
+
+    /**
      * Determine if an item exists at an offset.
      *
      * @param  mixed  $key
@@ -1253,6 +1316,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return json_decode($items->toJson(), true);
         } elseif ($items instanceof JsonSerializable) {
             return $items->jsonSerialize();
+        } elseif ($items instanceof Traversable) {
+            return iterator_to_array($items);
         }
 
         return (array) $items;

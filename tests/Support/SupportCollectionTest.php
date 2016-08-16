@@ -335,6 +335,16 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         );
     }
 
+    public function testWhereStrict()
+    {
+        $c = new Collection([['v' => 3], ['v' => '3']]);
+
+        $this->assertEquals(
+            [['v' => 3]],
+            $c->whereStrict('v', 3)->values()->all()
+        );
+    }
+
     public function testWhereIn()
     {
         $c = new Collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
@@ -531,6 +541,35 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         ], $c->unique(function ($item) {
             return $item['first'].$item['last'];
         })->all());
+    }
+
+    public function testUniqueStrict()
+    {
+        $c = new Collection([
+            [
+                'id' => '0',
+                'name' => 'zero',
+            ],
+            [
+                'id' => '00',
+                'name' => 'double zero',
+            ],
+            [
+                'id' => '0',
+                'name' => 'again zero',
+            ],
+        ]);
+
+        $this->assertEquals([
+            [
+                'id' => '0',
+                'name' => 'zero',
+            ],
+            [
+                'id' => '00',
+                'name' => 'double zero',
+            ],
+        ], $c->uniqueStrict('id')->all());
     }
 
     public function testCollapse()
@@ -856,6 +895,22 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['programming', 'basketball', 'music', 'powerlifting'], $data->all());
     }
 
+    public function testMapToAssoc()
+    {
+        $data = new Collection([
+            ['name' => 'Blastoise', 'type' => 'Water', 'idx' => 9],
+            ['name' => 'Charmander', 'type' => 'Fire', 'idx' => 4],
+            ['name' => 'Dragonair', 'type' => 'Dragon', 'idx' => 148],
+        ]);
+        $data = $data->mapToAssoc(function ($pokemon) {
+            return [$pokemon['name'] => $pokemon['type']];
+        });
+        $this->assertEquals(
+            ['Blastoise' => 'Water', 'Charmander' => 'Fire', 'Dragonair' => 'Dragon'],
+            $data->all()
+        );
+    }
+
     public function testTransform()
     {
         $data = new Collection(['first' => 'taylor', 'last' => 'otwell']);
@@ -1024,7 +1079,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         });
         $this->assertEquals([
             '0-taylorotwell' => ['firstname' => 'Taylor', 'lastname' => 'Otwell', 'locale' => 'US'],
-            '1-lucasmichot'  => ['firstname' => 'Lucas', 'lastname' => 'Michot', 'locale' => 'FR'],
+            '1-lucasmichot' => ['firstname' => 'Lucas', 'lastname' => 'Michot', 'locale' => 'FR'],
         ], $result->all());
     }
 
@@ -1051,6 +1106,36 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($c->contains('date'));
         $this->assertTrue($c->contains('class'));
         $this->assertFalse($c->contains('foo'));
+    }
+
+    public function testContainsStrict()
+    {
+        $c = new Collection([1, 3, 5, '02']);
+
+        $this->assertTrue($c->containsStrict(1));
+        $this->assertFalse($c->containsStrict(2));
+        $this->assertTrue($c->containsStrict('02'));
+        $this->assertTrue($c->containsStrict(function ($value) {
+            return $value < 5;
+        }));
+        $this->assertFalse($c->containsStrict(function ($value) {
+            return $value > 5;
+        }));
+
+        $c = new Collection([['v' => 1], ['v' => 3], ['v' => '04'], ['v' => 5]]);
+
+        $this->assertTrue($c->containsStrict('v', 1));
+        $this->assertFalse($c->containsStrict('v', 2));
+        $this->assertFalse($c->containsStrict('v', 4));
+        $this->assertTrue($c->containsStrict('v', '04'));
+
+        $c = new Collection(['date', 'class', (object) ['foo' => 50], '']);
+
+        $this->assertTrue($c->containsStrict('date'));
+        $this->assertTrue($c->containsStrict('class'));
+        $this->assertFalse($c->containsStrict('foo'));
+        $this->assertFalse($c->containsStrict(null));
+        $this->assertTrue($c->containsStrict(''));
     }
 
     public function testGettingSumFromCollection()
@@ -1420,6 +1505,54 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
     {
         $collection = new Collection([1, 2, 2, 1]);
         $this->assertEquals([1, 2], $collection->mode());
+    }
+
+    public function testSliceOffset()
+    {
+        $collection = new Collection([1, 2, 3, 4, 5, 6, 7, 8]);
+        $this->assertEquals([4, 5, 6, 7, 8], $collection->slice(3)->values()->toArray());
+    }
+
+    public function testSliceNegativeOffset()
+    {
+        $collection = new Collection([1, 2, 3, 4, 5, 6, 7, 8]);
+        $this->assertEquals([6, 7, 8], $collection->slice(-3)->values()->toArray());
+    }
+
+    public function testSliceOffsetAndLength()
+    {
+        $collection = new Collection([1, 2, 3, 4, 5, 6, 7, 8]);
+        $this->assertEquals([4, 5, 6], $collection->slice(3, 3)->values()->toArray());
+    }
+
+    public function testSliceOffsetAndNegativeLength()
+    {
+        $collection = new Collection([1, 2, 3, 4, 5, 6, 7, 8]);
+        $this->assertEquals([4, 5, 6, 7], $collection->slice(3, -1)->values()->toArray());
+    }
+
+    public function testSliceNegativeOffsetAndLength()
+    {
+        $collection = new Collection([1, 2, 3, 4, 5, 6, 7, 8]);
+        $this->assertEquals([4, 5, 6], $collection->slice(-5, 3)->values()->toArray());
+    }
+
+    public function testSliceNegativeOffsetAndNegativeLength()
+    {
+        $collection = new Collection([1, 2, 3, 4, 5, 6, 7, 8]);
+        $this->assertEquals([3, 4, 5, 6], $collection->slice(-6, -2)->values()->toArray());
+    }
+
+    public function testCollectonFromTraversable()
+    {
+        $collection = new Collection(new \ArrayObject([1, 2, 3]));
+        $this->assertEquals([1, 2, 3], $collection->toArray());
+    }
+
+    public function testCollectonFromTraversableWithKeys()
+    {
+        $collection = new Collection(new \ArrayObject(['foo' => 1, 'bar' => 2, 'baz' => 3]));
+        $this->assertEquals(['foo' => 1, 'bar' => 2, 'baz' => 3], $collection->toArray());
     }
 }
 

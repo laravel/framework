@@ -7,6 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class DatabaseNotification extends Model
 {
     /**
+     * Indicates if the IDs are auto-incrementing.
+     *
+     * @var bool
+     */
+    public $incrementing = false;
+
+    /**
      * The table associated with the model.
      *
      * @var string
@@ -26,9 +33,8 @@ class DatabaseNotification extends Model
      * @var array
      */
     protected $casts = [
-        'intro' => 'array',
-        'outro' => 'array',
-        'read' => 'boolean',
+        'data' => 'array',
+        'read_at' => 'datetime',
     ];
 
     /**
@@ -46,6 +52,17 @@ class DatabaseNotification extends Model
      */
     public function markAsRead()
     {
-        $this->forceFill(['read' => true])->save();
+        $this->forceFill(['read_at' => $this->freshTimestamp()])->save();
+    }
+
+    /**
+     * Create a new database notification collection instance.
+     *
+     * @param  array  $models
+     * @return \Illuminate\Notifications\DatabaseNotificationCollection
+     */
+    public function newCollection(array $models = [])
+    {
+        return new DatabaseNotificationCollection($models);
     }
 }

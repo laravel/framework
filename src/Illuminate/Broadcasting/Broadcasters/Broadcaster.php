@@ -16,18 +16,13 @@ abstract class Broadcaster implements BroadcasterContract
     protected $channels = [];
 
     /**
-     * {@inheritdoc}
-     */
-    abstract public function broadcast(array $channels, $event, array $payload = []);
-
-    /**
      * Register a channel authenticator.
      *
      * @param  string  $channel
      * @param  callable  $callback
      * @return $this
      */
-    public function auth($channel, callable $callback)
+    public function channel($channel, callable $callback)
     {
         $this->channels[$channel] = $callback;
 
@@ -38,12 +33,11 @@ abstract class Broadcaster implements BroadcasterContract
      * Authenticate the incoming request for a given channel.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param  string  $channel
      * @return mixed
      */
-    public function check($request)
+    protected function verifyUserCanAccessChannel($request, $channel)
     {
-        $channel = str_replace(['private-', 'presence-'], '', $request->channel_name);
-
         foreach ($this->channels as $pattern => $callback) {
             if (! Str::is($pattern, $channel)) {
                 continue;
@@ -84,21 +78,15 @@ abstract class Broadcaster implements BroadcasterContract
     }
 
     /**
-     * Return the valid Pusher authentication response.
+     * Format the channel array into an array of strings.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  mixed  $result
-     * @return mixed
+     * @param  array  $channels
+     * @return array
      */
-    protected function validAuthenticationResponse($request, $result)
+    protected function formatChannels(array $channels)
     {
-        if (is_bool($result)) {
-            return json_encode($result);
-        }
-
-        return json_encode(['channel_data' => [
-            'user_id' => $request->user()->getKey(),
-            'user_info' => $result,
-        ]]);
+        return array_map(function ($channel) {
+            return (string) $channel;
+        }, $channels);
     }
 }

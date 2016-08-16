@@ -263,31 +263,37 @@ class Arr
     }
 
     /**
-     * Check if an item exists in an array using "dot" notation.
+     * Check if an item or items exist in an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string  $key
+     * @param  string|array  $keys
      * @return bool
      */
-    public static function has($array, $key)
+    public static function has($array, $keys)
     {
+        if (is_null($keys)) {
+            return false;
+        }
+
+        $keys = (array) $keys;
+
         if (! $array) {
             return false;
         }
 
-        if (is_null($key)) {
+        if ($keys === []) {
             return false;
         }
 
-        if (static::exists($array, $key)) {
-            return true;
-        }
+        foreach ($keys as $key) {
+            $subKeyArray = $array;
 
-        foreach (explode('.', $key) as $segment) {
-            if (static::accessible($array) && static::exists($array, $segment)) {
-                $array = $array[$segment];
-            } else {
-                return false;
+            foreach (explode('.', $key) as $segment) {
+                if (static::accessible($subKeyArray) && static::exists($subKeyArray, $segment)) {
+                    $subKeyArray = $subKeyArray[$segment];
+                } else {
+                    return false;
+                }
             }
         }
 
@@ -485,14 +491,6 @@ class Arr
      */
     public static function where($array, callable $callback)
     {
-        $filtered = [];
-
-        foreach ($array as $key => $value) {
-            if (call_user_func($callback, $value, $key)) {
-                $filtered[$key] = $value;
-            }
-        }
-
-        return $filtered;
+        return array_filter($array, $callback, ARRAY_FILTER_USE_BOTH);
     }
 }

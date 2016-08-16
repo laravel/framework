@@ -83,10 +83,16 @@ trait AuthorizesRequests
     {
         $parameter = $parameter ?: strtolower(class_basename($model));
 
+        $middleware = [];
+
         foreach ($this->resourceAbilityMap() as $method => $ability) {
             $modelName = in_array($method, ['index', 'create', 'store']) ? $model : $parameter;
 
-            $this->middleware("can:{$ability},{$modelName}", $options)->only($method);
+            $middleware["can:{$ability},{$modelName}"][] = $method;
+        }
+
+        foreach ($middleware as $middlewareName => $methods) {
+            $this->middleware($middlewareName, $options)->only($methods);
         }
     }
 
@@ -98,7 +104,6 @@ trait AuthorizesRequests
     protected function resourceAbilityMap()
     {
         return [
-            'index' => 'view',
             'show' => 'view',
             'create' => 'create',
             'store' => 'create',

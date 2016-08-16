@@ -46,6 +46,21 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($model->isDirty(['foo', 'bar']));
     }
 
+    public function testCleanAttributes()
+    {
+        $model = new EloquentModelStub(['foo' => '1', 'bar' => 2, 'baz' => 3]);
+        $model->syncOriginal();
+        $model->foo = 1;
+        $model->bar = 20;
+        $model->baz = 30;
+
+        $this->assertFalse($model->isClean());
+        $this->assertTrue($model->isClean('foo'));
+        $this->assertFalse($model->isClean('bar'));
+        $this->assertFalse($model->isClean('foo', 'bar'));
+        $this->assertFalse($model->isClean(['foo', 'bar']));
+    }
+
     public function testCalculatedAttributes()
     {
         $model = new EloquentModelStub;
@@ -252,8 +267,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $model = $this->getMockBuilder('EloquentDateModelStub')->setMethods(['getDateFormat'])->getMock();
         $model->expects($this->any())->method('getDateFormat')->will($this->returnValue('Y-m-d'));
         $model->setRawAttributes([
-            'created_at'    => '2012-12-04',
-            'updated_at'    => '2012-12-05',
+            'created_at' => '2012-12-04',
+            'updated_at' => '2012-12-05',
         ]);
 
         $this->assertInstanceOf('Carbon\Carbon', $model->created_at);
@@ -265,8 +280,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $model = $this->getMockBuilder('EloquentDateModelStub')->setMethods(['getDateFormat'])->getMock();
         $model->expects($this->any())->method('getDateFormat')->will($this->returnValue('Y-m-d H:i:s'));
         $model->setRawAttributes([
-            'created_at'    => '2012-12-04',
-            'updated_at'    => time(),
+            'created_at' => '2012-12-04',
+            'updated_at' => time(),
         ]);
 
         $this->assertInstanceOf('Carbon\Carbon', $model->created_at);
@@ -698,17 +713,6 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertArrayNotHasKey('age', $array);
     }
 
-    public function testHiddenAreIgnoringWhenVisibleExists()
-    {
-        $model = new EloquentModelStub(['name' => 'foo', 'age' => 'bar', 'id' => 'baz']);
-        $model->setVisible(['name', 'id']);
-        $model->setHidden(['name', 'age']);
-        $array = $model->toArray();
-        $this->assertArrayHasKey('name', $array);
-        $this->assertArrayHasKey('id', $array);
-        $this->assertArrayNotHasKey('age', $array);
-    }
-
     public function testDynamicHidden()
     {
         $model = new EloquentModelDynamicHiddenStub(['name' => 'foo', 'age' => 'bar', 'id' => 'baz']);
@@ -726,6 +730,20 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('name', $array);
         $this->assertArrayHasKey('age', $array);
         $this->assertArrayNotHasKey('id', $array);
+    }
+
+    public function testMakeHidden()
+    {
+        $model = new EloquentModelStub(['name' => 'foo', 'age' => 'bar', 'id' => 'baz']);
+        $array = $model->toArray();
+        $this->assertArrayHasKey('name', $array);
+        $this->assertArrayHasKey('age', $array);
+        $this->assertArrayHasKey('id', $array);
+
+        $array = $model->makeHidden(['name', 'age'])->toArray();
+        $this->assertArrayNotHasKey('name', $array);
+        $this->assertArrayNotHasKey('age', $array);
+        $this->assertArrayHasKey('id', $array);
     }
 
     public function testDynamicVisible()

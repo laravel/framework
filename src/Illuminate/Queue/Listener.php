@@ -72,17 +72,9 @@ class Listener
     {
         $binary = ProcessUtils::escapeArgument((new PhpExecutableFinder)->find(false));
 
-        if (defined('HHVM_VERSION')) {
-            $binary .= ' --php';
-        }
+        $artisan = defined('ARTISAN_BINARY') ? ProcessUtils::escapeArgument(ARTISAN_BINARY) : 'artisan';
 
-        if (defined('ARTISAN_BINARY')) {
-            $artisan = ProcessUtils::escapeArgument(ARTISAN_BINARY);
-        } else {
-            $artisan = 'artisan';
-        }
-
-        $command = 'queue:work %s --queue=%s --delay=%s --memory=%s --sleep=%s --tries=%s';
+        $command = 'queue:work %s --once --queue=%s --delay=%s --memory=%s --sleep=%s --tries=%s';
 
         return "{$binary} {$artisan} {$command}";
     }

@@ -183,13 +183,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected $with = [];
 
     /**
-     * The class name to be used in polymorphic relations.
-     *
-     * @var string
-     */
-    protected $morphClass;
-
-    /**
      * Indicates if the model exists.
      *
      * @var bool
@@ -2036,7 +2029,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return array_search($class, $morphMap, true);
         }
 
-        return $this->morphClass ?: $class;
+        return $class;
     }
 
     /**
@@ -2121,6 +2114,21 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         if (! empty($this->visible)) {
             $this->addVisible($attributes);
         }
+
+        return $this;
+    }
+
+    /**
+     * Make the given, typically visible, attributes hidden.
+     *
+     * @param  array|string  $attributes
+     * @return $this
+     */
+    public function makeHidden($attributes)
+    {
+        $this->visible = array_diff($this->visible, (array) $attributes);
+
+        $this->hidden = array_unique(array_merge($this->hidden, $attributes));
 
         return $this;
     }
@@ -2567,10 +2575,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected function getArrayableItems(array $values)
     {
         if (count($this->getVisible()) > 0) {
-            return array_intersect_key($values, array_flip($this->getVisible()));
+            $values = array_intersect_key($values, array_flip($this->getVisible()));
         }
 
-        return array_diff_key($values, array_flip($this->getHidden()));
+        if (count($this->getHidden()) > 0) {
+            $values = array_diff_key($values, array_flip($this->getHidden()));
+        }
+
+        return $values;
     }
 
     /**
@@ -3137,6 +3149,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         }
 
         return false;
+    }
+
+    /**
+     * Determine if the model or given attribute(s) have remained the same.
+     *
+     * @param  array|string|null  $attributes
+     * @return bool
+     */
+    public function isClean($attributes = null)
+    {
+        return ! $this->isDirty(...func_get_args());
     }
 
     /**

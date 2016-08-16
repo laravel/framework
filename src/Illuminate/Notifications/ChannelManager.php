@@ -2,6 +2,7 @@
 
 namespace Illuminate\Notifications;
 
+use Ramsey\Uuid\Uuid;
 use InvalidArgumentException;
 use Illuminate\Support\Manager;
 use Nexmo\Client as NexmoClient;
@@ -22,83 +23,84 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     protected $defaultChannels = ['mail', 'database'];
 
     /**
-     * Create a new notification for the given notifiable entities.
+     * Send the given notification to the given notifiable entities.
      *
-     * @param  array  $notifiables
-     * @return \Illuminate\Notifications\Channels\Notification
+     * @param  \Illuminate\Support\Collection|array  $notifiables
+     * @param  mixed  $notification
+     * @return void
      */
-    public function to($notifiables)
+    public function send($notifiables, $notification)
     {
-        return new Channels\Notification($notifiables);
+        if ($notification instanceof ShouldQueue) {
+            return $this->queueNotification($notifiables, $notification);
+        }
+
+        return $this->sendNow($notifiables, $notification);
     }
 
     /**
-     * Dispatch the given notification instance to the given notifiable.
+     * Send the given notification immediately.
      *
-     * @param  mixed  $notifiable
-     * @param  mixed  $instance
-     * @param  array  $channels
+     * @param  \Illuminate\Support\Collection|array  $notifiables
+     * @param  mixed  $notification
      * @return void
      */
-    public function dispatch($notifiable, $instance, array $channels = [])
+    public function sendNow($notifiables, $notification)
     {
-        $notifications = $this->notificationsFromInstance(
-            $notifiable, $instance
-        );
+        foreach ($notifiables as $notifiable) {
+            $notification = clone $notification;
 
-        if (count($channels) > 0) {
-            foreach ($notifications as $notification) {
-                $notification->via((array) $channels);
+            $notification->id = (string) Uuid::uuid4();
+
+            $channels = $notification->via($notifiable);
+
+            if (empty($channels)) {
+                continue;
+            }
+
+            foreach ($channels as $channel) {
+                if (! $this->shouldSendNotification($notifiable, $notification, $channel)) {
+                    continue;
+                }
+
+                $this->driver($channel)->send($notifiable, $notification);
+
+                $this->app->make('events')->fire(
+                    new Events\NotificationSent($notifiable, $notification, $channel)
+                );
             }
         }
+    }
 
-        if ($instance instanceof ShouldQueue) {
-            return $this->queueNotifications($instance, $notifications);
-        }
-
-        foreach ($notifications as $notification) {
-            $this->send($notification);
-        }
+    /**
+     * Determines if the notification can be sent.
+     *
+     * @param  mixed  $notifiable
+     * @param  mixed  $notification
+     * @param  string  $channel
+     * @return bool
+     */
+    protected function shouldSendNotification($notifiable, $notification, $channel)
+    {
+        return $this->app->make('events')->until(
+            new Events\NotificationSending($notifiable, $notification, $channel)
+        ) !== false;
     }
 
     /**
      * Queue the given notification instances.
      *
-     * @param  mixed  $instance
-     * @param  array[\Illuminate\Notifcations\Channels\Notification]
+     * @param  mixed  $notifiables
+     * @param  array[\Illuminate\Notifcations\Channels\Notification]  $notification
      * @return void
      */
-    protected function queueNotifications($instance, array $notifications)
+    protected function queueNotification($notifiables, $notification)
     {
         $this->app->make(Bus::class)->dispatch(
-            (new SendQueuedNotifications($notifications))
-                    ->onConnection($instance->connection)
-                    ->onQueue($instance->queue)
-                    ->delay($instance->delay)
-        );
-    }
-
-    /**
-     * Send the given notification.
-     *
-     * @param  \Illuminate\Notifications\Channels\Notification  $notification
-     * @return void
-     */
-    public function send(Channels\Notification $notification)
-    {
-        if (! $notification->application) {
-            $notification->application(
-                $this->app['config']['app.name'],
-                $this->app['config']['app.logo']
-            );
-        }
-
-        foreach ($notification->via ?: $this->deliversVia() as $channel) {
-            $this->driver($channel)->send($notification);
-        }
-
-        $this->app->make('events')->fire(
-            new Events\NotificationSent($notification)
+            (new SendQueuedNotifications($notifiables, $notification))
+                    ->onConnection($notification->connection)
+                    ->onQueue($notification->queue)
+                    ->delay($notification->delay)
         );
     }
 
@@ -121,6 +123,16 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     protected function createDatabaseDriver()
     {
         return $this->app->make(Channels\DatabaseChannel::class);
+    }
+
+    /**
+     * Create an instance of the broadcast driver.
+     *
+     * @return \Illuminate\Notifications\Channels\BroadcastChannel
+     */
+    protected function createBroadcastDriver()
+    {
+        return $this->app->make(Channels\BroadcastChannel::class);
     }
 
     /**
@@ -209,18 +221,5 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     public function deliverVia($channels)
     {
         $this->defaultChannels = (array) $channels;
-    }
-
-    /**
-     * Build a new channel notification from the given object.
-     *
-     * @param  mixed  $notifiable
-     * @param  mixed  $notification
-     * @param  array|null  $channels
-     * @return array
-     */
-    public function notificationsFromInstance($notifiable, $notification, $channels = null)
-    {
-        return Channels\Notification::notificationsFromInstance($notifiable, $notification, $channels);
     }
 }

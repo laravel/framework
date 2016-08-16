@@ -2,7 +2,7 @@
     "name": "illuminate/support",
     "description": "The Illuminate Support package.",
     "license": "MIT",
-    "homepage": "http://laravel.com",
+    "homepage": "https://laravel.com",
     "support": {
         "issues": "https://github.com/laravel/framework/issues",
         "source": "https://github.com/laravel/framework"
@@ -10,7 +10,7 @@
     "authors": [
         {
             "name": "Taylor Otwell",
-            "email": "taylorotwell@gmail.com"
+            "email": "taylor@laravel.com"
         }
     ],
     "require": {
@@ -38,7 +38,6 @@
     },
     "suggest": {
         "illuminate/filesystem": "Required to use the composer class (5.2.*).",
-        "jeremeamia/superclosure": "Required to be able to serialize closures (~2.2).",
         "symfony/process": "Required to use the composer class (3.2.*).",
         "symfony/var-dumper": "Required to use the dd function (3.2.*)."
     },

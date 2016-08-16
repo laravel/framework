@@ -7,8 +7,8 @@ use ReflectionProperty;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Queue\Factory as Queue;
+use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
 
 class Mailable implements MailableContract
@@ -100,10 +100,10 @@ class Mailable implements MailableContract
     /**
      * Send the message using the given mailer.
      *
-     * @param  Mailer  $mailer
+     * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
      * @return void
      */
-    public function send(Mailer $mailer)
+    public function send(MailerContract $mailer)
     {
         Container::getInstance()->call([$this, 'build']);
 
@@ -119,7 +119,7 @@ class Mailable implements MailableContract
     /**
      * Queue the message for sending.
      *
-     * @param  Queue  $queue
+     * @param  \Illuminate\Contracts\Queue\Factory  $queue
      * @return mixed
      */
     public function queue(Queue $queue)
@@ -289,7 +289,7 @@ class Mailable implements MailableContract
      */
     public function from($address, $name = null)
     {
-        $this->setAddress($address, $name, 'from');
+        return $this->setAddress($address, $name, 'from');
     }
 
     /**
@@ -345,6 +345,7 @@ class Mailable implements MailableContract
      *
      * @param  object|array|string  $address
      * @param  string|null  $name
+     * @param  string  $property
      * @return $this
      */
     protected function setAddress($address, $name = null, $property = 'to')
@@ -395,7 +396,7 @@ class Mailable implements MailableContract
     /**
      * Set the plain text view for the message.
      *
-     * @param  string  $view
+     * @param  string  $textView
      * @param  array  $data
      * @return $this
      */
@@ -410,12 +411,17 @@ class Mailable implements MailableContract
     /**
      * Set the view data for the message.
      *
-     * @param  array  $data
+     * @param  string|array  $key
+     * @param  mixed   $value
      * @return $this
      */
-    public function with(array $data)
+    public function with($key, $value = null)
     {
-        $this->viewData = $data;
+        if (is_array($key)) {
+            $this->viewData = array_merge($this->viewData, $key);
+        } else {
+            $this->viewData[$key] = $value;
+        }
 
         return $this;
     }

@@ -115,6 +115,21 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Run a map over each of the items.
+     *
+     * @param  callable  $callback
+     * @return static
+     */
+    public function map(callable $callback)
+    {
+        $result = parent::map($callback);
+
+        return $result->contains(function ($item) {
+            return ! $item instanceof Model;
+        }) ? $result->toBase() : $result;
+    }
+
+    /**
      * Diff the collection with the given items.
      *
      * @param  \ArrayAccess|array  $items
@@ -160,12 +175,13 @@ class Collection extends BaseCollection implements QueueableCollection
      * Return only unique items from the collection.
      *
      * @param  string|callable|null  $key
+     * @param  bool  $strict
      * @return static
      */
-    public function unique($key = null)
+    public function unique($key = null, $strict = false)
     {
         if (! is_null($key)) {
-            return parent::unique($key);
+            return parent::unique($key, $strict);
         }
 
         return new static(array_values($this->getDictionary()));
@@ -340,15 +356,5 @@ class Collection extends BaseCollection implements QueueableCollection
     public function getQueueableIds()
     {
         return $this->modelKeys();
-    }
-
-    /**
-     * Get a base Support collection instance from this collection.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function toBase()
-    {
-        return new BaseCollection($this->items);
     }
 }

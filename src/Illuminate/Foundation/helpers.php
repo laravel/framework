@@ -12,6 +12,7 @@ use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Contracts\Cookie\Factory as CookieFactory;
 use Illuminate\Database\Eloquent\Factory as EloquentFactory;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
+use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
 
 if (! function_exists('abort')) {
     /**
@@ -188,6 +189,19 @@ if (! function_exists('bcrypt')) {
     function bcrypt($value, $options = [])
     {
         return app('hash')->make($value, $options);
+    }
+}
+
+if (! function_exists('broadcast')) {
+    /**
+     * Begin broadcasting an event.
+     *
+     * @param  mixed|null  $event
+     * @return \Illuminate\Broadcasting\PendingBroadcast|void
+     */
+    function broadcast($event = null)
+    {
+        return app(BroadcastFactory::class)->event($event);
     }
 }
 
@@ -589,7 +603,7 @@ if (! function_exists('request')) {
     /**
      * Get an instance of the current request or an input item from the request.
      *
-     * @param  string  $key
+     * @param  array|string  $key
      * @param  mixed   $default
      * @return \Illuminate\Http\Request|string|array
      */
@@ -597,6 +611,10 @@ if (! function_exists('request')) {
     {
         if (is_null($key)) {
             return app('request');
+        }
+
+        if (is_array($key)) {
+            return app('request')->only($key);
         }
 
         return app('request')->input($key, $default);

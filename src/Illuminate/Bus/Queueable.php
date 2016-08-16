@@ -21,7 +21,7 @@ trait Queueable
     /**
      * The number of seconds before the job should be made available.
      *
-     * @var int|null
+     * @var \DateTime|int|null
      */
     public $delay;
 

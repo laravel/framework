@@ -252,6 +252,17 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
 
         $this->assertFalse(Arr::has(null, null));
         $this->assertFalse(Arr::has([], null));
+
+        $array = ['products' => ['desk' => ['price' => 100]]];
+        $this->assertTrue(Arr::has($array, ['products.desk']));
+        $this->assertTrue(Arr::has($array, ['products.desk', 'products.desk.price']));
+        $this->assertTrue(Arr::has($array, ['products', 'products']));
+        $this->assertFalse(Arr::has($array, ['foo']));
+        $this->assertFalse(Arr::has($array, []));
+        $this->assertFalse(Arr::has($array, ['products.desk', 'products.price']));
+
+        $this->assertFalse(Arr::has([], [null]));
+        $this->assertFalse(Arr::has(null, [null]));
     }
 
     public function testIsAssoc()
@@ -424,6 +435,17 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         });
 
         $this->assertEquals([1 => 200, 3 => 400], $array);
+    }
+
+    public function testWhereKey()
+    {
+        $array = ['10' => 1, 'foo' => 3, 20 => 2];
+
+        $array = Arr::where($array, function ($value, $key) {
+            return is_numeric($key);
+        });
+
+        $this->assertEquals(['10' => 1, 20 => 2], $array);
     }
 
     public function testForget()

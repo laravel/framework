@@ -2,50 +2,26 @@
 
 namespace Illuminate\Notifications;
 
-use Illuminate\Support\Str;
+use Illuminate\Queue\SerializesModels;
 
 class Notification
 {
-    /**
-     * Get the "level" of the notification.
-     *
-     * @return string
-     */
-    public function level()
-    {
-        return property_exists($this, 'level') ? $this->level : 'info';
-    }
+    use SerializesModels;
 
     /**
-     * Get the subject of the notification.
+     * The unique identifier for the notification.
      *
-     * @return string
+     * @var string
      */
-    public function subject()
-    {
-        return property_exists($this, 'subject')
-                        ? $this->subject
-                        : Str::title(Str::snake(class_basename($this), ' '));
-    }
+    public $id;
 
     /**
-     * Create a new message builder instance.
-     *
-     * @param  string  $line
-     * @return \Illuminate\Notifications\MessageBuilder
-     */
-    public function line($line)
-    {
-        return new MessageBuilder($line);
-    }
-
-    /**
-     * Get the notification's options.
+     * Get the channels the event should broadcast on.
      *
      * @return array
      */
-    public function options()
+    public function broadcastOn()
     {
-        return property_exists($this, 'options') ? $this->options : [];
+        return [];
     }
 }
