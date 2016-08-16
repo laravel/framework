@@ -41,7 +41,7 @@ class MailChannel
 
         $message = $notification->toMail($notifiable);
 
-        $this->mailer->send($message->view, $message->toArray(), function ($m) use ($notifiable, $notification, $message) {
+        $this->mailer->send($message->view, $message->data(), function ($m) use ($notifiable, $notification, $message) {
             $recipients = $notifiable->routeNotificationFor('mail');
 
             if (is_array($recipients)) {
