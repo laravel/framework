@@ -129,7 +129,7 @@ class MailableMailer
      * @param  Mailable  $mailable
      * @return mixed
      */
-    protected function queue(Mailable $mailable)
+    public function queue(Mailable $mailable)
     {
         if (isset($mailable->delay)) {
             return $this->mailer->later($mailable->delay, $mailable);
