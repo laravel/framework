@@ -74,7 +74,7 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase
 
         $response = $dispatcher->dispatch(new StandAloneCommand);
 
-        $this->assertEquals('stone-alone-handler', $response);
+        $this->assertInstanceOf(StandAloneCommand::class, $response);
     }
 }
 
@@ -118,8 +118,8 @@ class StandAloneCommand
 
 class StandAloneHandler
 {
-    public function handle()
+    public function handle(StandAloneCommand $command)
     {
-        return 'stone-alone-handler';
+        return $command;
     }
 }
