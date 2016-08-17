@@ -34,6 +34,13 @@ class Dispatcher implements QueueingDispatcher
     protected $pipes = [];
 
     /**
+     * The command to handler mapping for non-self-handling events.
+     *
+     * @var array
+     */
+    protected $handlers = [];
+
+    /**
      * The queue resolver callback.
      *
      * @var \Closure|null
@@ -77,9 +84,33 @@ class Dispatcher implements QueueingDispatcher
      */
     public function dispatchNow($command)
     {
-        return $this->pipeline->send($command)->through($this->pipes)->then(function ($command) {
-            return $this->container->call([$command, 'handle']);
-        });
+        if ($handler = $this->getCommandHandler($command)) {
+            $callback = function ($command) use ($handler) {
+                return $handler->handle($command);
+            };
+        } else {
+            $callback = function ($command) {
+                return $this->container->call([$command, 'handle']);
+            };
+        }
+
+        return $this->pipeline->send($command)->through($this->pipes)->then($callback);
+    }
+
+    /**
+     * Retrieve the handler for a command.
+     *
+     * @param  mixed $command
+     *
+     * @return bool|mixed
+     */
+    protected function getCommandHandler($command)
+    {
+        if (array_key_exists(get_class($command), $this->handlers)) {
+            return $this->container->make($this->handlers[get_class($command)]);
+        }
+
+        return false;
     }
 
     /**
@@ -151,6 +182,20 @@ class Dispatcher implements QueueingDispatcher
     public function pipeThrough(array $pipes)
     {
         $this->pipes = $pipes;
+
+        return $this;
+    }
+
+    /**
+     * Map a command to a handler.
+     *
+     * @param  string $command
+     * @param  string $handler
+     * @return $this
+     */
+    public function map($command, $handler)
+    {
+        $this->handlers[$command] = $handler;
 
         return $this;
     }
