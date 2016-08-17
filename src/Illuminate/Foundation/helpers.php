@@ -13,7 +13,7 @@ use Illuminate\Contracts\Cookie\Factory as CookieFactory;
 use Illuminate\Database\Eloquent\Factory as EloquentFactory;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
-use Illuminate\Contracts\Notifications\Dispatcher as Notificantion;
+use Illuminate\Contracts\Notifications\Dispatcher as Notification;
 
 if (! function_exists('abort')) {
     /**
@@ -548,7 +548,7 @@ if (! function_exists('notify')) {
      */
     function notify($users, $notification)
     {
-        app(Notificantion::class)->send($users, $notification);
+        app(Notification::class)->send($users, $notification);
     }
 }
 
