@@ -93,7 +93,7 @@ class MailableMailer
     public function send(Mailable $mailable)
     {
         if ($mailable instanceof ShouldQueue) {
-            return $this->queue($this->fill($mailable));
+            return $this->queue($mailable);
         }
 
         return $this->mailer->send($this->fill($mailable));
@@ -111,6 +111,23 @@ class MailableMailer
     }
 
     /**
+     * Push the given mailable onto the queue.
+     *
+     * @param  Mailable  $mailable
+     * @return mixed
+     */
+    public function queue(Mailable $mailable)
+    {
+        $mailable = $this->fill($mailable);
+
+        if (isset($mailable->delay)) {
+            return $this->mailer->later($mailable->delay, $mailable);
+        }
+
+        return $this->mailer->queue($mailable);
+    }
+
+    /**
      * Populate the mailable with the addresses.
      *
      * @param  Mailable  $mailable
@@ -121,20 +138,5 @@ class MailableMailer
         return $mailable->to($this->to)
                         ->cc($this->cc)
                         ->bcc($this->bcc);
-    }
-
-    /**
-     * Push the given mailable onto the queue.
-     *
-     * @param  Mailable  $mailable
-     * @return mixed
-     */
-    public function queue(Mailable $mailable)
-    {
-        if (isset($mailable->delay)) {
-            return $this->mailer->later($mailable->delay, $mailable);
-        }
-
-        return $this->mailer->queue($mailable);
     }
 }
