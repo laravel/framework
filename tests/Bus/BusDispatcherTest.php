@@ -113,7 +113,6 @@ class BusDispatcherTestSpecificQueueAndDelayCommand implements Illuminate\Contra
 
 class StandAloneCommand
 {
-
 }
 
 class StandAloneHandler
