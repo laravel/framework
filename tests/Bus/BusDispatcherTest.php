@@ -61,7 +61,7 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase
 
         $dispatcher->dispatch(new BusDispatcherBasicCommand);
     }
-    
+
     public function testDispatcherCanDispatchStandAloneHandler()
     {
         $container = new Container;
@@ -69,7 +69,7 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase
         $dispatcher = new Dispatcher($container, function () use ($mock) {
             return $mock;
         });
-        
+
         $dispatcher->map(StandAloneCommand::class, StandAloneHandler::class);
 
         $response = $dispatcher->dispatch(new StandAloneCommand);
@@ -113,7 +113,7 @@ class BusDispatcherTestSpecificQueueAndDelayCommand implements Illuminate\Contra
 
 class StandAloneCommand
 {
-    
+
 }
 
 class StandAloneHandler
