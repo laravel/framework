@@ -109,7 +109,7 @@
         "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (~2.0).",
         "symfony/css-selector": "Required to use some of the crawler integration testing tools (2.8.*|3.0.*).",
         "symfony/dom-crawler": "Required to use most of the crawler integration testing tools (2.8.*|3.0.*).",
-        "symfony/psr-http-message-bridge": "Required to psr7 bridging features (0.2.*)."
+        "symfony/psr-http-message-bridge": "Required to use psr7 bridging features (0.2.*)."
     },
     "minimum-stability": "dev"
 }
