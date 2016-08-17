@@ -383,7 +383,7 @@ trait MakesHttpRequests
             $expected = substr($expected, 0, -1);
         }
 
-        return $expected;
+        return trim($expected);
     }
 
     /**
