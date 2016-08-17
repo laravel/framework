@@ -734,8 +734,15 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
 
     public function testMakeHidden()
     {
-        $model = new EloquentModelStub(['name' => 'foo', 'age' => 'bar', 'id' => 'baz']);
+        $model = new EloquentModelStub(['name' => 'foo', 'age' => 'bar', 'address' => 'foobar', 'id' => 'baz']);
         $array = $model->toArray();
+        $this->assertArrayHasKey('name', $array);
+        $this->assertArrayHasKey('age', $array);
+        $this->assertArrayHasKey('address', $array);
+        $this->assertArrayHasKey('id', $array);
+
+        $array = $model->makeHidden('address')->toArray();
+        $this->assertArrayNotHasKey('address', $array);
         $this->assertArrayHasKey('name', $array);
         $this->assertArrayHasKey('age', $array);
         $this->assertArrayHasKey('id', $array);
@@ -743,6 +750,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $array = $model->makeHidden(['name', 'age'])->toArray();
         $this->assertArrayNotHasKey('name', $array);
         $this->assertArrayNotHasKey('age', $array);
+        $this->assertArrayNotHasKey('address', $array);
         $this->assertArrayHasKey('id', $array);
     }
 
