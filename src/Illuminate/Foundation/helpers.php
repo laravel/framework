@@ -542,13 +542,13 @@ if (! function_exists('notify')) {
     /**
      * Send to users a notification instance.
      *
-     * @param $users
-     * @param $notification
-     * @return mixed
+     * @param  $users
+     * @param  $notification
+     * @return void
      */
     function notify($users, $notification)
     {
-        return app(Notificantion::class)->send($users, $notification);
+        app(Notificantion::class)->send($users, $notification);
     }
 }
 
