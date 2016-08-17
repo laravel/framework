@@ -53,7 +53,7 @@ class KeyGenerateCommand extends Command
     {
         $originalEnvContent = file_get_contents($this->laravel->environmentFilePath());
 
-        $newEnvContent = preg_replace('/APP_KEY="?([A-Za-z0-9:+=\/]+)"?/', "APP_KEY=\"$key\"", $originalEnvContent);
+        $newEnvContent = preg_replace('/APP_KEY="?[^\'"\s]+"?/', "APP_KEY=\"$key\"", $originalEnvContent);
 
         file_put_contents($this->laravel->environmentFilePath(), $newEnvContent);
     }
