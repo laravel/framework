@@ -6,6 +6,7 @@ use Ramsey\Uuid\Uuid;
 use InvalidArgumentException;
 use Illuminate\Support\Manager;
 use Nexmo\Client as NexmoClient;
+use Illuminate\Support\Collection;
 use GuzzleHttp\Client as HttpClient;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Bus\Dispatcher as Bus;
@@ -25,12 +26,16 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     /**
      * Send the given notification to the given notifiable entities.
      *
-     * @param  \Illuminate\Support\Collection|array  $notifiables
+     * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
      * @param  mixed  $notification
      * @return void
      */
     public function send($notifiables, $notification)
     {
+        if (! $notifiables instanceof Collection && ! is_array($notifiables)) {
+            $notifiables = [$notifiables];
+        }
+
         if ($notification instanceof ShouldQueue) {
             return $this->queueNotification($notifiables, $notification);
         }
@@ -41,12 +46,16 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     /**
      * Send the given notification immediately.
      *
-     * @param  \Illuminate\Support\Collection|array  $notifiables
+     * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
      * @param  mixed  $notification
      * @return void
      */
     public function sendNow($notifiables, $notification)
     {
+        if (! $notifiables instanceof Collection && ! is_array($notifiables)) {
+            $notifiables = [$notifiables];
+        }
+
         foreach ($notifiables as $notifiable) {
             $notification = clone $notification;
 

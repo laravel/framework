@@ -40,11 +40,13 @@ class ClosureCommand extends Command
 
         foreach ((new ReflectionFunction($this->callback))->getParameters() as $parameter) {
             if (isset($inputs[$parameter->name])) {
-                $parameters[] = $inputs[$parameter->name];
+                $parameters[$parameter->name] = $inputs[$parameter->name];
             }
         }
 
-        return call_user_func_array($this->callback->bindTo($this, $this), $parameters);
+        return $this->laravel->call(
+            $this->callback->bindTo($this, $this), $parameters
+        );
     }
 
     /**
