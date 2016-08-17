@@ -542,8 +542,8 @@ if (! function_exists('notify')) {
     /**
      * Send to users a notification instance.
      *
-     * @param  $users
-     * @param  $notification
+     * @param \Illuminate\Database\Eloquent\Collection $users
+     * @param \Illuminate\Notifications\Notification $notification
      * @return void
      */
     function notify($users, $notification)
