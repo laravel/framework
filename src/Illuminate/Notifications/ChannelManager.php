@@ -57,7 +57,6 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
         }
 
         foreach ($notifiables as $notifiable) {
-            $notification = clone $notification;
 
             $notification->id = (string) Uuid::uuid4();
 
@@ -72,7 +71,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
                     continue;
                 }
 
-                $this->driver($channel)->send($notifiable, $notification);
+                $this->driver($channel)->send($notifiable, clone $notification);
 
                 $this->app->make('events')->fire(
                     new Events\NotificationSent($notifiable, $notification, $channel)
