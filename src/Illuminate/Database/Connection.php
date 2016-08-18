@@ -407,7 +407,7 @@ class Connection implements ConnectionInterface
         foreach ($bindings as $key => $value) {
             $statement->bindValue(
                 is_string($key) ? $key : $key + 1, $value,
-                ! is_string($value) && is_numeric($value) ? PDO::PARAM_INT : PDO::PARAM_STR
+                is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR
             );
         }
     }
