@@ -24,7 +24,7 @@ class NotificationFailed
      * @var string
      */
     public $channel;
-    
+
     /**
      * The data needed to process this failure.
      *
