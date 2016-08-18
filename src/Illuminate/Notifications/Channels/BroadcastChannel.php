@@ -52,6 +52,10 @@ class BroadcastChannel
      */
     protected function getData($notifiable, Notification $notification)
     {
+        if (method_exists($notification, 'toBroadcast')) {
+            return $notification->toBroadcast($notifiable);
+        }
+
         if (method_exists($notification, 'toArray')) {
             return $notification->toArray($notifiable);
         }
