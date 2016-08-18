@@ -1325,6 +1325,18 @@ class Builder
     }
 
     /**
+     * Add an "order by" clause to the query.
+     *
+     * @param  string  $column
+     * @param  string  $direction
+     * @return $this
+     */
+    public function sortBy($column, $direction = 'asc')
+    {
+        return $this->orderBy($column, $direction);
+    }
+
+    /**
      * Add an "order by" clause for a timestamp to the query.
      *
      * @param  string  $column
