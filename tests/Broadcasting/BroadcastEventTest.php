@@ -44,6 +44,24 @@ class BroadcastEventTest extends PHPUnit_Framework_TestCase
 
         (new Illuminate\Broadcasting\BroadcastEvent($broadcaster))->fire($job, $jobData);
     }
+
+    public function testManualParameterSpecificationStillHasSocket()
+    {
+        $broadcaster = m::mock('Illuminate\Contracts\Broadcasting\Broadcaster');
+
+        $broadcaster->shouldReceive('broadcast')->once()->with(
+            ['test-channel'], 'TestBroadcastEventWithManualDataIncludingSocketViaTrait', ['name' => 'Taylor', 'socket' => null]
+        );
+
+        $event = new TestBroadcastEventWithManualDataIncludingSocketViaTrait;
+        $serializedEvent = serialize($event);
+        $jobData = ['event' => $serializedEvent];
+
+        $job = m::mock('Illuminate\Contracts\Queue\Job');
+        $job->shouldReceive('delete')->once();
+
+        (new Illuminate\Broadcasting\BroadcastEvent($broadcaster))->fire($job, $jobData);
+    }
 }
 
 class TestBroadcastEvent
@@ -66,6 +84,16 @@ class TestBroadcastEvent
 
 class TestBroadcastEventWithManualData extends TestBroadcastEvent
 {
+    public function broadcastWith()
+    {
+        return ['name' => 'Taylor'];
+    }
+}
+
+class TestBroadcastEventWithManualDataIncludingSocketViaTrait extends TestBroadcastEvent
+{
+    use Illuminate\Broadcasting\InteractsWithSockets;
+
     public function broadcastWith()
     {
         return ['name' => 'Taylor'];
