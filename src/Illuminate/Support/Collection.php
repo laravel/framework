@@ -607,7 +607,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  callable  $callback
      * @return static
      */
-    public function mapToAssoc(callable $callback)
+    public function mapWithKeys(callable $callback)
     {
         return $this->flatMap($callback);
     }

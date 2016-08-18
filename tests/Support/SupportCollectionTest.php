@@ -895,14 +895,14 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['programming', 'basketball', 'music', 'powerlifting'], $data->all());
     }
 
-    public function testMapToAssoc()
+    public function testMapWithKeys()
     {
         $data = new Collection([
             ['name' => 'Blastoise', 'type' => 'Water', 'idx' => 9],
             ['name' => 'Charmander', 'type' => 'Fire', 'idx' => 4],
             ['name' => 'Dragonair', 'type' => 'Dragon', 'idx' => 148],
         ]);
-        $data = $data->mapToAssoc(function ($pokemon) {
+        $data = $data->mapWithKeys(function ($pokemon) {
             return [$pokemon['name'] => $pokemon['type']];
         });
         $this->assertEquals(
