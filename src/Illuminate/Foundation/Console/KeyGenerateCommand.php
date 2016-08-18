@@ -32,6 +32,11 @@ class KeyGenerateCommand extends Command
         if ($this->option('show')) {
             return $this->line('<comment>'.$key.'</comment>');
         }
+        
+        // We verify the APP_KEY key exists in the environment file.
+        if (!preg_match("/APP_KEY=/", file_get_contents($this->laravel->environmentFilePath()))) {
+            return $this->line('<error>'.'Missing or invalid APP_KEY in environment file'.'</error>');
+        }
 
         // Next, we will replace the application key in the environment file so it is
         // automatically setup for this developer. This key gets generated using a
