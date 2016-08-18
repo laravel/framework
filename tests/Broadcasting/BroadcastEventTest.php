@@ -1,6 +1,5 @@
 <?php
 
-
 use Mockery as m;
 
 class BroadcastEventTest extends PHPUnit_Framework_TestCase
