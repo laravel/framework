@@ -1337,7 +1337,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(isset($model->some_relation));
     }
 
-    public function testIntIdTypePreserved()
+    public function testIntKeyTypePreserved()
     {
         $model = $this->getMockBuilder('EloquentModelStub')->setMethods(['newQueryWithoutScopes', 'updateTimestamps', 'refresh'])->getMock();
         $query = m::mock('Illuminate\Database\Eloquent\Builder');
@@ -1348,9 +1348,9 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, $model->id);
     }
 
-    public function testStringIdTypePreserved()
+    public function testStringKeyTypePreserved()
     {
-        $model = $this->getMockBuilder('EloquentIdTypeModelStub')->setMethods(['newQueryWithoutScopes', 'updateTimestamps', 'refresh'])->getMock();
+        $model = $this->getMockBuilder('EloquentKeyTypeModelStub')->setMethods(['newQueryWithoutScopes', 'updateTimestamps', 'refresh'])->getMock();
         $query = m::mock('Illuminate\Database\Eloquent\Builder');
         $query->shouldReceive('insertGetId')->once()->with([], 'id')->andReturn('string id');
         $model->expects($this->once())->method('newQueryWithoutScopes')->will($this->returnValue($query));
@@ -1367,7 +1367,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $scopes = [
             'published',
             'category' => 'Laravel',
-            'framework' => ['Laravel', '5.2'],
+            'framework' => ['Laravel', '5.3'],
         ];
 
         $this->assertInstanceOf(Builder::class, $model->scopes($scopes));
@@ -1537,7 +1537,7 @@ class EloquentModelSaveStub extends Model
     }
 }
 
-class EloquentIdTypeModelStub extends EloquentModelStub
+class EloquentKeyTypeModelStub extends EloquentModelStub
 {
     protected $keyType = 'string';
 }
