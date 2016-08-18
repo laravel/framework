@@ -63,14 +63,21 @@ class BroadcastEvent
      */
     protected function getPayloadFromEvent($event)
     {
-        if (method_exists($event, 'broadcastWith')) {
-            return $event->broadcastWith();
-        }
-
         $payload = [];
 
         foreach ((new ReflectionClass($event))->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
             $payload[$property->getName()] = $this->formatProperty($property->getValue($event));
+        }
+
+        if (method_exists($event, 'broadcastWith')) {
+            // In order to ease the developer we'll allow
+            // the developer to not need to explicit pass in the
+            // socket themselves.
+            if (array_key_exists('socket', $payload)) {
+                return $event->broadcastWith() + ['socket' => $payload['socket']];
+            }
+
+            return $event->broadcastWith();
         }
 
         return $payload;
