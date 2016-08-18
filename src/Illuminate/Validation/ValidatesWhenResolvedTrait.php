@@ -2,7 +2,7 @@
 
 namespace Illuminate\Validation;
 
-use Illuminate\Contracts\Validation\ValidationException;
+use Illuminate\Contracts\Validation\ValidationException as ValidationExceptionContract;
 use Illuminate\Contracts\Validation\UnauthorizedException;
 
 /**
@@ -46,7 +46,7 @@ trait ValidatesWhenResolvedTrait
      */
     protected function failedValidation(Validator $validator)
     {
-        throw new ValidationException($validator);
+        throw new ValidationExceptionContract($validator);
     }
 
     /**
