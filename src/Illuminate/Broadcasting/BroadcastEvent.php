@@ -65,7 +65,7 @@ class BroadcastEvent
     {
         $payload = [];
 
-        foreach((new ReflectionClass($event))->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
+        foreach ((new ReflectionClass($event))->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
             $payload[$property->getName()] = $this->formatProperty($property->getValue($event));
         }
 

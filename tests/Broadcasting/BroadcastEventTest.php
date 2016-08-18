@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Broadcasting\InteractsWithSockets;
 use Mockery as m;
 
 class BroadcastEventTest extends PHPUnit_Framework_TestCase
@@ -92,7 +93,7 @@ class TestBroadcastEventWithManualData extends TestBroadcastEvent
 
 class TestBroadcastEventWithManualDataIncludingSocketViaTrait extends TestBroadcastEvent
 {
-    use \Illuminate\Broadcasting\InteractsWithSockets;
+    use InteractsWithSockets;
 
     public function broadcastWith()
     {
