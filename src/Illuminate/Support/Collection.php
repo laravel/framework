@@ -587,7 +587,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         $previous = $reversedCollection->slice($current, 2);
 
-        if ($previous->count() == 2) {
+        if ($previous->count() === 2) {
             return $previous->last();
         } elseif ($loop) {
             return $this->last();
@@ -610,7 +610,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         $next = $this->slice($current, 2);
 
-        if ($next->count() == 2) {
+        if ($next->count() === 2) {
             return $next->last();
         } elseif ($loop) {
             return $this->first();
