@@ -2,7 +2,6 @@
 
 namespace Illuminate\Http;
 
-use Exception;
 use ArrayObject;
 use JsonSerializable;
 use Illuminate\Contracts\Support\Jsonable;
