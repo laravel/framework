@@ -36,6 +36,7 @@ class BroadcastChannel
      */
     public function send($notifiable, Notification $notification)
     {
+        $notification = clone $notification;
         $this->events->fire(new BroadcastNotificationCreated(
             $notifiable, $notification, $this->getData($notifiable, $notification)
         ));
