@@ -585,18 +585,18 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $current = $reversedCollection->search($currentItem, true);
         $current = $reversedCollection->keys()->search($current, true);
 
-        $previous = $reversedCollection->slice($current, 2);	  	        
+        $previous = $reversedCollection->slice($current, 2);
 
         if ($previous->count() == 2) {
             return $previous->last();
         } elseif ($loop) {
             return $this->last();
-        }		              
+        }
 
         return false;
     }
 
-     /**
+    /**
      * Get the next item from the collection.
      *
      * @param  mixed  $currentItem
@@ -606,7 +606,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function next($currentItem, $loop = false)
     {
         $current = $this->search($currentItem, true);
-        $current = $this->keys()->search($current, true);	
+        $current = $this->keys()->search($current, true);
 
         $next = $this->slice($current, 2);
 
@@ -614,7 +614,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return $next->last();
         } elseif ($loop) {
             return $this->first();
-        }		              
+        }
 
         return false;
     }
