@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http;
 
+use Exception;
 use Illuminate\Http\Exception\HttpResponseException;
 
 trait ResponseTrait
