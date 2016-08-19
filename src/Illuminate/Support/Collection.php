@@ -589,7 +589,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         if ($previous->count() === 2) {
             return $previous->last();
-        } elseif ($loop) {
+        }
+        if ($loop) {
             return $this->last();
         }
 
@@ -612,7 +613,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         if ($next->count() === 2) {
             return $next->last();
-        } elseif ($loop) {
+        }
+        if ($loop) {
             return $this->first();
         }
 
