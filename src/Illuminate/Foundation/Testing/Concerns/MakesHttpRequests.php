@@ -321,7 +321,7 @@ trait MakesHttpRequests
 
         $actual = json_encode(Arr::sortRecursive(
             (array) $this->decodeResponseJson()
-        ), JSON_PRETTY_PRINT);
+        ));
 
         foreach (Arr::sortRecursive($data) as $key => $value) {
             $expected = $this->formatToExpectedJson($key, $value);
@@ -373,7 +373,7 @@ trait MakesHttpRequests
      */
     protected function formatToExpectedJson($key, $value)
     {
-        $expected = json_encode([$key => $value], JSON_PRETTY_PRINT);
+        $expected = json_encode([$key => $value]);
 
         if (Str::startsWith($expected, '{')) {
             $expected = substr($expected, 1);
