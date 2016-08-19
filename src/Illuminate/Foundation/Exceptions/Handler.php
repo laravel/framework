@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Exceptions;
 use Exception;
 use Psr\Log\LoggerInterface;
 use Illuminate\Http\Response;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Validation\ValidationException;
@@ -18,6 +19,7 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Debug\ExceptionHandler as SymfonyExceptionHandler;
 use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
+use Symfony\Component\HttpFoundation\RedirectResponse as SymfonyRedirectResponse;
 
 class Handler implements ExceptionHandlerContract
 {
@@ -163,7 +165,11 @@ class Handler implements ExceptionHandlerContract
      */
     protected function toIlluminateResponse($response, Exception $e)
     {
-        $response = new Response($response->getContent(), $response->getStatusCode(), $response->headers->all());
+        if ($response instanceof SymfonyRedirectResponse) {
+            $response = new RedirectResponse($response->getTargetUrl(), $response->getStatusCode(), $response->headers->all());
+        } else {
+            $response = new Response($response->getContent(), $response->getStatusCode(), $response->headers->all());
+        }
 
         return $response->withException($e);
     }
