@@ -70,7 +70,7 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase
             return $mock;
         });
 
-        $dispatcher->map(StandAloneCommand::class, StandAloneHandler::class);
+        $dispatcher->map([StandAloneCommand::class => StandAloneHandler::class]);
 
         $response = $dispatcher->dispatch(new StandAloneCommand);
 

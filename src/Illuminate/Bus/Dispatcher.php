@@ -189,13 +189,12 @@ class Dispatcher implements QueueingDispatcher
     /**
      * Map a command to a handler.
      *
-     * @param  string $command
-     * @param  string $handler
+     * @param  array  $map
      * @return $this
      */
-    public function map($command, $handler)
+    public function map(array $map)
     {
-        $this->handlers[$command] = $handler;
+        $this->handlers = array_merge($this->handlers, $map);
 
         return $this;
     }
