@@ -80,11 +80,12 @@ class Dispatcher implements QueueingDispatcher
      * Dispatch a command to its appropriate handler in the current process.
      *
      * @param  mixed  $command
+     * @param  mixed  $handler
      * @return mixed
      */
-    public function dispatchNow($command)
+    public function dispatchNow($command, $handler = null)
     {
-        if ($handler = $this->getCommandHandler($command)) {
+        if ($handler || $handler = $this->getCommandHandler($command)) {
             $callback = function ($command) use ($handler) {
                 return $handler->handle($command);
             };
@@ -98,15 +99,25 @@ class Dispatcher implements QueueingDispatcher
     }
 
     /**
+     * Determine if the given command has a handler.
+     *
+     * @param  mixed  $command
+     * @return bool
+     */
+    public function hasCommandHandler($command)
+    {
+        return array_key_exists(get_class($command), $this->handlers);
+    }
+
+    /**
      * Retrieve the handler for a command.
      *
-     * @param  mixed $command
-     *
+     * @param  mixed  $command
      * @return bool|mixed
      */
-    protected function getCommandHandler($command)
+    public function getCommandHandler($command)
     {
-        if (array_key_exists(get_class($command), $this->handlers)) {
+        if ($this->hasCommandHandler($command)) {
             return $this->container->make($this->handlers[get_class($command)]);
         }
 
