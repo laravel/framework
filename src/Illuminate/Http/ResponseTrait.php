@@ -2,10 +2,18 @@
 
 namespace Illuminate\Http;
 
+use Exception;
 use Illuminate\Http\Exception\HttpResponseException;
 
 trait ResponseTrait
 {
+    /**
+     * The exception that triggered the error response (if applicable).
+     *
+     * @var \Exception|null
+     */
+    public $exception;
+
     /**
      * Get the status code for the response.
      *
@@ -80,6 +88,19 @@ trait ResponseTrait
         }
 
         $this->headers->setCookie($cookie);
+
+        return $this;
+    }
+
+    /**
+     * Set the exception to attach to the response.
+     *
+     * @param  \Exception  $e
+     * @return $this
+     */
+    public function withException(Exception $e)
+    {
+        $this->exception = $e;
 
         return $this;
     }
