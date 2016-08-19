@@ -1236,7 +1236,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function toBase()
     {
-        return is_subclass_of($this, self::class) ? new self($this) : $this;
+        return new self($this);
     }
 
     /**
