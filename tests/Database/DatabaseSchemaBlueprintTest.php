@@ -16,7 +16,7 @@ class DatabaseSchemaBlueprintTest extends PHPUnit_Framework_TestCase
 
     public function testToSqlRunsCommandsFromBlueprint()
     {
-        if (PHP_VERSION === "7.1.0beta3") {
+        if (PHP_VERSION === '7.1.0beta3') {
             $this->markTestSkipped('Segfaults on PHP 7.1 beta 3');
         }
 
