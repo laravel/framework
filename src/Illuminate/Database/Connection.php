@@ -336,11 +336,18 @@ class Connection implements ConnectionInterface
 
             $statement->execute();
 
+            $fetchMode = $me->getFetchMode();
             $fetchArgument = $me->getFetchArgument();
+            $fetchConstructorArgument = $me->getFetchConstructorArgument();
+
+            if ($fetchMode === PDO::FETCH_CLASS && ! isset($fetchArgument)) {
+                $fetchArgument = 'StdClass';
+                $fetchConstructorArgument = null;
+            }
 
             return isset($fetchArgument)
-                    ? $statement->fetchAll($me->getFetchMode(), $fetchArgument, $me->getFetchConstructorArgument())
-                    : $statement->fetchAll($me->getFetchMode());
+                ? $statement->fetchAll($fetchMode, $fetchArgument, $fetchConstructorArgument)
+                : $statement->fetchAll($fetchMode);
         });
     }
 
@@ -361,10 +368,19 @@ class Connection implements ConnectionInterface
 
             $statement = $this->getPdoForSelect($useReadPdo)->prepare($query);
 
-            if ($me->getFetchMode() === PDO::FETCH_CLASS) {
-                $statement->setFetchMode($me->getFetchMode(), 'StdClass');
+            $fetchMode = $me->getFetchMode();
+            $fetchArgument = $me->getFetchArgument();
+            $fetchConstructorArgument = $me->getFetchConstructorArgument();
+
+            if ($fetchMode === PDO::FETCH_CLASS && ! isset($fetchArgument)) {
+                $fetchArgument = 'StdClass';
+                $fetchConstructorArgument = null;
+            }
+
+            if (isset($fetchArgument)) {
+                $statement->setFetchMode($fetchMode, $fetchArgument, $fetchConstructorArgument);
             } else {
-                $statement->setFetchMode($me->getFetchMode());
+                $statement->setFetchMode($fetchMode);
             }
 
             $me->bindValues($statement, $me->prepareBindings($bindings));
@@ -391,7 +407,7 @@ class Connection implements ConnectionInterface
         foreach ($bindings as $key => $value) {
             $statement->bindValue(
                 is_string($key) ? $key : $key + 1, $value,
-                filter_var($value, FILTER_VALIDATE_FLOAT) !== false ? PDO::PARAM_INT : PDO::PARAM_STR
+                is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR
             );
         }
     }
@@ -608,7 +624,7 @@ class Connection implements ConnectionInterface
             $this->getPdo()->commit();
         }
 
-        --$this->transactions;
+        $this->transactions = max(0, $this->transactions - 1);
 
         $this->fireConnectionEvent('committed');
     }

@@ -7,6 +7,8 @@ use Closure;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Illuminate\Broadcasting\Broadcasters\LogBroadcaster;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use Illuminate\Broadcasting\Broadcasters\NullBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\RedisBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
 use Illuminate\Contracts\Broadcasting\Factory as FactoryContract;
@@ -48,18 +50,19 @@ class BroadcastManager implements FactoryContract
     /**
      * Register the routes for handling broadcast authentication and sockets.
      *
-     * @param  array  $attributes
+     * @param  array|null  $attributes
      * @return void
      */
-    public function route(array $attributes = [])
+    public function routes(array $attributes = null)
     {
         if ($this->app->routesAreCached()) {
             return;
         }
 
-        $this->app['router']->group($attributes, function () {
-            $this->app['router']->post('/broadcasting/auth', BroadcastController::class.'@authenticate');
-            $this->app['router']->post('/broadcasting/socket', BroadcastController::class.'@rememberSocket');
+        $attributes = $attributes ?: ['middleware' => ['web']];
+
+        $this->app['router']->group($attributes, function ($router) {
+            $router->post('/broadcasting/auth', BroadcastController::class.'@authenticate');
         });
     }
 
@@ -77,35 +80,46 @@ class BroadcastManager implements FactoryContract
 
         $request = $request ?: $this->app['request'];
 
-        if ($request->hasHeader('X-Socket-Id')) {
-            return $request->header('X-Socket-Id');
+        if ($request->hasHeader('X-Socket-ID')) {
+            return $request->header('X-Socket-ID');
         }
-
-        if (! $request->hasSession()) {
-            return;
-        }
-
-        return $this->app['cache']->get(
-            'broadcast:socket:'.$request->session()->getId()
-        );
     }
 
     /**
-     * Remember the socket for the given request.
+     * Begin broadcasting an event.
      *
-     * @param  \Illuminate\Http\Request|null  $request
+     * @param  mixed|null  $event
+     * @return \Illuminate\Broadcasting\PendingBroadcast|void
+     */
+    public function event($event = null)
+    {
+        return new PendingBroadcast($this->app->make('events'), $event);
+    }
+
+    /**
+     * Queue the given event for broadcast.
+     *
+     * @param  mixed  $event
      * @return void
      */
-    public function rememberSocket($request = null)
+    public function queue($event)
     {
-        if (! $request && ! $this->app->bound('request')) {
-            return;
+        $connection = $event instanceof ShouldBroadcastNow ? 'sync' : null;
+
+        if (is_null($connection) && isset($event->connection)) {
+            $connection = $event->connection;
         }
 
-        $request = $request ?: $this->app['request'];
+        $queue = null;
 
-        $this->app['cache']->forever(
-            'broadcast:socket:'.$request->session()->getId(), $request->socket_id
+        if (isset($event->broadcastQueue)) {
+            $queue = $event->broadcastQueue;
+        } elseif (isset($event->queue)) {
+            $queue = $event->queue;
+        }
+
+        $this->app->make('queue')->connection($connection)->pushOn(
+            $queue, BroadcastEvent::class, ['event' => serialize(clone $event)]
         );
     }
 
@@ -224,6 +238,17 @@ class BroadcastManager implements FactoryContract
     }
 
     /**
+     * Create an instance of the driver.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Contracts\Broadcasting\Broadcaster
+     */
+    protected function createNullDriver(array $config)
+    {
+        return new NullBroadcaster;
+    }
+
+    /**
      * Get the connection configuration.
      *
      * @param  string  $name
@@ -278,6 +303,6 @@ class BroadcastManager implements FactoryContract
      */
     public function __call($method, $parameters)
     {
-        return call_user_func_array([$this->driver(), $method], $parameters);
+        return $this->driver()->$method(...$parameters);
     }
 }

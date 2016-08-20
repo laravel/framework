@@ -108,7 +108,7 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase
                 '_token' => $session->token(),
                 'foo' => 'bar',
                 'baz' => 'boom',
-                'flash' => [
+                '_flash' => [
                     'new' => [],
                     'old' => ['baz'],
                 ],
@@ -182,24 +182,24 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase
         $session = $this->getSession();
         $session->flash('foo', 'bar');
         $session->set('fu', 'baz');
-        $session->set('flash.old', ['qu']);
-        $this->assertNotFalse(array_search('foo', $session->get('flash.new')));
-        $this->assertFalse(array_search('fu', $session->get('flash.new')));
+        $session->set('_flash.old', ['qu']);
+        $this->assertNotFalse(array_search('foo', $session->get('_flash.new')));
+        $this->assertFalse(array_search('fu', $session->get('_flash.new')));
         $session->keep(['fu', 'qu']);
-        $this->assertNotFalse(array_search('foo', $session->get('flash.new')));
-        $this->assertNotFalse(array_search('fu', $session->get('flash.new')));
-        $this->assertNotFalse(array_search('qu', $session->get('flash.new')));
-        $this->assertFalse(array_search('qu', $session->get('flash.old')));
+        $this->assertNotFalse(array_search('foo', $session->get('_flash.new')));
+        $this->assertNotFalse(array_search('fu', $session->get('_flash.new')));
+        $this->assertNotFalse(array_search('qu', $session->get('_flash.new')));
+        $this->assertFalse(array_search('qu', $session->get('_flash.old')));
     }
 
     public function testReflash()
     {
         $session = $this->getSession();
         $session->flash('foo', 'bar');
-        $session->set('flash.old', ['foo']);
+        $session->set('_flash.old', ['foo']);
         $session->reflash();
-        $this->assertNotFalse(array_search('foo', $session->get('flash.new')));
-        $this->assertFalse(array_search('foo', $session->get('flash.old')));
+        $this->assertNotFalse(array_search('foo', $session->get('_flash.new')));
+        $this->assertFalse(array_search('foo', $session->get('_flash.old')));
     }
 
     public function testReflashWithNow()
@@ -207,8 +207,8 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase
         $session = $this->getSession();
         $session->now('foo', 'bar');
         $session->reflash();
-        $this->assertNotFalse(array_search('foo', $session->get('flash.new')));
-        $this->assertFalse(array_search('foo', $session->get('flash.old')));
+        $this->assertNotFalse(array_search('foo', $session->get('_flash.new')));
+        $this->assertFalse(array_search('foo', $session->get('_flash.old')));
     }
 
     public function testReplace()
@@ -249,6 +249,40 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase
         $session->flush();
         $this->assertFalse($session->has('foo'));
         $this->assertFalse($session->getBag('bagged')->has('qu'));
+    }
+
+    public function testIncrement()
+    {
+        $session = $this->getSession();
+
+        $session->set('foo', 5);
+        $foo = $session->increment('foo');
+        $this->assertEquals(6, $foo);
+        $this->assertEquals(6, $session->get('foo'));
+
+        $foo = $session->increment('foo', 4);
+        $this->assertEquals(10, $foo);
+        $this->assertEquals(10, $session->get('foo'));
+
+        $session->increment('bar');
+        $this->assertEquals(1, $session->get('bar'));
+    }
+
+    public function testDecrement()
+    {
+        $session = $this->getSession();
+
+        $session->set('foo', 5);
+        $foo = $session->decrement('foo');
+        $this->assertEquals(4, $foo);
+        $this->assertEquals(4, $session->get('foo'));
+
+        $foo = $session->decrement('foo', 4);
+        $this->assertEquals(0, $foo);
+        $this->assertEquals(0, $session->get('foo'));
+
+        $session->decrement('bar');
+        $this->assertEquals(-1, $session->get('bar'));
     }
 
     public function testHasOldInputWithoutKey()

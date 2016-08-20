@@ -6,8 +6,10 @@ use Illuminate\Routing\Router;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Auth\Middleware\Authorize;
 use Illuminate\Routing\ResourceRegistrar;
 use Illuminate\Contracts\Routing\Registrar;
+use Illuminate\Auth\Middleware\Authenticate;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 
@@ -94,6 +96,12 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($router->currentRouteNamed('foo'));
         $this->assertTrue($router->is('foo'));
         $this->assertFalse($router->is('bar'));
+
+        $router = $this->getRouter();
+        $route = $router->get('foo/{file}', function ($file) {
+            return $file;
+        });
+        $this->assertEquals('oxygen%20', $router->dispatch(Request::create('http://test.com/foo/oxygen%2520', 'GET'))->getContent());
 
         $router = $this->getRouter();
         $router->patch('foo/bar', ['as' => 'foo', function () {
@@ -562,6 +570,33 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('dragon', $router->dispatch(Request::create('foo/Dragon', 'GET'))->getContent());
     }
 
+    public function testMiddlewarePrioritySorting()
+    {
+        $middleware = [
+            Placeholder1::class,
+            SubstituteBindings::class,
+            Placeholder2::class,
+            Authenticate::class,
+            Placeholder3::class,
+        ];
+
+        $router = $this->getRouter();
+
+        $router->middlewarePriority = [Authenticate::class, SubstituteBindings::class, Authorize::class];
+
+        $route = $router->get('foo', ['middleware' => $middleware, 'uses' => function ($name) {
+            return $name;
+        }]);
+
+        $this->assertEquals([
+            Placeholder1::class,
+            Authenticate::class,
+            SubstituteBindings::class,
+            Placeholder2::class,
+            Placeholder3::class,
+        ], $router->gatherRouteMiddleware($route));
+    }
+
     public function testModelBinding()
     {
         $router = $this->getRouter();
@@ -803,7 +838,9 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
     public function testInvalidActionException()
     {
         $router = $this->getRouter();
-        $router->get('/', ['uses' => 'Controller']);
+        $router->get('/', ['uses' => 'RouteTestControllerStub']);
+
+        $router->dispatch(Request::create('/'));
     }
 
     public function testResourceRouting()
@@ -1064,6 +1101,20 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $router->dispatch(Request::create('bar', 'GET'))->getContent();
     }
 
+    public function testDispatchingCallableActionClasses()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/bar', 'ActionStub');
+
+        $this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+
+        $router->get('foo/bar2', [
+            'uses' => 'ActionStub',
+        ]);
+
+        $this->assertEquals('hello', $router->dispatch(Request::create('foo/bar2', 'GET'))->getContent());
+    }
+
     protected function getRouter()
     {
         $container = new Container;
@@ -1263,5 +1314,13 @@ class RoutingTestUserModel extends Model
     public function firstOrFail()
     {
         return $this;
+    }
+}
+
+class ActionStub
+{
+    public function __invoke()
+    {
+        return 'hello';
     }
 }

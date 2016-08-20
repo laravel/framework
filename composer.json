@@ -3,7 +3,7 @@
     "description": "The Laravel Framework.",
     "keywords": ["framework", "laravel"],
     "license": "MIT",
-    "homepage": "http://laravel.com",
+    "homepage": "https://laravel.com",
     "support": {
         "issues": "https://github.com/laravel/framework/issues",
         "source": "https://github.com/laravel/framework"
@@ -11,7 +11,7 @@
     "authors": [
         {
             "name": "Taylor Otwell",
-            "email": "taylorotwell@gmail.com"
+            "email": "taylor@laravel.com"
         }
     ],
     "require": {
@@ -27,6 +27,7 @@
         "nesbot/carbon": "~1.20",
         "paragonie/random_compat": "~1.4|~2.0",
         "psy/psysh": "0.7.*",
+        "ramsey/uuid": "~3.0",
         "swiftmailer/swiftmailer": "~5.1",
         "symfony/console": "3.1.*",
         "symfony/debug": "3.1.*",
@@ -67,7 +68,8 @@
         "illuminate/support": "self.version",
         "illuminate/translation": "self.version",
         "illuminate/validation": "self.version",
-        "illuminate/view": "self.version"
+        "illuminate/view": "self.version",
+        "tightenco/collect": "self.version"
     },
     "require-dev": {
         "aws/aws-sdk-php": "~3.0",
@@ -79,9 +81,6 @@
         "symfony/dom-crawler": "3.1.*"
     },
     "autoload": {
-        "classmap": [
-            "src/Illuminate/Queue/IlluminateQueueClosure.php"
-        ],
         "files": [
             "src/Illuminate/Foundation/helpers.php",
             "src/Illuminate/Support/helpers.php"

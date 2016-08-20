@@ -112,6 +112,10 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $array = [['#foo', '#bar'], '#baz'];
         $this->assertEquals(['#foo', '#bar', '#baz'], Arr::flatten($array));
 
+        // Flattened array includes "null" items
+        $array = [['#foo', null], '#baz', null];
+        $this->assertEquals(['#foo', null, '#baz', null], Arr::flatten($array));
+
         // Sets of nested arrays are flattened
         $array = [['#foo', '#bar'], ['#baz']];
         $this->assertEquals(['#foo', '#bar', '#baz'], Arr::flatten($array));
@@ -120,19 +124,19 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $array = [['#foo', ['#bar']], ['#baz']];
         $this->assertEquals(['#foo', '#bar', '#baz'], Arr::flatten($array));
 
-        // Nested collections are flattened alongside arrays
+        // Nested arrays are flattened alongside arrays
         $array = [new Collection(['#foo', '#bar']), ['#baz']];
         $this->assertEquals(['#foo', '#bar', '#baz'], Arr::flatten($array));
 
-        // Nested collections containing plain arrays are flattened
+        // Nested arrays containing plain arrays are flattened
         $array = [new Collection(['#foo', ['#bar']]), ['#baz']];
         $this->assertEquals(['#foo', '#bar', '#baz'], Arr::flatten($array));
 
-        // Nested arrays containing collections are flattened
+        // Nested arrays containing arrays are flattened
         $array = [['#foo', new Collection(['#bar'])], ['#baz']];
         $this->assertEquals(['#foo', '#bar', '#baz'], Arr::flatten($array));
 
-        // Nested arrays containing collections containing arrays are flattened
+        // Nested arrays containing arrays containing arrays are flattened
         $array = [['#foo', new Collection(['#bar', ['#zap']])], ['#baz']];
         $this->assertEquals(['#foo', '#bar', '#zap', '#baz'], Arr::flatten($array));
     }
@@ -248,6 +252,17 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
 
         $this->assertFalse(Arr::has(null, null));
         $this->assertFalse(Arr::has([], null));
+
+        $array = ['products' => ['desk' => ['price' => 100]]];
+        $this->assertTrue(Arr::has($array, ['products.desk']));
+        $this->assertTrue(Arr::has($array, ['products.desk', 'products.desk.price']));
+        $this->assertTrue(Arr::has($array, ['products', 'products']));
+        $this->assertFalse(Arr::has($array, ['foo']));
+        $this->assertFalse(Arr::has($array, []));
+        $this->assertFalse(Arr::has($array, ['products.desk', 'products.price']));
+
+        $this->assertFalse(Arr::has([], [null]));
+        $this->assertFalse(Arr::has(null, [null]));
     }
 
     public function testIsAssoc()
@@ -415,11 +430,22 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
     {
         $array = [100, '200', 300, '400', 500];
 
-        $array = Arr::where($array, function ($key, $value) {
+        $array = Arr::where($array, function ($value, $key) {
             return is_string($value);
         });
 
         $this->assertEquals([1 => 200, 3 => 400], $array);
+    }
+
+    public function testWhereKey()
+    {
+        $array = ['10' => 1, 'foo' => 3, 20 => 2];
+
+        $array = Arr::where($array, function ($value, $key) {
+            return is_numeric($key);
+        });
+
+        $this->assertEquals(['10' => 1, 20 => 2], $array);
     }
 
     public function testForget()

@@ -96,11 +96,11 @@ trait ValidatesRequests
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  array  $errors
-     * @return \Illuminate\Http\Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function buildFailedValidationResponse(Request $request, array $errors)
     {
-        if (($request->ajax() && ! $request->pjax()) || $request->wantsJson()) {
+        if ($request->expectsJson()) {
             return new JsonResponse($errors, 422);
         }
 

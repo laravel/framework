@@ -8,7 +8,6 @@ interface Dispatcher
      * Dispatch a command to its appropriate handler.
      *
      * @param  mixed  $command
-     * @param  \Closure|null  $afterResolving
      * @return mixed
      */
     public function dispatch($command);
@@ -17,10 +16,10 @@ interface Dispatcher
      * Dispatch a command to its appropriate handler in the current process.
      *
      * @param  mixed  $command
-     * @param  \Closure|null  $afterResolving
+     * @param  mixed  $handler
      * @return mixed
      */
-    public function dispatchNow($command);
+    public function dispatchNow($command, $handler = null);
 
     /**
      * Set the pipes commands should be piped through before dispatching.

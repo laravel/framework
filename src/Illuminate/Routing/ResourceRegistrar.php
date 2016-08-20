@@ -354,7 +354,7 @@ class ResourceRegistrar
      * @param  string  $base
      * @param  string  $controller
      * @param  array   $options
-     * @return void
+     * @return \Illuminate\Routing\Route
      */
     protected function addResourceUpdate($name, $base, $controller, $options)
     {
@@ -386,6 +386,7 @@ class ResourceRegistrar
     /**
      * Set or unset the unmapped global parameters to singular.
      *
+     * @param  bool  $singular
      * @return void
      */
     public static function singularParameters($singular = true)

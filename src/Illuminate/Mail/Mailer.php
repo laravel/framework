@@ -6,14 +6,13 @@ use Closure;
 use Swift_Mailer;
 use Swift_Message;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use SuperClosure\Serializer;
 use InvalidArgumentException;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Container\Container;
-use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
+use Illuminate\Contracts\Queue\Factory as QueueContract;
+use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Contracts\Mail\MailQueue as MailQueueContract;
 
 class Mailer implements MailerContract, MailQueueContract
@@ -114,6 +113,28 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
+     * Begin the process of mailing a mailable class instance.
+     *
+     * @param  mixed  $users
+     * @return MailableMailer
+     */
+    public function to($users)
+    {
+        return (new MailableMailer($this))->to($users);
+    }
+
+    /**
+     * Begin the process of mailing a mailable class instance.
+     *
+     * @param  mixed  $users
+     * @return MailableMailer
+     */
+    public function bcc($users)
+    {
+        return (new MailableMailer($this))->bcc($users);
+    }
+
+    /**
      * Send a new message when only a raw text part.
      *
      * @param  string  $text
@@ -146,8 +167,12 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  \Closure|string  $callback
      * @return void
      */
-    public function send($view, array $data, $callback)
+    public function send($view, array $data = [], $callback = null)
     {
+        if ($view instanceof MailableContract) {
+            return $view->send($this);
+        }
+
         // First we need to parse the view, which could either be a string or an array
         // containing both an HTML and plain text versions of the view which should
         // be used when sending an e-mail. We will extract both of them out here.
@@ -180,11 +205,15 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  string|null  $queue
      * @return mixed
      */
-    public function queue($view, array $data, $callback, $queue = null)
+    public function queue($view, array $data = [], $callback = null, $queue = null)
     {
-        $callback = $this->buildQueueCallable($callback);
+        if ($view instanceof MailableContract) {
+            return $view->queue($this->queue);
+        }
 
-        return $this->queue->push('mailer@handleQueuedMessage', compact('view', 'data', 'callback'), $queue);
+        return $this->queue->pushOn(
+            $queue, new Jobs\HandleQueuedMessage($view, $data, $callback)
+        );
     }
 
     /**
@@ -227,11 +256,15 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  string|null  $queue
      * @return mixed
      */
-    public function later($delay, $view, array $data, $callback, $queue = null)
+    public function later($delay, $view, array $data = [], $callback = null, $queue = null)
     {
-        $callback = $this->buildQueueCallable($callback);
+        if ($view instanceof MailableContract) {
+            return $view->later($delay, $this->queue);
+        }
 
-        return $this->queue->later($delay, 'mailer@handleQueuedMessage', compact('view', 'data', 'callback'), $queue);
+        return $this->queue->laterOn(
+            $queue, $delay, new Jobs\HandleQueuedMessage($view, $data, $callback)
+        );
     }
 
     /**
@@ -247,50 +280,6 @@ class Mailer implements MailerContract, MailQueueContract
     public function laterOn($queue, $delay, $view, array $data, $callback)
     {
         return $this->later($delay, $view, $data, $callback, $queue);
-    }
-
-    /**
-     * Build the callable for a queued e-mail job.
-     *
-     * @param  \Closure|string  $callback
-     * @return string
-     */
-    protected function buildQueueCallable($callback)
-    {
-        if (! $callback instanceof Closure) {
-            return $callback;
-        }
-
-        return (new Serializer)->serialize($callback);
-    }
-
-    /**
-     * Handle a queued e-mail message job.
-     *
-     * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  array  $data
-     * @return void
-     */
-    public function handleQueuedMessage($job, $data)
-    {
-        $this->send($data['view'], $data['data'], $this->getQueuedCallable($data));
-
-        $job->delete();
-    }
-
-    /**
-     * Get the true callable for a queued e-mail message.
-     *
-     * @param  array  $data
-     * @return \Closure|string
-     */
-    protected function getQueuedCallable(array $data)
-    {
-        if (Str::contains($data['callback'], 'SerializableClosure')) {
-            return (new Serializer)->unserialize($data['callback']);
-        }
-
-        return $data['callback'];
     }
 
     /**

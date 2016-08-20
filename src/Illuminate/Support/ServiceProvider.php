@@ -95,9 +95,11 @@ abstract class ServiceProvider
      */
     protected function loadMigrationsFrom($paths)
     {
-        foreach ((array) $paths as $path) {
-            $this->app['migrator']->path($path);
-        }
+        $this->app->afterResolving('migrator', function ($migrator) use ($paths) {
+            foreach ((array) $paths as $path) {
+                $migrator->path($path);
+            }
+        });
     }
 
     /**

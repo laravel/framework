@@ -146,6 +146,33 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(new Collection([$one, $two, $three]), $c1->merge($c2));
     }
 
+    public function testMap()
+    {
+        $one = m::mock('Illuminate\Database\Eloquent\Model');
+        $two = m::mock('Illuminate\Database\Eloquent\Model');
+
+        $c = new Collection([$one, $two]);
+
+        $cAfterMap = $c->map(function ($item) {
+            return $item;
+        });
+
+        $this->assertEquals($c->all(), $cAfterMap->all());
+        $this->assertInstanceOf(Collection::class, $cAfterMap);
+    }
+
+    public function testMappingToNonModelsReturnsABaseCollection()
+    {
+        $one = m::mock('Illuminate\Database\Eloquent\Model');
+        $two = m::mock('Illuminate\Database\Eloquent\Model');
+
+        $c = (new Collection([$one, $two]))->map(function ($item) {
+            return 'not-a-model';
+        });
+
+        $this->assertEquals(BaseCollection::class, get_class($c));
+    }
+
     public function testCollectionDiffsWithGivenCollection()
     {
         $one = m::mock('Illuminate\Database\Eloquent\Model');
@@ -247,12 +274,12 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
     {
         $a = new Collection([['foo' => 'bar'], ['foo' => 'baz']]);
         $b = new Collection(['a', 'b', 'c']);
-        $this->assertEquals(get_class($a->pluck('foo')), BaseCollection::class);
-        $this->assertEquals(get_class($a->keys()), BaseCollection::class);
-        $this->assertEquals(get_class($a->collapse()), BaseCollection::class);
-        $this->assertEquals(get_class($a->flatten()), BaseCollection::class);
-        $this->assertEquals(get_class($a->zip(['a', 'b'], ['c', 'd'])), BaseCollection::class);
-        $this->assertEquals(get_class($b->flip()), BaseCollection::class);
+        $this->assertEquals(BaseCollection::class, get_class($a->pluck('foo')));
+        $this->assertEquals(BaseCollection::class, get_class($a->keys()));
+        $this->assertEquals(BaseCollection::class, get_class($a->collapse()));
+        $this->assertEquals(BaseCollection::class, get_class($a->flatten()));
+        $this->assertEquals(BaseCollection::class, get_class($a->zip(['a', 'b'], ['c', 'd'])));
+        $this->assertEquals(BaseCollection::class, get_class($b->flip()));
     }
 
     public function testMakeVisibleRemovesHiddenAndIncludesVisible()

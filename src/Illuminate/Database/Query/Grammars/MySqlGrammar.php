@@ -143,7 +143,7 @@ class MySqlGrammar extends Grammar
      * Prepares a JSON column being updated using the JSON_SET function.
      *
      * @param  string  $key
-     * @param  \Illuminate\Database\JsonExpression  $value
+     * @param  \Illuminate\Database\Query\JsonExpression  $value
      * @return string
      */
     protected function compileJsonUpdateColumn($key, JsonExpression $value)
@@ -197,14 +197,14 @@ class MySqlGrammar extends Grammar
             $sql = trim("delete $table from {$table}{$joins} $where");
         } else {
             $sql = trim("delete from $table $where");
-        }
 
-        if (isset($query->orders)) {
-            $sql .= ' '.$this->compileOrders($query, $query->orders);
-        }
+            if (isset($query->orders)) {
+                $sql .= ' '.$this->compileOrders($query, $query->orders);
+            }
 
-        if (isset($query->limit)) {
-            $sql .= ' '.$this->compileLimit($query, $query->limit);
+            if (isset($query->limit)) {
+                $sql .= ' '.$this->compileLimit($query, $query->limit);
+            }
         }
 
         return $sql;

@@ -81,8 +81,18 @@ class FormRequest extends Request implements ValidatesWhenResolved
         }
 
         return $factory->make(
-            $this->all(), $this->container->call([$this, 'rules']), $this->messages(), $this->attributes()
+            $this->validationData(), $this->container->call([$this, 'rules']), $this->messages(), $this->attributes()
         );
+    }
+
+    /**
+     * Get data to be validated from the request.
+     *
+     * @return array
+     */
+    protected function validationData()
+    {
+        return $this->all();
     }
 
     /**
@@ -134,7 +144,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     public function response(array $errors)
     {
-        if ($this->ajax() || $this->wantsJson()) {
+        if ($this->expectsJson()) {
             return new JsonResponse($errors, 422);
         }
 
@@ -146,7 +156,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
     /**
      * Get the response for a forbidden operation.
      *
-     * @return \Illuminate\Http\Response
+     * @return  \Symfony\Component\HttpFoundation\Response
      */
     public function forbiddenResponse()
     {

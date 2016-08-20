@@ -17,11 +17,12 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($compiler->isExpired('foo'));
     }
 
-    public function testIsExpiredReturnsTrueIfCachePathIsNull()
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testCannotConstructWithBadCachePath()
     {
-        $compiler = new BladeCompiler($files = $this->getFiles(), null);
-        $files->shouldReceive('exists')->never();
-        $this->assertTrue($compiler->isExpired('foo'));
+        new BladeCompiler($this->getFiles(), null);
     }
 
     public function testIsExpiredReturnsTrueWhenModificationTimesWarrant()
@@ -73,14 +74,6 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase
         // trigger compilation with null $path
         $compiler->compile();
         $this->assertEquals('foo', $compiler->getPath());
-    }
-
-    public function testCompileDoesntStoreFilesWhenCachePathIsNull()
-    {
-        $compiler = new BladeCompiler($files = $this->getFiles(), null);
-        $files->shouldReceive('get')->never();
-        $files->shouldReceive('put')->never();
-        $compiler->compile('foo');
     }
 
     public function testEchosAreCompiled()
@@ -211,21 +204,15 @@ test
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = '{{--this is a comment--}}';
-        $expected = '<?php /*this is a comment*/ ?>';
-        $this->assertEquals($expected, $compiler->compileString($string));
+        $this->assertEmpty($compiler->compileString($string));
 
         $string = '{{--
 this is a comment
 --}}';
-        $expected = '<?php /*
-this is a comment
-*/ ?>';
-        $this->assertEquals($expected, $compiler->compileString($string));
+        $this->assertEmpty($compiler->compileString($string));
 
         $string = sprintf('{{-- this is an %s long comment --}}', str_repeat('extremely ', 1000));
-        $expected = sprintf('<?php /* this is an %s long comment */ ?>', str_repeat('extremely ', 1000));
-
-        $this->assertEquals($expected, $compiler->compileString($string));
+        $this->assertEmpty($compiler->compileString($string));
     }
 
     public function testIfStatementsAreCompiled()
@@ -452,6 +439,18 @@ test
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
+    public function testForeachStatementsAreCompileWithUppercaseSyntax()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@foreach ($this->getUsers() AS $user)
+test
+@endforeach';
+        $expected = '<?php $__currentLoopData = $this->getUsers(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getFirstLoop(); ?>
+test
+<?php endforeach; $__env->popLoop(); $loop = $__env->getFirstLoop(); ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
     public function testNestedForeachStatementsAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
@@ -488,6 +487,10 @@ tag info
 
         $string = '@foreach (   $users as $user)';
         $expected = '<?php $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getFirstLoop(); ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+
+        $string = '@foreach ($tasks as $task)';
+        $expected = '<?php $__currentLoopData = $tasks; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $task): $__env->incrementLoopIndices(); $loop = $__env->getFirstLoop(); ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
@@ -706,7 +709,7 @@ empty
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $this->assertCount(0, $compiler->getCustomDirectives());
         $compiler->directive('customControl', function ($expression) {
-            return "<?php echo custom_control{$expression}; ?>";
+            return "<?php echo custom_control({$expression}); ?>";
         });
         $this->assertCount(1, $compiler->getCustomDirectives());
 

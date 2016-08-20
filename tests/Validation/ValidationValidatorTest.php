@@ -323,7 +323,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $trans->addResource('array', ['validation.in' => ':attribute must be included in :values.'], 'en', 'messages');
         $customValues = [
             'type' => [
-                '5'   => 'Short',
+                '5' => 'Short',
                 '300' => 'Long',
             ],
         ];
@@ -338,7 +338,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $trans->addResource('array', ['validation.in' => ':attribute must be included in :values.'], 'en', 'messages');
         $customValues = [
             'type' => [
-                '5'   => 'Short',
+                '5' => 'Short',
                 '300' => 'Long',
             ],
         ];
@@ -430,6 +430,18 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v->messages()->setFormat(':message');
         $this->assertEquals('all must be required!', $v->messages()->first('name.0'));
         $this->assertEquals('all must be required!', $v->messages()->first('name.1'));
+    }
+
+    public function testIfRulesAreSuccessfullyAdded()
+    {
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, [], ['foo' => 'Required']);
+        // foo has required rule
+        $this->assertTrue($v->hasRule('foo', 'Required'));
+        // foo doesn't have array rule
+        $this->assertFalse($v->hasRule('foo', 'Array'));
+        // bar doesn't exists
+        $this->assertFalse($v->hasRule('bar', 'Required'));
     }
 
     public function testValidateArray()
@@ -1004,6 +1016,12 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, ['foo' => '123'], ['foo' => 'Digits:200']);
         $this->assertFalse($v->passes());
 
+        $v = new Validator($trans, ['foo' => '+2.37'], ['foo' => 'Digits:5']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => '2e7'], ['foo' => 'Digits:3']);
+        $this->assertTrue($v->fails());
+
         $trans = $this->getRealTranslator();
         $v = new Validator($trans, ['foo' => '12345'], ['foo' => 'digits_between:1,6']);
         $this->assertTrue($v->passes());
@@ -1012,6 +1030,9 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['foo' => '123'], ['foo' => 'digits_between:4,5']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '+12.3'], ['foo' => 'digits_between:1,6']);
         $this->assertFalse($v->passes());
     }
 
@@ -1208,6 +1229,9 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['name' => ['foo', 'bar']], ['name' => 'Alpha|In:foo,bar']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['name' => ['foo', []]], ['name' => 'Array|In:foo,bar']);
         $this->assertFalse($v->passes());
     }
 
@@ -1648,16 +1672,16 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
             ['https://google.com'],
             ['http://illuminate.dev'],
             ['http://localhost'],
-            ['http://laravel.com/?'],
+            ['https://laravel.com/?'],
             ['http://президент.рф/'],
             ['http://스타벅스코리아.com'],
             ['http://xn--d1abbgf6aiiy.xn--p1ai/'],
-            ['http://laravel.com?'],
-            ['http://laravel.com?q=1'],
-            ['http://laravel.com/?q=1'],
-            ['http://laravel.com#'],
-            ['http://laravel.com#fragment'],
-            ['http://laravel.com/#fragment'],
+            ['https://laravel.com?'],
+            ['https://laravel.com?q=1'],
+            ['https://laravel.com/?q=1'],
+            ['https://laravel.com#'],
+            ['https://laravel.com#fragment'],
+            ['https://laravel.com/#fragment'],
         ];
     }
 
@@ -1739,8 +1763,11 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
     public function testValidateImageDimensions()
     {
         // Knowing that demo image.gif has width = 3 and height = 2
-        $uploadedFile = new \Symfony\Component\HttpFoundation\File\UploadedFile(__DIR__.'/fixtures/image.gif', '');
+        $uploadedFile = new \Symfony\Component\HttpFoundation\File\UploadedFile(__DIR__.'/fixtures/image.gif', '', null, null, null, true);
         $trans = $this->getRealTranslator();
+
+        $v = new Validator($trans, ['x' => 'file'], ['x' => 'dimensions']);
+        $this->assertTrue($v->fails());
 
         $v = new Validator($trans, [], ['x' => 'dimensions:min_width=1']);
         $v->setFiles(['x' => $uploadedFile]);
@@ -1786,7 +1813,15 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v->setFiles(['x' => $uploadedFile]);
         $this->assertTrue($v->passes());
 
+        $v = new Validator($trans, [], ['x' => 'dimensions:ratio=1.5']);
+        $v->setFiles(['x' => $uploadedFile]);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, [], ['x' => 'dimensions:ratio=1/1']);
+        $v->setFiles(['x' => $uploadedFile]);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, [], ['x' => 'dimensions:ratio=1']);
         $v->setFiles(['x' => $uploadedFile]);
         $this->assertTrue($v->fails());
     }
@@ -2410,6 +2445,23 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testParsingArrayKeysWithDot()
+    {
+        $trans = $this->getRealTranslator();
+
+        $v = new Validator($trans, ['foo' => ['bar' => ''], 'foo.bar' => 'valid'], ['foo.bar' => 'required']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => ['bar' => 'valid'], 'foo.bar' => ''], ['foo\.bar' => 'required']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => ['bar.baz' => '']], ['foo.bar\.baz' => 'required']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => [['bar.baz' => ''], ['bar.baz' => '']]], ['foo.*.bar\.baz' => 'required']);
+        $this->assertTrue($v->fails());
+    }
+
     public function testImplicitEachWithAsterisksWithArrayValues()
     {
         $trans = $this->getRealTranslator();
@@ -2993,6 +3045,76 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, ['foo' => ['a', 'b', 'c']], ['foo.*' => 'string']);
         $v->setRules(['foo.*' => 'integer']);
         $this->assertFalse($v->passes());
+    }
+
+    public function testInvalidMethod()
+    {
+        $trans = $this->getRealTranslator();
+
+        $v = new Validator($trans,
+            [
+                ['name' => 'John'],
+                ['name' => null],
+                ['name' => ''],
+            ],
+            [
+                '*.name' => 'required',
+            ]);
+
+        $this->assertEquals($v->invalid(), [
+            1 => ['name' => null],
+            2 => ['name' => ''],
+        ]);
+
+        $v = new Validator($trans,
+            [
+                'name' => '',
+            ],
+            [
+                'name' => 'required',
+            ]);
+
+        $this->assertEquals($v->invalid(), [
+            'name' => '',
+        ]);
+    }
+
+    public function testValidMethod()
+    {
+        $trans = $this->getRealTranslator();
+
+        $v = new Validator($trans,
+            [
+                ['name' => 'John'],
+                ['name' => null],
+                ['name' => ''],
+                ['name' => 'Doe'],
+            ],
+            [
+                '*.name' => 'required',
+            ]);
+
+        $this->assertEquals($v->valid(), [
+            0 => ['name' => 'John'],
+            3 => ['name' => 'Doe'],
+        ]);
+
+        $v = new Validator($trans,
+            [
+                'name' => 'Carlos',
+                'age' => 'unknown',
+                'gender' => 'male',
+            ],
+            [
+                'name' => 'required',
+                'gender' => 'in:male,female',
+                'age' => 'required|int',
+            ]);
+
+        $this->assertEquals($v->valid(), [
+            'name' => 'Carlos',
+            'gender' => 'male',
+        ]);
     }
 
     protected function getTranslator()

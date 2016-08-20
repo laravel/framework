@@ -38,7 +38,13 @@ class CallQueuedHandler
             $job, unserialize($data['command'])
         );
 
-        $this->dispatcher->dispatchNow($command);
+        $handler = $this->dispatcher->getCommandHandler($command) ?: null;
+
+        if ($handler) {
+            $this->setJobInstanceIfNecessary($job, $handler);
+        }
+
+        $this->dispatcher->dispatchNow($command, $handler);
 
         if (! $job->isDeletedOrReleased()) {
             $job->delete();
@@ -54,7 +60,7 @@ class CallQueuedHandler
      */
     protected function setJobInstanceIfNecessary(Job $job, $instance)
     {
-        if (in_array('Illuminate\Queue\InteractsWithQueue', class_uses_recursive(get_class($instance)))) {
+        if (in_array(InteractsWithQueue::class, class_uses_recursive(get_class($instance)))) {
             $instance->setJob($job);
         }
 
@@ -64,15 +70,18 @@ class CallQueuedHandler
     /**
      * Call the failed method on the job instance.
      *
+     * The exception that caused the failure will be passed.
+     *
      * @param  array  $data
+     * @param  \Exception  $e
      * @return void
      */
-    public function failed(array $data)
+    public function failed(array $data, $e)
     {
         $command = unserialize($data['command']);
 
         if (method_exists($command, 'failed')) {
-            $command->failed();
+            $command->failed($e);
         }
     }
 }

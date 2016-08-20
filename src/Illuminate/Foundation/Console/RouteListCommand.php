@@ -7,7 +7,6 @@ use Illuminate\Support\Str;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use Illuminate\Console\Command;
-use Illuminate\Routing\Controller;
 use Symfony\Component\Console\Input\InputOption;
 
 class RouteListCommand extends Command
@@ -157,12 +156,11 @@ class RouteListCommand extends Command
      */
     protected function getControllerMiddleware($actionName)
     {
-        Controller::setRouter($this->laravel['router']);
-
         $segments = explode('@', $actionName);
 
         return $this->getControllerMiddlewareFromInstance(
-            $this->laravel->make($segments[0]), $segments[1]
+            $this->laravel->make($segments[0]),
+            isset($segments[1]) ? $segments[1] : null
         );
     }
 
@@ -170,17 +168,21 @@ class RouteListCommand extends Command
      * Get the middlewares for the given controller instance and method.
      *
      * @param  \Illuminate\Routing\Controller  $controller
-     * @param  string  $method
+     * @param  string|null  $method
      * @return array
      */
     protected function getControllerMiddlewareFromInstance($controller, $method)
     {
+        if (! method_exists($controller, 'getMiddleware')) {
+            return [];
+        }
+
         $middleware = $this->router->getMiddleware();
 
         $results = [];
 
         foreach ($controller->getMiddleware() as $name => $options) {
-            if (! $this->methodExcludedByOptions($method, $options)) {
+            if (! $method || ! $this->methodExcludedByOptions($method, $options)) {
                 $results[] = Arr::get($middleware, $name, $name);
             }
         }

@@ -24,6 +24,13 @@ class FoundationMakesHttpRequestsJsonTest extends PHPUnit_Framework_TestCase
         $this->seeJson($resource->jsonSerialize());
     }
 
+    public function testSeeJsonDeeplyNestedPart()
+    {
+        $this->response = new Illuminate\Http\Response(new JsonSerializableMixedResourcesStub);
+
+        $this->seeJson(['bar' => ['foo' => 'bar 0', 'bar' => 'foo 0']]);
+    }
+
     public function testSeeJsonStructure()
     {
         $this->response = new Illuminate\Http\Response(new JsonSerializableMixedResourcesStub);

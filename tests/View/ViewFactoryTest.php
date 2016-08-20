@@ -455,6 +455,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         $factory->addLoop([1, 2, 3]);
 
         $expectedLoop = [
+            'iteration' => 0,
             'index' => 0,
             'remaining' => 3,
             'count' => 3,
@@ -469,6 +470,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         $factory->addLoop([1, 2, 3, 4]);
 
         $secondExpectedLoop = [
+            'iteration' => 0,
             'index' => 0,
             'remaining' => 4,
             'count' => 4,
@@ -491,6 +493,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         $factory->addLoop('');
 
         $expectedLoop = [
+            'iteration' => 0,
             'index' => 0,
             'remaining' => null,
             'count' => null,
@@ -513,7 +516,8 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
 
         $factory->incrementLoopIndices();
 
-        $this->assertEquals(2, $factory->getLoopStack()[0]['index']);
+        $this->assertEquals(2, $factory->getLoopStack()[0]['iteration']);
+        $this->assertEquals(1, $factory->getLoopStack()[0]['index']);
         $this->assertEquals(2, $factory->getLoopStack()[0]['remaining']);
     }
 
@@ -540,7 +544,8 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
 
         $factory->incrementLoopIndices();
 
-        $this->assertEquals(2, $factory->getLoopStack()[0]['index']);
+        $this->assertEquals(2, $factory->getLoopStack()[0]['iteration']);
+        $this->assertEquals(1, $factory->getLoopStack()[0]['index']);
         $this->assertFalse($factory->getLoopStack()[0]['first']);
         $this->assertNull($factory->getLoopStack()[0]['remaining']);
         $this->assertNull($factory->getLoopStack()[0]['last']);

@@ -77,6 +77,6 @@ class ControllerMakeCommand extends GeneratorCommand
     {
         $namespace = $this->getNamespace($name);
 
-        return str_replace("use $namespace\Controller;\n", '', parent::buildClass($name));
+        return str_replace("use {$namespace}\Controller;\n", '', parent::buildClass($name));
     }
 }

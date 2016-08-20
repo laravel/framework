@@ -102,6 +102,8 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
         EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
 
+        $this->assertEquals(2, EloquentTestUser::count());
+
         $model = EloquentTestUser::where('email', 'taylorotwell@gmail.com')->first();
         $this->assertEquals('taylorotwell@gmail.com', $model->email);
         $this->assertTrue(isset($model->email));
@@ -184,6 +186,32 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Illuminate\Pagination\LengthAwarePaginator', $models);
         $this->assertInstanceOf('EloquentTestUser', $models[0]);
         $this->assertEquals('foo@gmail.com', $models[0]->email);
+    }
+
+    public function testPaginatedModelCollectionRetrievalWhenNoElements()
+    {
+        Paginator::currentPageResolver(function () {
+            return 1;
+        });
+        $models = EloquentTestUser::oldest('id')->paginate(2);
+
+        $this->assertEquals(0, $models->count());
+        $this->assertInstanceOf('Illuminate\Pagination\LengthAwarePaginator', $models);
+
+        Paginator::currentPageResolver(function () {
+            return 2;
+        });
+        $models = EloquentTestUser::oldest('id')->paginate(2);
+
+        $this->assertEquals(0, $models->count());
+    }
+
+    public function testPaginatedModelCollectionRetrievalWhenNoElementsAndDefaultPerPage()
+    {
+        $models = EloquentTestUser::oldest('id')->paginate();
+
+        $this->assertEquals(0, $models->count());
+        $this->assertInstanceOf('Illuminate\Pagination\LengthAwarePaginator', $models);
     }
 
     public function testCountForPaginationWithGrouping()

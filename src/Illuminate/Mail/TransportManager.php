@@ -134,7 +134,9 @@ class TransportManager extends Manager
         $config = $this->app['config']->get('services.sparkpost', []);
 
         return new SparkPostTransport(
-            $this->getHttpClient($config), $config['secret']
+            $this->getHttpClient($config),
+            $config['secret'],
+            Arr::get($config, 'options', [])
         );
     }
 
@@ -152,7 +154,7 @@ class TransportManager extends Manager
      * Get a fresh Guzzle HTTP client instance.
      *
      * @param  array  $config
-     * @return HttpClient
+     * @return \GuzzleHttp\Client
      */
     protected function getHttpClient($config)
     {

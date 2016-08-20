@@ -46,8 +46,8 @@ class MailgunTransport extends Transport
      */
     public function __construct(ClientInterface $client, $key, $domain)
     {
-        $this->client = $client;
         $this->key = $key;
+        $this->client = $client;
         $this->setDomain($domain);
     }
 
@@ -96,7 +96,7 @@ class MailgunTransport extends Transport
         );
 
         foreach ($contacts as $address => $display) {
-            $formatted[] = $display ? $display." <$address>" : $address;
+            $formatted[] = $display ? $display." <{$address}>" : $address;
         }
 
         return implode(',', $formatted);

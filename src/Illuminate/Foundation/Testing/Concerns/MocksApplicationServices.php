@@ -4,6 +4,8 @@ namespace Illuminate\Foundation\Testing\Concerns;
 
 use Mockery;
 use Exception;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Notifications\Dispatcher as NotificationDispatcher;
 
 trait MocksApplicationServices
 {
@@ -15,11 +17,25 @@ trait MocksApplicationServices
     protected $firedEvents = [];
 
     /**
+     * All of the fired model events.
+     *
+     * @var array
+     */
+    protected $firedModelEvents = [];
+
+    /**
      * All of the dispatched jobs.
      *
      * @var array
      */
     protected $dispatchedJobs = [];
+
+    /**
+     * All of the dispatched notifications.
+     *
+     * @var array
+     */
+    protected $dispatchedNotifications = [];
 
     /**
      * Specify a list of events that should be fired for the given operation.
@@ -82,6 +98,8 @@ trait MocksApplicationServices
      */
     protected function withoutEvents()
     {
+        $this->withoutModelEvents();
+
         $mock = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
 
         $mock->shouldReceive('fire')->andReturnUsing(function ($called) {
@@ -89,6 +107,108 @@ trait MocksApplicationServices
         });
 
         $this->app->instance('events', $mock);
+
+        return $this;
+    }
+
+    /**
+     * Specify a list of events that should be fired for the given operation.
+     *
+     * These events will be mocked, so that handlers will not actually be executed.
+     *
+     * @param  string  $model
+     * @param  array|string  $events
+     * @return $this
+     *
+     * @throws \Exception
+     */
+    public function expectsModelEvents($model, $events)
+    {
+        $events = $this->formatModelEvents($model, $events);
+
+        $this->withoutModelEvents();
+
+        $this->beforeApplicationDestroyed(function () use ($events) {
+            $fired = $this->getFiredModelEvents($events);
+
+            if ($eventsNotFired = array_diff($events, $fired)) {
+                throw new Exception(
+                    'These expected Eloquent events were not fired: ['.implode(', ', $eventsNotFired).']'
+                );
+            }
+        });
+
+        return $this;
+    }
+
+    /**
+     * Specify a list of events that should not be fired for the given operation.
+     *
+     * These events will be mocked, so that handlers will not actually be executed.
+     *
+     * @param  string  $model
+     * @param  array|string  $events
+     * @return $this
+     *
+     * @throws \Exception
+     */
+    public function doesntExpectModelEvents($model, $events)
+    {
+        $events = $this->formatModelEvents($model, $events);
+
+        $this->withoutModelEvents();
+
+        $this->beforeApplicationDestroyed(function () use ($events) {
+            if ($fired = $this->getFiredModelEvents($events)) {
+                throw new Exception(
+                    'These unexpected Eloquent events were fired: ['.implode(', ', $fired).']'
+                );
+            }
+        });
+
+        return $this;
+    }
+
+    /**
+     * Convert a model and a list of events into the Eloquent's format.
+     *
+     * @param  string  $model
+     * @param  array|string  $events
+     * @return string[]
+     */
+    private function formatModelEvents($model, $events)
+    {
+        $events = (array) $events;
+
+        return array_map(function ($event) use ($model) {
+            return "eloquent.{$event}: {$model}";
+        }, (array) $events);
+    }
+
+    /**
+     * Mock the model event dispatcher so all Eloquent events are silenced.
+     *
+     * @return $this
+     */
+    protected function withoutModelEvents()
+    {
+        $mock = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
+
+        $mock->shouldReceive('fire')->andReturnUsing(function ($called) {
+            $this->firedModelEvents[] = $called;
+        });
+
+        $mock->shouldReceive('until')->andReturnUsing(function ($called) {
+            $this->firedModelEvents[] = $called;
+
+            return true;
+        });
+
+        $mock->shouldReceive('listen')->andReturnUsing(function ($event, $listener, $priority) {
+            //
+        });
+
+        Model::setEventDispatcher($mock);
 
         return $this;
     }
@@ -121,6 +241,17 @@ trait MocksApplicationServices
     protected function getFiredEvents(array $events)
     {
         return $this->getDispatched($events, $this->firedEvents);
+    }
+
+    /**
+     * Filter the given events against the fired events.
+     *
+     * @param  array  $events
+     * @return array
+     */
+    protected function getFiredModelEvents(array $events)
+    {
+        return $this->getDispatched($events, $this->firedModelEvents);
     }
 
     /**
@@ -237,5 +368,53 @@ trait MocksApplicationServices
         }
 
         return false;
+    }
+
+    /**
+     * Mock the notification dispatcher so all notifications are silenced.
+     *
+     * @return $this
+     */
+    protected function withoutNotifications()
+    {
+        $mock = Mockery::mock(NotificationDispatcher::class);
+
+        $mock->shouldReceive('dispatch')->andReturnUsing(function ($notifiable, $instance, $channels = []) {
+            $this->dispatchedNotifications[] = compact(
+                'notifiable', 'instance', 'channels'
+            );
+        });
+
+        $this->app->instance(NotificationDispatcher::class, $mock);
+
+        return $this;
+    }
+
+    /**
+     * Specify a notification that is expected to be dispatched.
+     *
+     * @param  mixed  $notifiable
+     * @param  string  $notification
+     * @return $this
+     */
+    protected function expectsNotification($notifiable, $notification)
+    {
+        $this->withoutNotifications();
+
+        $this->beforeApplicationDestroyed(function () use ($notifiable, $notification) {
+            foreach ($this->dispatchedNotifications as $dispatched) {
+                if (($dispatched['notifiable'] === $notifiable ||
+                    $dispatched['notifiable']->getKey() == $notifiable->getKey()) &&
+                    get_class($dispatched['instance']) === $notification) {
+                    return $this;
+                }
+            }
+
+            throw new Exception(
+                'The following expected notification were not dispatched: ['.$notification.']'
+            );
+        });
+
+        return $this;
     }
 }

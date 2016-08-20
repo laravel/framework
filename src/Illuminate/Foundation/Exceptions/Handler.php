@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Exceptions;
 use Exception;
 use Psr\Log\LoggerInterface;
 use Illuminate\Http\Response;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Validation\ValidationException;
@@ -18,6 +19,7 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Debug\ExceptionHandler as SymfonyExceptionHandler;
 use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
+use Symfony\Component\HttpFoundation\RedirectResponse as SymfonyRedirectResponse;
 
 class Handler implements ExceptionHandlerContract
 {
@@ -51,6 +53,8 @@ class Handler implements ExceptionHandlerContract
      *
      * @param  \Exception  $e
      * @return void
+     *
+     * @throws \Exception
      */
     public function report(Exception $e)
     {
@@ -98,6 +102,23 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
+     * Prepare exception for rendering.
+     *
+     * @param  \Exception  $e
+     * @return \Exception
+     */
+    protected function prepareException(Exception $e)
+    {
+        if ($e instanceof ModelNotFoundException) {
+            $e = new NotFoundHttpException($e->getMessage(), $e);
+        } elseif ($e instanceof AuthorizationException) {
+            $e = new HttpException(403, $e->getMessage());
+        }
+
+        return $e;
+    }
+
+    /**
      * Render an exception into a response.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -106,18 +127,28 @@ class Handler implements ExceptionHandlerContract
      */
     public function render($request, Exception $e)
     {
+        $e = $this->prepareException($e);
+
         if ($e instanceof HttpResponseException) {
             return $e->getResponse();
-        } elseif ($e instanceof ModelNotFoundException) {
-            $e = new NotFoundHttpException($e->getMessage(), $e);
         } elseif ($e instanceof AuthenticationException) {
             return $this->unauthenticated($request, $e);
-        } elseif ($e instanceof AuthorizationException) {
-            $e = new HttpException(403, $e->getMessage());
         } elseif ($e instanceof ValidationException) {
             return $this->convertValidationExceptionToResponse($e, $request);
         }
 
+        return $this->prepareResponse($request, $e);
+    }
+
+    /**
+     * Prepare response containing exception render.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Exception $e
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function prepareResponse($request, Exception $e)
+    {
         if ($this->isHttpException($e)) {
             return $this->toIlluminateResponse($this->renderHttpException($e), $e);
         } else {
@@ -134,7 +165,11 @@ class Handler implements ExceptionHandlerContract
      */
     protected function toIlluminateResponse($response, Exception $e)
     {
-        $response = new Response($response->getContent(), $response->getStatusCode(), $response->headers->all());
+        if ($response instanceof SymfonyRedirectResponse) {
+            $response = new RedirectResponse($response->getTargetUrl(), $response->getStatusCode(), $response->headers->all());
+        } else {
+            $response = new Response($response->getContent(), $response->getStatusCode(), $response->headers->all());
+        }
 
         return $response->withException($e);
     }
@@ -183,7 +218,7 @@ class Handler implements ExceptionHandlerContract
 
         $errors = $e->validator->errors()->getMessages();
 
-        if (($request->ajax() && ! $request->pjax()) || $request->wantsJson()) {
+        if ($request->expectsJson()) {
             return response()->json($errors, 422);
         }
 

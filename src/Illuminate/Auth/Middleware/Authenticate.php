@@ -31,7 +31,7 @@ class Authenticate
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
-     * @param  string  ...$guards
+     * @param  string[]  ...$guards
      * @return mixed
      *
      * @throws \Illuminate\Auth\AuthenticationException
@@ -53,12 +53,8 @@ class Authenticate
      */
     protected function authenticate(array $guards)
     {
-        if (count($guards) <= 1) {
-            $guard = array_first($guards) ?: $this->auth->getDefaultDriver();
-
-            $this->auth->guard($guard)->authenticate();
-
-            return $this->auth->shouldUse($guard);
+        if (empty($guards)) {
+            return $this->auth->authenticate();
         }
 
         foreach ($guards as $guard) {
