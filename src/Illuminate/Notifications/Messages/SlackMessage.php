@@ -14,6 +14,27 @@ class SlackMessage
     public $level = 'info';
 
     /**
+     * Webhook username.
+     *
+     * @var string|null
+     */
+    public $username;
+
+    /**
+     * Webhook icon emoji.
+     *
+     * @var string|null
+     */
+    public $icon_emoji;
+
+    /**
+     * Channel override.
+     *
+     * @var string|null
+     */
+    public $channel;
+
+    /**
      * The text content of the message.
      *
      * @var string
@@ -47,6 +68,37 @@ class SlackMessage
     public function error()
     {
         $this->level = 'error';
+
+        return $this;
+    }
+
+    /**
+     * Set a custom username and emoji icon for the Slack message.
+     *
+     * @param  string       $username
+     * @param  string|null  $icon
+     * @return $this
+     */
+    public function as($username, $icon = null)
+    {
+        $this->username = $username;
+
+        if (! is_null($icon)) {
+            $this->icon_emoji = $icon;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set which channel the Slack message should be posted in.
+     *
+     * @param  string $channel
+     * @return $this
+     */
+    public function in($channel)
+    {
+        $this->channel = $channel;
 
         return $this;
     }
