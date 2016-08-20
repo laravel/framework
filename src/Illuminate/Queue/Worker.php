@@ -105,7 +105,7 @@ class Worker
     {
         if (! $options->timeout) {
             $this->runNextJob($connectionName, $queue, $options);
-        } elseif ($processId = pcntl_fork()) {
+        } elseif (function_exists("pcntl_fork") && $processId = pcntl_fork()) {
             $this->waitForChildProcess($processId, $options->timeout);
         } else {
             $this->runNextJob($connectionName, $queue, $options);
