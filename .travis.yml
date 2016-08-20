@@ -29,4 +29,4 @@ install:
   - if [[ $setup = 'stable' ]]; then travis_retry composer update --prefer-source --no-interaction --prefer-stable; fi
   - if [[ $setup = 'lowest' ]]; then travis_retry composer update --prefer-source --no-interaction --prefer-lowest --prefer-stable; fi
 
-script: vendor/bin/phpunit
+script: vendor/bin/phpunit --debug
