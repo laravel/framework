@@ -98,8 +98,8 @@ class NotificationSlackChannelTestNotification extends Notification
     public function toSlack($notifiable)
     {
         return (new SlackMessage)
-                    ->as('Ghostbot', ':ghost:')
-                    ->in('#ghost-talk')
+                    ->from('Ghostbot', ':ghost:')
+                    ->to('#ghost-talk')
                     ->content('Content')
                     ->attachment(function ($attachment) {
                         $attachment->title('Laravel', 'https://laravel.com')

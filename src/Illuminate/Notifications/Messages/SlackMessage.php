@@ -79,7 +79,7 @@ class SlackMessage
      * @param  string|null  $icon
      * @return $this
      */
-    public function as($username, $icon = null)
+    public function from($username, $icon = null)
     {
         $this->username = $username;
 
@@ -96,7 +96,7 @@ class SlackMessage
      * @param  string $channel
      * @return $this
      */
-    public function in($channel)
+    public function to($channel)
     {
         $this->channel = $channel;
 
