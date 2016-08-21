@@ -189,7 +189,9 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
 	 */
 	protected function createSMSDriver()
 	{
-		return new Channels\SMSChannel(new HttpClient);
+		return new Channels\SMSChannel(new HttpClient, 
+		    $this->app['config']['services.sms.key'], 
+		    $this->app['config']['services.sms.url']);
 	}
 
     /**
