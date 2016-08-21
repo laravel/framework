@@ -26,6 +26,13 @@ class NotificationSent
     public $channel;
 
     /**
+     * The channel's response.
+     *
+     * @var mixed
+     */
+    public $response;
+
+    /**
      * Create a new event instance.
      *
      * @param  mixed  $notifiable
@@ -37,8 +44,8 @@ class NotificationSent
     public function __construct($notifiable, $notification, $channel, $response = null)
     {
         $this->channel = $channel;
+        $this->response = $response;
         $this->notifiable = $notifiable;
         $this->notification = $notification;
-        $this->response = $response;
     }
 }
