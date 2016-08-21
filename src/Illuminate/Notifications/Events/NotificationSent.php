@@ -31,12 +31,14 @@ class NotificationSent
      * @param  mixed  $notifiable
      * @param  \Illuminate\Notifications\Notification  $notification
      * @param  string  $channel
+     * @param  mixed  $response
      * @return void
      */
-    public function __construct($notifiable, $notification, $channel)
+    public function __construct($notifiable, $notification, $channel, $response = null)
     {
         $this->channel = $channel;
         $this->notifiable = $notifiable;
         $this->notification = $notification;
+        $this->response = $response;
     }
 }

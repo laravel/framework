@@ -32,11 +32,11 @@ class BroadcastChannel
      *
      * @param  mixed  $notifiable
      * @param  \Illuminate\Notifications\Notification  $notification
-     * @return void
+     * @return array|null
      */
     public function send($notifiable, Notification $notification)
     {
-        $this->events->fire(new BroadcastNotificationCreated(
+        return $this->events->fire(new BroadcastNotificationCreated(
             $notifiable, $notification, $this->getData($notifiable, $notification)
         ));
     }
