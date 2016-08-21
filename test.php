@@ -5,10 +5,16 @@ require("vendor/autoload.php");
 class Test
 {
 
-	public function __construct(Test2 $test2, $lol = null)
+	public function __construct($first, Test2 $test2, $last)
 	{
+		var_dump($first);
+		var_dump($last);
 	}
 
+}
+
+interface TestInterface
+{
 }
 
 class Test2
@@ -20,12 +26,15 @@ class Test2
 
 	public function Antoine(Test $test)
 	{
+		return "OK";
 	}
 
 }
 
 $container = new Illuminate\Container\Container();
 
-$container->bindService("Test", Test::class);
+$ret = $container->resolve(function() {
+    return func_get_args();
+});
 
-var_dump($container->resolve("Test"));
+var_dump($ret);

@@ -3,29 +3,106 @@
 namespace Illuminate\Container;
 
 use Closure;
+use Illuminate\Contracts\Container\Container as ContainerContract;
 
-class Container extends AbstractContainer
+class Container extends AbstractContainer implements ContainerContract
 {
+    /**
+     * Register a binding with the container.
+     *
+     * @param  string|array  $abstract
+     * @param  \Closure|string|null  $concrete
+     * @param  bool  $shared
+     * @return void
+     */
+	public function bind($abstract, $concrete = null, $shared = false)
+	{
+        $abstract = $this->normalize($abstract);
+        $concrete = $this->normalize($concrete);
+
+		return $this->bindService($abstract, $concrete);
+	}
+
+    /**
+     * Register a shared binding in the container.
+     *
+     * @param  string|array  $abstract
+     * @param  \Closure|string|null  $concrete
+     * @return void
+     */
+    public function singleton($abstract, $concrete = null)
+    {
+        $abstract = $this->normalize($abstract);
+        $concrete = ($concrete) ? $this->normalize($concrete) : $abstract;
+
+        return $this->bindSingleton($abstract, $concrete);
+    }
+
+    /**
+     * Register an existing instance as shared in the container.
+     *
+     * @param  string  $abstract
+     * @param  mixed   $instance
+     * @return void
+     */
+    public function instance($abstract, $instance)
+    {
+        $abstract = $this->normalize($abstract);
+        $instance = $this->normalize($instance);
+
+        return $this->bindPlain($abstract, $instance);
+    }
+
+    /**
+     * Resolve the given type from the container.
+     *
+     * @param  string  $abstract
+     * @param  array   $parameters
+     * @return mixed
+     */
+    public function make($abstract, array $parameters = [])
+    {
+        $abstract = $this->normalize($abstract);
+
+        return $this->resolve($abstract, $parameters);
+    }
+
+    /**
+     * Call the given Closure / class@method and inject its dependencies.
+     *
+     * @param  callable|string  $callback
+     * @param  array  $parameters
+     * @param  string|null  $defaultMethod
+     * @return mixed
+     */
+    public function call($callback, array $parameters = [], $defaultMethod = null)
+    {
+        if (is_string($callback) && strpos($callback, '@')) {
+            $segments = explode('@', $callback, 2);
+            $resolved = $this->resolve($segments[0]);
+
+            return $this->resolve([$resolved, $segments[1]], $parameters);
+        } else if (is_string($callback) && $defaultMethod) {
+            $resolved = $this->resolve($callback);
+
+            return $this->resolve([$resolved, $defaultMethod], $parameters);
+        }
+
+        return $this->resolve($callback, $parameters);
+        return call_user_func_array($callback, $parameters);
+    }
+
     private function normalize($service)
     {
         return is_string($service) ? ltrim($service, '\\') : $service;
     }
 
-	public function bind($abstract, $concrete = null, $shared = false)
-	{
-		return $this->bindPlain($abstract, $concrete);
-	}
-
-    public function singleton($abstract, $concrete = null)
-    {
-        return $this->bindSingleton($abstract, $concrete);
-    }
-
-    public function instance($abstract, $instance)
-    {
-        return $this->bindInstance($abstract, $instance);
-    }
-
+    /**
+     * Determine if the given abstract type has been bound.
+     *
+     * @param  string  $abstract
+     * @return bool
+     */
     public function bound($abstract)
     {
 		$abstract = $this->normalize($abstract);
@@ -33,17 +110,12 @@ class Container extends AbstractContainer
     	return isset($this->bindings[$abstract]);
     }
 
-    public function make($abstract, array $parameters = [])
-    {
-        return $this->resolve($abstract, $parameters);
-    }
-
-    public function call($callback, array $parameters = [], $defaultMethod = null)
-    {
-        //Call class@method, callable or class + method (not from container)
-        return $this->resolve($abstract, $parameters);
-    }
-
+    /**
+     * Determine if the given abstract type has been resolved.
+     *
+     * @param  string $abstract
+     * @return bool
+     */
     public function resolved($abstract)
     {
         $abstract = $this->normalize($abstract);
@@ -55,27 +127,91 @@ class Container extends AbstractContainer
         return false;
     }
 
+    /**
+     * Alias a type to a different name.
+     *
+     * @param  string  $abstract
+     * @param  string  $alias
+     * @return void
+     */
     public function alias($abstract, $alias)
     {
     }
+
+    /**
+     * Assign a set of tags to a given binding.
+     *
+     * @param  array|string  $abstracts
+     * @param  array|mixed   ...$tags
+     * @return void
+     */
     public function tag($abstracts, $tags)
     {
     }
+
+    /**
+     * Resolve all of the bindings for a given tag.
+     *
+     * @param  array  $tag
+     * @return array
+     */
     public function tagged($tag)
     {
     }
+
+    /**
+     * Register a binding if it hasn't already been registered.
+     *
+     * @param  string  $abstract
+     * @param  \Closure|string|null  $concrete
+     * @param  bool  $shared
+     * @return void
+     */
     public function bindIf($abstract, $concrete = null, $shared = false)
     {
     }
+
+    /**
+     * "Extend" an abstract type in the container.
+     *
+     * @param  string    $abstract
+     * @param  \Closure  $closure
+     * @return void
+     *
+     * @throws \InvalidArgumentException
+     */
     public function extend($abstract, Closure $closure)
     {
     }
+
+    /**
+     * Define a contextual binding.
+     *
+     * @param  string  $concrete
+     * @return \Illuminate\Contracts\Container\ContextualBindingBuilder
+     */
     public function when($concrete)
     {
     }
+
+    /**
+     * Register a new resolving callback.
+     *
+     * @param  string    $abstract
+     * @param  \Closure|null  $callback
+     * @return void
+     */
     public function resolving($abstract, Closure $callback = null)
     {
     }
+
+   /**
+     * Register a new after resolving callback.
+     *
+     * @param  string    $abstract
+     * @param  \Closure|null  $callback
+     * @return void
+     */
     public function afterResolving($abstract, Closure $callback = null)
     {
     }

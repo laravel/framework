@@ -22,19 +22,36 @@ class Resolver
 
 	private function resolveParameters(array $reflectionParameters, array $parameters = [])
     {
-    	$i = 0;
-        $resolvedParameters = [];
+        $dependencies = [];
+        $parameters = $this->nameParameters($reflectionParameters, $parameters);
 
         foreach ($reflectionParameters as $parameter) {
-            if (($class = $parameter->getClass())) {
-                $resolvedParameters[] = $this->resolve($class->getName());
-            } else {
-                $resolvedParameters[] = $parameters[$i++];
-            }
+	        if (array_key_exists($parameter->name, $parameters)) {
+	    		$dependencies[] = $parameters[$parameter->name];
+	    	} else if ($parameter->getClass()) {
+	            $dependencies[] = $this->resolve($parameter->getClass()->name, [], self::TYPE_CLASS);
+	        } else if ($parameter->isDefaultValueAvailable()) {
+	            $dependencies[] = $parameter->getDefaultValue();
+	        }
         }
 
-        return $resolvedParameters;
+        return $dependencies;
     }
+
+	private function nameParameters(array $reflectionParameters, array $parameters = [])
+	{
+		$ret = [];
+
+		foreach ($parameters as $key => $value) {
+			if (is_numeric($key)) {
+				$key = $reflectionParameters[$key]->name;
+			}
+
+			$ret[$key] = $value;
+		}
+
+		return $ret;
+	}
 
     public function resolveClass($class, array $parameters = [])
     {
@@ -81,7 +98,7 @@ class Resolver
 	    	return call_user_func_array([$this, $resolver], [$subject, $parameters]);
     	}
 
-        return null;
+        return $subject;
     }
 
     public static function getType($subject)
@@ -109,6 +126,6 @@ class Resolver
 
     public static function isFunction($subject)
     {
-    	return is_callable($subject) && is_string($subject);
+    	return is_callable($subject);
     }
 }
