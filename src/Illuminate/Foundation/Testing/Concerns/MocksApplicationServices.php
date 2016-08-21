@@ -403,7 +403,7 @@ trait MocksApplicationServices
 
         $this->beforeApplicationDestroyed(function () use ($notifiable, $notification) {
             foreach ($this->dispatchedNotifications as $dispatched) {
-                foreach($dispatched['notifiable'] as $notified) {
+                foreach ($dispatched['notifiable'] as $notified) {
                     if (($notified === $notifiable ||
                          $notified->getKey() == $notifiable->getKey()) &&
                         get_class($dispatched['instance']) === $notification
