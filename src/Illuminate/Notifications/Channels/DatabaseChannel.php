@@ -12,11 +12,11 @@ class DatabaseChannel
      *
      * @param  mixed  $notifiable
      * @param  \Illuminate\Notifications\Notification  $notification
-     * @return void
+     * @return \Illuminate\Database\Eloquent\Model
      */
     public function send($notifiable, Notification $notification)
     {
-        $notifiable->routeNotificationFor('database')->create([
+        return $notifiable->routeNotificationFor('database')->create([
             'id' => $notification->id,
             'type' => get_class($notification),
             'data' => $this->getData($notifiable, $notification),
