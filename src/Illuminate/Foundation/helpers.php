@@ -517,6 +517,20 @@ if (! function_exists('policy')) {
     }
 }
 
+if (! function_exists('public_storage')) {
+    /**
+     * Generate an asset path for the application, prefixed by storage/.
+     *
+     * @param  string  $path
+     * @param  bool    $secure
+     * @return string
+     */
+    function public_storage($path, $secure = null)
+    {
+        return app('url')->asset('storage'.DIRECTORY_SEPARATOR.$path, $secure);
+    }
+}
+
 if (! function_exists('public_path')) {
     /**
      * Get the path to the public folder.
