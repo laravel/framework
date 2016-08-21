@@ -16,7 +16,7 @@ use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Illuminate\Contracts\Routing\Registrar as RegistrarContract;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class Router implements RegistrarContract
 {
@@ -927,7 +927,7 @@ class Router implements RegistrarContract
      * @param  \Closure|null  $callback
      * @return void
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public function model($key, $class, Closure $callback = null)
     {
@@ -952,7 +952,7 @@ class Router implements RegistrarContract
                 return call_user_func($callback, $value);
             }
 
-            throw new NotFoundHttpException;
+            throw (new ModelNotFoundException)->setModel($class);
         });
     }
 
