@@ -3,78 +3,13 @@
 namespace Illuminate\Container;
 
 use Closure;
-use Illuminate\Container\Resolver;
 
-class Container extends Resolver
+class Container extends AbstractContainer
 {
-	const TYPE_PLAIN = 1;
-	const TYPE_INSTANCE = 2;
-	const TYPE_SINGLETON = 3;
-
-	private $bindings = [];
-	private $bindingsTypes = [];
-
-	private function normalize($service)
-	{
+    private function normalize($service)
+    {
         return is_string($service) ? ltrim($service, '\\') : $service;
-	}
-
-    private function bindPlain($abstract, $concrete = null)
-    {
-        $abstract = $this->normalize($abstract);
-        $concrete = $this->normalize($concrete);
-
-        $this->bindings[$abstract] = $concrete;
-        $this->bindingsTypes[$abstract] = self::TYPE_PLAIN;
     }
-
-    private function bindInstance($abstract, $concrete = null)
-    {
-        $abstract = $this->normalize($abstract);
-        $concrete = $this->normalize($concrete);
-
-        $this->bindings[$abstract] = $concrete;
-        $this->bindingsTypes[$abstract] = self::TYPE_INSTANCE;
-    }
-
-    private function bindSingleton($abstract, $concrete = null)
-    {
-        $abstract = $this->normalize($abstract);
-        $concrete = $this->normalize($concrete);
-
-        $this->bindings[$abstract] = $concrete;
-        $this->bindingsTypes[$abstract] = self::TYPE_SINGLETON;
-    }
-
-    private function resolveFromContainer($abstract, array $parameters = [])
-    {
-        $bind = $this->bindings[$abstract];
-        $bindType = $this->bindingsTypes[$abstract];
-
-        if (!is_object($bind)) {
-            $bind = parent::resolve($abstract, $parameters);
-        }
-        if ($bindType === self::TYPE_SINGLETON) {
-            $this->bindings[$abstract] = $bind;
-        }
-
-        return $bind;
-    }
-
-    public function resolve($abstract, array $parameters = [])
-    {
-        $abstract = $this->normalize($abstract);
-
-        if (is_string($abstract) && isset($this->bindings[$abstract])) {
-            $bind = $this->resolveFromContainer($abstract, $parameters);
-        } else {
-            $bind = parent::resolve($abstract, $parameters);
-        }
-
-        return $bind;
-    }
-
-	////////////////////////////
 
 	public function bind($abstract, $concrete = null, $shared = false)
 	{
@@ -98,6 +33,28 @@ class Container extends Resolver
     	return isset($this->bindings[$abstract]);
     }
 
+    public function make($abstract, array $parameters = [])
+    {
+        return $this->resolve($abstract, $parameters);
+    }
+
+    public function call($callback, array $parameters = [], $defaultMethod = null)
+    {
+        //Call class@method, callable or class + method (not from container)
+        return $this->resolve($abstract, $parameters);
+    }
+
+    public function resolved($abstract)
+    {
+        $abstract = $this->normalize($abstract);
+
+        if (isset($this->bindings[$abstract]) && is_object($this->bindings[$abstract])) {
+            return true;
+        }
+
+        return false;
+    }
+
     public function alias($abstract, $alias)
     {
     }
@@ -114,15 +71,6 @@ class Container extends Resolver
     {
     }
     public function when($concrete)
-    {
-    }
-    public function make($abstract, array $parameters = [])
-    {
-    }
-    public function call($callback, array $parameters = [], $defaultMethod = null)
-    {
-    }
-    public function resolved($abstract)
     {
     }
     public function resolving($abstract, Closure $callback = null)

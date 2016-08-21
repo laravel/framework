@@ -1,7 +1,6 @@
 <?php
 
-require("src/Illuminate/Container/Resolver.php");
-require("src/Illuminate/Container/Container.php");
+require("vendor/autoload.php");
 
 class Test
 {
@@ -27,6 +26,6 @@ class Test2
 
 $container = new Illuminate\Container\Container();
 
-$class = $container->resolve(Test::class);
+$container->bindService("Test", Test::class);
 
-var_dump($class);
+var_dump($container->resolve("Test"));

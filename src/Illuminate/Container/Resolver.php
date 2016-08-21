@@ -10,17 +10,24 @@ use ReflectionParameter;
 
 class Resolver
 {
+	const TYPE_CLASS = 1;
+	const TYPE_METHOD = 2;
+	const TYPE_FUNCTION = 3;
 
-	private function resolveParameters(Reflector $reflector, array $parameters = [])
+	private $RESOLVERS_MAP = [
+		self::TYPE_CLASS => "resolveClass",
+		self::TYPE_METHOD => "resolveMethod",
+		self::TYPE_FUNCTION => "resolveFunction"
+	];
+
+	private function resolveParameters(array $reflectionParameters, array $parameters = [])
     {
-        $i = 0;
+    	$i = 0;
         $resolvedParameters = [];
 
-        foreach ($reflector->getParameters() as $parameter) {
+        foreach ($reflectionParameters as $parameter) {
             if (($class = $parameter->getClass())) {
                 $resolvedParameters[] = $this->resolve($class->getName());
-            } else if ($parameter->isDefaultValueAvailable())  {
-                $resolvedParameters[] = $parameter->getDefaultValue();
             } else {
                 $resolvedParameters[] = $parameters[$i++];
             }
@@ -29,46 +36,79 @@ class Resolver
         return $resolvedParameters;
     }
 
-    private function resolveClass($class, array $parameters = [])
+    public function resolveClass($class, array $parameters = [])
     {
         $reflectionClass = new ReflectionClass($class);
-        $constructor = $reflectionClass->getConstructor();
 
-        if ($constructor) {
-            $resolvedParameters = $this->resolveParameters($constructor, $parameters);
-        } else {
-            $resolvedParameters = [];
+        if (($reflectionMethod = $reflectionClass->getConstructor())) {
+        	$reflectionParameters = $reflectionMethod->getParameters();
+
+        	$resolvedParameters = $this->resolveParameters($reflectionParameters, $parameters);
+
+        	return $reflectionClass->newInstanceArgs($resolvedParameters);
         }
 
-        return $reflectionClass->newInstanceArgs($resolvedParameters);
+        return $reflectionClass->newInstanceArgs();
     }
 
-    private function resolveMethod($method, array $parameters = [])
+    public function resolveMethod($method, array $parameters = [])
     {
         $reflectionMethod = new ReflectionMethod($method[0], $method[1]);
-        $resolvedParameters = $this->resolveParameters($reflectionMethod, $parameters);
+        $reflectionParameters = $reflectionMethod->getParameters();
+
+        $resolvedParameters = $this->resolveParameters($reflectionParameters, $parameters);
 
         return $reflectionMethod->invokeArgs($method[0], $resolvedParameters);
     }
 
-    private function resolveFunction($function, array $parameters = [])
+    public function resolveFunction($function, array $parameters = [])
     {
         $reflectionFunction = new ReflectionFunction($function);
-        $resolvedParameters = $this->resolveParameters($reflectionFunction, $parameters);
+        $reflectionParameters = $reflectionFunction->getParameters();
+
+        $resolvedParameters = $this->resolveParameters($reflectionParameters, $parameters);
 
         return $reflectionFunction->invokeArgs($resolvedParameters);
     }
 
-    public function resolve($abstract, array $parameters = [])
+    public function resolve($subject, array $parameters = [], $type = null)
     {
-        if (is_callable($abstract) && is_string($abstract)) {
-            return $this->resolveFunction($abstract, $parameters);
-        } else if (is_callable($abstract) && is_array($abstract)) {
-            return $this->resolveMethod($abstract, $parameters);
-        } else if (is_string($abstract)) {
-            return $this->resolveClass($abstract, $parameters);
+    	$type = ($type !== null) ? $type : self::getType($subject);
+
+    	if ($type) {
+	    	$resolver = $this->RESOLVERS_MAP[$type];
+
+	    	return call_user_func_array([$this, $resolver], [$subject, $parameters]);
+    	}
+
+        return null;
+    }
+
+    public static function getType($subject)
+    {
+        if (self::isClass($subject)) {
+        	return self::TYPE_CLASS;
+        } else if (self::isMethod($subject)) {
+        	return self::TYPE_METHOD;
+        } else if (self::isFunction($subject)) {
+        	return self::TYPE_FUNCTION;
         }
 
         return null;
+    }
+
+    public static function isClass($subject)
+    {
+    	return !is_callable($subject) && is_string($subject);
+    }
+
+    public static function isMethod($subject)
+    {
+    	return is_callable($subject) && is_array($subject);
+    }
+
+    public static function isFunction($subject)
+    {
+    	return is_callable($subject) && is_string($subject);
     }
 }
