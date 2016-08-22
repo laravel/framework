@@ -156,7 +156,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
     /**
      * Get the response for a forbidden operation.
      *
-     * @return  \Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function forbiddenResponse()
     {
