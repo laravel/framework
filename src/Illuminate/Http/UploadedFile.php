@@ -69,18 +69,44 @@ class UploadedFile extends SymfonyUploadedFile
     }
 
     /**
-     * Store the uploaded file on a filesystem disk.
+     * Store the uploaded file on a filesystem disk with public visibility
+     *
+     * @param  string  $path
+     * @param  string|null  $disk
+     * @return string|false
+     */
+    public function storePublicly($path, $disk = null)
+    {
+        return $this->storeAs($path, $this->hashName(), $disk, 'public');
+    }
+
+    /**
+     * Store the uploaded file on a filesystem disk with public visibility
      *
      * @param  string  $path
      * @param  string  $name
      * @param  string|null  $disk
      * @return string|false
      */
-    public function storeAs($path, $name, $disk = null)
+    public function storePubliclyAs($path, $name, $disk = null)
+    {
+        return $this->storeAs($path, $name, $disk, 'public');
+    }
+
+    /**
+     * Store the uploaded file on a filesystem disk.
+     *
+     * @param  string  $path
+     * @param  string  $name
+     * @param  string|null  $disk
+     * @param  string|null  $visibility
+     * @return string|false
+     */
+    public function storeAs($path, $name, $disk = null, $visibility = null)
     {
         $factory = Container::getInstance()->make(FilesystemFactory::class);
 
-        return $factory->disk($disk)->putFileAs($path, $this, $name);
+        return $factory->disk($disk)->putFileAs($path, $this, $name, $visibility);
     }
 
     /**
