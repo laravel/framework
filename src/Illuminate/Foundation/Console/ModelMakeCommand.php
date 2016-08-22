@@ -84,7 +84,8 @@ class ModelMakeCommand extends GeneratorCommand
         return $this->replaceNamespace($stub, $name)
             ->replaceClass($stub, $name)
             ->replaceTimestamps($stub)
-            ->replaceSoftDeletes($stub);
+            ->replaceSoftDeletes($stub)
+            ->replaceDateMutators($stub);
     }
 
     /**
@@ -108,10 +109,27 @@ class ModelMakeCommand extends GeneratorCommand
      * @param  string  $stub
      * @return $this
      */
-    protected function replaceSoftDeletes($stub)
+    protected function replaceSoftDeletes(&$stub)
     {
         if (! $this->option('soft-deletes')) {
             $stub = str_replace("use Illuminate\Database\Eloquent\SoftDeletes;\n", '', $stub)
+        }
+
+        return $this;
+    }
+
+    protected function replaceDateMutators(&$stub)
+    {
+        if (($this->option('no-timestamps') && !$this->option('soft-deletes')) ||
+            (!$this->option('no-timestamps') && !$this->option('soft-deletes'))) {
+            $stub = str_replace("protected $dates = ['created_at', 'updated_at', 'deleted_at'];\n", '', $stub);
+        }
+        else if ($this->option('no-timestamps') && $this->option('soft-deletes')) {
+            $stub = str_replace(
+                "protected $dates = ['created_at', 'updated_at', 'deleted_at'];", 
+                "protected $dates = ['soft-deletes'];", 
+                $stub
+            );
         }
 
         return $this;
