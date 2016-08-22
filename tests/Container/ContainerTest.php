@@ -128,17 +128,6 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('wow', $container->make('zing'));
     }
 
-    public function testShareMethod()
-    {
-        $container = new Container;
-        $closure = $container->share(function () {
-            return new stdClass;
-        });
-        $class1 = $closure($container);
-        $class2 = $closure($container);
-        $this->assertSame($class1, $class2);
-    }
-
     public function testBindingsCanBeOverridden()
     {
         $container = new Container;
@@ -160,9 +149,9 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
 
         $container = new Container;
 
-        $container['foo'] = $container->share(function () {
+        $container['foo'] = function () {
             return (object) ['name' => 'taylor'];
-        });
+        };
         $container->extend('foo', function ($old, $container) {
             $old->age = 26;
 
@@ -322,38 +311,6 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(isset($container['alias']));
     }
 
-    public function testReboundListeners()
-    {
-        unset($_SERVER['__test.rebind']);
-
-        $container = new Container;
-        $container->bind('foo', function () {
-        });
-        $container->rebinding('foo', function () {
-            $_SERVER['__test.rebind'] = true;
-        });
-        $container->bind('foo', function () {
-        });
-
-        $this->assertTrue($_SERVER['__test.rebind']);
-    }
-
-    public function testReboundListenersOnInstances()
-    {
-        unset($_SERVER['__test.rebind']);
-
-        $container = new Container;
-        $container->instance('foo', function () {
-        });
-        $container->rebinding('foo', function () {
-            $_SERVER['__test.rebind'] = true;
-        });
-        $container->instance('foo', function () {
-        });
-
-        $this->assertTrue($_SERVER['__test.rebind']);
-    }
-
     public function testPassingSomePrimitiveParameters()
     {
         $container = new Container;
@@ -423,19 +380,6 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
         $result = $container->call(function (StdClass $foo, $bar = []) {
             return func_get_args();
         }, ['bar' => 'taylor']);
-
-        $this->assertInstanceOf('stdClass', $result[0]);
-        $this->assertEquals('taylor', $result[1]);
-
-        /*
-         * Wrap a function...
-         */
-        $result = $container->wrap(function (StdClass $foo, $bar = []) {
-            return func_get_args();
-        }, ['bar' => 'taylor']);
-
-        $this->assertInstanceOf('Closure', $result);
-        $result = $result();
 
         $this->assertInstanceOf('stdClass', $result[0]);
         $this->assertEquals('taylor', $result[1]);
@@ -573,53 +517,6 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('ContainerImplementationStubTwo', $container->tagged('foo')[1]);
 
         $this->assertEmpty($container->tagged('this_tag_does_not_exist'));
-    }
-
-    public function testForgetInstanceForgetsInstance()
-    {
-        $container = new Container;
-        $containerConcreteStub = new ContainerConcreteStub;
-        $container->instance('ContainerConcreteStub', $containerConcreteStub);
-        $this->assertTrue($container->isShared('ContainerConcreteStub'));
-        $container->forgetInstance('ContainerConcreteStub');
-        $this->assertFalse($container->isShared('ContainerConcreteStub'));
-    }
-
-    public function testForgetInstancesForgetsAllInstances()
-    {
-        $container = new Container;
-        $containerConcreteStub1 = new ContainerConcreteStub;
-        $containerConcreteStub2 = new ContainerConcreteStub;
-        $containerConcreteStub3 = new ContainerConcreteStub;
-        $container->instance('Instance1', $containerConcreteStub1);
-        $container->instance('Instance2', $containerConcreteStub2);
-        $container->instance('Instance3', $containerConcreteStub3);
-        $this->assertTrue($container->isShared('Instance1'));
-        $this->assertTrue($container->isShared('Instance2'));
-        $this->assertTrue($container->isShared('Instance3'));
-        $container->forgetInstances();
-        $this->assertFalse($container->isShared('Instance1'));
-        $this->assertFalse($container->isShared('Instance2'));
-        $this->assertFalse($container->isShared('Instance3'));
-    }
-
-    public function testContainerFlushFlushesAllBindingsAliasesAndResolvedInstances()
-    {
-        $container = new Container;
-        $container->bind('ConcreteStub', function () {
-            return new ContainerConcreteStub;
-        }, true);
-        $container->alias('ConcreteStub', 'ContainerConcreteStub');
-        $concreteStubInstance = $container->make('ConcreteStub');
-        $this->assertTrue($container->resolved('ConcreteStub'));
-        $this->assertTrue($container->isAlias('ContainerConcreteStub'));
-        $this->assertArrayHasKey('ConcreteStub', $container->getBindings());
-        $this->assertTrue($container->isShared('ConcreteStub'));
-        $container->flush();
-        $this->assertFalse($container->resolved('ConcreteStub'));
-        $this->assertFalse($container->isAlias('ContainerConcreteStub'));
-        $this->assertEmpty($container->getBindings());
-        $this->assertFalse($container->isShared('ConcreteStub'));
     }
 
     public function testResolvedResolvesAliasToBindingNameBeforeChecking()

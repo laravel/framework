@@ -10,36 +10,44 @@ use Illuminate\Contracts\Container\Container as ContainerContract;
 class Container extends AbstractContainer implements ContainerContract
 {
     private $tags = [];
-    private $resolving = [];
+    private $extenders = [];
+    private $eventsAfterResolving;
 
-    public function resolve($subject, array $parameters = [])
+    public function __construct()
     {
-        $result = parent::resolve($subject, $parameters);
-        $resultType = gettype($result);
-        $subjectType = gettype($subject);
-
-        if ($subjectType === "string") {
-            $this->callResolvingCallbacks($subject, $result);
-        }
-        if ($resultType === "object") {
-            $this->callResolvingCallbacks(get_class($result), $result);
-        }
-        if ($resultType === "object" && !($result instanceof stdClass)) {
-            $this->callResolvingCallbacks(stdClass::class, $result);
-        }
-
-        return $result;
+        $this->eventsAfterResolving = new Events();
     }
 
-    private function callResolvingCallbacks($name, $object)
+    public function resolve($abstract, array $parameters = [])
     {
-        if (isset($this->resolving[$name]) && is_array($this->resolving[$name])) {
-            $callbacks = $this->resolving[$name];
+        $concrete = parent::resolve($abstract, $parameters);
 
-            foreach ($callbacks as $callback) {
-                $callback($object, $this);
+        if (is_string($abstract) && isset($this->extenders[$abstract])) {
+            $extenders = $this->extenders[$abstract];
+
+            unset($this->extenders[$abstract]);
+
+            foreach ($extenders as $extender) {
+                $concrete = $extender($concrete, $this);
             }
+
+            $this->bindPlain($abstract, $concrete);
         }
+
+        $this->fireAfterResolving($abstract, $concrete, [$concrete, $this]);
+
+        return $concrete;
+    }
+
+    private function fireExtenders()
+    {
+    }
+
+    private function fireAfterResolving($abstract, $concrete, $parameters = [])
+    {
+        $this->eventsAfterResolving->fireGlobal($parameters);
+        $this->eventsAfterResolving->fire($abstract, $parameters);
+        $this->eventsAfterResolving->fire($concrete, $parameters);
     }
 
     /**
@@ -100,25 +108,6 @@ class Container extends AbstractContainer implements ContainerContract
         } else {
             $this->bindPlain($abstract, $instance);
         }
-    }
-
-    /**
-     * Wrap a Closure such that it is shared.
-     *
-     * @param  \Closure  $closure
-     * @return \Closure
-     */
-    public function share(Closure $closure)
-    {
-        return function ($container) use ($closure) {
-            static $object;
-
-            if (is_null($object)) {
-                $object = $closure($container);
-            }
-
-            return $object;
-        };
     }
 
     /**
@@ -213,12 +202,17 @@ class Container extends AbstractContainer implements ContainerContract
     public function tag($abstracts, $tags)
     {
         $tags = (is_array($tags)) ? $tags : array_slice(func_get_args(), 1);
+        $abstracts = (is_array($abstracts)) ? $abstracts : [$abstracts];
 
-        foreach ((array) $abstracts as $key => $abstract) {
+        foreach ($abstracts as $key => $abstract) {
             $abstracts[$key] = $this->normalize($abstract);
         }
         foreach ($tags as $tagName) {
-            $this->tags[$tagName] = (array) $abstracts;
+            if (isset($this->tags[$tagName])) {
+                $this->tags[$tagName] = array_merge($this->tags[$tagName], $abstracts);
+            } else {
+                $this->tags[$tagName] = $abstracts;
+            }
         }
     }
 
@@ -268,12 +262,7 @@ class Container extends AbstractContainer implements ContainerContract
     public function extend($abstract, Closure $closure)
     {
         $abstract = $this->normalize($abstract);
-
-        if (isset($this->bindings[$abstract])) {
-            return $this->bindPlain($abstract, $closure($this->make($abstract), $this));
-        }
-
-        return $this->bind($abstract, $closure);
+        $this->extenders[$abstract][] = $closure;
     }
 
     /**
@@ -295,11 +284,7 @@ class Container extends AbstractContainer implements ContainerContract
      */
     public function resolving($abstract, Closure $callback = null)
     {
-        if ($callback === null && $abstract instanceof Closure) {
-            $this->resolving[stdClass::class][] = $abstract;
-        } else {
-            $this->resolving[$this->normalize($abstract)][] = $callback;
-        }
+        return $this->afterResolving($abstract, $callback);
     }
 
    /**
@@ -311,7 +296,11 @@ class Container extends AbstractContainer implements ContainerContract
      */
     public function afterResolving($abstract, Closure $callback = null)
     {
-        return $this->resolving($abstract, $callback);
+        if (is_string($abstract)) {
+            $abstract = $this->normalize($abstract);
+        }
+
+        return $this->eventsAfterResolving->listen($abstract, $callback);
     }
 
 }

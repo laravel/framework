@@ -28,7 +28,7 @@ class AbstractContainer extends Resolver implements ArrayAccess
     {
         if (is_string($subject) && isset($this->bindings[$subject])) {
             $binding = $this->bindings[$subject];
-            $binding[self::IS_RESOLVED] = true;
+            $this->bindings[$subject][self::IS_RESOLVED] = true;
 
             $resolver = $this->RESOLVERS_MAP[$binding[self::BINDING_TYPE]];
 

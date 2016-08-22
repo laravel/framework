@@ -5,40 +5,35 @@ require("vendor/autoload.php");
 class Test
 {
 
-	public function __construct()
+	public function __construct(Test2 $test2)
 	{
 	}
 
-	public function work()
-	{
-		return func_get_args();
-	}
-
-}
-
-interface TestInterface
-{
 }
 
 class Test2
 {
 
-	public function __construct()
+	public function __construct(Test3 $test2)
 	{
 	}
 
-	public function Antoine(Test $test)
+}
+
+class Test3
+{
+
+	public function __construct()
 	{
-		return "OK";
 	}
 
 }
 
 $container = new Illuminate\Container\Container();
 
-$container->bind('ContainerLazyExtendStub');
-$container->extend('ContainerLazyExtendStub', function ($obj, $container) {
-    $obj->init();
-
-    return $obj;
+$container->extend('foo', function ($old, $container) {
+    return $old.'bar';
 });
+$container['foo'] = 'foo';
+
+dump($container->make('foo'));
