@@ -80,15 +80,7 @@ class UploadedFile extends SymfonyUploadedFile
     {
         $factory = Container::getInstance()->make(FilesystemFactory::class);
 
-        $stream = fopen($this->path(), 'r+');
-
-        $result = $factory->disk($disk)->put($path = trim($path.'/'.$name, '/'), $stream);
-
-        if (is_resource($stream)) {
-            fclose($stream);
-        }
-
-        return $result ? $path : false;
+        return $factory->disk($disk)->putFileAs($path, $this, $name);
     }
 
     /**
