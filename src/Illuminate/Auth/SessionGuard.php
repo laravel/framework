@@ -130,6 +130,9 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
 
         if (! is_null($id)) {
             $user = $this->provider->retrieveById($id);
+            if ($user) {
+                $this->fireAuthenticatedEvent($user);
+            }
         }
 
         // If the user is null, but we decrypt a "recaller" cookie we can attempt to
@@ -472,6 +475,19 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     }
 
     /**
+     * Fire the authenticated event if the dispatcher is set.
+     *
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @return void
+     */
+    protected function fireAuthenticatedEvent($user)
+    {
+        if (isset($this->events)) {
+            $this->events->fire(new Events\Authenticated($user));
+        }
+    }
+
+    /**
      * Update the session with the given ID.
      *
      * @param  string  $id
@@ -719,6 +735,8 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         $this->user = $user;
 
         $this->loggedOut = false;
+
+        $this->fireAuthenticatedEvent($user);
 
         return $this;
     }
