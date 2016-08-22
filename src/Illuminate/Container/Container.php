@@ -15,14 +15,16 @@ class Container extends AbstractContainer implements ContainerContract
     public function resolve($subject, array $parameters = [])
     {
         $result = parent::resolve($subject, $parameters);
+        $resultType = gettype($result);
+        $subjectType = gettype($subject);
 
-        if (is_string($subject)) {
+        if ($subjectType === "string") {
             $this->callResolvingCallbacks($subject, $result);
         }
-        if (is_object($result)) {
+        if ($resultType === "object") {
             $this->callResolvingCallbacks(get_class($result), $result);
         }
-        if (is_object($result) && !($result instanceof stdClass)) {
+        if ($resultType === "object" && !($result instanceof stdClass)) {
             $this->callResolvingCallbacks(stdClass::class, $result);
         }
 
