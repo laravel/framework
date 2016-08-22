@@ -3,6 +3,7 @@
 namespace Illuminate\Filesystem;
 
 use RuntimeException;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Support\Collection;
 use League\Flysystem\AdapterInterface;
@@ -239,7 +240,9 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
 
             return $adapter->getClient()->getObjectUrl($adapter->getBucket(), $path);
         } elseif ($adapter instanceof LocalAdapter) {
-            return '/storage/'.$path;
+            $path = '/storage/'.$path;
+
+            return Str::contains($path, '/storage/public') ? Str::replaceFirst('/public', '', $path) : $path;
         } elseif (method_exists($adapter, 'getUrl')) {
             return $adapter->getUrl($path);
         } else {
