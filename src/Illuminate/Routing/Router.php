@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -357,6 +358,21 @@ class Router implements RegistrarContract
         }
 
         $registrar->register($name, $controller, $options);
+    }
+    
+    /**
+     * Register a new redirect route with the router.
+     *
+     * @param  string  $from
+     * @param  string  $to
+     * @param  int  $status
+     * @return \Illuminate\Routing\Route
+     */
+    public function redirect($from, $to, $status = 301)
+    {
+        return $this->get($from, function () use ($to, $status) {
+            return new RedirectResponse($to, $status);
+        });
     }
 
     /**
