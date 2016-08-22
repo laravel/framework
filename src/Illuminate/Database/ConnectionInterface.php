@@ -105,7 +105,7 @@ interface ConnectionInterface
      * Execute a Closure within a transaction.
      *
      * @param  \Closure  $callback
-     * @param  int       $attempts
+     * @param  int  $attempts
      * @return mixed
      *
      * @throws \Throwable

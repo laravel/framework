@@ -20,7 +20,7 @@ use Illuminate\Database\Query\Grammars\Grammar as QueryGrammar;
 
 class Connection implements ConnectionInterface
 {
-    use DetectsLostConnections, DetectsDeadlocks;
+    use DetectsDeadlocks, DetectsLostConnections;
 
     /**
      * The active PDO connection.
@@ -553,7 +553,7 @@ class Connection implements ConnectionInterface
      * Execute a Closure within a transaction.
      *
      * @param  \Closure  $callback
-     * @param  int       $attempts
+     * @param  int  $attempts
      * @return mixed
      *
      * @throws \Exception|\Throwable
