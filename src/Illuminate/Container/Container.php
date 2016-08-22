@@ -183,7 +183,7 @@ class Container extends AbstractContainer implements ContainerContract
     {
         $abstract = $this->normalize($abstract);
 
-        return isset($this->bindings[$abstract]) && is_object($this->bindings[$abstract]);
+        return isset($this->bindings[$abstract]) && $this->bindings[$abstract][AbstractContainer::IS_RESOLVED];
     }
 
     /**
@@ -265,6 +265,20 @@ class Container extends AbstractContainer implements ContainerContract
      */
     public function extend($abstract, Closure $closure)
     {
+        /*
+        $abstract = $this->normalize($abstract);
+
+        if (isset($this->bindings[$abstract]) && $this->resolved($abstract)) {
+            $newVal = $closure($this->make($abstract), $this);
+            $binding = $this->bindings[$abstract];
+            $bindingType = $binding[AbstractContainer::BINDING_TYPE];
+
+        } else if (isset($this->bindings[$abstract])) {
+            //
+        }
+
+        return $this->bind($abstract, $closure);
+        */
     }
 
     /**

@@ -13,6 +13,7 @@ class AbstractContainer extends Resolver implements ArrayAccess
     const TYPE_SINGLETON = 3;
 
     const VALUE = "value";
+    const IS_RESOLVED = "is_resolved";
     const BINDING_TYPE = "binding_type";
 
     private $RESOLVERS_MAP = [
@@ -26,8 +27,10 @@ class AbstractContainer extends Resolver implements ArrayAccess
     public function resolve($subject, array $parameters = [])
     {
         if (is_string($subject) && isset($this->bindings[$subject])) {
-            $bindingType = $this->bindings[$subject][self::BINDING_TYPE];
-            $resolver = $this->RESOLVERS_MAP[$bindingType];
+            $binding = $this->bindings[$subject];
+            $binding[self::IS_RESOLVED] = true;
+
+            $resolver = $this->RESOLVERS_MAP[$binding[self::BINDING_TYPE]];
 
             return call_user_func_array([$this, $resolver], [$subject, $parameters]);
         }
@@ -39,6 +42,7 @@ class AbstractContainer extends Resolver implements ArrayAccess
     {
         $this->bindings[$abstract] = [
             self::VALUE => $concrete,
+            self::IS_RESOLVED => false,
             self::BINDING_TYPE => self::TYPE_PLAIN
         ];
     }
@@ -47,6 +51,7 @@ class AbstractContainer extends Resolver implements ArrayAccess
     {
         $this->bindings[$abstract] = [
             self::VALUE => $concrete,
+            self::IS_RESOLVED => false,
             self::BINDING_TYPE => self::TYPE_SERVICE
         ];
     }
@@ -55,6 +60,7 @@ class AbstractContainer extends Resolver implements ArrayAccess
     {
         $this->bindings[$abstract] = [
             self::VALUE => $concrete,
+            self::IS_RESOLVED => false,
             self::BINDING_TYPE => self::TYPE_SINGLETON
         ];
     }
