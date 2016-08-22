@@ -97,7 +97,7 @@ class ModelMakeCommand extends GeneratorCommand
     protected function replaceTimestamps(&$stub)
     {
         if (! $this->option('no-timestamps')) {
-            $stub = str_replace("public $timestamps = false;\n", '', $stub)
+            $stub = str_replace("public $timestamps = false;\n", '', $stub);
         }
 
         return $this;
@@ -112,7 +112,7 @@ class ModelMakeCommand extends GeneratorCommand
     protected function replaceSoftDeletes(&$stub)
     {
         if (! $this->option('soft-deletes')) {
-            $stub = str_replace("use Illuminate\Database\Eloquent\SoftDeletes;\n", '', $stub)
+            $stub = str_replace("use Illuminate\Database\Eloquent\SoftDeletes;\n", '', $stub);
         }
 
         return $this;
