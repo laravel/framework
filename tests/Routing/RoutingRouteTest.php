@@ -608,7 +608,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @expectedException Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public function testModelBindingWithNullReturn()
     {
