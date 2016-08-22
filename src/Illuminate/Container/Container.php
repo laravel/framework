@@ -51,7 +51,7 @@ class Container extends AbstractContainer implements ContainerContract
 	public function bind($abstract, $concrete = null, $shared = false)
 	{
         $abstract = $this->normalize($abstract);
-        $concrete = $this->normalize($concrete);
+        $concrete = ($concrete) ? $this->normalize($concrete) : $abstract;
 
         if (is_array($abstract)) {
             $this->bindService(key($abstract), $concrete);
@@ -265,20 +265,13 @@ class Container extends AbstractContainer implements ContainerContract
      */
     public function extend($abstract, Closure $closure)
     {
-        /*
         $abstract = $this->normalize($abstract);
 
-        if (isset($this->bindings[$abstract]) && $this->resolved($abstract)) {
-            $newVal = $closure($this->make($abstract), $this);
-            $binding = $this->bindings[$abstract];
-            $bindingType = $binding[AbstractContainer::BINDING_TYPE];
-
-        } else if (isset($this->bindings[$abstract])) {
-            //
+        if (isset($this->bindings[$abstract])) {
+            return $this->bindPlain($abstract, $closure($this->make($abstract), $this));
         }
 
         return $this->bind($abstract, $closure);
-        */
     }
 
     /**

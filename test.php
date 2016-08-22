@@ -36,12 +36,9 @@ class Test2
 
 $container = new Illuminate\Container\Container();
 
-$container->resolving('stdClass', function ($object) {
-    return $object->name = 'taylor';
-});
-$container->bind('foo', function () {
-    return new StdClass;
-});
-$instance = $container->make('foo');
+$container->bind('ContainerLazyExtendStub');
+$container->extend('ContainerLazyExtendStub', function ($obj, $container) {
+    $obj->init();
 
-dump($instance);
+    return $obj;
+});
