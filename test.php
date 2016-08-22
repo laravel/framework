@@ -36,8 +36,12 @@ class Test2
 
 $container = new Illuminate\Container\Container();
 
-$container->bind(['bam' => 'boom'], function () {
-    return 'pow';
+$container->resolving('stdClass', function ($object) {
+    return $object->name = 'taylor';
 });
+$container->bind('foo', function () {
+    return new StdClass;
+});
+$instance = $container->make('foo');
 
-dump($container->make('bam'));
+dump($instance);

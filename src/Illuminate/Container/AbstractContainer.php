@@ -29,12 +29,10 @@ class AbstractContainer extends Resolver implements ArrayAccess
             $bindingType = $this->bindings[$subject][self::BINDING_TYPE];
             $resolver = $this->RESOLVERS_MAP[$bindingType];
 
-            $value = call_user_func_array([$this, $resolver], [$subject, $parameters]);
-        } else {
-            $value = parent::resolve($subject, $parameters);
+            return call_user_func_array([$this, $resolver], [$subject, $parameters]);
         }
 
-        return $value;
+        return parent::resolve($subject, $parameters);
     }
 
     public function bindPlain($abstract, $concrete)

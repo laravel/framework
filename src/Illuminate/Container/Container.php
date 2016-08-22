@@ -4,10 +4,41 @@ namespace Illuminate\Container;
 
 use Closure;
 use Resolver;
+use stdClass;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 
 class Container extends AbstractContainer implements ContainerContract
 {
+    private $resolving = [];
+
+    public function resolve($subject, array $parameters = [])
+    {
+        $result = parent::resolve($subject, $parameters);
+
+        if (is_string($subject)) {
+            $this->callResolvingCallbacks($subject, $result);
+        }
+        if (is_object($result)) {
+            $this->callResolvingCallbacks(get_class($result), $result);
+        }
+        if (is_object($result) && !($result instanceof stdClass)) {
+            $this->callResolvingCallbacks(stdClass::class, $result);
+        }
+
+        return $result;
+    }
+
+    private function callResolvingCallbacks($name, $object)
+    {
+        if (isset($this->resolving[$name]) && is_array($this->resolving[$name])) {
+            $callbacks = $this->resolving[$name];
+
+            foreach ($callbacks as $callback) {
+                $callback($object, $this);
+            }
+        }
+    }
+
     /**
      * Register a binding with the container.
      *
@@ -116,14 +147,10 @@ class Container extends AbstractContainer implements ContainerContract
     public function call($callback, array $parameters = [], $defaultMethod = null)
     {
         if (is_string($callback) && strpos($callback, '@')) {
-            $segments = explode('@', $callback, 2);
-            $resolved = $this->resolve($segments[0], [], Resolver::TYPE_CLASS);
-
-            return $this->resolve([$resolved, $segments[1]], $parameters, Resolver::TYPE_METHOD);
-        } else if (is_string($callback) && $defaultMethod) {
-            $resolved = $this->resolve($callback, [], Resolver::TYPE_CLASS);
-
-            return $this->resolve([$resolved, $defaultMethod], $parameters, Resolver::TYPE_METHOD);
+            list($callback, $defaultMethod) = explode('@', $callback, 2);
+        }
+        if (is_string($callback) && $defaultMethod) {
+            return $this->resolve([$this->resolve($callback), $defaultMethod], $parameters);
         }
 
         return $this->resolve($callback, $parameters);
@@ -142,9 +169,7 @@ class Container extends AbstractContainer implements ContainerContract
      */
     public function bound($abstract)
     {
-		$abstract = $this->normalize($abstract);
-
-    	return isset($this->bindings[$abstract]);
+    	return isset($this->bindings[$this->normalize($abstract)]);
     }
 
     /**
@@ -157,11 +182,7 @@ class Container extends AbstractContainer implements ContainerContract
     {
         $abstract = $this->normalize($abstract);
 
-        if (isset($this->bindings[$abstract]) && is_object($this->bindings[$abstract])) {
-            return true;
-        }
-
-        return false;
+        return isset($this->bindings[$abstract]) && is_object($this->bindings[$abstract]);
     }
 
     /**
@@ -210,6 +231,9 @@ class Container extends AbstractContainer implements ContainerContract
      */
     public function bindIf($abstract, $concrete = null, $shared = false)
     {
+        if (!$this->bound($abstract)) {
+            $this->bind($abstract, $concrete, $shared);
+        }
     }
 
     /**
@@ -244,6 +268,11 @@ class Container extends AbstractContainer implements ContainerContract
      */
     public function resolving($abstract, Closure $callback = null)
     {
+        if ($callback === null && $abstract instanceof Closure) {
+            $this->resolving[stdClass::class][] = $abstract;
+        } else {
+            $this->resolving[$this->normalize($abstract)][] = $callback;
+        }
     }
 
    /**
@@ -255,6 +284,7 @@ class Container extends AbstractContainer implements ContainerContract
      */
     public function afterResolving($abstract, Closure $callback = null)
     {
+        return $this->resolving($abstract, $callback);
     }
 
 }
