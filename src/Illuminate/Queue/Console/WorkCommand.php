@@ -105,7 +105,7 @@ class WorkCommand extends Command
      */
     protected function gatherWorkerOptions()
     {
-        $timeout = $this->option('timeout', 60);
+        $timeout = $this->option('timeout');
 
         if ($timeout && ! function_exists('pcntl_fork')) {
             throw new RuntimeException('The pcntl extension is required in order to specify job timeouts.');
