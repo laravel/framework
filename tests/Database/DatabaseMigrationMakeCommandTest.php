@@ -51,9 +51,9 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase
         $app = new Illuminate\Foundation\Application;
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
-        $creator->shouldReceive('create')->once()->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'users', true);
+        $creator->shouldReceive('create')->once()->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'users', true, true, true);
 
-        $this->runCommand($command, ['name' => 'create_foo', '--create' => 'users']);
+        $this->runCommand($command, ['name' => 'create_foo', '--create' => 'users', '--no-timestamps' => true, '--soft-deletes' => true]);
     }
 
     public function testCanSpecifyPathToCreateMigrationsIn()
