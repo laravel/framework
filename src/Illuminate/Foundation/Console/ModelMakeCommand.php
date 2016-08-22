@@ -118,6 +118,12 @@ class ModelMakeCommand extends GeneratorCommand
         return $this;
     }
 
+    /**
+     * Add date mutators if soft-deletes option is set
+     * 
+     * @param  string  $stub
+     * @return $this
+     */
     protected function replaceDateMutators(&$stub)
     {
         if (($this->option('no-timestamps') && !$this->option('soft-deletes')) ||
