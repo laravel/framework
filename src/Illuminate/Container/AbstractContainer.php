@@ -16,12 +16,7 @@ class AbstractContainer extends Resolver implements ArrayAccess
     const IS_RESOLVED = "is_resolved";
     const BINDING_TYPE = "binding_type";
 
-    protected $BINDERS_MAP = [
-        self::TYPE_PLAIN => "bindPlain",
-        self::TYPE_SERVICE => "bindService",
-        self::TYPE_SINGLETON => "bindSingleton"
-    ];
-    protected $RESOLVERS_MAP = [
+    private $RESOLVERS_MAP = [
         self::TYPE_PLAIN => "resolvePlain",
         self::TYPE_SERVICE => "resolveService",
         self::TYPE_SINGLETON => "resolveSingleton"
@@ -70,12 +65,12 @@ class AbstractContainer extends Resolver implements ArrayAccess
         ];
     }
 
-    protected function resolvePlain($abstract, array $parameters = [])
+    public function resolvePlain($abstract, array $parameters = [])
     {
         return $this->bindings[$abstract][self::VALUE];
     }
 
-    protected function resolveService($abstract, array $parameters = [])
+    public function resolveService($abstract, array $parameters = [])
     {
         $binding = $this->bindings[$abstract];
         $resolved = parent::resolve($binding[self::VALUE], $parameters);
@@ -83,7 +78,7 @@ class AbstractContainer extends Resolver implements ArrayAccess
         return $resolved;
     }
 
-    protected function resolveSingleton($abstract, array $parameters = [])
+    public function resolveSingleton($abstract, array $parameters = [])
     {
         $binding = $this->bindings[$abstract];
         $resolved = parent::resolve($binding[self::VALUE], $parameters);
