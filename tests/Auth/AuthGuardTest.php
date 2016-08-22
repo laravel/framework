@@ -251,6 +251,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
         $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
         $user->shouldReceive('setRememberToken')->once();
         $provider->shouldReceive('updateRememberToken')->once();
+        $events->shouldReceive('fire')->once()->with(m::type(Authenticated::class));
         $mock->setUser($user);
         $events->shouldReceive('fire')->once()->with(m::type('Illuminate\Auth\Events\Logout'));
         $mock->logout();
