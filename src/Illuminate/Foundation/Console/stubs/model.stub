@@ -6,5 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class DummyClass extends Model
 {
-    //
+    use Illuminate\Database\Eloquent\SoftDeletes;
+
+    public $timestamps = false;
+    
+    // 
 }

@@ -40,7 +40,12 @@ class ModelMakeCommand extends GeneratorCommand
             if ($this->option('migration')) {
                 $table = Str::plural(Str::snake(class_basename($this->argument('name'))));
 
-                $this->call('make:migration', ['name' => "create_{$table}_table", '--create' => $table]);
+                $this->call('make:migration', [
+                    'name' => "create_{$table}_table", 
+                    '--create' => $table,
+                    '--no-timestamps' => $this->option('no-timestamps'),
+                    '--soft-deletes' => $this->option('soft-deletes'),
+                ]);
             }
         }
     }
@@ -67,6 +72,52 @@ class ModelMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Build the class with the given name.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function buildClass($name)
+    {
+        $stub = $this->files->get($this->getStub());
+
+        return $this->replaceNamespace($stub, $name)
+            ->replaceClass($stub, $name)
+            ->replaceTimestamps($stub)
+            ->replaceSoftDeletes($stub);
+    }
+
+    /**
+     * Remove the timestamps attribute if no-timestamps option is not set
+     *
+     * @param  string  $stub
+     * @return $this
+     */
+    protected function replaceTimestamps(&$stub)
+    {
+        if (! $this->option('no-timestamps')) {
+            $stub = str_replace("public $timestamps = false;\n", '', $stub)
+        }
+
+        return $this;
+    }
+
+    /**
+     * Remove the SoftDeletes trait if soft-deletes option is not set
+     *
+     * @param  string  $stub
+     * @return $this
+     */
+    protected function replaceSoftDeletes($stub)
+    {
+        if (! $this->option('soft-deletes')) {
+            $stub = str_replace("use Illuminate\Database\Eloquent\SoftDeletes;\n", '', $stub)
+        }
+
+        return $this;
+    }
+
+    /**
      * Get the console command options.
      *
      * @return array
@@ -75,6 +126,8 @@ class ModelMakeCommand extends GeneratorCommand
     {
         return [
             ['migration', 'm', InputOption::VALUE_NONE, 'Create a new migration file for the model.'],
+            ['no-timestamps', 'nts', InputOption::VALUE_NONE, 'Set timestamps attribute to false.'],
+            ['soft-deletes', 'sd', InputOption::VALUE_NONE, 'Add SoftDeletes trait to the model.'],
         ];
     }
 }
