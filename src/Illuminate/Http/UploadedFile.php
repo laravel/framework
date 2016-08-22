@@ -9,37 +9,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 
 class UploadedFile extends SymfonyUploadedFile
 {
-    use HashesFileNames, Macroable;
-
-    /**
-     * Get the fully qualified path to the file.
-     *
-     * @return string
-     */
-    public function path()
-    {
-        return $this->getRealPath();
-    }
-
-    /**
-     * Get the file's extension.
-     *
-     * @return string
-     */
-    public function extension()
-    {
-        return $this->guessExtension();
-    }
-
-    /**
-     * Get the file's extension supplied by the client.
-     *
-     * @return string
-     */
-    public function clientExtension()
-    {
-        return $this->guessClientExtension();
-    }
+    use FileHelpers, Macroable;
 
     /**
      * Store the uploaded file on a filesystem disk.
