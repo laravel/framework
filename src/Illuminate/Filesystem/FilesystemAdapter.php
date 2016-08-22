@@ -3,6 +3,7 @@
 namespace Illuminate\Filesystem;
 
 use RuntimeException;
+use Illuminate\Http\File;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Http\UploadedFile;
@@ -74,7 +75,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      */
     public function put($path, $contents, $visibility = null)
     {
-        if ($contents instanceof UploadedFile) {
+        if ($contents instanceof File || $contents instanceof UploadedFile) {
             return $this->putFile($path, $contents, $visibility);
         }
 
@@ -108,14 +109,14 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      * Store the uploaded file on the disk with a given name.
      *
      * @param  string  $path
-     * @param  \Illuminate\Http\UploadedFile  $file
+     * @param  \Illuminate\Http\File|\Illuminate\Http\UploadedFile  $file
      * @param  string  $name
      * @param  string  $visibility
      * @return string|false
      */
     public function putFileAs($path, $file, $name, $visibility = null)
     {
-        $stream = fopen($file->path(), 'r+');
+        $stream = fopen($file->getRealPath(), 'r+');
 
         $result = $this->put($path = trim($path.'/'.$name, '/'), $stream, $visibility);
 
