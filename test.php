@@ -5,10 +5,13 @@ require("vendor/autoload.php");
 class Test
 {
 
-	public function __construct($first, Test2 $test2, $last)
+	public function __construct()
 	{
-		var_dump($first);
-		var_dump($last);
+	}
+
+	public function work()
+	{
+		return func_get_args();
 	}
 
 }
@@ -33,8 +36,8 @@ class Test2
 
 $container = new Illuminate\Container\Container();
 
-$ret = $container->resolve(function() {
-    return func_get_args();
+$container->bind(['bam' => 'boom'], function () {
+    return 'pow';
 });
 
-var_dump($ret);
+dump($container->make('bam'));

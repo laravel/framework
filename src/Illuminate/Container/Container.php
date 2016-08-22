@@ -3,6 +3,7 @@
 namespace Illuminate\Container;
 
 use Closure;
+use Resolver;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 
 class Container extends AbstractContainer implements ContainerContract
@@ -20,7 +21,12 @@ class Container extends AbstractContainer implements ContainerContract
         $abstract = $this->normalize($abstract);
         $concrete = $this->normalize($concrete);
 
-		return $this->bindService($abstract, $concrete);
+        if (is_array($abstract)) {
+            $this->bindService(key($abstract), $concrete);
+            $this->alias(key($abstract), current($abstract));
+        } else {
+            $this->bindService($abstract, $concrete);
+        }
 	}
 
     /**
@@ -35,7 +41,12 @@ class Container extends AbstractContainer implements ContainerContract
         $abstract = $this->normalize($abstract);
         $concrete = ($concrete) ? $this->normalize($concrete) : $abstract;
 
-        return $this->bindSingleton($abstract, $concrete);
+        if (is_array($abstract)) {
+            $this->bindSingleton(key($abstract), $concrete);
+            $this->alias(key($abstract), current($abstract));
+        } else {
+            $this->bindSingleton($abstract, $concrete);
+        }
     }
 
     /**
@@ -48,9 +59,32 @@ class Container extends AbstractContainer implements ContainerContract
     public function instance($abstract, $instance)
     {
         $abstract = $this->normalize($abstract);
-        $instance = $this->normalize($instance);
 
-        return $this->bindPlain($abstract, $instance);
+        if (is_array($abstract)) {
+            $this->bindPlain(key($abstract), $instance);
+            $this->alias(key($abstract), current($abstract));
+        } else {
+            $this->bindPlain($abstract, $instance);
+        }
+    }
+
+    /**
+     * Wrap a Closure such that it is shared.
+     *
+     * @param  \Closure  $closure
+     * @return \Closure
+     */
+    public function share(Closure $closure)
+    {
+        return function ($container) use ($closure) {
+            static $object;
+
+            if (is_null($object)) {
+                $object = $closure($container);
+            }
+
+            return $object;
+        };
     }
 
     /**
@@ -63,6 +97,10 @@ class Container extends AbstractContainer implements ContainerContract
     public function make($abstract, array $parameters = [])
     {
         $abstract = $this->normalize($abstract);
+
+        if (isset($this->bindings[$abstract]) && $this->bindings[$abstract][AbstractContainer::VALUE] instanceof Closure) {
+            return $this->resolve($abstract, [$this, $parameters]);
+        }
 
         return $this->resolve($abstract, $parameters);
     }
@@ -79,17 +117,16 @@ class Container extends AbstractContainer implements ContainerContract
     {
         if (is_string($callback) && strpos($callback, '@')) {
             $segments = explode('@', $callback, 2);
-            $resolved = $this->resolve($segments[0]);
+            $resolved = $this->resolve($segments[0], [], Resolver::TYPE_CLASS);
 
-            return $this->resolve([$resolved, $segments[1]], $parameters);
+            return $this->resolve([$resolved, $segments[1]], $parameters, Resolver::TYPE_METHOD);
         } else if (is_string($callback) && $defaultMethod) {
-            $resolved = $this->resolve($callback);
+            $resolved = $this->resolve($callback, [], Resolver::TYPE_CLASS);
 
-            return $this->resolve([$resolved, $defaultMethod], $parameters);
+            return $this->resolve([$resolved, $defaultMethod], $parameters, Resolver::TYPE_METHOD);
         }
 
         return $this->resolve($callback, $parameters);
-        return call_user_func_array($callback, $parameters);
     }
 
     private function normalize($service)
@@ -136,6 +173,10 @@ class Container extends AbstractContainer implements ContainerContract
      */
     public function alias($abstract, $alias)
     {
+        $alias = $this->normalize($alias);
+        $abstract = $this->normalize($abstract);
+
+        $this->bindings[$alias] = &$this->bindings[$abstract];
     }
 
     /**

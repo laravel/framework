@@ -2,6 +2,7 @@
 
 namespace Illuminate\Container;
 
+use Closure;
 use Reflector;
 use ReflectionClass;
 use ReflectionMethod;
@@ -14,44 +15,18 @@ class Resolver
 	const TYPE_METHOD = 2;
 	const TYPE_FUNCTION = 3;
 
-	private $RESOLVERS_MAP = [
-		self::TYPE_CLASS => "resolveClass",
-		self::TYPE_METHOD => "resolveMethod",
-		self::TYPE_FUNCTION => "resolveFunction"
-	];
-
-	private function resolveParameters(array $reflectionParameters, array $parameters = [])
+    public function resolve($subject, array $parameters = [])
     {
-        $dependencies = [];
-        $parameters = $this->nameParameters($reflectionParameters, $parameters);
+        if (is_callable($subject)) {
+            if (is_string($subject) || $subject instanceof Closure) {
+                return $this->resolveFunction($subject, $parameters);
+            }
 
-        foreach ($reflectionParameters as $parameter) {
-	        if (array_key_exists($parameter->name, $parameters)) {
-	    		$dependencies[] = $parameters[$parameter->name];
-	    	} else if ($parameter->getClass()) {
-	            $dependencies[] = $this->resolve($parameter->getClass()->name, [], self::TYPE_CLASS);
-	        } else if ($parameter->isDefaultValueAvailable()) {
-	            $dependencies[] = $parameter->getDefaultValue();
-	        }
+            return $this->resolveMethod($subject, $parameters);
         }
 
-        return $dependencies;
+        return $this->resolveClass($subject, $parameters);
     }
-
-	private function nameParameters(array $reflectionParameters, array $parameters = [])
-	{
-		$ret = [];
-
-		foreach ($parameters as $key => $value) {
-			if (is_numeric($key)) {
-				$key = $reflectionParameters[$key]->name;
-			}
-
-			$ret[$key] = $value;
-		}
-
-		return $ret;
-	}
 
     public function resolveClass($class, array $parameters = [])
     {
@@ -88,44 +63,26 @@ class Resolver
         return $reflectionFunction->invokeArgs($resolvedParameters);
     }
 
-    public function resolve($subject, array $parameters = [], $type = null)
+    private function resolveParameters(array $reflectionParameters, array $parameters = [])
     {
-    	$type = ($type !== null) ? $type : self::getType($subject);
+        $dependencies = [];
 
-    	if ($type) {
-	    	$resolver = $this->RESOLVERS_MAP[$type];
+        foreach ($reflectionParameters as $key => $parameter) {
+            if (array_key_exists($key, $parameters)) {
+                $dependencies[] = $parameters[$key];
 
-	    	return call_user_func_array([$this, $resolver], [$subject, $parameters]);
-    	}
+                unset($parameters[$key]);
+            } else if (array_key_exists($parameter->name, $parameters)) {
+                $dependencies[] = $parameters[$parameter->name];
 
-        return $subject;
-    }
-
-    public static function getType($subject)
-    {
-        if (self::isClass($subject)) {
-        	return self::TYPE_CLASS;
-        } else if (self::isMethod($subject)) {
-        	return self::TYPE_METHOD;
-        } else if (self::isFunction($subject)) {
-        	return self::TYPE_FUNCTION;
+                unset($parameters[$parameters[$parameter->name]]);
+            } else if ($parameter->getClass()) {
+                $dependencies[] = $this->resolve($parameter->getClass()->name);
+            } else if ($parameter->isDefaultValueAvailable()) {
+                $dependencies[] = $parameter->getDefaultValue();
+            }
         }
 
-        return null;
-    }
-
-    public static function isClass($subject)
-    {
-    	return !is_callable($subject) && is_string($subject);
-    }
-
-    public static function isMethod($subject)
-    {
-    	return is_callable($subject) && is_array($subject);
-    }
-
-    public static function isFunction($subject)
-    {
-    	return is_callable($subject);
+        return array_merge($dependencies, $parameters);
     }
 }
