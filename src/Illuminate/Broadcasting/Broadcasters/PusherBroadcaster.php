@@ -56,11 +56,11 @@ class PusherBroadcaster extends Broadcaster
     {
         if (Str::startsWith($request->channel_name, 'private')) {
             return $this->pusher->socket_auth($request->channel_name, $request->socket_id);
-        } else {
-            return $this->pusher->presence_auth(
-                $request->channel_name, $request->socket_id, $request->user()->id, $result
-            );
         }
+
+        return $this->pusher->presence_auth(
+            $request->channel_name, $request->socket_id, $request->user()->id, $result
+        );
     }
 
     /**

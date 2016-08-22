@@ -179,9 +179,9 @@ class Arr
                 return array_merge($result, [$item]);
             } elseif ($depth === 1) {
                 return array_merge($result, array_values($item));
-            } else {
-                return array_merge($result, static::flatten($item, $depth - 1));
             }
+
+            return array_merge($result, static::flatten($item, $depth - 1));
         }, []);
     }
 

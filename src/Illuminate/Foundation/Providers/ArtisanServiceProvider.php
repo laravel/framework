@@ -613,8 +613,8 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         if ($this->app->environment('production')) {
             return array_values($this->commands);
-        } else {
-            return array_merge(array_values($this->commands), array_values($this->devCommands));
         }
+
+        return array_merge(array_values($this->commands), array_values($this->devCommands));
     }
 }

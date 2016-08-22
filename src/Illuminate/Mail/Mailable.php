@@ -132,11 +132,11 @@ class Mailable implements MailableContract
             return $queue->connection($connection)->pushOn(
                 $queueName, new SendQueuedMailable($this)
             );
-        } else {
-            return $queue->connection($connection)->push(
-                new SendQueuedMailable($this)
-            );
         }
+
+        return $queue->connection($connection)->push(
+            new SendQueuedMailable($this)
+        );
     }
 
     /**
@@ -156,11 +156,11 @@ class Mailable implements MailableContract
             return $queue->connection($connection)->laterOn(
                 $queueName, $delay, new SendQueuedMailable($this)
             );
-        } else {
-            return $queue->connection($connection)->later(
-                $delay, new SendQueuedMailable($this)
-            );
         }
+
+        return $queue->connection($connection)->later(
+            $delay, new SendQueuedMailable($this)
+        );
     }
 
     /**
@@ -174,9 +174,9 @@ class Mailable implements MailableContract
             return [$this->view, $this->textView];
         } elseif (isset($this->textView)) {
             return ['text' => $this->textView];
-        } else {
-            return $this->view;
         }
+
+        return $this->view;
     }
 
     /**
