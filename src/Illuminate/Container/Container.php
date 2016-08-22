@@ -9,6 +9,7 @@ use Illuminate\Contracts\Container\Container as ContainerContract;
 
 class Container extends AbstractContainer implements ContainerContract
 {
+    private $tags = [];
     private $resolving = [];
 
     public function resolve($subject, array $parameters = [])
@@ -209,16 +210,33 @@ class Container extends AbstractContainer implements ContainerContract
      */
     public function tag($abstracts, $tags)
     {
+        $tags = (is_array($tags)) ? $tags : array_slice(func_get_args(), 1);
+
+        foreach ((array) $abstracts as $key => $abstract) {
+            $abstracts[$key] = $this->normalize($abstract);
+        }
+        foreach ($tags as $tagName) {
+            $this->tags[$tagName] = (array) $abstracts;
+        }
     }
 
     /**
      * Resolve all of the bindings for a given tag.
      *
-     * @param  array  $tag
+     * @param  string  $tag
      * @return array
      */
     public function tagged($tag)
     {
+        $results = [];
+
+        if (isset($this->tags[$tag])) {
+            foreach ($this->tags[$tag] as $abstract) {
+                $results[] = $this->make($abstract);
+            }
+        }
+
+        return $results;
     }
 
     /**
