@@ -69,7 +69,7 @@ class UploadedFile extends SymfonyUploadedFile
     }
 
     /**
-     * Store the uploaded file on a filesystem disk with public visibility
+     * Store the uploaded file on a filesystem disk with public visibility.
      *
      * @param  string  $path
      * @param  string|null  $disk
@@ -81,7 +81,7 @@ class UploadedFile extends SymfonyUploadedFile
     }
 
     /**
-     * Store the uploaded file on a filesystem disk with public visibility
+     * Store the uploaded file on a filesystem disk with public visibility.
      *
      * @param  string  $path
      * @param  string  $name
