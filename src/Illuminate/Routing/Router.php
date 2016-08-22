@@ -359,7 +359,7 @@ class Router implements RegistrarContract
 
         $registrar->register($name, $controller, $options);
     }
-    
+
     /**
      * Register a new redirect route with the router.
      *
