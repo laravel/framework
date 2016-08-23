@@ -1,9 +1,4 @@
 <?php
-/**
- * Copyright (c) 2016 S-IMK GmbH
- * Letzte Dateiänderung: 23.08.16 14:37 (kaemmerling)
- */
-
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
