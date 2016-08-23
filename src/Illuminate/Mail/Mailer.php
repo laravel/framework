@@ -3,6 +3,8 @@
 namespace Illuminate\Mail;
 
 use Closure;
+use Exception;
+use Throwable;
 use Swift_Mailer;
 use Swift_Message;
 use Illuminate\Support\Arr;
@@ -388,12 +390,12 @@ class Mailer implements MailerContract, MailQueueContract
             }
 
             return $result;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             if ($this->events) {
                 $this->events->fire(new Events\MessageNotSent($message, $e, get_class($this->swift->getTransport())));
             }
             throw $e;
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             if ($this->events) {
                 $this->events->fire(new Events\MessageNotSent($message, $e, get_class($this->swift->getTransport())));
             }

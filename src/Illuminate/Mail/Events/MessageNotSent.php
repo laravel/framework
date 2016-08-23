@@ -19,9 +19,9 @@ class MessageNotSent
     public $transport;
 
     /**
-     * The throwed \Exception or \Throwable.
+     * The exception thrown.
      *
-     * @var \Exception|\Throwable
+     * @var \Throwable
      */
     public $exception;
 
@@ -29,7 +29,7 @@ class MessageNotSent
      * Create a new event instance.
      *
      * @param  \Swift_Message  $message
-     * @param  \Exception|\Throwable  $exception
+     * @param  \Throwable  $exception
      * @param  string  $transport
      * @return void
      */
