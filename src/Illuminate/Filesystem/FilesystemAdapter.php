@@ -286,9 +286,9 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
             return Str::contains($path, '/storage/public') ? Str::replaceFirst('/public', '', $path) : $path;
         } elseif (method_exists($adapter, 'getUrl')) {
             return $adapter->getUrl($path);
-        } else {
-            throw new RuntimeException('This driver does not support retrieving URLs.');
         }
+
+        throw new RuntimeException('This driver does not support retrieving URLs.');
     }
 
     /**
