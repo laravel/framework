@@ -120,7 +120,7 @@ class ModelMakeCommand extends GeneratorCommand
 
     /**
      * Add date mutators if soft-deletes option is set.
-     * 
+     *
      * @param  string  $stub
      * @return $this
      */
