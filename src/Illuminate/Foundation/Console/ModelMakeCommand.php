@@ -41,7 +41,7 @@ class ModelMakeCommand extends GeneratorCommand
                 $table = Str::plural(Str::snake(class_basename($this->argument('name'))));
 
                 $this->call('make:migration', [
-                    'name' => "create_{$table}_table", 
+                    'name' => "create_{$table}_table",
                     '--create' => $table,
                     '--no-timestamps' => $this->option('no-timestamps'),
                     '--soft-deletes' => $this->option('soft-deletes'),
@@ -89,7 +89,7 @@ class ModelMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Remove the timestamps attribute if no-timestamps option is not set
+     * Remove the timestamps attribute if no-timestamps option is not set.
      *
      * @param  string  $stub
      * @return $this
@@ -104,7 +104,7 @@ class ModelMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Remove the SoftDeletes trait if soft-deletes option is not set
+     * Remove the SoftDeletes trait if soft-deletes option is not set.
      *
      * @param  string  $stub
      * @return $this
@@ -119,21 +119,20 @@ class ModelMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Add date mutators if soft-deletes option is set
+     * Add date mutators if soft-deletes option is set.
      * 
      * @param  string  $stub
      * @return $this
      */
     protected function replaceDateMutators(&$stub)
     {
-        if (($this->option('no-timestamps') && !$this->option('soft-deletes')) ||
-            (!$this->option('no-timestamps') && !$this->option('soft-deletes'))) {
+        if (($this->option('no-timestamps') && ! $this->option('soft-deletes')) ||
+            (! $this->option('no-timestamps') && ! $this->option('soft-deletes'))) {
             $stub = str_replace("protected $dates = ['created_at', 'updated_at', 'deleted_at'];\n", '', $stub);
-        }
-        else if ($this->option('no-timestamps') && $this->option('soft-deletes')) {
+        } elseif ($this->option('no-timestamps') && $this->option('soft-deletes')) {
             $stub = str_replace(
-                "protected $dates = ['created_at', 'updated_at', 'deleted_at'];", 
-                "protected $dates = ['soft-deletes'];", 
+                "protected $dates = ['created_at', 'updated_at', 'deleted_at'];",
+                "protected $dates = ['soft-deletes'];",
                 $stub
             );
         }
