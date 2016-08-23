@@ -91,8 +91,8 @@ class ViewMakeCommand extends GeneratorCommand
         $stub = $this->files->get($this->getStub());
         $parent = $this->option('parent');
         $section = $this->option('section');
-        $stacks = $this->option('stacks');
-        $this->replaceParentView($stub, $parent)->replaceSection($stub, $section, $this->option('class'))->insertStacks($stub, $stacks);
+        $pushes = $this->option('pushes');
+        $this->replaceParentView($stub, $parent)->replaceSection($stub, $section, $this->option('class'))->insertPushes($stub, $pushes);
 
         return $stub;
     }
@@ -146,16 +146,16 @@ class ViewMakeCommand extends GeneratorCommand
      * Inserts the Stacks at the end of the stub.
      *
      * @param  string  $stub
-     * @param  string  $sectionName
+     * @param  array  $pushes
      * @return $this
      */
-    protected function insertStacks(&$stub, array $stacks = [])
+    protected function insertPushes(&$stub, array $pushes = [])
     {
-        if (! empty($stacks)) {
-            $stub_stack = PHP_EOL.'@stack(\'DummyStack\')'.PHP_EOL.PHP_EOL.'@endstack';
+        if (! empty($pushes)) {
+            $stub_push = PHP_EOL.'@push(\'DummyStack\')'.PHP_EOL.PHP_EOL.'@endpush';
 
-            foreach ($stacks as $stack) {
-                $stub = str_replace('DummyStack', $stack, ($stub.$stub_stack));
+            foreach ($pushes as $stack) {
+                $stub = str_replace('DummyStack', $stack, ($stub.$stub_push));
             }
         }
 
@@ -188,7 +188,7 @@ class ViewMakeCommand extends GeneratorCommand
 
             ['class', null, InputOption::VALUE_OPTIONAL, 'Defines the default bootstrap class that wrapps your content. [false for disable]', 'container'],
 
-            ['stacks', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Creates stackes'],
+            ['pushes', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Creates push to your stack'],
         ];
     }
 }
