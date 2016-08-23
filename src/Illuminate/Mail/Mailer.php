@@ -386,6 +386,7 @@ class Mailer implements MailerContract, MailQueueContract
             if ($this->events) {
                 $this->events->fire(new Events\MessageSent($message, $result));
             }
+
             return $result;
         } catch (\Exception $e) {
             if ($this->events) {
