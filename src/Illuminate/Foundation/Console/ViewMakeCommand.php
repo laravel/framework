@@ -94,6 +94,7 @@ class ViewMakeCommand extends GeneratorCommand
         $class = $this->option('class');
         $stacks = $this->option('stacks');
         $this->replaceParentView($stub, $parent)->replaceSection($stub, $section, $class)->insertStacks($stub, $stacks);
+
         return $stub;
     }
 
@@ -109,6 +110,7 @@ class ViewMakeCommand extends GeneratorCommand
         $stub = str_replace(
             'DummyParentView', $parentViewName, $stub
         );
+        
         return $this;
     }
 
@@ -138,6 +140,7 @@ class ViewMakeCommand extends GeneratorCommand
         $stub = str_replace(
             '</DumyDiv>', $divEnd, $stub
         );
+
         return $this;
     }
 
@@ -157,6 +160,7 @@ class ViewMakeCommand extends GeneratorCommand
                 $stub = str_replace('DummyStack', $stack, ($stub.$stub_stack));
             }
         }
+
         return $this;
     }
 

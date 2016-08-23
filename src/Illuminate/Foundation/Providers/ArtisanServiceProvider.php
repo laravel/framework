@@ -1,4 +1,8 @@
 <?php
+/**
+ * Copyright (c) 2016 S-IMK GmbH
+ * Letzte Dateiänderung: 23.08.16 14:40 (kaemmerling)
+ */
 
 namespace Illuminate\Foundation\Providers;
 
@@ -605,6 +609,7 @@ class ArtisanServiceProvider extends ServiceProvider
             return new NotificationTableCommand($app['files'], $app['composer']);
         });
     }
+
     /**
      * Register the command.
      *
@@ -616,6 +621,7 @@ class ArtisanServiceProvider extends ServiceProvider
             return new ViewMakeCommand($app['files']);
         });
     }
+
     /**
      * Get the services provided by the provider.
      *
