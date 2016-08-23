@@ -48,7 +48,7 @@ class Processor
     }
 
     /**
-     * Process the results of a index listing
+     * Process the results of a index listing.
      *
      * @param  array $results array of Doctrine\DBAL\Schema\Index
      * @return array

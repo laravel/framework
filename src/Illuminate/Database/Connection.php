@@ -926,6 +926,7 @@ class Connection implements ConnectionInterface
     public function getDoctrineIndexes($table)
     {
         $schema = $this->getDoctrineSchemaManager();
+
         return $schema->listTableIndexes($table);
     }
 

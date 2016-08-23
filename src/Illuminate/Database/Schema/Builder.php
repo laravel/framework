@@ -135,7 +135,7 @@ class Builder
      *
      * @param  string  $table
      * @param  string  $index
-     * @return boolean
+     * @return bool
      */
     public function hasIndex($table, $index)
     {
