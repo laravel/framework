@@ -12,7 +12,7 @@ class MessageSent
     public $message;
 
     /**
-     * The Swift transport
+     * The Swift transport.
      *
      * @var string
      */

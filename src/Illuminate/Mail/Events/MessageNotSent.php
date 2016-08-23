@@ -12,14 +12,14 @@ class MessageNotSent
     public $message;
 
     /**
-     * The Swift transport
+     * The Swift transport.
      *
      * @var string
      */
     public $transport;
 
     /**
-     * The throwed \Exception or \Throwable
+     * The throwed \Exception or \Throwable.
      *
      * @var \Exception|\Throwable
      */
