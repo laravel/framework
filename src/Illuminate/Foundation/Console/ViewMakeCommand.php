@@ -42,7 +42,7 @@ class ViewMakeCommand extends GeneratorCommand
      */
     protected function alreadyExists($rawName)
     {
-        return file_exists($rawName);
+        return file_exists($this->getPath($this->parseName($rawName)));
     }
 
     /**
