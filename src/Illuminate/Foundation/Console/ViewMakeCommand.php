@@ -48,7 +48,6 @@ class ViewMakeCommand extends GeneratorCommand
      */
     protected function parseName($name)
     {
-
         if (Str::contains($name, '\\')) {
             $name = str_replace('\\', '/', $name);
         }
@@ -110,7 +109,7 @@ class ViewMakeCommand extends GeneratorCommand
         $stub = str_replace(
             'DummyParentView', $parentViewName, $stub
         );
-        
+
         return $this;
     }
 

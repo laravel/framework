@@ -1,9 +1,4 @@
 <?php
-/**
- * Copyright (c) 2016 S-IMK GmbH
- * Letzte Dateiänderung: 23.08.16 14:40 (kaemmerling)
- */
-
 namespace Illuminate\Foundation\Providers;
 
 use Illuminate\Foundation\Console\ViewMakeCommand;
