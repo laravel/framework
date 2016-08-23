@@ -731,7 +731,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string  $related
      * @param  string  $foreignKey
      * @param  string  $localKey
-     * @param  bool  $forceConnection     
+     * @param  bool  $forceConnection
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function hasOne($related, $foreignKey = null, $localKey = null, $forceConnection = false)
@@ -740,9 +740,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $instance = new $related;
         
-        if($forceConnection)
+        if ($forceConnection) {
             $instance->setConnection($this->connection);
-
+        }
+        
         $localKey = $localKey ?: $this->getKeyName();
 
         return new HasOne($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey);
@@ -756,15 +757,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string  $type
      * @param  string  $id
      * @param  string  $localKey
-     * @param  bool  $forceConnection     
+     * @param  bool  $forceConnection
      * @return \Illuminate\Database\Eloquent\Relations\MorphOne
      */
     public function morphOne($related, $name, $type = null, $id = null, $localKey = null, $forceConnection = false)
     {
         $instance = new $related;
 
-        if($forceConnection)
+        if ($forceConnection) {
             $instance->setConnection($this->connection);
+        }
 
         list($type, $id) = $this->getMorphs($name, $type, $id);
 
@@ -782,7 +784,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string  $foreignKey
      * @param  string  $otherKey
      * @param  string  $relation
-     * @param  bool  $forceConnection     
+     * @param  bool  $forceConnection
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function belongsTo($related, $foreignKey = null, $otherKey = null, $relation = null, $forceConnection = false)
@@ -805,8 +807,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $instance = new $related;
 
-        if($forceConnection)
+        if ($forceConnection) {
             $instance->setConnection($this->connection);
+        }
 
         // Once we have the foreign key names, we'll just create a new Eloquent query
         // for the related models and returns the relationship instance which will
@@ -824,7 +827,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string  $name
      * @param  string  $type
      * @param  string  $id
-     * @param  bool  $forceConnection     
+     * @param  bool  $forceConnection
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
     public function morphTo($name = null, $type = null, $id = null, $forceConnection = false)
@@ -857,8 +860,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
             $instance = new $class;
         
-            if($forceConnection)
+            if ($forceConnection) {
                 $instance->setConnection($this->connection);
+            }
 
             return new MorphTo(
                 $instance->newQuery(), $this, $id, $instance->getKeyName(), $type, $name
@@ -883,7 +887,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string  $related
      * @param  string  $foreignKey
      * @param  string  $localKey
-     * @param  bool  $forceConnection     
+     * @param  bool  $forceConnection
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function hasMany($related, $foreignKey = null, $localKey = null, $forceConnection = false)
@@ -892,8 +896,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $instance = new $related;
     
-        if($forceConnection)
+        if ($forceConnection) {
             $instance->setConnection($this->connection);
+        }
 
         $localKey = $localKey ?: $this->getKeyName();
 
@@ -908,7 +913,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string|null  $firstKey
      * @param  string|null  $secondKey
      * @param  string|null  $localKey
-     * @param  bool  $forceConnection     
+     * @param  bool  $forceConnection
      * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
      */
     public function hasManyThrough($related, $through, $firstKey = null, $secondKey = null, $localKey = null, $forceConnection = false)
@@ -923,8 +928,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $instance = (new $related);
         
-        if($forceConnection)
+        if ($forceConnection) {
             $instance->setConnection($this->connection);
+        }
 
 
         return new HasManyThrough($instance->newQuery(), $this, $through, $firstKey, $secondKey, $localKey);
@@ -938,15 +944,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string  $type
      * @param  string  $id
      * @param  string  $localKey
-     * @param  bool  $forceConnection     
+     * @param  bool  $forceConnection
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
     public function morphMany($related, $name, $type = null, $id = null, $localKey = null, $forceConnection = false)
     {
         $instance = new $related;
 
-        if($forceConnection)
+        if ($forceConnection) {
             $instance->setConnection($this->connection);
+        }
 
         // Here we will gather up the morph type and ID for the relationship so that we
         // can properly query the intermediate table of a relation. Finally, we will
@@ -968,7 +975,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string  $foreignKey
      * @param  string  $otherKey
      * @param  string  $relation
-     * @param  bool  $forceConnection     
+     * @param  bool  $forceConnection
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function belongsToMany($related, $table = null, $foreignKey = null, $otherKey = null, $relation = null, $forceConnection = false)
@@ -987,8 +994,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $instance = new $related;
 
-        if($forceConnection)
+        if ($forceConnection) {
             $instance->setConnection($this->connection);
+        }
 
         $otherKey = $otherKey ?: $instance->getForeignKey();
 
@@ -1016,7 +1024,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string  $foreignKey
      * @param  string  $otherKey
      * @param  bool  $inverse
-     * @param  bool  $forceConnection     
+     * @param  bool  $forceConnection
      * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
     public function morphToMany($related, $name, $table = null, $foreignKey = null, $otherKey = null, $inverse = false, $forceConnection = false)
@@ -1030,8 +1038,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $instance = new $related;
 
-        if($forceConnection)
+        if ($forceConnection) {
             $instance->setConnection($this->connection);
+        }
 
         $otherKey = $otherKey ?: $instance->getForeignKey();
 
@@ -1056,7 +1065,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string  $table
      * @param  string  $foreignKey
      * @param  string  $otherKey
-     * @param  bool  $forceConnection   
+     * @param  bool  $forceConnection
      * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
     public function morphedByMany($related, $name, $table = null, $foreignKey = null, $otherKey = null, $forceConnection = false)
