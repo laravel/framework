@@ -391,11 +391,16 @@ class Builder
      * @param  int  $count
      * @param  callable  $callback
      * @param  string  $column
+     * @param  string  $alias  Alias of the ID column if there are multiple columns with the same name. The alias must be defined in a select statement.
      * @return bool
      */
-    public function chunkById($count, callable $callback, $column = 'id')
+    public function chunkById($count, callable $callback, $column = null, $alias = null)
     {
         $lastId = null;
+
+        $column = is_null($column) ? $this->getModel()->getKeyName() : null;
+
+        $alias = is_null($alias) ? $column : $alias;
 
         $results = $this->forPageAfterId($count, 0, $column)->get();
 
@@ -404,7 +409,7 @@ class Builder
                 return false;
             }
 
-            $lastId = $results->last()->{$column};
+            $lastId = $results->last()->{$alias};
 
             $results = $this->forPageAfterId($count, $lastId, $column)->get();
         }
