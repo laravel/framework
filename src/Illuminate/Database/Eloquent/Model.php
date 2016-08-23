@@ -739,11 +739,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $foreignKey = $foreignKey ?: $this->getForeignKey();
 
         $instance = new $related;
-        
+
         if ($forceConnection) {
             $instance->setConnection($this->connection);
         }
-        
+
         $localKey = $localKey ?: $this->getKeyName();
 
         return new HasOne($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey);
@@ -859,7 +859,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $class = $this->getActualClassNameForMorph($class);
 
             $instance = new $class;
-        
+
             if ($forceConnection) {
                 $instance->setConnection($this->connection);
             }
@@ -895,7 +895,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $foreignKey = $foreignKey ?: $this->getForeignKey();
 
         $instance = new $related;
-    
+
         if ($forceConnection) {
             $instance->setConnection($this->connection);
         }
@@ -927,7 +927,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $localKey = $localKey ?: $this->getKeyName();
 
         $instance = (new $related);
-        
+
         if ($forceConnection) {
             $instance->setConnection($this->connection);
         }
