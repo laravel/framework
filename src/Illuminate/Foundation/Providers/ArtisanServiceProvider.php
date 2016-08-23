@@ -17,6 +17,7 @@ use Illuminate\Foundation\Console\AppNameCommand;
 use Illuminate\Foundation\Console\OptimizeCommand;
 use Illuminate\Foundation\Console\TestMakeCommand;
 use Illuminate\Foundation\Console\MailMakeCommand;
+use Illuminate\Foundation\Console\ViewMakeCommand;
 use Illuminate\Foundation\Console\RouteListCommand;
 use Illuminate\Foundation\Console\EventMakeCommand;
 use Illuminate\Foundation\Console\ModelMakeCommand;
@@ -105,6 +106,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'Serve' => 'command.serve',
         'TestMake' => 'command.test.make',
         'VendorPublish' => 'command.vendor.publish',
+        'ViewMake' => 'command.view.make',
     ];
 
     /**
@@ -601,6 +603,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.notification.table', function ($app) {
             return new NotificationTableCommand($app['files'], $app['composer']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerViewMakeCommand()
+    {
+        $this->app->singleton('command.view.make', function ($app) {
+            return new ViewMakeCommand($app['files']);
         });
     }
 
