@@ -17,9 +17,7 @@ class ContainerResolver
     public function resolve($subject, array $parameters = [])
     {
         if (is_callable($subject)) {
-            if (is_string($subject) && strpos($subject, "::")) {
-                $resolved = $this->resolveMethod(explode('::', $subject), $parameters);
-            } else if (is_string($subject) || $subject instanceof Closure) {
+            if (is_string($subject) && function_exists($subject) || $subject instanceof Closure) {
                 $resolved = $this->resolveFunction($subject, $parameters);
             } else {
                 $resolved = $this->resolveMethod($subject, $parameters);
@@ -54,7 +52,12 @@ class ContainerResolver
 
     public function resolveMethod($method, array $parameters = [])
     {
-        $reflectionMethod = new ReflectionMethod($method[0], $method[1]);
+        if (is_string($method)) {
+            $reflectionMethod = new ReflectionMethod($method);
+        } else {
+            $reflectionMethod = new ReflectionMethod($method[0], $method[1]);
+        }
+
         $reflectionParameters = $reflectionMethod->getParameters();
         $this->buildStack[] = $reflectionMethod->getName();
 

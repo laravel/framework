@@ -41,5 +41,3 @@ class Test3
 
 
 $container = new Illuminate\Container\Container();
-
-$container->call("Test3@test2");
