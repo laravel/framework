@@ -80,7 +80,7 @@ class Route
 
     /**
      * Additional data to set on the route.
-     * 
+     *
      * @var array
      */
     protected $data = [];
