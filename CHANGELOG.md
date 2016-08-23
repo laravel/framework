@@ -20,9 +20,6 @@
 - Convert `$attributes` in `makeHidden()` to array ([#14852](https://github.com/laravel/framework/pull/14852), [#14857](https://github.com/laravel/framework/pull/14857))
 - Prevent conflicting class name import to namespace in `ValidatesWhenResolvedTrait` ([#14878](https://github.com/laravel/framework/pull/14878))
 
-### Removed
-- Removed Nitpick CI leftovers ([88ef62c](https://github.com/laravel/framework/commit/88ef62c773fc37c29892f5cf2d077e3c09f9b1b9), [e75d25a](https://github.com/laravel/framework/commit/e75d25aebf943462a4b7fb9288c949d941f5278b))
-
 
 ## v5.2.43 (2016-08-10)
 
