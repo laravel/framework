@@ -1796,7 +1796,7 @@ class Builder
      *
      * @param  int  $count
      * @param  callable  $callback
-     * @return  bool
+     * @return bool
      */
     public function chunk($count, callable $callback)
     {
