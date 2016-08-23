@@ -647,8 +647,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function only($keys)
     {
-        $keys = is_array($keys) ? $keys : func_get_args();
-
+        $keys = func_num_args() > 1 ? func_get_args() : $this->getArrayableItems($keys);
+        
         return new static(Arr::only($this->items, $keys));
     }
 
