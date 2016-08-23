@@ -339,7 +339,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
 
     /**
      * @expectedException Illuminate\Contracts\Container\BindingResolutionException
-     * @expectedExceptionMessage Unresolvable dependency resolving [Parameter #0 [ <required> $first ]] in class ContainerMixedPrimitiveStub
+     * @expectedExceptionMessage Unresolvable dependency resolving [Parameter #0 [ <required> $first ]] in [ContainerMixedPrimitiveStub]
      */
     public function testInternalClassWithDefaultParameters()
     {
@@ -349,7 +349,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
 
     /**
      * @expectedException Illuminate\Contracts\Container\BindingResolutionException
-     * @expectedExceptionMessage Target [IContainerContractStub] is not instantiable.
+     * @expectedExceptionMessage [IContainerContractStub] is not instantiable. Build stack : [IContainerContractStub]
      */
     public function testBindingResolutionExceptionMessage()
     {
@@ -359,7 +359,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
 
     /**
      * @expectedException Illuminate\Contracts\Container\BindingResolutionException
-     * @expectedExceptionMessage Target [IContainerContractStub] is not instantiable while building [ContainerTestContextInjectOne].
+     * @expectedExceptionMessage [IContainerContractStub] is not instantiable. Build stack : [ContainerTestContextInjectOne, IContainerContractStub]
      */
     public function testBindingResolutionExceptionMessageIncludesBuildStack()
     {
@@ -383,15 +383,6 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('stdClass', $result[0]);
         $this->assertEquals('taylor', $result[1]);
-    }
-
-    /**
-     * @expectedException ReflectionException
-     */
-    public function testCallWithAtSignBasedClassReferencesWithoutMethodThrowsException()
-    {
-        $container = new Container;
-        $result = $container->call('ContainerTestCallStub');
     }
 
     public function testCallWithAtSignBasedClassReferences()

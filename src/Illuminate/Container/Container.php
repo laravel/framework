@@ -4,7 +4,8 @@ namespace Illuminate\Container;
 
 use Closure;
 use Resolver;
-use stdClass;
+use ReflectionException;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 
 class Container extends AbstractContainer implements ContainerContract
@@ -20,34 +21,40 @@ class Container extends AbstractContainer implements ContainerContract
 
     public function resolve($abstract, array $parameters = [])
     {
-        $concrete = parent::resolve($abstract, $parameters);
-
-        if (is_string($abstract) && isset($this->extenders[$abstract])) {
-            $extenders = $this->extenders[$abstract];
-
-            unset($this->extenders[$abstract]);
-
-            foreach ($extenders as $extender) {
-                $concrete = $extender($concrete, $this);
-            }
-
-            $this->bindPlain($abstract, $concrete);
+        try {
+            $concrete = parent::resolve($abstract, $parameters);
+        } catch (ReflectionException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            throw new BindingResolutionException($e->getMessage());
         }
 
+        $this->fireExtenders($abstract, $concrete);
         $this->fireAfterResolving($abstract, $concrete, [$concrete, $this]);
 
         return $concrete;
     }
 
-    private function fireExtenders()
+    private function fireExtenders($abstract, &$concrete)
     {
+        if (!is_string($abstract) || !isset($this->extenders[$abstract])) {
+            return ;
+        }
+        $extenders = $this->extenders[$abstract];
+
+        unset($this->extenders[$abstract]);
+
+        foreach ($extenders as $extender) {
+            $concrete = $extender($concrete, $this);
+        }
+
+        $this->bindPlain($abstract, $concrete);
     }
 
     private function fireAfterResolving($abstract, $concrete, $parameters = [])
     {
         $this->eventsAfterResolving->fireGlobal($parameters);
-        $this->eventsAfterResolving->fire($abstract, $parameters);
-        $this->eventsAfterResolving->fire($concrete, $parameters);
+        $this->eventsAfterResolving->fire([$abstract, $concrete], $parameters);
     }
 
     /**
@@ -121,7 +128,7 @@ class Container extends AbstractContainer implements ContainerContract
     {
         $abstract = $this->normalize($abstract);
 
-        if (isset($this->bindings[$abstract]) && $this->bindings[$abstract][AbstractContainer::VALUE] instanceof Closure) {
+        if (is_string($abstract) && isset($this->bindings[$abstract]) && $this->bindings[$abstract][AbstractContainer::VALUE] instanceof Closure) {
             return $this->resolve($abstract, [$this, $parameters]);
         }
 
@@ -262,6 +269,7 @@ class Container extends AbstractContainer implements ContainerContract
     public function extend($abstract, Closure $closure)
     {
         $abstract = $this->normalize($abstract);
+
         $this->extenders[$abstract][] = $closure;
     }
 

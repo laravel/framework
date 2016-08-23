@@ -20,11 +20,15 @@ class Events
         }
 	}
 
-	public function fire($subject, $parameters = [])
+	public function fire($subjects, $parameters = [])
 	{
-		$listeners = $this->getListenersFor($subject);
+		$subjects = (is_array($subjects)) ? $subjects : [$subjects];
 
-		self::callListeners($listeners, $parameters);
+		foreach ($subjects as $subject) {
+			$listeners = $this->getListenersFor($subject);
+
+			self::callListeners($listeners, $parameters);
+		}
 	}
 
 	public function fireGlobal($parameters = [])
