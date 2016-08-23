@@ -382,7 +382,16 @@ class Mailer implements MailerContract, MailQueueContract
         }
 
         try {
-            return $this->swift->send($message, $this->failedRecipients);
+            $result = $this->swift->send($message, $this->failedRecipients);
+            if ($this->events) {
+                $this->events->fire(new Events\MessageSent($message, $result));
+            }
+            return $result;
+        } catch (\Exception $e) {
+            if ($this->events) {
+                $this->events->fire(new Events\MessageNotSent($message, $e, get_class($this->swift->getTransport())));
+            }
+            throw $e;
         } finally {
             $this->swift->getTransport()->stop();
         }
