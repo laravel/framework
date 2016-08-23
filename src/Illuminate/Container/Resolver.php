@@ -26,7 +26,7 @@ class Resolver
             $resolved = $this->resolveClass($subject, $parameters);
         }
 
-        $this->buildStack = [];
+        array_pop($this->buildStack);
 
         return $resolved;
     }
@@ -72,28 +72,50 @@ class Resolver
         return $reflectionFunction->invokeArgs($resolvedParameters);
     }
 
+    private function resolveParameter(ReflectionParameter $parameter, array $parameters = [])
+    {
+        $name = $parameter->getName();
+        $index = $parameter->getPosition();
+
+        if (isset($parameters[$name])) {
+            return $parameters[$parameter->name];
+        }
+        if (isset($parameters[$index])) {
+            return $parameters[$index];
+        }
+        if ($parameter->getClass()) {
+            return $this->resolve($parameter->getClass()->name);
+        }
+        if ($parameter->isDefaultValueAvailable()) {
+            return $parameter->getDefaultValue();
+        }
+
+        try {
+            return $this->resolve($parameter->name);
+        } catch (Exception $e) {
+            throw new Exception("Unresolvable dependency resolving [$parameter] in [".end($this->buildStack)."]");
+        }
+    }
+
     private function resolveParameters(array $reflectionParameters, array $parameters = [])
     {
         $dependencies = [];
 
         foreach ($reflectionParameters as $key => $parameter) {
-            if (isset($parameters[$key])) {
-                $dependencies[] = $parameters[$key];
+            $dependencies[] = $this->resolveParameter($parameter, $parameters);
+        }
 
-                unset($parameters[$key]);
-            } else if (isset($parameters[$parameter->name])) {
-                $dependencies[] = $parameters[$parameter->name];
+        return self::mergeParameters($dependencies, $parameters);
+    }
 
-                unset($parameters[$parameter->name]);
-            } else if ($parameter->getClass()) {
-                $dependencies[] = $this->resolve($parameter->getClass()->name);
-            } else if ($parameter->isDefaultValueAvailable()) {
-                $dependencies[] = $parameter->getDefaultValue();
-            } else {
-                throw new Exception("Unresolvable dependency resolving [$parameter] in [".end($this->buildStack)."]");
+    private static function mergeParameters(array $rootParameters, array $parameters = [])
+    {
+        foreach ($parameters as $key => $value) {
+            if (is_numeric($key) && !isset($rootParameters[$key])) {
+                $rootParameters[$key] = $value;
             }
         }
 
-        return array_merge($dependencies, $parameters);
+        return $rootParameters;
     }
 }
