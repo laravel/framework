@@ -24,20 +24,22 @@ class Test2
 
 class Test3
 {
-
 	public function __construct()
 	{
-		dump(func_get_args());
+		dump("CONSTRUCT");
 	}
 
-}
+	public static function test()
+	{
+	}
 
-interface iface
-{
-	function f1();
+	public function test2()
+	{
+	}
+
 }
 
 
 $container = new Illuminate\Container\Container();
 
-$container->make(Test3::class, ["Antoine"]);
+$container->call("Test3@test2");

@@ -3,12 +3,11 @@
 namespace Illuminate\Container;
 
 use Closure;
-use Resolver;
 use ReflectionException;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 
-class Container extends AbstractContainer implements ContainerContract
+class Container extends ContainerAbstract implements ContainerContract
 {
     private $tags = [];
     private $extenders = [];
@@ -128,7 +127,7 @@ class Container extends AbstractContainer implements ContainerContract
     {
         $abstract = $this->normalize($abstract);
 
-        if (is_string($abstract) && isset($this->bindings[$abstract]) && $this->bindings[$abstract][AbstractContainer::VALUE] instanceof Closure) {
+        if (is_string($abstract) && isset($this->bindings[$abstract]) && $this->bindings[$abstract][ContainerAbstract::VALUE] instanceof Closure) {
             return $this->resolve($abstract, [$this, $parameters]);
         }
 
@@ -181,7 +180,7 @@ class Container extends AbstractContainer implements ContainerContract
     {
         $abstract = $this->normalize($abstract);
 
-        return isset($this->bindings[$abstract]) && $this->bindings[$abstract][AbstractContainer::IS_RESOLVED];
+        return isset($this->bindings[$abstract]) && $this->bindings[$abstract][ContainerAbstract::IS_RESOLVED];
     }
 
     /**

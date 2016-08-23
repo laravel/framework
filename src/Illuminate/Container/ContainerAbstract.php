@@ -3,10 +3,11 @@
 namespace Illuminate\Container;
 
 use ArrayAccess;
+use Illuminate\Container\Traits\ArrayAccessTrait;
 
-class AbstractContainer extends Resolver implements ArrayAccess
+class ContainerAbstract extends ContainerResolver implements ArrayAccess
 {
-    use ArrayContainerTrait;
+    use ArrayAccessTrait;
 
 	const TYPE_PLAIN = 1;
     const TYPE_SERVICE = 2;

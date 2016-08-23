@@ -10,14 +10,16 @@ use ReflectionMethod;
 use ReflectionFunction;
 use ReflectionParameter;
 
-class Resolver
+class ContainerResolver
 {
     protected $buildStack = [];
 
     public function resolve($subject, array $parameters = [])
     {
         if (is_callable($subject)) {
-            if (is_string($subject) || $subject instanceof Closure) {
+            if (is_string($subject) && strpos($subject, "::")) {
+                $resolved = $this->resolveMethod(explode('::', $subject), $parameters);
+            } else if (is_string($subject) || $subject instanceof Closure) {
                 $resolved = $this->resolveFunction($subject, $parameters);
             } else {
                 $resolved = $this->resolveMethod($subject, $parameters);
@@ -58,7 +60,7 @@ class Resolver
 
         $resolvedParameters = $this->resolveParameters($reflectionParameters, $parameters);
 
-        return $reflectionMethod->invokeArgs($method[0], $resolvedParameters);
+        return call_user_func_array($method, $resolvedParameters);
     }
 
     public function resolveFunction($function, array $parameters = [])

@@ -1,8 +1,8 @@
 <?php
 
-namespace Illuminate\Container;
+namespace Illuminate\Container\Traits;
 
-trait ArrayContainerTrait
+trait ArrayAccessTrait
 {
     public function offsetSet($offset, $value)
     {
