@@ -46,4 +46,11 @@ class Processor
     {
         return $results;
     }
+
+    public function processIndexListing($results)
+    {
+        return $results->map(function($index) {
+            return strtolower($index->getName());
+        });
+    }
 }
