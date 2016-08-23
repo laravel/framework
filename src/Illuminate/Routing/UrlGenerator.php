@@ -143,9 +143,9 @@ class UrlGenerator implements UrlGeneratorContract
             return $url;
         } elseif ($fallback) {
             return $this->to($fallback);
-        } else {
-            return $this->to('/');
         }
+
+        return $this->to('/');
     }
 
     /**

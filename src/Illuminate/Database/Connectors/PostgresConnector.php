@@ -110,8 +110,8 @@ class PostgresConnector extends Connector implements ConnectorInterface
     {
         if (is_array($schema)) {
             return '"'.implode('", "', $schema).'"';
-        } else {
-            return '"'.$schema.'"';
         }
+
+        return '"'.$schema.'"';
     }
 }
