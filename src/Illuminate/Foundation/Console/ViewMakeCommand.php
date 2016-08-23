@@ -96,8 +96,9 @@ class ViewMakeCommand extends GeneratorCommand
         $stub = $this->files->get($this->getStub());
         $parent = $this->option('parent');
         $section = $this->option('section');
+        $class = $this->option('class');
         $stacks = $this->option('stacks');
-        $this->replaceParentView($stub, $parent)->replaceSection($stub, $section)->insertStacks($stub,$stacks);
+        $this->replaceParentView($stub, $parent)->replaceSection($stub, $section,$class)->insertStacks($stub,$stacks);
         return $stub;
     }
 
@@ -121,12 +122,26 @@ class ViewMakeCommand extends GeneratorCommand
      *
      * @param  string $stub
      * @param  string $sectionName
+     * @param  string $class
      * @return $this
      */
-    protected function replaceSection(&$stub, $sectionName)
+    protected function replaceSection(&$stub, $sectionName,$class)
     {
         $stub = str_replace(
             'DummySection', $sectionName, $stub
+        );
+        if($class != 'false'){
+            $divStart = "<div class='{$class}'>".PHP_EOL;
+            $divEnd = PHP_EOL."</div>";
+        } else {
+            $divStart = null;
+            $divEnd = null;
+        }
+        $stub = str_replace(
+            '<DumyDiv>', $divStart, $stub
+        );
+        $stub = str_replace(
+            '</DumyDiv>', $divEnd, $stub
         );
         return $this;
     }
@@ -174,7 +189,9 @@ class ViewMakeCommand extends GeneratorCommand
 
             ['section', null, InputOption::VALUE_REQUIRED, 'The section where your content is placed', 'content'],
 
-            ['stacks', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Prepares your stacks in the view'],
+            ['class', null, InputOption::VALUE_OPTIONAL, 'Defines the default bootstrap class that wrapps your content. [false for disable]','container'],
+
+            ['stacks', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Creates stackes'],
         ];
     }
 }
