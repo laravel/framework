@@ -70,7 +70,7 @@ class Route
      * @var array|null
      */
     protected $parameterNames;
-    
+
     /**
      * Additional data to set on the route.
      *
