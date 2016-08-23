@@ -104,7 +104,7 @@ class Dispatcher implements QueueingDispatcher
      * @param  mixed  $command
      * @return bool
      */
-    public function hasCommandHandler($command)
+    protected function hasCommandHandler($command)
     {
         return array_key_exists(get_class($command), $this->handlers);
     }
