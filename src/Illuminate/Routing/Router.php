@@ -372,7 +372,7 @@ class Router implements RegistrarContract
     {
         return $this->any($url, '\Illuminate\Foundation\Http\RedirectController@handle')->setData([
             'destination' => $destination,
-            'status' => $status;
+            'status' => $status,
         ]);
     }
 
