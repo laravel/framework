@@ -77,7 +77,7 @@ class ViewMakeCommand extends GeneratorCommand
      */
     protected function getPath($name)
     {
-        return resource_path('/views/' . $name . '.blade.php');
+        return resource_path('/views/'.$name.'.blade.php');
     }
 
     /**
@@ -125,7 +125,7 @@ class ViewMakeCommand extends GeneratorCommand
         $stub = str_replace(
             'DummySection', $sectionName, $stub
         );
-        if ($class != 'false'){
+        if ($class != 'false') {
             $divStart = "<div class='{$class}'>".PHP_EOL;
             $divEnd = PHP_EOL.'</div>';
         } else {
