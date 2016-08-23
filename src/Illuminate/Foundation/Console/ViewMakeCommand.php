@@ -66,7 +66,7 @@ class ViewMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return __DIR__ . '/stubs/view.stub';
+        return __DIR__.'/stubs/view.stub';
     }
 
     /**
@@ -93,7 +93,7 @@ class ViewMakeCommand extends GeneratorCommand
         $section = $this->option('section');
         $class = $this->option('class');
         $stacks = $this->option('stacks');
-        $this->replaceParentView($stub, $parent)->replaceSection($stub, $section,$class)->insertStacks($stub,$stacks);
+        $this->replaceParentView($stub, $parent)->replaceSection($stub, $section, $class)->insertStacks($stub, $stacks);
         return $stub;
     }
 
@@ -120,14 +120,14 @@ class ViewMakeCommand extends GeneratorCommand
      * @param  string $class
      * @return $this
      */
-    protected function replaceSection(&$stub, $sectionName,$class)
+    protected function replaceSection(&$stub, $sectionName, $class)
     {
         $stub = str_replace(
             'DummySection', $sectionName, $stub
         );
-        if($class != 'false'){
+        if ($class != 'false'){
             $divStart = "<div class='{$class}'>".PHP_EOL;
-            $divEnd = PHP_EOL."</div>";
+            $divEnd = PHP_EOL.'</div>';
         } else {
             $divStart = null;
             $divEnd = null;
@@ -150,11 +150,11 @@ class ViewMakeCommand extends GeneratorCommand
      */
     protected function insertStacks(&$stub, array $stacks = [])
     {
-        if(!empty($stacks)){
+        if (! empty($stacks)) {
             $stub_stack = PHP_EOL.'@stack(\'DummyStack\')'.PHP_EOL.PHP_EOL.'@endstack';
 
-            foreach ($stacks as $stack){
-                $stub = str_replace('DummyStack',$stack, ($stub.$stub_stack));
+            foreach ($stacks as $stack) {
+                $stub = str_replace('DummyStack', $stack, ($stub.$stub_stack));
             }
         }
         return $this;
@@ -184,7 +184,7 @@ class ViewMakeCommand extends GeneratorCommand
 
             ['section', null, InputOption::VALUE_REQUIRED, 'The section where your content is placed', 'content'],
 
-            ['class', null, InputOption::VALUE_OPTIONAL, 'Defines the default bootstrap class that wrapps your content. [false for disable]','container'],
+            ['class', null, InputOption::VALUE_OPTIONAL, 'Defines the default bootstrap class that wrapps your content. [false for disable]', 'container'],
 
             ['stacks', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Creates stackes'],
         ];
