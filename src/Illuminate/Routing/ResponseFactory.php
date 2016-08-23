@@ -140,9 +140,9 @@ class ResponseFactory implements FactoryContract
     /**
      * Return the raw contents of a binary file.
      *
-     * @param  \SplFileInfo|string $file
-     * @param  array $headers
-     * @return  \Symfony\Component\HttpFoundation\BinaryFileResponse
+     * @param  \SplFileInfo|string  $file
+     * @param  array  $headers
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     public function file($file, array $headers = [])
     {

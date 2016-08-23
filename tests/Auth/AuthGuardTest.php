@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Auth\Events\Authenticated;
 use Mockery as m;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Attempting;
@@ -107,13 +108,14 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
         $mock->login($user);
     }
 
-    public function testLoginFiresLoginEvent()
+    public function testLoginFiresLoginAndAuthenticatedEvents()
     {
         list($session, $provider, $request, $cookie) = $this->getMocks();
         $mock = $this->getMockBuilder('Illuminate\Auth\SessionGuard')->setMethods(['getName'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
         $mock->setDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
         $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
         $events->shouldReceive('fire')->once()->with(m::type('Illuminate\Auth\Events\Login'));
+        $events->shouldReceive('fire')->once()->with(m::type('Illuminate\Auth\Events\Authenticated'));
         $mock->expects($this->once())->method('getName')->will($this->returnValue('foo'));
         $user->shouldReceive('getAuthIdentifier')->once()->andReturn('bar');
         $mock->getSession()->shouldReceive('set')->with('foo', 'bar')->once();
@@ -137,6 +139,15 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
         $guard = $this->getGuard()->setUser($user);
 
         $this->assertEquals($user, $guard->authenticate());
+    }
+
+    public function testSetUserFiresAuthenticatedEvent()
+    {
+        $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
+        $guard = $this->getGuard();
+        $guard->setDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
+        $events->shouldReceive('fire')->once()->with(m::type(Authenticated::class));
+        $guard->setUser($user);
     }
 
     /**
@@ -240,6 +251,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
         $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
         $user->shouldReceive('setRememberToken')->once();
         $provider->shouldReceive('updateRememberToken')->once();
+        $events->shouldReceive('fire')->once()->with(m::type(Authenticated::class));
         $mock->setUser($user);
         $events->shouldReceive('fire')->once()->with(m::type('Illuminate\Auth\Events\Logout'));
         $mock->logout();
