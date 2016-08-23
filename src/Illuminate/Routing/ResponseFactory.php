@@ -142,7 +142,7 @@ class ResponseFactory implements FactoryContract
      *
      * @param  \SplFileInfo|string $file
      * @param  array $headers
-     * @return  \Symfony\Component\HttpFoundation\BinaryFileResponse
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     public function file($file, array $headers = [])
     {
