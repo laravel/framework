@@ -47,17 +47,26 @@ trait ContextualBindingsTrait
         $this->contextualBindings[$hash] = $implementation;
     }
 
+    /**
+     * Get a contextual binding
+     *
+     * @param  string  $when
+     * @param  string  $needs
+     * @return void
+     */
     private function getContextualBinding($when, $needs)
     {
         $hash = crc32($this->normalize($when) . $this->normalize($needs));
 
-        if (isset($this->contextualBindings[$hash])) {
-            return $this->contextualBindings[$hash];
-        }
-
-        return null;
+        return (isset($this->contextualBindings[$hash])) ? $this->contextualBindings[$hash] : null;
     }
 
+    /**
+     * Get a contextual binding from a reflection parameter
+     *
+     * @param  \ReflectionParameter  $parameter
+     * @return  mixed
+     */
     private function resolveContextualBinding(\ReflectionParameter $parameter)
     {
         $when = $this->buildStack[count($this->buildStack) - 1];

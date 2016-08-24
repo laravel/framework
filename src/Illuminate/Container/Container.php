@@ -101,7 +101,10 @@ class Container extends ContainerAbstract implements ContainerContract
     {
         $abstract = $this->normalize($abstract);
 
-        if (is_string($abstract) && isset($this->bindings[$abstract]) && $this->bindings[$abstract][ContainerAbstract::VALUE] instanceof Closure) {
+        if ($abstract instanceof Closure) {
+            return $this->resolve($abstract, [$this, $parameters]);
+        }
+        if ($this->bound($abstract) && $this->bindings[$abstract][ContainerAbstract::VALUE] instanceof Closure) {
             return $this->resolve($abstract, [$this, $parameters]);
         }
 
@@ -142,11 +145,9 @@ class Container extends ContainerAbstract implements ContainerContract
     {
         $contextualBinding = $this->resolveContextualBinding($parameter);
 
-        if ($contextualBinding && $contextualBinding instanceof Closure) {
-            return $this->resolve($contextualBinding, [$this]);
-        } else if ($contextualBinding) {
+        if ($contextualBinding) {
             try {
-                return $this->resolve($contextualBinding);
+                return $this->make($contextualBinding, $parameters);
             } catch (\Exception $e){
                 return $contextualBinding;
             }
@@ -168,7 +169,9 @@ class Container extends ContainerAbstract implements ContainerContract
      */
     public function bound($abstract)
     {
-    	return isset($this->bindings[$this->normalize($abstract)]);
+        $abstract = $this->normalize($abstract);
+
+    	return is_string($abstract) && isset($this->bindings[$abstract]);
     }
 
     /**
