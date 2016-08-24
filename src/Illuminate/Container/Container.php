@@ -139,6 +139,18 @@ class Container extends ContainerAbstract implements ContainerContract
 
     protected function resolveParameter(\ReflectionParameter $parameter, array $parameters = [])
     {
+        $contextualBinding = $this->resolveContextualBinding($parameter);
+
+        if ($contextualBinding && $contextualBinding instanceof Closure) {
+            return $this->resolve($contextualBinding, [$this]);
+        } else if ($contextualBinding) {
+            try {
+                return $this->resolve($contextualBinding);
+            } catch (\Exception $e){
+                return $contextualBinding;
+            }
+        }
+
         return parent::resolveParameter($parameter, $parameters);
     }
 

@@ -16,9 +16,9 @@ trait ContextualBindingsTrait
      */
     public function when($concrete)
     {
-        // $this->when = $concrete;
+        $this->when = $this->normalize($concrete);
 
-        // return $this;
+        return $this;
     }
 
     /**
@@ -29,7 +29,7 @@ trait ContextualBindingsTrait
      */
     public function needs($abstract)
     {
-        $this->needs = $abstract;
+        $this->needs = $this->normalize($abstract);
 
         return $this;
     }
@@ -47,7 +47,32 @@ trait ContextualBindingsTrait
         $this->contextualBindings[$hash] = $implementation;
     }
 
-    private function getContextualBinding()
+    private function getContextualBinding($when, $needs)
     {
+        $hash = crc32($this->normalize($when) . $this->normalize($needs));
+
+        if (isset($this->contextualBindings[$hash])) {
+            return $this->contextualBindings[$hash];
+        }
+
+        return null;
+    }
+
+    private function resolveContextualBinding(\ReflectionParameter $parameter)
+    {
+        $when = $this->buildStack[count($this->buildStack) - 1];
+        $implementation = null;
+
+        $parameterName = $parameter->getName();
+        $parameterClass = $parameter->getClass();
+
+        if ($parameterClass) {
+            $implementation = $this->getContextualBinding($when, $parameterClass->name);
+        }
+        if (!$implementation) {
+            $implementation = $this->getContextualBinding($when, "$" . $parameterName);
+        }
+
+        return $implementation;
     }
 }

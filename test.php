@@ -46,8 +46,7 @@ interface ITest
 $container = new Illuminate\Container\Container();
 $containerOld = new Illuminate\Container\ContainerOld();
 
-// $container->make(Test2::class);
+$container->make(Test2::class);
 
 // $container->when("Test2")->needs("Test")->give(100);
 
-dump(method_exists("Test3::test"));
