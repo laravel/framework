@@ -4,7 +4,7 @@ require("vendor/autoload.php");
 
 class Test
 {
-	public function __construct($first, Test2 $test2, $last)
+	public function __construct(Test2 $test2)
 	{
 	}
 
@@ -31,11 +31,9 @@ interface ITest
 }
 
 $container = new Illuminate\Container\Container();
-$containerOld = new Illuminate\Container\ContainerOld();
+// $container = new Illuminate\Container\ContainerOld();
 
-// $containerOld->make(function() {
-// 	dump(func_get_args());
-// });
-$containerOld->call(function() {
-	dump(func_get_args());
-});
+for ($i = 0; $i < 10000; $i++) {
+	$container->make(Test::class);
+}
+

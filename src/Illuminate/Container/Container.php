@@ -47,7 +47,7 @@ class Container extends ContainerAbstract implements ContainerContract
     public function bindIf($abstract, $concrete = null)
     {
         if (!$this->bound($abstract)) {
-            $this->bind($abstract, $concrete, $shared);
+            $this->bind($abstract, $concrete);
         }
     }
 
@@ -102,7 +102,7 @@ class Container extends ContainerAbstract implements ContainerContract
         $abstract = self::normalize($abstract);
 
         if ($abstract instanceof Closure) {
-            return $this->resolve($abstract, [$this, $parameters]);
+            return parent::resolve($abstract, [$this, $parameters]);
         }
         if ($this->bound($abstract) && $this->bindings[$abstract][ContainerAbstract::VALUE] instanceof Closure) {
             return $this->resolve($abstract, [$this, $parameters]);
