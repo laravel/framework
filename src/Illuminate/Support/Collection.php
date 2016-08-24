@@ -948,7 +948,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $items = $this->items;
 
         $callback
-            ? uasort($items, $callback) 
+            ? uasort($items, $callback)
             : asort($items);
 
         return new static($items);
