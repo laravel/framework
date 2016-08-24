@@ -1928,51 +1928,51 @@ class Builder
      * Retrieve the minimum value of a given column.
      *
      * @param  string  $column
-     * @return float|int
+     * @return mixed
      */
     public function min($column)
     {
-        return $this->numericAggregate(__FUNCTION__, [$column]);
+        return $this->aggregate(__FUNCTION__, [$column]);
     }
 
     /**
      * Retrieve the maximum value of a given column.
      *
      * @param  string  $column
-     * @return float|int
+     * @return mixed
      */
     public function max($column)
     {
-        return $this->numericAggregate(__FUNCTION__, [$column]);
+        return $this->aggregate(__FUNCTION__, [$column]);
     }
 
     /**
      * Retrieve the sum of the values of a given column.
      *
      * @param  string  $column
-     * @return float|int
+     * @return mixed
      */
     public function sum($column)
     {
-        return $this->numericAggregate(__FUNCTION__, [$column]);
+        return $this->aggregate(__FUNCTION__, [$column]);
     }
 
     /**
      * Retrieve the average of the values of a given column.
      *
      * @param  string  $column
-     * @return float|int
+     * @return mixed
      */
     public function avg($column)
     {
-        return $this->numericAggregate(__FUNCTION__, [$column]);
+        return $this->aggregate(__FUNCTION__, [$column]);
     }
 
     /**
      * Alias for the "avg" method.
      *
      * @param  string  $column
-     * @return float|int
+     * @return mixed
      */
     public function average($column)
     {
