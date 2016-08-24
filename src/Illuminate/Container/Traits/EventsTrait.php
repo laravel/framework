@@ -3,7 +3,6 @@
 namespace Illuminate\Container\Traits;
 
 use Closure;
-use ReflectionClass;
 
 trait EventsTrait
 {
@@ -42,7 +41,7 @@ trait EventsTrait
         }
     }
 
-    public function fireAfterResolving($abstract, $resolved)
+    private function fireAfterResolving($abstract, $resolved)
     {
     	$callbacks = $this->globalAfterResolving;
 
@@ -61,7 +60,7 @@ trait EventsTrait
     	self::fireCallbacks($callbacks, [$resolved, $this]);
     }
 
-    public static function fireCallbacks(array $callbacks, array $parameters = [])
+    private static function fireCallbacks(array $callbacks, array $parameters = [])
     {
     	foreach ($callbacks as $callback) {
     		call_user_func_array($callback, $parameters);

@@ -162,7 +162,31 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('taylor', $result->name);
         $this->assertEquals(26, $result->age);
-        $this->assertSame($result, $container->make('foo'));
+    }
+
+    public function testExtendedBindingsKeptTypes()
+    {
+        $container = new Container;
+
+        $container->singleton('foo', function() {
+            return (object) ['name' => 'taylor'];
+        });
+        $container->extend('foo', function ($old, $container) {
+            $old->age = 26;
+
+            return $old;
+        });
+        $container->bind('bar', function() {
+            return (object) ['name' => 'taylor'];
+        });
+        $container->extend('bar', function ($old, $container) {
+            $old->age = 26;
+
+            return $old;
+        });
+
+        $this->assertSame($container->make('foo'), $container->make('foo'));
+        $this->assertNotSame($container->make('bar'), $container->make('bar'));
     }
 
     public function testMultipleExtends()

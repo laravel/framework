@@ -39,16 +39,17 @@ class Test3
 
 }
 
-// $container = new Illuminate\Container\Container();
+$container = new Illuminate\Container\Container();
 
-/*
+$container['foo'] = function () {
+    return (object) ['name' => 'taylor'];
+};
+$container->extend('foo', function ($old, $container) {
+    $old->age = 26;
 
-After resolving xxx, call callback
+    return $old;
+});
 
--If resolved is instanceof xxx
--If container bind is equal to xxx
+$result = $container->make('foo');
 
-If event is a class -> will check instance for all
-
- */
-
+dump($result);

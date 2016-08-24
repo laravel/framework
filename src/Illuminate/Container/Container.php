@@ -11,39 +11,16 @@ class Container extends ContainerAbstract implements ContainerContract
 {
     use Traits\TagsTrait;
     use Traits\EventsTrait;
-
-    private $extenders = [];
+    use Traits\ExtendersTrait;
 
     public function resolve($abstract, array $parameters = [])
     {
-        try {
-            $concrete = parent::resolve($abstract, $parameters);
-        } catch (ReflectionException $e) {
-            throw $e;
-        } catch (\Exception $e) {
-            throw new BindingResolutionException($e->getMessage());
-        }
+        $resolved = parent::resolve($abstract, $parameters);
+        $resolved = $this->extendResolved($abstract, $resolved);
 
-        $this->fireExtenders($abstract, $concrete);
-        $this->fireAfterResolving($abstract, $concrete);
+        $this->fireAfterResolving($abstract, $resolved);
 
-        return $concrete;
-    }
-
-    private function fireExtenders($abstract, &$concrete)
-    {
-        if (!is_string($abstract) || !isset($this->extenders[$abstract])) {
-            return ;
-        }
-        $extenders = $this->extenders[$abstract];
-
-        unset($this->extenders[$abstract]);
-
-        foreach ($extenders as $extender) {
-            $concrete = $extender($concrete, $this);
-        }
-
-        $this->bindPlain($abstract, $concrete);
+        return $resolved;
     }
 
     /**
@@ -201,22 +178,6 @@ class Container extends ContainerAbstract implements ContainerContract
         if (!$this->bound($abstract)) {
             $this->bind($abstract, $concrete, $shared);
         }
-    }
-
-    /**
-     * "Extend" an abstract type in the container.
-     *
-     * @param  string    $abstract
-     * @param  \Closure  $closure
-     * @return void
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function extend($abstract, Closure $closure)
-    {
-        $abstract = $this->normalize($abstract);
-
-        $this->extenders[$abstract][] = $closure;
     }
 
     /**

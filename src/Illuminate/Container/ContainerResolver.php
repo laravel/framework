@@ -4,11 +4,11 @@ namespace Illuminate\Container;
 
 use Closure;
 use Reflector;
-use Exception;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionFunction;
 use ReflectionParameter;
+use Illuminate\Contracts\Container\BindingResolutionException as Exception;
 
 class ContainerResolver
 {
@@ -97,7 +97,7 @@ class ContainerResolver
 
         try {
             return $this->resolve($parameter->name);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new Exception("Unresolvable dependency resolving [$parameter] in [".end($this->buildStack)."]");
         }
     }
