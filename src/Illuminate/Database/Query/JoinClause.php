@@ -42,7 +42,7 @@ class JoinClause extends Builder
         $this->parentQuery = $parentQuery;
 
         parent::__construct(
-            $parentQuery->connection, $parentQuery->grammar, $parentQuery->processor
+            $parentQuery->getConnection(), $parentQuery->getGrammar(), $parentQuery->getProcessor()
         );
     }
 
