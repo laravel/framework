@@ -769,7 +769,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
     /**
      * Get a schema builder instance.
      *
-     * @return Illuminate\Database\Schema\Builder
+     * @return \Illuminate\Database\Schema\Builder
      */
     protected function schema($connection = 'default')
     {
