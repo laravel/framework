@@ -12,8 +12,19 @@ use Illuminate\Contracts\Container\BindingResolutionException as Exception;
 
 class ContainerResolver
 {
+    /**
+     * The stack of concretions currently being built.
+     *
+     * @var array
+     */
     protected $buildStack = [];
 
+    /**
+     * Resolve a closure / function / method / class
+     * @param  string|array $subject
+     * @param  array  $parameters
+     * @return mixed
+     */
     public function resolve($subject, array $parameters = [])
     {
         if (is_callable($subject)) {
@@ -33,6 +44,12 @@ class ContainerResolver
         return $resolved;
     }
 
+    /**
+     * Resolve a class
+     * @param  string $subject
+     * @param  array  $parameters
+     * @return mixed
+     */
     public function resolveClass($class, array $parameters = [])
     {
         $reflectionClass = new ReflectionClass($class);
@@ -49,6 +66,12 @@ class ContainerResolver
         return $reflectionClass->newInstanceArgs();
     }
 
+    /**
+     * Resolve a method
+     * @param  string|array $subject
+     * @param  array  $parameters
+     * @return mixed
+     */
     public function resolveMethod($method, array $parameters = [])
     {
         if (is_string($method)) {
@@ -65,6 +88,12 @@ class ContainerResolver
         return call_user_func_array($method, $resolvedParameters);
     }
 
+    /**
+     * Resolve a closure / function
+     * @param  string|\Closure $subject
+     * @param  array  $parameters
+     * @return mixed
+     */
     public function resolveFunction($function, array $parameters = [])
     {
         $reflectionFunction = new ReflectionFunction($function);
@@ -76,6 +105,12 @@ class ContainerResolver
         return $reflectionFunction->invokeArgs($resolvedParameters);
     }
 
+    /**
+     * Resolve a parameter
+     * @param  \ReflectionParameter $parameter
+     * @param  array               $parameters
+     * @return mixed
+     */
     protected function resolveParameter(ReflectionParameter $parameter, array $parameters = [])
     {
         $name = $parameter->getName();
@@ -97,6 +132,12 @@ class ContainerResolver
         throw new Exception("Unresolvable dependency resolving [$parameter] in [".end($this->buildStack)."]");
     }
 
+    /**
+     * Resolve an array of \ReflectionParameter parameters
+     * @param  array  $reflectionParameters
+     * @param  array  $parameters
+     * @return array
+     */
     protected function resolveParameters(array $reflectionParameters, array $parameters = [])
     {
         $dependencies = [];
@@ -108,6 +149,12 @@ class ContainerResolver
         return self::mergeParameters($dependencies, $parameters);
     }
 
+    /**
+     * Merge some dynamicly resolved parameters whith some others provided by the user
+     * @param  array  $rootParameters
+     * @param  array  $parameters
+     * @return array
+     */
     private static function mergeParameters(array $rootParameters, array $parameters = [])
     {
         foreach ($parameters as $key => $value) {
