@@ -19,6 +19,21 @@ class ContainerResolver
      */
     protected $buildStack = [];
 
+    public static function isClass($value)
+    {
+        return is_string($value) && class_exists($value);
+    }
+
+    public static function isMethod($value)
+    {
+        return is_callable($value) && !self::isFunction($value);
+    }
+
+    public static function isFunction($value)
+    {
+        return is_callable($value) && ($value instanceof Closure || is_string($value) && function_exists($value));
+    }
+
     /**
      * Resolve a closure / function / method / class
      * @param  string|array $subject
@@ -27,14 +42,12 @@ class ContainerResolver
      */
     public function resolve($subject, array $parameters = [])
     {
-        if (is_callable($subject)) {
-            if (is_string($subject) && function_exists($subject) || $subject instanceof Closure) {
-                $resolved = $this->resolveFunction($subject, $parameters);
-            } else {
-                $resolved = $this->resolveMethod($subject, $parameters);
-            }
-        } else if (is_string($subject) && class_exists($subject)) {
+        if (self::isClass($subject)) {
             $resolved = $this->resolveClass($subject, $parameters);
+        } else if (self::isMethod($subject)) {
+            $resolved = $this->resolveMethod($subject, $parameters);
+        } else if (self::isFunction($subject)) {
+            $resolved = $this->resolveFunction($subject, $parameters);
         } else {
             throw new Exception("[$subject] is not resolvable. Build stack : [".implode(', ', $this->buildStack)."]");
         }
