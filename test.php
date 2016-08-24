@@ -39,5 +39,16 @@ class Test3
 
 }
 
+// $container = new Illuminate\Container\Container();
 
-$container = new Illuminate\Container\Container();
+/*
+
+After resolving xxx, call callback
+
+-If resolved is instanceof xxx
+-If container bind is equal to xxx
+
+If event is a class -> will check instance for all
+
+ */
+
