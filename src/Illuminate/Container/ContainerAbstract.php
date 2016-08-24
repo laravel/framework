@@ -46,6 +46,11 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
         return parent::resolve($subject, $parameters);
     }
 
+    public function isBinded($abstract)
+    {
+        return is_string($abstract) && isset($this->bindings[$abstract]);
+    }
+
     /**
      * Bind a plain value
      * @param  string $abstract

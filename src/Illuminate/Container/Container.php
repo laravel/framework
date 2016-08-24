@@ -100,12 +100,10 @@ class Container extends ContainerAbstract implements ContainerContract
     public function make($abstract, array $parameters = [])
     {
         $abstract = self::normalize($abstract);
+        $concreteValue = ($this->isBinded($abstract)) ? $this->bindings[$abstract][self::VALUE] : $abstract;
 
-        if ($abstract instanceof Closure) {
-            return parent::resolve($abstract, [$this, $parameters]);
-        }
-        if ($this->bound($abstract) && $this->bindings[$abstract][ContainerAbstract::VALUE] instanceof Closure) {
-            return $this->resolve($abstract, [$this, $parameters]);
+        if ($concreteValue instanceof Closure) {
+            $parameters = [$this, $parameters];
         }
 
         return $this->resolve($abstract, $parameters);
@@ -178,9 +176,7 @@ class Container extends ContainerAbstract implements ContainerContract
      */
     public function bound($abstract)
     {
-        $abstract = self::normalize($abstract);
-
-    	return is_string($abstract) && isset($this->bindings[$abstract]);
+        return $this->isBinded(self::normalize($abstract));
     }
 
     /**

@@ -35,6 +35,8 @@ interface ITest
 $container = new Illuminate\Container\Container();
 // $container = new Illuminate\Container\ContainerOld();
 
+
+/*
 class Is
 {
 	public static function isClass($subject)
@@ -64,3 +66,4 @@ $tests = [
 foreach ($tests as $key => $value) {
 	dump($key . " -> " . (Is::isClass($value) ? "true" : "false"));
 }
+*/

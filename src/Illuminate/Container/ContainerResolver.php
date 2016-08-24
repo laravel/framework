@@ -19,23 +19,51 @@ class ContainerResolver
      */
     protected $buildStack = [];
 
+    /**
+     * Check if something is a class
+     *
+     * @param  mixed  $value
+     * @return boolean
+     */
     public static function isClass($value)
     {
         return is_string($value) && class_exists($value);
     }
 
+    /**
+     * Check if something is a method
+     *
+     * @param  mixed  $value
+     * @return boolean
+     */
     public static function isMethod($value)
     {
         return is_callable($value) && !self::isFunction($value);
     }
 
+    /**
+     * Check if something is a function
+     *
+     * @param  mixed  $value
+     * @return boolean
+     */
     public static function isFunction($value)
     {
         return is_callable($value) && ($value instanceof Closure || is_string($value) && function_exists($value));
     }
 
     /**
-     * Resolve a closure / function / method / class
+     * Check if something is resolvable
+     * @param  mixed  $value
+     * @return boolean
+     */
+    public static function isResolvable($value)
+    {
+        return self::isClass($value) || self::isMethod($value) || self::isFunction($value);
+    }
+
+    /**
+     * Resolve a closure, function, method or a class
      * @param  string|array $subject
      * @param  array  $parameters
      * @return mixed
@@ -69,14 +97,10 @@ class ContainerResolver
         $this->buildStack[] = $reflectionClass->getName();
 
         if (($reflectionMethod = $reflectionClass->getConstructor())) {
-        	$reflectionParameters = $reflectionMethod->getParameters();
-
-        	$resolvedParameters = $this->resolveParameters($reflectionParameters, $parameters);
-
-            return $reflectionClass->newInstanceArgs($resolvedParameters);
+        	$parameters = $this->resolveParameters($reflectionMethod->getParameters(), $parameters);
         }
 
-        return $reflectionClass->newInstanceArgs();
+        return $reflectionClass->newInstanceArgs($parameters);
     }
 
     /**
@@ -87,12 +111,7 @@ class ContainerResolver
      */
     public function resolveMethod($method, array $parameters = [])
     {
-        if (is_string($method)) {
-            $reflectionMethod = new ReflectionMethod($method);
-        } else {
-            $reflectionMethod = new ReflectionMethod($method[0], $method[1]);
-        }
-
+        $reflectionMethod = is_string($method) ? new ReflectionMethod($method) : new ReflectionMethod($method[0], $method[1]);
         $reflectionParameters = $reflectionMethod->getParameters();
         $this->buildStack[] = $reflectionMethod->getName();
 
@@ -135,8 +154,8 @@ class ContainerResolver
         if (isset($parameters[$index])) {
             return $parameters[$index];
         }
-        if ($parameter->getClass()) {
-            return $this->resolve($parameter->getClass()->name);
+        if (($class = $parameter->getClass())) {
+            return $this->resolve($class->name);
         }
         if ($parameter->isDefaultValueAvailable()) {
             return $parameter->getDefaultValue();
@@ -171,7 +190,7 @@ class ContainerResolver
     private static function mergeParameters(array $rootParameters, array $parameters = [])
     {
         foreach ($parameters as $key => $value) {
-            if (is_numeric($key) && !isset($rootParameters[$key])) {
+            if (!isset($rootParameters[$key]) && is_numeric($key)) {
                 $rootParameters[$key] = $value;
             }
         }
