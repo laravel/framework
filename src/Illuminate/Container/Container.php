@@ -10,6 +10,7 @@ use Illuminate\Contracts\Container\Container as ContainerContract;
 class Container extends ContainerAbstract implements ContainerContract
 {
     use Traits\TagsTrait;
+    use Traits\AliasTrait;
     use Traits\EventsTrait;
     use Traits\ExtendersTrait;
     use Traits\ContextualBindingsTrait;
@@ -22,7 +23,7 @@ class Container extends ContainerAbstract implements ContainerContract
      * @param  bool  $shared
      * @return void
      */
-	public function bind($abstract, $concrete = null, $shared = false)
+	public function bind($abstract, $concrete = null)
 	{
         $abstract = $this->normalize($abstract);
         $concrete = ($concrete) ? $this->normalize($concrete) : $abstract;
@@ -43,7 +44,7 @@ class Container extends ContainerAbstract implements ContainerContract
      * @param  bool  $shared
      * @return void
      */
-    public function bindIf($abstract, $concrete = null, $shared = false)
+    public function bindIf($abstract, $concrete = null)
     {
         if (!$this->bound($abstract)) {
             $this->bind($abstract, $concrete, $shared);
@@ -182,20 +183,4 @@ class Container extends ContainerAbstract implements ContainerContract
 
         return isset($this->bindings[$abstract]) && $this->bindings[$abstract][ContainerAbstract::IS_RESOLVED];
     }
-
-    /**
-     * Alias a type to a different name.
-     *
-     * @param  string  $abstract
-     * @param  string  $alias
-     * @return void
-     */
-    public function alias($abstract, $alias)
-    {
-        $alias = $this->normalize($alias);
-        $abstract = $this->normalize($abstract);
-
-        $this->bindings[$alias] = &$this->bindings[$abstract];
-    }
-
 }
