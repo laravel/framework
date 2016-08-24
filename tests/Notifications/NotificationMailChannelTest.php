@@ -22,7 +22,9 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
             $mailer = Mockery::mock(Illuminate\Contracts\Mail\Mailer::class)
         );
 
-        $mailer->shouldReceive('send')->with('notifications::email', $data, Mockery::type('Closure'));
+        $view = ['notifications::email', 'notifications::email-plain'];
+
+        $mailer->shouldReceive('send')->with($view, $data, Mockery::type('Closure'));
 
         $channel->send($notifiable, $notification);
     }
