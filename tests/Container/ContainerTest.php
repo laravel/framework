@@ -373,7 +373,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
 
     /**
      * @expectedException Illuminate\Contracts\Container\BindingResolutionException
-     * @expectedExceptionMessage [IContainerContractStub] is not instantiable. Build stack : [IContainerContractStub]
+     * @expectedExceptionMessage [IContainerContractStub] is not resolvable. Build stack : []
      */
     public function testBindingResolutionExceptionMessage()
     {
@@ -383,7 +383,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
 
     /**
      * @expectedException Illuminate\Contracts\Container\BindingResolutionException
-     * @expectedExceptionMessage [IContainerContractStub] is not instantiable. Build stack : [ContainerTestContextInjectOne, IContainerContractStub]
+     * @expectedExceptionMessage [IContainerContractStub] is not resolvable. Build stack : [ContainerTestContextInjectOne]
      */
     public function testBindingResolutionExceptionMessageIncludesBuildStack()
     {

@@ -22,8 +22,10 @@ class ContainerResolver
             } else {
                 $resolved = $this->resolveMethod($subject, $parameters);
             }
-        } else {
+        } else if (is_string($subject) && class_exists($subject)) {
             $resolved = $this->resolveClass($subject, $parameters);
+        } else {
+            throw new Exception("[$subject] is not resolvable. Build stack : [".implode(', ', $this->buildStack)."]");
         }
 
         array_pop($this->buildStack);
@@ -42,9 +44,6 @@ class ContainerResolver
         	$resolvedParameters = $this->resolveParameters($reflectionParameters, $parameters);
 
             return $reflectionClass->newInstanceArgs($resolvedParameters);
-        }
-        if (!$reflectionClass->isInstantiable()) {
-            throw new Exception("[$class] is not instantiable. Build stack : [".implode(', ', $this->buildStack)."]");
         }
 
         return $reflectionClass->newInstanceArgs();
@@ -77,7 +76,7 @@ class ContainerResolver
         return $reflectionFunction->invokeArgs($resolvedParameters);
     }
 
-    private function resolveParameter(ReflectionParameter $parameter, array $parameters = [])
+    protected function resolveParameter(ReflectionParameter $parameter, array $parameters = [])
     {
         $name = $parameter->getName();
         $index = $parameter->getPosition();
@@ -95,14 +94,10 @@ class ContainerResolver
             return $parameter->getDefaultValue();
         }
 
-        try {
-            return $this->resolve($parameter->name);
-        } catch (\Exception $e) {
-            throw new Exception("Unresolvable dependency resolving [$parameter] in [".end($this->buildStack)."]");
-        }
+        throw new Exception("Unresolvable dependency resolving [$parameter] in [".end($this->buildStack)."]");
     }
 
-    private function resolveParameters(array $reflectionParameters, array $parameters = [])
+    protected function resolveParameters(array $reflectionParameters, array $parameters = [])
     {
         $dependencies = [];
 

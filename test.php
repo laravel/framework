@@ -39,17 +39,15 @@ class Test3
 
 }
 
+interface ITest
+{
+}
+
 $container = new Illuminate\Container\Container();
+$containerOld = new Illuminate\Container\ContainerOld();
 
-$container['foo'] = function () {
-    return (object) ['name' => 'taylor'];
-};
-$container->extend('foo', function ($old, $container) {
-    $old->age = 26;
+// $container->make(Test2::class);
 
-    return $old;
-});
+// $container->when("Test2")->needs("Test")->give(100);
 
-$result = $container->make('foo');
-
-dump($result);
+dump(method_exists("Test3::test"));

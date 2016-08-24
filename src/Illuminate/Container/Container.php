@@ -12,16 +12,7 @@ class Container extends ContainerAbstract implements ContainerContract
     use Traits\TagsTrait;
     use Traits\EventsTrait;
     use Traits\ExtendersTrait;
-
-    public function resolve($abstract, array $parameters = [])
-    {
-        $resolved = parent::resolve($abstract, $parameters);
-        $resolved = $this->extendResolved($abstract, $resolved);
-
-        $this->fireAfterResolving($abstract, $resolved);
-
-        return $resolved;
-    }
+    use Traits\ContextualBindingsTrait;
 
     /**
      * Register a binding with the container.
@@ -45,22 +36,17 @@ class Container extends ContainerAbstract implements ContainerContract
 	}
 
     /**
-     * Register a shared binding in the container.
+     * Register a binding if it hasn't already been registered.
      *
-     * @param  string|array  $abstract
+     * @param  string  $abstract
      * @param  \Closure|string|null  $concrete
+     * @param  bool  $shared
      * @return void
      */
-    public function singleton($abstract, $concrete = null)
+    public function bindIf($abstract, $concrete = null, $shared = false)
     {
-        $abstract = $this->normalize($abstract);
-        $concrete = ($concrete) ? $this->normalize($concrete) : $abstract;
-
-        if (is_array($abstract)) {
-            $this->bindSingleton(key($abstract), $concrete);
-            $this->alias(key($abstract), current($abstract));
-        } else {
-            $this->bindSingleton($abstract, $concrete);
+        if (!$this->bound($abstract)) {
+            $this->bind($abstract, $concrete, $shared);
         }
     }
 
@@ -80,6 +66,26 @@ class Container extends ContainerAbstract implements ContainerContract
             $this->alias(key($abstract), current($abstract));
         } else {
             $this->bindPlain($abstract, $instance);
+        }
+    }
+
+    /**
+     * Register a shared binding in the container.
+     *
+     * @param  string|array  $abstract
+     * @param  \Closure|string|null  $concrete
+     * @return void
+     */
+    public function singleton($abstract, $concrete = null)
+    {
+        $abstract = $this->normalize($abstract);
+        $concrete = ($concrete) ? $this->normalize($concrete) : $abstract;
+
+        if (is_array($abstract)) {
+            $this->bindSingleton(key($abstract), $concrete);
+            $this->alias(key($abstract), current($abstract));
+        } else {
+            $this->bindSingleton($abstract, $concrete);
         }
     }
 
@@ -119,6 +125,21 @@ class Container extends ContainerAbstract implements ContainerContract
         }
 
         return $this->resolve($callback, $parameters);
+    }
+
+    public function resolve($abstract, array $parameters = [])
+    {
+        $resolved = parent::resolve($abstract, $parameters);
+        $resolved = $this->extendResolved($abstract, $resolved);
+
+        $this->fireAfterResolving($abstract, $resolved);
+
+        return $resolved;
+    }
+
+    protected function resolveParameter(\ReflectionParameter $parameter, array $parameters = [])
+    {
+        return parent::resolveParameter($parameter, $parameters);
     }
 
     private function normalize($service)
@@ -163,31 +184,6 @@ class Container extends ContainerAbstract implements ContainerContract
         $abstract = $this->normalize($abstract);
 
         $this->bindings[$alias] = &$this->bindings[$abstract];
-    }
-
-    /**
-     * Register a binding if it hasn't already been registered.
-     *
-     * @param  string  $abstract
-     * @param  \Closure|string|null  $concrete
-     * @param  bool  $shared
-     * @return void
-     */
-    public function bindIf($abstract, $concrete = null, $shared = false)
-    {
-        if (!$this->bound($abstract)) {
-            $this->bind($abstract, $concrete, $shared);
-        }
-    }
-
-    /**
-     * Define a contextual binding.
-     *
-     * @param  string  $concrete
-     * @return \Illuminate\Contracts\Container\ContextualBindingBuilder
-     */
-    public function when($concrete)
-    {
     }
 
 }
