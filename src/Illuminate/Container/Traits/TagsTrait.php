@@ -19,7 +19,7 @@ trait TagsTrait
         $abstracts = (is_array($abstracts)) ? $abstracts : [$abstracts];
 
         foreach ($abstracts as $key => $abstract) {
-            $abstracts[$key] = $this->normalize($abstract);
+            $abstracts[$key] = self::normalize($abstract);
         }
         foreach ($tags as $tagName) {
             if (isset($this->tags[$tagName])) {

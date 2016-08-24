@@ -25,8 +25,8 @@ class Container extends ContainerAbstract implements ContainerContract
      */
 	public function bind($abstract, $concrete = null)
 	{
-        $abstract = $this->normalize($abstract);
-        $concrete = ($concrete) ? $this->normalize($concrete) : $abstract;
+        $abstract = self::normalize($abstract);
+        $concrete = ($concrete) ? self::normalize($concrete) : $abstract;
 
         if (is_array($abstract)) {
             $this->bindService(key($abstract), $concrete);
@@ -60,7 +60,7 @@ class Container extends ContainerAbstract implements ContainerContract
      */
     public function instance($abstract, $instance)
     {
-        $abstract = $this->normalize($abstract);
+        $abstract = self::normalize($abstract);
 
         if (is_array($abstract)) {
             $this->bindPlain(key($abstract), $instance);
@@ -79,8 +79,8 @@ class Container extends ContainerAbstract implements ContainerContract
      */
     public function singleton($abstract, $concrete = null)
     {
-        $abstract = $this->normalize($abstract);
-        $concrete = ($concrete) ? $this->normalize($concrete) : $abstract;
+        $abstract = self::normalize($abstract);
+        $concrete = ($concrete) ? self::normalize($concrete) : $abstract;
 
         if (is_array($abstract)) {
             $this->bindSingleton(key($abstract), $concrete);
@@ -99,7 +99,7 @@ class Container extends ContainerAbstract implements ContainerContract
      */
     public function make($abstract, array $parameters = [])
     {
-        $abstract = $this->normalize($abstract);
+        $abstract = self::normalize($abstract);
 
         if ($abstract instanceof Closure) {
             return $this->resolve($abstract, [$this, $parameters]);
@@ -131,6 +131,13 @@ class Container extends ContainerAbstract implements ContainerContract
         return $this->resolve($callback, $parameters);
     }
 
+    /**
+     * Intercept the resolve call to add some features
+     *
+     * @param  mixed $abstract
+     * @param  array  $parameters
+     * @return mixed
+     */
     public function resolve($abstract, array $parameters = [])
     {
         $resolved = parent::resolve($abstract, $parameters);
@@ -141,6 +148,13 @@ class Container extends ContainerAbstract implements ContainerContract
         return $resolved;
     }
 
+    /**
+     * Intercept the resolveParameter call to deal with contextual binding
+     *
+     * @param  \ReflectionParameter $parameter
+     * @param  array                $parameters
+     * @return mixed
+     */
     protected function resolveParameter(\ReflectionParameter $parameter, array $parameters = [])
     {
         $contextualBinding = $this->resolveContextualBinding($parameter);
@@ -156,11 +170,6 @@ class Container extends ContainerAbstract implements ContainerContract
         return parent::resolveParameter($parameter, $parameters);
     }
 
-    private function normalize($service)
-    {
-        return is_string($service) ? ltrim($service, '\\') : $service;
-    }
-
     /**
      * Determine if the given abstract type has been bound.
      *
@@ -169,7 +178,7 @@ class Container extends ContainerAbstract implements ContainerContract
      */
     public function bound($abstract)
     {
-        $abstract = $this->normalize($abstract);
+        $abstract = self::normalize($abstract);
 
     	return is_string($abstract) && isset($this->bindings[$abstract]);
     }
@@ -182,8 +191,19 @@ class Container extends ContainerAbstract implements ContainerContract
      */
     public function resolved($abstract)
     {
-        $abstract = $this->normalize($abstract);
+        $abstract = self::normalize($abstract);
 
         return isset($this->bindings[$abstract]) && $this->bindings[$abstract][ContainerAbstract::IS_RESOLVED];
+    }
+
+    /**
+     * Normalize the given class name by removing leading slashes.
+     *
+     * @param  mixed  $service
+     * @return mixed
+     */
+    private static function normalize($service)
+    {
+        return is_string($service) ? ltrim($service, '\\') : $service;
     }
 }

@@ -16,7 +16,7 @@ trait ContextualBindingsTrait
      */
     public function when($concrete)
     {
-        $this->when = $this->normalize($concrete);
+        $this->when = self::normalize($concrete);
 
         return $this;
     }
@@ -29,7 +29,9 @@ trait ContextualBindingsTrait
      */
     public function needs($abstract)
     {
-        $this->needs = $this->normalize($abstract);
+        $abstract = ($abstract[0] === '$') ? substr($abstract, 1) : $abstract;
+
+        $this->needs = self::normalize($abstract);
 
         return $this;
     }
@@ -56,7 +58,7 @@ trait ContextualBindingsTrait
      */
     private function getContextualBinding($when, $needs)
     {
-        $hash = crc32($this->normalize($when) . $this->normalize($needs));
+        $hash = crc32($when . $needs);
 
         return (isset($this->contextualBindings[$hash])) ? $this->contextualBindings[$hash] : null;
     }
@@ -65,21 +67,15 @@ trait ContextualBindingsTrait
      * Get a contextual binding from a reflection parameter
      *
      * @param  \ReflectionParameter  $parameter
-     * @return  mixed
+     * @return mixed
      */
     private function resolveContextualBinding(\ReflectionParameter $parameter)
     {
         $when = $this->buildStack[count($this->buildStack) - 1];
-        $implementation = null;
+        $implementation = $this->getContextualBinding($when, $parameter->getName());
 
-        $parameterName = $parameter->getName();
-        $parameterClass = $parameter->getClass();
-
-        if ($parameterClass) {
-            $implementation = $this->getContextualBinding($when, $parameterClass->name);
-        }
-        if (!$implementation) {
-            $implementation = $this->getContextualBinding($when, "$" . $parameterName);
+        if (!$implementation && ($class = $parameter->getClass())) {
+            $implementation = $this->getContextualBinding($when, $class->name);
         }
 
         return $implementation;

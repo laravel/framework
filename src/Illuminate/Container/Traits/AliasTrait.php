@@ -13,8 +13,8 @@ trait AliasTrait
      */
     public function alias($abstract, $alias)
     {
-        $alias = $this->normalize($alias);
-        $abstract = $this->normalize($abstract);
+        $alias = self::normalize($alias);
+        $abstract = self::normalize($abstract);
 
         $this->bindings[$alias] = &$this->bindings[$abstract];
     }

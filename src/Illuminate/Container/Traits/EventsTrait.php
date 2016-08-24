@@ -30,7 +30,7 @@ trait EventsTrait
      */
     public function afterResolving($abstract, Closure $callback = null)
     {
-        $abstract = $this->normalize($abstract);
+        $abstract = self::normalize($abstract);
 
         if ($callback === null && $abstract instanceof Closure) {
 			$this->globalAfterResolving[] = $abstract;
@@ -41,6 +41,13 @@ trait EventsTrait
         }
     }
 
+    /**
+     * Fire the afterResolving callbacks
+     *
+     * @param  mixed $abstract
+     * @param  mixed $resolved
+     * @return void
+     */
     private function fireAfterResolving($abstract, $resolved)
     {
     	$callbacks = $this->globalAfterResolving;
@@ -60,6 +67,13 @@ trait EventsTrait
     	self::fireCallbacks($callbacks, [$resolved, $this]);
     }
 
+    /**
+     * Call the provided array of closures
+     *
+     * @param  array  $callbacks
+     * @param  array  $parameters
+     * @return void
+     */
     private static function fireCallbacks(array $callbacks, array $parameters = [])
     {
     	foreach ($callbacks as $callback) {

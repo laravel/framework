@@ -20,11 +20,17 @@ trait ExtendersTrait
      */
     public function extend($abstract, Closure $closure)
     {
-        $abstract = $this->normalize($abstract);
+        $abstract = self::normalize($abstract);
 
         $this->extenders[$abstract][] = $closure;
     }
 
+    /**
+     * "Extend" a resolved subject
+     * @param  mixed $abstract
+     * @param  mixed $resolved
+     * @return mixed
+     */
     private function extendResolved($abstract, $resolved)
     {
         if (!is_string($abstract) || !isset($this->extenders[$abstract])) {
