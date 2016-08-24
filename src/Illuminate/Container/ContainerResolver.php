@@ -94,10 +94,12 @@ class ContainerResolver
     public function resolveClass($class, array $parameters = [])
     {
         $reflectionClass = new ReflectionClass($class);
+        $reflectionMethod = $reflectionClass->getConstructor();
         $this->buildStack[] = $reflectionClass->getName();
 
-        if (($reflectionMethod = $reflectionClass->getConstructor())) {
-        	$parameters = $this->resolveParameters($reflectionMethod->getParameters(), $parameters);
+        if ($reflectionMethod) {
+            $reflectionParameters = $reflectionMethod->getParameters();
+        	$parameters = $this->resolveParameters($reflectionParameters, $parameters);
         }
 
         return $reflectionClass->newInstanceArgs($parameters);
