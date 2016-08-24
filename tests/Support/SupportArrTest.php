@@ -221,6 +221,10 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
 
     public function testHas()
     {
+        $array = ['products.desk' => ['price' => 100]];
+        $this->assertTrue(Arr::has($array, ['products.desk']));
+        $this->assertFalse(Arr::has($array, ['products.desk', 'missing']));
+
         $array = ['products' => ['desk' => ['price' => 100]]];
         $this->assertTrue(Arr::has($array, 'products.desk'));
         $this->assertTrue(Arr::has($array, 'products.desk.price'));

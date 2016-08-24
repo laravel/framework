@@ -1,5 +1,26 @@
 # Release Notes
 
+## v5.2.44 (2016-08-23)
+
+### Added
+- Added `BelongsToMany::syncWithoutDetaching()` method ([33aee31](https://github.com/laravel/framework/commit/33aee31523b9fc280aced35a5eb5f6b627263b45))
+- Added `withoutTrashed()` method to `SoftDeletingScope` ([#14805](https://github.com/laravel/framework/pull/14805))
+- Support Flysystem's `disable_asserts` config value ([#14864](https://github.com/laravel/framework/pull/14864))
+
+### Changed
+- Support multi-dimensional `$data` arrays in `invalid()` and `valid()` methods ([#14651](https://github.com/laravel/framework/pull/14651))
+- Support column aliases in `chunkById()` ([#14711](https://github.com/laravel/framework/pull/14711))
+- Re-attempt transaction when encountering a deadlock ([#14930](https://github.com/laravel/framework/pull/14930))
+
+### Fixed
+- Only return floats or integers in `aggregate()` ([#14781](https://github.com/laravel/framework/pull/14781))
+- Fixed numeric aggregate queries ([#14793](https://github.com/laravel/framework/pull/14793))
+- Create new row in `firstOrCreate()` when a model has a mutator ([#14656](https://github.com/laravel/framework/pull/14656))
+- Protect against empty paths in the `view:clear` command ([#14812](https://github.com/laravel/framework/pull/14812))
+- Convert `$attributes` in `makeHidden()` to array ([#14852](https://github.com/laravel/framework/pull/14852), [#14857](https://github.com/laravel/framework/pull/14857))
+- Prevent conflicting class name import to namespace in `ValidatesWhenResolvedTrait` ([#14878](https://github.com/laravel/framework/pull/14878))
+
+
 ## v5.2.43 (2016-08-10)
 
 ### Changed

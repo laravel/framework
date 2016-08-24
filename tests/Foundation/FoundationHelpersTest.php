@@ -37,4 +37,19 @@ class FoundationHelpersTest extends PHPUnit_Framework_TestCase
 
         cache(['foo' => 'bar']);
     }
+
+    public function testUnversionedElixir()
+    {
+        $file = 'unversioned.css';
+
+        app()->singleton('path.public', function () {
+            return __DIR__;
+        });
+
+        touch(public_path($file));
+
+        $this->assertEquals('/'.$file, elixir($file));
+
+        unlink(public_path($file));
+    }
 }
