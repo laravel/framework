@@ -4,13 +4,12 @@ use Mockery as m;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as BaseCollection;
-use Illuminate\Database\Capsule\Manager as DB;
 
 class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
 {
     public function setUp()
     {
-        $db = new DB;
+        $db = new Illuminate\Database\Capsule\Manager;
 
         $db->addConnection([
             'driver'    => 'sqlite',
