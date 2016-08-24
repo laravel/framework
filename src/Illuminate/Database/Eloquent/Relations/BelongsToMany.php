@@ -974,7 +974,7 @@ class BelongsToMany extends Relation
     /**
      * Cast the given keys to integers if they are numeric and string otherwise.
      *
-     * @param  arary  $keys
+     * @param  array  $keys
      * @return array
      */
     protected function castKeys(array $keys)
