@@ -44,6 +44,13 @@ class Kernel implements KernelContract
     protected $commands = [];
 
     /**
+     * Indicates if the Closure commands have been loaded.
+     *
+     * @var bool
+     */
+    protected $commandsLoaded = false;
+
+    /**
      * The bootstrap classes for the application.
      *
      * @var array
@@ -77,8 +84,6 @@ class Kernel implements KernelContract
 
         $this->app->booted(function () {
             $this->defineConsoleSchedule();
-
-            $this->commands();
         });
     }
 
@@ -107,6 +112,12 @@ class Kernel implements KernelContract
     {
         try {
             $this->bootstrap();
+
+            if (! $this->commandsLoaded) {
+                $this->commands();
+
+                $this->commandsLoaded = true;
+            }
 
             return $this->getArtisan()->run($input, $output);
         } catch (Exception $e) {
