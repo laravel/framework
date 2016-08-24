@@ -147,7 +147,7 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
     public function testGet()
     {
         $array = ['products.desk' => ['price' => 100]];
-        $this->assertEquals(['price' => 100], Arr::get($array, ['products.desk']));
+        $this->assertEquals(['price' => 100], Arr::get($array, 'products.desk'));
 
         $array = ['products' => ['desk' => ['price' => 100]]];
         $value = Arr::get($array, 'products.desk');
@@ -214,6 +214,7 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
     public function testHas()
     {
         $array = ['products.desk' => ['price' => 100]];
+        $this->assertTrue(Arr::has($array, 'products.desk'));
         $this->assertTrue(Arr::has($array, ['products.desk']));
         $this->assertFalse(Arr::has($array, ['products.desk', 'missing']));
 
