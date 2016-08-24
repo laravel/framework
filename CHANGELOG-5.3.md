@@ -1,5 +1,10 @@
 # Release Notes
 
+## v5.3.2 (2016-08-24)
+
+- Revert changes to Eloquent `Builder` that breaks `firstOr*` methods ([#15018](https://github.com/laravel/framework/pull/15018))
+
+
 ## v5.3.1 (2016-08-24)
 
 ### Changed
