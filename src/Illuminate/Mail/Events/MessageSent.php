@@ -9,7 +9,7 @@ class MessageSent
     /**
      * The Swift message instance.
      *
-     * @var Swift_Message
+     * @var \Swift_Message
      */
     public $message;
 
@@ -30,7 +30,7 @@ class MessageSent
     /**
      * Create a new event instance.
      *
-     * @param  Swift_Message  $message
+     * @param  \Swift_Message  $message
      * @param  array  $result
      * @param  string  $transport
      * @return void
