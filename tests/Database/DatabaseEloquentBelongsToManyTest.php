@@ -746,6 +746,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
         $parent = $relation->getParent();
         $parent->shouldReceive('touches')->andReturn(false);
         $parent->shouldReceive('getEventDispatcher')->andReturn($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
+
         return [$parent, $events];
     }
 
@@ -753,6 +754,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
     {
         $relationQuery = $relation->getQuery();
         $relationQuery->shouldReceive('getQuery->newQuery->from')->once()->andReturn($newPivotStatement = m::mock('Illuminate\Database\Query\Builder'));
+
         return $newPivotStatement;
     }
 
@@ -760,6 +762,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
     {
         $statement = $this->getNewStatement($relation);
         $statement->shouldReceive('where')->once()->with('user_id', 1)->andReturnSelf();
+
         return $statement;
     }
 

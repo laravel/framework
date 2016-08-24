@@ -1243,6 +1243,110 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Register a relation attaching model event with the dispatcher.
+     *
+     * @param  string  $relation
+     * @param  \Closure|string  $callback
+     * @param  int  $priority
+     * @return void
+     */
+    public static function attaching($relation, $callback, $priority = 0)
+    {
+        static::registerModelEvent("attaching.{$relation}", $callback, $priority);
+    }
+
+    /**
+     * Register a relation attached model event with the dispatcher.
+     *
+     * @param  string  $relation
+     * @param  \Closure|string  $callback
+     * @param  int  $priority
+     * @return void
+     */
+    public static function attached($relation, $callback, $priority = 0)
+    {
+        static::registerModelEvent("attached.{$relation}", $callback, $priority);
+    }
+
+    /**
+     * Register a relation detaching model event with the dispatcher.
+     *
+     * @param  string  $relation
+     * @param  \Closure|string  $callback
+     * @param  int  $priority
+     * @return void
+     */
+    public static function detaching($relation, $callback, $priority = 0)
+    {
+        static::registerModelEvent("detaching.{$relation}", $callback, $priority);
+    }
+
+    /**
+     * Register a relation detached model event with the dispatcher.
+     *
+     * @param  string  $relation
+     * @param  \Closure|string  $callback
+     * @param  int  $priority
+     * @return void
+     */
+    public static function detached($relation, $callback, $priority = 0)
+    {
+        static::registerModelEvent("detached.{$relation}", $callback, $priority);
+    }
+
+    /**
+     * Register a relation syncing model event with the dispatcher.
+     *
+     * @param  string  $relation
+     * @param  \Closure|string  $callback
+     * @param  int  $priority
+     * @return void
+     */
+    public static function syncing($relation, $callback, $priority = 0)
+    {
+        static::registerModelEvent("syncing.{$relation}", $callback, $priority);
+    }
+
+    /**
+     * Register a relation synced model event with the dispatcher.
+     *
+     * @param  string  $relation
+     * @param  \Closure|string  $callback
+     * @param  int  $priority
+     * @return void
+     */
+    public static function synced($relation, $callback, $priority = 0)
+    {
+        static::registerModelEvent("synced.{$relation}", $callback, $priority);
+    }
+
+    /**
+     * Register a relation toggling model event with the dispatcher.
+     *
+     * @param  string  $relation
+     * @param  \Closure|string  $callback
+     * @param  int  $priority
+     * @return void
+     */
+    public static function toggling($relation, $callback, $priority = 0)
+    {
+        static::registerModelEvent("toggling.{$relation}", $callback, $priority);
+    }
+
+    /**
+     * Register a relation toggled model event with the dispatcher.
+     *
+     * @param  string  $relation
+     * @param  \Closure|string  $callback
+     * @param  int  $priority
+     * @return void
+     */
+    public static function toggled($relation, $callback, $priority = 0)
+    {
+        static::registerModelEvent("toggled.{$relation}", $callback, $priority);
+    }
+
+    /**
      * Remove all of the event listeners for the model.
      *
      * @return void
