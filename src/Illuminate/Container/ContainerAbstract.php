@@ -25,6 +25,13 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
 
 	protected $bindings = [];
 
+    /**
+     * Resolve something (binded or not)
+     *
+     * @param  mixed $subject
+     * @param  array  $parameters
+     * @return mixed
+     */
     public function resolve($subject, array $parameters = [])
     {
         if (is_string($subject) && isset($this->bindings[$subject])) {
@@ -39,6 +46,12 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
         return parent::resolve($subject, $parameters);
     }
 
+    /**
+     * Bind a plain value
+     * @param  string $abstract
+     * @param  mixed $concrete
+     * @return void
+     */
     public function bindPlain($abstract, $concrete)
     {
         $this->bindings[$abstract] = [
@@ -48,6 +61,12 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
         ];
     }
 
+    /**
+     * Bind a value which need to be resolved each time
+     * @param  string $abstract
+     * @param  mixed $concrete
+     * @return void
+     */
     public function bindService($abstract, $concrete)
     {
         $this->bindings[$abstract] = [
@@ -57,6 +76,12 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
         ];
     }
 
+    /**
+     * Bind a value which need to be resolved one time
+     * @param  string $abstract
+     * @param  mixed $concrete
+     * @return void
+     */
     public function bindSingleton($abstract, $concrete)
     {
         $this->bindings[$abstract] = [
@@ -66,19 +91,36 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
         ];
     }
 
+    /**
+     * Resolve a plain value from the container
+     * @param  string $abstract
+     * @param  array  $parameters
+     * @return mixed
+     */
     public function resolvePlain($abstract, array $parameters = [])
     {
         return $this->bindings[$abstract][self::VALUE];
     }
 
+    /**
+     * Resolve a service from the container
+     * @param  string $abstract
+     * @param  array  $parameters
+     * @return mixed
+     */
     public function resolveService($abstract, array $parameters = [])
     {
         $binding = $this->bindings[$abstract];
-        $resolved = parent::resolve($binding[self::VALUE], $parameters);
 
-        return $resolved;
+        return parent::resolve($binding[self::VALUE], $parameters);
     }
 
+    /**
+     * Resolve a singleton from the container
+     * @param  string $abstract
+     * @param  array  $parameters
+     * @return mixed
+     */
     public function resolveSingleton($abstract, array $parameters = [])
     {
         $binding = $this->bindings[$abstract];
