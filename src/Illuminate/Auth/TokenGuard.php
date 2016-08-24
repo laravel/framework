@@ -18,11 +18,11 @@ class TokenGuard implements Guard
     protected $request;
 
     /**
-     * The name of the field on the request containing the API token.
+     * The name of the query string item from the request containing the API token.
      *
      * @var string
      */
-    protected $inputKey;
+    protected $queryKey;
 
     /**
      * The name of the token "column" in persistent storage.
@@ -42,7 +42,7 @@ class TokenGuard implements Guard
     {
         $this->request = $request;
         $this->provider = $provider;
-        $this->inputKey = 'api_token';
+        $this->queryKey = 'api_token';
         $this->storageKey = 'api_token';
     }
 
@@ -80,7 +80,7 @@ class TokenGuard implements Guard
      */
     public function getTokenForRequest()
     {
-        $token = $this->request->input($this->inputKey);
+        $token = $this->request->query($this->queryKey);
 
         if (empty($token)) {
             $token = $this->request->bearerToken();
@@ -101,11 +101,11 @@ class TokenGuard implements Guard
      */
     public function validate(array $credentials = [])
     {
-        if (empty($credentials[$this->inputKey])) {
+        if (empty($credentials[$this->queryKey])) {
             return false;
         }
 
-        $credentials = [$this->storageKey => $credentials[$this->inputKey]];
+        $credentials = [$this->storageKey => $credentials[$this->queryKey]];
 
         if ($this->provider->retrieveByCredentials($credentials)) {
             return true;
