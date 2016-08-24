@@ -14,18 +14,18 @@ class MessageSent
     public $message;
 
     /**
-     * The Swift transport.
-     *
-     * @var string
-     */
-    public $transport;
-
-    /**
      * The Swift send result - format depends on the transport.
      *
      * @var array
      */
     public $result;
+
+    /**
+     * The Swift transport.
+     *
+     * @var string
+     */
+    public $transport;
 
     /**
      * Create a new event instance.

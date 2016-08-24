@@ -14,18 +14,18 @@ class MessageNotSent
     public $message;
 
     /**
-     * The Swift transport.
-     *
-     * @var string
-     */
-    public $transport;
-
-    /**
      * The exception thrown.
      *
      * @var \Throwable
      */
     public $exception;
+
+    /**
+     * The Swift transport.
+     *
+     * @var string
+     */
+    public $transport;
 
     /**
      * Create a new event instance.
