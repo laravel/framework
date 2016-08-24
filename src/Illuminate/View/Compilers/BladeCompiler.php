@@ -930,7 +930,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * @param  string  $expression
      * @return string
      */
-    protected function stripParentheses($expression)
+    public function stripParentheses($expression)
     {
         if (Str::startsWith($expression, '(')) {
             $expression = substr($expression, 1, -1);
