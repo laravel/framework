@@ -71,18 +71,14 @@ class ContainerResolver
     public function resolve($subject, array $parameters = [])
     {
         if (self::isClass($subject)) {
-            $resolved = $this->resolveClass($subject, $parameters);
+            return $this->resolveClass($subject, $parameters);
         } else if (self::isMethod($subject)) {
-            $resolved = $this->resolveMethod($subject, $parameters);
+            return $this->resolveMethod($subject, $parameters);
         } else if (self::isFunction($subject)) {
-            $resolved = $this->resolveFunction($subject, $parameters);
-        } else {
-            throw new Exception("[$subject] is not resolvable. Build stack : [".implode(', ', $this->buildStack)."]");
+            return $this->resolveFunction($subject, $parameters);
         }
 
-        array_pop($this->buildStack);
-
-        return $resolved;
+        throw new Exception("[$subject] is not resolvable. Build stack : [".implode(', ', $this->buildStack)."]");
     }
 
     /**
@@ -95,12 +91,15 @@ class ContainerResolver
     {
         $reflectionClass = new ReflectionClass($class);
         $reflectionMethod = $reflectionClass->getConstructor();
-        $this->buildStack[] = $reflectionClass->getName();
+
+        array_push($this->buildStack, $reflectionClass->getName());
 
         if ($reflectionMethod) {
             $reflectionParameters = $reflectionMethod->getParameters();
         	$parameters = $this->resolveParameters($reflectionParameters, $parameters);
         }
+
+        array_pop($this->buildStack);
 
         return $reflectionClass->newInstanceArgs($parameters);
     }
@@ -115,9 +114,12 @@ class ContainerResolver
     {
         $reflectionMethod = is_string($method) ? new ReflectionMethod($method) : new ReflectionMethod($method[0], $method[1]);
         $reflectionParameters = $reflectionMethod->getParameters();
-        $this->buildStack[] = $reflectionMethod->getName();
+
+        array_push($this->buildStack, $reflectionMethod->getName());
 
         $resolvedParameters = $this->resolveParameters($reflectionParameters, $parameters);
+
+        array_pop($this->buildStack);
 
         return call_user_func_array($method, $resolvedParameters);
     }
@@ -132,9 +134,12 @@ class ContainerResolver
     {
         $reflectionFunction = new ReflectionFunction($function);
         $reflectionParameters = $reflectionFunction->getParameters();
-        $this->buildStack[] = $reflectionFunction->getName();
+
+        array_push($this->buildStack, $reflectionFunction->getName());
 
         $resolvedParameters = $this->resolveParameters($reflectionParameters, $parameters);
+
+        array_pop($this->buildStack);
 
         return $reflectionFunction->invokeArgs($resolvedParameters);
     }
