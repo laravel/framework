@@ -45,10 +45,37 @@ class ResetPassword extends Notification
     {
         return (new MailMessage)
             ->line([
-                'You are receiving this email because we received a password reset request for your account.',
-                'Click the button below to reset your password:',
+                $this->getTranslation(
+                    'passwords.reset_email_line1',
+                    'You are receiving this email because we received a password reset request for your account.'
+                ),
+                $this->getTranslation(
+                    'passwords.reset_email_line2',
+                    'Click the button below to reset your password:'
+                ),
             ])
-            ->action('Reset Password', url('password/reset', $this->token))
-            ->line('If you did not request a password reset, no further action is required.');
+            ->action(
+                $this->getTranslation('passwords.reset_email_action', 'Reset Password'),
+                url('password/reset', $this->token)
+            )
+            ->line(
+                $this->getTranslation(
+                    'passwords.reset_email_footer',
+                    'If you did not request a password reset, no further action is required.'
+                )
+            );
+    }
+
+    /**
+     * Get the value of a language line.
+     *
+     * @param  string $key
+     * @param  string $default
+     * @return string
+     */
+    public function getTranslation($key, $default = '')
+    {
+        return app('translator')->has($key)
+            ? trans($key) : $default;
     }
 }
