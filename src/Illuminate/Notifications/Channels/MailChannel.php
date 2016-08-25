@@ -50,6 +50,10 @@ class MailChannel
                 $m->to($recipients);
             }
 
+            if (! empty($message->from)) {
+                $m->from($message->from[0], isset($message->from[1]) ? $message->from[1] : null);
+            }
+
             $m->subject($message->subject ?: Str::title(
                 Str::snake(class_basename($notification), ' ')
             ));
