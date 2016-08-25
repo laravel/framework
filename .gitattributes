@@ -8,5 +8,5 @@
 .php_cs export-ignore
 .travis.yml export-ignore
 phpunit.xml export-ignore
-CHANGELOG.md export-ignore
+CHANGELOG-5.2.md export-ignore
 CONTRIBUTING.md export-ignore
