@@ -56,6 +56,17 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
     }
 
     /**
+     * Check if a binding is computed
+     *
+     * @param  array  $binding
+     * @return boolean
+     */
+    public static function isComputed($binding)
+    {
+        return $binding[self::IS_RESOLVED] && $binding[self::BINDING_TYPE] !== self::TYPE_SERVICE;
+    }
+
+    /**
      * Bind a plain value
      *
      * @param  string $abstract

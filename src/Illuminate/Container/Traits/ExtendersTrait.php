@@ -20,36 +20,35 @@ trait ExtendersTrait
      */
     public function extend($abstract, Closure $closure)
     {
-        $abstract = self::normalize($abstract);
-        $concrete = ($this->isBinded($abstract)) ? $this->bindings[$abstract] : null;
-
-        if ($concrete && $concrete[self::IS_RESOLVED] && $concrete[self::BINDING_TYPE] !== self::TYPE_SERVICE) {
-            $this->bindings[$abstract][self::VALUE] = $closure($this->bindings[$abstract][self::VALUE], $this);
-        } else {
-            $this->extenders[$abstract][] = $closure;
-        }
+        $this->extendAbstract(self::normalize($abstract), $closure);
     }
 
-    /**
-     * "Extend" a resolved subject
-     * @param  mixed $abstract
-     * @param  mixed $resolved
-     * @return mixed
-     */
-    private function extendResolved($abstract, $resolved)
+    private function extendAbstract($abstract, Closure $closure)
+    {
+        $this->extenders[$abstract][] = $closure;
+    }
+
+    private function extendConcrete($concrete, Closure $closure)
+    {
+        return $closure($concrete, $this);
+    }
+
+    private function extendResolved($abstract, &$resolved)
     {
         if (!is_string($abstract) || !isset($this->extenders[$abstract])) {
-            return $resolved;
+            return ;
         }
+
+        $binding = $this->bindings[$abstract];
+
         foreach ($this->extenders[$abstract] as $extender) {
-            $resolved = $extender($resolved, $this);
+            $resolved = $this->extendConcrete($resolved, $extender);
         }
-        if (isset($this->bindings[$abstract]) && $this->bindings[$abstract][self::BINDING_TYPE] !== self::TYPE_SERVICE) {
+
+        if ($binding[ContainerAbstract::BINDING_TYPE] !== ContainerAbstract::TYPE_SERVICE) {
             unset($this->extenders[$abstract]);
-            $this->bindPlain($abstract, $resolved);
+
+            $this->bindings[$abstract][ContainerAbstract::VALUE] = $resolved;
         }
-
-        return $resolved;
     }
-
 }

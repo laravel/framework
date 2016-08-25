@@ -27,12 +27,13 @@ class Container extends ContainerAbstract implements ContainerContract
 	{
         $abstract = self::normalize($abstract);
         $concrete = ($concrete) ? self::normalize($concrete) : $abstract;
+        $parameters = ($concrete instanceof Closure) ? [$this] : [];
 
         if (is_array($abstract)) {
-            $this->bindService(key($abstract), $concrete);
+            $this->bindService(key($abstract), $concrete, $parameters);
             $this->alias(key($abstract), current($abstract));
         } else {
-            $this->bindService($abstract, $concrete);
+            $this->bindService($abstract, $concrete, $parameters);
         }
 	}
 
@@ -81,12 +82,13 @@ class Container extends ContainerAbstract implements ContainerContract
     {
         $abstract = self::normalize($abstract);
         $concrete = ($concrete) ? self::normalize($concrete) : $abstract;
+        $parameters = ($concrete instanceof Closure) ? [$this] : [];
 
         if (is_array($abstract)) {
-            $this->bindSingleton(key($abstract), $concrete);
+            $this->bindSingleton(key($abstract), $concrete, $parameters);
             $this->alias(key($abstract), current($abstract));
         } else {
-            $this->bindSingleton($abstract, $concrete);
+            $this->bindSingleton($abstract, $concrete, $parameters);
         }
     }
 
@@ -125,7 +127,7 @@ class Container extends ContainerAbstract implements ContainerContract
         if (is_string($abstract) && strpos($abstract, '@')) {
             $parts = explode('@', $abstract, 2);
 
-            return $resolver->resolve([$this->resolve($parts[0]), $parts[1]], $parameters);
+            return $resolver->resolve([$resolver->resolve($parts[0]), $parts[1]], $parameters);
         }
 
         return $resolver->resolve($abstract, $parameters);
@@ -140,26 +142,62 @@ class Container extends ContainerAbstract implements ContainerContract
      */
     public function resolve($abstract, array $parameters = [])
     {
-        $concrete = ($this->isBinded($abstract)) ? $this->bindings[$abstract] : null;
+        if ($this->isBinded($abstract)) {
+            return $this->resolveBinded($abstract, $parameters);
+        }
 
-        if ($concrete && $concrete[self::IS_RESOLVED] && $concrete[self::BINDING_TYPE] !== self::TYPE_SERVICE) {
-            return $concrete[self::VALUE];
+        return $this->resolveNonBinded($abstract, $parameters);
+    }
+
+    private function resolveBinded($abstract, array $parameters = [])
+    {
+        if (ContainerAbstract::isComputed($this->bindings[$abstract])) {
+            return $this->bindings[$abstract][ContainerAbstract::VALUE];
         }
-        if ($abstract instanceof Closure) {
-            return parent::resolve($abstract, [$this, $parameters]);
+
+        $binding = $this->bindings[$abstract];
+        $concrete = $binding[ContainerAbstract::VALUE];
+        $resolved = parent::resolve($abstract, $parameters);
+
+        $this->extendResolved($abstract, $resolved);
+        $this->afterResolvingCallback($abstract, $concrete);
+
+        return $resolved;
+    }
+
+    private function resolveNonBinded($concrete, array $parameters = [])
+    {
+        if ($concrete instanceof Closure) {
+            array_unshift($parameters, $this);
         }
-        if ($concrete && $concrete[self::VALUE] instanceof Closure) {
+
+        $resolved = parent::resolve($concrete, $parameters);
+
+        return $resolved;
+    }
+
+/*
+    public function resolve($abstract, array $parameters = [])
+    {
+        $binding = ($this->isBinded($abstract)) ? $this->bindings[$abstract] : null;
+        $concrete = ($binding) ? $binding[self::VALUE] : $abstract;
+
+        if ($binding && $binding[self::IS_RESOLVED] && $binding[self::BINDING_TYPE] !== self::TYPE_SERVICE) {
+            return $binding[self::VALUE];
+        }
+        if ($concrete instanceof Closure) {
             $parameters = [$this, $parameters];
         }
 
         $resolved = parent::resolve($abstract, $parameters);
+
         $resolved = $this->extendResolved($abstract, $resolved);
 
         $this->fireAfterResolving($abstract, $resolved);
 
         return $resolved;
     }
-
+*/
     /**
      * Intercept the resolveParameter call to deal with contextual binding
      *
@@ -167,6 +205,7 @@ class Container extends ContainerAbstract implements ContainerContract
      * @param  array                $parameters
      * @return mixed
      */
+/*
     protected function resolveParameter(\ReflectionParameter $parameter, array $parameters = [])
     {
         $contextualBinding = $this->resolveContextualBinding($parameter);
@@ -181,6 +220,7 @@ class Container extends ContainerAbstract implements ContainerContract
 
         return parent::resolveParameter($parameter, $parameters);
     }
+*/
 
     /**
      * Determine if the given abstract type has been bound.
