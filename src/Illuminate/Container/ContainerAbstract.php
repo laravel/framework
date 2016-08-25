@@ -14,8 +14,9 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
     const TYPE_SINGLETON = 2;
 
     const VALUE = 0;
-    const IS_RESOLVED = 1;
-    const BINDING_TYPE = 2;
+    const PARAMETERS = 1;
+    const IS_RESOLVED = 2;
+    const BINDING_TYPE = 3;
 
 	protected $bindings = [];
 
@@ -28,11 +29,11 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
      */
     public function resolve($subject, array $parameters = [])
     {
-        if (is_string($subject) && isset($this->bindings[$subject])) {
+        if ($this->isBinded($subject)) {
             $bindingType = $this->bindings[$subject][self::BINDING_TYPE];
 
             if ($bindingType === self::TYPE_PLAIN) {
-                return $this->resolvePlain($subject, $parameters);
+                return $this->resolvePlain($subject);
             } else if ($bindingType === self::TYPE_SERVICE) {
                 return $this->resolveService($subject, $parameters);
             }
@@ -43,6 +44,12 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
         return parent::resolve($subject, $parameters);
     }
 
+    /**
+     * Check if an abstract is binded to the container
+     *
+     * @param  string  $abstract
+     * @return boolean
+     */
     public function isBinded($abstract)
     {
         return is_string($abstract) && isset($this->bindings[$abstract]);
@@ -50,6 +57,7 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
 
     /**
      * Bind a plain value
+     *
      * @param  string $abstract
      * @param  mixed $concrete
      * @return void
@@ -65,14 +73,16 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
 
     /**
      * Bind a value which need to be resolved each time
+     *
      * @param  string $abstract
      * @param  mixed $concrete
      * @return void
      */
-    public function bindService($abstract, $concrete)
+    public function bindService($abstract, $concrete, $parameters = [])
     {
         $this->bindings[$abstract] = [
             self::VALUE => $concrete,
+            self::PARAMETERS => $parameters,
             self::IS_RESOLVED => false,
             self::BINDING_TYPE => self::TYPE_SERVICE
         ];
@@ -80,14 +90,16 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
 
     /**
      * Bind a value which need to be resolved one time
+     *
      * @param  string $abstract
      * @param  mixed $concrete
      * @return void
      */
-    public function bindSingleton($abstract, $concrete)
+    public function bindSingleton($abstract, $concrete, $parameters = [])
     {
         $this->bindings[$abstract] = [
             self::VALUE => $concrete,
+            self::PARAMETERS => $parameters,
             self::IS_RESOLVED => false,
             self::BINDING_TYPE => self::TYPE_SINGLETON
         ];
@@ -95,11 +107,12 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
 
     /**
      * Resolve a plain value from the container
+     *
      * @param  string $abstract
      * @param  array  $parameters
      * @return mixed
      */
-    public function resolvePlain($abstract, array $parameters = [])
+    public function resolvePlain($abstract)
     {
         $this->bindings[$abstract][self::IS_RESOLVED] = true;
 
@@ -108,34 +121,42 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
 
     /**
      * Resolve a service from the container
+     *
      * @param  string $abstract
      * @param  array  $parameters
      * @return mixed
      */
     public function resolveService($abstract, array $parameters = [])
     {
-        $this->bindings[$abstract][self::IS_RESOLVED] = true;
+        $binding = &$this->bindings[$abstract];
 
-        return parent::resolve($this->bindings[$abstract][self::VALUE], $parameters);
+        $binding[self::IS_RESOLVED] = true;
+        $parameters = array_merge($parameters, $binding[self::PARAMETERS]);
+
+        return parent::resolve($binding[self::VALUE], $parameters);
     }
 
     /**
      * Resolve a singleton from the container
+     *
      * @param  string $abstract
      * @param  array  $parameters
      * @return mixed
      */
     public function resolveSingleton($abstract, array $parameters = [])
     {
-        $binding = $this->bindings[$abstract];
+        $binding = &$this->bindings[$abstract];
 
         if ($binding[self::IS_RESOLVED]) {
             return $binding[self::VALUE];
         }
 
-        $this->bindings[$abstract][self::IS_RESOLVED] = true;
-        $this->bindings[$abstract][self::VALUE] = parent::resolve($binding[self::VALUE], $parameters);
+        $parameters = array_merge($parameters, $binding[self::PARAMETERS]);
+        $resolved = parent::resolve($binding[self::VALUE], $parameters);
 
-        return $this->bindings[$abstract][self::VALUE];
+        $binding[self::VALUE] = $resolved;
+        $binding[self::IS_RESOLVED] = true;
+
+        return $binding[self::VALUE];
     }
 }
