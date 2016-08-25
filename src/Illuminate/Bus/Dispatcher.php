@@ -89,7 +89,7 @@ class Dispatcher implements QueueingDispatcher
             if ($handler || $handler = $this->getCommandHandler($command)) {
                 return $handler->handle($command);
             }
-            
+
             return $this->container->call([$command, 'handle']);
         });
     }
