@@ -114,7 +114,7 @@ interface Container
      * @param  string|null  $defaultMethod
      * @return mixed
      */
-    public function call($callback, array $parameters = [], $defaultMethod = null);
+    public function call($callback, array $parameters = []);
 
     /**
      * Determine if the given abstract type has been resolved.

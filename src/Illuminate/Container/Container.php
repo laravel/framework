@@ -93,35 +93,42 @@ class Container extends ContainerAbstract implements ContainerContract
     /**
      * Resolve the given type from the container.
      *
-     * @param  string  $abstract
-     * @param  array   $parameters
+     * @param  mixed  $abstract
+     * @param  array  $parameters
      * @return mixed
      */
     public function make($abstract, array $parameters = [])
     {
         $abstract = self::normalize($abstract);
 
+        if (is_string($abstract) && strpos($abstract, '@')) {
+            $parts = explode('@', $abstract, 2);
+
+            return $this->resolve([$this->resolve($parts[0]), $parts[1]], $parameters);
+        }
+
         return $this->resolve($abstract, $parameters);
     }
 
     /**
-     * Call the given Closure / class@method and inject its dependencies.
+     * Resolve the given type from outside the container.
      *
-     * @param  callable|string  $callback
+     * @param  mixed  $abstract
      * @param  array  $parameters
-     * @param  string|null  $defaultMethod
      * @return mixed
      */
-    public function call($callback, array $parameters = [], $defaultMethod = null)
+    public function call($abstract, array $parameters = [])
     {
-        if (is_string($callback) && strpos($callback, '@')) {
-            list($callback, $defaultMethod) = explode('@', $callback, 2);
-        }
-        if (is_string($callback) && $defaultMethod) {
-            return $this->resolve([$this->resolve($callback), $defaultMethod], $parameters);
+        $resolver = new ContainerResolver();
+        $abstract = self::normalize($abstract);
+
+        if (is_string($abstract) && strpos($abstract, '@')) {
+            $parts = explode('@', $abstract, 2);
+
+            return $resolver->resolve([$this->resolve($parts[0]), $parts[1]], $parameters);
         }
 
-        return parent::resolve($callback, $parameters);
+        return $resolver->resolve($abstract, $parameters);
     }
 
     /**

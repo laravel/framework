@@ -426,7 +426,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $result[1]);
 
         $container = new Container;
-        $result = $container->call('ContainerTestCallStub', ['foo', 'bar'], 'work');
+        $result = $container->call('ContainerTestCallStub@work', ['foo', 'bar']);
         $this->assertEquals(['foo', 'bar'], $result);
     }
 

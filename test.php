@@ -1,5 +1,21 @@
 <?php
 
+/*
+
+Breacking changes :
+
+-Container::call cant't anymore take a default method (3rd param)
+-Container::call doesn't resolve from container
+
+Features :
+
+-Container::call and Container::make have the same behaviour except that Container::call
+resolve from outside the container and Container::make resolve from inside the container
+-Container::call and Container::make supprots : closure, "class@method",
+[object, "method"], "object::method" and "class" notations
+
+ */
+
 require("vendor/autoload.php");
 
 class Test
@@ -37,11 +53,13 @@ $container = new Illuminate\Container\Container();
 
 //Plain, Service, Singleton
 
+/*
 $container->singleton(Test::class);
 
 for ($i = 0; $i < 10000; $i++) {
 	$container->make(Test::class);
 }
+*/
 
 /*
 class Is
