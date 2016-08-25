@@ -9,19 +9,13 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
 {
     use ArrayAccessTrait;
 
-	const TYPE_PLAIN = 1;
-    const TYPE_SERVICE = 2;
-    const TYPE_SINGLETON = 3;
+	const TYPE_PLAIN = 0;
+    const TYPE_SERVICE = 1;
+    const TYPE_SINGLETON = 2;
 
-    const VALUE = "value";
-    const IS_RESOLVED = "is_resolved";
-    const BINDING_TYPE = "binding_type";
-
-    private $RESOLVERS_MAP = [
-        self::TYPE_PLAIN => "resolvePlain",
-        self::TYPE_SERVICE => "resolveService",
-        self::TYPE_SINGLETON => "resolveSingleton"
-    ];
+    const VALUE = 0;
+    const IS_RESOLVED = 1;
+    const BINDING_TYPE = 2;
 
 	protected $bindings = [];
 
@@ -35,12 +29,15 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
     public function resolve($subject, array $parameters = [])
     {
         if (is_string($subject) && isset($this->bindings[$subject])) {
-            $binding = $this->bindings[$subject];
-            $this->bindings[$subject][self::IS_RESOLVED] = true;
+            $bindingType = $this->bindings[$subject][self::BINDING_TYPE];
 
-            $resolver = $this->RESOLVERS_MAP[$binding[self::BINDING_TYPE]];
+            if ($bindingType === self::TYPE_PLAIN) {
+                return $this->resolvePlain($subject, $parameters);
+            } else if ($bindingType === self::TYPE_SERVICE) {
+                return $this->resolveService($subject, $parameters);
+            }
 
-            return call_user_func_array([$this, $resolver], [$subject, $parameters]);
+            return $this->resolveSingleton($subject, $parameters);
         }
 
         return parent::resolve($subject, $parameters);
@@ -61,7 +58,7 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
     {
         $this->bindings[$abstract] = [
             self::VALUE => $concrete,
-            self::IS_RESOLVED => false,
+            self::IS_RESOLVED => true,
             self::BINDING_TYPE => self::TYPE_PLAIN
         ];
     }
@@ -115,9 +112,9 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
      */
     public function resolveService($abstract, array $parameters = [])
     {
-        $binding = $this->bindings[$abstract];
+        $this->bindings[$abstract][self::IS_RESOLVED] = true;
 
-        return parent::resolve($binding[self::VALUE], $parameters);
+        return parent::resolve($this->bindings[$abstract][self::VALUE], $parameters);
     }
 
     /**
@@ -129,10 +126,14 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
     public function resolveSingleton($abstract, array $parameters = [])
     {
         $binding = $this->bindings[$abstract];
-        $resolved = parent::resolve($binding[self::VALUE], $parameters);
 
-        $this->bindPlain($abstract, $resolved);
+        if ($binding[self::IS_RESOLVED]) {
+            return $binding[self::VALUE];
+        }
 
-        return $resolved;
+        $this->bindings[$abstract][self::IS_RESOLVED] = true;
+        $this->bindings[$abstract][self::VALUE] = parent::resolve($binding[self::VALUE], $parameters);
+
+        return $this->bindings[$abstract][self::VALUE];
     }
 }

@@ -35,6 +35,13 @@ interface ITest
 $container = new Illuminate\Container\Container();
 // $container = new Illuminate\Container\ContainerOld();
 
+//Plain, Service, Singleton
+
+$container->singleton(Test::class);
+
+for ($i = 0; $i < 10000; $i++) {
+	$container->make(Test::class);
+}
 
 /*
 class Is
