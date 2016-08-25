@@ -719,8 +719,15 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
 
     public function testMakeHidden()
     {
-        $model = new EloquentModelStub(['name' => 'foo', 'age' => 'bar', 'id' => 'baz']);
+        $model = new EloquentModelStub(['name' => 'foo', 'age' => 'bar', 'address' => 'foobar', 'id' => 'baz']);
         $array = $model->toArray();
+        $this->assertArrayHasKey('name', $array);
+        $this->assertArrayHasKey('age', $array);
+        $this->assertArrayHasKey('address', $array);
+        $this->assertArrayHasKey('id', $array);
+
+        $array = $model->makeHidden('address')->toArray();
+        $this->assertArrayNotHasKey('address', $array);
         $this->assertArrayHasKey('name', $array);
         $this->assertArrayHasKey('age', $array);
         $this->assertArrayHasKey('id', $array);
@@ -728,6 +735,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $array = $model->makeHidden(['name', 'age'])->toArray();
         $this->assertArrayNotHasKey('name', $array);
         $this->assertArrayNotHasKey('age', $array);
+        $this->assertArrayNotHasKey('address', $array);
         $this->assertArrayHasKey('id', $array);
     }
 
@@ -1330,7 +1338,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(isset($model->some_relation));
     }
 
-    public function testIntIdTypePreserved()
+    public function testIntKeyTypePreserved()
     {
         $model = $this->getMock('EloquentModelStub', ['newQueryWithoutScopes', 'updateTimestamps', 'refresh']);
         $query = m::mock('Illuminate\Database\Eloquent\Builder');
@@ -1341,9 +1349,9 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, $model->id);
     }
 
-    public function testStringIdTypePreserved()
+    public function testStringKeyTypePreserved()
     {
-        $model = $this->getMock('EloquentIdTypeModelStub', ['newQueryWithoutScopes', 'updateTimestamps', 'refresh']);
+        $model = $this->getMock('EloquentKeyTypeModelStub', ['newQueryWithoutScopes', 'updateTimestamps', 'refresh']);
         $query = m::mock('Illuminate\Database\Eloquent\Builder');
         $query->shouldReceive('insertGetId')->once()->with([], 'id')->andReturn('string id');
         $model->expects($this->once())->method('newQueryWithoutScopes')->will($this->returnValue($query));
@@ -1496,7 +1504,7 @@ class EloquentModelSaveStub extends Model
     }
 }
 
-class EloquentIdTypeModelStub extends EloquentModelStub
+class EloquentKeyTypeModelStub extends EloquentModelStub
 {
     protected $keyType = 'string';
 }

@@ -498,7 +498,9 @@ class Validator implements ValidatorContract
             $this->passes();
         }
 
-        return array_diff_key($this->data, $this->messages()->toArray());
+        return array_diff_key(
+            $this->data, $this->attributesThatHaveMessages()
+        );
     }
 
     /**
@@ -512,7 +514,25 @@ class Validator implements ValidatorContract
             $this->passes();
         }
 
-        return array_intersect_key($this->data, $this->messages()->toArray());
+        return array_intersect_key(
+            $this->data, $this->attributesThatHaveMessages()
+        );
+    }
+
+    /**
+     * Generate an array of all attributes that have messages.
+     *
+     * @return array
+     */
+    protected function attributesThatHaveMessages()
+    {
+        $results = [];
+
+        foreach ($this->messages()->toArray() as $key => $message) {
+            $results[] = explode('.', $key)[0];
+        }
+
+        return array_flip(array_unique($results));
     }
 
     /**

@@ -796,6 +796,17 @@ class BelongsToMany extends Relation
     }
 
     /**
+     * Sync the intermediate tables with a list of IDs without detaching.
+     *
+     * @param  \Illuminate\Database\Eloquent\Collection|array  $ids
+     * @return array
+     */
+    public function syncWithoutDetaching($ids)
+    {
+        return $this->sync($ids, false);
+    }
+
+    /**
      * Sync the intermediate tables with a list of IDs or collection of models.
      *
      * @param  \Illuminate\Database\Eloquent\Collection|array  $ids

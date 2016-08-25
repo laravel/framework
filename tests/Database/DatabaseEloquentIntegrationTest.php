@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Database\Connection;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -427,6 +426,15 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, count($results));
         $this->assertEquals('Child Post', $results->first()->name);
+    }
+
+    public function testAggregatedValuesOfDatetimeField()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'test1@test.test', 'created_at' => '2016-08-10 09:21:00', 'updated_at' => Carbon\Carbon::now()]);
+        EloquentTestUser::create(['id' => 2, 'email' => 'test2@test.test', 'created_at' => '2016-08-01 12:00:00', 'updated_at' => Carbon\Carbon::now()]);
+
+        $this->assertEquals('2016-08-10 09:21:00', EloquentTestUser::max('created_at'));
+        $this->assertEquals('2016-08-01 12:00:00', EloquentTestUser::min('created_at'));
     }
 
     public function testWhereHasOnSelfReferencingBelongsToRelationship()
@@ -872,7 +880,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
     /**
      * Get a database connection instance.
      *
-     * @return Connection
+     * @return \Illuminate\Database\Connection
      */
     protected function connection($connection = 'default')
     {
@@ -882,7 +890,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
     /**
      * Get a schema builder instance.
      *
-     * @return Schema\Builder
+     * @return \Illuminate\Database\Schema\Builder
      */
     protected function schema($connection = 'default')
     {

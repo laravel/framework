@@ -2148,7 +2148,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function makeHidden($attributes)
     {
-        $this->visible = array_diff($this->visible, (array) $attributes);
+        $attributes = (array) $attributes;
+
+        $this->visible = array_diff($this->visible, $attributes);
 
         $this->hidden = array_unique(array_merge($this->hidden, $attributes));
 
