@@ -69,8 +69,8 @@ class ResetPassword extends Notification
     /**
      * Get the value of a language line.
      *
-     * @param  string $key
-     * @param  string $default
+     * @param  string  $key
+     * @param  string  $default
      * @return string
      */
     public function getTranslation($key, $default = '')
