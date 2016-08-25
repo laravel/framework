@@ -108,7 +108,7 @@ class FoundationExpectsModelEventsTest extends TestCase
     /** @test */
     public function expects_events_fires_on_model_events()
     {
-        EloquentTestModel::created(function() {
+        EloquentTestModel::created(function () {
             event(ExampleEvent::class);
         });
 
