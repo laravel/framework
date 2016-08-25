@@ -43,6 +43,30 @@ class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('PDO', $this->db->connection('read_write')->getReadPdo());
     }
 
+    public function testSingleConnectionNotCreatedUntilNeeded()
+    {
+        $connection = $this->db->connection();
+        $pdo = new \ReflectionProperty(get_class($connection), 'pdo');
+        $pdo->setAccessible(true);
+        $readPdo = new \ReflectionProperty(get_class($connection), 'readPdo');
+        $readPdo->setAccessible(true);
+
+        $this->assertNotInstanceOf('PDO', $pdo->getValue($connection));
+        $this->assertNotInstanceOf('PDO', $readPdo->getValue($connection));
+    }
+
+    public function testReadWriteConnectionsNotCreatedUntilNeeded()
+    {
+        $connection = $this->db->connection('read_write');
+        $pdo = new \ReflectionProperty(get_class($connection), 'pdo');
+        $pdo->setAccessible(true);
+        $readPdo = new \ReflectionProperty(get_class($connection), 'readPdo');
+        $readPdo->setAccessible(true);
+
+        $this->assertNotInstanceOf('PDO', $pdo->getValue($connection));
+        $this->assertNotInstanceOf('PDO', $readPdo->getValue($connection));
+    }
+
     /**
      * @expectedException InvalidArgumentException
      */
