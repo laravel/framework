@@ -100,11 +100,6 @@ class Container extends ContainerAbstract implements ContainerContract
     public function make($abstract, array $parameters = [])
     {
         $abstract = self::normalize($abstract);
-        $concreteValue = ($this->isBinded($abstract)) ? $this->bindings[$abstract][self::VALUE] : $abstract;
-
-        if ($concreteValue instanceof Closure) {
-            $parameters = [$this, $parameters];
-        }
 
         return $this->resolve($abstract, $parameters);
     }
@@ -126,7 +121,7 @@ class Container extends ContainerAbstract implements ContainerContract
             return $this->resolve([$this->resolve($callback), $defaultMethod], $parameters);
         }
 
-        return $this->resolve($callback, $parameters);
+        return parent::resolve($callback, $parameters);
     }
 
     /**
@@ -138,6 +133,18 @@ class Container extends ContainerAbstract implements ContainerContract
      */
     public function resolve($abstract, array $parameters = [])
     {
+        $concrete = ($this->isBinded($abstract)) ? $this->bindings[$abstract] : null;
+
+        if ($concrete && $concrete[self::IS_RESOLVED] && $concrete[self::BINDING_TYPE] !== self::TYPE_SERVICE) {
+            return $concrete[self::VALUE];
+        }
+        if ($abstract instanceof Closure) {
+            return parent::resolve($abstract, [$this, $parameters]);
+        }
+        if ($concrete && $concrete[self::VALUE] instanceof Closure) {
+            $parameters = [$this, $parameters];
+        }
+
         $resolved = parent::resolve($abstract, $parameters);
         $resolved = $this->extendResolved($abstract, $resolved);
 

@@ -58,7 +58,7 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
     {
         $this->bindings[$abstract] = [
             self::VALUE => $concrete,
-            self::IS_RESOLVED => true,
+            self::IS_RESOLVED => false,
             self::BINDING_TYPE => self::TYPE_PLAIN
         ];
     }
@@ -101,6 +101,8 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
      */
     public function resolvePlain($abstract, array $parameters = [])
     {
+        $this->bindings[$abstract][self::IS_RESOLVED] = true;
+
         return $this->bindings[$abstract][self::VALUE];
     }
 

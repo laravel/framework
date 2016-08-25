@@ -21,8 +21,13 @@ trait ExtendersTrait
     public function extend($abstract, Closure $closure)
     {
         $abstract = self::normalize($abstract);
+        $concrete = ($this->isBinded($abstract)) ? $this->bindings[$abstract] : null;
 
-        $this->extenders[$abstract][] = $closure;
+        if ($concrete && $concrete[self::IS_RESOLVED] && $concrete[self::BINDING_TYPE] !== self::TYPE_SERVICE) {
+            $this->bindings[$abstract][self::VALUE] = $closure($this->bindings[$abstract][self::VALUE], $this);
+        } else {
+            $this->extenders[$abstract][] = $closure;
+        }
     }
 
     /**
