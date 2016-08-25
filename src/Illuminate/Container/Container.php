@@ -3,8 +3,6 @@
 namespace Illuminate\Container;
 
 use Closure;
-use ReflectionException;
-use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 
 class Container extends ContainerAbstract implements ContainerContract
@@ -175,52 +173,6 @@ class Container extends ContainerAbstract implements ContainerContract
 
         return $resolved;
     }
-
-/*
-    public function resolve($abstract, array $parameters = [])
-    {
-        $binding = ($this->isBinded($abstract)) ? $this->bindings[$abstract] : null;
-        $concrete = ($binding) ? $binding[self::VALUE] : $abstract;
-
-        if ($binding && $binding[self::IS_RESOLVED] && $binding[self::BINDING_TYPE] !== self::TYPE_SERVICE) {
-            return $binding[self::VALUE];
-        }
-        if ($concrete instanceof Closure) {
-            $parameters = [$this, $parameters];
-        }
-
-        $resolved = parent::resolve($abstract, $parameters);
-
-        $resolved = $this->extendResolved($abstract, $resolved);
-
-        $this->fireAfterResolving($abstract, $resolved);
-
-        return $resolved;
-    }
-*/
-    /**
-     * Intercept the resolveParameter call to deal with contextual binding
-     *
-     * @param  \ReflectionParameter $parameter
-     * @param  array                $parameters
-     * @return mixed
-     */
-/*
-    protected function resolveParameter(\ReflectionParameter $parameter, array $parameters = [])
-    {
-        $contextualBinding = $this->resolveContextualBinding($parameter);
-
-        if ($contextualBinding) {
-            try {
-                return $this->make($contextualBinding, $parameters);
-            } catch (\Exception $e){
-                return $contextualBinding;
-            }
-        }
-
-        return parent::resolveParameter($parameter, $parameters);
-    }
-*/
 
     /**
      * Determine if the given abstract type has been bound.

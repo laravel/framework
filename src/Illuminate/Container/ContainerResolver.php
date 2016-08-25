@@ -42,6 +42,17 @@ class ContainerResolver
     }
 
     /**
+     * Check if something is a closure
+     *
+     * @param  mixed  $value
+     * @return boolean
+     */
+    public static function isClosure($value)
+    {
+        return $value instanceof Closure;
+    }
+
+    /**
      * Check if something is a function
      *
      * @param  mixed  $value
