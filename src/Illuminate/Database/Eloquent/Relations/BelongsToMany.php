@@ -856,6 +856,17 @@ class BelongsToMany extends Relation
         return $changes;
     }
 
+    /*
+     * Sync the intermediate tables with a list of IDs without detaching.
+     *
+     * @param  \Illuminate\Database\Eloquent\Collection|array  $ids
+     * @return array
+     */
+    public function syncWithoutDetaching($ids)
+    {
+        return $this->sync($ids, false);
+    }
+
     /**
      * Sync the intermediate tables with a list of IDs or collection of models.
      *
@@ -963,7 +974,7 @@ class BelongsToMany extends Relation
     /**
      * Cast the given keys to integers if they are numeric and string otherwise.
      *
-     * @param  arary  $keys
+     * @param  array  $keys
      * @return array
      */
     protected function castKeys(array $keys)

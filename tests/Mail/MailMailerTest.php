@@ -1,7 +1,6 @@
 <?php
 
 use Mockery as m;
-use SuperClosure\Serializer;
 
 class MailMailerTest extends PHPUnit_Framework_TestCase
 {
@@ -79,7 +78,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
         list($view, $swift) = $this->getMocks();
         $mailer = new Illuminate\Mail\Mailer($view, $swift);
         $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Factory'));
-        $queue->shouldReceive('push')->once()->with('mailer@handleQueuedMessage', ['view' => 'foo', 'data' => [1], 'callback' => 'callable'], null);
+        $queue->shouldReceive('pushOn')->once()->with(null, m::type('Illuminate\Mail\Jobs\HandleQueuedMessage'));
 
         $mailer->queue('foo', [1], 'callable');
     }
@@ -89,21 +88,9 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
         list($view, $swift) = $this->getMocks();
         $mailer = new Illuminate\Mail\Mailer($view, $swift);
         $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Factory'));
-        $queue->shouldReceive('push')->once()->with('mailer@handleQueuedMessage', ['view' => 'foo', 'data' => [1], 'callback' => 'callable'], 'queue');
+        $queue->shouldReceive('pushOn')->once()->with('queue', m::type('Illuminate\Mail\Jobs\HandleQueuedMessage'));
 
         $mailer->queueOn('queue', 'foo', [1], 'callable');
-    }
-
-    public function testMailerCanQueueMessagesToItselfWithSerializedClosures()
-    {
-        list($view, $swift) = $this->getMocks();
-        $mailer = new Illuminate\Mail\Mailer($view, $swift);
-        $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Factory'));
-        $serialized = (new Serializer)->serialize($closure = function () {
-        });
-        $queue->shouldReceive('push')->once()->with('mailer@handleQueuedMessage', ['view' => 'foo', 'data' => [1], 'callback' => $serialized], null);
-
-        $mailer->queue('foo', [1], $closure);
     }
 
     public function testMailerCanQueueMessagesToItselfLater()
@@ -111,7 +98,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
         list($view, $swift) = $this->getMocks();
         $mailer = new Illuminate\Mail\Mailer($view, $swift);
         $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Factory'));
-        $queue->shouldReceive('later')->once()->with(10, 'mailer@handleQueuedMessage', ['view' => 'foo', 'data' => [1], 'callback' => 'callable'], null);
+        $queue->shouldReceive('laterOn')->once()->with(null, 10, m::type('Illuminate\Mail\Jobs\HandleQueuedMessage'));
 
         $mailer->later(10, 'foo', [1], 'callable');
     }
@@ -121,7 +108,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
         list($view, $swift) = $this->getMocks();
         $mailer = new Illuminate\Mail\Mailer($view, $swift);
         $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Factory'));
-        $queue->shouldReceive('later')->once()->with(10, 'mailer@handleQueuedMessage', ['view' => 'foo', 'data' => [1], 'callback' => 'callable'], 'queue');
+        $queue->shouldReceive('laterOn')->once()->with('queue', 10, m::type('Illuminate\Mail\Jobs\HandleQueuedMessage'));
 
         $mailer->laterOn('queue', 10, 'foo', [1], 'callable');
     }

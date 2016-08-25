@@ -40,7 +40,7 @@ class NexmoSmsChannel
      *
      * @param  mixed  $notifiable
      * @param  \Illuminate\Notifications\Notification  $notification
-     * @return void
+     * @return \Nexmo\Message\Message
      */
     public function send($notifiable, Notification $notification)
     {
@@ -54,7 +54,7 @@ class NexmoSmsChannel
             $message = new NexmoMessage($message);
         }
 
-        $this->nexmo->message()->send([
+        return $this->nexmo->message()->send([
             'from' => $message->from ?: $this->from,
             'to' => $to,
             'text' => trim($message->content),

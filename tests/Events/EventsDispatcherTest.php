@@ -180,6 +180,46 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase
         $d->listen('some.event', 'TestDispatcherQueuedHandlerCustomQueue@someMethod');
         $d->fire('some.event', ['foo', 'bar']);
     }
+
+    public function testClassesWork()
+    {
+        unset($_SERVER['__event.test']);
+        $d = new Dispatcher;
+        $d->listen('ExampleEvent', function () {
+            $_SERVER['__event.test'] = 'baz';
+        });
+        $d->fire(new ExampleEvent);
+
+        $this->assertSame('baz', $_SERVER['__event.test']);
+    }
+
+    public function testInterfacesWork()
+    {
+        unset($_SERVER['__event.test']);
+        $d = new Dispatcher;
+        $d->listen('SomeEventInterface', function () {
+            $_SERVER['__event.test'] = 'bar';
+        });
+        $d->fire(new AnotherEvent);
+
+        $this->assertSame('bar', $_SERVER['__event.test']);
+    }
+
+    public function testBothClassesAndInterfacesWork()
+    {
+        unset($_SERVER['__event.test']);
+        $d = new Dispatcher;
+        $d->listen('AnotherEvent', function () {
+            $_SERVER['__event.test1'] = 'fooo';
+        });
+        $d->listen('SomeEventInterface', function () {
+            $_SERVER['__event.test2'] = 'baar';
+        });
+        $d->fire(new AnotherEvent);
+
+        $this->assertSame('fooo', $_SERVER['__event.test1']);
+        $this->assertSame('baar', $_SERVER['__event.test2']);
+    }
 }
 
 class TestDispatcherQueuedHandler implements Illuminate\Contracts\Queue\ShouldQueue
@@ -199,4 +239,19 @@ class TestDispatcherQueuedHandlerCustomQueue implements Illuminate\Contracts\Que
     {
         $queue->push($handler, $payload);
     }
+}
+
+class ExampleEvent
+{
+    //
+}
+
+interface SomeEventInterface
+{
+    //
+}
+
+class AnotherEvent implements SomeEventInterface
+{
+    //
 }

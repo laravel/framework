@@ -157,6 +157,9 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
 
     public function testGet()
     {
+        $array = ['products.desk' => ['price' => 100]];
+        $this->assertEquals(['price' => 100], Arr::get($array, 'products.desk'));
+
         $array = ['products' => ['desk' => ['price' => 100]]];
         $value = Arr::get($array, 'products.desk');
         $this->assertEquals(['price' => 100], $value);
@@ -221,6 +224,9 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
 
     public function testHas()
     {
+        $array = ['products.desk' => ['price' => 100]];
+        $this->assertTrue(Arr::has($array, 'products.desk'));
+
         $array = ['products' => ['desk' => ['price' => 100]]];
         $this->assertTrue(Arr::has($array, 'products.desk'));
         $this->assertTrue(Arr::has($array, 'products.desk.price'));
@@ -252,6 +258,17 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
 
         $this->assertFalse(Arr::has(null, null));
         $this->assertFalse(Arr::has([], null));
+
+        $array = ['products' => ['desk' => ['price' => 100]]];
+        $this->assertTrue(Arr::has($array, ['products.desk']));
+        $this->assertTrue(Arr::has($array, ['products.desk', 'products.desk.price']));
+        $this->assertTrue(Arr::has($array, ['products', 'products']));
+        $this->assertFalse(Arr::has($array, ['foo']));
+        $this->assertFalse(Arr::has($array, []));
+        $this->assertFalse(Arr::has($array, ['products.desk', 'products.price']));
+
+        $this->assertFalse(Arr::has([], [null]));
+        $this->assertFalse(Arr::has(null, [null]));
     }
 
     public function testIsAssoc()

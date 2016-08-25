@@ -600,6 +600,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Run an associative map over each of the items.
+     *
+     * The callback should return an associative array with a single key/value pair.
+     *
+     * @param  callable  $callback
+     * @return static
+     */
+    public function mapWithKeys(callable $callback)
+    {
+        return $this->flatMap($callback);
+    }
+
+    /**
      * Map a collection and flatten the result by a single level.
      *
      * @param  callable  $callback
@@ -934,13 +947,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         $items = $this->items;
 
-        $callback ? uasort($items, $callback) : uasort($items, function ($a, $b) {
-            if ($a == $b) {
-                return 0;
-            }
-
-            return ($a < $b) ? -1 : 1;
-        });
+        $callback
+            ? uasort($items, $callback)
+            : asort($items);
 
         return new static($items);
     }
@@ -1059,9 +1068,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Return only unique items from the collection array.
      *
      * @param  string|callable|null  $key
+     * @param  bool  $strict
+     *
      * @return static
      */
-    public function unique($key = null)
+    public function unique($key = null, $strict = false)
     {
         if (is_null($key)) {
             return new static(array_unique($this->items, SORT_REGULAR));
@@ -1071,8 +1082,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         $exists = [];
 
-        return $this->reject(function ($item) use ($key, &$exists) {
-            if (in_array($id = $key($item), $exists)) {
+        return $this->reject(function ($item) use ($key, $strict, &$exists) {
+            if (in_array($id = $key($item), $exists, $strict)) {
                 return true;
             }
 
@@ -1088,21 +1099,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function uniqueStrict($key = null)
     {
-        if (is_null($key)) {
-            return new static(array_unique($this->items, SORT_REGULAR));
-        }
-
-        $key = $this->valueRetriever($key);
-
-        $exists = [];
-
-        return $this->reject(function ($item) use ($key, &$exists) {
-            if (in_array($id = $key($item), $exists, true)) {
-                return true;
-            }
-
-            $exists[] = $id;
-        });
+        return $this->unique($key, true);
     }
 
     /**
@@ -1235,7 +1232,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function toBase()
     {
-        return is_subclass_of($this, self::class) ? new self($this) : $this;
+        return new self($this);
     }
 
     /**

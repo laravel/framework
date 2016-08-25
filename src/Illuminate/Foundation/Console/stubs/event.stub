@@ -24,12 +24,12 @@ class DummyClass
     }
 
     /**
-     * Get the channels the event should be broadcast on.
+     * Get the channels the event should broadcast on.
      *
-     * @return array
+     * @return Channel|array
      */
     public function broadcastOn()
     {
-        return [new PrivateChannel('channel-name')];
+        return new PrivateChannel('channel-name');
     }
 }

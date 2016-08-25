@@ -6,6 +6,7 @@ use Ramsey\Uuid\Uuid;
 use InvalidArgumentException;
 use Illuminate\Support\Manager;
 use Nexmo\Client as NexmoClient;
+use Illuminate\Support\Collection;
 use GuzzleHttp\Client as HttpClient;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Bus\Dispatcher as Bus;
@@ -25,12 +26,16 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     /**
      * Send the given notification to the given notifiable entities.
      *
-     * @param  \Illuminate\Support\Collection|array  $notifiables
+     * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
      * @param  mixed  $notification
      * @return void
      */
     public function send($notifiables, $notification)
     {
+        if (! $notifiables instanceof Collection && ! is_array($notifiables)) {
+            $notifiables = [$notifiables];
+        }
+
         if ($notification instanceof ShouldQueue) {
             return $this->queueNotification($notifiables, $notification);
         }
@@ -41,14 +46,20 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     /**
      * Send the given notification immediately.
      *
-     * @param  \Illuminate\Support\Collection|array  $notifiables
+     * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
      * @param  mixed  $notification
      * @return void
      */
     public function sendNow($notifiables, $notification)
     {
+        if (! $notifiables instanceof Collection && ! is_array($notifiables)) {
+            $notifiables = [$notifiables];
+        }
+
+        $original = clone $notification;
+
         foreach ($notifiables as $notifiable) {
-            $notification = clone $notification;
+            $notification = clone $original;
 
             $notification->id = (string) Uuid::uuid4();
 
@@ -58,14 +69,33 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
                 continue;
             }
 
-            $this->app->make('events')->fire(
-                new Events\NotificationSent($notifiable, $notification)
-            );
-
             foreach ($channels as $channel) {
-                $this->driver($channel)->send($notifiable, $notification);
+                if (! $this->shouldSendNotification($notifiable, $notification, $channel)) {
+                    continue;
+                }
+
+                $response = $this->driver($channel)->send($notifiable, $notification);
+
+                $this->app->make('events')->fire(
+                    new Events\NotificationSent($notifiable, $notification, $channel, $response)
+                );
             }
         }
+    }
+
+    /**
+     * Determines if the notification can be sent.
+     *
+     * @param  mixed  $notifiable
+     * @param  mixed  $notification
+     * @param  string  $channel
+     * @return bool
+     */
+    protected function shouldSendNotification($notifiable, $notification, $channel)
+    {
+        return $this->app->make('events')->until(
+            new Events\NotificationSending($notifiable, $notification, $channel)
+        ) !== false;
     }
 
     /**

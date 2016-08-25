@@ -2,7 +2,6 @@
 
 namespace Illuminate\Http;
 
-use Exception;
 use ArrayObject;
 use JsonSerializable;
 use Illuminate\Contracts\Support\Jsonable;
@@ -19,13 +18,6 @@ class Response extends BaseResponse
      * @var mixed
      */
     public $original;
-
-    /**
-     * The exception that triggered the error response (if applicable).
-     *
-     * @var \Exception
-     */
-    public $exception;
 
     /**
      * Set the content on the response.
@@ -93,18 +85,5 @@ class Response extends BaseResponse
     public function getOriginalContent()
     {
         return $this->original;
-    }
-
-    /**
-     * Set the exception to attach to the response.
-     *
-     * @param  \Exception  $e
-     * @return $this
-     */
-    public function withException(Exception $e)
-    {
-        $this->exception = $e;
-
-        return $this;
     }
 }

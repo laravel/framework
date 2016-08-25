@@ -328,7 +328,7 @@ trait MakesHttpRequests
 
             $this->{$method}(
                 Str::contains($actual, $expected),
-                ($negate ? 'Found unexpected' : 'Unable to find')." JSON fragment [{$expected}] within [{$actual}]."
+                ($negate ? 'Found unexpected' : 'Unable to find').' JSON fragment'.PHP_EOL."[{$expected}]".PHP_EOL.'within'.PHP_EOL."[{$actual}]."
             );
         }
 
@@ -383,7 +383,7 @@ trait MakesHttpRequests
             $expected = substr($expected, 0, -1);
         }
 
-        return $expected;
+        return trim($expected);
     }
 
     /**

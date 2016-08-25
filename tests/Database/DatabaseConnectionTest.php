@@ -177,6 +177,21 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($mock, $result);
     }
 
+    /**
+     * @expectedException \Illuminate\Database\QueryException
+     */
+    public function testTransactionMethodRetriesOnDeadlock()
+    {
+        $pdo = $this->getMockBuilder('DatabaseConnectionTestMockPDO')->setMethods(['beginTransaction', 'commit', 'rollBack'])->getMock();
+        $mock = $this->getMockConnection([], $pdo);
+        $pdo->expects($this->exactly(3))->method('beginTransaction');
+        $pdo->expects($this->exactly(3))->method('rollBack');
+        $pdo->expects($this->never())->method('commit');
+        $mock->transaction(function () {
+            throw new Illuminate\Database\QueryException('', [], new Exception('Deadlock found when trying to get lock'));
+        }, 3);
+    }
+
     public function testTransactionMethodRollsbackAndThrows()
     {
         $pdo = $this->getMockBuilder('DatabaseConnectionTestMockPDO')->setMethods(['beginTransaction', 'commit', 'rollBack'])->getMock();
@@ -224,7 +239,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
         $mock->expects($this->once())->method('tryAgainIfCausedByLostConnection');
 
         $method->invokeArgs($mock, ['', [], function () {
-            throw new \Illuminate\Database\QueryException('', [], new \Exception);
+            throw new Illuminate\Database\QueryException('', [], new Exception);
         }]);
     }
 
@@ -243,7 +258,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
         $mock->beginTransaction();
 
         $method->invokeArgs($mock, ['', [], function () {
-            throw new \Illuminate\Database\QueryException('', [], new \Exception);
+            throw new Illuminate\Database\QueryException('', [], new Exception);
         }]);
     }
 

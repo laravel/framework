@@ -2,6 +2,8 @@
 
 namespace Illuminate\Notifications\Messages;
 
+use Illuminate\Notifications\Action;
+
 class SimpleMessage
 {
     /**

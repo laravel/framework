@@ -12,15 +12,15 @@ class DatabaseChannel
      *
      * @param  mixed  $notifiable
      * @param  \Illuminate\Notifications\Notification  $notification
-     * @return void
+     * @return \Illuminate\Database\Eloquent\Model
      */
     public function send($notifiable, Notification $notification)
     {
-        $notifiable->routeNotificationFor('database')->create([
+        return $notifiable->routeNotificationFor('database')->create([
             'id' => $notification->id,
             'type' => get_class($notification),
             'data' => $this->getData($notifiable, $notification),
-            'read' => false,
+            'read_at' => null,
         ]);
     }
 
@@ -36,7 +36,9 @@ class DatabaseChannel
     protected function getData($notifiable, Notification $notification)
     {
         if (method_exists($notification, 'toDatabase')) {
-            return $notification->toDatabase($notifiable)->data;
+            $data = $notification->toDatabase($notifiable);
+
+            return is_array($data) ? $data : $data->data;
         } elseif (method_exists($notification, 'toArray')) {
             return $notification->toArray($notifiable);
         }

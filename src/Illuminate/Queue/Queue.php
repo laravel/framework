@@ -78,7 +78,7 @@ abstract class Queue
             return json_encode([
                 'job' => 'Illuminate\Queue\CallQueuedHandler@call',
                 'data' => [
-                    'commandName' => get_class($job).'@handle',
+                    'commandName' => get_class($job),
                     'command' => serialize(clone $job),
                 ],
             ]);

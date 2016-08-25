@@ -2,6 +2,8 @@
 
 namespace Illuminate\Mail;
 
+use Illuminate\Contracts\Queue\ShouldQueue;
+
 class MailableMailer
 {
     /**
@@ -90,41 +92,51 @@ class MailableMailer
      */
     public function send(Mailable $mailable)
     {
-        $mailable = $mailable->to($this->to)
-                 ->cc($this->cc)
-                 ->bcc($this->bcc);
+        if ($mailable instanceof ShouldQueue) {
+            return $this->queue($mailable);
+        }
 
-        return $this->mailer->send($mailable);
+        return $this->mailer->send($this->fill($mailable));
     }
 
     /**
-     * Queue a mailable message for sending.
+     * Send a mailable message immediately.
+     *
+     * @param  Mailable  $mailable
+     * @return mixed
+     */
+    public function sendNow(Mailable $mailable)
+    {
+        return $this->mailer->send($this->fill($mailable));
+    }
+
+    /**
+     * Push the given mailable onto the queue.
      *
      * @param  Mailable  $mailable
      * @return mixed
      */
     public function queue(Mailable $mailable)
     {
-        $mailable = $mailable->to($this->to)
-                 ->cc($this->cc)
-                 ->bcc($this->bcc);
+        $mailable = $this->fill($mailable);
+
+        if (isset($mailable->delay)) {
+            return $this->mailer->later($mailable->delay, $mailable);
+        }
 
         return $this->mailer->queue($mailable);
     }
 
     /**
-     * Deliver the queued message after the given delay.
+     * Populate the mailable with the addresses.
      *
-     * @param  \DateTime|int  $delay
      * @param  Mailable  $mailable
-     * @return mixed
+     * @return Mailable
      */
-    public function later($delay, Mailable $mailable)
+    protected function fill(Mailable $mailable)
     {
-        $mailable = $mailable->to($this->to)
-                 ->cc($this->cc)
-                 ->bcc($this->bcc);
-
-        return $this->mailer->later($delay, $mailable);
+        return $mailable->to($this->to)
+                        ->cc($this->cc)
+                        ->bcc($this->bcc);
     }
 }

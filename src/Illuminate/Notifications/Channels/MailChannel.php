@@ -41,12 +41,26 @@ class MailChannel
 
         $message = $notification->toMail($notifiable);
 
-        $this->mailer->send($message->view, $message->toArray(), function ($m) use ($notifiable, $notification, $message) {
-            $m->to($notifiable->routeNotificationFor('mail'));
+        $this->mailer->send($message->view, $message->data(), function ($m) use ($notifiable, $notification, $message) {
+            $recipients = $notifiable->routeNotificationFor('mail');
+
+            if (is_array($recipients)) {
+                $m->bcc($recipients);
+            } else {
+                $m->to($recipients);
+            }
 
             $m->subject($message->subject ?: Str::title(
                 Str::snake(class_basename($notification), ' ')
             ));
+
+            foreach ($message->attachments as $attachment) {
+                $m->attach($attachment['file'], $attachment['options']);
+            }
+
+            foreach ($message->rawAttachments as $attachment) {
+                $m->attachData($attachment['data'], $attachment['name'], $attachment['options']);
+            }
         });
     }
 }

@@ -18,7 +18,7 @@ class TokenGuard implements Guard
     protected $request;
 
     /**
-     * The name of the field on the request containing the API token.
+     * The name of the query string item from the request containing the API token.
      *
      * @var string
      */
@@ -78,9 +78,9 @@ class TokenGuard implements Guard
      *
      * @return string
      */
-    protected function getTokenForRequest()
+    public function getTokenForRequest()
     {
-        $token = $this->request->input($this->inputKey);
+        $token = $this->request->query($this->inputKey);
 
         if (empty($token)) {
             $token = $this->request->bearerToken();
