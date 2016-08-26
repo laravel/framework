@@ -42,17 +42,6 @@ class ContainerResolver
     }
 
     /**
-     * Check if something is a closure
-     *
-     * @param  mixed  $value
-     * @return boolean
-     */
-    public static function isClosure($value)
-    {
-        return $value instanceof Closure;
-    }
-
-    /**
      * Check if something is a function
      *
      * @param  mixed  $value
@@ -194,6 +183,10 @@ class ContainerResolver
 
         foreach ($reflectionParameters as $key => $parameter) {
             $dependencies[] = $this->resolveParameter($parameter, $parameters);
+
+            if ($dependencies[$key] instanceof Closure) {
+                $dependencies[$key] = call_user_func($dependencies[$key], $this);
+            }
         }
 
         return self::mergeParameters($dependencies, $parameters);

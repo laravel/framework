@@ -6,7 +6,6 @@ trait ContextualBindingsTrait
 {
     private $when;
     private $needs;
-    private $contextualBindings = [];
 
     /**
      * Define a contextual binding.
@@ -56,12 +55,14 @@ trait ContextualBindingsTrait
      * @param  string  $needs
      * @return void
      */
+    /*
     private function getContextualBinding($when, $needs)
     {
         $hash = crc32($when . $needs);
 
         return (isset($this->contextualBindings[$hash])) ? $this->contextualBindings[$hash] : null;
     }
+    */
 
     /**
      * Get a contextual binding from a reflection parameter
@@ -69,6 +70,7 @@ trait ContextualBindingsTrait
      * @param  \ReflectionParameter  $parameter
      * @return mixed
      */
+    /*
     private function resolveContextualBinding(\ReflectionParameter $parameter)
     {
         $when = $this->buildStack[count($this->buildStack) - 1];
@@ -80,4 +82,5 @@ trait ContextualBindingsTrait
 
         return $implementation;
     }
+    */
 }

@@ -6,6 +6,7 @@ Breacking changes :
 
 -Container::call cant't anymore take a default method (3rd param)
 -Container::call doesn't resolve from container
+-After resolving callbacks no longer check the resolved subject
 
 Features :
 
@@ -59,13 +60,7 @@ function testPerf()
 	}
 }
 
-$container = new Illuminate\Container\Container();
+// $container = new Illuminate\Container\Container();
 // $container = new Illuminate\Container\ContainerOld();
 
-$container->resolving(Test::class, function() {
-	dump("CALLED");
-});
 
-// $container->bind(Test::class);
-
-$container->make(Test::class);
