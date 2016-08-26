@@ -669,6 +669,8 @@ trait MakesHttpRequests
 
         if (is_null($value)) {
             PHPUnit::assertArrayHasKey($key, $this->response->original->getData());
+        } elseif ($value instanceof \Closure) {
+            PHPUnit::assertTrue($value($this->response->original->$key));
         } else {
             PHPUnit::assertEquals($value, $this->response->original->$key);
         }

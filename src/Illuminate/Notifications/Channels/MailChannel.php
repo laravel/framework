@@ -44,6 +44,10 @@ class MailChannel
         $this->mailer->send($message->view, $message->data(), function ($m) use ($notifiable, $notification, $message) {
             $recipients = $notifiable->routeNotificationFor('mail');
 
+            if (! empty($message->from)) {
+                $m->from($message->from[0], isset($message->from[1]) ? $message->from[1] : null);
+            }
+
             if (is_array($recipients)) {
                 $m->bcc($recipients);
             } else {

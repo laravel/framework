@@ -19,6 +19,13 @@ class MailMessage extends SimpleMessage
     public $viewData = [];
 
     /**
+     * The "from" information for the message.
+     *
+     * @var array
+     */
+    public $from = [];
+
+    /**
      * The attachments for the message.
      *
      * @var array
@@ -43,6 +50,20 @@ class MailMessage extends SimpleMessage
     {
         $this->view = $view;
         $this->viewData = $data;
+
+        return $this;
+    }
+
+    /**
+     * Set the from address for the mail message.
+     *
+     * @param  string  $address
+     * @param  string|null  $name
+     * @return $this
+     */
+    public function from($address, $name = null)
+    {
+        $this->from = [$address, $name];
 
         return $this;
     }
