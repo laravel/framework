@@ -94,6 +94,7 @@ class Pipeline extends BasePipeline
             $response->withException($e);
         }
 
+        self::$exceptionLevel--;
         return $response;
     }
 }
