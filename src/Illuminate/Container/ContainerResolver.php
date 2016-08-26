@@ -10,7 +10,7 @@ use ReflectionFunction;
 use ReflectionParameter;
 use Illuminate\Contracts\Container\BindingResolutionException as Exception;
 
-class ContainerResolver
+class self
 {
     /**
      * The stack of concretions currently being built.
@@ -215,6 +215,25 @@ class ContainerResolver
         }
 
         return $rootParameters;
+    }
+
+    /**
+     * Get the reflection object for something
+     *
+     * @param  mixed $subject
+     * @return mixed
+     */
+    protected static function getReflector($subject)
+    {
+        if (self::isClass($subject)) {
+            return self::getClassReflector($subject);
+        } else if (self::isMethod($subject)) {
+            return self::getMethodReflector($subject);
+        } else if (self::isFunction($subject)) {
+            return self::getFunctionReflector($subject);
+        }
+
+        return null;
     }
 
     /**
