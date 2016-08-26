@@ -30,18 +30,47 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
     public function resolve($subject, array $parameters = [])
     {
         if ($this->isBinded($subject)) {
-            $bindingType = $this->bindings[$subject][self::BINDING_TYPE];
+            return $this->resolveBinded($subject, $parameters);
+        } else {
+            return $this->resolveNonBinded($subject, $parameters);
+        }
+    }
 
-            if ($bindingType === self::TYPE_PLAIN) {
-                return $this->resolvePlain($subject);
-            } else if ($bindingType === self::TYPE_SERVICE) {
-                return $this->resolveService($subject, $parameters);
-            }
+    /**
+     * Resolve a binded type
+     *
+     * @param  string $abstract
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function resolveBinded($abstract, array $parameters = [])
+    {
+        $bindingType = $this->bindings[$abstract][self::BINDING_TYPE];
 
-            return $this->resolveSingleton($subject, $parameters);
+        if ($bindingType === self::TYPE_PLAIN) {
+            return $this->resolvePlain($abstract);
+        } else if ($bindingType === self::TYPE_SERVICE) {
+            return $this->resolveService($abstract, $parameters);
+        } else {
+            return $this->resolveSingleton($abstract, $parameters);
+        }
+    }
+
+    /**
+     * Resolve a non binded type
+     *
+     * @param  string $abstract
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function resolveNonBinded($concrete, array $parameters = [])
+    {
+        if (is_string($concrete) && strpos($concrete, '@')) {
+            $parts = explode('@', $concrete, 2);
+            $concrete = [$this->resolve($parts[0]), $parts[1]];
         }
 
-        return parent::resolve($subject, $parameters);
+        return parent::resolve($concrete, $parameters);
     }
 
     /**
@@ -86,7 +115,8 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
      * Bind a value which need to be resolved each time
      *
      * @param  string $abstract
-     * @param  mixed $concrete
+     * @param  mixed  $concrete
+     * @param  array  $parameters
      * @return void
      */
     public function bindService($abstract, $concrete, $parameters = [])
@@ -103,7 +133,8 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
      * Bind a value which need to be resolved one time
      *
      * @param  string $abstract
-     * @param  mixed $concrete
+     * @param  mixed  $concrete
+     * @param  array  $parameters
      * @return void
      */
     public function bindSingleton($abstract, $concrete, $parameters = [])
@@ -125,9 +156,10 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
      */
     public function resolvePlain($abstract)
     {
-        $this->bindings[$abstract][self::IS_RESOLVED] = true;
+        $binding = &$this->bindings[$abstract];
+        $binding[self::IS_RESOLVED] = true;
 
-        return $this->bindings[$abstract][self::VALUE];
+        return $binding[self::VALUE];
     }
 
     /**
