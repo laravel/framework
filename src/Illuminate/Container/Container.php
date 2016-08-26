@@ -130,7 +130,7 @@ class Container extends ContainerAbstract implements ContainerContract
     public function resolve($abstract, array $parameters = [])
     {
         if (is_string($abstract) && isset($this->contextualParameters[$abstract])) {
-            $parameters = array_merge($this->contextualParameters[$abstract], $parameters);
+            $parameters = array_replace($this->contextualParameters[$abstract], $parameters);
         }
 
         if ($this->isBinded($abstract)) {

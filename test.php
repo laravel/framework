@@ -31,7 +31,7 @@ class Test
 class Test2
 {
 
-	public function __construct(Test3 $test3)
+	public function __construct(Test3 $test3, $something)
 	{
 		dump($test3);
 	}
@@ -65,7 +65,8 @@ function testPerf()
 $container = new Illuminate\Container\Container();
 // $container = new Illuminate\Container\ContainerOld();
 
-$container->when(Test2::class)->needs(Test3::class)->give(Test3::class);
+
+$container->when(Test2::class)->needs('$something')->give(100);
 
 $container->make(Test2::class);
 
