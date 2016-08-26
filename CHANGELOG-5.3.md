@@ -1,7 +1,14 @@
-# Release Notes
+# Release Notes for 5.3.x
+
+## v5.3.3 (2016-08-26)
+
+### Fixed
+- Fixed testing of Eloquent model events ([#15052](https://github.com/laravel/framework/pull/15052))
+
 
 ## v5.3.2 (2016-08-24)
 
+### Fixed
 - Revert changes to Eloquent `Builder` that breaks `firstOr*` methods ([#15018](https://github.com/laravel/framework/pull/15018))
 
 
