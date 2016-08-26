@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Routing\Controller;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Auth\Middleware\Authorize;
@@ -1129,7 +1130,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
     }
 }
 
-class RouteTestControllerStub extends Illuminate\Routing\Controller
+class RouteTestControllerStub extends Controller
 {
     public function __construct()
     {
@@ -1145,7 +1146,7 @@ class RouteTestControllerStub extends Illuminate\Routing\Controller
     }
 }
 
-class RouteTestControllerMiddlewareGroupStub extends Illuminate\Routing\Controller
+class RouteTestControllerMiddlewareGroupStub extends Controller
 {
     public function __construct()
     {
@@ -1158,7 +1159,7 @@ class RouteTestControllerMiddlewareGroupStub extends Illuminate\Routing\Controll
     }
 }
 
-class RouteTestControllerWithParameterStub extends Illuminate\Routing\Controller
+class RouteTestControllerWithParameterStub extends Controller
 {
     public function returnParameter($bar = '')
     {
