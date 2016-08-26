@@ -3177,7 +3177,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             if (! array_key_exists($key, $this->original)) {
                 $dirty[$key] = $value;
             } elseif ($value !== $this->original[$key] &&
-                                 ! $this->originalIsNumericallyEquivalent($key)) {
+                                 ! $this->originalIsNumericallyEquivalent($key) &&
+                                 ! $this->originalIsSameDateAndTime($key)) {
                 $dirty[$key] = $value;
             }
         }
@@ -3198,6 +3199,25 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $original = $this->original[$key];
 
         return is_numeric($current) && is_numeric($original) && strcmp((string) $current, (string) $original) === 0;
+    }
+
+    /**
+     * Determine if the new and old values for a given key are equivalent dates.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function originalIsSameDateAndTime($key)
+    {
+        if (! in_array($key, $this->dates)) {
+            return false;
+        }
+
+        $current = new Carbon($this->attributes[$key]);
+
+        $original = new Carbon($this->original[$key]);
+
+        return $current->eq($original);
     }
 
     /**
