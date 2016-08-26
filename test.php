@@ -59,20 +59,13 @@ function testPerf()
 	}
 }
 
-// $container = new Illuminate\Container\Container();
+$container = new Illuminate\Container\Container();
 // $container = new Illuminate\Container\ContainerOld();
 
-
-testPerf();
-
-/*
-$container->resolving(Test3::class, function() {
+$container->resolving(Test::class, function() {
 	dump("CALLED");
 });
 
-$container->bind("test", function() {
-	return new Test3;
-});
+// $container->bind(Test::class);
 
-$container->make("test");
-*/
+$container->make(Test::class);

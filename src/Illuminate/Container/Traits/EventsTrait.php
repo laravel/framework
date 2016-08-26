@@ -39,51 +39,27 @@ trait EventsTrait
         }
     }
 
-    private function afterResolvingCallback($abstract, $concrete)
-    {
-    }
-
     /**
-     * Fire the afterResolving callbacks
+     * Call the callbacks
      *
-     * @param  mixed $abstract
+     * @param  mixed $concrete
      * @param  mixed $resolved
+     * @param  mixed $abstract
      * @return void
      */
-    /*
-    private function fireAfterResolving($abstract, $resolved)
+    private function afterResolvingCallback($concrete, $resolved, $abstract = null)
     {
-    	$callbacks = $this->globalAfterResolving;
+        $callbacks = $this->globalAfterResolving;
 
-    	if (is_object($resolved)) {
-    		foreach ($this->afterResolving as $key => $value) {
-    			if ($abstract === $key || $resolved instanceof $key) {
-    				$callbacks = array_merge($callbacks, $value);
-    			}
-    		}
-    	} elseif (is_string($abstract)) {
-    		if (isset($this->afterResolving[$abstract])) {
-    			$callbacks = array_merge($callbacks, $this->afterResolving[$abstract]);
-    		}
-    	}
+        if (is_string($concrete) && isset($this->afterResolving[$concrete])) {
+            $callbacks = array_merge($callbacks, $this->afterResolving[$concrete]);
+        }
+        if (is_string($abstract) && isset($this->afterResolving[$abstract])) {
+            $callbacks = array_merge($callbacks, $this->afterResolving[$abstract]);
+        }
 
-    	self::fireCallbacks($callbacks, [$resolved, $this]);
+        foreach ($callbacks as $callback) {
+            call_user_func_array($callback, [$resolved, $this]);
+        }
     }
-    */
-
-    /**
-     * Call the provided array of closures
-     *
-     * @param  array  $callbacks
-     * @param  array  $parameters
-     * @return void
-     */
-    /*
-    private static function fireCallbacks(array $callbacks, array $parameters = [])
-    {
-    	foreach ($callbacks as $callback) {
-    		call_user_func_array($callback, $parameters);
-    	}
-    }
-    */
 }
