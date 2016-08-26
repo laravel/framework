@@ -10,7 +10,7 @@ use ReflectionFunction;
 use ReflectionParameter;
 use Illuminate\Contracts\Container\BindingResolutionException as Exception;
 
-class self
+class ContainerResolver
 {
     /**
      * The stack of concretions currently being built.
