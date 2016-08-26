@@ -656,7 +656,7 @@ class Router implements RegistrarContract
             return (array) $this->resolveMiddlewareClassName($name);
         })->flatten();
 
-        return $this->sortMiddleware($middleware)->all();
+        return $this->sortMiddleware($middleware);
     }
 
     /**
@@ -735,25 +735,29 @@ class Router implements RegistrarContract
      * Sort the given middleware by priority.
      *
      * @param  \Illuminate\Support\Collection  $middlewares
-     * @return \Illuminate\Support\Collection
+     * @return array
      */
     protected function sortMiddleware(Collection $middlewares)
     {
-        $priority = collect($this->middlewarePriority);
+        $priority = $this->middlewarePriority;
 
-        $sorted = collect();
+        $sorted = [];
 
         foreach ($middlewares as $middleware) {
-            if ($sorted->contains($middleware)) {
+            if (in_array($middleware, $sorted)) {
                 continue;
             }
 
-            if (($index = $priority->search($middleware)) !== false) {
-                $sorted = $sorted->merge(
-                    $priority->take($index)->filter(function ($middleware) use ($middlewares, $sorted) {
-                        return $middlewares->contains($middleware) &&
-                             ! $sorted->contains($middleware);
-                    })
+            if (($index = array_search($middleware, $priority)) !== false) {
+                $sorted = array_merge(
+                    $sorted,
+                    array_filter(
+                        array_slice($priority, 0, $index),
+                        function ($middleware) use ($middlewares, $sorted) {
+                            return $middlewares->contains($middleware) &&
+                                 ! in_array($middleware, $sorted);
+                        }
+                    )
                 );
             }
 
