@@ -169,6 +169,25 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('caught', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
     }
 
+    public function testControllerClosureMiddleware()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/bar', [
+            'uses' => 'RouteTestClosureMiddlewareController@index',
+            'middleware' => 'foo',
+        ]);
+        $router->middleware('foo', function ($request, $next) {
+            $request['foo-middleware'] = 'foo-middleware';
+
+            return $next($request);
+        });
+
+        $this->assertEquals(
+            'index-foo-middleware-controller-closure',
+            $router->dispatch(Request::create('foo/bar', 'GET'))->getContent()
+        );
+    }
+
     /**
      * @expectedException \LogicException
      * @expectedExceptionMessage Route for [foo/bar] has no action.
@@ -1176,6 +1195,25 @@ class RouteTestControllerWithParameterStub extends Controller
     public function returnParameter($bar = '')
     {
         return $bar;
+    }
+}
+
+class RouteTestClosureMiddlewareController extends Controller
+{
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            $response = $next($request);
+
+            return $response->setContent(
+                $response->content().'-'.$request['foo-middleware'].'-controller-closure'
+            );
+        });
+    }
+
+    public function index()
+    {
+        return 'index';
     }
 }
 
