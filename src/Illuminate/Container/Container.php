@@ -25,6 +25,7 @@ class Container extends ContainerAbstract implements ContainerContract
 	{
         $abstract = self::normalize($abstract);
         $concrete = ($concrete) ? self::normalize($concrete) : $abstract;
+
         $parameters = ($concrete instanceof Closure) ? [$this] : [];
 
         if (is_array($abstract)) {
@@ -80,6 +81,7 @@ class Container extends ContainerAbstract implements ContainerContract
     {
         $abstract = self::normalize($abstract);
         $concrete = ($concrete) ? self::normalize($concrete) : $abstract;
+
         $parameters = ($concrete instanceof Closure) ? [$this] : [];
 
         if (is_array($abstract)) {
@@ -140,13 +142,24 @@ class Container extends ContainerAbstract implements ContainerContract
      */
     public function resolve($abstract, array $parameters = [])
     {
-        if ($this->isBinded($abstract)) {
-            return $this->resolveBinded($abstract, $parameters);
+        if (is_string($abstract) && isset($this->contextualParameters[$abstract])) {
+            $parameters = array_merge($this->contextualParameters[$abstract], $parameters);
         }
 
-        return $this->resolveNonBinded($abstract, $parameters);
+        if ($this->isBinded($abstract)) {
+            return $this->resolveBinded($abstract, $parameters);
+        } else {
+            return $this->resolveNonBinded($abstract, $parameters);
+        }
     }
 
+    /**
+     * Resolve a binded type
+     *
+     * @param  string $abstract
+     * @param  array  $parameters
+     * @return mixed
+     */
     private function resolveBinded($abstract, array $parameters = [])
     {
         if (ContainerAbstract::isComputed($this->bindings[$abstract])) {
@@ -163,6 +176,13 @@ class Container extends ContainerAbstract implements ContainerContract
         return $resolved;
     }
 
+    /**
+     * Resolve a non binded type
+     *
+     * @param  mixed $concrete
+     * @param  array  $parameters
+     * @return mixed
+     */
     private function resolveNonBinded($concrete, array $parameters = [])
     {
         if ($concrete instanceof Closure) {

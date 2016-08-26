@@ -63,11 +63,3 @@ function testPerf()
 $container = new Illuminate\Container\Container();
 // $container = new Illuminate\Container\ContainerOld();
 
-$container->extend(Test::class, function($old) {
-	dump("CALLED");
-
-	return $old;
-});
-
-$container->make(Test::class);
-

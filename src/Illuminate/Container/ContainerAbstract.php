@@ -162,11 +162,10 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
             return $binding[self::VALUE];
         }
 
-        $parameters = array_merge($parameters, $binding[self::PARAMETERS]);
-        $resolved = parent::resolve($binding[self::VALUE], $parameters);
-
-        $binding[self::VALUE] = $resolved;
         $binding[self::IS_RESOLVED] = true;
+        $parameters = array_merge($parameters, $binding[self::PARAMETERS]);
+
+        $binding[self::VALUE] = parent::resolve($binding[self::VALUE], $parameters);
 
         return $binding[self::VALUE];
     }

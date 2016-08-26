@@ -7,7 +7,8 @@ use Illuminate\Container\ContainerResolver;
 trait ContextualBindingsTrait
 {
     private $concrete;
-    private $avstract;
+    private $abstract;
+    private $contextualParameters = [];
 
     /**
      * Define a contextual binding.
