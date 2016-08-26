@@ -148,6 +148,18 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
     public function testClosureMiddleware()
     {
         $router = $this->getRouter();
+        $middleware = function ($request, $next) {
+            return 'caught';
+        };
+        $router->get('foo/bar', ['middleware' => $middleware, function () {
+            return 'hello';
+        }]);
+        $this->assertEquals('caught', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+    }
+
+    public function testDefinedClosureMiddleware()
+    {
+        $router = $this->getRouter();
         $router->get('foo/bar', ['middleware' => 'foo', function () {
             return 'hello';
         }]);
