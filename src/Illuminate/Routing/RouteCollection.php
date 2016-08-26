@@ -21,7 +21,7 @@ class RouteCollection implements Countable, IteratorAggregate
     protected $routes = [];
 
     /**
-     * An flattened array of all of the routes.
+     * A flattened array of all of the routes.
      *
      * @var array
      */
@@ -101,11 +101,11 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     protected function addLookups($route)
     {
+        $action = $route->getAction();
+
         // If the route has a name, we will add it to the name look-up table so that we
         // will quickly be able to find any route associate with a name and not have
         // to iterate through every route every time we need to perform a look-up.
-        $action = $route->getAction();
-
         if (isset($action['as'])) {
             $this->nameList[$action['as']] = $route;
         }
