@@ -31,9 +31,8 @@ class Test
 class Test2
 {
 
-	public function __construct(Test3 $test3, $something)
+	public function __construct(Test3 $test3)
 	{
-		dump($test3);
 	}
 
 }
@@ -62,12 +61,8 @@ function testPerf()
 	}
 }
 
+
 $container = new Illuminate\Container\Container();
 // $container = new Illuminate\Container\ContainerOld();
 
-
-$container->bind('foo', function ($container, $a, $b, $c) {
-    return [$a, $b, $c];
-});
-
-$container->make('foo', [1, 2, 3]);
+testPerf();

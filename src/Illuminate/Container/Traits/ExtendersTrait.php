@@ -15,24 +15,43 @@ trait ExtendersTrait
      * @param  string    $abstract
      * @param  \Closure  $closure
      * @return void
-     *
-     * @throws \InvalidArgumentException
      */
     public function extend($abstract, Closure $closure)
     {
         $this->extendAbstract(self::normalize($abstract), $closure);
     }
 
+    /**
+     * "Extend" an abstract type in the container.
+     *
+     * @param  string    $abstract
+     * @param  \Closure  $closure
+     * @return void
+     */
     private function extendAbstract($abstract, Closure $closure)
     {
         $this->extenders[$abstract][] = $closure;
     }
 
+    /**
+     * Call the given closure
+     *
+     * @param  mixed   $concrete
+     * @param  Closure $closure
+     * @return mixed
+     */
     private function extendConcrete($concrete, Closure $closure)
     {
         return $closure($concrete, $this);
     }
 
+    /**
+     * Extend a resolved subject
+     *
+     * @param  string $abstract
+     * @param  mixed &$resolved
+     * @return void
+     */
     private function extendResolved($abstract, &$resolved)
     {
         if (!is_string($abstract) || !isset($this->extenders[$abstract])) {

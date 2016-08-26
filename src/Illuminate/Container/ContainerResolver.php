@@ -95,7 +95,7 @@ class ContainerResolver
         $reflectionClass = self::getClassReflector($class);
         $reflectionMethod = $reflectionClass->getConstructor();
 
-        array_push($this->buildStack, $reflectionClass->getName());
+        array_push($this->buildStack, $reflectionClass->name);
 
         if ($reflectionMethod) {
             $reflectionParameters = $reflectionMethod->getParameters();
@@ -119,7 +119,7 @@ class ContainerResolver
         $reflectionMethod = self::getMethodReflector($method);
         $reflectionParameters = $reflectionMethod->getParameters();
 
-        array_push($this->buildStack, $reflectionMethod->getName());
+        array_push($this->buildStack, $reflectionMethod->name);
 
         $resolvedParameters = $this->resolveParameters($reflectionParameters, $parameters);
 
@@ -140,7 +140,7 @@ class ContainerResolver
         $reflectionFunction = self::getFunctionReflector($function);
         $reflectionParameters = $reflectionFunction->getParameters();
 
-        array_push($this->buildStack, $reflectionFunction->getName());
+        array_push($this->buildStack, $reflectionFunction->name);
 
         $resolvedParameters = $this->resolveParameters($reflectionParameters, $parameters);
 
@@ -158,7 +158,7 @@ class ContainerResolver
      */
     protected function resolveParameter(ReflectionParameter $parameter, array $parameters = [])
     {
-        $name = $parameter->getName();
+        $name = $parameter->name;
         $index = $parameter->getPosition();
 
         if (isset($parameters[$name])) {
@@ -192,7 +192,7 @@ class ContainerResolver
             $dependencies[] = $this->resolveParameter($parameter, $parameters);
 
             if ($dependencies[$key] instanceof Closure) {
-                $dependencies[$key] = call_user_func($dependencies[$key], $this);
+                $dependencies[$key] = $dependencies[$key]($this);
             }
         }
 
@@ -209,7 +209,7 @@ class ContainerResolver
     private static function mergeParameters(array $rootParameters, array $parameters = [])
     {
         foreach ($parameters as $key => $value) {
-            if (!isset($rootParameters[$key]) && is_numeric($key)) {
+            if (!isset($rootParameters[$key]) && is_int($key)) {
                 $rootParameters[$key] = $value;
             }
         }

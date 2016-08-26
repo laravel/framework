@@ -50,7 +50,6 @@ trait EventsTrait
     private function afterResolvingCallback($concrete, $resolved, $abstract = null)
     {
         $callbacks = $this->globalAfterResolving;
-        $parameters = [$resolved, $this];
 
         if (is_string($concrete) && isset($this->afterResolving[$concrete])) {
             $callbacks = array_merge($callbacks, $this->afterResolving[$concrete]);
@@ -60,7 +59,7 @@ trait EventsTrait
         }
 
         foreach ($callbacks as $callback) {
-            call_user_func_array($callback, $parameters);
+            $callback($resolved, $this);
         }
     }
 }
