@@ -12,18 +12,18 @@ class MailMessage extends SimpleMessage
     public $view = 'notifications::email';
 
     /**
-     * The from address for the message.
-     *
-     * @var array
-     */
-    public $from = [];
-
-    /**
      * The view data for the message.
      *
      * @var array
      */
     public $viewData = [];
+
+    /**
+     * The "from" information for the message.
+     *
+     * @var array
+     */
+    public $from = [];
 
     /**
      * The attachments for the message.
@@ -58,6 +58,7 @@ class MailMessage extends SimpleMessage
      * Set the from address for the mail message.
      *
      * @param  string  $address
+     * @param  string|null  $name
      * @return $this
      */
     public function from($address, $name = null)
