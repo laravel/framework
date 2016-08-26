@@ -14,6 +14,7 @@ Features :
 resolve from outside the container and Container::make resolve from inside the container
 -Container::call and Container::make supprots : closure, "class@method",
 [object, "method"], "object::method" and "class" notations
+-Contextual binding support all types
 
  */
 
@@ -42,7 +43,7 @@ class Test3
 	{
 	}
 
-	public static function test()
+	public function test()
 	{
 	}
 }
@@ -67,3 +68,4 @@ function testPerf()
 $container = new Illuminate\Container\Container();
 // $container = new Illuminate\Container\ContainerOld();
 
+$container->make("Test3@test");

@@ -17,7 +17,7 @@ trait ContextualBindingsTrait
      * Define a contextual binding.
      *
      * @param  string  $abstract
-     * @return \Illuminate\Contracts\Container\ContextualBindingBuilder
+     * @return ContextualBindingsTrait
      */
     public function when($abstract)
     {
@@ -25,6 +25,8 @@ trait ContextualBindingsTrait
 
         if (isset($this->bindings[$this->abstract])) {
             $this->concrete = $this->bindings[$this->abstract][ContainerResolver::VALUE];
+        } else if (strpos($abstract, '@')) {
+            $this->concrete = explode('@', $abstract, 2);
         } else {
             $this->concrete = $this->abstract;
         }
@@ -36,7 +38,7 @@ trait ContextualBindingsTrait
      * Define the abstract target that depends on the context.
      *
      * @param  string  $parameter
-     * @return $this
+     * @return ContextualBindingsTrait
      */
     public function needs($parameter)
     {

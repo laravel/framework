@@ -103,12 +103,6 @@ class Container extends ContainerAbstract implements ContainerContract
     {
         $abstract = self::normalize($abstract);
 
-        if (is_string($abstract) && strpos($abstract, '@')) {
-            $parts = explode('@', $abstract, 2);
-
-            return $this->resolve([$this->resolve($parts[0]), $parts[1]], $parameters);
-        }
-
         return $this->resolve($abstract, $parameters);
     }
 
@@ -121,16 +115,9 @@ class Container extends ContainerAbstract implements ContainerContract
      */
     public function call($abstract, array $parameters = [])
     {
-        $resolver = new ContainerResolver();
         $abstract = self::normalize($abstract);
 
-        if (is_string($abstract) && strpos($abstract, '@')) {
-            $parts = explode('@', $abstract, 2);
-
-            return $resolver->resolve([$resolver->resolve($parts[0]), $parts[1]], $parameters);
-        }
-
-        return $resolver->resolve($abstract, $parameters);
+        return (new ContainerResolver())->resolveNonBinded($abstract, $parameters);
     }
 
     /**
@@ -160,7 +147,7 @@ class Container extends ContainerAbstract implements ContainerContract
      * @param  array  $parameters
      * @return mixed
      */
-    private function resolveBinded($abstract, array $parameters = [])
+    public function resolveBinded($abstract, array $parameters = [])
     {
         if (ContainerAbstract::isComputed($this->bindings[$abstract])) {
             return $this->bindings[$abstract][ContainerAbstract::VALUE];
@@ -168,7 +155,7 @@ class Container extends ContainerAbstract implements ContainerContract
 
         $binding = $this->bindings[$abstract];
         $concrete = $binding[ContainerAbstract::VALUE];
-        $resolved = parent::resolve($abstract, $parameters);
+        $resolved = parent::resolveBinded($abstract, $parameters);
 
         $this->extendResolved($abstract, $resolved);
         $this->afterResolvingCallback($concrete, $resolved, $abstract);
@@ -183,13 +170,13 @@ class Container extends ContainerAbstract implements ContainerContract
      * @param  array  $parameters
      * @return mixed
      */
-    private function resolveNonBinded($concrete, array $parameters = [])
+    public function resolveNonBinded($concrete, array $parameters = [])
     {
         if ($concrete instanceof Closure) {
             array_unshift($parameters, $this);
         }
 
-        $resolved = parent::resolve($concrete, $parameters);
+        $resolved = parent::resolveNonBinded($concrete, $parameters);
 
         $this->extendResolved($concrete, $resolved);
         $this->afterResolvingCallback($concrete, $resolved);

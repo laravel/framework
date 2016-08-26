@@ -21,6 +21,28 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
 	protected $bindings = [];
 
     /**
+     * Check if an abstract is binded to the container
+     *
+     * @param  string  $abstract
+     * @return boolean
+     */
+    public function isBinded($abstract)
+    {
+        return is_string($abstract) && isset($this->bindings[$abstract]);
+    }
+
+    /**
+     * Check if a binding is computed
+     *
+     * @param  array  $binding
+     * @return boolean
+     */
+    public static function isComputed($binding)
+    {
+        return $binding[self::IS_RESOLVED] && $binding[self::BINDING_TYPE] !== self::TYPE_SERVICE;
+    }
+
+    /**
      * Resolve something (binded or not)
      *
      * @param  mixed $subject
@@ -71,28 +93,6 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
         }
 
         return parent::resolve($concrete, $parameters);
-    }
-
-    /**
-     * Check if an abstract is binded to the container
-     *
-     * @param  string  $abstract
-     * @return boolean
-     */
-    public function isBinded($abstract)
-    {
-        return is_string($abstract) && isset($this->bindings[$abstract]);
-    }
-
-    /**
-     * Check if a binding is computed
-     *
-     * @param  array  $binding
-     * @return boolean
-     */
-    public static function isComputed($binding)
-    {
-        return $binding[self::IS_RESOLVED] && $binding[self::BINDING_TYPE] !== self::TYPE_SERVICE;
     }
 
     /**
