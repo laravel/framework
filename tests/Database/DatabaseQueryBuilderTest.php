@@ -344,6 +344,18 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([0 => 1, 1 => 1, 2 => 2, 3 => 3], $builder->getBindings());
     }
 
+    public function testRawWhereIns()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereIn('id', [new Raw(1)]);
+        $this->assertEquals('select * from "users" where "id" in (1)', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereIn('id', [new Raw(1)]);
+        $this->assertEquals('select * from "users" where "id" = ? or "id" in (1)', $builder->toSql());
+        $this->assertEquals([0 => 1], $builder->getBindings());
+    }
+
     public function testEmptyWhereIns()
     {
         $builder = $this->getBuilder();
