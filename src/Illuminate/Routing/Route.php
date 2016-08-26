@@ -820,7 +820,7 @@ class Route
      */
     public function domain()
     {
-        return isset($this->action['domain']) ? $this->action['domain'] : null;
+        return isset($this->action['domain']) ? str_replace(['http://', 'https://'], '', $this->action['domain']) : null;
     }
 
     /**
