@@ -676,11 +676,13 @@ class Router implements RegistrarContract
             return $name;
         } elseif (isset($map[$name]) && $map[$name] instanceof Closure) {
             return $map[$name];
+
         // If the middleware is the name of a middleware group, we will return the array
         // of middlewares that belong to the group. This allows developers to group a
         // set of middleware under single keys that can be conveniently referenced.
         } elseif (isset($this->middlewareGroups[$name])) {
             return $this->parseMiddlewareGroup($name);
+
         // Finally, when the middleware is simply a string mapped to a class name the
         // middleware name will get parsed into the full class name and parameters
         // which may be run using the Pipeline which accepts this string format.
