@@ -160,22 +160,38 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
     {
         // If the message exists in the container, we will transform it and return
         // the message. Otherwise, we'll check if the key is implicit & collect
-        // all messages that match the given key and output it as an array.
+        // all the messages that match a given key and output it as an array.
         if (array_key_exists($key, $this->messages)) {
-            return $this->transform($this->messages[$key], $this->checkFormat($format), $key);
+            return $this->transform(
+                $this->messages[$key], $this->checkFormat($format), $key
+            );
         }
-
-        $output = [];
 
         if (Str::contains($key, '*')) {
-            foreach ($this->messages as $messageKey => $messages) {
-                if (Str::is($key, $messageKey)) {
-                    $output[$messageKey] = $this->transform($messages, $this->checkFormat($format), $messageKey);
-                }
-            }
+            return $this->getMessagesForWildcardKey($key, $format);
         }
 
-        return $output;
+        return [];
+    }
+
+    /**
+     * Get the messages for a wildcard key.
+     *
+     * @param  string  $key
+     * @param  string|null  $format
+     * @return array
+     */
+    protected function getMessagesForWildcardKey($key, $format)
+    {
+        return collect($this->messages)
+                ->filter(function ($messages, $messageKey) use ($key) {
+                    return Str::is($key, $messageKey);
+                })
+                ->map(function ($messages, $messageKey) use ($format) {
+                    return $this->transform(
+                        $messages, $this->checkFormat($format), $messageKey
+                    );
+                })->all();
     }
 
     /**
