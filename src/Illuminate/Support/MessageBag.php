@@ -158,14 +158,22 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
      */
     public function get($key, $format = null)
     {
+        $output = [];
+
         // If the message exists in the container, we will transform it and return
         // the message. Otherwise, we'll return an empty array since the entire
         // methods is to return back an array of messages in the first place.
         if (array_key_exists($key, $this->messages)) {
-            return $this->transform($this->messages[$key], $this->checkFormat($format), $key);
+            $output = $this->transform($this->messages[$key], $this->checkFormat($format), $key);
+        } elseif (Str::contains($key, '*')) {
+            foreach ($this->messages as $messageKey => $messages) {
+                if (Str::is($key, $messageKey)) {
+                    $output[$messageKey] = $this->transform($messages, $this->checkFormat($format), $messageKey);
+                }
+            }
         }
 
-        return [];
+        return $output;
     }
 
     /**
