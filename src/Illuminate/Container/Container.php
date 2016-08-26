@@ -26,13 +26,11 @@ class Container extends ContainerAbstract implements ContainerContract
         $abstract = self::normalize($abstract);
         $concrete = ($concrete) ? self::normalize($concrete) : $abstract;
 
-        $parameters = ($concrete instanceof Closure) ? [$this] : [];
-
         if (is_array($abstract)) {
-            $this->bindService(key($abstract), $concrete, $parameters);
+            $this->bindService(key($abstract), $concrete);
             $this->alias(key($abstract), current($abstract));
         } else {
-            $this->bindService($abstract, $concrete, $parameters);
+            $this->bindService($abstract, $concrete);
         }
 	}
 
@@ -82,13 +80,11 @@ class Container extends ContainerAbstract implements ContainerContract
         $abstract = self::normalize($abstract);
         $concrete = ($concrete) ? self::normalize($concrete) : $abstract;
 
-        $parameters = ($concrete instanceof Closure) ? [$this] : [];
-
         if (is_array($abstract)) {
-            $this->bindSingleton(key($abstract), $concrete, $parameters);
+            $this->bindSingleton(key($abstract), $concrete);
             $this->alias(key($abstract), current($abstract));
         } else {
-            $this->bindSingleton($abstract, $concrete, $parameters);
+            $this->bindSingleton($abstract, $concrete);
         }
     }
 
@@ -149,12 +145,16 @@ class Container extends ContainerAbstract implements ContainerContract
      */
     public function resolveBinded($abstract, array $parameters = [])
     {
-        if (ContainerAbstract::isComputed($this->bindings[$abstract])) {
-            return $this->bindings[$abstract][ContainerAbstract::VALUE];
-        }
-
         $binding = $this->bindings[$abstract];
         $concrete = $binding[ContainerAbstract::VALUE];
+
+        if (ContainerAbstract::isComputed($binding)) {
+            return $binding[ContainerAbstract::VALUE];
+        }
+        if ($concrete instanceof Closure) {
+            array_unshift($parameters, $this);
+        }
+
         $resolved = parent::resolveBinded($abstract, $parameters);
 
         $this->extendResolved($abstract, $resolved);

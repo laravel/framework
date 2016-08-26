@@ -119,11 +119,10 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
      * @param  array  $parameters
      * @return void
      */
-    public function bindService($abstract, $concrete, $parameters = [])
+    public function bindService($abstract, $concrete)
     {
         $this->bindings[$abstract] = [
             self::VALUE => $concrete,
-            self::PARAMETERS => $parameters,
             self::IS_RESOLVED => false,
             self::BINDING_TYPE => self::TYPE_SERVICE
         ];
@@ -137,11 +136,10 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
      * @param  array  $parameters
      * @return void
      */
-    public function bindSingleton($abstract, $concrete, $parameters = [])
+    public function bindSingleton($abstract, $concrete)
     {
         $this->bindings[$abstract] = [
             self::VALUE => $concrete,
-            self::PARAMETERS => $parameters,
             self::IS_RESOLVED => false,
             self::BINDING_TYPE => self::TYPE_SINGLETON
         ];
@@ -174,7 +172,6 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
         $binding = &$this->bindings[$abstract];
 
         $binding[self::IS_RESOLVED] = true;
-        $parameters = array_replace($binding[self::PARAMETERS], $parameters);
 
         return parent::resolve($binding[self::VALUE], $parameters);
     }
@@ -194,10 +191,8 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
             return $binding[self::VALUE];
         }
 
-        $binding[self::IS_RESOLVED] = true;
-        $parameters = array_replace($binding[self::PARAMETERS], $parameters);
-
         $binding[self::VALUE] = parent::resolve($binding[self::VALUE], $parameters);
+        $binding[self::IS_RESOLVED] = true;
 
         return $binding[self::VALUE];
     }

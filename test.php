@@ -66,7 +66,8 @@ $container = new Illuminate\Container\Container();
 // $container = new Illuminate\Container\ContainerOld();
 
 
-$container->when(Test2::class)->needs('$something')->give(100);
+$container->bind('foo', function ($container, $a, $b, $c) {
+    return [$a, $b, $c];
+});
 
-$container->make(Test2::class);
-
+$container->make('foo', [1, 2, 3]);

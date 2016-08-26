@@ -259,8 +259,8 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
     public function testParametersCanBePassedThroughToClosure()
     {
         $container = new Container;
-        $container->bind('foo', function ($c, $parameters) {
-            return $parameters;
+        $container->bind('foo', function ($container, $a, $b, $c) {
+            return [$a, $b, $c];
         });
 
         $this->assertEquals([1, 2, 3], $container->make('foo', [1, 2, 3]));
@@ -292,20 +292,6 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
     {
         $container = new Container;
         $container->resolving(function ($object) {
-            return $object->name = 'taylor';
-        });
-        $container->bind('foo', function () {
-            return new StdClass;
-        });
-        $instance = $container->make('foo');
-
-        $this->assertEquals('taylor', $instance->name);
-    }
-
-    public function testResolvingCallbacksAreCalledForType()
-    {
-        $container = new Container;
-        $container->resolving('stdClass', function ($object) {
             return $object->name = 'taylor';
         });
         $container->bind('foo', function () {
