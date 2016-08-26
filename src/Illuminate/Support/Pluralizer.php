@@ -20,6 +20,7 @@ class Pluralizer
         'data',
         'deer',
         'education',
+        'emoji',
         'equipment',
         'fish',
         'gold',
