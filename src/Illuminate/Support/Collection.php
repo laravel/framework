@@ -1318,4 +1318,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         return (array) $items;
     }
+
+    /**
+     * Drop the first or last {$limit} items.
+     *
+     * @param  int  $limit
+     * @return static
+     */
+    public function drop($limit)
+    {
+        if ($limit < 0) {
+            return $this->slice(0, $limit);
+        }
+
+        return $this->slice($limit);
+    }
 }

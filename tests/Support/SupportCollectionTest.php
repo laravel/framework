@@ -1554,6 +1554,20 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $collection = new Collection(new \ArrayObject(['foo' => 1, 'bar' => 2, 'baz' => 3]));
         $this->assertEquals(['foo' => 1, 'bar' => 2, 'baz' => 3], $collection->toArray());
     }
+
+    public function testDrop()
+    {
+        $data = new Collection(['taylor', 'dayle', 'shawn']);
+        $data = $data->drop(2);
+        $this->assertEquals([2 => 'shawn'], $data->all());
+    }
+
+    public function testDropLast()
+    {
+        $data = new Collection(['taylor', 'dayle', 'shawn']);
+        $data = $data->drop(-2);
+        $this->assertEquals(['taylor'], $data->all());
+    }
 }
 
 class TestAccessorEloquentTestStub
