@@ -171,7 +171,8 @@ class Container extends ContainerAbstract implements ContainerContract
 
         $resolved = parent::resolve($concrete, $parameters);
 
-        $this->afterResolvingCallback($concrete, $resolved, $abstract);
+        $this->extendResolved($concrete, $resolved);
+        $this->afterResolvingCallback($concrete, $resolved);
 
         return $resolved;
     }
