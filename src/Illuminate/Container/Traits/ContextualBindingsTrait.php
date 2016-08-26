@@ -4,6 +4,7 @@ namespace Illuminate\Container\Traits;
 
 use ReflectionClass;
 use Illuminate\Container\ContainerResolver;
+use Illuminate\Contracts\Container\BindingResolutionException as Exception;
 
 trait ContextualBindingsTrait
 {
@@ -15,7 +16,7 @@ trait ContextualBindingsTrait
     /**
      * Define a contextual binding.
      *
-     * @param  string  $concrete
+     * @param  string  $abstract
      * @return \Illuminate\Contracts\Container\ContextualBindingBuilder
      */
     public function when($abstract)
@@ -56,8 +57,14 @@ trait ContextualBindingsTrait
      */
     public function give($implementation)
     {
-        $reflectionClass = new ReflectionClass($this->concrete);
-        $reflectionParameters = $reflectionClass->getConstructor()->getParameters();
+        if (!($reflector = ContainerResolver::getReflector($this->concrete))) {
+            throw new Exception("[$this->concrete] is not resolvable.");
+        }
+        if ($reflector instanceof ReflectionClass && !($reflector = $reflector->getConstructor())) {
+            throw new Exception("[$this->concrete] must have a constructor.");
+        }
+
+        $reflectionParameters = $reflector->getParameters();
 
         foreach ($reflectionParameters as $key => $parameter) {
             $class = $parameter->getClass();
@@ -68,5 +75,7 @@ trait ContextualBindingsTrait
                 return ;
             }
         }
+
+        throw new Exception("Parameter [$this->parameter] not found in [$this->concrete].");
     }
 }

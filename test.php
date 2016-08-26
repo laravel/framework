@@ -41,6 +41,10 @@ class Test3
 	public function __construct()
 	{
 	}
+
+	public static function test()
+	{
+	}
 }
 
 interface ITest
@@ -53,12 +57,13 @@ function testPerf()
 	$container = new Illuminate\Container\Container();
 	// $container = new Illuminate\Container\ContainerOld();
 
-	$container->singleton(Test::Class);
+	// $container->singleton(Test::Class);
 
 	for ($i=0; $i < 10000; $i++) {
 		$container->make(Test::class);
 	}
 }
 
-// $container = new Illuminate\Container\Container();
+$container = new Illuminate\Container\Container();
 // $container = new Illuminate\Container\ContainerOld();
+
