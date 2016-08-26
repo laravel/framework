@@ -54,6 +54,7 @@ class ContainerResolver
 
     /**
      * Check if something is resolvable
+     *
      * @param  mixed  $value
      * @return boolean
      */
@@ -64,6 +65,7 @@ class ContainerResolver
 
     /**
      * Resolve a closure, function, method or a class
+     *
      * @param  string|array $subject
      * @param  array  $parameters
      * @return mixed
@@ -83,13 +85,14 @@ class ContainerResolver
 
     /**
      * Resolve a class
+     *
      * @param  string $subject
      * @param  array  $parameters
      * @return mixed
      */
     public function resolveClass($class, array $parameters = [])
     {
-        $reflectionClass = new ReflectionClass($class);
+        $reflectionClass = self::getClassReflector($class);
         $reflectionMethod = $reflectionClass->getConstructor();
 
         array_push($this->buildStack, $reflectionClass->getName());
@@ -106,13 +109,14 @@ class ContainerResolver
 
     /**
      * Resolve a method
+     *
      * @param  string|array $subject
      * @param  array  $parameters
      * @return mixed
      */
     public function resolveMethod($method, array $parameters = [])
     {
-        $reflectionMethod = is_string($method) ? new ReflectionMethod($method) : new ReflectionMethod($method[0], $method[1]);
+        $reflectionMethod = self::getMethodReflector($method);
         $reflectionParameters = $reflectionMethod->getParameters();
 
         array_push($this->buildStack, $reflectionMethod->getName());
@@ -126,13 +130,14 @@ class ContainerResolver
 
     /**
      * Resolve a closure / function
+     *
      * @param  string|\Closure $subject
      * @param  array  $parameters
      * @return mixed
      */
     public function resolveFunction($function, array $parameters = [])
     {
-        $reflectionFunction = new ReflectionFunction($function);
+        $reflectionFunction = self::getFunctionReflector($function);
         $reflectionParameters = $reflectionFunction->getParameters();
 
         array_push($this->buildStack, $reflectionFunction->getName());
@@ -146,6 +151,7 @@ class ContainerResolver
 
     /**
      * Resolve a parameter
+     *
      * @param  \ReflectionParameter $parameter
      * @param  array               $parameters
      * @return mixed
@@ -156,7 +162,7 @@ class ContainerResolver
         $index = $parameter->getPosition();
 
         if (isset($parameters[$name])) {
-            return $parameters[$parameter->name];
+            return $parameters[$name];
         }
         if (isset($parameters[$index])) {
             return $parameters[$index];
@@ -173,6 +179,7 @@ class ContainerResolver
 
     /**
      * Resolve an array of \ReflectionParameter parameters
+     *
      * @param  array  $reflectionParameters
      * @param  array  $parameters
      * @return array
@@ -194,6 +201,7 @@ class ContainerResolver
 
     /**
      * Merge some dynamicly resolved parameters whith some others provided by the user
+     *
      * @param  array  $rootParameters
      * @param  array  $parameters
      * @return array
@@ -208,4 +216,42 @@ class ContainerResolver
 
         return $rootParameters;
     }
+
+    /**
+     * Get the reflection object for a class
+     *
+     * @param  string $class
+     * @return \ReflectionClass
+     */
+    protected static function getClassReflector($class)
+    {
+        return new ReflectionClass($class);
+    }
+
+    /**
+     * Get the reflection object for a method
+     *
+     * @param  string|array $method
+     * @return \ReflectionMethod
+     */
+    protected static function getMethodReflector($method)
+    {
+        if (is_string($method)) {
+            return new ReflectionMethod($method);
+        } else {
+            return new ReflectionMethod($method[0], $method[1]);
+        }
+    }
+
+    /**
+     * Get the reflection object for a function
+     *
+     * @param  string|closure $function
+     * @return \ReflectionFunction
+     */
+    protected static function getFunctionReflector($function)
+    {
+        return new ReflectionFunction($function);
+    }
+
 }
