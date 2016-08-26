@@ -2,12 +2,14 @@
 
 namespace Illuminate\Container\Traits;
 
+use ReflectionClass;
 use Illuminate\Container\ContainerResolver;
 
 trait ContextualBindingsTrait
 {
     private $concrete;
     private $abstract;
+    private $parameter;
     private $contextualParameters = [];
 
     /**
@@ -16,12 +18,14 @@ trait ContextualBindingsTrait
      * @param  string  $concrete
      * @return \Illuminate\Contracts\Container\ContextualBindingBuilder
      */
-    public function when($concrete)
+    public function when($abstract)
     {
-        $this->concrete = self::normalize($concrete);
+        $this->abstract = self::normalize($abstract);
 
-        if (isset($this->bindings[$this->concrete])) {
-            $this->concrete = $this->bindings[$this->concrete][ContainerResolver::VALUE];
+        if (isset($this->bindings[$this->abstract])) {
+            $this->concrete = $this->bindings[$this->abstract][ContainerResolver::VALUE];
+        } else {
+            $this->concrete = $this->abstract;
         }
 
         return $this;
@@ -30,15 +34,15 @@ trait ContextualBindingsTrait
     /**
      * Define the abstract target that depends on the context.
      *
-     * @param  string  $abstract
+     * @param  string  $parameter
      * @return $this
      */
-    public function needs($abstract)
+    public function needs($parameter)
     {
-        $this->abstract = self::normalize($abstract);
+        $this->parameter = self::normalize($parameter);
 
-        if ($this->abstract[0] === '$') {
-            $this->abstract = substr($this->abstract, 1);
+        if ($this->parameter[0] === '$') {
+            $this->parameter = substr($this->parameter, 1);
         }
 
         return $this;
@@ -52,5 +56,17 @@ trait ContextualBindingsTrait
      */
     public function give($implementation)
     {
+        $reflectionClass = new ReflectionClass($this->concrete);
+        $reflectionParameters = $reflectionClass->getConstructor()->getParameters();
+
+        foreach ($reflectionParameters as $key => $parameter) {
+            $class = $parameter->getClass();
+
+            if ($this->parameter === $parameter->name || $class && $this->parameter === $class->name) {
+                $this->contextualParameters[$this->abstract][$key] = $implementation;
+
+                return ;
+            }
+        }
     }
 }

@@ -50,8 +50,8 @@ interface ITest
 
 function testPerf()
 {
-	// $container = new Illuminate\Container\Container();
-	$container = new Illuminate\Container\ContainerOld();
+	$container = new Illuminate\Container\Container();
+	// $container = new Illuminate\Container\ContainerOld();
 
 	$container->singleton(Test::Class);
 
@@ -60,6 +60,5 @@ function testPerf()
 	}
 }
 
-$container = new Illuminate\Container\Container();
+// $container = new Illuminate\Container\Container();
 // $container = new Illuminate\Container\ContainerOld();
-
