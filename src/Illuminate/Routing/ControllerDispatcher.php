@@ -60,9 +60,9 @@ class ControllerDispatcher
             return [];
         }
 
-        return collect($controller->getMiddleware())->reject(function ($options, $name) use ($method) {
-            return static::methodExcludedByOptions($method, $options);
-        })->keys()->all();
+        return collect($controller->getMiddleware())->reject(function ($data) use ($method) {
+            return static::methodExcludedByOptions($method, $data['options']);
+        })->pluck('middleware')->all();
     }
 
     /**

@@ -98,8 +98,6 @@ trait MocksApplicationServices
      */
     protected function withoutEvents()
     {
-        $this->withoutModelEvents();
-
         $mock = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
 
         $mock->shouldReceive('fire')->andReturnUsing(function ($called) {

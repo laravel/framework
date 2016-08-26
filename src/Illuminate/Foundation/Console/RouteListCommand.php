@@ -181,9 +181,13 @@ class RouteListCommand extends Command
 
         $results = [];
 
-        foreach ($controller->getMiddleware() as $name => $options) {
-            if (! $method || ! $this->methodExcludedByOptions($method, $options)) {
-                $results[] = Arr::get($middleware, $name, $name);
+        foreach ($controller->getMiddleware() as $data) {
+            if (! is_string($data['middleware'])) {
+                continue;
+            }
+
+            if (! $method || ! $this->methodExcludedByOptions($method, $data['options'])) {
+                $results[] = Arr::get($middleware, $data['middleware'], $data['middleware']);
             }
         }
 

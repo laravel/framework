@@ -3,7 +3,7 @@
 namespace Illuminate\Cache;
 
 use Illuminate\Contracts\Cache\Store;
-use Illuminate\Redis\Database as Redis;
+use Illuminate\Contracts\Redis\Database as Redis;
 
 class RedisStore extends TaggableStore implements Store
 {
