@@ -117,7 +117,7 @@ class Container extends ContainerAbstract implements ContainerContract
     {
         $abstract = self::normalize($abstract);
 
-        return (new ContainerResolver())->resolveNonBinded($abstract, $parameters);
+        return (new ContainerAbstract())->resolveNonBinded($abstract, $parameters);
     }
 
     /**

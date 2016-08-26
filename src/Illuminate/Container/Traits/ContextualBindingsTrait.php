@@ -2,6 +2,7 @@
 
 namespace Illuminate\Container\Traits;
 
+use Closure;
 use ReflectionClass;
 use Illuminate\Container\ContainerResolver;
 use Illuminate\Contracts\Container\BindingResolutionException as Exception;
@@ -67,17 +68,38 @@ trait ContextualBindingsTrait
         }
 
         $reflectionParameters = $reflector->getParameters();
+        $contextualParameters = &$this->contextualParameters[$this->abstract];
 
         foreach ($reflectionParameters as $key => $parameter) {
             $class = $parameter->getClass();
 
-            if ($this->parameter === $parameter->name || $class && $this->parameter === $class->name) {
-                $this->contextualParameters[$this->abstract][$key] = $implementation;
-
-                return ;
+            if ($this->parameter === $parameter->name) {
+                return $contextualParameters[$key] = $implementation;
+            }
+            if ($class->name && $this->parameter === $class->name) {
+                return $contextualParameters[$key] = self::contextualBindingFormat($implementation, $class);
             }
         }
 
-        throw new Exception("Parameter [$this->parameter] not found in [$this->concrete].");
+        throw new Exception("Parameter [$this->parameter] cannot be injected in [$this->concrete].");
     }
+
+    /**
+     * Format a class binding
+     *
+     * @param  string|closure|object $implementation
+     * @param  \ReflectionParameter  $parameterClass
+     * @return closure|object
+     */
+    private static function contextualBindingFormat($implementation, $parameter)
+    {
+        if ($implementation instanceof Closure || $implementation instanceof $parameter->name) {
+            return $implementation;
+        }
+
+        return function($container) use ($implementation) {
+            return $container->make($implementation);
+        };
+    }
+
 }
