@@ -11,6 +11,10 @@
         {
             "name": "Taylor Otwell",
             "email": "taylor@laravel.com"
+        },
+        {
+            "name": "Antoine Bellion",
+            "email": "antoine@jubiwee.com"
         }
     ],
     "require": {

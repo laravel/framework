@@ -48,7 +48,7 @@ interface Container
      * @param  bool  $shared
      * @return void
      */
-    public function bind($abstract, $concrete = null, $shared = false);
+    public function bind($abstract, $concrete = null);
 
     /**
      * Register a binding if it hasn't already been registered.
@@ -58,7 +58,7 @@ interface Container
      * @param  bool  $shared
      * @return void
      */
-    public function bindIf($abstract, $concrete = null, $shared = false);
+    public function bindIf($abstract, $concrete = null);
 
     /**
      * Register a shared binding in the container.
@@ -114,7 +114,7 @@ interface Container
      * @param  string|null  $defaultMethod
      * @return mixed
      */
-    public function call($callback, array $parameters = [], $defaultMethod = null);
+    public function call($callback, array $parameters = []);
 
     /**
      * Determine if the given abstract type has been resolved.
