@@ -20,7 +20,7 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
 	protected $bindings = [];
 
     /**
-     * Check if an abstract is binded to the container
+     * Check if an abstract is bound to the container
      *
      * @param  string  $abstract
      * @return boolean
@@ -42,7 +42,7 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
     }
 
     /**
-     * Resolve something (binded or not)
+     * Resolve something (bound or not)
      *
      * @param  mixed  $subject
      * @param  array  $parameters
@@ -58,7 +58,7 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
     }
 
     /**
-     * Resolve a binded type
+     * Resolve a bound type
      *
      * @param  string $abstract
      * @param  array  $parameters
@@ -78,7 +78,7 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
     }
 
     /**
-     * Resolve a non binded type
+     * Resolve a non bound type
      *
      * @param  string $abstract
      * @param  array  $parameters

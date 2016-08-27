@@ -143,7 +143,7 @@ class Container extends ContainerAbstract implements ContainerContract
     }
 
     /**
-     * Resolve a binded type
+     * Resolve a bound type
      *
      * @param  string $abstract
      * @param  array  $parameters
@@ -170,7 +170,7 @@ class Container extends ContainerAbstract implements ContainerContract
     }
 
     /**
-     * Resolve a non binded type
+     * Resolve a non bound type
      *
      * @param  mixed $concrete
      * @param  array  $parameters
