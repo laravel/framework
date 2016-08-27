@@ -190,10 +190,6 @@ class ContainerResolver
 
         foreach ($reflectionParameters as $key => $parameter) {
             $dependencies[] = $this->resolveParameter($parameter, $parameters);
-
-            if ($dependencies[$key] instanceof Closure) {
-                $dependencies[$key] = $dependencies[$key]($this);
-            }
         }
 
         return self::mergeParameters($dependencies, $parameters);

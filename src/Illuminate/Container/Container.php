@@ -124,7 +124,15 @@ class Container extends ContainerAbstract implements ContainerContract
     public function resolve($abstract, array $parameters = [])
     {
         if (is_string($abstract) && isset($this->contextualParameters[$abstract])) {
-            $parameters = array_replace($this->contextualParameters[$abstract], $parameters);
+            $contextualParameters = $this->contextualParameters[$abstract];
+
+            foreach ($contextualParameters as $key => $value) {
+                if ($value instanceof Closure) {
+                    $contextualParameters[$key] = $value($this);
+                }
+            }
+
+            $parameters = array_replace($contextualParameters, $parameters);
         }
 
         if ($this->isBinded($abstract)) {

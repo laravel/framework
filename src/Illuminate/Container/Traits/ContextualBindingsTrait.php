@@ -77,7 +77,7 @@ trait ContextualBindingsTrait
             if ($this->parameter === $parameter->name) {
                 return $contextualParameters[$key] = $implementation;
             }
-            if ($class->name && $this->parameter === $class->name) {
+            if ($class && $this->parameter === $class->name) {
                 return $contextualParameters[$key] = self::contextualBindingFormat($implementation, $class);
             }
         }
@@ -89,10 +89,10 @@ trait ContextualBindingsTrait
      * Format a class binding
      *
      * @param  string|closure|object $implementation
-     * @param  \ReflectionParameter  $parameterClass
+     * @param  ReflectionClass       $parameterClass
      * @return closure|object
      */
-    private static function contextualBindingFormat($implementation, $parameter)
+    private static function contextualBindingFormat($implementation, ReflectionClass $parameter)
     {
         if ($implementation instanceof Closure || $implementation instanceof $parameter->name) {
             return $implementation;
@@ -102,5 +102,4 @@ trait ContextualBindingsTrait
             return $container->make($implementation);
         };
     }
-
 }
