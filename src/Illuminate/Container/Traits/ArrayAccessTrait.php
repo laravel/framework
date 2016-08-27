@@ -39,7 +39,7 @@ trait ArrayAccessTrait
      */
     public function offsetUnset($offset)
     {
-        return unset($this->bindings[$offset]);
+        unset($this->bindings[$offset]);
     }
 
     /**
