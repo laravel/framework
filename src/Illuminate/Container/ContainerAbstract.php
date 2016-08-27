@@ -25,7 +25,7 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
      * @param  string  $abstract
      * @return boolean
      */
-    public function isBinded($abstract)
+    public function isBound($abstract)
     {
         return is_string($abstract) && isset($this->bindings[$abstract]);
     }
@@ -50,10 +50,10 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
      */
     public function resolve($subject, array $parameters = [])
     {
-        if ($this->isBinded($subject)) {
-            return $this->resolveBinded($subject, $parameters);
+        if ($this->isBound($subject)) {
+            return $this->resolveBound($subject, $parameters);
         } else {
-            return $this->resolveNonBinded($subject, $parameters);
+            return $this->resolveNonBound($subject, $parameters);
         }
     }
 
@@ -64,7 +64,7 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
      * @param  array  $parameters
      * @return mixed
      */
-    public function resolveBinded($abstract, array $parameters = [])
+    public function resolveBound($abstract, array $parameters = [])
     {
         $bindingType = $this->bindings[$abstract][self::BINDING_TYPE];
 
@@ -84,7 +84,7 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
      * @param  array  $parameters
      * @return mixed
      */
-    public function resolveNonBinded($concrete, array $parameters = [])
+    public function resolveNonBound($concrete, array $parameters = [])
     {
         if (is_string($concrete) && strpos($concrete, '@')) {
             $parts = explode('@', $concrete, 2);

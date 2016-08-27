@@ -111,7 +111,7 @@ class Container extends ContainerAbstract implements ContainerContract
     {
         $abstract = self::normalize($abstract);
 
-        return (new ContainerAbstract())->resolveNonBinded($abstract, $parameters);
+        return (new ContainerAbstract())->resolveNonBound($abstract, $parameters);
     }
 
     /**
@@ -135,10 +135,10 @@ class Container extends ContainerAbstract implements ContainerContract
             $parameters = array_replace($contextualParameters, $parameters);
         }
 
-        if ($this->isBinded($abstract)) {
-            return $this->resolveBinded($abstract, $parameters);
+        if ($this->isBound($abstract)) {
+            return $this->resolveBound($abstract, $parameters);
         } else {
-            return $this->resolveNonBinded($abstract, $parameters);
+            return $this->resolveNonBound($abstract, $parameters);
         }
     }
 
@@ -149,7 +149,7 @@ class Container extends ContainerAbstract implements ContainerContract
      * @param  array  $parameters
      * @return mixed
      */
-    public function resolveBinded($abstract, array $parameters = [])
+    public function resolveBound($abstract, array $parameters = [])
     {
         $binding = $this->bindings[$abstract];
         $concrete = $binding[ContainerAbstract::VALUE];
@@ -161,7 +161,7 @@ class Container extends ContainerAbstract implements ContainerContract
             array_unshift($parameters, $this);
         }
 
-        $resolved = parent::resolveBinded($abstract, $parameters);
+        $resolved = parent::resolveBound($abstract, $parameters);
 
         $this->extendResolved($abstract, $resolved);
         $this->afterResolvingCallback($concrete, $resolved, $abstract);
@@ -176,13 +176,13 @@ class Container extends ContainerAbstract implements ContainerContract
      * @param  array  $parameters
      * @return mixed
      */
-    public function resolveNonBinded($concrete, array $parameters = [])
+    public function resolveNonBound($concrete, array $parameters = [])
     {
         if ($concrete instanceof Closure) {
             array_unshift($parameters, $this);
         }
 
-        $resolved = parent::resolveNonBinded($concrete, $parameters);
+        $resolved = parent::resolveNonBound($concrete, $parameters);
 
         $this->extendResolved($concrete, $resolved);
         $this->afterResolvingCallback($concrete, $resolved);
@@ -198,7 +198,7 @@ class Container extends ContainerAbstract implements ContainerContract
      */
     public function bound($abstract)
     {
-        return $this->isBinded(self::normalize($abstract));
+        return $this->isBound(self::normalize($abstract));
     }
 
     /**
