@@ -16,9 +16,8 @@ class Container extends ContainerAbstract implements ContainerContract
     /**
      * Register a binding with the container.
      *
-     * @param  string|array  $abstract
+     * @param  string|array          $abstract
      * @param  \Closure|string|null  $concrete
-     * @param  bool  $shared
      * @return void
      */
 	public function bind($abstract, $concrete = null)
@@ -37,9 +36,8 @@ class Container extends ContainerAbstract implements ContainerContract
     /**
      * Register a binding if it hasn't already been registered.
      *
-     * @param  string  $abstract
+     * @param  string                $abstract
      * @param  \Closure|string|null  $concrete
-     * @param  bool  $shared
      * @return void
      */
     public function bindIf($abstract, $concrete = null)
@@ -71,7 +69,7 @@ class Container extends ContainerAbstract implements ContainerContract
     /**
      * Register a shared binding in the container.
      *
-     * @param  string|array  $abstract
+     * @param  string|array          $abstract
      * @param  \Closure|string|null  $concrete
      * @return void
      */

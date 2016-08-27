@@ -12,7 +12,7 @@ trait EventsTrait
     /**
      * Register a new resolving callback.
      *
-     * @param  string    $abstract
+     * @param  string         $abstract
      * @param  \Closure|null  $callback
      * @return void
      */
@@ -24,7 +24,7 @@ trait EventsTrait
    /**
      * Register a new after resolving callback.
      *
-     * @param  string    $abstract
+     * @param  string         $abstract
      * @param  \Closure|null  $callback
      * @return void
      */

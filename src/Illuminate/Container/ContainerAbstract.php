@@ -44,7 +44,7 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
     /**
      * Resolve something (binded or not)
      *
-     * @param  mixed $subject
+     * @param  mixed  $subject
      * @param  array  $parameters
      * @return mixed
      */
@@ -98,7 +98,7 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
      * Bind a plain value
      *
      * @param  string $abstract
-     * @param  mixed $concrete
+     * @param  mixed  $concrete
      * @return void
      */
     public function bindPlain($abstract, $concrete)
@@ -115,7 +115,6 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
      *
      * @param  string $abstract
      * @param  mixed  $concrete
-     * @param  array  $parameters
      * @return void
      */
     public function bindService($abstract, $concrete)
@@ -132,7 +131,6 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
      *
      * @param  string $abstract
      * @param  mixed  $concrete
-     * @param  array  $parameters
      * @return void
      */
     public function bindSingleton($abstract, $concrete)
@@ -148,7 +146,6 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
      * Resolve a plain value from the container
      *
      * @param  string $abstract
-     * @param  array  $parameters
      * @return mixed
      */
     public function resolvePlain($abstract)

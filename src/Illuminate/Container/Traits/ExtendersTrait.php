@@ -49,7 +49,7 @@ trait ExtendersTrait
      * Extend a resolved subject
      *
      * @param  string $abstract
-     * @param  mixed &$resolved
+     * @param  mixed  &$resolved
      * @return void
      */
     private function extendResolved($abstract, &$resolved)

@@ -66,8 +66,8 @@ class ContainerResolver
     /**
      * Resolve a closure, function, method or a class
      *
-     * @param  string|array $subject
-     * @param  array  $parameters
+     * @param  string|array  $subject
+     * @param  array         $parameters
      * @return mixed
      */
     public function resolve($subject, array $parameters = [])
@@ -110,8 +110,8 @@ class ContainerResolver
     /**
      * Resolve a method
      *
-     * @param  string|array $subject
-     * @param  array  $parameters
+     * @param  string|array  $subject
+     * @param  array         $parameters
      * @return mixed
      */
     public function resolveMethod($method, array $parameters = [])
@@ -131,8 +131,8 @@ class ContainerResolver
     /**
      * Resolve a closure / function
      *
-     * @param  string|\Closure $subject
-     * @param  array  $parameters
+     * @param  string|\Closure  $subject
+     * @param  array            $parameters
      * @return mixed
      */
     public function resolveFunction($function, array $parameters = [])
@@ -152,8 +152,8 @@ class ContainerResolver
     /**
      * Resolve a parameter
      *
-     * @param  \ReflectionParameter $parameter
-     * @param  array               $parameters
+     * @param  \ReflectionParameter  $parameter
+     * @param  array                 $parameters
      * @return mixed
      */
     protected function resolveParameter(ReflectionParameter $parameter, array $parameters = [])

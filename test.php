@@ -74,10 +74,9 @@ function testPerf()
 $container = new Illuminate\Container\Container();
 // $container = new Illuminate\Container\ContainerOld();
 
+$container->bind("oauth_scopes", [
+	"user-email" => "User email",
+	"user-username" => "User username"
+]);
 
-$container->extend("Test@test", function($old) {
-	return $old . "bar";
-});
-
-dump($container->make([$container->make(Test::class), "test"]));
-
+dump($container->make("oauth_scopes"));
