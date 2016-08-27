@@ -277,6 +277,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     {
         $this->instance('path', $this->path());
         $this->instance('path.base', $this->basePath());
+        $this->instance('path.resources', $this->resourcesPath());
         $this->instance('path.lang', $this->langPath());
         $this->instance('path.config', $this->configPath());
         $this->instance('path.public', $this->publicPath());
@@ -351,13 +352,23 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     }
 
     /**
+     * Get the path to the resources folder.
+     *
+     * @return string
+     */
+    public function resourcesPath()
+    {
+        return $this->basePath.DIRECTORY_SEPARATOR.'resources';
+    }
+
+    /**
      * Get the path to the language files.
      *
      * @return string
      */
     public function langPath()
     {
-        return $this->basePath.DIRECTORY_SEPARATOR.'resources'.DIRECTORY_SEPARATOR.'lang';
+        return $this->resourcesPath().DIRECTORY_SEPARATOR.'lang';
     }
 
     /**
