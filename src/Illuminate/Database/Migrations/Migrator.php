@@ -205,6 +205,7 @@ class Migrator
 
             foreach ($migrations as $migration) {
                 $migration = (object) $migration;
+
                 $rolledBack[] = $files[$migration->migration];
 
                 $this->runDown(
