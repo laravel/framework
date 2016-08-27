@@ -119,7 +119,7 @@ class Container extends ContainerAbstract implements ContainerContract
     /**
      * Intercept the resolve call to add some features
      *
-     * @param  mixed $abstract
+     * @param  mixed  $abstract
      * @param  array  $parameters
      * @return mixed
      */

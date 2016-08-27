@@ -14,9 +14,8 @@ class ContainerAbstract extends ContainerResolver implements ArrayAccess
     const TYPE_SINGLETON = 2;
 
     const VALUE = 0;
-    const PARAMETERS = 1;
-    const IS_RESOLVED = 2;
-    const BINDING_TYPE = 3;
+    const IS_RESOLVED = 1;
+    const BINDING_TYPE = 2;
 
 	protected $bindings = [];
 
