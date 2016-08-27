@@ -1,5 +1,22 @@
 # Release Notes for 5.3.x
 
+## v5.3.4 (2016-08-26)
+
+### Added
+- Added ability to set from address for email notifications ([#15055](https://github.com/laravel/framework/pull/15055))
+
+### Changed
+- Support implicit keys in `MessageBag::get()` ([#15063](https://github.com/laravel/framework/pull/15063))
+- Allow passing of closures to `assertViewHas()` ([#15074](https://github.com/laravel/framework/pull/15074))
+- Strip protocol from Route group domains parameters ([#15070](https://github.com/laravel/framework/pull/15070))
+- Support dot notation as callback in `Arr::sort()` ([#15050](https://github.com/laravel/framework/pull/15050))
+- Use Redis database interface instead of implementation ([#15041](https://github.com/laravel/framework/pull/15041))
+- Allow closure middleware to be registered from the controller constructor ([#15080](https://github.com/laravel/framework/pull/15080), [abd85c9](https://github.com/laravel/framework/commit/abd85c916df0cc0a6dc55de943a39db8b7eb4e0d))
+
+### Fixed
+- Fixed plural form of Emoji ([#15068](https://github.com/laravel/framework/pull/15068))
+
+
 ## v5.3.3 (2016-08-26)
 
 ### Fixed
