@@ -474,6 +474,27 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidationStopsAtFailedPresenceCheck()
+    {
+        $trans = $this->getRealTranslator();
+
+        $v = new Validator($trans, ['name' => null], ['name' => 'Required|string']);
+        $v->passes();
+        $this->assertEquals(['validation.required'], $v->errors()->get('name'));
+
+        $v = new Validator($trans, ['name' => null, 'email' => 'email'], ['name' => 'required_with:email|string']);
+        $v->passes();
+        $this->assertEquals(['validation.required_with'], $v->errors()->get('name'));
+
+        $v = new Validator($trans, ['name' => null, 'email' => ''], ['name' => 'required_with:email|string']);
+        $v->passes();
+        $this->assertEquals(['validation.string'], $v->errors()->get('name'));
+
+        $v = new Validator($trans, [], ['name' => 'present|string']);
+        $v->passes();
+        $this->assertEquals(['validation.present'], $v->errors()->get('name'));
+    }
+
     public function testValidatePresent()
     {
         $trans = $this->getRealTranslator();
