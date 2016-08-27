@@ -3,6 +3,7 @@
 use Mockery as m;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Connectors\ConnectionFactory;
 
 class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase
 {
@@ -46,9 +47,9 @@ class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase
     public function testSingleConnectionNotCreatedUntilNeeded()
     {
         $connection = $this->db->connection();
-        $pdo = new \ReflectionProperty(get_class($connection), 'pdo');
+        $pdo = new ReflectionProperty(get_class($connection), 'pdo');
         $pdo->setAccessible(true);
-        $readPdo = new \ReflectionProperty(get_class($connection), 'readPdo');
+        $readPdo = new ReflectionProperty(get_class($connection), 'readPdo');
         $readPdo->setAccessible(true);
 
         $this->assertNotInstanceOf('PDO', $pdo->getValue($connection));
@@ -58,9 +59,9 @@ class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase
     public function testReadWriteConnectionsNotCreatedUntilNeeded()
     {
         $connection = $this->db->connection('read_write');
-        $pdo = new \ReflectionProperty(get_class($connection), 'pdo');
+        $pdo = new ReflectionProperty(get_class($connection), 'pdo');
         $pdo->setAccessible(true);
-        $readPdo = new \ReflectionProperty(get_class($connection), 'readPdo');
+        $readPdo = new ReflectionProperty(get_class($connection), 'readPdo');
         $readPdo->setAccessible(true);
 
         $this->assertNotInstanceOf('PDO', $pdo->getValue($connection));
@@ -72,7 +73,7 @@ class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase
      */
     public function testIfDriverIsntSetExceptionIsThrown()
     {
-        $factory = new Illuminate\Database\Connectors\ConnectionFactory($container = m::mock('Illuminate\Container\Container'));
+        $factory = new ConnectionFactory($container = m::mock('Illuminate\Container\Container'));
         $factory->createConnector(['foo']);
     }
 
@@ -81,14 +82,14 @@ class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase
      */
     public function testExceptionIsThrownOnUnsupportedDriver()
     {
-        $factory = new Illuminate\Database\Connectors\ConnectionFactory($container = m::mock('Illuminate\Container\Container'));
+        $factory = new ConnectionFactory($container = m::mock('Illuminate\Container\Container'));
         $container->shouldReceive('bound')->once()->andReturn(false);
         $factory->createConnector(['driver' => 'foo']);
     }
 
     public function testCustomConnectorsCanBeResolvedViaContainer()
     {
-        $factory = new Illuminate\Database\Connectors\ConnectionFactory($container = m::mock('Illuminate\Container\Container'));
+        $factory = new ConnectionFactory($container = m::mock('Illuminate\Container\Container'));
         $container->shouldReceive('bound')->once()->with('db.connector.foo')->andReturn(true);
         $container->shouldReceive('make')->once()->with('db.connector.foo')->andReturn('connector');
 
