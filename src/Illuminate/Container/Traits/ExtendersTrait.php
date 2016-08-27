@@ -63,8 +63,7 @@ trait ExtendersTrait
         foreach ($this->extenders[$abstract] as $extender) {
             $resolved = $this->extendConcrete($resolved, $extender);
         }
-
-        if ($binding[ContainerAbstract::BINDING_TYPE] !== ContainerAbstract::TYPE_SERVICE) {
+        if ($binding && $binding[ContainerAbstract::BINDING_TYPE] !== ContainerAbstract::TYPE_SERVICE) {
             unset($this->extenders[$abstract]);
 
             $this->bindings[$abstract][ContainerAbstract::VALUE] = $resolved;
