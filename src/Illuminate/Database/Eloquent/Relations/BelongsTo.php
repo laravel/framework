@@ -10,6 +10,13 @@ use Illuminate\Database\Eloquent\Collection;
 class BelongsTo extends Relation
 {
     /**
+     * Whether the foreign key(s) on the applied constraints were null.
+     *
+     * @var bool
+     */
+    protected $constraintsMatchNone = false;
+
+    /**
      * The foreign key of the parent model.
      *
      * @var string
@@ -63,7 +70,25 @@ class BelongsTo extends Relation
      */
     public function getResults()
     {
+        if ($this->constraintsMatchNone) {
+            return;
+        }
+
         return $this->query->first();
+    }
+
+    /**
+     * Get the relationship for eager loading.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getEager()
+    {
+        if ($this->constraintsMatchNone) {
+            return $this->query->getModel()->newCollection();
+        }
+
+        return parent::getEager();
     }
 
     /**
@@ -78,8 +103,13 @@ class BelongsTo extends Relation
             // or has many relationships, we need to actually query on the primary key
             // of the related models matching on the foreign key that's on a parent.
             $table = $this->related->getTable();
+            $foreignKey = $this->parent->{$this->foreignKey};
 
-            $this->query->where($table.'.'.$this->otherKey, '=', $this->parent->{$this->foreignKey});
+            $this->query->where($table.'.'.$this->otherKey, '=', $foreignKey);
+
+            if (is_null($foreignKey)) {
+                $this->constraintsMatchNone = true;
+            }
         }
     }
 
@@ -147,8 +177,17 @@ class BelongsTo extends Relation
         // a non-standard name and not "id". We will then construct the constraint for
         // our eagerly loading query so it returns the proper models from execution.
         $key = $this->related->getTable().'.'.$this->otherKey;
+        $keys = $this->getEagerModelKeys($models);
 
-        $this->query->whereIn($key, $this->getEagerModelKeys($models));
+        // If there are no keys we will just set it to an array with either null or 0
+        // (depending on if incrementing keys are in use) so the query won't fail and
+        // will return zero results, which should be what the developer expects.
+        if (count($keys) === 0) {
+            $keys = [$this->related->getIncrementing() ? 0 : null];
+            $this->constraintsMatchNone = true;
+        }
+
+        $this->query->whereIn($key, $keys);
     }
 
     /**
@@ -168,13 +207,6 @@ class BelongsTo extends Relation
             if (! is_null($value = $model->{$this->foreignKey})) {
                 $keys[] = $value;
             }
-        }
-
-        // If there are no keys that were not null we will just return an array with either
-        // null or 0 in (depending on if incrementing keys are in use) so the query wont
-        // fail plus returns zero results, which should be what the developer expects.
-        if (count($keys) === 0) {
-            return [$this->related->getIncrementing() ? 0 : null];
         }
 
         return array_values(array_unique($keys));

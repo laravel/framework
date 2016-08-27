@@ -60,7 +60,7 @@ class DatabaseEloquentBelongsToTest extends PHPUnit_Framework_TestCase
     public function testAssociateMethodSetsForeignKeyOnModel()
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model');
-        $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
+        $parent->shouldReceive('getAttribute')->twice()->with('foreign_key')->andReturn('foreign.value');
         $relation = $this->getRelation($parent);
         $associate = m::mock('Illuminate\Database\Eloquent\Model');
         $associate->shouldReceive('getAttribute')->once()->with('id')->andReturn(1);
@@ -73,7 +73,7 @@ class DatabaseEloquentBelongsToTest extends PHPUnit_Framework_TestCase
     public function testDissociateMethodUnsetsForeignKeyOnModel()
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model');
-        $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
+        $parent->shouldReceive('getAttribute')->twice()->with('foreign_key')->andReturn('foreign.value');
         $relation = $this->getRelation($parent);
         $parent->shouldReceive('setAttribute')->once()->with('foreign_key', null);
         $parent->shouldReceive('setRelation')->once()->with('relation', null);
@@ -83,7 +83,7 @@ class DatabaseEloquentBelongsToTest extends PHPUnit_Framework_TestCase
     public function testAssociateMethodSetsForeignKeyOnModelById()
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model');
-        $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
+        $parent->shouldReceive('getAttribute')->twice()->with('foreign_key')->andReturn('foreign.value');
         $relation = $this->getRelation($parent);
         $parent->shouldReceive('setAttribute')->once()->with('foreign_key', 1);
         $relation->associate(1);
@@ -105,17 +105,33 @@ class DatabaseEloquentBelongsToTest extends PHPUnit_Framework_TestCase
         $relation->addEagerConstraints($models);
     }
 
+    public function testQueryNotRunWhenForeignKeyNull()
+    {
+        $relation = $this->getRelation(new MissingEloquentBelongsToModelStub());
+        $relation->getQuery()->shouldNotReceive('first');
+
+        $this->assertNull($relation->getResults());
+
+        $relation = $this->getRelation(new MissingEloquentBelongsToModelStub());
+        $relation->getQuery()->getModel()->shouldReceive('newCollection')->andReturn(new Collection());
+        $relation->getQuery()->shouldReceive('whereIn')->once();
+        $relation->getQuery()->shouldNotReceive('get');
+        $relation->addEagerConstraints([new MissingEloquentBelongsToModelStub(), new MissingEloquentBelongsToModelStub()]);
+
+        $this->assertTrue($relation->getEager()->isEmpty());
+    }
+
     protected function getRelation($parent = null, $incrementing = true)
     {
+        $parent = $parent ?: new EloquentBelongsToModelStub;
         $builder = m::mock('Illuminate\Database\Eloquent\Builder');
-        $builder->shouldReceive('where')->with('relation.id', '=', 'foreign.value');
+        $builder->shouldReceive('where')->with('relation.id', '=', $parent->foreign_key);
         $related = m::mock('Illuminate\Database\Eloquent\Model');
         $related->incrementing = $incrementing;
         $related->shouldReceive('getIncrementing')->andReturn($incrementing);
         $related->shouldReceive('getKeyName')->andReturn('id');
         $related->shouldReceive('getTable')->andReturn('relation');
         $builder->shouldReceive('getModel')->andReturn($related);
-        $parent = $parent ?: new EloquentBelongsToModelStub;
 
         return new BelongsTo($builder, $parent, 'foreign_key', 'id', 'relation');
     }
