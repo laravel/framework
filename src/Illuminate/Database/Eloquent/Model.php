@@ -3218,9 +3218,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $original = $this->original[$key];
 
         if ((is_null($current) && ! is_null($original)) ||
-            (is_null($original) && ! is_null($current))) {
-                return false;
-            }
+                    (is_null($original) && ! is_null($current))) {
+            return false;
+        }
 
         $current = new Carbon($current);
         $original = new Carbon($original);
