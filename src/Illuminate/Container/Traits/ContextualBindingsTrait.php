@@ -4,6 +4,7 @@ namespace Illuminate\Container\Traits;
 
 use Closure;
 use ReflectionClass;
+use Illuminate\Container\ContainerAbstract;
 use Illuminate\Container\ContainerResolver;
 use Illuminate\Contracts\Container\BindingResolutionException as Exception;
 
@@ -25,7 +26,7 @@ trait ContextualBindingsTrait
         $this->abstract = self::normalize($abstract);
 
         if (isset($this->bindings[$this->abstract])) {
-            $this->concrete = $this->bindings[$this->abstract][ContainerResolver::VALUE];
+            $this->concrete = $this->bindings[$this->abstract][ContainerAbstract::VALUE];
         } else if (strpos($abstract, '@')) {
             $this->concrete = explode('@', $abstract, 2);
         } else {
