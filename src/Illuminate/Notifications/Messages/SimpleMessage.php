@@ -21,8 +21,7 @@ class SimpleMessage
     public $subject;
 
     /**
-     * Greeting at the beginning of the notification.
-     * If null, a greeting depending on the level will be displayed.
+     * The notification's greeting.
      *
      * @var string|null
      */
