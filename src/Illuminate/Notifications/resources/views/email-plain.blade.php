@@ -1,4 +1,4 @@
-{{ $level == 'error' ? 'Whoops!' : 'Hello!' }}
+{{ ( $greeting !== null ) ? $greeting : ($level == 'error' ? 'Whoops!' : 'Hello!') }}
 
 <?php
 
