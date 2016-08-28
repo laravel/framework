@@ -68,9 +68,9 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
 
             foreach ($channels as $channel) {
                 $notification = clone $original;
-                
+
                 $notification->id = $notificationId;
-            
+
                 if (! $this->shouldSendNotification($notifiable, $notification, $channel)) {
                     continue;
                 }
