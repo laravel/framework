@@ -1,4 +1,11 @@
-{{ $level == 'error' ? 'Whoops!' : 'Hello!' }}
+<?php
+if ($greeting !== null) {
+    echo e($greeting);
+} else {
+    echo $level == 'error' ? 'Whoops!' : 'Hello!';
+}
+
+?>
 
 <?php
 
