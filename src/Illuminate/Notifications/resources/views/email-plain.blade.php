@@ -1,8 +1,8 @@
 <?php
 if( $greeting !== null ) {
-	echo e($greeting);
+    echo e($greeting);
 } else {
-	echo $level == 'error' ? 'Whoops!' : 'Hello!';
+    echo $level == 'error' ? 'Whoops!' : 'Hello!';
 }
 
 ?>
