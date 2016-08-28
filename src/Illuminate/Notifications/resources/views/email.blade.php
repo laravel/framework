@@ -84,10 +84,14 @@ $style = [
                                     <td style="{{ $fontFamily }} {{ $style['email-body_cell'] }}">
                                         <!-- Greeting -->
                                         <h1 style="{{ $style['header-1'] }}">
-                                            @if ($level == 'error')
-                                                Whoops!
+                                            @if ($greeting !== null)
+                                                {{ $greeting }}
                                             @else
-                                                Hello!
+                                                @if ($level == 'error')
+                                                    Whoops!
+                                                @else
+                                                    Hello!
+                                                @endif
                                             @endif
                                         </h1>
 
