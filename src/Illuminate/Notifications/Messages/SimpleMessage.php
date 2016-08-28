@@ -22,7 +22,6 @@ class SimpleMessage
 
     /**
      * Greeting at the beginning of the notification.
-     * 
      * If null, a greeting depending on the level will be displayed.
      *
      * @var string|null
