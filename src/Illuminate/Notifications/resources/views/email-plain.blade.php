@@ -5,10 +5,6 @@ if ($greeting !== null) {
     echo $level == 'error' ? 'Whoops!' : 'Hello!';
 }
 
-?>
-
-<?php
-
 if (! empty($introLines)) {
     echo implode("\r\n", $introLines), "\r\n\r\n";
 }
@@ -20,7 +16,7 @@ if (isset($actionText)) {
 if (! empty($outroLines)) {
     echo implode("\r\n", $outroLines), "\r\n\r\n";
 }
-
 ?>
+
 Regards,
 {{ config('app.name') }}
