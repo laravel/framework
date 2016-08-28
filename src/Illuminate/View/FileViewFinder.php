@@ -160,7 +160,8 @@ class FileViewFinder implements ViewFinderInterface
     {
         $this->paths[] = $location;
     }
-     /**
+
+    /**
      * Prepend a location to the finder.
      *
      * @param  string  $location
