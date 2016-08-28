@@ -1,5 +1,5 @@
 <?php
-if ( $greeting !== null ) {
+if ($greeting !== null) {
     echo e($greeting);
 } else {
     echo $level == 'error' ? 'Whoops!' : 'Hello!';
