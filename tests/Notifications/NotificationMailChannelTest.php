@@ -181,6 +181,35 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
 
         $channel->send($notifiable, $notification);
     }
+
+    public function testMessageWithToAddress()
+    {
+        $notification = new NotificationMailChannelTestNotificationWithToAddress;
+        $notifiable = new NotificationMailChannelTestNotifiable;
+
+        $message = $notification->toMail($notifiable);
+        $data = $message->toArray();
+
+        $channel = new Illuminate\Notifications\Channels\MailChannel(
+            $mailer = Mockery::mock(Illuminate\Contracts\Mail\Mailer::class)
+        );
+
+        $views = ['notifications::email', 'notifications::email-plain'];
+
+        $mailer->shouldReceive('send')->with($views, $data, Mockery::on(function ($closure) {
+            $mock = Mockery::mock('Illuminate\Mailer\Message');
+
+            $mock->shouldReceive('subject')->once();
+
+            $mock->shouldReceive('to')->once()->with('jeffrey@laracasts.com');
+
+            $closure($mock);
+
+            return true;
+        }));
+
+        $channel->send($notifiable, $notification);
+    }
 }
 
 class NotificationMailChannelTestNotifiable
@@ -232,5 +261,14 @@ class NotificationMailChannelTestNotificationWithFromAddressNoName extends Notif
     {
         return (new MailMessage)
             ->from('test@mail.com');
+    }
+}
+
+class NotificationMailChannelTestNotificationWithToAddress extends Notification
+{
+    public function toMail($notifiable)
+    {
+        return (new MailMessage)
+            ->to('jeffrey@laracasts.com');
     }
 }
