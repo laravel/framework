@@ -309,7 +309,7 @@ boom
         $string = '@unless (name(foo(bar)))
 breeze
 @endunless';
-        $expected = '<?php if ( ! (name(foo(bar)))): ?>
+        $expected = '<?php if (! (name(foo(bar)))): ?>
 breeze
 <?php endif; ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
@@ -325,7 +325,7 @@ boom
 @endif';
         $expected = '<?php if(name(foo(bar))): ?>
 breeze
-<?php elseif ( ! (boom(breeze))): ?>
+<?php elseif (! (boom(breeze))): ?>
 boom
 <?php endif; ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
