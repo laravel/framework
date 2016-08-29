@@ -134,6 +134,46 @@ if (! function_exists('asset')) {
     }
 }
 
+if (!function_exists('css')) {
+    /**
+     * Generate an external style sheet form/url.
+     *
+     * @param $path
+     * @param bool $min
+     * @param bool $get_url
+     * @return mixed
+     * @internal param mixed $object
+     */
+
+    function css($path, $min = false, $get_url = false)
+    {
+        $url = asset('/css/' . $path . $min ? '.min' : '' . '.css', null, false);
+
+        return $get_url ? $url :  '<link type="text/css" href="' . $url . '" rel="stylesheet">';
+    }
+}
+
+
+if (!function_exists('js')) {
+    /**
+     * Generate an external script file form/url.
+     *
+     * @param $path
+     * @param bool $min
+     * @param bool $get_url
+     * @return mixed
+     * @internal param mixed $object
+     */
+
+    function js($path, $min = false, $get_url = false)
+    {
+        $url = asset('/js/' . $path. $min ? '.min' : '' . '.js', null, false);
+
+        return $get_url ? $url : '<script src="' . $url . '" type="text/javascript"></script>';
+    }
+}
+
+
 if (! function_exists('auth')) {
     /**
      * Get the available auth instance.
