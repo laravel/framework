@@ -70,6 +70,16 @@ class HandleExceptions {
 	 */
 	public function handleException($e)
 	{
+		if (!$e instanceof Exception) {
+	   		$e = new ErrorException(
+		 		$e->getMessage(),
+		   		$e->getCode(),
+		   		E_ERROR,
+		   		$e->getFile(),
+		   		$e->getLine()
+   			);
+	   	}
+
 		$this->getExceptionHandler()->report($e);
 
 		if ($this->app->runningInConsole())
