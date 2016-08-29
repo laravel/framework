@@ -751,18 +751,23 @@ class Validator implements ValidatorContract
     }
 
     /**
-     * Stop on error if "bail" rule is assigned and attribute has a message.
+     * Check if we should stop further validations on a given attribute.
      *
      * @param  string  $attribute
      * @return bool
      */
     protected function shouldStopValidating($attribute)
     {
-        if (! $this->hasRule($attribute, ['Bail'])) {
-            return false;
+        if ($this->hasRule($attribute, ['Bail'])) {
+            return $this->messages->has($attribute);
         }
 
-        return $this->messages->has($attribute);
+        // In case the attribute has any rule that indicates that the field is required
+        // and that rule already failed then we should stop validation at this point
+        // as now there is no point in calling other rules with this field empty.
+        return $this->hasRule($attribute, $this->implicitRules) &&
+               isset($this->failedRules[$attribute]) &&
+               array_intersect(array_keys($this->failedRules[$attribute]), $this->implicitRules);
     }
 
     /**
