@@ -389,7 +389,7 @@ class Builder
      * @param  int  $count
      * @param  callable  $callback
      * @param  string  $column
-     * @param  string  $alias  Alias of the ID column if there are multiple columns with the same name. The alias must be defined in a select statement.
+     * @param  string  $alias
      * @return bool
      */
     public function chunkById($count, callable $callback, $column = null, $alias = null)
