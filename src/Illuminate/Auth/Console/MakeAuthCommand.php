@@ -49,10 +49,16 @@ class MakeAuthCommand extends Command
         $this->exportViews();
 
         if (! $this->option('views')) {
-            file_put_contents(
-                app_path('Http/Controllers/HomeController.php'),
-                $this->compileControllerStub()
-            );
+            $erase = true;
+            if (is_file(app_path('Http/Controllers/HomeController.php'))) {
+                $erase = $this->confirm('HomeController already exists, shall we replace it?', true);
+            }
+            if ($erase) {
+                file_put_contents(
+                    app_path('Http/Controllers/HomeController.php'),
+                    $this->compileControllerStub()
+                );
+            }
 
             file_put_contents(
                 base_path('routes/web.php'),
