@@ -1950,11 +1950,11 @@ class Builder
      * Retrieve the sum of the values of a given column.
      *
      * @param  string  $column
-     * @return mixed
+     * @return float
      */
     public function sum($column)
     {
-        return $this->aggregate(__FUNCTION__, [$column]);
+        return $this->numericAggregate(__FUNCTION__, [$column]);
     }
 
     /**
