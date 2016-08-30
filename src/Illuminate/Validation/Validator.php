@@ -150,6 +150,13 @@ class Validator implements ValidatorContract
     protected $sizeRules = ['Size', 'Between', 'Min', 'Max'];
 
     /**
+     * The validation rules that work with files.
+     *
+     * @var array
+     */
+    protected $fileRules = ['File', 'Image', 'Mimes', 'Mimetypes', 'Min', 'Max', 'Size', 'Between', 'Dimensions'];
+
+    /**
      * The numeric related validation rules.
      *
      * @var array
@@ -518,6 +525,15 @@ class Validator implements ValidatorContract
         // that the attribute is required, rules are not run for missing values.
         $value = $this->getValue($attribute);
 
+        if (
+            $value instanceof UploadedFile &&
+            ! $value->isValid() &&
+            $this->hasRule($attribute, array_merge($this->fileRules, $this->implicitRules))
+        ) {
+            return $this->addFailure($attribute, 'file_uploaded', []);
+        }
+
+
         $validatable = $this->isValidatable($rule, $attribute, $value);
 
         $method = "validate{$rule}";
@@ -760,6 +776,10 @@ class Validator implements ValidatorContract
     {
         if ($this->hasRule($attribute, ['Bail'])) {
             return $this->messages->has($attribute);
+        }
+
+        if (isset($this->failedRules[$attribute]) && in_array('file_uploaded', array_keys($this->failedRules[$attribute]))) {
+            return true;
         }
 
         // In case the attribute has any rule that indicates that the field is required
