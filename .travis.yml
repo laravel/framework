@@ -19,6 +19,7 @@ matrix:
 sudo: false
 
 services:
+  - memcached
   - redis-server
 
 before_install:
