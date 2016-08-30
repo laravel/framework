@@ -513,7 +513,18 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileUnless($expression)
     {
-        return "<?php if ( ! $expression): ?>";
+        return "<?php if (! $expression): ?>";
+    }
+
+    /**
+     * Compile the else-unless statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileElseunless($expression)
+    {
+        return "<?php elseif (! $expression): ?>";
     }
 
     /**
