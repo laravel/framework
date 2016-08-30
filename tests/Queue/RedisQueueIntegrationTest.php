@@ -1,10 +1,10 @@
 <?php
 
 use Mockery as m;
-use Illuminate\Redis\Database;
 use Illuminate\Queue\RedisQueue;
 use Illuminate\Container\Container;
 use Illuminate\Queue\Jobs\RedisJob;
+use Illuminate\Redis\PredisDatabase;
 
 class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
 {
@@ -36,7 +36,7 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
             return;
         }
 
-        $this->redis = new Database([
+        $this->redis = new PredisDatabase([
             'cluster' => false,
             'default' => [
                 'host' => $host,
