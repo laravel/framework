@@ -4,6 +4,9 @@ namespace Illuminate\Support\Facades;
 
 /**
  * @see \Illuminate\Redis\Database
+ * @see \Illuminate\Redis\PredisDatabase
+ * @see \Illuminate\Redis\PhpRedisDatabase
+ * @see \Illuminate\Contracts\Redis\Database
  */
 class Redis extends Facade
 {
