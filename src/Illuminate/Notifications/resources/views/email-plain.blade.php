@@ -1,19 +1,22 @@
-{{ $level == 'error' ? 'Whoops!' : 'Hello!' }}
-
 <?php
 
+if (! empty($greeting)) {
+    echo $greeting, "\n\n";
+} else {
+    echo $level == 'error' ? 'Whoops!' : 'Hello!', "\n\n";
+}
+
 if (! empty($introLines)) {
-    echo implode("\r\n", $introLines), "\r\n\r\n";
+    echo implode("\n", $introLines), "\n\n";
 }
 
 if (isset($actionText)) {
-    echo "{$actionText}: {$actionUrl}\r\n\r\n";
+    echo "{$actionText}: {$actionUrl}", "\n\n";
 }
 
 if (! empty($outroLines)) {
-    echo implode("\r\n", $outroLines), "\r\n\r\n";
+    echo implode("\n", $outroLines), "\n\n";
 }
 
-?>
-Regards,
-{{ config('app.name') }}
+echo 'Regards,', "\n";
+echo config('app.name'), "\n";
