@@ -386,6 +386,7 @@ class Str
 
         if (! ctype_lower($value)) {
             $value = self::normalizeScreamingCase($value);
+            $value = trim($value);
             $value = static::lower(preg_replace('/(.)(?=[A-Z])/u', '$1'.$delimiter, $value));
             $value = preg_replace('/[_\s-]+/', $delimiter, $value);
         }
