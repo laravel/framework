@@ -501,7 +501,7 @@ if (! function_exists('dd')) {
 
 if (! function_exists('e')) {
     /**
-     * Escape HTML entities in a string.
+     * Escape HTML special characters in a string.
      *
      * @param  \Illuminate\Contracts\Support\Htmlable|string  $value
      * @return string
@@ -512,7 +512,7 @@ if (! function_exists('e')) {
             return $value->toHtml();
         }
 
-        return htmlentities($value, ENT_QUOTES, 'UTF-8', false);
+        return htmlspecialchars($value, ENT_QUOTES, 'UTF-8', false);
     }
 }
 
