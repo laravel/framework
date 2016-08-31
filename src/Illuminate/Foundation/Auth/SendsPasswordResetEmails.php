@@ -16,7 +16,7 @@ trait SendsPasswordResetEmails
     {
         return property_exists($this, 'linkRequestFormViewName') ? $this->linkRequestFormViewName : 'auth.passwords.email';
     }
-    
+
     /**
      * Display the form to request a password reset link.
      *
