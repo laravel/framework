@@ -2,10 +2,10 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Illuminate\Http\Request;
-use Illuminate\Contracts\View\View;
 use PHPUnit_Framework_Assert as PHPUnit;
 use PHPUnit_Framework_ExpectationFailedException;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
@@ -286,7 +286,7 @@ trait MakesHttpRequests
             return $this->seeJson();
         }
 
-        if (! $responseData) {
+        if (!$responseData) {
             $responseData = json_decode($this->response->getContent(), true);
         }
 
@@ -328,7 +328,7 @@ trait MakesHttpRequests
 
             $this->{$method}(
                 Str::contains($actual, $expected),
-                ($negate ? 'Found unexpected' : 'Unable to find').' JSON fragment'.PHP_EOL."[{$expected}]".PHP_EOL.'within'.PHP_EOL."[{$actual}]."
+                ($negate ? 'Found unexpected' : 'Unable to find') . ' JSON fragment' . PHP_EOL . "[{$expected}]" . PHP_EOL . 'within' . PHP_EOL . "[{$actual}]."
             );
         }
 
@@ -412,7 +412,7 @@ trait MakesHttpRequests
 
         $this->assertTrue($headers->has($headerName), "Header [{$headerName}] not present on response.");
 
-        if (! is_null($value)) {
+        if (!is_null($value)) {
             $this->assertEquals(
                 $headers->get($headerName), $value,
                 "Header [{$headerName}] was found, but value [{$headers->get($headerName)}] does not match [{$value}]."
@@ -457,14 +457,14 @@ trait MakesHttpRequests
 
         $this->assertTrue($exist, "Cookie [{$cookieName}] not present on response.");
 
-        if (! $exist || is_null($value)) {
+        if (!$exist || is_null($value)) {
             return $this;
         }
 
         $cookieValue = $cookie->getValue();
 
         $actual = $encrypted
-            ? $this->app['encrypter']->decrypt($cookieValue) : $cookieValue;
+        ? $this->app['encrypter']->decrypt($cookieValue) : $cookieValue;
 
         $this->assertEquals(
             $actual, $value,
@@ -590,8 +590,8 @@ trait MakesHttpRequests
             $uri = substr($uri, 1);
         }
 
-        if (! Str::startsWith($uri, 'http')) {
-            $uri = $this->baseUrl.'/'.$uri;
+        if (!Str::startsWith($uri, 'http')) {
+            $uri = $this->baseUrl . '/' . $uri;
         }
 
         return trim($uri, '/');
@@ -611,8 +611,8 @@ trait MakesHttpRequests
         foreach ($headers as $name => $value) {
             $name = strtr(strtoupper($name), '-', '_');
 
-            if (! Str::startsWith($name, $prefix) && $name != 'CONTENT_TYPE') {
-                $name = $prefix.$name;
+            if (!Str::startsWith($name, $prefix) && $name != 'CONTENT_TYPE') {
+                $name = $prefix . $name;
             }
 
             $server[$name] = $value;
@@ -650,6 +650,17 @@ trait MakesHttpRequests
         return $this;
     }
 
+    public function assertViewIs(string $name)
+    {
+        if (!isset($this->response->original) || !$this->response->original instanceof View) {
+            return PHPUnit::assertTrue(false, 'The response was not a view.');
+        }
+
+        PHPUnit::assertEquals($name, $this->response->original->getName());
+
+        return $this;
+    }
+
     /**
      * Assert that the response view has a given piece of bound data.
      *
@@ -663,7 +674,7 @@ trait MakesHttpRequests
             return $this->assertViewHasAll($key);
         }
 
-        if (! isset($this->response->original) || ! $this->response->original instanceof View) {
+        if (!isset($this->response->original) || !$this->response->original instanceof View) {
             return PHPUnit::assertTrue(false, 'The response was not a view.');
         }
 
@@ -705,7 +716,7 @@ trait MakesHttpRequests
      */
     public function assertViewMissing($key)
     {
-        if (! isset($this->response->original) || ! $this->response->original instanceof View) {
+        if (!isset($this->response->original) || !$this->response->original instanceof View) {
             return PHPUnit::assertTrue(false, 'The response was not a view.');
         }
 
