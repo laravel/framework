@@ -47,7 +47,7 @@ class ClosureRule extends Rule
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isImplicit()
     {

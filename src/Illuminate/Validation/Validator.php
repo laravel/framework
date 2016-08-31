@@ -365,8 +365,6 @@ class Validator implements ValidatorContract
         if (array_key_exists($rule, $this->availableRules)) {
             return $this->availableRules[$rule];
         }
-
-        return;
     }
 
     /**
@@ -501,8 +499,6 @@ class Validator implements ValidatorContract
         if (array_key_exists($attribute, $this->attributesExplicitMap)) {
             return $this->attributesExplicitMap[$attribute];
         }
-
-        return;
     }
 
     public function getRuleParameters($rule, $attribute)
@@ -579,12 +575,11 @@ class Validator implements ValidatorContract
      */
     protected function isValidatable(Rule $rule, $attribute, $value)
     {
-        return (
+        return
             $this->presentOrIsImplicit($rule, $attribute, $value) &&
             $this->passesOptionalCheck($attribute) &&
             $this->isNotNullIfMarkedAsNullable($attribute, $value) &&
-            $this->hasNotFailedPreviousRuleIfPresenceRule($rule, $attribute)
-        );
+            $this->hasNotFailedPreviousRuleIfPresenceRule($rule, $attribute);
     }
 
     /**

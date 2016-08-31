@@ -19,7 +19,7 @@ class SizeRule extends Rule
     public function mapParameters($parameters)
     {
         return [
-            'size' => array_shift($parameters)
+            'size' => array_shift($parameters),
         ];
     }
 

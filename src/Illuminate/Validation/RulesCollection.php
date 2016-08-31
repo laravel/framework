@@ -2,16 +2,12 @@
 
 namespace Illuminate\Validation;
 
-use Illuminate\Contracts\Validation\Validator as ValidatorContract;
-use Illuminate\Contracts\Validation\Rule as RuleContract;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rules\ClosureRule;
 
 class RulesCollection
 {
     /**
-     * Rules in {rule} => {parameters} format
+     * Rules in {rule} => {parameters} format.
      *
      * @var array
      */
@@ -44,7 +40,7 @@ class RulesCollection
             if (is_int($rule)) {
                 if (is_string($params)) {
                     list($rule, $params) = $this->parseStringRule($params);
-                } else if (is_array($params)) {
+                } elseif (is_array($params)) {
                     $rule = array_shift($params);
                     $params = $params;
                 }
@@ -99,7 +95,7 @@ class RulesCollection
     }
 
     /**
-     * Merge new rules with current ones
+     * Merge new rules with current ones.
      * @param  array|string $rules rules to be parsed. Either array or string format
      * @return self
      */
@@ -111,10 +107,10 @@ class RulesCollection
     }
 
     /**
-     * Check if collection has given rule
+     * Check if collection has given rule.
      *
      * @param  string  $rule rule key that has to be checked
-     * @return boolean wheter rule exists in collection or not
+     * @return bool wheter rule exists in collection or not
      */
     public function has($rules)
     {
@@ -132,7 +128,7 @@ class RulesCollection
     }
 
     /**
-     * Get collection rules
+     * Get collection rules.
      *
      * @return array collection rules
      */
@@ -145,7 +141,5 @@ class RulesCollection
         if (array_key_exists($rule, $this->rules)) {
             return $this->rules[$rule];
         }
-
-        return null;
     }
 }

@@ -17,6 +17,5 @@ class ActiveUrlRule extends Rule
         }
 
         return false;
-
     }
 }

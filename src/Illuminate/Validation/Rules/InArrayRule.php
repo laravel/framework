@@ -20,7 +20,7 @@ class InArrayRule extends Rule
     public function mapParameters($parameters)
     {
         return [
-            'other_field' => array_shift($parameters)
+            'other_field' => array_shift($parameters),
         ];
     }
 

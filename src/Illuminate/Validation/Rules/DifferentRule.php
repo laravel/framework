@@ -18,7 +18,7 @@ class DifferentRule extends Rule
     public function mapParameters($parameters)
     {
         return [
-            'other_attribute' => array_shift($parameters)
+            'other_attribute' => array_shift($parameters),
         ];
     }
 

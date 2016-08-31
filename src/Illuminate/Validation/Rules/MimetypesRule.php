@@ -7,7 +7,7 @@ use Illuminate\Validation\Rule;
 class MimetypesRule extends Rule
 {
     use Traits\ValidFileInstance;
-    
+
     public function mapParameters($parameters)
     {
         return [

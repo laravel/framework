@@ -35,8 +35,6 @@ trait DateValidation
 
             return $params['format'];
         }
-
-        return;
     }
 
     /**

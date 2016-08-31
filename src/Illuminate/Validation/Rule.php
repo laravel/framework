@@ -3,33 +3,32 @@
 namespace Illuminate\Validation;
 
 use Illuminate\Contracts\Validation\Rule as RuleContract;
-use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 
 abstract class Rule implements RuleContract
 {
     /**
-     * Defines if rule is implicit
+     * Defines if rule is implicit.
      *
-     * @var boolean
+     * @var bool
      */
     protected $implicit = false;
 
     /**
-     * Defines required parameters count for validator
+     * Defines required parameters count for validator.
      *
-     * @var integer
+     * @var int
      */
     protected $requiredParametersCount = 0;
 
     /**
-     * Wheter to allow parsing named parameters
+     * Wheter to allow parsing named parameters.
      *
-     * @var boolean
+     * @var bool
      */
     protected $allowNamedParameters = false;
 
     /**
-     * Maps associative parameters to
+     * Maps associative parameters to.
      *
      * @param  array  $parameters
      * @return array
@@ -40,9 +39,9 @@ abstract class Rule implements RuleContract
     }
 
     /**
-     * Determines if rule is implicit based on implicit field
+     * Determines if rule is implicit based on implicit field.
      *
-     * @return boolean
+     * @return bool
      */
     public function isImplicit()
     {
@@ -50,9 +49,9 @@ abstract class Rule implements RuleContract
     }
 
     /**
-     * Returns required parameters count
+     * Returns required parameters count.
      *
-     * @return integer
+     * @return int
      */
     public function getRequiredParametersCount()
     {
@@ -60,9 +59,9 @@ abstract class Rule implements RuleContract
     }
 
     /**
-     * Returns wheter named parameters are allowed
+     * Returns wheter named parameters are allowed.
      *
-     * @return boolean
+     * @return bool
      */
     public function allowNamedParameters()
     {
@@ -70,13 +69,13 @@ abstract class Rule implements RuleContract
     }
 
     /**
-     * Returns whether rule is valid or not
+     * Returns whether rule is valid or not.
      *
      * @param  string $attribute
      * @param  mixed $value
      * @param  array $parameters
      * @param  \Illuminate\Validation\Validator $validator
-     * @return boolean
+     * @return bool
      */
-    public abstract function passes($attribute, $value, $parameters, $validator);
+    abstract public function passes($attribute, $value, $parameters, $validator);
 }

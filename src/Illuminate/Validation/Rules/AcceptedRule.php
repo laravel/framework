@@ -1,6 +1,7 @@
 <?php
 
 namespace Illuminate\Validation\Rules;
+
 use Illuminate\Validation\Rule;
 
 class AcceptedRule extends Rule

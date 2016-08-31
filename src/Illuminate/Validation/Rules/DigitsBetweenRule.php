@@ -21,6 +21,7 @@ class DigitsBetweenRule extends Rule
             'max' => array_shift($parameters),
         ];
     }
+
     /**
      * {@inheritdoc}
      */

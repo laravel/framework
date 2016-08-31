@@ -1,6 +1,7 @@
 <?php
 
 namespace Illuminate\Validation\Rules\Traits;
+
 use Illuminate\Support\Arr;
 
 trait ExtractDataFromPath

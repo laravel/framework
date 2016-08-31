@@ -14,7 +14,7 @@ class ConfirmedRule extends Rule
         $otherAttribute = $attribute.'_confirmation';
 
         return $validator->validateRule('same', $attribute, [
-            'other_attribute' => $otherAttribute
+            'other_attribute' => $otherAttribute,
         ]);
     }
 }
