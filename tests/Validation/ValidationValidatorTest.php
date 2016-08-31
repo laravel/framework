@@ -535,10 +535,6 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $file = new File('', false);
         $v = new Validator($trans, ['name' => $file], ['name' => 'all_whitespace']);
         $this->assertTrue($v->passes());
-        
-        $file = new File(' ', false);
-        $v = new Validator($trans, ['name' => $file], ['name' => 'all_whitespace']);
-        $this->assertFalse($v->passes());
 
         $file = new File(__FILE__, false);
         $v = new Validator($trans, ['name' => $file], ['name' => 'all_whitespace']);
