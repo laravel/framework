@@ -716,7 +716,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Create a collection of all elements pulled by their keys
+     * Create a collection of all elements pulled by their keys.
      * @param  mixed $keys
      * @param  array|null  $defaults
      * @return static
