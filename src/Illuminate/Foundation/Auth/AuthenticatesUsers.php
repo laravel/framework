@@ -19,7 +19,7 @@ trait AuthenticatesUsers
     {
         return property_exists($this, 'loginFormViewName') ? $this->loginFormViewName : 'auth.login';
     }
-    
+
     /**
      * Show the application's login form.
      *
