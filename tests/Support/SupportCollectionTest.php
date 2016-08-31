@@ -1554,6 +1554,86 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $collection = new Collection(new \ArrayObject(['foo' => 1, 'bar' => 2, 'baz' => 3]));
         $this->assertEquals(['foo' => 1, 'bar' => 2, 'baz' => 3], $collection->toArray());
     }
+
+    public function testPickRetrievesItemFromCollectionUsingIndex()
+    {
+        $c = new Collection(['foo', 'bar']);
+
+        $this->assertEquals(['foo'], $c->pick(0)->toArray());
+        $this->assertEquals([1 => 'bar'], $c->all());
+    }
+
+    public function testPickRetrievesItemsFromCollectionUsingIndex()
+    {
+        $c = new Collection(['foo', 'bar']);
+
+        $this->assertEquals(['foo', 'bar'], $c->pick([0, 1])->toArray());
+        $this->assertEquals([], $c->all());
+    }
+
+    public function testPickRetrievesNonexistingItemFromCollection()
+    {
+        $c = new Collection(['foo', 'bar']);
+
+        $this->assertEquals(['foo' => null], $c->pick('foo')->toArray());
+        $this->assertEquals(['foo', 'bar'], $c->all());
+    }
+
+    public function testPickRetrievesNonexistingItemsFromCollection()
+    {
+        $c = new Collection(['foo', 'bar']);
+
+        $this->assertEquals(['foo' => null, 'bar' => null], $c->pick(['foo', 'bar'])->toArray());
+        $this->assertEquals(['foo', 'bar'], $c->all());
+    }
+
+    public function testPickRetrievesNonexistingItemFromCollectionReturnsDefault()
+    {
+        $c = new Collection(['foo', 'bar']);
+
+        $this->assertEquals(['foo' => 1], $c->pick('foo', ['foo' => 1])->toArray());
+        $this->assertEquals(['foo', 'bar'], $c->all());
+    }
+
+    public function testPickRetrievesNonexistingItemsFromCollectionReturnsDefaults()
+    {
+        $c = new Collection(['foo', 'bar']);
+
+        $this->assertEquals(['foo' => 1, 'bar' => null], $c->pick(['foo', 'bar'], ['foo' => 1])->toArray());
+        $this->assertEquals(['foo', 'bar'], $c->all());
+    }
+
+    public function testPickRetrievesItemFromAssociativeCollection()
+    {
+        $c = new Collection(['foo' => 1, 'bar' => 2, 'baz' => 3]);
+
+        $this->assertEquals(['foo' => 1], $c->pick('foo')->toArray());
+        $this->assertEquals(['bar' => 2, 'baz' => 3], $c->all());
+    }
+
+    public function testPickRetrievesItemsFromAssociativeCollection()
+    {
+        $c = new Collection(['foo' => 1, 'bar' => 2, 'baz' => 3]);
+
+        $this->assertEquals(['foo' => 1, 'bar' => 2], $c->pick(['foo', 'bar'])->toArray());
+        $this->assertEquals(['baz' => 3], $c->all());
+    }
+
+    public function testPickRetrievesItemsFromAssociativeCollectionIncludingNonexistingItems()
+    {
+        $c = new Collection(['foo' => 1, 'bar' => 2, 'baz' => 3]);
+
+        $this->assertEquals(['foo' => 1, 'bar' => 2, 'zap' => null], $c->pick(['foo', 'bar', 'zap'])->toArray());
+        $this->assertEquals(['baz' => 3], $c->all());
+    }
+
+    public function testPickRetrievesItemsFromAssociativeCollectionIncludingNonexistingItemsReturnsDefaults()
+    {
+        $c = new Collection(['foo' => 1, 'bar' => 2, 'baz' => 3]);
+
+        $this->assertEquals(['foo' => 1, 'bar' => 2, 'zap' => 4], $c->pick(['foo', 'bar', 'zap'], ['zap' => 4])->toArray());
+        $this->assertEquals(['baz' => 3], $c->all());
+    }
 }
 
 class TestAccessorEloquentTestStub
