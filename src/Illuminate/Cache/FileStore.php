@@ -83,8 +83,8 @@ class FileStore implements Store
 
         // Next, we'll extract the number of minutes that are remaining for a cache
         // so that we can properly retain the time for things like the increment
-        // operation that may be performed on the cache. We'll round this out.
-        $time = ceil(($expire - time()) / 60);
+        // operation that may be performed on the cache.
+        $time = ($expire - time()) / 60;
 
         return compact('data', 'time');
     }
@@ -132,7 +132,7 @@ class FileStore implements Store
 
         $int = ((int) $raw['data']) + $value;
 
-        $this->put($key, $int, (int) $raw['time']);
+        $this->put($key, $int, $raw['time']);
 
         return $int;
     }
@@ -213,7 +213,7 @@ class FileStore implements Store
      */
     protected function expiration($minutes)
     {
-        $time = time() + ($minutes * 60);
+        $time = time() + (int) ($minutes * 60);
 
         if ($minutes === 0 || $time > 9999999999) {
             return 9999999999;
