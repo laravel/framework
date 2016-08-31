@@ -819,7 +819,7 @@ class Validator implements ValidatorContract
 
         return true;
     }
-    
+
     /**
      * Validate that the given attribute does not contain all whitespaces if it is present.
      *
