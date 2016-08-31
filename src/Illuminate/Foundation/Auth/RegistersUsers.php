@@ -18,7 +18,7 @@ trait RegistersUsers
     {
         return property_exists($this, 'registrationFormViewName') ? $this->registrationFormViewName : 'auth.register';
     }
-    
+
     /**
      * Show the application registration form.
      *
