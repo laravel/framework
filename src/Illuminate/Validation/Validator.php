@@ -163,7 +163,7 @@ class Validator implements ValidatorContract
      */
     protected $implicitRules = [
         'Required', 'Filled', 'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll',
-        'RequiredIf', 'RequiredUnless', 'Accepted', 'Present',
+        'RequiredIf', 'RequiredUnless', 'Accepted', 'Present', 'AllWhitespace',
     ];
 
     /**
@@ -815,6 +815,22 @@ class Validator implements ValidatorContract
     {
         if (Arr::has(array_merge($this->data, $this->files), $attribute)) {
             return $this->validateRequired($attribute, $value);
+        }
+
+        return true;
+    }
+    
+    /**
+     * Validate that the given attribute does not contain all whitespaces if it is present.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @return bool
+     */
+    protected function validateAllWhitespace($attribute, $value)
+    {
+        if (ctype_space($value)) {
+            return false;
         }
 
         return true;
