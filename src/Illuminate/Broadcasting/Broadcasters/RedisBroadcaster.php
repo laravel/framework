@@ -4,8 +4,8 @@ namespace Illuminate\Broadcasting\Broadcasters;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Illuminate\Contracts\Redis\Database as RedisDatabase;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Illuminate\Contracts\Redis\Database as RedisDatabase;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class RedisBroadcaster extends Broadcaster
