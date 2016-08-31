@@ -716,6 +716,26 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Create a collection of all elements pulled by their keys.
+     * @param  mixed $keys
+     * @param  array|null  $defaults
+     * @return static
+     */
+    public function pick($keys, array $defaults = null)
+    {
+        $chunks = [];
+
+        $keys = $this->getArrayableItems($keys);
+
+        foreach ($keys as $key) {
+            $default = ($defaults && array_key_exists($key, $defaults)) ? $defaults[$key] : null;
+            $chunks[$key] = $this->pull($key, $default);
+        }
+
+        return new static($chunks);
+    }
+
+    /**
      * Pass the collection to the given callback and return the result.
      *
      * @param  callable $callback
