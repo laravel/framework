@@ -144,8 +144,6 @@ class Factory implements FactoryContract
 
         $validator->addImplicitExtensions($implicit);
 
-        $validator->addReplacers($this->replacers);
-
         $validator->setFallbackMessages($this->fallbackMessages);
     }
 
