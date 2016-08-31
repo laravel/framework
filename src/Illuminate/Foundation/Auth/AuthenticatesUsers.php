@@ -11,6 +11,16 @@ trait AuthenticatesUsers
     use RedirectsUsers, ThrottlesLogins;
 
     /**
+     * Get the login form view name to be used by the controller.
+     *
+     * @return string
+     */
+    public function loginFormViewName()
+    {
+        return property_exists($this, 'loginFormViewName') ? $this->loginFormViewName : 'auth.login';
+    }
+    
+    /**
      * Show the application's login form.
      *
      * @return \Illuminate\Http\Response
@@ -157,15 +167,5 @@ trait AuthenticatesUsers
     protected function guard()
     {
         return Auth::guard();
-    }
-    
-    /**
-     * Get the login form view name to be used by the controller.
-     *
-     * @return string
-     */
-    public function loginFormViewName()
-    {
-        return property_exists($this, 'loginFormViewName') ? $this->loginFormViewName : 'auth.login';
     }
 }
