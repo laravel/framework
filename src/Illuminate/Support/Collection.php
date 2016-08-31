@@ -640,7 +640,25 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         });
     }
 
-    /**
+  /**
+   * Replace the collection with the given items.
+   *
+   * @param  mixed $items
+   * @param bool $recursive
+   * @return static
+   * @see http://php.net/manual/en/function.array-replace.php
+   * @see http://php.net/manual/en/function.array-replace-recursive.php
+   */
+   public function replace($items, $recursive = false)
+   {
+     if($recursive) {
+       return new static(array_replace_recursive($this->items, $this->getArrayableItems($items)));
+     }
+     return new static(array_replace($this->items, $this->getArrayableItems($items)));
+   }
+
+
+  /**
      * Merge the collection with the given items.
      *
      * @param  mixed  $items
