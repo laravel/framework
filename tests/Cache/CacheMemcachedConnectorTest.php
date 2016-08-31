@@ -103,7 +103,7 @@ class CacheMemcachedConnectorTest extends PHPUnit_Framework_TestCase
 
     protected function memcachedMockWithAddServer($returnedVersion = [])
     {
-        $memcached = m::mock('stdClass');
+        $memcached = m::mock('Memcached');
         $memcached->shouldReceive('addServer')->once()->with($this->getHost(), $this->getPort(), $this->getWeight());
         $memcached->shouldReceive('getVersion')->once()->andReturn($returnedVersion);
         $memcached->shouldReceive('getServerList')->once()->andReturn([]);
