@@ -650,10 +650,10 @@ trait MakesHttpRequests
         return $this;
     }
 
-    /** 
+    /**
      * Assert that the response view has a given name.
-     * 
-     * @param  string $name 
+     *
+     * @param  string $name
      * @return $this
      */
     public function assertViewIs(string $name)
