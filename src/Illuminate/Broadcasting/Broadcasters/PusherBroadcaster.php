@@ -5,7 +5,6 @@ namespace Illuminate\Broadcasting\Broadcasters;
 use Pusher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class PusherBroadcaster extends Broadcaster
@@ -57,14 +56,11 @@ class PusherBroadcaster extends Broadcaster
     public function validAuthenticationResponse($request, $result)
     {
         if (Str::startsWith($request->channel_name, 'private')) {
-            return new JsonResponse(
-                $this->pusher->socket_auth($request->channel_name, $request->socket_id)
-            );
+            return $this->pusher->socket_auth($request->channel_name, $request->socket_id);
         } else {
-            return new JsonResponse(
-                $this->pusher->presence_auth(
-                    $request->channel_name, $request->socket_id, $request->user()->id, $result
-                ));
+            return $this->pusher->presence_auth(
+                $request->channel_name, $request->socket_id, $request->user()->id, $result
+            );
         }
     }
 

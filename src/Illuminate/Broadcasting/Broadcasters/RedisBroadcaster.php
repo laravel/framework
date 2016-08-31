@@ -4,7 +4,6 @@ namespace Illuminate\Broadcasting\Broadcasters;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Illuminate\Contracts\Redis\Database as RedisDatabase;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -65,10 +64,10 @@ class RedisBroadcaster extends Broadcaster
     public function validAuthenticationResponse($request, $result)
     {
         if (is_bool($result)) {
-            return new JsonResponse($result);
+            return json_encode($result);
         }
 
-        return new JsonResponse(['channel_data' => [
+        return json_encode(['channel_data' => [
             'user_id' => $request->user()->getKey(),
             'user_info' => $result,
         ]]);
