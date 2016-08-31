@@ -10,7 +10,7 @@ trait RegistersUsers
     use RedirectsUsers;
     
     /**
-     * Get the login form view name to be used by the controller.
+     * Get the registration form view name to be used by the controller.
      *
      * @return string
      */
