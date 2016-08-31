@@ -2,9 +2,7 @@
 
 namespace Illuminate\Validation;
 
-use Illuminate\Contracts\Validation\Rule as RuleContract;
-
-abstract class Rule implements RuleContract
+abstract class Rule
 {
     /**
      * Defines if rule is implicit.
