@@ -341,6 +341,23 @@ class Mailable implements MailableContract
     }
 
     /**
+     * Set the priority of this message.
+     *
+     * The value is an integer where 1 is the highest priority and 5 is the lowest.
+     *
+     * @param  int  $level
+     * @return $this
+     */
+    public function priority($level = 3)
+    {
+        $this->callbacks[] = function ($message) use ($level) {
+            $message->setPriority($level);
+        };
+
+        return $this;
+    }
+
+    /**
      * Set the recipients of the message.
      *
      * @param  object|array|string  $address
