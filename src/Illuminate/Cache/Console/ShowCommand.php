@@ -90,6 +90,8 @@ class ShowCommand extends Command
      */
     private function getFullCache($store)
     {
+        $this->store->put('name', 'jordna', 60);
+
         switch ($store) {
             case 'memcached':
                 return $this->fromMemcached();
@@ -107,12 +109,26 @@ class ShowCommand extends Command
      */
     private function fromMemcached()
     {
-        $cached = $this->store->getMemcached()->fetchAll();
+        $keys = $this->store->getMemcached()->getAllKeys();
 
         $array = [];
 
-        if (is_null($cached)) {
+        // If no keys are found then just
+        // return an empty array.
+        if (is_null($keys) || $keys === false) {
             return $array;
+        }
+
+        // Iterate over all the returned keys
+        // and push them into an array.
+        foreach ($keys as $key) {
+            if (strpos($key, 'laravel') === false) {
+                continue;
+            }
+
+            $key = str_replace($this->store->getPrefix(), '', $key);
+
+            $array[] = [$key, $this->store->get($key)];
         }
 
         return $array;
