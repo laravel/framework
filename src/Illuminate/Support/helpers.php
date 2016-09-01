@@ -315,6 +315,19 @@ if (! function_exists('camel_case')) {
     }
 }
 
+if (! function_exists('sentence_case')) {
+    /**
+     * Convert snake_case or title_case to simple sentence.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function sentence_case ($string)
+    {
+        return str_replace(['_', '-'], ' ', ucfirst(strtolower($string)));
+    }
+}
+
 if (! function_exists('class_basename')) {
     /**
      * Get the class "basename" of the given object / class.
