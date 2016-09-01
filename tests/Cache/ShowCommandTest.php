@@ -42,7 +42,7 @@ class ShowCommandTest extends PHPUnit_Framework_TestCase
         $command->setLaravel($application);
 
         $cacheManager->shouldReceive('store')->once()->with('redis')->andReturn($cacheStore);
-        $cacheStore->shouldReceive('many')->once()->with(['*'])->andReturn(null);
+        $cacheStore->shouldReceive('get')->once()->with('*')->andReturn(null);
 
         $arguments = ['store' => 'redis'];
         $command->run(new ArrayInput($arguments), new NullOutput);

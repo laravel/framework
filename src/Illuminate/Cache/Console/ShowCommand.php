@@ -125,7 +125,7 @@ class ShowCommand extends Command
      */
     private function fromRedis()
     {
-        $keys = $this->store->many(['*']);
+        $keys = $this->store->get('*');
 
         $array = [];
 
@@ -138,7 +138,7 @@ class ShowCommand extends Command
         // Iterate over all the returned keys
         // and push them into an array.
         foreach ($keys as $key) {
-            $array[] = [$key, $store->get($key)];
+            $array[] = [$key, $this->store->get($key)];
         }
 
         return $array;
