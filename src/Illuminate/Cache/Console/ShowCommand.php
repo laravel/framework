@@ -112,13 +112,13 @@ class ShowCommand extends Command
      */
     private function fromRedis()
     {
-        $keys = $this->store->getRedis()->command('KEYS', ['*']);
+        $keys = $this->store->many(['*']);
 
         $array = [];
 
         // If no keys are found then just
         // return an empty array.
-        if (!empty($keys)) {
+        if (is_null($keys)) {
             return $array;
         }
 

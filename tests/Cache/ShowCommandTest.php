@@ -1,5 +1,6 @@
 <?php
 
+use Predis\ClientInterface;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Foundation\Application;
@@ -27,6 +28,41 @@ class ShowCommandTest extends PHPUnit_Framework_TestCase
 
         $arguments = ['store' => 'memcached'];
         $command->run(new ArrayInput($arguments), new NullOutput);
+    }
+
+    public function testShowRedisCommand()
+    {
+        $command = new ShowCommandTester(
+            $cacheManager = Mockery::mock(CacheManager::class)
+        );
+
+        $cacheStore = Mockery::mock(Store::class);
+
+        $application = new Application;
+        $command->setLaravel($application);
+
+        $cacheManager->shouldReceive('store')->once()->with('redis')->andReturn($cacheStore);
+        $cacheStore->shouldReceive('many')->once()->with(['*'])->andReturn(null);
+
+        $arguments = ['store' => 'redis'];
+        $command->run(new ArrayInput($arguments), new NullOutput);
+    }
+
+    public function testExpectedOutputWithInvalidStore()
+    {
+        $command = new ShowCommandTester(
+            $cacheManager = Mockery::mock(CacheManager::class)
+        );
+
+        $cacheStore = Mockery::mock(Store::class);
+
+        $application = new Application;
+        $command->setLaravel($application);
+
+        $cacheManager->shouldReceive('store')->once()->with('invalid')->andReturn(InvalidArgumentException::class);
+
+        $arguments = ['store' => 'invalid'];
+        $command->run(new ArrayInput($arguments), new NullOutput());
     }
 }
 
