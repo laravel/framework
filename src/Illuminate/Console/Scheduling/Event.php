@@ -728,7 +728,7 @@ class Event
      * @param  string  $endTime
      * @return $this
      */
-    public function exceptBetween($startTime, $endTime)
+    public function unlessBetween($startTime, $endTime)
     {
         return $this->skip($this->inTimeInterval($startTime, $endTime));
     }

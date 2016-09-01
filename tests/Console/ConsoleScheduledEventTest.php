@@ -118,7 +118,7 @@ class ConsoleScheduledEventTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($event->between("9:00", "9:00")->filtersPass($app));
         $this->assertFalse($event->between("10:00", "11:00")->filtersPass($app));
 
-        $this->assertFalse($event->exceptBetween("8:00", "10:00")->filtersPass($app));
-        $this->assertTrue($event->exceptBetween("10:00", "11:00")->isDue($app));
+        $this->assertFalse($event->unlessBetween("8:00", "10:00")->filtersPass($app));
+        $this->assertTrue($event->unlessBetween("10:00", "11:00")->isDue($app));
     }
 }
