@@ -2,10 +2,10 @@
 
 namespace Illuminate\Cache\Console;
 
+use Illuminate\Cache\MemcachedStore;
 use Illuminate\Console\Command;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Contracts\Cache\Store;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
 class ShowCommand extends Command
@@ -16,6 +16,11 @@ class ShowCommand extends Command
     private $manager;
 
     /**
+     * @var \Illuminate\Contracts\Cache\Store
+     */
+    private $store;
+
+    /**
      * @var string
      */
     protected $name = 'cache:show';
@@ -23,7 +28,7 @@ class ShowCommand extends Command
     /**
      * @var string
      */
-    protected $description = 'Show the full cache.';
+    protected $description = 'Show the full cache for a given repository.';
 
     /**
      * ShowCommand constructor.
@@ -33,6 +38,8 @@ class ShowCommand extends Command
      */
     public function __construct(CacheManager $manager)
     {
+        parent::__construct();
+
         $this->manager = $manager;
     }
 
@@ -49,11 +56,13 @@ class ShowCommand extends Command
 
         // Retrieve the selected store or the
         // default caching instance.
-        $cache = $this->manager->store($store);
+        $this->store = $this->manager->store($store);
 
-        if ($this->getFullCache($cache) === false) {
+        if ($cached = $this->getFullCache($store) === false) {
             return $this->info('The cache store you entered could not be found.');
         }
+
+        return $cached;
     }
 
     /**
@@ -64,23 +73,23 @@ class ShowCommand extends Command
     protected function getArguments()
     {
         return [
-            ['store', InputOption::REQUIRED, 'The cache store you want to display.']
+            ['store', InputArgument::REQUIRED, 'The cache store you want to display.']
         ];
     }
 
     /**
      * Retrieve the complete cache.
      *
-     * @param  \Illuminate\Contracts\Cache\Store  $store
+     * @param  string  $store
      * @return mixed
      */
-    private function getFullCache(Store $store)
+    private function getFullCache($store)
     {
-        switch (get_class($store)) {
-            case 'MemcachedStore':
-                return $this->fromMemcached($store);
-            case 'RedisStore':
-                return $this->fromRedis($store);
+        switch ($store) {
+            case 'memcached':
+                return $this->fromMemcached();
+            case 'redis':
+                return $this->fromRedis();
         }
 
         return false;
@@ -89,30 +98,32 @@ class ShowCommand extends Command
     /**
      * Retrieve from Memcached.
      *
-     * @param  \Illuminate\Contracts\Cache\Store  $store
      * @return mixed
      */
-    private function fromMemcached(Store $store)
+    private function fromMemcached()
     {
-        return $store->getMemcached()->fetchAll();
+        return $this->store->getMemcached()->fetchAll();
     }
 
     /**
      * Retrieve from Redis.
      *
-     * @param  \Illuminate\Contracts\Cache\Store  $store
      * @return mixed
      */
-    private function fromRedis(Store $store)
+    private function fromRedis()
     {
-        $keys = $store->getRedis()->command('KEYS', ['*']);
+        $keys = $this->store->getRedis()->command('KEYS', ['*']);
 
         $array = [];
 
+        // If no keys are found then just
+        // return an empty array.
         if (!empty($keys)) {
-            foreach ($keys as $key) {
-                $array[$key] = $store->get($key);
-            }
+            return $array;
+        }
+
+        foreach ($keys as $key) {
+            $array[$key] = $store->get($key);
         }
 
         return $array;
