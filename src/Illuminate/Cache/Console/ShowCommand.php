@@ -2,7 +2,6 @@
 
 namespace Illuminate\Cache\Console;
 
-use Illuminate\Cache\MemcachedStore;
 use Illuminate\Console\Command;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Contracts\Cache\Store;
@@ -55,7 +54,7 @@ class ShowCommand extends Command
      */
     public function handle()
     {
-        // The optional cache store you 
+        // The optional cache store you
         // want to display.
         $store = $this->argument('store');
 
@@ -78,7 +77,7 @@ class ShowCommand extends Command
     protected function getArguments()
     {
         return [
-            ['store', InputArgument::REQUIRED, 'The cache store you want to display.']
+            ['store', InputArgument::REQUIRED, 'The cache store you want to display.'],
         ];
     }
 
@@ -155,7 +154,7 @@ class ShowCommand extends Command
         // and push them into an array.
         foreach ($keys as $key) {
             $array[] = [
-                $key, $this->store->connection()->executeRaw(['get', $key])
+                $key, $this->store->connection()->executeRaw(['get', $key]),
             ];
         }
 

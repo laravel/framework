@@ -70,5 +70,4 @@ class ShowCommandTest extends PHPUnit_Framework_TestCase
 
 class ShowCommandTester extends ShowCommand
 {
-
 }

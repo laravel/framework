@@ -54,7 +54,7 @@ class CacheServiceProvider extends ServiceProvider
 
         $this->commands([
             'command.cache.clear',
-            'command.cache.show'
+            'command.cache.show',
         ]);
     }
 
