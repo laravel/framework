@@ -928,6 +928,10 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function chunk($size)
     {
+        if ($size == 0) {
+            return $this;
+        }
+
         $chunks = [];
 
         foreach (array_chunk($this->items, $size, true) as $chunk) {
