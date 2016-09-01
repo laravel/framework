@@ -184,7 +184,7 @@ class Store implements SessionInterface
      */
     public function isValidId($id)
     {
-        return is_string($id) && preg_match('/^[a-f0-9]{40}$/', $id);
+        return is_string($id) && ctype_alnum($id) && strlen($id) === 40;
     }
 
     /**
@@ -194,7 +194,7 @@ class Store implements SessionInterface
      */
     protected function generateSessionId()
     {
-        return sha1(uniqid('', true).Str::random(25).microtime(true));
+        return Str::random(40);
     }
 
     /**
