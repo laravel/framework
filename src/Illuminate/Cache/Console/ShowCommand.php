@@ -31,6 +31,11 @@ class ShowCommand extends Command
     protected $description = 'Show the full cache for a given repository.';
 
     /**
+     * @var array
+     */
+    protected $headers = ['Key', 'Value'];
+
+    /**
      * ShowCommand constructor.
      *
      * @param  \Illuminate\Cache\CacheManager $manager
@@ -58,11 +63,11 @@ class ShowCommand extends Command
         // default caching instance.
         $this->store = $this->manager->store($store);
 
-        if ($cached = $this->getFullCache($store) === false) {
+        if (($cached = $this->getFullCache($store)) === false) {
             return $this->info('The cache store you entered could not be found.');
         }
 
-        return $cached;
+        $this->table($this->headers, $cached);
     }
 
     /**
@@ -92,7 +97,7 @@ class ShowCommand extends Command
                 return $this->fromRedis();
         }
 
-        return false;
+        return [];
     }
 
     /**
@@ -102,7 +107,15 @@ class ShowCommand extends Command
      */
     private function fromMemcached()
     {
-        return $this->store->getMemcached()->fetchAll();
+        $cached = $this->store->getMemcached()->fetchAll();
+
+        $array = [];
+
+        if (is_null($cached)) {
+            return $array;
+        }
+
+        return $array;
     }
 
     /**
@@ -122,8 +135,10 @@ class ShowCommand extends Command
             return $array;
         }
 
+        // Iterate over all the returned keys
+        // and push them into an array.
         foreach ($keys as $key) {
-            $array[$key] = $store->get($key);
+            $array[] = [$key, $store->get($key)];
         }
 
         return $array;
