@@ -24,18 +24,11 @@ use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 class Validator implements ValidatorContract
 {
     /**
-     * The Translator implementation.
+     * All of the registered "after" callbacks.
      *
-     * @var \Symfony\Component\Translation\TranslatorInterface
+     * @var array
      */
-    protected $translator;
-
-    /**
-     * The Presence Verifier implementation.
-     *
-     * @var \Illuminate\Validation\PresenceVerifierInterface
-     */
-    protected $presenceVerifier;
+    protected $after = [];
 
     /**
      * The container instance.
@@ -45,60 +38,11 @@ class Validator implements ValidatorContract
     protected $container;
 
     /**
-     * The failed validation rules.
+     * The array of custom attribute names.
      *
      * @var array
      */
-    protected $failedRules = [];
-
-    /**
-     * The message bag instance.
-     *
-     * @var \Illuminate\Support\MessageBag
-     */
-    protected $messages;
-
-    /**
-     * The data under validation.
-     *
-     * @var array
-     */
-    protected $data;
-
-    /**
-     * The files under validation.
-     *
-     * @var array
-     */
-    protected $files = [];
-
-    /**
-     * The initial rules provided.
-     *
-     * @var array
-     */
-    protected $initialRules;
-
-    /**
-     * The rules to be applied to the data.
-     *
-     * @var array
-     */
-    protected $rules;
-
-    /**
-     * The array of wildcard attributes with their asterisks expanded.
-     *
-     * @var array
-     */
-    protected $implicitAttributes = [];
-
-    /**
-     * All of the registered "after" callbacks.
-     *
-     * @var array
-     */
-    protected $after = [];
+    protected $customAttributes = [];
 
     /**
      * The array of custom error messages.
@@ -108,25 +52,29 @@ class Validator implements ValidatorContract
     protected $customMessages = [];
 
     /**
-     * The array of fallback error messages.
-     *
-     * @var array
-     */
-    protected $fallbackMessages = [];
-
-    /**
-     * The array of custom attribute names.
-     *
-     * @var array
-     */
-    protected $customAttributes = [];
-
-    /**
      * The array of custom displayable values.
      *
      * @var array
      */
     protected $customValues = [];
+
+    /**
+     * The data under validation.
+     *
+     * @var array
+     */
+    protected $data;
+
+    /**
+     * The validation rules which depend on other fields as parameters.
+     *
+     * @var array
+     */
+    protected $dependentRules = [
+        'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll',
+        'RequiredIf', 'RequiredUnless', 'Confirmed', 'Same', 'Different', 'Unique',
+        'Before', 'After',
+    ];
 
     /**
      * All of the custom validator extensions.
@@ -136,25 +84,32 @@ class Validator implements ValidatorContract
     protected $extensions = [];
 
     /**
-     * All of the custom replacer extensions.
+     * The failed validation rules.
      *
      * @var array
      */
-    protected $replacers = [];
+    protected $failedRules = [];
 
     /**
-     * The size related validation rules.
+     * The array of fallback error messages.
      *
      * @var array
      */
-    protected $sizeRules = ['Size', 'Between', 'Min', 'Max'];
+    protected $fallbackMessages = [];
 
     /**
-     * The numeric related validation rules.
+     * The files under validation.
      *
      * @var array
      */
-    protected $numericRules = ['Numeric', 'Integer'];
+    protected $files = [];
+
+    /**
+     * The array of wildcard attributes with their asterisks expanded.
+     *
+     * @var array
+     */
+    protected $implicitAttributes = [];
 
     /**
      * The validation rules that imply the field is required.
@@ -167,15 +122,60 @@ class Validator implements ValidatorContract
     ];
 
     /**
-     * The validation rules which depend on other fields as parameters.
+     * The initial rules provided.
      *
      * @var array
      */
-    protected $dependentRules = [
-        'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll',
-        'RequiredIf', 'RequiredUnless', 'Confirmed', 'Same', 'Different', 'Unique',
-        'Before', 'After',
-    ];
+    protected $initialRules;
+
+    /**
+     * The message bag instance.
+     *
+     * @var \Illuminate\Support\MessageBag
+     */
+    protected $messages;
+
+    /**
+     * The numeric related validation rules.
+     *
+     * @var array
+     */
+    protected $numericRules = ['Numeric', 'Integer'];
+
+    /**
+     * The Presence Verifier implementation.
+     *
+     * @var \Illuminate\Validation\PresenceVerifierInterface
+     */
+    protected $presenceVerifier;
+
+    /**
+     * All of the custom replacer extensions.
+     *
+     * @var array
+     */
+    protected $replacers = [];
+
+    /**
+     * The rules to be applied to the data.
+     *
+     * @var array
+     */
+    protected $rules;
+
+    /**
+     * The size related validation rules.
+     *
+     * @var array
+     */
+    protected $sizeRules = ['Size', 'Between', 'Min', 'Max'];
+
+    /**
+     * The Translator implementation.
+     *
+     * @var \Symfony\Component\Translation\TranslatorInterface
+     */
+    protected $translator;
 
     /**
      * Create a new Validator instance.
