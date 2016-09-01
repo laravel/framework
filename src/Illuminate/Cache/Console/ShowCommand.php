@@ -90,8 +90,6 @@ class ShowCommand extends Command
      */
     private function getFullCache($store)
     {
-        $this->store->put('name', 'jordna', 60);
-
         switch ($store) {
             case 'memcached':
                 return $this->fromMemcached();
@@ -126,6 +124,8 @@ class ShowCommand extends Command
                 continue;
             }
 
+            // Remove the prefix from the key name
+            // before looking the key up in the store.
             $key = str_replace($this->store->getPrefix(), '', $key);
 
             $array[] = [$key, $this->store->get($key)];
@@ -141,20 +141,22 @@ class ShowCommand extends Command
      */
     private function fromRedis()
     {
-        $keys = $this->store->get('*');
+        $keys = $this->store->connection()->executeRaw(['keys', '*']);
 
         $array = [];
 
         // If no keys are found then just
         // return an empty array.
-        if (is_null($keys)) {
+        if (empty($keys)) {
             return $array;
         }
 
         // Iterate over all the returned keys
         // and push them into an array.
         foreach ($keys as $key) {
-            $array[] = [$key, $this->store->get($key)];
+            $array[] = [
+                $key, $this->store->connection()->executeRaw(['get', $key])
+            ];
         }
 
         return $array;

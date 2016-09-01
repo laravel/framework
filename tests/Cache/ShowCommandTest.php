@@ -24,7 +24,7 @@ class ShowCommandTest extends PHPUnit_Framework_TestCase
 
         $cacheManager->shouldReceive('store')->once()->with('memcached')->andReturn($cacheStore);
         $cacheStore->shouldReceive('getMemcached')->once()->andReturn($memcached);
-        $memcached->shouldReceive('fetchAll')->once();
+        $memcached->shouldReceive('getAllKeys')->once();
 
         $arguments = ['store' => 'memcached'];
         $command->run(new ArrayInput($arguments), new NullOutput);
@@ -37,12 +37,14 @@ class ShowCommandTest extends PHPUnit_Framework_TestCase
         );
 
         $cacheStore = Mockery::mock(Store::class);
+        $predisMock = Mockery::mock(ClientInterface::class);
 
         $application = new Application;
         $command->setLaravel($application);
 
         $cacheManager->shouldReceive('store')->once()->with('redis')->andReturn($cacheStore);
-        $cacheStore->shouldReceive('get')->once()->with('*')->andReturn(null);
+        $cacheStore->shouldReceive('connection')->once()->andReturn($predisMock);
+        $predisMock->shouldReceive('executeRaw')->once()->withArgs([['keys', '*']]);
 
         $arguments = ['store' => 'redis'];
         $command->run(new ArrayInput($arguments), new NullOutput);
