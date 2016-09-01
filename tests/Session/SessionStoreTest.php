@@ -64,9 +64,11 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase
     public function testCantSetInvalidId()
     {
         $session = $this->getSession();
+        $this->assertTrue($session->isValidId($session->getId()));
 
         $session->setId(null);
         $this->assertNotNull($session->getId());
+        $this->assertTrue($session->isValidId($session->getId()));
 
         $session->setId(['a']);
         $this->assertNotSame(['a'], $session->getId());
