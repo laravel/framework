@@ -105,4 +105,20 @@ class ConsoleScheduledEventTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('0 19 * * 3 *', $event->wednesdays()->at('19:00')->timezone('EST')->getExpression());
         $this->assertTrue($event->isDue($app));
     }
+
+    public function testTimeBetweenChecks()
+    {
+        $app = m::mock('Illuminate\Foundation\Application[isDownForMaintenance,environment]');
+        $app->shouldReceive('isDownForMaintenance')->andReturn(false);
+        $app->shouldReceive('environment')->andReturn('production');
+        Carbon::setTestNow(Carbon::create(2015, 1, 1, 9, 0, 0));
+
+        $event = new Event('php foo');
+        $this->assertTrue($event->between("8:00", "10:00")->filtersPass($app));
+        $this->assertTrue($event->between("9:00", "9:00")->filtersPass($app));
+        $this->assertFalse($event->between("10:00", "11:00")->filtersPass($app));
+
+        $this->assertFalse($event->exceptBetween("8:00", "10:00")->filtersPass($app));
+        $this->assertTrue($event->exceptBetween("10:00", "11:00")->isDue($app));
+    }
 }
