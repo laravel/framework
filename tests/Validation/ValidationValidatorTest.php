@@ -774,14 +774,14 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $trans = $this->getRealTranslator();
 
         // If file is not successfully uploaded validation should fail with a
-        // 'file_uploaded' error message instead of the original rule.
+        // 'uploaded' error message instead of the original rule.
         $file = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile');
         $file->shouldReceive('isValid')->andReturn(false);
         $file->shouldNotReceive('getSize');
         $v = new Validator($trans, [], ['photo' => 'Max:10']);
         $v->setFiles(['photo' => $file]);
         $this->assertTrue($v->fails());
-        $this->assertEquals(['validation.file_uploaded'], $v->errors()->get('photo'));
+        $this->assertEquals(['validation.uploaded'], $v->errors()->get('photo'));
 
         // Even "required" will not run if the file failed to upload.
         $file = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile');
@@ -789,7 +789,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, [], ['photo' => 'required']);
         $v->setFiles(['photo' => $file]);
         $this->assertTrue($v->fails());
-        $this->assertEquals(['validation.file_uploaded'], $v->errors()->get('photo'));
+        $this->assertEquals(['validation.uploaded'], $v->errors()->get('photo'));
 
         // It should only fail with that rule if a validation rule implies it's
         // a file. Otherwise it should fail with the regular rule.
@@ -806,7 +806,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, [], ['photo' => 'file|mimes:pdf|min:10']);
         $v->setFiles(['photo' => $file]);
         $this->assertTrue($v->fails());
-        $this->assertEquals(['validation.file_uploaded'], $v->errors()->get('photo'));
+        $this->assertEquals(['validation.uploaded'], $v->errors()->get('photo'));
     }
 
     public function testValidateInArray()
