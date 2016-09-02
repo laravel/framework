@@ -339,7 +339,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
             $result *= $status;
         }
 
-        $this->assertTrue($result === 1);
+        $this->assertFalse($result === 1);
     }
 
     public function testRequireOnceRequiresFileProperly()
