@@ -1121,7 +1121,6 @@ class Router implements RegistrarContract
     /**
      * Alias for the "currentRouteNamed" method.
      *
-     * @param  mixed  string
      * @return bool
      */
     public function is()
@@ -1165,7 +1164,6 @@ class Router implements RegistrarContract
     /**
      * Alias for the "currentRouteUses" method.
      *
-     * @param  mixed  string
      * @return bool
      */
     public function uses()

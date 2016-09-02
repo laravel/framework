@@ -177,7 +177,6 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * Determine if the current request URI matches a pattern.
      *
-     * @param  mixed  string
      * @return bool
      */
     public function is()
@@ -194,7 +193,6 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * Determine if the current request URL and query string matches a pattern.
      *
-     * @param  mixed  string
      * @return bool
      */
     public function fullUrlIs()
