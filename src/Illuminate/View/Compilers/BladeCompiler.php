@@ -4,6 +4,7 @@ namespace Illuminate\View\Compilers;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use RuntimeException;
 
 class BladeCompiler extends Compiler implements CompilerInterface
 {
@@ -576,10 +577,13 @@ class BladeCompiler extends Compiler implements CompilerInterface
      *
      * @param  string  $expression
      * @return string
+     * @throws RuntimeException if the $expression doesn't match a valid foreach expression.
      */
     protected function compileForeach($expression)
     {
-        preg_match('/\( *(.*) +as *([^\)]*)/i', $expression, $matches);
+        if (! preg_match('/\( *(.*) +as *([^\)]*)/i', $expression, $matches)) {
+            throw new RuntimeException("Invalid `foreach` expression: ${expression}");
+        }
 
         $iteratee = trim($matches[1]);
 
@@ -619,12 +623,15 @@ class BladeCompiler extends Compiler implements CompilerInterface
      *
      * @param  string  $expression
      * @return string
+     * @throws RuntimeException if the $expression doesn't match a valid foreach expression.
      */
     protected function compileForelse($expression)
     {
         $empty = '$__empty_'.++$this->forelseCounter;
 
-        preg_match('/\( *(.*) +as *([^\)]*)/', $expression, $matches);
+        if (! preg_match('/\( *(.*) +as *([^\)]*)/', $expression, $matches)) {
+            throw new RuntimeException("Invalid `forelse` expression: ${expression}");
+        }
 
         $iteratee = trim($matches[1]);
 
