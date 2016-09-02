@@ -27,7 +27,7 @@ class DatabaseMigratorIntegrationTest extends PHPUnit_Framework_TestCase
 
         $container = new Illuminate\Container\Container;
         $container->instance('db', $db->getDatabaseManager());
-        Illuminate\Support\Facades\Facade::setFacadeApplication($container);
+        Illuminate\Facades\Facade::setFacadeApplication($container);
 
         $this->migrator = new Migrator(
             $repository = new DatabaseMigrationRepository($db->getDatabaseManager(), 'migrations'),
@@ -42,8 +42,8 @@ class DatabaseMigratorIntegrationTest extends PHPUnit_Framework_TestCase
 
     public function tearDown()
     {
-        Illuminate\Support\Facades\Facade::clearResolvedInstances();
-        Illuminate\Support\Facades\Facade::setFacadeApplication(null);
+        Illuminate\Facades\Facade::clearResolvedInstances();
+        Illuminate\Facades\Facade::setFacadeApplication(null);
     }
 
     public function testBasicMigrationOfSingleFolder()

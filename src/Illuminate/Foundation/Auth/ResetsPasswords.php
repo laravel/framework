@@ -4,8 +4,8 @@ namespace Illuminate\Foundation\Auth;
 
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Password;
+use Illuminate\Facades\Auth;
+use Illuminate\Facades\Password;
 
 trait ResetsPasswords
 {

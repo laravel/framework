@@ -3,7 +3,7 @@
 namespace Illuminate\Foundation\Testing\Constraints;
 
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\URL;
+use Illuminate\Facades\URL;
 
 class HasLink extends PageConstraint
 {

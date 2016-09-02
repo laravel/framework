@@ -2,7 +2,7 @@
 
 namespace Illuminate\Broadcasting;
 
-use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Facades\Broadcast;
 
 trait InteractsWithSockets
 {
