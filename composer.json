@@ -53,6 +53,7 @@
         "illuminate/encryption": "self.version",
         "illuminate/events": "self.version",
         "illuminate/exception": "self.version",
+        "illuminate/facades": "self.version",
         "illuminate/filesystem": "self.version",
         "illuminate/hashing": "self.version",
         "illuminate/http": "self.version",

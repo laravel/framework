@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Facades\Schema;
 use Illuminate\Database\Migrations\Migration;
 
 class CreateFlightsTable extends Migration

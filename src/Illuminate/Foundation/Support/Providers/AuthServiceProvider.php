@@ -2,7 +2,7 @@
 
 namespace Illuminate\Foundation\Support\Providers;
 
-use Illuminate\Support\Facades\Gate;
+use Illuminate\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider

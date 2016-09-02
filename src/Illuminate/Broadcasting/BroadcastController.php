@@ -5,7 +5,7 @@ namespace Illuminate\Broadcasting;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Facades\Broadcast;
 
 class BroadcastController extends Controller
 {
