@@ -814,4 +814,30 @@ test';
             ['(((', ')))'],
         ];
     }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Invalid 'foreach' expression: ($messages => $m)
+     */
+    public function testInvalidForeachRaisesException()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@foreach ($messages => $m)
+test
+@endforeach';
+        $compiler->compileString($string);
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Invalid 'forelse' expression: ($messages => $m)
+     */
+    public function testInvalidForelseRaisesException()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@forelse ($messages => $m)
+test
+@endforelse';
+        $compiler->compileString($string);
+    }
 }
