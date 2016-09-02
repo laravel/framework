@@ -114,11 +114,11 @@ class ConsoleScheduledEventTest extends PHPUnit_Framework_TestCase
         Carbon::setTestNow(Carbon::create(2015, 1, 1, 9, 0, 0));
 
         $event = new Event('php foo');
-        $this->assertTrue($event->between("8:00", "10:00")->filtersPass($app));
-        $this->assertTrue($event->between("9:00", "9:00")->filtersPass($app));
-        $this->assertFalse($event->between("10:00", "11:00")->filtersPass($app));
+        $this->assertTrue($event->between('8:00', '10:00')->filtersPass($app));
+        $this->assertTrue($event->between('9:00', '9:00')->filtersPass($app));
+        $this->assertFalse($event->between('10:00', '11:00')->filtersPass($app));
 
-        $this->assertFalse($event->unlessBetween("8:00", "10:00")->filtersPass($app));
-        $this->assertTrue($event->unlessBetween("10:00", "11:00")->isDue($app));
+        $this->assertFalse($event->unlessBetween('8:00', '10:00')->filtersPass($app));
+        $this->assertTrue($event->unlessBetween('10:00', '11:00')->isDue($app));
     }
 }
