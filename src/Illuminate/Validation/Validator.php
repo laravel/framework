@@ -150,11 +150,14 @@ class Validator implements ValidatorContract
     protected $sizeRules = ['Size', 'Between', 'Min', 'Max'];
 
     /**
-     * The validation rules that work with files.
+     * The validation rules that may be applied to files.
      *
      * @var array
      */
-    protected $fileRules = ['File', 'Image', 'Mimes', 'Mimetypes', 'Min', 'Max', 'Size', 'Between', 'Dimensions'];
+    protected $fileRules = [
+        'File', 'Image', 'Mimes', 'Mimetypes', 'Min', 'Max',
+        'Size', 'Between', 'Dimensions'
+    ];
 
     /**
      * The numeric related validation rules.
@@ -520,20 +523,21 @@ class Validator implements ValidatorContract
             $parameters = $this->replaceAsterisksInParameters($parameters, $keys);
         }
 
-        // We will get the value for the given attribute from the array of data and then
-        // verify that the attribute is indeed validatable. Unless the rule implies
-        // that the attribute is required, rules are not run for missing values.
         $value = $this->getValue($attribute);
 
+        // If the attribute is a file, we will verify that the file upload was actually successful
+        // and if it wasn't we will add a failure for the attribute. Files may not successfully
+        // upload if they are too large bsaed on PHP's settings so we will bail in this case.
         if (
-            $value instanceof UploadedFile &&
-            ! $value->isValid() &&
+            $value instanceof UploadedFile && ! $value->isValid() &&
             $this->hasRule($attribute, array_merge($this->fileRules, $this->implicitRules))
         ) {
-            return $this->addFailure($attribute, 'file_uploaded', []);
+            return $this->addFailure($attribute, 'uploaded', []);
         }
 
-
+        // If we have made it this far we will make sure the attribute is validatable and if it is
+        // we will call the validation method with the attribute. If a method returns false the
+        // attribute is invalid and we will add a failure message for this failing attribute.
         $validatable = $this->isValidatable($rule, $attribute, $value);
 
         $method = "validate{$rule}";
@@ -778,7 +782,8 @@ class Validator implements ValidatorContract
             return $this->messages->has($attribute);
         }
 
-        if (isset($this->failedRules[$attribute]) && in_array('file_uploaded', array_keys($this->failedRules[$attribute]))) {
+        if (isset($this->failedRules[$attribute]) &&
+            in_array('uploaded', array_keys($this->failedRules[$attribute]))) {
             return true;
         }
 
