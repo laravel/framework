@@ -244,6 +244,44 @@ if (! function_exists('array_pull')) {
     }
 }
 
+if (! function_exists('array_rows_to_columns')) {
+    /**
+     * rows to columns
+     *
+     * @param  array   $array
+     * @return array
+     */
+    function array_rows_to_columns(array $data)
+    {
+        $newArray = [];
+        $lastKey = null;
+        $lastValue = null;
+        $oldArray = $data;
+        if (count($data) == 1) {
+            foreach ($data as $key => $value) {
+                if (is_array($value)) {
+                    return [$key => $value];
+                }
+
+                return $value;
+            }
+        }
+        foreach ($data as $key => $value) {
+            if (is_null($lastKey)) {
+                $lastKey = $key;
+                $lastValue = $value;
+                continue;
+            }
+            if (isset($oldArray[$lastKey])) {
+                unset($oldArray[$lastKey]);
+                $newArray[$lastValue] = array_rows_to_columns($oldArray);
+            }
+        }
+
+        return $newArray;
+    }
+}
+
 if (! function_exists('array_set')) {
     /**
      * Set an array item to a given value using "dot" notation.
@@ -890,3 +928,4 @@ if (! function_exists('with')) {
         return $object;
     }
 }
+
