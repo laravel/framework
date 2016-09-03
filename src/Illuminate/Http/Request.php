@@ -873,7 +873,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * @param  array  $files
      * @return mixed
      */
-    private function filterFiles($files)
+    protected function filterFiles($files)
     {
         foreach ($files as $key => $file) {
             if (is_array($file)) {
