@@ -28,7 +28,7 @@ class MemcachedStore extends TaggableStore implements Store
      * @param  string      $prefix
      * @return void
      */
-    public function __construct($memcached, $prefix = '')
+    public function __construct(Memcached $memcached, $prefix = '')
     {
         $this->setPrefix($prefix);
         $this->memcached = $memcached;
