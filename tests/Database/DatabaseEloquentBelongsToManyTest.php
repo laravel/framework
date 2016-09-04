@@ -582,6 +582,23 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
         ];
     }
 
+    public function testToggleMethodCanLeaveRelatedTimestampsIntact()
+    {
+        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['attach', 'detach'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $query = m::mock('stdClass');
+        $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
+        $query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
+        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+        $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
+        $query->shouldReceive('pluck')->once()->with('role_id')->andReturn(new BaseCollection([1, 2, 3]));
+        $relation->expects($this->once())->method('attach')->with($this->equalTo(['x' => []]), $this->equalTo([]), $this->equalTo(false));
+        $relation->expects($this->once())->method('detach')->with($this->equalTo([2, 3]));
+        $relation->getRelated()->shouldNotReceive('touches');
+        $relation->getParent()->shouldNotReceive('touches');
+
+        $this->assertEquals(['attached' => ['x'], 'detached' => [2, 3]], $relation->toggle([2, 3, 'x'], false));
+    }
+
     public function testToggleMethodTogglesIntermediateTableWithGivenArrayAndAttributes()
     {
         $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['attach', 'detach', 'touchIfTouching', 'updateExistingPivot'])->setConstructorArgs($this->getRelationArguments())->getMock();
