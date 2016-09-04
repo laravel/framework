@@ -94,6 +94,7 @@ class PusherBroadcaster extends Broadcaster
 
     /**
      * Decoded PusherResponse.
+     *
      * @param  mixed  $response
      * @return array
      */
