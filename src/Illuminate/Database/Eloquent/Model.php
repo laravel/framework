@@ -650,7 +650,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $key = $this->getKeyName();
 
-        return static::with($with)->where($key, $this->getKey())->first();
+        return static::newQueryWithoutScopes()->with($with)->where($key, $this->getKey())->first();
     }
 
     /**
