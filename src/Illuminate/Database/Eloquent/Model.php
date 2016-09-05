@@ -2,7 +2,7 @@
 
 namespace Illuminate\Database\Eloquent;
 
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use Closure;
 use DateTime;
 use Exception;
