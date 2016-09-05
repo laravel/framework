@@ -203,7 +203,7 @@ class MigrationServiceProvider extends ServiceProvider
             return new InstallCommand($app['migration.repository']);
         });
     }
-    
+
     /**
      * Register the "wipe" migration command.
      *
@@ -228,7 +228,7 @@ class MigrationServiceProvider extends ServiceProvider
             'command.migrate.rollback', 'command.migrate.reset',
             'command.migrate.refresh', 'command.migrate.install',
             'command.migrate.status', 'migration.creator',
-            'command.migrate.make', 'command.migrate.wipe'
+            'command.migrate.make', 'command.migrate.wipe',
         ];
     }
 }

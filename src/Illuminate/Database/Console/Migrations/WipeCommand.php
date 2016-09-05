@@ -52,24 +52,25 @@ class WipeCommand extends Command
      */
     private function wipe($pretend)
     {
-        $sql  = " SELECT concat('DROP TABLE IF EXISTS `', table_name, '`;') AS drop_query ";
-        $sql .= " FROM information_schema.tables ";
-        $sql .= " WHERE table_schema = :table_schema ";
+        $sql = " SELECT concat('DROP TABLE IF EXISTS `', table_name, '`;') AS drop_query ";
+        $sql .= ' FROM information_schema.tables ';
+        $sql .= ' WHERE table_schema = :table_schema ';
 
         $db_connection = is_null($this->option('database')) ? config('database.default') : $this->option('database');
-        $db_name = config('database.connections.' . $db_connection . '.database');
+        $db_name = config('database.connections.'.$db_connection.'.database');
 
         if (is_null($db_name)) {
             throw new Exception('Invalid database connection.');
         }
 
-        $this->line('<comment>Database connection: </comment>' . $db_connection);
-        $this->line('<comment>Database name: </comment>' . $db_name);
+        $this->line('<comment>Database connection: </comment>'.$db_connection);
+        $this->line('<comment>Database name: </comment>'.$db_name);
 
-        $tables = DB::select($sql, [ 'table_schema' => $db_name ]);
+        $tables = DB::select($sql, ['table_schema' => $db_name]);
 
         if (! count($tables)) {
-            $this->error("No tables found in database.");
+            $this->error('No tables found in database.');
+
             return;
         }
 
@@ -77,6 +78,7 @@ class WipeCommand extends Command
             foreach ($tables as $table) {
                 $this->info($table->drop_query);
             }
+
             return;
         }
 
@@ -90,7 +92,7 @@ class WipeCommand extends Command
             DB::statement('SET FOREIGN_KEY_CHECKS=0;');
             DB::statement($sql);
             DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-            $this->line("<info>Dropped table: </info>" . $table_name);
+            $this->line('<info>Dropped table: </info>'.$table_name);
         }
     }
 }
