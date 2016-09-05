@@ -1060,7 +1060,7 @@ class Builder
             // name and remember the last part as output name.
             $nameParts = explode(' ', $name);
             $resultName = '';
-            if (count($nameParts) == 3 && strtolower($nameParts[1]) == 'as') {
+            if (count($nameParts) == 3 && Str::lower($nameParts[1]) == 'as') {
                 $name = $nameParts[0];
                 $resultName = $nameParts[2];
             }
