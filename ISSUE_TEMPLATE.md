@@ -1,8 +1,8 @@
-- Laravel Version: #.#.# 
-- PHP Version: 
+- Laravel Version: #.#.#
+- PHP Version:
 - Database Driver & Version:
 
 ### Description:
 
 
-### Steps to reproduce:
+### Steps To Reproduce:
