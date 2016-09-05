@@ -12,7 +12,6 @@ use Illuminate\Database\Console\Migrations\MigrateCommand;
 use Illuminate\Database\Console\Migrations\RefreshCommand;
 use Illuminate\Database\Console\Migrations\RollbackCommand;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
-use Illuminate\Database\Console\Migrations\WipeCommand;
 use Illuminate\Database\Migrations\DatabaseMigrationRepository;
 
 class MigrationServiceProvider extends ServiceProvider
@@ -93,7 +92,7 @@ class MigrationServiceProvider extends ServiceProvider
      */
     protected function registerCommands()
     {
-        $commands = ['Migrate', 'Rollback', 'Reset', 'Refresh', 'Install', 'Make', 'Status', 'Wipe'];
+        $commands = ['Migrate', 'Rollback', 'Reset', 'Refresh', 'Install', 'Make', 'Status'];
 
         // We'll simply spin through the list of commands that are migration related
         // and register each one of them with an application container. They will
@@ -109,7 +108,7 @@ class MigrationServiceProvider extends ServiceProvider
             'command.migrate', 'command.migrate.make',
             'command.migrate.install', 'command.migrate.rollback',
             'command.migrate.reset', 'command.migrate.refresh',
-            'command.migrate.status', 'command.migrate.wipe'
+            'command.migrate.status'
         );
     }
 
@@ -205,18 +204,6 @@ class MigrationServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register the "wipe" migration command.
-     *
-     * @return void
-     */
-    protected function registerWipeCommand()
-    {
-        $this->app->singleton('command.migrate.wipe', function () {
-            return new WipeCommand;
-        });
-    }
-
-    /**
      * Get the services provided by the provider.
      *
      * @return array
@@ -228,7 +215,7 @@ class MigrationServiceProvider extends ServiceProvider
             'command.migrate.rollback', 'command.migrate.reset',
             'command.migrate.refresh', 'command.migrate.install',
             'command.migrate.status', 'migration.creator',
-            'command.migrate.make', 'command.migrate.wipe',
+            'command.migrate.make',
         ];
     }
 }

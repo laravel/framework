@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Database\Console\Migrations;
+namespace Illuminate\Database\Console\Seeds;
 
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
@@ -17,7 +17,7 @@ class WipeCommand extends Command
      * @var string
      */
     protected $signature = '
-        migrate:wipe
+        db:wipe
         { --pretend : Dump the SQL queries that would be run. }
         { --force : Force the operation to run when in production. }
         { --database= : The database connection to use. }
@@ -35,7 +35,7 @@ class WipeCommand extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function fire()
     {
         if (! $this->confirmToProceed()) {
             return;
