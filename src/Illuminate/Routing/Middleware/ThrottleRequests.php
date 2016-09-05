@@ -102,6 +102,7 @@ class ThrottleRequests
 
         if (! is_null($retryAfter)) {
             $headers['Retry-After'] = $retryAfter;
+            $headers['X-RateLimit-Reset'] = time() + $retryAfter;
         }
 
         $response->headers->add($headers);
