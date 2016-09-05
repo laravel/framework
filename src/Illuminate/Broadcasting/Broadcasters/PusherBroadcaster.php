@@ -56,10 +56,13 @@ class PusherBroadcaster extends Broadcaster
     public function validAuthenticationResponse($request, $result)
     {
         if (Str::startsWith($request->channel_name, 'private')) {
-            return $this->pusher->socket_auth($request->channel_name, $request->socket_id);
+            return $this->decodedPusherResponse(
+                $this->pusher->socket_auth($request->channel_name, $request->socket_id)
+            );
         } else {
-            return $this->pusher->presence_auth(
-                $request->channel_name, $request->socket_id, $request->user()->id, $result
+            return $this->decodedPusherResponse(
+                $this->pusher->presence_auth(
+                    $request->channel_name, $request->socket_id, $request->user()->id, $result)
             );
         }
     }
@@ -87,5 +90,16 @@ class PusherBroadcaster extends Broadcaster
     public function getPusher()
     {
         return $this->pusher;
+    }
+
+    /**
+     * Decoded PusherResponse.
+     *
+     * @param  mixed  $response
+     * @return array
+     */
+    public function decodedPusherResponse($response)
+    {
+        return json_decode($response, true);
     }
 }
