@@ -120,7 +120,7 @@ class Arr
             return $array->offsetExists($key);
         }
 
-        return array_key_exists($key, $array);
+        return isset($array[$key]) || array_key_exists($key, $array);
     }
 
     /**
@@ -163,7 +163,7 @@ class Arr
     public static function last($array, callable $callback = null, $default = null)
     {
         if (is_null($callback)) {
-            return empty($array) ? value($default) : end($array);
+            return empty($array) ? value($default) : static::first(array_slice($array, -1));
         }
 
         return static::first(array_reverse($array, true), $callback, $default);
@@ -200,8 +200,6 @@ class Arr
      */
     public static function forget(&$array, $keys)
     {
-        $original = &$array;
-
         $keys = (array) $keys;
 
         if (count($keys) === 0) {
@@ -212,26 +210,23 @@ class Arr
             // if the exact key exists in the top-level, remove it
             if (static::exists($array, $key)) {
                 unset($array[$key]);
+            } elseif (strpos($key, '.')) {
+                $parts = explode('.', $key);
 
-                continue;
-            }
+                $target = array_pop($parts);
 
-            $parts = explode('.', $key);
+                $intermediary = &$array;
 
-            // clean up before each pass
-            $array = &$original;
+                foreach ($parts as $part) {
+                    if (! isset($intermediary[$part])) {
+                        continue 2;
+                    }
 
-            while (count($parts) > 1) {
-                $part = array_shift($parts);
-
-                if (isset($array[$part]) && is_array($array[$part])) {
-                    $array = &$array[$part];
-                } else {
-                    continue 2;
+                    $intermediary = &$intermediary[$part];
                 }
-            }
 
-            unset($array[array_shift($parts)]);
+                unset($intermediary[$target]);
+            }
         }
     }
 
@@ -437,22 +432,24 @@ class Arr
             return $array = $value;
         }
 
-        $keys = explode('.', $key);
+        if (strpos($key, '.')) {
+            $parts = explode('.', $key);
 
-        while (count($keys) > 1) {
-            $key = array_shift($keys);
+            $key = array_pop($parts);
 
-            // If the key doesn't exist at this depth, we will just create an empty array
-            // to hold the next value, allowing us to create the arrays to hold final
-            // values at the correct depth. Then we'll keep digging into the array.
-            if (! isset($array[$key]) || ! is_array($array[$key])) {
-                $array[$key] = [];
+            foreach ($parts as $part) {
+                // If the key doesn't exist at this depth, we will just create an empty array
+                // to hold the next value, allowing us to create the arrays to hold final
+                // values at the correct depth. Then we'll keep digging into the array.
+                if (! isset($array[$part]) || ! is_array($array[$part])) {
+                    $array[$part] = [];
+                }
+
+                $array = &$array[$part];
             }
-
-            $array = &$array[$key];
         }
 
-        $array[array_shift($keys)] = $value;
+        $array[$key] = $value;
 
         return $array;
     }
