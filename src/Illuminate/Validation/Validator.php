@@ -527,7 +527,7 @@ class Validator implements ValidatorContract
 
         // If the attribute is a file, we will verify that the file upload was actually successful
         // and if it wasn't we will add a failure for the attribute. Files may not successfully
-        // upload if they are too large bsaed on PHP's settings so we will bail in this case.
+        // upload if they are too large based on PHP's settings so we will bail in this case.
         if (
             $value instanceof UploadedFile && ! $value->isValid() &&
             $this->hasRule($attribute, array_merge($this->fileRules, $this->implicitRules))
