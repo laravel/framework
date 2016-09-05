@@ -30,6 +30,6 @@ class Create{{tableClassName}}Table extends Migration
      */
     public function down()
     {
-        Schema::drop('{{table}}');
+        Schema::dropIfExists('{{table}}');
     }
 }
