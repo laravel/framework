@@ -1056,6 +1056,15 @@ class Builder
         $relations = is_array($relations) ? $relations : func_get_args();
 
         foreach ($this->parseWithRelations($relations) as $name => $constraints) {
+            // If relation string matches "relation as newname" extract first part as the relation
+            // name and remember the last part as output name.
+            $nameParts = explode(' ', $name);
+            $resultName = '';
+            if (count($nameParts) == 3 && strtolower($nameParts[1]) == 'as') {
+                $name = $nameParts[0];
+                $resultName = $nameParts[2];
+            }
+
             // Here we will get the relationship count query and prepare to add it to the main query
             // as a sub-select. First, we'll get the "has" query and use that to get the relation
             // count query. We will normalize the relation name then append _count as the name.
@@ -1069,7 +1078,7 @@ class Builder
 
             $query->mergeModelDefinedRelationConstraints($relation->getQuery());
 
-            $this->selectSub($query->toBase(), snake_case($name).'_count');
+            $this->selectSub($query->toBase(), snake_case(!empty($resultName) ? $resultName : $name).'_count');
         }
 
         return $this;
