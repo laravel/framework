@@ -189,7 +189,7 @@ class Worker
     /**
      * Process a given job from the queue.
      *
-     * @param  string  $connection
+     * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  \Illuminate\Queue\WorkerOptions  $options
      * @return void

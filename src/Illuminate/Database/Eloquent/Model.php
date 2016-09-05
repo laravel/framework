@@ -1401,7 +1401,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @param  array  $attributes
      * @param  array  $options
-     * @return bool|int
+     * @return bool
      */
     public function update(array $attributes = [], array $options = [])
     {
@@ -1462,7 +1462,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // clause to only update this model. Otherwise, we'll just insert them.
         if ($this->exists) {
             $saved = $this->isDirty() ?
-                        $this->performUpdate($query) : false;
+                        $this->performUpdate($query) : true;
         }
 
         // If the model is brand new, we'll insert it into our database and set the

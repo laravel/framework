@@ -769,6 +769,46 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('The last field is required unless first is in taylor, sven.', $v->messages()->first('last'));
     }
 
+    public function testFailedFileUploads()
+    {
+        $trans = $this->getRealTranslator();
+
+        // If file is not successfully uploaded validation should fail with a
+        // 'uploaded' error message instead of the original rule.
+        $file = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile');
+        $file->shouldReceive('isValid')->andReturn(false);
+        $file->shouldNotReceive('getSize');
+        $v = new Validator($trans, [], ['photo' => 'Max:10']);
+        $v->setFiles(['photo' => $file]);
+        $this->assertTrue($v->fails());
+        $this->assertEquals(['validation.uploaded'], $v->errors()->get('photo'));
+
+        // Even "required" will not run if the file failed to upload.
+        $file = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile');
+        $file->shouldReceive('isValid')->once()->andReturn(false);
+        $v = new Validator($trans, [], ['photo' => 'required']);
+        $v->setFiles(['photo' => $file]);
+        $this->assertTrue($v->fails());
+        $this->assertEquals(['validation.uploaded'], $v->errors()->get('photo'));
+
+        // It should only fail with that rule if a validation rule implies it's
+        // a file. Otherwise it should fail with the regular rule.
+        $file = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile');
+        $file->shouldReceive('isValid')->andReturn(false);
+        $v = new Validator($trans, [], ['photo' => 'string']);
+        $v->setFiles(['photo' => $file]);
+        $this->assertTrue($v->fails());
+        $this->assertEquals(['validation.string'], $v->errors()->get('photo'));
+
+        // Validation shouldn't continue if a file failed to upload.
+        $file = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile');
+        $file->shouldReceive('isValid')->once()->andReturn(false);
+        $v = new Validator($trans, [], ['photo' => 'file|mimes:pdf|min:10']);
+        $v->setFiles(['photo' => $file]);
+        $this->assertTrue($v->fails());
+        $this->assertEquals(['validation.uploaded'], $v->errors()->get('photo'));
+    }
+
     public function testValidateInArray()
     {
         $trans = $this->getRealTranslator();
@@ -1187,7 +1227,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
 
         $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['isValid', 'getSize'])->setConstructorArgs([__FILE__, basename(__FILE__)])->getMock();
-        $file->expects($this->at(0))->method('isValid')->will($this->returnValue(true));
+        $file->expects($this->any())->method('isValid')->will($this->returnValue(true));
         $file->expects($this->at(1))->method('getSize')->will($this->returnValue(3072));
         $v = new Validator($trans, [], ['photo' => 'Max:10']);
         $v->setFiles(['photo' => $file]);
