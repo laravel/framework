@@ -868,7 +868,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Filter the given request files.
+     * Filter the given array of files, removing any empty values.
      *
      * @param  array  $files
      * @return mixed
