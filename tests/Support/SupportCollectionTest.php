@@ -1579,7 +1579,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         );
     }
 
-    public function  testSplitCollectionWithCountLessThenDivisor()
+    public function testSplitCollectionWithCountLessThenDivisor()
     {
         $collection = new Collection(['a']);
 
