@@ -107,6 +107,7 @@ class WipeCommand extends BaseCommand
 
         if (! count($tables)) {
             $this->error('No tables found in database.');
+
             return;
         }
 
@@ -114,6 +115,7 @@ class WipeCommand extends BaseCommand
             foreach ($tables as $table) {
                 $this->info($this->generateSql($table));
             }
+
             return;
         }
 
@@ -135,6 +137,7 @@ class WipeCommand extends BaseCommand
     {
         $sql = 'DROP TABLE IF EXISTS `:table_name`;';
         $result = str_replace(':table_name', $table_name, $sql);
+
         return $result;
     }
 }
