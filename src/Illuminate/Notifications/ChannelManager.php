@@ -17,11 +17,11 @@ use Illuminate\Contracts\Notifications\Dispatcher as DispatcherContract;
 class ChannelManager extends Manager implements DispatcherContract, FactoryContract
 {
     /**
-     * The default channels used to deliver messages.
+     * The default channel used to deliver messages.
      *
-     * @var array
+     * @var string
      */
-    protected $defaultChannels = ['mail', 'database'];
+    protected $defaultChannel = 'mail';
 
     /**
      * Send the given notification to the given notifiable entities.
@@ -206,19 +206,19 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     }
 
     /**
-     * Get the default channel driver names.
+     * Get the default channel driver name.
      *
-     * @return array
+     * @return string
      */
     public function getDefaultDriver()
     {
-        return $this->defaultChannels;
+        return $this->defaultChannel;
     }
 
     /**
-     * Get the default channel driver names.
+     * Get the default channel driver name.
      *
-     * @return array
+     * @return string
      */
     public function deliversVia()
     {
@@ -226,13 +226,13 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     }
 
     /**
-     * Set the default channel driver names.
+     * Set the default channel driver name.
      *
-     * @param  array|string  $channels
+     * @param  string  $channel
      * @return void
      */
-    public function deliverVia($channels)
+    public function deliverVia($channel)
     {
-        $this->defaultChannels = (array) $channels;
+        $this->defaultChannel = $channel;
     }
 }
