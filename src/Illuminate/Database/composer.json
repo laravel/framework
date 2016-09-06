@@ -7,7 +7,12 @@
         "issues": "https://github.com/laravel/framework/issues",
         "source": "https://github.com/laravel/framework"
     },
-    "keywords": ["laravel", "database", "sql", "orm"],
+    "keywords": [
+        "database",
+        "laravel",
+        "orm",
+        "sql"
+    ],
     "authors": [
         {
             "name": "Taylor Otwell",
