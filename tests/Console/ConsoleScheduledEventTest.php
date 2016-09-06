@@ -111,7 +111,7 @@ class ConsoleScheduledEventTest extends PHPUnit_Framework_TestCase
         $app = m::mock('Illuminate\Foundation\Application[isDownForMaintenance,environment]');
         $app->shouldReceive('isDownForMaintenance')->andReturn(false);
         $app->shouldReceive('environment')->andReturn('production');
-        Carbon::setTestNow(Carbon::create(2015, 1, 1, 9, 0, 0));
+        Carbon::setTestNow(Carbon::now()->startOfDay()->addHours(9));
 
         $event = new Event('php foo');
         $this->assertTrue($event->between('8:00', '10:00')->filtersPass($app));
