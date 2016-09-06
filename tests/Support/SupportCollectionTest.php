@@ -1557,7 +1557,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 
     public function testSplitCollectionWithADivisableCount()
     {
-        $collection = Collection::make(['a', 'b', 'c', 'd']);
+        $collection = new Collection(['a', 'b', 'c', 'd']);
 
         $this->assertEquals(
             [['a', 'b'], ['c', 'd']],

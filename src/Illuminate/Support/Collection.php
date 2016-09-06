@@ -923,7 +923,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Split a collection into a certain number of groups.
      *
-     * @param int $numberOfGroups
+     * @param  int $numberOfGroups
      * @return static
      */
      public function split($numberOfGroups)
