@@ -792,7 +792,7 @@ class Factory implements FactoryContract
     /**
      * Add new loop to the stack.
      *
-     * @param  array|\Countable  $data
+     * @param  \Countable|array  $data
      * @return void
      */
     public function addLoop($data)
