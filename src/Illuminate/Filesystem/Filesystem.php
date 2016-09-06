@@ -306,17 +306,6 @@ class Filesystem
     }
 
     /**
-     * Determine if the given path is writable.
-     *
-     * @param  string  $path
-     * @return bool
-     */
-    public function isWritable($path)
-    {
-        return is_writable($path);
-    }
-
-    /**
      * Determine if the given path is readable.
      *
      * @param  string  $path
@@ -325,6 +314,17 @@ class Filesystem
     public function isReadable($path)
     {
         return is_readable($path);
+    }
+
+    /**
+     * Determine if the given path is writable.
+     *
+     * @param  string  $path
+     * @return bool
+     */
+    public function isWritable($path)
+    {
+        return is_writable($path);
     }
 
     /**
