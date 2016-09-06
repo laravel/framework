@@ -641,7 +641,7 @@ class Event
     {
         return function () use ($startTime,$endTime) {
             $now = Carbon::now()->timestamp;
-            
+
             return $now >= strtotime($startTime) && $now <= strtotime($endTime);
         };
     }
