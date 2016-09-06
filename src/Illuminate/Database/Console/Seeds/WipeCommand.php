@@ -49,7 +49,7 @@ class WipeCommand extends BaseCommand
     protected $fs;
 
     /**
-     * Create a new migration command instance and filesystem instance
+     * Create a new migration command instance and filesystem instance.
      *
      * @param  \Illuminate\Database\Migrations\Migrator  $migrator
      * @return void
