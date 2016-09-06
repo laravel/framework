@@ -1,5 +1,6 @@
 * text=auto
 
+/.github export-ignore
 /build export-ignore
 /tests export-ignore
 .editorconfig export-ignore
@@ -10,4 +11,3 @@
 phpunit.xml.dist export-ignore
 CHANGELOG-5.2.md export-ignore
 CHANGELOG-5.3.md export-ignore
-CONTRIBUTING.md export-ignore
