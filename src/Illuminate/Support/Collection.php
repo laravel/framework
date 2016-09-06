@@ -921,6 +921,23 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Split a collection into a certain number of groups.
+     *
+     * @param  int  $numberOfGroups
+     * @return static
+     */
+    public function split($numberOfGroups)
+    {
+        if ($this->isEmpty()) {
+            return new static;
+        }
+
+        $groupSize = ceil($this->count() / $numberOfGroups);
+
+        return $this->chunk($groupSize);
+    }
+
+    /**
      * Chunk the underlying collection array.
      *
      * @param  int   $size

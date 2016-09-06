@@ -1554,6 +1554,54 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $collection = new Collection(new \ArrayObject(['foo' => 1, 'bar' => 2, 'baz' => 3]));
         $this->assertEquals(['foo' => 1, 'bar' => 2, 'baz' => 3], $collection->toArray());
     }
+
+    public function testSplitCollectionWithADivisableCount()
+    {
+        $collection = new Collection(['a', 'b', 'c', 'd']);
+
+        $this->assertEquals(
+            [['a', 'b'], ['c', 'd']],
+            $collection->split(2)->map(function (Collection $chunk) {
+                return $chunk->values()->toArray();
+            })->toArray()
+        );
+    }
+
+    public function testSplitCollectionWithAnUndivisableCount()
+    {
+        $collection = new Collection(['a', 'b', 'c']);
+
+        $this->assertEquals(
+            [['a', 'b'], ['c']],
+            $collection->split(2)->map(function (Collection $chunk) {
+                return $chunk->values()->toArray();
+            })->toArray()
+        );
+    }
+
+    public function testSplitCollectionWithCountLessThenDivisor()
+    {
+        $collection = new Collection(['a']);
+
+        $this->assertEquals(
+            [['a']],
+            $collection->split(2)->map(function (Collection $chunk) {
+                return $chunk->values()->toArray();
+            })->toArray()
+        );
+    }
+
+    public function testSplitEmptyCollection()
+    {
+        $collection = new Collection();
+
+        $this->assertEquals(
+            [],
+            $collection->split(2)->map(function (Collection $chunk) {
+                return $chunk->values()->toArray();
+            })->toArray()
+        );
+    }
 }
 
 class TestAccessorEloquentTestStub
