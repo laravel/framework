@@ -38,7 +38,7 @@ class WipeServiceProvider extends ServiceProvider
     protected function registerWipeCommand()
     {
         $this->app->singleton('command.wipe', function ($app) {
-            return new WipeCommand($app['db']);
+            return new WipeCommand($app['migrator']);
         });
     }
 
