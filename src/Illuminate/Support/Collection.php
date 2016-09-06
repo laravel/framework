@@ -929,7 +929,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function split($numberOfGroups)
     {
         if ($this->isEmpty()) {
-            return $this;
+            return new static;
         }
 
         $groupSize = ceil($this->count() / $numberOfGroups);
