@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Queue\AttemptsExceededException;
 use Illuminate\Queue\WorkerOptions;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
@@ -89,10 +90,14 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
     {
         $e = new RuntimeException;
 
-        $job = new WorkerFakeJob(function () use ($e) {
+        $job = new WorkerFakeJob(function ($job) use ($e) {
+
+            // In normal use this would be incremented by being popped off the queue
+            $job->attempts++;
+
             throw $e;
         });
-        $job->attempts = 5;
+        $job->attempts = 1;
 
         $worker = $this->getWorker('default', ['queue' => [$job]]);
         $worker->runNextJob('default', 'queue', $this->workerOptions(['maxTries' => 1]));
@@ -101,6 +106,25 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($job->deleted);
         $this->assertEquals($e, $job->failedWith);
         $this->exceptionHandler->shouldHaveReceived('report')->with($e);
+        $this->events->shouldHaveReceived('fire')->with(Mockery::type(JobExceptionOccurred::class))->once();
+        $this->events->shouldHaveReceived('fire')->with(Mockery::type(JobFailed::class))->once();
+        $this->events->shouldNotHaveReceived('fire', [Mockery::type(JobProcessed::class)]);
+    }
+
+    public function test_job_is_failed_if_it_has_already_exceeded_max_attempts()
+    {
+        $job = new WorkerFakeJob(function ($job) {
+            $job->attempts++;
+        });
+        $job->attempts = 2;
+
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+        $worker->runNextJob('default', 'queue', $this->workerOptions(['maxTries' => 1]));
+
+        $this->assertNull($job->releaseAfter);
+        $this->assertTrue($job->deleted);
+        $this->assertInstanceOf(AttemptsExceededException::class, $job->failedWith);
+        $this->exceptionHandler->shouldHaveReceived('report')->with(Mockery::type(AttemptsExceededException::class));
         $this->events->shouldHaveReceived('fire')->with(Mockery::type(JobExceptionOccurred::class))->once();
         $this->events->shouldHaveReceived('fire')->with(Mockery::type(JobFailed::class))->once();
         $this->events->shouldNotHaveReceived('fire', [Mockery::type(JobProcessed::class)]);
@@ -212,7 +236,7 @@ class WorkerFakeJob
     public function fire()
     {
         $this->fired = true;
-        $this->callback->__invoke();
+        $this->callback->__invoke($this);
     }
 
     public function payload()

@@ -202,6 +202,9 @@ class Worker
         try {
             $this->raiseBeforeJobEvent($connectionName, $job);
 
+            // Check if this job has already been received too many times
+            $this->markJobAsFailedIfAlreadyExceedsMaxAttempts($connectionName, $job, $options->maxTries);
+
             // Here we will fire off the job and let it process. We will catch any exceptions so
             // they can be reported to the developers logs, etc. Once the job is finished the
             // proper events will be fired to let any listeners know this job has finished.
@@ -251,6 +254,29 @@ class Worker
     }
 
     /**
+     * Mark the given job as failed if it has exceeded the maximum allowed attempts. This will likely be because
+     * the job previously exceeded a timeout.
+     *
+     * @param  string  $connectionName
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  int  $maxTries
+     * @return void
+     */
+    protected function markJobAsFailedIfAlreadyExceedsMaxAttempts($connectionName, $job, $maxTries)
+    {
+        if ($maxTries === 0 || $job->attempts() <= $maxTries) {
+            return;
+        }
+
+        $e = new AttemptsExceededException(
+            "Queue job has already been attempted more than maxTries, it may have previously timed out");
+
+        $this->failJob($connectionName, $job, $e);
+
+        throw $e;
+    }
+
+    /**
      * Mark the given job as failed if it has exceeded the maximum allowed attempts.
      *
      * @param  string  $connectionName
@@ -263,6 +289,23 @@ class Worker
         $connectionName, $job, $maxTries, $e
     ) {
         if ($maxTries === 0 || $job->attempts() < $maxTries) {
+            return;
+        }
+
+        $this->failJob($connectionName, $job, $e);
+    }
+
+    /**
+     * Mark the given job as failed and raise the relevant event.
+     *
+     * @param  string  $connectionName
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  \Exception  $e
+     * @return void
+     */
+    protected function failJob($connectionName, $job, $e)
+    {
+        if ($job->isDeleted()) {
             return;
         }
 
