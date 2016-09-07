@@ -202,8 +202,9 @@ class Worker
         try {
             $this->raiseBeforeJobEvent($connectionName, $job);
 
-            // Check if this job has already been received too many times
-            $this->markJobAsFailedIfAlreadyExceedsMaxAttempts($connectionName, $job, $options->maxTries);
+            $this->markJobAsFailedIfAlreadyExceedsMaxAttempts(
+                $connectionName, $job, $options->maxTries
+            );
 
             // Here we will fire off the job and let it process. We will catch any exceptions so
             // they can be reported to the developers logs, etc. Once the job is finished the
@@ -269,8 +270,8 @@ class Worker
             return;
         }
 
-        $e = new AttemptsExceededException(
-            'Queue job has already been attempted more than maxTries, it may have previously timed out'
+        $e = new MaxAttemptsExceededException(
+            'A queued job has been attempted too many times. The job may have previously timed out.'
         );
 
         $this->failJob($connectionName, $job, $e);
