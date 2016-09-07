@@ -4,6 +4,7 @@ namespace Illuminate\Notifications\Channels;
 
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Mail\Mailer;
+use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Notifications\Notification;
 
 class MailChannel
@@ -40,6 +41,11 @@ class MailChannel
         }
 
         $message = $notification->toMail($notifiable);
+
+        if ($message instanceof Mailable) {
+            $message->send($this->mailer);
+            return;
+        }
 
         $this->mailer->send($message->view, $message->data(), function ($m) use ($notifiable, $notification, $message) {
             $recipients = empty($message->to) ? $notifiable->routeNotificationFor('mail') : $message->to;
