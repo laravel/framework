@@ -43,9 +43,7 @@ class MailChannel
         $message = $notification->toMail($notifiable);
 
         if ($message instanceof Mailable) {
-            $message->send($this->mailer);
-
-            return;
+            return $message->send($this->mailer);
         }
 
         $this->mailer->send($message->view, $message->data(), function ($m) use ($notifiable, $notification, $message) {
