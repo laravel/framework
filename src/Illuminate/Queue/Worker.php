@@ -269,7 +269,7 @@ class Worker
         }
 
         $e = new AttemptsExceededException(
-            "Queue job has already been attempted more than maxTries, it may have previously timed out");
+            'Queue job has already been attempted more than maxTries, it may have previously timed out');
 
         $this->failJob($connectionName, $job, $e);
 
