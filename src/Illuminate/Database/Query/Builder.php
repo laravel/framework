@@ -981,7 +981,7 @@ class Builder
     }
 
     /**
-     * Add a external sub-select to the query.
+     * Add an external sub-select to the query.
      *
      * @param  string   $column
      * @param  \Illuminate\Database\Query\Builder|static  $query
