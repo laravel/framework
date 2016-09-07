@@ -322,7 +322,7 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * Create the column definition for a integer type.
+     * Create the column definition for an integer type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
