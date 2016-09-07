@@ -44,6 +44,7 @@ class MailChannel
 
         if ($message instanceof Mailable) {
             $message->send($this->mailer);
+
             return;
         }
 
