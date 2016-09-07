@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Queue\AttemptsExceededException;
 use Illuminate\Queue\WorkerOptions;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
@@ -8,6 +7,7 @@ use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Queue\Events\JobExceptionOccurred;
+use Illuminate\Queue\MaxAttemptsExceededException;
 
 class QueueWorkerTest extends PHPUnit_Framework_TestCase
 {
@@ -122,8 +122,8 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
 
         $this->assertNull($job->releaseAfter);
         $this->assertTrue($job->deleted);
-        $this->assertInstanceOf(AttemptsExceededException::class, $job->failedWith);
-        $this->exceptionHandler->shouldHaveReceived('report')->with(Mockery::type(AttemptsExceededException::class));
+        $this->assertInstanceOf(MaxAttemptsExceededException::class, $job->failedWith);
+        $this->exceptionHandler->shouldHaveReceived('report')->with(Mockery::type(MaxAttemptsExceededException::class));
         $this->events->shouldHaveReceived('fire')->with(Mockery::type(JobExceptionOccurred::class))->once();
         $this->events->shouldHaveReceived('fire')->with(Mockery::type(JobFailed::class))->once();
         $this->events->shouldNotHaveReceived('fire', [Mockery::type(JobProcessed::class)]);
