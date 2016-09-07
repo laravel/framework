@@ -4,6 +4,7 @@ namespace Illuminate\Mail;
 
 use ReflectionClass;
 use ReflectionProperty;
+use BadMethodCallException;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
@@ -483,5 +484,23 @@ class Mailable implements MailableContract
         $this->callbacks[] = $callback;
 
         return $this;
+    }
+
+    /**
+     * Dynamically bind parameters to the message.
+     *
+     * @param  string  $method
+     * @param  array   $parameters
+     * @return $this
+     *
+     * @throws \BadMethodCallException
+     */
+    public function __call($method, $parameters)
+    {
+        if (Str::startsWith($method, 'with')) {
+            return $this->with(Str::snake(substr($method, 4)), $parameters[0]);
+        }
+
+        throw new BadMethodCallException("Method [$method] does not exist on mailable.");
     }
 }
