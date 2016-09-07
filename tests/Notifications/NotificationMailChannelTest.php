@@ -294,7 +294,7 @@ class NotificationMailChannelTestNotificationWithMailableContract extends Notifi
         $mock = Mockery::mock(Illuminate\Contracts\Mail\Mailable::class);
 
         $mock->shouldReceive('send')->once()->with(Mockery::on(function ($mailer) {
-            if (! ($mailer instanceof \Illuminate\Contracts\Mail\Mailer)) {
+            if (! $mailer instanceof Illuminate\Contracts\Mail\Mailer) {
                 return false;
             }
 
