@@ -91,7 +91,6 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
         $e = new RuntimeException;
 
         $job = new WorkerFakeJob(function ($job) use ($e) {
-
             // In normal use this would be incremented by being popped off the queue
             $job->attempts++;
 
