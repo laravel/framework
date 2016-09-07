@@ -2,9 +2,9 @@
 
 namespace Illuminate\Mail;
 
-use BadMethodCallException;
 use ReflectionClass;
 use ReflectionProperty;
+use BadMethodCallException;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
