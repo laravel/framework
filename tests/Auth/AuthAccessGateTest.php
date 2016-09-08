@@ -155,6 +155,15 @@ class GateTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($gate->check('update-dash', new AccessGateTestDummy));
     }
 
+    public function test_policy_converts_dots_to_camel()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
+
+        $this->assertTrue($gate->check('update.dot', new AccessGateTestDummy));
+    }
+
     public function test_policy_default_to_false_if_method_does_not_exist()
     {
         $gate = $this->getBasicGate();
@@ -293,6 +302,11 @@ class AccessGateTestPolicy
     }
 
     public function updateDash($user, AccessGateTestDummy $dummy)
+    {
+        return $user instanceof StdClass;
+    }
+
+    public function updateDot($user, AccessGateTestDummy $dummy)
     {
         return $user instanceof StdClass;
     }
