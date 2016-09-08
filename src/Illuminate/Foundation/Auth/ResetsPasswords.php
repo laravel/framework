@@ -14,13 +14,11 @@ trait ResetsPasswords
     /**
      * Display the password reset view for the given token.
      *
-     * If no token is present, display the link request form.
-     *
      * @param  \Illuminate\Http\Request  $request
-     * @param  string|null  $token
+     * @param  string  $token
      * @return \Illuminate\Http\Response
      */
-    public function showResetForm(Request $request, $token = null)
+    public function showResetForm(Request $request, $token)
     {
         return view('auth.passwords.reset')->with(
             ['token' => $token, 'email' => $request->email]
