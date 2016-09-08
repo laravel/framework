@@ -25,7 +25,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      *
      * @var string
      */
-    const VERSION = '5.3.6';
+    const VERSION = '5.3.7';
 
     /**
      * The base path for the Laravel installation.
