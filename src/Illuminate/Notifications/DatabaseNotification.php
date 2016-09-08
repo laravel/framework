@@ -67,4 +67,9 @@ class DatabaseNotification extends Model
     {
         return new DatabaseNotificationCollection($models);
     }
+    
+    public function getNameAttribute()
+    {
+        return snake_case(class_basename($this->type));
+    }
 }
