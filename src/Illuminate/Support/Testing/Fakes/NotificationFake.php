@@ -68,10 +68,6 @@ class NotificationFake implements NotificationFactory
 
         $notifications = collect($this->notificationsFor($notifiable, $notification));
 
-        if (is_null($callback)) {
-            return $notifications;
-        }
-
         return $notifications->filter(function ($arguments) use ($callback) {
             return $callback(...array_values($arguments));
         })->pluck('notification');

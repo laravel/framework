@@ -84,10 +84,6 @@ class QueueFake implements Queue
             return true;
         };
 
-        if (is_null($callback)) {
-            return collect($this->jobs[$job]);
-        }
-
         return collect($this->jobs[$job])->filter(function ($data) use ($callback) {
             return $callback($data['job'], $data['queue']);
         })->pluck('job');

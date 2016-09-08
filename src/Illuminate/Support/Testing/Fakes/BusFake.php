@@ -61,10 +61,6 @@ class BusFake implements Dispatcher
             return true;
         };
 
-        if (is_null($callback)) {
-            return collect($this->commands[$command]);
-        }
-
         return collect($this->commands[$command])->filter(function ($command) use ($callback) {
             return $callback($command);
         });
