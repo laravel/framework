@@ -880,7 +880,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
                 $files[$key] = $this->filterFiles($files[$key]);
             }
 
-            if (! $files[$key]) {
+            if (empty($files[$key])) {
                 unset($files[$key]);
             }
         }
