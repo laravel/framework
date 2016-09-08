@@ -1984,7 +1984,9 @@ class Builder
      */
     public function sum($column)
     {
-        return $this->aggregate(__FUNCTION__, [$column]);
+        $result = $this->aggregate(__FUNCTION__, [$column]);
+
+        return $result ?: 0;
     }
 
     /**
