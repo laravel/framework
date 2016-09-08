@@ -2,7 +2,6 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
-use Illuminate\Mail\Mailer;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\MailableMailer;
 
