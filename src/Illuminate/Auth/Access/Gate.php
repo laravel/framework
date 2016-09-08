@@ -364,6 +364,10 @@ class Gate implements GateContract
                 }
             }
 
+            if (strpos($ability, '.') !== false) {
+                $ability = str_replace('.', '-', $ability);
+            }
+
             if (strpos($ability, '-') !== false) {
                 $ability = Str::camel($ability);
             }
