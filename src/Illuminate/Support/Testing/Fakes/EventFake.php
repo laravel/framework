@@ -61,10 +61,6 @@ class EventFake implements Dispatcher
             return true;
         };
 
-        if (is_null($callback)) {
-            return collect($this->events[$event]);
-        }
-
         return collect($this->events[$event])->filter(function ($arguments) use ($callback) {
             return $callback(...$arguments);
         })->flatMap(function ($arguments) {

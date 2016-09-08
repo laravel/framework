@@ -120,10 +120,6 @@ class MailFake implements Mailer
             return true;
         };
 
-        if (is_null($callback)) {
-            return collect($this->mailables[$mailable]);
-        }
-
         return $this->mailablesOf($mailable)->filter(function ($mailable) use ($callback) {
             return $callback($mailable->mailable, ...array_values($mailable->getRecipients()));
         });
