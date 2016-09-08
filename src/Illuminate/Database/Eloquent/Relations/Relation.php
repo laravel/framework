@@ -306,7 +306,8 @@ abstract class Relation
         $map = static::buildMorphMapFromModels($map);
 
         if (is_array($map)) {
-            static::$morphMap = $merge ? array_merge(static::$morphMap, $map) : $map;
+            static::$morphMap = $merge && static::$morphMap
+                            ? array_merge(static::$morphMap, $map) : $map;
         }
 
         return static::$morphMap;
