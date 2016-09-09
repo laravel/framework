@@ -1049,7 +1049,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $callback = $this->valueRetriever($callback);
 
         return $this->reduce(function ($result, $item) use ($callback) {
-            return $result += $callback($item);
+            return $result + $callback($item);
         }, 0);
     }
 
