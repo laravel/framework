@@ -31,9 +31,9 @@ class SyncJob extends Job implements JobContract
      */
     public function __construct(Container $container, $payload, $queue)
     {
+        $this->queue = $queue;
         $this->payload = $payload;
         $this->container = $container;
-        $this->queue = $queue;
     }
 
     /**
