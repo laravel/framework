@@ -453,7 +453,7 @@ trait MocksApplicationServices
     protected function getDispatchedNotifications(array $notifications)
     {
         return $this->getDispatched($notifications,
-            collect($this->dispatchedNotifications)->map(function($notification) {
+            collect($this->dispatchedNotifications)->map(function ($notification) {
                 return $notification['instance'];
             })->all()
         );
