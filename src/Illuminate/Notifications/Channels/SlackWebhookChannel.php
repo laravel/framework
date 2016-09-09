@@ -42,12 +42,29 @@ class SlackWebhookChannel
 
         $message = $notification->toSlack($notifiable);
 
-        return $this->http->post($url, [
-            'json' => [
+        $this->http->post($url, $this->buildJsonPayload($message));
+    }
+
+    /**
+     * Build up a JSON payload for the Slack webhook.
+     *
+     * @param  \Illuminate\Notifications\Messages\SlackMessage  $message
+     * @return array
+     */
+    protected function buildJsonPayload(SlackMessage $message)
+    {
+        $optionalFields = array_filter([
+            'username' => data_get($message, 'username'),
+            'icon_emoji' => data_get($message, 'icon'),
+            'channel' => data_get($message, 'channel'),
+        ]);
+
+        return [
+            'json' => array_merge([
                 'text' => $message->content,
                 'attachments' => $this->attachments($message),
-            ],
-        ]);
+            ], $optionalFields),
+        ];
     }
 
     /**
