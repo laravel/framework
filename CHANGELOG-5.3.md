@@ -1,5 +1,23 @@
 # Release Notes for 5.3.x
 
+## v5.3.8 (2016-09-09)
+
+### Added
+- Added missing `MailableMailer::later()` method ([#15364](https://github.com/laravel/framework/pull/15364))
+- Added missing `$queue` parameter on `SyncJob` ([#15368](https://github.com/laravel/framework/pull/15368))
+- Added SSL options for PostgreSQL DSN ([#15371](https://github.com/laravel/framework/pull/15371))
+- Added ability to disable touching of parent when toggling relation ([#15263](https://github.com/laravel/framework/pull/15263))
+- Added username, icon and channel options for Slack Notifications ([#14910](https://github.com/laravel/framework/pull/14910))
+
+### Changed
+- Updated `symfony/css-selector` version ([#15344](https://github.com/laravel/framework/pull/15344))
+- Renamed methods in `NotificationFake` ([69b08f6](https://github.com/laravel/framework/commit/69b08f66fbe70b4df8332a8f2a7557a49fd8c693))
+- Minor code improvements ([#15369](https://github.com/laravel/framework/pull/15369))
+
+### Fixed
+- Fixed catchable fatal error introduced [#15250](https://github.com/laravel/framework/pull/15250) ([#15350](https://github.com/laravel/framework/pull/15350))
+
+
 ## v5.3.7 (2016-09-08)
 
 ### Added
