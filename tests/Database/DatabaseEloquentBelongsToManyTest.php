@@ -138,13 +138,12 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
 
     public function testAttachInsertsPivotTableRecord()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
-        $query = m::mock('stdClass');
-        $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
-        $query->shouldReceive('insert')->once()->with([['user_id' => 1, 'role_id' => 2, 'foo' => 'bar']])->andReturn(true);
-        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
-        $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
-        $relation->expects($this->once())->method('touchIfTouching');
+        $relation = $this->getRelation();
+        $relation->getParent()->shouldReceive('touches')->andReturn(false);
+        $relation->getRelated()->shouldReceive('touches')->andReturn(false);
+
+        $query = $this->getNewStatement($relation);
+        $query->shouldReceive('insert')->once()->with([['user_id' => 1, 'role_id' => 2, 'foo' => 'bar']]);
 
         $relation->attach(2, ['foo' => 'bar']);
     }
@@ -609,53 +608,162 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
         $relation->touchIfTouching();
     }
 
-    public function testSyncMethodConvertsCollectionToArrayOfKeys()
+    public function testSyncMethodAcceptsCollectionOfModels()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['attach', 'detach', 'touchIfTouching', 'formatRecordsList'])->setConstructorArgs($this->getRelationArguments())->getMock();
-        $query = m::mock('stdClass');
-        $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
-        $query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
-        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
-        $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
-        $query->shouldReceive('pluck')->once()->with('role_id')->andReturn(new BaseCollection([1, 2, 3]));
+        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['attach', 'detach', 'touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $query = $this->getNewQuery($relation);
+        $query->shouldReceive('pluck')->once()->with('role_id')->andReturn(new BaseCollection());
 
         $collection = new Collection([
             m::mock(['getKey' => 1]),
             m::mock(['getKey' => 2]),
-            m::mock(['getKey' => 3]),
         ]);
-        $relation->expects($this->once())->method('formatRecordsList')->with([1, 2, 3])->will($this->returnValue([1 => [], 2 => [], 3 => []]));
-        $relation->sync($collection);
+        $this->assertEquals(['attached' => [1, 2], 'detached' => [], 'updated' => []], $relation->sync($collection));
     }
 
     public function testWherePivotParamsUsedForNewQueries()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['attach', 'detach', 'touchIfTouching', 'formatRecordsList'])->setConstructorArgs($this->getRelationArguments())->getMock();
-
-        // we expect to call $relation->wherePivot()
-        $relation->getQuery()->shouldReceive('where')->once()->andReturn($relation);
-
-        // Our sync() call will produce a new query
-        $mockQueryBuilder = m::mock('stdClass');
-        $query = m::mock('stdClass');
-        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder);
-        $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
-
-        // BelongsToMany::newPivotStatement() sets this
-        $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
-
-        // BelongsToMany::newPivotQuery() sets this
-        $query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
+        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['attach', 'detach', 'touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation->getQuery()->shouldReceive('where')->once()->with('user_role.foo', '=', 'bar', 'and')->andReturnSelf();
+        $currentQuery = $this->getNewQuery($relation);
+        $currentQuery->shouldReceive('pluck')->andReturn(new BaseCollection([1, 2, 3]));
 
         // This is our test! The wherePivot() params also need to be called
-        $query->shouldReceive('where')->once()->with('foo', '=', 'bar')->andReturn($query);
+        $currentQuery->shouldReceive('where')->once()->with('foo', '=', 'bar')->andReturnSelf();
 
-        // This is so $relation->sync() works
-        $query->shouldReceive('pluck')->once()->with('role_id')->andReturn(new BaseCollection([1, 2, 3]));
-        $relation->expects($this->once())->method('formatRecordsList')->with([1, 2, 3])->will($this->returnValue([1 => [], 2 => [], 3 => []]));
+        $relation->wherePivot('foo', '=', 'bar')->sync([1, 2, 3]);
+    }
 
-        $relation = $relation->wherePivot('foo', '=', 'bar'); // these params are to be stored
-        $relation->sync([1, 2, 3]); // triggers the whole process above
+    public function testAttachingFiresEvents()
+    {
+        $query = $this->getNewStatement($relation = $this->getRelation());
+        $query->shouldReceive('insert')->once()->andReturn(1);
+
+        $relation->getRelated()->shouldReceive('touches')->andReturn(false);
+        list($parent, $events) = $this->getEventsParent($relation);
+
+        $events->shouldReceive('until')->once()->with('eloquent.attaching.relation_name: '.get_class($parent), [$parent, new BaseCollection([['user_id' => 1, 'role_id' => 5, 'pivot_column' => 'extra_data']])])->andReturn(true);
+        $events->shouldReceive('fire')->once()->with('eloquent.attached.relation_name: '.get_class($parent), [$parent, new BaseCollection([['user_id' => 1, 'role_id' => 5, 'pivot_column' => 'extra_data']])])->andReturn(true);
+
+        $relation->attach(5, ['pivot_column' => 'extra_data']);
+    }
+
+    public function testDetachingFiresEvents()
+    {
+        $query = $this->getNewQuery($relation = $this->getRelation());
+        $query->shouldReceive('whereIn')->once()->with('role_id', [5]);
+        $query->shouldReceive('delete')->once()->andReturn(1);
+
+        $relation->getRelated()->shouldReceive('touches')->andReturn(false);
+        list($parent, $events) = $this->getEventsParent($relation);
+
+        $events->shouldReceive('until')->once()->with('eloquent.detaching.relation_name: '.get_class($parent), [$parent, new BaseCollection(5)])->andReturn(true);
+        $events->shouldReceive('fire')->once()->with('eloquent.detached.relation_name: '.get_class($parent), [$parent, new BaseCollection(5)])->andReturn(true);
+
+        $relation->detach(5);
+    }
+
+    public function testSyncingFiresEvents()
+    {
+        $current = $this->getNewQuery($relation = $this->getRelation());
+        $current->shouldReceive('pluck')->with('role_id')->andReturn(new BaseCollection(5));
+
+        $queryForId = $this->getNewQuery($relation);
+        $queryForId->shouldReceive('where')->with('role_id', 5)->andReturnSelf();
+        $queryForId->shouldReceive('update')->once()->with(['pivot_column' => 'extra_data'])->andReturn(1);
+
+        $relation->getRelated()->shouldReceive('touches')->andReturn(false);
+        list($parent, $events) = $this->getEventsParent($relation);
+
+        $events->shouldReceive('until')->once()->with('eloquent.syncing.relation_name: '.get_class($parent), [$parent, new BaseCollection([5 => ['pivot_column' => 'extra_data']])])->andReturn(true);
+        $events->shouldReceive('fire')->once()->with('eloquent.synced.relation_name: '.get_class($parent), [$parent, new BaseCollection(['attached' => [], 'detached' => [], 'updated' => [5]])])->andReturn(true);
+
+        $relation->sync([5 => ['pivot_column' => 'extra_data']]);
+    }
+
+    public function testTogglingFiresEvents()
+    {
+        $current = $this->getNewQuery($relation = $this->getRelation());
+        $current->shouldReceive('pluck')->with('role_id')->andReturn(new BaseCollection(4));
+
+        $detaching = $this->getNewQuery($relation);
+        $detaching->shouldReceive('whereIn')->once()->with('role_id', [4]);
+        $detaching->shouldReceive('delete')->once()->andReturn(1);
+
+        $attaching = $this->getNewStatement($relation);
+        $attaching->shouldReceive('insert')->once()->andReturn(1);
+
+        $relation->getRelated()->shouldReceive('touches')->andReturn(false);
+        list($parent, $events) = $this->getEventsParent($relation);
+
+        $events->shouldReceive('until')->once()->with('eloquent.toggling.relation_name: '.get_class($parent), [$parent, new BaseCollection([4 => [], 5 => ['pivot_column' => 'extra_data']])])->andReturn(true);
+        $events->shouldReceive('until')->once()->with('eloquent.detaching.relation_name: '.get_class($parent), [$parent, new BaseCollection(4)])->andReturn(true);
+        $events->shouldReceive('fire')->once()->with('eloquent.detached.relation_name: '.get_class($parent), [$parent, new BaseCollection(4)])->andReturn(true);
+        $events->shouldReceive('until')->once()->with('eloquent.attaching.relation_name: '.get_class($parent), [$parent, new BaseCollection([['user_id' => 1, 'role_id' => 5, 'pivot_column' => 'extra_data']])])->andReturn(true);
+        $events->shouldReceive('fire')->once()->with('eloquent.attached.relation_name: '.get_class($parent), [$parent, new BaseCollection([['user_id' => 1, 'role_id' => 5, 'pivot_column' => 'extra_data']])])->andReturn(true);
+        $events->shouldReceive('fire')->once()->with('eloquent.toggled.relation_name: '.get_class($parent), [$parent, new BaseCollection(['attached' => [5], 'detached' => [4]])])->andReturn(true);
+
+        $relation->toggle([4, 5 => ['pivot_column' => 'extra_data']]);
+    }
+
+    public function testSyncingFiresAllEvents()
+    {
+        $relation = $this->getRelation();
+        $relation->getRelated()->shouldReceive('touches')->andReturn(false);
+        $syncData = [
+            5 => ['pivot_column' => 'extra_updated'],
+            6 => ['pivot_column' => 'extra_attached'],
+        ];
+
+        $current = $this->getNewQuery($relation);
+        $current->shouldReceive('pluck')->with('role_id')->andReturn(new BaseCollection([4, 5]));
+
+        $detaching = $this->getNewQuery($relation);
+        $detaching->shouldReceive('whereIn')->once()->with('role_id', [4]);
+        $detaching->shouldReceive('delete')->once()->andReturn(1);
+
+        $updating = $this->getNewQuery($relation);
+        $updating->shouldReceive('where')->with('role_id', 5)->andReturnSelf();
+        $updating->shouldReceive('update')->once()->with(['pivot_column' => 'extra_updated'])->andReturn(1);
+
+        $attaching = $this->getNewStatement($relation);
+        $attaching->shouldReceive('insert')->once()->andReturn(1);
+
+        list($parent, $events) = $this->getEventsParent($relation);
+
+        $events->shouldReceive('until')->once()->with('eloquent.syncing.relation_name: '.get_class($parent), [$parent, new BaseCollection($syncData)])->andReturn(true);
+        $events->shouldReceive('until')->once()->with('eloquent.detaching.relation_name: '.get_class($parent), [$parent, new BaseCollection(4)])->andReturn(true);
+        $events->shouldReceive('fire')->once()->with('eloquent.detached.relation_name: '.get_class($parent), [$parent, new BaseCollection(4)])->andReturn(true);
+        $events->shouldReceive('until')->once()->with('eloquent.attaching.relation_name: '.get_class($parent), [$parent, new BaseCollection([['user_id' => 1, 'role_id' => 6, 'pivot_column' => 'extra_attached']])])->andReturn(true);
+        $events->shouldReceive('fire')->once()->with('eloquent.attached.relation_name: '.get_class($parent), [$parent, new BaseCollection([['user_id' => 1, 'role_id' => 6, 'pivot_column' => 'extra_attached']])])->andReturn(true);
+        $events->shouldReceive('fire')->once()->with('eloquent.synced.relation_name: '.get_class($parent), [$parent, new BaseCollection(['attached' => [6], 'detached' => [4], 'updated' => [5]])])->andReturn(true);
+
+        $relation->sync($syncData);
+    }
+
+    public function getEventsParent($relation)
+    {
+        $parent = $relation->getParent();
+        $parent->shouldReceive('touches')->andReturn(false);
+        $parent->shouldReceive('getEventDispatcher')->andReturn($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
+
+        return [$parent, $events];
+    }
+
+    public function getNewStatement($relation)
+    {
+        $relationQuery = $relation->getQuery();
+        $relationQuery->shouldReceive('getQuery->newQuery->from')->once()->andReturn($newPivotStatement = m::mock('Illuminate\Database\Query\Builder'));
+
+        return $newPivotStatement;
+    }
+
+    public function getNewQuery($relation)
+    {
+        $statement = $this->getNewStatement($relation);
+        $statement->shouldReceive('where')->once()->with('user_id', 1)->andReturnSelf();
+
+        return $statement;
     }
 
     public function getRelation()
@@ -671,6 +779,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
         $parent->shouldReceive('getKey')->andReturn(1);
         $parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
         $parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
+        $parent->shouldReceive('getEventDispatcher')->byDefault();
 
         $builder = m::mock('Illuminate\Database\Eloquent\Builder');
         $related = m::mock('Illuminate\Database\Eloquent\Model');

@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class BelongsToMany extends Relation
@@ -801,7 +802,7 @@ class BelongsToMany extends Relation
      * Each existing model is detached, and non existing ones are attached.
      *
      * @param  mixed  $ids
-     * @return array
+     * @return array|false
      */
     public function toggle($ids)
     {
@@ -809,28 +810,21 @@ class BelongsToMany extends Relation
             'attached' => [], 'detached' => [],
         ];
 
-        if ($ids instanceof Model) {
-            $ids = $ids->getKey();
-        }
-
-        if ($ids instanceof Collection) {
-            $ids = $ids->modelKeys();
-        }
-
         // First we will execute a query to get all of the current attached IDs for
         // the relationship, which will allow us to determine which of them will
         // be attached and which of them will be detached from the join table.
-        $current = $this->newPivotQuery()
-                    ->pluck($this->otherKey)->all();
+        $current = $this->newPivotQuery()->pluck($this->otherKey);
 
-        $records = $this->formatRecordsList((array) $ids);
+        $records = $this->formatRecordsList($ids);
+
+        if ($this->fireParentEvent("toggling.{$this->relationName}", $records) === false) {
+            return false;
+        }
 
         // Next, we will determine which IDs should get removed from the join table
         // by checking which of the given ID / records is in the list of current
         // records. We will then remove all those rows from the joining table.
-        $detach = array_values(array_intersect(
-            $current, array_keys($records)
-        ));
+        $detach = $current->intersect($records->keys())->values()->all();
 
         if (count($detach) > 0) {
             $this->detach($detach, false);
@@ -841,7 +835,7 @@ class BelongsToMany extends Relation
         // Finally, for all of the records that were not detached, we'll attach the
         // records into the intermediate table. Then we'll add those attaches to
         // the change list and be ready to return these results to the caller.
-        $attach = array_diff_key($records, array_flip($detach));
+        $attach = array_diff_key($records->all(), array_flip($detach));
 
         if (count($attach) > 0) {
             $this->attach($attach, [], false);
@@ -852,6 +846,8 @@ class BelongsToMany extends Relation
         if (count($changes['attached']) || count($changes['detached'])) {
             $this->touchIfTouching();
         }
+
+        $this->fireParentEvent("toggled.{$this->relationName}", collect($changes), false);
 
         return $changes;
     }
@@ -872,7 +868,7 @@ class BelongsToMany extends Relation
      *
      * @param  \Illuminate\Database\Eloquent\Collection|array  $ids
      * @param  bool   $detaching
-     * @return array
+     * @return array|false
      */
     public function sync($ids, $detaching = true)
     {
@@ -880,18 +876,18 @@ class BelongsToMany extends Relation
             'attached' => [], 'detached' => [], 'updated' => [],
         ];
 
-        if ($ids instanceof Collection) {
-            $ids = $ids->modelKeys();
-        }
-
         // First we need to attach any of the associated models that are not currently
         // in this joining table. We'll spin through the given IDs, checking to see
         // if they exist in the array of current ones, and if not we will insert.
-        $current = $this->newPivotQuery()->pluck($this->otherKey)->all();
+        $current = $this->newPivotQuery()->pluck($this->otherKey);
 
         $records = $this->formatRecordsList($ids);
 
-        $detach = array_diff($current, array_keys($records));
+        if ($this->fireParentEvent("syncing.{$this->relationName}", $records) === false) {
+            return false;
+        }
+
+        $detach = $current->diff($records->keys())->values()->all();
 
         // Next, we will take the differences of the currents and given IDs and detach
         // all of the entities that exist in the "current" array but are not in the
@@ -906,12 +902,14 @@ class BelongsToMany extends Relation
         // touching until after the entire operation is complete so we don't fire a
         // ton of touch operations until we are totally done syncing the records.
         $changes = array_merge(
-            $changes, $this->attachNew($records, $current, false)
+            $changes, $this->attachNew($records->all(), $current->all(), false)
         );
 
         if (count($changes['attached']) || count($changes['updated'])) {
             $this->touchIfTouching();
         }
+
+        $this->fireParentEvent("synced.{$this->relationName}", collect($changes), false);
 
         return $changes;
     }
@@ -919,14 +917,14 @@ class BelongsToMany extends Relation
     /**
      * Format the sync/toggle list so that it is keyed by ID.
      *
-     * @param  array  $records
-     * @return array
+     * @param  mixed  $records
+     * @return \Illuminate\Support\Collection
      */
-    protected function formatRecordsList(array $records)
+    protected function formatRecordsList($records)
     {
         $results = [];
 
-        foreach ($records as $id => $attributes) {
+        foreach ($this->parseRecordsArg($records) as $id => $attributes) {
             if (! is_array($attributes)) {
                 list($id, $attributes) = [$attributes, []];
             }
@@ -934,7 +932,7 @@ class BelongsToMany extends Relation
             $results[$id] = $attributes;
         }
 
-        return $results;
+        return collect($results);
     }
 
     /**
@@ -1010,36 +1008,56 @@ class BelongsToMany extends Relation
     /**
      * Attach a model to the parent.
      *
-     * @param  mixed  $id
+     * @param  mixed  $ids
      * @param  array  $attributes
      * @param  bool   $touch
-     * @return void
+     * @return null|false
      */
-    public function attach($id, array $attributes = [], $touch = true)
+    public function attach($ids, array $attributes = [], $touch = true)
     {
-        if ($id instanceof Model) {
-            $id = $id->getKey();
+        $attached = $this->createAttachRecords($ids, $attributes);
+
+        if ($this->fireParentEvent("attaching.{$this->relationName}", $attached) === false) {
+            return false;
         }
 
-        if ($id instanceof Collection) {
-            $id = $id->modelKeys();
-        }
-
-        $query = $this->newPivotStatement();
-
-        $query->insert($this->createAttachRecords((array) $id, $attributes));
+        $this->newPivotStatement()->insert($attached->all());
 
         if ($touch) {
             $this->touchIfTouching();
         }
+
+        $this->fireParentEvent("attached.{$this->relationName}", $attached, false);
+    }
+
+    /**
+     * Fire the given event for the parent model.
+     *
+     * @param  string  $event
+     * @param  bool  $halt
+     * @return mixed
+     */
+    protected function fireParentEvent($event, $records, $halt = true)
+    {
+        $dispatcher = $this->getParent()->getEventDispatcher();
+
+        if (! $dispatcher) {
+            return true;
+        }
+
+        $event = "eloquent.{$event}: ".get_class($this->getParent());
+
+        $method = $halt ? 'until' : 'fire';
+
+        return $dispatcher->$method($event, [$this->getParent(), $records]);
     }
 
     /**
      * Create an array of records to insert into the pivot table.
      *
-     * @param  array  $ids
+     * @param  mixed  $ids
      * @param  array  $attributes
-     * @return array
+     * @return \Illuminate\Support\Collection
      */
     protected function createAttachRecords($ids, array $attributes)
     {
@@ -1051,11 +1069,34 @@ class BelongsToMany extends Relation
         // To create the attachment records, we will simply spin through the IDs given
         // and create a new record to insert for each ID. Each ID may actually be a
         // key in the array, with extra attributes to be placed in other columns.
-        foreach ($ids as $key => $value) {
+        foreach ($this->parseRecordsArg($ids) as $key => $value) {
             $records[] = $this->attacher($key, $value, $attributes, $timed);
         }
 
-        return $records;
+        return collect($records);
+    }
+
+    /**
+     * Parse records argument for the relation attaching/detaching/syncing/toggling actions.
+     *
+     * @param  mixed  $records
+     * @return array
+     */
+    protected function parseRecordsArg($records)
+    {
+        if ($records instanceof Model) {
+            $records = $records->getKey();
+        }
+
+        if ($records instanceof Collection) {
+            $records = $records->modelKeys();
+        }
+
+        if ($records instanceof BaseCollection) {
+            $records = $records->all();
+        }
+
+        return (array) $records;
     }
 
     /**
@@ -1146,27 +1187,23 @@ class BelongsToMany extends Relation
      *
      * @param  mixed  $ids
      * @param  bool  $touch
-     * @return int
+     * @return int|false
      */
     public function detach($ids = [], $touch = true)
     {
-        if ($ids instanceof Model) {
-            $ids = $ids->getKey();
-        }
-
-        if ($ids instanceof Collection) {
-            $ids = $ids->modelKeys();
-        }
-
         $query = $this->newPivotQuery();
 
         // If associated IDs were passed to the method we will only delete those
         // associations, otherwise all of the association ties will be broken.
         // We'll return the numbers of affected rows when we do the deletes.
-        $ids = (array) $ids;
+        $ids = collect($this->parseRecordsArg($ids));
+
+        if ($this->fireParentEvent("detaching.{$this->relationName}", $ids) === false) {
+            return false;
+        }
 
         if (count($ids) > 0) {
-            $query->whereIn($this->otherKey, $ids);
+            $query->whereIn($this->otherKey, $ids->all());
         }
 
         // Once we have all of the conditions set on the statement, we are ready
@@ -1177,6 +1214,8 @@ class BelongsToMany extends Relation
         if ($touch) {
             $this->touchIfTouching();
         }
+
+        $this->fireParentEvent("detached.{$this->relationName}", $ids, false);
 
         return $results;
     }

@@ -82,6 +82,7 @@ class DatabaseEloquentMorphToManyTest extends PHPUnit_Framework_TestCase
         $parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
         $parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
         $parent->shouldReceive('getMorphClass')->andReturn(get_class($parent));
+        $parent->shouldReceive('getEventDispatcher')->byDefault();
 
         $builder = m::mock('Illuminate\Database\Eloquent\Builder');
         $related = m::mock('Illuminate\Database\Eloquent\Model');
