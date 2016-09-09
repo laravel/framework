@@ -14,6 +14,27 @@ class SlackMessage
     public $level = 'info';
 
     /**
+     * The username to send the message from.
+     *
+     * @var string|null
+     */
+    public $username;
+
+    /**
+     * The user icon for the message.
+     *
+     * @var string|null
+     */
+    public $icon;
+
+    /**
+     * The channel to send the message on.
+     *
+     * @var string|null
+     */
+    public $channel;
+
+    /**
      * The text content of the message.
      *
      * @var string
@@ -47,6 +68,37 @@ class SlackMessage
     public function error()
     {
         $this->level = 'error';
+
+        return $this;
+    }
+
+    /**
+     * Set a custom user icon for the Slack message.
+     *
+     * @param  string  $username
+     * @param  string|null  $icon
+     * @return $this
+     */
+    public function from($username, $icon = null)
+    {
+        $this->username = $username;
+
+        if (! is_null($icon)) {
+            $this->icon = $icon;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set the Slack channel the message should be sent to.
+     *
+     * @param  string $channel
+     * @return $this
+     */
+    public function to($channel)
+    {
+        $this->channel = $channel;
 
         return $this;
     }
