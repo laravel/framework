@@ -267,4 +267,23 @@ class WorkerFakeJob
     {
         $this->failedWith = $e;
     }
+
+    public function testJobSleepsWhenAnExceptionIsThrownForADaemonWorker()
+    {
+        $exceptionHandler = m::mock('Illuminate\Contracts\Debug\ExceptionHandler');
+        $job = m::mock('Illuminate\Contracts\Queue\Job');
+        $job->shouldReceive('fire')->once()->andReturnUsing(function () {
+            throw new RuntimeException;
+        });
+        $worker = m::mock('Illuminate\Queue\Worker', [$manager = m::mock('Illuminate\Queue\QueueManager')])->makePartial();
+        $manager->shouldReceive('connection')->once()->with('connection')->andReturn($connection = m::mock('StdClass'));
+        $manager->shouldReceive('getName')->andReturn('connection');
+        $connection->shouldReceive('pop')->once()->with('queue')->andReturn($job);
+        $worker->shouldReceive('sleep')->once()->with(3);
+
+        $exceptionHandler->shouldReceive('report')->once();
+
+        $worker->setDaemonExceptionHandler($exceptionHandler);
+        $worker->pop('connection', 'queue');
+    }
 }
