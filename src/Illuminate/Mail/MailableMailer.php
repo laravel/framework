@@ -136,11 +136,7 @@ class MailableMailer
      */
     public function later($delay, Mailable $mailable)
     {
-        $mailable = $mailable->to($this->to)
-                 ->cc($this->cc)
-                 ->bcc($this->bcc);
-
-        return $this->mailer->later($delay, $mailable);
+        return $this->mailer->later($delay, $this->fill($mailable));
     }
 
     /**
