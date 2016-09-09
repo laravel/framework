@@ -1491,9 +1491,9 @@ class Validator implements ValidatorContract
             $connection, $table, $column, $value, $parameters
         ) >= $expected;
     }
-    
+
     /**
-     * Validate the existence of an attribute value in a database table and return false 
+     * Validate the existence of an attribute value in a database table and return false.
      * if the record exists.
      *
      * @param  string  $attribute
@@ -1503,7 +1503,7 @@ class Validator implements ValidatorContract
      */
     public function validateExistsNot($attribute, $value, $parameters)
     {
-        return !$this->validateExists($attribute, $value, $parameters);
+        return ! $this->validateExists($attribute, $value, $parameters);
     }
 
     /**
