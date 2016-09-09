@@ -100,7 +100,7 @@ class PostgresConnector extends Connector implements ConnectorInterface
         if (isset($config['sslcert'])) {
             $dsn .= ";sslcert={$sslcert}";
         }
-        
+
         if (isset($config['sslkey'])) {
             $dsn .= ";sslkey={$sslkey}";
         }
