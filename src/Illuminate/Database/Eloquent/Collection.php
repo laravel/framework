@@ -118,7 +118,7 @@ class Collection extends BaseCollection implements QueueableCollection
      * Run a map over each of the items.
      *
      * @param  callable  $callback
-     * @return static
+     * @return \Illuminate\Support\Collection
      */
     public function map(callable $callback)
     {
@@ -176,7 +176,7 @@ class Collection extends BaseCollection implements QueueableCollection
      *
      * @param  string|callable|null  $key
      * @param  bool  $strict
-     * @return static
+     * @return static|\Illuminate\Support\Collection
      */
     public function unique($key = null, $strict = false)
     {
