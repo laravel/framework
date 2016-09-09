@@ -1088,6 +1088,12 @@ class Validator implements ValidatorContract
 
         $other = Arr::get($this->data, $parameters[0]);
 
+        if(is_array($other)) {
+            unset(explode('.', $attribute)[1]);
+
+            return isset($other) && ! in_array($value, $other);
+        }
+
         return isset($other) && $value !== $other;
     }
 
