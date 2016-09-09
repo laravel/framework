@@ -128,6 +128,22 @@ class MailableMailer
     }
 
     /**
+     * Deliver the queued message after the given delay.
+     *
+     * @param  \DateTime|int  $delay
+     * @param  Mailable  $mailable
+     * @return mixed
+     */
+    public function later($delay, Mailable $mailable)
+    {
+        $mailable = $mailable->to($this->to)
+                 ->cc($this->cc)
+                 ->bcc($this->bcc);
+
+        return $this->mailer->later($delay, $mailable);
+    }
+
+    /**
      * Populate the mailable with the addresses.
      *
      * @param  Mailable  $mailable
