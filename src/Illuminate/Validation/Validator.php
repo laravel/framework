@@ -1491,6 +1491,20 @@ class Validator implements ValidatorContract
             $connection, $table, $column, $value, $parameters
         ) >= $expected;
     }
+    
+    /**
+     * Validate the existence of an attribute value in a database table and return false 
+     * if the record exists.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @param  array   $parameters
+     * @return bool
+     */
+    public function validateExistsNot($attribute, $value, $parameters)
+    {
+        return !$this->validateExists($attribute, $value, $parameters);
+    }
 
     /**
      * Get the number of records that exist in storage.
