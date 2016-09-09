@@ -110,8 +110,8 @@ class DatabaseUserProvider implements UserProvider
         }
 
         // Now we are ready to execute the query to see if we have an user matching
-        // the given credentials. If not, we will just return nulls and indicate
-        // that there are no matching users for these given credential arrays.
+        // the given credentials. If not, we will just return null and indicate
+        // that there are no matching users for this given credentials' array.
         $user = $query->first();
 
         return $this->getGenericUser($user);
