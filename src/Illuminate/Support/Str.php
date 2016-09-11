@@ -87,7 +87,7 @@ class Str
     public static function endsWith($haystack, $needles)
     {
         foreach ((array) $needles as $needle) {
-            if ((string) $needle === substr($haystack, - strlen($needle)))  {
+            if ((string) $needle === substr($haystack, -strlen($needle))) {
                 return true;
             }
         }
