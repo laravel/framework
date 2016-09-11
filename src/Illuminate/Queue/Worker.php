@@ -266,7 +266,7 @@ class Worker
      */
     protected function markJobAsFailedIfAlreadyExceedsMaxAttempts($connectionName, $job, $maxTries)
     {
-        if ($maxTries === 0 || $job->attempts() <= $maxTries) {
+        if ($maxTries == 0 || $job->attempts() <= $maxTries) {
             return;
         }
 
