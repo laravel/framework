@@ -386,10 +386,7 @@ class Grammar extends BaseGrammar
      */
     protected function whereBits(Builder $query, $where)
     {
-        $maskBits = 'b\''.decbin($where['bits']).'\'';
-        $valueBits = 'b\''.decbin($where['compareValue']).'\'';
-
-        return $this->wrap($where['column'])." {$where['bitwise']} {$maskBits} {$where['compare']} {$valueBits}";
+        return $this->wrap($where['column'])." {$where['bitwise']} ? {$where['compare']} ?";
     }
 
     /**

@@ -1080,7 +1080,9 @@ class Builder
 
         $type = 'Bits';
 
-        $this->wheres[] = compact('type', 'column', 'bits', 'bitwise', 'compare', 'compareValue', 'boolean');
+        $this->wheres[] = compact('type', 'column', 'bitwise', 'compare', 'boolean');
+
+        $this->addBinding([$bits, $compareValue], 'where');
 
         return $this;
     }

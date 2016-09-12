@@ -560,13 +560,13 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereBits('flags', $FLAG_CAN_READ | $FLAG_CAN_WRITE);
-        $this->assertEquals('select * from "users" where "flags" & b\'11\' = b\'11\'', $builder->toSql());
-        $this->assertEquals([], $builder->getBindings());
+        $this->assertEquals('select * from "users" where "flags" & ? = ?', $builder->toSql());
+        $this->assertEquals([0 => 3, 1 => 3], $builder->getBindings());
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('role', '=', 'admin')->orWhereBits('flags', '|', $FLAG_CAN_DO_SOMETHING, '>', 2);
-        $this->assertEquals('select * from "users" where "role" = ? or "flags" | b\'1\' > b\'10\'', $builder->toSql());
-        $this->assertEquals([0 => 'admin'], $builder->getBindings());
+        $this->assertEquals('select * from "users" where "role" = ? or "flags" | ? > ?', $builder->toSql());
+        $this->assertEquals([0 => 'admin', 1 => 1, 2 => 2], $builder->getBindings());
     }
 
     public function testGroupBys()
