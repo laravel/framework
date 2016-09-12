@@ -2,6 +2,8 @@
 
 namespace Illuminate\Foundation\Auth;
 
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -29,9 +31,24 @@ trait RegistersUsers
     {
         $this->validator($request->all())->validate();
 
-        $this->guard()->login($this->create($request->all()));
+        $user = $this->create($request->all());
+
+        $this->fireRegisteredEvent($user);
+
+        $this->guard()->login($user);
 
         return redirect($this->redirectPath());
+    }
+
+    /**
+     * Fire an event when a user registers.
+     *
+     * @param \Illuminate\Contracts\Auth\Authenticatable $authenticatable
+     * @return void
+     */
+    protected function fireRegisteredEvent(Authenticatable $authenticatable)
+    {
+        event(new Registered($authenticatable));
     }
 
     /**
