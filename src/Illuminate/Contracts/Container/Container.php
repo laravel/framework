@@ -141,4 +141,16 @@ interface Container
      * @return void
      */
     public function afterResolving($abstract, Closure $callback = null);
+
+    /**
+     * Get a closure to resolve the given type from the container.
+     * The given closure will have an optional [array $parameters] parameter
+     * to merge with the default parameters given when the factory was made.
+     *
+     * @param  string $abstract
+     * @param  array  $defaults
+     *
+     * @return \Closure
+     */
+    public function getFactory($abstract, array $defaults = []);
 }
