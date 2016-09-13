@@ -1238,4 +1238,21 @@ class Container implements ArrayAccess, ContainerContract
     {
         $this[$key] = $value;
     }
+
+    /**
+     * Get a closure to resolve the given type from the container.
+     *
+     * The given closure will have an optional [array $parameters] parameter
+     * to merge with the default parameters given when the factory was made.
+     *
+     * @param  string  $abstract
+     * @param  array   $defaults
+     * @return \Closure
+     */
+    public function getFactory($abstract, array $defaults = [])
+    {
+        return function (array $params = []) use ($abstract, $defaults) {
+            return $this->make($abstract, $params + $defaults);
+        };
+    }
 }
