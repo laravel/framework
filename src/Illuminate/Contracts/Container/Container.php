@@ -98,6 +98,15 @@ interface Container
     public function when($concrete);
 
     /**
+     * Get a closure to resolve the given type from the container.
+     *
+     * @param  string  $abstract
+     * @param  array  $defaults
+     * @return \Closure
+     */
+    public function factory($abstract, array $defaults = []);
+
+    /**
      * Resolve the given type from the container.
      *
      * @param  string  $abstract
