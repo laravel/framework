@@ -2,7 +2,6 @@
 
 namespace Illuminate\View;
 
-use Closure;
 use Exception;
 use Throwable;
 use ArrayAccess;
@@ -162,8 +161,6 @@ class View implements ArrayAccess, ViewContract
         foreach ($data as $key => $value) {
             if ($value instanceof Renderable) {
                 $data[$key] = $value->render();
-            } elseif ($value instanceof Closure) {
-                $data[$key] = call_user_func($value);
             }
         }
 
