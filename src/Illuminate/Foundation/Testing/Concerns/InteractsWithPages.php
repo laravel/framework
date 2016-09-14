@@ -98,7 +98,7 @@ trait InteractsWithPages
 
         $this->clearInputs();
 
-        if($this->followsRedirects){
+        if ($this->followsRedirects) {
             $this->followRedirects()->assertPageLoaded($uri);
         }
 
