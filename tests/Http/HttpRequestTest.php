@@ -264,7 +264,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
             'name' => 'Taylor',
             'age' => null,
             'approved' => false,
-            'bio' => ''
+            'bio' => '',
         ]);
         $this->assertEquals(
             ['name' => 'Taylor', 'approved' => false, 'bio' => ''],
