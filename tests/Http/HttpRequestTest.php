@@ -260,8 +260,16 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
 
     public function testIntersectMethod()
     {
-        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => null, 'approved' => false]);
-        $this->assertEquals(['name' => 'Taylor', 'approved' => false], $request->intersect('name', 'age', 'email', 'approved'));
+        $request = Request::create('/', 'GET', [
+            'name' => 'Taylor',
+            'age' => null,
+            'approved' => false,
+            'bio' => ''
+        ]);
+        $this->assertEquals([
+            'name' => 'Taylor', 'approved' => false, 'bio' => ''
+            ], $request->intersect('name', 'age', 'email', 'approved', 'bio')
+        );
     }
 
     public function testQueryMethod()
