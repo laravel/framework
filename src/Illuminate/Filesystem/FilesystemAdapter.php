@@ -198,15 +198,19 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     {
         $paths = is_array($paths) ? $paths : func_get_args();
 
+        $success = true;
+
         foreach ($paths as $path) {
             try {
-                $this->driver->delete($path);
+                if (! $this->driver->delete($path)) {
+                    $success = false;
+                }
             } catch (FileNotFoundException $e) {
-                //
+                $success = false;
             }
         }
 
-        return true;
+        return $success;
     }
 
     /**
@@ -276,7 +280,9 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     {
         $adapter = $this->driver->getAdapter();
 
-        if ($adapter instanceof AwsS3Adapter) {
+        if (method_exists($adapter, 'getUrl')) {
+            return $adapter->getUrl($path);
+        } elseif ($adapter instanceof AwsS3Adapter) {
             $path = $adapter->getPathPrefix().$path;
 
             return $adapter->getClient()->getObjectUrl($adapter->getBucket(), $path);
@@ -284,8 +290,6 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
             $path = '/storage/'.$path;
 
             return Str::contains($path, '/storage/public') ? Str::replaceFirst('/public', '', $path) : $path;
-        } elseif (method_exists($adapter, 'getUrl')) {
-            return $adapter->getUrl($path);
         } else {
             throw new RuntimeException('This driver does not support retrieving URLs.');
         }

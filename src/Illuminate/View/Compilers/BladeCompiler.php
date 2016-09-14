@@ -513,7 +513,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileUnless($expression)
     {
-        return "<?php if ( ! $expression): ?>";
+        return "<?php if (! $expression): ?>";
     }
 
     /**

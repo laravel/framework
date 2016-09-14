@@ -801,9 +801,10 @@ class BelongsToMany extends Relation
      * Each existing model is detached, and non existing ones are attached.
      *
      * @param  mixed  $ids
+     * @param  bool   $touch
      * @return array
      */
-    public function toggle($ids)
+    public function toggle($ids, $touch = true)
     {
         $changes = [
             'attached' => [], 'detached' => [],
@@ -849,7 +850,7 @@ class BelongsToMany extends Relation
             $changes['attached'] = array_keys($attach);
         }
 
-        if (count($changes['attached']) || count($changes['detached'])) {
+        if ($touch && (count($changes['attached']) || count($changes['detached']))) {
             $this->touchIfTouching();
         }
 

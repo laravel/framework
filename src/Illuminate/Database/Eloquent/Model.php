@@ -650,7 +650,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $key = $this->getKeyName();
 
-        return static::with($with)->where($key, $this->getKey())->first();
+        return static::newQueryWithoutScopes()->with($with)->where($key, $this->getKey())->first();
     }
 
     /**
@@ -805,10 +805,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         if (is_null($name)) {
             list($current, $caller) = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
 
-            $name = Str::snake($caller['function']);
+            $name = $caller['function'];
         }
 
-        list($type, $id) = $this->getMorphs($name, $type, $id);
+        list($type, $id) = $this->getMorphs(Str::snake($name), $type, $id);
 
         // If the type value is null it is probably safe to assume we're eager loading
         // the relationship. In this case we'll just pass in a dummy query where we
@@ -1401,7 +1401,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @param  array  $attributes
      * @param  array  $options
-     * @return bool|int
+     * @return bool
      */
     public function update(array $attributes = [], array $options = [])
     {
@@ -1462,7 +1462,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // clause to only update this model. Otherwise, we'll just insert them.
         if ($this->exists) {
             $saved = $this->isDirty() ?
-                        $this->performUpdate($query) : false;
+                        $this->performUpdate($query, $options) : true;
         }
 
         // If the model is brand new, we'll insert it into our database and set the
@@ -1515,9 +1515,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Perform a model update operation.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  array                                  $options
      * @return bool
      */
-    protected function performUpdate(Builder $query)
+    protected function performUpdate(Builder $query, array $options = [])
     {
         // If the updating event returns false, we will cancel the update operation so
         // developers can hook Validation systems into their models and cancel this
@@ -1529,7 +1530,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // First we need to create a fresh query instance and touch the creation and
         // update timestamp on the model which are maintained by us for developer
         // convenience. Then we will just continue saving the model instances.
-        if ($this->timestamps) {
+        if ($this->timestamps && Arr::get($options, 'touch', true)) {
             $this->updateTimestamps();
         }
 

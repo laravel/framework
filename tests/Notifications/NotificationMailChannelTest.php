@@ -210,6 +210,20 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
 
         $channel->send($notifiable, $notification);
     }
+
+    public function testMessageWithMailableContract()
+    {
+        $notification = new NotificationMailChannelTestNotificationWithMailableContract;
+        $notifiable = new NotificationMailChannelTestNotifiable;
+
+        $channel = new Illuminate\Notifications\Channels\MailChannel(
+            $mailer = Mockery::mock(Illuminate\Contracts\Mail\Mailer::class)
+        );
+
+        $mailer->shouldReceive('send')->once();
+
+        $channel->send($notifiable, $notification);
+    }
 }
 
 class NotificationMailChannelTestNotifiable
@@ -270,5 +284,25 @@ class NotificationMailChannelTestNotificationWithToAddress extends Notification
     {
         return (new MailMessage)
             ->to('jeffrey@laracasts.com');
+    }
+}
+
+class NotificationMailChannelTestNotificationWithMailableContract extends Notification
+{
+    public function toMail($notifiable)
+    {
+        $mock = Mockery::mock(Illuminate\Contracts\Mail\Mailable::class);
+
+        $mock->shouldReceive('send')->once()->with(Mockery::on(function ($mailer) {
+            if (! $mailer instanceof Illuminate\Contracts\Mail\Mailer) {
+                return false;
+            }
+
+            $mailer->send('notifications::email-plain');
+
+            return true;
+        }));
+
+        return $mock;
     }
 }

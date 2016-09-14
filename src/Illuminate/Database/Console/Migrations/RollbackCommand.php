@@ -81,6 +81,8 @@ class RollbackCommand extends BaseCommand
 
             ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'],
 
+            ['path', null, InputOption::VALUE_OPTIONAL, 'The path of migrations files to be executed.'],
+
             ['pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'],
 
             ['step', null, InputOption::VALUE_OPTIONAL, 'The number of migrations to be reverted.'],

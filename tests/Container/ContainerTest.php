@@ -667,6 +667,50 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
         $instance = $container->make('ContainerInjectVariableStub');
         $this->assertInstanceOf('ContainerConcreteStub', $instance->something);
     }
+
+    public function testContainerGetFactory()
+    {
+        $container = new Container;
+        $container->bind('name', function () {
+            return 'Taylor';
+        });
+
+        $factory = $container->factory('name');
+        $this->assertEquals($container->make('name'), $factory());
+    }
+
+    public function testContainerGetFactoryWithDefaultParams()
+    {
+        $container = new Container;
+        $container->bind('foo', function ($c, $parameters) {
+            return $parameters;
+        });
+
+        $factory = $container->factory('foo', [1, 2, 3]);
+        $this->assertEquals([1, 2, 3], $factory());
+    }
+
+    public function testContainerGetFactoryWithOverridenParams()
+    {
+        $container = new Container;
+        $container->bind('foo', function ($c, $parameters) {
+            return $parameters;
+        });
+
+        $factory = $container->factory('foo', [1, 2, 3]);
+        $this->assertEquals([4, 2, 3], $factory([4]));
+    }
+
+    public function testContainerGetFactoryWithOverridenNamedParams()
+    {
+        $container = new Container;
+        $container->bind('foo', function ($c, $parameters) {
+            return $parameters;
+        });
+
+        $factory = $container->factory('foo', ['bar' => 1, 'baz' => 2]);
+        $this->assertEquals(['bar' => 1, 'baz' => 3], $factory(['baz' => 3]));
+    }
 }
 
 class ContainerConcreteStub
