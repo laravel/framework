@@ -675,7 +675,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
             return 'Taylor';
         });
 
-        $factory = $container->getFactory('name');
+        $factory = $container->factory('name');
         $this->assertEquals($container->make('name'), $factory());
     }
 
@@ -686,7 +686,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
             return $parameters;
         });
 
-        $factory = $container->getFactory('foo', [1, 2, 3]);
+        $factory = $container->factory('foo', [1, 2, 3]);
         $this->assertEquals([1, 2, 3], $factory());
     }
 
@@ -697,7 +697,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
             return $parameters;
         });
 
-        $factory = $container->getFactory('foo', [1, 2, 3]);
+        $factory = $container->factory('foo', [1, 2, 3]);
         $this->assertEquals([4, 2, 3], $factory([4]));
     }
 
@@ -708,7 +708,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
             return $parameters;
         });
 
-        $factory = $container->getFactory('foo', ['bar' => 1, 'baz' => 2]);
+        $factory = $container->factory('foo', ['bar' => 1, 'baz' => 2]);
         $this->assertEquals(['bar' => 1, 'baz' => 3], $factory(['baz' => 3]));
     }
 }
