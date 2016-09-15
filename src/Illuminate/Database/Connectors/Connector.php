@@ -85,7 +85,7 @@ class Connector
     }
 
     /**
-     * Handle a exception that occurred during connect execution.
+     * Handle an exception that occurred during connect execution.
      *
      * @param  \Exception  $e
      * @param  string  $dsn

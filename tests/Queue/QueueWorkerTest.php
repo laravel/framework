@@ -7,6 +7,7 @@ use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Queue\Events\JobExceptionOccurred;
+use Illuminate\Queue\MaxAttemptsExceededException;
 
 class QueueWorkerTest extends PHPUnit_Framework_TestCase
 {
@@ -89,10 +90,13 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
     {
         $e = new RuntimeException;
 
-        $job = new WorkerFakeJob(function () use ($e) {
+        $job = new WorkerFakeJob(function ($job) use ($e) {
+            // In normal use this would be incremented by being popped off the queue
+            $job->attempts++;
+
             throw $e;
         });
-        $job->attempts = 5;
+        $job->attempts = 1;
 
         $worker = $this->getWorker('default', ['queue' => [$job]]);
         $worker->runNextJob('default', 'queue', $this->workerOptions(['maxTries' => 1]));
@@ -101,6 +105,25 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($job->deleted);
         $this->assertEquals($e, $job->failedWith);
         $this->exceptionHandler->shouldHaveReceived('report')->with($e);
+        $this->events->shouldHaveReceived('fire')->with(Mockery::type(JobExceptionOccurred::class))->once();
+        $this->events->shouldHaveReceived('fire')->with(Mockery::type(JobFailed::class))->once();
+        $this->events->shouldNotHaveReceived('fire', [Mockery::type(JobProcessed::class)]);
+    }
+
+    public function test_job_is_failed_if_it_has_already_exceeded_max_attempts()
+    {
+        $job = new WorkerFakeJob(function ($job) {
+            $job->attempts++;
+        });
+        $job->attempts = 2;
+
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+        $worker->runNextJob('default', 'queue', $this->workerOptions(['maxTries' => 1]));
+
+        $this->assertNull($job->releaseAfter);
+        $this->assertTrue($job->deleted);
+        $this->assertInstanceOf(MaxAttemptsExceededException::class, $job->failedWith);
+        $this->exceptionHandler->shouldHaveReceived('report')->with(Mockery::type(MaxAttemptsExceededException::class));
         $this->events->shouldHaveReceived('fire')->with(Mockery::type(JobExceptionOccurred::class))->once();
         $this->events->shouldHaveReceived('fire')->with(Mockery::type(JobFailed::class))->once();
         $this->events->shouldNotHaveReceived('fire', [Mockery::type(JobProcessed::class)]);
@@ -212,7 +235,7 @@ class WorkerFakeJob
     public function fire()
     {
         $this->fired = true;
-        $this->callback->__invoke();
+        $this->callback->__invoke($this);
     }
 
     public function payload()
@@ -243,5 +266,24 @@ class WorkerFakeJob
     public function failed($e)
     {
         $this->failedWith = $e;
+    }
+
+    public function testJobSleepsWhenAnExceptionIsThrownForADaemonWorker()
+    {
+        $exceptionHandler = m::mock('Illuminate\Contracts\Debug\ExceptionHandler');
+        $job = m::mock('Illuminate\Contracts\Queue\Job');
+        $job->shouldReceive('fire')->once()->andReturnUsing(function () {
+            throw new RuntimeException;
+        });
+        $worker = m::mock('Illuminate\Queue\Worker', [$manager = m::mock('Illuminate\Queue\QueueManager')])->makePartial();
+        $manager->shouldReceive('connection')->once()->with('connection')->andReturn($connection = m::mock('StdClass'));
+        $manager->shouldReceive('getName')->andReturn('connection');
+        $connection->shouldReceive('pop')->once()->with('queue')->andReturn($job);
+        $worker->shouldReceive('sleep')->once()->with(3);
+
+        $exceptionHandler->shouldReceive('report')->once();
+
+        $worker->setDaemonExceptionHandler($exceptionHandler);
+        $worker->pop('connection', 'queue');
     }
 }

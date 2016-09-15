@@ -195,6 +195,23 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($model->save());
     }
 
+    public function testSaveDoesntUpateTimestampsIfTouchOptionDisabled()
+    {
+        $model = $this->getMockBuilder('EloquentModelStub')->setMethods(['newQueryWithoutScopes', 'updateTimestamps', 'fireModelEvent'])->getMock();
+        $query = m::mock('Illuminate\Database\Eloquent\Builder');
+        $query->shouldReceive('where')->once()->with('id', '=', 1);
+        $query->shouldReceive('update')->once()->with(['name' => 'taylor'])->andReturn(1);
+        $model->expects($this->once())->method('newQueryWithoutScopes')->will($this->returnValue($query));
+        $model->expects($this->never())->method('updateTimestamps');
+        $model->expects($this->any())->method('fireModelEvent')->will($this->returnValue(true));
+
+        $model->id = 1;
+        $model->syncOriginal();
+        $model->name = 'taylor';
+        $model->exists = true;
+        $this->assertTrue($model->save(['touch' => false]));
+    }
+
     public function testSaveIsCancelledIfSavingEventReturnsFalse()
     {
         $model = $this->getMockBuilder('EloquentModelStub')->setMethods(['newQueryWithoutScopes'])->getMock();
@@ -939,10 +956,32 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
     {
         $model = new EloquentModelStub;
         $this->addMockConnection($model);
+
+        // $this->morphTo();
         $relation = $model->morphToStub();
         $this->assertEquals('morph_to_stub_id', $relation->getForeignKey());
+        $this->assertEquals('morph_to_stub_type', $relation->getMorphType());
+        $this->assertEquals('morphToStub', $relation->getRelation());
         $this->assertSame($model, $relation->getParent());
         $this->assertInstanceOf('EloquentModelSaveStub', $relation->getQuery()->getModel());
+
+        // $this->morphTo(null, 'type', 'id');
+        $relation2 = $model->morphToStubWithKeys();
+        $this->assertEquals('id', $relation2->getForeignKey());
+        $this->assertEquals('type', $relation2->getMorphType());
+        $this->assertEquals('morphToStubWithKeys', $relation2->getRelation());
+
+        // $this->morphTo('someName');
+        $relation3 = $model->morphToStubWithName();
+        $this->assertEquals('some_name_id', $relation3->getForeignKey());
+        $this->assertEquals('some_name_type', $relation3->getMorphType());
+        $this->assertEquals('someName', $relation3->getRelation());
+
+        // $this->morphTo('someName', 'type', 'id');
+        $relation4 = $model->morphToStubWithNameAndKeys();
+        $this->assertEquals('id', $relation4->getForeignKey());
+        $this->assertEquals('type', $relation4->getMorphType());
+        $this->assertEquals('someName', $relation4->getRelation());
     }
 
     public function testBelongsToManyCreatesProperRelation()
@@ -1470,6 +1509,21 @@ class EloquentModelStub extends Model
     public function morphToStub()
     {
         return $this->morphTo();
+    }
+
+    public function morphToStubWithKeys()
+    {
+        return $this->morphTo(null, 'type', 'id');
+    }
+
+    public function morphToStubWithName()
+    {
+        return $this->morphTo('someName');
+    }
+
+    public function morphToStubWithNameAndKeys()
+    {
+        return $this->morphTo('someName', 'type', 'id');
     }
 
     public function belongsToExplicitKeyStub()

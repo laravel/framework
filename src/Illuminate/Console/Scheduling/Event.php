@@ -639,14 +639,10 @@ class Event
      */
     private function inTimeInterval($startTime, $endTime)
     {
-        $startTime = str_replace(':', '', $startTime);
-
-        $endTime = str_replace(':', '', $endTime);
-
         return function () use ($startTime, $endTime) {
-            $now = Carbon::now()->format('Hi');
+            $now = Carbon::now()->timestamp;
 
-            return $now >= $startTime && $now <= $endTime;
+            return $now >= strtotime($startTime) && $now <= strtotime($endTime);
         };
     }
 

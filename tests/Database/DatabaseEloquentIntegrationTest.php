@@ -875,6 +875,13 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertCount(1, $result->getRelations());
     }
 
+    public function testModelIgnoredByGlobalScopeCanBeRefreshed()
+    {
+        $user = EloquentTestUserWithOmittingGlobalScope::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+
+        $this->assertNotNull($user->fresh());
+    }
+
     public function testForPageAfterIdCorrectlyPaginates()
     {
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
@@ -974,6 +981,18 @@ class EloquentTestUserWithGlobalScope extends EloquentTestUser
 
         static::addGlobalScope(function ($builder) {
             $builder->with('posts');
+        });
+    }
+}
+
+class EloquentTestUserWithOmittingGlobalScope extends EloquentTestUser
+{
+    public static function boot()
+    {
+        parent::boot();
+
+        static::addGlobalScope(function ($builder) {
+            $builder->where('email', '!=', 'taylorotwell@gmail.com');
         });
     }
 }
