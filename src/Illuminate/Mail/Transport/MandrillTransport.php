@@ -45,7 +45,7 @@ class MandrillTransport extends Transport
             'key' => $this->key,
             'to' => $this->getToAddresses($message),
             'raw_message' => $message->toString(),
-            'async' => true,
+            'async' => false,
         ];
 
         if (version_compare(ClientInterface::VERSION, '6') === 1) {
