@@ -603,6 +603,20 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
+     * Get a closure to resolve the given type from the container.
+     *
+     * @param  string  $abstract
+     * @param  array  $defaults
+     * @return \Closure
+     */
+    public function factory($abstract, array $defaults = [])
+    {
+        return function (array $params = []) use ($abstract, $defaults) {
+            return $this->make($abstract, $params + $defaults);
+        };
+    }
+
+    /**
      * Resolve the given type from the container.
      *
      * @param  string  $abstract

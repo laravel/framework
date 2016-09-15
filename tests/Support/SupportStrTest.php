@@ -44,6 +44,7 @@ class SupportStrTest extends PHPUnit_Framework_TestCase
         $this->assertFalse(Str::startsWith('jason', 'day'));
         $this->assertFalse(Str::startsWith('jason', ['day']));
         $this->assertFalse(Str::startsWith('jason', ''));
+        $this->assertFalse(Str::startsWith('7', ' 7'));
     }
 
     public function testEndsWith()

@@ -90,7 +90,8 @@ class Worker
      */
     protected function daemonShouldRun()
     {
-        return ! $this->manager->isDownForMaintenance();
+        return $this->manager->isDownForMaintenance()
+            ? false : $this->events->until('illuminate.queue.looping') !== false;
     }
 
     /**
@@ -201,6 +202,10 @@ class Worker
         try {
             $this->raiseBeforeJobEvent($connectionName, $job);
 
+            $this->markJobAsFailedIfAlreadyExceedsMaxAttempts(
+                $connectionName, $job, (int) $options->maxTries
+            );
+
             // Here we will fire off the job and let it process. We will catch any exceptions so
             // they can be reported to the developers logs, etc. Once the job is finished the
             // proper events will be fired to let any listeners know this job has finished.
@@ -234,7 +239,7 @@ class Worker
         // another listener (or this same one). We will re-throw this exception after.
         try {
             $this->markJobAsFailedIfHasExceededMaxAttempts(
-                $connectionName, $job, $options->maxTries, $e
+                $connectionName, $job, (int) $options->maxTries, $e
             );
 
             $this->raiseExceptionOccurredJobEvent(
@@ -252,6 +257,31 @@ class Worker
     /**
      * Mark the given job as failed if it has exceeded the maximum allowed attempts.
      *
+     * This will likely be because the job previously exceeded a timeout.
+     *
+     * @param  string  $connectionName
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  int  $maxTries
+     * @return void
+     */
+    protected function markJobAsFailedIfAlreadyExceedsMaxAttempts($connectionName, $job, $maxTries)
+    {
+        if ($maxTries === 0 || $job->attempts() <= $maxTries) {
+            return;
+        }
+
+        $e = new MaxAttemptsExceededException(
+            'A queued job has been attempted too many times. The job may have previously timed out.'
+        );
+
+        $this->failJob($connectionName, $job, $e);
+
+        throw $e;
+    }
+
+    /**
+     * Mark the given job as failed if it has exceeded the maximum allowed attempts.
+     *
      * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  int  $maxTries
@@ -262,6 +292,23 @@ class Worker
         $connectionName, $job, $maxTries, $e
     ) {
         if ($maxTries === 0 || $job->attempts() < $maxTries) {
+            return;
+        }
+
+        $this->failJob($connectionName, $job, $e);
+    }
+
+    /**
+     * Mark the given job as failed and raise the relevant event.
+     *
+     * @param  string  $connectionName
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  \Exception  $e
+     * @return void
+     */
+    protected function failJob($connectionName, $job, $e)
+    {
+        if ($job->isDeleted()) {
             return;
         }
 
