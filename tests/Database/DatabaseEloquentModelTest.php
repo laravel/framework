@@ -1376,6 +1376,17 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(isset($model->some_relation));
     }
 
+    public function testNonExistingAttributeWithInternalMethodNameDoesntCallMethod()
+    {
+        $model = m::mock('EloquentModelStub[delete]');
+        $model->shouldNotReceive('delete');
+        $this->assertNull($model->delete);
+
+        $model = m::mock('EloquentModelStub[delete]');
+        $model->delete = 123;
+        $this->assertEquals(123, $model->delete);
+    }
+
     public function testIntKeyTypePreserved()
     {
         $model = $this->getMockBuilder('EloquentModelStub')->setMethods(['newQueryWithoutScopes', 'updateTimestamps', 'refresh'])->getMock();
