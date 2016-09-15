@@ -635,6 +635,7 @@ trait InteractsWithPages
         $this->assertFilterProducesResults($element);
 
         $element = str_replace('#', '', $element);
+        $element = str_replace('[]', '', $element);
 
         $this->inputs[$element] = $text;
 
