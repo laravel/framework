@@ -34,7 +34,7 @@ trait InteractsWithPages
      *
      * @var bool
      */
-    protected $followsRedirects = true;
+    protected $followingRedirects = true;
 
     /**
      * Nested crawler instances used by the "within" method.
@@ -98,7 +98,7 @@ trait InteractsWithPages
 
         $this->clearInputs();
 
-        if ($this->followsRedirects) {
+        if ($this->followingRedirects) {
             $this->followRedirects()->assertPageLoaded($uri);
         }
 
@@ -731,14 +731,26 @@ trait InteractsWithPages
     }
 
     /**
-     * Toggle the option to follow redirects.
+     * Set the follow redirects property.
      *
-     * @param bool $follow
+     * @param bool $option
      */
-    public function toggleFollowsRedirects($follow = true)
+    public function setFollowingRedirects($option)
     {
-        $this->followsRedirects = $follow;
+        $this->followingRedirects = $option;
 
         return $this;
     }
+
+    /**
+     * Get the follow redirects property.
+     *
+     * @return bool
+     */
+    public function isFollowingRedirects()
+    {
+        return $this->followingRedirects;
+    }
+
+
 }
