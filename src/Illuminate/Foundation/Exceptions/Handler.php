@@ -197,10 +197,14 @@ class Handler implements ExceptionHandlerContract
         $status = $e->getStatusCode();
 
         if (view()->exists("errors.{$status}")) {
-            return response()->view("errors.{$status}", ['exception' => $e], $status, $e->getHeaders());
+            $viewName = "errors.{$status}";
+        } elseif (config('app.debug', false) !== true && view()->exists('errors.default')) {
+            $viewName = 'errors.default';
         } else {
             return $this->convertExceptionToResponse($e);
         }
+
+        return response()->view($viewName, ['exception' => $e], $status, $e->getHeaders());
     }
 
     /**
