@@ -738,14 +738,17 @@ class Builder
      *
      * @param  bool  $value
      * @param  \Closure  $callback
+     * @param  \Closure  $default
      * @return $this
      */
-    public function when($value, $callback)
+    public function when($value, $callback, $default = null)
     {
         $builder = $this;
 
         if ($value) {
             $builder = call_user_func($callback, $builder);
+        } elseif ($default) {
+            $builder = call_user_func($default, $builder);
         }
 
         return $builder;
