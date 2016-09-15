@@ -1,26 +1,37 @@
 <?php
 
-namespace Illuminate\Foundation\Bootstrap;
+namespace Illuminate\Log;
 
-use Illuminate\Log\Writer;
 use Monolog\Logger as Monolog;
+use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Foundation\Application;
 
-class ConfigureLogging
+class LogServiceProvider extends ServiceProvider
 {
     /**
-     * Bootstrap the given application.
+     * Register the service provider.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
-    public function bootstrap(Application $app)
+    public function register()
     {
-        $log = $this->registerLogger($app);
+        $this->app->singleton('log', function ($app) {
+            return $this->createLogger($app);
+        });
+    }
 
-        // If a custom Monolog configurator has been registered for the application
-        // we will call that, passing Monolog along. Otherwise, we will grab the
-        // the configurations for the log system and use it for configuration.
+    /**
+     * Create the logger.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application $app
+     * @return \Illuminate\Log\Writer
+     */
+    public function createLogger($app)
+    {
+        $log = new Writer(
+            new Monolog($app->environment()), $app['events']
+        );
+
         if ($app->hasMonologConfigurator()) {
             call_user_func(
                 $app->getMonologConfigurator(), $log->getMonolog()
@@ -28,19 +39,6 @@ class ConfigureLogging
         } else {
             $this->configureHandlers($app, $log);
         }
-    }
-
-    /**
-     * Register the logger instance in the container.
-     *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @return \Illuminate\Log\Writer
-     */
-    protected function registerLogger(Application $app)
-    {
-        $app->instance('log', $log = new Writer(
-            new Monolog($app->environment()), $app['events'])
-        );
 
         return $log;
     }
