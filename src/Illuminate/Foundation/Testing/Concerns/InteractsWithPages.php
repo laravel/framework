@@ -751,6 +751,4 @@ trait InteractsWithPages
     {
         return $this->followingRedirects;
     }
-
-
 }
