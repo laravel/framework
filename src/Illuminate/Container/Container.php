@@ -1085,7 +1085,7 @@ class Container implements ArrayAccess, ContainerContract
      * @param  string  $abstract
      * @return string
      */
-    protected function getAlias($abstract)
+    public function getAlias($abstract)
     {
         if (! isset($this->aliases[$abstract])) {
             return $abstract;
