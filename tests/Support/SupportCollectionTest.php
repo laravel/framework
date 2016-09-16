@@ -72,6 +72,20 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($c->isEmpty());
     }
 
+    public function testCollectionIsNotEmpty()
+    {
+        $c = new Collection(['foo' => 'bar']);
+
+        $this->assertTrue($c->isNotEmpty());
+    }
+
+    public function testEmptyColletionIsNotEmpty()
+    {
+        $c = new Collection();
+
+        $this->assertFalse($c->isNotEmpty());
+    }
+
     public function testCollectionIsConstructed()
     {
         $collection = new Collection('foo');
