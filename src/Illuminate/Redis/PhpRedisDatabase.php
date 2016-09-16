@@ -46,12 +46,12 @@ class PhpRedisDatabase extends Database
     {
         $servers = array_map([$this, 'buildClusterSeed'], $servers);
 
-        $timeout = empty($options['timeout']) ? 0 : $options['timeout'];
-        $readTimeout = empty($options['read_write_timeout']) ? 0 : $options['read_write_timeout'];
-        $persistent = isset($options['persistent']) && $options['persistent'];
-
         return ['default' => new RedisCluster(
-            null, array_values($servers), $timeout, $readTimeout, $persistent
+            null,
+            array_values($servers),
+            Arr::get($options, 'timeout', 0),
+            Arr::get($options, 'read_timeout', 0),
+            isset($options['persistent']) && $options['persistent']
         )];
     }
 
@@ -81,8 +81,8 @@ class PhpRedisDatabase extends Database
                 $client->setOption(Redis::OPT_PREFIX, $server['prefix']);
             }
 
-            if (! empty($server['read_write_timeout'])) {
-                $client->setOption(Redis::OPT_READ_TIMEOUT, $server['read_write_timeout']);
+            if (! empty($server['read_timeout'])) {
+                $client->setOption(Redis::OPT_READ_TIMEOUT, $server['read_timeout']);
             }
 
             if (! empty($server['password'])) {
@@ -107,27 +107,9 @@ class PhpRedisDatabase extends Database
      */
     protected function buildClusterSeed(array $server)
     {
-        $parameters = [];
-
-        if (! empty($server['database'])) {
-            $parameters['database'] = $server['database'];
-        }
-
-        if (! empty($server['password'])) {
-            $parameters['auth'] = $server['password'];
-        }
-
-        if (! empty($server['prefix'])) {
-            $parameters['prefix'] = $server['prefix'];
-        }
-
-        if (! empty($server['timeout'])) {
-            $parameters['timeout'] = $server['timeout'];
-        }
-
-        if (! empty($server['read_write_timeout'])) {
-            $parameters['read_timeout'] = $server['read_write_timeout'];
-        }
+        $parameters = Arr::only($server, [
+            'database', 'password', 'prefix', 'read_timeout',
+        ]);
 
         return $server['host'].':'.$server['port'].'?'.http_build_query($parameters);
     }
