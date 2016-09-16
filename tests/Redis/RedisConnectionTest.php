@@ -35,6 +35,6 @@ class RedisConnectionTest extends PHPUnit_Framework_TestCase
             ],
         ];
 
-        return new Illuminate\Redis\Database($servers);
+        return new Illuminate\Redis\PredisDatabase($servers);
     }
 }
