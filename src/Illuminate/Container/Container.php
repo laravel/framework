@@ -775,8 +775,8 @@ class Container implements ArrayAccess, ContainerContract
             return new $concrete;
         }
 
-        // if parameters is empty, reslove the dependency for constructor's parameters,
-        // otherwise pass parameters to constructor.
+        // If parameters is empty, reslove the dependency for constructor's
+        // parameters, otherwise pass parameters to constructor.
         if (empty($parameters)) {
             $reflectedParameters = $constructor->getParameters();
             $instances = $this->getDependencies($reflectedParameters);
