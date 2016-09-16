@@ -31,7 +31,7 @@ trait SendsPasswordResetEmails
         // to send the link, we will examine the response then see the message we
         // need to show to the user. Finally, we'll send out a proper response.
         $response = $this->broker()->sendResetLink(
-            $request->only('email'), $this->resetNotifier()
+            $request->only('email')
         );
 
         if ($response === Password::RESET_LINK_SENT) {
@@ -44,16 +44,6 @@ trait SendsPasswordResetEmails
         return back()->withErrors(
             ['email' => trans($response)]
         );
-    }
-
-    /**
-     * Get the Closure which is used to build the password reset notification.
-     *
-     * @return \Closure
-     */
-    protected function resetNotifier()
-    {
-        //
     }
 
     /**

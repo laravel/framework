@@ -653,6 +653,13 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($container->resolved('foo'));
     }
 
+    public function testGetAlias()
+    {
+        $container = new Container;
+        $container->alias('ConcreteStub', 'foo');
+        $this->assertEquals($container->getAlias('foo'), 'ConcreteStub');
+    }
+
     public function testContainerCanInjectSimpleVariable()
     {
         $container = new Container;
