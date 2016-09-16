@@ -1376,6 +1376,27 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(isset($model->some_relation));
     }
 
+    public function testNonExistingAttributeWithInternalMethodNameDoesntCallMethod()
+    {
+        $model = m::mock('EloquentModelStub[delete,getRelationValue]');
+        $model->name = 'Spark';
+        $model->shouldNotReceive('delete');
+        $model->shouldReceive('getRelationValue')->once()->with('belongsToStub')->andReturn('relation');
+
+        // Can return a normal relation
+        $this->assertEquals('relation', $model->belongsToStub);
+
+        // Can return a normal attribute
+        $this->assertEquals('Spark', $model->name);
+
+        // Returns null for a Model.php method name
+        $this->assertNull($model->delete);
+
+        $model = m::mock('EloquentModelStub[delete]');
+        $model->delete = 123;
+        $this->assertEquals(123, $model->delete);
+    }
+
     public function testIntKeyTypePreserved()
     {
         $model = $this->getMockBuilder('EloquentModelStub')->setMethods(['newQueryWithoutScopes', 'updateTimestamps', 'refresh'])->getMock();
