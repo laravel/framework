@@ -749,7 +749,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $localKey = $localKey ?: $this->getKeyName();
 
         if (is_null($parent)) {
-            $parent=$this;
+            $parent = $this;
         }
 
         return new MorphOne($instance->newQuery(), $parent, $table.'.'.$type, $table.'.'.$id, $localKey);
@@ -916,7 +916,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $localKey = $localKey ?: $this->getKeyName();
 
         if (is_null($parent)) {
-            $parent=$this;
+            $parent = $this;
         }
 
         return new MorphMany($instance->newQuery(), $parent, $table.'.'.$type, $table.'.'.$id, $localKey);
