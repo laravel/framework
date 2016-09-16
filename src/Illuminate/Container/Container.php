@@ -801,10 +801,9 @@ class Container implements ArrayAccess, ContainerContract
      * Resolve all of the dependencies from the ReflectionParameters.
      *
      * @param  array  $parameters
-     * @param  array  $primitives
      * @return array
      */
-    protected function getDependencies(array $parameters, array $primitives = [])
+    protected function getDependencies(array $parameters)
     {
         $dependencies = [];
 
@@ -814,9 +813,7 @@ class Container implements ArrayAccess, ContainerContract
             // If the class is null, it means the dependency is a string or some other
             // primitive type which we can not resolve since it is not a class and
             // we will just bomb out with an error since we have no-where to go.
-            if (array_key_exists($parameter->name, $primitives)) {
-                $dependencies[] = $primitives[$parameter->name];
-            } elseif (is_null($dependency)) {
+            if (is_null($dependency)) {
                 $dependencies[] = $this->resolveNonClass($parameter);
             } else {
                 $dependencies[] = $this->resolveClass($parameter);
