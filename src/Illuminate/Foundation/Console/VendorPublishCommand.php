@@ -69,7 +69,7 @@ class VendorPublishCommand extends Command
      * @param  string  $tag
      * @return mixed
      */
-    private function publishTag($tag)
+    protected function publishTag($tag)
     {
         $paths = ServiceProvider::pathsToPublish(
             $this->option('provider'), $tag
