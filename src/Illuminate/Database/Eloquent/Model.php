@@ -735,9 +735,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string  $type
      * @param  string  $id
      * @param  string  $localKey
+     * @param  \Illuminate\Database\Eloquent\Model  $parent
      * @return \Illuminate\Database\Eloquent\Relations\MorphOne
      */
-    public function morphOne($related, $name, $type = null, $id = null, $localKey = null)
+    public function morphOne($related, $name, $type = null, $id = null, $localKey = null, Model $parent = null)
     {
         $instance = new $related;
 
@@ -747,7 +748,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $localKey = $localKey ?: $this->getKeyName();
 
-        return new MorphOne($instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id, $localKey);
+        if (is_null($parent)) {
+            $parent=$this;
+        }
+
+        return new MorphOne($instance->newQuery(), $parent, $table.'.'.$type, $table.'.'.$id, $localKey);
     }
 
     /**
@@ -897,7 +902,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  \Illuminate\Database\Eloquent\Model  $parent
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
-    public function morphMany($related, $name, $type = null, $id = null, $localKey = null, Model $parent=null)
+    public function morphMany($related, $name, $type = null, $id = null, $localKey = null, Model $parent = null)
     {
         $instance = new $related;
 
