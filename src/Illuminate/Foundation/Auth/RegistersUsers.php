@@ -31,24 +31,11 @@ trait RegistersUsers
     {
         $this->validator($request->all())->validate();
 
-        $user = $this->create($request->all());
-
-        $this->fireRegisteredEvent($user);
+        event(new Registered($user = $this->create($request->all())));
 
         $this->guard()->login($user);
 
         return redirect($this->redirectPath());
-    }
-
-    /**
-     * Fire an event when a user registers.
-     *
-     * @param \Illuminate\Contracts\Auth\Authenticatable $authenticatable
-     * @return void
-     */
-    protected function fireRegisteredEvent(Authenticatable $authenticatable)
-    {
-        event(new Registered($authenticatable));
     }
 
     /**
