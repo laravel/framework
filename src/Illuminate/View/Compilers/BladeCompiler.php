@@ -579,7 +579,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileForeach($expression)
     {
-        preg_match('/\( *(.*) +as *([^\)]*)/s', $expression, $matches);
+        preg_match('/\( *(.*) +as *([^\)]*)/is', $expression, $matches);
 
         $iteratee = trim($matches[1]);
 
