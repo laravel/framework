@@ -870,10 +870,10 @@ class Builder
     /**
      * Add a relationship count / exists condition to the query with where clauses.
      *
-     * @param  string    $relation
+     * @param  string  $relation
      * @param  \Closure|null  $callback
-     * @param  string    $operator
-     * @param  int       $count
+     * @param  string  $operator
+     * @param  int     $count
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
     public function whereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)
