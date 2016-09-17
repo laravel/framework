@@ -857,7 +857,7 @@ class BelongsToMany extends Relation
         return $changes;
     }
 
-    /*
+    /**
      * Sync the intermediate tables with a list of IDs without detaching.
      *
      * @param  \Illuminate\Database\Eloquent\Collection|array  $ids
