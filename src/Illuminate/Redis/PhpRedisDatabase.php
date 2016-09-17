@@ -138,6 +138,6 @@ class PhpRedisDatabase extends Database
      */
     public function psubscribe($channels, Closure $callback, $connection = null)
     {
-        $this->psubscribe($channels, $callback, $connection, __FUNCTION__);
+        $this->subscribe($channels, $callback, $connection, __FUNCTION__);
     }
 }
