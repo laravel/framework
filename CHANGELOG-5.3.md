@@ -1,5 +1,14 @@
 # Release Notes for 5.3.x
 
+## v5.3.9 (2016-09-12)
+
+### Changed
+- Optimized performance of `Str::startsWith()` and `Str::endsWith()` ([#15380](https://github.com/laravel/framework/pull/15380), [#15397](https://github.com/laravel/framework/pull/15397))
+
+### Fixed
+- Fixed queue job without `--tries` option ([#15370](https://github.com/laravel/framework/pull/15370), [#15390](https://github.com/laravel/framework/pull/15390))
+
+
 ## v5.3.8 (2016-09-09)
 
 ### Added
