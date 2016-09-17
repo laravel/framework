@@ -72,7 +72,7 @@ trait SoftDeletes
     {
         // If the model is not soft-deleted, we will not proceed with restore operation
         // as there is no point in doing so.
-        if($this->trashed() === false) {
+        if ($this->trashed() === false) {
             return false;
         }
 
