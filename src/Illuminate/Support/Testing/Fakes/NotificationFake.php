@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
+use Illuminate\Support\Collection;
 use Ramsey\Uuid\Uuid;
 use PHPUnit_Framework_Assert as PHPUnit;
 use Illuminate\Contracts\Notifications\Factory as NotificationFactory;

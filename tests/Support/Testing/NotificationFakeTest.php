@@ -39,6 +39,17 @@ class NotificationFakeTest extends PHPUnit_Framework_TestCase
         $this->notification->assertSentTo( $notifiable2, $notification );
     }
 
+	public function testNotificationsCanBeSentToACollection()
+    {
+        $notifiable1 = static::mockNotifiable();
+        $notifiable2 = static::mockNotifiable();
+		$notification = static::mockNotification();
+
+		$this->notification->send( new Collection([ $notifiable1, $notifiable2 ]), $notification );
+
+		$this->notification->assertSentTo( $notifiable1, $notification );
+        $this->notification->assertSentTo( $notifiable2, $notification );
+    }
 
 
 	private static function mockNotifiable()
