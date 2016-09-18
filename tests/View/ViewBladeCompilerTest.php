@@ -528,6 +528,22 @@ empty
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
+    public function testForelseStatementsAreCompiledWithUppercaseSyntax()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@forelse ($this->getUsers() AS $user)
+breeze
+@empty
+empty
+@endforelse';
+        $expected = '<?php $__empty_1 = true; $__currentLoopData = $this->getUsers(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getFirstLoop(); $__empty_1 = false; ?>
+breeze
+<?php endforeach; $__env->popLoop(); $loop = $__env->getFirstLoop(); if ($__empty_1): ?>
+empty
+<?php endif; ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
     public function testForelseStatementsAreCompiledWithMultipleLine()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);

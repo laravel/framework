@@ -624,7 +624,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         $empty = '$__empty_'.++$this->forelseCounter;
 
-        preg_match('/\( *(.*) +as *([^\)]*)/s', $expression, $matches);
+        preg_match('/\( *(.*) +as *([^\)]*)/is', $expression, $matches);
 
         $iteratee = trim($matches[1]);
 
