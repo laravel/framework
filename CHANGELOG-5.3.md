@@ -19,7 +19,6 @@
 - Added username, icon and channel options for Slack Notifications ([#14910](https://github.com/laravel/framework/pull/14910))
 
 ### Changed
-- Updated `symfony/css-selector` version ([#15344](https://github.com/laravel/framework/pull/15344))
 - Renamed methods in `NotificationFake` ([69b08f6](https://github.com/laravel/framework/commit/69b08f66fbe70b4df8332a8f2a7557a49fd8c693))
 - Minor code improvements ([#15369](https://github.com/laravel/framework/pull/15369))
 
