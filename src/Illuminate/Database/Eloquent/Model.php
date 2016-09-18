@@ -407,7 +407,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function observe($class, $priority = 0)
     {
-        $instance = new static;
+        $instance = static::makeNewInstance();
 
         $className = is_string($class) ? $class : get_class($class);
 
@@ -478,7 +478,18 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Create a new instance of the given model.
+     * Make a new instance of the given model.
+     *
+     * @param  array  $attributes
+     * @return static
+     */
+    public static function makeNewInstance($attributes = [])
+    {
+        return new static((array) $attributes);
+    }
+
+    /**
+     * Get a new instance of the given model.
      *
      * @param  array  $attributes
      * @param  bool  $exists
@@ -489,7 +500,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // This method just provides a convenient way for us to generate fresh model
         // instances of this current model. It is particularly useful during the
         // hydration of new objects via the Eloquent query builder instances.
-        $model = new static((array) $attributes);
+        $model = static::makeNewInstance((array) $attributes);
 
         $model->exists = $exists;
 
@@ -523,7 +534,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function hydrate(array $items, $connection = null)
     {
-        $instance = (new static)->setConnection($connection);
+        $instance = static::makeNewInstance()->setConnection($connection);
 
         $items = array_map(function ($item) use ($instance) {
             return $instance->newFromBuilder($item);
@@ -542,7 +553,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function hydrateRaw($query, $bindings = [], $connection = null)
     {
-        $instance = (new static)->setConnection($connection);
+        $instance = static::makeNewInstance()->setConnection($connection);
 
         $items = $instance->getConnection()->select($query, $bindings);
 
@@ -557,7 +568,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function create(array $attributes = [])
     {
-        $model = new static($attributes);
+        $model = static::makeNewInstance($attributes);
 
         $model->save();
 
@@ -573,7 +584,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public static function forceCreate(array $attributes)
     {
         return static::unguarded(function () use ($attributes) {
-            return (new static)->create($attributes);
+            return static::makeNewInstance()->create($attributes);
         });
     }
 
@@ -584,7 +595,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function query()
     {
-        return (new static)->newQuery();
+        return static::makeNewInstance()->newQuery();
     }
 
     /**
@@ -598,7 +609,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // First we will just create a fresh instance of this model, and then we can
         // set the connection on the model so that it is be used for the queries
         // we execute, as well as being set on each relationship we retrieve.
-        $instance = new static;
+        $instance = static::makeNewInstance();
 
         $instance->setConnection($connection);
 
@@ -612,7 +623,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function onWriteConnection()
     {
-        $instance = new static;
+        $instance = static::makeNewInstance();
 
         return $instance->newQuery()->useWritePdo();
     }
@@ -627,7 +638,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $columns = is_array($columns) ? $columns : func_get_args();
 
-        $instance = new static;
+        $instance = static::makeNewInstance();
 
         return $instance->newQuery()->get($columns);
     }
@@ -684,7 +695,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $relations = func_get_args();
         }
 
-        $instance = new static;
+        $instance = static::makeNewInstance();
 
         return $instance->newQuery()->with($relations);
     }
@@ -1072,7 +1083,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $ids = is_array($ids) ? $ids : func_get_args();
 
-        $instance = new static;
+        $instance = static::makeNewInstance();
 
         // We will actually pull the models from the database table and call delete on
         // each of them individually so that their events get fired properly with a
@@ -1253,7 +1264,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return;
         }
 
-        $instance = new static;
+        $instance = static::makeNewInstance();
 
         foreach ($instance->getObservableEvents() as $event) {
             static::$dispatcher->forget("eloquent.{$event}: ".static::class);
@@ -3046,7 +3057,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $attributes = Arr::except($this->attributes, $except);
 
-        $instance = new static;
+        $instance = static::makeNewInstance();
 
         $instance->setRawAttributes($attributes);
 
@@ -3529,7 +3540,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function __callStatic($method, $parameters)
     {
-        $instance = new static;
+        $instance = static::makeNewInstance();
 
         return call_user_func_array([$instance, $method], $parameters);
     }
