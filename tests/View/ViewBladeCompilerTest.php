@@ -451,6 +451,24 @@ test
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
+    public function testForeachStatementsAreCompileWithMultipleLine()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@foreach ([
+foo,
+bar,
+] as $label)
+test
+@endforeach';
+        $expected = '<?php $__currentLoopData = [
+foo,
+bar,
+]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $label): $__env->incrementLoopIndices(); $loop = $__env->getFirstLoop(); ?>
+test
+<?php endforeach; $__env->popLoop(); $loop = $__env->getFirstLoop(); ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
     public function testNestedForeachStatementsAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
