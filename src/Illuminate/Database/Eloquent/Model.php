@@ -735,10 +735,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string  $type
      * @param  string  $id
      * @param  string  $localKey
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  string|\Illuminate\Database\Eloquent\Model  $parent
      * @return \Illuminate\Database\Eloquent\Relations\MorphOne
      */
-    public function morphOne($related, $name, $type = null, $id = null, $localKey = null, Model $parent = null)
+    public function morphOne($related, $name, $type = null, $id = null, $localKey = null, $parent = null)
     {
         $instance = new $related;
 
@@ -750,6 +750,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         if (is_null($parent)) {
             $parent = $this;
+        }
+        if (is_string($parent)) {
+            $parent = new $parent;
         }
 
         return new MorphOne($instance->newQuery(), $parent, $table.'.'.$type, $table.'.'.$id, $localKey);
@@ -899,10 +902,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string  $type
      * @param  string  $id
      * @param  string  $localKey
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  string|\Illuminate\Database\Eloquent\Model  $parent
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
-    public function morphMany($related, $name, $type = null, $id = null, $localKey = null, Model $parent = null)
+    public function morphMany($related, $name, $type = null, $id = null, $localKey = null, $parent = null)
     {
         $instance = new $related;
 
@@ -917,6 +920,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         if (is_null($parent)) {
             $parent = $this;
+        }
+        if (is_string($parent)) {
+            $parent = new $parent;
         }
 
         return new MorphMany($instance->newQuery(), $parent, $table.'.'.$type, $table.'.'.$id, $localKey);
