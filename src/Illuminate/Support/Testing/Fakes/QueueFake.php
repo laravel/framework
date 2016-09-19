@@ -191,4 +191,15 @@ class QueueFake implements Queue
     {
         //
     }
+
+    /**
+     * Return fake queue.
+     *
+     * @param  string $value
+     * @return \Illuminate\Contracts\Queue\Queue
+     */
+    public function connection($value = null)
+    {
+        return $this;
+    }
 }
