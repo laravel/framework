@@ -2989,7 +2989,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function getDateFormat()
     {
-        return $this->dateFormat ?: $this->getConnection()->getQueryGrammar()->getDateFormat();
+        return ($this->dateFormat ?: config('app.dateFormat')) ?: $this->getConnection()->getQueryGrammar()->getDateFormat();
     }
 
     /**
