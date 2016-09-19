@@ -714,9 +714,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string  $related
      * @param  string  $foreignKey
      * @param  string  $localKey
+     * @param  string|\Illuminate\Database\Eloquent\Model  $parent
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function hasOne($related, $foreignKey = null, $localKey = null)
+    public function hasOne($related, $foreignKey = null, $localKey = null, $parent = null)
     {
         $foreignKey = $foreignKey ?: $this->getForeignKey();
 
@@ -724,7 +725,15 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $localKey = $localKey ?: $this->getKeyName();
 
-        return new HasOne($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey);
+        if (is_null($parent)) {
+            $parent = $this;
+        }
+        
+        if (is_string($parent)) {
+            $parent = new $parent;
+        }
+
+        return new HasOne($instance->newQuery(), $parent, $instance->getTable().'.'.$foreignKey, $localKey);
     }
 
     /**
@@ -751,6 +760,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         if (is_null($parent)) {
             $parent = $this;
         }
+
         if (is_string($parent)) {
             $parent = new $parent;
         }
@@ -765,9 +775,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string  $foreignKey
      * @param  string  $otherKey
      * @param  string  $relation
+     * @param  string|\Illuminate\Database\Eloquent\Model  $parent
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function belongsTo($related, $foreignKey = null, $otherKey = null, $relation = null)
+    public function belongsTo($related, $foreignKey = null, $otherKey = null, $relation = null, $parent = null)
     {
         // If no relation name was given, we will use this debug backtrace to extract
         // the calling method's name and use that as the relationship name as most
@@ -794,7 +805,15 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $otherKey = $otherKey ?: $instance->getKeyName();
 
-        return new BelongsTo($query, $this, $foreignKey, $otherKey, $relation);
+        if (is_null($parent)) {
+            $parent = $this;
+        }
+
+        if (is_string($parent)) {
+            $parent = new $parent;
+        }
+
+        return new BelongsTo($query, $parent, $foreignKey, $otherKey, $relation);
     }
 
     /**
@@ -803,9 +822,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string  $name
      * @param  string  $type
      * @param  string  $id
+     * @param  string|\Illuminate\Database\Eloquent\Model  $parent
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
-    public function morphTo($name = null, $type = null, $id = null)
+    public function morphTo($name = null, $type = null, $id = null, $parent = null)
     {
         // If no name is provided, we will use the backtrace to get the function name
         // since that is most likely the name of the polymorphic interface. We can
@@ -818,12 +838,20 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         list($type, $id) = $this->getMorphs(Str::snake($name), $type, $id);
 
+        if (is_null($parent)) {
+            $parent = $this;
+        }
+
+        if (is_string($parent)) {
+            $parent = new $parent;
+        }
+
         // If the type value is null it is probably safe to assume we're eager loading
         // the relationship. In this case we'll just pass in a dummy query where we
         // need to remove any eager loads that may already be defined on a model.
         if (empty($class = $this->$type)) {
             return new MorphTo(
-                $this->newQuery()->setEagerLoads([]), $this, $id, null, $type, $name
+                $this->newQuery()->setEagerLoads([]), $parent, $id, null, $type, $name
             );
         }
 
@@ -836,7 +864,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $instance = new $class;
 
             return new MorphTo(
-                $instance->newQuery(), $this, $id, $instance->getKeyName(), $type, $name
+                $instance->newQuery(), $parent, $id, $instance->getKeyName(), $type, $name
             );
         }
     }
@@ -858,9 +886,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string  $related
      * @param  string  $foreignKey
      * @param  string  $localKey
+     * @param  string|\Illuminate\Database\Eloquent\Model  $parent
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function hasMany($related, $foreignKey = null, $localKey = null)
+    public function hasMany($related, $foreignKey = null, $localKey = null, $parent = null)
     {
         $foreignKey = $foreignKey ?: $this->getForeignKey();
 
@@ -868,7 +897,15 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $localKey = $localKey ?: $this->getKeyName();
 
-        return new HasMany($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey);
+        if (is_null($parent)) {
+            $parent = $this;
+        }
+
+        if (is_string($parent)) {
+            $parent = new $parent;
+        }
+
+        return new HasMany($instance->newQuery(), $parent, $instance->getTable().'.'.$foreignKey, $localKey);
     }
 
     /**
@@ -879,9 +916,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string|null  $firstKey
      * @param  string|null  $secondKey
      * @param  string|null  $localKey
+     * @param  string|\Illuminate\Database\Eloquent\Model  $parent
      * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
      */
-    public function hasManyThrough($related, $through, $firstKey = null, $secondKey = null, $localKey = null)
+    public function hasManyThrough($related, $through, $firstKey = null, $secondKey = null, $localKey = null, $parent = null)
     {
         $through = new $through;
 
@@ -891,7 +929,15 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $localKey = $localKey ?: $this->getKeyName();
 
-        return new HasManyThrough((new $related)->newQuery(), $this, $through, $firstKey, $secondKey, $localKey);
+        if (is_null($parent)) {
+            $parent = $this;
+        }
+
+        if (is_string($parent)) {
+            $parent = new $parent;
+        }
+
+        return new HasManyThrough((new $related)->newQuery(), $parent, $through, $firstKey, $secondKey, $localKey);
     }
 
     /**
@@ -921,6 +967,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         if (is_null($parent)) {
             $parent = $this;
         }
+
         if (is_string($parent)) {
             $parent = new $parent;
         }
@@ -936,9 +983,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string  $foreignKey
      * @param  string  $otherKey
      * @param  string  $relation
+     * @param  string|\Illuminate\Database\Eloquent\Model  $parent
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function belongsToMany($related, $table = null, $foreignKey = null, $otherKey = null, $relation = null)
+    public function belongsToMany($related, $table = null, $foreignKey = null, $otherKey = null, $relation = null, $parent = null)
     {
         // If no relationship name was passed, we will pull backtraces to get the
         // name of the calling function. We will use that function name as the
@@ -968,7 +1016,15 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // appropriate query constraint and entirely manages the hydrations.
         $query = $instance->newQuery();
 
-        return new BelongsToMany($query, $this, $table, $foreignKey, $otherKey, $relation);
+        if (is_null($parent)) {
+            $parent = $this;
+        }
+
+        if (is_string($parent)) {
+            $parent = new $parent;
+        }
+
+        return new BelongsToMany($query, $parent, $table, $foreignKey, $otherKey, $relation);
     }
 
     /**
@@ -980,9 +1036,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string  $foreignKey
      * @param  string  $otherKey
      * @param  bool  $inverse
+     * @param  string|\Illuminate\Database\Eloquent\Model  $parent
      * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
-    public function morphToMany($related, $name, $table = null, $foreignKey = null, $otherKey = null, $inverse = false)
+    public function morphToMany($related, $name, $table = null, $foreignKey = null, $otherKey = null, $inverse = false, $parent = null)
     {
         $caller = $this->getBelongsToManyCaller();
 
@@ -1002,8 +1059,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $table = $table ?: Str::plural($name);
 
+        if (is_null($parent)) {
+            $parent = $this;
+        }
+
+        if (is_string($parent)) {
+            $parent = new $parent;
+        }
+
         return new MorphToMany(
-            $query, $this, $name, $table, $foreignKey,
+            $query, $parent, $name, $table, $foreignKey,
             $otherKey, $caller, $inverse
         );
     }
@@ -1016,9 +1081,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string  $table
      * @param  string  $foreignKey
      * @param  string  $otherKey
+     * @param  string|\Illuminate\Database\Eloquent\Model  $parent
      * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
-    public function morphedByMany($related, $name, $table = null, $foreignKey = null, $otherKey = null)
+    public function morphedByMany($related, $name, $table = null, $foreignKey = null, $otherKey = null, $parent = null)
     {
         $foreignKey = $foreignKey ?: $this->getForeignKey();
 
@@ -1027,7 +1093,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // of the morph-to-many method since we're figuring out these inverses.
         $otherKey = $otherKey ?: $name.'_id';
 
-        return $this->morphToMany($related, $name, $table, $foreignKey, $otherKey, true);
+        return $this->morphToMany($related, $name, $table, $foreignKey, $otherKey, true, $parent);
     }
 
     /**
