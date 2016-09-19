@@ -111,14 +111,14 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(is_numeric($log[0]['time']));
     }
 
-    public function testTransactionsDecrementedOnTransactionException()
+    public function testTransactionLevelNotIncrementedOnTransactionException()
     {
         $pdo = $this->getMock('DatabaseConnectionTestMockPDO');
-        $pdo->expects($this->once())->method('beginTransaction')->will($this->throwException(new ErrorException('MySQL server has gone away')));
+        $pdo->expects($this->once())->method('beginTransaction')->will($this->throwException(new Exception));
         $connection = $this->getMockConnection([], $pdo);
         try {
             $connection->beginTransaction();
-        } catch (ErrorException $e) {
+        } catch (Exception $e) {
             $this->assertEquals(0, $connection->transactionLevel());
         }
     }
