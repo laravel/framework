@@ -345,7 +345,7 @@ class Mailer implements MailerContract, MailQueueContract
         }
 
         // If the view is an array, but doesn't contain numeric keys, we will assume
-        // the the views are being explicitly specified and will extract them via
+        // the views are being explicitly specified and will extract them via
         // named keys instead, allowing the developers to use one or the other.
         if (is_array($view)) {
             return [
