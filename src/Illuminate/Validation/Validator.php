@@ -958,6 +958,8 @@ class Validator implements ValidatorContract
     protected function validateRequiredIf($attribute, $value, $parameters)
     {
         $this->requireParameterCount(2, $parameters, 'required_if');
+        
+        $parameters = $this->trimStringParameters($parameters);
 
         $data = Arr::get($this->data, $parameters[0]);
 
@@ -991,6 +993,8 @@ class Validator implements ValidatorContract
     protected function validateRequiredUnless($attribute, $value, $parameters)
     {
         $this->requireParameterCount(2, $parameters, 'required_unless');
+        
+        $parameters = $this->trimStringParameters($parameters);
 
         $data = Arr::get($this->data, $parameters[0]);
 
@@ -1033,6 +1037,8 @@ class Validator implements ValidatorContract
     protected function validateInArray($attribute, $value, $parameters)
     {
         $this->requireParameterCount(1, $parameters, 'in_array');
+        
+        $parameters = $this->trimStringParameters($parameters);
 
         $explicitPath = $this->getLeadingExplicitAttributePath($parameters[0]);
 
@@ -1068,6 +1074,8 @@ class Validator implements ValidatorContract
     protected function validateSame($attribute, $value, $parameters)
     {
         $this->requireParameterCount(1, $parameters, 'same');
+        
+        $parameters = $this->trimStringParameters($parameters);
 
         $other = Arr::get($this->data, $parameters[0]);
 
@@ -1085,6 +1093,8 @@ class Validator implements ValidatorContract
     protected function validateDifferent($attribute, $value, $parameters)
     {
         $this->requireParameterCount(1, $parameters, 'different');
+        
+        $parameters = $this->trimStringParameters($parameters);
 
         $other = Arr::get($this->data, $parameters[0]);
 
@@ -1198,6 +1208,8 @@ class Validator implements ValidatorContract
     protected function validateDigits($attribute, $value, $parameters)
     {
         $this->requireParameterCount(1, $parameters, 'digits');
+        
+        $parameters = $this->trimStringParameters($parameters);
 
         return ! preg_match('/[^0-9]/', $value)
             && strlen((string) $value) == $parameters[0];
@@ -1214,6 +1226,8 @@ class Validator implements ValidatorContract
     protected function validateDigitsBetween($attribute, $value, $parameters)
     {
         $this->requireParameterCount(2, $parameters, 'digits_between');
+        
+        $parameters = $this->trimStringParameters($parameters);
 
         $length = strlen((string) $value);
 
@@ -1232,6 +1246,8 @@ class Validator implements ValidatorContract
     protected function validateSize($attribute, $value, $parameters)
     {
         $this->requireParameterCount(1, $parameters, 'size');
+        
+        $parameters = $this->trimStringParameters($parameters);
 
         return $this->getSize($attribute, $value) == $parameters[0];
     }
@@ -1247,6 +1263,8 @@ class Validator implements ValidatorContract
     protected function validateBetween($attribute, $value, $parameters)
     {
         $this->requireParameterCount(2, $parameters, 'between');
+        
+        $parameters = $this->trimStringParameters($parameters);
 
         $size = $this->getSize($attribute, $value);
 
@@ -1264,6 +1282,8 @@ class Validator implements ValidatorContract
     protected function validateMin($attribute, $value, $parameters)
     {
         $this->requireParameterCount(1, $parameters, 'min');
+        
+        $parameters = $this->trimStringParameters($parameters);
 
         return $this->getSize($attribute, $value) >= $parameters[0];
     }
@@ -1279,6 +1299,8 @@ class Validator implements ValidatorContract
     protected function validateMax($attribute, $value, $parameters)
     {
         $this->requireParameterCount(1, $parameters, 'max');
+        
+        $parameters = $this->trimStringParameters($parameters);
 
         if ($value instanceof UploadedFile && ! $value->isValid()) {
             return false;
@@ -1385,13 +1407,15 @@ class Validator implements ValidatorContract
     protected function validateUnique($attribute, $value, $parameters)
     {
         $this->requireParameterCount(1, $parameters, 'unique');
+        
+        $parameters = $this->trimStringParameters($parameters);
 
         list($connection, $table) = $this->parseTable($parameters[0]);
+        
         // The second parameter position holds the name of the column that needs to
         // be verified as unique. If this parameter isn't specified we will just
         // assume that this column to be verified shares the attribute's name.
-        $column = isset($parameters[1])
-                    ? $parameters[1] : $this->guessColumnForQuery($attribute);
+        $column = isset($parameters[1]) ? $parameters[1] : $this->guessColumnForQuery($attribute);
 
         list($idColumn, $id) = [null, null];
 
@@ -1476,14 +1500,15 @@ class Validator implements ValidatorContract
     protected function validateExists($attribute, $value, $parameters)
     {
         $this->requireParameterCount(1, $parameters, 'exists');
+        
+        $parameters = $this->trimStringParameters($parameters);
 
         list($connection, $table) = $this->parseTable($parameters[0]);
 
         // The second parameter position holds the name of the column that should be
         // verified as existing. If this parameter is not specified we will guess
         // that the columns being "verified" shares the given attribute's name.
-        $column = isset($parameters[1])
-                    ? $parameters[1] : $this->guessColumnForQuery($attribute);
+        $column = isset($parameters[1]) ? $parameters[1] : $this->guessColumnForQuery($attribute);
 
         $expected = (is_array($value)) ? count($value) : 1;
 
@@ -1683,6 +1708,8 @@ class Validator implements ValidatorContract
         list($width, $height) = $sizeDetails;
 
         $parameters = $this->parseNamedParameters($parameters);
+        
+        $parameters = $this->trimStringParameters($parameters);
 
         if (
             isset($parameters['width']) && $parameters['width'] != $width ||
@@ -1814,6 +1841,8 @@ class Validator implements ValidatorContract
         }
 
         $this->requireParameterCount(1, $parameters, 'regex');
+        
+        $parameters = $this->trimStringParameters($parameters);
 
         return preg_match($parameters[0], $value) > 0;
     }
@@ -1851,6 +1880,8 @@ class Validator implements ValidatorContract
     protected function validateDateFormat($attribute, $value, $parameters)
     {
         $this->requireParameterCount(1, $parameters, 'date_format');
+        
+        $parameters = $this->trimStringParameters($parameters);
 
         if (! is_string($value) && ! is_numeric($value)) {
             return false;
@@ -1872,6 +1903,8 @@ class Validator implements ValidatorContract
     protected function validateBefore($attribute, $value, $parameters)
     {
         $this->requireParameterCount(1, $parameters, 'before');
+        
+        $parameters = $this->trimStringParameters($parameters);
 
         if (! is_string($value) && ! is_numeric($value) && ! $value instanceof DateTimeInterface) {
             return false;
@@ -1914,6 +1947,8 @@ class Validator implements ValidatorContract
     protected function validateAfter($attribute, $value, $parameters)
     {
         $this->requireParameterCount(1, $parameters, 'after');
+        
+        $parameters = $this->trimStringParameters($parameters);
 
         if (! is_string($value) && ! is_numeric($value) && ! $value instanceof DateTimeInterface) {
             return false;
@@ -3374,6 +3409,23 @@ class Validator implements ValidatorContract
         }
     }
 
+    /**
+     * Trim whitespaces from string parameters.
+     *
+     * @param  array  $parameters
+     * @return array  $parameters
+     */
+    protected function trimStringParameters($parameters)
+    {
+        foreach ($parameters as &$parameter) {
+            if(is_string($parameter)) {
+                $parameter = trim($parameter);
+            }
+        }
+        
+        return $parameters;
+    }
+    
     /**
      * Handle dynamic calls to class methods.
      *
