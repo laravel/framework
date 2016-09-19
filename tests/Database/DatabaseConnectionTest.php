@@ -116,20 +116,23 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
         $pdo = $this->getMock('DatabaseConnectionTestMockPDO');
         $pdo->expects($this->once())->method('beginTransaction')->will($this->throwException(new ErrorException('MySQL server has gone away')));
         $connection = $this->getMockConnection([], $pdo);
-        $this->setExpectedException('ErrorException', 'MySQL server has gone away');
-        $connection->beginTransaction();
-        $connection->disconnect();
-        $this->assertNull($connection->getPdo());
+        try {
+            $connection->beginTransaction();
+        } catch (ErrorException $e) {
+            $this->assertEquals(0, $connection->transactionLevel());
+        }
     }
 
+    /**
+     * @expectedException RuntimeException
+     */
     public function testCantSwapPDOWithOpenTransaction()
     {
         $pdo = $this->getMock('DatabaseConnectionTestMockPDO');
         $pdo->expects($this->once())->method('beginTransaction')->will($this->returnValue(true));
         $connection = $this->getMockConnection([], $pdo);
         $connection->beginTransaction();
-        $this->setExpectedException('RuntimeException', "Can't swap PDO instance while within transaction.");
-        $connection->disconnect();
+        $connection->setPdo(null);
     }
 
     public function testBeganTransactionFiresEventsIfSet()
@@ -203,7 +206,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
         $mock = $this->getMockConnection([], $pdo);
 
         $mock->setReconnector(function ($connection) {
-            $connection->setPDO(null);
+            $connection->setPdo(null);
         });
 
         $mock->transaction(function ($connection) {
