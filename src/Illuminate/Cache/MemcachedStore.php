@@ -82,7 +82,7 @@ class MemcachedStore extends TaggableStore implements Store
      */
     public function put($key, $value, $minutes)
     {
-        $this->memcached->set($this->prefix.$key, $value, (int) ($minutes * 60));
+        $this->memcached->set($this->prefix.$key, $value, $this->formatExpireTime($minutes));
     }
 
     /**
@@ -100,7 +100,7 @@ class MemcachedStore extends TaggableStore implements Store
             $prefixedValues[$this->prefix.$key] = $value;
         }
 
-        $this->memcached->setMulti($prefixedValues, (int) ($minutes * 60));
+        $this->memcached->setMulti($prefixedValues, $this->formatExpireTime($minutes));
     }
 
     /**
@@ -113,7 +113,7 @@ class MemcachedStore extends TaggableStore implements Store
      */
     public function add($key, $value, $minutes)
     {
-        return $this->memcached->add($this->prefix.$key, $value, (int) ($minutes * 60));
+        return $this->memcached->add($this->prefix.$key, $value, $this->formatExpireTime($minutes));
     }
 
     /**
@@ -202,5 +202,23 @@ class MemcachedStore extends TaggableStore implements Store
     public function setPrefix($prefix)
     {
         $this->prefix = ! empty($prefix) ? $prefix.':' : '';
+    }
+
+    /**
+     * Memcached requires the expiration time to be seconds unless they exceed
+     * 30 days. Then, a unix timestamp is expected. This will return the correct
+     * representation to be used for Memcached.
+     *
+     * @param  int     $minutes
+     * @return int
+     */
+    private function formatExpireTime($minutes)
+    {
+        // 30 days in minutes
+        if ($minutes > 60 * 24 * 30) {
+            return (int) (time() + ($minutes * 60));
+        }
+
+        return (int) ($minutes * 60);
     }
 }
