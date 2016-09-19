@@ -50,7 +50,13 @@ class CacheMemcachedStoreTest extends PHPUnit_Framework_TestCase
         }
 
         $memcache = $this->getMockBuilder('Memcached')->setMethods(['set'])->getMock();
-        $memcache->expects($this->once())->method('set')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(60));
+
+        // Since the expire time is relative to the current unix time, a second could've passed between
+        // the defined expectation and the actual put-call. Thus, either of these calls is valid.
+        $memcache->expects($this->once())->method('set')->withConsecutive(
+            [$this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(time() + 60)],
+            [$this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(time() + 61)]
+        );
         $store = new Illuminate\Cache\MemcachedStore($memcache);
         $store->put('foo', 'bar', 1);
     }
