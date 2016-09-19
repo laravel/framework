@@ -1411,7 +1411,7 @@ class Validator implements ValidatorContract
         $parameters = $this->trimStringParameters($parameters);
 
         list($connection, $table) = $this->parseTable($parameters[0]);
-        
+
         // The second parameter position holds the name of the column that needs to
         // be verified as unique. If this parameter isn't specified we will just
         // assume that this column to be verified shares the attribute's name.
@@ -3422,7 +3422,7 @@ class Validator implements ValidatorContract
                 $parameter = trim($parameter);
             }
         }
-        
+
         return $parameters;
     }
     
