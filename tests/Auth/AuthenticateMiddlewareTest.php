@@ -88,8 +88,7 @@ class AuthenticateMiddlewareTest extends PHPUnit_Framework_TestCase
 
         try {
             $this->authenticate('default');
-        }
-        catch(AuthenticationException $e) {
+        } catch(AuthenticationException $e) {
             $this->assertSame($e->guards()->first(), 'default');
 
             throw $e;
