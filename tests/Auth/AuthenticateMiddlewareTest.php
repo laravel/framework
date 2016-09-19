@@ -69,7 +69,7 @@ class AuthenticateMiddlewareTest extends PHPUnit_Framework_TestCase
         $this->authenticate('default', 'secondary');
     }
 
-    public function testMultipleDriversAuthenticatedUdatesDefault()
+    public function testMultipleDriversAuthenticatedUpdatesDefault()
     {
         $this->registerAuthDriver('default', false);
 
@@ -78,6 +78,22 @@ class AuthenticateMiddlewareTest extends PHPUnit_Framework_TestCase
         $this->authenticate('default', 'secondary');
 
         $this->assertSame($secondary, $this->auth->guard());
+    }
+
+    public function testUnauthenticatedExceptionContainsGuard()
+    {
+        $this->setExpectedException(AuthenticationException::class);
+
+        $this->registerAuthDriver('default', false);
+
+        try {
+            $this->authenticate('default');
+        }
+        catch(AuthenticationException $e) {
+            $this->assertSame($e->guards()->first(), 'default');
+
+            throw $e;
+        }
     }
 
     /**
