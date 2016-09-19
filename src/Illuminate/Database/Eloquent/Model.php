@@ -17,6 +17,7 @@ use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -216,6 +217,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @var \Illuminate\Contracts\Events\Dispatcher
      */
     protected static $dispatcher;
+
+    /**
+     * The IoC container instance.
+     *
+     * @var \Illuminate\Container\Container
+     */
+    protected static $container;
 
     /**
      * The array of booted models.
@@ -485,7 +493,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function makeNewInstance($attributes = [])
     {
-        return new static((array) $attributes);
+        if (isset(static::$container)) {
+            $instance = static::$container->make(static::class);
+        } else {
+            $instance = new static((array) $attributes);
+        }
+
+        return $instance;
     }
 
     /**
@@ -3348,6 +3362,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public static function unsetConnectionResolver()
     {
         static::$resolver = null;
+    }
+
+    /**
+     * Set the IoC container instance.
+     *
+     * @param  \Illuminate\Container\Container  $container
+     * @return void
+     */
+    public static function setContainer(Container $container)
+    {
+        static::$container = $container;
     }
 
     /**
