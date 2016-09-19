@@ -3425,7 +3425,7 @@ class Validator implements ValidatorContract
 
         return $parameters;
     }
-    
+
     /**
      * Handle dynamic calls to class methods.
      *
