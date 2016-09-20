@@ -90,8 +90,13 @@ class Worker
      */
     protected function daemonShouldRun()
     {
-        return $this->manager->isDownForMaintenance()
-            ? false : $this->events->until('illuminate.queue.looping') !== false;
+        if ($this->manager->isDownForMaintenance() || $this->events->until('illuminate.queue.looping') === false) {
+            $this->sleep(1);
+
+            return false;
+        }
+
+        return true;
     }
 
     /**
