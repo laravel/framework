@@ -830,7 +830,7 @@ class EloquentBuilderTestModelSelfRelatedStub extends Illuminate\Database\Eloque
 
     public function childFoo()
     {
-        return $this->hasOne('EloquentBuilderTestModelSelfRelatedStub', 'parent_id', 'id', 'child');
+        return $this->hasOne('EloquentBuilderTestModelSelfRelatedStub', 'parent_id', 'id');
     }
 
     public function childFoos()
