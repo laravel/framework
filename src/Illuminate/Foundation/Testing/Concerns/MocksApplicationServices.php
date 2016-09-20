@@ -313,7 +313,7 @@ trait MocksApplicationServices
     {
         $mock = Mockery::mock('Illuminate\Contracts\Bus\Dispatcher');
 
-        $mock->shouldReceive('dispatch')->andReturnUsing(function ($dispatched) {
+        $mock->shouldReceive('dispatch', 'dispatchNow')->andReturnUsing(function ($dispatched) {
             $this->dispatchedJobs[] = $dispatched;
         });
 
