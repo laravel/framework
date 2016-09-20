@@ -10,15 +10,15 @@
     "authors": [
         {
             "name": "Taylor Otwell",
-            "email": "taylorotwell@gmail.com"
+            "email": "taylor@laravel.com"
         }
     ],
     "require": {
         "php": ">=5.6.4",
-        "illuminate/broadcasting": "5.3.*",
-        "illuminate/bus": "5.3.*",
-        "illuminate/contracts": "5.3.*",
-        "illuminate/support": "5.3.*",
+        "illuminate/broadcasting": "5.4.*",
+        "illuminate/bus": "5.4.*",
+        "illuminate/contracts": "5.4.*",
+        "illuminate/support": "5.4.*",
         "ramsey/uuid": "~3.0"
     },
     "autoload": {
@@ -28,12 +28,12 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.3-dev"
+            "dev-master": "5.4-dev"
         }
     },
     "suggest": {
         "guzzlehttp/guzzle": "Required to use the Slack transport.",
-        "illuminate/database": "Required to use the database transport (5.3.*).",
+        "illuminate/database": "Required to use the database transport (5.4.*).",
         "nexmo/client": "Required to use the Nexmo transport."
     },
     "minimum-stability": "dev"
