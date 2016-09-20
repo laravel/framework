@@ -269,17 +269,6 @@ class Kernel implements KernelContract
     }
 
     /**
-     * Set the Artisan application instance.
-     *
-     * @param  \Illuminate\Console\Application $value
-     * @return void
-     */
-    public function setArtisan($value)
-    {
-        $this->artisan = $value;
-    }
-
-    /**
      * Get the Artisan application instance.
      *
      * @return \Illuminate\Console\Application
@@ -292,6 +281,17 @@ class Kernel implements KernelContract
         }
 
         return $this->artisan;
+    }
+
+    /**
+     * Set the Artisan application instance.
+     *
+     * @param  \Illuminate\Console\Application  $artisan
+     * @return void
+     */
+    public function setArtisan($artisan)
+    {
+        $this->artisan = $artisan;
     }
 
     /**
