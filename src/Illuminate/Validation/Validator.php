@@ -3352,11 +3352,13 @@ class Validator implements ValidatorContract
      */
     protected function callClassBasedReplacer($callback, $message, $attribute, $rule, $parameters)
     {
-        if (! Str::contains($callback, '@')) {
-            $callback .= '@replace';
+        if (Str::contains($callback, '@')) {
+            list($class, $method) = explode('@', $callback);
+        } else {
+            list($class, $method) = [$callback, 'replace'];
         }
 
-        return $this->container->call($callback, array_slice(func_get_args(), 1));
+        return call_user_func_array([$this->container->make($class), $method], array_slice(func_get_args(), 1));
     }
 
     /**
