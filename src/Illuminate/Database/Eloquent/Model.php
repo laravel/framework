@@ -728,7 +728,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         if (is_null($parent)) {
             $parent = $this;
         }
-        
+
         if (is_string($parent)) {
             $parent = new $parent;
         }
