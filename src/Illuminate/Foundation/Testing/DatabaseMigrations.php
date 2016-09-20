@@ -2,7 +2,7 @@
 
 namespace Illuminate\Foundation\Testing;
 
-use Illuminate\Foundation\Console\Kernel;
+use Illuminate\Contracts\Console\Kernel;
 
 trait DatabaseMigrations
 {
