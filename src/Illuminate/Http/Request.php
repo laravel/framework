@@ -167,7 +167,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function segments()
     {
-        $segments = explode('/', $this->path());
+        $segments = explode('/', $this->decodedPath());
 
         return array_values(array_filter($segments, function ($v) {
             return $v != '';
@@ -182,7 +182,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     public function is()
     {
         foreach (func_get_args() as $pattern) {
-            if (Str::is($pattern, urldecode($this->path()))) {
+            if (Str::is($pattern, $this->decodedPath())) {
                 return true;
             }
         }
