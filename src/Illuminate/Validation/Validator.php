@@ -3352,7 +3352,7 @@ class Validator implements ValidatorContract
      */
     protected function callClassBasedReplacer($callback, $message, $attribute, $rule, $parameters)
     {
-        if (!Str::contains($callback, '@')) {
+        if (! Str::contains($callback, '@')) {
             $callback .= '@replace';
         }
 
