@@ -59,6 +59,7 @@
         "illuminate/http": "self.version",
         "illuminate/log": "self.version",
         "illuminate/mail": "self.version",
+        "illuminate/notifications": "self.version",
         "illuminate/pagination": "self.version",
         "illuminate/pipeline": "self.version",
         "illuminate/queue": "self.version",

@@ -30,7 +30,7 @@ interface Paginator
     public function fragment($fragment = null);
 
     /**
-     * The the URL for the next page, or null.
+     * The URL for the next page, or null.
      *
      * @return string|null
      */
