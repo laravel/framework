@@ -36,18 +36,6 @@ trait InteractsWithQueue
     }
 
     /**
-     * Fail the job from the queue.
-     *
-     * @return void
-     */
-    public function failed()
-    {
-        if ($this->job) {
-            return $this->job->failed();
-        }
-    }
-
-    /**
      * Release the job back into the queue.
      *
      * @param  int   $delay
