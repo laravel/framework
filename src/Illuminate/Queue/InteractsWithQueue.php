@@ -40,7 +40,7 @@ trait InteractsWithQueue
      *
      * @return void
      */
-    public function failed()
+    public function fail()
     {
         if ($this->job) {
             return $this->job->failed();
