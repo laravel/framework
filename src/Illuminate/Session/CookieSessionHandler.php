@@ -60,7 +60,7 @@ class CookieSessionHandler implements SessionHandlerInterface
         $value = $this->request->cookies->get($sessionId) ?: '';
 
         if (! is_null($decoded = json_decode($value, true)) && is_array($decoded)) {
-            if (isset($decoded['expires']) && time() <= $decoded['expires']) {
+            if (isset($decoded['expires']) && Carbon::now()->timestamp <= $decoded['expires']) {
                 return $decoded['data'];
             }
         }
