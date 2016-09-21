@@ -2242,12 +2242,10 @@ class Validator implements ValidatorContract
                 return $this->customAttributes[$expectedAttributeName];
             }
 
-            $key = "validation.attributes.{$expectedAttributeName}";
-
             // We allow for the developer to specify language lines for each of the
             // attributes allowing for more displayable counterparts of each of
             // the attributes. This provides the ability for simple formats.
-            if (($line = $this->translator->trans($key)) !== $key) {
+            if ($line = Arr::get($this->translator->get('validation.attributes'), $expectedAttributeName)) {
                 return $line;
             }
         }
