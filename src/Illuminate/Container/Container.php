@@ -4,6 +4,7 @@ namespace Illuminate\Container;
 
 use Closure;
 use ArrayAccess;
+use LogicException;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionFunction;
@@ -1082,9 +1083,9 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Get the alias for an abstract if available.
      *
-     * @param  string $abstract
-     *
+     * @param  string  $abstract
      * @return string
+     *
      * @throws \LogicException
      */
     public function getAlias($abstract)
@@ -1094,9 +1095,7 @@ class Container implements ArrayAccess, ContainerContract
         }
 
         if ($this->aliases[$abstract] === $abstract) {
-            throw new \LogicException(
-                "Container alias loop: {$abstract} is aliased to {$abstract}."
-            );
+            throw new LogicException("[{$abstract}] is aliased to itself.");
         }
 
         return $this->getAlias($this->aliases[$abstract]);
