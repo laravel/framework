@@ -1,12 +1,41 @@
 # Release Notes for 5.3.x
 
+## v5.3.10 (2016-09-20)
+
+### Added
+- Fire `Registered` event when a user registers ([#15401](https://github.com/laravel/framework/pull/15401))
+- Added `Container::factory()` method  ([#15415](https://github.com/laravel/framework/pull/15415))
+- Added `$default` parameter to query/eloquent builder `when()` method ([#15428](https://github.com/laravel/framework/pull/15428), [#15442](https://github.com/laravel/framework/pull/15442))
+- Added missing `$notifiable` parameter to `ResetPassword::toMail()` ([#15448](https://github.com/laravel/framework/pull/15448))
+
+### Changed
+- Updated `ServiceProvider` to use `resourcePath()` over `basePath()` ([#15400](https://github.com/laravel/framework/pull/15400))
+- Throw `RuntimeException` if `pcntl_fork()` doesn't exists ([#15393](https://github.com/laravel/framework/pull/15393))
+- Changed visibility of `Container::getAlias()` to public ([#15444](https://github.com/laravel/framework/pull/15444))
+- Changed visibility of `VendorPublishCommand::publishTag()` to protected ([#15461](https://github.com/laravel/framework/pull/15461))
+- Changed visibility of `TestCase::afterApplicationCreated()` to public ([#15493](https://github.com/laravel/framework/pull/15493))
+- Prevent calling `Model` methods when calling them as attributes ([#15438](https://github.com/laravel/framework/pull/15438))
+- Default `$callback` to `null` in eloquent builder `whereHas()` ([#15475](https://github.com/laravel/framework/pull/15475))
+- Support newlines in Blade's `@foreach` ([#15485](https://github.com/laravel/framework/pull/15485))
+
+### Fixed
+- Reverted "Allow passing a `Closure` to `View::share()` [#15312](https://github.com/laravel/framework/pull/15312)" ([#15312](https://github.com/laravel/framework/pull/15312))
+- Resolve issues with multi-value select elements ([#15436](https://github.com/laravel/framework/pull/15436))
+- Fixed issue with `X-HTTP-METHOD-OVERRIDE` spoofing in `Request` ([#15410](https://github.com/laravel/framework/pull/15410))
+
+### Removed
+- Removed unused `SendsPasswordResetEmails::resetNotifier()` method ([#15446](https://github.com/laravel/framework/pull/15446))
+- Removed uninstantiable `Seeder` class ([#15450](https://github.com/laravel/framework/pull/15450))
+- Removed unnecessary variable in `AuthenticatesUsers::login()` ([#15507](https://github.com/laravel/framework/pull/15507))
+
+
 ## v5.3.9 (2016-09-12)
 
 ### Changed
 - Optimized performance of `Str::startsWith()` and `Str::endsWith()` ([#15380](https://github.com/laravel/framework/pull/15380), [#15397](https://github.com/laravel/framework/pull/15397))
 
 ### Fixed
-- Fixed queue job without `--tries` option ([#15370](https://github.com/laravel/framework/pull/15370), [#15390](https://github.com/laravel/framework/pull/15390))
+- Fixed queue job without `--tries` option marks jobs failed ([#15370](https://github.com/laravel/framework/pull/15370), [#15390](https://github.com/laravel/framework/pull/15390))
 
 
 ## v5.3.8 (2016-09-09)
