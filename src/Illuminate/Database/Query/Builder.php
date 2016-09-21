@@ -2172,7 +2172,7 @@ class Builder
             return $this->insert(array_merge($attributes, $values));
         }
 
-        return (bool) $this->where($attributes)->take(1)->update($values);
+        return (bool) $this->take(1)->update($values);
     }
 
     /**
