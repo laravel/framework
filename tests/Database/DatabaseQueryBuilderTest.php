@@ -1286,7 +1286,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
             m::mock('Illuminate\Database\Query\Processors\Processor'),
         ]);
 
-        $builder->shouldReceive('where')->twice()->with(['email' => 'foo'])->andReturn(m::self());
+        $builder->shouldReceive('where')->once()->with(['email' => 'foo'])->andReturn(m::self());
         $builder->shouldReceive('exists')->once()->andReturn(true);
         $builder->shouldReceive('take')->andReturnSelf();
         $builder->shouldReceive('update')->once()->with(['name' => 'bar'])->andReturn(1);
