@@ -128,6 +128,23 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
     }
 
     /**
+     * Add translation lines to the given locale.
+     *
+     * @param  array  $lines
+     * @param  string  $locale
+     * @param  string  $namespace
+     * @return void
+     */
+    public function addLines(array $lines, $locale, $namespace = '*')
+    {
+        foreach ($lines as $key => $value) {
+            list($group, $item) = explode('.', $key, 2);
+
+            Arr::set($this->loaded, "$namespace.$group.$locale.$item", $value);
+        }
+    }
+
+    /**
      * Retrieve a language line out the loaded array.
      *
      * @param  string  $namespace
