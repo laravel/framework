@@ -1082,13 +1082,21 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Get the alias for an abstract if available.
      *
-     * @param  string  $abstract
+     * @param  string $abstract
+     *
      * @return string
+     * @throws \LogicException
      */
     public function getAlias($abstract)
     {
         if (! isset($this->aliases[$abstract])) {
             return $abstract;
+        }
+
+        if ($this->aliases[$abstract] === $abstract) {
+            throw new \LogicException(
+                "Container alias loop: {$abstract} is aliased to {$abstract}."
+            );
         }
 
         return $this->getAlias($this->aliases[$abstract]);
