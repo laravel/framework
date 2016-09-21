@@ -49,10 +49,12 @@ class CacheMemcachedStoreTest extends PHPUnit_Framework_TestCase
             $this->markTestSkipped('Memcached module not installed');
         }
 
+        Carbon\Carbon::setTestNow($now = Carbon\Carbon::now());
         $memcache = $this->getMockBuilder('Memcached')->setMethods(['set'])->getMock();
-        $memcache->expects($this->once())->method('set')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(60));
+        $memcache->expects($this->once())->method('set')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo($now->timestamp + 60));
         $store = new Illuminate\Cache\MemcachedStore($memcache);
         $store->put('foo', 'bar', 1);
+        Carbon\Carbon::setTestNow();
     }
 
     public function testIncrementMethodProperlyCallsMemcache()
