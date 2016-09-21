@@ -1,5 +1,14 @@
 # Release Notes for 5.3.x
 
+## v5.3.9 (2016-09-12)
+
+### Changed
+- Optimized performance of `Str::startsWith()` and `Str::endsWith()` ([#15380](https://github.com/laravel/framework/pull/15380), [#15397](https://github.com/laravel/framework/pull/15397))
+
+### Fixed
+- Fixed queue job without `--tries` option ([#15370](https://github.com/laravel/framework/pull/15370), [#15390](https://github.com/laravel/framework/pull/15390))
+
+
 ## v5.3.8 (2016-09-09)
 
 ### Added
@@ -10,7 +19,6 @@
 - Added username, icon and channel options for Slack Notifications ([#14910](https://github.com/laravel/framework/pull/14910))
 
 ### Changed
-- Updated `symfony/css-selector` version ([#15344](https://github.com/laravel/framework/pull/15344))
 - Renamed methods in `NotificationFake` ([69b08f6](https://github.com/laravel/framework/commit/69b08f66fbe70b4df8332a8f2a7557a49fd8c693))
 - Minor code improvements ([#15369](https://github.com/laravel/framework/pull/15369))
 
