@@ -10,6 +10,7 @@ use Illuminate\Database\SQLiteConnection;
 use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\SqlServerConnection;
 use Illuminate\Contracts\Container\Container;
+use PDOException;
 
 class ConnectionFactory
 {
@@ -99,9 +100,8 @@ class ConnectionFactory
         if (array_key_exists('host', $config)) {
             return $this->createPdoResolverWithHosts($config);
         }
-        else{
-            return $this->createPdoResolverWithoutHosts($config);
-        }
+
+        return $this->createPdoResolverWithoutHosts($config);
     }
 
     /**
@@ -110,27 +110,27 @@ class ConnectionFactory
      * @param  array  $config
      * @return \Closure
      */
-    protected function createPdoResolverWithHosts(array $config){
+    protected function createPdoResolverWithHosts(array $config)
+    {
         return function () use ($config) {
-            if (!is_array($config['host'])) {
+            if (! is_array($config['host'])) {
                 $hosts = [$config['host']];
             } else {
                 $hosts = $config['host'];
                 shuffle($hosts);
             }
 
-            foreach($hosts as $host){
+            foreach ($hosts as $host) {
                 $config['host'] = $host;
 
-                try{
+                try {
                     return $this->createConnector($config)->connect($config);
-                }
-                catch(\PDOException $e){
+                } catch(PDOException $e) {
                 }
             }
 
             if (empty($hosts)) {
-                throw new InvalidArgumentException("Database hosts array cannot be empty");
+                throw new InvalidArgumentException('Database hosts array cannot be empty');
             }
 
             throw $e;
@@ -138,14 +138,15 @@ class ConnectionFactory
     }
 
     /**
-     * Create a new Closure that resolves to a PDO instance where there is no configured host
+     * Create a new Closure that resolves to a PDO instance where there is no configured host.
      *
      * @param  array  $config
      * @return \Closure
      */
-    protected function createPdoResolverWithoutHosts(array $config){
+    protected function createPdoResolverWithoutHosts(array $config)
+    {
         return function () use ($config) {
-                return $this->createConnector($config)->connect($config);
+            return $this->createConnector($config)->connect($config);
         };
     }
 
