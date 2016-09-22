@@ -364,7 +364,8 @@ class Migrator
      */
     public function resolve($file)
     {
-        $class = Str::studly(implode('_', array_slice(explode('_', $file), 4)));
+        preg_match('/_(_*[a-fA-F].*)/', $file, $matches);
+        $class = Str::studly($matches[1]);
 
         return new $class;
     }
