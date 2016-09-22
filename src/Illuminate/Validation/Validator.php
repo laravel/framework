@@ -2428,7 +2428,7 @@ class Validator implements ValidatorContract
         }
 
         return [
-            'values' => implode(', ', $parameters)
+            'values' => implode(', ', $parameters),
         ];
     }
 
@@ -2458,7 +2458,7 @@ class Validator implements ValidatorContract
     protected function mapInArray($message, $attribute, $rule, $parameters)
     {
         return [
-            'other' => $this->getAttribute($parameters[0])
+            'other' => $this->getAttribute($parameters[0]),
         ];
     }
 
@@ -2504,7 +2504,7 @@ class Validator implements ValidatorContract
     protected function mapRequiredWith($message, $attribute, $rule, $parameters)
     {
         return [
-            'values' => implode(' / ', $this->getAttributeList($parameters))
+            'values' => implode(' / ', $this->getAttributeList($parameters)),
         ];
     }
 
