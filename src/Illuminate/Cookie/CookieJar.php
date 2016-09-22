@@ -53,7 +53,7 @@ class CookieJar implements JarContract
     {
         list($path, $domain, $secure) = $this->getPathAndDomain($path, $domain, $secure);
 
-        $time = ($minutes == 0) ? 0 : Carbon::now()->timestamp + ($minutes * 60);
+        $time = ($minutes == 0) ? 0 : Carbon::now()->getTimestamp() + ($minutes * 60);
 
         return new Cookie($name, $value, $time, $path, $domain, $secure, $httpOnly);
     }

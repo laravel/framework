@@ -154,7 +154,7 @@ abstract class Queue
      */
     protected function getTime()
     {
-        return Carbon::now()->timestamp;
+        return Carbon::now()->getTimestamp();
     }
 
     /**
