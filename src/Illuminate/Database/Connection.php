@@ -505,11 +505,11 @@ class Connection implements ConnectionInterface
     {
         if ($this->transactions == 0) {
             try {
-                $this->getPdo()->beginTransaction();
+                $this->pdo->beginTransaction();
             } catch (Exception $e) {
                 if ($this->causedByLostConnection($e)) {
                     $this->reconnect();
-                    $this->getPdo()->beginTransaction();
+                    $this->pdo->beginTransaction();
                 } else {
                     throw $e;
                 }

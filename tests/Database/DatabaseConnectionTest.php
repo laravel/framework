@@ -123,6 +123,36 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
         }
     }
 
+    public function testBeginTransactionMethodRetriesOnFailure()
+    {
+        $pdo = $this->getMock('DatabaseConnectionTestMockPDO');
+        $pdo->expects($this->exactly(2))->method('beginTransaction');
+        $pdo->expects($this->at(0))->method('beginTransaction')->will($this->throwException(new ErrorException('server has gone away')));
+        $connection = $this->getMockConnection(['reconnect'], $pdo);
+        $connection->expects($this->once())->method('reconnect');
+        $connection->beginTransaction();
+        $this->assertEquals(1, $connection->transactionLevel());
+    }
+
+    public function testBeginTransactionMethodNeverRetriesIfWithinTransaction()
+    {
+        $pdo = $this->getMock('DatabaseConnectionTestMockPDO');
+        $pdo->expects($this->once())->method('beginTransaction');
+        $pdo->expects($this->once())->method('exec')->will($this->throwException(new Exception));
+        $connection = $this->getMockConnection([], $pdo);
+        $queryGrammar = $this->getMock('Illuminate\Database\Query\Grammars\Grammar');
+        $queryGrammar->expects($this->once())->method('supportsSavepoints')->will($this->returnValue(true));
+        $connection->setQueryGrammar($queryGrammar);
+        $connection->expects($this->never())->method('reconnect');
+        $connection->beginTransaction();
+        $this->assertEquals(1, $connection->transactionLevel());
+        try {
+            $connection->beginTransaction();
+        } catch (Exception $e) {
+            $this->assertEquals(1, $connection->transactionLevel());
+        }
+    }
+
     /**
      * @expectedException RuntimeException
      */
