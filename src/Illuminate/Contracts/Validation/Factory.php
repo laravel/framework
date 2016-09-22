@@ -36,11 +36,11 @@ interface Factory
     public function extendImplicit($rule, $extension, $message = null);
 
     /**
-     * Register a custom implicit validator message replacer.
+     * Register a custom implicit validator message mapper.
      *
      * @param  string   $rule
-     * @param  \Closure|string  $replacer
+     * @param  \Closure|string  $mapper
      * @return void
      */
-    public function replacer($rule, $replacer);
+    public function mapper($rule, $mapper);
 }

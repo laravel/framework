@@ -185,10 +185,10 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
     public function testCustomReplacersAreCalled()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $trans->addLines(['validation.required' => 'foo bar'], 'en');
+        $trans->addLines(['validation.required' => 'foo :bar'], 'en');
         $v = new Validator($trans, ['name' => ''], ['name' => 'Required']);
-        $v->addReplacer('required', function ($message, $attribute, $rule, $parameters) {
-            return str_replace('bar', 'taylor', $message);
+        $v->addMapper('required', function ($message, $attribute, $rule, $parameters) {
+            return ['bar' => 'taylor'];
         });
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');

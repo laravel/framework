@@ -84,19 +84,18 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      */
     public function has($key, $locale = null, $fallback = true)
     {
-        return $this->get($key, [], $locale, $fallback) !== $key;
+        return $this->get($key, $locale, $fallback) !== $key;
     }
 
     /**
      * Get the translation for the given key.
      *
      * @param  string  $key
-     * @param  array   $replace
      * @param  string|null  $locale
      * @param  bool  $fallback
      * @return string|array|null
      */
-    public function get($key, array $replace = [], $locale = null, $fallback = true)
+    public function get($key, $locale = null, $fallback = true)
     {
         list($namespace, $group, $item) = $this->parseKey($key);
 
@@ -108,9 +107,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
         foreach ($locales as $locale) {
             $this->load($namespace, $group, $locale);
 
-            $line = $this->getLine(
-                $namespace, $group, $locale, $item, $replace
-            );
+            $line = $this->getLine($namespace, $group, $locale, $item);
 
             if (! is_null($line)) {
                 break;
@@ -151,16 +148,13 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      * @param  string  $group
      * @param  string  $locale
      * @param  string  $item
-     * @param  array   $replace
      * @return string|array|null
      */
-    protected function getLine($namespace, $group, $locale, $item, array $replace)
+    protected function getLine($namespace, $group, $locale, $item)
     {
         $line = Arr::get($this->loaded[$namespace][$group][$locale], $item);
 
-        if (is_string($line)) {
-            return $this->makeReplacements($line, $replace);
-        } elseif (is_array($line) && count($line) > 0) {
+        if (is_string($line) || (is_array($line) && count($line) > 0)) {
             return $line;
         }
     }
@@ -172,7 +166,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      * @param  array   $replace
      * @return string
      */
-    protected function makeReplacements($line, array $replace)
+    public function format($line, array $replace)
     {
         $replace = $this->sortReplacements($replace);
 
@@ -205,13 +199,12 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      *
      * @param  string  $key
      * @param  int|array|\Countable  $number
-     * @param  array   $replace
      * @param  string  $locale
      * @return string
      */
-    public function choice($key, $number, array $replace = [], $locale = null)
+    public function choice($key, $number, $locale = null)
     {
-        $line = $this->get($key, $replace, $locale = $locale ?: $this->locale ?: $this->fallback);
+        $line = $this->get($key, $locale = $locale ?: $this->locale ?: $this->fallback);
 
         if (is_array($number) || $number instanceof \Countable) {
             $number = count($number);
@@ -219,7 +212,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
 
         $replace['count'] = $number;
 
-        return $this->makeReplacements($this->getSelector()->choose($line, $number, $locale), $replace);
+        return $this->getSelector()->choose($line, $number, $locale);
     }
 
     /**
@@ -233,7 +226,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      */
     public function trans($id, array $parameters = [], $domain = 'messages', $locale = null)
     {
-        return $this->get($id, $parameters, $locale);
+        return $this->format($this->get($id, $locale), $parameters);
     }
 
     /**
@@ -248,7 +241,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      */
     public function transChoice($id, $number, array $parameters = [], $domain = 'messages', $locale = null)
     {
-        return $this->choice($id, $number, $parameters, $locale);
+        return $this->format($this->choice($id, $number, $locale), $parameters);
     }
 
     /**
