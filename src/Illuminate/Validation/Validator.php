@@ -3009,12 +3009,12 @@ class Validator implements ValidatorContract
      * Register a custom validator message replacer.
      *
      * @param  string  $rule
-     * @param  \Closure|string  $replacer
+     * @param  \Closure|string  $mapper
      * @return void
      */
-    public function addMapper($rule, $replacer)
+    public function addMapper($rule, $mapper)
     {
-        $this->mappers[Str::snake($rule)] = $replacer;
+        $this->mappers[Str::snake($rule)] = $mapper;
     }
 
     /**
