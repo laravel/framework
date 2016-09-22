@@ -364,7 +364,7 @@ class Migrator
      */
     public function resolve($file)
     {
-        if (!preg_match('/\d{4}_\d{2}_\d{2}_\d{6}_([a-zA-Z]\w*)/', $file, $matches)) {
+        if (! preg_match('/\d{4}_\d{2}_\d{2}_\d{6}_([a-zA-Z]\w*)/', $file, $matches)) {
             throw new \InvalidArgumentException("Invalid migration file name '$file'.");
         }
  
