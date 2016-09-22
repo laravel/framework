@@ -876,7 +876,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     protected function filterFiles($files)
     {
         if (! $files) {
-            return null;
+            return;
         }
 
         foreach ($files as $key => $file) {
