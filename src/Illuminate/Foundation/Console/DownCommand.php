@@ -45,7 +45,7 @@ class DownCommand extends Command
     protected function getDownFilePayload()
     {
         return [
-            'time' => Carbon::now()->timestamp,
+            'time' => Carbon::now()->getTimestamp(),
             'message' => $this->option('message'),
             'retry' => $this->getRetryTime(),
         ];

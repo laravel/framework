@@ -78,7 +78,7 @@ class DatabaseStore implements Store
                 $cache = (object) $cache;
             }
 
-            if (Carbon::now()->timestamp >= $cache->expiration) {
+            if (Carbon::now()->getTimestamp() >= $cache->expiration) {
                 $this->forget($key);
 
                 return;
@@ -187,7 +187,7 @@ class DatabaseStore implements Store
      */
     protected function getTime()
     {
-        return Carbon::now()->timestamp;
+        return Carbon::now()->getTimestamp();
     }
 
     /**
