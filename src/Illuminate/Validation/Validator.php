@@ -140,7 +140,7 @@ class Validator implements ValidatorContract
      *
      * @var array
      */
-    protected $replacers = [];
+    protected $mappers = [];
 
     /**
      * The size related validation rules.
@@ -2060,7 +2060,7 @@ class Validator implements ValidatorContract
         // If the rule being validated is a "size" rule, we will need to gather the
         // specific error message for the type of attribute being validated such
         // as a number, file or string which all have different message types.
-        elseif (in_array($rule, $this->sizeRules)) {
+        if (in_array($rule, $this->sizeRules)) {
             return $this->getSizeMessage($attribute, $rule);
         }
 
@@ -2069,8 +2069,8 @@ class Validator implements ValidatorContract
         // messages out of the translator service for this validation rule.
         $key = "validation.{$lowerRule}";
 
-        if ($key != ($value = $this->translator->trans($key))) {
-            return $value;
+        if ($this->translator->has($key)) {
+            return $this->translator->get($key);
         }
 
         return $this->getInlineMessage(
@@ -2112,14 +2112,14 @@ class Validator implements ValidatorContract
      */
     protected function getCustomMessageFromTranslator($customKey)
     {
-        if (($message = $this->translator->trans($customKey)) !== $customKey) {
-            return $message;
+        if ($this->translator->has($customKey)) {
+            return $this->translator->get($customKey);
         }
 
         $shortKey = preg_replace('/^validation\.custom\./', '', $customKey);
 
         $customMessages = Arr::dot(
-            (array) $this->translator->trans('validation.custom')
+            (array) $this->translator->get('validation.custom')
         );
 
         foreach ($customMessages as $key => $message) {
@@ -2149,7 +2149,7 @@ class Validator implements ValidatorContract
 
         $key = "validation.{$lowerRule}.{$type}";
 
-        return $this->translator->trans($key);
+        return $this->translator->get($key);
     }
 
     /**
@@ -2187,19 +2187,24 @@ class Validator implements ValidatorContract
     {
         $value = $this->getAttribute($attribute);
 
-        $message = str_replace(
-            [':attribute', ':ATTRIBUTE', ':Attribute'],
-            [$value, Str::upper($value), Str::ucfirst($value)],
-            $message
-        );
+        $snakeRule = Str::snake($rule);
 
-        if (isset($this->replacers[Str::snake($rule)])) {
-            $message = $this->callReplacer($message, $attribute, Str::snake($rule), $parameters);
-        } elseif (method_exists($this, $replacer = "replace{$rule}")) {
-            $message = $this->$replacer($message, $attribute, $rule, $parameters);
+        if (isset($this->mappers[$snakeRule])) {
+            $parameters = $this->callMapper($message, $attribute, $snakeRule, $parameters);
+        } elseif (method_exists($this, $mapper = "map{$rule}")) {
+            $parameters = $this->$mapper($message, $attribute, $rule, $parameters);
         }
 
-        return $message;
+        $parameters = array_merge(
+            $parameters,
+            [
+                'attribute' => $value,
+                'ATTRIBUTE' => Str::upper($value),
+                'Attribute' => Str::ucfirst($value),
+            ]
+        );
+
+        return $this->translator->format($message, $parameters);
     }
 
     /**
@@ -2299,8 +2304,8 @@ class Validator implements ValidatorContract
 
         $key = "validation.values.{$attribute}.{$value}";
 
-        if (($line = $this->translator->trans($key)) !== $key) {
-            return $line;
+        if ($this->translator->has($key)) {
+            return $this->translator->get($key);
         }
 
         return $value;
@@ -2315,9 +2320,12 @@ class Validator implements ValidatorContract
      * @param  array   $parameters
      * @return string
      */
-    protected function replaceBetween($message, $attribute, $rule, $parameters)
+    protected function mapBetween($message, $attribute, $rule, $parameters)
     {
-        return str_replace([':min', ':max'], $parameters, $message);
+        return [
+            'min' => $parameters[0],
+            'max' => $parameters[1],
+        ];
     }
 
     /**
@@ -2329,9 +2337,9 @@ class Validator implements ValidatorContract
      * @param  array   $parameters
      * @return string
      */
-    protected function replaceDateFormat($message, $attribute, $rule, $parameters)
+    protected function mapDateFormat($message, $attribute, $rule, $parameters)
     {
-        return str_replace(':format', $parameters[0], $message);
+        return ['format' => $parameters[0]];
     }
 
     /**
@@ -2343,9 +2351,9 @@ class Validator implements ValidatorContract
      * @param  array   $parameters
      * @return string
      */
-    protected function replaceDifferent($message, $attribute, $rule, $parameters)
+    protected function mapDifferent($message, $attribute, $rule, $parameters)
     {
-        return $this->replaceSame($message, $attribute, $rule, $parameters);
+        return $this->mapSame($message, $attribute, $rule, $parameters);
     }
 
     /**
@@ -2357,9 +2365,9 @@ class Validator implements ValidatorContract
      * @param  array   $parameters
      * @return string
      */
-    protected function replaceDigits($message, $attribute, $rule, $parameters)
+    protected function mapDigits($message, $attribute, $rule, $parameters)
     {
-        return str_replace(':digits', $parameters[0], $message);
+        return ['digits' => $parameters[0]];
     }
 
     /**
@@ -2371,9 +2379,9 @@ class Validator implements ValidatorContract
      * @param  array   $parameters
      * @return string
      */
-    protected function replaceDigitsBetween($message, $attribute, $rule, $parameters)
+    protected function mapDigitsBetween($message, $attribute, $rule, $parameters)
     {
-        return $this->replaceBetween($message, $attribute, $rule, $parameters);
+        return $this->mapBetween($message, $attribute, $rule, $parameters);
     }
 
     /**
@@ -2385,9 +2393,9 @@ class Validator implements ValidatorContract
      * @param  array   $parameters
      * @return string
      */
-    protected function replaceMin($message, $attribute, $rule, $parameters)
+    protected function mapMin($message, $attribute, $rule, $parameters)
     {
-        return str_replace(':min', $parameters[0], $message);
+        return ['min' => $parameters[0]];
     }
 
     /**
@@ -2401,7 +2409,7 @@ class Validator implements ValidatorContract
      */
     protected function replaceMax($message, $attribute, $rule, $parameters)
     {
-        return str_replace(':max', $parameters[0], $message);
+        return ['max' => $parameters[0]];
     }
 
     /**
@@ -2413,13 +2421,15 @@ class Validator implements ValidatorContract
      * @param  array   $parameters
      * @return string
      */
-    protected function replaceIn($message, $attribute, $rule, $parameters)
+    protected function mapIn($message, $attribute, $rule, $parameters)
     {
         foreach ($parameters as &$parameter) {
             $parameter = $this->getDisplayableValue($attribute, $parameter);
         }
 
-        return str_replace(':values', implode(', ', $parameters), $message);
+        return [
+            'values' => implode(', ', $parameters),
+        ];
     }
 
     /**
@@ -2431,9 +2441,9 @@ class Validator implements ValidatorContract
      * @param  array   $parameters
      * @return string
      */
-    protected function replaceNotIn($message, $attribute, $rule, $parameters)
+    protected function mapNotIn($message, $attribute, $rule, $parameters)
     {
-        return $this->replaceIn($message, $attribute, $rule, $parameters);
+        return $this->mapIn($message, $attribute, $rule, $parameters);
     }
 
     /**
@@ -2445,9 +2455,11 @@ class Validator implements ValidatorContract
      * @param  array   $parameters
      * @return string
      */
-    protected function replaceInArray($message, $attribute, $rule, $parameters)
+    protected function mapInArray($message, $attribute, $rule, $parameters)
     {
-        return str_replace(':other', $this->getAttribute($parameters[0]), $message);
+        return [
+            'other' => $this->getAttribute($parameters[0]),
+        ];
     }
 
     /**
@@ -2459,9 +2471,11 @@ class Validator implements ValidatorContract
      * @param  array   $parameters
      * @return string
      */
-    protected function replaceMimetypes($message, $attribute, $rule, $parameters)
+    protected function mapMimetypes($message, $attribute, $rule, $parameters)
     {
-        return str_replace(':values', implode(', ', $parameters), $message);
+        return [
+            'values' => implode(', ', $parameters),
+        ];
     }
 
     /**
@@ -2473,9 +2487,9 @@ class Validator implements ValidatorContract
      * @param  array   $parameters
      * @return string
      */
-    protected function replaceMimes($message, $attribute, $rule, $parameters)
+    protected function mapMimes($message, $attribute, $rule, $parameters)
     {
-        return str_replace(':values', implode(', ', $parameters), $message);
+        return $this->mapMimetypes($message, $attribute, $rule, $parameters);
     }
 
     /**
@@ -2487,11 +2501,11 @@ class Validator implements ValidatorContract
      * @param  array   $parameters
      * @return string
      */
-    protected function replaceRequiredWith($message, $attribute, $rule, $parameters)
+    protected function mapRequiredWith($message, $attribute, $rule, $parameters)
     {
-        $parameters = $this->getAttributeList($parameters);
-
-        return str_replace(':values', implode(' / ', $parameters), $message);
+        return [
+            'values' => implode(' / ', $this->getAttributeList($parameters)),
+        ];
     }
 
     /**
@@ -2503,9 +2517,9 @@ class Validator implements ValidatorContract
      * @param  array   $parameters
      * @return string
      */
-    protected function replaceRequiredWithAll($message, $attribute, $rule, $parameters)
+    protected function mapRequiredWithAll($message, $attribute, $rule, $parameters)
     {
-        return $this->replaceRequiredWith($message, $attribute, $rule, $parameters);
+        return $this->mapRequiredWith($message, $attribute, $rule, $parameters);
     }
 
     /**
@@ -2517,9 +2531,9 @@ class Validator implements ValidatorContract
      * @param  array   $parameters
      * @return string
      */
-    protected function replaceRequiredWithout($message, $attribute, $rule, $parameters)
+    protected function mapRequiredWithout($message, $attribute, $rule, $parameters)
     {
-        return $this->replaceRequiredWith($message, $attribute, $rule, $parameters);
+        return $this->mapRequiredWith($message, $attribute, $rule, $parameters);
     }
 
     /**
@@ -2531,9 +2545,9 @@ class Validator implements ValidatorContract
      * @param  array   $parameters
      * @return string
      */
-    protected function replaceRequiredWithoutAll($message, $attribute, $rule, $parameters)
+    protected function mapRequiredWithoutAll($message, $attribute, $rule, $parameters)
     {
-        return $this->replaceRequiredWith($message, $attribute, $rule, $parameters);
+        return $this->mapRequiredWith($message, $attribute, $rule, $parameters);
     }
 
     /**
@@ -2545,9 +2559,9 @@ class Validator implements ValidatorContract
      * @param  array   $parameters
      * @return string
      */
-    protected function replaceSize($message, $attribute, $rule, $parameters)
+    protected function mapSize($message, $attribute, $rule, $parameters)
     {
-        return str_replace(':size', $parameters[0], $message);
+        return ['size' => $parameters[0]];
     }
 
     /**
@@ -2559,13 +2573,16 @@ class Validator implements ValidatorContract
      * @param  array   $parameters
      * @return string
      */
-    protected function replaceRequiredIf($message, $attribute, $rule, $parameters)
+    protected function mapRequiredIf($message, $attribute, $rule, $parameters)
     {
         $parameters[1] = $this->getDisplayableValue($parameters[0], Arr::get($this->data, $parameters[0]));
 
         $parameters[0] = $this->getAttribute($parameters[0]);
 
-        return str_replace([':other', ':value'], $parameters, $message);
+        return [
+            'other' => $parameters[0],
+            'value' => $parameters[1],
+        ];
     }
 
     /**
@@ -2577,11 +2594,14 @@ class Validator implements ValidatorContract
      * @param  array   $parameters
      * @return string
      */
-    protected function replaceRequiredUnless($message, $attribute, $rule, $parameters)
+    protected function mapRequiredUnless($message, $attribute, $rule, $parameters)
     {
         $other = $this->getAttribute(array_shift($parameters));
 
-        return str_replace([':other', ':values'], [$other, implode(', ', $parameters)], $message);
+        return [
+            'other' => $other,
+            'values' => implode(', ', $parameters),
+        ];
     }
 
     /**
@@ -2593,9 +2613,11 @@ class Validator implements ValidatorContract
      * @param  array   $parameters
      * @return string
      */
-    protected function replaceSame($message, $attribute, $rule, $parameters)
+    protected function mapSame($message, $attribute, $rule, $parameters)
     {
-        return str_replace(':other', $this->getAttribute($parameters[0]), $message);
+        return [
+            'other' => $this->getAttribute($parameters[0]),
+        ];
     }
 
     /**
@@ -2607,13 +2629,15 @@ class Validator implements ValidatorContract
      * @param  array   $parameters
      * @return string
      */
-    protected function replaceBefore($message, $attribute, $rule, $parameters)
+    protected function mapBefore($message, $attribute, $rule, $parameters)
     {
         if (! (strtotime($parameters[0]))) {
-            return str_replace(':date', $this->getAttribute($parameters[0]), $message);
+            $date = $this->getAttribute($parameters[0]);
+        } else {
+            $date = $parameters[0];
         }
 
-        return str_replace(':date', $parameters[0], $message);
+        return compact('date');
     }
 
     /**
@@ -2625,9 +2649,9 @@ class Validator implements ValidatorContract
      * @param  array   $parameters
      * @return string
      */
-    protected function replaceAfter($message, $attribute, $rule, $parameters)
+    protected function mapAfter($message, $attribute, $rule, $parameters)
     {
-        return $this->replaceBefore($message, $attribute, $rule, $parameters);
+        return $this->mapBefore($message, $attribute, $rule, $parameters);
     }
 
     /**
@@ -2955,42 +2979,42 @@ class Validator implements ValidatorContract
     }
 
     /**
-     * Get the array of custom validator message replacers.
+     * Get the array of custom validator message mappers.
      *
      * @return array
      */
-    public function getReplacers()
+    public function getMappers()
     {
-        return $this->replacers;
+        return $this->mappers;
     }
 
     /**
-     * Register an array of custom validator message replacers.
+     * Register an array of custom validator message mappers.
      *
-     * @param  array  $replacers
+     * @param  array  $mappers
      * @return void
      */
-    public function addReplacers(array $replacers)
+    public function addMappers(array $mappers)
     {
-        if ($replacers) {
-            $keys = array_map('\Illuminate\Support\Str::snake', array_keys($replacers));
+        if ($mappers) {
+            $keys = array_map('\Illuminate\Support\Str::snake', array_keys($mappers));
 
-            $replacers = array_combine($keys, array_values($replacers));
+            $mappers = array_combine($keys, array_values($mappers));
         }
 
-        $this->replacers = array_merge($this->replacers, $replacers);
+        $this->mappers = array_merge($this->mappers, $mappers);
     }
 
     /**
      * Register a custom validator message replacer.
      *
      * @param  string  $rule
-     * @param  \Closure|string  $replacer
+     * @param  \Closure|string  $mapper
      * @return void
      */
-    public function addReplacer($rule, $replacer)
+    public function addMapper($rule, $mapper)
     {
-        $this->replacers[Str::snake($rule)] = $replacer;
+        $this->mappers[Str::snake($rule)] = $mapper;
     }
 
     /**
@@ -3332,14 +3356,14 @@ class Validator implements ValidatorContract
      * @param  array   $parameters
      * @return string|null
      */
-    protected function callReplacer($message, $attribute, $rule, $parameters)
+    protected function callMapper($message, $attribute, $rule, $parameters)
     {
-        $callback = $this->replacers[$rule];
+        $callback = $this->mappers[$rule];
 
         if ($callback instanceof Closure) {
             return call_user_func_array($callback, func_get_args());
         } elseif (is_string($callback)) {
-            return $this->callClassBasedReplacer($callback, $message, $attribute, $rule, $parameters);
+            return $this->callClassBasedMapper($callback, $message, $attribute, $rule, $parameters);
         }
     }
 
@@ -3353,7 +3377,7 @@ class Validator implements ValidatorContract
      * @param  array   $parameters
      * @return string
      */
-    protected function callClassBasedReplacer($callback, $message, $attribute, $rule, $parameters)
+    protected function callClassBasedMapper($callback, $message, $attribute, $rule, $parameters)
     {
         if (Str::contains($callback, '@')) {
             list($class, $method) = explode('@', $callback);

@@ -28,14 +28,15 @@ class ValidationFactoryTest extends PHPUnit_Framework_TestCase
         $noop2 = function () {
         };
         $noop3 = function () {
+            return [];
         };
         $factory->extend('foo', $noop1);
         $factory->extendImplicit('implicit', $noop2);
-        $factory->replacer('replacer', $noop3);
+        $factory->mapper('replacer', $noop3);
         $factory->setPresenceVerifier($presence);
         $validator = $factory->make([], []);
         $this->assertEquals(['foo' => $noop1, 'implicit' => $noop2], $validator->getExtensions());
-        $this->assertEquals(['replacer' => $noop3], $validator->getReplacers());
+        $this->assertEquals(['replacer' => $noop3], $validator->getMappers());
         $this->assertEquals($presence, $validator->getPresenceVerifier());
 
         $presence = m::mock(PresenceVerifierInterface::class);

@@ -46,11 +46,11 @@ class Factory implements FactoryContract
     protected $implicitExtensions = [];
 
     /**
-     * All of the custom validator message replacers.
+     * All of the custom validator message mappers.
      *
      * @var array
      */
-    protected $replacers = [];
+    protected $mappers = [];
 
     /**
      * All of the fallback messages for custom rules.
@@ -144,7 +144,7 @@ class Factory implements FactoryContract
 
         $validator->addImplicitExtensions($implicit);
 
-        $validator->addReplacers($this->replacers);
+        $validator->addMappers($this->mappers);
 
         $validator->setFallbackMessages($this->fallbackMessages);
     }
@@ -202,15 +202,15 @@ class Factory implements FactoryContract
     }
 
     /**
-     * Register a custom implicit validator message replacer.
+     * Register a custom implicit validator message mapper.
      *
      * @param  string   $rule
-     * @param  \Closure|string  $replacer
+     * @param  \Closure|string  $mappers
      * @return void
      */
-    public function replacer($rule, $replacer)
+    public function mapper($rule, $mappers)
     {
-        $this->replacers[$rule] = $replacer;
+        $this->mappers[$rule] = $mappers;
     }
 
     /**
