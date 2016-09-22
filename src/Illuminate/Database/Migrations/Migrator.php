@@ -364,7 +364,7 @@ class Migrator
      */
     public function resolve($file)
     {
-        preg_match('/_(_*[a-fA-F].*)/', $file, $matches);
+        preg_match('/_(_*[a-zA-Z].*)/', $file, $matches);
         $class = Str::studly($matches[1]);
 
         return new $class;
