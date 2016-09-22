@@ -198,15 +198,18 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
     public function testClassBasedCustomReplacers()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $trans->addLines(['validation.foo' => 'foo!'], 'en');
-        $v = new Validator($trans, [], ['name' => 'required']);
+        $trans->addLines(['validation.foo' => 'foo :foo!'], 'en');
+        $v = new Validator($trans, [], ['foo' => 'foo']);
         $v->setContainer($container = m::mock('Illuminate\Container\Container'));
-        $v->addReplacer('required', 'Foo@bar');
+        $v->addImplicitExtension('foo', function () {
+            return false;
+        });
+        $v->addMapper('foo', 'Foo@bar');
         $container->shouldReceive('make')->once()->with('Foo')->andReturn($foo = m::mock('StdClass'));
-        $foo->shouldReceive('bar')->once()->andReturn('replaced!');
+        $foo->shouldReceive('bar')->once()->andReturn(['foo' => 'bar']);
         $v->passes();
         $v->messages()->setFormat(':message');
-        $this->assertEquals('replaced!', $v->messages()->first('name'));
+        $this->assertEquals('foo bar!', $v->messages()->first('foo'));
     }
 
     public function testAttributeNamesAreReplaced()
