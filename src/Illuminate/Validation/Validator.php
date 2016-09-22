@@ -2123,7 +2123,7 @@ class Validator implements ValidatorContract
         );
 
         foreach ($customMessages as $key => $message) {
-            if (Str::contains($key, ['*']) && Str::is($key, $shortKey)) {
+            if ($shortKey === $key || (Str::contains($key, ['*']) && Str::is($key, $shortKey))) {
                 return $message;
             }
         }
