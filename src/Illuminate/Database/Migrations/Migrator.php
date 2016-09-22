@@ -367,7 +367,7 @@ class Migrator
         if (! preg_match('/\d{4}_\d{2}_\d{2}_\d{6}_([a-zA-Z]\w*)/', $file, $matches)) {
             throw new \InvalidArgumentException("Invalid migration file name '$file'.");
         }
- 
+
         $class = Str::studly($matches[1]);
 
         return new $class;
