@@ -17,7 +17,7 @@ use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
 use Illuminate\Contracts\Container\Container;
 use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\Translation\TranslatorInterface;
+use Illuminate\Contracts\Translation\Translator;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 
@@ -26,7 +26,7 @@ class Validator implements ValidatorContract
     /**
      * The Translator implementation.
      *
-     * @var \Symfony\Component\Translation\TranslatorInterface
+     * @var \Illuminate\Contracts\Translation\Translator
      */
     protected $translator;
 
@@ -190,14 +190,14 @@ class Validator implements ValidatorContract
     /**
      * Create a new Validator instance.
      *
-     * @param  \Symfony\Component\Translation\TranslatorInterface  $translator
+     * @param  \Illuminate\Contracts\Translation\Translator  $translator
      * @param  array  $data
      * @param  array  $rules
      * @param  array  $messages
      * @param  array  $customAttributes
      * @return void
      */
-    public function __construct(TranslatorInterface $translator, array $data, array $rules, array $messages = [], array $customAttributes = [])
+    public function __construct(Translator $translator, array $data, array $rules, array $messages = [], array $customAttributes = [])
     {
         $this->initialRules = $rules;
         $this->translator = $translator;
@@ -3126,7 +3126,7 @@ class Validator implements ValidatorContract
     /**
      * Get the Translator implementation.
      *
-     * @return \Symfony\Component\Translation\TranslatorInterface
+     * @return \Illuminate\Contracts\Translation\Translator
      */
     public function getTranslator()
     {
@@ -3136,10 +3136,10 @@ class Validator implements ValidatorContract
     /**
      * Set the Translator implementation.
      *
-     * @param  \Symfony\Component\Translation\TranslatorInterface  $translator
+     * @param  \Illuminate\Contracts\Translation\Translator  $translator
      * @return void
      */
-    public function setTranslator(TranslatorInterface $translator)
+    public function setTranslator(Translator $translator)
     {
         $this->translator = $translator;
     }

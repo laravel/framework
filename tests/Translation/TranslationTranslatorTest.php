@@ -74,7 +74,7 @@ class TranslationTranslatorTest extends PHPUnit_Framework_TestCase
     {
         $t = $this->getMockBuilder('Illuminate\Translation\Translator')->setMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
         $t->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo(['replace']), $this->equalTo('en'))->will($this->returnValue('line'));
-        $t->setSelector($selector = m::mock('Symfony\Component\Translation\MessageSelector'));
+        $t->setSelector($selector = m::mock('Illuminate\Translation\MessageSelector'));
         $selector->shouldReceive('choose')->once()->with('line', 10, 'en')->andReturn('choiced');
 
         $t->choice('foo', 10, ['replace']);
@@ -84,7 +84,7 @@ class TranslationTranslatorTest extends PHPUnit_Framework_TestCase
     {
         $t = $this->getMockBuilder('Illuminate\Translation\Translator')->setMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
         $t->expects($this->exactly(2))->method('get')->with($this->equalTo('foo'), $this->equalTo(['replace']), $this->equalTo('en'))->will($this->returnValue('line'));
-        $t->setSelector($selector = m::mock('Symfony\Component\Translation\MessageSelector'));
+        $t->setSelector($selector = m::mock('Illuminate\Translation\MessageSelector'));
         $selector->shouldReceive('choose')->twice()->with('line', 3, 'en')->andReturn('choiced');
 
         $values = ['foo', 'bar', 'baz'];

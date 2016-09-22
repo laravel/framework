@@ -7,10 +7,9 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\NamespacedItemResolver;
-use Symfony\Component\Translation\MessageSelector;
-use Symfony\Component\Translation\TranslatorInterface;
+use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 
-class Translator extends NamespacedItemResolver implements TranslatorInterface
+class Translator extends NamespacedItemResolver implements TranslatorContract
 {
     use Macroable;
 
@@ -45,7 +44,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
     /**
      * The message selector.
      *
-     * @var \Symfony\Component\Translation\MessageSelector
+     * @var \Illuminate\Translation\MessageSelector
      */
     protected $selector;
 
@@ -225,30 +224,28 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
     /**
      * Get the translation for a given key.
      *
-     * @param  string  $id
-     * @param  array   $parameters
-     * @param  string  $domain
+     * @param  string  $key
+     * @param  array   $replace
      * @param  string  $locale
      * @return string|array|null
      */
-    public function trans($id, array $parameters = [], $domain = 'messages', $locale = null)
+    public function trans($key, array $replace = [], $locale = null)
     {
-        return $this->get($id, $parameters, $locale);
+        return $this->get($key, $replace, $locale);
     }
 
     /**
      * Get a translation according to an integer value.
      *
-     * @param  string  $id
+     * @param  string  $key
      * @param  int|array|\Countable  $number
-     * @param  array   $parameters
-     * @param  string  $domain
+     * @param  array   $replace
      * @param  string  $locale
      * @return string
      */
-    public function transChoice($id, $number, array $parameters = [], $domain = 'messages', $locale = null)
+    public function transChoice($key, $number, array $replace = [], $locale = null)
     {
-        return $this->choice($id, $number, $parameters, $locale);
+        return $this->choice($key, $number, $replace, $locale);
     }
 
     /**
@@ -329,7 +326,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
     /**
      * Get the message selector instance.
      *
-     * @return \Symfony\Component\Translation\MessageSelector
+     * @return \Illuminate\Translation\MessageSelector
      */
     public function getSelector()
     {
@@ -343,7 +340,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
     /**
      * Set the message selector instance.
      *
-     * @param  \Symfony\Component\Translation\MessageSelector  $selector
+     * @param  \Illuminate\Translation\MessageSelector  $selector
      * @return void
      */
     public function setSelector(MessageSelector $selector)

@@ -765,7 +765,7 @@ if (! function_exists('trans')) {
      * @param  array   $parameters
      * @param  string  $domain
      * @param  string  $locale
-     * @return \Symfony\Component\Translation\TranslatorInterface|string
+     * @return \Illuminate\Contracts\Translation\Translator|string
      */
     function trans($id = null, $parameters = [], $domain = 'messages', $locale = null)
     {
