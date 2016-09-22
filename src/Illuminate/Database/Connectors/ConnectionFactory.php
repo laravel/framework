@@ -96,54 +96,58 @@ class ConnectionFactory
      */
     protected function createPdoResolver(array $config)
     {
-	    if (array_key_exists('host', $config)) {
-	    	return $this->createPdoResolverWithHosts($config);
-	    }
-	    else{
-		    return $this->createPdoResolverWithoutHosts($config);
-	    }
+        if (array_key_exists('host', $config)) {
+            return $this->createPdoResolverWithHosts($config);
+        }
+        else{
+            return $this->createPdoResolverWithoutHosts($config);
+        }
     }
 
-	/**
-	 * Create a new Closure that resolves to a PDO instance with a specific host or an array of hosts.
-	 *
-	 * @param  array  $config
-	 * @return \Closure
-	 */
+    /**
+     * Create a new Closure that resolves to a PDO instance with a specific host or an array of hosts.
+     *
+     * @param  array  $config
+     * @return \Closure
+     */
     protected function createPdoResolverWithHosts(array $config){
-	    return function () use ($config) {
-		    if (!is_array($config['host'])) {
-			    $hosts = [$config['host']];
-		    } else {
-			    $hosts = $config['host'];
-			    shuffle($hosts);
-		    }
+        return function () use ($config) {
+            if (!is_array($config['host'])) {
+                $hosts = [$config['host']];
+            } else {
+                $hosts = $config['host'];
+                shuffle($hosts);
+            }
 
-		    foreach($hosts as $host){
-			    $config['host'] = $host;
+            foreach($hosts as $host){
+                $config['host'] = $host;
 
-			    try{
-				    return $this->createConnector($config)->connect($config);
-			    }
-			    catch(\PDOException $e){
-			    }
-		    }
+                try{
+                    return $this->createConnector($config)->connect($config);
+                }
+                catch(\PDOException $e){
+                }
+            }
 
-		    throw $e;
-	    };
+            if (empty($hosts)) {
+                throw new InvalidArgumentException("Database hosts array cannot be empty");
+            }
+
+            throw $e;
+        };
     }
 
-	/**
-	 * Create a new Closure that resolves to a PDO instance where there is no configured host
-	 *
-	 * @param  array  $config
-	 * @return \Closure
-	 */
-	protected function createPdoResolverWithoutHosts(array $config){
-		return function () use ($config) {
-				return $this->createConnector($config)->connect($config);
-		};
-	}
+    /**
+     * Create a new Closure that resolves to a PDO instance where there is no configured host
+     *
+     * @param  array  $config
+     * @return \Closure
+     */
+    protected function createPdoResolverWithoutHosts(array $config){
+        return function () use ($config) {
+                return $this->createConnector($config)->connect($config);
+        };
+    }
 
     /**
      * Get the read configuration for a read / write connection.
