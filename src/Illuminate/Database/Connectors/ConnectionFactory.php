@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Connectors;
 
 use PDO;
+use PDOException;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Illuminate\Database\MySqlConnection;
@@ -10,7 +11,6 @@ use Illuminate\Database\SQLiteConnection;
 use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\SqlServerConnection;
 use Illuminate\Contracts\Container\Container;
-use PDOException;
 
 class ConnectionFactory
 {
@@ -125,7 +125,8 @@ class ConnectionFactory
 
                 try {
                     return $this->createConnector($config)->connect($config);
-                } catch(PDOException $e) {
+                } catch (PDOException $e) {
+                	//
                 }
             }
 
