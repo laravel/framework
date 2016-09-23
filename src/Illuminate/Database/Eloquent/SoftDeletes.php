@@ -104,6 +104,16 @@ trait SoftDeletes
     }
 
     /**
+     * Determine if the model is currently force deleting.
+     *
+     * @return bool
+     */
+    public function isForceDeleting()
+    {
+        return $this->forceDeleting;
+    }
+
+    /**
      * Register a restoring model event with the dispatcher.
      *
      * @param  \Closure|string  $callback
