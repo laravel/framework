@@ -117,8 +117,8 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['item3', 'item4'], $p->items());
 
         $this->assertEquals([
-            'per_page' => 2, 'current_page' => 2, 'next_page_url' => '/?page=3',
-            'prev_page_url' => '/?page=1', 'from' => 3, 'to' => 4, 'data' => ['item3', 'item4'],
+            'per_page' => 2, 'current_page' => 2, 'next_page_url' => 'http://foo.bar?page=3',
+            'prev_page_url' => 'http://foo.bar?page=1', 'from' => 3, 'to' => 4, 'data' => ['item3', 'item4'],
         ], $p->toArray());
     }
 
