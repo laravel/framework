@@ -758,7 +758,6 @@ if (! function_exists('storage_path')) {
 }
 
 if (! function_exists('t')) {
-     
     /**
      * Short function trans() .
      *
