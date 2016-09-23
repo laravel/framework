@@ -36,7 +36,6 @@
         "symfony/http-kernel": "3.2.*",
         "symfony/process": "3.2.*",
         "symfony/routing": "3.2.*",
-        "symfony/translation": "3.2.*",
         "symfony/var-dumper": "3.2.*",
         "vlucas/phpdotenv": "~2.2"
     },
