@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -509,7 +510,7 @@ trait MakesHttpRequests
 
         $request = Request::create(
             $this->currentUri, $method, $parameters,
-            $cookies, $files, array_replace($this->serverVariables, $server), $content
+            $cookies, $this->filterFiles($files), array_replace($this->serverVariables, $server), $content
         );
 
         $response = $kernel->handle($request);
@@ -517,6 +518,35 @@ trait MakesHttpRequests
         $kernel->terminate($request, $response);
 
         return $this->response = $response;
+    }
+
+    /**
+     * Filter the given array of files, removing any empty values.
+     *
+     * @param  array  $files
+     * @return mixed
+     */
+    protected function filterFiles($files)
+    {
+        foreach ($files as $key => $file) {
+            if ($file instanceof UploadedFile) {
+                continue;
+            }
+
+            if (is_array($file)) {
+                if (! isset($file['name'])) {
+                    $files[$key] = $this->filterFiles($files[$key]);
+                } elseif (isset($files[$key]['error']) && $files[$key]['error'] !== 0) {
+                    unset($files[$key]);
+                }
+
+                continue;
+            }
+
+            unset($files[$key]);
+        }
+
+        return $files;
     }
 
     /**
