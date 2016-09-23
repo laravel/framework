@@ -760,14 +760,14 @@ if (! function_exists('storage_path')) {
 if (! function_exists('t')) {
      
     /**
-    * Short function trans() .
-    *
-    * @param  string  $id
-    * @param  array   $parameters
-    * @param  string  $domain
-    * @param  string  $locale
-    * @return \Symfony\Component\Translation\TranslatorInterface|string
-    */
+     * Short function trans() .
+     *
+     * @param  string  $id
+     * @param  array   $parameters
+     * @param  string  $domain
+     * @param  string  $locale
+     * @return \Symfony\Component\Translation\TranslatorInterface|string
+     */
     function t($id = null, $parameters = [], $domain = 'messages', $locale = null)
     {
         return trans($id, $parameters, $domain, $locale);
