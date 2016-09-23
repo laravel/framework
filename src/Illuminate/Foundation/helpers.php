@@ -761,15 +761,13 @@ if (! function_exists('t')) {
     /**
      * Short function trans() .
      *
-     * @param  string  $id
-     * @param  array   $parameters
-     * @param  string  $domain
-     * @param  string  $locale
      * @return \Symfony\Component\Translation\TranslatorInterface|string
+     *
+     * @see trans
      */
-    function t($id = null, $parameters = [], $domain = 'messages', $locale = null)
+    function t()
     {
-        return trans($id, $parameters, $domain, $locale);
+        return call_user_func_array('trans', func_get_args());
     }
 }
 
