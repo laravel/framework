@@ -127,6 +127,10 @@ class Route
         if (isset($this->action['prefix'])) {
             $this->prefix($this->action['prefix']);
         }
+
+        if (isset($this->action['suffix'])) {
+            $this->suffix($this->action['suffix']);
+        }
     }
 
     /**
@@ -744,6 +748,21 @@ class Route
     }
 
     /**
+     * Add a suffix to the route URI.
+     *
+     * @param  string  $suffix
+     * @return $this
+     */
+    public function suffix($suffix)
+    {
+        $uri = rtrim($this->uri).ltrim($suffix);
+
+        $this->uri = trim($uri);
+
+        return $this;
+    }
+
+    /**
      * Get the URI associated with the route.
      *
      * @return string
@@ -855,6 +874,16 @@ class Route
     public function getPrefix()
     {
         return isset($this->action['prefix']) ? $this->action['prefix'] : null;
+    }
+
+    /**
+     * Get the suffix of the route instance.
+     *
+     * @return string
+     */
+    public function getSuffix()
+    {
+        return isset($this->action['suffix']) ? $this->action['suffix'] : null;
     }
 
     /**
