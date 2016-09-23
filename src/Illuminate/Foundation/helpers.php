@@ -770,7 +770,7 @@ if (! function_exists('t')) {
     */
     function t($id = null, $parameters = [], $domain = 'messages', $locale = null)
     {
-        return trans($id,$parameters,$domain,$locale);
+        return trans($id, $parameters, $domain, $locale);
     }
 }
 
