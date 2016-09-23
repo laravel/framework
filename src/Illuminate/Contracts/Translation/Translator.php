@@ -26,17 +26,17 @@ interface Translator
     public function transChoice($key, $number, array $replace = [], $locale = null);
 
     /**
+     * Get the default locale being used.
+     *
+     * @return string
+     */
+    public function getLocale();
+
+    /**
      * Set the default locale.
      *
      * @param  string  $locale
      * @return void
      */
     public function setLocale($locale);
-
-    /**
-     * Get the default locale being used.
-     *
-     * @return string
-     */
-    public function getLocale();
 }
