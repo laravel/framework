@@ -2,10 +2,10 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Contracts\View\View;
 use PHPUnit_Framework_Assert as PHPUnit;
 use PHPUnit_Framework_ExpectationFailedException;
