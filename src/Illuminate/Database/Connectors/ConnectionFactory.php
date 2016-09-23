@@ -120,13 +120,16 @@ class ConnectionFactory
                 shuffle($hosts);
             }
 
+            $lastHost = end($hosts);
             foreach ($hosts as $host) {
                 $config['host'] = $host;
 
                 try {
                     return $this->createConnector($config)->connect($config);
                 } catch (PDOException $e) {
-                	//
+	                if ($host !== $lastHost) {
+	                    $this->container->make('Illuminate\Contracts\Debug\ExceptionHandler')->report($e);
+                    }
                 }
             }
 
