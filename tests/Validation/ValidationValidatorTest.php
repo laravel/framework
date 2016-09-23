@@ -3196,7 +3196,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
     protected function getTranslator()
     {
-        return m::mock('Symfony\Component\Translation\TranslatorInterface');
+        return m::mock('Illuminate\Contracts\Translation\Translator');
     }
 
     public function getIlluminateArrayTranslator()
