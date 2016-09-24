@@ -37,6 +37,10 @@ class Schedule
      */
     public function command($command, array $parameters = [])
     {
+        if(class_exists($command)) {
+            $command = (new $command)->getName();
+        }
+
         $binary = ProcessUtils::escapeArgument((new PhpExecutableFinder)->find(false));
 
         $artisan = defined('ARTISAN_BINARY') ? ProcessUtils::escapeArgument(ARTISAN_BINARY) : 'artisan';
