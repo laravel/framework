@@ -37,7 +37,7 @@ class Schedule
      */
     public function command($command, array $parameters = [])
     {
-        if(class_exists($command)) {
+        if (class_exists($command)) {
             $command = (new $command)->getName();
         }
 

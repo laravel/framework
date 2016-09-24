@@ -61,6 +61,7 @@ class ConsoleEventSchedulerTest extends PHPUnit_Framework_TestCase
     }
 }
 
-class ConsoleCommandStub extends Illuminate\Console\Command {
+class ConsoleCommandStub extends Illuminate\Console\Command
+{
     protected $signature = 'foo:bar';
 }
