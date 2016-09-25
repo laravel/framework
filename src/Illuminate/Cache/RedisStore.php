@@ -3,14 +3,14 @@
 namespace Illuminate\Cache;
 
 use Illuminate\Contracts\Cache\Store;
-use Illuminate\Contracts\Redis\Database as Redis;
+use Illuminate\Contracts\Redis\Database;
 
 class RedisStore extends TaggableStore implements Store
 {
     /**
      * The Redis database connection.
      *
-     * @var \Illuminate\Redis\Database
+     * @var \Illuminate\Contracts\Redis\Database
      */
     protected $redis;
 
@@ -31,12 +31,12 @@ class RedisStore extends TaggableStore implements Store
     /**
      * Create a new Redis store.
      *
-     * @param  \Illuminate\Redis\Database  $redis
+     * @param  \Illuminate\Contracts\Redis\Database  $redis
      * @param  string  $prefix
      * @param  string  $connection
      * @return void
      */
-    public function __construct(Redis $redis, $prefix = '', $connection = 'default')
+    public function __construct(Database $redis, $prefix = '', $connection = 'default')
     {
         $this->redis = $redis;
         $this->setPrefix($prefix);
@@ -51,7 +51,9 @@ class RedisStore extends TaggableStore implements Store
      */
     public function get($key)
     {
-        if (! is_null($value = $this->connection()->get($this->prefix.$key))) {
+        $value = $this->connection()->get($this->prefix.$key);
+
+        if (! is_null($value) && $value !== false) {
             return is_numeric($value) ? $value : unserialize($value);
         }
     }
@@ -208,7 +210,7 @@ class RedisStore extends TaggableStore implements Store
     /**
      * Get the Redis database instance.
      *
-     * @return \Illuminate\Redis\Database
+     * @return \Illuminate\Contracts\Redis\Database
      */
     public function getRedis()
     {
