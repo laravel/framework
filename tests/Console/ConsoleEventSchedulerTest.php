@@ -61,7 +61,26 @@ class ConsoleEventSchedulerTest extends PHPUnit_Framework_TestCase
     }
 }
 
+class FooClassStub
+{
+    protected $schedule;
+
+    public function __construct(Schedule $schedule)
+    {
+        $this->schedule = $schedule;
+    }
+}
+
 class ConsoleCommandStub extends Illuminate\Console\Command
 {
     protected $signature = 'foo:bar';
+
+    protected $foo;
+
+    public function __construct(FooClassStub $foo)
+    {
+        parent::__construct();
+
+        $this->foo = $foo;
+    }
 }
