@@ -16,7 +16,7 @@ class CommandRunning
     /**
      * The console input.
      *
-     * @var string
+     * @var \Symfony\Component\Console\Input\InputInterface
      */
     public $input;
 
