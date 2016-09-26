@@ -86,7 +86,7 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
         $session = (object) $this->getQuery()->find($sessionId);
 
         if (isset($session->last_activity)) {
-            if ($session->last_activity < Carbon::now()->subMinutes($this->minutes)->getTimestamp()) {
+            if (Carbon::createFromTimestamp($session->last_activity)->addMinutes($this->minutes)->isPast()) {
                 $this->exists = true;
 
                 return;
@@ -164,7 +164,7 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
      */
     public function gc($lifetime)
     {
-        $this->getQuery()->where('last_activity', '<=', Carbon::now()->getTimestamp() - $lifetime)->delete();
+        $this->getQuery()->where('last_activity', '<=', Carbon::now()->subSeconds($lifetime)->getTimestamp())->delete();
     }
 
     /**
