@@ -103,7 +103,7 @@ class ThrottleRequests
 
         if (! is_null($retryAfter)) {
             $headers['Retry-After'] = $retryAfter;
-            $headers['X-RateLimit-Reset'] = Carbon::now()->getTimestamp() + $retryAfter;
+            $headers['X-RateLimit-Reset'] = Carbon::now()->addSeconds($retryAfter)->getTimestamp();
         }
 
         $response->headers->add($headers);

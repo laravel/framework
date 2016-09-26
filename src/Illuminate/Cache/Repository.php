@@ -487,7 +487,7 @@ class Repository implements CacheContract, ArrayAccess
     protected function getMinutes($duration)
     {
         if ($duration instanceof DateTime) {
-            $duration = Carbon::now()->diffInSeconds(Carbon::instance($duration), false) / 60;
+            $duration = -Carbon::instance($duration)->diffInSeconds(null, false) / 60;
         }
 
         return (int) ($duration * 60) > 0 ? $duration : null;

@@ -78,7 +78,7 @@ class DatabaseStore implements Store
                 $cache = (object) $cache;
             }
 
-            if (Carbon::now()->getTimestamp() >= $cache->expiration) {
+            if (Carbon::createFromTimestamp($cache->expiration)->isPast()) {
                 $this->forget($key);
 
                 return;
