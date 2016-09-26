@@ -6,7 +6,9 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Container\Container;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Illuminate\Contracts\Console\Application as ApplicationContract;
@@ -19,6 +21,13 @@ class Application extends SymfonyApplication implements ApplicationContract
      * @var \Illuminate\Contracts\Container\Container
      */
     protected $laravel;
+
+    /**
+     * The Event Dispatcher.
+     *
+     * @var \Illuminate\Contracts\Events\Dispatcher
+     */
+    protected $events;
 
     /**
      * The output from the previous command.
@@ -40,10 +49,11 @@ class Application extends SymfonyApplication implements ApplicationContract
         parent::__construct('Laravel Framework', $version);
 
         $this->laravel = $laravel;
+        $this->events = $events;
         $this->setAutoExit(false);
         $this->setCatchExceptions(false);
 
-        $events->fire(new Events\ArtisanStarting($this));
+        $this->events->fire(new Events\ArtisanStarting($this));
     }
 
     /**
@@ -66,6 +76,15 @@ class Application extends SymfonyApplication implements ApplicationContract
         $this->setCatchExceptions(true);
 
         return $result;
+    }
+
+    public function run(InputInterface $input = null, OutputInterface $output = null)
+    {
+        $this->events->fire(
+            new Events\CommandRunning($this->getCommandName($input), $input)
+        );
+
+        return parent::run($input, $output);
     }
 
     /**
