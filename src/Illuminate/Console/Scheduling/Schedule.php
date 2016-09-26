@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use Illuminate\Container\Container;
 use Symfony\Component\Process\ProcessUtils;
 use Symfony\Component\Process\PhpExecutableFinder;
 
@@ -38,7 +39,7 @@ class Schedule
     public function command($command, array $parameters = [])
     {
         if (class_exists($command)) {
-            $command = app($command)->getName();
+            $command = Container::getInstance()->make($command)->getName();
         }
 
         $binary = ProcessUtils::escapeArgument((new PhpExecutableFinder)->find(false));
