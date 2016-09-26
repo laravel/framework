@@ -374,7 +374,12 @@ class Mailable implements MailableContract
 
         if ($address instanceof Collection || is_array($address)) {
             foreach ($address as $user) {
-                $this->{$property}($user->email, $user->name);
+                if (is_array($user)){
+                    $user = (object) $user;
+                }elseif (is_string($user)) {
+                    $user = (object) ['email' => $user];
+                }
+                $this->{$property}($user->email, isset($user->name) ? $user->name : null);
             }
         } else {
             $this->{$property}[] = compact('address', 'name');
