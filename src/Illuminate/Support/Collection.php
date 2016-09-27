@@ -198,10 +198,15 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Get the items in the collection that are not present in the given items.
      *
      * @param  mixed  $items
+     * @param  bool  $associative
      * @return static
      */
-    public function diff($items)
+    public function diff($items, $associative = false)
     {
+        if($associative){
+            return new static(array_diff_assoc($this->items, $this->getArrayableItems($items)));
+        }
+
         return new static(array_diff($this->items, $this->getArrayableItems($items)));
     }
 
