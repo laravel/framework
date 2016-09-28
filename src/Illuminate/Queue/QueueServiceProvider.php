@@ -4,6 +4,7 @@ namespace Illuminate\Queue;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Queue\Console\WorkCommand;
+use Illuminate\Queue\Console\DaemonCommand;
 use Illuminate\Queue\Console\ListenCommand;
 use Illuminate\Queue\Console\RestartCommand;
 use Illuminate\Queue\Connectors\SqsConnector;
@@ -89,11 +90,15 @@ class QueueServiceProvider extends ServiceProvider
      */
     protected function registerWorkCommand()
     {
-        $this->app->singleton('command.queue.work', function ($app) {
-            return new WorkCommand($app['queue.worker']);
+        $this->app->singleton('command.queue.work', function () {
+            return new WorkCommand;
         });
 
-        $this->commands('command.queue.work');
+        $this->app->singleton('command.queue.daemon', function ($app) {
+            return new DaemonCommand($app['queue.worker']);
+        });
+
+        $this->commands('command.queue.work', 'command.queue.daemon');
     }
 
     /**
