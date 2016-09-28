@@ -53,7 +53,7 @@ class MakeAuthCommand extends Command
             $this->warn("The following files already exist. If you continue to be overwritten on them and you will lose your old files.\n");
 
             foreach ($existFiles as $key => $value) {
-                 $this->error($value);
+                $this->error($value);
             }
 
             if ($this->confirm('Do you want to continue? [y|N]')) {
