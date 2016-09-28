@@ -211,6 +211,37 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
         $channel->send($notifiable, $notification);
     }
 
+    public function testMessageWithPriority()
+    {
+        $notification = new NotificationMailChannelTestNotificationWithPriority;
+        $notifiable = new NotificationMailChannelTestNotifiable;
+
+        $message = $notification->toMail($notifiable);
+        $data = $message->toArray();
+
+        $channel = new Illuminate\Notifications\Channels\MailChannel(
+            $mailer = Mockery::mock(Illuminate\Contracts\Mail\Mailer::class)
+        );
+
+        $views = ['notifications::email', 'notifications::email-plain'];
+
+        $mailer->shouldReceive('send')->with($views, $data, Mockery::on(function ($closure) {
+            $mock = Mockery::mock('Illuminate\Mailer\Message');
+
+            $mock->shouldReceive('subject')->once();
+
+            $mock->shouldReceive('to')->once()->with('taylor@laravel.com');
+
+            $mock->shouldReceive('setPriority')->once()->with(1);
+
+            $closure($mock);
+
+            return true;
+        }));
+
+        $channel->send($notifiable, $notification);
+    }
+
     public function testMessageWithMailableContract()
     {
         $notification = new NotificationMailChannelTestNotificationWithMailableContract;
@@ -284,6 +315,15 @@ class NotificationMailChannelTestNotificationWithToAddress extends Notification
     {
         return (new MailMessage)
             ->to('jeffrey@laracasts.com');
+    }
+}
+
+class NotificationMailChannelTestNotificationWithPriority extends Notification
+{
+    public function toMail($notifiable)
+    {
+        return (new MailMessage)
+            ->priority(1);
     }
 }
 

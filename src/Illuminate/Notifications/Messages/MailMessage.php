@@ -50,6 +50,13 @@ class MailMessage extends SimpleMessage
     public $rawAttachments = [];
 
     /**
+     * Priority level of the message.
+     *
+     * @var int
+     */
+    public $priority = null;
+
+    /**
      * Set the view for the mail message.
      *
      * @param  string  $view
@@ -128,5 +135,20 @@ class MailMessage extends SimpleMessage
     public function data()
     {
         return array_merge($this->toArray(), $this->viewData);
+    }
+
+    /**
+     * Set the priority of this message.
+     *
+     * The value is an integer where 1 is the highest priority and 5 is the lowest.
+     *
+     * @param  int  $level
+     * @return $this
+     */
+    public function priority($level)
+    {
+        $this->priority = $level;
+
+        return $this;
     }
 }
