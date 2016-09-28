@@ -128,16 +128,6 @@ class MailMessage extends SimpleMessage
     }
 
     /**
-     * Get the data array for the mail message.
-     *
-     * @return array
-     */
-    public function data()
-    {
-        return array_merge($this->toArray(), $this->viewData);
-    }
-
-    /**
      * Set the priority of this message.
      *
      * The value is an integer where 1 is the highest priority and 5 is the lowest.
@@ -150,5 +140,15 @@ class MailMessage extends SimpleMessage
         $this->priority = $level;
 
         return $this;
+    }
+
+    /**
+     * Get the data array for the mail message.
+     *
+     * @return array
+     */
+    public function data()
+    {
+        return array_merge($this->toArray(), $this->viewData);
     }
 }
