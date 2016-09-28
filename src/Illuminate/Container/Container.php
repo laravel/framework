@@ -618,7 +618,7 @@ class Container implements ArrayAccess, ContainerContract
         // If an instance of the type is currently being managed as a singleton we'll
         // just return an existing instance instead of instantiating new instances
         // so the developer can keep using the same objects instance every time.
-        if (isset($this->instances[$abstract])) {
+        if (isset($this->instances[$abstract]) && is_null($this->getContextualConcrete($abstract))) {
             return $this->instances[$abstract];
         }
 
