@@ -701,7 +701,26 @@ trait InteractsWithPages
                         : $file;
         }, $files, $names);
 
-        return array_combine($names, $files);
+        $uploads = array_combine($names, $files);
+
+        foreach ($uploads as $key => $file) {
+            // If key is in array format, parse into a nested array
+            if (preg_match('/.*?(?:\[.*?\])+/', $key)) {
+                preg_match_all('/([^\[\]]+)/', $key, $key_parts);
+
+                $keys = array_reverse($key_parts[1]);
+                $new_key = array_pop($keys);
+
+                foreach ($keys as $k) {
+                    $file = array($k => $file);
+                }
+
+                $uploads[$new_key] = $file;
+                unset($uploads[$key]);
+            }
+        }
+
+        return $uploads;
     }
 
     /**
