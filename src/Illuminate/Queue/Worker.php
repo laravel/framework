@@ -71,7 +71,7 @@ class Worker
 
         while (true) {
             if ($this->daemonShouldRun()) {
-                $this->runNextJobForDaemon($connectionName, $queue, $options);
+                $this->runNextJob($connectionName, $queue, $options);
             } else {
                 $this->sleep($options->sleep);
             }
@@ -101,30 +101,6 @@ class Worker
         }
 
         return true;
-    }
-
-    /**
-     * Run the next job for the daemon worker.
-     *
-     * @param  string  $connectionName
-     * @param  string  $queue
-     * @param  \Illuminate\Queue\WorkerOptions  $options
-     * @return void
-     */
-    protected function runNextJobForDaemon($connectionName, $queue, WorkerOptions $options)
-    {
-        return $this->runNextJob($connectionName, $queue, $options);
-
-        // Removing forking for now because it doesn't work with SQS...
-        if (! $options->timeout) {
-            $this->runNextJob($connectionName, $queue, $options);
-        } elseif ($processId = pcntl_fork()) {
-            $this->waitForChildProcess($processId, $options->timeout);
-        } else {
-            $this->runNextJob($connectionName, $queue, $options);
-
-            exit;
-        }
     }
 
     /**
