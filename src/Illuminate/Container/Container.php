@@ -692,6 +692,19 @@ class Container implements ArrayAccess, ContainerContract
         if (isset($this->contextual[end($this->buildStack)][$abstract])) {
             return $this->contextual[end($this->buildStack)][$abstract];
         }
+
+        // If the abstract is an alias then lookup will
+        // fail because it is using the wrong abstract.
+        // Look for a binding that matches an alias
+        foreach ($this->aliases as $alias => $concrete) {
+            if ($abstract !== $concrete) {
+                continue;
+            }
+
+            if (isset($this->contextual[end($this->buildStack)][$alias])) {
+                return $this->contextual[end($this->buildStack)][$alias];
+            }
+        }
     }
 
     /**
