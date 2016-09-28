@@ -113,6 +113,9 @@ class Worker
      */
     protected function runNextJobForDaemon($connectionName, $queue, WorkerOptions $options)
     {
+        return $this->runNextJob($connectionName, $queue, $options);
+
+        // Removing forking for now because it doesn't work with SQS...
         if (! $options->timeout) {
             $this->runNextJob($connectionName, $queue, $options);
         } elseif ($processId = pcntl_fork()) {
