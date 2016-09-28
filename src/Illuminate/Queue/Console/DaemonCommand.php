@@ -3,14 +3,12 @@
 namespace Illuminate\Queue\Console;
 
 use Carbon\Carbon;
-use RuntimeException;
 use Illuminate\Queue\Worker;
 use Illuminate\Console\Command;
 use Illuminate\Queue\WorkerOptions;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
-use Illuminate\Queue\Events\JobProcessing;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
