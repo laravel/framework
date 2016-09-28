@@ -505,7 +505,7 @@ class Container implements ArrayAccess, ContainerContract
 
         $dependencies = $this->getMethodDependencies($callback, $parameters);
 
-        return call_user_func_array($callback, $dependencies);
+        return $callback(...$dependencies);
     }
 
     /**
