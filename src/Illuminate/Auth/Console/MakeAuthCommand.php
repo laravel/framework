@@ -48,16 +48,18 @@ class MakeAuthCommand extends Command
     {
         $existFiles = $this->checkExistFiles();
 
-        if(count($existFiles)){
+        if (count($existFiles)) {
             $this->warn("\nWarning!");
             $this->warn("The following files already exist. If you continue to be overwritten on them and you will lose your old files.\n");
 
-            foreach ($existFiles as $key => $value)
-                $this->error($value);
+            foreach ($existFiles as $key => $value) {
+                 $this->error($value);
+            }
 
-            if ($this->confirm('Do you want to continue? [y|N]'))
+            if ($this->confirm('Do you want to continue? [y|N]')) {
                 $this->makeAuth();
-        }else{
+            }
+        } else {
             $this->makeAuth();
         }
     }
@@ -67,7 +69,8 @@ class MakeAuthCommand extends Command
      *
      * @return void
      */
-    protected function makeAuth(){
+    protected function makeAuth()
+    {
         $this->createDirectories();
 
         $this->exportViews();
@@ -154,14 +157,16 @@ class MakeAuthCommand extends Command
         foreach ($this->views as $key => $value) {
             $file = base_path('resources/views/'.$value);
 
-            if(file_exists($file))
+            if (file_exists($file)) {
                 $exists[] = $file;
+            }
         }
 
         $file = base_path('app/Http/Controllers/HomeController.php');
 
-        if(file_exists($file))
+        if (file_exists($file)) {
             $exists[] = $file;
+        }
 
         return $exists;
     }
