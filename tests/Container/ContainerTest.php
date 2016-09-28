@@ -506,7 +506,6 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('ContainerImplementationStubTwo', $two->impl);
     }
 
-
     public function testContextualBindingWorksForExistingInstancedBindings()
     {
         $container = new Container;
