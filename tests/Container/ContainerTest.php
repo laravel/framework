@@ -506,6 +506,65 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('ContainerImplementationStubTwo', $two->impl);
     }
 
+
+    public function testContextualBindingWorksForExistingInstancedBindings()
+    {
+        $container = new Container;
+
+        $container->instance('IContainerContractStub', new ContainerImplementationStub);
+
+        $container->when('ContainerTestContextInjectOne')->needs('IContainerContractStub')->give('ContainerImplementationStubTwo');
+
+        $this->assertInstanceOf(
+            'ContainerImplementationStubTwo',
+            $container->make('ContainerTestContextInjectOne')->impl
+        );
+    }
+
+    public function testContextualBindingWorksForNewlyInstancedBindings()
+    {
+        $container = new Container;
+
+        $container->when('ContainerTestContextInjectOne')->needs('IContainerContractStub')->give('ContainerImplementationStubTwo');
+
+        $container->instance('IContainerContractStub', new ContainerImplementationStub);
+
+        $this->assertInstanceOf(
+            'ContainerImplementationStubTwo',
+            $container->make('ContainerTestContextInjectOne')->impl
+        );
+    }
+
+    public function testContextualBindingWorksOnExistingAliasedInstances()
+    {
+        $container = new Container;
+
+        $container->instance('stub', new ContainerImplementationStub);
+        $container->alias('stub', 'IContainerContractStub');
+
+        $container->when('ContainerTestContextInjectOne')->needs('IContainerContractStub')->give('ContainerImplementationStubTwo');
+
+        $this->assertInstanceOf(
+            'ContainerImplementationStubTwo',
+            $container->make('ContainerTestContextInjectOne')->impl
+        );
+    }
+
+    public function testContextualBindingWorksOnNewAliasedInstances()
+    {
+        $container = new Container;
+
+        $container->when('ContainerTestContextInjectOne')->needs('IContainerContractStub')->give('ContainerImplementationStubTwo');
+
+        $container->instance('stub', new ContainerImplementationStub);
+        $container->alias('stub', 'IContainerContractStub');
+
+        $this->assertInstanceOf(
+            'ContainerImplementationStubTwo',
+            $container->make('ContainerTestContextInjectOne')->impl
+        );
+    }
+
     public function testContainerTags()
     {
         $container = new Container;
