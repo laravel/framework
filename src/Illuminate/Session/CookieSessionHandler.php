@@ -23,7 +23,7 @@ class CookieSessionHandler implements SessionHandlerInterface
      */
     protected $request;
 
-    /*
+    /**
      * The number of minutes the session should be valid.
      *
      * @var int
