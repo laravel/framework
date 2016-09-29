@@ -562,6 +562,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $foo = new File(__FILE__, false);
         $v = new Validator($trans, ['name' => [$file, $foo]], ['name.0' => 'Required', 'name.1' => 'Required']);
         $this->assertTrue($v->passes());
+        $this->assertEmpty($v->getData());
     }
 
     public function testValidateRequiredWith()
