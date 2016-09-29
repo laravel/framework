@@ -3227,16 +3227,34 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
     public function testMultipleFileUploads()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $file = new File(__FILE__, false);
-        $file2 = new File(__FILE__, false);
-        $v = new Validator($trans, ['file' => [$file, $file2]], ['file.*' => 'Required|mimes:xls']);
-        $this->assertFalse($v->passes());
+        $uploadedFile = [__FILE__, '', null, null, null, true];
+        
+        $file1 = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension', 'isValid'])->setConstructorArgs($uploadedFile)->getMock();
+        $file1->expects($this->any())->method('guessExtension')->will($this->returnValue('xls'));
+        $file2->expects($this->any())->method('isValid')->will($this->returnValue(true));
+
+        $file2 = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension', 'isValid'])->setConstructorArgs($uploadedFile)->getMock();
+        $file2->expects($this->any())->method('guessExtension')->will($this->returnValue('xls'));
+        $file2->expects($this->any())->method('isValid')->will($this->returnValue(true));
+
+        $v = new Validator($trans, ['file' => [$file1, $file2]], ['file.*' => 'Required|mimes:xls']);
+        $this->assertTrue($v->passes());
     }
 
     public function testFileUploads()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $file = new File(__FILE__, false);
+        $uploadedFile = [__FILE__, '', null, null, null, true];
+        
+        $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension', 'isValid'])->setConstructorArgs($uploadedFile)->getMock();
+        $file->expects($this->any())->method('guessExtension')->will($this->returnValue('xls'));
+        $file2->expects($this->any())->method('isValid')->will($this->returnValue(true));
+        $v = new Validator($trans, ['file' => $file], ['file' => 'Required|mimes:xls']);
+        $this->assertTrue($v->passes());
+
+        $file2 = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension', 'isValid'])->setConstructorArgs($uploadedFile)->getMock();
+        $file2->expects($this->any())->method('guessExtension')->will($this->returnValue('xls'));
+        $file2->expects($this->any())->method('isValid')->will($this->returnValue(false));
         $v = new Validator($trans, ['file' => $file], ['file' => 'Required|mimes:xls']);
         $this->assertFalse($v->passes());
     }
