@@ -4,7 +4,6 @@ namespace Illuminate\Queue;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Queue\Console\WorkCommand;
-use Illuminate\Queue\Console\DaemonCommand;
 use Illuminate\Queue\Console\ListenCommand;
 use Illuminate\Queue\Console\RestartCommand;
 use Illuminate\Queue\Connectors\SqsConnector;
