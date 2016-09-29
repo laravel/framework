@@ -90,15 +90,11 @@ class QueueServiceProvider extends ServiceProvider
      */
     protected function registerWorkCommand()
     {
-        $this->app->singleton('command.queue.work', function () {
-            return new WorkCommand;
+        $this->app->singleton('command.queue.work', function ($app) {
+            return new WorkCommand($app['queue.worker']);
         });
 
-        $this->app->singleton('command.queue.daemon', function ($app) {
-            return new DaemonCommand($app['queue.worker']);
-        });
-
-        $this->commands('command.queue.work', 'command.queue.daemon');
+        $this->commands('command.queue.work');
     }
 
     /**
