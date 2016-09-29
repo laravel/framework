@@ -57,7 +57,7 @@ class WorkCommand extends Command
         $_SERVER['argv'][1] = 'queue:daemon';
 
         return (new Process(PHP_BINARY.' '.implode(' ', $_SERVER['argv']), getcwd()))
-            ->setTimeout(null)
-            ->setIdleTimeout($this->option('timeout') + $this->option('sleep'));
+                    ->setTimeout(null)
+                    ->setIdleTimeout($this->option('timeout') + $this->option('sleep'));
     }
 }
