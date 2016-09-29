@@ -3205,6 +3205,42 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         ]);
     }
 
+    public function testFilesHydration()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $file = new File(__FILE__, false);
+        $v = new Validator($trans, ['file' => $file, 'text' => 'text'], ['text' => 'Required']);
+        $this->assertEquals(['file' => $file], $v->getFiles());
+        $this->assertEquals(['text' => 'text'], $v->getData());
+    }
+
+    public function testArrayOfFilesHydration()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $file = new File(__FILE__, false);
+        $file2 = new File(__FILE__, false);
+        $v = new Validator($trans, ['file' => [$file, $file2], 'text' => 'text'], ['text' => 'Required']);
+        $this->assertEquals(['file.0' => $file, 'file.1' => $file2], $v->getFiles());
+        $this->assertEquals(['text' => 'text'], $v->getData());
+    }
+
+    public function testMultipleFileUploads()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $file = new File(__FILE__, false);
+        $file2 = new File(__FILE__, false);
+        $v = new Validator($trans, ['file' => [$file, $file2]], ['file.*' => 'Required|mimes:xls']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testFileUploads()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $file = new File(__FILE__, false);
+        $v = new Validator($trans, ['file' => $file], ['file' => 'Required|mimes:xls']);
+        $this->assertFalse($v->passes());
+    }
+
     protected function getTranslator()
     {
         return m::mock('Symfony\Component\Translation\TranslatorInterface');
