@@ -104,30 +104,6 @@ class Worker
     }
 
     /**
-     * Wait for the given child process to finish.
-     *
-     * @param  int  $processId
-     * @param  int  $timeout
-     * @return void
-     */
-    protected function waitForChildProcess($processId, $timeout)
-    {
-        declare(ticks=1) {
-            pcntl_signal(SIGALRM, function () use ($processId, $timeout) {
-                posix_kill($processId, SIGKILL);
-
-                $this->exceptions->report(new TimeoutException("Queue child process timed out after {$timeout} seconds."));
-            }, true);
-
-            pcntl_alarm($timeout);
-
-            pcntl_waitpid($processId, $status);
-
-            pcntl_alarm(0);
-        }
-    }
-
-    /**
      * Process the next job on the queue.
      *
      * @param  string  $connectionName
