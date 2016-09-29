@@ -184,17 +184,20 @@ class Validator implements ValidatorContract
         }
 
         foreach ($data as $key => $value) {
-            $key = ($arrayKey) ? "$arrayKey.$key" : $key;
+            $new_key = ($arrayKey) ? "$arrayKey.$key" : $key;
 
             // If this value is an instance of the HttpFoundation File class we will
             // remove it from the data array and add it to the files array, which
             // we use to conveniently separate out these files from other data.
             if ($value instanceof File) {
-                $this->files[$key] = $value;
+                $this->files[$new_key] = $value;
 
                 unset($data[$key]);
             } elseif (is_array($value)) {
-                $this->parseData($value, $key);
+                $value = $this->parseData($value, $key);
+                if (empty($value)){
+                    unset($data[$key]);
+                }
             }
         }
 
