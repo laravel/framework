@@ -50,7 +50,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      * @param  mixed  $notification
      * @return void
      */
-    public function sendNow($notifiables, $notification)
+    public function sendNow($notifiables, $notification, array $channels = null)
     {
         if (! $notifiables instanceof Collection && ! is_array($notifiables)) {
             $notifiables = [$notifiables];
@@ -61,7 +61,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
         foreach ($notifiables as $notifiable) {
             $notificationId = (string) Uuid::uuid4();
 
-            $channels = $notification->via($notifiable);
+            $channels = $channels ?: $notification->via($notifiable);
 
             if (empty($channels)) {
                 continue;
@@ -109,12 +109,22 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      */
     protected function queueNotification($notifiables, $notification)
     {
-        $this->app->make(Bus::class)->dispatch(
-            (new SendQueuedNotifications($notifiables, $notification))
-                    ->onConnection($notification->connection)
-                    ->onQueue($notification->queue)
-                    ->delay($notification->delay)
-        );
+        if (! $notifiables instanceof Collection && ! is_array($notifiables)) {
+            $notifiables = [$notifiables];
+        }
+
+        $bus = $this->app->make(Bus::class);
+
+        foreach ($notifiables as $notifiable) {
+            foreach ($notification->via($notifiable) as $channel) {
+                $bus->dispatch(
+                    (new SendQueuedNotifications($notifiables, $notification, [$channel]))
+                            ->onConnection($notification->connection)
+                            ->onQueue($notification->queue)
+                            ->delay($notification->delay)
+                );
+            }
+        }
     }
 
     /**
