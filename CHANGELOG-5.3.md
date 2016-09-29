@@ -1,5 +1,15 @@
 # Release Notes for 5.3.x
 
+## v5.3.12 (2016-09-29)
+
+### Added
+- Added support for priority level in mail notifications ([#15651](https://github.com/laravel/framework/pull/15651))
+- Added missing `$minutes` property on `CookieSessionHandler` ([#15664](https://github.com/laravel/framework/pull/15664))
+
+### Changed
+- Removed forking and pcntl requirements while still supporting timeouts ([#15650](https://github.com/laravel/framework/pull/15650))
+
+
 ## v5.3.11 (2016-09-27)
 
 ### Added
