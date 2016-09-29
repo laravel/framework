@@ -79,7 +79,7 @@ class BroadcastNotificationCreated implements ShouldBroadcast
     {
         if (method_exists($this->notifiable, 'getNotificationChannel')) {
             return $this->notifiable->getNotificationChannel();
-        } 
+        }
         
         return str_replace('\\', '.', get_class($this->notifiable)).'.'.$this->notifiable->getKey();       
     }
