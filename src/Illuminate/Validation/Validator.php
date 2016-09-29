@@ -194,9 +194,11 @@ class Validator implements ValidatorContract
 
                 unset($data[$key]);
             } elseif (is_array($value)) {
-                $value = $this->parseData($value, $key);
-                if (empty($value)){
-                    unset($data[$key]);
+                if (! empty($value)) {
+                    $value = $this->parseData($value, $key);
+                    if (empty($value)) {
+                        unset($data[$key]);
+                    }
                 }
             }
         }
