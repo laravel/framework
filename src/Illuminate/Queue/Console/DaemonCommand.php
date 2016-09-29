@@ -9,8 +9,6 @@ use Illuminate\Queue\WorkerOptions;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 
 class DaemonCommand extends Command
 {
@@ -19,7 +17,17 @@ class DaemonCommand extends Command
      *
      * @var string
      */
-    protected $name = 'queue:daemon';
+    protected $signature = 'queue:work 
+                            {connection? : The name of connection}
+                            {--queue= : The queue to listen on}
+                            {--daemon : Run the worker in daemon mode (Deprecated)}
+                            {--once : Only process the next job on the queue}
+                            {--delay=0 : Amount of time to delay failed jobs}
+                            {--force : Force the worker to run even in maintenance mode}
+                            {--memory=128 : The memory limit in megabytes}
+                            {--sleep=3 : Number of seconds to sleep when no job is available}
+                            {--timeout=60 : The number of seconds a child process can run}
+                            {--tries=0 : Number of times to attempt a job before logging it failed}';
 
     /**
      * The console command description.
@@ -180,45 +188,5 @@ class DaemonCommand extends Command
     protected function downForMaintenance()
     {
         return $this->option('force') ? false : $this->laravel->isDownForMaintenance();
-    }
-
-    /**
-     * Get the console command arguments.
-     *
-     * @return array
-     */
-    protected function getArguments()
-    {
-        return [
-            ['connection', InputArgument::OPTIONAL, 'The name of connection', null],
-        ];
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['queue', null, InputOption::VALUE_OPTIONAL, 'The queue to listen on'],
-
-            ['daemon', null, InputOption::VALUE_NONE, 'Run the worker in daemon mode (Deprecated)'],
-
-            ['once', null, InputOption::VALUE_NONE, 'Only process the next job on the queue'],
-
-            ['delay', null, InputOption::VALUE_OPTIONAL, 'Amount of time to delay failed jobs', 0],
-
-            ['force', null, InputOption::VALUE_NONE, 'Force the worker to run even in maintenance mode'],
-
-            ['memory', null, InputOption::VALUE_OPTIONAL, 'The memory limit in megabytes', 128],
-
-            ['sleep', null, InputOption::VALUE_OPTIONAL, 'Number of seconds to sleep when no job is available', 3],
-
-            ['timeout', null, InputOption::VALUE_OPTIONAL, 'The number of seconds a child process can run', 60],
-
-            ['tries', null, InputOption::VALUE_OPTIONAL, 'Number of times to attempt a job before logging it failed', 0],
-        ];
     }
 }

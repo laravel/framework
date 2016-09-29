@@ -4,7 +4,6 @@ namespace Illuminate\Queue\Console;
 
 use Illuminate\Console\Command;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Console\Input\InputOption;
 
 class WorkCommand extends Command
 {
@@ -13,7 +12,17 @@ class WorkCommand extends Command
      *
      * @var string
      */
-    protected $name = 'queue:work';
+    protected $signature = 'queue:work 
+                            {connection? : The name of connection}
+                            {--queue= : The queue to listen on}
+                            {--daemon : Run the worker in daemon mode (Deprecated)}
+                            {--once : Only process the next job on the queue}
+                            {--delay=0 : Amount of time to delay failed jobs}
+                            {--force : Force the worker to run even in maintenance mode}
+                            {--memory=128 : The memory limit in megabytes}
+                            {--sleep=3 : Number of seconds to sleep when no job is available}
+                            {--timeout=60 : The number of seconds a child process can run}
+                            {--tries=0 : Number of times to attempt a job before logging it failed}';
 
     /**
      * The console command description.
@@ -50,33 +59,5 @@ class WorkCommand extends Command
         return (new Process(PHP_BINARY.' '.implode(' ', $_SERVER['argv']), getcwd()))
                     ->setTimeout(null)
                     ->setIdleTimeout($this->option('timeout') + $this->option('sleep'));
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['queue', null, InputOption::VALUE_OPTIONAL, 'The queue to listen on'],
-
-            ['daemon', null, InputOption::VALUE_NONE, 'Run the worker in daemon mode (Deprecated)'],
-
-            ['once', null, InputOption::VALUE_NONE, 'Only process the next job on the queue'],
-
-            ['delay', null, InputOption::VALUE_OPTIONAL, 'Amount of time to delay failed jobs', 0],
-
-            ['force', null, InputOption::VALUE_NONE, 'Force the worker to run even in maintenance mode'],
-
-            ['memory', null, InputOption::VALUE_OPTIONAL, 'The memory limit in megabytes', 128],
-
-            ['sleep', null, InputOption::VALUE_OPTIONAL, 'Number of seconds to sleep when no job is available', 3],
-
-            ['timeout', null, InputOption::VALUE_OPTIONAL, 'The number of seconds a child process can run', 60],
-
-            ['tries', null, InputOption::VALUE_OPTIONAL, 'Number of times to attempt a job before logging it failed', 0],
-        ];
     }
 }
