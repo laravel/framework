@@ -48,6 +48,7 @@ class Container implements ArrayAccess, ContainerContract
      * @var array
      */
     protected $aliases = [];
+    protected $aliasAbstracts = [];
 
     /**
      * The extension closures for services.
@@ -400,6 +401,7 @@ class Container implements ArrayAccess, ContainerContract
     public function alias($abstract, $alias)
     {
         $this->aliases[$alias] = $abstract;
+        $this->aliasAbstracts[$abstract][] = $alias;
     }
 
     /**
@@ -693,14 +695,14 @@ class Container implements ArrayAccess, ContainerContract
             return $this->contextual[end($this->buildStack)][$abstract];
         }
 
+        if (empty($this->aliasAbstracts[$abstract])) {
+            return;
+        }
+
         // If the abstract is an alias then lookup will
         // fail because it is using the wrong abstract.
         // Look for a binding that matches an alias
-        foreach ($this->aliases as $alias => $concrete) {
-            if ($abstract !== $concrete) {
-                continue;
-            }
-
+        foreach ($this->aliasAbstracts[$abstract] as $alias) {
             if (isset($this->contextual[end($this->buildStack)][$alias])) {
                 return $this->contextual[end($this->buildStack)][$alias];
             }
@@ -1135,6 +1137,7 @@ class Container implements ArrayAccess, ContainerContract
         $this->resolved = [];
         $this->bindings = [];
         $this->instances = [];
+        $this->aliasAbstracts = [];
     }
 
     /**
