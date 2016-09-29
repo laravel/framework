@@ -17,7 +17,7 @@ class DaemonCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'queue:work 
+    protected $signature = 'queue:daemon 
                             {connection? : The name of connection}
                             {--queue= : The queue to listen on}
                             {--daemon : Run the worker in daemon mode (Deprecated)}
