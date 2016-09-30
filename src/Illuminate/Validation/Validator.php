@@ -2856,7 +2856,7 @@ class Validator implements ValidatorContract
 
         $value = $this->getValue($attribute);
 
-        if (!is_null($value)) {
+        if (! is_null($value)) {
             Arr::set($results, $attribute, $value);
         }
 
