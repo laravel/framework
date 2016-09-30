@@ -2854,9 +2854,9 @@ class Validator implements ValidatorContract
     {
         $results = [];
 
-        $value = Arr::get($this->data, $attribute, '__missing__');
+        $value = $this->getValue($attribute);
 
-        if ($value != '__missing__') {
+        if (!is_null($value)) {
             Arr::set($results, $attribute, $value);
         }
 
