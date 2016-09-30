@@ -339,7 +339,10 @@ class Validator implements ValidatorContract
      */
     public function each($attribute, $rules)
     {
-        $data = Arr::dot($this->initializeAttributeOnData($attribute));
+        $data = array_merge(
+            Arr::dot($this->initializeAttributeOnData($attribute)), 
+            $this->files
+        );
 
         $pattern = str_replace('\*', '[^\.]+', preg_quote($attribute));
 
@@ -2854,9 +2857,9 @@ class Validator implements ValidatorContract
     {
         $results = [];
 
-        $value = $this->getValue($attribute);
+        $value = Arr::get($this->data, $attribute, '__missing__');
 
-        if (! is_null($value)) {
+        if ($value != '__missing__') {
             Arr::set($results, $attribute, $value);
         }
 
