@@ -1,5 +1,27 @@
 # Release Notes for 5.3.x
 
+## v5.3.15 (2016-09-29)
+
+### Changed
+- Use granular notification queue jobs ([#15681](https://github.com/laravel/framework/pull/15681), [3a5e510](https://github.com/laravel/framework/commit/3a5e510af5e92ab2eaa25d728b8c74d9cf8833c2))
+- Reverted recent changes to the queue ([d8dc8dc](https://github.com/laravel/framework/commit/d8dc8dc4bde56f63d8b1eacec3f3d4d68cc51894))
+
+
+## v5.3.14 (2016-09-29)
+
+### Fixed
+- Fixed `DaemonCommand` command name ([b681bff](https://github.com/laravel/framework/commit/b681bffc247ebac1fbb4afcec03e2ce12627e0cc))
+
+
+## v5.3.13 (2016-09-29)
+
+### Added
+- Added `serialize()` and `unserialize()` on `RedisStore` ([#15657](https://github.com/laravel/framework/pull/15657))
+
+### Changed
+- Use `$signature` command style on `DaemonCommand` and `WorkCommand` ([#15677](https://github.com/laravel/framework/pull/15677))
+
+
 ## v5.3.12 (2016-09-29)
 
 ### Added
