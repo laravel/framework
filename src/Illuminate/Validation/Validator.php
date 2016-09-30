@@ -340,7 +340,7 @@ class Validator implements ValidatorContract
     public function each($attribute, $rules)
     {
         $data = array_merge(
-            Arr::dot($this->initializeAttributeOnData($attribute)), 
+            Arr::dot($this->initializeAttributeOnData($attribute)),
             $this->files
         );
 
