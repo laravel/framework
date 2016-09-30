@@ -195,6 +195,10 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function only($keys)
     {
+        if (is_null($keys)) {
+            return $this;
+        }
+
         $dictionary = Arr::only($this->getDictionary(), $keys);
 
         return new static(array_values($dictionary));
