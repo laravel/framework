@@ -2121,8 +2121,8 @@ class Builder
         $bindings = [];
 
         foreach ($values as $index => $record) {
-            foreach($allKeys as $key) {
-                if(isset($record[$key])) {
+            foreach ($allKeys as $key) {
+                if (isset($record[$key])) {
                     $bindings[] = $record[$key];
                 } else {
                     $bindings[] = null;
