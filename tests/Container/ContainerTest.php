@@ -564,6 +564,41 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
         );
     }
 
+    public function testContextualBindingWorksOnNewAliasedBindings()
+    {
+        $container = new Container;
+
+        $container->when('ContainerTestContextInjectOne')->needs('IContainerContractStub')->give('ContainerImplementationStubTwo');
+
+        $container->bind('stub', ContainerImplementationStub::class);
+        $container->alias('stub', 'IContainerContractStub');
+
+        $this->assertInstanceOf(
+            'ContainerImplementationStubTwo',
+            $container->make('ContainerTestContextInjectOne')->impl
+        );
+    }
+
+    public function testContextualBindingDoesntOverrideNonContextualResolution()
+    {
+        $container = new Container;
+
+        $container->instance('stub', new ContainerImplementationStub());
+        $container->alias('stub', 'IContainerContractStub');
+
+        $container->when('ContainerTestContextInjectTwo')->needs('IContainerContractStub')->give('ContainerImplementationStubTwo');
+
+        $this->assertInstanceOf(
+            'ContainerImplementationStubTwo',
+            $container->make('ContainerTestContextInjectTwo')->impl
+        );
+
+        $this->assertInstanceOf(
+            'ContainerImplementationStub',
+            $container->make('ContainerTestContextInjectOne')->impl
+        );
+    }
+
     public function testContainerTags()
     {
         $container = new Container;
