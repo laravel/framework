@@ -73,15 +73,15 @@ class CallQueuedHandler
      * The exception that caused the failure will be passed.
      *
      * @param  array  $data
-     * @param  \Exception  $e
+     * @param  \Exception  $exception
      * @return void
      */
-    public function failed(array $data, $e)
+    public function failed(array $data, $exception)
     {
         $command = unserialize($data['command']);
 
         if (method_exists($command, 'failed')) {
-            $command->failed($e);
+            $command->failed($exception);
         }
     }
 }

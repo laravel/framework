@@ -138,10 +138,10 @@ abstract class Job
     /**
      * Call the failed method on the job instance.
      *
-     * @param  \Exception  $e
+     * @param  \Exception  $exception
      * @return void
      */
-    public function failed($e)
+    public function failed($exception)
     {
         $payload = $this->payload();
 
@@ -150,7 +150,7 @@ abstract class Job
         $this->instance = $this->resolve($class);
 
         if (method_exists($this->instance, 'failed')) {
-            $this->instance->failed($payload['data'], $e);
+            $this->instance->failed($payload['data'], $exception);
         }
     }
 
