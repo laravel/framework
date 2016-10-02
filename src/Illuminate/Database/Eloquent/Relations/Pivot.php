@@ -29,6 +29,11 @@ class Pivot extends Model
     protected $otherKey;
 
     /**
+    * Timestamps for pivot table
+    */
+    protected $timestamps = false;
+    
+    /**
      * The attributes that aren't mass assignable.
      *
      * @var array
