@@ -839,7 +839,19 @@ class Router implements RegistrarContract
      */
     protected function performBinding($key, $value, $route)
     {
-        return call_user_func($this->binders[$key], $value, $route);
+        $routes = array_filter($this->binders[$key], function($key) use($route) {
+            return preg_match('#' . str_replace('/', '\/', $key) . '#', $route->getUri());
+        }, ARRAY_FILTER_USE_KEY);
+        if (count($routes) > 1) {
+            $routes = array_filter($routes, function($key) {
+                return $key != '.*';
+            }, ARRAY_FILTER_USE_KEY);
+        }
+        $binder = array_first($routes);
+        if (is_null($binder)) {
+            return $value;
+        }
+        return call_user_func($binder, $value, $route);
     }
 
     /**
@@ -933,11 +945,12 @@ class Router implements RegistrarContract
      * @param  string  $key
      * @param  string  $class
      * @param  \Closure|null  $callback
+     * @param  string|null  $when
      * @return void
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function model($key, $class, Closure $callback = null)
+    public function model($key, $class, Closure $callback = null, $when = null)
     {
         $this->bind($key, function ($value) use ($class, $callback) {
             if (is_null($value)) {
@@ -961,7 +974,7 @@ class Router implements RegistrarContract
             }
 
             throw (new ModelNotFoundException)->setModel($class);
-        });
+        }, $when);
     }
 
     /**
@@ -969,15 +982,19 @@ class Router implements RegistrarContract
      *
      * @param  string  $key
      * @param  string|callable  $binder
+     * @param  string  $when
      * @return void
      */
-    public function bind($key, $binder)
+    public function bind($key, $binder, $when = null)
     {
         if (is_string($binder)) {
             $binder = $this->createClassBinding($binder);
         }
-
-        $this->binders[str_replace('-', '_', $key)] = $binder;
+        $key = str_replace('-', '_', $key);
+        if (!isset($this->binders[$key])) {
+            $this->binders[$key] = [];
+        }
+        $this->binders[$key][is_null($when) ? '.*' : $when] = $binder;
     }
 
     /**

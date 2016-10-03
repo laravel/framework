@@ -582,6 +582,30 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
+    public function testRouteBindingWithWhen()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
+            return $name;
+        }]);
+        $router->bind('bar', function ($value) {
+            return strtoupper($value);
+        }, 'foo/.*');
+        $this->assertEquals('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
+
+    public function testRouteBindingWithWhenOtherWhen()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
+            return $name;
+        }]);
+        $router->bind('bar', function ($value) {
+            return strtoupper($value);
+        }, 'blah/.*');
+        $this->assertEquals('taylor', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
+
     public function testRouteClassBinding()
     {
         $router = $this->getRouter();
@@ -590,6 +614,26 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         }]);
         $router->bind('bar', 'RouteBindingStub');
         $this->assertEquals('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
+
+    public function testRouteClassBindingWithWhen()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
+            return $name;
+        }]);
+        $router->bind('bar', 'RouteBindingStub', 'foo/.*');
+        $this->assertEquals('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
+
+    public function testRouteClassBindingWithWhenOtherWhen()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
+            return $name;
+        }]);
+        $router->bind('bar', 'RouteBindingStub', 'blah/.*');
+        $this->assertEquals('taylor', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
     public function testRouteClassMethodBinding()
