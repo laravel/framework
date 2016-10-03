@@ -70,6 +70,8 @@ class Worker
         $lastRestart = $this->getTimestampOfLastQueueRestart();
 
         while (true) {
+            $this->registerTimeoutHandler($options);
+
             if ($this->daemonShouldRun()) {
                 $this->runNextJob($connectionName, $queue, $options);
             } else {
@@ -81,6 +83,29 @@ class Worker
                 $this->stop();
             }
         }
+    }
+
+    /**
+     * Register the worker timeout handler (PHP 7.1+).
+     *
+     * @param  WorkerOptions  $options
+     * @return void
+     */
+    protected function registerTimeoutHandler(WorkerOptions $options)
+    {
+        if (version_compare(PHP_VERSION, '7.1.0') < 0 || ! extension_loaded('pcntl')) {
+            return;
+        }
+
+        pcntl_async_signals(true);
+
+        pcntl_signal(SIGALRM, function () {
+            $this->exceptions->report(new TimeoutException("A queue worker timed out while processing a job."));
+
+            exit(1);
+        });
+
+        pcntl_alarm($options->timeout + $options->sleep);
     }
 
     /**
