@@ -699,7 +699,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function only($keys)
     {
         if (is_null($keys)) {
-            return $this;
+            return new static($this->items);
         }
 
         $keys = is_array($keys) ? $keys : func_get_args();
