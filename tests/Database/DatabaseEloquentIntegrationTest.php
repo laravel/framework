@@ -989,7 +989,7 @@ class EloquentTestUser extends Eloquent
 
     public function postWithPhotos()
     {
-        return $this->post()->join('photo', function($join) {
+        return $this->post()->join('photo', function ($join) {
             $join->on('photo.imageable_id', 'photo.id');
             $join->where('photo.imageable_type', 'EloquentTestPost');
         });
