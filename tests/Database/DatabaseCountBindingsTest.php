@@ -187,7 +187,7 @@ class BlockTranslation extends Eloquent
 class TestTranslationScope implements ScopeInterface
 {
     /**
-     * This holds the index of the new join binding
+     * This holds the index of the new join binding.
      * @var int
      */
     protected $bindingIndex;
@@ -208,8 +208,8 @@ class TestTranslationScope implements ScopeInterface
         $this->bindingIndex = count($builder->getQuery()->getRawBindings()['join']);
 
         $builder->leftJoin($translationTable, function ($join) use ($translationTable, $foreignKey, $model) {
-            $join->on($translationTable . '.' . $foreignKey, '=', $model->getQualifiedKeyName())
-                ->where($translationTable . '.locale', '=', 'en');
+            $join->on($translationTable.'.'.$foreignKey, '=', $model->getQualifiedKeyName())
+                ->where($translationTable.'.locale', '=', 'en');
         });
     }
 
