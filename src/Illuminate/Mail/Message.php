@@ -86,7 +86,7 @@ class Message
     /**
      * Add a carbon copy to the message.
      *
-     * @param  string  $address
+     * @param  string|array  $address
      * @param  string|null  $name
      * @return $this
      */
@@ -98,7 +98,7 @@ class Message
     /**
      * Add a blind carbon copy to the message.
      *
-     * @param  string  $address
+     * @param  string|array  $address
      * @param  string|null  $name
      * @return $this
      */
