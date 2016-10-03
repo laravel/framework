@@ -691,9 +691,7 @@ trait InteractsWithPages
      */
     protected function convertUploadsForTesting(Form $form, array $uploads)
     {
-        $files = $form->getFiles();
-
-        $files = array_filter($files, function ($name) use ($uploads) {
+        $files = array_filter($form->getFiles(), function ($name) use ($uploads) {
             return isset($uploads[$name]);
         }, ARRAY_FILTER_USE_KEY);
 
