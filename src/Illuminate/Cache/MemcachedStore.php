@@ -5,6 +5,7 @@ namespace Illuminate\Cache;
 use Memcached;
 use Carbon\Carbon;
 use Illuminate\Contracts\Cache\Store;
+use ReflectionMethod;
 
 class MemcachedStore extends TaggableStore implements Store
 {
@@ -23,6 +24,13 @@ class MemcachedStore extends TaggableStore implements Store
     protected $prefix;
 
     /**
+     * A flag indicating whether the Memcached version is >= 3.0.0
+     *
+     * @var bool
+     */
+    protected $memcached_version_3_0;
+
+    /**
      * Create a new Memcached store.
      *
      * @param  \Memcached  $memcached
@@ -33,6 +41,7 @@ class MemcachedStore extends TaggableStore implements Store
     {
         $this->setPrefix($prefix);
         $this->memcached = $memcached;
+        $this->memcached_version_3_0 = (new ReflectionMethod('Memcached', 'getMulti'))->getNumberOfParameters() == 2;
     }
 
     /**
@@ -64,7 +73,12 @@ class MemcachedStore extends TaggableStore implements Store
             return $this->prefix.$key;
         }, $keys);
 
-        $values = $this->memcached->getMulti($prefixedKeys, null, Memcached::GET_PRESERVE_ORDER);
+        if ($this->memcached_version_3_0) {
+            $values = $this->memcached->getMulti($prefixedKeys, Memcached::GET_PRESERVE_ORDER);
+        } else {
+            $null = null;
+            $values = $this->memcached->getMulti($prefixedKeys, $null, Memcached::GET_PRESERVE_ORDER);
+        }
 
         if ($this->memcached->getResultCode() != 0) {
             return array_fill_keys($keys, null);
