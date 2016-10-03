@@ -3067,13 +3067,31 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Get all of the current attributes on the model.
+     * Get a selection of the current attributes on the model.
+     *
+     * @param array $keys
      *
      * @return array
      */
-    public function getAttributes()
+    public function getAttributes($keys = [])
     {
-        return $this->attributes;
+        if ($keys === []) {
+            return $this->attributes;
+        }
+
+        $keys = is_array($keys) ? $keys : func_get_args();
+
+        $result = [];
+
+        foreach ($keys as $key) {
+            $value = $this->getAttribute($key);
+
+            if (! is_null($value)) {
+                $result[$key] = $value;
+            }
+        }
+
+        return $result;
     }
 
     /**
