@@ -693,6 +693,10 @@ trait InteractsWithPages
     {
         $files = $form->getFiles();
 
+        $files = array_filter($files, function ($name) use ($uploads) {
+            return isset($uploads[$name]);
+        }, ARRAY_FILTER_USE_KEY);
+
         $names = array_keys($files);
 
         $files = array_map(function (array $file, $name) use ($uploads) {
