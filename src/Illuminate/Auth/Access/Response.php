@@ -34,7 +34,7 @@ class Response
     /**
      * Get the string representation of the message.
      *
-     * @return string
+     * @return string|nulls
      */
     public function __toString()
     {
