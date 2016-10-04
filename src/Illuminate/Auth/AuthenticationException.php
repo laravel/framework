@@ -7,7 +7,7 @@ use Exception;
 class AuthenticationException extends Exception
 {
     /**
-     * Array of the given guards.
+     * All of the guards that were checked.
      *
      * @var array
      */
@@ -18,30 +18,19 @@ class AuthenticationException extends Exception
      *
      * @param string  $message
      */
-    public function __construct($message = 'Unauthenticated.')
+    public function __construct($message = 'Unauthenticated.', array $guards = [])
     {
         parent::__construct($message);
-    }
 
-    /**
-     * Set the given guards.
-     *
-     * @param array $guards
-     * @return $this
-     */
-    public function setGuards(array $guards)
-    {
         $this->guards = $guards;
-
-        return $this;
     }
 
     /**
-     * Get the given guards.
+     * Get the guards that were checked.
      *
      * @return array
      */
-    public function getGuards()
+    public function guards()
     {
         return $this->guards;
     }
