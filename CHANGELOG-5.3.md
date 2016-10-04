@@ -1,5 +1,24 @@
 # Release Notes for 5.3.x
 
+## v5.3.16 (2016-10-04)
+
+### Added
+- Added "furniture" and "wheat" to `Pluralizer::uncountable()` ([#15703](https://github.com/laravel/framework/pull/15703))
+- Allow passing `$keys` to `Model::getAttributes()` ([#15722](https://github.com/laravel/framework/pull/15722))
+- Added database blueprint for soft deletes with timezone ([#15737](https://github.com/laravel/framework/pull/15737))
+- Added given guards to `AuthenticationException` ([#15745](https://github.com/laravel/framework/pull/15745))
+- Added [Seneca](https://en.wikipedia.org/wiki/Seneca_the_Younger) quote to `Inspire` command ([#15747](https://github.com/laravel/framework/pull/15747))
+- Added `div#app` to auth layout stub ([08bcbdb](https://github.com/laravel/framework/commit/08bcbdbe70b69330943cc45625b160877b37341a))
+- Added PHP 7.1 timeout handler to queue worker ([cc9e1f0](https://github.com/laravel/framework/commit/cc9e1f09683fd23cf8e973e84bf310f7ce1304a2))
+
+### Changed
+- Changed visibility of `Route::getController()` to public ([#15678](https://github.com/laravel/framework/pull/15678))
+- Changed notifications `id` column type to `uuid` ([#15719](https://github.com/laravel/framework/pull/15719))
+
+### Fixed
+- Fixed PDO bindings when using `whereHas()` ([#15740](https://github.com/laravel/framework/pull/15740))
+
+
 ## v5.3.15 (2016-09-29)
 
 ### Changed
