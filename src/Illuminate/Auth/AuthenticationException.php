@@ -7,7 +7,7 @@ use Exception;
 class AuthenticationException extends Exception
 {
     /**
-     * Array of the given guards
+     * Array of the given guards.
      *
      * @var array
      */
@@ -24,7 +24,7 @@ class AuthenticationException extends Exception
     }
 
     /**
-     * Set the given guards
+     * Set the given guards.
      *
      * @param array $guards
      * @return $this
@@ -37,7 +37,7 @@ class AuthenticationException extends Exception
     }
 
     /**
-     * Get the given guards
+     * Get the given guards.
      *
      * @return array
      */
