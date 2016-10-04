@@ -45,7 +45,7 @@ class AuthenticateMiddlewareTest extends PHPUnit_Framework_TestCase
 
             $this->authenticate('default');
         } catch (AuthenticationException $e) {
-            $this->assertContains('default', $e->getGuards());
+            $this->assertContains('default', $e->guards());
 
             return;
         }
@@ -95,7 +95,7 @@ class AuthenticateMiddlewareTest extends PHPUnit_Framework_TestCase
 
             $this->authenticate(...$expectedGuards);
         } catch (AuthenticationException $e) {
-            $this->assertEquals($expectedGuards, $e->getGuards());
+            $this->assertEquals($expectedGuards, $e->guards());
 
             return;
         }
