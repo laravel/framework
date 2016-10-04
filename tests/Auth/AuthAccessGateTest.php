@@ -146,6 +146,15 @@ class GateTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($gate->check('update', new AccessGateTestDummy));
     }
 
+    public function test_policy_classes_handle_checks_for_all_subtypes()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
+
+        $this->assertTrue($gate->check('update', new AccessGateTestSubDummy));
+    }
+
     public function test_policy_converts_dash_to_camel()
     {
         $gate = $this->getBasicGate();
@@ -264,6 +273,11 @@ class AccessGateTestClass
 }
 
 class AccessGateTestDummy
+{
+    //
+}
+
+class AccessGateTestSubDummy extends AccessGateTestDummy
 {
     //
 }
