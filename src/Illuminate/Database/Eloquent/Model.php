@@ -3067,6 +3067,34 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Get a subset of the attributes.
+     *
+     * @param array $keys
+     *
+     * @return array
+     */
+    public function only($keys = [])
+    {
+        $keys = is_array($keys) ? $keys : func_get_args();
+
+        return Arr::only($this->attributesToArray(), $keys);
+    }
+
+    /**
+     * Get all of the attributes except the specified keys.
+     *
+     * @param array $keys
+     *
+     * @return array
+     */
+    public function except($keys = [])
+    {
+        $keys = is_array($keys) ? $keys : func_get_args();
+
+        return Arr::except($this->attributesToArray(), $keys);
+    }
+
+    /**
      * Get all of the current attributes on the model.
      *
      * @return array
