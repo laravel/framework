@@ -987,11 +987,13 @@ class Builder
 
         $relationQuery = $relation->getQuery();
 
+        $whereBindings = Arr::get($relationQuery->getRawBindings(), 'where', []);
+
         // Here we have some relation query and the original relation. We need to copy over any
         // where clauses that the developer may have put in the relation definition function.
         // We need to remove any global scopes that the developer already removed as well.
         return $this->withoutGlobalScopes($removedScopes)->mergeWheres(
-            $relationQuery->wheres, $relationQuery->getBindings()
+            $relationQuery->wheres, $whereBindings
         );
     }
 
