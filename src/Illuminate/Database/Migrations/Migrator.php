@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Migrations;
 
+use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
@@ -159,7 +160,9 @@ class Migrator
             return $this->pretendToRun($migration, 'up');
         }
 
-        $migration->up();
+        $this->runMigration(function () use ($migration) {
+            $migration->up();
+        });
 
         // Once we have run a migrations class, we will log that it was run in this
         // repository so that we don't try to run it next time we do a migration
@@ -279,7 +282,9 @@ class Migrator
             return $this->pretendToRun($instance, 'down');
         }
 
-        $instance->down();
+        $this->runMigration(function () use ($instance) {
+            $instance->down();
+        });
 
         // Once we have successfully run the migration "down" we will remove it from
         // the migration repository so it will be considered to have not been run
@@ -354,6 +359,26 @@ class Migrator
         return $db->pretend(function () use ($migration, $method) {
             $migration->$method();
         });
+    }
+
+    /**
+     * Run a migration, inside a transaction if the database supports it.
+     *
+     * @param  \Closure  $callback
+     * @retrun void
+     */
+    protected function runMigration(Closure $callback)
+    {
+        // To deal with potential errors during migrations that may leave a database
+        // in an invalid state, we wrap everything in a transaction so all changes
+        // are rolled back, and the developer need not manually repair errors.
+        $connection = $this->resolveConnection($this->connection);
+
+        $grammar = $connection->getSchemaGrammar();
+
+        $grammar->supportsSchemaTransactions()
+            ? $connection->transaction($callback)
+            : $callback();
     }
 
     /**
