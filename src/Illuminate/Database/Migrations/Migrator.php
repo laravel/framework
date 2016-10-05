@@ -365,7 +365,7 @@ class Migrator
      * Run a migration, inside a transaction if the database supports it.
      *
      * @param  \Closure  $callback
-     * @retrun void
+     * @return void
      */
     protected function runMigration(Closure $callback)
     {
