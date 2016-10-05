@@ -704,23 +704,36 @@ trait InteractsWithPages
         $uploads = array_combine($names, $files);
 
         foreach ($uploads as $key => $file) {
-            // If key is in array format, parse into a nested array
             if (preg_match('/.*?(?:\[.*?\])+/', $key)) {
-                preg_match_all('/([^\[\]]+)/', $key, $key_parts);
-
-                $keys = array_reverse($key_parts[1]);
-                $new_key = array_pop($keys);
-
-                foreach ($keys as $k) {
-                    $file = array($k => $file);
-                }
-
-                $uploads[$new_key] = $file;
-                unset($uploads[$key]);
+                $this->prepareArrayBasedFileInput($uploads, $key, $file);
             }
         }
 
         return $uploads;
+    }
+
+    /**
+     * Store an array based file upload with the proper nested array structure.
+     *
+     * @param  array  $uploads
+     * @param  string  $key
+     * @param  mixed  $file
+     */
+    protected function prepareArrayBasedFileInput(&$uploads, $key, $file)
+    {
+        preg_match_all('/([^\[\]]+)/', $key, $segments);
+
+        $segments = array_reverse($segments[1]);
+
+        $newKey = array_pop($segments);
+
+        foreach ($segments as $segment) {
+            $file = [$segment => $file];
+        }
+
+        $uploads[$newKey] = $file;
+
+        unset($uploads[$key]);
     }
 
     /**
