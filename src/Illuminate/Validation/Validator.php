@@ -247,17 +247,22 @@ class Validator implements ValidatorContract
         }
 
         foreach ($data as $key => $value) {
-            $key = ($arrayKey) ? "$arrayKey.$key" : $key;
+            $new_key = ($arrayKey) ? "$arrayKey.$key" : $key;
 
             // If this value is an instance of the HttpFoundation File class we will
             // remove it from the data array and add it to the files array, which
             // we use to conveniently separate out these files from other data.
             if ($value instanceof File) {
-                $this->files[$key] = $value;
+                $this->files[$new_key] = $value;
 
                 unset($data[$key]);
             } elseif (is_array($value)) {
-                $this->hydrateFiles($value, $key);
+                if (! empty($value)) {
+                    $value = $this->hydrateFiles($value, $new_key);
+                    if (empty($value)) {
+                        unset($data[$key]);
+                    }
+                }
             }
         }
 
@@ -334,7 +339,10 @@ class Validator implements ValidatorContract
      */
     public function each($attribute, $rules)
     {
-        $data = Arr::dot($this->initializeAttributeOnData($attribute));
+        $data = array_merge(
+            Arr::dot($this->initializeAttributeOnData($attribute)),
+            $this->files
+        );
 
         $pattern = str_replace('\*', '[^\.]+', preg_quote($attribute));
 
