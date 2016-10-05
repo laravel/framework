@@ -870,11 +870,15 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * Filter the given array of files, removing any empty values.
      *
-     * @param  array  $files
+     * @param  mixed  $files
      * @return mixed
      */
     protected function filterFiles($files)
     {
+        if (! $files) {
+            return;
+        }
+
         foreach ($files as $key => $file) {
             if (is_array($file)) {
                 $files[$key] = $this->filterFiles($files[$key]);

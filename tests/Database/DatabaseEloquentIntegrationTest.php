@@ -555,6 +555,21 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('Grandparent Post', $results->first()->name);
     }
 
+    public function testHasWithNonWhereBindings()
+    {
+        $user = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+
+        $user->posts()->create(['name' => 'Post 2'])
+             ->photos()->create(['name' => 'photo.jpg']);
+
+        $query = EloquentTestUser::has('postWithPhotos');
+
+        $bindingsCount = count($query->getBindings());
+        $questionMarksCount = substr_count($query->toSql(), '?');
+
+        $this->assertEquals($questionMarksCount, $bindingsCount);
+    }
+
     public function testBelongsToManyRelationshipModelsAreProperlyHydratedOverChunkedRequest()
     {
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
@@ -970,6 +985,14 @@ class EloquentTestUser extends Eloquent
     public function photos()
     {
         return $this->morphMany('EloquentTestPhoto', 'imageable');
+    }
+
+    public function postWithPhotos()
+    {
+        return $this->post()->join('photo', function ($join) {
+            $join->on('photo.imageable_id', 'post.id');
+            $join->where('photo.imageable_type', 'EloquentTestPost');
+        });
     }
 }
 

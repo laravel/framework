@@ -391,14 +391,19 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
                 'name.*' => [
                     'required' => 'all are really required!',
                 ],
+                'lang.en' => [
+                    'required' => 'english is required!',
+                ],
             ],
         ]);
-        $v = new Validator($trans, ['name' => ['', '']], []);
+        $v = new Validator($trans, ['name' => ['', ''], 'lang' => ['en' => '']], []);
         $v->each('name', 'required|max:255');
+        $v->each('lang.*', 'required|max:255');
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
         $this->assertEquals('all are really required!', $v->messages()->first('name.0'));
         $this->assertEquals('all are really required!', $v->messages()->first('name.1'));
+        $this->assertEquals('english is required!', $v->messages()->first('lang.en'));
     }
 
     public function testValidationDotCustomDotAnythingCanBeTranslated()
@@ -552,6 +557,12 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $file = new File(__FILE__, false);
         $v = new Validator($trans, ['name' => $file], ['name' => 'Required']);
         $this->assertTrue($v->passes());
+
+        $file = new File(__FILE__, false);
+        $foo = new File(__FILE__, false);
+        $v = new Validator($trans, ['name' => [$file, $foo]], ['name.0' => 'Required', 'name.1' => 'Required']);
+        $this->assertTrue($v->passes());
+        $this->assertEmpty($v->getData());
     }
 
     public function testValidateRequiredWith()
@@ -2278,7 +2289,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => [['name' => 'first', 'title' => null]]], []);
         $v->sometimes('foo.*.name', 'Required|String', function ($i) {
-            return $i['foo'][0]['title'] === null;
+            return is_null($i['foo'][0]['title']);
         });
         $this->assertEquals(['foo.0.name' => ['Required', 'String']], $v->getRules());
     }
@@ -3192,6 +3203,42 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
             'name' => 'Carlos',
             'gender' => 'male',
         ]);
+    }
+
+    public function testFilesHydration()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $file = new File(__FILE__, false);
+        $v = new Validator($trans, ['file' => $file, 'text' => 'text'], ['text' => 'Required']);
+        $this->assertEquals(['file' => $file], $v->getFiles());
+        $this->assertEquals(['text' => 'text'], $v->getData());
+    }
+
+    public function testArrayOfFilesHydration()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $file = new File(__FILE__, false);
+        $file2 = new File(__FILE__, false);
+        $v = new Validator($trans, ['file' => [$file, $file2], 'text' => 'text'], ['text' => 'Required']);
+        $this->assertEquals(['file.0' => $file, 'file.1' => $file2], $v->getFiles());
+        $this->assertEquals(['text' => 'text'], $v->getData());
+    }
+
+    public function testMultipleFileUploads()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $file = new File(__FILE__, false);
+        $file2 = new File(__FILE__, false);
+        $v = new Validator($trans, ['file' => [$file, $file2]], ['file.*' => 'Required|mimes:xls']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testFileUploads()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $file = new File(__FILE__, false);
+        $v = new Validator($trans, ['file' => $file], ['file' => 'Required|mimes:xls']);
+        $this->assertFalse($v->passes());
     }
 
     protected function getTranslator()

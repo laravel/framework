@@ -189,7 +189,7 @@ abstract class Job
      */
     protected function getTime()
     {
-        return Carbon::now()->timestamp;
+        return Carbon::now()->getTimestamp();
     }
 
     /**
