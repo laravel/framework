@@ -939,6 +939,9 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
         $v = new Validator($trans, ['foo' => '123'], ['foo' => 'digits_between:4,5']);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => ['123']], ['foo' => 'digits_between:4,5']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateSize()
