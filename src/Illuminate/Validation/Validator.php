@@ -256,12 +256,9 @@ class Validator implements ValidatorContract
                 $this->files[$newKey] = $value;
 
                 unset($data[$key]);
-            } elseif (is_array($value)) {
-                if (! empty($value)) {
-                    if (empty($this->hydrateFiles($value, $newKey))) {
-                        unset($data[$key]);
-                    }
-                }
+            } elseif (is_array($value) && ! empty($value) &&
+                      empty($this->hydrateFiles($value, $newKey))) {
+                unset($data[$key]);
             }
         }
 
