@@ -135,7 +135,7 @@ class MakeAuthCommand extends Command
         $languageDirectory = __DIR__.'/stubs/make/resources/lang/';
         $supportedLanguageDirectoryPaths = glob($languageDirectory.'*', GLOB_ONLYDIR);
 
-        return array_map(function ($path) use ($languageDirectory, $supportedLanguageDirectoryPaths){
+        return array_map(function ($path) use ($languageDirectory, $supportedLanguageDirectoryPaths) {
             return str_replace($languageDirectory, '', $path);
         }, $supportedLanguageDirectoryPaths);
     }
