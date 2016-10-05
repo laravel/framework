@@ -1132,7 +1132,7 @@ class Validator implements ValidatorContract
     {
         $this->requireParameterCount(2, $parameters, 'digits_between');
 
-        if(! $this->validateNumeric($attribute, $value)){
+        if (! $this->validateNumeric($attribute, $value)){
             return false;
         }
 
