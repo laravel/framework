@@ -73,6 +73,37 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $this->assertFalse(Arr::exists(new Collection(['a' => null]), 'b'));
     }
 
+    public function testFilterRecursive()
+    {
+        $array = [
+            'foo' => [
+                'bar' => [
+                    'baz' => ['a', 'b', 'c'],
+                    'foo' => [
+                        'bar' => [],
+                        'baz' => '',
+                    ],
+                ],
+                'foo' => [],
+                'baz' => [true, false],
+            ],
+        ];
+
+        $expected = [
+            'foo' => [
+                'bar' => [
+                    'baz' => ['a', 'b', 'c'],
+                    'foo' => [],
+                ],
+                'baz' => [true],
+            ],
+        ];
+
+        $array = Arr::filterRecursive($array);
+
+        $this->assertEquals($expected, $array);
+    }
+
     public function testFirst()
     {
         $array = [100, 200, 300];

@@ -98,6 +98,19 @@ if (! function_exists('array_except')) {
     }
 }
 
+if (! function_exists('array_filter_recursive')) {
+    /**
+     * Recursively filter an array.
+     *
+     * @param  array  $array
+     * @param  callable|null  $callback
+     * @return array
+     */
+    function array_filter_recursive(array $array, callable $callback = null) {
+        return Arr::filterRecursive($array, $callback);
+    }
+}
+
 if (! function_exists('array_first')) {
     /**
      * Return the first element in an array passing a given truth test.
