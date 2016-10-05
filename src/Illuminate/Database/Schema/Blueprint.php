@@ -317,6 +317,16 @@ class Blueprint
     }
 
     /**
+     * Indicate that the soft delete column should be dropped.
+     *
+     * @return void
+     */
+    public function dropSoftDeletesTz()
+    {
+        $this->dropSoftDeletes();
+    }
+
+    /**
      * Indicate that the remember token column should be dropped.
      *
      * @return void
@@ -819,6 +829,16 @@ class Blueprint
     public function softDeletes()
     {
         return $this->timestamp('deleted_at')->nullable();
+    }
+
+    /**
+     * Add a "deleted at" timestampTz for the table.
+     *
+     * @return \Illuminate\Support\Fluent
+     */
+    public function softDeletesTz()
+    {
+        return $this->timestampTz('deleted_at')->nullable();
     }
 
     /**

@@ -640,7 +640,7 @@ class Event
     private function inTimeInterval($startTime, $endTime)
     {
         return function () use ($startTime, $endTime) {
-            $now = Carbon::now()->timestamp;
+            $now = Carbon::now()->getTimestamp();
 
             return $now >= strtotime($startTime) && $now <= strtotime($endTime);
         };

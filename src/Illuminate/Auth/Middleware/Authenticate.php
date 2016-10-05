@@ -63,6 +63,6 @@ class Authenticate
             }
         }
 
-        throw new AuthenticationException;
+        throw new AuthenticationException('Unauthenticated.', $guards);
     }
 }

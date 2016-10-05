@@ -40,7 +40,7 @@ class RedisStore extends TaggableStore implements Store
     {
         $this->redis = $redis;
         $this->setPrefix($prefix);
-        $this->connection = $connection;
+        $this->setConnection($connection);
     }
 
     /**
@@ -54,7 +54,7 @@ class RedisStore extends TaggableStore implements Store
         $value = $this->connection()->get($this->prefix.$key);
 
         if (! is_null($value) && $value !== false) {
-            return is_numeric($value) ? $value : unserialize($value);
+            return $this->unserialize($value);
         }
     }
 
@@ -77,7 +77,7 @@ class RedisStore extends TaggableStore implements Store
         $values = $this->connection()->mget($prefixedKeys);
 
         foreach ($values as $index => $value) {
-            $return[$keys[$index]] = is_numeric($value) ? $value : unserialize($value);
+            $return[$keys[$index]] = $this->unserialize($value);
         }
 
         return $return;
@@ -93,7 +93,7 @@ class RedisStore extends TaggableStore implements Store
      */
     public function put($key, $value, $minutes)
     {
-        $value = is_numeric($value) ? $value : serialize($value);
+        $value = $this->serialize($value);
 
         $this->connection()->setex($this->prefix.$key, (int) max(1, $minutes * 60), $value);
     }
@@ -149,9 +149,7 @@ class RedisStore extends TaggableStore implements Store
      */
     public function forever($key, $value)
     {
-        $value = is_numeric($value) ? $value : serialize($value);
-
-        $this->connection()->set($this->prefix.$key, $value);
+        $this->connection()->set($this->prefix.$key, $this->serialize($value));
     }
 
     /**
@@ -236,5 +234,27 @@ class RedisStore extends TaggableStore implements Store
     public function setPrefix($prefix)
     {
         $this->prefix = ! empty($prefix) ? $prefix.':' : '';
+    }
+
+    /**
+     * Serialize the value.
+     *
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function serialize($value)
+    {
+        return is_numeric($value) ? $value : serialize($value);
+    }
+
+    /**
+     * Unserialize the value.
+     *
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function unserialize($value)
+    {
+        return is_numeric($value) ? $value : unserialize($value);
     }
 }

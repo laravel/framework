@@ -5,9 +5,11 @@ namespace Illuminate\Foundation\Testing\Concerns;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Contracts\View\View;
 use PHPUnit_Framework_Assert as PHPUnit;
 use PHPUnit_Framework_ExpectationFailedException;
+use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 
 trait MakesHttpRequests
@@ -507,10 +509,12 @@ trait MakesHttpRequests
 
         $this->resetPageContext();
 
-        $request = Request::create(
+        $symfonyRequest = SymfonyRequest::create(
             $this->currentUri, $method, $parameters,
-            $cookies, $files, array_replace($this->serverVariables, $server), $content
+            $cookies, $this->filterFiles($files), array_replace($this->serverVariables, $server), $content
         );
+
+        $request = Request::createFromBase($symfonyRequest);
 
         $response = $kernel->handle($request);
 
@@ -619,6 +623,35 @@ trait MakesHttpRequests
         }
 
         return $server;
+    }
+
+    /**
+     * Filter the given array of files, removing any empty values.
+     *
+     * @param  array  $files
+     * @return mixed
+     */
+    protected function filterFiles($files)
+    {
+        foreach ($files as $key => $file) {
+            if ($file instanceof UploadedFile) {
+                continue;
+            }
+
+            if (is_array($file)) {
+                if (! isset($file['name'])) {
+                    $files[$key] = $this->filterFiles($files[$key]);
+                } elseif (isset($files[$key]['error']) && $files[$key]['error'] !== 0) {
+                    unset($files[$key]);
+                }
+
+                continue;
+            }
+
+            unset($files[$key]);
+        }
+
+        return $files;
     }
 
     /**

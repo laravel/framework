@@ -4,6 +4,7 @@ namespace Illuminate\Container;
 
 use Closure;
 use ArrayAccess;
+use LogicException;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionFunction;
@@ -224,10 +225,10 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function getClosure($abstract, $concrete)
     {
-        return function ($c, $parameters = []) use ($abstract, $concrete) {
+        return function ($container, $parameters = []) use ($abstract, $concrete) {
             $method = ($abstract == $concrete) ? 'build' : 'make';
 
-            return $c->$method($concrete, $parameters);
+            return $container->$method($concrete, $parameters);
         };
     }
 
@@ -904,7 +905,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function resolving($abstract, Closure $callback = null)
     {
-        if ($callback === null && $abstract instanceof Closure) {
+        if (is_null($callback) && $abstract instanceof Closure) {
             $this->resolvingCallback($abstract);
         } else {
             $this->resolvingCallbacks[$this->normalize($abstract)][] = $callback;
@@ -920,7 +921,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function afterResolving($abstract, Closure $callback = null)
     {
-        if ($abstract instanceof Closure && $callback === null) {
+        if ($abstract instanceof Closure && is_null($callback)) {
             $this->afterResolvingCallback($abstract);
         } else {
             $this->afterResolvingCallbacks[$this->normalize($abstract)][] = $callback;
@@ -1084,11 +1085,17 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @param  string  $abstract
      * @return string
+     *
+     * @throws \LogicException
      */
     public function getAlias($abstract)
     {
         if (! isset($this->aliases[$abstract])) {
             return $abstract;
+        }
+
+        if ($this->aliases[$abstract] === $abstract) {
+            throw new LogicException("[{$abstract}] is aliased to itself.");
         }
 
         return $this->getAlias($this->aliases[$abstract]);

@@ -8,9 +8,11 @@ use Illuminate\Support\Manager;
 use Nexmo\Client as NexmoClient;
 use Illuminate\Support\Collection;
 use GuzzleHttp\Client as HttpClient;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Bus\Dispatcher as Bus;
 use Nexmo\Client\Credentials\Basic as NexmoCredentials;
+use Illuminate\Database\Eloquent\Collection as ModelCollection;
 use Illuminate\Contracts\Notifications\Factory as FactoryContract;
 use Illuminate\Contracts\Notifications\Dispatcher as DispatcherContract;
 
@@ -32,9 +34,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      */
     public function send($notifiables, $notification)
     {
-        if (! $notifiables instanceof Collection && ! is_array($notifiables)) {
-            $notifiables = [$notifiables];
-        }
+        $notifiables = $this->formatNotifiables($notifiables);
 
         if ($notification instanceof ShouldQueue) {
             return $this->queueNotification($notifiables, $notification);
@@ -50,18 +50,16 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      * @param  mixed  $notification
      * @return void
      */
-    public function sendNow($notifiables, $notification)
+    public function sendNow($notifiables, $notification, array $channels = null)
     {
-        if (! $notifiables instanceof Collection && ! is_array($notifiables)) {
-            $notifiables = [$notifiables];
-        }
+        $notifiables = $this->formatNotifiables($notifiables);
 
         $original = clone $notification;
 
         foreach ($notifiables as $notifiable) {
             $notificationId = (string) Uuid::uuid4();
 
-            $channels = $notification->via($notifiable);
+            $channels = $channels ?: $notification->via($notifiable);
 
             if (empty($channels)) {
                 continue;
@@ -109,12 +107,36 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      */
     protected function queueNotification($notifiables, $notification)
     {
-        $this->app->make(Bus::class)->dispatch(
-            (new SendQueuedNotifications($notifiables, $notification))
-                    ->onConnection($notification->connection)
-                    ->onQueue($notification->queue)
-                    ->delay($notification->delay)
-        );
+        $notifiables = $this->formatNotifiables($notifiables);
+
+        $bus = $this->app->make(Bus::class);
+
+        foreach ($notifiables as $notifiable) {
+            foreach ($notification->via($notifiable) as $channel) {
+                $bus->dispatch(
+                    (new SendQueuedNotifications($notifiables, $notification, [$channel]))
+                            ->onConnection($notification->connection)
+                            ->onQueue($notification->queue)
+                            ->delay($notification->delay)
+                );
+            }
+        }
+    }
+
+    /**
+     * Format the notifiables into a Collection / array if necessary.
+     *
+     * @param  mixed  $notifiables
+     * @return ModelCollection|array
+     */
+    protected function formatNotifiables($notifiables)
+    {
+        if (! $notifiables instanceof Collection && ! is_array($notifiables)) {
+            return $notifiables instanceof Model
+                            ? new ModelCollection([$notifiables]) : [$notifiables];
+        }
+
+        return $notifiables;
     }
 
     /**

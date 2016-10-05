@@ -701,7 +701,39 @@ trait InteractsWithPages
                         : $file;
         }, $files, $names);
 
-        return array_combine($names, $files);
+        $uploads = array_combine($names, $files);
+
+        foreach ($uploads as $key => $file) {
+            if (preg_match('/.*?(?:\[.*?\])+/', $key)) {
+                $this->prepareArrayBasedFileInput($uploads, $key, $file);
+            }
+        }
+
+        return $uploads;
+    }
+
+    /**
+     * Store an array based file upload with the proper nested array structure.
+     *
+     * @param  array  $uploads
+     * @param  string  $key
+     * @param  mixed  $file
+     */
+    protected function prepareArrayBasedFileInput(&$uploads, $key, $file)
+    {
+        preg_match_all('/([^\[\]]+)/', $key, $segments);
+
+        $segments = array_reverse($segments[1]);
+
+        $newKey = array_pop($segments);
+
+        foreach ($segments as $segment) {
+            $file = [$segment => $file];
+        }
+
+        $uploads[$newKey] = $file;
+
+        unset($uploads[$key]);
     }
 
     /**

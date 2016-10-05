@@ -202,7 +202,7 @@ class QueueManager implements FactoryContract, MonitorContract
      */
     protected function getConfig($name)
     {
-        if ($name === null || $name === 'null') {
+        if (is_null($name) || $name === 'null') {
             return ['driver' => 'null'];
         }
 

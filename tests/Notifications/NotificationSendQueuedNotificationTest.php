@@ -13,7 +13,7 @@ class NotificationSendQueuedNotificationTest extends PHPUnit_Framework_TestCase
     {
         $job = new SendQueuedNotifications('notifiables', 'notification');
         $manager = Mockery::mock('Illuminate\Notifications\ChannelManager');
-        $manager->shouldReceive('sendNow')->once()->with('notifiables', 'notification');
+        $manager->shouldReceive('sendNow')->once()->with('notifiables', 'notification', null);
         $job->handle($manager);
     }
 }
