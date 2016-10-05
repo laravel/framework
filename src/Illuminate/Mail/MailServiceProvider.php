@@ -21,9 +21,9 @@ class MailServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('mailer', function ($app) {
-            $this->registerSwiftMailer();
+        $this->registerSwiftMailer();
 
+        $this->app->singleton('mailer', function ($app) {
             // Once we have create the mailer instance, we will set a container instance
             // on the mailer. This allows us to resolve mailer classes via containers
             // for maximum testability on said classes instead of passing Closures.

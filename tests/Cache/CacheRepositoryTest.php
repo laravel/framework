@@ -22,7 +22,9 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->andReturn(null);
         $this->assertEquals('bar', $repo->get('foo', 'bar'));
-        $this->assertEquals('baz', $repo->get('boom', function () { return 'baz'; }));
+        $this->assertEquals('baz', $repo->get('boom', function () {
+            return 'baz';
+        }));
     }
 
     public function testSettingDefaultCacheTime()
@@ -47,7 +49,9 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->andReturn(null);
         $repo->getStore()->shouldReceive('put')->once()->with('foo', 'bar', 10);
-        $result = $repo->remember('foo', 10, function () { return 'bar'; });
+        $result = $repo->remember('foo', 10, function () {
+            return 'bar';
+        });
         $this->assertEquals('bar', $result);
 
         /*
@@ -57,9 +61,13 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase
         $repo->getStore()->shouldReceive('get')->andReturn(null);
         $repo->getStore()->shouldReceive('put')->once()->with('foo', 'bar', 10);
         $repo->getStore()->shouldReceive('put')->once()->with('baz', 'qux', 9);
-        $result = $repo->remember('foo', Carbon::now()->addMinutes(10)->addSeconds(2), function () { return 'bar'; });
+        $result = $repo->remember('foo', Carbon::now()->addMinutes(10)->addSeconds(2), function () {
+            return 'bar';
+        });
         $this->assertEquals('bar', $result);
-        $result = $repo->remember('baz', Carbon::now()->addMinutes(10)->subSeconds(2), function () { return 'qux'; });
+        $result = $repo->remember('baz', Carbon::now()->addMinutes(10)->subSeconds(2), function () {
+            return 'qux';
+        });
         $this->assertEquals('qux', $result);
     }
 
@@ -68,7 +76,9 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->andReturn(null);
         $repo->getStore()->shouldReceive('forever')->once()->with('foo', 'bar');
-        $result = $repo->rememberForever('foo', function () { return 'bar'; });
+        $result = $repo->rememberForever('foo', function () {
+            return 'bar';
+        });
         $this->assertEquals('bar', $result);
     }
 
@@ -93,7 +103,9 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase
     public function testRegisterMacroWithNonStaticCall()
     {
         $repo = $this->getRepository();
-        $repo::macro(__CLASS__, function () { return 'Taylor'; });
+        $repo::macro(__CLASS__, function () {
+            return 'Taylor';
+        });
         $this->assertEquals($repo->{__CLASS__}(), 'Taylor');
     }
 

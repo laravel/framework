@@ -59,7 +59,7 @@ class ViewTest extends PHPUnit_Framework_TestCase
         }));
 
         $this->assertEquals('contents', $view->render(function () {
-            return; // null
+            //
         }));
     }
 

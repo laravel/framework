@@ -128,7 +128,7 @@ abstract class AbstractPaginator
         }
 
         return $this->path.'?'
-                        .urldecode(http_build_query($parameters, null, '&'))
+                        .http_build_query($parameters, '', '&')
                         .$this->buildFragment();
     }
 

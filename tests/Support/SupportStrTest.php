@@ -93,6 +93,12 @@ class SupportStrTest extends PHPUnit_Framework_TestCase
         $this->assertFalse(Str::is('/', '/a'));
         $this->assertTrue(Str::is('foo/*', 'foo/bar/baz'));
         $this->assertTrue(Str::is('*/foo', 'blah/baz/foo'));
+
+        $valueObject = new StringableObjectStub('foo/bar/baz');
+        $patternObject = new StringableObjectStub('foo/*');
+
+        $this->assertTrue(Str::is('foo/bar/baz', $valueObject));
+        $this->assertTrue(Str::is($patternObject, $valueObject));
     }
 
     public function testLower()
@@ -141,6 +147,9 @@ class SupportStrTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('laravel php framework', Str::snake('LaravelPhpFramework', ' '));
         $this->assertEquals('laravel_php_framework', Str::snake('Laravel Php Framework'));
         $this->assertEquals('laravel_php_framework', Str::snake('Laravel    Php      Framework   '));
+        // ensure cache keys don't overlap
+        $this->assertEquals('laravel__php__framework', Str::snake('LaravelPhpFramework', '__'));
+        $this->assertEquals('laravel_php_framework_', Str::snake('LaravelPhpFramework_', '_'));
     }
 
     public function testStudly()
@@ -180,5 +189,20 @@ class SupportStrTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('Laravel framework', Str::ucfirst('laravel framework'));
         $this->assertEquals('Мама', Str::ucfirst('мама'));
         $this->assertEquals('Мама мыла раму', Str::ucfirst('мама мыла раму'));
+    }
+}
+
+class StringableObjectStub
+{
+    private $value;
+
+    public function __construct($value)
+    {
+        $this->value = $value;
+    }
+
+    public function __toString()
+    {
+        return $this->value;
     }
 }

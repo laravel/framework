@@ -235,11 +235,11 @@ class FilesystemManager implements FactoryContract
      *
      * @param  \League\Flysystem\AdapterInterface  $adapter
      * @param  array  $config
-     * @return \Leage\Flysystem\FlysystemInterface
+     * @return \League\Flysystem\FlysystemInterface
      */
     protected function createFlysystem(AdapterInterface $adapter, array $config)
     {
-        $config = Arr::only($config, ['visibility']);
+        $config = Arr::only($config, ['visibility', 'disable_asserts']);
 
         return new Flysystem($adapter, count($config) > 0 ? $config : null);
     }

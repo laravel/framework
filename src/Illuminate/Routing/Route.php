@@ -261,7 +261,7 @@ class Route
      * Get or set the middlewares attached to the route.
      *
      * @param  array|string|null $middleware
-     * @return array
+     * @return $this|array
      */
     public function middleware($middleware = null)
     {
@@ -463,7 +463,6 @@ class Route
         if (isset($this->parameters)) {
             return array_map(function ($value) {
                 return is_string($value) ? rawurldecode($value) : $value;
-
             }, $this->parameters);
         }
 
@@ -610,6 +609,12 @@ class Route
     {
         foreach ($parameters as $key => &$value) {
             $value = isset($value) ? $value : Arr::get($this->defaults, $key);
+        }
+
+        foreach ($this->defaults as $key => $value) {
+            if (! isset($parameters[$key])) {
+                $parameters[$key] = $value;
+            }
         }
 
         return $parameters;

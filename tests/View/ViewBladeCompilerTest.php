@@ -17,11 +17,12 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($compiler->isExpired('foo'));
     }
 
-    public function testIsExpiredReturnsTrueIfCachePathIsNull()
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testCannotConstructWithBadCachePath()
     {
-        $compiler = new BladeCompiler($files = $this->getFiles(), null);
-        $files->shouldReceive('exists')->never();
-        $this->assertTrue($compiler->isExpired('foo'));
+        new BladeCompiler($this->getFiles(), null);
     }
 
     public function testIsExpiredReturnsTrueWhenModificationTimesWarrant()
@@ -73,14 +74,6 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase
         // trigger compilation with null $path
         $compiler->compile();
         $this->assertEquals('foo', $compiler->getPath());
-    }
-
-    public function testCompileDoesntStoreFilesWhenCachePathIsNull()
-    {
-        $compiler = new BladeCompiler($files = $this->getFiles(), null);
-        $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
-        $files->shouldReceive('put')->never();
-        $compiler->compile('foo');
     }
 
     public function testEchosAreCompiled()
@@ -207,6 +200,11 @@ this is a comment
 this is a comment
 */ ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
+
+        $string = sprintf('{{-- this is an %s long comment --}}', str_repeat('extremely ', 1000));
+        $expected = sprintf('<?php /* this is an %s long comment */ ?>', str_repeat('extremely ', 1000));
+
+        $this->assertEquals($expected, $compiler->compileString($string));
     }
 
     public function testIfStatementsAreCompiled()
@@ -227,7 +225,7 @@ breeze
         $string = '@can (\'update\', [$post])
 breeze
 @endcan';
-        $expected = '<?php if (Gate::check(\'update\', [$post])): ?>
+        $expected = '<?php if (app(\'Illuminate\\Contracts\\Auth\\Access\\Gate\')->check(\'update\', [$post])): ?>
 breeze
 <?php endif; ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
@@ -239,7 +237,7 @@ breeze
         $string = '@cannot (\'update\', [$post])
 breeze
 @endcannot';
-        $expected = '<?php if (Gate::denies(\'update\', [$post])): ?>
+        $expected = '<?php if (app(\'Illuminate\\Contracts\\Auth\\Access\\Gate\')->denies(\'update\', [$post])): ?>
 breeze
 <?php endif; ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
@@ -504,7 +502,9 @@ empty
     public function testCustomExtensionsAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $compiler->extend(function ($value) { return str_replace('foo', 'bar', $value); });
+        $compiler->extend(function ($value) {
+            return str_replace('foo', 'bar', $value);
+        });
         $this->assertEquals('bar', $compiler->compileString('foo'));
     }
 

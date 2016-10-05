@@ -71,7 +71,9 @@ class FoundationAuthorizesRequestsTraitTest extends PHPUnit_Framework_TestCase
         $container = new Container;
         Container::setInstance($container);
 
-        $gate = new Illuminate\Auth\Access\Gate($container, function () { return (object) ['id' => 1]; });
+        $gate = new Illuminate\Auth\Access\Gate($container, function () {
+            return (object) ['id' => 1];
+        });
         $container->instance(Gate::class, $gate);
 
         return $gate;
