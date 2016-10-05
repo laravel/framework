@@ -126,4 +126,38 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('http://website.com/test?page=1', $p->previousPageUrl());
     }
+
+    public function testSimplePaginatorUsesCustomToArrayResolver()
+    {
+        Paginator::toArrayResolver(function ($paginator) {
+            return [
+                'count' => $paginator->count(),
+                'data' => $paginator->getCollection()->toArray(),
+            ];
+        });
+
+        $p = new Paginator($array = ['item1', 'item2', 'item3'], 10);
+
+        $this->assertEquals([
+            'count' => 3,
+            'data' => ['item1', 'item2', 'item3'],
+        ], $p->toArray());
+    }
+
+    public function testLengthAwarePaginatorUsesCustomToArrayResolver()
+    {
+        Paginator::toArrayResolver(function ($paginator) {
+            return [
+                'count' => $paginator->count(),
+                'data' => $paginator->getCollection()->toArray(),
+            ];
+        });
+
+        $p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3'], 3, 10);
+
+        $this->assertEquals([
+            'count' => 3,
+            'data' => ['item1', 'item2', 'item3'],
+        ], $p->toArray());
+    }
 }
