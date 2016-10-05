@@ -103,7 +103,7 @@ class FactoryBuilder
     public function make(array $attributes = [])
     {
         if (! $this->amount) {
-            return new Collection([]);
+            return new Collection;
         }
 
         if ($this->amount === 1) {
