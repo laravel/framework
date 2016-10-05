@@ -11,10 +11,10 @@ return [
         'password_reset' => 'Forgot Your Password?',
         'register' => 'Register',
         'reset_password' => 'Reset Password',
-        'send_password_reset' => 'Send Password Reset Link'
+        'send_password_reset' => 'Send Password Reset Link',
     ],
     'home' => [
         'heading' => 'Dashboard',
-        'logged_in' => 'You are logged in!'
+        'logged_in' => 'You are logged in!',
     ]
 ];

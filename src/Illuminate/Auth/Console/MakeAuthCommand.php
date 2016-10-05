@@ -107,14 +107,14 @@ class MakeAuthCommand extends Command
     }
 
     /**
-     * Validate the language option
+     * Validate the language option.
      *
      * @param string $language
      */
     protected function checkIfLanguageIsSupported($language)
     {
         $supportedLanguages = $this->getSupportedLanguages();
-        if (!in_array($language, $supportedLanguages)) {
+        if (! in_array($language, $supportedLanguages)) {
             throw new InvalidArgumentException(
                 sprintf(
                     'Language %s is not supported. Supported languages: %s',
@@ -126,7 +126,7 @@ class MakeAuthCommand extends Command
     }
 
     /**
-     * Get a list of languages found in resources/lang folder
+     * Get a list of languages found in resources/lang folder.
      *
      * @return array
      */
@@ -135,7 +135,7 @@ class MakeAuthCommand extends Command
         $languageDirectory = __DIR__.'/stubs/make/resources/lang/';
         $supportedLanguageDirectoryPaths = glob($languageDirectory.'*', GLOB_ONLYDIR);
 
-        return array_map(function($path) use ($languageDirectory, $supportedLanguageDirectoryPaths){
+        return array_map(function ($path) use ($languageDirectory, $supportedLanguageDirectoryPaths){
             return str_replace($languageDirectory, '', $path);
         }, $supportedLanguageDirectoryPaths);
     }
@@ -151,10 +151,10 @@ class MakeAuthCommand extends Command
             mkdir(base_path('resources/lang/'.$language), 0755, true);
         }
 
-        if (!file_exists(base_path('resources/lang/' . $language . '/labels.php'))) {
+        if (! file_exists(base_path('resources/lang/'.$language.'/labels.php'))) {
             copy(
-                __DIR__.'/stubs/make/resources/lang/' . $language . '/labels.php',
-                base_path('resources/lang/' . $language . '/labels.php')
+                __DIR__.'/stubs/make/resources/lang/'.$language.'/labels.php',
+                base_path('resources/lang/'.$language.'/labels.php')
             );
         }
     }
