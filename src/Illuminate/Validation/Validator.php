@@ -247,7 +247,7 @@ class Validator implements ValidatorContract
         }
 
         foreach ($data as $key => $value) {
-            $newKey = ($arrayKey) ? "$arrayKey.$key" : $key;
+            $newKey = $arrayKey ? "$arrayKey.$key" : $key;
 
             // If this value is an instance of the HttpFoundation File class we will
             // remove it from the data array and add it to the files array, which
@@ -258,9 +258,7 @@ class Validator implements ValidatorContract
                 unset($data[$key]);
             } elseif (is_array($value)) {
                 if (! empty($value)) {
-                    $value = $this->hydrateFiles($value, $newKey);
-
-                    if (empty($value)) {
+                    if (empty($this->hydrateFiles($value, $newKey))) {
                         unset($data[$key]);
                     }
                 }
