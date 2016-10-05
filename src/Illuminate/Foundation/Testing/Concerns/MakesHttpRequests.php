@@ -10,6 +10,7 @@ use Illuminate\Contracts\View\View;
 use PHPUnit_Framework_Assert as PHPUnit;
 use PHPUnit_Framework_ExpectationFailedException;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
+use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 trait MakesHttpRequests
 {
@@ -508,10 +509,12 @@ trait MakesHttpRequests
 
         $this->resetPageContext();
 
-        $request = Request::create(
+        $symfonyRequest = SymfonyRequest::create(
             $this->currentUri, $method, $parameters,
             $cookies, $this->filterFiles($files), array_replace($this->serverVariables, $server), $content
         );
+
+        $request = Request::createFromBase($symfonyRequest);
 
         $response = $kernel->handle($request);
 
