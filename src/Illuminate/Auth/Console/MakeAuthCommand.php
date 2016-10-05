@@ -4,6 +4,7 @@ namespace Illuminate\Auth\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Console\AppNamespaceDetectorTrait;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 
 class MakeAuthCommand extends Command
 {
@@ -14,7 +15,7 @@ class MakeAuthCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'make:auth {--views : Only scaffold the authentication views}';
+    protected $signature = 'make:auth {--views : Only scaffold the authentication views} {--lang=en : The language of the labels}';
 
     /**
      * The console command description.
@@ -44,9 +45,15 @@ class MakeAuthCommand extends Command
      */
     public function fire()
     {
+        $language = strtolower($this->option('lang'));
+
+        $this->checkIfLanguageIsSupported($language);
+
         $this->createDirectories();
 
         $this->exportViews();
+
+        $this->exportLanguageFile($language);
 
         if (! $this->option('views')) {
             file_put_contents(
@@ -78,6 +85,10 @@ class MakeAuthCommand extends Command
         if (! is_dir(base_path('resources/views/auth/passwords'))) {
             mkdir(base_path('resources/views/auth/passwords'), 0755, true);
         }
+
+        if (! is_dir(base_path('resources/lang'))) {
+            mkdir(base_path('resources/lang'), 0755, true);
+        }
     }
 
     /**
@@ -91,6 +102,59 @@ class MakeAuthCommand extends Command
             copy(
                 __DIR__.'/stubs/make/views/'.$key,
                 base_path('resources/views/'.$value)
+            );
+        }
+    }
+
+    /**
+     * Validate the language option
+     *
+     * @param string $language
+     */
+    protected function checkIfLanguageIsSupported($language)
+    {
+        $supportedLanguages = $this->getSupportedLanguages();
+        if (!in_array($language, $supportedLanguages)) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Language %s is not supported. Supported languages: %s',
+                    $language,
+                    implode($supportedLanguages, ', ')
+                )
+            );
+        }
+    }
+
+    /**
+     * Get a list of languages found in resources/lang folder
+     *
+     * @return array
+     */
+    protected function getSupportedLanguages()
+    {
+        $languageDirectory = __DIR__.'/stubs/make/resources/lang/';
+        $supportedLanguageDirectoryPaths = glob($languageDirectory.'*', GLOB_ONLYDIR);
+
+        return array_map(function($path) use ($languageDirectory, $supportedLanguageDirectoryPaths){
+            return str_replace($languageDirectory, '', $path);
+        }, $supportedLanguageDirectoryPaths);
+    }
+
+    /**
+     * Export the language translation file for the specified language.
+     *
+     * @param string $language
+     */
+    protected function exportLanguageFile($language)
+    {
+        if (! is_dir(base_path('resources/lang/'.$language))) {
+            mkdir(base_path('resources/lang/'.$language), 0755, true);
+        }
+
+        if (!file_exists(base_path('resources/lang/' . $language . '/labels.php'))) {
+            copy(
+                __DIR__.'/stubs/make/resources/lang/' . $language . '/labels.php',
+                base_path('resources/lang/' . $language . '/labels.php')
             );
         }
     }
