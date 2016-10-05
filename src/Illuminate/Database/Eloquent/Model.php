@@ -3077,17 +3077,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $keys = is_array($keys) ? $keys : func_get_args();
 
-        $result = [];
-
-        foreach ($keys as $key) {
-            $value = $this->getAttribute($key);
-
-            if (! is_null($value)) {
-                $result[$key] = $value;
-            }
-        }
-
-        return $result;
+        return Arr::only($this->attributesToArray(), $keys);
     }
 
     /**
