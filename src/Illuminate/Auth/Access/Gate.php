@@ -312,9 +312,15 @@ class Gate implements GateContract
      */
     protected function resolveAuthCallback($user, $ability, array $arguments)
     {
-        if ($this->firstArgumentCorrespondsToPolicy($arguments)) {
-            return $this->resolvePolicyCallback($user, $ability, $arguments);
-        } elseif (isset($this->abilities[$ability])) {
+        if (isset($arguments[0])) {
+            $policy = $this->getPolicyFor($arguments[0]);
+
+            if ($policy !== null) {
+                return $this->resolvePolicyCallback($user, $ability, $arguments, $policy);
+            }
+        }
+
+        if (isset($this->abilities[$ability])) {
             return $this->abilities[$ability];
         } else {
             return function () {
@@ -324,42 +330,22 @@ class Gate implements GateContract
     }
 
     /**
-     * Determine if the first argument in the array corresponds to a policy.
-     *
-     * @param  array  $arguments
-     * @return bool
-     */
-    protected function firstArgumentCorrespondsToPolicy(array $arguments)
-    {
-        if (! isset($arguments[0])) {
-            return false;
-        }
-
-        if (is_object($arguments[0])) {
-            return isset($this->policies[get_class($arguments[0])]);
-        }
-
-        return is_string($arguments[0]) && isset($this->policies[$arguments[0]]);
-    }
-
-    /**
      * Resolve the callback for a policy check.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @param  string  $ability
      * @param  array  $arguments
+     * @param  mixed  $policy
      * @return callable
      */
-    protected function resolvePolicyCallback($user, $ability, array $arguments)
+    protected function resolvePolicyCallback($user, $ability, array $arguments, $policy)
     {
-        return function () use ($user, $ability, $arguments) {
-            $instance = $this->getPolicyFor($arguments[0]);
-
+        return function () use ($user, $ability, $arguments, $policy) {
             // If we receive a non-null result from the before method, we will return it
             // as the final result. This will allow developers to override the checks
             // in the policy to return a result for all rules defined in the class.
-            if (method_exists($instance, 'before')) {
-                if (! is_null($result = $instance->before($user, $ability, ...$arguments))) {
+            if (method_exists($policy, 'before')) {
+                if (! is_null($result = $policy->before($user, $ability, ...$arguments))) {
                     return $result;
                 }
             }
@@ -375,11 +361,11 @@ class Gate implements GateContract
                 array_shift($arguments);
             }
 
-            if (! is_callable([$instance, $ability])) {
+            if (! is_callable([$policy, $ability])) {
                 return false;
             }
 
-            return $instance->{$ability}($user, ...$arguments);
+            return $policy->{$ability}($user, ...$arguments);
         };
     }
 
@@ -388,8 +374,6 @@ class Gate implements GateContract
      *
      * @param  object|string  $class
      * @return mixed
-     *
-     * @throws \InvalidArgumentException
      */
     public function getPolicyFor($class)
     {
@@ -397,11 +381,15 @@ class Gate implements GateContract
             $class = get_class($class);
         }
 
-        if (! isset($this->policies[$class])) {
-            throw new InvalidArgumentException("Policy not defined for [{$class}].");
+        if (isset($this->policies[$class])) {
+            return $this->resolvePolicy($this->policies[$class]);
         }
 
-        return $this->resolvePolicy($this->policies[$class]);
+        foreach ($this->policies as $expected => $policy) {
+            if (is_subclass_of($class, $expected)) {
+                return $this->resolvePolicy($policy);
+            }
+        }
     }
 
     /**
