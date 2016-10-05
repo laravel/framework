@@ -24,11 +24,11 @@ class MemcachedStore extends TaggableStore implements Store
     protected $prefix;
 
     /**
-     * A flag indicating whether the Memcached version is >= 3.0.0
+     * Indicates whether we are using Memcached version >= 3.0.0.
      *
      * @var bool
      */
-    protected $memcached_version_3_0;
+    protected $onVersionThree;
 
     /**
      * Create a new Memcached store.
@@ -41,7 +41,9 @@ class MemcachedStore extends TaggableStore implements Store
     {
         $this->setPrefix($prefix);
         $this->memcached = $memcached;
-        $this->memcached_version_3_0 = (new ReflectionMethod('Memcached', 'getMulti'))->getNumberOfParameters() == 2;
+
+        $this->onVersionThree = (new ReflectionMethod('Memcached', 'getMulti'))
+                            ->getNumberOfParameters() == 2;
     }
 
     /**
@@ -73,10 +75,11 @@ class MemcachedStore extends TaggableStore implements Store
             return $this->prefix.$key;
         }, $keys);
 
-        if ($this->memcached_version_3_0) {
+        if ($this->onVersionThree) {
             $values = $this->memcached->getMulti($prefixedKeys, Memcached::GET_PRESERVE_ORDER);
         } else {
             $null = null;
+
             $values = $this->memcached->getMulti($prefixedKeys, $null, Memcached::GET_PRESERVE_ORDER);
         }
 
