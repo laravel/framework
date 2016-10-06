@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Log\LogServiceProvider;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Events\EventServiceProvider;
 use Illuminate\Routing\RoutingServiceProvider;
@@ -185,6 +186,8 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         $this->register(new EventServiceProvider($this));
 
         $this->register(new RoutingServiceProvider($this));
+
+        $this->register(new LogServiceProvider($this));
     }
 
     /**
