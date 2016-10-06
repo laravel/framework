@@ -43,6 +43,26 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['name' => 'taylor'], $model->getAttributes(['name', 'doesntexist']));
     }
 
+    public function testOnly()
+    {
+        $model = new EloquentModelStub(['foo' => '1', 'bar' => 2, 'baz' => 3]);
+
+        $this->assertEquals(['foo' => '1'], $model->only('foo'));
+        $this->assertEquals(['foo' => '1', 'bar' => 2], $model->only('foo', 'bar'));
+        $this->assertEquals(['foo' => '1', 'bar' => 2], $model->only(['foo', 'bar']));
+        $this->assertEquals(['foo' => '1', 'bar' => 2, 'baz' => 3], $model->only(['foo', 'bar', 'baz']));
+    }
+
+    public function testExcept()
+    {
+        $model = new EloquentModelStub(['foo' => '1', 'bar' => 2, 'baz' => 3]);
+
+        $this->assertEquals(['bar' => 2, 'baz' => 3], $model->except('foo'));
+        $this->assertEquals(['baz' => 3], $model->except('foo', 'bar'));
+        $this->assertEquals(['baz' => 3], $model->except(['foo', 'bar']));
+        $this->assertEquals([], $model->except(['foo', 'bar', 'baz']));
+    }
+
     public function testDirtyAttributes()
     {
         $model = new EloquentModelStub(['foo' => '1', 'bar' => 2, 'baz' => 3]);
