@@ -306,9 +306,11 @@ class Dispatcher implements DispatcherContract
                             ? $this->listeners[$eventName] : [];
 
         if (class_exists($eventName, false)) {
-            foreach (class_implements($eventName) as $interface) {
-                if (isset($this->listeners[$interface])) {
-                    $listeners = array_merge_recursive($listeners, $this->listeners[$interface]);
+            $abstractTypes = array_merge(class_implements($eventName), class_parents($eventName));
+
+            foreach ($abstractTypes as $abstractType) {
+                if (isset($this->listeners[$abstractType])) {
+                    $listeners = array_merge_recursive($listeners, $this->listeners[$abstractType]);
                 }
             }
         }

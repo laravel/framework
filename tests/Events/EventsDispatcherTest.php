@@ -220,6 +220,34 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase
         $this->assertSame('fooo', $_SERVER['__event.test1']);
         $this->assertSame('baar', $_SERVER['__event.test2']);
     }
+
+    public function testAbstractClassesWork()
+    {
+        unset($_SERVER['__event.test']);
+        $d = new Dispatcher;
+        $d->listen('SomeAbstractClass', function () {
+            $_SERVER['__event.test'] = 'bar';
+        });
+        $d->fire(new ExampleConcreteEvent);
+
+        $this->assertSame('bar', $_SERVER['__event.test']);
+    }
+
+    public function testBothClassesAndAbstractClassesWork()
+    {
+        unset($_SERVER['__event.test1'], $_SERVER['__event.test2']);
+        $d = new Dispatcher;
+        $d->listen('ExampleConcreteEvent', function () {
+            $_SERVER['__event.test1'] = 'fooo';
+        });
+        $d->listen('SomeAbstractClass', function () {
+            $_SERVER['__event.test2'] = 'baar';
+        });
+        $d->fire(new ExampleConcreteEvent);
+
+        $this->assertSame('fooo', $_SERVER['__event.test1']);
+        $this->assertSame('baar', $_SERVER['__event.test2']);
+    }
 }
 
 class TestDispatcherQueuedHandler implements Illuminate\Contracts\Queue\ShouldQueue
@@ -252,6 +280,16 @@ interface SomeEventInterface
 }
 
 class AnotherEvent implements SomeEventInterface
+{
+    //
+}
+
+abstract class SomeAbstractClass
+{
+    //
+}
+
+class ExampleConcreteEvent extends SomeAbstractClass
 {
     //
 }
