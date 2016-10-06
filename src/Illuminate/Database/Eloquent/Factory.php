@@ -90,7 +90,7 @@ class Factory implements ArrayAccess
      */
     public function state($class, $state, callable $attributes)
     {
-        $this->modifiers[$class][$state] = $attributes;
+        $this->states[$class][$state] = $attributes;
     }
 
     /**
@@ -199,7 +199,7 @@ class Factory implements ArrayAccess
      */
     public function of($class, $name = 'default')
     {
-        return new FactoryBuilder($class, $name, $this->definitions, $this->faker, $this->states);
+        return new FactoryBuilder($class, $name, $this->definitions, $this->states, $this->faker);
     }
 
     /**
