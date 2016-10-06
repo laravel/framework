@@ -131,7 +131,7 @@ class FactoryBuilder
      */
     public function make(array $attributes = [])
     {
-        if (! $this->amount) {
+        if ($this->amount < 1) {
             return new Collection;
         }
 
