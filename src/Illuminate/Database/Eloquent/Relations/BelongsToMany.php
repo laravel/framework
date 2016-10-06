@@ -374,7 +374,7 @@ class BelongsToMany extends Relation
     {
         $query->select($columns);
 
-        $query->from($this->related->getTable().' as '.$hash = $this->getRelationCountHash());
+        $query->from($this->related->getTable().' '.$hash = $this->getRelationCountHash());
 
         $this->related->setTable($hash);
 
