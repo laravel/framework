@@ -1,5 +1,20 @@
 # Release Notes for 5.3.x
 
+## v5.3.17 (2016-10-06)
+
+### Added
+- Added model factory "states" ([#14241](https://github.com/laravel/framework/pull/14241))
+
+### Changed
+- `Collection::only()` now returns all items if `$keys` is `null` ([#15695](https://github.com/laravel/framework/pull/15695))
+
+### Fixed
+- Added workaround for Memcached 3 on PHP7 when using `many()` ([#15739](https://github.com/laravel/framework/pull/15739))
+- Fixed bug in `Validator::hydrateFiles()` when removing the files array ([#15663](https://github.com/laravel/framework/pull/15663))
+- Fixed model factory bug when `$amount` is zero ([#15764](https://github.com/laravel/framework/pull/15764), [#15779](https://github.com/laravel/framework/pull/15779))
+- Prevent multiple notifications getting sent out when using the `Notification` facade ([#15789](https://github.com/laravel/framework/pull/15789))
+
+
 ## v5.3.16 (2016-10-04)
 
 ### Added
