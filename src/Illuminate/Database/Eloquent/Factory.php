@@ -34,11 +34,11 @@ class Factory implements ArrayAccess
     protected $definitions = [];
 
     /**
-     * The model modifiers in the container.
+     * The registered model states.
      *
      * @var array
      */
-    protected $modifiers = [];
+    protected $states = [];
 
     /**
      * Create a new factory container.
@@ -81,16 +81,16 @@ class Factory implements ArrayAccess
     }
 
     /**
-     * Define a modifier with a given set of attributes.
+     * Define a state with a given set of attributes.
      *
      * @param  string  $class
-     * @param  string  $name
+     * @param  string  $state
      * @param  callable  $attributes
      * @return void
      */
-    public function defineModifier($class, $name, callable $attributes)
+    public function state($class, $state, callable $attributes)
     {
-        $this->modifiers[$class][$name] = $attributes;
+        $this->modifiers[$class][$state] = $attributes;
     }
 
     /**
@@ -199,7 +199,7 @@ class Factory implements ArrayAccess
      */
     public function of($class, $name = 'default')
     {
-        return new FactoryBuilder($class, $name, $this->definitions, $this->faker, $this->modifiers);
+        return new FactoryBuilder($class, $name, $this->definitions, $this->faker, $this->states);
     }
 
     /**

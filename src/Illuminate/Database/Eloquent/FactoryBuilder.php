@@ -16,13 +16,6 @@ class FactoryBuilder
     protected $definitions;
 
     /**
-     * The model modifiers in the container.
-     *
-     * @var array
-     */
-    protected $modifiers;
-
-    /**
      * The model being built.
      *
      * @var string
@@ -44,11 +37,18 @@ class FactoryBuilder
     protected $amount = 1;
 
     /**
-     * The modifiers to apply.
+     * The model states.
      *
      * @var array
      */
-    protected $activeModifiers = [];
+    protected $states;
+
+    /**
+     * The states to apply.
+     *
+     * @var array
+     */
+    protected $activeStates = [];
 
     /**
      * The Faker instance for the builder.
@@ -63,17 +63,17 @@ class FactoryBuilder
      * @param  string  $class
      * @param  string  $name
      * @param  array  $definitions
+     * @param  array  $states
      * @param  \Faker\Generator  $faker
-     * @param  array  $modifiers
      * @return void
      */
-    public function __construct($class, $name, array $definitions, Faker $faker, array $modifiers)
+    public function __construct($class, $name, array $definitions, array $states, Faker $faker)
     {
         $this->name = $name;
         $this->class = $class;
         $this->faker = $faker;
+        $this->states = $states;
         $this->definitions = $definitions;
-        $this->modifiers = $modifiers;
     }
 
     /**
@@ -90,18 +90,14 @@ class FactoryBuilder
     }
 
     /**
-     * Set the active modifiers.
+     * Set the states to be applied to the model.
      *
-     * @param  array|string  $modifiers
+     * @param  array|dynamic  $states
      * @return $this
      */
-    public function modifiers($modifiers)
+    public function states($states)
     {
-        if(is_string($modifiers)){
-            $modifiers = [$modifiers];
-        }
-
-        $this->activeModifiers = $modifiers;
+        $this->activeStates = is_array($states) ? $states : func_get_args();
 
         return $this;
     }
@@ -168,25 +164,33 @@ class FactoryBuilder
                 $this->faker, $attributes
             );
 
-            foreach($this->activeModifiers as $activeModifier){
-                if( ! isset($this->modifiers[$this->class][$activeModifier])) {
-                    throw new InvalidArgumentException("Unable to locate factory modifier with name [{$activeModifier}] [{$this->class}].");
-                }
+            return new $this->class($this->callClosureAttributes(
+                array_merge($this->applyStates($definition, $attributes), $attributes)
+            ));
+        });
+    }
 
-                $modifier = call_user_func(
-                    $this->modifiers[$this->class][$activeModifier],
-                    $this->faker, $attributes
-                );
-
-                $definition = array_merge($definition, $modifier);
+    /**
+     * Apply the active states to the model definition array.
+     *
+     * @param  array  $definition
+     * @param  array  $attributes
+     * @return array
+     */
+    protected function applyStates(array $definition, array $attributes = [])
+    {
+        foreach ($this->activeStates as $state) {
+            if (! isset($this->states[$this->class][$state])) {
+                throw new InvalidArgumentException("Unable to locate [{$state}] state for [{$this->class}].");
             }
 
-            $evaluated = $this->callClosureAttributes(
-                array_merge($definition, $attributes)
-            );
+            $definition = array_merge($definition, call_user_func(
+                $this->states[$this->class][$state],
+                $this->faker, $attributes
+            ));
+        }
 
-            return new $this->class($evaluated);
-        });
+        return $definition;
     }
 
     /**
