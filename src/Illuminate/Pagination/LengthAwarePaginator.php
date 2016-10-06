@@ -153,7 +153,9 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
         return [
             'total' => $this->total(),
             'per_page' => $this->perPage(),
+            'pre_page' => $this->currentPage() == 1 ? null : $this->currentPage() - 1,
             'current_page' => $this->currentPage(),
+            'next_page' => $this->currentPage() == $this->lastPage() ? null : $this->currentPage() + 1,
             'last_page' => $this->lastPage(),
             'next_page_url' => $this->nextPageUrl(),
             'prev_page_url' => $this->previousPageUrl(),
