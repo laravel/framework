@@ -29,7 +29,7 @@ class LogServiceProvider extends ServiceProvider
     public function createLogger($app)
     {
         $log = new Writer(
-            new Monolog($app->environment()), $app['events']
+            new Monolog($app->bound('env') ? $app->environment() : 'production'), $app['events']
         );
 
         if ($app->hasMonologConfigurator()) {
@@ -52,7 +52,13 @@ class LogServiceProvider extends ServiceProvider
      */
     protected function configureHandlers(Application $app, Writer $log)
     {
-        $method = 'configure'.ucfirst($app['config']['app.log']).'Handler';
+        if ($this->app->bound('config')) {
+            $handler = $this->app->make('config')->get('app.log');
+        } else {
+            $handler = 'single';
+        }
+
+        $method = 'configure'.ucfirst($handler).'Handler';
 
         $this->{$method}($app, $log);
     }
@@ -68,7 +74,7 @@ class LogServiceProvider extends ServiceProvider
     {
         $log->useFiles(
             $app->storagePath().'/logs/laravel.log',
-            $app->make('config')->get('app.log_level', 'debug')
+            $this->logLevel()
         );
     }
 
@@ -81,13 +87,9 @@ class LogServiceProvider extends ServiceProvider
      */
     protected function configureDailyHandler(Application $app, Writer $log)
     {
-        $config = $app->make('config');
-
-        $maxFiles = $config->get('app.log_max_files');
-
         $log->useDailyFiles(
-            $app->storagePath().'/logs/laravel.log', is_null($maxFiles) ? 5 : $maxFiles,
-            $config->get('app.log_level', 'debug')
+            $app->storagePath().'/logs/laravel.log', $this->maxFiles(),
+            $this->logLevel()
         );
     }
 
@@ -100,10 +102,7 @@ class LogServiceProvider extends ServiceProvider
      */
     protected function configureSyslogHandler(Application $app, Writer $log)
     {
-        $log->useSyslog(
-            'laravel',
-            $app->make('config')->get('app.log_level', 'debug')
-        );
+        $log->useSyslog('laravel', $this->logLevel());
     }
 
     /**
@@ -115,6 +114,34 @@ class LogServiceProvider extends ServiceProvider
      */
     protected function configureErrorlogHandler(Application $app, Writer $log)
     {
-        $log->useErrorLog($app->make('config')->get('app.log_level', 'debug'));
+        $log->useErrorLog($this->logLevel());
+    }
+
+    /**
+     * Get the log level for the application.
+     *
+     * @return string
+     */
+    protected function logLevel()
+    {
+        if ($this->app->bound('config')) {
+            return $this->app->make('config')->get('app.log_level');
+        }
+
+        return 'debug';
+    }
+
+    /**
+     * Get the maximum number of log files for the application.
+     *
+     * @return int
+     */
+    protected function maxFiles()
+    {
+        if ($this->app->bound('config')) {
+            return $this->app->make('config')->get('app.log_max_files', 5);
+        }
+
+        return 0;
     }
 }

@@ -141,15 +141,15 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function __construct($basePath = null)
     {
+        if ($basePath) {
+            $this->setBasePath($basePath);
+        }
+
         $this->registerBaseBindings();
 
         $this->registerBaseServiceProviders();
 
         $this->registerCoreContainerAliases();
-
-        if ($basePath) {
-            $this->setBasePath($basePath);
-        }
     }
 
     /**
@@ -185,9 +185,9 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     {
         $this->register(new EventServiceProvider($this));
 
-        $this->register(new RoutingServiceProvider($this));
-
         $this->register(new LogServiceProvider($this));
+
+        $this->register(new RoutingServiceProvider($this));
     }
 
     /**
