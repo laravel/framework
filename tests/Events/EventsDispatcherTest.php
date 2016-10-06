@@ -207,7 +207,7 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase
 
     public function testBothClassesAndInterfacesWork()
     {
-        unset($_SERVER['__event.test']);
+        unset($_SERVER['__event.test1'], $_SERVER['__event.test2']);
         $d = new Dispatcher;
         $d->listen('AnotherEvent', function () {
             $_SERVER['__event.test1'] = 'fooo';
