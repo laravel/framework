@@ -148,14 +148,14 @@ class MakeAuthCommand extends Command
      */
     protected function exportTranslationFile($locale)
     {
-        if (!is_dir(base_path('resources/lang/' . $locale))) {
-            mkdir(base_path('resources/lang/' . $locale), 0755, true);
+        if (! is_dir(base_path('resources/lang/'.$locale))) {
+            mkdir(base_path('resources/lang/'.$locale), 0755, true);
         }
 
-        if (!file_exists(base_path('resources/lang/' . $locale . '/labels.php'))) {
+        if (! file_exists(base_path('resources/lang/'.$locale.'/labels.php'))) {
             copy(
-                __DIR__ . '/stubs/make/resources/lang/' . $locale . '/labels.php',
-                base_path('resources/lang/' . $locale . '/labels.php')
+                __DIR__.'/stubs/make/resources/lang/'.$locale.'/labels.php',
+                base_path('resources/lang/'.$locale.'/labels.php')
             );
         }
     }
