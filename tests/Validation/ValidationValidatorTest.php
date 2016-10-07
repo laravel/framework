@@ -1426,7 +1426,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, [['email' => 'foo', 'type' => 'bar']], [
-            '*.email' => 'unique:users', '*.type' => 'exists:user_types'
+            '*.email' => 'unique:users', '*.type' => 'exists:user_types',
         ]);
         $mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
         $mock->shouldReceive('setConnection')->twice()->with(null);
@@ -1437,7 +1437,8 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
 
         $trans = $this->getIlluminateArrayTranslator();
-        $closure = function () {};
+        $closure = function () {
+        };
         $v = new Validator($trans, [['email' => 'foo', 'type' => 'bar']], [
             '*.email' => (new Unique('users'))->where($closure),
             '*.type' => (new Exists('user_types'))->where($closure),
