@@ -31,18 +31,6 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(json_encode(['name' => 'taylor']), $attributes['list_items']);
     }
 
-    public function testGetMultipleAttributes()
-    {
-        $model = new EloquentModelStub(['name' => 'taylor', 'framework' => 'laravel', 'foo' => 'bar']);
-
-        $this->assertEquals(['name' => 'taylor', 'foo' => 'bar'], $model->getAttributes('name', 'foo'));
-        $this->assertEquals(['name' => 'taylor', 'foo' => 'bar'], $model->getAttributes(['name', 'foo']));
-        $this->assertEquals(['name' => 'taylor'], $model->getAttributes('name'));
-        $this->assertEquals(['name' => 'taylor'], $model->getAttributes(['name']));
-
-        $this->assertEquals(['name' => 'taylor'], $model->getAttributes(['name', 'doesntexist']));
-    }
-
     public function testDirtyAttributes()
     {
         $model = new EloquentModelStub(['foo' => '1', 'bar' => 2, 'baz' => 3]);
