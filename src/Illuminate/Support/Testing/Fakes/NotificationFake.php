@@ -58,19 +58,25 @@ class NotificationFake implements NotificationFactory
      */
     public function sent($notifiable, $notification, $callback = null)
     {
-        if (! $this->hasSent($notifiable, $notification)) {
-            return collect();
+        if (!is_array($notifiable ) && !($notifiable instanceof \IteratorAggregate)) {
+            $notifiable = [$notifiable];
         }
 
-        $callback = $callback ?: function () {
-            return true;
-        };
+        return collect($notifiable)->flatMap(function($notifiableItem) use ($notification, $callback) {
+            if (!$this->hasSent($notifiableItem, $notification)) {
+                return collect();
+            }
 
-        $notifications = collect($this->notificationsFor($notifiable, $notification));
+            $callback = $callback ?: function () {
+                return true;
+            };
 
-        return $notifications->filter(function ($arguments) use ($callback) {
-            return $callback(...array_values($arguments));
-        })->pluck('notification');
+            $notifications = collect($this->notificationsFor($notifiableItem, $notification));
+
+            return $notifications->filter(function ($arguments) use ($callback) {
+                return $callback(...array_values($arguments));
+            })->pluck('notification');
+        });
     }
 
     /**
