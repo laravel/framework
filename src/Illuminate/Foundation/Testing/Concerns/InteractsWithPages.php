@@ -51,7 +51,7 @@ trait InteractsWithPages
     protected $uploads = [];
 
     /**
-     * Disabled validation fields array
+     * Disabled validation fields array.
      *
      * @var array
      */
@@ -656,11 +656,11 @@ trait InteractsWithPages
      */
     private function disableValidationOn($form)
     {
-        if (!is_array($this->disabledValidationFields)) {
+        if (! is_array($this->disabledValidationFields)) {
             return;
         }
 
-        foreach($this->disabledValidationFields as $field)
+        foreach ($this->disabledValidationFields as $field)
         {
             $form->get($field)->disableValidation();
         }
