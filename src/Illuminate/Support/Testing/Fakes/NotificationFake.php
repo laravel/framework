@@ -58,12 +58,12 @@ class NotificationFake implements NotificationFactory
      */
     public function sent($notifiable, $notification, $callback = null)
     {
-        if (!is_array($notifiable ) && !($notifiable instanceof \IteratorAggregate)) {
+        if (! is_array($notifiable) && ! ($notifiable instanceof \IteratorAggregate)) {
             $notifiable = [$notifiable];
         }
 
-        return collect($notifiable)->flatMap(function($notifiableItem) use ($notification, $callback) {
-            if (!$this->hasSent($notifiableItem, $notification)) {
+        return collect($notifiable)->flatMap(function ($notifiableItem) use ($notification, $callback) {
+            if (! $this->hasSent($notifiableItem, $notification)) {
                 return collect();
             }
 
