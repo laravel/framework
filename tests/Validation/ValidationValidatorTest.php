@@ -3,6 +3,8 @@
 use Mockery as m;
 use Carbon\Carbon;
 use Illuminate\Validation\Validator;
+use Illuminate\Validation\Rules\Unique;
+use Illuminate\Validation\Rules\Exists;
 use Symfony\Component\HttpFoundation\File\File;
 
 class ValidationValidatorTest extends PHPUnit_Framework_TestCase
@@ -1420,17 +1422,31 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
     }
 
-    /**
-     * @group testing
-     */
     public function testValidateUniqueAndExistsSendsCorrectFieldNameToDBWithArrays()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, [['email' => 'foo', 'type' => 'bar']], ['*.email' => 'unique:users', '*.type' => 'exists:user_types']);
+        $v = new Validator($trans, [['email' => 'foo', 'type' => 'bar']], [
+            '*.email' => 'unique:users', '*.type' => 'exists:user_types',
+        ]);
         $mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
         $mock->shouldReceive('setConnection')->twice()->with(null);
         $mock->shouldReceive('getCount')->with('users', 'email', 'foo', null, null, [])->andReturn(0);
         $mock->shouldReceive('getCount')->with('user_types', 'type', 'bar', null, null, [])->andReturn(1);
+        $v->setPresenceVerifier($mock);
+        $this->assertTrue($v->passes());
+
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $closure = function () {
+        };
+        $v = new Validator($trans, [['email' => 'foo', 'type' => 'bar']], [
+            '*.email' => (new Unique('users'))->where($closure),
+            '*.type' => (new Exists('user_types'))->where($closure),
+        ]);
+        $mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+        $mock->shouldReceive('setConnection')->twice()->with(null);
+        $mock->shouldReceive('getCount')->with('users', 'email', 'foo', null, 'id', [$closure])->andReturn(0);
+        $mock->shouldReceive('getCount')->with('user_types', 'type', 'bar', null, null, [$closure])->andReturn(1);
         $v->setPresenceVerifier($mock);
         $this->assertTrue($v->passes());
     }
