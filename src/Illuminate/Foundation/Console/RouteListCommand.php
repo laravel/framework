@@ -138,15 +138,9 @@ class RouteListCommand extends Command
      */
     protected function getMiddleware($route)
     {
-        $middlewares = $route->gatherMiddleware();
-
-        foreach ($middlewares as $i => $middleware) {
-            if ($middleware instanceof Closure) {
-                $middlewares[$i] = 'Closure';
-            }
-        }
-
-        return implode(',', $middlewares);
+        return collect($route->gatherMiddleware())->map(function ($middleware) {
+            return $middleware instanceof Closure ? 'Closure' : $middleware;
+        })->implode(',');
     }
 
     /**
