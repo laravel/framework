@@ -282,7 +282,7 @@ class Validator implements ValidatorContract
                 if (is_string($rule)) {
                     $rules[$key] = explode('|', $rule);
                 } elseif (is_object($rule)) {
-                    $rules[$key] = (string) $rule;
+                    $rules[$key] = [$rule];
                 } else {
                     $rules[$key] = $rule;
                 }
