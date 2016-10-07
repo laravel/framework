@@ -660,8 +660,7 @@ trait InteractsWithPages
             return;
         }
 
-        foreach ($this->disabledValidationFields as $field)
-        {
+        foreach ($this->disabledValidationFields as $field) {
             $form->get($field)->disableValidation();
         }
 
