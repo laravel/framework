@@ -4,7 +4,7 @@ namespace Illuminate\Auth\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Console\AppNamespaceDetectorTrait;
-use Symfony\Component\Console\Exception\InvalidArgumentException;
+use InvalidArgumentException;
 
 class MakeAuthCommand extends Command
 {
@@ -15,7 +15,8 @@ class MakeAuthCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'make:auth {--views : Only scaffold the authentication views} {--lang=en : The language of the labels}';
+    protected $signature = 'make:auth {--views : Only scaffold the authentication views}
+        {--locale= : The locale of the translation labels}';
 
     /**
      * The console command description.
@@ -45,15 +46,15 @@ class MakeAuthCommand extends Command
      */
     public function fire()
     {
-        $language = strtolower($this->option('lang'));
+        $locale = strtolower($this->option('locale') ?: app()->getLocale());
 
-        $this->checkIfLanguageIsSupported($language);
+        $this->checkIfLocaleIsSupported($locale);
 
         $this->createDirectories();
 
         $this->exportViews();
 
-        $this->exportLanguageFile($language);
+        $this->exportTranslationFile($locale);
 
         if (! $this->option('views')) {
             file_put_contents(
@@ -107,54 +108,54 @@ class MakeAuthCommand extends Command
     }
 
     /**
-     * Validate the language option.
+     * Validate the locale option.
      *
-     * @param string $language
+     * @param string $locale
      */
-    protected function checkIfLanguageIsSupported($language)
+    protected function checkIfLocaleIsSupported($locale)
     {
-        $supportedLanguages = $this->getSupportedLanguages();
-        if (! in_array($language, $supportedLanguages)) {
+        $supportedLocales = $this->getSupportedLocales();
+        if (! in_array($locale, $supportedLocales)) {
             throw new InvalidArgumentException(
                 sprintf(
-                    'Language %s is not supported. Supported languages: %s',
-                    $language,
-                    implode($supportedLanguages, ', ')
+                    'Locale %s is not supported. Supported locales: %s',
+                    $locale,
+                    implode($supportedLocales, ', ')
                 )
             );
         }
     }
 
     /**
-     * Get a list of languages found in resources/lang folder.
+     * Get a list of locales found in resources/lang folder.
      *
      * @return array
      */
-    protected function getSupportedLanguages()
+    protected function getSupportedLocales()
     {
-        $languageDirectory = __DIR__.'/stubs/make/resources/lang/';
-        $supportedLanguageDirectoryPaths = glob($languageDirectory.'*', GLOB_ONLYDIR);
+        $localesDirectory = __DIR__.'/stubs/make/resources/lang/';
+        $supportedLocalesDirectoryPaths = glob($localesDirectory.'*', GLOB_ONLYDIR);
 
-        return array_map(function ($path) use ($languageDirectory, $supportedLanguageDirectoryPaths) {
-            return str_replace($languageDirectory, '', $path);
-        }, $supportedLanguageDirectoryPaths);
+        return array_map(function ($path) use ($localesDirectory, $supportedLocalesDirectoryPaths) {
+            return str_replace($localesDirectory, '', $path);
+        }, $supportedLocalesDirectoryPaths);
     }
 
     /**
-     * Export the language translation file for the specified language.
+     * Export the language translation file for the specified locale.
      *
-     * @param string $language
+     * @param string $locale
      */
-    protected function exportLanguageFile($language)
+    protected function exportTranslationFile($locale)
     {
-        if (! is_dir(base_path('resources/lang/'.$language))) {
-            mkdir(base_path('resources/lang/'.$language), 0755, true);
+        if (!is_dir(base_path('resources/lang/' . $locale))) {
+            mkdir(base_path('resources/lang/' . $locale), 0755, true);
         }
 
-        if (! file_exists(base_path('resources/lang/'.$language.'/labels.php'))) {
+        if (!file_exists(base_path('resources/lang/' . $locale . '/labels.php'))) {
             copy(
-                __DIR__.'/stubs/make/resources/lang/'.$language.'/labels.php',
-                base_path('resources/lang/'.$language.'/labels.php')
+                __DIR__ . '/stubs/make/resources/lang/' . $locale . '/labels.php',
+                base_path('resources/lang/' . $locale . '/labels.php')
             );
         }
     }
