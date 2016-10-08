@@ -8,7 +8,7 @@ use Illuminate\Support\Collection;
 class ArrayTransport extends Transport
 {
     /**
-     * The collection of Swift Messages
+     * The collection of Swift Messages.
      *
      * @var \Illuminate\Support\Collection
      */
