@@ -21,7 +21,7 @@ class HtmlLink
         $this->url = $url;
     }
 
-    public function matches($message)
+    public function matches(\Swift_Message $message)
     {
         return (new HasLink($this->text, $this->url))->matches($message->getBody());
     }

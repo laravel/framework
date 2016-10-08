@@ -9,7 +9,11 @@ trait InteractsWithMail
 {
     public function getSwiftMessages()
     {
-        return $this->app->make('mailer')->getSwiftMailer()->getTransport()->getMessages();
+        $messages = $this->app->make('mailer')->getSwiftMailer()->getTransport()->getMessages();
+
+        $this->assertNotEmpty($messages, 'No messages were sent');
+
+        return $messages;
     }
 
     public function seeMail(Closure $assertions)

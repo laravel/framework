@@ -11,9 +11,6 @@ class ToAddress
         $this->to = (array) $to;
     }
 
-    /**
-     * \Swift_Message
-     */
     public function matches(\Swift_Message $message)
     {
         return $this->to === array_keys($message->getTo());
@@ -26,6 +23,6 @@ class ToAddress
      */
     public function __toString()
     {
-        return "To address(es): ".implode(", ", $this->to);
+        return 'To address(es): '.implode(', ', $this->to);
     }
 }

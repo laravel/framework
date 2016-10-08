@@ -3,15 +3,15 @@
 namespace Illuminate\Foundation\Testing\Constraints;
 
 use Closure;
-use Illuminate\Foundation\Testing\Constraints\Mail\HtmlLink;
-use Illuminate\Foundation\Testing\Constraints\Mail\Subject;
-use Illuminate\Foundation\Testing\Constraints\Mail\ToAddress;
 use Swift_Message;
+use Illuminate\Foundation\Testing\Constraints\Mail\Subject;
+use Illuminate\Foundation\Testing\Constraints\Mail\HtmlLink;
+use Illuminate\Foundation\Testing\Constraints\Mail\ToAddress;
 
 class Mail
 {
     protected $constraints = [];
-    protected $lastErrorMessage;
+    protected $failedConstraints = [];
 
     public function __construct(Closure $assertions = null)
     {
@@ -37,13 +37,17 @@ class Mail
 
     public function matches(Swift_Message $message)
     {
+        $found = true;
+
         foreach ($this->constraints as $constraint) {
-            if (!$constraint->matches($message)) {
-                return false;
+            if (! $constraint->matches($message)) {
+                $this->failedConstraints[] = $constraint;
+
+                $found = false;
             }
         }
 
-        return true;
+        return $found;
     }
 
     protected function addConstraint($constraint)
@@ -55,6 +59,6 @@ class Mail
 
     public function __toString()
     {
-        return implode(', ', $this->constraints);
+        return implode(', ', $this->failedConstraints);
     }
 }
