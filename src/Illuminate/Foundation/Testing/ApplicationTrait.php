@@ -192,6 +192,19 @@ trait ApplicationTrait
     }
 
     /**
+     * Skip middleware for the test.
+     *
+     * @param  array  $middleware
+     * @return $this
+     */
+    public function skipMiddleware(array $middleware = [])
+    {
+        $this->app->instance('middleware.skip', $middleware);
+
+        return $this;
+    }
+
+    /**
      * Set the currently logged in user for the application.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user

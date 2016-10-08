@@ -696,8 +696,9 @@ class Router implements RegistrarContract
     {
         $shouldSkipMiddleware = $this->container->bound('middleware.disable') &&
                                 $this->container->make('middleware.disable') === true;
+        $skipMiddleware = $this->container->bound('middleware.skip') ? $this->container->make('middleware.skip') : [];
 
-        $middleware = $shouldSkipMiddleware ? [] : $this->gatherRouteMiddlewares($route);
+        $middleware = $shouldSkipMiddleware ? [] : array_diff($this->gatherRouteMiddlewares($route), $skipMiddleware);
 
         return (new Pipeline($this->container))
                         ->send($request)

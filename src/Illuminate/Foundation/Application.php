@@ -794,6 +794,16 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     }
 
     /**
+     * Get specific middleware to be disabled for the application.
+     *
+     * @return array
+     */
+    public function skipMiddleware()
+    {
+        return $this->bound('middleware.skip') ? $this->make('middleware.skip') : [];
+    }
+
+    /**
      * Determine if the application configuration is cached.
      *
      * @return bool
