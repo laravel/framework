@@ -3,9 +3,10 @@
 namespace Illuminate\Foundation\Testing\Constraints;
 
 use Closure;
+use Illuminate\Foundation\Testing\Constraints\Mail\HtmlLink;
+use Illuminate\Foundation\Testing\Constraints\Mail\Subject;
+use Illuminate\Foundation\Testing\Constraints\Mail\ToAddress;
 use Swift_Message;
-use PHPUnit_Framework_Assert as Assert;
-use PHPUnit_Framework_ExpectationFailedException as ExpectationException;
 
 class Mail
 {
@@ -21,64 +22,39 @@ class Mail
 
     public function to($users)
     {
-        return $this->addConstraint('To', $users);
+        return $this->addConstraint(new ToAddress($users));
     }
 
     public function subject($subject)
     {
-        return $this->addConstraint('Subject', $subject);
+        return $this->addConstraint(new Subject($subject));
     }
 
     public function htmlLink($text, $url = null)
     {
-        return $this->addConstraint('HtmlLink', compact('text', 'url'));
+        return $this->addConstraint(new HtmlLink($text, $url));
     }
 
     public function matches(Swift_Message $message)
     {
-        try {
-            $this->runAssertions($message);
-
-            return true;
-        } catch (ExpectationException $e) {
-            return dd($e->getMessage());
+        foreach ($this->constraints as $constraint) {
+            if (!$constraint->matches($message)) {
+                return false;
+            }
         }
+
+        return true;
     }
 
-    /**
-     * @param \Swift_Message $message
-     */
-    protected function runAssertions(Swift_Message $message)
+    protected function addConstraint($constraint)
     {
-        foreach ($this->constraints as $constraint => $expected) {
-            $this->{'assert'.$constraint}($message, $expected);
-        }
-    }
-
-    protected function addConstraint($constraint, $expected)
-    {
-        $this->constraints[$constraint] = $expected;
+        $this->constraints[] = $constraint;
 
         return $this;
     }
 
-    protected function assertTo(Swift_Message $message, $expected)
-    {
-        Assert::assertSame((array) $expected, array_keys($message->getTo()));
-    }
-
-    protected function assertSubject(Swift_Message $message, $expected)
-    {
-        Assert::assertSame($expected, $message->getSubject());
-    }
-
-    protected function assertHtmlLink(Swift_Message $message, $expected)
-    {
-        Assert::assertThat($message->getBody(), new HasLink($expected['text'], $expected['url']));
-    }
-
     public function __toString()
     {
-        return json_encode($this->constraints);
+        return implode(', ', $this->constraints);
     }
 }
