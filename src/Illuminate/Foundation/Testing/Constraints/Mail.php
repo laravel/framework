@@ -29,6 +29,11 @@ class Mail
         return $this->addConstraint('Subject', $subject);
     }
 
+    public function htmlLink($text, $url = null)
+    {
+        return $this->addConstraint('HtmlLink', compact('text', 'url'));
+    }
+
     public function matches(Swift_Message $message)
     {
         try {
@@ -36,7 +41,7 @@ class Mail
 
             return true;
         } catch (ExpectationException $e) {
-            return false;
+            return dd($e->getMessage());
         }
     }
 
@@ -65,6 +70,11 @@ class Mail
     protected function assertSubject(Swift_Message $message, $expected)
     {
         Assert::assertSame($expected, $message->getSubject());
+    }
+
+    protected function assertHtmlLink(Swift_Message $message, $expected)
+    {
+        Assert::assertThat($message->getBody(), new HasLink($expected['text'], $expected['url']));
     }
 
     public function __toString()
