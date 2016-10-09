@@ -629,10 +629,12 @@ class Router implements RegistrarContract
      */
     protected function runRouteWithinStack(Route $route, Request $request)
     {
-        $shouldSkipMiddleware = $this->container->bound('middleware.disable') &&
-                                $this->container->make('middleware.disable') === true;
+        $shouldDisableMiddleware = $this->container->bound('middleware.disable') &&
+                                   $this->container->make('middleware.disable') === true;
 
-        $middleware = $shouldSkipMiddleware ? [] : $this->gatherRouteMiddleware($route);
+        $shouldSkipMiddleware = $this->container->bound('middleware.skip') ? $this->container->make('middleware.skip') : [];
+
+        $middleware = $shouldDisableMiddleware ? [] : array_values(array_diff($this->gatherRouteMiddleware($route), $shouldSkipMiddleware));
 
         return (new Pipeline($this->container))
                         ->send($request)
