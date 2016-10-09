@@ -86,14 +86,14 @@ class Event
 
     /**
      * The expiredTime the command can run. (-1 indicates no limits).
-     * 
+     *
      * @var int
      */
     public $expiredTime = -1;
 
     /**
      * The email to alarm when command run in exception.
-     * 
+     *
      * @var int
      */
     public $alarmEmail = '';
@@ -208,7 +208,6 @@ class Event
         $this->callAfterCallbacks($container);
     }
 
-
     /**
      * Run the command in the background.
      *
@@ -226,7 +225,7 @@ class Event
     }
 
     /**
-     * Run the command in the background.
+     * try clean up finished command.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
      * @return bool
@@ -241,6 +240,7 @@ class Event
         if (0 < $this->expiredTime && time() >= $this->expiredTime) {
             // alert
             $this->alarmTimeout($container);
+
             return true;
         }
 
@@ -250,6 +250,7 @@ class Event
         }
 
         $this->callAfterCallbacks($container);
+
         return true;
     }
 
@@ -754,7 +755,7 @@ class Event
 
     /**
      * State the lengthest seconds of the command can run. (-1 indicates no limits).
-     * 
+     *
      * @var int
      * @return $this
      */
