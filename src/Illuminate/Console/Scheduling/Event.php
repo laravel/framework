@@ -78,25 +78,25 @@ class Event
     public $runAsynBackground = false;
 
     /**
-     * The lengthest seconds of the command can run. (-1 indicates no limits)
-     * 
+     * The lengthest seconds of the command can run. (-1 indicates no limits).
+     *
      * @var int
      */
     public $mostRunTime = -1;
 
     /**
-     * The expiredTime the command can run. (-1 indicates no limits)
+     * The expiredTime the command can run. (-1 indicates no limits).
      * 
      * @var int
      */
     public $expiredTime = -1;
 
     /**
-     * The email to alarm when command run in exception
+     * The email to alarm when command run in exception.
      * 
      * @var int
      */
-    public $alarmEmail = "";
+    public $alarmEmail = '';
 
     /**
      * The array of filter callbacks.
@@ -233,11 +233,11 @@ class Event
      */
     public function tryCleanUp(Container $container)
     {
-        if (!$this->runAsynBackground) {
+        if (! $this->runAsynBackground) {
             return true;
         }
 
-        // timeout alarm 
+        // timeout alarm
         if (0 < $this->expiredTime && time() >= $this->expiredTime) {
             // alert
             $this->alarmTimeout($container);
@@ -753,9 +753,10 @@ class Event
     }
 
     /**
-     * State the lengthest seconds of the command can run. (-1 indicates no limits)
+     * State the lengthest seconds of the command can run. (-1 indicates no limits).
      * 
      * @var int
+     * @return $this
      */
     public function mostRunTime($seconds = -1)
     {
@@ -1097,7 +1098,10 @@ class Event
     }
 
     /**
-     * alerm where the command run too long
+     * alerm where the command run too long.
+     *
+     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @return void
      */
     private function alarmTimeout(Container $container)
     {
@@ -1107,8 +1111,8 @@ class Event
             return;
         }
 
-        $container->call(function(Mailer $mailer) use ($addresses) {
-            $mailer->raw("run timeout", function ($m) use ($addresses) {
+        $container->call(function (Mailer $mailer) use ($addresses) {
+            $mailer->raw('run timeout', function ($m) use ($addresses) {
                 $m->subject($this->getEmailSubject());
 
                 foreach ($addresses as $address) {

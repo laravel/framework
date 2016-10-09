@@ -69,7 +69,7 @@ class ScheduleRunCommand extends Command
 
         // the last to cleanUp all the commands
         $finished = false;
-        while (!$finished) {
+        while (! $finished) {
             $finished = true;
             foreach ($events as $event) {
                 $status = $event->tryCleanUp($this->laravel);
