@@ -66,5 +66,18 @@ class ScheduleRunCommand extends Command
         if (count($events) === 0 || $eventsRan === 0) {
             $this->info('No scheduled commands are ready to run.');
         }
+
+        // the last to cleanUp all the commands
+        $finished = false;
+        while (!$finished) {
+            $finished = true;
+            foreach ($events as $event) {
+                $status = $event->tryCleanUp($this->laravel);
+                if ($finished) {
+                    $finished = $status;
+                }
+            }
+            sleep(1);
+        }
     }
 }
