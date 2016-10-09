@@ -105,6 +105,19 @@ class CacheMemcachedStoreTest extends PHPUnit_Framework_TestCase
         $store->forget('foo');
     }
 
+    public function testFlushesCached()
+    {
+        if (! class_exists('Memcached')) {
+            $this->markTestSkipped('Memcached module not installed');
+        }
+
+        $memcache = $this->getMockBuilder('Memcached')->setMethods(['flush'])->getMock();
+        $memcache->expects($this->once())->method('flush')->willReturn(true);
+        $store = new Illuminate\Cache\MemcachedStore($memcache);
+        $result = $store->flush();
+        $this->assertTrue($result);
+    }
+
     public function testGetAndSetPrefix()
     {
         if (! class_exists('Memcached')) {

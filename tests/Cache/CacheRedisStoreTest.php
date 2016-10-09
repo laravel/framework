@@ -119,6 +119,15 @@ class CacheRedisStoreTest extends PHPUnit_Framework_TestCase
         $redis->forget('foo');
     }
 
+    public function testFlushesCached()
+    {
+        $redis = $this->getRedis();
+        $redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
+        $redis->getRedis()->shouldReceive('flushdb')->once()->andReturn('ok');
+        $result = $redis->flush();
+        $this->assertTrue($result);
+    }
+
     public function testGetAndSetPrefix()
     {
         $redis = $this->getRedis();
