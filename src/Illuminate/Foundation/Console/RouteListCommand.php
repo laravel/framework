@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Routing\Route;
@@ -137,74 +138,9 @@ class RouteListCommand extends Command
      */
     protected function getMiddleware($route)
     {
-        $middlewares = array_values($route->middleware());
-
-        $actionName = $route->getActionName();
-
-        if (! empty($actionName) && $actionName !== 'Closure') {
-            $middlewares = array_merge($middlewares, $this->getControllerMiddleware($actionName));
-        }
-
-        return implode(',', $middlewares);
-    }
-
-    /**
-     * Get the middleware for the given Controller@action name.
-     *
-     * @param  string  $actionName
-     * @return array
-     */
-    protected function getControllerMiddleware($actionName)
-    {
-        $segments = explode('@', $actionName);
-
-        return $this->getControllerMiddlewareFromInstance(
-            $this->laravel->make($segments[0]),
-            isset($segments[1]) ? $segments[1] : null
-        );
-    }
-
-    /**
-     * Get the middlewares for the given controller instance and method.
-     *
-     * @param  \Illuminate\Routing\Controller  $controller
-     * @param  string|null  $method
-     * @return array
-     */
-    protected function getControllerMiddlewareFromInstance($controller, $method)
-    {
-        if (! method_exists($controller, 'getMiddleware')) {
-            return [];
-        }
-
-        $middleware = $this->router->getMiddleware();
-
-        $results = [];
-
-        foreach ($controller->getMiddleware() as $data) {
-            if (! is_string($data['middleware'])) {
-                continue;
-            }
-
-            if (! $method || ! $this->methodExcludedByOptions($method, $data['options'])) {
-                $results[] = Arr::get($middleware, $data['middleware'], $data['middleware']);
-            }
-        }
-
-        return $results;
-    }
-
-    /**
-     * Determine if the given options exclude a particular method.
-     *
-     * @param  string  $method
-     * @param  array  $options
-     * @return bool
-     */
-    protected function methodExcludedByOptions($method, array $options)
-    {
-        return (! empty($options['only']) && ! in_array($method, (array) $options['only'])) ||
-            (! empty($options['except']) && in_array($method, (array) $options['except']));
+        return collect($route->gatherMiddleware())->map(function ($middleware) {
+            return $middleware instanceof Closure ? 'Closure' : $middleware;
+        })->implode(',');
     }
 
     /**

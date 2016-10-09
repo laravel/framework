@@ -70,8 +70,10 @@ class Worker
         $lastRestart = $this->getTimestampOfLastQueueRestart();
 
         while (true) {
+            $this->registerTimeoutHandler($options);
+
             if ($this->daemonShouldRun()) {
-                $this->runNextJobForDaemon($connectionName, $queue, $options);
+                $this->runNextJob($connectionName, $queue, $options);
             } else {
                 $this->sleep($options->sleep);
             }
@@ -84,59 +86,46 @@ class Worker
     }
 
     /**
+     * Register the worker timeout handler (PHP 7.1+).
+     *
+     * @param  WorkerOptions  $options
+     * @return void
+     */
+    protected function registerTimeoutHandler(WorkerOptions $options)
+    {
+        if (version_compare(PHP_VERSION, '7.1.0') < 0 || ! extension_loaded('pcntl')) {
+            return;
+        }
+
+        pcntl_async_signals(true);
+
+        pcntl_signal(SIGALRM, function () {
+            $this->exceptions->report(new TimeoutException('A queue worker timed out while processing a job.'));
+
+            exit(1);
+        });
+
+        pcntl_alarm($options->timeout + $options->sleep);
+    }
+
+    /**
      * Determine if the daemon should process on this iteration.
      *
      * @return bool
      */
     protected function daemonShouldRun()
     {
-        return $this->manager->isDownForMaintenance()
-            ? false : $this->events->until('illuminate.queue.looping') !== false;
-    }
+        if ($this->manager->isDownForMaintenance() ||
+            $this->events->until('illuminate.queue.looping') === false) {
+            // If the application is down for maintenance or doesn't want the queues to run
+            // we will sleep for one second just in case the developer has it set to not
+            // sleep at all. This just prevents CPU from maxing out in this situation.
+            $this->sleep(1);
 
-    /**
-     * Run the next job for the daemon worker.
-     *
-     * @param  string  $connectionName
-     * @param  string  $queue
-     * @param  \Illuminate\Queue\WorkerOptions  $options
-     * @return void
-     */
-    protected function runNextJobForDaemon($connectionName, $queue, WorkerOptions $options)
-    {
-        if (! $options->timeout) {
-            $this->runNextJob($connectionName, $queue, $options);
-        } elseif ($processId = pcntl_fork()) {
-            $this->waitForChildProcess($processId, $options->timeout);
-        } else {
-            $this->runNextJob($connectionName, $queue, $options);
-
-            exit;
+            return false;
         }
-    }
 
-    /**
-     * Wait for the given child process to finish.
-     *
-     * @param  int  $processId
-     * @param  int  $timeout
-     * @return void
-     */
-    protected function waitForChildProcess($processId, $timeout)
-    {
-        declare(ticks=1) {
-            pcntl_signal(SIGALRM, function () use ($processId, $timeout) {
-                posix_kill($processId, SIGKILL);
-
-                $this->exceptions->report(new TimeoutException("Queue child process timed out after {$timeout} seconds."));
-            }, true);
-
-            pcntl_alarm($timeout);
-
-            pcntl_waitpid($processId, $status);
-
-            pcntl_alarm(0);
-        }
+        return true;
     }
 
     /**

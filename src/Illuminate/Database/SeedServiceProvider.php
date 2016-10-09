@@ -21,10 +21,6 @@ class SeedServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('seeder', function () {
-            return new Seeder;
-        });
-
         $this->registerSeedCommand();
 
         $this->commands('command.seed');

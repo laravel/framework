@@ -73,14 +73,12 @@ class Parser
      */
     protected static function parseArgument($token)
     {
-        $description = null;
-
         if (Str::contains($token, ' : ')) {
             list($token, $description) = explode(' : ', $token, 2);
-
             $token = trim($token);
-
             $description = trim($description);
+        } else {
+            $description = null;
         }
 
         switch (true) {
@@ -105,21 +103,21 @@ class Parser
      */
     protected static function parseOption($token)
     {
-        $description = null;
-
         if (Str::contains($token, ' : ')) {
             list($token, $description) = explode(' : ', $token);
             $token = trim($token);
             $description = trim($description);
+        } else {
+            $description = null;
         }
-
-        $shortcut = null;
 
         $matches = preg_split('/\s*\|\s*/', $token, 2);
 
         if (isset($matches[1])) {
             $shortcut = $matches[0];
             $token = $matches[1];
+        } else {
+            $shortcut = null;
         }
 
         switch (true) {

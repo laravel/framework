@@ -3,6 +3,7 @@
 namespace Illuminate\Queue;
 
 use DateTime;
+use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Illuminate\Container\Container;
@@ -153,7 +154,7 @@ abstract class Queue
      */
     protected function getTime()
     {
-        return time();
+        return Carbon::now()->getTimestamp();
     }
 
     /**

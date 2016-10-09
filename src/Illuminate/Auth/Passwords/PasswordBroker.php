@@ -145,12 +145,12 @@ class PasswordBroker implements PasswordBrokerContract
      */
     public function validateNewPassword(array $credentials)
     {
-        list($password, $confirm) = [
-            $credentials['password'],
-            $credentials['password_confirmation'],
-        ];
-
         if (isset($this->passwordValidator)) {
+            list($password, $confirm) = [
+                $credentials['password'],
+                $credentials['password_confirmation'],
+            ];
+
             return call_user_func(
                 $this->passwordValidator, $credentials) && $password === $confirm;
         }

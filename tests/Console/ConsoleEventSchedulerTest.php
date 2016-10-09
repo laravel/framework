@@ -47,4 +47,40 @@ class ConsoleEventSchedulerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($binary.' artisan queue:listen --tries=3', $events[1]->command);
         $this->assertEquals($binary.' artisan queue:listen --tries=3', $events[2]->command);
     }
+
+    public function testCreateNewArtisanCommandUsingCommandClass()
+    {
+        $escape = '\\' === DIRECTORY_SEPARATOR ? '"' : '\'';
+
+        $schedule = new Schedule;
+        $schedule->command(ConsoleCommandStub::class, ['--force']);
+
+        $events = $schedule->events();
+        $binary = $escape.PHP_BINARY.$escape;
+        $this->assertEquals($binary.' artisan foo:bar --force', $events[0]->command);
+    }
+}
+
+class FooClassStub
+{
+    protected $schedule;
+
+    public function __construct(Schedule $schedule)
+    {
+        $this->schedule = $schedule;
+    }
+}
+
+class ConsoleCommandStub extends Illuminate\Console\Command
+{
+    protected $signature = 'foo:bar';
+
+    protected $foo;
+
+    public function __construct(FooClassStub $foo)
+    {
+        parent::__construct();
+
+        $this->foo = $foo;
+    }
 }

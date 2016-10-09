@@ -34,6 +34,13 @@ class Factory implements ArrayAccess
     protected $definitions = [];
 
     /**
+     * The registered model states.
+     *
+     * @var array
+     */
+    protected $states = [];
+
+    /**
      * Create a new factory container.
      *
      * @param  \Faker\Generator  $faker
@@ -71,6 +78,19 @@ class Factory implements ArrayAccess
     public function define($class, callable $attributes, $name = 'default')
     {
         $this->definitions[$class][$name] = $attributes;
+    }
+
+    /**
+     * Define a state with a given set of attributes.
+     *
+     * @param  string  $class
+     * @param  string  $state
+     * @param  callable  $attributes
+     * @return void
+     */
+    public function state($class, $state, callable $attributes)
+    {
+        $this->states[$class][$state] = $attributes;
     }
 
     /**
@@ -179,7 +199,7 @@ class Factory implements ArrayAccess
      */
     public function of($class, $name = 'default')
     {
-        return new FactoryBuilder($class, $name, $this->definitions, $this->faker);
+        return new FactoryBuilder($class, $name, $this->definitions, $this->states, $this->faker);
     }
 
     /**

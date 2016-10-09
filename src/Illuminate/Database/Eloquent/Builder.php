@@ -738,14 +738,17 @@ class Builder
      *
      * @param  bool  $value
      * @param  \Closure  $callback
+     * @param  \Closure  $default
      * @return $this
      */
-    public function when($value, $callback)
+    public function when($value, $callback, $default = null)
     {
         $builder = $this;
 
         if ($value) {
             $builder = call_user_func($callback, $builder);
+        } elseif ($default) {
+            $builder = call_user_func($default, $builder);
         }
 
         return $builder;
@@ -867,13 +870,13 @@ class Builder
     /**
      * Add a relationship count / exists condition to the query with where clauses.
      *
-     * @param  string    $relation
-     * @param  \Closure  $callback
-     * @param  string    $operator
-     * @param  int       $count
+     * @param  string  $relation
+     * @param  \Closure|null  $callback
+     * @param  string  $operator
+     * @param  int     $count
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function whereHas($relation, Closure $callback, $operator = '>=', $count = 1)
+    public function whereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)
     {
         return $this->has($relation, $operator, $count, 'and', $callback);
     }
@@ -984,11 +987,13 @@ class Builder
 
         $relationQuery = $relation->getQuery();
 
+        $whereBindings = Arr::get($relationQuery->getRawBindings(), 'where', []);
+
         // Here we have some relation query and the original relation. We need to copy over any
         // where clauses that the developer may have put in the relation definition function.
         // We need to remove any global scopes that the developer already removed as well.
         return $this->withoutGlobalScopes($removedScopes)->mergeWheres(
-            $relationQuery->wheres, $relationQuery->getBindings()
+            $relationQuery->wheres, $whereBindings
         );
     }
 

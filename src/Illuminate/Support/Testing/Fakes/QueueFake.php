@@ -101,6 +101,17 @@ class QueueFake implements Queue
     }
 
     /**
+     * Resolve a queue connection instance.
+     *
+     * @param  string  $name
+     * @return \Illuminate\Contracts\Queue\Queue
+     */
+    public function connection($value = null)
+    {
+        return $this;
+    }
+
+    /**
      * Get the size of the queue.
      *
      * @param  string  $queue
