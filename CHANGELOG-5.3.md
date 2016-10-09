@@ -1,5 +1,19 @@
 # Release Notes for 5.3.x
 
+## v5.3.18 (2016-10-07)
+
+### Added
+- Added object based `unique` and `exists` validation rules ([#15809](https://github.com/laravel/framework/pull/15809))
+
+### Changed
+- Added primary key to `migrations` table ([#15770](https://github.com/laravel/framework/pull/15770))
+- Simplified `route:list` command code ([#15802](https://github.com/laravel/framework/pull/15802), [cb2eb79](https://github.com/laravel/framework/commit/cb2eb7963b29aafe63c87e1d2b1e633ecd0c25b0))
+
+### Fixed
+- Use eloquent collection for proper serialization of [#15789](https://github.com/laravel/framework/pull/15789) ([1c78e00](https://github.com/laravel/framework/commit/1c78e00ef3815e7b0bf710037b52faefb464e97d))
+- Reverted [#15722](https://github.com/laravel/framework/pull/15722) ([#15813](https://github.com/laravel/framework/pull/15813))
+
+
 ## v5.3.17 (2016-10-06)
 
 ### Added
