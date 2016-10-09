@@ -27,7 +27,11 @@ class NotificationFake implements NotificationFactory
     public function assertSentTo($notifiable, $notification, $callback = null)
     {
         PHPUnit::assertTrue(
-            $this->sent($notifiable, $notification, $callback)->count() > 0,
+            $this->sent($notifiable, $notification, $callback)->filter(
+                function ($notifications) {
+                    return $notifications->isEmpty();
+                }
+            )->count() === 0,
             "The expected [{$notification}] notification was not sent."
         );
     }
@@ -43,7 +47,11 @@ class NotificationFake implements NotificationFactory
     public function assertNotSentTo($notifiable, $notification, $callback = null)
     {
         PHPUnit::assertTrue(
-            $this->sent($notifiable, $notification, $callback)->count() === 0,
+            $this->sent($notifiable, $notification, $callback)->filter(
+                function ($notifications) {
+                    return ! $notifications->isEmpty();
+                }
+            )->count() === 0,
             "The unexpected [{$notification}] notification was sent."
         );
     }
@@ -62,7 +70,7 @@ class NotificationFake implements NotificationFactory
             $notifiable = [$notifiable];
         }
 
-        return collect($notifiable)->flatMap(function ($notifiableItem) use ($notification, $callback) {
+        return collect($notifiable)->map(function ($notifiableItem) use ($notification, $callback) {
             if (! $this->hasSent($notifiableItem, $notification)) {
                 return collect();
             }
@@ -80,7 +88,7 @@ class NotificationFake implements NotificationFactory
     }
 
     /**
-     * Determine if there are more notifications left to inspect.
+     * Determine if there are morae notifications left to inspect.
      *
      * @param  mixed  $notifiable
      * @param  string  $notification
