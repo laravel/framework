@@ -362,23 +362,20 @@ class Migrator
     }
 
     /**
-     * Run a migration, inside a transaction if the database supports it.
+     * Run a migration inside a transaction if the database supports it.
      *
      * @param  \Closure  $callback
      * @return void
      */
     protected function runMigration(Closure $callback)
     {
-        // To deal with potential errors during migrations that may leave a database
-        // in an invalid state, we wrap everything in a transaction so all changes
-        // are rolled back, and the developer need not manually repair errors.
         $connection = $this->resolveConnection($this->connection);
 
         $grammar = $connection->getSchemaGrammar();
 
         $grammar->supportsSchemaTransactions()
-            ? $connection->transaction($callback)
-            : $callback();
+                    ? $connection->transaction($callback)
+                    : $callback();
     }
 
     /**
