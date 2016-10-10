@@ -19,7 +19,7 @@ class Schedule
      * Add a new callback event to the schedule.
      *
      * @param  string  $callback
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return \Illuminate\Console\Scheduling\Event
      */
     public function call($callback, array $parameters = [])

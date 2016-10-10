@@ -18,7 +18,7 @@ class BcryptHasher implements HasherContract
      * Hash the given value.
      *
      * @param  string  $value
-     * @param  array   $options
+     * @param  array  $options
      * @return string
      *
      * @throws \RuntimeException
@@ -41,7 +41,7 @@ class BcryptHasher implements HasherContract
      *
      * @param  string  $value
      * @param  string  $hashedValue
-     * @param  array   $options
+     * @param  array  $options
      * @return bool
      */
     public function check($value, $hashedValue, array $options = [])
@@ -57,7 +57,7 @@ class BcryptHasher implements HasherContract
      * Check if the given hash has been hashed using the given options.
      *
      * @param  string  $hashedValue
-     * @param  array   $options
+     * @param  array  $options
      * @return bool
      */
     public function needsRehash($hashedValue, array $options = [])

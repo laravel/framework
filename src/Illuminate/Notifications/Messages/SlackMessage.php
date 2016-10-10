@@ -93,7 +93,7 @@ class SlackMessage
     /**
      * Set the Slack channel the message should be sent to.
      *
-     * @param  string $channel
+     * @param  string  $channel
      * @return $this
      */
     public function to($channel)

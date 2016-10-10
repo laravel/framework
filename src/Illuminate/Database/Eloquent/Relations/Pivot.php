@@ -39,9 +39,9 @@ class Pivot extends Model
      * Create a new pivot model instance.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @param  array   $attributes
+     * @param  array  $attributes
      * @param  string  $table
-     * @param  bool    $exists
+     * @param  bool  $exists
      * @return void
      */
     public function __construct(Model $parent, $attributes, $table, $exists = false)
@@ -73,9 +73,9 @@ class Pivot extends Model
      * Create a new pivot model from raw values returned from a query.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @param  array   $attributes
+     * @param  array  $attributes
      * @param  string  $table
-     * @param  bool    $exists
+     * @param  bool  $exists
      * @return static
      */
     public static function fromRawAttributes(Model $parent, $attributes, $table, $exists = false)

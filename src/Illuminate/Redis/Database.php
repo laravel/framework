@@ -80,7 +80,7 @@ class Database implements DatabaseContract
      * Run a command against the Redis database.
      *
      * @param  string  $method
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return mixed
      */
     public function command($method, array $parameters = [])
@@ -129,7 +129,7 @@ class Database implements DatabaseContract
      * Dynamically make a Redis command.
      *
      * @param  string  $method
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return mixed
      */
     public function __call($method, $parameters)

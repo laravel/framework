@@ -71,9 +71,9 @@ class Store implements SessionInterface
     /**
      * Create a new session instance.
      *
-     * @param  string $name
-     * @param  \SessionHandlerInterface $handler
-     * @param  string|null $id
+     * @param  string  $name
+     * @param  \SessionHandlerInterface  $handler
+     * @param  string|null  $id
      * @return void
      */
     public function __construct($name, SessionHandlerInterface $handler, $id = null)
@@ -374,7 +374,7 @@ class Store implements SessionInterface
      * Get the requested item from the flashed input array.
      *
      * @param  string  $key
-     * @param  mixed   $default
+     * @param  mixed  $default
      * @return mixed
      */
     public function getOldInput($key = null, $default = null)
@@ -399,7 +399,7 @@ class Store implements SessionInterface
      * Put a key / value pair or array of key / value pairs in the session.
      *
      * @param  string|array  $key
-     * @param  mixed       $value
+     * @param  mixed  $value
      * @return void
      */
     public function put($key, $value = null)
@@ -417,7 +417,7 @@ class Store implements SessionInterface
      * Push a value onto a session array.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return void
      */
     public function push($key, $value)
@@ -461,7 +461,7 @@ class Store implements SessionInterface
      * Flash a key / value pair to the session.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return void
      */
     public function flash($key, $value)
@@ -477,8 +477,8 @@ class Store implements SessionInterface
      * Flash a key / value pair to the session
      * for immediate use.
      *
-     * @param  string $key
-     * @param  mixed $value
+     * @param  string  $key
+     * @param  mixed  $value
      * @return void
      */
     public function now($key, $value)

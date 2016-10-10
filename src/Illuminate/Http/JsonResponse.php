@@ -16,9 +16,9 @@ class JsonResponse extends BaseJsonResponse
      * Constructor.
      *
      * @param  mixed  $data
-     * @param  int    $status
+     * @param  int  $status
      * @param  array  $headers
-     * @param  int    $options
+     * @param  int  $options
      */
     public function __construct($data = null, $status = 200, $headers = [], $options = 0)
     {
@@ -42,7 +42,7 @@ class JsonResponse extends BaseJsonResponse
      * Get the json_decoded data from the response.
      *
      * @param  bool  $assoc
-     * @param  int   $depth
+     * @param  int  $depth
      * @return mixed
      */
     public function getData($assoc = false, $depth = 512)

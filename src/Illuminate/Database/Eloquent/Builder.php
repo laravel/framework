@@ -759,7 +759,7 @@ class Builder
      *
      * @param  string  $column
      * @param  string  $operator
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @param  string  $boolean
      * @return $this
      */
@@ -783,7 +783,7 @@ class Builder
      *
      * @param  string  $column
      * @param  string  $operator
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
     public function orWhere($column, $operator = null, $value = null)
@@ -796,7 +796,7 @@ class Builder
      *
      * @param  string  $relation
      * @param  string  $operator
-     * @param  int     $count
+     * @param  int  $count
      * @param  string  $boolean
      * @param  \Closure|null  $callback
      * @return \Illuminate\Database\Eloquent\Builder|static
@@ -831,7 +831,7 @@ class Builder
      *
      * @param  string  $relations
      * @param  string  $operator
-     * @param  int     $count
+     * @param  int  $count
      * @param  string  $boolean
      * @param  \Closure|null  $callback
      * @return \Illuminate\Database\Eloquent\Builder|static
@@ -873,7 +873,7 @@ class Builder
      * @param  string  $relation
      * @param  \Closure|null  $callback
      * @param  string  $operator
-     * @param  int     $count
+     * @param  int  $count
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
     public function whereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)
@@ -898,7 +898,7 @@ class Builder
      *
      * @param  string  $relation
      * @param  string  $operator
-     * @param  int     $count
+     * @param  int  $count
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
     public function orHas($relation, $operator = '>=', $count = 1)
@@ -909,10 +909,10 @@ class Builder
     /**
      * Add a relationship count / exists condition to the query with where clauses and an "or".
      *
-     * @param  string    $relation
+     * @param  string  $relation
      * @param  \Closure  $callback
-     * @param  string    $operator
-     * @param  int       $count
+     * @param  string  $operator
+     * @param  int  $count
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
     public function orWhereHas($relation, Closure $callback, $operator = '>=', $count = 1)
@@ -958,7 +958,7 @@ class Builder
     /**
      * Add a sub query count clause to the query.
      *
-     * @param  \Illuminate\Database\Query\Builder $query
+     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  string  $operator
      * @param  int  $count
      * @param  string  $boolean
@@ -1131,7 +1131,7 @@ class Builder
      * Parse the nested relationships in a relation.
      *
      * @param  string  $name
-     * @param  array   $results
+     * @param  array  $results
      * @return array
      */
     protected function parseNestedWith($name, $results)
@@ -1180,8 +1180,8 @@ class Builder
     /**
      * Apply the given scope on the current builder instance.
      *
-     * @param  callable $scope
-     * @param  array $parameters
+     * @param  callable  $scope
+     * @param  array  $parameters
      * @return mixed
      */
     protected function callScope(callable $scope, $parameters = [])
@@ -1392,7 +1392,7 @@ class Builder
     /**
      * Extend the builder with a given callback.
      *
-     * @param  string    $name
+     * @param  string  $name
      * @param  \Closure  $callback
      * @return void
      */
@@ -1416,7 +1416,7 @@ class Builder
      * Dynamically handle calls into the query instance.
      *
      * @param  string  $method
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return mixed
      */
     public function __call($method, $parameters)

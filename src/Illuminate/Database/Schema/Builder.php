@@ -73,7 +73,7 @@ class Builder
      * Determine if the given table has given columns.
      *
      * @param  string  $table
-     * @param  array   $columns
+     * @param  array  $columns
      * @return bool
      */
     public function hasColumns($table, array $columns)
@@ -121,7 +121,7 @@ class Builder
     /**
      * Modify a table on the schema.
      *
-     * @param  string    $table
+     * @param  string  $table
      * @param  \Closure  $callback
      * @return \Illuminate\Database\Schema\Blueprint
      */
@@ -133,7 +133,7 @@ class Builder
     /**
      * Create a new table on the schema.
      *
-     * @param  string    $table
+     * @param  string  $table
      * @param  \Closure  $callback
      * @return \Illuminate\Database\Schema\Blueprint
      */

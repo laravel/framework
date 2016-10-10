@@ -27,7 +27,7 @@ interface Container
      * Assign a set of tags to a given binding.
      *
      * @param  array|string  $abstracts
-     * @param  array|mixed   ...$tags
+     * @param  array|mixed  ...$tags
      * @return void
      */
     public function tag($abstracts, $tags);
@@ -72,7 +72,7 @@ interface Container
     /**
      * "Extend" an abstract type in the container.
      *
-     * @param  string    $abstract
+     * @param  string  $abstract
      * @param  \Closure  $closure
      * @return void
      *
@@ -84,7 +84,7 @@ interface Container
      * Register an existing instance as shared in the container.
      *
      * @param  string  $abstract
-     * @param  mixed   $instance
+     * @param  mixed  $instance
      * @return void
      */
     public function instance($abstract, $instance);
@@ -101,7 +101,7 @@ interface Container
      * Resolve the given type from the container.
      *
      * @param  string  $abstract
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return mixed
      */
     public function make($abstract, array $parameters = []);
@@ -119,7 +119,7 @@ interface Container
     /**
      * Determine if the given abstract type has been resolved.
      *
-     * @param  string $abstract
+     * @param  string  $abstract
      * @return bool
      */
     public function resolved($abstract);
@@ -127,7 +127,7 @@ interface Container
     /**
      * Register a new resolving callback.
      *
-     * @param  string    $abstract
+     * @param  string  $abstract
      * @param  \Closure|null  $callback
      * @return void
      */
@@ -136,7 +136,7 @@ interface Container
     /**
      * Register a new after resolving callback.
      *
-     * @param  string    $abstract
+     * @param  string  $abstract
      * @param  \Closure|null  $callback
      * @return void
      */

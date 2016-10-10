@@ -80,7 +80,7 @@ class SparkPostTransport extends Transport
      *
      * Note that SparkPost still respects CC, BCC headers in raw message itself.
      *
-     * @param  \Swift_Mime_Message $message
+     * @param  \Swift_Mime_Message  $message
      * @return array
      */
     protected function getRecipients(Swift_Mime_Message $message)

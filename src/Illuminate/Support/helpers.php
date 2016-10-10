@@ -33,9 +33,9 @@ if (! function_exists('array_add')) {
     /**
      * Add an element to an array using "dot" notation if it doesn't exist.
      *
-     * @param  array   $array
+     * @param  array  $array
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return array
      */
     function array_add($array, $key, $value)
@@ -74,7 +74,7 @@ if (! function_exists('array_dot')) {
     /**
      * Flatten a multi-dimensional associative array with dots.
      *
-     * @param  array   $array
+     * @param  array  $array
      * @param  string  $prepend
      * @return array
      */
@@ -147,7 +147,7 @@ if (! function_exists('array_get')) {
      *
      * @param  \ArrayAccess|array  $array
      * @param  string  $key
-     * @param  mixed   $default
+     * @param  mixed  $default
      * @return mixed
      */
     function array_get($array, $key, $default = null)
@@ -203,7 +203,7 @@ if (! function_exists('array_pluck')) {
     /**
      * Pluck an array of values from an array.
      *
-     * @param  array   $array
+     * @param  array  $array
      * @param  string|array  $value
      * @param  string|array|null  $key
      * @return array
@@ -233,9 +233,9 @@ if (! function_exists('array_pull')) {
     /**
      * Get a value from the array, and remove it.
      *
-     * @param  array   $array
+     * @param  array  $array
      * @param  string  $key
-     * @param  mixed   $default
+     * @param  mixed  $default
      * @return mixed
      */
     function array_pull(&$array, $key, $default = null)
@@ -250,9 +250,9 @@ if (! function_exists('array_set')) {
      *
      * If no key is given to the method, the entire array will be replaced.
      *
-     * @param  array   $array
+     * @param  array  $array
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return array
      */
     function array_set(&$array, $key, $value)
@@ -370,7 +370,7 @@ if (! function_exists('data_fill')) {
     /**
      * Fill in data where it's missing.
      *
-     * @param  mixed   $target
+     * @param  mixed  $target
      * @param  string|array  $key
      * @param  mixed  $value
      * @return mixed
@@ -385,9 +385,9 @@ if (! function_exists('data_get')) {
     /**
      * Get an item from an array or object using "dot" notation.
      *
-     * @param  mixed   $target
+     * @param  mixed  $target
      * @param  string|array  $key
-     * @param  mixed   $default
+     * @param  mixed  $default
      * @return mixed
      */
     function data_get($target, $key, $default = null)
@@ -490,8 +490,7 @@ if (! function_exists('dd')) {
     /**
      * Dump the passed variables and end the script.
      *
-     * @param  mixed
-     * @return void
+     * @param  mixed       * @return void
      */
     function dd()
     {
@@ -566,7 +565,7 @@ if (! function_exists('object_get')) {
      *
      * @param  object  $object
      * @param  string  $key
-     * @param  mixed   $default
+     * @param  mixed  $default
      * @return mixed
      */
     function object_get($object, $key, $default = null)
@@ -592,7 +591,7 @@ if (! function_exists('preg_replace_array')) {
      * Replace a given pattern with each value in the array in sequentially.
      *
      * @param  string  $pattern
-     * @param  array   $replacements
+     * @param  array  $replacements
      * @param  string  $subject
      * @return string
      */
@@ -681,7 +680,7 @@ if (! function_exists('str_limit')) {
      * Limit the number of characters in a string.
      *
      * @param  string  $value
-     * @param  int     $limit
+     * @param  int  $limit
      * @param  string  $end
      * @return string
      */
@@ -696,7 +695,7 @@ if (! function_exists('str_plural')) {
      * Get the plural form of an English word.
      *
      * @param  string  $value
-     * @param  int     $count
+     * @param  int  $count
      * @return string
      */
     function str_plural($value, $count = 2)
@@ -725,7 +724,7 @@ if (! function_exists('str_replace_array')) {
      * Replace a given value in the string sequentially with an array.
      *
      * @param  string  $search
-     * @param  array   $replace
+     * @param  array  $replace
      * @param  string  $subject
      * @return string
      */

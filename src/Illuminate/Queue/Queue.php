@@ -29,7 +29,7 @@ abstract class Queue
      *
      * @param  string  $queue
      * @param  string  $job
-     * @param  mixed   $data
+     * @param  mixed  $data
      * @return mixed
      */
     public function pushOn($queue, $job, $data = '')
@@ -43,7 +43,7 @@ abstract class Queue
      * @param  string  $queue
      * @param  \DateTime|int  $delay
      * @param  string  $job
-     * @param  mixed   $data
+     * @param  mixed  $data
      * @return mixed
      */
     public function laterOn($queue, $delay, $job, $data = '')
@@ -54,8 +54,8 @@ abstract class Queue
     /**
      * Push an array of jobs onto the queue.
      *
-     * @param  array   $jobs
-     * @param  mixed   $data
+     * @param  array  $jobs
+     * @param  mixed  $data
      * @param  string  $queue
      * @return mixed
      */
@@ -70,7 +70,7 @@ abstract class Queue
      * Create a payload string from the given job and data.
      *
      * @param  string  $job
-     * @param  mixed   $data
+     * @param  mixed  $data
      * @param  string  $queue
      * @return string
      *

@@ -549,7 +549,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * Flash the input for the current request to the session.
      *
      * @param  string  $filter
-     * @param  array   $keys
+     * @param  array  $keys
      * @return void
      */
     public function flash($filter = null, $keys = [])
@@ -638,7 +638,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * Get the JSON payload for the request.
      *
      * @param  string  $key
-     * @param  mixed   $default
+     * @param  mixed  $default
      * @return mixed
      */
     public function json($key = null, $default = null)
@@ -922,7 +922,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * Get the route handling the request.
      *
-     * @param string|null $param
+     * @param  string|null  $param
      *
      * @return \Illuminate\Routing\Route|object|string
      */
