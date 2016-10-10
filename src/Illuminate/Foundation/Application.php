@@ -1140,7 +1140,8 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             return $this->namespace;
         }
 
-        $composer = json_decode(file_get_contents(base_path('composer.json')), true);
+        $composer_filename = env('COMPOSER', 'composer.json');
+        $composer = json_decode(file_get_contents(base_path($composer_filename)), true);
 
         foreach ((array) data_get($composer, 'autoload.psr-4') as $namespace => $path) {
             foreach ((array) $path as $pathChoice) {
