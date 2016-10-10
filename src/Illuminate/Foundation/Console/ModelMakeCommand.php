@@ -42,6 +42,7 @@ class ModelMakeCommand extends GeneratorCommand
 
                 $this->call('make:migration', ['name' => "create_{$table}_table", '--create' => $table]);
             }
+
             if ($this->option('controller')) {
                 $controller = Str::camel(class_basename($this->argument('name')));
 
@@ -80,6 +81,7 @@ class ModelMakeCommand extends GeneratorCommand
     {
         return [
             ['migration', 'm', InputOption::VALUE_NONE, 'Create a new migration file for the model.'],
+
             ['controller', 'c', InputOption::VALUE_NONE, 'Create a new resource controller for the model.'],
         ];
     }
