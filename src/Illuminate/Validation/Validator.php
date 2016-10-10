@@ -268,10 +268,10 @@ class Validator implements ValidatorContract
     /**
      * Explode the rules into an array of rules.
      *
-     * @param  string|array  $rules
+     * @param  array  $rules
      * @return array
      */
-    protected function explodeRules($rules)
+    protected function explodeRules(array $rules)
     {
         foreach ($rules as $key => $rule) {
             if (Str::contains($key, '*')) {
