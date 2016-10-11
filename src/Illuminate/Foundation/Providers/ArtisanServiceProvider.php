@@ -57,55 +57,123 @@ class ArtisanServiceProvider extends ServiceProvider
      *
      * @var array
      */
-    protected $commands = [
-        'ClearCompiled' => 'command.clear-compiled',
-        'ClearResets' => 'command.auth.resets.clear',
-        'ConfigCache' => 'command.config.cache',
-        'ConfigClear' => 'command.config.clear',
-        'Down' => 'command.down',
-        'Environment' => 'command.environment',
-        'KeyGenerate' => 'command.key.generate',
-        'Optimize' => 'command.optimize',
-        'RouteCache' => 'command.route.cache',
-        'RouteClear' => 'command.route.clear',
-        'RouteList' => 'command.route.list',
-        'StorageLink' => 'command.storage.link',
-        'Tinker' => 'command.tinker',
-        'Up' => 'command.up',
-        'ViewClear' => 'command.view.clear',
-    ];
+    protected $commands = [];
 
     /**
      * The commands to be registered.
      *
      * @var array
      */
-    protected $devCommands = [
-        'AppName' => 'command.app.name',
-        'AuthMake' => 'command.auth.make',
-        'CacheTable' => 'command.cache.table',
-        'ConsoleMake' => 'command.console.make',
-        'ControllerMake' => 'command.controller.make',
-        'EventGenerate' => 'command.event.generate',
-        'EventMake' => 'command.event.make',
-        'JobMake' => 'command.job.make',
-        'ListenerMake' => 'command.listener.make',
-        'MailMake' => 'command.mail.make',
-        'MiddlewareMake' => 'command.middleware.make',
-        'ModelMake' => 'command.model.make',
-        'NotificationMake' => 'command.notification.make',
-        'NotificationTable' => 'command.notification.table',
-        'PolicyMake' => 'command.policy.make',
-        'ProviderMake' => 'command.provider.make',
-        'QueueFailedTable' => 'command.queue.failed-table',
-        'QueueTable' => 'command.queue.table',
-        'RequestMake' => 'command.request.make',
-        'SeederMake' => 'command.seeder.make',
-        'SessionTable' => 'command.session.table',
-        'Serve' => 'command.serve',
-        'TestMake' => 'command.test.make',
-        'VendorPublish' => 'command.vendor.publish',
-    ];
+    protected $devCommands = [];
+
+    public function __construct($app)
+    {
+        $this->defineCommands();
+        $this->defineDevCommands();
+        parent::__construct($app);
+    }
+
+    private function defineCommands()
+    {
+        $type = config('app.type', 'full');
+
+        switch ($type) {
+            case 'cli':
+                $this->commands = [
+                    'ClearCompiled' => 'command.clear-compiled',
+                    'ClearResets' => 'command.auth.resets.clear',
+                    'ConfigCache' => 'command.config.cache',
+                    'ConfigClear' => 'command.config.clear',
+                    'Down' => 'command.down',
+                    'Environment' => 'command.environment',
+                    'KeyGenerate' => 'command.key.generate',
+                    'Optimize' => 'command.optimize',
+                    'StorageLink' => 'command.storage.link',
+                    'Tinker' => 'command.tinker',
+                    'Up' => 'command.up',
+                ];
+                break;
+            case 'full':
+            default:
+                $this->commands = [
+                    'ClearCompiled' => 'command.clear-compiled',
+                    'ClearResets' => 'command.auth.resets.clear',
+                    'ConfigCache' => 'command.config.cache',
+                    'ConfigClear' => 'command.config.clear',
+                    'Down' => 'command.down',
+                    'Environment' => 'command.environment',
+                    'KeyGenerate' => 'command.key.generate',
+                    'Optimize' => 'command.optimize',
+                    'RouteCache' => 'command.route.cache',
+                    'RouteClear' => 'command.route.clear',
+                    'RouteList' => 'command.route.list',
+                    'StorageLink' => 'command.storage.link',
+                    'Tinker' => 'command.tinker',
+                    'Up' => 'command.up',
+                    'ViewClear' => 'command.view.clear',
+                ];
+                break;
+        }
+    }
+
+    private function defineDevCommands()
+    {
+        $type = config('app.type', 'full');
+
+        switch ($type) {
+            case 'cli':
+                $this->commands = [
+                    'AppName' => 'command.app.name',
+                    'CacheTable' => 'command.cache.table',
+                    'ConsoleMake' => 'command.console.make',
+                    'EventGenerate' => 'command.event.generate',
+                    'EventMake' => 'command.event.make',
+                    'JobMake' => 'command.job.make',
+                    'ListenerMake' => 'command.listener.make',
+                    'MailMake' => 'command.mail.make',
+                    'ModelMake' => 'command.model.make',
+                    'NotificationMake' => 'command.notification.make',
+                    'NotificationTable' => 'command.notification.table',
+                    'PolicyMake' => 'command.policy.make',
+                    'ProviderMake' => 'command.provider.make',
+                    'QueueFailedTable' => 'command.queue.failed-table',
+                    'QueueTable' => 'command.queue.table',
+                    'SeederMake' => 'command.seeder.make',
+                    'TestMake' => 'command.test.make',
+                    'VendorPublish' => 'command.vendor.publish',
+                ];
+                break;
+            case 'full':
+            default:
+                $this->commands = [
+                    'AppName' => 'command.app.name',
+                    'AuthMake' => 'command.auth.make',
+                    'CacheTable' => 'command.cache.table',
+                    'ConsoleMake' => 'command.console.make',
+                    'ControllerMake' => 'command.controller.make',
+                    'EventGenerate' => 'command.event.generate',
+                    'EventMake' => 'command.event.make',
+                    'JobMake' => 'command.job.make',
+                    'ListenerMake' => 'command.listener.make',
+                    'MailMake' => 'command.mail.make',
+                    'MiddlewareMake' => 'command.middleware.make',
+                    'ModelMake' => 'command.model.make',
+                    'NotificationMake' => 'command.notification.make',
+                    'NotificationTable' => 'command.notification.table',
+                    'PolicyMake' => 'command.policy.make',
+                    'ProviderMake' => 'command.provider.make',
+                    'QueueFailedTable' => 'command.queue.failed-table',
+                    'QueueTable' => 'command.queue.table',
+                    'RequestMake' => 'command.request.make',
+                    'SeederMake' => 'command.seeder.make',
+                    'SessionTable' => 'command.session.table',
+                    'Serve' => 'command.serve',
+                    'TestMake' => 'command.test.make',
+                    'VendorPublish' => 'command.vendor.publish',
+                ];
+                break;
+        }
+    }
 
     /**
      * Register the service provider.
