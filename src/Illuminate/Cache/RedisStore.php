@@ -117,6 +117,28 @@ class RedisStore extends TaggableStore implements Store
     }
 
     /**
+     * Store an item in the cache if the key doesn't exist.
+     *
+     * @param  string  $key
+     * @param  mixed   $value
+     * @param  float|int  $minutes
+     * @return bool
+     */
+    public function add($key, $value, $minutes)
+    {
+        $lua = <<<'LUA'
+local v = redis.call('get', KEYS[1])
+if (v) then
+return false
+end
+redis.call('setex', KEYS[1], ARGV[2], ARGV[1])
+return true
+LUA;
+        $value = $this->serialize($value);
+        return (bool) $this->connection()->eval($lua, 1, $this->prefix.$key, $value, (int) max(1, $minutes * 60));
+    }
+
+    /**
      * Increment the value of an item in the cache.
      *
      * @param  string  $key
