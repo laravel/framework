@@ -49,11 +49,11 @@ class StatusCommand extends BaseCommand
      */
     public function fire()
     {
+        $this->migrator->setConnection($this->option('database'));
+
         if (! $this->migrator->repositoryExists()) {
             return $this->error('No migrations found.');
         }
-
-        $this->migrator->setConnection($this->option('database'));
 
         $ran = $this->migrator->getRepository()->getRan();
 

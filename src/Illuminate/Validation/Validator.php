@@ -268,10 +268,10 @@ class Validator implements ValidatorContract
     /**
      * Explode the rules into an array of rules.
      *
-     * @param  string|array  $rules
+     * @param  array  $rules
      * @return array
      */
-    protected function explodeRules($rules)
+    protected function explodeRules(array $rules)
     {
         foreach ($rules as $key => $rule) {
             if (Str::contains($key, '*')) {
@@ -279,7 +279,13 @@ class Validator implements ValidatorContract
 
                 unset($rules[$key]);
             } else {
-                $rules[$key] = (is_string($rule)) ? explode('|', $rule) : $rule;
+                if (is_string($rule)) {
+                    $rules[$key] = explode('|', $rule);
+                } elseif (is_object($rule)) {
+                    $rules[$key] = [$rule];
+                } else {
+                    $rules[$key] = $rule;
+                }
             }
         }
 
@@ -512,6 +518,8 @@ class Validator implements ValidatorContract
      */
     protected function validateAttribute($attribute, $rule)
     {
+        $this->currentRule = $rule;
+
         list($rule, $parameters) = $this->parseRule($rule);
 
         if ($rule == '') {
@@ -1390,10 +1398,11 @@ class Validator implements ValidatorContract
         $this->requireParameterCount(1, $parameters, 'unique');
 
         list($connection, $table) = $this->parseTable($parameters[0]);
+
         // The second parameter position holds the name of the column that needs to
         // be verified as unique. If this parameter isn't specified we will just
         // assume that this column to be verified shares the attribute's name.
-        $column = isset($parameters[1])
+        $column = isset($parameters[1]) && $parameters[1] !== 'NULL'
                     ? $parameters[1] : $this->guessColumnForQuery($attribute);
 
         list($idColumn, $id) = [null, null];
@@ -1422,6 +1431,10 @@ class Validator implements ValidatorContract
         $verifier->setConnection($connection);
 
         $extra = $this->getUniqueExtra($parameters);
+
+        if ($this->currentRule instanceof Rules\Unique) {
+            $extra = array_merge($extra, $this->currentRule->queryCallbacks());
+        }
 
         return $verifier->getCount(
             $table, $column, $value, $id, $idColumn, $extra
@@ -1485,7 +1498,7 @@ class Validator implements ValidatorContract
         // The second parameter position holds the name of the column that should be
         // verified as existing. If this parameter is not specified we will guess
         // that the columns being "verified" shares the given attribute's name.
-        $column = isset($parameters[1])
+        $column = isset($parameters[1]) && $parameters[1] !== 'NULL'
                     ? $parameters[1] : $this->guessColumnForQuery($attribute);
 
         $expected = (is_array($value)) ? count($value) : 1;
@@ -1512,6 +1525,10 @@ class Validator implements ValidatorContract
         $verifier->setConnection($connection);
 
         $extra = $this->getExtraExistConditions($parameters);
+
+        if ($this->currentRule instanceof Rules\Exists) {
+            $extra = array_merge($extra, $this->currentRule->queryCallbacks());
+        }
 
         if (is_array($value)) {
             return $verifier->getMultiCount($table, $column, $value, $extra);

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Validation;
 
+use Closure;
 use Illuminate\Support\Str;
 use Illuminate\Database\ConnectionResolverInterface;
 
@@ -52,7 +53,13 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface
         }
 
         foreach ($extra as $key => $extraValue) {
-            $this->addWhere($query, $key, $extraValue);
+            if ($extraValue instanceof Closure) {
+                $query->where(function ($query) use ($extraValue) {
+                    $extraValue($query);
+                });
+            } else {
+                $this->addWhere($query, $key, $extraValue);
+            }
         }
 
         return $query->count();
@@ -72,7 +79,13 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface
         $query = $this->table($collection)->whereIn($column, $values);
 
         foreach ($extra as $key => $extraValue) {
-            $this->addWhere($query, $key, $extraValue);
+            if ($extraValue instanceof Closure) {
+                $query->where(function ($query) use ($extraValue) {
+                    $extraValue($query);
+                });
+            } else {
+                $this->addWhere($query, $key, $extraValue);
+            }
         }
 
         return $query->count();
