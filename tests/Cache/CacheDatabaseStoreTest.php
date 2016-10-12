@@ -96,9 +96,10 @@ class CacheDatabaseStoreTest extends PHPUnit_Framework_TestCase
         $store = $this->getStore();
         $table = m::mock('StdClass');
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
-        $table->shouldReceive('delete')->once();
+        $table->shouldReceive('delete')->once()->andReturn(2);
 
-        $store->flush();
+        $result = $store->flush();
+        $this->assertTrue($result);
     }
 
     public function testIncrementReturnsCorrectValues()

@@ -182,15 +182,19 @@ class FileStore implements Store
     /**
      * Remove all items from the cache.
      *
-     * @return void
+     * @return bool
      */
     public function flush()
     {
         if ($this->files->isDirectory($this->directory)) {
             foreach ($this->files->directories($this->directory) as $directory) {
-                $this->files->deleteDirectory($directory);
+                if(!$this->files->deleteDirectory($directory)){
+                    return false;
+                }
             }
+            return true;
         }
+        return false;
     }
 
     /**
