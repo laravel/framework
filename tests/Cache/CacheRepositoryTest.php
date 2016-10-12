@@ -125,6 +125,14 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($result);
     }
 
+    public function testCacheAddCallsRedisStoreAdd()
+    {
+        $store = m::mock(Illuminate\Cache\RedisStore::class);
+        $store->shouldReceive('add')->once()->with('k', 'v', 60)->andReturn(true);
+        $repository = new Illuminate\Cache\Repository($store);
+        $this->assertTrue($repository->add('k', 'v', 60));
+    }
+
     public function testRegisterMacroWithNonStaticCall()
     {
         $repo = $this->getRepository();
