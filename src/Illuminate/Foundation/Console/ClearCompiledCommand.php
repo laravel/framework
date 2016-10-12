@@ -37,7 +37,7 @@ class ClearCompiledCommand extends Command
         if (file_exists($servicesPath)) {
             @unlink($servicesPath);
         }
-        
-        $this->info('Compiled class file removed!');
+
+        $this->info('The compiled class file has been removed.');
     }
 }
