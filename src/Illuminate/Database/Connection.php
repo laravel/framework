@@ -791,24 +791,28 @@ class Connection implements ConnectionInterface
     /**
      * Disconnect from the underlying PDO connection.
      *
+     * @param  bool  $force
+     *
      * @return void
      */
-    public function disconnect()
+    public function disconnect($force = false)
     {
-        $this->setPdo(null)->setReadPdo(null);
+        $this->setPdo(null, $force)->setReadPdo(null);
     }
 
     /**
      * Reconnect to the database.
      *
+     * @param  bool  $force
+     *
      * @return void
      *
      * @throws \LogicException
      */
-    public function reconnect()
+    public function reconnect($force = false)
     {
         if (is_callable($this->reconnector)) {
-            return call_user_func($this->reconnector, $this);
+            return call_user_func($this->reconnector, $this, $force);
         }
 
         throw new LogicException('Lost connection and no reconnector available.');
@@ -981,15 +985,18 @@ class Connection implements ConnectionInterface
      * Set the PDO connection.
      *
      * @param  \PDO|null  $pdo
+     * @param  bool  $force
      * @return $this
      *
      * @throws \RuntimeException
      */
-    public function setPdo($pdo)
+    public function setPdo($pdo, $force = false)
     {
-        if ($this->transactions >= 1) {
+        if ($this->transactions >= 1 && ! $force) {
             throw new RuntimeException("Can't swap PDO instance while within transaction.");
         }
+
+        $this->transactions = 0;
 
         $this->pdo = $pdo;
 

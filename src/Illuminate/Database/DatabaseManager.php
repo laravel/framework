@@ -106,12 +106,13 @@ class DatabaseManager implements ConnectionResolverInterface
      * Disconnect from the given database.
      *
      * @param  string  $name
+     * @param  bool  $force
      * @return void
      */
-    public function disconnect($name = null)
+    public function disconnect($name = null, $force = true)
     {
         if (isset($this->connections[$name = $name ?: $this->getDefaultConnection()])) {
-            $this->connections[$name]->disconnect();
+            $this->connections[$name]->disconnect($force);
         }
     }
 
@@ -119,11 +120,12 @@ class DatabaseManager implements ConnectionResolverInterface
      * Reconnect to the given database.
      *
      * @param  string  $name
+     * @param  bool  $force
      * @return \Illuminate\Database\Connection
      */
-    public function reconnect($name = null)
+    public function reconnect($name = null, $force = false)
     {
-        $this->disconnect($name = $name ?: $this->getDefaultConnection());
+        $this->disconnect($name = $name ?: $this->getDefaultConnection(), $force);
 
         if (! isset($this->connections[$name])) {
             return $this->connection($name);
@@ -193,8 +195,8 @@ class DatabaseManager implements ConnectionResolverInterface
         // Here we'll set a reconnector callback. This reconnector can be any callable
         // so we will set a Closure to reconnect from this manager with the name of
         // the connection, which will allow us to reconnect from the connections.
-        $connection->setReconnector(function ($connection) {
-            $this->reconnect($connection->getName());
+        $connection->setReconnector(function ($connection, $force = false) {
+            $this->reconnect($connection->getName(), $force);
         });
 
         return $connection;
