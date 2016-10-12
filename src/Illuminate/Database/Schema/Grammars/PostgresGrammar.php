@@ -8,6 +8,13 @@ use Illuminate\Database\Schema\Blueprint;
 class PostgresGrammar extends Grammar
 {
     /**
+     * If this Grammar supports schema changes wrapped in a transaction.
+     *
+     * @var bool
+     */
+    protected $transactions = true;
+
+    /**
      * The possible column modifiers.
      *
      * @var array
