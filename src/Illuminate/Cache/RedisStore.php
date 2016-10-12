@@ -135,6 +135,7 @@ redis.call('setex', KEYS[1], ARGV[2], ARGV[1])
 return true
 LUA;
         $value = $this->serialize($value);
+
         return (bool) $this->connection()->eval($lua, 1, $this->prefix.$key, $value, (int) max(1, $minutes * 60));
     }
 
