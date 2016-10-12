@@ -48,7 +48,7 @@ class RedisCacheTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Breaking change
+     * Breaking change.
      */
     public function testRedisCacheAddFalse()
     {
@@ -59,7 +59,7 @@ class RedisCacheTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Breaking change
+     * Breaking change.
      */
     public function testRedisCacheAddNull()
     {
