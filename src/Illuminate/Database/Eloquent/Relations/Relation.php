@@ -149,6 +149,23 @@ abstract class Relation
     }
 
     /**
+     * Add the constraints for a relationship aggregate function query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $parent
+     * @param  \Illuminate\Database\Eloquent\Builder  $aggregate The function
+     *                                                 (e.g. avg, sum, count,
+     *                                                    etc...)
+     * @param  \Illuminate\Database\Eloquent\Builder  $params The params passed
+     *                                                to Sql aggregate function
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function getRelationAggregateQuery(Builder $query, Builder $parent, $aggregate, $params = NULL)
+    {
+        return $this->getRelationQuery($query, $parent, new Expression($aggregate . '(' . ($params ? $this->wrap($params) : $this->wrap($this->getHasCompareKey())) . ')'));
+    }
+
+    /**
      * Add the constraints for a relationship query.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
