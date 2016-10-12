@@ -100,6 +100,7 @@ class ArrayStore extends TaggableStore implements Store
     public function flush()
     {
         $this->storage = [];
+
         return true;
     }
 

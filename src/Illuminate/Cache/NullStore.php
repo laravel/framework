@@ -93,7 +93,7 @@ class NullStore extends TaggableStore implements Store
      */
     public function flush()
     {
-        //
+        return true;
     }
 
     /**

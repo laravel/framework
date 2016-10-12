@@ -170,7 +170,9 @@ class RedisStore extends TaggableStore implements Store
      */
     public function flush()
     {
-        return (bool) $this->connection()->flushdb();
+        $this->connection()->flushdb();
+
+        return true;
     }
 
     /**
