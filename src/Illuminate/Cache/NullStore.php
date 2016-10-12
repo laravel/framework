@@ -89,7 +89,7 @@ class NullStore extends TaggableStore implements Store
     /**
      * Remove all items from the cache.
      *
-     * @return void
+     * @return bool
      */
     public function flush()
     {
