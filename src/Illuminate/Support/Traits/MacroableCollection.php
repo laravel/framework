@@ -41,7 +41,7 @@ trait MacroableCollection
             if (static::$macros[$method] instanceof Closure) {
                 return call_user_func_array(static::$macros[$method]->bindTo($this, static::class), $parameters);
             }
-            
+
             return call_user_func_array(static::$macros[$method], $parameters);
         }
 
