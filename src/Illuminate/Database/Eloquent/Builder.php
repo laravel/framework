@@ -207,7 +207,7 @@ class Builder
             return $result;
         }
 
-        throw (new ModelNotFoundException)->setModel(get_class($this->model));
+        throw (new ModelNotFoundException)->setModel(get_class($this->model), $id);
     }
 
     /**
