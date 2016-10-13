@@ -718,6 +718,25 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
         $factory = $container->factory('foo', ['bar' => 1, 'baz' => 2]);
         $this->assertEquals(['bar' => 1, 'baz' => 3], $factory(['baz' => 3]));
     }
+
+    public function testGetBoundedInstance()
+    {
+        $container = new Container;
+        $container->bind('foo', function () {
+            return 'bar';
+        });
+
+        $this->assertEquals('bar', $container->get('foo'));
+    }
+
+    /**
+     * @expectedException \Psr\Container\Exception\NotFoundException
+     */
+    public function testGetUnboundInstance()
+    {
+        $container = new Container;
+        $container->get('foo');
+    }
 }
 
 class ContainerConcreteStub
