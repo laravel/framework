@@ -118,7 +118,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function get($id)
     {
-        if (!$this->bound($id)) {
+        if (! $this->bound($id)) {
             throw new NotFoundException("Type [{$id}] is not bounded.");
         }
 
