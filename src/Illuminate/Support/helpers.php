@@ -606,6 +606,33 @@ if (! function_exists('preg_replace_array')) {
     }
 }
 
+if (! function_exists('retry')) {
+    /**
+     * Retry an operation a given number of times.
+     *
+     * @param  int  $times
+     * @param  callable  $callback
+     * @return mixed
+     */
+    function retry($times, callable $callback)
+    {
+        $times--;
+
+        beginning:
+        try {
+            return $callback();
+        } catch (Exception $e) {
+            if (! $times) {
+                throw $e;
+            }
+
+            $times--;
+
+            goto beginning;
+        }
+    }
+}
+
 if (! function_exists('snake_case')) {
     /**
      * Convert a string to snake case.
