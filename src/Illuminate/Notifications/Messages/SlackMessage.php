@@ -49,11 +49,11 @@ class SlackMessage
     public $attachments = [];
 
     /**
-     * Additional settings for Slack HTTP Client.
+     * Additional request options for the Guzzle HTTP client.
      *
      * @var array
      */
-    public $options = [];
+    public $http = [];
 
     /**
      * Indicate that the notification gives information about a successful operation.
@@ -154,14 +154,14 @@ class SlackMessage
     }
 
     /**
-     * Setup additional configuration for Slack HTTP Client.
+     * Set additional request options for teh Guzzle HTTP client.
      *
      * @param  array  $options
      * @return $this
      */
-    public function options($options)
+    public function http(array $options)
     {
-        $this->options = $options;
+        $this->http = $options;
 
         return $this;
     }
