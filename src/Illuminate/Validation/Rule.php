@@ -5,6 +5,17 @@ namespace Illuminate\Validation;
 class Rule
 {
     /**
+     * Get a dimensions constraint builder instance.
+     *
+     * @param  array  $constraints
+     * @return \Illuminate\Validation\Rules\Dimensions
+     */
+    public static function dimensions(array $constraints = [])
+    {
+        return new Rules\Dimensions($constraints);
+    }
+
+    /**
      * Get a exists constraint builder instance.
      *
      * @param  string  $table
