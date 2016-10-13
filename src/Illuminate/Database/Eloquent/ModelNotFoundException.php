@@ -14,17 +14,17 @@ class ModelNotFoundException extends RuntimeException
     protected $model;
 
     /**
-     * Ids of the affected instances
+     * Ids of the affected instances.
      *
-     * @var integer|array
+     * @var int|array
      */
     protected $instanceIds;
 
     /**
-     * Set the affected Eloquent model and instance ids
+     * Set the affected Eloquent model and instance ids.
      *
-     * @param  string        $model
-     * @param  integer|array $instanceIds
+     * @param  string    $model
+     * @param  int|array $instanceIds
      * @return $this
      */
     public function setModel($model, $instanceIds)
@@ -52,12 +52,12 @@ class ModelNotFoundException extends RuntimeException
     }
 
     /**
-     * Get the affected instance ids
+     * Get the affected instance ids.
      *
-     * @return integer|array
+     * @return int|array
      */
     public function getInstanceIds()
     {
-        return $this->instanceId;
+        return $this->instanceIds;
     }
 }
