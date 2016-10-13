@@ -166,6 +166,15 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
         $connection->disconnect();
     }
 
+    public function testCanForceSwapPDOWithOpenTransaction()
+    {
+        $pdo = $this->createMock('DatabaseConnectionTestMockPDO');
+        $pdo->expects($this->once())->method('beginTransaction')->will($this->returnValue(true));
+        $connection = $this->getMockConnection([], $pdo);
+        $connection->beginTransaction();
+        $connection->disconnect(true);
+    }
+
     public function testBeganTransactionFiresEventsIfSet()
     {
         $pdo = $this->createMock('DatabaseConnectionTestMockPDO');
