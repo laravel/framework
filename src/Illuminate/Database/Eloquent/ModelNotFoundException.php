@@ -14,29 +14,29 @@ class ModelNotFoundException extends RuntimeException
     protected $model;
 
     /**
-     * Id or array of ids of the affected instances
+     * Ids of the affected instances
      *
      * @var integer|array
      */
-    protected $instanceId;
+    protected $instanceIds;
 
     /**
-     * Set the affected Eloquent model.
+     * Set the affected Eloquent model and instance ids
      *
      * @param  string        $model
-     * @param  integer|array $instanceId
+     * @param  integer|array $instanceIds
      * @return $this
      */
-    public function setModel($model, $instanceId)
+    public function setModel($model, $instanceIds)
     {
-        $this->model      = $model;
-        $this->instanceId = $instanceId;
+        $this->model       = $model;
+        $this->instanceIds = $instanceIds;
 
-        if (is_array($instanceId)) {
-            $instanceId = sprintf('[%s]', implode($instanceId, ', '));
+        if (is_array($instanceIds)) {
+            $instanceIds = sprintf('[%s]', implode($instanceIds, ', '));
         }
 
-        $this->message = "No query results for model [{$model}] with id={$instanceId}.";
+        $this->message = "No query results for model [{$model}] with id={$instanceIds}.";
 
         return $this;
     }
@@ -52,11 +52,11 @@ class ModelNotFoundException extends RuntimeException
     }
 
     /**
-     * Get the affected instance id or array of ids
+     * Get the affected instance ids
      *
      * @return integer|array
      */
-    public function getInstanceId()
+    public function getInstanceIds()
     {
         return $this->instanceId;
     }
