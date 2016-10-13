@@ -154,7 +154,7 @@ class SlackMessage
     }
 
     /**
-     * Set additional request options for teh Guzzle HTTP client.
+     * Set additional request options for the Guzzle HTTP client.
      *
      * @param  array  $options
      * @return $this
