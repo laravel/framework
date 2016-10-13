@@ -558,10 +558,10 @@ trait MakesHttpRequests
      *
      * @param  string  $method
      * @param  string  $uri
-     * @param  array   $parameters
-     * @param  array   $cookies
-     * @param  array   $files
-     * @param  array   $server
+     * @param  array  $parameters
+     * @param  array  $cookies
+     * @param  array  $files
+     * @param  array  $server
      * @param  string  $content
      * @return \Illuminate\Http\Response
      */
@@ -592,10 +592,10 @@ trait MakesHttpRequests
      *
      * @param  string  $method
      * @param  string  $uri
-     * @param  array   $parameters
-     * @param  array   $cookies
-     * @param  array   $files
-     * @param  array   $server
+     * @param  array  $parameters
+     * @param  array  $cookies
+     * @param  array  $files
+     * @param  array  $server
      * @param  string  $content
      * @return \Illuminate\Http\Response
      */
@@ -611,11 +611,11 @@ trait MakesHttpRequests
      *
      * @param  string  $method
      * @param  string  $action
-     * @param  array   $wildcards
-     * @param  array   $parameters
-     * @param  array   $cookies
-     * @param  array   $files
-     * @param  array   $server
+     * @param  array  $wildcards
+     * @param  array  $parameters
+     * @param  array  $cookies
+     * @param  array  $files
+     * @param  array  $server
      * @param  string  $content
      * @return \Illuminate\Http\Response
      */
@@ -631,11 +631,11 @@ trait MakesHttpRequests
      *
      * @param  string  $method
      * @param  string  $name
-     * @param  array   $routeParameters
-     * @param  array   $parameters
-     * @param  array   $cookies
-     * @param  array   $files
-     * @param  array   $server
+     * @param  array  $routeParameters
+     * @param  array  $parameters
+     * @param  array  $cookies
+     * @param  array  $files
+     * @param  array  $server
      * @param  string  $content
      * @return \Illuminate\Http\Response
      */
@@ -815,7 +815,7 @@ trait MakesHttpRequests
      * Assert whether the client was redirected to a given URI.
      *
      * @param  string  $uri
-     * @param  array   $with
+     * @param  array  $with
      * @return $this
      */
     public function assertRedirectedTo($uri, $with = [])
@@ -833,8 +833,8 @@ trait MakesHttpRequests
      * Assert whether the client was redirected to a given route.
      *
      * @param  string  $name
-     * @param  array   $parameters
-     * @param  array   $with
+     * @param  array  $parameters
+     * @param  array  $with
      * @return $this
      */
     public function assertRedirectedToRoute($name, $parameters = [], $with = [])
@@ -846,8 +846,8 @@ trait MakesHttpRequests
      * Assert whether the client was redirected to a given action.
      *
      * @param  string  $name
-     * @param  array   $parameters
-     * @param  array   $with
+     * @param  array  $parameters
+     * @param  array  $with
      * @return $this
      */
     public function assertRedirectedToAction($name, $parameters = [], $with = [])

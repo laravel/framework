@@ -374,8 +374,8 @@ trait InteractsWithPages
     /**
      * Assert that a given link is seen on the page.
      *
-     * @param  string $text
-     * @param  string|null $url
+     * @param  string  $text
+     * @param  string|null  $url
      * @param  bool  $negate
      * @return $this
      */

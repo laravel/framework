@@ -34,7 +34,7 @@ class ConnectionFactory
     /**
      * Establish a PDO connection based on the configuration.
      *
-     * @param  array   $config
+     * @param  array  $config
      * @param  string  $name
      * @return \Illuminate\Database\Connection
      */
@@ -136,7 +136,7 @@ class ConnectionFactory
     /**
      * Get a read / write level configuration.
      *
-     * @param  array   $config
+     * @param  array  $config
      * @param  string  $type
      * @return array
      */
@@ -164,7 +164,7 @@ class ConnectionFactory
     /**
      * Parse and prepare the database configuration.
      *
-     * @param  array   $config
+     * @param  array  $config
      * @param  string  $name
      * @return array
      */
@@ -208,11 +208,11 @@ class ConnectionFactory
     /**
      * Create a new connection instance.
      *
-     * @param  string   $driver
-     * @param  \PDO|\Closure     $connection
-     * @param  string   $database
-     * @param  string   $prefix
-     * @param  array    $config
+     * @param  string  $driver
+     * @param  \PDO|\Closure  $connection
+     * @param  string  $database
+     * @param  string  $prefix
+     * @param  array  $config
      * @return \Illuminate\Database\Connection
      *
      * @throws \InvalidArgumentException

@@ -91,7 +91,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      * Get the translation for the given key.
      *
      * @param  string  $key
-     * @param  array   $replace
+     * @param  array  $replace
      * @param  string|null  $locale
      * @param  bool  $fallback
      * @return string|array|null
@@ -151,7 +151,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      * @param  string  $group
      * @param  string  $locale
      * @param  string  $item
-     * @param  array   $replace
+     * @param  array  $replace
      * @return string|array|null
      */
     protected function getLine($namespace, $group, $locale, $item, array $replace)
@@ -169,7 +169,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      * Make the place-holder replacements on a line.
      *
      * @param  string  $line
-     * @param  array   $replace
+     * @param  array  $replace
      * @return string
      */
     protected function makeReplacements($line, array $replace)
@@ -205,7 +205,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      *
      * @param  string  $key
      * @param  int|array|\Countable  $number
-     * @param  array   $replace
+     * @param  array  $replace
      * @param  string  $locale
      * @return string
      */
@@ -226,7 +226,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      * Get the translation for a given key.
      *
      * @param  string  $id
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @param  string  $domain
      * @param  string  $locale
      * @return string|array|null
@@ -241,7 +241,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      *
      * @param  string  $id
      * @param  int|array|\Countable  $number
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @param  string  $domain
      * @param  string  $locale
      * @return string

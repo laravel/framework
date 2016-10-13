@@ -7,7 +7,7 @@ trait InteractsWithAuthentication
     /**
      * Assert that the user is authenticated.
      *
-     * @param string|null  $guard
+     * @param  string|null  $guard
      * @return $this
      */
     public function seeIsAuthenticated($guard = null)
@@ -44,8 +44,7 @@ trait InteractsWithAuthentication
     /**
      * Assert that the user is authenticated as the given user.
      *
-     * @param  $user
-     * @param  string|null  $guard
+     * @param  $user       * @param  string|null  $guard
      * @return $this
      */
     public function seeIsAuthenticatedAs($user, $guard = null)
@@ -100,7 +99,7 @@ trait InteractsWithAuthentication
     /**
      * Return true is the credentials are valid, false otherwise.
      *
-     * @param  array $credentials
+     * @param  array  $credentials
      * @param  string|null  $guard
      * @return bool
      */

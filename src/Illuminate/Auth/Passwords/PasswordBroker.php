@@ -198,7 +198,7 @@ class PasswordBroker implements PasswordBrokerContract
     /**
      * Create a new password reset token for the given user.
      *
-     * @param  CanResetPasswordContract $user
+     * @param  CanResetPasswordContract  $user
      * @return string
      */
     public function createToken(CanResetPasswordContract $user)
@@ -220,8 +220,8 @@ class PasswordBroker implements PasswordBrokerContract
     /**
      * Validate the given password reset token.
      *
-     * @param  CanResetPasswordContract $user
-     * @param  string $token
+     * @param  CanResetPasswordContract  $user
+     * @param  string  $token
      * @return bool
      */
     public function tokenExists(CanResetPasswordContract $user, $token)

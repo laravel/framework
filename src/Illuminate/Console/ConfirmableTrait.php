@@ -9,7 +9,7 @@ trait ConfirmableTrait
     /**
      * Confirm before proceeding with the action.
      *
-     * @param  string    $warning
+     * @param  string  $warning
      * @param  \Closure|bool|null  $callback
      * @return bool
      */

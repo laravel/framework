@@ -102,8 +102,7 @@ trait ResetsPasswords
     /**
      * Get the response for a failed password reset.
      *
-     * @param  \Illuminate\Http\Request
-     * @param  string  $response
+     * @param  \Illuminate\Http\Request       * @param  string  $response
      * @return \Illuminate\Http\Response
      */
     protected function sendResetFailedResponse(Request $request, $response)

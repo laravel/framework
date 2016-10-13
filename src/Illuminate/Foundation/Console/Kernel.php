@@ -223,7 +223,7 @@ class Kernel implements KernelContract
      * Queue the given console command.
      *
      * @param  string  $command
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return void
      */
     public function queue($command, array $parameters = [])

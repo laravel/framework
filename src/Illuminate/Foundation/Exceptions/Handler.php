@@ -144,7 +144,7 @@ class Handler implements ExceptionHandlerContract
      * Prepare response containing exception render.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Exception $e
+     * @param  \Exception  $e
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function prepareResponse($request, Exception $e)

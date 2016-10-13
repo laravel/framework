@@ -151,10 +151,10 @@ class Connection implements ConnectionInterface
     /**
      * Create a new database connection instance.
      *
-     * @param  \PDO|\Closure     $pdo
-     * @param  string   $database
-     * @param  string   $tablePrefix
-     * @param  array    $config
+     * @param  \PDO|\Closure  $pdo
+     * @param  string  $database
+     * @param  string  $tablePrefix
+     * @param  array  $config
      * @return void
      */
     public function __construct($pdo, $database = '', $tablePrefix = '', array $config = [])
@@ -290,7 +290,7 @@ class Connection implements ConnectionInterface
      * Run a select statement and return a single result.
      *
      * @param  string  $query
-     * @param  array   $bindings
+     * @param  array  $bindings
      * @return mixed
      */
     public function selectOne($query, $bindings = [])
@@ -304,7 +304,7 @@ class Connection implements ConnectionInterface
      * Run a select statement against the database.
      *
      * @param  string  $query
-     * @param  array   $bindings
+     * @param  array  $bindings
      * @return array
      */
     public function selectFromWriteConnection($query, $bindings = [])
@@ -398,7 +398,7 @@ class Connection implements ConnectionInterface
     /**
      * Bind values to their parameters in the given statement.
      *
-     * @param  \PDOStatement $statement
+     * @param  \PDOStatement  $statement
      * @param  array  $bindings
      * @return void
      */
@@ -427,7 +427,7 @@ class Connection implements ConnectionInterface
      * Run an insert statement against the database.
      *
      * @param  string  $query
-     * @param  array   $bindings
+     * @param  array  $bindings
      * @return bool
      */
     public function insert($query, $bindings = [])
@@ -439,7 +439,7 @@ class Connection implements ConnectionInterface
      * Run an update statement against the database.
      *
      * @param  string  $query
-     * @param  array   $bindings
+     * @param  array  $bindings
      * @return int
      */
     public function update($query, $bindings = [])
@@ -451,7 +451,7 @@ class Connection implements ConnectionInterface
      * Run a delete statement against the database.
      *
      * @param  string  $query
-     * @param  array   $bindings
+     * @param  array  $bindings
      * @return int
      */
     public function delete($query, $bindings = [])
@@ -463,7 +463,7 @@ class Connection implements ConnectionInterface
      * Execute an SQL statement and return the boolean result.
      *
      * @param  string  $query
-     * @param  array   $bindings
+     * @param  array  $bindings
      * @return bool
      */
     public function statement($query, $bindings = [])
@@ -485,7 +485,7 @@ class Connection implements ConnectionInterface
      * Run an SQL statement and get the number of rows affected.
      *
      * @param  string  $query
-     * @param  array   $bindings
+     * @param  array  $bindings
      * @return int
      */
     public function affectingStatement($query, $bindings = [])
@@ -700,8 +700,8 @@ class Connection implements ConnectionInterface
     /**
      * Run a SQL statement and log its execution context.
      *
-     * @param  string    $query
-     * @param  array     $bindings
+     * @param  string  $query
+     * @param  array  $bindings
      * @param  \Closure  $callback
      * @return mixed
      *
@@ -741,8 +741,8 @@ class Connection implements ConnectionInterface
     /**
      * Run a SQL statement.
      *
-     * @param  string    $query
-     * @param  array     $bindings
+     * @param  string  $query
+     * @param  array  $bindings
      * @param  \Closure  $callback
      * @return mixed
      *
@@ -773,8 +773,8 @@ class Connection implements ConnectionInterface
      * Handle a query exception that occurred during query execution.
      *
      * @param  \Illuminate\Database\QueryException  $e
-     * @param  string    $query
-     * @param  array     $bindings
+     * @param  string  $query
+     * @param  array  $bindings
      * @param  \Closure  $callback
      * @return mixed
      *
@@ -833,7 +833,7 @@ class Connection implements ConnectionInterface
      * Log a query in the connection's query log.
      *
      * @param  string  $query
-     * @param  array   $bindings
+     * @param  array  $bindings
      * @param  float|null  $time
      * @return void
      */
@@ -888,7 +888,7 @@ class Connection implements ConnectionInterface
     /**
      * Get the elapsed time since a given starting point.
      *
-     * @param  int    $start
+     * @param  int  $start
      * @return float
      */
     protected function getElapsedTime($start)
