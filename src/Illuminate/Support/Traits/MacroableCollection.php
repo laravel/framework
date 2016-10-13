@@ -59,7 +59,7 @@ trait MacroableCollection
     }
     
     /**
-     * Register the magic where macro
+     * Register the magic where macro.
      *
      * @return \Closure
      */
