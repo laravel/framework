@@ -7,7 +7,6 @@ use Closure;
 use Exception;
 use Throwable;
 use LogicException;
-use RuntimeException;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Database\Query\Expression;
@@ -782,7 +781,7 @@ class Connection implements ConnectionInterface
      */
     protected function tryAgainIfCausedByLostConnection(QueryException $e, $query, $bindings, Closure $callback)
     {
-        if ($this->causedByLostConnection($e->getPrevious())) {
+        if ($this->transactions == 0 &&  $this->causedByLostConnection($e->getPrevious())) {
             $this->reconnect();
 
             return $this->runQueryCallback($query, $bindings, $callback);
@@ -985,14 +984,10 @@ class Connection implements ConnectionInterface
      *
      * @param  \PDO|null  $pdo
      * @return $this
-     *
-     * @throws \RuntimeException
      */
     public function setPdo($pdo)
     {
-        if ($this->transactions >= 1) {
-            throw new RuntimeException("Can't swap PDO instance while within transaction.");
-        }
+        $this->transactions = 0;
 
         $this->pdo = $pdo;
 
