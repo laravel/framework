@@ -65,8 +65,16 @@ trait MacroableCollection
      */
     protected function registerMagicWhere()
     {
-        return function($attribute, $value) {
-            return $this->where($attribute, '=', $value);
+        // Signature:
+        // $collection->whereName('jeff');
+        // $collection->whereName('!=', 'jeff');
+        return function($attribute, $operator, $value=null) {
+            if($value == null)
+            {
+                return $this->where($attribute, '=', $operator);
+            }
+            
+            return $this->where($attribute, $operator, $value);
         };
     }
 }
