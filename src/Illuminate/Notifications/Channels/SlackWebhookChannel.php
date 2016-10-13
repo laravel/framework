@@ -59,12 +59,12 @@ class SlackWebhookChannel
             'channel' => data_get($message, 'channel'),
         ]);
 
-        return [
+        return array_merge([
             'json' => array_merge([
                 'text' => $message->content,
                 'attachments' => $this->attachments($message),
             ], $optionalFields),
-        ];
+        ], $message->http);
     }
 
     /**

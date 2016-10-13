@@ -115,6 +115,18 @@ trait MakesHttpRequests
     }
 
     /**
+     * Visit the given URI with a GET request, expecting a JSON response.
+     *
+     * @param string $uri
+     * @param array $headers
+     * @return $this
+     */
+    public function getJson($uri, array $headers = [])
+    {
+        return $this->json('GET', $uri, [], $headers);
+    }
+
+    /**
      * Visit the given URI with a POST request.
      *
      * @param  string  $uri
@@ -129,6 +141,19 @@ trait MakesHttpRequests
         $this->call('POST', $uri, $data, [], [], $server);
 
         return $this;
+    }
+
+    /**
+     * Visit the given URI with a POST request, expecting a JSON response.
+     *
+     * @param string $uri
+     * @param array  $data
+     * @param array  $headers
+     * @return $this
+     */
+    public function postJson($uri, array $data = [], array $headers = [])
+    {
+        return $this->json('POST', $uri, $data, $headers);
     }
 
     /**
@@ -149,6 +174,19 @@ trait MakesHttpRequests
     }
 
     /**
+     * Visit the given URI with a PUT request, expecting a JSON response.
+     *
+     * @param string $uri
+     * @param array  $data
+     * @param array  $headers
+     * @return $this
+     */
+    public function putJson($uri, array $data = [], array $headers = [])
+    {
+        return $this->json('PUT', $uri, $data, $headers);
+    }
+
+    /**
      * Visit the given URI with a PATCH request.
      *
      * @param  string  $uri
@@ -166,6 +204,19 @@ trait MakesHttpRequests
     }
 
     /**
+     * Visit the given URI with a PATCH request, expecting a JSON response.
+     *
+     * @param string $uri
+     * @param array  $data
+     * @param array  $headers
+     * @return $this
+     */
+    public function patchJson($uri, array $data = [], array $headers = [])
+    {
+        return $this->json('PATCH', $uri, $data, $headers);
+    }
+
+    /**
      * Visit the given URI with a DELETE request.
      *
      * @param  string  $uri
@@ -180,6 +231,19 @@ trait MakesHttpRequests
         $this->call('DELETE', $uri, $data, [], [], $server);
 
         return $this;
+    }
+
+    /**
+     * Visit the given URI with a DELETE request, expecting a JSON response.
+     *
+     * @param string $uri
+     * @param array  $data
+     * @param array  $headers
+     * @return $this
+     */
+    public function deleteJson($uri, array $data = [], array $headers = [])
+    {
+        return $this->json('DELETE', $uri, $data, $headers);
     }
 
     /**
