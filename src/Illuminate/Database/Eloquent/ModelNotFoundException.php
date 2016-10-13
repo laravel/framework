@@ -29,7 +29,7 @@ class ModelNotFoundException extends RuntimeException
      */
     public function setModel($model, $instanceIds)
     {
-        $this->model       = $model;
+        $this->model = $model;
         $this->instanceIds = $instanceIds;
 
         if (is_array($instanceIds)) {
