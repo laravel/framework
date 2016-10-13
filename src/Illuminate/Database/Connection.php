@@ -601,21 +601,24 @@ class Connection implements ConnectionInterface
      */
     public function beginTransaction()
     {
-        ++$this->transactions;
-
-        if ($this->transactions == 1) {
+        if ($this->transactions == 0) {
             try {
-                $this->getPdo()->beginTransaction();
+                $this->pdo->beginTransaction();
             } catch (Exception $e) {
-                --$this->transactions;
-
-                throw $e;
+                if ($this->causedByLostConnection($e)) {
+                    $this->reconnect();
+                    $this->pdo->beginTransaction();
+                } else {
+                    throw $e;
+                }
             }
-        } elseif ($this->transactions > 1 && $this->queryGrammar->supportsSavepoints()) {
-            $this->getPdo()->exec(
-                $this->queryGrammar->compileSavepoint('trans'.$this->transactions)
+        } elseif ($this->transactions >= 1 && $this->queryGrammar->supportsSavepoints()) {
+            $this->pdo->exec(
+                $this->queryGrammar->compileSavepoint('trans'.($this->transactions + 1))
             );
         }
+
+        ++$this->transactions;
 
         $this->fireConnectionEvent('beganTransaction');
     }
