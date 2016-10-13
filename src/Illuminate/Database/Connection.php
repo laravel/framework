@@ -649,7 +649,6 @@ class Connection implements ConnectionInterface
         }
 
         if ($toLevel < 0 || $toLevel >= $this->transactions) {
-            // Ignore
             return;
         }
 
