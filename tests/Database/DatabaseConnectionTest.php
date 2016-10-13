@@ -160,8 +160,19 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
         $pdo = $this->createMock('DatabaseConnectionTestMockPDO');
         $connection = $this->getMockConnection(['getName'], $pdo);
         $connection->expects($this->any())->method('getName')->will($this->returnValue('name'));
+        $connection->beginTransaction();
         $connection->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
         $events->shouldReceive('fire')->once()->with(m::type('Illuminate\Database\Events\TransactionRolledBack'));
+        $connection->rollBack();
+    }
+
+    public function testRedundantRollBackFiresNoEvent()
+    {
+        $pdo = $this->createMock('DatabaseConnectionTestMockPDO');
+        $connection = $this->getMockConnection(['getName'], $pdo);
+        $connection->expects($this->any())->method('getName')->will($this->returnValue('name'));
+        $connection->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
+        $events->shouldNotReceive('fire');
         $connection->rollBack();
     }
 

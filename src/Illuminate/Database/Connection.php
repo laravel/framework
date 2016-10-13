@@ -639,19 +639,29 @@ class Connection implements ConnectionInterface
     /**
      * Rollback the active database transaction.
      *
+     * @param  int|null  $toLevel
      * @return void
      */
-    public function rollBack()
+    public function rollBack($toLevel = null)
     {
-        if ($this->transactions == 1) {
+        if (is_null($toLevel)) {
+            $toLevel = $this->transactions - 1;
+        }
+
+        if ($toLevel < 0 || $toLevel >= $this->transactions) {
+            // Ignore
+            return;
+        }
+
+        if ($toLevel == 0) {
             $this->getPdo()->rollBack();
-        } elseif ($this->transactions > 1 && $this->queryGrammar->supportsSavepoints()) {
+        } elseif ($this->queryGrammar->supportsSavepoints()) {
             $this->getPdo()->exec(
-                $this->queryGrammar->compileSavepointRollBack('trans'.$this->transactions)
+                $this->queryGrammar->compileSavepointRollBack('trans'.($toLevel + 1))
             );
         }
 
-        $this->transactions = max(0, $this->transactions - 1);
+        $this->transactions = $toLevel;
 
         $this->fireConnectionEvent('rollingBack');
     }
