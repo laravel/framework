@@ -59,12 +59,19 @@ class SlackWebhookChannel
             'channel' => data_get($message, 'channel'),
         ]);
 
-        return [
+        $payload = [
             'json' => array_merge([
                 'text' => $message->content,
                 'attachments' => $this->attachments($message),
             ], $optionalFields),
         ];
+
+        // Add other configuration settings if available.
+        if (! empty($message->options)) {
+            $payload = array_merge($payload, $message->options);
+        }
+
+        return $payload;
     }
 
     /**

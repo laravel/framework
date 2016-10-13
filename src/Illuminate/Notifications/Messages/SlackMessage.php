@@ -49,6 +49,13 @@ class SlackMessage
     public $attachments = [];
 
     /**
+     * Additional settings for Slack HTTP Client.
+     *
+     * @var array
+     */
+    public $options = [];
+
+    /**
      * Indicate that the notification gives information about a successful operation.
      *
      * @return $this
@@ -144,5 +151,18 @@ class SlackMessage
             case 'error':
                 return '#F35A00';
         }
+    }
+
+    /**
+     * Setup additional configuration for Slack HTTP Client.
+     *
+     * @param  array  $options
+     * @return $this
+     */
+    public function options($options)
+    {
+        $this->options = $options;
+
+        return $this;
     }
 }
