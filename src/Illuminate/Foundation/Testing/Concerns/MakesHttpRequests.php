@@ -121,7 +121,7 @@ trait MakesHttpRequests
      * @param array $headers
      * @return $this
      */
-    public function jsonGet($uri, array $headers = [])
+    public function getJson($uri, array $headers = [])
     {
         return $this->json('GET', $uri, [], $headers);
     }
@@ -151,7 +151,7 @@ trait MakesHttpRequests
      * @param array  $headers
      * @return $this
      */
-    public function jsonPost($uri, array $data = [], array $headers = [])
+    public function postJson($uri, array $data = [], array $headers = [])
     {
         return $this->json('POST', $uri, $data, $headers);
     }
@@ -181,7 +181,7 @@ trait MakesHttpRequests
      * @param array  $headers
      * @return $this
      */
-    public function jsonPut($uri, array $data = [], array $headers = [])
+    public function putJson($uri, array $data = [], array $headers = [])
     {
         return $this->json('PUT', $uri, $data, $headers);
     }
@@ -211,7 +211,7 @@ trait MakesHttpRequests
      * @param array  $headers
      * @return $this
      */
-    public function jsonPatch($uri, array $data = [], array $headers = [])
+    public function patchJson($uri, array $data = [], array $headers = [])
     {
         return $this->json('PATCH', $uri, $data, $headers);
     }
@@ -241,7 +241,7 @@ trait MakesHttpRequests
      * @param array  $headers
      * @return $this
      */
-    public function jsonDelete($uri, array $data = [], array $headers = [])
+    public function deleteJson($uri, array $data = [], array $headers = [])
     {
         return $this->json('DELETE', $uri, $data, $headers);
     }
