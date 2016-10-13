@@ -8,7 +8,6 @@ use Illuminate\Support\Str;
 
 trait MacroableCollection
 {
-    
     /**
      * Checks if macro is registered or if it's a magic macro.
      *
@@ -38,10 +37,8 @@ trait MacroableCollection
             throw new BadMethodCallException("Method {$method} does not exist.");
         }
         
-        if($macroExists)
-        {
-            if (static::$macros[$method] instanceof Closure)
-            {
+        if($macroExists) {
+            if (static::$macros[$method] instanceof Closure) {
                 return call_user_func_array(static::$macros[$method]->bindTo($this, static::class), $parameters);
             }
             
@@ -69,8 +66,7 @@ trait MacroableCollection
         // $collection->whereName('jeff');
         // $collection->whereName('!=', 'jeff');
         return function($attribute, $operator, $value=null) {
-            if($value == null)
-            {
+            if($value == null) {
                 return $this->where($attribute, '=', $operator);
             }
             
