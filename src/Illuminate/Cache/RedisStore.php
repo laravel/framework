@@ -127,12 +127,11 @@ class RedisStore extends TaggableStore implements Store
     public function add($key, $value, $minutes)
     {
         $lua = <<<'LUA'
-local v = redis.call('get', KEYS[1])
-if (v) then
-return false
+if (redis.call('exists', KEYS[1]) > 0) then
+return 0
 end
 redis.call('setex', KEYS[1], ARGV[2], ARGV[1])
-return true
+return 1
 LUA;
         $value = $this->serialize($value);
 
