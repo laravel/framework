@@ -612,9 +612,10 @@ if (! function_exists('retry')) {
      *
      * @param  int  $times
      * @param  callable  $callback
+     * @param  int  $sleep
      * @return mixed
      */
-    function retry($times, callable $callback)
+    function retry($times, callable $callback, $sleep = 0)
     {
         $times--;
 
@@ -627,6 +628,10 @@ if (! function_exists('retry')) {
             }
 
             $times--;
+
+            if ($sleep) {
+                usleep($sleep * 1000);
+            }
 
             goto beginning;
         }
