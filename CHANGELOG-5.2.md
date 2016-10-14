@@ -259,7 +259,7 @@
 - Simplified calling `Model::replicate()` with `$except` argument ([#13676](https://github.com/laravel/framework/pull/13676))
 - Allow auth events to be serialized ([#13704](https://github.com/laravel/framework/pull/13704))
 - Added `for` and `id` attributes to auth scaffold ([#13689](https://github.com/laravel/framework/pull/13689))
-- Aquire lock before deleting reserved job ([4b502dc](https://github.com/laravel/framework/commit/4b502dc6eecd80efad01e845469b9a2bac26dae0#diff-b05083dc38b4e45d38d28c676abbad83))
+- Acquire lock before deleting reserved job ([4b502dc](https://github.com/laravel/framework/commit/4b502dc6eecd80efad01e845469b9a2bac26dae0#diff-b05083dc38b4e45d38d28c676abbad83))
 
 ### Fixed
 - Prefix timestamps when updating many-to-many relationships ([#13519](https://github.com/laravel/framework/pull/13519))
