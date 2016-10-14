@@ -79,16 +79,16 @@ class FormRequest extends Request implements ValidatesWhenResolved
         if (method_exists($this, 'validator')) {
             $validator = $this->container->call([$this, 'validator'], compact('factory'));
         } else {
-	        $validator = $factory->make(
-	            $this->validationData(), $this->container->call([$this, 'rules']), $this->messages(), $this->attributes()
-	        );
+            $validator = $factory->make(
+                $this->validationData(), $this->container->call([$this, 'rules']), $this->messages(), $this->attributes()
+            );
         }
 
         if (method_exists($this, 'validatorHooks')) {
-        	$this->validatorHooks($validator);
+            $this->validatorHooks($validator);
         }
 
-       	return $validator;
+        return $validator;
     }
 
     /**
