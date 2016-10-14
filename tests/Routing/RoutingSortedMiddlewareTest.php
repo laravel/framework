@@ -48,7 +48,8 @@ class RoutingSortedMiddlewareTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['First'], (new SortedMiddleware(['First'], ['First']))->all());
         $this->assertEquals(['First', 'Second'], (new SortedMiddleware(['First', 'Second'], ['Second', 'First']))->all());
 
-        $closure = function () {};
+        $closure = function () {
+        };
         $this->assertEquals(['Second', $closure], (new SortedMiddleware(['First', 'Second'], ['Second', $closure]))->all());
     }
 }
