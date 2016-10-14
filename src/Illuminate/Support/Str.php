@@ -368,6 +368,22 @@ class Str
 
         return trim($title, $separator);
     }
+    
+    
+    /**
+     * hide some character from Email Ex: mghallamzz@gmail.com like mgh***zz@gmail.com
+     *
+     * @param $email
+     * @return string
+     */
+    public static function obfuscate_email($email){
+
+        $em   = explode("@",$email);
+        $name = implode(array_slice($em, 0, count($em)-1), '@');
+        $len  = floor(strlen($name)/2);
+
+        return substr($name,0, $len) . str_repeat('*', $len) . "@" . end($em);
+    }
 
     /**
      * Convert a string to snake case.
