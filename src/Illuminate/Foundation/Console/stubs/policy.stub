@@ -13,8 +13,8 @@ class DummyClass
     /**
      * Determine whether the user can view the dummyModelName.
      *
-     * @param  \DummyModelNamespaceUser  $user
-     * @param  \DummyModelNamespaceDummyModel  $dummyModelName
+     * @param  DummyModelNamespaceUser  $user
+     * @param  DummyModelNamespaceDummyModel  $dummyModelName
      * @return mixed
      */
     public function view(User $user, DummyModel $dummyModelName)
@@ -25,7 +25,7 @@ class DummyClass
     /**
      * Determine whether the user can create dummyPluralModelName.
      *
-     * @param  \DummyModelNamespaceUser  $user
+     * @param  DummyModelNamespaceUser  $user
      * @return mixed
      */
     public function create(User $user)
@@ -36,8 +36,8 @@ class DummyClass
     /**
      * Determine whether the user can update the dummyModelName.
      *
-     * @param  \DummyModelNamespaceUser  $user
-     * @param  \DummyModelNamespaceDummyModel  $dummyModelName
+     * @param  DummyModelNamespaceUser  $user
+     * @param  DummyModelNamespaceDummyModel  $dummyModelName
      * @return mixed
      */
     public function update(User $user, DummyModel $dummyModelName)
@@ -48,8 +48,8 @@ class DummyClass
     /**
      * Determine whether the user can delete the dummyModelName.
      *
-     * @param  \DummyModelNamespaceUser  $user
-     * @param  \DummyModelNamespaceDummyModel  $dummyModelName
+     * @param  DummyModelNamespaceUser  $user
+     * @param  DummyModelNamespaceDummyModel  $dummyModelName
      * @return mixed
      */
     public function delete(User $user, DummyModel $dummyModelName)
