@@ -603,7 +603,7 @@ class Connection implements ConnectionInterface
     {
         if ($this->transactions == 0) {
             try {
-                $this->pdo->beginTransaction();
+                $this->getPdo()->beginTransaction();
             } catch (Exception $e) {
                 if ($this->causedByLostConnection($e)) {
                     $this->reconnect();
@@ -613,7 +613,7 @@ class Connection implements ConnectionInterface
                 }
             }
         } elseif ($this->transactions >= 1 && $this->queryGrammar->supportsSavepoints()) {
-            $this->pdo->exec(
+            $this->getPdo()->exec(
                 $this->queryGrammar->compileSavepoint('trans'.($this->transactions + 1))
             );
         }
