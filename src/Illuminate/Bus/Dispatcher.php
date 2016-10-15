@@ -6,6 +6,7 @@ use Closure;
 use RuntimeException;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Contracts\Queue\Queue;
+use Illuminate\Contracts\Bus\ShouldFake;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
@@ -69,6 +70,10 @@ class Dispatcher implements QueueingDispatcher
      */
     public function dispatch($command)
     {
+        if ($this->commandShouldBeFaked($command)) {
+            return $this->dispatchFake($command);
+        }
+
         if ($this->queueResolver && $this->commandShouldBeQueued($command)) {
             return $this->dispatchToQueue($command);
         } else {
@@ -96,6 +101,19 @@ class Dispatcher implements QueueingDispatcher
         }
 
         return $this->pipeline->send($command)->through($this->pipes)->then($callback);
+    }
+
+    /**
+     * Dispatch a command to its fake handler in the current process.
+     *
+     * @param  mixed  $command
+     * @return mixed
+     */
+    public function dispatchFake($command)
+    {
+        return $this->pipeline->send($command)->through($this->pipes)->then(function ($command) {
+            return $this->container->call([$command, 'fake']);
+        });
     }
 
     /**
@@ -133,6 +151,17 @@ class Dispatcher implements QueueingDispatcher
     protected function commandShouldBeQueued($command)
     {
         return $command instanceof ShouldQueue;
+    }
+
+    /**
+     * Determine if the given command should be faked.
+     *
+     * @param  mixed  $command
+     * @return bool
+     */
+    protected function commandShouldBeFaked($command)
+    {
+        return $command instanceof ShouldFake && $this->container->environment() == 'local';
     }
 
     /**
