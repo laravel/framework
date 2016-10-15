@@ -66,7 +66,7 @@ class PolicyMakeCommand extends GeneratorCommand
 
     /**
      * Separate the namespaced model into
-     * the namespace and the model name
+     * the namespace and the model name.
      *
      * @param  string  $model
      * @return array
