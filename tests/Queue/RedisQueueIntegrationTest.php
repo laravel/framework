@@ -4,19 +4,10 @@ use Mockery as m;
 use Illuminate\Queue\RedisQueue;
 use Illuminate\Container\Container;
 use Illuminate\Queue\Jobs\RedisJob;
-use Illuminate\Redis\PredisDatabase;
 
 class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
 {
-    /**
-     * @var bool
-     */
-    private static $connectionFailedOnceWithDefaultsSkip = false;
-
-    /**
-     * @var Database
-     */
-    private $redis;
+    use InteractsWithRedis;
 
     /**
      * @var RedisQueue
@@ -26,36 +17,7 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
     public function setUp()
     {
         parent::setUp();
-
-        $host = getenv('REDIS_HOST') ?: '127.0.0.1';
-        $port = getenv('REDIS_PORT') ?: 6379;
-
-        if (static::$connectionFailedOnceWithDefaultsSkip) {
-            $this->markTestSkipped('Trying default host/port failed, please set environment variable REDIS_HOST & REDIS_PORT to enable '.__CLASS__);
-
-            return;
-        }
-
-        $this->redis = new PredisDatabase([
-            'cluster' => false,
-            'default' => [
-                'host' => $host,
-                'port' => $port,
-                'database' => 5,
-                'timeout' => 0.5,
-            ],
-        ]);
-
-        try {
-            $this->redis->connection()->flushdb();
-        } catch (\Exception $e) {
-            if ($host === '127.0.0.1' && $port === 6379 && getenv('REDIS_HOST') === false) {
-                $this->markTestSkipped('Trying default host/port failed, please set environment variable REDIS_HOST & REDIS_PORT to enable '.__CLASS__);
-                static::$connectionFailedOnceWithDefaultsSkip = true;
-
-                return;
-            }
-        }
+        $this->setUpRedis();
 
         $this->queue = new RedisQueue($this->redis);
         $this->queue->setContainer(m::mock(Container::class));
@@ -64,10 +26,8 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
     public function tearDown()
     {
         parent::tearDown();
+        $this->tearDownRedis();
         m::close();
-        if ($this->redis) {
-            $this->redis->connection()->flushdb();
-        }
     }
 
     public function testExpiredJobsArePopped()

@@ -2,41 +2,23 @@
 
 use Illuminate\Cache\RedisStore;
 use Illuminate\Cache\Repository;
-use Illuminate\Redis\PredisDatabase;
 use Mockery as m;
 
 class RedisCacheTest extends PHPUnit_Framework_TestCase
 {
-    /**
-     * @var PredisDatabase
-     */
-    private $redis;
+    use InteractsWithRedis;
 
     public function setUp()
     {
         parent::setUp();
-
-        $host = getenv('REDIS_HOST') ?: '127.0.0.1';
-        $port = getenv('REDIS_PORT') ?: 6379;
-
-        $this->redis = new PredisDatabase([
-            'cluster' => false,
-            'default' => [
-                'host' => $host,
-                'port' => $port,
-                'database' => 5,
-                'timeout' => 0.5,
-            ],
-        ]);
-
-        $this->redis->connection()->flushdb();
+        $this->setUpRedis();
     }
 
     public function tearDown()
     {
         parent::tearDown();
         m::close();
-        $this->redis->connection()->flushdb();
+        $this->tearDownRedis();
     }
 
     public function testRedisCacheAddTwice()
