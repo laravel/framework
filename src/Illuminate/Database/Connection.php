@@ -7,7 +7,6 @@ use Closure;
 use Exception;
 use Throwable;
 use LogicException;
-use RuntimeException;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Database\Query\Expression;
@@ -576,6 +575,14 @@ class Connection implements ConnectionInterface
             // up in the database. Then we'll re-throw the exception so it can
             // be handled how the developer sees fit for their applications.
             catch (Exception $e) {
+                // On deadlock, if this is a nested transaction, we cannot retry.
+                // the outer most transaction is rolled back by the server
+                // so we shouldn't rollback to save points.
+                if ($this->causedByDeadlock($e) && $this->transactions > 1) {
+                    --$this->transactions;
+                    throw $e;
+                }
+
                 $this->rollBack();
 
                 if ($this->causedByDeadlock($e) && $a < $attempts) {
@@ -985,14 +992,10 @@ class Connection implements ConnectionInterface
      *
      * @param  \PDO|null  $pdo
      * @return $this
-     *
-     * @throws \RuntimeException
      */
     public function setPdo($pdo)
     {
-        if ($this->transactions >= 1) {
-            throw new RuntimeException("Can't swap PDO instance while within transaction.");
-        }
+        $this->transactions = 0;
 
         $this->pdo = $pdo;
 
