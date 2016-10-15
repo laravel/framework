@@ -28,7 +28,7 @@ class Rule
     }
 
     /**
-     * Get a in constraint builder instance.
+     * Get an in constraint builder instance.
      *
      * @param  array  $values
      * @return \Illuminate\Validation\Rules\In
