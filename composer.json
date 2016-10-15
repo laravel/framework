@@ -89,6 +89,11 @@
             "Illuminate\\": "src/Illuminate/"
         }
     },
+    "autoload-dev": {
+        "files": [
+            "tests/Redis/InteractsWithRedis.php"
+        ]
+    },
     "extra": {
         "branch-alias": {
             "dev-master": "5.4-dev"
