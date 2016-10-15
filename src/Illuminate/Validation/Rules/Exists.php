@@ -4,7 +4,7 @@ namespace Illuminate\Validation\Rules;
 
 use Closure;
 
-class Exists
+class Exists implements Rule
 {
     /**
      * The table to run the query against.
@@ -60,7 +60,7 @@ class Exists
             return $this->using($column);
         }
 
-        $this->wheres[] = compact('column', 'value');
+        $this->wheres[$column] = $value;
 
         return $this;
     }
@@ -118,8 +118,8 @@ class Exists
      */
     protected function formatWheres()
     {
-        return collect($this->wheres)->map(function ($where) {
-            return $where['column'].','.$where['value'];
+        return collect($this->wheres)->map(function ($value, $key) {
+            return "$key,$value";
         })->implode(',');
     }
 
@@ -131,6 +131,11 @@ class Exists
     public function queryCallbacks()
     {
         return $this->using ? [$this->using] : [];
+    }
+
+    public function toArray()
+    {
+        return ['exists', [$this->table, $this->column, $this->wheres]];
     }
 
     /**

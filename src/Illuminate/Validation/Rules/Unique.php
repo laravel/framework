@@ -4,7 +4,7 @@ namespace Illuminate\Validation\Rules;
 
 use Closure;
 
-class Unique
+class Unique implements Rule
 {
     /**
      * The table to run the query against.
@@ -74,7 +74,7 @@ class Unique
             return $this->using($column);
         }
 
-        $this->wheres[] = compact('column', 'value');
+        $this->wheres[$column] = $value;
 
         return $this;
     }
@@ -147,8 +147,8 @@ class Unique
      */
     protected function formatWheres()
     {
-        return collect($this->wheres)->map(function ($where) {
-            return $where['column'].','.$where['value'];
+        return collect($this->wheres)->map(function ($value, $key) {
+            return "$key,$value";
         })->implode(',');
     }
 
@@ -160,6 +160,17 @@ class Unique
     public function queryCallbacks()
     {
         return $this->using ? [$this->using] : [];
+    }
+
+    public function toArray()
+    {
+        return ['unique', [
+            $this->table,
+            $this->column,
+            $this->ignore ?: 'NULL',
+            $this->idColumn,
+            $this->wheres,
+        ]];
     }
 
     /**
