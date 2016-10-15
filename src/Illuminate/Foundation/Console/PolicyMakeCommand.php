@@ -53,21 +53,37 @@ class PolicyMakeCommand extends GeneratorCommand
      */
     protected function replaceModel($stub, $model)
     {
-        $model = str_replace('/', '\\', $model);
+        list($model, $namespace) = $this->getModelAndNamespace($model);
 
-        if (Str::startsWith($model, '\\')) {
-            $stub = str_replace('NamespacedDummyModel', trim($model, '\\'), $stub);
-        } else {
-            $stub = str_replace('NamespacedDummyModel', $this->laravel->getNamespace().$model, $stub);
-        }
-
-        $model = class_basename(trim($model, '\\'));
+        $stub = str_replace('DummyModelNamespace', $namespace, $stub);
 
         $stub = str_replace('DummyModel', $model, $stub);
 
         $stub = str_replace('dummyModelName', Str::camel($model), $stub);
 
         return str_replace('dummyPluralModelName', Str::plural(Str::camel($model)), $stub);
+    }
+
+    /**
+     * Separate the namespaced model into
+     * the namespace and the model name
+     *
+     * @param  string  $model
+     * @return array
+     */
+    protected function getModelAndNamespace($model)
+    {
+        $model = str_replace('/', '\\', $model);
+
+        $modelName = class_basename(trim($model, '\\'));
+
+        $namespace = substr($model, 0, -strlen($modelName));
+
+        $namespace = ltrim($namespace, '\\');
+
+        $namespace = $namespace ?: $this->laravel->getNamespace();
+
+        return [$modelName, $namespace];
     }
 
     /**
