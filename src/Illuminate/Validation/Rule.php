@@ -28,6 +28,17 @@ class Rule
     }
 
     /**
+     * Get a in constraint builder instance.
+     *
+     * @param  array  $values
+     * @return \Illuminate\Validation\Rules\In
+     */
+    public static function in(array $values)
+    {
+        return new Rules\In($values);
+    }
+
+    /**
      * Get a unique constraint builder instance.
      *
      * @param  string  $table
