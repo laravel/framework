@@ -233,7 +233,6 @@ test
 test
 <?php endif; ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
-
     }
 
     public function testHasSectionStatementsAreCompiled()
