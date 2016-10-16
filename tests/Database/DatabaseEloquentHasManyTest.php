@@ -175,7 +175,7 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase
     {
         $records = [
             'taylor' => ['name' => 'taylor'],
-            'colin' => ['name' => 'colin']
+            'colin' => ['name' => 'colin'],
         ];
 
         $relation = $this->getRelation();
