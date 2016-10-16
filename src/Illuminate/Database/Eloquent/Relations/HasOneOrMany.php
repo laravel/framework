@@ -336,10 +336,10 @@ abstract class HasOneOrMany extends Relation
      */
     public function createMany(array $records)
     {
-        $instances = [];
+        $instances = $this->related->newCollection();
 
         foreach ($records as $record) {
-            $instances[] = $this->create($record);
+            $instances->push($this->create($record));
         }
 
         return $instances;

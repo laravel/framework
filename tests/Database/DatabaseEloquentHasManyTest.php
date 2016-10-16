@@ -14,7 +14,7 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase
     public function testCreateMethodProperlyCreatesNewModel()
     {
         $relation = $this->getRelation();
-        $created = $this->getMockBuilder('Illuminate\Database\Eloquent\Model')->setMethods(['save', 'getKey', 'setAttribute'])->getMock();
+        $created = $this->getMockBuilder('Illuminate\Database\Eloquent\Model')->setMethods(['save', /*'getKey',*/ 'setAttribute'])->getMock();
         $created->expects($this->once())->method('save')->will($this->returnValue(true));
         $relation->getRelated()->shouldReceive('newInstance')->once()->with(['name' => 'taylor'])->andReturn($created);
         $created->expects($this->once())->method('setAttribute')->with('foreign_key', 1);
@@ -177,6 +177,25 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(0, count($models[2]->foo));
     }
 
+    public function testCreateManyCreatesARelatedModelForEachRecord()
+    {
+        $records = [
+            'taylor' => ['name' => 'taylor'],
+            'colin' => ['name' => 'colin']
+        ];
+
+        $relation = $this->getRelation();
+        $relation->getRelated()->shouldReceive('newCollection')->once()->andReturn(new Collection);
+
+        $taylor = $this->expectNewlyCreatedModel($relation, ['name' => 'taylor']);
+        $colin = $this->expectNewlyCreatedModel($relation, ['name' => 'colin']);
+
+        $instances = $relation->createMany($records);
+        $this->assertInstanceOf(Collection::class, $instances);
+        $this->assertEquals($taylor, $instances[0]);
+        $this->assertEquals($colin, $instances[1]);
+    }
+
     protected function getRelation()
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder');
@@ -190,6 +209,16 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase
         $parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
 
         return new HasMany($builder, $parent, 'table.foreign_key', 'id');
+    }
+
+    protected function expectNewlyCreatedModel($relation, $attributes)
+    {
+        $model = $this->getMockBuilder('Illuminate\Database\Eloquent\Model')->setMethods(['setAttribute', 'save'])->getMock();
+        $model->expects($this->once())->method('setAttribute')->with('foreign_key', 1);
+        $model->expects($this->once())->method('save');
+        $relation->getRelated()->shouldReceive('newInstance')->once()->with($attributes)->andReturn($model);
+
+        return $model;
     }
 }
 
