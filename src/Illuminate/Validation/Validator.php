@@ -203,8 +203,7 @@ class Validator implements ValidatorContract
         array $rules,
         array $messages = [],
         array $customAttributes = []
-    )
-    {
+    ) {
         $this->initialRules = $rules;
         $this->translator = $translator;
         $this->customMessages = $messages;
