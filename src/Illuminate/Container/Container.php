@@ -456,7 +456,7 @@ class Container implements ArrayAccess, ContainerContract
         $instance = $this->make($abstract);
 
         foreach ($this->getReboundCallbacks($abstract) as $callback) {
-            call_user_func($callback, $this, $instance);
+            $callback($this, $instance);
         }
     }
 
@@ -505,7 +505,7 @@ class Container implements ArrayAccess, ContainerContract
 
         $dependencies = $this->getMethodDependencies($callback, $parameters);
 
-        return call_user_func_array($callback, $dependencies);
+        return $callback(...$dependencies);
     }
 
     /**
@@ -835,7 +835,7 @@ class Container implements ArrayAccess, ContainerContract
     {
         if (! is_null($concrete = $this->getContextualConcrete('$'.$parameter->name))) {
             if ($concrete instanceof Closure) {
-                return call_user_func($concrete, $this);
+                return $concrete($this);
             } else {
                 return $concrete;
             }
