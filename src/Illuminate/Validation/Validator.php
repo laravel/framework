@@ -2219,6 +2219,15 @@ class Validator implements ValidatorContract
             $message = $this->$replacer($message, $attribute, $rule, $parameters);
         }
 
+        $matches = [];
+
+        preg_match_all('/:(\w+)[^\w]?/', $message, $matches);
+
+        foreach ($matches[1] as $match)
+        {
+            $message = str_replace(":{$match}", $this->getAttribute($match), $message);
+        }
+        
         return $message;
     }
 
