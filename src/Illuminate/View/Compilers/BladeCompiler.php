@@ -1152,5 +1152,5 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function compileEndSwitch()
     {
         return "<?php }  ?>";
-    }    
+    }
 }
