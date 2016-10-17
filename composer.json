@@ -37,7 +37,8 @@
         "symfony/process": "3.2.*",
         "symfony/routing": "3.2.*",
         "symfony/var-dumper": "3.2.*",
-        "vlucas/phpdotenv": "~2.2"
+        "vlucas/phpdotenv": "~2.2",
+        "psr/container": "~1.0@dev"
     },
     "replace": {
         "illuminate/auth": "self.version",
