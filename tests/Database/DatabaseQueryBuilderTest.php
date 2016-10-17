@@ -1176,6 +1176,11 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testInsertGetIdMethod()
     {
         $builder = $this->getBuilder();
+        $builder->getProcessor()->shouldReceive('processInsertGetId')->once()->with($builder, 'insert into "users" ("email") values (?)', ['foo'], null)->andReturn(1);
+        $result = $builder->from('users')->insertGetId(['email' => 'foo']);
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getBuilder();
         $builder->getProcessor()->shouldReceive('processInsertGetId')->once()->with($builder, 'insert into "users" ("email") values (?)', ['foo'], 'id')->andReturn(1);
         $result = $builder->from('users')->insertGetId(['email' => 'foo'], 'id');
         $this->assertEquals(1, $result);
