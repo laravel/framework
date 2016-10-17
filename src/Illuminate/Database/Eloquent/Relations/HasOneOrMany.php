@@ -329,17 +329,17 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
-     * Create an array of new instances of the related model.
+     * Create a Collection of new instances of the related model.
      *
      * @param  array  $records
-     * @return array
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     public function createMany(array $records)
     {
-        $instances = [];
+        $instances = $this->related->newCollection();
 
         foreach ($records as $record) {
-            $instances[] = $this->create($record);
+            $instances->push($this->create($record));
         }
 
         return $instances;
