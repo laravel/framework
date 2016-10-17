@@ -374,11 +374,28 @@ class Migrator
             $migration->$method();
         };
 
-        $grammar = $connection->getSchemaGrammar();
+        $grammar = $this->getSchemaGrammar($connection);
 
         $grammar->supportsSchemaTransactions()
                     ? $connection->transaction($callback)
                     : $callback();
+    }
+
+    /**
+     * Get the schema grammar out of a migration connection.
+     *
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return \Illuminate\Database\Schema\Grammars\Grammar
+     */
+    protected function getSchemaGrammar($connection)
+    {
+        if (is_null($grammar = $connection->getSchemaGrammar())) {
+            $connection->useDefaultSchemaGrammar();
+
+            $grammar = $connection->getSchemaGrammar();
+        }
+
+        return $grammar;
     }
 
     /**
