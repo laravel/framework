@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ClosureCommand extends Command
 {
     /**
-     * The callback.
+     * The command callback.
      *
      * @var \Closure
      */
