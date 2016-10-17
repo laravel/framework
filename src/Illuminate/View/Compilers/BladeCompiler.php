@@ -1130,10 +1130,10 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         if ($this->firstCase) {
             $this->firstCase = false;
-            
+
             return $this->CompileFirstCase($value);
         }
-        
+
         return "<?php  case {$value}:  ?>";
     }
 
