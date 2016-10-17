@@ -1194,6 +1194,19 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, $result);
     }
 
+    public function testLastInsertIdMethod()
+    {
+        $builder = $this->getBuilder();
+        $builder->getProcessor()->shouldReceive('processLastInsertId')->once()->with($builder, null)->andReturn(1);
+        $result = $builder->lastInsertId();
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getBuilder();
+        $builder->getProcessor()->shouldReceive('processLastInsertId')->once()->with($builder, 'id')->andReturn(1);
+        $result = $builder->lastInsertId('id');
+        $this->assertEquals(1, $result);
+    }
+
     public function testInsertMethodRespectsRawBindings()
     {
         $builder = $this->getBuilder();

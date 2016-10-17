@@ -31,6 +31,18 @@ class Processor
     {
         $query->getConnection()->insert($sql, $values);
 
+        return $this->processLastInsertId($query, $sequence);
+    }
+
+    /**
+     * Process a "last insert ID" query.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  string  $sequence
+     * @return int
+     */
+    public function processLastInsertId(Builder $query, $sequence = null)
+    {
         $id = $query->getConnection()->getPdo()->lastInsertId($sequence);
 
         return is_numeric($id) ? (int) $id : $id;

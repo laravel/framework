@@ -19,9 +19,21 @@ class SqlServerProcessor extends Processor
      */
     public function processInsertGetId(Builder $query, $sql, $values, $sequence = null)
     {
-        $connection = $query->getConnection();
+        $query->getConnection()->insert($sql, $values);
 
-        $connection->insert($sql, $values);
+        return $this->processLastInsertId($query, $sequence);
+    }
+
+    /**
+     * Process a "last insert ID" query.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  string  $sequence
+     * @return int
+     */
+    public function processLastInsertId(Builder $query, $sequence = null)
+    {
+        $connection = $query->getConnection();
 
         if ($connection->getConfig('odbc') === true) {
             $id = $this->processInsertGetIdForOdbc($connection);
