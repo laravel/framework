@@ -1090,4 +1090,68 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         $this->echoFormat = $format;
     }
+    
+     /**
+     * Compile the switch statements into valid PHP.
+     * @param  string  $variable
+     *
+     * @return string
+     */
+    public function compileSwitch($variable)
+    {
+        return "<?php switch({$variable}){ ";
+    }
+
+     /**
+     * Compile the first case statement into valid PHP.
+     * @param  string  $value
+     *
+     * @return string
+     */
+    public function compileFirstCase($value)
+    {
+        return "case {$value}:  ?>";
+    }
+    
+    /**
+     * Compile the case statement into valid PHP.
+     * @param  string  $value
+     *
+     * @return string
+     */
+    public function compileCase($value)
+    {
+        return "<?php  case {$value}:  ?>";
+    }
+    
+    /**
+     * Compile the break statement into valid PHP.
+     *
+     * @return string
+     */
+    public function compileBreakCase()
+    {
+        return "<?php break; ?>";
+    }
+    
+    /**
+     * Compile the default case statement into valid PHP.
+     *
+     * @return string
+     */
+    public function compileWhatEver()
+    {
+        return "<?php default: ?>";
+    }
+
+    /**
+     * Compile the end of switch statement into valid PHP.
+     *
+     * @return string
+     */
+    public function compileEndSwitch()
+    {
+        return "<?php }  ?>";
+    }    
+    
 }
