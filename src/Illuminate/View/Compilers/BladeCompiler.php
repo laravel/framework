@@ -1131,7 +1131,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     public function compileBreakCase()
     {
-        return "<?php break; ?>";
+        return '<?php break; ?>';
     }
 
     /**
@@ -1141,7 +1141,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     public function compileWhatEver()
     {
-        return "<?php default: ?>";
+        return '<?php default: ?>';
     }
 
     /**
@@ -1151,6 +1151,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     public function compileEndSwitch()
     {
-        return "<?php }  ?>";
+        return '<?php }  ?>';
     }
 }
