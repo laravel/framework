@@ -159,7 +159,7 @@ class Migrator
             return $this->pretendToRun($migration, 'up');
         }
 
-        $this->migrate($migration, 'up');
+        $this->runMigration($migration, 'up');
 
         // Once we have run a migrations class, we will log that it was run in this
         // repository so that we don't try to run it next time we do a migration
