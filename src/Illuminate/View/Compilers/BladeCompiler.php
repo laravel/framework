@@ -101,7 +101,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Helper to set the switch first case.
      *
-     * @var boolean
+     * @var bool
      */
     protected $firstCase;
 
@@ -1128,10 +1128,12 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     public function compileCase($value)
     {
-        if($this->firstCase) {
+        if ($this->firstCase) {
             $this->firstCase = false;
+            
             return $this->CompileFirstCase($value);
         }
+        
         return "<?php  case {$value}:  ?>";
     }
 
