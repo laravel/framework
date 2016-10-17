@@ -120,6 +120,7 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
         }
 
         $this->exists = true;
+        return true;
     }
 
     /**

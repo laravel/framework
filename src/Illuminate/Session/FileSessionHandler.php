@@ -80,7 +80,7 @@ class FileSessionHandler implements SessionHandlerInterface
      */
     public function write($sessionId, $data)
     {
-        $this->files->put($this->path.'/'.$sessionId, $data, true);
+        return ($this->files->put($this->path.'/'.$sessionId, $data, true) ? true : false);
     }
 
     /**
