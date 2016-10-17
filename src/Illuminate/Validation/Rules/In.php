@@ -5,6 +5,11 @@ namespace Illuminate\Validation\Rules;
 class In
 {
     /**
+     * The name of the rule.
+     */
+    protected $rule = 'in';
+
+    /**
      * The accepted values.
      *
      * @var array
@@ -29,6 +34,6 @@ class In
      */
     public function __toString()
     {
-        return 'in:'.implode(',', $this->values);
+        return $this->rule.':'.implode(',', $this->values);
     }
 }
