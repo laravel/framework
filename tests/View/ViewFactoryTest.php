@@ -209,7 +209,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
     {
         $factory = $this->getFactory();
         $view = m::mock('Illuminate\View\View');
-        $view->shouldReceive('getName')->once()->andReturn('name');
+        $view->shouldReceive('name')->once()->andReturn('name');
         $factory->getDispatcher()->shouldReceive('fire')->once()->with('composing: name', [$view]);
 
         $factory->callComposer($view);
