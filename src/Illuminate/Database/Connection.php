@@ -331,6 +331,9 @@ class Connection implements ConnectionInterface
             // of the database result set. Each element in the array will be a single
             // row from the database table, and will either be an array or objects.
             $statement = $this->getPdoForSelect($useReadPdo)->prepare($query);
+            if ($statement === false) {
+                throw new QueryException($query, $bindings, new Exception());
+            }
 
             $me->bindValues($statement, $me->prepareBindings($bindings));
 
@@ -367,6 +370,9 @@ class Connection implements ConnectionInterface
             }
 
             $statement = $this->getPdoForSelect($useReadPdo)->prepare($query);
+            if ($statement === false) {
+                throw new QueryException($query, $bindings, new Exception());
+            }
 
             $fetchMode = $me->getFetchMode();
             $fetchArgument = $me->getFetchArgument();
@@ -474,6 +480,9 @@ class Connection implements ConnectionInterface
             }
 
             $statement = $this->getPdo()->prepare($query);
+            if ($statement === false) {
+                throw new QueryException($query, $bindings, new Exception());
+            }
 
             $this->bindValues($statement, $me->prepareBindings($bindings));
 
@@ -499,6 +508,9 @@ class Connection implements ConnectionInterface
             // by the statement and return that back to the developer. We'll first need
             // to execute the statement and then we'll use PDO to fetch the affected.
             $statement = $me->getPdo()->prepare($query);
+            if ($statement === false) {
+                throw new QueryException($query, $bindings, new Exception());
+            }
 
             $this->bindValues($statement, $me->prepareBindings($bindings));
 
