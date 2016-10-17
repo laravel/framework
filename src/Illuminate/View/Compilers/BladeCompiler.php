@@ -1090,8 +1090,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         $this->echoFormat = $format;
     }
-    
-     /**
+
+    /**
      * Compile the switch statements into valid PHP.
      * @param  string  $variable
      *
@@ -1102,7 +1102,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
         return "<?php switch({$variable}){ ";
     }
 
-     /**
+    /**
      * Compile the first case statement into valid PHP.
      * @param  string  $value
      *
@@ -1112,7 +1112,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         return "case {$value}:  ?>";
     }
-    
+
     /**
      * Compile the case statement into valid PHP.
      * @param  string  $value
@@ -1123,7 +1123,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         return "<?php  case {$value}:  ?>";
     }
-    
+
     /**
      * Compile the break statement into valid PHP.
      *
@@ -1133,7 +1133,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         return "<?php break; ?>";
     }
-    
+
     /**
      * Compile the default case statement into valid PHP.
      *
@@ -1153,5 +1153,4 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         return "<?php }  ?>";
     }    
-    
 }
