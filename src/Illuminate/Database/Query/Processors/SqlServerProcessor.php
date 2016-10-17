@@ -33,7 +33,7 @@ class SqlServerProcessor extends Processor
     }
 
     /**
-     * Process an "insert get ID" query for ODBC.
+     * Process a "last insert ID" query for ODBC.
      *
      * @param  \Illuminate\Database\Connection  $connection
      * @return int
