@@ -22,13 +22,6 @@ abstract class Seeder
     protected $command;
 
     /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-    abstract public function run();
-
-    /**
      * Seed the given connection from the given path.
      *
      * @param  string  $class
@@ -36,7 +29,7 @@ abstract class Seeder
      */
     public function call($class)
     {
-        $this->resolve($class)->run();
+        $this->resolve($class)->__invoke();
 
         if (isset($this->command)) {
             $this->command->getOutput()->writeln("<info>Seeded:</info> $class");
@@ -90,5 +83,25 @@ abstract class Seeder
         $this->command = $command;
 
         return $this;
+    }
+
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function __invoke()
+    {
+        if (method_exists($this, 'run')) {
+            if (isset($this->container)) {
+                return $this->container->call([$this, 'run']);
+            }
+
+            return $this->run();
+        }
+
+        throw new \InvalidArgumentException('Method [run] missing from '.get_class($this));
     }
 }
