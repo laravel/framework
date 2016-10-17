@@ -516,7 +516,7 @@ class Factory implements FactoryContract
      */
     public function callComposer(ViewContract $view)
     {
-        $this->events->fire('composing: '.$view->getName(), [$view]);
+        $this->events->fire('composing: '.$view->name(), [$view]);
     }
 
     /**
@@ -527,7 +527,7 @@ class Factory implements FactoryContract
      */
     public function callCreator(ViewContract $view)
     {
-        $this->events->fire('creating: '.$view->getName(), [$view]);
+        $this->events->fire('creating: '.$view->name(), [$view]);
     }
 
     /**
