@@ -56,7 +56,7 @@ class Str
             return static::$camelCache[$value];
         }
 
-        return static::$camelCache[$value] = lcfirst(static::studly(strtolower($value)));
+        return static::$camelCache[$value] = lcfirst(static::studly((ctype_upper(preg_replace("/[-_]/", "", $value))) ? strtolower($value) : $value));
     }
 
     /**
