@@ -7,7 +7,6 @@ use Closure;
 use Exception;
 use Throwable;
 use LogicException;
-use RuntimeException;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Database\Query\Expression;
@@ -985,14 +984,10 @@ class Connection implements ConnectionInterface
      *
      * @param  \PDO|null  $pdo
      * @return $this
-     *
-     * @throws \RuntimeException
      */
     public function setPdo($pdo)
     {
-        if ($this->transactions >= 1) {
-            throw new RuntimeException("Can't swap PDO instance while within transaction.");
-        }
+        $this->transactions = 0;
 
         $this->pdo = $pdo;
 
