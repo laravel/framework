@@ -45,8 +45,14 @@ class ModelMakeCommand extends GeneratorCommand
 
             if ($this->option('controller')) {
                 $controller = Str::studly(class_basename($this->argument('name')));
-
-                $this->call('make:controller', ['name' => "{$controller}Controller", '--resource' => true]);
+                
+                if ($this->option('controller_resource') {
+                    $resource = true;  
+                } else {
+                    $resource = false;
+                }
+                
+                $this->call('make:controller', ['name' => "{$controller}Controller", '--resource' => $resource]);
             }
         }
     }
@@ -82,7 +88,10 @@ class ModelMakeCommand extends GeneratorCommand
         return [
             ['migration', 'm', InputOption::VALUE_NONE, 'Create a new migration file for the model.'],
 
-            ['controller', 'c', InputOption::VALUE_NONE, 'Create a new resource controller for the model.'],
+            ['controller', 'c', InputOption::VALUE_NONE, 'Create a new controller for the model.'],
+            
+            ['controller_resource', 'c_r', InputOption::VALUE_NONE,
+             'Set is resource controller or no. If create a new controller for the model']
         ];
     }
 }
