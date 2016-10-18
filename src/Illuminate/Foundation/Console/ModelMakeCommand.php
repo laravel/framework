@@ -46,7 +46,7 @@ class ModelMakeCommand extends GeneratorCommand
             if ($this->option('controller')) {
                 $controller = Str::studly(class_basename($this->argument('name')));
                 
-                if ($this->option('controller_resource') {
+                if ($this->option('controller_resource')) {
                     $resource = true;  
                 } else {
                     $resource = false;
