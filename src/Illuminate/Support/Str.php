@@ -56,7 +56,7 @@ class Str
             return static::$camelCache[$value];
         }
 
-        return static::$camelCache[$value] = lcfirst(static::studly($value));
+        return static::$camelCache[$value] = lcfirst(static::studly(strtolower($value)));
     }
 
     /**
