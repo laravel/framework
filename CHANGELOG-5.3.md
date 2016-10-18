@@ -1,30 +1,34 @@
 # Release Notes for 5.3.x
 
-## [Unreleased]
+## v5.3.19 (2016-10-17)
 
 ### Added
 - Added `--controller` (or `-c`) option to `make:model` command ([#15795](https://github.com/laravel/framework/pull/15795))
 - Added object based `dimensions` validation rule ([#15852](https://github.com/laravel/framework/pull/15852))
-- Added object based `in` validation rule ([#15923](https://github.com/laravel/framework/pull/15923))
+- Added object based `in` and `not_in` validation rule ([#15923](https://github.com/laravel/framework/pull/15923), [#15951](https://github.com/laravel/framework/pull/15951), [336a807](https://github.com/laravel/framework/commit/336a807ee56de27adcb3f9d34b337300520568ac))
 - Added `clear-compiled` command success message ([#15868](https://github.com/laravel/framework/pull/15868))
 - Added `SlackMessage::http()` to specify additional `headers` or `proxy` options ([#15882](https://github.com/laravel/framework/pull/15882))
 - Added a name to the logout route ([#15889](https://github.com/laravel/framework/pull/15889))
 - Added "feedback" to `Pluralizer::uncountable()` ([#15895](https://github.com/laravel/framework/pull/15895))
 - Added `FormRequest::withValidator($validator)` hook ([#15918](https://github.com/laravel/framework/pull/15918), [bf8a36a](https://github.com/laravel/framework/commit/bf8a36ac3df03a2c889cbc9aa535e5cf9ff48777))
+- Add missing `ClosureCommand::$callback` property ([#15956](https://github.com/laravel/framework/pull/15956))
 
 ### Changed
 - Total rewrite of middleware sorting logic ([6b69fb8](https://github.com/laravel/framework/commit/6b69fb81fc7c36e9e129a0ce2e56a824cc907859), [9cc5334](https://github.com/laravel/framework/commit/9cc5334d00824441ccce5e9d2979723e41b2fc05))
-- Wrap PostgreSQL database schema changes in a transaction ([#15780](https://github.com/laravel/framework/pull/15780))
+- Wrap PostgreSQL database schema changes in a transaction ([#15780](https://github.com/laravel/framework/pull/15780), [#15962](https://github.com/laravel/framework/pull/15962))
 - Expect `array` on `Validator::explodeRules()` ([#15838](https://github.com/laravel/framework/pull/15838))
 - Return `null` if an empty key was passed to `Model::getAttribute()` ([#15874](https://github.com/laravel/framework/pull/15874))
 - Support multiple `LengthAwarePaginator` on a single page with different `$pageName` properties ([#15870](https://github.com/laravel/framework/pull/15870))
 - Pass ids to `ModelNotFoundException` ([#15896](https://github.com/laravel/framework/pull/15896))
 - Improved database transaction logic ([7a0832b](https://github.com/laravel/framework/commit/7a0832bb44057f1060c96c2e01652aae7c583323))
+- Use `name()` method instead of `getName()` ([#15955](https://github.com/laravel/framework/pull/15955))
+- Minor syntax improvements ([#15953](https://github.com/laravel/framework/pull/15953), [#15954](https://github.com/laravel/framework/pull/15954), [4e9c9fd](https://github.com/laravel/framework/commit/4e9c9fd98b4dff71f449764e87c52577e2634587))
 
 ### Fixed
 - Fixed `migrate:status` using another connection ([#15824](https://github.com/laravel/framework/pull/15824))
 - Fixed calling closure based commands ([#15873](https://github.com/laravel/framework/pull/15873))
 - Split `SimpleMessage` by all possible EOLs ([#15921](https://github.com/laravel/framework/pull/15921))
+- Ensure that the search and the creation/update of Eloquent instances happens on the same connection ([#15958](https://github.com/laravel/framework/pull/15958))
 
 
 ## v5.3.18 (2016-10-07)
