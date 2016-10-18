@@ -46,7 +46,7 @@ class ModelMakeCommand extends GeneratorCommand
             if ($this->option('controller')) {
                 $controller = Str::studly(class_basename($this->argument('name')));
                 
-                if ($this->option('controller_resource')) {
+                if ($this->option('resource')) {
                     $resource = true;
                 } else {
                     $resource = false;
@@ -90,7 +90,7 @@ class ModelMakeCommand extends GeneratorCommand
 
             ['controller', 'c', InputOption::VALUE_NONE, 'Create a new controller for the model.'],
             
-            ['controller_resource', 'c_r', InputOption::VALUE_NONE,
+            ['resource', 'r', InputOption::VALUE_NONE,
              'Set is resource controller or no. If create a new controller for the model', ],
         ];
     }
