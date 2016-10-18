@@ -60,6 +60,6 @@ trait SerializesAndRestoresModelIdentifiers
         $model = new $value->class;
 
         return $model->newQuery()->useWritePdo()
-                    ->whereIn($model->getKeyName(), $value->id)->get();
+                    ->whereIn($model->getQualifiedKeyName(), $value->id)->get();
     }
 }
