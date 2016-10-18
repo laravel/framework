@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database;
 
+use InvalidArgumentException;
 use Illuminate\Console\Command;
 use Illuminate\Container\Container;
 
@@ -94,14 +95,12 @@ abstract class Seeder
      */
     public function __invoke()
     {
-        if (method_exists($this, 'run')) {
-            if (isset($this->container)) {
-                return $this->container->call([$this, 'run']);
-            }
-
-            return $this->run();
+        if (! method_exists($this, 'run')) {
+            throw new InvalidArgumentException('Method [run] missing from '.get_class($this));
         }
 
-        throw new \InvalidArgumentException('Method [run] missing from '.get_class($this));
+        return isset($this->container)
+                    ? $this->container->call([$this, 'run'])
+                    : $this->run();
     }
 }
