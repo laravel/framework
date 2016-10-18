@@ -608,6 +608,23 @@ if (! function_exists('redirect')) {
     }
 }
 
+if (! function_exists('remember')) {
+    /**
+     * Get an item from the cache, or store the default value.
+     *
+     * @param $key
+     * @param Closure $callback
+     * @param null $minutes
+     * @return mixed
+     */
+    function remember($key, Closure $callback, $minutes = null)
+    {
+        $minutes = $minutes ?: config('cache.default_minutes', 1);
+
+        return cache()->remember($key, $minutes, $callback);
+    }
+}
+
 if (! function_exists('request')) {
     /**
      * Get an instance of the current request or an input item from the request.
