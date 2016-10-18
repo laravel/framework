@@ -617,24 +617,17 @@ if (! function_exists('retry')) {
      */
     function retry($times, callable $callback, $sleep = 0)
     {
-        $times--;
-
-        beginning:
-        try {
-            return $callback();
-        } catch (Exception $e) {
-            if (! $times) {
-                throw $e;
+        do {
+            try {
+                return $callback();
+            } catch (Exception $e) {
+                if ($times > 1 && $sleep > 0) {
+                    usleep($sleep * 1000);
+                }
             }
+        } while (--$times);
 
-            $times--;
-
-            if ($sleep) {
-                usleep($sleep * 1000);
-            }
-
-            goto beginning;
-        }
+        throw $e;
     }
 }
 
