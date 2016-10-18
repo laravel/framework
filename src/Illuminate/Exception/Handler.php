@@ -256,6 +256,10 @@ class Handler {
 			{
 				$response = $this->formatException($e);
 			}
+			catch (\Throwable $e)
+			{
+				$response = $this->formatException($e);
+			}
 
 			// If this handler returns a "non-null" response, we will return it so it will
 			// get sent back to the browsers. Once the handler returns a valid response

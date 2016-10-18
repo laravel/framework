@@ -95,6 +95,10 @@ class TinkerCommand extends Command {
 			{
 				$this->error($e->getMessage());
 			}
+			catch (\Throwable $e)
+			{
+				$this->error($e->getMessage());
+			}
 
 			$input = $this->prompt();
 		}
