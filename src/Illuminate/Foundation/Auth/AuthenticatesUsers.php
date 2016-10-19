@@ -109,7 +109,7 @@ trait AuthenticatesUsers
      * Get the failed login response instance.
      *
      * @param \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
     protected function sendFailedLoginResponse(Request $request)
     {
