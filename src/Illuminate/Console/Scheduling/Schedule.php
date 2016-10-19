@@ -77,10 +77,10 @@ class Schedule
     {
         return collect($parameters)->map(function ($value, $key) {
             if (is_array($value)) {
-                $value = collect($value)->map(function($value) {
+                $value = collect($value)->map(function ($value) {
                     return ProcessUtils::escapeArgument($value);
                 })->implode(' ');
-            } elseif (!is_numeric($value) && !preg_match('/^(-.$|--.*)/i', $value)) {
+            } elseif (! is_numeric($value) && ! preg_match('/^(-.$|--.*)/i', $value)) {
                 $value = ProcessUtils::escapeArgument($value);
             }
 
