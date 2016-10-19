@@ -42,7 +42,7 @@ class ModelMakeCommand extends GeneratorCommand
 
                 $this->call('make:migration', [
                     'name' => "create_{$table}_table",
-                    '--create' => $table
+                    '--create' => $table,
                 ]);
             }
 
@@ -51,7 +51,7 @@ class ModelMakeCommand extends GeneratorCommand
 
                 $this->call('make:controller', [
                     'name' => "{$controller}Controller",
-                    '--resource' => $this->option('resource')
+                    '--resource' => $this->option('resource'),
                 ]);
             }
         }
@@ -90,7 +90,7 @@ class ModelMakeCommand extends GeneratorCommand
 
             ['controller', 'c', InputOption::VALUE_NONE, 'Create a new controller for the model.'],
 
-            ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller', ],
+            ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller'],
         ];
     }
 }
