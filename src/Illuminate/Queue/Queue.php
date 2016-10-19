@@ -83,15 +83,11 @@ abstract class Queue
                 'job' => 'Illuminate\Queue\CallQueuedHandler@call',
                 'data' => [
                     'commandName' => get_class($job),
-                    'command' => serialize(clone $job),
+                    'command64' => base64_encode(serialize(clone $job)),
                 ],
             ]);
         } else {
             $payload = json_encode($this->createPlainPayload($job, $data));
-        }
-
-        if (JSON_ERROR_NONE !== json_last_error()) {
-            throw new InvalidArgumentException('Unable to create payload: '.json_last_error_msg());
         }
 
         return $payload;
