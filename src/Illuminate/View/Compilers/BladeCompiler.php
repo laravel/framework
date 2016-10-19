@@ -1152,7 +1152,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      *
      * @return string
      */
-    public function compileWhatever()
+    public function compileDefault()
     {
         return '<?php default: ?>';
     }
