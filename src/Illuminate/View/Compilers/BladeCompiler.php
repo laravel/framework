@@ -411,7 +411,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileParent()
     {
-        return "##parent-placeholder##";
+        return '##parent-placeholder##';
     }
 
     /**
