@@ -18,8 +18,7 @@ class RoutingSortedMiddlewareTest extends PHPUnit_Framework_TestCase
             'Something',
             'Something',
             'Second',
-            'Something',
-            'Something',
+            'Otherthing',
             'First:api',
             'Third:foo',
             'First:foo,bar',
@@ -29,15 +28,10 @@ class RoutingSortedMiddlewareTest extends PHPUnit_Framework_TestCase
 
         $expected = [
             'Something',
-            'Something',
-            'Something',
-            'Something',
             'First:api',
             'First:foo,bar',
             'Second',
-            'Something',
-            'Something',
-            'Second',
+            'Otherthing',
             'Third:foo',
             'Third',
         ];
