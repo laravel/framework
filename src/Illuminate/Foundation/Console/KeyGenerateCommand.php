@@ -52,14 +52,13 @@ class KeyGenerateCommand extends Command
     protected function setKeyInEnvironmentFile($key)
     {
         if (file_exists($this->laravel->environmentFilePath())) {
-
             file_put_contents($this->laravel->environmentFilePath(), str_replace(
                 'APP_KEY='.$this->laravel['config']['app.key'],
                 'APP_KEY='.$key,
                 file_get_contents($this->laravel->environmentFilePath())
             ));
         } else {
-            $this->error("Environment file is missing.");
+            $this->error('Environment file is missing.');
             exit();
         }
     }
