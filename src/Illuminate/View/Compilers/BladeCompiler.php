@@ -405,6 +405,16 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Replace the @parent directive to a placeholder.
+     *
+     * @return string
+     */
+    protected function compileParent()
+    {
+        return "##parent-placeholder##";
+    }
+
+    /**
      * Compile the each statements into valid PHP.
      *
      * @param  string  $expression

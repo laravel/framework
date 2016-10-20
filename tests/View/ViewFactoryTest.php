@@ -245,7 +245,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
     {
         $factory = $this->getFactory();
         $factory->startSection('foo');
-        echo 'hi @parent';
+        echo 'hi ##parent-placeholder##';
         $factory->stopSection();
         $factory->startSection('foo');
         echo 'there';
@@ -257,10 +257,10 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
     {
         $factory = $this->getFactory();
         $factory->startSection('foo');
-        echo 'hello @parent nice to see you @parent';
+        echo 'hello ##parent-placeholder## nice to see you ##parent-placeholder##';
         $factory->stopSection();
         $factory->startSection('foo');
-        echo 'my @parent';
+        echo 'my ##parent-placeholder##';
         $factory->stopSection();
         $factory->startSection('foo');
         echo 'friend';
