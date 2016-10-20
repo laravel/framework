@@ -175,7 +175,7 @@ class FileStore implements Store
         if (config('cache.stores.file.gc_dirs')) {
             $topmost_directory = dirname(dirname($file));
             return $this->files->deleteDirectory($topmost_directory);
-        } else if ($this->files->exists($file)) {
+        } elseif ($this->files->exists($file)) {
             return $this->files->delete($file);
         }
 
