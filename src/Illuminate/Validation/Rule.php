@@ -2,8 +2,12 @@
 
 namespace Illuminate\Validation;
 
+use Illuminate\Support\Traits\Macroable;
+
 class Rule
 {
+    use Macroable;
+
     /**
      * Get a dimensions constraint builder instance.
      *
