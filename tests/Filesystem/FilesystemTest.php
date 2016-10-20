@@ -269,6 +269,9 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
 
     public function testIsReadable()
     {
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            self::markTestSkipped('You cannot remove read permissions on windows');
+        }
         file_put_contents($this->tempDir.'/foo.txt', 'foo');
         $files = new Filesystem();
         @chmod($this->tempDir.'/foo.txt', 0000);
