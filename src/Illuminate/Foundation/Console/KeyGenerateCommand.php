@@ -54,7 +54,7 @@ class KeyGenerateCommand extends Command
         file_put_contents($this->laravel->environmentFilePath(), str_replace(
             'APP_KEY='.$this->laravel['config']['app.key'],
             'APP_KEY='.$key,
-            file_get_contents($this->laravel->environmentFilePath())
+            @file_get_contents($this->laravel->environmentFilePath())
         ));
     }
 
