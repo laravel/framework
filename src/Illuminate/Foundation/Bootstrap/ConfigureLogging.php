@@ -9,24 +9,42 @@ use Illuminate\Contracts\Foundation\Application;
 class ConfigureLogging
 {
     /**
+     * The application implementation.
+     *
+     * @var \Illuminate\Contracts\Foundation\Application
+     */
+    protected $app;
+
+    /**
+     * Create a new BootProviders instance.
+     *
+     * @param \Illuminate\Contracts\Foundation\Application $app
+     * @return void
+     */
+    public function __construct(Application $app)
+    {
+        $this->app = $app;
+    }
+
+    /**
      * Bootstrap the given application.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
-    public function bootstrap(Application $app)
+    public function bootstrap()
     {
-        $log = $this->registerLogger($app);
+        $log = $this->registerLogger($this->$app);
 
         // If a custom Monolog configurator has been registered for the application
         // we will call that, passing Monolog along. Otherwise, we will grab the
         // the configurations for the log system and use it for configuration.
-        if ($app->hasMonologConfigurator()) {
+        if ($this->app->hasMonologConfigurator()) {
             call_user_func(
-                $app->getMonologConfigurator(), $log->getMonolog()
+                $this->app->getMonologConfigurator(), $log->getMonolog()
             );
         } else {
-            $this->configureHandlers($app, $log);
+            $this->configureHandlers($log);
         }
     }
 
@@ -36,10 +54,10 @@ class ConfigureLogging
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return \Illuminate\Log\Writer
      */
-    protected function registerLogger(Application $app)
+    protected function registerLogger()
     {
-        $app->instance('log', $log = new Writer(
-            new Monolog($app->environment()), $app['events'])
+        $this->app->instance('log', $log = new Writer(
+            new Monolog($this->app->environment()), $app['events'])
         );
 
         return $log;
@@ -52,7 +70,7 @@ class ConfigureLogging
      * @param  \Illuminate\Log\Writer  $log
      * @return void
      */
-    protected function configureHandlers(Application $app, Writer $log)
+    protected function configureHandlers(Writer $log)
     {
         $method = 'configure'.ucfirst($app['config']['app.log']).'Handler';
 
@@ -69,8 +87,8 @@ class ConfigureLogging
     protected function configureSingleHandler(Application $app, Writer $log)
     {
         $log->useFiles(
-            $app->storagePath().'/logs/laravel.log',
-            $app->make('config')->get('app.log_level', 'debug')
+            $this->app->storagePath().'/logs/laravel.log',
+            $this->app->make('config')->get('app.log_level', 'debug')
         );
     }
 
@@ -83,12 +101,12 @@ class ConfigureLogging
      */
     protected function configureDailyHandler(Application $app, Writer $log)
     {
-        $config = $app->make('config');
+        $config = $this->app->make('config');
 
         $maxFiles = $config->get('app.log_max_files');
 
         $log->useDailyFiles(
-            $app->storagePath().'/logs/laravel.log', is_null($maxFiles) ? 5 : $maxFiles,
+            $this->app->storagePath().'/logs/laravel.log', is_null($maxFiles) ? 5 : $maxFiles,
             $config->get('app.log_level', 'debug')
         );
     }
@@ -104,7 +122,7 @@ class ConfigureLogging
     {
         $log->useSyslog(
             'laravel',
-            $app->make('config')->get('app.log_level', 'debug')
+            $this->app->make('config')->get('app.log_level', 'debug')
         );
     }
 
@@ -117,6 +135,6 @@ class ConfigureLogging
      */
     protected function configureErrorlogHandler(Application $app, Writer $log)
     {
-        $log->useErrorLog($app->make('config')->get('app.log_level', 'debug'));
+        $log->useErrorLog($this->app->make('config')->get('app.log_level', 'debug'));
     }
 }

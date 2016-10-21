@@ -11,34 +11,52 @@ use Illuminate\Contracts\Config\Repository as RepositoryContract;
 class LoadConfiguration
 {
     /**
+     * The application implementation.
+     *
+     * @var \Illuminate\Contracts\Foundation\Application
+     */
+    protected $app;
+
+    /**
+     * Create a new BootProviders instance.
+     *
+     * @param \Illuminate\Contracts\Foundation\Application $app
+     * @return void
+     */
+    public function __construct(Application $app)
+    {
+        $this->app = $app;
+    }
+
+    /**
      * Bootstrap the given application.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
-    public function bootstrap(Application $app)
+    public function bootstrap()
     {
         $items = [];
 
         // First we will see if we have a cache configuration file. If we do, we'll load
         // the configuration items from that file so that it is very quick. Otherwise
         // we will need to spin through every configuration file and load them all.
-        if (file_exists($cached = $app->getCachedConfigPath())) {
+        if (file_exists($cached = $this->app->getCachedConfigPath())) {
             $items = require $cached;
 
             $loadedFromCache = true;
         }
 
-        $app->instance('config', $config = new Repository($items));
+        $this->app->instance('config', $config = new Repository($items));
 
         // Next we will spin through all of the configuration files in the configuration
         // directory and load each one into the repository. This will make all of the
         // options available to the developer for use in various parts of this app.
         if (! isset($loadedFromCache)) {
-            $this->loadConfigurationFiles($app, $config);
+            $this->loadConfigurationFiles($config);
         }
 
-        $app->detectEnvironment(function () use ($config) {
+        $this->app->detectEnvironment(function () use ($config) {
             return $config->get('app.env', 'production');
         });
 
@@ -54,9 +72,9 @@ class LoadConfiguration
      * @param  \Illuminate\Contracts\Config\Repository  $repository
      * @return void
      */
-    protected function loadConfigurationFiles(Application $app, RepositoryContract $repository)
+    protected function loadConfigurationFiles(RepositoryContract $repository)
     {
-        foreach ($this->getConfigurationFiles($app) as $key => $path) {
+        foreach ($this->getConfigurationFiles() as $key => $path) {
             $repository->set($key, require $path);
         }
     }
@@ -67,11 +85,11 @@ class LoadConfiguration
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return array
      */
-    protected function getConfigurationFiles(Application $app)
+    protected function getConfigurationFiles()
     {
         $files = [];
 
-        $configPath = realpath($app->configPath());
+        $configPath = realpath($this->app->configPath());
 
         foreach (Finder::create()->files()->name('*.php')->in($configPath) as $file) {
             $nesting = $this->getConfigurationNesting($file, $configPath);
