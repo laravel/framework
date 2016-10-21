@@ -53,11 +53,17 @@ class PolicyMakeCommand extends GeneratorCommand
      */
     protected function replaceModel($stub, $model)
     {
-        list($model, $namespace) = $this->getModelAndNamespace($model);
+        list($model, $modelNamespace) = $this->getModelAndNamespace($model);
 
-        $stub = str_replace('DummyModelNamespace', $namespace, $stub);
+        list($user,  $userNamespace)  = $this->getUserAndNamespace();
+
+        $stub = str_replace('DummyModelNamespace', $modelNamespace, $stub);
+
+        $stub = str_replace('DummyUserNamespace', $userNamespace, $stub);
 
         $stub = str_replace('DummyModel', $model, $stub);
+
+        $stub = str_replace('DummyUser', $user, $stub);
 
         $stub = str_replace('dummyModelName', Str::camel($model), $stub);
 
@@ -73,7 +79,7 @@ class PolicyMakeCommand extends GeneratorCommand
      */
     protected function getModelAndNamespace($model)
     {
-        $model = str_replace('/', '\\', $model);
+        $model     = str_replace('/', '\\', $model);
 
         $modelName = class_basename(trim($model, '\\'));
 
@@ -84,6 +90,23 @@ class PolicyMakeCommand extends GeneratorCommand
         $namespace = $namespace ?: $this->laravel->getNamespace();
 
         return [$modelName, $namespace];
+    }
+
+    /**
+     * Get the default user and its namespace.
+     *
+     * @param  string  $default
+     * @return array
+     */
+    protected function getUserAndNamespace($default = 'App\\User')
+    {
+        $config   = $this->laravel->make('config');
+
+        $guard    = $config->get('auth.defaults.guard');
+        $provider = $config->get("auth.guards.$guard.provider");
+        $model    = $config->get("auth.providers.$provider.model", $default);
+
+        return $this->getModelAndNamespace($model);
     }
 
     /**
