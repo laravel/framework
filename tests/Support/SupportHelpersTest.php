@@ -156,19 +156,19 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
                 'id' => 5,
                 'name' => 'John',
                 'department' => 'Sales',
-                'email' => 'john@example.com'
+                'email' => 'john@example.com',
             ],
             [
                 'id' => 7,
                 'name' => 'Jane',
                 'department' => 'Marketing',
-                'email' => 'jane@example.com'
+                'email' => 'jane@example.com',
             ]
         ];
 
         $mapped = array_map_with_keys(
             function ($item) {
-                    return [$item['id'] => $item['name']];
+                return [$item['id'] => $item['name']];
             }, $array);
 
         $expected = [
@@ -178,7 +178,6 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals($mapped, $expected);
     }
-
 
     public function testArrayPluck()
     {
