@@ -44,7 +44,7 @@ class ModelMakeCommand extends GeneratorCommand
             }
 
             if ($this->option('controller')) {
-                $controller = Str::camel(class_basename($this->argument('name')));
+                $controller = Str::studly(class_basename($this->argument('name')));
 
                 $this->call('make:controller', ['name' => "{$controller}Controller", '--resource' => true]);
             }
