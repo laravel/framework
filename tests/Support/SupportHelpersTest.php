@@ -163,7 +163,7 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
                 'name' => 'Jane',
                 'department' => 'Marketing',
                 'email' => 'jane@example.com',
-            ]
+            ],
         ];
 
         $mapped = array_map_with_keys(
