@@ -2,6 +2,7 @@
 
 namespace Illuminate\Session;
 
+use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use SessionHandlerInterface;
@@ -747,5 +748,25 @@ class Store implements SessionInterface
         if ($this->handlerNeedsRequest()) {
             $this->handler->setRequest($request);
         }
+    }
+
+    /**
+     * Get an item from the sessuib, or store the default value.
+     *
+     * @param  string $key
+     * @param  \Closure $callback
+     * @return mixed
+     */
+    public function remember($key, Closure $callback)
+    {
+        // If the item exists in the session we will just return this immediately
+        // otherwise we will execute the given Closure and store the result
+        if (!is_null($value = $this->get($key))) {
+            return $value;
+        }
+
+        $this->put($key, $value = $callback());
+
+        return $value;
     }
 }
