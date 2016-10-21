@@ -47,7 +47,7 @@ trait RegistersUsers
     {
         return Auth::guard();
     }
-    
+
     /**
      * The user has been registered.
      *
@@ -57,6 +57,5 @@ trait RegistersUsers
      */
     protected function registered(Request $request, $user)
     {
-        return null;
     }
 }
