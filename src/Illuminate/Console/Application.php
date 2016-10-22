@@ -28,6 +28,13 @@ class Application extends SymfonyApplication implements ApplicationContract
     protected $lastOutput;
 
     /**
+     * The console application bootstrappers.
+     *
+     * @var array
+     */
+    protected static $bootstrappers = [];
+
+    /**
      * Create a new Artisan console application.
      *
      * @param  \Illuminate\Contracts\Container\Container  $laravel
@@ -44,6 +51,20 @@ class Application extends SymfonyApplication implements ApplicationContract
         $this->setCatchExceptions(false);
 
         $events->fire(new Events\ArtisanStarting($this));
+
+        $this->bootstrap();
+    }
+
+    /**
+     * Bootstrap the console application.
+     *
+     * @return void
+     */
+    protected function bootstrap()
+    {
+        foreach (static::$bootstrappers as $bootstrapper) {
+            $bootstrapper($this);
+        }
     }
 
     /**
@@ -168,5 +189,16 @@ class Application extends SymfonyApplication implements ApplicationContract
     public function getLaravel()
     {
         return $this->laravel;
+    }
+
+    /**
+     * Register an application starting bootstrapper.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public static function starting(\Closure $callback)
+    {
+        static::$bootstrappers[] = $callback;
     }
 }

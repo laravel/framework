@@ -2,7 +2,7 @@
 
 namespace Illuminate\Support;
 
-use Illuminate\Console\Events\ArtisanStarting;
+use Illuminate\Console\Application as Artisan;
 
 abstract class ServiceProvider
 {
@@ -176,13 +176,8 @@ abstract class ServiceProvider
     {
         $commands = is_array($commands) ? $commands : func_get_args();
 
-        // To register the commands with Artisan, we will grab each of the arguments
-        // passed into the method and listen for Artisan "start" event which will
-        // give us the Artisan console instance which we will give commands to.
-        $events = $this->app['events'];
-
-        $events->listen(ArtisanStarting::class, function ($event) use ($commands) {
-            $event->artisan->resolveCommands($commands);
+        Artisan::starting(function ($artisan) use ($commands) {
+            $artisan->resolveCommands($commands);
         });
     }
 
