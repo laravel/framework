@@ -77,8 +77,8 @@ class BroadcastNotificationCreated implements ShouldBroadcast
      */
     protected function channelName()
     {
-        if (method_exists($this->notifiable, 'broadcastNotificationChannelName')) {
-            return $this->notifiable->broadcastNotificationChannelName($this->notification);
+        if (method_exists($this->notifiable, 'receivesBroadcastNotificationsOn')) {
+            return $this->notifiable->receivesBroadcastNotificationsOn($this->notification);
         }
 
         $class = str_replace('\\', '.', get_class($this->notifiable));
