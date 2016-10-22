@@ -423,7 +423,7 @@ class Store implements SessionInterface
      */
     public function remember($key, Closure $callback)
     {
-        if (!is_null($value = $this->get($key))) {
+        if (! is_null($value = $this->get($key))) {
             return $value;
         }
 
