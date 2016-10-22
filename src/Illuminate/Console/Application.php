@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console;
 
+use Closure;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Container\Container;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -65,6 +66,17 @@ class Application extends SymfonyApplication implements ApplicationContract
         foreach (static::$bootstrappers as $bootstrapper) {
             $bootstrapper($this);
         }
+    }
+
+    /**
+     * Register a console "starting" bootstrapper.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public static function starting(Closure $callback)
+    {
+        static::$bootstrappers[] = $callback;
     }
 
     /**
@@ -189,16 +201,5 @@ class Application extends SymfonyApplication implements ApplicationContract
     public function getLaravel()
     {
         return $this->laravel;
-    }
-
-    /**
-     * Register an application starting bootstrapper.
-     *
-     * @param  \Closure  $callback
-     * @return void
-     */
-    public static function starting(\Closure $callback)
-    {
-        static::$bootstrappers[] = $callback;
     }
 }
