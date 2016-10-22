@@ -483,7 +483,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $results = [];
 
         foreach ($this->items as $key => $item) {
-            $results[$keyBy($item, $key)] = $item;
+            $k = $keyBy($item, $key);
+            if (is_object($k))
+                $k = (string) $k;
+
+            $results[$k] = $item;
         }
 
         return new static($results);
