@@ -34,7 +34,8 @@ trait RegistersUsers
 
         $this->guard()->login($user);
 
-        return redirect($this->redirectPath());
+        return $this->registered($request, $user)
+            ?: redirect($this->redirectPath());
     }
 
     /**
@@ -45,5 +46,16 @@ trait RegistersUsers
     protected function guard()
     {
         return Auth::guard();
+    }
+
+    /**
+     * The user has been registered.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  mixed  $user
+     * @return mixed
+     */
+    protected function registered(Request $request, $user)
+    {
     }
 }
