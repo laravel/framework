@@ -2741,6 +2741,18 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Sets the casts array.
+     *
+     * @param  array  $casts
+     * @return $this
+     */
+    public function setCasts(array $casts)
+    {
+        $this->casts = $casts;
+        return $this;
+    }
+
+    /**
      * Determine whether an attribute should be cast to a native type.
      *
      * @param  string  $key
