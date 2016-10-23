@@ -98,7 +98,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $values = with(isset($key) ? $this->pluck($key) : $this)
                     ->sort()->values();
 
-        $middle = (int) floor($count / 2);
+        $middle = (int) ($count / 2);
 
         if ($count % 2) {
             return $values->get($middle);
@@ -483,7 +483,13 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $results = [];
 
         foreach ($this->items as $key => $item) {
-            $results[$keyBy($item, $key)] = $item;
+            $resolvedKey = $keyBy($item, $key);
+
+            if (is_object($resolvedKey)) {
+                $resolvedKey = (string) $resolvedKey;
+            }
+
+            $results[$resolvedKey] = $item;
         }
 
         return new static($results);
@@ -698,6 +704,10 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function only($keys)
     {
+        if (is_null($keys)) {
+            return new static($this->items);
+        }
+
         $keys = is_array($keys) ? $keys : func_get_args();
 
         return new static(Arr::only($this->items, $keys));
@@ -921,6 +931,23 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Split a collection into a certain number of groups.
+     *
+     * @param  int  $numberOfGroups
+     * @return static
+     */
+    public function split($numberOfGroups)
+    {
+        if ($this->isEmpty()) {
+            return new static;
+        }
+
+        $groupSize = ceil($this->count() / $numberOfGroups);
+
+        return $this->chunk($groupSize);
+    }
+
+    /**
      * Chunk the underlying collection array.
      *
      * @param  int   $size
@@ -1032,7 +1059,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $callback = $this->valueRetriever($callback);
 
         return $this->reduce(function ($result, $item) use ($callback) {
-            return $result += $callback($item);
+            return $result + $callback($item);
         }, 0);
     }
 

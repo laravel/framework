@@ -358,20 +358,25 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
 
     public function testSort()
     {
-        $array = [
+        $unsorted = [
             ['name' => 'Desk'],
             ['name' => 'Chair'],
         ];
-
-        $array = array_values(Arr::sort($array, function ($value) {
-            return $value['name'];
-        }));
 
         $expected = [
             ['name' => 'Chair'],
             ['name' => 'Desk'],
         ];
-        $this->assertEquals($expected, $array);
+
+        // sort with closure
+        $sortedWithClosure = array_values(Arr::sort($unsorted, function ($value) {
+            return $value['name'];
+        }));
+        $this->assertEquals($expected, $sortedWithClosure);
+
+        // sort with dot notation
+        $sortedWithDotNotation = array_values(Arr::sort($unsorted, 'name'));
+        $this->assertEquals($expected, $sortedWithDotNotation);
     }
 
     public function testSortRecursive()

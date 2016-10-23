@@ -59,7 +59,7 @@ class ResetCommand extends BaseCommand
 
         // First, we'll make sure that the migration table actually exists before we
         // start trying to rollback and re-run all of the migrations. If it's not
-        // present we will just bail out with a info message for the developer.
+        // present we'll just bail out with an info message for the developers.
         if (! $this->migrator->repositoryExists()) {
             return $this->comment('Migration table not found.');
         }
@@ -87,6 +87,8 @@ class ResetCommand extends BaseCommand
             ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'],
 
             ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'],
+
+            ['path', null, InputOption::VALUE_OPTIONAL, 'The path of migrations files to be executed.'],
 
             ['pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'],
         ];

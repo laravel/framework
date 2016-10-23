@@ -306,6 +306,16 @@ class BelongsTo extends Relation
     }
 
     /**
+     * Get the name of the relationship.
+     *
+     * @return string
+     */
+    public function getRelation()
+    {
+        return $this->relation;
+    }
+
+    /**
      * Get the fully qualified associated key of the relationship.
      *
      * @return string

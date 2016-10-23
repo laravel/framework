@@ -48,11 +48,11 @@ class RefreshCommand extends Command
 
         if ($step > 0) {
             $this->call('migrate:rollback', [
-                '--database' => $database, '--force' => $force, '--step' => $step,
+                '--database' => $database, '--force' => $force, '--path' => $path, '--step' => $step,
             ]);
         } else {
             $this->call('migrate:reset', [
-                '--database' => $database, '--force' => $force,
+                '--database' => $database, '--force' => $force, '--path' => $path,
             ]);
         }
 

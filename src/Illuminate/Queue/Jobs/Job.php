@@ -3,6 +3,7 @@
 namespace Illuminate\Queue\Jobs;
 
 use DateTime;
+use Carbon\Carbon;
 use Illuminate\Support\Arr;
 
 abstract class Job
@@ -188,7 +189,7 @@ abstract class Job
      */
     protected function getTime()
     {
-        return time();
+        return Carbon::now()->getTimestamp();
     }
 
     /**

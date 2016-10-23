@@ -124,7 +124,7 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
-     * Get a URL for a given page number.
+     * Get the URL for a given page number.
      *
      * @param  int  $page
      * @return string

@@ -1,5 +1,12 @@
 # Release Notes
 
+## v5.2.45 (2016-08-26)
+
+### Fixed
+- Revert changes to Eloquent `Builder` that breaks `firstOr*` methods ([#15018](https://github.com/laravel/framework/pull/15018))
+- Revert aggregate changes in [#14793](https://github.com/laravel/framework/pull/14793) ([#14994](https://github.com/laravel/framework/pull/14994))
+
+
 ## v5.2.44 (2016-08-23)
 
 ### Added
@@ -252,7 +259,7 @@
 - Simplified calling `Model::replicate()` with `$except` argument ([#13676](https://github.com/laravel/framework/pull/13676))
 - Allow auth events to be serialized ([#13704](https://github.com/laravel/framework/pull/13704))
 - Added `for` and `id` attributes to auth scaffold ([#13689](https://github.com/laravel/framework/pull/13689))
-- Aquire lock before deleting reserved job ([4b502dc](https://github.com/laravel/framework/commit/4b502dc6eecd80efad01e845469b9a2bac26dae0#diff-b05083dc38b4e45d38d28c676abbad83))
+- Acquire lock before deleting reserved job ([4b502dc](https://github.com/laravel/framework/commit/4b502dc6eecd80efad01e845469b9a2bac26dae0#diff-b05083dc38b4e45d38d28c676abbad83))
 
 ### Fixed
 - Prefix timestamps when updating many-to-many relationships ([#13519](https://github.com/laravel/framework/pull/13519))

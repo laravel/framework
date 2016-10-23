@@ -106,6 +106,18 @@ class FoundationExpectsModelEventsTest extends TestCase
     }
 
     /** @test */
+    public function expects_events_fires_on_model_events()
+    {
+        EloquentTestModel::created(function () {
+            event(ExampleEvent::class);
+        });
+
+        $this->expectsEvents(ExampleEvent::class);
+
+        EloquentTestModel::create(['field' => 1]);
+    }
+
+    /** @test */
     public function unfired_events_can_be_checked_for()
     {
         $this->doesntExpectModelEvents(EloquentTestModel::class, [

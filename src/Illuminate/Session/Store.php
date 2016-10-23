@@ -2,6 +2,7 @@
 
 namespace Illuminate\Session;
 
+use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use SessionHandlerInterface;
@@ -126,7 +127,7 @@ class Store implements SessionInterface
         if ($data) {
             $data = @unserialize($this->prepareForUnserialize($data));
 
-            if ($data !== false && $data !== null && is_array($data)) {
+            if ($data !== false && ! is_null($data) && is_array($data)) {
                 return $data;
             }
         }
@@ -184,7 +185,7 @@ class Store implements SessionInterface
      */
     public function isValidId($id)
     {
-        return is_string($id) && preg_match('/^[a-f0-9]{40}$/', $id);
+        return is_string($id) && ctype_alnum($id) && strlen($id) === 40;
     }
 
     /**
@@ -194,7 +195,7 @@ class Store implements SessionInterface
      */
     protected function generateSessionId()
     {
-        return sha1(uniqid('', true).Str::random(25).microtime(true));
+        return Str::random(40);
     }
 
     /**
@@ -414,6 +415,24 @@ class Store implements SessionInterface
     }
 
     /**
+     * Get an item from the session, or store the default value.
+     *
+     * @param  string  $key
+     * @param  \Closure  $callback
+     * @return mixed
+     */
+    public function remember($key, Closure $callback)
+    {
+        if (! is_null($value = $this->get($key))) {
+            return $value;
+        }
+
+        return tap($callback(), function ($value) use ($key) {
+            $this->put($key, $value);
+        });
+    }
+
+    /**
      * Push a value onto a session array.
      *
      * @param  string  $key
@@ -474,8 +493,7 @@ class Store implements SessionInterface
     }
 
     /**
-     * Flash a key / value pair to the session
-     * for immediate use.
+     * Flash a key / value pair to the session for immediate use.
      *
      * @param  string $key
      * @param  mixed $value

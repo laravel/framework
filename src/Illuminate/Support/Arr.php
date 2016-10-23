@@ -134,7 +134,13 @@ class Arr
     public static function first($array, callable $callback = null, $default = null)
     {
         if (is_null($callback)) {
-            return empty($array) ? value($default) : reset($array);
+            if (empty($array)) {
+                return value($default);
+            }
+
+            foreach ($array as $item) {
+                return $item;
+            }
         }
 
         foreach ($array as $key => $value) {
@@ -452,13 +458,13 @@ class Arr
     }
 
     /**
-     * Sort the array using the given callback.
+     * Sort the array using the given callback or "dot" notation.
      *
      * @param  array  $array
-     * @param  callable  $callback
+     * @param  callable|string  $callback
      * @return array
      */
-    public static function sort($array, callable $callback)
+    public static function sort($array, $callback)
     {
         return Collection::make($array)->sortBy($callback)->all();
     }

@@ -76,7 +76,7 @@ if (! function_exists('abort_unless')) {
 
 if (! function_exists('action')) {
     /**
-     * Generate a URL to a controller action.
+     * Generate the URL to a controller action.
      *
      * @param  string  $name
      * @param  array   $parameters
@@ -653,7 +653,7 @@ if (! function_exists('resource_path')) {
      */
     function resource_path($path = '')
     {
-        return app()->basePath().DIRECTORY_SEPARATOR.'resources'.($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return app()->resourcePath().($path ? DIRECTORY_SEPARATOR.$path : $path);
     }
 }
 
@@ -680,7 +680,7 @@ if (! function_exists('response')) {
 
 if (! function_exists('route')) {
     /**
-     * Generate a URL to a named route.
+     * Generate the URL to a named route.
      *
      * @param  string  $name
      * @param  array   $parameters

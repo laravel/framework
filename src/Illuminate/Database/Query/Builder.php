@@ -459,14 +459,17 @@ class Builder
      *
      * @param  bool  $value
      * @param  \Closure  $callback
+     * @param  \Closure  $default
      * @return \Illuminate\Database\Query\Builder
      */
-    public function when($value, $callback)
+    public function when($value, $callback, $default = null)
     {
         $builder = $this;
 
         if ($value) {
             $builder = call_user_func($callback, $builder);
+        } elseif ($default) {
+            $builder = call_user_func($default, $builder);
         }
 
         return $builder;
@@ -582,7 +585,7 @@ class Builder
     /**
      * Add an "or where" clause to the query.
      *
-     * @param  string  $column
+     * @param  \Closure|string  $column
      * @param  string  $operator
      * @param  mixed   $value
      * @return \Illuminate\Database\Query\Builder|static
@@ -909,7 +912,11 @@ class Builder
 
         $this->wheres[] = compact('type', 'column', 'values', 'boolean');
 
-        $this->addBinding($values, 'where');
+        foreach ($values as $value) {
+            if (! $value instanceof Expression) {
+                $this->addBinding($value, 'where');
+            }
+        }
 
         return $this;
     }
@@ -977,7 +984,7 @@ class Builder
     }
 
     /**
-     * Add a external sub-select to the query.
+     * Add an external sub-select to the query.
      *
      * @param  string   $column
      * @param  \Illuminate\Database\Query\Builder|static  $query
@@ -1980,7 +1987,9 @@ class Builder
      */
     public function sum($column)
     {
-        return $this->aggregate(__FUNCTION__, [$column]);
+        $result = $this->aggregate(__FUNCTION__, [$column]);
+
+        return $result ?: 0;
     }
 
     /**
@@ -2163,7 +2172,7 @@ class Builder
             return $this->insert(array_merge($attributes, $values));
         }
 
-        return (bool) $this->where($attributes)->take(1)->update($values);
+        return (bool) $this->take(1)->update($values);
     }
 
     /**

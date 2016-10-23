@@ -65,9 +65,9 @@ class PolicyMakeCommand extends GeneratorCommand
 
         $stub = str_replace('DummyModel', $model, $stub);
 
-        $stub = str_replace('dummyModelName', Str::lower($model), $stub);
+        $stub = str_replace('dummyModelName', Str::camel($model), $stub);
 
-        return str_replace('dummyPluralModelName', Str::plural(Str::lower($model)), $stub);
+        return str_replace('dummyPluralModelName', Str::plural(Str::camel($model)), $stub);
     }
 
     /**

@@ -101,7 +101,6 @@ class RedirectResponse extends BaseRedirectResponse
     /**
      * Flash an array of input to the session.
      *
-     * @param  mixed  string
      * @return $this
      */
     public function onlyInput()
@@ -112,7 +111,6 @@ class RedirectResponse extends BaseRedirectResponse
     /**
      * Flash an array of input to the session.
      *
-     * @param  mixed  string
      * @return \Illuminate\Http\RedirectResponse
      */
     public function exceptInput()

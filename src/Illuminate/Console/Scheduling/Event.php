@@ -607,6 +607,46 @@ class Event
     }
 
     /**
+     * Schedule the event to run between start and end time.
+     *
+     * @param  string  $startTime
+     * @param  string  $endTime
+     * @return $this
+     */
+    public function between($startTime, $endTime)
+    {
+        return $this->when($this->inTimeInterval($startTime, $endTime));
+    }
+
+    /**
+     * Schedule the event to not run between start and end time.
+     *
+     * @param  string  $startTime
+     * @param  string  $endTime
+     * @return $this
+     */
+    public function unlessBetween($startTime, $endTime)
+    {
+        return $this->skip($this->inTimeInterval($startTime, $endTime));
+    }
+
+    /**
+     * Schedule the event to run between start and end time.
+     *
+     * @param  string  $startTime
+     * @param  string  $endTime
+     * @return \Closure
+     */
+    private function inTimeInterval($startTime, $endTime)
+    {
+        return function () use ($startTime, $endTime) {
+            $now = Carbon::now()->getTimestamp();
+
+            return $now >= strtotime($startTime) && $now <= strtotime($endTime);
+        };
+    }
+
+    /**
      * State that the command should run in background.
      *
      * @return $this

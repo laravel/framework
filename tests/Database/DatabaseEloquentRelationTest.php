@@ -53,6 +53,17 @@ class DatabaseEloquentRelationTest extends PHPUnit_Framework_TestCase
         Relation::morphMap([], false);
     }
 
+    public function testSettingMorphMapWithNumericKeys()
+    {
+        Relation::morphMap([1 => 'App\User']);
+
+        $this->assertEquals([
+            1 => 'App\User',
+        ], Relation::morphMap());
+
+        Relation::morphMap([], false);
+    }
+
     /**
      * Testing to ensure loop does not occur during relational queries in global scopes.
      *

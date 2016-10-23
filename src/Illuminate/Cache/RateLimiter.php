@@ -2,6 +2,7 @@
 
 namespace Illuminate\Cache;
 
+use Carbon\Carbon;
 use Illuminate\Contracts\Cache\Repository as Cache;
 
 class RateLimiter
@@ -39,7 +40,7 @@ class RateLimiter
         }
 
         if ($this->attempts($key) > $maxAttempts) {
-            $this->cache->add($key.':lockout', time() + ($decayMinutes * 60), $decayMinutes);
+            $this->cache->add($key.':lockout', Carbon::now()->getTimestamp() + ($decayMinutes * 60), $decayMinutes);
 
             $this->resetAttempts($key);
 
@@ -120,6 +121,6 @@ class RateLimiter
      */
     public function availableIn($key)
     {
-        return $this->cache->get($key.':lockout') - time();
+        return $this->cache->get($key.':lockout') - Carbon::now()->getTimestamp();
     }
 }

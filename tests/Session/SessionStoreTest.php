@@ -64,9 +64,11 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase
     public function testCantSetInvalidId()
     {
         $session = $this->getSession();
+        $this->assertTrue($session->isValidId($session->getId()));
 
         $session->setId(null);
         $this->assertNotNull($session->getId());
+        $this->assertTrue($session->isValidId($session->getId()));
 
         $session->setId(['a']);
         $this->assertNotSame(['a'], $session->getId());
@@ -341,6 +343,17 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($session->exists('bogus'));
         $this->assertTrue($session->exists(['foo', 'baz']));
         $this->assertFalse($session->exists(['foo', 'baz', 'bogus']));
+    }
+
+    public function testRememberMethodCallsPutAndReturnsDefault()
+    {
+        $session = $this->getSession();
+        $session->getHandler()->shouldReceive('get')->andReturn(null);
+        $result = $session->remember('foo', function () {
+            return 'bar';
+        });
+        $this->assertEquals('bar', $session->get('foo'));
+        $this->assertEquals('bar', $result);
     }
 
     public function getSession()

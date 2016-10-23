@@ -661,6 +661,15 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         class_uses_recursive('SupportTestClassTwo'));
     }
 
+    public function testClassUsesRecursiveAcceptsObject()
+    {
+        $this->assertEquals([
+            'SupportTestTraitOne' => 'SupportTestTraitOne',
+            'SupportTestTraitTwo' => 'SupportTestTraitTwo',
+        ],
+        class_uses_recursive(new SupportTestClassTwo));
+    }
+
     public function testArrayAdd()
     {
         $this->assertEquals(['surname' => 'Mövsümov'], array_add([], 'surname', 'Mövsümov'));

@@ -289,7 +289,7 @@ class Router implements RegistrarContract
         // Authentication Routes...
         $this->get('login', 'Auth\LoginController@showLoginForm')->name('login');
         $this->post('login', 'Auth\LoginController@login');
-        $this->post('logout', 'Auth\LoginController@logout');
+        $this->post('logout', 'Auth\LoginController@logout')->name('logout');
 
         // Registration Routes...
         $this->get('register', 'Auth\RegisterController@showRegistrationForm');
@@ -656,7 +656,7 @@ class Router implements RegistrarContract
             return (array) $this->resolveMiddlewareClassName($name);
         })->flatten();
 
-        return $this->sortMiddleware($middleware)->all();
+        return $this->sortMiddleware($middleware);
     }
 
     /**
@@ -669,16 +669,20 @@ class Router implements RegistrarContract
     {
         $map = $this->middleware;
 
-        // If the middleware is the name of a middleware group, we will return the array
-        // of middlewares that belong to the group. This allows developers to group a
-        // set of middleware under single keys that can be conveniently referenced.
-        if (isset($this->middlewareGroups[$name])) {
-            return $this->parseMiddlewareGroup($name);
         // When the middleware is simply a Closure, we will return this Closure instance
         // directly so that Closures can be registered as middleware inline, which is
         // convenient on occasions when the developers are experimenting with them.
+        if ($name instanceof Closure) {
+            return $name;
         } elseif (isset($map[$name]) && $map[$name] instanceof Closure) {
             return $map[$name];
+
+        // If the middleware is the name of a middleware group, we will return the array
+        // of middlewares that belong to the group. This allows developers to group a
+        // set of middleware under single keys that can be conveniently referenced.
+        } elseif (isset($this->middlewareGroups[$name])) {
+            return $this->parseMiddlewareGroup($name);
+
         // Finally, when the middleware is simply a string mapped to a class name the
         // middleware name will get parsed into the full class name and parameters
         // which may be run using the Pipeline which accepts this string format.
@@ -686,7 +690,7 @@ class Router implements RegistrarContract
             list($name, $parameters) = array_pad(explode(':', $name, 2), 2, null);
 
             return (isset($map[$name]) ? $map[$name] : $name).
-                   ($parameters !== null ? ':'.$parameters : '');
+                   (! is_null($parameters) ? ':'.$parameters : '');
         }
     }
 
@@ -733,32 +737,11 @@ class Router implements RegistrarContract
      * Sort the given middleware by priority.
      *
      * @param  \Illuminate\Support\Collection  $middlewares
-     * @return \Illuminate\Support\Collection
+     * @return array
      */
     protected function sortMiddleware(Collection $middlewares)
     {
-        $priority = collect($this->middlewarePriority);
-
-        $sorted = collect();
-
-        foreach ($middlewares as $middleware) {
-            if ($sorted->contains($middleware)) {
-                continue;
-            }
-
-            if (($index = $priority->search($middleware)) !== false) {
-                $sorted = $sorted->merge(
-                    $priority->take($index)->filter(function ($middleware) use ($middlewares, $sorted) {
-                        return $middlewares->contains($middleware) &&
-                             ! $sorted->contains($middleware);
-                    })
-                );
-            }
-
-            $sorted[] = $middleware;
-        }
-
-        return $sorted;
+        return (new SortedMiddleware($this->middlewarePriority, $middlewares))->all();
     }
 
     /**
@@ -1111,9 +1094,8 @@ class Router implements RegistrarContract
     }
 
     /**
-     * Alias for the "currentRouteName" method.
+     * Alias for the "currentRouteNamed" method.
      *
-     * @param  mixed  string
      * @return bool
      */
     public function is()
@@ -1157,7 +1139,6 @@ class Router implements RegistrarContract
     /**
      * Alias for the "currentRouteUses" method.
      *
-     * @param  mixed  string
      * @return bool
      */
     public function uses()

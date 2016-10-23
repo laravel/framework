@@ -24,6 +24,13 @@ class CookieSessionHandler implements SessionHandlerInterface
     protected $request;
 
     /**
+     * The number of minutes the session should be valid.
+     *
+     * @var int
+     */
+    protected $minutes;
+
+    /**
      * Create a new cookie driven handler instance.
      *
      * @param  \Illuminate\Contracts\Cookie\QueueingFactory  $cookie
@@ -60,7 +67,7 @@ class CookieSessionHandler implements SessionHandlerInterface
         $value = $this->request->cookies->get($sessionId) ?: '';
 
         if (! is_null($decoded = json_decode($value, true)) && is_array($decoded)) {
-            if (isset($decoded['expires']) && time() <= $decoded['expires']) {
+            if (isset($decoded['expires']) && Carbon::now()->getTimestamp() <= $decoded['expires']) {
                 return $decoded['data'];
             }
         }
@@ -77,6 +84,8 @@ class CookieSessionHandler implements SessionHandlerInterface
             'data' => $data,
             'expires' => Carbon::now()->addMinutes($this->minutes)->getTimestamp(),
         ]), $this->minutes);
+
+        return true;
     }
 
     /**
@@ -85,6 +94,8 @@ class CookieSessionHandler implements SessionHandlerInterface
     public function destroy($sessionId)
     {
         $this->cookie->queue($this->cookie->forget($sessionId));
+
+        return true;
     }
 
     /**

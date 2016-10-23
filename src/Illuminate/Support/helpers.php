@@ -158,15 +158,15 @@ if (! function_exists('array_get')) {
 
 if (! function_exists('array_has')) {
     /**
-     * Check if an item exists in an array using "dot" notation.
+     * Check if an item or items exist in an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string  $key
+     * @param  string|array  $keys
      * @return bool
      */
-    function array_has($array, $key)
+    function array_has($array, $keys)
     {
-        return Arr::has($array, $key);
+        return Arr::has($array, $keys);
     }
 }
 
@@ -334,11 +334,15 @@ if (! function_exists('class_uses_recursive')) {
     /**
      * Returns all traits used by a class, its subclasses and trait of their traits.
      *
-     * @param  string  $class
+     * @param  object|string  $class
      * @return array
      */
     function class_uses_recursive($class)
     {
+        if (is_object($class)) {
+            $class = get_class($class);
+        }
+
         $results = [];
 
         foreach (array_merge([$class => $class], class_parents($class)) as $class) {
@@ -394,7 +398,7 @@ if (! function_exists('data_get')) {
 
         $key = is_array($key) ? $key : explode('.', $key);
 
-        while (($segment = array_shift($key)) !== null) {
+        while (! is_null($segment = array_shift($key))) {
             if ($segment === '*') {
                 if ($target instanceof Collection) {
                     $target = $target->all();
@@ -501,7 +505,7 @@ if (! function_exists('dd')) {
 
 if (! function_exists('e')) {
     /**
-     * Escape HTML entities in a string.
+     * Escape HTML special characters in a string.
      *
      * @param  \Illuminate\Contracts\Support\Htmlable|string  $value
      * @return string
@@ -512,7 +516,7 @@ if (! function_exists('e')) {
             return $value->toHtml();
         }
 
-        return htmlentities($value, ENT_QUOTES, 'UTF-8', false);
+        return htmlspecialchars($value, ENT_QUOTES, 'UTF-8', false);
     }
 }
 
@@ -594,7 +598,7 @@ if (! function_exists('preg_replace_array')) {
      */
     function preg_replace_array($pattern, array $replacements, $subject)
     {
-        return preg_replace_callback($pattern, function ($match) use (&$replacements) {
+        return preg_replace_callback($pattern, function () use (&$replacements) {
             foreach ($replacements as $key => $value) {
                 return array_shift($replacements);
             }

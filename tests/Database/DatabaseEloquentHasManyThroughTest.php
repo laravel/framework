@@ -36,6 +36,36 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase
         $relation->addEagerConstraints([$model1, $model2]);
     }
 
+    public function testEagerConstraintsAreProperlyAddedWithCustomKey()
+    {
+        $builder = m::mock('Illuminate\Database\Eloquent\Builder');
+        $builder->shouldReceive('join')->once()->with('users', 'users.id', '=', 'posts.user_id');
+        $builder->shouldReceive('where')->with('users.country_id', '=', 1);
+
+        $country = m::mock('Illuminate\Database\Eloquent\Model');
+        $country->shouldReceive('getKeyName')->andReturn('id');
+        $country->shouldReceive('offsetGet')->andReturn(1);
+        $country->shouldReceive('getForeignKey')->andReturn('country_id');
+
+        $user = m::mock('Illuminate\Database\Eloquent\Model');
+        $user->shouldReceive('getTable')->andReturn('users');
+        $user->shouldReceive('getQualifiedKeyName')->andReturn('users.id');
+        $post = m::mock('Illuminate\Database\Eloquent\Model');
+        $post->shouldReceive('getTable')->andReturn('posts');
+
+        $builder->shouldReceive('getModel')->andReturn($post);
+
+        $relation = new HasManyThrough($builder, $country, $user, 'country_id', 'user_id', 'not_id');
+        $relation->getQuery()->shouldReceive('whereIn')->once()->with('users.country_id', [3, 4]);
+        $model1 = new EloquentHasManyThroughModelStub;
+        $model1->id = 1;
+        $model1->not_id = 3;
+        $model2 = new EloquentHasManyThroughModelStub;
+        $model2->id = 2;
+        $model2->not_id = 4;
+        $relation->addEagerConstraints([$model1, $model2]);
+    }
+
     public function testModelsAreProperlyMatchedToParents()
     {
         $relation = $this->getRelation();

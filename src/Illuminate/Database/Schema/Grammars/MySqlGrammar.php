@@ -376,7 +376,7 @@ class MySqlGrammar extends Grammar
     }
 
     /**
-     * Create the column definition for a integer type.
+     * Create the column definition for an integer type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
@@ -777,7 +777,7 @@ class MySqlGrammar extends Grammar
     protected function modifyComment(Blueprint $blueprint, Fluent $column)
     {
         if (! is_null($column->comment)) {
-            return ' comment "'.$column->comment.'"';
+            return " comment '".$column->comment."'";
         }
     }
 

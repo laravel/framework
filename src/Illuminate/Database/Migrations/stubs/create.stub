@@ -26,6 +26,6 @@ class DummyClass extends Migration
      */
     public function down()
     {
-        Schema::drop('DummyTable');
+        Schema::dropIfExists('DummyTable');
     }
 }

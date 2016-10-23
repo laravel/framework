@@ -1338,6 +1338,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
     {
         $data = new Collection(['first' => 'Taylor', 'last' => 'Otwell', 'email' => 'taylorotwell@gmail.com']);
 
+        $this->assertEquals($data->all(), $data->only(null)->all());
         $this->assertEquals(['first' => 'Taylor'], $data->only(['first', 'missing'])->all());
         $this->assertEquals(['first' => 'Taylor'], $data->only('first', 'missing')->all());
 
@@ -1553,6 +1554,54 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
     {
         $collection = new Collection(new \ArrayObject(['foo' => 1, 'bar' => 2, 'baz' => 3]));
         $this->assertEquals(['foo' => 1, 'bar' => 2, 'baz' => 3], $collection->toArray());
+    }
+
+    public function testSplitCollectionWithADivisableCount()
+    {
+        $collection = new Collection(['a', 'b', 'c', 'd']);
+
+        $this->assertEquals(
+            [['a', 'b'], ['c', 'd']],
+            $collection->split(2)->map(function (Collection $chunk) {
+                return $chunk->values()->toArray();
+            })->toArray()
+        );
+    }
+
+    public function testSplitCollectionWithAnUndivisableCount()
+    {
+        $collection = new Collection(['a', 'b', 'c']);
+
+        $this->assertEquals(
+            [['a', 'b'], ['c']],
+            $collection->split(2)->map(function (Collection $chunk) {
+                return $chunk->values()->toArray();
+            })->toArray()
+        );
+    }
+
+    public function testSplitCollectionWithCountLessThenDivisor()
+    {
+        $collection = new Collection(['a']);
+
+        $this->assertEquals(
+            [['a']],
+            $collection->split(2)->map(function (Collection $chunk) {
+                return $chunk->values()->toArray();
+            })->toArray()
+        );
+    }
+
+    public function testSplitEmptyCollection()
+    {
+        $collection = new Collection();
+
+        $this->assertEquals(
+            [],
+            $collection->split(2)->map(function (Collection $chunk) {
+                return $chunk->values()->toArray();
+            })->toArray()
+        );
     }
 }
 
