@@ -36,6 +36,8 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     {
         $notifiables = $this->formatNotifiables($notifiables);
 
+        $notification->id = (string) Uuid::uuid4();
+
         if ($notification instanceof ShouldQueue) {
             return $this->queueNotification($notifiables, $notification);
         }
@@ -106,8 +108,6 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
         $notifiables = $this->formatNotifiables($notifiables);
 
         $bus = $this->app->make(Bus::class);
-
-        $notification->id = (string) Uuid::uuid4();
 
         foreach ($notifiables as $notifiable) {
             foreach ($notification->via($notifiable) as $channel) {
