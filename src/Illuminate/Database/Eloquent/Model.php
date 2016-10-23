@@ -2749,6 +2749,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function setCasts(array $casts)
     {
         $this->casts = $casts;
+        
         return $this;
     }
 

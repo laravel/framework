@@ -1229,7 +1229,7 @@ class BelongsToMany extends Relation
             return [];
         }
 
-        $prefix = Str::snake($this->relationName) . '.pivot.';
+        $prefix = Str::snake($this->relationName).'.pivot.';
         $prefixLength = strlen($prefix);
 
         $casts = [];
@@ -1237,7 +1237,7 @@ class BelongsToMany extends Relation
         foreach ($this->parent->getCasts() as $key => $type) {
             if (substr($key, 0, $prefixLength) === $prefix) {
                 $key = substr($key, $prefixLength);
-                $casts[ $key ] = $type;
+                $casts[$key] = $type;
             }
         }
 

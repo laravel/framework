@@ -698,7 +698,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
         $related->shouldReceive('getTable')->andReturn('roles');
         $related->shouldReceive('getKeyName')->andReturn('id');
         $parent->shouldReceive('getCasts')->andReturn([
-            'relation_name.pivot.active' => 'boolean'
+            'relation_name.pivot.active' => 'boolean',
         ]);
         $related->shouldReceive('newPivot')->andReturnUsing(function () {
             $reflector = new ReflectionClass('Illuminate\Database\Eloquent\Relations\Pivot');
