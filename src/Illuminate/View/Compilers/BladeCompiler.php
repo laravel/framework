@@ -1106,6 +1106,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     public function compileSwitch($variable)
     {
+        $this->firstCase = true;
         return "<?php switch({$variable}){ ";
     }
 
