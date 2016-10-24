@@ -327,10 +327,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
             $this->markTestSkipped('Skipping since the pcntl extension is not available');
         }
 
-        $content = '';
-        for ($i = 0; $i < 1000000; ++$i) {
-            $content .= $i;
-        }
+        $content = str_repeat('123456', 1000000);
         $result = 1;
 
         for ($i = 1; $i <= 20; ++$i) {
