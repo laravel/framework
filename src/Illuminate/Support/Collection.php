@@ -726,6 +726,28 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Get the collection with a specific record on head.
+     * 
+     * @param mixed $key
+     * 
+     * @return mixed
+     */ 
+    public function onHead($key)
+    {
+        if (!$this->offsetExists($key)) {
+            return;
+        }
+
+        $carry = $this->items[$key];
+
+        $this->offsetUnset($key);
+
+        array_unshift($this->items, $carry);
+
+        return $this;
+    }
+
+    /**
      * Pass the collection to the given callback and return the result.
      *
      * @param  callable $callback
