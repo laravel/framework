@@ -4,6 +4,7 @@ namespace Illuminate\View\Compilers;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\View\Factory as ViewFactory;
 
 class BladeCompiler extends Compiler implements CompilerInterface
 {
@@ -402,6 +403,16 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function compileEchoDefaults($value)
     {
         return preg_replace('/^(?=\$)(.+?)(?:\s+or\s+)(.+?)$/s', 'isset($1) ? $1 : $2', $value);
+    }
+
+    /**
+     * Replace the @parent directive to a placeholder.
+     *
+     * @return string
+     */
+    protected function compileParent()
+    {
+        return ViewFactory::parentPlaceholder();
     }
 
     /**
