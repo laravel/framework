@@ -729,12 +729,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Get the collection with a specific record on head.
      * 
      * @param mixed $key
-     * 
      * @return mixed
      */ 
     public function onHead($key)
     {
-        if (!$this->offsetExists($key)) {
+        if (! $this->offsetExists($key)) {
             return;
         }
 
