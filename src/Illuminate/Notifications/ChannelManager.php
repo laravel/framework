@@ -102,7 +102,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      * Queue the given notification instances.
      *
      * @param  mixed  $notifiables
-     * @param  array[\Illuminate\Notifcations\Channels\Notification]  $notification
+     * @param  array[\Illuminate\Notifications\Channels\Notification]  $notification
      * @return void
      */
     protected function queueNotification($notifiables, $notification)

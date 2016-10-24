@@ -169,7 +169,8 @@ class MySqlGrammar extends Grammar
         $index = 0;
 
         foreach ($values as $column => $value) {
-            if ($this->isJsonSelector($column) && is_bool($value)) {
+            if ($this->isJsonSelector($column) &&
+                in_array(gettype($value), ['boolean', 'integer', 'double'])) {
                 unset($bindings[$index]);
             }
 
