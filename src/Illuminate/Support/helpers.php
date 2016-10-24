@@ -630,7 +630,7 @@ if (! function_exists('retry')) {
             $times--;
 
             if ($sleep) {
-                usleep($sleep * 1000);
+                usleep($sleep * 1000000);
             }
 
             goto beginning;
