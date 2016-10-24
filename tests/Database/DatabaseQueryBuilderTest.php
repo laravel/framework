@@ -1385,10 +1385,17 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
                         'update `users` set `options` = json_set(`options`, "$.enable", false), `updated_at` = ? where `id` = ?',
                         ['2015-05-26 22:02:06', 0]
                     );
-
         $builder = new Builder($connection, $grammar, $processor);
+        $builder->from('users')->where('id', '=', 0)->update(['options->enable' => false, 'updated_at' => '2015-05-26 22:02:06']);
 
-        $result = $builder->from('users')->where('id', '=', 0)->update(['options->enable' => false, 'updated_at' => '2015-05-26 22:02:06']);
+        $connection->shouldReceive('update')
+            ->once()
+            ->with(
+                'update `users` set `options` = json_set(`options`, "$.size", 45), `updated_at` = ? where `id` = ?',
+                ['2015-05-26 22:02:06', 0]
+            );
+        $builder = new Builder($connection, $grammar, $processor);
+        $builder->from('users')->where('id', '=', 0)->update(['options->size' => 45, 'updated_at' => '2015-05-26 22:02:06']);
     }
 
     public function testMySqlWrappingJsonWithString()
