@@ -1112,17 +1112,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
-     * Compile the first case statement into valid PHP.
-     * @param  string  $value
-     *
-     * @return string
-     */
-    private function compileFirstCase($value)
-    {
-        return "case {$value}:  ?>";
-    }
-
-    /**
      * Compile the case statement into valid PHP.
      * @param  string  $value
      *
@@ -1133,7 +1122,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
         if ($this->firstCase) {
             $this->firstCase = false;
 
-            return $this->CompileFirstCase($value);
+            return "case {$value}:  ?>";
         }
 
         return "<?php  case {$value}:  ?>";
