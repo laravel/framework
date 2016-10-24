@@ -243,9 +243,10 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
 
     public function testSectionExtending()
     {
+        $placeholder = Illuminate\View\Factory::parentPlaceholder();
         $factory = $this->getFactory();
         $factory->startSection('foo');
-        echo 'hi @parent';
+        echo 'hi '.$placeholder;
         $factory->stopSection();
         $factory->startSection('foo');
         echo 'there';
@@ -255,12 +256,13 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
 
     public function testSectionMultipleExtending()
     {
+        $placeholder = Illuminate\View\Factory::parentPlaceholder();
         $factory = $this->getFactory();
         $factory->startSection('foo');
-        echo 'hello @parent nice to see you @parent';
+        echo 'hello '.$placeholder.' nice to see you '.$placeholder;
         $factory->stopSection();
         $factory->startSection('foo');
-        echo 'my @parent';
+        echo 'my '.$placeholder;
         $factory->stopSection();
         $factory->startSection('foo');
         echo 'friend';

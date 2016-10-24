@@ -147,8 +147,16 @@ dad
 child
 @endsection'));
 
+        $files->put($this->tempDir.'/extends-child-child.php', $compiler->compileString('
+@extends("extends-child")
+@section("me")
+@parent
+child-child
+@endsection'));
+
         $factory = $this->prepareCommonFactory();
         $this->assertEquals("yield:\ndad\n\nchild\n", $factory->make('extends-child')->render());
+        $this->assertEquals("yield:\ndad\n\nchild\n\nchild-child\n", $factory->make('extends-child-child')->render());
     }
 
     public function testExtendsWithVariable()
@@ -180,7 +188,26 @@ dad
 
         $factory = $this->prepareCommonFactory();
         $this->assertEquals("yield:\ntitle\n", $factory->make('extends-variable-child-a', ['title' => 'title'])->render());
-        $this->assertEquals("yield:\ndad\n\n", $factory->make('extends-variable-child-b', ['title' => '@parent'])->render());
+        $this->assertEquals("yield:\n@parent\n", $factory->make('extends-variable-child-b', ['title' => '@parent'])->render());
+    }
+
+    public function testExtendsWithVariableAndNoParent()
+    {
+        $files = new Filesystem;
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+
+        $files->put($this->tempDir.'/extends-variable-layout.php', $compiler->compileString('
+yield:
+@yield("me")'));
+
+        $files->put($this->tempDir.'/extends-variable.php', $compiler->compileString('
+@extends("extends-variable-layout")
+@section("me")
+{{ $title }}
+@endsection'));
+
+        $factory = $this->prepareCommonFactory();
+        $this->assertEquals("yield:\n@parent\n", $factory->make('extends-variable', ['title' => '@parent'])->render());
     }
 
     protected function prepareCommonFactory()
