@@ -4,6 +4,7 @@ namespace Illuminate\View\Compilers;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\View\Factory as ViewFactory;
 
 class BladeCompiler extends Compiler implements CompilerInterface
 {
@@ -411,7 +412,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileParent()
     {
-        return '##parent-placeholder##';
+        return ViewFactory::parentPlaceholder();
     }
 
     /**

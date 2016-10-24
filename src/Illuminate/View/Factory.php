@@ -122,6 +122,13 @@ class Factory implements FactoryContract
     protected $renderCount = 0;
 
     /**
+     * The parent placeholder for the request.
+     *
+     * @var string
+     */
+    protected static $parentPlaceholder;
+
+    /**
      * Create a new view factory instance.
      *
      * @param  \Illuminate\View\Engines\EngineResolver  $engines
@@ -631,7 +638,7 @@ class Factory implements FactoryContract
     protected function extendSection($section, $content)
     {
         if (isset($this->sections[$section])) {
-            $content = str_replace('##parent-placeholder##', $content, $this->sections[$section]);
+            $content = str_replace(static::parentPlaceholder(), $content, $this->sections[$section]);
         }
 
         $this->sections[$section] = $content;
@@ -655,8 +662,22 @@ class Factory implements FactoryContract
         $sectionContent = str_replace('@@parent', '--parent--holder--', $sectionContent);
 
         return str_replace(
-            '--parent--holder--', '@parent', str_replace('##parent-placeholder##', '', $sectionContent)
+            '--parent--holder--', '@parent', str_replace(static::parentPlaceholder(), '', $sectionContent)
         );
+    }
+
+    /**
+     * Get the parent placeholder for the current request.
+     *
+     * @return string
+     */
+    public static function parentPlaceholder()
+    {
+        if (! static::$parentPlaceholder) {
+            static::$parentPlaceholder = '##parent-placeholder-'.Str::random(40).'##';
+        }
+
+        return static::$parentPlaceholder;
     }
 
     /**
