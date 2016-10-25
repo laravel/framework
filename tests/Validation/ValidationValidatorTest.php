@@ -564,7 +564,9 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $foo = new File(__FILE__, false);
         $v = new Validator($trans, ['name' => [$file, $foo]], ['name.0' => 'Required', 'name.1' => 'Required']);
         $this->assertTrue($v->passes());
-        $this->assertEmpty($v->getData());
+
+        $v = new Validator($trans, ['files' => [$file, $foo]], ['files' => 'Required']);
+        $this->assertTrue($v->passes());
     }
 
     public function testValidateRequiredWith()
@@ -3227,7 +3229,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $file = new File(__FILE__, false);
         $v = new Validator($trans, ['file' => $file, 'text' => 'text'], ['text' => 'Required']);
         $this->assertEquals(['file' => $file], $v->getFiles());
-        $this->assertEquals(['text' => 'text'], $v->getData());
+        $this->assertEquals(['text' => 'text', 'file' => $file], $v->getData());
     }
 
     public function testArrayOfFilesHydration()
@@ -3237,7 +3239,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $file2 = new File(__FILE__, false);
         $v = new Validator($trans, ['file' => [$file, $file2], 'text' => 'text'], ['text' => 'Required']);
         $this->assertEquals(['file.0' => $file, 'file.1' => $file2], $v->getFiles());
-        $this->assertEquals(['text' => 'text'], $v->getData());
+        $this->assertEquals(['text' => 'text', 'file' => [$file, $file2]], $v->getData());
     }
 
     public function testMultipleFileUploads()
