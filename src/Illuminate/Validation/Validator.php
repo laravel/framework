@@ -255,7 +255,6 @@ class Validator implements ValidatorContract
             // we use to conveniently separate out these files from other data.
             if ($value instanceof File) {
                 $this->files[$newKey] = $value;
-
             } elseif (is_array($value) && ! empty($value) &&
                       empty($this->hydrateFiles($value, $newKey))) {
             }
