@@ -51,6 +51,30 @@ class FoundationMakesHttpRequestsJsonTest extends PHPUnit_Framework_TestCase
         $this->response = new Illuminate\Http\Response(new JsonSerializableSingleResourceStub);
         $this->seeJsonStructure(['*' => ['foo', 'bar', 'foobar']]);
     }
+
+    public function testSeeJsonTypedStructure()
+    {
+        $this->response = new Illuminate\Http\Response(new JsonSerializableTypedResourceStub);
+
+        $this->seeJsonTypedStructure([
+            'foo' => 'string',
+            'bar' => 'integer',
+            'foobar' => 'array',
+            'baz' => 'boolean',
+            'nested_foo' => [
+                'foo' => 'string',
+                'bar' => 'integer',
+                'foobar' => 'array',
+                'baz' => 'boolean',
+                'double_nested_foo' => [
+                    'foo' => 'string',
+                    'bar' => 'integer',
+                    'foobar' => 'array',
+                    'baz' => 'boolean',
+                ],
+            ],
+        ]);
+    }
 }
 
 class JsonSerializableMixedResourcesStub implements JsonSerializable
@@ -86,5 +110,39 @@ class JsonSerializableSingleResourceStub implements JsonSerializable
             ['foo' => 'foo 2', 'bar' => 'bar 2', 'foobar' => 'foobar 2'],
             ['foo' => 'foo 3', 'bar' => 'bar 3', 'foobar' => 'foobar 3'],
         ];
+    }
+}
+
+class JsonSerializableTypedResourceStub implements JsonSerializable
+{
+    public function jsonSerialize()
+    {
+        return json_decode('{
+            "foo": "bar",
+            "bar": 42,
+            "foobar": [
+                "foo",
+                "bar"
+            ],
+            "baz": true,
+            "nested_foo": {
+                "foo": "bar",
+                "bar": 42,
+                "foobar": [
+                    "foo",
+                    "bar"
+                ],
+                "baz": false,
+                "double_nested_foo": {
+                    "foo": "bar",
+                    "bar": 42,
+                    "foobar": [
+                        "foo",
+                        "bar"
+                    ],
+                    "baz": false
+                }
+            }
+        }');
     }
 }

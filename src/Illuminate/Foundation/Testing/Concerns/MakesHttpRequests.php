@@ -375,6 +375,42 @@ trait MakesHttpRequests
     }
 
     /**
+     * Assert that the JSON response has a given typed structure.
+     *
+     * @param  array|null  $structure
+     * @param  array|null  $responseData
+     * @return $this
+     */
+    public function seeJsonTypedStructure(array $structure = null, $responseData = null)
+    {
+        if (is_null($structure)) {
+            return $this->seeJsonStructure($structure);
+        }
+
+        if (! $responseData) {
+            $responseData = json_decode($this->response->getContent(), true);
+        }
+
+        foreach ($structure as $key => $type) {
+            if (is_array($type) && $key === '*') {
+                $this->assertInternalType('array', $responseData);
+
+                foreach ($responseData as $responseDataItem) {
+                    $this->seeJsonTypedStructure($structure['*'], $responseDataItem);
+                }
+            } elseif (is_array($type) && array_key_exists($key, $structure)) {
+                if (is_array($structure[$key])) {
+                    $this->seeJsonTypedStructure($structure[$key], $responseData[$key]);
+                }
+            } else {
+                $this->assertInternalType($type, $responseData[$key]);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Assert that the response contains the given JSON.
      *
      * @param  array  $data
