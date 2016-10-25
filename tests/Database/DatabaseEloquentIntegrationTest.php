@@ -377,8 +377,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
     {
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
         EloquentTestUser::findOrFail([1, 2]);
-    }
-    
+    }    
 
     public function testOneToOneRelationship()
     {
