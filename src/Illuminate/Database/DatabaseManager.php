@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database;
 
+use PDO;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -263,6 +264,26 @@ class DatabaseManager implements ConnectionResolverInterface
     }
 
     /**
+     * Get all of the support drivers.
+     *
+     * @return array
+     */
+    public function supportedDrivers()
+    {
+        return ['mysql', 'pgsql', 'sqlite', 'sqlsrv'];
+    }
+
+    /**
+     * Get all of the drivers that are actually available.
+     *
+     * @return array
+     */
+    public function availableDrivers()
+    {
+        return array_intersect($this->supportedDrivers(), str_replace('dblib', 'sqlsrv', PDO::getAvailableDrivers()));
+    }
+
+    /**
      * Register an extension connection resolver.
      *
      * @param  string    $name
@@ -293,6 +314,6 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     public function __call($method, $parameters)
     {
-        return call_user_func_array([$this->connection(), $method], $parameters);
+        return $this->connection()->$method(...$parameters);
     }
 }

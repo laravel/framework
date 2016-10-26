@@ -1,6 +1,6 @@
 git subsplit init git@github.com:laravel/framework.git
 git subsplit publish --heads="master 5.2 5.1" --no-tags src/Illuminate/Auth:git@github.com:illuminate/auth.git
-git subsplit publish --heads="master 5.2 5.1" --no-tags src/Illuminate/Bus:git@github.com:illuminate/broadcasting.git
+git subsplit publish --heads="master 5.2 5.1" --no-tags src/Illuminate/Broadcasting:git@github.com:illuminate/broadcasting.git
 git subsplit publish --heads="master 5.2 5.1" --no-tags src/Illuminate/Bus:git@github.com:illuminate/bus.git
 git subsplit publish --heads="master 5.2 5.1" --no-tags src/Illuminate/Cache:git@github.com:illuminate/cache.git
 git subsplit publish --heads="master 5.2 5.1" --no-tags src/Illuminate/Config:git@github.com:illuminate/config.git

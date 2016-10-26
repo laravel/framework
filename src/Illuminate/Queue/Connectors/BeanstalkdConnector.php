@@ -20,7 +20,7 @@ class BeanstalkdConnector implements ConnectorInterface
         $pheanstalk = new Pheanstalk($config['host'], Arr::get($config, 'port', PheanstalkInterface::DEFAULT_PORT));
 
         return new BeanstalkdQueue(
-            $pheanstalk, $config['queue'], Arr::get($config, 'ttr', Pheanstalk::DEFAULT_TTR)
+            $pheanstalk, $config['queue'], Arr::get($config, 'retry_after', Pheanstalk::DEFAULT_TTR)
         );
     }
 }

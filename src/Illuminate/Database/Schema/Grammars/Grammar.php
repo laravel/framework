@@ -18,6 +18,13 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager as SchemaManager;
 abstract class Grammar extends BaseGrammar
 {
     /**
+     * If this Grammar supports schema changes wrapped in a transaction.
+     *
+     * @var bool
+     */
+    protected $transactions = false;
+
+    /**
      * Compile a rename column command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
@@ -82,6 +89,8 @@ abstract class Grammar extends BaseGrammar
     {
         $table = $this->wrapTable($blueprint);
 
+        $index = $this->wrap($command->index);
+
         $on = $this->wrapTable($command->on);
 
         // We need to prepare several of the elements of the foreign key definition
@@ -91,7 +100,7 @@ abstract class Grammar extends BaseGrammar
 
         $onColumns = $this->columnize((array) $command->references);
 
-        $sql = "alter table {$table} add constraint {$command->index} ";
+        $sql = "alter table {$table} add constraint {$index} ";
 
         $sql .= "foreign key ({$columns}) references {$on} ({$onColumns})";
 
@@ -202,7 +211,6 @@ abstract class Grammar extends BaseGrammar
     {
         return array_map(function ($value) use ($prefix) {
             return $prefix.' '.$value;
-
         }, $values);
     }
 
@@ -277,6 +285,8 @@ abstract class Grammar extends BaseGrammar
      * @param  \Illuminate\Support\Fluent  $command
      * @param  \Illuminate\Database\Connection $connection
      * @return array
+     *
+     * @throws \RuntimeException
      */
     public function compileChange(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
@@ -393,6 +403,9 @@ abstract class Grammar extends BaseGrammar
             case 'longtext':
                 $type = 'text';
                 break;
+            case 'binary':
+                $type = 'blob';
+                break;
         }
 
         return Type::getType($type);
@@ -409,10 +422,8 @@ abstract class Grammar extends BaseGrammar
         switch ($type) {
             case 'mediumText':
                 return 65535 + 1;
-
             case 'longText':
                 return 16777215 + 1;
-
             default:
                 return 255 + 1;
         }
@@ -430,16 +441,12 @@ abstract class Grammar extends BaseGrammar
             case 'type':
             case 'name':
                 return;
-
             case 'nullable':
                 return 'notnull';
-
             case 'total':
                 return 'precision';
-
             case 'places':
                 return 'scale';
-
             default:
                 return $attribute;
         }
@@ -455,5 +462,15 @@ abstract class Grammar extends BaseGrammar
     protected function mapFluentValueToDoctrine($option, $value)
     {
         return $option == 'notnull' ? ! $value : $value;
+    }
+
+    /**
+     * Check if this Grammar supports schema changes wrapped in a transaction.
+     *
+     * @return bool
+     */
+    public function supportsSchemaTransactions()
+    {
+        return $this->transactions;
     }
 }

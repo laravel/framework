@@ -21,7 +21,8 @@ class QueueRedisJobTest extends PHPUnit_Framework_TestCase
     public function testDeleteRemovesTheJobFromRedis()
     {
         $job = $this->getJob();
-        $job->getRedisQueue()->shouldReceive('deleteReserved')->once()->with('default', $job->getRedisJob());
+        $job->getRedisQueue()->shouldReceive('deleteReserved')->once()
+            ->with('default', json_encode(['job' => 'foo', 'data' => ['data'], 'attempts' => 2]));
 
         $job->delete();
     }
@@ -29,8 +30,8 @@ class QueueRedisJobTest extends PHPUnit_Framework_TestCase
     public function testReleaseProperlyReleasesJobOntoRedis()
     {
         $job = $this->getJob();
-        $job->getRedisQueue()->shouldReceive('deleteReserved')->once()->with('default', $job->getRedisJob());
-        $job->getRedisQueue()->shouldReceive('release')->once()->with('default', $job->getRedisJob(), 1, 2);
+        $job->getRedisQueue()->shouldReceive('deleteAndRelease')->once()
+            ->with('default', json_encode(['job' => 'foo', 'data' => ['data'], 'attempts' => 2]), 1);
 
         $job->release(1);
     }
@@ -38,9 +39,10 @@ class QueueRedisJobTest extends PHPUnit_Framework_TestCase
     protected function getJob()
     {
         return new Illuminate\Queue\Jobs\RedisJob(
-            m::mock('Illuminate\Container\Container'),
-            m::mock('Illuminate\Queue\RedisQueue'),
+            m::mock(Illuminate\Container\Container::class),
+            m::mock(Illuminate\Queue\RedisQueue::class),
             json_encode(['job' => 'foo', 'data' => ['data'], 'attempts' => 1]),
+            json_encode(['job' => 'foo', 'data' => ['data'], 'attempts' => 2]),
             'default'
         );
     }

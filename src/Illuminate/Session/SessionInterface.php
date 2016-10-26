@@ -8,6 +8,14 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface as BaseSessionInte
 interface SessionInterface extends BaseSessionInterface
 {
     /**
+     * Checks if an attribute exists.
+     *
+     * @param  string|array  $key
+     * @return bool
+     */
+    public function exists($key);
+
+    /**
      * Get the session handler instance.
      *
      * @return \SessionHandlerInterface

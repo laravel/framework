@@ -35,7 +35,7 @@ class CacheTableCommand extends Command
     protected $composer;
 
     /**
-     * Create a new session table command instance.
+     * Create a new cache table command instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  \Illuminate\Support\Composer  $composer

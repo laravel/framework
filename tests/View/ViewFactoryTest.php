@@ -19,7 +19,9 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         $factory->getEngineResolver()->shouldReceive('resolve')->once()->with('php')->andReturn($engine = m::mock('Illuminate\View\Engines\EngineInterface'));
         $factory->getFinder()->shouldReceive('addExtension')->once()->with('php');
         $factory->setDispatcher(new Illuminate\Events\Dispatcher);
-        $factory->creator('view', function ($view) { $_SERVER['__test.view'] = $view; });
+        $factory->creator('view', function ($view) {
+            $_SERVER['__test.view'] = $view;
+        });
         $factory->addExtension('php', 'php');
         $view = $factory->make('view', ['foo' => 'bar'], ['baz' => 'boom']);
 
@@ -92,7 +94,8 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
     {
         $factory = $this->getFactory();
 
-        $resolver = function () {};
+        $resolver = function () {
+        };
 
         $factory->getFinder()->shouldReceive('addExtension')->once()->with('foo');
         $factory->getEngineResolver()->shouldReceive('register')->once()->with('bar', $resolver);
@@ -136,7 +139,9 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
     {
         $factory = $this->getFactory();
         $factory->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type('Closure'));
-        $callback = $factory->composer('foo', function () { return 'bar'; });
+        $callback = $factory->composer('foo', function () {
+            return 'bar';
+        });
         $callback = $callback[0];
 
         $this->assertEquals('bar', $callback());
@@ -146,7 +151,9 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
     {
         $factory = $this->getFactory();
         $factory->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type('Closure'), 1);
-        $callback = $factory->composer('foo', function () { return 'bar'; }, 1);
+        $callback = $factory->composer('foo', function () {
+            return 'bar';
+        }, 1);
         $callback = $callback[0];
 
         $this->assertEquals('bar', $callback());
@@ -202,7 +209,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
     {
         $factory = $this->getFactory();
         $view = m::mock('Illuminate\View\View');
-        $view->shouldReceive('getName')->once()->andReturn('name');
+        $view->shouldReceive('name')->once()->andReturn('name');
         $factory->getDispatcher()->shouldReceive('fire')->once()->with('composing: name', [$view]);
 
         $factory->callComposer($view);
@@ -236,9 +243,10 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
 
     public function testSectionExtending()
     {
+        $placeholder = Illuminate\View\Factory::parentPlaceholder();
         $factory = $this->getFactory();
         $factory->startSection('foo');
-        echo 'hi @parent';
+        echo 'hi '.$placeholder;
         $factory->stopSection();
         $factory->startSection('foo');
         echo 'there';
@@ -248,12 +256,13 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
 
     public function testSectionMultipleExtending()
     {
+        $placeholder = Illuminate\View\Factory::parentPlaceholder();
         $factory = $this->getFactory();
         $factory->startSection('foo');
-        echo 'hello @parent nice to see you @parent';
+        echo 'hello '.$placeholder.' nice to see you '.$placeholder;
         $factory->stopSection();
         $factory->startSection('foo');
-        echo 'my @parent';
+        echo 'my '.$placeholder;
         $factory->stopSection();
         $factory->startSection('foo');
         echo 'friend';
@@ -264,22 +273,34 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
     public function testSingleStackPush()
     {
         $factory = $this->getFactory();
-        $factory->startSection('foo');
+        $factory->startPush('foo');
         echo 'hi';
-        $factory->appendSection();
-        $this->assertEquals('hi', $factory->yieldContent('foo'));
+        $factory->stopPush();
+        $this->assertEquals('hi', $factory->yieldPushContent('foo'));
     }
 
     public function testMultipleStackPush()
     {
         $factory = $this->getFactory();
-        $factory->startSection('foo');
+        $factory->startPush('foo');
         echo 'hi';
-        $factory->appendSection();
-        $factory->startSection('foo');
+        $factory->stopPush();
+        $factory->startPush('foo');
         echo ', Hello!';
-        $factory->appendSection();
-        $this->assertEquals('hi, Hello!', $factory->yieldContent('foo'));
+        $factory->stopPush();
+        $this->assertEquals('hi, Hello!', $factory->yieldPushContent('foo'));
+
+        // mimic a parent view is rendering
+        $factory->incrementRender();
+        $factory->startPush('foo');
+        echo 'Dear ';
+        $factory->stopPush();
+        $factory->startPush('foo');
+        echo 'friend';
+        $factory->stopPush();
+        $factory->decrementRender();
+
+        $this->assertEquals('Dear friendhi, Hello!', $factory->yieldPushContent('foo'));
     }
 
     public function testSessionAppending()
@@ -390,7 +411,9 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
     public function testExceptionsInSectionsAreThrown()
     {
         $engine = new Illuminate\View\Engines\CompilerEngine(m::mock('Illuminate\View\Compilers\CompilerInterface'));
-        $engine->getCompiler()->shouldReceive('getCompiledPath')->andReturnUsing(function ($path) { return $path; });
+        $engine->getCompiler()->shouldReceive('getCompiledPath')->andReturnUsing(function ($path) {
+            return $path;
+        });
         $engine->getCompiler()->shouldReceive('isExpired')->twice()->andReturn(false);
         $factory = $this->getFactory();
         $factory->getEngineResolver()->shouldReceive('resolve')->twice()->andReturn($engine);
@@ -425,6 +448,109 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         $factory->stopSection();
 
         $factory->appendSection();
+    }
+
+    public function testAddingLoops()
+    {
+        $factory = $this->getFactory();
+
+        $factory->addLoop([1, 2, 3]);
+
+        $expectedLoop = [
+            'iteration' => 0,
+            'index' => 0,
+            'remaining' => 3,
+            'count' => 3,
+            'first' => true,
+            'last' => false,
+            'depth' => 1,
+            'parent' => null,
+        ];
+
+        $this->assertEquals([$expectedLoop], $factory->getLoopStack());
+
+        $factory->addLoop([1, 2, 3, 4]);
+
+        $secondExpectedLoop = [
+            'iteration' => 0,
+            'index' => 0,
+            'remaining' => 4,
+            'count' => 4,
+            'first' => true,
+            'last' => false,
+            'depth' => 2,
+            'parent' => (object) $expectedLoop,
+        ];
+        $this->assertEquals([$expectedLoop, $secondExpectedLoop], $factory->getLoopStack());
+
+        $factory->popLoop();
+
+        $this->assertEquals([$expectedLoop], $factory->getLoopStack());
+    }
+
+    public function testAddingUncountableLoop()
+    {
+        $factory = $this->getFactory();
+
+        $factory->addLoop('');
+
+        $expectedLoop = [
+            'iteration' => 0,
+            'index' => 0,
+            'remaining' => null,
+            'count' => null,
+            'first' => true,
+            'last' => null,
+            'depth' => 1,
+            'parent' => null,
+        ];
+
+        $this->assertEquals([$expectedLoop], $factory->getLoopStack());
+    }
+
+    public function testIncrementingLoopIndices()
+    {
+        $factory = $this->getFactory();
+
+        $factory->addLoop([1, 2, 3, 4]);
+
+        $factory->incrementLoopIndices();
+
+        $factory->incrementLoopIndices();
+
+        $this->assertEquals(2, $factory->getLoopStack()[0]['iteration']);
+        $this->assertEquals(1, $factory->getLoopStack()[0]['index']);
+        $this->assertEquals(2, $factory->getLoopStack()[0]['remaining']);
+    }
+
+    public function testReachingEndOfLoop()
+    {
+        $factory = $this->getFactory();
+
+        $factory->addLoop([1, 2]);
+
+        $factory->incrementLoopIndices();
+
+        $factory->incrementLoopIndices();
+
+        $this->assertTrue($factory->getLoopStack()[0]['last']);
+    }
+
+    public function testIncrementingLoopIndicesOfUncountable()
+    {
+        $factory = $this->getFactory();
+
+        $factory->addLoop('');
+
+        $factory->incrementLoopIndices();
+
+        $factory->incrementLoopIndices();
+
+        $this->assertEquals(2, $factory->getLoopStack()[0]['iteration']);
+        $this->assertEquals(1, $factory->getLoopStack()[0]['index']);
+        $this->assertFalse($factory->getLoopStack()[0]['first']);
+        $this->assertNull($factory->getLoopStack()[0]['remaining']);
+        $this->assertNull($factory->getLoopStack()[0]['last']);
     }
 
     protected function getFactory()

@@ -13,7 +13,10 @@ class MySqlGrammar extends Grammar
      *
      * @var array
      */
-    protected $modifiers = ['Unsigned', 'Charset', 'Collate', 'Nullable', 'Default', 'Increment', 'Comment', 'After', 'First'];
+    protected $modifiers = [
+        'VirtualAs', 'StoredAs', 'Unsigned', 'Charset', 'Collate', 'Nullable',
+        'Default', 'Increment', 'Comment', 'After', 'First',
+    ];
 
     /**
      * The possible column serials.
@@ -65,6 +68,8 @@ class MySqlGrammar extends Grammar
 
         if (isset($blueprint->engine)) {
             $sql .= ' engine = '.$blueprint->engine;
+        } elseif (! is_null($engine = $connection->getConfig('engine'))) {
+            $sql .= ' engine = '.$engine;
         }
 
         return $sql;
@@ -163,7 +168,11 @@ class MySqlGrammar extends Grammar
 
         $table = $this->wrapTable($blueprint);
 
-        return "alter table {$table} add {$type} `{$command->index}`($columns)";
+        $index = $this->wrap($command->index);
+
+        $algorithm = $command->algorithm ? ' using '.$command->algorithm : '';
+
+        return "alter table {$table} add {$type} {$index}{$algorithm}($columns)";
     }
 
     /**
@@ -229,7 +238,9 @@ class MySqlGrammar extends Grammar
     {
         $table = $this->wrapTable($blueprint);
 
-        return "alter table {$table} drop index `{$command->index}`";
+        $index = $this->wrap($command->index);
+
+        return "alter table {$table} drop index {$index}";
     }
 
     /**
@@ -243,7 +254,9 @@ class MySqlGrammar extends Grammar
     {
         $table = $this->wrapTable($blueprint);
 
-        return "alter table {$table} drop index `{$command->index}`";
+        $index = $this->wrap($command->index);
+
+        return "alter table {$table} drop index {$index}";
     }
 
     /**
@@ -257,7 +270,9 @@ class MySqlGrammar extends Grammar
     {
         $table = $this->wrapTable($blueprint);
 
-        return "alter table {$table} drop foreign key `{$command->index}`";
+        $index = $this->wrap($command->index);
+
+        return "alter table {$table} drop foreign key {$index}";
     }
 
     /**
@@ -272,6 +287,26 @@ class MySqlGrammar extends Grammar
         $from = $this->wrapTable($blueprint);
 
         return "rename table {$from} to ".$this->wrapTable($command->to);
+    }
+
+    /**
+     * Compile the command to enable foreign key constraints.
+     *
+     * @return string
+     */
+    public function compileEnableForeignKeyConstraints()
+    {
+        return 'SET FOREIGN_KEY_CHECKS=1;';
+    }
+
+    /**
+     * Compile the command to disable foreign key constraints.
+     *
+     * @return string
+     */
+    public function compileDisableForeignKeyConstraints()
+    {
+        return 'SET FOREIGN_KEY_CHECKS=0;';
     }
 
     /**
@@ -341,7 +376,7 @@ class MySqlGrammar extends Grammar
     }
 
     /**
-     * Create the column definition for a integer type.
+     * Create the column definition for an integer type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
@@ -573,6 +608,56 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Create the column definition for an IP address type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeIpAddress(Fluent $column)
+    {
+        return 'varchar(45)';
+    }
+
+    /**
+     * Create the column definition for a MAC address type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeMacAddress(Fluent $column)
+    {
+        return 'varchar(17)';
+    }
+
+    /**
+     * Get the SQL for a generated virtual column modifier.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string|null
+     */
+    protected function modifyVirtualAs(Blueprint $blueprint, Fluent $column)
+    {
+        if (! is_null($column->virtualAs)) {
+            return " as ({$column->virtualAs})";
+        }
+    }
+
+    /**
+     * Get the SQL for a generated stored column modifier.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string|null
+     */
+    protected function modifyStoredAs(Blueprint $blueprint, Fluent $column)
+    {
+        if (! is_null($column->storedAs)) {
+            return " as ({$column->storedAs}) stored";
+        }
+    }
+
+    /**
      * Get the SQL for an unsigned column modifier.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
@@ -692,7 +777,7 @@ class MySqlGrammar extends Grammar
     protected function modifyComment(Blueprint $blueprint, Fluent $column)
     {
         if (! is_null($column->comment)) {
-            return ' comment "'.$column->comment.'"';
+            return " comment '".$column->comment."'";
         }
     }
 

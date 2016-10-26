@@ -2,13 +2,11 @@
 
 namespace Illuminate\Queue;
 
-use Closure;
 use DateTime;
+use Carbon\Carbon;
 use Illuminate\Support\Arr;
-use SuperClosure\Serializer;
+use InvalidArgumentException;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Queue\QueueableEntity;
-use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
 abstract class Queue
 {
@@ -18,6 +16,13 @@ abstract class Queue
      * @var \Illuminate\Container\Container
      */
     protected $container;
+
+    /**
+     * The encrypter implementation.
+     *
+     * @var \Illuminate\Contracts\Encryption\Encrypter
+     */
+    protected $encrypter;
 
     /**
      * Push a new job onto the queue.
@@ -68,19 +73,28 @@ abstract class Queue
      * @param  mixed   $data
      * @param  string  $queue
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function createPayload($job, $data = '', $queue = null)
     {
-        if ($job instanceof Closure) {
-            return json_encode($this->createClosurePayload($job, $data));
-        } elseif (is_object($job)) {
-            return json_encode([
+        if (is_object($job)) {
+            $payload = json_encode([
                 'job' => 'Illuminate\Queue\CallQueuedHandler@call',
-                'data' => ['command' => serialize(clone $job)],
+                'data' => [
+                    'commandName' => get_class($job),
+                    'command' => serialize(clone $job),
+                ],
             ]);
+        } else {
+            $payload = json_encode($this->createPlainPayload($job, $data));
         }
 
-        return json_encode($this->createPlainPayload($job, $data));
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            throw new InvalidArgumentException('Unable to create payload: '.json_last_error_msg());
+        }
+
+        return $payload;
     }
 
     /**
@@ -92,61 +106,7 @@ abstract class Queue
      */
     protected function createPlainPayload($job, $data)
     {
-        return ['job' => $job, 'data' => $this->prepareQueueableEntities($data)];
-    }
-
-    /**
-     * Prepare any queueable entities for storage in the queue.
-     *
-     * @param  mixed  $data
-     * @return mixed
-     */
-    protected function prepareQueueableEntities($data)
-    {
-        if ($data instanceof QueueableEntity) {
-            return $this->prepareQueueableEntity($data);
-        }
-
-        if (is_array($data)) {
-            $data = array_map(function ($d) {
-                if (is_array($d)) {
-                    return $this->prepareQueueableEntities($d);
-                }
-
-                return $this->prepareQueueableEntity($d);
-            }, $data);
-        }
-
-        return $data;
-    }
-
-    /**
-     * Prepare a single queueable entity for storage on the queue.
-     *
-     * @param  mixed  $value
-     * @return mixed
-     */
-    protected function prepareQueueableEntity($value)
-    {
-        if ($value instanceof QueueableEntity) {
-            return '::entity::|'.get_class($value).'|'.$value->getQueueableId();
-        }
-
-        return $value;
-    }
-
-    /**
-     * Create a payload string for the given Closure job.
-     *
-     * @param  \Closure  $job
-     * @param  mixed     $data
-     * @return string
-     */
-    protected function createClosurePayload($job, $data)
-    {
-        $closure = $this->crypt->encrypt((new Serializer)->serialize($job));
-
-        return ['job' => 'IlluminateQueueClosure', 'data' => compact('closure')];
+        return ['job' => $job, 'data' => $data];
     }
 
     /**
@@ -156,12 +116,20 @@ abstract class Queue
      * @param  string  $key
      * @param  string  $value
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function setMeta($payload, $key, $value)
     {
         $payload = json_decode($payload, true);
 
-        return json_encode(Arr::set($payload, $key, $value));
+        $payload = json_encode(Arr::set($payload, $key, $value));
+
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            throw new InvalidArgumentException('Unable to create payload: '.json_last_error_msg());
+        }
+
+        return $payload;
     }
 
     /**
@@ -186,7 +154,7 @@ abstract class Queue
      */
     protected function getTime()
     {
-        return time();
+        return Carbon::now()->getTimestamp();
     }
 
     /**
@@ -198,16 +166,5 @@ abstract class Queue
     public function setContainer(Container $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * Set the encrypter instance.
-     *
-     * @param  \Illuminate\Contracts\Encryption\Encrypter  $crypt
-     * @return void
-     */
-    public function setEncrypter(EncrypterContract $crypt)
-    {
-        $this->crypt = $crypt;
     }
 }

@@ -2,8 +2,10 @@
 
 namespace Illuminate\Foundation\Auth;
 
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Cache\RateLimiter;
+use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Lang;
 
 trait ThrottlesLogins
@@ -16,9 +18,8 @@ trait ThrottlesLogins
      */
     protected function hasTooManyLoginAttempts(Request $request)
     {
-        return app(RateLimiter::class)->tooManyAttempts(
-            $request->input($this->loginUsername()).$request->ip(),
-            $this->maxLoginAttempts(), $this->lockoutTime() / 60
+        return $this->limiter()->tooManyAttempts(
+            $this->throttleKey($request), 5, 1
         );
     }
 
@@ -30,24 +31,7 @@ trait ThrottlesLogins
      */
     protected function incrementLoginAttempts(Request $request)
     {
-        app(RateLimiter::class)->hit(
-            $request->input($this->loginUsername()).$request->ip()
-        );
-    }
-
-    /**
-     * Determine how many retries are left for the user.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return int
-     */
-    protected function retriesLeft(Request $request)
-    {
-        $attempts = app(RateLimiter::class)->attempts(
-            $request->input($this->loginUsername()).$request->ip()
-        );
-
-        return $this->maxLoginAttempts() - $attempts + 1;
+        $this->limiter()->hit($this->throttleKey($request));
     }
 
     /**
@@ -58,28 +42,15 @@ trait ThrottlesLogins
      */
     protected function sendLockoutResponse(Request $request)
     {
-        $seconds = app(RateLimiter::class)->availableIn(
-            $request->input($this->loginUsername()).$request->ip()
+        $seconds = $this->limiter()->availableIn(
+            $this->throttleKey($request)
         );
 
-        return redirect()->back()
-            ->withInput($request->only($this->loginUsername(), 'remember'))
-            ->withErrors([
-                $this->loginUsername() => $this->getLockoutErrorMessage($seconds),
-            ]);
-    }
+        $message = Lang::get('auth.throttle', ['seconds' => $seconds]);
 
-    /**
-     * Get the login lockout error message.
-     *
-     * @param  int  $seconds
-     * @return string
-     */
-    protected function getLockoutErrorMessage($seconds)
-    {
-        return Lang::has('auth.throttle')
-            ? Lang::get('auth.throttle', ['seconds' => $seconds])
-            : 'Too many login attempts. Please try again in '.$seconds.' seconds.';
+        return redirect()->back()
+            ->withInput($request->only($this->username(), 'remember'))
+            ->withErrors([$this->username() => $message]);
     }
 
     /**
@@ -90,28 +61,38 @@ trait ThrottlesLogins
      */
     protected function clearLoginAttempts(Request $request)
     {
-        app(RateLimiter::class)->clear(
-            $request->input($this->loginUsername()).$request->ip()
-        );
+        $this->limiter()->clear($this->throttleKey($request));
     }
 
     /**
-     * Get the maximum number of login attempts for delaying further attempts.
+     * Fire an event when a lockout occurs.
      *
-     * @return int
+     * @param  \Illuminate\Http\Request  $request
+     * @return void
      */
-    protected function maxLoginAttempts()
+    protected function fireLockoutEvent(Request $request)
     {
-        return property_exists($this, 'maxLoginAttempts') ? $this->maxLoginAttempts : 5;
+        event(new Lockout($request));
     }
 
     /**
-     * The number of seconds to delay further login attempts.
+     * Get the throttle key for the given request.
      *
-     * @return int
+     * @param  \Illuminate\Http\Request  $request
+     * @return string
      */
-    protected function lockoutTime()
+    protected function throttleKey(Request $request)
     {
-        return property_exists($this, 'lockoutTime') ? $this->lockoutTime : 60;
+        return Str::lower($request->input($this->username())).'|'.$request->ip();
+    }
+
+    /**
+     * Get the rate limiter instance.
+     *
+     * @return \Illuminate\Cache\RateLimiter
+     */
+    protected function limiter()
+    {
+        return app(RateLimiter::class);
     }
 }

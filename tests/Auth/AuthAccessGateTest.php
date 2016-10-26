@@ -19,8 +19,12 @@ class GateTest extends PHPUnit_Framework_TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', function ($user) { return true; });
-        $gate->define('bar', function ($user) { return false; });
+        $gate->define('foo', function ($user) {
+            return true;
+        });
+        $gate->define('bar', function ($user) {
+            return false;
+        });
 
         $this->assertTrue($gate->check('foo'));
         $this->assertFalse($gate->check('bar'));
@@ -30,7 +34,9 @@ class GateTest extends PHPUnit_Framework_TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', function ($user) { return true; });
+        $gate->define('foo', function ($user) {
+            return true;
+        });
         $gate->before(function ($user, $ability) {
             $this->assertEquals('foo', $ability);
 
@@ -44,8 +50,11 @@ class GateTest extends PHPUnit_Framework_TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', function ($user) { return true; });
-        $gate->before(function () {});
+        $gate->define('foo', function ($user) {
+            return true;
+        });
+        $gate->before(function () {
+        });
 
         $this->assertTrue($gate->check('foo'));
     }
@@ -54,8 +63,12 @@ class GateTest extends PHPUnit_Framework_TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', function ($user) { return true; });
-        $gate->define('bar', function ($user) { return false; });
+        $gate->define('foo', function ($user) {
+            return true;
+        });
+        $gate->define('bar', function ($user) {
+            return false;
+        });
 
         $gate->after(function ($user, $ability, $result) {
             if ($ability == 'foo') {
@@ -133,6 +146,24 @@ class GateTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($gate->check('update', new AccessGateTestDummy));
     }
 
+    public function test_policy_classes_handle_checks_for_all_subtypes()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
+
+        $this->assertTrue($gate->check('update', new AccessGateTestSubDummy));
+    }
+
+    public function test_policy_classes_handle_checks_for_interfaces()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummyInterface::class, AccessGateTestPolicy::class);
+
+        $this->assertTrue($gate->check('update', new AccessGateTestSubDummy));
+    }
+
     public function test_policy_converts_dash_to_camel()
     {
         $gate = $this->getBasicGate();
@@ -157,7 +188,7 @@ class GateTest extends PHPUnit_Framework_TestCase
 
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
 
-        $this->assertTrue($gate->check('create', AccessGateTestDummy::class));
+        $this->assertTrue($gate->check('create', [AccessGateTestDummy::class, true]));
     }
 
     public function test_policies_may_have_before_methods_to_override_checks()
@@ -173,7 +204,9 @@ class GateTest extends PHPUnit_Framework_TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('update', function () { $this->fail(); });
+        $gate->define('update', function () {
+            $this->fail();
+        });
 
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
 
@@ -248,7 +281,17 @@ class AccessGateTestClass
     }
 }
 
-class AccessGateTestDummy
+interface AccessGateTestDummyInterface
+{
+    //
+}
+
+class AccessGateTestDummy implements AccessGateTestDummyInterface
+{
+    //
+}
+
+class AccessGateTestSubDummy extends AccessGateTestDummy
 {
     //
 }
@@ -257,9 +300,19 @@ class AccessGateTestPolicy
 {
     use HandlesAuthorization;
 
+    public function createAny($user, $additional)
+    {
+        return $additional;
+    }
+
     public function create($user)
     {
         return $user->isAdmin ? $this->allow() : $this->deny('You are not an admin.');
+    }
+
+    public function updateAny($user, AccessGateTestDummy $dummy)
+    {
+        return ! $user->isAdmin;
     }
 
     public function update($user, AccessGateTestDummy $dummy)

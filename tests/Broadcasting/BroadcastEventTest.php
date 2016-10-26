@@ -32,7 +32,7 @@ class BroadcastEventTest extends PHPUnit_Framework_TestCase
         $broadcaster = m::mock('Illuminate\Contracts\Broadcasting\Broadcaster');
 
         $broadcaster->shouldReceive('broadcast')->once()->with(
-            ['test-channel'], 'TestBroadcastEventWithManualData', ['name' => 'Taylor']
+            ['test-channel'], 'TestBroadcastEventWithManualData', ['name' => 'Taylor', 'socket' => null]
         );
 
         $event = new TestBroadcastEventWithManualData;

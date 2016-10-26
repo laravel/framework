@@ -12,7 +12,7 @@ interface UrlGenerator
     public function current();
 
     /**
-     * Generate a absolute URL to the given path.
+     * Generate an absolute URL to the given path.
      *
      * @param  string  $path
      * @param  mixed  $extra
@@ -31,7 +31,7 @@ interface UrlGenerator
     public function secure($path, $parameters = []);
 
     /**
-     * Generate a URL to an application asset.
+     * Generate the URL to an application asset.
      *
      * @param  string  $path
      * @param  bool    $secure

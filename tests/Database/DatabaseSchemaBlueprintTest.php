@@ -20,7 +20,7 @@ class DatabaseSchemaBlueprintTest extends PHPUnit_Framework_TestCase
         $conn->shouldReceive('statement')->once()->with('foo');
         $conn->shouldReceive('statement')->once()->with('bar');
         $grammar = m::mock('Illuminate\Database\Schema\Grammars\MySqlGrammar');
-        $blueprint = $this->getMock('Illuminate\Database\Schema\Blueprint', ['toSql'], ['users']);
+        $blueprint = $this->getMockBuilder('Illuminate\Database\Schema\Blueprint')->setMethods(['toSql'])->setConstructorArgs(['users'])->getMock();
         $blueprint->expects($this->once())->method('toSql')->with($this->equalTo($conn), $this->equalTo($grammar))->will($this->returnValue(['foo', 'bar']));
 
         $blueprint->build($conn, $grammar);

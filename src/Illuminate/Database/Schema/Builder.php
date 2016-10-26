@@ -90,6 +90,20 @@ class Builder
     }
 
     /**
+     * Get the data type for the given column name.
+     *
+     * @param  string  $table
+     * @param  string  $column
+     * @return string
+     */
+    public function getColumnType($table, $column)
+    {
+        $table = $this->connection->getTablePrefix().$table;
+
+        return $this->connection->getDoctrineColumn($table, $column)->getType()->getName();
+    }
+
+    /**
      * Get the column listing for a given table.
      *
      * @param  string  $table
@@ -178,6 +192,30 @@ class Builder
         $blueprint->rename($to);
 
         $this->build($blueprint);
+    }
+
+    /**
+     * Enable foreign key constraints.
+     *
+     * @return bool
+     */
+    public function enableForeignKeyConstraints()
+    {
+        return $this->connection->statement(
+            $this->grammar->compileEnableForeignKeyConstraints()
+        );
+    }
+
+    /**
+     * Disable foreign key constraints.
+     *
+     * @return bool
+     */
+    public function disableForeignKeyConstraints()
+    {
+        return $this->connection->statement(
+            $this->grammar->compileDisableForeignKeyConstraints()
+        );
     }
 
     /**

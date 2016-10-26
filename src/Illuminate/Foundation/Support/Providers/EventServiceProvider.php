@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Support\Providers;
 
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -24,19 +24,18 @@ class EventServiceProvider extends ServiceProvider
     /**
      * Register the application's event listeners.
      *
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @return void
      */
-    public function boot(DispatcherContract $events)
+    public function boot()
     {
-        foreach ($this->listen as $event => $listeners) {
+        foreach ($this->listens() as $event => $listeners) {
             foreach ($listeners as $listener) {
-                $events->listen($event, $listener);
+                Event::listen($event, $listener);
             }
         }
 
         foreach ($this->subscribe as $subscriber) {
-            $events->subscribe($subscriber);
+            Event::subscribe($subscriber);
         }
     }
 

@@ -7,9 +7,9 @@ use ArrayAccess;
 use JsonSerializable;
 use IteratorAggregate;
 use Illuminate\Support\Collection;
+use Illuminate\Support\HtmlString;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Pagination\Presenter;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator as LengthAwarePaginatorContract;
 
 class LengthAwarePaginator extends AbstractPaginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate, JsonSerializable, Jsonable, LengthAwarePaginatorContract
@@ -48,7 +48,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
         $this->perPage = $perPage;
         $this->lastPage = (int) ceil($total / $perPage);
         $this->path = $this->path != '/' ? rtrim($this->path, '/') : $this->path;
-        $this->currentPage = $this->setCurrentPage($currentPage, $this->lastPage);
+        $this->currentPage = $this->setCurrentPage($currentPage, $this->pageName);
         $this->items = $items instanceof Collection ? $items : Collection::make($items);
     }
 
@@ -56,19 +56,12 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
      * Get the current page for the request.
      *
      * @param  int  $currentPage
-     * @param  int  $lastPage
+     * @param  string  $pageName
      * @return int
      */
-    protected function setCurrentPage($currentPage, $lastPage)
+    protected function setCurrentPage($currentPage, $pageName)
     {
-        $currentPage = $currentPage ?: static::resolveCurrentPage();
-
-        // The page number will get validated and adjusted if it either less than one
-        // or greater than the last page available based on the count of the given
-        // items array. If it's greater than the last, we'll give back the last.
-        if (is_numeric($currentPage) && $currentPage > $lastPage) {
-            return $lastPage > 0 ? $lastPage : 1;
-        }
+        $currentPage = $currentPage ?: static::resolveCurrentPage($pageName);
 
         return $this->isValidPageNumber($currentPage) ? (int) $currentPage : 1;
     }
@@ -116,20 +109,38 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
     }
 
     /**
-     * Render the paginator using the given presenter.
+     * Render the paginator using the given view.
      *
-     * @param  \Illuminate\Contracts\Pagination\Presenter|null  $presenter
+     * @param  string  $view
      * @return string
      */
-    public function render(Presenter $presenter = null)
+    public function links($view = null)
     {
-        if (is_null($presenter) && static::$presenterResolver) {
-            $presenter = call_user_func(static::$presenterResolver, $this);
-        }
+        return $this->render($view);
+    }
 
-        $presenter = $presenter ?: new BootstrapThreePresenter($this);
+    /**
+     * Render the paginator using the given view.
+     *
+     * @param  string  $view
+     * @return string
+     */
+    public function render($view = null)
+    {
+        $window = UrlWindow::make($this);
 
-        return $presenter->render();
+        $elements = [
+            $window['first'],
+            is_array($window['slider']) ? '...' : null,
+            $window['slider'],
+            is_array($window['last']) ? '...' : null,
+            $window['last'],
+        ];
+
+        return new HtmlString(static::viewFactory()->make($view ?: static::$defaultView, [
+            'paginator' => $this,
+            'elements' => array_filter($elements),
+        ])->render());
     }
 
     /**
@@ -140,15 +151,15 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
     public function toArray()
     {
         return [
-            'total'         => $this->total(),
-            'per_page'      => $this->perPage(),
-            'current_page'  => $this->currentPage(),
-            'last_page'     => $this->lastPage(),
+            'total' => $this->total(),
+            'per_page' => $this->perPage(),
+            'current_page' => $this->currentPage(),
+            'last_page' => $this->lastPage(),
             'next_page_url' => $this->nextPageUrl(),
             'prev_page_url' => $this->previousPageUrl(),
-            'from'          => $this->firstItem(),
-            'to'            => $this->lastItem(),
-            'data'          => $this->items->toArray(),
+            'from' => $this->firstItem(),
+            'to' => $this->lastItem(),
+            'data' => $this->items->toArray(),
         ];
     }
 

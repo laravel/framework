@@ -3,20 +3,20 @@
 namespace Illuminate\Routing;
 
 use Closure;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Illuminate\Contracts\Routing\Registrar as RegistrarContract;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Router implements RegistrarContract
 {
@@ -63,6 +63,22 @@ class Router implements RegistrarContract
      * @var array
      */
     protected $middleware = [];
+
+    /**
+     * All of the middleware groups.
+     *
+     * @var array
+     */
+    protected $middlewareGroups = [];
+
+    /**
+     * The priority-sorted list of middleware.
+     *
+     * Forces the listed middleware to always be in the given order.
+     *
+     * @var array
+     */
+    public $middlewarePriority = [];
 
     /**
      * The registered route value binders.
@@ -114,10 +130,10 @@ class Router implements RegistrarContract
      * Register a new GET route with the router.
      *
      * @param  string  $uri
-     * @param  \Closure|array|string  $action
+     * @param  \Closure|array|string|null  $action
      * @return \Illuminate\Routing\Route
      */
-    public function get($uri, $action)
+    public function get($uri, $action = null)
     {
         return $this->addRoute(['GET', 'HEAD'], $uri, $action);
     }
@@ -126,10 +142,10 @@ class Router implements RegistrarContract
      * Register a new POST route with the router.
      *
      * @param  string  $uri
-     * @param  \Closure|array|string  $action
+     * @param  \Closure|array|string|null  $action
      * @return \Illuminate\Routing\Route
      */
-    public function post($uri, $action)
+    public function post($uri, $action = null)
     {
         return $this->addRoute('POST', $uri, $action);
     }
@@ -138,10 +154,10 @@ class Router implements RegistrarContract
      * Register a new PUT route with the router.
      *
      * @param  string  $uri
-     * @param  \Closure|array|string  $action
+     * @param  \Closure|array|string|null  $action
      * @return \Illuminate\Routing\Route
      */
-    public function put($uri, $action)
+    public function put($uri, $action = null)
     {
         return $this->addRoute('PUT', $uri, $action);
     }
@@ -150,10 +166,10 @@ class Router implements RegistrarContract
      * Register a new PATCH route with the router.
      *
      * @param  string  $uri
-     * @param  \Closure|array|string  $action
+     * @param  \Closure|array|string|null  $action
      * @return \Illuminate\Routing\Route
      */
-    public function patch($uri, $action)
+    public function patch($uri, $action = null)
     {
         return $this->addRoute('PATCH', $uri, $action);
     }
@@ -162,10 +178,10 @@ class Router implements RegistrarContract
      * Register a new DELETE route with the router.
      *
      * @param  string  $uri
-     * @param  \Closure|array|string  $action
+     * @param  \Closure|array|string|null  $action
      * @return \Illuminate\Routing\Route
      */
-    public function delete($uri, $action)
+    public function delete($uri, $action = null)
     {
         return $this->addRoute('DELETE', $uri, $action);
     }
@@ -174,10 +190,10 @@ class Router implements RegistrarContract
      * Register a new OPTIONS route with the router.
      *
      * @param  string  $uri
-     * @param  \Closure|array|string  $action
+     * @param  \Closure|array|string|null  $action
      * @return \Illuminate\Routing\Route
      */
-    public function options($uri, $action)
+    public function options($uri, $action = null)
     {
         return $this->addRoute('OPTIONS', $uri, $action);
     }
@@ -186,10 +202,10 @@ class Router implements RegistrarContract
      * Register a new route responding to all verbs.
      *
      * @param  string  $uri
-     * @param  \Closure|array|string  $action
+     * @param  \Closure|array|string|null  $action
      * @return \Illuminate\Routing\Route
      */
-    public function any($uri, $action)
+    public function any($uri, $action = null)
     {
         $verbs = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'];
 
@@ -201,12 +217,34 @@ class Router implements RegistrarContract
      *
      * @param  array|string  $methods
      * @param  string  $uri
-     * @param  \Closure|array|string  $action
+     * @param  \Closure|array|string|null  $action
      * @return \Illuminate\Routing\Route
      */
-    public function match($methods, $uri, $action)
+    public function match($methods, $uri, $action = null)
     {
         return $this->addRoute(array_map('strtoupper', (array) $methods), $uri, $action);
+    }
+
+    /**
+     * Set the unmapped global resource parameters to singular.
+     *
+     * @param  bool  $singular
+     * @return void
+     */
+    public function singularResourceParameters($singular = true)
+    {
+        ResourceRegistrar::singularParameters($singular);
+    }
+
+    /**
+     * Set the global resource parameter mapping.
+     *
+     * @param  array  $parameters
+     * @return void
+     */
+    public function resourceParameters(array $parameters = [])
+    {
+        ResourceRegistrar::setParameters($parameters);
     }
 
     /**
@@ -227,7 +265,7 @@ class Router implements RegistrarContract
      *
      * @param  string  $name
      * @param  string  $controller
-     * @param  array   $options
+     * @param  array  $options
      * @return void
      */
     public function resource($name, $controller, array $options = [])
@@ -249,26 +287,25 @@ class Router implements RegistrarContract
     public function auth()
     {
         // Authentication Routes...
-        $this->get('login', 'Auth\AuthController@getLogin');
-        $this->post('login', 'Auth\AuthController@postLogin');
-        $this->get('logout', 'Auth\AuthController@getLogout');
+        $this->get('login', 'Auth\LoginController@showLoginForm')->name('login');
+        $this->post('login', 'Auth\LoginController@login');
+        $this->post('logout', 'Auth\LoginController@logout')->name('logout');
 
         // Registration Routes...
-        $this->get('register', 'Auth\AuthController@getRegister');
-        $this->post('register', 'Auth\AuthController@postRegister');
+        $this->get('register', 'Auth\RegisterController@showRegistrationForm');
+        $this->post('register', 'Auth\RegisterController@register');
 
         // Password Reset Routes...
-        $this->get('password/email', 'Auth\PasswordController@getEmail');
-        $this->post('password/email', 'Auth\PasswordController@postEmail');
-
-        $this->get('password/reset/{token}', 'Auth\PasswordController@getReset');
-        $this->post('password/reset', 'Auth\PasswordController@postReset');
+        $this->get('password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm');
+        $this->post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail');
+        $this->get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm');
+        $this->post('password/reset', 'Auth\ResetPasswordController@reset');
     }
 
     /**
      * Create a route group with shared attributes.
      *
-     * @param  array     $attributes
+     * @param  array  $attributes
      * @param  \Closure  $callback
      * @return void
      */
@@ -336,7 +373,7 @@ class Router implements RegistrarContract
             $new['as'] = $old['as'].(isset($new['as']) ? $new['as'] : '');
         }
 
-        return array_merge_recursive(array_except($old, ['namespace', 'prefix', 'where', 'as']), $new);
+        return array_merge_recursive(Arr::except($old, ['namespace', 'prefix', 'where', 'as']), $new);
     }
 
     /**
@@ -396,7 +433,7 @@ class Router implements RegistrarContract
      *
      * @param  array|string  $methods
      * @param  string  $uri
-     * @param  \Closure|array|string  $action
+     * @param  \Closure|array|string|null  $action
      * @return \Illuminate\Routing\Route
      */
     protected function addRoute($methods, $uri, $action)
@@ -409,7 +446,7 @@ class Router implements RegistrarContract
      *
      * @param  array|string  $methods
      * @param  string  $uri
-     * @param  mixed   $action
+     * @param  mixed  $action
      * @return \Illuminate\Routing\Route
      */
     protected function createRoute($methods, $uri, $action)
@@ -442,12 +479,14 @@ class Router implements RegistrarContract
      *
      * @param  array|string  $methods
      * @param  string  $uri
-     * @param  mixed   $action
+     * @param  mixed  $action
      * @return \Illuminate\Routing\Route
      */
     protected function newRoute($methods, $uri, $action)
     {
-        return (new Route($methods, $uri, $action))->setContainer($this->container);
+        return (new Route($methods, $uri, $action))
+                    ->setRouter($this)
+                    ->setContainer($this->container);
     }
 
     /**
@@ -501,7 +540,7 @@ class Router implements RegistrarContract
             return false;
         }
 
-        return is_string($action) || is_string(isset($action['uses']) ? $action['uses'] : null);
+        return is_string($action) || (isset($action['uses']) && is_string($action['uses']));
     }
 
     /**
@@ -554,9 +593,7 @@ class Router implements RegistrarContract
     {
         $this->currentRequest = $request;
 
-        $response = $this->dispatchToRoute($request);
-
-        return $this->prepareResponse($request, $response);
+        return $this->dispatchToRoute($request);
     }
 
     /**
@@ -595,15 +632,14 @@ class Router implements RegistrarContract
         $shouldSkipMiddleware = $this->container->bound('middleware.disable') &&
                                 $this->container->make('middleware.disable') === true;
 
-        $middleware = $shouldSkipMiddleware ? [] : $this->gatherRouteMiddlewares($route);
+        $middleware = $shouldSkipMiddleware ? [] : $this->gatherRouteMiddleware($route);
 
         return (new Pipeline($this->container))
                         ->send($request)
                         ->through($middleware)
                         ->then(function ($request) use ($route) {
                             return $this->prepareResponse(
-                                $request,
-                                $route->run($request)
+                                $request, $route->run($request)
                             );
                         });
     }
@@ -614,27 +650,98 @@ class Router implements RegistrarContract
      * @param  \Illuminate\Routing\Route  $route
      * @return array
      */
-    public function gatherRouteMiddlewares(Route $route)
+    public function gatherRouteMiddleware(Route $route)
     {
-        return Collection::make($route->middleware())->map(function ($name) {
-            return Collection::make($this->resolveMiddlewareClassName($name));
-        })
-        ->collapse()->all();
+        $middleware = collect($route->gatherMiddleware())->map(function ($name) {
+            return (array) $this->resolveMiddlewareClassName($name);
+        })->flatten();
+
+        return $this->sortMiddleware($middleware);
     }
 
     /**
-     * Resolve the middleware name to a class name preserving passed parameters.
+     * Resolve the middleware name to a class name(s) preserving passed parameters.
      *
      * @param  string  $name
-     * @return string
+     * @return string|array
      */
     public function resolveMiddlewareClassName($name)
     {
         $map = $this->middleware;
 
-        list($name, $parameters) = array_pad(explode(':', $name, 2), 2, null);
+        // When the middleware is simply a Closure, we will return this Closure instance
+        // directly so that Closures can be registered as middleware inline, which is
+        // convenient on occasions when the developers are experimenting with them.
+        if ($name instanceof Closure) {
+            return $name;
+        } elseif (isset($map[$name]) && $map[$name] instanceof Closure) {
+            return $map[$name];
 
-        return (isset($map[$name]) ? $map[$name] : $name).($parameters !== null ? ':'.$parameters : '');
+        // If the middleware is the name of a middleware group, we will return the array
+        // of middlewares that belong to the group. This allows developers to group a
+        // set of middleware under single keys that can be conveniently referenced.
+        } elseif (isset($this->middlewareGroups[$name])) {
+            return $this->parseMiddlewareGroup($name);
+
+        // Finally, when the middleware is simply a string mapped to a class name the
+        // middleware name will get parsed into the full class name and parameters
+        // which may be run using the Pipeline which accepts this string format.
+        } else {
+            list($name, $parameters) = array_pad(explode(':', $name, 2), 2, null);
+
+            return (isset($map[$name]) ? $map[$name] : $name).
+                   (! is_null($parameters) ? ':'.$parameters : '');
+        }
+    }
+
+    /**
+     * Parse the middleware group and format it for usage.
+     *
+     * @param  string  $name
+     * @return array
+     */
+    protected function parseMiddlewareGroup($name)
+    {
+        $results = [];
+
+        foreach ($this->middlewareGroups[$name] as $middleware) {
+            // If the middleware is another middleware group we will pull in the group and
+            // merge its middleware into the results. This allows groups to conveniently
+            // reference other groups without needing to repeat all their middlewares.
+            if (isset($this->middlewareGroups[$middleware])) {
+                $results = array_merge(
+                    $results, $this->parseMiddlewareGroup($middleware)
+                );
+
+                continue;
+            }
+
+            list($middleware, $parameters) = array_pad(
+                explode(':', $middleware, 2), 2, null
+            );
+
+            // If this middleware is actually a route middleware, we will extract the full
+            // class name out of the middleware list now. Then we'll add the parameters
+            // back onto this class' name so the pipeline will properly extract them.
+            if (isset($this->middleware[$middleware])) {
+                $middleware = $this->middleware[$middleware];
+            }
+
+            $results[] = $middleware.($parameters ? ':'.$parameters : '');
+        }
+
+        return $results;
+    }
+
+    /**
+     * Sort the given middleware by priority.
+     *
+     * @param  \Illuminate\Support\Collection  $middlewares
+     * @return array
+     */
+    protected function sortMiddleware(Collection $middlewares)
+    {
+        return (new SortedMiddleware($this->middlewarePriority, $middlewares))->all();
     }
 
     /**
@@ -649,7 +756,7 @@ class Router implements RegistrarContract
 
         $this->container->instance('Illuminate\Routing\Route', $route);
 
-        return $this->substituteBindings($route);
+        return $route;
     }
 
     /**
@@ -658,15 +765,13 @@ class Router implements RegistrarContract
      * @param  \Illuminate\Routing\Route  $route
      * @return \Illuminate\Routing\Route
      */
-    protected function substituteBindings($route)
+    public function substituteBindings($route)
     {
         foreach ($route->parameters() as $key => $value) {
             if (isset($this->binders[$key])) {
                 $route->setParameter($key, $this->performBinding($key, $value, $route));
             }
         }
-
-        $this->substituteImplicitBindings($route);
 
         return $route;
     }
@@ -677,18 +782,23 @@ class Router implements RegistrarContract
      * @param  \Illuminate\Routing\Route  $route
      * @return void
      */
-    protected function substituteImplicitBindings($route)
+    public function substituteImplicitBindings($route)
     {
         $parameters = $route->parameters();
 
         foreach ($route->signatureParameters(Model::class) as $parameter) {
             $class = $parameter->getClass();
 
-            if (array_key_exists($parameter->name, $parameters)) {
-                $method = $parameter->isDefaultValueAvailable() ? 'find' : 'findOrFail';
+            if (array_key_exists($parameter->name, $parameters) &&
+                ! $route->getParameter($parameter->name) instanceof Model) {
+                $method = $parameter->isDefaultValueAvailable() ? 'first' : 'firstOrFail';
+
+                $model = $class->newInstance();
 
                 $route->setParameter(
-                    $parameter->name, $class->newInstance()->{$method}($parameters[$parameter->name])
+                    $parameter->name, $model->where(
+                        $model->getRouteKeyName(), $parameters[$parameter->name]
+                    )->{$method}()
                 );
             }
         }
@@ -743,6 +853,56 @@ class Router implements RegistrarContract
     }
 
     /**
+     * Register a group of middleware.
+     *
+     * @param  string  $name
+     * @param  array  $middleware
+     * @return $this
+     */
+    public function middlewareGroup($name, array $middleware)
+    {
+        $this->middlewareGroups[$name] = $middleware;
+
+        return $this;
+    }
+
+    /**
+     * Add a middleware to the beginning of a middleware group.
+     *
+     * If the middleware is already in the group, it will not be added again.
+     *
+     * @param  string  $group
+     * @param  string  $middleware
+     * @return $this
+     */
+    public function prependMiddlewareToGroup($group, $middleware)
+    {
+        if (isset($this->middlewareGroups[$group]) && ! in_array($middleware, $this->middlewareGroups[$group])) {
+            array_unshift($this->middlewareGroups[$group], $middleware);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add a middleware to the end of a middleware group.
+     *
+     * If the middleware is already in the group, it will not be added again.
+     *
+     * @param  string  $group
+     * @param  string  $middleware
+     * @return $this
+     */
+    public function pushMiddlewareToGroup($group, $middleware)
+    {
+        if (isset($this->middlewareGroups[$group]) && ! in_array($middleware, $this->middlewareGroups[$group])) {
+            $this->middlewareGroups[$group][] = $middleware;
+        }
+
+        return $this;
+    }
+
+    /**
      * Register a model binder for a wildcard.
      *
      * @param  string  $key
@@ -750,7 +910,7 @@ class Router implements RegistrarContract
      * @param  \Closure|null  $callback
      * @return void
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public function model($key, $class, Closure $callback = null)
     {
@@ -775,7 +935,7 @@ class Router implements RegistrarContract
                 return call_user_func($callback, $value);
             }
 
-            throw new NotFoundHttpException;
+            throw (new ModelNotFoundException)->setModel($class);
         });
     }
 
@@ -798,7 +958,7 @@ class Router implements RegistrarContract
     /**
      * Create a class based binding using the IoC container.
      *
-     * @param  string    $binding
+     * @param  string  $binding
      * @return \Closure
      */
     public function createClassBinding($binding)
@@ -936,7 +1096,6 @@ class Router implements RegistrarContract
     /**
      * Alias for the "currentRouteNamed" method.
      *
-     * @param  mixed  string
      * @return bool
      */
     public function is()
@@ -980,7 +1139,6 @@ class Router implements RegistrarContract
     /**
      * Alias for the "currentRouteUses" method.
      *
-     * @param  mixed  string
      * @return bool
      */
     public function uses()
@@ -1034,7 +1192,7 @@ class Router implements RegistrarContract
     public function setRoutes(RouteCollection $routes)
     {
         foreach ($routes as $route) {
-            $route->setContainer($this->container);
+            $route->setRouter($this)->setContainer($this->container);
         }
 
         $this->routes = $routes;

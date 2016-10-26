@@ -37,7 +37,7 @@ interface Repository
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  \DateTime|int  $minutes
+     * @param  \DateTime|float|int  $minutes
      * @return void
      */
     public function put($key, $value, $minutes);
@@ -47,10 +47,28 @@ interface Repository
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  \DateTime|int  $minutes
+     * @param  \DateTime|float|int  $minutes
      * @return bool
      */
     public function add($key, $value, $minutes);
+
+    /**
+     * Increment the value of an item in the cache.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return int|bool
+     */
+    public function increment($key, $value = 1);
+
+    /**
+     * Decrement the value of an item in the cache.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return int|bool
+     */
+    public function decrement($key, $value = 1);
 
     /**
      * Store an item in the cache indefinitely.
@@ -65,7 +83,7 @@ interface Repository
      * Get an item from the cache, or store the default value.
      *
      * @param  string  $key
-     * @param  \DateTime|int  $minutes
+     * @param  \DateTime|float|int  $minutes
      * @param  \Closure  $callback
      * @return mixed
      */

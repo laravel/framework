@@ -61,6 +61,21 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase
 
         $dispatcher->dispatch(new BusDispatcherBasicCommand);
     }
+
+    public function testDispatcherCanDispatchStandAloneHandler()
+    {
+        $container = new Container;
+        $mock = m::mock('Illuminate\Contracts\Queue\Queue');
+        $dispatcher = new Dispatcher($container, function () use ($mock) {
+            return $mock;
+        });
+
+        $dispatcher->map([StandAloneCommand::class => StandAloneHandler::class]);
+
+        $response = $dispatcher->dispatch(new StandAloneCommand);
+
+        $this->assertInstanceOf(StandAloneCommand::class, $response);
+    }
 }
 
 class BusInjectionStub
@@ -94,4 +109,16 @@ class BusDispatcherTestSpecificQueueAndDelayCommand implements Illuminate\Contra
 {
     public $queue = 'foo';
     public $delay = 10;
+}
+
+class StandAloneCommand
+{
+}
+
+class StandAloneHandler
+{
+    public function handle(StandAloneCommand $command)
+    {
+        return $command;
+    }
 }

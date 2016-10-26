@@ -7,7 +7,6 @@ use Closure;
 use Exception;
 use Throwable;
 use LogicException;
-use RuntimeException;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Database\Query\Expression;
@@ -20,7 +19,7 @@ use Illuminate\Database\Query\Grammars\Grammar as QueryGrammar;
 
 class Connection implements ConnectionInterface
 {
-    use DetectsLostConnections;
+    use DetectsDeadlocks, DetectsLostConnections;
 
     /**
      * The active PDO connection.
@@ -77,6 +76,20 @@ class Connection implements ConnectionInterface
      * @var int
      */
     protected $fetchMode = PDO::FETCH_OBJ;
+
+    /**
+     * The argument for the fetch mode.
+     *
+     * @var mixed
+     */
+    protected $fetchArgument;
+
+    /**
+     * The constructor arguments for the PDO::FETCH_CLASS fetch mode.
+     *
+     * @var array
+     */
+    protected $fetchConstructorArgument = [];
 
     /**
      * The number of active transactions.
@@ -137,13 +150,13 @@ class Connection implements ConnectionInterface
     /**
      * Create a new database connection instance.
      *
-     * @param  \PDO     $pdo
+     * @param  \PDO|\Closure     $pdo
      * @param  string   $database
      * @param  string   $tablePrefix
      * @param  array    $config
      * @return void
      */
-    public function __construct(PDO $pdo, $database = '', $tablePrefix = '', array $config = [])
+    public function __construct($pdo, $database = '', $tablePrefix = '', array $config = [])
     {
         $this->pdo = $pdo;
 
@@ -318,10 +331,84 @@ class Connection implements ConnectionInterface
             // row from the database table, and will either be an array or objects.
             $statement = $this->getPdoForSelect($useReadPdo)->prepare($query);
 
-            $statement->execute($me->prepareBindings($bindings));
+            $me->bindValues($statement, $me->prepareBindings($bindings));
 
-            return $statement->fetchAll($me->getFetchMode());
+            $statement->execute();
+
+            $fetchMode = $me->getFetchMode();
+            $fetchArgument = $me->getFetchArgument();
+            $fetchConstructorArgument = $me->getFetchConstructorArgument();
+
+            if ($fetchMode === PDO::FETCH_CLASS && ! isset($fetchArgument)) {
+                $fetchArgument = 'StdClass';
+                $fetchConstructorArgument = null;
+            }
+
+            return isset($fetchArgument)
+                ? $statement->fetchAll($fetchMode, $fetchArgument, $fetchConstructorArgument)
+                : $statement->fetchAll($fetchMode);
         });
+    }
+
+    /*
+     * Run a select statement against the database and returns a generator.
+     *
+     * @param  string  $query
+     * @param  array  $bindings
+     * @param  bool  $useReadPdo
+     * @return \Generator
+     */
+    public function cursor($query, $bindings = [], $useReadPdo = true)
+    {
+        $statement = $this->run($query, $bindings, function ($me, $query, $bindings) use ($useReadPdo) {
+            if ($me->pretending()) {
+                return [];
+            }
+
+            $statement = $this->getPdoForSelect($useReadPdo)->prepare($query);
+
+            $fetchMode = $me->getFetchMode();
+            $fetchArgument = $me->getFetchArgument();
+            $fetchConstructorArgument = $me->getFetchConstructorArgument();
+
+            if ($fetchMode === PDO::FETCH_CLASS && ! isset($fetchArgument)) {
+                $fetchArgument = 'StdClass';
+                $fetchConstructorArgument = null;
+            }
+
+            if (isset($fetchArgument)) {
+                $statement->setFetchMode($fetchMode, $fetchArgument, $fetchConstructorArgument);
+            } else {
+                $statement->setFetchMode($fetchMode);
+            }
+
+            $me->bindValues($statement, $me->prepareBindings($bindings));
+
+            $statement->execute();
+
+            return $statement;
+        });
+
+        while ($record = $statement->fetch()) {
+            yield $record;
+        }
+    }
+
+    /**
+     * Bind values to their parameters in the given statement.
+     *
+     * @param  \PDOStatement $statement
+     * @param  array  $bindings
+     * @return void
+     */
+    public function bindValues($statement, $bindings)
+    {
+        foreach ($bindings as $key => $value) {
+            $statement->bindValue(
+                is_string($key) ? $key : $key + 1, $value,
+                is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR
+            );
+        }
     }
 
     /**
@@ -385,9 +472,11 @@ class Connection implements ConnectionInterface
                 return true;
             }
 
-            $bindings = $me->prepareBindings($bindings);
+            $statement = $this->getPdo()->prepare($query);
 
-            return $me->getPdo()->prepare($query)->execute($bindings);
+            $this->bindValues($statement, $me->prepareBindings($bindings));
+
+            return $statement->execute();
         });
     }
 
@@ -410,7 +499,9 @@ class Connection implements ConnectionInterface
             // to execute the statement and then we'll use PDO to fetch the affected.
             $statement = $me->getPdo()->prepare($query);
 
-            $statement->execute($me->prepareBindings($bindings));
+            $this->bindValues($statement, $me->prepareBindings($bindings));
+
+            $statement->execute();
 
             return $statement->rowCount();
         });
@@ -461,55 +552,72 @@ class Connection implements ConnectionInterface
      * Execute a Closure within a transaction.
      *
      * @param  \Closure  $callback
+     * @param  int  $attempts
      * @return mixed
      *
-     * @throws \Throwable
+     * @throws \Exception|\Throwable
      */
-    public function transaction(Closure $callback)
+    public function transaction(Closure $callback, $attempts = 1)
     {
-        $this->beginTransaction();
+        for ($a = 1; $a <= $attempts; $a++) {
+            $this->beginTransaction();
 
-        // We'll simply execute the given callback within a try / catch block
-        // and if we catch any exception we can rollback the transaction
-        // so that none of the changes are persisted to the database.
-        try {
-            $result = $callback($this);
+            // We'll simply execute the given callback within a try / catch block
+            // and if we catch any exception we can rollback the transaction
+            // so that none of the changes are persisted to the database.
+            try {
+                $result = $callback($this);
 
-            $this->commit();
+                $this->commit();
+            }
+
+            // If we catch an exception, we will roll back so nothing gets messed
+            // up in the database. Then we'll re-throw the exception so it can
+            // be handled how the developer sees fit for their applications.
+            catch (Exception $e) {
+                $this->rollBack();
+
+                if ($this->causedByDeadlock($e) && $a < $attempts) {
+                    continue;
+                }
+
+                throw $e;
+            } catch (Throwable $e) {
+                $this->rollBack();
+
+                throw $e;
+            }
+
+            return $result;
         }
-
-        // If we catch an exception, we will roll back so nothing gets messed
-        // up in the database. Then we'll re-throw the exception so it can
-        // be handled how the developer sees fit for their applications.
-        catch (Exception $e) {
-            $this->rollBack();
-
-            throw $e;
-        } catch (Throwable $e) {
-            $this->rollBack();
-
-            throw $e;
-        }
-
-        return $result;
     }
 
     /**
      * Start a new database transaction.
      *
      * @return void
+     * @throws Exception
      */
     public function beginTransaction()
     {
-        ++$this->transactions;
-
-        if ($this->transactions == 1) {
-            $this->pdo->beginTransaction();
-        } elseif ($this->transactions > 1 && $this->queryGrammar->supportsSavepoints()) {
-            $this->pdo->exec(
-                $this->queryGrammar->compileSavepoint('trans'.$this->transactions)
+        if ($this->transactions == 0) {
+            try {
+                $this->getPdo()->beginTransaction();
+            } catch (Exception $e) {
+                if ($this->causedByLostConnection($e)) {
+                    $this->reconnect();
+                    $this->pdo->beginTransaction();
+                } else {
+                    throw $e;
+                }
+            }
+        } elseif ($this->transactions >= 1 && $this->queryGrammar->supportsSavepoints()) {
+            $this->getPdo()->exec(
+                $this->queryGrammar->compileSavepoint('trans'.($this->transactions + 1))
             );
         }
+
+        ++$this->transactions;
 
         $this->fireConnectionEvent('beganTransaction');
     }
@@ -522,10 +630,10 @@ class Connection implements ConnectionInterface
     public function commit()
     {
         if ($this->transactions == 1) {
-            $this->pdo->commit();
+            $this->getPdo()->commit();
         }
 
-        --$this->transactions;
+        $this->transactions = max(0, $this->transactions - 1);
 
         $this->fireConnectionEvent('committed');
     }
@@ -533,19 +641,28 @@ class Connection implements ConnectionInterface
     /**
      * Rollback the active database transaction.
      *
+     * @param  int|null  $toLevel
      * @return void
      */
-    public function rollBack()
+    public function rollBack($toLevel = null)
     {
-        if ($this->transactions == 1) {
-            $this->pdo->rollBack();
-        } elseif ($this->transactions > 1 && $this->queryGrammar->supportsSavepoints()) {
-            $this->pdo->exec(
-                $this->queryGrammar->compileSavepointRollBack('trans'.$this->transactions)
+        if (is_null($toLevel)) {
+            $toLevel = $this->transactions - 1;
+        }
+
+        if ($toLevel < 0 || $toLevel >= $this->transactions) {
+            return;
+        }
+
+        if ($toLevel == 0) {
+            $this->getPdo()->rollBack();
+        } elseif ($this->queryGrammar->supportsSavepoints()) {
+            $this->getPdo()->exec(
+                $this->queryGrammar->compileSavepointRollBack('trans'.($toLevel + 1))
             );
         }
 
-        $this->transactions = max(0, $this->transactions - 1);
+        $this->transactions = $toLevel;
 
         $this->fireConnectionEvent('rollingBack');
     }
@@ -610,6 +727,10 @@ class Connection implements ConnectionInterface
         try {
             $result = $this->runQueryCallback($query, $bindings, $callback);
         } catch (QueryException $e) {
+            if ($this->transactions >= 1) {
+                throw $e;
+            }
+
             $result = $this->tryAgainIfCausedByLostConnection(
                 $e, $query, $bindings, $callback
             );
@@ -827,7 +948,7 @@ class Connection implements ConnectionInterface
         if (is_null($this->doctrineConnection)) {
             $driver = $this->getDoctrineDriver();
 
-            $data = ['pdo' => $this->pdo, 'dbname' => $this->getConfig('database')];
+            $data = ['pdo' => $this->getPdo(), 'dbname' => $this->getConfig('database')];
 
             $this->doctrineConnection = new DoctrineConnection($data, $driver);
         }
@@ -842,6 +963,10 @@ class Connection implements ConnectionInterface
      */
     public function getPdo()
     {
+        if ($this->pdo instanceof Closure) {
+            return $this->pdo = call_user_func($this->pdo);
+        }
+
         return $this->pdo;
     }
 
@@ -856,7 +981,11 @@ class Connection implements ConnectionInterface
             return $this->getPdo();
         }
 
-        return $this->readPdo ?: $this->pdo;
+        if ($this->readPdo instanceof Closure) {
+            return $this->readPdo = call_user_func($this->readPdo);
+        }
+
+        return $this->readPdo ?: $this->getPdo();
     }
 
     /**
@@ -867,9 +996,7 @@ class Connection implements ConnectionInterface
      */
     public function setPdo($pdo)
     {
-        if ($this->transactions >= 1) {
-            throw new RuntimeException("Can't swap PDO instance while within transaction.");
-        }
+        $this->transactions = 0;
 
         $this->pdo = $pdo;
 
@@ -930,7 +1057,7 @@ class Connection implements ConnectionInterface
      */
     public function getDriverName()
     {
-        return $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+        return $this->getConfig('driver');
     }
 
     /**
@@ -1038,14 +1165,38 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Set the default fetch mode for the connection.
+     * Get the fetch argument to be applied when selecting.
+     *
+     * @return mixed
+     */
+    public function getFetchArgument()
+    {
+        return $this->fetchArgument;
+    }
+
+    /**
+     * Get custom constructor arguments for the PDO::FETCH_CLASS fetch mode.
+     *
+     * @return array
+     */
+    public function getFetchConstructorArgument()
+    {
+        return $this->fetchConstructorArgument;
+    }
+
+    /**
+     * Set the default fetch mode for the connection, and optional arguments for the given fetch mode.
      *
      * @param  int  $fetchMode
+     * @param  mixed  $fetchArgument
+     * @param  array  $fetchConstructorArgument
      * @return int
      */
-    public function setFetchMode($fetchMode)
+    public function setFetchMode($fetchMode, $fetchArgument = null, array $fetchConstructorArgument = [])
     {
         $this->fetchMode = $fetchMode;
+        $this->fetchArgument = $fetchArgument;
+        $this->fetchConstructorArgument = $fetchConstructorArgument;
     }
 
     /**

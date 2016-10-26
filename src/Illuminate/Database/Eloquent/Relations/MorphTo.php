@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
+use BadMethodCallException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -29,12 +30,12 @@ class MorphTo extends BelongsTo
      */
     protected $dictionary = [];
 
-    /*
-     * Indicates if soft-deleted model instances should be fetched.
+    /**
+     * A buffer of dynamic calls to query macros.
      *
-     * @var bool
+     * @var array
      */
-    protected $withTrashed = false;
+    protected $macroBuffer = [];
 
     /**
      * Create a new morph to relationship instance.
@@ -104,10 +105,6 @@ class MorphTo extends BelongsTo
      */
     public function match(array $models, Collection $results, $relation)
     {
-        foreach (array_keys($this->dictionary) as $type) {
-            $this->matchToMorphParents($type, $this->getResultsByType($type), $relation);
-        }
-
         return $models;
     }
 
@@ -141,18 +138,34 @@ class MorphTo extends BelongsTo
     }
 
     /**
+     * Get the results of the relationship.
+     *
+     * Called via eager load method of Eloquent query builder.
+     *
+     * @return mixed
+     */
+    public function getEager()
+    {
+        foreach (array_keys($this->dictionary) as $type) {
+            $this->matchToMorphParents($type, $this->getResultsByType($type));
+        }
+
+        return $this->models;
+    }
+
+    /**
      * Match the results for a given type to their parents.
      *
-     * @param  string $type
-     * @param  \Illuminate\Database\Eloquent\Collection $results
-     * @param string $relation
+     * @param  string  $type
+     * @param  \Illuminate\Database\Eloquent\Collection  $results
+     * @return void
      */
-    protected function matchToMorphParents($type, Collection $results, $relation)
+    protected function matchToMorphParents($type, Collection $results)
     {
         foreach ($results as $result) {
             if (isset($this->dictionary[$type][$result->getKey()])) {
                 foreach ($this->dictionary[$type][$result->getKey()] as $model) {
-                    $model->setRelation($relation, $result);
+                    $model->setRelation($this->relation, $result);
                 }
             }
         }
@@ -170,9 +183,9 @@ class MorphTo extends BelongsTo
 
         $key = $instance->getTable().'.'.$instance->getKeyName();
 
-        $query = $instance->newQuery();
-
-        $query = $this->useWithTrashed($query);
+        $query = $this->replayMacros($instance->newQuery())
+            ->mergeModelDefinedRelationConstraints($this->getQuery())
+            ->with($this->getQuery()->getEagerLoads());
 
         return $query->whereIn($key, $this->gatherKeysByType($type)->all())->get();
     }
@@ -189,7 +202,6 @@ class MorphTo extends BelongsTo
 
         return collect($this->dictionary[$type])->map(function ($models) use ($foreign) {
             return head($models)->{$foreign};
-
         })->values()->unique();
     }
 
@@ -227,31 +239,40 @@ class MorphTo extends BelongsTo
     }
 
     /**
-     * Fetch soft-deleted model instances with query.
+     * Replay stored macro calls on the actual related instance.
      *
-     * @return $this
-     */
-    public function withTrashed()
-    {
-        $this->withTrashed = true;
-
-        $this->query = $this->useWithTrashed($this->query);
-
-        return $this;
-    }
-
-    /**
-     * Return trashed models with query if told so.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param \Illuminate\Database\Eloquent\Builder $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    protected function useWithTrashed(Builder $query)
+    protected function replayMacros(Builder $query)
     {
-        if ($this->withTrashed && $query->getMacro('withTrashed') !== null) {
-            return $query->withTrashed();
+        foreach ($this->macroBuffer as $macro) {
+            call_user_func_array([$query, $macro['method']], $macro['parameters']);
         }
 
         return $query;
+    }
+
+    /**
+     * Handle dynamic method calls to the relationship.
+     *
+     * @param  string  $method
+     * @param  array   $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        try {
+            return parent::__call($method, $parameters);
+        }
+
+        // If we tried to call a method that does not exist on the parent Builder instance,
+        // we'll assume that we want to call a query macro (e.g. withTrashed) that only
+        // exists on related models. We will just store the call and replay it later.
+        catch (BadMethodCallException $e) {
+            $this->macroBuffer[] = compact('method', 'parameters');
+
+            return $this;
+        }
     }
 }

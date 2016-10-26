@@ -31,7 +31,7 @@ class NullStore extends TaggableStore implements Store
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  int     $minutes
+     * @param  float|int  $minutes
      * @return void
      */
     public function put($key, $value, $minutes)
@@ -52,7 +52,7 @@ class NullStore extends TaggableStore implements Store
     }
 
     /**
-     * Increment the value of an item in the cache.
+     * Decrement the value of an item in the cache.
      *
      * @param  string  $key
      * @param  mixed   $value
@@ -89,11 +89,11 @@ class NullStore extends TaggableStore implements Store
     /**
      * Remove all items from the cache.
      *
-     * @return void
+     * @return bool
      */
     public function flush()
     {
-        //
+        return true;
     }
 
     /**

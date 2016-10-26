@@ -2,7 +2,7 @@
     "name": "illuminate/queue",
     "description": "The Illuminate Queue package.",
     "license": "MIT",
-    "homepage": "http://laravel.com",
+    "homepage": "https://laravel.com",
     "support": {
         "issues": "https://github.com/laravel/framework/issues",
         "source": "https://github.com/laravel/framework"
@@ -10,36 +10,32 @@
     "authors": [
         {
             "name": "Taylor Otwell",
-            "email": "taylorotwell@gmail.com"
+            "email": "taylor@laravel.com"
         }
     ],
     "require": {
-        "php": ">=5.5.9",
-        "illuminate/console": "5.3.*",
-        "illuminate/contracts": "5.3.*",
-        "illuminate/container": "5.3.*",
-        "illuminate/http": "5.3.*",
-        "illuminate/support": "5.3.*",
-        "symfony/process": "3.1.*",
-        "nesbot/carbon": "~1.20"
+        "php": ">=5.6.4",
+        "illuminate/console": "5.4.*",
+        "illuminate/container": "5.4.*",
+        "illuminate/contracts": "5.4.*",
+        "illuminate/support": "5.4.*",
+        "nesbot/carbon": "~1.20",
+        "symfony/debug": "3.2.*",
+        "symfony/process": "3.2.*"
     },
     "autoload": {
         "psr-4": {
             "Illuminate\\Queue\\": ""
-        },
-        "classmap": [
-            "IlluminateQueueClosure.php"
-        ]
+        }
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.3-dev"
+            "dev-master": "5.4-dev"
         }
     },
     "suggest": {
         "aws/aws-sdk-php": "Required to use the SQS queue driver (~3.0).",
-        "illuminate/redis": "Required to use the Redis queue driver (5.3.*).",
-        "iron-io/iron_mq": "Required to use the Iron queue driver (~2.0).",
+        "illuminate/redis": "Required to use the Redis queue driver (5.4.*).",
         "pda/pheanstalk": "Required to use the Beanstalk queue driver (~3.0)."
     },
     "minimum-stability": "dev"

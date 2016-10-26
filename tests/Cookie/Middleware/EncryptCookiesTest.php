@@ -45,7 +45,7 @@ class EncryptCookiesTest extends PHPUnit_Framework_TestCase
         $response = $this->router->dispatch(Request::create($this->setCookiePath, 'GET'));
 
         $cookies = $response->headers->getCookies();
-        $this->assertEquals(2, count($cookies));
+        $this->assertCount(2, $cookies);
         $this->assertEquals('encrypted_cookie', $cookies[0]->getName());
         $this->assertNotEquals('value', $cookies[0]->getValue());
         $this->assertEquals('unencrypted_cookie', $cookies[1]->getName());
@@ -62,7 +62,7 @@ class EncryptCookiesTest extends PHPUnit_Framework_TestCase
         $response = $this->router->dispatch(Request::create($this->queueCookiePath, 'GET'));
 
         $cookies = $response->headers->getCookies();
-        $this->assertEquals(2, count($cookies));
+        $this->assertCount(2, $cookies);
         $this->assertEquals('encrypted_cookie', $cookies[0]->getName());
         $this->assertNotEquals('value', $cookies[0]->getValue());
         $this->assertEquals('unencrypted_cookie', $cookies[1]->getName());

@@ -54,12 +54,12 @@ class ViewTest extends PHPUnit_Framework_TestCase
             return 'new contents';
         }));
 
-        $this->assertEquals('', $view->render(function () {
+        $this->assertEmpty($view->render(function () {
             return '';
         }));
 
         $this->assertEquals('contents', $view->render(function () {
-            return; // null
+            //
         }));
     }
 
@@ -135,6 +135,18 @@ class ViewTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($view->offsetExists('foo'));
     }
 
+    public function testViewConstructedWithObjectData()
+    {
+        $view = $this->getView(new DataObjectStub);
+        $this->assertInstanceOf('ArrayAccess', $view);
+        $this->assertTrue($view->offsetExists('foo'));
+        $this->assertEquals($view->offsetGet('foo'), 'bar');
+        $view->offsetSet('foo', 'baz');
+        $this->assertEquals($view->offsetGet('foo'), 'baz');
+        $view->offsetUnset('foo');
+        $this->assertFalse($view->offsetExists('foo'));
+    }
+
     public function testViewMagicMethods()
     {
         $view = $this->getView(['foo' => 'bar']);
@@ -199,7 +211,7 @@ class ViewTest extends PHPUnit_Framework_TestCase
         $qu = $view->errors->get('qu');
         $this->assertEquals($qu[0], 'ux');
         $data = ['foo' => 'baz'];
-        $this->assertSame($view, $view->withErrors(new \Illuminate\Support\MessageBag($data)));
+        $this->assertSame($view, $view->withErrors(new Illuminate\Support\MessageBag($data)));
         $foo = $view->errors->get('foo');
         $this->assertEquals($foo[0], 'baz');
     }
@@ -214,4 +226,9 @@ class ViewTest extends PHPUnit_Framework_TestCase
             $data
         );
     }
+}
+
+class DataObjectStub
+{
+    public $foo = 'bar';
 }

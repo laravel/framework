@@ -2,9 +2,9 @@
 
 namespace DummyNamespace;
 
-use DummyRootNamespaceHttp\Requests\Request;
+use Illuminate\Foundation\Http\FormRequest;
 
-class DummyClass extends Request
+class DummyClass extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

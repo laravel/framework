@@ -3,6 +3,7 @@
 namespace Illuminate\View;
 
 use Closure;
+use Countable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -10,6 +11,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\View\Engines\EngineResolver;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Contracts\View\Factory as FactoryContract;
 
 class Factory implements FactoryContract
@@ -92,11 +94,39 @@ class Factory implements FactoryContract
     protected $sectionStack = [];
 
     /**
+     * The stack of in-progress loops.
+     *
+     * @var array
+     */
+    protected $loopsStack = [];
+
+    /**
+     * All of the finished, captured push sections.
+     *
+     * @var array
+     */
+    protected $pushes = [];
+
+    /**
+     * The stack of in-progress push sections.
+     *
+     * @var array
+     */
+    protected $pushStack = [];
+
+    /**
      * The number of active rendering operations.
      *
      * @var int
      */
     protected $renderCount = 0;
+
+    /**
+     * The parent placeholder for the request.
+     *
+     * @var string
+     */
+    protected static $parentPlaceholder;
 
     /**
      * Create a new view factory instance.
@@ -121,7 +151,7 @@ class Factory implements FactoryContract
      * @param  string  $path
      * @param  array   $data
      * @param  array   $mergeData
-     * @return \Illuminate\View\View
+     * @return \Illuminate\Contracts\View\View
      */
     public function file($path, $data = [], $mergeData = [])
     {
@@ -192,7 +222,7 @@ class Factory implements FactoryContract
      *
      * @param  string  $view
      * @param  mixed   $data
-     * @return \Illuminate\View\View
+     * @return \Illuminate\Contracts\View\View
      */
     public function of($view, $data = [])
     {
@@ -307,8 +337,8 @@ class Factory implements FactoryContract
     {
         $extensions = array_keys($this->extensions);
 
-        return Arr::first($extensions, function ($key, $value) use ($path) {
-            return Str::endsWith($path, $value);
+        return Arr::first($extensions, function ($value) use ($path) {
+            return Str::endsWith($path, '.'.$value);
         });
     }
 
@@ -321,13 +351,13 @@ class Factory implements FactoryContract
      */
     public function share($key, $value = null)
     {
-        if (! is_array($key)) {
-            return $this->shared[$key] = $value;
+        $keys = is_array($key) ? $key : [$key => $value];
+
+        foreach ($keys as $key => $value) {
+            $this->shared[$key] = $value;
         }
 
-        foreach ($key as $innerKey => $innerValue) {
-            $this->share($innerKey, $innerValue);
-        }
+        return $value;
     }
 
     /**
@@ -488,23 +518,23 @@ class Factory implements FactoryContract
     /**
      * Call the composer for a given view.
      *
-     * @param  \Illuminate\View\View  $view
+     * @param  \Illuminate\Contracts\View\View  $view
      * @return void
      */
-    public function callComposer(View $view)
+    public function callComposer(ViewContract $view)
     {
-        $this->events->fire('composing: '.$view->getName(), [$view]);
+        $this->events->fire('composing: '.$view->name(), [$view]);
     }
 
     /**
      * Call the creator for a given view.
      *
-     * @param  \Illuminate\View\View  $view
+     * @param  \Illuminate\Contracts\View\View  $view
      * @return void
      */
-    public function callCreator(View $view)
+    public function callCreator(ViewContract $view)
     {
-        $this->events->fire('creating: '.$view->getName(), [$view]);
+        $this->events->fire('creating: '.$view->name(), [$view]);
     }
 
     /**
@@ -608,7 +638,7 @@ class Factory implements FactoryContract
     protected function extendSection($section, $content)
     {
         if (isset($this->sections[$section])) {
-            $content = str_replace('@parent', $content, $this->sections[$section]);
+            $content = str_replace(static::parentPlaceholder(), $content, $this->sections[$section]);
         }
 
         $this->sections[$section] = $content;
@@ -632,8 +662,94 @@ class Factory implements FactoryContract
         $sectionContent = str_replace('@@parent', '--parent--holder--', $sectionContent);
 
         return str_replace(
-            '--parent--holder--', '@parent', str_replace('@parent', '', $sectionContent)
+            '--parent--holder--', '@parent', str_replace(static::parentPlaceholder(), '', $sectionContent)
         );
+    }
+
+    /**
+     * Get the parent placeholder for the current request.
+     *
+     * @return string
+     */
+    public static function parentPlaceholder()
+    {
+        if (! static::$parentPlaceholder) {
+            static::$parentPlaceholder = '##parent-placeholder-'.Str::random(40).'##';
+        }
+
+        return static::$parentPlaceholder;
+    }
+
+    /**
+     * Start injecting content into a push section.
+     *
+     * @param  string  $section
+     * @param  string  $content
+     * @return void
+     */
+    public function startPush($section, $content = '')
+    {
+        if ($content === '') {
+            if (ob_start()) {
+                $this->pushStack[] = $section;
+            }
+        } else {
+            $this->extendPush($section, $content);
+        }
+    }
+
+    /**
+     * Stop injecting content into a push section.
+     *
+     * @return string
+     * @throws \InvalidArgumentException
+     */
+    public function stopPush()
+    {
+        if (empty($this->pushStack)) {
+            throw new InvalidArgumentException('Cannot end a section without first starting one.');
+        }
+
+        $last = array_pop($this->pushStack);
+
+        $this->extendPush($last, ob_get_clean());
+
+        return $last;
+    }
+
+    /**
+     * Append content to a given push section.
+     *
+     * @param  string  $section
+     * @param  string  $content
+     * @return void
+     */
+    protected function extendPush($section, $content)
+    {
+        if (! isset($this->pushes[$section])) {
+            $this->pushes[$section] = [];
+        }
+        if (! isset($this->pushes[$section][$this->renderCount])) {
+            $this->pushes[$section][$this->renderCount] = $content;
+        } else {
+            $this->pushes[$section][$this->renderCount] .= $content;
+        }
+    }
+
+    /**
+     * Get the string contents of a push section.
+     *
+     * @param  string  $section
+     * @param  string  $default
+     * @return string
+     */
+    public function yieldPushContent($section, $default = '')
+    {
+        if (! isset($this->pushes[$section])) {
+            return $default;
+        }
+
+        return implode(array_reverse($this->pushes[$section]));
     }
 
     /**
@@ -643,9 +759,13 @@ class Factory implements FactoryContract
      */
     public function flushSections()
     {
-        $this->sections = [];
+        $this->renderCount = 0;
 
+        $this->sections = [];
         $this->sectionStack = [];
+
+        $this->pushes = [];
+        $this->pushStack = [];
     }
 
     /**
@@ -688,6 +808,81 @@ class Factory implements FactoryContract
     public function doneRendering()
     {
         return $this->renderCount == 0;
+    }
+
+    /**
+     * Add new loop to the stack.
+     *
+     * @param  \Countable|array  $data
+     * @return void
+     */
+    public function addLoop($data)
+    {
+        $length = is_array($data) || $data instanceof Countable ? count($data) : null;
+
+        $parent = Arr::last($this->loopsStack);
+
+        $this->loopsStack[] = [
+            'iteration' => 0,
+            'index' => 0,
+            'remaining' => isset($length) ? $length : null,
+            'count' => $length,
+            'first' => true,
+            'last' => isset($length) ? $length == 1 : null,
+            'depth' => count($this->loopsStack) + 1,
+            'parent' => $parent ? (object) $parent : null,
+        ];
+    }
+
+    /**
+     * Increment the top loop's indices.
+     *
+     * @return void
+     */
+    public function incrementLoopIndices()
+    {
+        $loop = &$this->loopsStack[count($this->loopsStack) - 1];
+
+        $loop['iteration']++;
+        $loop['index'] = $loop['iteration'] - 1;
+
+        $loop['first'] = $loop['iteration'] == 1;
+
+        if (isset($loop['count'])) {
+            $loop['remaining']--;
+
+            $loop['last'] = $loop['iteration'] == $loop['count'];
+        }
+    }
+
+    /**
+     * Pop a loop from the top of the loop stack.
+     *
+     * @return void
+     */
+    public function popLoop()
+    {
+        array_pop($this->loopsStack);
+    }
+
+    /**
+     * Get an instance of the first loop in the stack.
+     *
+     * @return array
+     */
+    public function getFirstLoop()
+    {
+        return ($last = Arr::last($this->loopsStack)) ? (object) $last : null;
+    }
+
+    /**
+     * Get the entire loop stack.
+     *
+     * @return array
+     */
+    public function getLoopStack()
+    {
+        return $this->loopsStack;
     }
 
     /**

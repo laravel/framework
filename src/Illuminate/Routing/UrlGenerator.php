@@ -130,15 +130,22 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Get the URL for the previous request.
      *
+     * @param  mixed  $fallback
      * @return string
      */
-    public function previous()
+    public function previous($fallback = false)
     {
         $referrer = $this->request->headers->get('referer');
 
         $url = $referrer ? $this->to($referrer) : $this->getPreviousUrlFromSession();
 
-        return $url ?: $this->to('/');
+        if ($url) {
+            return $url;
+        } elseif ($fallback) {
+            return $this->to($fallback);
+        } else {
+            return $this->to('/');
+        }
     }
 
     /**
@@ -194,7 +201,7 @@ class UrlGenerator implements UrlGeneratorContract
     }
 
     /**
-     * Generate a URL to an application asset.
+     * Generate the URL to an application asset.
      *
      * @param  string  $path
      * @param  bool|null  $secure
@@ -215,7 +222,7 @@ class UrlGenerator implements UrlGeneratorContract
     }
 
     /**
-     * Generate a URL to an asset from a custom root domain such as CDN, etc.
+     * Generate the URL to an asset from a custom root domain such as CDN, etc.
      *
      * @param  string  $root
      * @param  string  $path
@@ -246,7 +253,7 @@ class UrlGenerator implements UrlGeneratorContract
     }
 
     /**
-     * Generate a URL to a secure asset.
+     * Generate the URL to a secure asset.
      *
      * @param  string  $path
      * @return string
@@ -314,6 +321,8 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  mixed  $parameters
      * @param  bool   $absolute
      * @return string
+     *
+     * @throws \Illuminate\Routing\Exceptions\UrlGenerationException
      */
     protected function toRoute($route, $parameters, $absolute)
     {
@@ -330,7 +339,7 @@ class UrlGenerator implements UrlGeneratorContract
             throw UrlGenerationException::forMissingParameters($route);
         }
 
-        $uri = strtr(urlencode($uri), $this->dontEncode);
+        $uri = strtr(rawurlencode($uri), $this->dontEncode);
 
         return $absolute ? $uri : '/'.ltrim(str_replace($root, '', $uri), '/');
     }
@@ -381,7 +390,6 @@ class UrlGenerator implements UrlGeneratorContract
     {
         return preg_replace_callback('/\{(.*?)\??\}/', function ($m) use (&$parameters) {
             return isset($parameters[$m[1]]) ? Arr::pull($parameters, $m[1]) : $m[0];
-
         }, $path);
     }
 
@@ -394,7 +402,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     protected function addQueryString($uri, array $parameters)
     {
-        // If the URI has a fragment, we will move it to the end of the URI since it will
+        // If the URI has a fragment, we will move it to the end of this URI since it will
         // need to come after any query string that may be added to the URL else it is
         // not going to be available. We will remove it then append it back on here.
         if (! is_null($fragment = parse_url($uri, PHP_URL_FRAGMENT))) {
@@ -475,9 +483,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     protected function getStringParameters(array $parameters)
     {
-        return Arr::where($parameters, function ($k) {
-            return is_string($k);
-        });
+        return array_filter($parameters, 'is_string', ARRAY_FILTER_USE_KEY);
     }
 
     /**
@@ -488,9 +494,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     protected function getNumericParameters(array $parameters)
     {
-        return Arr::where($parameters, function ($k) {
-            return is_numeric($k);
-        });
+        return array_filter($parameters, 'is_numeric', ARRAY_FILTER_USE_KEY);
     }
 
     /**
@@ -715,11 +719,13 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Get the session implementation from the resolver.
      *
-     * @return \Illuminate\Session\Store
+     * @return \Illuminate\Session\Store|null
      */
     protected function getSession()
     {
-        return call_user_func($this->sessionResolver ?: function () {});
+        if ($this->sessionResolver) {
+            return call_user_func($this->sessionResolver);
+        }
     }
 
     /**

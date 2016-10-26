@@ -18,7 +18,7 @@ class RedisConnectionTest extends PHPUnit_Framework_TestCase
         $redis = $this->getRedis(true);
         $client = $redis->connection();
 
-        $this->assertEquals(1, $client->getConnection()->count());
+        $this->assertCount(1, $client->getConnection());
     }
 
     protected function getRedis($cluster = false)
@@ -35,6 +35,6 @@ class RedisConnectionTest extends PHPUnit_Framework_TestCase
             ],
         ];
 
-        return new Illuminate\Redis\Database($servers);
+        return new Illuminate\Redis\PredisDatabase($servers);
     }
 }

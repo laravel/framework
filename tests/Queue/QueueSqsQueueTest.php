@@ -22,7 +22,8 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase
         $this->baseUrl = 'https://sqs.someregion.amazonaws.com';
 
         // This is how the modified getQueue builds the queueUrl
-        $this->queueUrl = $this->baseUrl.'/'.$this->account.'/'.$this->queueName;
+        $this->prefix = $this->baseUrl.'/'.$this->account.'/';
+        $this->queueUrl = $this->prefix.$this->queueName;
 
         $this->mockedJob = 'foo';
         $this->mockedData = ['data'];
@@ -46,7 +47,7 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase
 
     public function testPopProperlyPopsJobOffOfSqs()
     {
-        $queue = $this->getMock('Illuminate\Queue\SqsQueue', ['getQueue'], [$this->sqs, $this->queueName, $this->account]);
+        $queue = $this->getMockBuilder('Illuminate\Queue\SqsQueue')->setMethods(['getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
         $queue->setContainer(m::mock('Illuminate\Container\Container'));
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->will($this->returnValue($this->queueUrl));
         $this->sqs->shouldReceive('receiveMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'AttributeNames' => ['ApproximateReceiveCount']])->andReturn($this->mockedReceiveMessageResponseModel);
@@ -54,21 +55,10 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Illuminate\Queue\Jobs\SqsJob', $result);
     }
 
-    public function testPopProperlyPopsJobOffOfSqsWithCustomJobCreator()
-    {
-        $queue = $this->getMock('Illuminate\Queue\SqsQueue', ['getQueue'], [$this->sqs, $this->queueName, $this->account]);
-        $queue->createJobsUsing(function () { return 'job!'; });
-        $queue->setContainer(m::mock('Illuminate\Container\Container'));
-        $queue->expects($this->once())->method('getQueue')->with($this->queueName)->will($this->returnValue($this->queueUrl));
-        $this->sqs->shouldReceive('receiveMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'AttributeNames' => ['ApproximateReceiveCount']])->andReturn($this->mockedReceiveMessageResponseModel);
-        $result = $queue->pop($this->queueName);
-        $this->assertEquals('job!', $result);
-    }
-
     public function testDelayedPushWithDateTimeProperlyPushesJobOntoSqs()
     {
         $now = Carbon\Carbon::now();
-        $queue = $this->getMock('Illuminate\Queue\SqsQueue', ['createPayload', 'getSeconds', 'getQueue'], [$this->sqs, $this->queueName, $this->account]);
+        $queue = $this->getMockBuilder('Illuminate\Queue\SqsQueue')->setMethods(['createPayload', 'getSeconds', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
         $queue->expects($this->once())->method('createPayload')->with($this->mockedJob, $this->mockedData)->will($this->returnValue($this->mockedPayload));
         $queue->expects($this->once())->method('getSeconds')->with($now)->will($this->returnValue(5));
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->will($this->returnValue($this->queueUrl));
@@ -79,7 +69,7 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase
 
     public function testDelayedPushProperlyPushesJobOntoSqs()
     {
-        $queue = $this->getMock('Illuminate\Queue\SqsQueue', ['createPayload', 'getSeconds', 'getQueue'], [$this->sqs, $this->queueName, $this->account]);
+        $queue = $this->getMockBuilder('Illuminate\Queue\SqsQueue')->setMethods(['createPayload', 'getSeconds', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
         $queue->expects($this->once())->method('createPayload')->with($this->mockedJob, $this->mockedData)->will($this->returnValue($this->mockedPayload));
         $queue->expects($this->once())->method('getSeconds')->with($this->mockedDelay)->will($this->returnValue($this->mockedDelay));
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->will($this->returnValue($this->queueUrl));
@@ -90,7 +80,7 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase
 
     public function testPushProperlyPushesJobOntoSqs()
     {
-        $queue = $this->getMock('Illuminate\Queue\SqsQueue', ['createPayload', 'getQueue'], [$this->sqs, $this->queueName, $this->account]);
+        $queue = $this->getMockBuilder('Illuminate\Queue\SqsQueue')->setMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
         $queue->expects($this->once())->method('createPayload')->with($this->mockedJob, $this->mockedData)->will($this->returnValue($this->mockedPayload));
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->will($this->returnValue($this->queueUrl));
         $this->sqs->shouldReceive('sendMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload])->andReturn($this->mockedSendMessageResponseModel);
@@ -98,10 +88,18 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($this->mockedMessageId, $id);
     }
 
-    public function testGetQueueProperlyResolvesName()
+    public function testGetQueueProperlyResolvesUrlWithPrefix()
     {
-        $queue = new Illuminate\Queue\SqsQueue($this->sqs, $this->queueName, $this->baseUrl.'/'.$this->account.'/');
-        $this->assertEquals($this->queueUrl, $queue->getQueue($this->queueName));
+        $queue = new Illuminate\Queue\SqsQueue($this->sqs, $this->queueName, $this->prefix);
+        $this->assertEquals($this->queueUrl, $queue->getQueue(null));
+        $queueUrl = $this->baseUrl.'/'.$this->account.'/test';
+        $this->assertEquals($queueUrl, $queue->getQueue('test'));
+    }
+
+    public function testGetQueueProperlyResolvesUrlWithoutPrefix()
+    {
+        $queue = new Illuminate\Queue\SqsQueue($this->sqs, $this->queueUrl);
+        $this->assertEquals($this->queueUrl, $queue->getQueue(null));
         $queueUrl = $this->baseUrl.'/'.$this->account.'/test';
         $this->assertEquals($queueUrl, $queue->getQueue($queueUrl));
     }

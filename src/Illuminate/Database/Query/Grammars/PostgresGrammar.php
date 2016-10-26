@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Query\Builder;
 
 class PostgresGrammar extends Grammar
@@ -15,6 +16,7 @@ class PostgresGrammar extends Grammar
         '=', '<', '>', '<=', '>=', '<>', '!=',
         'like', 'not like', 'between', 'ilike',
         '&', '|', '#', '<<', '>>',
+        '@>', '<@', '?', '?|', '?&', '||', '-', '-', '#-',
     ];
 
     /**
@@ -31,6 +33,35 @@ class PostgresGrammar extends Grammar
         }
 
         return $value ? 'for update' : 'for share';
+    }
+
+    /**
+     * Compile a "where date" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereDate(Builder $query, $where)
+    {
+        $value = $this->parameter($where['value']);
+
+        return $this->wrap($where['column']).'::date '.$where['operator'].' '.$value;
+    }
+
+    /**
+     * Compile a date based where clause.
+     *
+     * @param  string  $type
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function dateBasedWhere($type, Builder $query, $where)
+    {
+        $value = $this->parameter($where['value']);
+
+        return 'extract('.$type.' from '.$this->wrap($where['column']).') '.$where['operator'].' '.$value;
     }
 
     /**
@@ -142,8 +173,10 @@ class PostgresGrammar extends Grammar
         // all out then implode them. This should give us "where" like syntax after
         // everything has been built and then we will join it to the real wheres.
         foreach ($query->joins as $join) {
-            foreach ($join->clauses as $clause) {
-                $joinWheres[] = $this->compileJoinConstraint($clause);
+            foreach ($join->wheres as $where) {
+                $method = "where{$where['type']}";
+
+                $joinWheres[] = $where['boolean'].' '.$this->$method($query, $where);
             }
         }
 
@@ -176,5 +209,60 @@ class PostgresGrammar extends Grammar
     public function compileTruncate(Builder $query)
     {
         return ['truncate '.$this->wrapTable($query->from).' restart identity' => []];
+    }
+
+    /**
+     * Wrap a single string in keyword identifiers.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function wrapValue($value)
+    {
+        if ($value === '*') {
+            return $value;
+        }
+
+        if (Str::contains($value, '->')) {
+            return $this->wrapJsonSelector($value);
+        }
+
+        return '"'.str_replace('"', '""', $value).'"';
+    }
+
+    /**
+     * Wrap the given JSON selector.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function wrapJsonSelector($value)
+    {
+        $path = explode('->', $value);
+
+        $field = $this->wrapValue(array_shift($path));
+
+        $wrappedPath = $this->wrapJsonPathAttributes($path);
+
+        $attribute = array_pop($wrappedPath);
+
+        if (! empty($wrappedPath)) {
+            return $field.'->'.implode('->', $wrappedPath).'->>'.$attribute;
+        }
+
+        return $field.'->>'.$attribute;
+    }
+
+    /**
+     * Wrap the attributes of the give JSON path.
+     *
+     * @param  array  $path
+     * @return array
+     */
+    protected function wrapJsonPathAttributes($path)
+    {
+        return array_map(function ($attribute) {
+            return "'$attribute'";
+        }, $path);
     }
 }

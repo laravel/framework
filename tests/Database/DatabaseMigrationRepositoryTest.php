@@ -1,6 +1,7 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Support\Collection;
 use Illuminate\Database\Migrations\DatabaseMigrationRepository;
 
 class DatabaseMigrationRepositoryTest extends PHPUnit_Framework_TestCase
@@ -19,16 +20,16 @@ class DatabaseMigrationRepositoryTest extends PHPUnit_Framework_TestCase
         $repo->getConnection()->shouldReceive('table')->once()->with('migrations')->andReturn($query);
         $query->shouldReceive('orderBy')->once()->with('batch', 'asc')->andReturn($query);
         $query->shouldReceive('orderBy')->once()->with('migration', 'asc')->andReturn($query);
-        $query->shouldReceive('pluck')->once()->with('migration')->andReturn('bar');
+        $query->shouldReceive('pluck')->once()->with('migration')->andReturn(new Collection(['bar']));
 
-        $this->assertEquals('bar', $repo->getRan());
+        $this->assertEquals(['bar'], $repo->getRan());
     }
 
     public function testGetLastMigrationsGetsAllMigrationsWithTheLatestBatchNumber()
     {
-        $repo = $this->getMock('Illuminate\Database\Migrations\DatabaseMigrationRepository', ['getLastBatchNumber'], [
+        $repo = $this->getMockBuilder('Illuminate\Database\Migrations\DatabaseMigrationRepository')->setMethods(['getLastBatchNumber'])->setConstructorArgs([
             $resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'), 'migrations',
-        ]);
+        ])->getMock();
         $repo->expects($this->once())->method('getLastBatchNumber')->will($this->returnValue(1));
         $query = m::mock('stdClass');
         $connectionMock = m::mock('Illuminate\Database\Connection');
@@ -36,9 +37,9 @@ class DatabaseMigrationRepositoryTest extends PHPUnit_Framework_TestCase
         $repo->getConnection()->shouldReceive('table')->once()->with('migrations')->andReturn($query);
         $query->shouldReceive('where')->once()->with('batch', 1)->andReturn($query);
         $query->shouldReceive('orderBy')->once()->with('migration', 'desc')->andReturn($query);
-        $query->shouldReceive('get')->once()->andReturn('foo');
+        $query->shouldReceive('get')->once()->andReturn(new Collection(['foo']));
 
-        $this->assertEquals('foo', $repo->getLast());
+        $this->assertEquals(['foo'], $repo->getLast());
     }
 
     public function testLogMethodInsertsRecordIntoMigrationTable()
@@ -69,9 +70,9 @@ class DatabaseMigrationRepositoryTest extends PHPUnit_Framework_TestCase
 
     public function testGetNextBatchNumberReturnsLastBatchNumberPlusOne()
     {
-        $repo = $this->getMock('Illuminate\Database\Migrations\DatabaseMigrationRepository', ['getLastBatchNumber'], [
+        $repo = $this->getMockBuilder('Illuminate\Database\Migrations\DatabaseMigrationRepository')->setMethods(['getLastBatchNumber'])->setConstructorArgs([
             m::mock('Illuminate\Database\ConnectionResolverInterface'), 'migrations',
-        ]);
+        ])->getMock();
         $repo->expects($this->once())->method('getLastBatchNumber')->will($this->returnValue(1));
 
         $this->assertEquals(2, $repo->getNextBatchNumber());

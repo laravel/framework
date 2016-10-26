@@ -53,6 +53,17 @@ class DatabaseEloquentRelationTest extends PHPUnit_Framework_TestCase
         Relation::morphMap([], false);
     }
 
+    public function testSettingMorphMapWithNumericKeys()
+    {
+        Relation::morphMap([1 => 'App\User']);
+
+        $this->assertEquals([
+            1 => 'App\User',
+        ], Relation::morphMap());
+
+        Relation::morphMap([], false);
+    }
+
     /**
      * Testing to ensure loop does not occur during relational queries in global scopes.
      *
@@ -72,9 +83,6 @@ class DatabaseEloquentRelationTest extends PHPUnit_Framework_TestCase
         $queryBuilder->shouldReceive('getGrammar')->andReturn($grammar);
         $grammar->shouldReceive('wrap');
         $parent->shouldReceive('newQueryWithoutScopes')->andReturn($eloquentBuilder);
-
-        //Test Condition
-        $parent->shouldReceive('applyGlobalScopes')->andReturn($eloquentBuilder)->never();
 
         $relation = new EloquentRelationStub($eloquentBuilder, $parent);
         $relation->wrap('test');
@@ -107,7 +115,7 @@ class EloquentRelationStub extends Relation
     {
     }
 
-    public function match(array $models, \Illuminate\Database\Eloquent\Collection $results, $relation)
+    public function match(array $models, Illuminate\Database\Eloquent\Collection $results, $relation)
     {
     }
 

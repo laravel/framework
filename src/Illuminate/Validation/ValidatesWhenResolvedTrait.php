@@ -2,9 +2,6 @@
 
 namespace Illuminate\Validation;
 
-use Illuminate\Contracts\Validation\ValidationException;
-use Illuminate\Contracts\Validation\UnauthorizedException;
-
 /**
  * Provides default implementation of ValidatesWhenResolved contract.
  */
@@ -40,7 +37,9 @@ trait ValidatesWhenResolvedTrait
      * Handle a failed validation attempt.
      *
      * @param  \Illuminate\Validation\Validator  $validator
-     * @return mixed
+     * @return void
+     *
+     * @throws \Illuminate\Validation\ValidationException
      */
     protected function failedValidation(Validator $validator)
     {
@@ -64,7 +63,9 @@ trait ValidatesWhenResolvedTrait
     /**
      * Handle a failed authorization attempt.
      *
-     * @return mixed
+     * @return void
+     *
+     * @throws \Illuminate\Validation\UnauthorizedException
      */
     protected function failedAuthorization()
     {

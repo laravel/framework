@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Contracts\Validation\Factory;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Validation\ValidationException;
 
 trait ValidatesRequests
 {
@@ -18,6 +19,26 @@ trait ValidatesRequests
     protected $validatesRequestErrorBag;
 
     /**
+     * Run the validation routine against the given validator.
+     *
+     * @param  \Illuminate\Contracts\Validation\Validator|array  $validator
+     * @param  \Illuminate\Http\Request|null  $request
+     * @return void
+     */
+    public function validateWith($validator, Request $request = null)
+    {
+        $request = $request ?: app('request');
+
+        if (is_array($validator)) {
+            $validator = $this->getValidationFactory()->make($request->all(), $validator);
+        }
+
+        if ($validator->fails()) {
+            $this->throwValidationException($request, $validator);
+        }
+    }
+
+    /**
      * Validate the given request with the given rules.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -25,8 +46,6 @@ trait ValidatesRequests
      * @param  array  $messages
      * @param  array  $customAttributes
      * @return void
-     *
-     * @throws \Illuminate\Foundation\Validation\ValidationException
      */
     public function validate(Request $request, array $rules, array $messages = [], array $customAttributes = [])
     {
@@ -47,7 +66,7 @@ trait ValidatesRequests
      * @param  array  $customAttributes
      * @return void
      *
-     * @throws \Illuminate\Foundation\Validation\ValidationException
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function validateWithBag($errorBag, Request $request, array $rules, array $messages = [], array $customAttributes = [])
     {
@@ -63,7 +82,7 @@ trait ValidatesRequests
      * @param  \Illuminate\Contracts\Validation\Validator  $validator
      * @return void
      *
-     * @throws \Illuminate\Foundation\Validation\ValidationException
+     * @throws \Illuminate\Validation\ValidationException
      */
     protected function throwValidationException(Request $request, $validator)
     {
@@ -77,11 +96,11 @@ trait ValidatesRequests
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  array  $errors
-     * @return \Illuminate\Http\Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function buildFailedValidationResponse(Request $request, array $errors)
     {
-        if ($request->ajax() || $request->wantsJson()) {
+        if ($request->expectsJson()) {
             return new JsonResponse($errors, 422);
         }
 

@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Auth;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Auth\Events\Registered;
 
 trait RegistersUsers
 {
@@ -14,7 +15,7 @@ trait RegistersUsers
      *
      * @return \Illuminate\Http\Response
      */
-    public function getRegister()
+    public function showRegistrationForm()
     {
         return view('auth.register');
     }
@@ -25,18 +26,36 @@ trait RegistersUsers
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function postRegister(Request $request)
+    public function register(Request $request)
     {
-        $validator = $this->validator($request->all());
+        $this->validator($request->all())->validate();
 
-        if ($validator->fails()) {
-            $this->throwValidationException(
-                $request, $validator
-            );
-        }
+        event(new Registered($user = $this->create($request->all())));
 
-        Auth::login($this->create($request->all()));
+        $this->guard()->login($user);
 
-        return redirect($this->redirectPath());
+        return $this->registered($request, $user)
+            ?: redirect($this->redirectPath());
+    }
+
+    /**
+     * Get the guard to be used during registration.
+     *
+     * @return \Illuminate\Contracts\Auth\StatefulGuard
+     */
+    protected function guard()
+    {
+        return Auth::guard();
+    }
+
+    /**
+     * The user has been registered.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  mixed  $user
+     * @return mixed
+     */
+    protected function registered(Request $request, $user)
+    {
     }
 }

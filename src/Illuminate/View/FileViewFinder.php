@@ -147,7 +147,6 @@ class FileViewFinder implements ViewFinderInterface
     {
         return array_map(function ($extension) use ($name) {
             return str_replace('.', '/', $name).'.'.$extension;
-
         }, $this->extensions);
     }
 
@@ -160,6 +159,17 @@ class FileViewFinder implements ViewFinderInterface
     public function addLocation($location)
     {
         $this->paths[] = $location;
+    }
+
+    /**
+     * Prepend a location to the finder.
+     *
+     * @param  string  $location
+     * @return void
+     */
+    public function prependLocation($location)
+    {
+        array_unshift($this->paths, $location);
     }
 
     /**

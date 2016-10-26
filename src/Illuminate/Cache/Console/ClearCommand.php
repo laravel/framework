@@ -4,6 +4,7 @@ namespace Illuminate\Cache\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Cache\CacheManager;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
 class ClearCommand extends Command
@@ -47,17 +48,23 @@ class ClearCommand extends Command
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
-        $storeName = $this->argument('store');
+        $tags = array_filter(explode(',', $this->option('tags')));
 
-        $this->laravel['events']->fire('cache:clearing', [$storeName]);
+        $cache = $this->cache->store($store = $this->argument('store'));
 
-        $this->cache->store($storeName)->flush();
+        $this->laravel['events']->fire('cache:clearing', [$store, $tags]);
 
-        $this->laravel['events']->fire('cache:cleared', [$storeName]);
+        if (! empty($tags)) {
+            $cache->tags($tags)->flush();
+        } else {
+            $cache->flush();
+        }
 
-        $this->info('Application cache cleared!');
+        $this->info('Cache cleared successfully.');
+
+        $this->laravel['events']->fire('cache:cleared', [$store, $tags]);
     }
 
     /**
@@ -69,6 +76,18 @@ class ClearCommand extends Command
     {
         return [
             ['store', InputArgument::OPTIONAL, 'The name of the store you would like to clear.'],
+        ];
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['tags', null, InputOption::VALUE_OPTIONAL, 'The cache tags you would like to clear.', null],
         ];
     }
 }

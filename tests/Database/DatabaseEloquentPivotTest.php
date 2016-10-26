@@ -13,7 +13,7 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase
     public function testPropertiesAreSetCorrectly()
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
-        $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
+        $parent->shouldReceive('getConnectionName')->twice()->andReturn('connection');
         $parent->getConnection()->getQueryGrammar()->shouldReceive('getDateFormat')->andReturn('Y-m-d H:i:s');
         $parent->setDateFormat('Y-m-d H:i:s');
         $pivot = new Pivot($parent, ['foo' => 'bar', 'created_at' => '2015-09-12'], 'table', true);
@@ -32,6 +32,16 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase
         $pivot = new DatabaseEloquentPivotTestMutatorStub($parent, ['foo' => 'bar'], 'table', true);
 
         $this->assertTrue($pivot->getMutatorCalled());
+    }
+
+    public function testFromRawAttributesDoesNotDoubleMutate()
+    {
+        $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
+        $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
+
+        $pivot = DatabaseEloquentPivotTestJsonCastStub::fromRawAttributes($parent, ['foo' => json_encode(['name' => 'Taylor'])], 'table', true);
+
+        $this->assertEquals(['name' => 'Taylor'], $pivot->foo);
     }
 
     public function testPropertiesUnchangedAreNotDirty()
@@ -81,7 +91,7 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase
         $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
         $parent->guard([]);
         $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
-        $pivot = $this->getMock('Illuminate\Database\Eloquent\Relations\Pivot', ['newQuery'], [$parent, ['foo' => 'bar'], 'table']);
+        $pivot = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\Pivot')->setMethods(['newQuery'])->setConstructorArgs([$parent, ['foo' => 'bar'], 'table'])->getMock();
         $pivot->setPivotKeys('foreign', 'other');
         $pivot->foreign = 'foreign.value';
         $pivot->other = 'other.value';
@@ -118,4 +128,11 @@ class DatabaseEloquentPivotTestMutatorStub extends Illuminate\Database\Eloquent\
     {
         return $this->mutatorCalled;
     }
+}
+
+class DatabaseEloquentPivotTestJsonCastStub extends Illuminate\Database\Eloquent\Relations\Pivot
+{
+    protected $casts = [
+        'foo' => 'json',
+    ];
 }

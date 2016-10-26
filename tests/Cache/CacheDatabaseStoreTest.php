@@ -23,7 +23,7 @@ class CacheDatabaseStoreTest extends PHPUnit_Framework_TestCase
 
     public function testNullIsReturnedAndItemDeletedWhenItemIsExpired()
     {
-        $store = $this->getMock('Illuminate\Cache\DatabaseStore', ['forget'], $this->getMocks());
+        $store = $this->getMockBuilder('Illuminate\Cache\DatabaseStore')->setMethods(['forget'])->setConstructorArgs($this->getMocks())->getMock();
         $table = m::mock('StdClass');
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
         $table->shouldReceive('where')->once()->with('key', '=', 'prefixfoo')->andReturn($table);
@@ -47,7 +47,7 @@ class CacheDatabaseStoreTest extends PHPUnit_Framework_TestCase
 
     public function testEncryptedValueIsInsertedWhenNoExceptionsAreThrown()
     {
-        $store = $this->getMock('Illuminate\Cache\DatabaseStore', ['getTime'], $this->getMocks());
+        $store = $this->getMockBuilder('Illuminate\Cache\DatabaseStore')->setMethods(['getTime'])->setConstructorArgs($this->getMocks())->getMock();
         $table = m::mock('StdClass');
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
         $store->getEncrypter()->shouldReceive('encrypt')->once()->with('bar')->andReturn('bar');
@@ -59,7 +59,7 @@ class CacheDatabaseStoreTest extends PHPUnit_Framework_TestCase
 
     public function testEncryptedValueIsUpdatedWhenInsertThrowsException()
     {
-        $store = $this->getMock('Illuminate\Cache\DatabaseStore', ['getTime'], $this->getMocks());
+        $store = $this->getMockBuilder('Illuminate\Cache\DatabaseStore')->setMethods(['getTime'])->setConstructorArgs($this->getMocks())->getMock();
         $table = m::mock('StdClass');
         $store->getConnection()->shouldReceive('table')->with('table')->andReturn($table);
         $store->getEncrypter()->shouldReceive('encrypt')->once()->with('bar')->andReturn('bar');
@@ -75,7 +75,7 @@ class CacheDatabaseStoreTest extends PHPUnit_Framework_TestCase
 
     public function testForeverCallsStoreItemWithReallyLongTime()
     {
-        $store = $this->getMock('Illuminate\Cache\DatabaseStore', ['put'], $this->getMocks());
+        $store = $this->getMockBuilder('Illuminate\Cache\DatabaseStore')->setMethods(['put'])->setConstructorArgs($this->getMocks())->getMock();
         $store->expects($this->once())->method('put')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(5256000));
         $store->forever('foo', 'bar');
     }
@@ -96,9 +96,94 @@ class CacheDatabaseStoreTest extends PHPUnit_Framework_TestCase
         $store = $this->getStore();
         $table = m::mock('StdClass');
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
-        $table->shouldReceive('delete')->once();
+        $table->shouldReceive('delete')->once()->andReturn(2);
 
-        $store->flush();
+        $result = $store->flush();
+        $this->assertTrue($result);
+    }
+
+    public function testIncrementReturnsCorrectValues()
+    {
+        $store = $this->getStore();
+        $table = m::mock('StdClass');
+        $cache = m::mock('StdClass');
+
+        $store->getConnection()->shouldReceive('transaction')->once()->with(m::type('Closure'))->andReturnUsing(function ($closure) {
+            return $closure();
+        });
+        $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
+        $table->shouldReceive('where')->once()->with('key', 'prefixfoo')->andReturn($table);
+        $table->shouldReceive('lockForUpdate')->once()->andReturn($table);
+        $table->shouldReceive('first')->once()->andReturn(null);
+        $this->assertFalse($store->increment('foo'));
+
+        $cache->value = 'bar';
+        $store->getConnection()->shouldReceive('transaction')->once()->with(m::type('Closure'))->andReturnUsing(function ($closure) {
+            return $closure();
+        });
+        $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
+        $table->shouldReceive('where')->once()->with('key', 'prefixfoo')->andReturn($table);
+        $table->shouldReceive('lockForUpdate')->once()->andReturn($table);
+        $table->shouldReceive('first')->once()->andReturn($cache);
+        $store->getEncrypter()->shouldReceive('decrypt')->once()->with('bar')->andReturn('bar');
+        $this->assertFalse($store->increment('foo'));
+
+        $cache->value = 2;
+        $store->getConnection()->shouldReceive('transaction')->once()->with(m::type('Closure'))->andReturnUsing(function ($closure) {
+            return $closure();
+        });
+        $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
+        $table->shouldReceive('where')->once()->with('key', 'prefixfoo')->andReturn($table);
+        $table->shouldReceive('lockForUpdate')->once()->andReturn($table);
+        $table->shouldReceive('first')->once()->andReturn($cache);
+        $store->getEncrypter()->shouldReceive('decrypt')->once()->with(2)->andReturn(2);
+        $store->getEncrypter()->shouldReceive('encrypt')->once()->with(3)->andReturn(3);
+        $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
+        $table->shouldReceive('where')->once()->with('key', 'prefixfoo')->andReturn($table);
+        $table->shouldReceive('update')->once()->with(['value' => 3]);
+        $this->assertEquals(3, $store->increment('foo'));
+    }
+
+    public function testDecrementReturnsCorrectValues()
+    {
+        $store = $this->getStore();
+        $table = m::mock('StdClass');
+        $cache = m::mock('StdClass');
+
+        $store->getConnection()->shouldReceive('transaction')->once()->with(m::type('Closure'))->andReturnUsing(function ($closure) {
+            return $closure();
+        });
+        $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
+        $table->shouldReceive('where')->once()->with('key', 'prefixfoo')->andReturn($table);
+        $table->shouldReceive('lockForUpdate')->once()->andReturn($table);
+        $table->shouldReceive('first')->once()->andReturn(null);
+        $this->assertFalse($store->decrement('foo'));
+
+        $cache->value = 'bar';
+        $store->getConnection()->shouldReceive('transaction')->once()->with(m::type('Closure'))->andReturnUsing(function ($closure) {
+            return $closure();
+        });
+        $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
+        $table->shouldReceive('where')->once()->with('key', 'prefixfoo')->andReturn($table);
+        $table->shouldReceive('lockForUpdate')->once()->andReturn($table);
+        $table->shouldReceive('first')->once()->andReturn($cache);
+        $store->getEncrypter()->shouldReceive('decrypt')->once()->with('bar')->andReturn('bar');
+        $this->assertFalse($store->decrement('foo'));
+
+        $cache->value = 3;
+        $store->getConnection()->shouldReceive('transaction')->once()->with(m::type('Closure'))->andReturnUsing(function ($closure) {
+            return $closure();
+        });
+        $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
+        $table->shouldReceive('where')->once()->with('key', 'prefixbar')->andReturn($table);
+        $table->shouldReceive('lockForUpdate')->once()->andReturn($table);
+        $table->shouldReceive('first')->once()->andReturn($cache);
+        $store->getEncrypter()->shouldReceive('decrypt')->once()->with(3)->andReturn(3);
+        $store->getEncrypter()->shouldReceive('encrypt')->once()->with(2)->andReturn(2);
+        $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
+        $table->shouldReceive('where')->once()->with('key', 'prefixbar')->andReturn($table);
+        $table->shouldReceive('update')->once()->with(['value' => 2]);
+        $this->assertEquals(2, $store->decrement('bar'));
     }
 
     protected function getStore()

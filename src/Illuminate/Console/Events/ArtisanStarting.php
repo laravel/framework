@@ -7,7 +7,7 @@ class ArtisanStarting
     /**
      * The Artisan application instance.
      *
-     * @var \Illuminate\Console\Application 
+     * @var \Illuminate\Console\Application
      */
     public $artisan;
 

@@ -40,9 +40,11 @@ class SupportStrTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(Str::startsWith('jason', 'jas'));
         $this->assertTrue(Str::startsWith('jason', 'jason'));
         $this->assertTrue(Str::startsWith('jason', ['jas']));
+        $this->assertTrue(Str::startsWith('jason', ['day', 'jas']));
         $this->assertFalse(Str::startsWith('jason', 'day'));
         $this->assertFalse(Str::startsWith('jason', ['day']));
         $this->assertFalse(Str::startsWith('jason', ''));
+        $this->assertFalse(Str::startsWith('7', ' 7'));
     }
 
     public function testEndsWith()
@@ -50,6 +52,7 @@ class SupportStrTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(Str::endsWith('jason', 'on'));
         $this->assertTrue(Str::endsWith('jason', 'jason'));
         $this->assertTrue(Str::endsWith('jason', ['on']));
+        $this->assertTrue(Str::endsWith('jason', ['no', 'on']));
         $this->assertFalse(Str::endsWith('jason', 'no'));
         $this->assertFalse(Str::endsWith('jason', ['no']));
         $this->assertFalse(Str::endsWith('jason', ''));
@@ -59,7 +62,9 @@ class SupportStrTest extends PHPUnit_Framework_TestCase
     public function testStrContains()
     {
         $this->assertTrue(Str::contains('taylor', 'ylo'));
+        $this->assertTrue(Str::contains('taylor', 'taylor'));
         $this->assertTrue(Str::contains('taylor', ['ylo']));
+        $this->assertTrue(Str::contains('taylor', ['xxx', 'ylo']));
         $this->assertFalse(Str::contains('taylor', 'xxx'));
         $this->assertFalse(Str::contains('taylor', ['xxx']));
         $this->assertFalse(Str::contains('taylor', ''));
@@ -93,6 +98,12 @@ class SupportStrTest extends PHPUnit_Framework_TestCase
         $this->assertFalse(Str::is('/', '/a'));
         $this->assertTrue(Str::is('foo/*', 'foo/bar/baz'));
         $this->assertTrue(Str::is('*/foo', 'blah/baz/foo'));
+
+        $valueObject = new StringableObjectStub('foo/bar/baz');
+        $patternObject = new StringableObjectStub('foo/*');
+
+        $this->assertTrue(Str::is('foo/bar/baz', $valueObject));
+        $this->assertTrue(Str::is($patternObject, $valueObject));
     }
 
     public function testLower()
@@ -120,7 +131,7 @@ class SupportStrTest extends PHPUnit_Framework_TestCase
 
     public function testQuickRandom()
     {
-        $randomInteger = mt_rand(1, 100);
+        $randomInteger = random_int(1, 100);
         $this->assertEquals($randomInteger, strlen(Str::quickRandom($randomInteger)));
         $this->assertInternalType('string', Str::quickRandom());
         $this->assertEquals(16, strlen(Str::quickRandom()));
@@ -129,9 +140,33 @@ class SupportStrTest extends PHPUnit_Framework_TestCase
     public function testRandom()
     {
         $this->assertEquals(16, strlen(Str::random()));
-        $randomInteger = mt_rand(1, 100);
+        $randomInteger = random_int(1, 100);
         $this->assertEquals($randomInteger, strlen(Str::random($randomInteger)));
         $this->assertInternalType('string', Str::random());
+    }
+
+    public function testReplaceArray()
+    {
+        $this->assertEquals('foo/bar/baz', Str::replaceArray('?', ['foo', 'bar', 'baz'], '?/?/?'));
+        $this->assertEquals('foo/bar/baz/?', Str::replaceArray('?', ['foo', 'bar', 'baz'], '?/?/?/?'));
+        $this->assertEquals('foo/bar', Str::replaceArray('?', ['foo', 'bar', 'baz'], '?/?'));
+        $this->assertEquals('?/?/?', Str::replaceArray('x', ['foo', 'bar', 'baz'], '?/?/?'));
+    }
+
+    public function testReplaceFirst()
+    {
+        $this->assertEquals('fooqux foobar', Str::replaceFirst('bar', 'qux', 'foobar foobar'));
+        $this->assertEquals('foo/qux? foo/bar?', Str::replaceFirst('bar?', 'qux?', 'foo/bar? foo/bar?'));
+        $this->assertEquals('foo foobar', Str::replaceFirst('bar', '', 'foobar foobar'));
+        $this->assertEquals('foobar foobar', Str::replaceFirst('xxx', 'yyy', 'foobar foobar'));
+    }
+
+    public function testReplaceLast()
+    {
+        $this->assertEquals('foobar fooqux', Str::replaceLast('bar', 'qux', 'foobar foobar'));
+        $this->assertEquals('foo/bar? foo/qux?', Str::replaceLast('bar?', 'qux?', 'foo/bar? foo/bar?'));
+        $this->assertEquals('foobar foo', Str::replaceLast('bar', '', 'foobar foobar'));
+        $this->assertEquals('foobar foobar', Str::replaceLast('xxx', 'yyy', 'foobar foobar'));
     }
 
     public function testSnake()
@@ -141,6 +176,9 @@ class SupportStrTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('laravel php framework', Str::snake('LaravelPhpFramework', ' '));
         $this->assertEquals('laravel_php_framework', Str::snake('Laravel Php Framework'));
         $this->assertEquals('laravel_php_framework', Str::snake('Laravel    Php      Framework   '));
+        // ensure cache keys don't overlap
+        $this->assertEquals('laravel__php__framework', Str::snake('LaravelPhpFramework', '__'));
+        $this->assertEquals('laravel_php_framework_', Str::snake('LaravelPhpFramework_', '_'));
     }
 
     public function testStudly()
@@ -180,5 +218,20 @@ class SupportStrTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('Laravel framework', Str::ucfirst('laravel framework'));
         $this->assertEquals('Мама', Str::ucfirst('мама'));
         $this->assertEquals('Мама мыла раму', Str::ucfirst('мама мыла раму'));
+    }
+}
+
+class StringableObjectStub
+{
+    private $value;
+
+    public function __construct($value)
+    {
+        $this->value = $value;
+    }
+
+    public function __toString()
+    {
+        return $this->value;
     }
 }

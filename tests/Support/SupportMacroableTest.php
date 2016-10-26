@@ -19,21 +19,29 @@ class SupportMacroableTest extends PHPUnit_Framework_TestCase
     public function testRegisterMacro()
     {
         $macroable = $this->macroable;
-        $macroable::macro(__CLASS__, function () { return 'Taylor'; });
+        $macroable::macro(__CLASS__, function () {
+            return 'Taylor';
+        });
         $this->assertEquals('Taylor', $macroable::{__CLASS__}());
     }
 
     public function testRegisterMacroAndCallWithoutStatic()
     {
         $macroable = $this->macroable;
-        $macroable::macro(__CLASS__, function () { return 'Taylor'; });
+        $macroable::macro(__CLASS__, function () {
+            return 'Taylor';
+        });
         $this->assertEquals('Taylor', $macroable->{__CLASS__}());
     }
 
     public function testWhenCallingMacroClosureIsBoundToObject()
     {
-        TestMacroable::macro('tryInstance', function () { return $this->protectedVariable; });
-        TestMacroable::macro('tryStatic', function () { return static::getProtectedStatic(); });
+        TestMacroable::macro('tryInstance', function () {
+            return $this->protectedVariable;
+        });
+        TestMacroable::macro('tryStatic', function () {
+            return static::getProtectedStatic();
+        });
         $instance = new TestMacroable;
 
         $result = $instance->tryInstance();

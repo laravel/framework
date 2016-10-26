@@ -3,15 +3,15 @@
 namespace Illuminate\Queue\Connectors;
 
 use Illuminate\Support\Arr;
-use Illuminate\Redis\Database;
 use Illuminate\Queue\RedisQueue;
+use Illuminate\Contracts\Redis\Database;
 
 class RedisConnector implements ConnectorInterface
 {
     /**
      * The Redis database instance.
      *
-     * @var \Illuminate\Redis\Database
+     * @var \Illuminate\Contracts\Redis\Database
      */
     protected $redis;
 
@@ -25,7 +25,7 @@ class RedisConnector implements ConnectorInterface
     /**
      * Create a new Redis queue connector instance.
      *
-     * @param  \Illuminate\Redis\Database  $redis
+     * @param  \Illuminate\Contracts\Redis\Database  $redis
      * @param  string|null  $connection
      * @return void
      */
@@ -43,12 +43,10 @@ class RedisConnector implements ConnectorInterface
      */
     public function connect(array $config)
     {
-        $queue = new RedisQueue(
-            $this->redis, $config['queue'], Arr::get($config, 'connection', $this->connection)
+        return new RedisQueue(
+            $this->redis, $config['queue'],
+            Arr::get($config, 'connection', $this->connection),
+            Arr::get($config, 'retry_after', 60)
         );
-
-        $queue->setExpire(Arr::get($config, 'expire', 60));
-
-        return $queue;
     }
 }

@@ -39,6 +39,14 @@ interface Gate
     public function before(callable $callback);
 
     /**
+     * Register a callback to run after all Gate checks.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function after(callable $callback);
+
+    /**
      * Determine if the given ability should be granted for the current user.
      *
      * @param  string  $ability
@@ -64,6 +72,27 @@ interface Gate
      * @return bool
      */
     public function check($ability, $arguments = []);
+
+    /**
+     * Determine if the given ability should be granted for the current user.
+     *
+     * @param  string  $ability
+     * @param  array|mixed  $arguments
+     * @return \Illuminate\Auth\Access\Response
+     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function authorize($ability, $arguments = []);
+
+    /**
+     * Get a policy instance for a given class.
+     *
+     * @param  object|string  $class
+     * @return mixed
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function getPolicyFor($class);
 
     /**
      * Get a guard instance for the given user.

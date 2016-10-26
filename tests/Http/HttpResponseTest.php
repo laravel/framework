@@ -22,6 +22,10 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase
         $response->setContent(['foo' => 'bar']);
         $this->assertEquals('{"foo":"bar"}', $response->getContent());
         $this->assertEquals('application/json', $response->headers->get('Content-Type'));
+
+        $response = new Illuminate\Http\Response(new JsonSerializableStub);
+        $this->assertEquals('{"foo":"bar"}', $response->getContent());
+        $this->assertEquals('application/json', $response->headers->get('Content-Type'));
     }
 
     public function testRenderablesAreRendered()
@@ -47,10 +51,10 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase
     public function testWithCookie()
     {
         $response = new Illuminate\Http\Response();
-        $this->assertEquals(0, count($response->headers->getCookies()));
-        $this->assertEquals($response, $response->withCookie(new \Symfony\Component\HttpFoundation\Cookie('foo', 'bar')));
+        $this->assertCount(0, $response->headers->getCookies());
+        $this->assertEquals($response, $response->withCookie(new Symfony\Component\HttpFoundation\Cookie('foo', 'bar')));
         $cookies = $response->headers->getCookies();
-        $this->assertEquals(1, count($cookies));
+        $this->assertCount(1, $cookies);
         $this->assertEquals('foo', $cookies[0]->getName());
         $this->assertEquals('bar', $cookies[0]->getValue());
     }
@@ -149,5 +153,13 @@ class JsonableStub implements Jsonable
     public function toJson($options = 0)
     {
         return 'foo';
+    }
+}
+
+class JsonSerializableStub implements JsonSerializable
+{
+    public function jsonSerialize()
+    {
+        return ['foo' => 'bar'];
     }
 }

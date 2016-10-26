@@ -4,6 +4,7 @@ namespace Illuminate\Cache;
 
 use Closure;
 use Exception;
+use Carbon\Carbon;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
@@ -77,7 +78,7 @@ class DatabaseStore implements Store
                 $cache = (object) $cache;
             }
 
-            if (time() >= $cache->expiration) {
+            if (Carbon::now()->getTimestamp() >= $cache->expiration) {
                 $this->forget($key);
 
                 return;
@@ -92,7 +93,7 @@ class DatabaseStore implements Store
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  int     $minutes
+     * @param  float|int  $minutes
      * @return void
      */
     public function put($key, $value, $minutes)
@@ -104,7 +105,7 @@ class DatabaseStore implements Store
         // time and place that on the table so we will check it on our retrieval.
         $value = $this->encrypter->encrypt($value);
 
-        $expiration = $this->getTime() + ($minutes * 60);
+        $expiration = $this->getTime() + (int) ($minutes * 60);
 
         try {
             $this->table()->insert(compact('key', 'value', 'expiration'));
@@ -118,30 +119,26 @@ class DatabaseStore implements Store
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @return void
+     * @return int|bool
      */
     public function increment($key, $value = 1)
     {
-        $this->connection->transaction(function () use ($key, $value) {
-            return $this->incrementOrDecrement($key, $value, function ($current) use ($value) {
-                return $current + $value;
-            });
+        return $this->incrementOrDecrement($key, $value, function ($current, $value) {
+            return $current + $value;
         });
     }
 
     /**
-     * Increment the value of an item in the cache.
+     * Decrement the value of an item in the cache.
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @return void
+     * @return int|bool
      */
     public function decrement($key, $value = 1)
     {
-        $this->connection->transaction(function () use ($key, $value) {
-            return $this->incrementOrDecrement($key, $value, function ($current) use ($value) {
-                return $current - $value;
-            });
+        return $this->incrementOrDecrement($key, $value, function ($current, $value) {
+            return $current - $value;
         });
     }
 
@@ -151,23 +148,36 @@ class DatabaseStore implements Store
      * @param  string  $key
      * @param  mixed  $value
      * @param  \Closure  $callback
-     * @return void
+     * @return int|bool
      */
     protected function incrementOrDecrement($key, $value, Closure $callback)
     {
-        $prefixed = $this->prefix.$key;
+        return $this->connection->transaction(function () use ($key, $value, $callback) {
+            $prefixed = $this->prefix.$key;
 
-        $cache = $this->table()->where('key', $prefixed)->lockForUpdate()->first();
+            $cache = $this->table()->where('key', $prefixed)->lockForUpdate()->first();
 
-        if (! is_null($cache)) {
-            $current = $this->encrypter->decrypt($cache->value);
-
-            if (is_numeric($current)) {
-                $this->table()->where('key', $prefixed)->update([
-                    'value' => $this->encrypter->encrypt($callback($current)),
-                ]);
+            if (is_null($cache)) {
+                return false;
             }
-        }
+
+            if (is_array($cache)) {
+                $cache = (object) $cache;
+            }
+
+            $current = $this->encrypter->decrypt($cache->value);
+            $new = $callback((int) $current, $value);
+
+            if (! is_numeric($current)) {
+                return false;
+            }
+
+            $this->table()->where('key', $prefixed)->update([
+                'value' => $this->encrypter->encrypt($new),
+            ]);
+
+            return $new;
+        });
     }
 
     /**
@@ -177,7 +187,7 @@ class DatabaseStore implements Store
      */
     protected function getTime()
     {
-        return time();
+        return Carbon::now()->getTimestamp();
     }
 
     /**
@@ -208,11 +218,11 @@ class DatabaseStore implements Store
     /**
      * Remove all items from the cache.
      *
-     * @return void
+     * @return bool
      */
     public function flush()
     {
-        $this->table()->delete();
+        return (bool) $this->table()->delete();
     }
 
     /**

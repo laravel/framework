@@ -57,23 +57,12 @@ class MigrateCommand extends BaseCommand
 
         $this->prepareDatabase();
 
-        // The pretend option can be used for "simulating" the migration and grabbing
-        // the SQL queries that would fire if the migration were to be run against
-        // a database for real, which is helpful for double checking migrations.
-        $pretend = $this->input->getOption('pretend');
-
         // Next, we will check to see if a path option has been defined. If it has
         // we will use the path relative to the root of this installation folder
         // so that migrations may be run for any path within the applications.
-        if (! is_null($path = $this->input->getOption('path'))) {
-            $path = $this->laravel->basePath().'/'.$path;
-        } else {
-            $path = $this->getMigrationPath();
-        }
-
-        $this->migrator->run($path, [
-            'pretend' => $pretend,
-            'step' => $this->input->getOption('step'),
+        $this->migrator->run($this->getMigrationPaths(), [
+            'pretend' => $this->option('pretend'),
+            'step' => $this->option('step'),
         ]);
 
         // Once the migrator has run we will grab the note output and send it out to
@@ -86,7 +75,7 @@ class MigrateCommand extends BaseCommand
         // Finally, if the "seed" option has been given, we will re-run the database
         // seed task to re-populate the database, which is convenient when adding
         // a migration and a seed at the same time, as it is only this command.
-        if ($this->input->getOption('seed')) {
+        if ($this->option('seed')) {
             $this->call('db:seed', ['--force' => true]);
         }
     }
@@ -98,10 +87,10 @@ class MigrateCommand extends BaseCommand
      */
     protected function prepareDatabase()
     {
-        $this->migrator->setConnection($this->input->getOption('database'));
+        $this->migrator->setConnection($this->option('database'));
 
         if (! $this->migrator->repositoryExists()) {
-            $options = ['--database' => $this->input->getOption('database')];
+            $options = ['--database' => $this->option('database')];
 
             $this->call('migrate:install', $options);
         }

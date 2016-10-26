@@ -43,16 +43,6 @@ class SqsJob extends Job implements JobContract
     }
 
     /**
-     * Fire the job.
-     *
-     * @return void
-     */
-    public function fire()
-    {
-        $this->resolveAndFire(json_decode($this->getRawBody(), true));
-    }
-
-    /**
      * Get the raw body string for the job.
      *
      * @return string
@@ -72,9 +62,7 @@ class SqsJob extends Job implements JobContract
         parent::delete();
 
         $this->sqs->deleteMessage([
-
             'QueueUrl' => $this->queue, 'ReceiptHandle' => $this->job['ReceiptHandle'],
-
         ]);
     }
 
@@ -113,16 +101,6 @@ class SqsJob extends Job implements JobContract
     public function getJobId()
     {
         return $this->job['MessageId'];
-    }
-
-    /**
-     * Get the IoC container instance.
-     *
-     * @return \Illuminate\Container\Container
-     */
-    public function getContainer()
-    {
-        return $this->container;
     }
 
     /**

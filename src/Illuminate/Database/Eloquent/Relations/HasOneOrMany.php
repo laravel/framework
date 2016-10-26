@@ -24,6 +24,13 @@ abstract class HasOneOrMany extends Relation
     protected $localKey;
 
     /**
+     * The count of self joins.
+     *
+     * @var int
+     */
+    protected static $selfJoinCount = 0;
+
+    /**
      * Create a new has one or many relationship instance.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
@@ -55,33 +62,37 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
-     * Add the constraints for a relationship count query.
+     * Add the constraints for a relationship query.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @param  \Illuminate\Database\Eloquent\Builder  $parent
+     * @param  array|mixed  $columns
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function getRelationCountQuery(Builder $query, Builder $parent)
+    public function getRelationQuery(Builder $query, Builder $parent, $columns = ['*'])
     {
         if ($parent->getQuery()->from == $query->getQuery()->from) {
-            return $this->getRelationCountQueryForSelfRelation($query, $parent);
+            return $this->getRelationQueryForSelfRelation($query, $parent, $columns);
         }
 
-        return parent::getRelationCountQuery($query, $parent);
+        return parent::getRelationQuery($query, $parent, $columns);
     }
 
     /**
-     * Add the constraints for a relationship count query on the same table.
+     * Add the constraints for a relationship query on the same table.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @param  \Illuminate\Database\Eloquent\Builder  $parent
+     * @param  array|mixed  $columns
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function getRelationCountQueryForSelfRelation(Builder $query, Builder $parent)
+    public function getRelationQueryForSelfRelation(Builder $query, Builder $parent, $columns = ['*'])
     {
-        $query->select(new Expression('count(*)'));
+        $query->select($columns);
 
         $query->from($query->getModel()->getTable().' as '.$hash = $this->getRelationCountHash());
+
+        $query->getModel()->setTable($hash);
 
         $key = $this->wrap($this->getQualifiedParentKeyName());
 
@@ -95,7 +106,7 @@ abstract class HasOneOrMany extends Relation
      */
     public function getRelationCountHash()
     {
-        return 'self_'.md5(microtime(true));
+        return 'laravel_reserved_'.static::$selfJoinCount++;
     }
 
     /**
@@ -217,8 +228,8 @@ abstract class HasOneOrMany extends Relation
     /**
      * Attach a collection of models to the parent instance.
      *
-     * @param  \Illuminate\Database\Eloquent\Collection|array  $models
-     * @return \Illuminate\Database\Eloquent\Collection|array
+     * @param  \Traversable|array  $models
+     * @return \Traversable|array
      */
     public function saveMany($models)
     {
@@ -318,17 +329,17 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
-     * Create an array of new instances of the related model.
+     * Create a Collection of new instances of the related model.
      *
      * @param  array  $records
-     * @return array
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     public function createMany(array $records)
     {
-        $instances = [];
+        $instances = $this->related->newCollection();
 
         foreach ($records as $record) {
-            $instances[] = $this->create($record);
+            $instances->push($this->create($record));
         }
 
         return $instances;

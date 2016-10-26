@@ -3,6 +3,7 @@
 namespace Illuminate\Http;
 
 use ArrayObject;
+use JsonSerializable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Renderable;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
@@ -17,13 +18,6 @@ class Response extends BaseResponse
      * @var mixed
      */
     public $original;
-
-    /**
-     * The exception that triggered the error response (if applicable).
-     *
-     * @var \Exception
-     */
-    public $exception;
 
     /**
      * Set the content on the response.
@@ -79,6 +73,7 @@ class Response extends BaseResponse
     {
         return $content instanceof Jsonable ||
                $content instanceof ArrayObject ||
+               $content instanceof JsonSerializable ||
                is_array($content);
     }
 

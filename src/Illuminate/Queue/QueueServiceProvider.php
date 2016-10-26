@@ -2,7 +2,6 @@
 
 namespace Illuminate\Queue;
 
-use IlluminateQueueClosure;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Queue\Console\WorkCommand;
 use Illuminate\Queue\Console\ListenCommand;
@@ -10,7 +9,6 @@ use Illuminate\Queue\Console\RestartCommand;
 use Illuminate\Queue\Connectors\SqsConnector;
 use Illuminate\Queue\Connectors\NullConnector;
 use Illuminate\Queue\Connectors\SyncConnector;
-use Illuminate\Queue\Connectors\IronConnector;
 use Illuminate\Queue\Connectors\RedisConnector;
 use Illuminate\Queue\Failed\NullFailedJobProvider;
 use Illuminate\Queue\Connectors\DatabaseConnector;
@@ -40,8 +38,6 @@ class QueueServiceProvider extends ServiceProvider
         $this->registerListener();
 
         $this->registerFailedJobServices();
-
-        $this->registerQueueClosure();
     }
 
     /**
@@ -79,7 +75,10 @@ class QueueServiceProvider extends ServiceProvider
         $this->registerRestartCommand();
 
         $this->app->singleton('queue.worker', function ($app) {
-            return new Worker($app['queue'], $app['queue.failer'], $app['events']);
+            return new Worker(
+                $app['queue'], $app['events'],
+                $app['Illuminate\Contracts\Debug\ExceptionHandler']
+            );
         });
     }
 
@@ -147,7 +146,7 @@ class QueueServiceProvider extends ServiceProvider
      */
     public function registerConnectors($manager)
     {
-        foreach (['Null', 'Sync', 'Database', 'Beanstalkd', 'Redis', 'Sqs', 'Iron'] as $connector) {
+        foreach (['Null', 'Sync', 'Database', 'Beanstalkd', 'Redis', 'Sqs'] as $connector) {
             $this->{"register{$connector}Connector"}($manager);
         }
     }
@@ -233,21 +232,6 @@ class QueueServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register the IronMQ queue connector.
-     *
-     * @param  \Illuminate\Queue\QueueManager  $manager
-     * @return void
-     */
-    protected function registerIronConnector($manager)
-    {
-        $app = $this->app;
-
-        $manager->addConnector('iron', function () use ($app) {
-            return new IronConnector($app['encrypter']);
-        });
-    }
-
-    /**
      * Register the failed job services.
      *
      * @return void
@@ -262,18 +246,6 @@ class QueueServiceProvider extends ServiceProvider
             } else {
                 return new NullFailedJobProvider;
             }
-        });
-    }
-
-    /**
-     * Register the Illuminate queued closure job.
-     *
-     * @return void
-     */
-    protected function registerQueueClosure()
-    {
-        $this->app->singleton('IlluminateQueueClosure', function ($app) {
-            return new IlluminateQueueClosure($app['encrypter']);
         });
     }
 

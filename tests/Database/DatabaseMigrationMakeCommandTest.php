@@ -20,7 +20,7 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase
         $app = new Illuminate\Foundation\Application;
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
-        $creator->shouldReceive('create')->once()->with('create_foo', __DIR__.'/migrations', null, false);
+        $creator->shouldReceive('create')->once()->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', null, false);
         $composer->shouldReceive('dumpAutoloads')->once();
 
         $this->runCommand($command, ['name' => 'create_foo']);
@@ -36,7 +36,7 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase
         $app = new Illuminate\Foundation\Application;
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
-        $creator->shouldReceive('create')->once()->with('create_foo', __DIR__.'/migrations', null, false);
+        $creator->shouldReceive('create')->once()->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', null, false);
 
         $this->runCommand($command, ['name' => 'create_foo']);
     }
@@ -51,7 +51,7 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase
         $app = new Illuminate\Foundation\Application;
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
-        $creator->shouldReceive('create')->once()->with('create_foo', __DIR__.'/migrations', 'users', true);
+        $creator->shouldReceive('create')->once()->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'users', true);
 
         $this->runCommand($command, ['name' => 'create_foo', '--create' => 'users']);
     }
