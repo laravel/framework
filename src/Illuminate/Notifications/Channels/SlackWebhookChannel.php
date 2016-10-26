@@ -95,7 +95,7 @@ class SlackWebhookChannel
     protected function fields(SlackAttachment $attachment)
     {
         return collect($attachment->fields)->map(function ($value, $key) {
-        	if (is_array($value)) {
+            if (is_array($value)) {
                 return $value;
             }
             return ['title' => $key, 'value' => $value, 'short' => true];
