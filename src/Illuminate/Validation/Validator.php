@@ -66,13 +66,6 @@ class Validator implements ValidatorContract
     protected $data;
 
     /**
-     * The files under validation.
-     *
-     * @var array
-     */
-    protected $files = [];
-
-    /**
      * The initial rules provided.
      *
      * @var array
@@ -204,7 +197,7 @@ class Validator implements ValidatorContract
         $this->translator = $translator;
         $this->customMessages = $messages;
         $this->customAttributes = $customAttributes;
-        $this->data = $this->hydrateFiles($this->parseData($data));
+        $this->data = $this->parseData($data);
 
         $this->setRules($rules);
     }
@@ -232,38 +225,6 @@ class Validator implements ValidatorContract
         }
 
         return $newData;
-    }
-
-    /**
-     * Hydrate the files array.
-     *
-     * @param  array   $data
-     * @param  string  $arrayKey
-     * @return array
-     */
-    protected function hydrateFiles(array $data, $arrayKey = null)
-    {
-        if (is_null($arrayKey)) {
-            $this->files = [];
-        }
-
-        foreach ($data as $key => $value) {
-            $newKey = $arrayKey ? "$arrayKey.$key" : $key;
-
-            // If this value is an instance of the HttpFoundation File class we will
-            // remove it from the data array and add it to the files array, which
-            // we use to conveniently separate out these files from other data.
-            if ($value instanceof File) {
-                $this->files[$newKey] = $value;
-
-                unset($data[$key]);
-            } elseif (is_array($value) && ! empty($value) &&
-                      empty($this->hydrateFiles($value, $newKey))) {
-                unset($data[$key]);
-            }
-        }
-
-        return $data;
     }
 
     /**
@@ -342,9 +303,7 @@ class Validator implements ValidatorContract
      */
     public function each($attribute, $rules)
     {
-        $data = array_merge(
-            Arr::dot($this->initializeAttributeOnData($attribute)), $this->files
-        );
+        $data = Arr::dot($this->initializeAttributeOnData($attribute));
 
         $pattern = str_replace('\*', '[^\.]+', preg_quote($attribute));
 
@@ -615,11 +574,7 @@ class Validator implements ValidatorContract
      */
     protected function getValue($attribute)
     {
-        if (! is_null($value = Arr::get($this->data, $attribute))) {
-            return $value;
-        } elseif (! is_null($value = Arr::get($this->files, $attribute))) {
-            return $value;
-        }
+        return Arr::get($this->data, $attribute);
     }
 
     /**
@@ -665,8 +620,7 @@ class Validator implements ValidatorContract
     {
         if ($this->hasRule($attribute, ['Sometimes'])) {
             return array_key_exists($attribute, Arr::dot($this->data))
-                || in_array($attribute, array_keys($this->data))
-                || array_key_exists($attribute, $this->files);
+                || in_array($attribute, array_keys($this->data));
         }
 
         return true;
@@ -838,7 +792,7 @@ class Validator implements ValidatorContract
      */
     protected function validatePresent($attribute, $value)
     {
-        return Arr::has(array_merge($this->data, $this->files), $attribute);
+        return Arr::has($this->data, $attribute);
     }
 
     /**
@@ -850,7 +804,7 @@ class Validator implements ValidatorContract
      */
     protected function validateFilled($attribute, $value)
     {
-        if (Arr::has(array_merge($this->data, $this->files), $attribute)) {
+        if (Arr::has($this->data, $attribute)) {
             return $this->validateRequired($attribute, $value);
         }
 
@@ -1026,7 +980,7 @@ class Validator implements ValidatorContract
         $count = 0;
 
         foreach ($attributes as $key) {
-            if (Arr::get($this->data, $key) || Arr::get($this->files, $key)) {
+            if (Arr::get($this->data, $key)) {
                 $count++;
             }
         }
@@ -2192,7 +2146,7 @@ class Validator implements ValidatorContract
             return 'numeric';
         } elseif ($this->hasRule($attribute, ['Array'])) {
             return 'array';
-        } elseif (array_key_exists($attribute, $this->files)) {
+        } elseif ($this->getValue($attribute) instanceof UploadedFile) {
             return 'file';
         }
 
@@ -2662,7 +2616,7 @@ class Validator implements ValidatorContract
      */
     public function attributes()
     {
-        return array_merge($this->data, $this->files);
+        return $this->data;
     }
 
     /**
@@ -3094,29 +3048,6 @@ class Validator implements ValidatorContract
     public function setValueNames(array $values)
     {
         $this->customValues = $values;
-
-        return $this;
-    }
-
-    /**
-     * Get the files under validation.
-     *
-     * @return array
-     */
-    public function getFiles()
-    {
-        return $this->files;
-    }
-
-    /**
-     * Set the files under validation.
-     *
-     * @param  array  $files
-     * @return $this
-     */
-    public function setFiles(array $files)
-    {
-        $this->files = $files;
 
         return $this;
     }
