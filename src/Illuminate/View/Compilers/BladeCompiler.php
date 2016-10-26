@@ -590,7 +590,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileForeach($expression)
     {
-        preg_match('/\( *(.*) +as *([^\)]*)/is', $expression, $matches);
+        preg_match('/\( *(.*) +as *(.*)\)$/is', $expression, $matches);
 
         $iteratee = trim($matches[1]);
 
@@ -635,7 +635,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         $empty = '$__empty_'.++$this->forelseCounter;
 
-        preg_match('/\( *(.*) +as *([^\)]*)/is', $expression, $matches);
+        preg_match('/\( *(.*) +as *(.*)\)$/is', $expression, $matches);
 
         $iteratee = trim($matches[1]);
 

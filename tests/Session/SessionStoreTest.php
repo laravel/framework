@@ -345,6 +345,17 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($session->exists(['foo', 'baz', 'bogus']));
     }
 
+    public function testRememberMethodCallsPutAndReturnsDefault()
+    {
+        $session = $this->getSession();
+        $session->getHandler()->shouldReceive('get')->andReturn(null);
+        $result = $session->remember('foo', function () {
+            return 'bar';
+        });
+        $this->assertEquals('bar', $session->get('foo'));
+        $this->assertEquals('bar', $result);
+    }
+
     public function getSession()
     {
         $reflection = new ReflectionClass('Illuminate\Session\Store');

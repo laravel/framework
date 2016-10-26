@@ -223,7 +223,9 @@ class Builder
             return $model;
         }
 
-        return $this->model->newInstance();
+        return $this->model->newInstance()->setConnection(
+            $this->query->getConnection()->getName()
+        );
     }
 
     /**
@@ -239,7 +241,9 @@ class Builder
             return $instance;
         }
 
-        return $this->model->newInstance($attributes + $values);
+        return $this->model->newInstance($attributes + $values)->setConnection(
+            $this->query->getConnection()->getName()
+        );
     }
 
     /**
@@ -255,7 +259,9 @@ class Builder
             return $instance;
         }
 
-        $instance = $this->model->newInstance($attributes + $values);
+        $instance = $this->model->newInstance($attributes + $values)->setConnection(
+            $this->query->getConnection()->getName()
+        );
 
         $instance->save();
 
