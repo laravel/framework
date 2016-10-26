@@ -82,6 +82,14 @@ class EncrypterTest extends PHPUnit_Framework_TestCase
 
     public function testOpenSslEncrypterCanDecryptMcryptedData()
     {
+        if (! extension_loaded('mcrypt')) {
+            $this->markTestSkipped('Mcrypt module not installed');
+        }
+
+        if (version_compare(PHP_VERSION, '7.1') > 0) {
+            $this->markTestSkipped('Not compatable with PHP 7.1+');
+        }
+
         $key = Str::random(32);
         $encrypter = new Illuminate\Encryption\McryptEncrypter($key);
         $encrypted = $encrypter->encrypt('foo');

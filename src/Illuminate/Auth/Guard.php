@@ -180,7 +180,7 @@ class Guard implements GuardContract
             return;
         }
 
-        $id = $this->session->get($this->getName(), $this->getRecallerId());
+        $id = $this->session->get($this->getName());
 
         if (is_null($id) && $this->user()) {
             $id = $this->user()->getAuthIdentifier();
@@ -571,9 +571,11 @@ class Guard implements GuardContract
     {
         $this->session->remove($this->getName());
 
-        $recaller = $this->getRecallerName();
+        if (! is_null($this->getRecaller())) {
+            $recaller = $this->getRecallerName();
 
-        $this->getCookieJar()->queue($this->getCookieJar()->forget($recaller));
+            $this->getCookieJar()->queue($this->getCookieJar()->forget($recaller));
+        }
     }
 
     /**

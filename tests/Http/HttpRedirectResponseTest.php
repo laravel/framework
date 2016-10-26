@@ -36,7 +36,7 @@ class HttpRedirectResponseTest extends PHPUnit_Framework_TestCase
     {
         $response = new RedirectResponse('foo.bar');
         $this->assertEquals(0, count($response->headers->getCookies()));
-        $this->assertEquals($response, $response->withCookie(new \Symfony\Component\HttpFoundation\Cookie('foo', 'bar')));
+        $this->assertEquals($response, $response->withCookie(new Symfony\Component\HttpFoundation\Cookie('foo', 'bar')));
         $cookies = $response->headers->getCookies();
         $this->assertEquals(1, count($cookies));
         $this->assertEquals('foo', $cookies[0]->getName());

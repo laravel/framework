@@ -90,12 +90,12 @@ class WorkCommand extends Command
      */
     protected function runWorker($connection, $queue, $delay, $memory, $daemon = false)
     {
+        $this->worker->setDaemonExceptionHandler(
+            $this->laravel['Illuminate\Contracts\Debug\ExceptionHandler']
+        );
+
         if ($daemon) {
             $this->worker->setCache($this->laravel['cache']->driver());
-
-            $this->worker->setDaemonExceptionHandler(
-                $this->laravel['Illuminate\Contracts\Debug\ExceptionHandler']
-            );
 
             return $this->worker->daemon(
                 $connection, $queue, $delay, $memory,

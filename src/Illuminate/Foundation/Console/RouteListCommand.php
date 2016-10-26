@@ -90,7 +90,7 @@ class RouteListCommand extends Command
         }
 
         if ($sort = $this->option('sort')) {
-            $results = array_sort($results, function ($value) use ($sort) {
+            $results = Arr::sort($results, function ($value) use ($sort) {
                 return $value[$sort];
             });
         }

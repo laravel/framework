@@ -211,9 +211,11 @@ class SqlServerGrammar extends Grammar
      */
     public function compileExists(Builder $query)
     {
-        $select = $this->compileSelect($query);
+        $existsQuery = clone $query;
 
-        return "select cast(case when exists($select) then 1 else 0 end as bit) as {$this->wrap('exists')}";
+        $existsQuery->columns = [];
+
+        return $this->compileSelect($existsQuery->selectRaw('1 [exists]')->limit(1));
     }
 
     /**
@@ -312,5 +314,31 @@ class SqlServerGrammar extends Grammar
         }
 
         return trim("update {$table}{$joins} set $columns $where");
+    }
+
+    /**
+     * Wrap a table in keyword identifiers.
+     *
+     * @param  \Illuminate\Database\Query\Expression|string  $table
+     * @return string
+     */
+    public function wrapTable($table)
+    {
+        return $this->wrapTableValuedFunction(parent::wrapTable($table));
+    }
+
+    /**
+     * Wrap a table in keyword identifiers.
+     *
+     * @param  string  $table
+     * @return string
+     */
+    protected function wrapTableValuedFunction($table)
+    {
+        if (preg_match('/^(.+?)(\(.*?\))]$/', $table, $matches) === 1) {
+            $table = $matches[1].']'.$matches[2];
+        }
+
+        return $table;
     }
 }

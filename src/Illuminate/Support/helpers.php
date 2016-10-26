@@ -62,7 +62,7 @@ if (! function_exists('array_collapse')) {
     /**
      * Collapse an array of arrays into a single array.
      *
-     * @param  array|\ArrayAccess  $array
+     * @param  \ArrayAccess|array  $array
      * @return array
      */
     function array_collapse($array)
@@ -552,7 +552,6 @@ if (! function_exists('preg_replace_sub')) {
             foreach ($replacements as $key => $value) {
                 return array_shift($replacements);
             }
-
         }, $subject);
     }
 }
@@ -772,6 +771,18 @@ if (! function_exists('value')) {
     function value($value)
     {
         return $value instanceof Closure ? $value() : $value;
+    }
+}
+
+if (! function_exists('windows_os')) {
+    /**
+     * Determine whether the current envrionment is Windows based.
+     *
+     * @return bool
+     */
+    function windows_os()
+    {
+        return strtolower(substr(PHP_OS, 0, 3)) === 'win';
     }
 }
 

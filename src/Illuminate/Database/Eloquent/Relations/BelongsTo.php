@@ -109,6 +109,8 @@ class BelongsTo extends Relation
 
         $query->from($query->getModel()->getTable().' as '.$hash = $this->getRelationCountHash());
 
+        $query->getModel()->setTable($hash);
+
         $key = $this->wrap($this->getQualifiedForeignKey());
 
         return $query->where($hash.'.'.$query->getModel()->getKeyName(), '=', new Expression($key));

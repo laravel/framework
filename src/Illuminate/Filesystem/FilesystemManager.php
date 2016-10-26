@@ -6,6 +6,7 @@ use Closure;
 use Aws\S3\S3Client;
 use OpenCloud\Rackspace;
 use Illuminate\Support\Arr;
+use InvalidArgumentException;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\FilesystemInterface;
 use League\Flysystem\Filesystem as Flysystem;
@@ -89,6 +90,8 @@ class FilesystemManager implements FactoryContract
      *
      * @param  string  $name
      * @return \Illuminate\Contracts\Filesystem\Filesystem
+     *
+     * @throws \InvalidArgumentException
      */
     protected function resolve($name)
     {
@@ -98,7 +101,13 @@ class FilesystemManager implements FactoryContract
             return $this->callCustomCreator($config);
         }
 
-        return $this->{'create'.ucfirst($config['driver']).'Driver'}($config);
+        $driverMethod = 'create'.ucfirst($config['driver']).'Driver';
+
+        if (method_exists($this, $driverMethod)) {
+            return $this->{$driverMethod}($config);
+        } else {
+            throw new InvalidArgumentException("Driver [{$config['driver']}] not supported.");
+        }
     }
 
     /**
@@ -128,7 +137,7 @@ class FilesystemManager implements FactoryContract
     {
         $permissions = isset($config['permissions']) ? $config['permissions'] : [];
 
-        $links = (array_get($config, 'links') === 'skip')
+        $links = Arr::get($config, 'links') === 'skip'
             ? LocalAdapter::SKIP_LINKS
             : LocalAdapter::DISALLOW_LINKS;
 
@@ -226,11 +235,11 @@ class FilesystemManager implements FactoryContract
      *
      * @param  \League\Flysystem\AdapterInterface  $adapter
      * @param  array  $config
-     * @return \Leage\Flysystem\FlysystemInterface
+     * @return \League\Flysystem\FlysystemInterface
      */
     protected function createFlysystem(AdapterInterface $adapter, array $config)
     {
-        $config = Arr::only($config, ['visibility']);
+        $config = Arr::only($config, ['visibility', 'disable_asserts']);
 
         return new Flysystem($adapter, count($config) > 0 ? $config : null);
     }

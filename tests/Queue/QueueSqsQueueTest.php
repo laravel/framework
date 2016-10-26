@@ -22,7 +22,8 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase
         $this->baseUrl = 'https://sqs.someregion.amazonaws.com';
 
         // This is how the modified getQueue builds the queueUrl
-        $this->queueUrl = $this->baseUrl.'/'.$this->account.'/'.$this->queueName;
+        $this->prefix = $this->baseUrl.'/'.$this->account.'/';
+        $this->queueUrl = $this->prefix.$this->queueName;
 
         $this->mockedJob = 'foo';
         $this->mockedData = ['data'];
@@ -57,7 +58,9 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase
     public function testPopProperlyPopsJobOffOfSqsWithCustomJobCreator()
     {
         $queue = $this->getMock('Illuminate\Queue\SqsQueue', ['getQueue'], [$this->sqs, $this->queueName, $this->account]);
-        $queue->createJobsUsing(function () { return 'job!'; });
+        $queue->createJobsUsing(function () {
+            return 'job!';
+        });
         $queue->setContainer(m::mock('Illuminate\Container\Container'));
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->will($this->returnValue($this->queueUrl));
         $this->sqs->shouldReceive('receiveMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'AttributeNames' => ['ApproximateReceiveCount']])->andReturn($this->mockedReceiveMessageResponseModel);
@@ -98,10 +101,18 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($this->mockedMessageId, $id);
     }
 
-    public function testGetQueueProperlyResolvesName()
+    public function testGetQueueProperlyResolvesUrlWithPrefix()
     {
-        $queue = new Illuminate\Queue\SqsQueue($this->sqs, $this->queueName, $this->baseUrl.'/'.$this->account.'/');
-        $this->assertEquals($this->queueUrl, $queue->getQueue($this->queueName));
+        $queue = new Illuminate\Queue\SqsQueue($this->sqs, $this->queueName, $this->prefix);
+        $this->assertEquals($this->queueUrl, $queue->getQueue(null));
+        $queueUrl = $this->baseUrl.'/'.$this->account.'/test';
+        $this->assertEquals($queueUrl, $queue->getQueue('test'));
+    }
+
+    public function testGetQueueProperlyResolvesUrlWithoutPrefix()
+    {
+        $queue = new Illuminate\Queue\SqsQueue($this->sqs, $this->queueUrl);
+        $this->assertEquals($this->queueUrl, $queue->getQueue(null));
         $queueUrl = $this->baseUrl.'/'.$this->account.'/test';
         $this->assertEquals($queueUrl, $queue->getQueue($queueUrl));
     }

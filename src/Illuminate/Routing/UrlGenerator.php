@@ -171,8 +171,8 @@ class UrlGenerator implements UrlGeneratorContract
         $root = $this->getRootUrl($scheme);
 
         if (($queryPosition = strpos($path, '?')) !== false) {
-            $query = mb_substr($path, $queryPosition);
-            $path = mb_substr($path, 0, $queryPosition);
+            $query = substr($path, $queryPosition);
+            $path = substr($path, 0, $queryPosition);
         } else {
             $query = '';
         }
@@ -370,7 +370,6 @@ class UrlGenerator implements UrlGeneratorContract
     {
         return preg_replace_callback('/\{(.*?)\??\}/', function ($m) use (&$parameters) {
             return isset($parameters[$m[1]]) ? Arr::pull($parameters, $m[1]) : $m[0];
-
         }, $path);
     }
 
@@ -704,11 +703,13 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Get the session implementation from the resolver.
      *
-     * @return \Illuminate\Session\Store
+     * @return \Illuminate\Session\Store|null
      */
     protected function getSession()
     {
-        return call_user_func($this->sessionResolver ?: function () {});
+        if ($this->sessionResolver) {
+            return call_user_func($this->sessionResolver);
+        }
     }
 
     /**

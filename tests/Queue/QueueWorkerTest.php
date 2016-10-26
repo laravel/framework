@@ -66,7 +66,9 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
     {
         $worker = new Illuminate\Queue\Worker(m::mock('Illuminate\Queue\QueueManager'));
         $job = m::mock('Illuminate\Contracts\Queue\Job');
-        $job->shouldReceive('fire')->once()->andReturnUsing(function () { throw new RuntimeException; });
+        $job->shouldReceive('fire')->once()->andReturnUsing(function () {
+            throw new RuntimeException;
+        });
         $job->shouldReceive('isDeleted')->once()->andReturn(false);
         $job->shouldReceive('release')->once()->with(5);
 
@@ -80,10 +82,31 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
     {
         $worker = new Illuminate\Queue\Worker(m::mock('Illuminate\Queue\QueueManager'));
         $job = m::mock('Illuminate\Contracts\Queue\Job');
-        $job->shouldReceive('fire')->once()->andReturnUsing(function () { throw new RuntimeException; });
+        $job->shouldReceive('fire')->once()->andReturnUsing(function () {
+            throw new RuntimeException;
+        });
         $job->shouldReceive('isDeleted')->once()->andReturn(true);
         $job->shouldReceive('release')->never();
 
         $worker->process('connection', $job, 0, 5);
+    }
+
+    public function testJobSleepsWhenAnExceptionIsThrownForADaemonWorker()
+    {
+        $exceptionHandler = m::mock('Illuminate\Contracts\Debug\ExceptionHandler');
+        $job = m::mock('Illuminate\Contracts\Queue\Job');
+        $job->shouldReceive('fire')->once()->andReturnUsing(function () {
+            throw new RuntimeException;
+        });
+        $worker = m::mock('Illuminate\Queue\Worker', [$manager = m::mock('Illuminate\Queue\QueueManager')])->makePartial();
+        $manager->shouldReceive('connection')->once()->with('connection')->andReturn($connection = m::mock('StdClass'));
+        $manager->shouldReceive('getName')->andReturn('connection');
+        $connection->shouldReceive('pop')->once()->with('queue')->andReturn($job);
+        $worker->shouldReceive('sleep')->once()->with(3);
+
+        $exceptionHandler->shouldReceive('report')->once();
+
+        $worker->setDaemonExceptionHandler($exceptionHandler);
+        $worker->pop('connection', 'queue');
     }
 }

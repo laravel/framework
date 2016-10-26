@@ -55,13 +55,6 @@ class Store implements SessionInterface
     protected $bagData = [];
 
     /**
-     * The keys that should only be available for the current request.
-     *
-     * @var array
-     */
-    protected $nowKeys = [];
-
-    /**
      * The session handler implementation.
      *
      * @var \SessionHandlerInterface
@@ -266,8 +259,6 @@ class Store implements SessionInterface
 
         $this->ageFlashData();
 
-        $this->removeFlashNowData();
-
         $this->handler->write($this->getId(), $this->prepareForStorage(serialize($this->attributes)));
 
         $this->started = false;
@@ -292,7 +283,11 @@ class Store implements SessionInterface
     protected function addBagDataToSession()
     {
         foreach (array_merge($this->bags, [$this->metaBag]) as $bag) {
-            $this->put($bag->getStorageKey(), $this->bagData[$bag->getStorageKey()]);
+            $key = $bag->getStorageKey();
+
+            if (isset($this->bagData[$key])) {
+                $this->put($key, $this->bagData[$key]);
+            }
         }
     }
 
@@ -303,27 +298,11 @@ class Store implements SessionInterface
      */
     public function ageFlashData()
     {
-        foreach ($this->get('flash.old', []) as $old) {
-            $this->forget($old);
-        }
+        $this->forget($this->get('flash.old', []));
 
         $this->put('flash.old', $this->get('flash.new', []));
 
         $this->put('flash.new', []);
-    }
-
-    /**
-     * Remove data that was flashed for only the current request.
-     *
-     * @return void
-     */
-    public function removeFlashNowData()
-    {
-        foreach ($this->nowKeys as $key) {
-            $this->forget($key);
-        }
-
-        $this->nowKeys = [];
     }
 
     /**
@@ -454,7 +433,7 @@ class Store implements SessionInterface
     {
         $this->put($key, $value);
 
-        $this->nowKeys[] = $key;
+        $this->push('flash.old', $key);
     }
 
     /**
@@ -544,14 +523,14 @@ class Store implements SessionInterface
     }
 
     /**
-     * Remove an item from the session.
+     * Remove one or many items from the session.
      *
-     * @param  string  $key
+     * @param  string|array  $keys
      * @return void
      */
-    public function forget($key)
+    public function forget($keys)
     {
-        Arr::forget($this->attributes, $key);
+        Arr::forget($this->attributes, $keys);
     }
 
     /**

@@ -22,7 +22,6 @@ class Collection extends BaseCollection
 
         return Arr::first($this->items, function ($itemKey, $model) use ($key) {
             return $model->getKey() == $key;
-
         }, $default);
     }
 
@@ -204,7 +203,7 @@ class Collection extends BaseCollection
      */
     public function except($keys)
     {
-        $dictionary = array_except($this->getDictionary(), $keys);
+        $dictionary = Arr::except($this->getDictionary(), $keys);
 
         return new static(array_values($dictionary));
     }

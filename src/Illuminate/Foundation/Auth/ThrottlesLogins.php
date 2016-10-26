@@ -17,7 +17,7 @@ trait ThrottlesLogins
     protected function hasTooManyLoginAttempts(Request $request)
     {
         return app(RateLimiter::class)->tooManyAttempts(
-            $request->input($this->loginUsername()).$request->ip(),
+            $this->getThrottleKey($request),
             $this->maxLoginAttempts(), $this->lockoutTime() / 60
         );
     }
@@ -31,7 +31,7 @@ trait ThrottlesLogins
     protected function incrementLoginAttempts(Request $request)
     {
         app(RateLimiter::class)->hit(
-            $request->input($this->loginUsername()).$request->ip()
+            $this->getThrottleKey($request)
         );
     }
 
@@ -44,7 +44,7 @@ trait ThrottlesLogins
     protected function retriesLeft(Request $request)
     {
         $attempts = app(RateLimiter::class)->attempts(
-            $request->input($this->loginUsername()).$request->ip()
+            $this->getThrottleKey($request)
         );
 
         return $this->maxLoginAttempts() - $attempts + 1;
@@ -59,10 +59,10 @@ trait ThrottlesLogins
     protected function sendLockoutResponse(Request $request)
     {
         $seconds = app(RateLimiter::class)->availableIn(
-            $request->input($this->loginUsername()).$request->ip()
+            $this->getThrottleKey($request)
         );
 
-        return redirect($this->loginPath())
+        return redirect()->back()
             ->withInput($request->only($this->loginUsername(), 'remember'))
             ->withErrors([
                 $this->loginUsername() => $this->getLockoutErrorMessage($seconds),
@@ -91,8 +91,19 @@ trait ThrottlesLogins
     protected function clearLoginAttempts(Request $request)
     {
         app(RateLimiter::class)->clear(
-            $request->input($this->loginUsername()).$request->ip()
+            $this->getThrottleKey($request)
         );
+    }
+
+    /**
+     * Get the throttle key for the given request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return string
+     */
+    protected function getThrottleKey(Request $request)
+    {
+        return mb_strtolower($request->input($this->loginUsername())).'|'.$request->ip();
     }
 
     /**

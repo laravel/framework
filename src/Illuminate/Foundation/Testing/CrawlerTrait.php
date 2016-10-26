@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Testing;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 
@@ -191,11 +192,11 @@ trait CrawlerTrait
      */
     public function seeJsonEquals(array $data)
     {
-        $actual = json_encode(array_sort_recursive(
+        $actual = json_encode(Arr::sortRecursive(
             json_decode($this->response->getContent(), true)
         ));
 
-        $this->assertEquals(json_encode(array_sort_recursive($data)), $actual);
+        $this->assertEquals(json_encode(Arr::sortRecursive($data)), $actual);
 
         return $this;
     }
@@ -248,11 +249,11 @@ trait CrawlerTrait
             return $this->fail('Invalid JSON was returned from the route. Perhaps an exception was thrown?');
         }
 
-        $actual = json_encode(array_sort_recursive(
+        $actual = json_encode(Arr::sortRecursive(
             (array) $actual
         ));
 
-        foreach (array_sort_recursive($data) as $key => $value) {
+        foreach (Arr::sortRecursive($data) as $key => $value) {
             $expected = $this->formatToExpectedJson($key, $value);
 
             $this->{$method}(

@@ -19,7 +19,9 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         $factory->getEngineResolver()->shouldReceive('resolve')->once()->with('php')->andReturn($engine = m::mock('Illuminate\View\Engines\EngineInterface'));
         $factory->getFinder()->shouldReceive('addExtension')->once()->with('php');
         $factory->setDispatcher(new Illuminate\Events\Dispatcher);
-        $factory->creator('view', function ($view) { $_SERVER['__test.view'] = $view; });
+        $factory->creator('view', function ($view) {
+            $_SERVER['__test.view'] = $view;
+        });
         $factory->addExtension('php', 'php');
         $view = $factory->make('view', ['foo' => 'bar'], ['baz' => 'boom']);
 
@@ -92,7 +94,8 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
     {
         $factory = $this->getFactory();
 
-        $resolver = function () {};
+        $resolver = function () {
+        };
 
         $factory->getFinder()->shouldReceive('addExtension')->once()->with('foo');
         $factory->getEngineResolver()->shouldReceive('register')->once()->with('bar', $resolver);
@@ -136,7 +139,9 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
     {
         $factory = $this->getFactory();
         $factory->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type('Closure'));
-        $callback = $factory->composer('foo', function () { return 'bar'; });
+        $callback = $factory->composer('foo', function () {
+            return 'bar';
+        });
         $callback = $callback[0];
 
         $this->assertEquals('bar', $callback());
@@ -146,7 +151,9 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
     {
         $factory = $this->getFactory();
         $factory->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type('Closure'), 1);
-        $callback = $factory->composer('foo', function () { return 'bar'; }, 1);
+        $callback = $factory->composer('foo', function () {
+            return 'bar';
+        }, 1);
         $callback = $callback[0];
 
         $this->assertEquals('bar', $callback());
@@ -390,7 +397,9 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
     public function testExceptionsInSectionsAreThrown()
     {
         $engine = new Illuminate\View\Engines\CompilerEngine(m::mock('Illuminate\View\Compilers\CompilerInterface'));
-        $engine->getCompiler()->shouldReceive('getCompiledPath')->andReturnUsing(function ($path) { return $path; });
+        $engine->getCompiler()->shouldReceive('getCompiledPath')->andReturnUsing(function ($path) {
+            return $path;
+        });
         $engine->getCompiler()->shouldReceive('isExpired')->twice()->andReturn(false);
         $factory = $this->getFactory();
         $factory->getEngineResolver()->shouldReceive('resolve')->twice()->andReturn($engine);

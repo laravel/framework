@@ -130,6 +130,72 @@ class Builder
     }
 
     /**
+     * Find a model by its primary key or return fresh model instance.
+     *
+     * @param  mixed  $id
+     * @param  array  $columns
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function findOrNew($id, $columns = ['*'])
+    {
+        if (! is_null($model = $this->find($id, $columns))) {
+            return $model;
+        }
+
+        return $this->model->newInstance();
+    }
+
+    /**
+     * Get the first record matching the attributes or instantiate it.
+     *
+     * @param  array  $attributes
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function firstOrNew(array $attributes)
+    {
+        if (! is_null($instance = $this->where($attributes)->first())) {
+            return $instance;
+        }
+
+        return $this->model->newInstance($attributes);
+    }
+
+    /**
+     * Get the first record matching the attributes or create it.
+     *
+     * @param  array  $attributes
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function firstOrCreate(array $attributes)
+    {
+        if (! is_null($instance = $this->where($attributes)->first())) {
+            return $instance;
+        }
+
+        $instance = $this->model->newInstance($attributes);
+
+        $instance->save();
+
+        return $instance;
+    }
+
+    /**
+     * Create or update a record matching the attributes, and fill it with values.
+     *
+     * @param  array  $attributes
+     * @param  array  $values
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function updateOrCreate(array $attributes, array $values = [])
+    {
+        $instance = $this->firstOrNew($attributes);
+
+        $instance->fill($values)->save();
+
+        return $instance;
+    }
+
+    /**
      * Execute the query and get the first result.
      *
      * @param  array  $columns
@@ -212,7 +278,7 @@ class Builder
      *
      * @param  int  $count
      * @param  callable  $callback
-     * @return void
+     * @return bool
      */
     public function chunk($count, callable $callback)
     {
@@ -223,13 +289,15 @@ class Builder
             // developer take care of everything within the callback, which allows us to
             // keep the memory low for spinning through large result sets for working.
             if (call_user_func($callback, $results) === false) {
-                break;
+                return false;
             }
 
             $page++;
 
             $results = $this->forPage($page, $count)->get();
         }
+
+        return true;
     }
 
     /**
@@ -465,28 +533,28 @@ class Builder
     /**
      * Get the relation instance for the given relation name.
      *
-     * @param  string  $relation
+     * @param  string  $name
      * @return \Illuminate\Database\Eloquent\Relations\Relation
      */
-    public function getRelation($relation)
+    public function getRelation($name)
     {
         // We want to run a relationship query without any constrains so that we will
         // not have to remove these where clauses manually which gets really hacky
         // and is error prone while we remove the developer's own where clauses.
-        $query = Relation::noConstraints(function () use ($relation) {
-            return $this->getModel()->$relation();
+        $relation = Relation::noConstraints(function () use ($name) {
+            return $this->getModel()->$name();
         });
 
-        $nested = $this->nestedRelations($relation);
+        $nested = $this->nestedRelations($name);
 
         // If there are nested relationships set on the query, we will put those onto
         // the query instances so that they can be handled after this relationship
         // is loaded. In this way they will all trickle down as they are loaded.
         if (count($nested) > 0) {
-            $query->getQuery()->with($nested);
+            $relation->getQuery()->with($nested);
         }
 
-        return $query;
+        return $relation;
     }
 
     /**
@@ -720,9 +788,9 @@ class Builder
 
         $hasQuery = $hasQuery->getModel()->removeGlobalScopes($hasQuery);
 
-        $hasQuery->mergeWheres(
-            $relationQuery->wheres, $relationQuery->getBindings()
-        );
+        $whereBindings = array_get($relationQuery->getRawBindings(), 'where', []);
+
+        $hasQuery->mergeWheres($relationQuery->wheres, $whereBindings);
 
         $this->query->addBinding($hasQuery->getQuery()->getBindings(), 'where');
     }
@@ -774,7 +842,9 @@ class Builder
             // constraints have been specified for the eager load and we'll just put
             // an empty Closure with the loader so that we can treat all the same.
             if (is_numeric($name)) {
-                $f = function () {};
+                $f = function () {
+                    //
+                };
 
                 list($name, $constraints) = [$constraints, $f];
             }
@@ -808,7 +878,9 @@ class Builder
             $progress[] = $segment;
 
             if (! isset($results[$last = implode('.', $progress)])) {
-                $results[$last] = function () {};
+                $results[$last] = function () {
+                    //
+                };
             }
         }
 

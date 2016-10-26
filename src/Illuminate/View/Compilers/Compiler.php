@@ -2,6 +2,7 @@
 
 namespace Illuminate\View\Compilers;
 
+use InvalidArgumentException;
 use Illuminate\Filesystem\Filesystem;
 
 abstract class Compiler
@@ -26,9 +27,15 @@ abstract class Compiler
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  string  $cachePath
      * @return void
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct(Filesystem $files, $cachePath)
     {
+        if (! $cachePath) {
+            throw new InvalidArgumentException('Please provide a valid cache path.');
+        }
+
         $this->files = $files;
         $this->cachePath = $cachePath;
     }
@@ -57,7 +64,7 @@ abstract class Compiler
         // If the compiled file doesn't exist we will indicate that the view is expired
         // so that it can be re-compiled. Else, we will verify the last modification
         // of the views is less than the modification times of the compiled views.
-        if (! $this->cachePath || ! $this->files->exists($compiled)) {
+        if (! $this->files->exists($compiled)) {
             return true;
         }
 

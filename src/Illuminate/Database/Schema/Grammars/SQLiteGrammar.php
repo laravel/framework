@@ -437,7 +437,7 @@ class SQLiteGrammar extends Grammar
      */
     protected function typeBoolean(Fluent $column)
     {
-        return 'tinyint';
+        return 'tinyint(1)';
     }
 
     /**

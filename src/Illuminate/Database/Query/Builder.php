@@ -7,7 +7,6 @@ use BadMethodCallException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Arrayable;
@@ -765,6 +764,12 @@ class Builder
     {
         $type = $not ? 'NotIn' : 'In';
 
+        if ($values instanceof static) {
+            return $this->whereInExistingQuery(
+                $column, $values, $boolean, $not
+            );
+        }
+
         // If the value of the where in clause is actually a Closure, we will assume that
         // the developer is using a full sub-select for this "in" statement, and will
         // execute those Closures, then we can re-construct the entire sub-selects.
@@ -837,6 +842,26 @@ class Builder
         // provided callback with the query so the developer may set any of the query
         // conditions they want for the in clause, then we'll put it in this array.
         call_user_func($callback, $query = $this->newQuery());
+
+        $this->wheres[] = compact('type', 'column', 'query', 'boolean');
+
+        $this->addBinding($query->getBindings(), 'where');
+
+        return $this;
+    }
+
+    /**
+     * Add a external sub-select to the query.
+     *
+     * @param  string   $column
+     * @param  \Illuminate\Database\Query\Builder|static  $query
+     * @param  string   $boolean
+     * @param  bool     $not
+     * @return $this
+     */
+    protected function whereInExistingQuery($column, $query, $boolean, $not)
+    {
+        $type = $not ? 'NotInSub' : 'InSub';
 
         $this->wheres[] = compact('type', 'column', 'query', 'boolean');
 
@@ -1565,32 +1590,27 @@ class Builder
      */
     public function lists($column, $key = null)
     {
-        $columns = $this->getListSelect($column, $key);
+        $results = $this->get(is_null($key) ? [$column] : [$column, $key]);
 
-        $results = new Collection($this->get($columns));
-
-        return $results->pluck($columns[0], Arr::get($columns, 1))->all();
+        // If the columns are qualified with a table or have an alias, we cannot use
+        // those directly in the "pluck" operations since the results from the DB
+        // are only keyed by the column itself. We'll strip the table out here.
+        return Arr::pluck(
+            $results,
+            $this->stripTableForPluck($column),
+            $this->stripTableForPluck($key)
+        );
     }
 
     /**
-     * Get the columns that should be used in a list array.
+     * Strip off the table name or alias from a column identifier.
      *
      * @param  string  $column
-     * @param  string  $key
-     * @return array
+     * @return string|null
      */
-    protected function getListSelect($column, $key)
+    protected function stripTableForPluck($column)
     {
-        $select = is_null($key) ? [$column] : [$column, $key];
-
-        // If the selected column contains a "dot", we will remove it so that the list
-        // operation can run normally. Specifying the table is not needed, since we
-        // really want the names of the columns as it is in this resulting array.
-        return array_map(function ($column) {
-            $dot = strpos($column, '.');
-
-            return $dot === false ? $column : substr($column, $dot + 1);
-        }, $select);
+        return is_null($column) ? $column : last(preg_split('~\.| ~', $column));
     }
 
     /**
@@ -1608,7 +1628,7 @@ class Builder
     /**
      * Determine if any rows exist for the current query.
      *
-     * @return bool|null
+     * @return bool
      */
     public function exists()
     {
@@ -1621,6 +1641,8 @@ class Builder
 
             return (bool) $results['exists'];
         }
+
+        return false;
     }
 
     /**
@@ -1642,7 +1664,7 @@ class Builder
      * Retrieve the minimum value of a given column.
      *
      * @param  string  $column
-     * @return float|int
+     * @return mixed
      */
     public function min($column)
     {
@@ -1653,7 +1675,7 @@ class Builder
      * Retrieve the maximum value of a given column.
      *
      * @param  string  $column
-     * @return float|int
+     * @return mixed
      */
     public function max($column)
     {
@@ -1664,20 +1686,18 @@ class Builder
      * Retrieve the sum of the values of a given column.
      *
      * @param  string  $column
-     * @return float|int
+     * @return mixed
      */
     public function sum($column)
     {
-        $result = $this->aggregate(__FUNCTION__, [$column]);
-
-        return $result ?: 0;
+        return $this->aggregate(__FUNCTION__, [$column]);
     }
 
     /**
      * Retrieve the average of the values of a given column.
      *
      * @param  string  $column
-     * @return float|int
+     * @return mixed
      */
     public function avg($column)
     {
@@ -1688,7 +1708,7 @@ class Builder
      * Alias for the "avg" method.
      *
      * @param  string  $column
-     * @return float|int
+     * @return mixed
      */
     public function average($column)
     {
@@ -1700,7 +1720,7 @@ class Builder
      *
      * @param  string  $function
      * @param  array   $columns
-     * @return float|int
+     * @return mixed
      */
     public function aggregate($function, $columns = ['*'])
     {
@@ -1727,10 +1747,34 @@ class Builder
         $this->bindings['select'] = $previousSelectBindings;
 
         if (isset($results[0])) {
-            $result = array_change_key_case((array) $results[0]);
-
-            return $result['aggregate'];
+            return array_change_key_case((array) $results[0])['aggregate'];
         }
+    }
+
+    /**
+     * Execute a numeric aggregate function on the database.
+     *
+     * @param  string  $function
+     * @param  array   $columns
+     * @return float|int
+     */
+    public function numericAggregate($function, $columns = ['*'])
+    {
+        $result = $this->aggregate($function, $columns);
+
+        if (! $result) {
+            return 0;
+        }
+
+        if (is_int($result) || is_float($result)) {
+            return $result;
+        }
+
+        if (strpos((string) $result, '.') === false) {
+            return (int) $result;
+        }
+
+        return (float) $result;
     }
 
     /**
@@ -1824,6 +1868,10 @@ class Builder
      */
     public function increment($column, $amount = 1, array $extra = [])
     {
+        if (! is_numeric($amount)) {
+            throw new InvalidArgumentException('Non-numeric value passed to increment method.');
+        }
+
         $wrapped = $this->grammar->wrap($column);
 
         $columns = array_merge([$column => $this->raw("$wrapped + $amount")], $extra);
@@ -1841,6 +1889,10 @@ class Builder
      */
     public function decrement($column, $amount = 1, array $extra = [])
     {
+        if (! is_numeric($amount)) {
+            throw new InvalidArgumentException('Non-numeric value passed to decrement method.');
+        }
+
         $wrapped = $this->grammar->wrap($column);
 
         $columns = array_merge([$column => $this->raw("$wrapped - $amount")], $extra);

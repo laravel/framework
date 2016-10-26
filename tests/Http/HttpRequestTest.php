@@ -507,6 +507,27 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($request->accepts('application/baz+json'));
     }
 
+    public function testBadAcceptHeader()
+    {
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'Mozilla/5.0 (Windows; U; Windows NT 5.1; pt-PT; rv:1.9.1.2) Gecko/20090729 Firefox/3.5.2 (.NET CLR 3.5.30729)']);
+        $this->assertFalse($request->accepts(['text/html', 'application/json']));
+        $this->assertFalse($request->accepts('text/html'));
+        $this->assertFalse($request->accepts('text/foo'));
+        $this->assertFalse($request->accepts('application/json'));
+        $this->assertFalse($request->accepts('application/baz+json'));
+        $this->assertFalse($request->acceptsHtml());
+        $this->assertFalse($request->acceptsJson());
+
+        // Should not be handled as regex.
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => '.+/.+']);
+        $this->assertFalse($request->accepts('application/json'));
+        $this->assertFalse($request->accepts('application/baz+json'));
+
+        // Should not produce compilation error on invalid regex.
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => '(/(']);
+        $this->assertFalse($request->accepts('text/html'));
+    }
+
     /**
      * @expectedException RuntimeException
      */
@@ -519,7 +540,9 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
     public function testUserResolverMakesUserAvailableAsMagicProperty()
     {
         $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
-        $request->setUserResolver(function () { return 'user'; });
+        $request->setUserResolver(function () {
+            return 'user';
+        });
         $this->assertEquals('user', $request->user());
     }
 

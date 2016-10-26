@@ -14,7 +14,9 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase
     {
         unset($_SERVER['__event.test']);
         $d = new Dispatcher;
-        $d->listen('foo', function ($foo) { $_SERVER['__event.test'] = $foo; });
+        $d->listen('foo', function ($foo) {
+            $_SERVER['__event.test'] = $foo;
+        });
         $d->fire('foo', ['bar']);
         $this->assertEquals('bar', $_SERVER['__event.test']);
     }
@@ -69,9 +71,15 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase
     {
         unset($_SERVER['__event.test']);
         $d = new Dispatcher;
-        $d->listen('foo.bar', function () { $_SERVER['__event.test'] = 'regular'; });
-        $d->listen('foo.*', function () { $_SERVER['__event.test'] = 'wildcard'; });
-        $d->listen('bar.*', function () { $_SERVER['__event.test'] = 'nope'; });
+        $d->listen('foo.bar', function () {
+            $_SERVER['__event.test'] = 'regular';
+        });
+        $d->listen('foo.*', function () {
+            $_SERVER['__event.test'] = 'wildcard';
+        });
+        $d->listen('bar.*', function () {
+            $_SERVER['__event.test'] = 'nope';
+        });
         $d->fire('foo.bar');
 
         $this->assertEquals('wildcard', $_SERVER['__event.test']);
@@ -81,19 +89,59 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase
     {
         unset($_SERVER['__event.test']);
         $d = new Dispatcher;
-        $d->listen('foo', function () { $_SERVER['__event.test'] = 'foo'; });
+        $d->listen('foo', function () {
+            $_SERVER['__event.test'] = 'foo';
+        });
         $d->forget('foo');
         $d->fire('foo');
 
         $this->assertFalse(isset($_SERVER['__event.test']));
     }
 
+    public function testWildcardListenersCanBeRemoved()
+    {
+        unset($_SERVER['__event.test']);
+        $d = new Dispatcher;
+        $d->listen('foo.*', function () {
+            $_SERVER['__event.test'] = 'foo';
+        });
+        $d->forget('foo.*');
+        $d->fire('foo.bar');
+
+        $this->assertFalse(isset($_SERVER['__event.test']));
+    }
+
+    public function testListenersCanBeFound()
+    {
+        $d = new Dispatcher;
+        $this->assertFalse($d->hasListeners('foo'));
+
+        $d->listen('foo', function () {
+        });
+        $this->assertTrue($d->hasListeners('foo'));
+    }
+
+    public function testWildcardListenersCanBeFound()
+    {
+        $d = new Dispatcher;
+        $this->assertFalse($d->hasListeners('foo.*'));
+
+        $d->listen('foo.*', function () {
+        });
+        $this->assertTrue($d->hasListeners('foo.*'));
+    }
+
     public function testFiringReturnsCurrentlyFiredEvent()
     {
         unset($_SERVER['__event.test']);
         $d = new Dispatcher;
-        $d->listen('foo', function () use ($d) { $_SERVER['__event.test'] = $d->firing(); $d->fire('bar'); });
-        $d->listen('bar', function () use ($d) { $_SERVER['__event.test'] = $d->firing(); });
+        $d->listen('foo', function () use ($d) {
+            $_SERVER['__event.test'] = $d->firing();
+            $d->fire('bar');
+        });
+        $d->listen('bar', function () use ($d) {
+            $_SERVER['__event.test'] = $d->firing();
+        });
         $d->fire('foo');
 
         $this->assertEquals('bar', $_SERVER['__event.test']);
@@ -108,7 +156,9 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase
             'method' => 'someMethod',
             'data' => serialize(['foo', 'bar']),
         ]);
-        $d->setQueueResolver(function () use ($queue) { return $queue; });
+        $d->setQueueResolver(function () use ($queue) {
+            return $queue;
+        });
 
         $d->listen('some.event', 'TestDispatcherQueuedHandler@someMethod');
         $d->fire('some.event', ['foo', 'bar']);
@@ -123,7 +173,9 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase
             'method' => 'someMethod',
             'data' => serialize(['foo', 'bar']),
         ]);
-        $d->setQueueResolver(function () use ($queue) { return $queue; });
+        $d->setQueueResolver(function () use ($queue) {
+            return $queue;
+        });
 
         $d->listen('some.event', 'TestDispatcherQueuedHandlerCustomQueue@someMethod');
         $d->fire('some.event', ['foo', 'bar']);

@@ -9,7 +9,7 @@ class SupportFluentTest extends PHPUnit_Framework_TestCase
         $array = ['name' => 'Taylor', 'age' => 25];
         $fluent = new Fluent($array);
 
-        $refl = new \ReflectionObject($fluent);
+        $refl = new ReflectionObject($fluent);
         $attributes = $refl->getProperty('attributes');
         $attributes->setAccessible(true);
 
@@ -22,7 +22,7 @@ class SupportFluentTest extends PHPUnit_Framework_TestCase
         $array = ['name' => 'Taylor', 'age' => 25];
         $fluent = new Fluent((object) $array);
 
-        $refl = new \ReflectionObject($fluent);
+        $refl = new ReflectionObject($fluent);
         $attributes = $refl->getProperty('attributes');
         $attributes->setAccessible(true);
 
@@ -35,7 +35,7 @@ class SupportFluentTest extends PHPUnit_Framework_TestCase
         $array = ['name' => 'Taylor', 'age' => 25];
         $fluent = new Fluent(new FluentArrayIteratorStub($array));
 
-        $refl = new \ReflectionObject($fluent);
+        $refl = new ReflectionObject($fluent);
         $attributes = $refl->getProperty('attributes');
         $attributes->setAccessible(true);
 
@@ -97,7 +97,7 @@ class SupportFluentTest extends PHPUnit_Framework_TestCase
     }
 }
 
-class FluentArrayIteratorStub implements \IteratorAggregate
+class FluentArrayIteratorStub implements IteratorAggregate
 {
     protected $items = [];
 
