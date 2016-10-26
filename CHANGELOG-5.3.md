@@ -25,7 +25,7 @@
 ### Fixed
 - Fixed `session_write_close()` on PHP7 ([#15968](https://github.com/laravel/framework/pull/15968))
 - Fixed ambiguous id issues when restoring models with eager loaded / joined query ([#15983](https://github.com/laravel/framework/pull/15983))
-- Fixed integer and double support in `JsonExperssion` ([#16068](https://github.com/laravel/framework/pull/16068))
+- Fixed integer and double support in `JsonExpression` ([#16068](https://github.com/laravel/framework/pull/16068))
 - Fixed UUIDs when queueing notifications ([18d26df](https://github.com/laravel/framework/commit/18d26df24f1f3b17bd20c7244d9b85d273138d79))
 - Fixed empty session issue when the session file is being accessed simultaneously ([#15998](https://github.com/laravel/framework/pull/15998))
 
