@@ -3,6 +3,7 @@
 use Closure;
 use ErrorException;
 use ReflectionFunction;
+use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Illuminate\Support\Contracts\ResponsePreparerInterface;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\Debug\Exception\FatalErrorException as FatalError;
@@ -256,6 +257,10 @@ class Handler {
 			{
 				$response = $this->formatException($e);
 			}
+			catch (\Throwable $e)
+			{
+				$response = $this->formatException($e);
+			}
 
 			// If this handler returns a "non-null" response, we will return it so it will
 			// get sent back to the browsers. Once the handler returns a valid response
@@ -276,6 +281,10 @@ class Handler {
 	protected function displayException($exception)
 	{
 		$displayer = $this->debug ? $this->debugDisplayer : $this->plainDisplayer;
+
+		if (! $exception instanceof \Exception) {
+			$exception = new FatalThrowableError($exception);
+		}
 
 		return $displayer->display($exception);
 	}
