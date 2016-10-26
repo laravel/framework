@@ -98,6 +98,7 @@ class SlackWebhookChannel
             if (is_array($value)) {
                 return $value;
             }
+
             return ['title' => $key, 'value' => $value, 'short' => true];
         })->values()->all();
     }
