@@ -66,13 +66,6 @@ class Validator implements ValidatorContract
     protected $data;
 
     /**
-     * The files under validation.
-     *
-     * @var array
-     */
-    protected $files = [];
-
-    /**
      * The initial rules provided.
      *
      * @var array
@@ -197,13 +190,14 @@ class Validator implements ValidatorContract
      * @param  array  $customAttributes
      * @return void
      */
-    public function __construct(Translator $translator, array $data, array $rules, array $messages = [], array $customAttributes = [])
+    public function __construct(Translator $translator, array $data, array $rules,
+                                array $messages = [], array $customAttributes = [])
     {
         $this->initialRules = $rules;
         $this->translator = $translator;
         $this->customMessages = $messages;
-        $this->customAttributes = $customAttributes;
         $this->data = $this->parseData($data);
+        $this->customAttributes = $customAttributes;
 
         $this->setRules($rules);
     }
@@ -1615,7 +1609,11 @@ class Validator implements ValidatorContract
         }
 
         if ($url = parse_url($value, PHP_URL_HOST)) {
-            return count(dns_get_record($url, DNS_A | DNS_AAAA)) > 0;
+            try {
+                return count(dns_get_record($url, DNS_A | DNS_AAAA)) > 0;
+            } catch (Exception $e) {
+                return false;
+            }
         }
 
         return false;

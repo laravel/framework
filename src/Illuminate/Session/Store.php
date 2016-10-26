@@ -2,6 +2,7 @@
 
 namespace Illuminate\Session;
 
+use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use SessionHandlerInterface;
@@ -414,6 +415,24 @@ class Store implements SessionInterface
     }
 
     /**
+     * Get an item from the session, or store the default value.
+     *
+     * @param  string  $key
+     * @param  \Closure  $callback
+     * @return mixed
+     */
+    public function remember($key, Closure $callback)
+    {
+        if (! is_null($value = $this->get($key))) {
+            return $value;
+        }
+
+        return tap($callback(), function ($value) use ($key) {
+            $this->put($key, $value);
+        });
+    }
+
+    /**
      * Push a value onto a session array.
      *
      * @param  string  $key
@@ -474,8 +493,7 @@ class Store implements SessionInterface
     }
 
     /**
-     * Flash a key / value pair to the session
-     * for immediate use.
+     * Flash a key / value pair to the session for immediate use.
      *
      * @param  string $key
      * @param  mixed $value

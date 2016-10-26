@@ -2,8 +2,12 @@
 
 namespace Illuminate\Validation;
 
+use Illuminate\Support\Traits\Macroable;
+
 class Rule
 {
+    use Macroable;
+
     /**
      * Get a dimensions constraint builder instance.
      *
@@ -25,6 +29,28 @@ class Rule
     public static function exists($table, $column = 'NULL')
     {
         return new Rules\Exists($table, $column);
+    }
+
+    /**
+     * Get an in constraint builder instance.
+     *
+     * @param  array  $values
+     * @return \Illuminate\Validation\Rules\In
+     */
+    public static function in(array $values)
+    {
+        return new Rules\In($values);
+    }
+
+    /**
+     * Get a not_in constraint builder instance.
+     *
+     * @param  array  $values
+     * @return \Illuminate\Validation\Rules\In
+     */
+    public static function notIn(array $values)
+    {
+        return new Rules\NotIn($values);
     }
 
     /**

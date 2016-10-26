@@ -741,32 +741,7 @@ class Router implements RegistrarContract
      */
     protected function sortMiddleware(Collection $middlewares)
     {
-        $priority = $this->middlewarePriority;
-
-        $sorted = [];
-
-        foreach ($middlewares as $middleware) {
-            if (in_array($middleware, $sorted)) {
-                continue;
-            }
-
-            if (($index = array_search($middleware, $priority)) !== false) {
-                $sorted = array_merge(
-                    $sorted,
-                    array_filter(
-                        array_slice($priority, 0, $index),
-                        function ($middleware) use ($middlewares, $sorted) {
-                            return $middlewares->contains($middleware) &&
-                                 ! in_array($middleware, $sorted);
-                        }
-                    )
-                );
-            }
-
-            $sorted[] = $middleware;
-        }
-
-        return $sorted;
+        return (new SortedMiddleware($this->middlewarePriority, $middlewares))->all();
     }
 
     /**
