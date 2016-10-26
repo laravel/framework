@@ -1,5 +1,20 @@
 # Release Notes for 5.3.x
 
+## v5.3.21 (2016-10-26)
+
+### Added
+- Added `ResetsPasswords::validationErrorMessages()` method ([#16111](https://github.com/laravel/framework/pull/16111))
+
+### Changed
+- Use `toString()` instead of `(string)` on UUIDs for notification ids ([#16109](https://github.com/laravel/framework/pull/16109))
+
+### Fixed
+- Don't hydrate files in `Validator` ([#16105](https://github.com/laravel/framework/pull/16105))
+
+### Removed
+- Removed `-q` shortcut from `make:listener` command ([#16110](https://github.com/laravel/framework/pull/16110))
+
+
 ## v5.3.20 (2016-10-25)
 
 ### Added
