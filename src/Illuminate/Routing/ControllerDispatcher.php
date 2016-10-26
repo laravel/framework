@@ -160,7 +160,7 @@ class ControllerDispatcher
      */
     protected function call($instance, $route, $method)
     {
-        if (!in_array($method, get_class_methods($instance))) {
+        if (! in_array($method, get_class_methods($instance))) {
             throw new BadMethodCallException("Method [$method] does not exist.");
         }
 
