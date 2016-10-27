@@ -1914,7 +1914,7 @@ class Validator implements ValidatorContract
     }
 
     /**
-     * Run after, before not_after or not_before validation depending on given rule
+     * Run after, before not_after or not_before validation depending on given rule.
      *
      * @param string $attribute
      * @param mixed $value
@@ -1932,7 +1932,7 @@ class Validator implements ValidatorContract
         }
 
         if ($format = $this->getDateFormat($attribute)) {
-            return $this->{'validate' . Str::studly($rule). 'WithFormat'}($format, $value, $parameters);
+            return $this->{'validate'.Str::studly($rule).'WithFormat'}($format, $value, $parameters);
         }
 
         if (! $date = $this->getDateTimestamp($parameters[0])) {
@@ -1943,7 +1943,7 @@ class Validator implements ValidatorContract
         if ($dateTimestamp === false || $date === false) {
             return false;
         }
-        
+
         switch ($rule) {
             case 'after':
                 return $this->getDateTimestamp($value) > $date;
@@ -1954,7 +1954,7 @@ class Validator implements ValidatorContract
             case 'not_after':
                 return $this->getDateTimestamp($value) <= $date;
         }
-        
+
         return false;
     }
 
@@ -2003,9 +2003,9 @@ class Validator implements ValidatorContract
         $before = $this->getDateTimeWithOptionalFormat($format, $before);
 
         $after = $this->getDateTimeWithOptionalFormat($format, $after);
-        
+
         if ($allowEqual) {
-            return ($before && $after) && ($after >= $before); 
+            return ($before && $after) && ($after >= $before);
         }
 
         return ($before && $after) && ($after > $before);
