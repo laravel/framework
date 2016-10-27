@@ -779,7 +779,6 @@ class Validator implements ValidatorContract
                 return (string) $value->getPath() != '';
             default:
                 return true;
-                break;
         }
     }
 
