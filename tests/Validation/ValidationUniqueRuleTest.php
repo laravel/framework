@@ -8,7 +8,6 @@ class ValidationUniqueRuleTest extends PHPUnit_Framework_TestCase
         $rule->where('foo', 'bar');
         $this->assertEquals('unique:table,NULL,NULL,id,foo,bar', (string) $rule);
 
-
         $rule = new Illuminate\Validation\Rules\Unique('table', 'column');
         $rule->ignore(1, 'id_column');
         $rule->where('foo', 'bar');
