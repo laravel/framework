@@ -1424,7 +1424,6 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v->setPresenceVerifier($mock);
         $this->assertTrue($v->passes());
 
-
         $trans = $this->getIlluminateArrayTranslator();
         $closure = function () {
         };
