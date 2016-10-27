@@ -30,7 +30,7 @@ interface Store
      * @param  float|int  $minutes
      * @return void
      */
-    public function put($key, $value, $minutes);
+    public function put($key, $value, $minutes = 10);
 
     /**
      * Store multiple items in the cache for a given number of minutes.
@@ -39,7 +39,7 @@ interface Store
      * @param  float|int  $minutes
      * @return void
      */
-    public function putMany(array $values, $minutes);
+    public function putMany(array $values, $minutes = 10);
 
     /**
      * Increment the value of an item in the cache.
