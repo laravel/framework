@@ -1850,21 +1850,20 @@ class Validator implements ValidatorContract
      */
     protected function validateBefore($attribute, $value, $parameters)
     {
-        $this->requireParameterCount(1, $parameters, 'before');
+        return $this->runAfterOrBeforeValidation($attribute, $value, $parameters, 'before');
+    }
 
-        if (! is_string($value) && ! is_numeric($value) && ! $value instanceof DateTimeInterface) {
-            return false;
-        }
-
-        if ($format = $this->getDateFormat($attribute)) {
-            return $this->validateBeforeWithFormat($format, $value, $parameters);
-        }
-
-        if (! $date = $this->getDateTimestamp($parameters[0])) {
-            $date = $this->getDateTimestamp($this->getValue($parameters[0]));
-        }
-
-        return $this->getDateTimestamp($value) < $date;
+    /**
+     * Validate the date is not before a given date.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @param  array   $parameters
+     * @return bool
+     */
+    protected function validateNotBefore($attribute, $value, $parameters)
+    {
+        return $this->runAfterOrBeforeValidation($attribute, $value, $parameters, 'not_before');
     }
 
     /**
@@ -1883,6 +1882,21 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Validate the date is not before a given date with a given format.
+     *
+     * @param  string  $format
+     * @param  mixed   $value
+     * @param  array   $parameters
+     * @return bool
+     */
+    protected function validateNotBeforeWithFormat($format, $value, $parameters)
+    {
+        $param = $this->getValue($parameters[0]) ?: $parameters[0];
+
+        return $this->checkDateTimeOrder($format, $param, $value, true);
+    }
+
+    /**
      * Validate the date is after a given date.
      *
      * @param  string  $attribute
@@ -1892,21 +1906,65 @@ class Validator implements ValidatorContract
      */
     protected function validateAfter($attribute, $value, $parameters)
     {
-        $this->requireParameterCount(1, $parameters, 'after');
+        return $this->runAfterOrBeforeValidation($attribute, $value, $parameters, 'after');
+    }
+
+    /**
+     * Validate the date is not after a given date.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @param  array   $parameters
+     * @return bool
+     */
+    protected function validateNotAfter($attribute, $value, $parameters)
+    {
+        return $this->runAfterOrBeforeValidation($attribute, $value, $parameters, 'not_after');
+    }
+
+    /**
+     * Run after, before not_after or not_before validation depending on given rule.
+     *
+     * @param string $attribute
+     * @param mixed $value
+     * @param array $parameters
+     * @param string $rule
+     *
+     * @return bool
+     */
+    protected function runAfterOrBeforeValidation($attribute, $value, $parameters, $rule)
+    {
+        $this->requireParameterCount(1, $parameters, $rule);
 
         if (! is_string($value) && ! is_numeric($value) && ! $value instanceof DateTimeInterface) {
             return false;
         }
 
         if ($format = $this->getDateFormat($attribute)) {
-            return $this->validateAfterWithFormat($format, $value, $parameters);
+            return $this->{'validate'.Str::studly($rule).'WithFormat'}($format, $value, $parameters);
         }
 
         if (! $date = $this->getDateTimestamp($parameters[0])) {
             $date = $this->getDateTimestamp($this->getValue($parameters[0]));
         }
 
-        return $this->getDateTimestamp($value) > $date;
+        $dateTimestamp = $this->getDateTimestamp($value);
+        if ($dateTimestamp === false || $date === false) {
+            return false;
+        }
+
+        switch ($rule) {
+            case 'after':
+                return $this->getDateTimestamp($value) > $date;
+            case 'not_before':
+                return $this->getDateTimestamp($value) >= $date;
+            case 'before':
+                return $this->getDateTimestamp($value) < $date;
+            case 'not_after':
+                return $this->getDateTimestamp($value) <= $date;
+        }
+
+        return false;
     }
 
     /**
@@ -1925,18 +1983,39 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Validate the date is not after a given date with a given format.
+     *
+     * @param  string  $format
+     * @param  mixed   $value
+     * @param  array   $parameters
+     * @return bool
+     */
+    protected function validateNotAfterWithFormat($format, $value, $parameters)
+    {
+        $param = $this->getValue($parameters[0]) ?: $parameters[0];
+
+        return $this->checkDateTimeOrder($format, $value, $param, true);
+    }
+
+    /**
      * Given two date/time strings, check that one is after the other.
      *
      * @param  string  $format
      * @param  string  $before
      * @param  string  $after
+     * @param  bool  $allowEqual
+     *
      * @return bool
      */
-    protected function checkDateTimeOrder($format, $before, $after)
+    protected function checkDateTimeOrder($format, $before, $after, $allowEqual = false)
     {
         $before = $this->getDateTimeWithOptionalFormat($format, $before);
 
         $after = $this->getDateTimeWithOptionalFormat($format, $after);
+
+        if ($allowEqual) {
+            return ($before && $after) && ($after >= $before);
+        }
 
         return ($before && $after) && ($after > $before);
     }
