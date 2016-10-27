@@ -2,7 +2,10 @@
 
 namespace Illuminate\Broadcasting\Broadcasters;
 
+use ReflectionFunction;
+use ReflectionParameter;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Illuminate\Contracts\Broadcasting\Broadcaster as BroadcasterContract;
 
@@ -39,11 +42,11 @@ abstract class Broadcaster implements BroadcasterContract
     protected function verifyUserCanAccessChannel($request, $channel)
     {
         foreach ($this->channels as $pattern => $callback) {
-            if (! Str::is($pattern, $channel)) {
+            if (! Str::is(preg_replace('/\{(.*?)\}/', '*', $pattern), $channel)) {
                 continue;
             }
 
-            $parameters = $this->extractAuthParameters($pattern, $channel);
+            $parameters = $this->extractAuthParameters($pattern, $channel, $callback);
 
             if ($result = $callback($request->user(), ...$parameters)) {
                 return $this->validAuthenticationResponse($request, $result);
@@ -58,23 +61,29 @@ abstract class Broadcaster implements BroadcasterContract
      *
      * @param  string  $pattern
      * @param  string  $channel
+     * @param  callable  $callback
      * @return array
      */
-    protected function extractAuthParameters($pattern, $channel)
+    protected function extractAuthParameters($pattern, $channel, $callback)
     {
-        if (! Str::contains($pattern, '*')) {
-            return [];
+        $parameters = [];
+
+        $pattern = preg_replace('/\{(.*?)\}/', '([^\.]+)', $pattern);
+
+        preg_match('/^'.$pattern.'/', $channel, $keys);
+
+        $callbackParameters = (new ReflectionFunction($callback))->getParameters();
+
+        foreach ($callbackParameters as $parameter) {
+            if ($parameter->getPosition() === 0) {
+                continue;
+            }
+
+            $parameters[] = ! isset($keys[$parameter->getPosition()])
+                            ? null : $this->getAuthParameterFromKeys($parameter, $keys);
         }
 
-        $pattern = str_replace('\*', '([^\.]+)', preg_quote($pattern));
-
-        if (preg_match('/^'.$pattern.'/', $channel, $keys)) {
-            array_shift($keys);
-
-            return $keys;
-        }
-
-        return [];
+        return $parameters;
     }
 
     /**
@@ -88,5 +97,25 @@ abstract class Broadcaster implements BroadcasterContract
         return array_map(function ($channel) {
             return (string) $channel;
         }, $channels);
+    }
+
+    /**
+     * Extract a parameter from the given keys.
+     *
+     * @param  ReflectionParameter  $parameter
+     * @param  array  $keys
+     * @return mixed
+     */
+    protected function getAuthParameterFromKeys($parameter, $keys)
+    {
+        $key = $keys[$parameter->getPosition()];
+
+        if ($parameter->getClass() && $parameter->getClass()->isSubclassOf(Model::class)) {
+            $model = $parameter->getClass()->newInstance();
+
+            return $model->where($model->getRouteKeyName(), $key)->first();
+        }
+
+        return $key;
     }
 }
