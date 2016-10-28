@@ -238,9 +238,21 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($model->save());
     }
 
+    public function testEventsCanBeFiredWithCustomEventObjects()
+    {
+        $model = $this->getMockBuilder('EloquentModelEventObjectStub')->setMethods(['newQueryWithoutScopes'])->getMock();
+        $query = m::mock('Illuminate\Database\Eloquent\Builder');
+        $model->expects($this->once())->method('newQueryWithoutScopes')->will($this->returnValue($query));
+        $model->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
+        $events->shouldReceive('until')->once()->with(m::type(EloquentModelSavingEventStub::class))->andReturn(false);
+        $model->exists = true;
+
+        $this->assertFalse($model->save());
+    }
+
     public function testUpdateProcessWithoutTimestamps()
     {
-        $model = $this->getMockBuilder('EloquentModelStub')->setMethods(['newQueryWithoutScopes', 'updateTimestamps', 'fireModelEvent'])->getMock();
+        $model = $this->getMockBuilder('EloquentModelEventObjectStub')->setMethods(['newQueryWithoutScopes', 'updateTimestamps', 'fireModelEvent'])->getMock();
         $model->timestamps = false;
         $query = m::mock('Illuminate\Database\Eloquent\Builder');
         $query->shouldReceive('where')->once()->with('id', '=', 1);
@@ -1803,4 +1815,13 @@ class EloquentModelNonIncrementingStub extends Illuminate\Database\Eloquent\Mode
     protected $table = 'stub';
     protected $guarded = [];
     public $incrementing = false;
+}
+
+class EloquentModelSavingEventStub {}
+
+class EloquentModelEventObjectStub extends Illuminate\Database\Eloquent\Model
+{
+    protected $events = [
+        'saving' => EloquentModelSavingEventStub::class
+    ];
 }
