@@ -1168,7 +1168,9 @@ class BelongsToMany extends Relation
         // given all of the association ties will be broken.
 
         if ($ids !== NULL) {
-            if(count($ids) == 0) return 0;
+            if(count($ids) == 0) {
+                return 0;
+            }
             $query->whereIn($this->otherKey, (array) $ids);
         }
 
