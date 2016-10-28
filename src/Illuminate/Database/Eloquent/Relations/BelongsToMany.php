@@ -1172,7 +1172,7 @@ class BelongsToMany extends Relation
             if (count($ids) == 0) {
                 return 0;
             }
-            
+
             $query->whereIn($this->otherKey, (array) $ids);
         }
 
@@ -1189,7 +1189,6 @@ class BelongsToMany extends Relation
         // We'll then return the numbers of affected rows.
         return $results;
     }
-
 
     /**
      * If we're touching the parent model, touch.
