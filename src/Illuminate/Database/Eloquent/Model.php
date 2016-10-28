@@ -169,6 +169,15 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected $touches = [];
 
     /**
+     * The event map for the model.
+     *
+     * Allows for object-based events for native Eloquent events.
+     *
+     * @var array
+     */
+    protected $events = [];
+
+    /**
      * User exposed observable events.
      *
      * @var array
@@ -1655,12 +1664,21 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return true;
         }
 
+        $method = $halt ? 'until' : 'fire';
+
+        // If a custom event type has been configured for this event we'll fire that
+        // instead of the string version of the event. This provides for a custom
+        // "object-based" event more consistent with the rest of the framework.
+        if (isset($this->events[$event])) {
+            return static::$dispatcher->$method(
+                new $this->events[$event]($this)
+            );
+        }
+
         // We will append the names of the class to the event to distinguish it from
         // other model events that are fired, allowing us to listen on each model
         // event set individually instead of catching event for all the models.
         $event = "eloquent.{$event}: ".static::class;
-
-        $method = $halt ? 'until' : 'fire';
 
         return static::$dispatcher->$method($event, $this);
     }
