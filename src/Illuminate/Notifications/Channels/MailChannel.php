@@ -59,7 +59,7 @@ class MailChannel
                 $m->to($recipients);
             }
 
-            if ( $message->cc ) {
+            if ($message->cc) {
                 $m->cc($message->cc);
             }
 
