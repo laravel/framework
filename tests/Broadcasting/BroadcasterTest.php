@@ -37,7 +37,7 @@ class BroadcasterTest extends PHPUnit_Framework_TestCase
         $parameters = $broadcaster->extractAuthParameters('asd', 'asd', $callback);
         $this->assertEquals([], $parameters);
 
-        /**
+        /*
          * Test Explicit Binding...
          */
         $container = new Container;
