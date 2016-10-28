@@ -110,7 +110,7 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
 
             $mock->shouldReceive('to')->never();
 
-            $mock->shouldReceive('bcc')->with(['taylor@laravel.com', 'jeffrey@laracasts.com']);
+            $mock->shouldReceive('cc')->with(['taylor@laravel.com', 'jeffrey@laracasts.com']);
 
             $closure($mock);
 
