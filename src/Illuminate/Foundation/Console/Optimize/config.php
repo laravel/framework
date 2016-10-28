@@ -20,6 +20,7 @@ return [
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Cookie/QueueingFactory.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Encryption/Encrypter.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Queue/QueueableEntity.php',
+    $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Routing/BindingRegistrar.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Routing/Registrar.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Routing/ResponseFactory.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Routing/UrlGenerator.php',
