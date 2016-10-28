@@ -1817,11 +1817,13 @@ class EloquentModelNonIncrementingStub extends Illuminate\Database\Eloquent\Mode
     public $incrementing = false;
 }
 
-class EloquentModelSavingEventStub {}
+class EloquentModelSavingEventStub
+{
+}
 
 class EloquentModelEventObjectStub extends Illuminate\Database\Eloquent\Model
 {
     protected $events = [
-        'saving' => EloquentModelSavingEventStub::class
+        'saving' => EloquentModelSavingEventStub::class,
     ];
 }
