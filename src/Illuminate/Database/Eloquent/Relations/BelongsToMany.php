@@ -1148,7 +1148,6 @@ class BelongsToMany extends Relation
      *
      * @param  mixed  $ids
      * @param  bool  $touch
-     *
      * @return int
      */
     public function detach($ids = null, $touch = true)
@@ -1167,7 +1166,6 @@ class BelongsToMany extends Relation
         // associations, if it's an empty collection or array, code
         // will not continue and return zero. If no argument is
         // given all of the association ties will be broken.
-
         if ($ids !== null) {
             if (count($ids) == 0) {
                 return 0;
@@ -1179,7 +1177,6 @@ class BelongsToMany extends Relation
         // Once we have all of the conditions set on the statement, we are ready
         // to run the delete on the pivot table. Then, if the touch parameter
         // is true, we will go ahead and touch all related models to sync.
-
         $results = $query->delete();
 
         if ($touch) {
