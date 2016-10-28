@@ -106,6 +106,22 @@ class RoutingRedirectorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('http://foo.com/bar', $response->getTargetUrl());
     }
 
+    public function testBackRedirectToFallback()
+    {
+        $this->headers->shouldReceive('has')->with('referer')->andReturn(false);
+        $this->url->shouldReceive('previous')->with('http://foo.com/fallback')->andReturn('http://foo.com/fallback');
+        $response = $this->redirect->back(302, [], 'http://foo.com/fallback');
+        $this->assertEquals('http://foo.com/fallback', $response->getTargetUrl());
+    }
+
+    public function testBackRedirectToIndex()
+    {
+        $this->headers->shouldReceive('has')->with('referer')->andReturn(false);
+        $this->url->shouldReceive('previous')->with(false)->andReturn('/');
+        $response = $this->redirect->back();
+        $this->assertEquals('/', $response->getTargetUrl());
+    }
+
     public function testAwayDoesntValidateTheUrl()
     {
         $response = $this->redirect->away('bar');
