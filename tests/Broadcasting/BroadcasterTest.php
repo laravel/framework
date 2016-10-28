@@ -1,7 +1,9 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Routing\BindingRegistrar;
 use Illuminate\Broadcasting\Broadcasters\Broadcaster;
 
 class BroadcasterTest extends PHPUnit_Framework_TestCase
@@ -22,7 +24,7 @@ class BroadcasterTest extends PHPUnit_Framework_TestCase
 
         $callback = function ($user, BroadcasterTestEloquentModelStub $model, BroadcasterTestEloquentModelStub $model2, $something) {
         };
-        $parameters = $broadcaster->extractAuthParameters('asd.{model}.{model}.{nonModel}', 'asd.1.uid.something', $callback);
+        $parameters = $broadcaster->extractAuthParameters('asd.{model}.{model2}.{nonModel}', 'asd.1.uid.something', $callback);
         $this->assertEquals(['model.1.instance', 'model.uid.instance', 'something'], $parameters);
 
         $callback = function ($user) {
@@ -33,12 +35,34 @@ class BroadcasterTest extends PHPUnit_Framework_TestCase
         $callback = function ($user, $something) {
         };
         $parameters = $broadcaster->extractAuthParameters('asd', 'asd', $callback);
-        $this->assertEquals([null], $parameters);
+        $this->assertEquals([], $parameters);
 
+        /**
+         * Test Explicit Binding...
+         */
+        $container = new Container;
+        Container::setInstance($container);
+        $binder = m::mock(BindingRegistrar::class);
+        $binder->shouldReceive('getBindingCallback')->with('model')->andReturn(function () {
+            return 'bound';
+        });
+        $container->instance(BindingRegistrar::class, $binder);
+        $callback = function ($user, $model) {
+        };
+        $parameters = $broadcaster->extractAuthParameters('something.{model}', 'something.1', $callback);
+        $this->assertEquals(['bound'], $parameters);
+        Container::setInstance(new Container);
+    }
+
+    /**
+     * @expectedException Symfony\Component\HttpKernel\Exception\HttpException
+     */
+    public function testNotFoundThrowsHttpException()
+    {
+        $broadcaster = new FakeBroadcaster();
         $callback = function ($user, BroadcasterTestEloquentModelNotFoundStub $model) {
         };
         $parameters = $broadcaster->extractAuthParameters('asd.{model}', 'asd.1', $callback);
-        $this->assertEquals([null], $parameters);
     }
 }
 
@@ -76,7 +100,7 @@ class BroadcasterTestEloquentModelStub extends Model
         return $this;
     }
 
-    public function first()
+    public function firstOr()
     {
         return "model.{$this->value}.instance";
     }
@@ -96,7 +120,8 @@ class BroadcasterTestEloquentModelNotFoundStub extends Model
         return $this;
     }
 
-    public function first()
+    public function firstOr($callback)
     {
+        return call_user_func($callback);
     }
 }
