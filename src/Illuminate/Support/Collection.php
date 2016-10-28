@@ -375,6 +375,77 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Filter items where the given key's content is like the value.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return static
+     */
+    public function like($key, $value = null)
+    {
+        return $this->filter($this->callbackForLike($key, 'like', $value));
+    }
+
+    /**
+     * Filter items where the given key's content is like the value while considering case.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return static
+     */
+    public function likeCaseSensitive($key, $value = null)
+    {
+        return $this->filter($this->callbackForLike($key, 'likecs', $value));
+    }
+
+    /**
+     * Filter items where the given key's content is not like the value.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return static
+     */
+    public function notLike($key, $value = null)
+    {
+        return $this->filter($this->callbackForLike($key, 'notlike', $value));
+    }
+
+    /**
+     * Filter items where the given key's content is not like the value while considering case.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return static
+     */
+    public function notLikeCaseSensitive($key, $value = null)
+    {
+        return $this->filter($this->callbackForLike($key, 'notlikecs', $value));
+    }
+
+    /**
+     * Get an like checker callback.
+     *
+     * @param  string $key
+     * @param string $comparison
+     * @param  mixed $value
+     * @return \Closure
+     */
+    protected function callbackForLike($key, $comparison, $value)
+    {
+        return $callback = function ($item) use ($key, $comparison, $value) {
+            $retrieved = data_get($item, $key);
+
+            switch ($comparison) {
+                default:
+                case 'like': return mb_stripos($retrieved, $value) !== false;
+                case 'notlike': return mb_stripos($retrieved, $value) === false;
+                case 'likecs': return mb_strpos($retrieved, $value) !== false;
+                case 'notlikecs': return mb_strpos($retrieved, $value) === false;
+            }
+        };
+    }
+
+    /**
      * Get the first item from the collection.
      *
      * @param  callable|null  $callback
