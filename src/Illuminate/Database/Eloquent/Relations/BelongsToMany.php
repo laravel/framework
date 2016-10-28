@@ -1148,6 +1148,7 @@ class BelongsToMany extends Relation
      *
      * @param  mixed  $ids
      * @param  bool  $touch
+     *
      * @return int
      */
     public function detach($ids = null, $touch = true)
@@ -1167,8 +1168,8 @@ class BelongsToMany extends Relation
         // will not continue and return zero. If no argument is
         // given all of the association ties will be broken.
 
-        if ($ids !== NULL) {
-            if(count($ids) == 0) {
+        if ($ids !== null) {
+            if (count($ids) == 0) {
                 return 0;
             }
             
