@@ -54,7 +54,7 @@ class MailChannel
             }
 
             if (is_array($recipients)) {
-                $m->bcc($recipients);
+                $m->cc($recipients);
             } else {
                 $m->to($recipients);
             }
