@@ -197,6 +197,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public $wasRecentlyCreated = false;
 
     /**
+     * Indicates if the model was updated during the current request lifecycle.
+     *
+     * @var bool
+     */
+    public $wasRecentlyUpdated = false;
+
+    /**
      * Indicates whether attributes are snake cased on arrays.
      *
      * @var bool
@@ -1541,6 +1548,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         if (count($dirty) > 0) {
             $this->setKeysForSaveQuery($query)->update($dirty);
+
+            $this->wasRecentlyUpdated = true;
 
             $this->fireModelEvent('updated', false);
         }
