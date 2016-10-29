@@ -49,6 +49,12 @@ class ModelMakeCommand extends GeneratorCommand
             ]);
         }
 
+        if ($this->option('seeder')) {
+            $seeder = Str::plural(Str::studly(class_basename($this->argument('name'))));
+
+            $this->call('make:seeder', ['name' => "{$seeder}Seeder"]);
+        }
+
         if ($this->option('controller')) {
             $controller = Str::studly(class_basename($this->argument('name')));
 
@@ -89,6 +95,8 @@ class ModelMakeCommand extends GeneratorCommand
     {
         return [
             ['migration', 'm', InputOption::VALUE_NONE, 'Create a new migration file for the model.'],
+
+            ['seeder', 's', InputOption::VALUE_NONE, 'Create a new Seeder class for the model.'],
 
             ['controller', 'c', InputOption::VALUE_NONE, 'Create a new controller for the model.'],
 
