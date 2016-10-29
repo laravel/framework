@@ -603,7 +603,7 @@ trait InteractsWithPages
             $buttonText = null;
         }
 
-        $form =  $this->getForm($buttonText);
+        $form = $this->getForm($buttonText);
 
         if ($disableValidation) {
             $form = $form->disableValidation();
