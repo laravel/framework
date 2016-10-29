@@ -2,7 +2,7 @@
 
 namespace Illuminate\Database\Connectors;
 
-use PDO;
+
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Illuminate\Database\MySqlConnection;
