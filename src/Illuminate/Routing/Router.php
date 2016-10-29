@@ -12,13 +12,14 @@ use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Routing\BindingRegistrar;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Illuminate\Contracts\Routing\Registrar as RegistrarContract;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
-class Router implements RegistrarContract
+class Router implements RegistrarContract, BindingRegistrar
 {
     use Macroable;
 
@@ -953,6 +954,19 @@ class Router implements RegistrarContract
         }
 
         $this->binders[str_replace('-', '_', $key)] = $binder;
+    }
+
+    /**
+     * Get the binding callback for a given binding.
+     *
+     * @param  string  $key
+     * @return \Closure|null
+     */
+    public function getBindingCallback($key)
+    {
+        if (isset($this->binders[$key = str_replace('-', '_', $key)])) {
+            return $this->binders[$key];
+        }
     }
 
     /**

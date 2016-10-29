@@ -5,7 +5,7 @@ namespace Illuminate\Validation;
 use Closure;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Container\Container;
-use Symfony\Component\Translation\TranslatorInterface;
+use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Validation\Factory as FactoryContract;
 
 class Factory implements FactoryContract
@@ -13,7 +13,7 @@ class Factory implements FactoryContract
     /**
      * The Translator implementation.
      *
-     * @var \Symfony\Component\Translation\TranslatorInterface
+     * @var \Illuminate\Contracts\Translation\Translator
      */
     protected $translator;
 
@@ -69,11 +69,11 @@ class Factory implements FactoryContract
     /**
      * Create a new Validator factory instance.
      *
-     * @param  \Symfony\Component\Translation\TranslatorInterface  $translator
+     * @param  \Illuminate\Contracts\Translation\Translator $translator
      * @param  \Illuminate\Contracts\Container\Container  $container
      * @return void
      */
-    public function __construct(TranslatorInterface $translator, Container $container = null)
+    public function __construct(Translator $translator, Container $container = null)
     {
         $this->container = $container;
         $this->translator = $translator;
@@ -227,7 +227,7 @@ class Factory implements FactoryContract
     /**
      * Get the Translator implementation.
      *
-     * @return \Symfony\Component\Translation\TranslatorInterface
+     * @return \Illuminate\Contracts\Translation\Translator
      */
     public function getTranslator()
     {

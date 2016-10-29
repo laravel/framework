@@ -232,15 +232,16 @@ class Builder
      * Get the first record matching the attributes or instantiate it.
      *
      * @param  array  $attributes
+     * @param  array  $values
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function firstOrNew(array $attributes)
+    public function firstOrNew(array $attributes, array $values = [])
     {
         if (! is_null($instance = $this->where($attributes)->first())) {
             return $instance;
         }
 
-        return $this->model->newInstance($attributes)->setConnection(
+        return $this->model->newInstance($attributes + $values)->setConnection(
             $this->query->getConnection()->getName()
         );
     }
@@ -309,6 +310,28 @@ class Builder
         }
 
         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    }
+
+    /**
+     * Execute the query and get the first result or call a callback.
+     *
+     * @param  \Closure|array  $columns
+     * @param  \Closure|null  $callback
+     * @return \Illuminate\Database\Eloquent\Model|static|mixed
+     */
+    public function firstOr($columns = ['*'], Closure $callback = null)
+    {
+        if ($columns instanceof Closure) {
+            $callback = $columns;
+
+            $columns = ['*'];
+        }
+
+        if (! is_null($model = $this->first($columns))) {
+            return $model;
+        }
+
+        return call_user_func($callback);
     }
 
     /**

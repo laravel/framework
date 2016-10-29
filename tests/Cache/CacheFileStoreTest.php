@@ -120,10 +120,23 @@ class CacheFileStoreTest extends PHPUnit_Framework_TestCase
         $files = $this->mockFilesystem();
         $files->expects($this->once())->method('isDirectory')->with($this->equalTo(__DIR__))->will($this->returnValue(true));
         $files->expects($this->once())->method('directories')->with($this->equalTo(__DIR__))->will($this->returnValue(['foo']));
-        $files->expects($this->once())->method('deleteDirectory')->with($this->equalTo('foo'));
+        $files->expects($this->once())->method('deleteDirectory')->with($this->equalTo('foo'))->will($this->returnValue(true));
 
         $store = new FileStore($files, __DIR__);
-        $store->flush();
+        $result = $store->flush();
+        $this->assertTrue($result, 'Flush failed');
+    }
+
+    public function testFlushFailsDirectoryClean()
+    {
+        $files = $this->mockFilesystem();
+        $files->expects($this->once())->method('isDirectory')->with($this->equalTo(__DIR__))->will($this->returnValue(true));
+        $files->expects($this->once())->method('directories')->with($this->equalTo(__DIR__))->will($this->returnValue(['foo']));
+        $files->expects($this->once())->method('deleteDirectory')->with($this->equalTo('foo'))->will($this->returnValue(false));
+
+        $store = new FileStore($files, __DIR__);
+        $result = $store->flush();
+        $this->assertFalse($result, 'Flush should not have cleared directories');
     }
 
     public function testFlushIgnoreNonExistingDirectory()
@@ -132,7 +145,8 @@ class CacheFileStoreTest extends PHPUnit_Framework_TestCase
         $files->expects($this->once())->method('isDirectory')->with($this->equalTo(__DIR__.'--wrong'))->will($this->returnValue(false));
 
         $store = new FileStore($files, __DIR__.'--wrong');
-        $store->flush();
+        $result = $store->flush();
+        $this->assertFalse($result, 'Flush should not clean directory');
     }
 
     protected function mockFilesystem()

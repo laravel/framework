@@ -4,6 +4,9 @@ class CacheMemcachedStoreTest extends PHPUnit_Framework_TestCase
 {
     public function testGetReturnsNullWhenNotFound()
     {
+        if (! class_exists('Memcached')) {
+            $this->markTestSkipped('Memcached module not installed');
+        }
         $memcache = $this->getMockBuilder('StdClass')->setMethods(['get', 'getResultCode'])->getMock();
         $memcache->expects($this->once())->method('get')->with($this->equalTo('foo:bar'))->will($this->returnValue(null));
         $memcache->expects($this->once())->method('getResultCode')->will($this->returnValue(1));
@@ -13,6 +16,9 @@ class CacheMemcachedStoreTest extends PHPUnit_Framework_TestCase
 
     public function testMemcacheValueIsReturned()
     {
+        if (! class_exists('Memcached')) {
+            $this->markTestSkipped('Memcached module not installed');
+        }
         $memcache = $this->getMockBuilder('StdClass')->setMethods(['get', 'getResultCode'])->getMock();
         $memcache->expects($this->once())->method('get')->will($this->returnValue('bar'));
         $memcache->expects($this->once())->method('getResultCode')->will($this->returnValue(0));
@@ -103,6 +109,19 @@ class CacheMemcachedStoreTest extends PHPUnit_Framework_TestCase
         $memcache->expects($this->once())->method('delete')->with($this->equalTo('foo'));
         $store = new Illuminate\Cache\MemcachedStore($memcache);
         $store->forget('foo');
+    }
+
+    public function testFlushesCached()
+    {
+        if (! class_exists('Memcached')) {
+            $this->markTestSkipped('Memcached module not installed');
+        }
+
+        $memcache = $this->getMockBuilder('Memcached')->setMethods(['flush'])->getMock();
+        $memcache->expects($this->once())->method('flush')->willReturn(true);
+        $store = new Illuminate\Cache\MemcachedStore($memcache);
+        $result = $store->flush();
+        $this->assertTrue($result);
     }
 
     public function testGetAndSetPrefix()
