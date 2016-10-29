@@ -56,7 +56,7 @@ class BroadcastNotificationCreated implements ShouldBroadcast
     {
         $channels = $this->notification->broadcastOn();
 
-        if (!empty($channels)) {
+        if (! empty($channels)) {
             return $channels;
         }
 
