@@ -22,4 +22,14 @@ trait HasDatabaseNotifications
                             ->whereNull('read_at')
                             ->orderBy('created_at', 'desc');
     }
+
+    /**
+     * Get the entity's read notifications.
+     */
+    public function readNotifications()
+    {
+        return $this->morphMany(DatabaseNotification::class, 'notifiable')
+                            ->whereNotNull('read_at')
+                            ->orderBy('created_at', 'desc');
+    }
 }
