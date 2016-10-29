@@ -560,11 +560,13 @@ trait InteractsWithPages
      * Submit a form using the button with the given text value.
      *
      * @param  string  $buttonText
+     * @param  bool  $disableValidation
+     *
      * @return $this
      */
-    protected function press($buttonText)
+    protected function press($buttonText, $disableValidation = false)
     {
-        return $this->submitForm($buttonText, $this->inputs, $this->uploads);
+        return $this->submitForm($buttonText, $this->inputs, $this->uploads, $disableValidation);
     }
 
     /**
@@ -573,11 +575,13 @@ trait InteractsWithPages
      * @param  string  $buttonText
      * @param  array  $inputs
      * @param  array  $uploads
+     * @param  bool  $disableValidation
+     *
      * @return $this
      */
-    protected function submitForm($buttonText, $inputs = [], $uploads = [])
+    protected function submitForm($buttonText, $inputs = [], $uploads = [], $disableValidation = false)
     {
-        $this->makeRequestUsingForm($this->fillForm($buttonText, $inputs), $uploads);
+        $this->makeRequestUsingForm($this->fillForm($buttonText, $inputs, $disableValidation), $uploads);
 
         return $this;
     }
@@ -587,9 +591,11 @@ trait InteractsWithPages
      *
      * @param  string  $buttonText
      * @param  array  $inputs
+     * @param  bool  $disableValidation
+     *
      * @return \Symfony\Component\DomCrawler\Form
      */
-    protected function fillForm($buttonText, $inputs = [])
+    protected function fillForm($buttonText, $inputs = [], $disableValidation = false)
     {
         if (! is_string($buttonText)) {
             $inputs = $buttonText;
@@ -597,7 +603,13 @@ trait InteractsWithPages
             $buttonText = null;
         }
 
-        return $this->getForm($buttonText)->setValues($inputs);
+        $form =  $this->getForm($buttonText);
+
+        if ($disableValidation) {
+            $form = $form->disableValidation();
+        }
+
+        return $form->setValues($inputs);
     }
 
     /**
