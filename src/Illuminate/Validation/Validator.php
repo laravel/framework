@@ -7,6 +7,7 @@ use DateTime;
 use Countable;
 use Exception;
 use DateTimeZone;
+use Illuminate\Contracts\Validation\Rule;
 use RuntimeException;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
@@ -236,6 +237,10 @@ class Validator implements ValidatorContract
     protected function explodeRules(array $rules)
     {
         foreach ($rules as $key => $rule) {
+            if ($rule instanceof Rule) {
+                $rule->apply($this, $key);
+            }
+
             if (Str::contains($key, '*')) {
                 $this->each($key, [$rule]);
 
