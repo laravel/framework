@@ -157,38 +157,36 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
     public function testChunkExecuteCallbackOverPaginatedRequest()
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[forPage,get]', [$this->getMockQueryBuilder()]);
+        $chunk1 = new Collection(['foo1', 'foo2']);
+        $chunk2 = new Collection(['foo3']);
         $builder->shouldReceive('forPage')->once()->with(1, 2)->andReturn($builder);
         $builder->shouldReceive('forPage')->once()->with(2, 2)->andReturn($builder);
-        $builder->shouldReceive('get')->times(2)->andReturn(new Collection(['foo1', 'foo2']), new Collection(['foo3']));
+        $builder->shouldReceive('get')->times(2)->andReturn($chunk1, $chunk2);
 
         $callbackExecutionAssertor = m::mock('StdClass');
-        $callbackExecutionAssertor->shouldReceive('doSomething')->with('foo1')->once();
-        $callbackExecutionAssertor->shouldReceive('doSomething')->with('foo2')->once();
-        $callbackExecutionAssertor->shouldReceive('doSomething')->with('foo3')->once();
+        $callbackExecutionAssertor->shouldReceive('doSomething')->with($chunk1)->once();
+        $callbackExecutionAssertor->shouldReceive('doSomething')->with($chunk2)->once();
 
         $builder->chunk(2, function ($results) use ($callbackExecutionAssertor) {
-            foreach ($results as $result) {
-                $callbackExecutionAssertor->doSomething($result);
-            }
+            $callbackExecutionAssertor->doSomething($results);
         });
     }
 
     public function testChunkCanBeStoppedByReturningFalse()
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[forPage,get]', [$this->getMockQueryBuilder()]);
+        $chunk1 = new Collection(['foo1', 'foo2']);
+        $chunk2 = new Collection(['foo3']);
         $builder->shouldReceive('forPage')->once()->with(1, 2)->andReturn($builder);
         $builder->shouldReceive('forPage')->never()->with(2, 2);
-        $builder->shouldReceive('get')->times(1)->andReturn(new Collection(['foo1', 'foo2']));
+        $builder->shouldReceive('get')->times(1)->andReturn($chunk1);
 
         $callbackExecutionAssertor = m::mock('StdClass');
-        $callbackExecutionAssertor->shouldReceive('doSomething')->with('foo1')->once();
-        $callbackExecutionAssertor->shouldReceive('doSomething')->with('foo2')->once();
-        $callbackExecutionAssertor->shouldReceive('doSomething')->with('foo3')->never();
+        $callbackExecutionAssertor->shouldReceive('doSomething')->with($chunk1)->once();
+        $callbackExecutionAssertor->shouldReceive('doSomething')->with($chunk2)->never();
 
         $builder->chunk(2, function ($results) use ($callbackExecutionAssertor) {
-            foreach ($results as $result) {
-                $callbackExecutionAssertor->doSomething($result);
-            }
+            $callbackExecutionAssertor->doSomething($results);
 
             return false;
         });
