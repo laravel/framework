@@ -23,6 +23,12 @@ class RedisConnectionTest extends PHPUnit_Framework_TestCase
 
     protected function getRedis($cluster = false)
     {
+        if (!class_exists('Predis\Client')) {
+            $this->markTestSkipped("Class 'Predis\\Client' not found");
+
+            return;
+        }
+        
         $servers = [
             'cluster' => $cluster,
             'default' => [
