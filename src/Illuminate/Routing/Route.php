@@ -275,7 +275,7 @@ class Route
      */
     public function gatherMiddleware()
     {
-        return collect(array_merge($this->middleware(), $this->controllerMiddleware()))->unique();
+        return array_unique(array_merge($this->middleware(), $this->controllerMiddleware()), SORT_REGULAR);
     }
 
     /**
