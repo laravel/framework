@@ -1808,8 +1808,9 @@ class Builder
     public function chunk($count, callable $callback)
     {
         $results = $this->forPage($page = 1, $count)->get();
+        $countResults = $results->count();
 
-        while (! $results->isEmpty()) {
+        while ($countResults > 0) {
             // On each chunk result set, we will pass them to the callback and then let the
             // developer take care of everything within the callback, which allows us to
             // keep the memory low for spinning through large result sets for working.
@@ -1817,9 +1818,14 @@ class Builder
                 return false;
             }
 
+            if ($countResults < $count) {
+                break;
+            }
+
             $page++;
 
             $results = $this->forPage($page, $count)->get();
+            $countResults = count($results);
         }
 
         return true;
