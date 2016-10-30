@@ -159,8 +159,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[forPage,get]', [$this->getMockQueryBuilder()]);
         $builder->shouldReceive('forPage')->once()->with(1, 2)->andReturn($builder);
         $builder->shouldReceive('forPage')->once()->with(2, 2)->andReturn($builder);
-        $builder->shouldReceive('forPage')->once()->with(3, 2)->andReturn($builder);
-        $builder->shouldReceive('get')->times(3)->andReturn(new Collection(['foo1', 'foo2']), new Collection(['foo3']), new Collection([]));
+        $builder->shouldReceive('get')->times(2)->andReturn(new Collection(['foo1', 'foo2']), new Collection(['foo3']));
 
         $callbackExecutionAssertor = m::mock('StdClass');
         $callbackExecutionAssertor->shouldReceive('doSomething')->with('foo1')->once();
