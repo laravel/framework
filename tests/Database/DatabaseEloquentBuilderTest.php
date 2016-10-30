@@ -154,7 +154,28 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertNull($builder->value('name'));
     }
 
-    public function testChunkExecuteCallbackOverPaginatedRequest()
+    public function testChunkWithLastChunkComplete()
+    {
+        $builder = m::mock('Illuminate\Database\Eloquent\Builder[forPage,get]', [$this->getMockQueryBuilder()]);
+        $chunk1 = new Collection(['foo1', 'foo2']);
+        $chunk2 = new Collection(['foo3', 'foo4']);
+        $chunk3 = new Collection([]);
+        $builder->shouldReceive('forPage')->once()->with(1, 2)->andReturn($builder);
+        $builder->shouldReceive('forPage')->once()->with(2, 2)->andReturn($builder);
+        $builder->shouldReceive('forPage')->once()->with(3, 2)->andReturn($builder);
+        $builder->shouldReceive('get')->times(3)->andReturn($chunk1, $chunk2, $chunk3);
+
+        $callbackExecutionAssertor = m::mock('StdClass');
+        $callbackExecutionAssertor->shouldReceive('doSomething')->with($chunk1)->once();
+        $callbackExecutionAssertor->shouldReceive('doSomething')->with($chunk2)->once();
+        $callbackExecutionAssertor->shouldReceive('doSomething')->with($chunk3)->never();
+
+        $builder->chunk(2, function ($results) use ($callbackExecutionAssertor) {
+            $callbackExecutionAssertor->doSomething($results);
+        });
+    }
+
+    public function testChunkWithLastChunkPartial()
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[forPage,get]', [$this->getMockQueryBuilder()]);
         $chunk1 = new Collection(['foo1', 'foo2']);
