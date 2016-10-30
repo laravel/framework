@@ -27,6 +27,12 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
+        if (!class_exists('Predis\Client')) {
+            $this->markTestSkipped("Class 'Predis\\Client' not found");
+
+            return;
+        }
+        
         $host = getenv('REDIS_HOST') ?: '127.0.0.1';
         $port = getenv('REDIS_PORT') ?: 6379;
 
