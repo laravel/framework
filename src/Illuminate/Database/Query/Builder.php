@@ -1841,21 +1841,24 @@ class Builder
      */
     public function chunkById($count, callable $callback, $column = 'id', $alias = null)
     {
-        $lastId = null;
-
         $alias = $alias ?: $column;
 
-        $results = $this->forPageAfterId($count, 0, $column)->get();
+        $lastId = 0;
 
-        while (! $results->isEmpty()) {
+        do {
+            $results = $this->forPageAfterId($count, $lastId, $column)->get();
+            $countResults = $results->count();
+
+            if ($countResults == 0) {
+                break;
+            }
+
             if (call_user_func($callback, $results) === false) {
                 return false;
             }
 
             $lastId = $results->last()->{$alias};
-
-            $results = $this->forPageAfterId($count, $lastId, $column)->get();
-        }
+        } while ($countResults == $count);
 
         return true;
     }

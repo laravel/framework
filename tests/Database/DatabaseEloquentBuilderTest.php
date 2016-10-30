@@ -213,17 +213,32 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         });
     }
 
-    public function testChunkPaginatesUsingId()
+    public function testChunkPaginatesUsingIdWithLastChunkComplete()
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[forPageAfterId,get]', [$this->getMockQueryBuilder()]);
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'someIdField')->andReturn($builder);
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 2, 'someIdField')->andReturn($builder);
-        $builder->shouldReceive('forPageAfterId')->once()->with(2, 10, 'someIdField')->andReturn($builder);
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 11, 'someIdField')->andReturn($builder);
 
         $builder->shouldReceive('get')->times(3)->andReturn(
             new Collection([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]),
-            new Collection([(object) ['someIdField' => 10]]),
+            new Collection([(object) ['someIdField' => 10], (object) ['someIdField' => 11]]),
             new Collection([])
+        );
+
+        $builder->chunkById(2, function ($results) {
+        }, 'someIdField');
+    }
+
+    public function testChunkPaginatesUsingIdWithLastChunkPartial()
+    {
+        $builder = m::mock('Illuminate\Database\Eloquent\Builder[forPageAfterId,get]', [$this->getMockQueryBuilder()]);
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'someIdField')->andReturn($builder);
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 2, 'someIdField')->andReturn($builder);
+
+        $builder->shouldReceive('get')->times(2)->andReturn(
+            new Collection([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]),
+            new Collection([(object) ['someIdField' => 10]])
         );
 
         $builder->chunkById(2, function ($results) {

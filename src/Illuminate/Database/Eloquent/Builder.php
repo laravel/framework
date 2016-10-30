@@ -404,19 +404,22 @@ class Builder
      */
     public function chunkById($count, callable $callback, $column = 'id')
     {
-        $lastId = null;
+        $lastId = 0;
 
-        $results = $this->forPageAfterId($count, 0, $column)->get();
+        do {
+            $results = $this->forPageAfterId($count, $lastId, $column)->get();
+            $countResults = $results->count();
 
-        while (! $results->isEmpty()) {
+            if ($countResults == 0) {
+                break;
+            }
+
             if (call_user_func($callback, $results) === false) {
                 return false;
             }
 
             $lastId = $results->last()->{$column};
-
-            $results = $this->forPageAfterId($count, $lastId, $column)->get();
-        }
+        } while ($countResults == $count);
 
         return true;
     }
