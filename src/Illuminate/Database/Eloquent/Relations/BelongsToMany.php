@@ -1162,12 +1162,11 @@ class BelongsToMany extends Relation
 
         $query = $this->newPivotQuery();
 
-        // If any argument is passed for IDs we will only delete those
-        // associations, if it's an empty collection or array, code
-        // will not continue and return zero. If no argument is
-        // given all of the association ties will be broken.
-        if ($ids !== null) {
-            if (count($ids) == 0) {
+        // If associated IDs were passed to the method we will only delete those
+        // associations, otherwise all of the association ties will be broken.
+        // We'll return the numbers of affected rows when we do the deletes.
+        if (! is_null($ids)) {
+            if (count($ids) === 0) {
                 return 0;
             }
 
@@ -1183,7 +1182,6 @@ class BelongsToMany extends Relation
             $this->touchIfTouching();
         }
 
-        // We'll then return the numbers of affected rows.
         return $results;
     }
 
