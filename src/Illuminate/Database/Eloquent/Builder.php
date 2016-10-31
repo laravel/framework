@@ -394,9 +394,17 @@ class Builder
      */
     public function chunk($count, callable $callback)
     {
-        $results = $this->forPage($page = 1, $count)->get();
+        $page = 1;
 
-        while (! $results->isEmpty()) {
+        do {
+            $results = $this->forPage($page, $count)->get();
+
+            $countResults = $results->count();
+
+            if ($countResults == 0) {
+                break;
+            }
+
             // On each chunk result set, we will pass them to the callback and then let the
             // developer take care of everything within the callback, which allows us to
             // keep the memory low for spinning through large result sets for working.
@@ -405,9 +413,7 @@ class Builder
             }
 
             $page++;
-
-            $results = $this->forPage($page, $count)->get();
-        }
+        } while ($countResults == $count);
 
         return true;
     }
@@ -422,19 +428,23 @@ class Builder
      */
     public function chunkById($count, callable $callback, $column = 'id')
     {
-        $lastId = null;
+        $lastId = 0;
 
-        $results = $this->forPageAfterId($count, 0, $column)->get();
+        do {
+            $results = $this->forPageAfterId($count, $lastId, $column)->get();
 
-        while (! $results->isEmpty()) {
+            $countResults = $results->count();
+
+            if ($countResults == 0) {
+                break;
+            }
+
             if (call_user_func($callback, $results) === false) {
                 return false;
             }
 
             $lastId = $results->last()->{$column};
-
-            $results = $this->forPageAfterId($count, $lastId, $column)->get();
-        }
+        } while ($countResults == $count);
 
         return true;
     }
