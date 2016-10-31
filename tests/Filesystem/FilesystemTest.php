@@ -271,11 +271,16 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
     {
         file_put_contents($this->tempDir.'/foo.txt', 'foo');
         $files = new Filesystem();
-        @chmod($this->tempDir.'/foo.txt', 0000);
-        $this->assertFalse($files->isReadable($this->tempDir.'/foo.txt'));
-        $this->assertFalse($files->isReadable($this->tempDir.'/bar.txt'));
-        @chmod($this->tempDir.'/foo.txt', 0777);
-        $this->assertTrue($files->isReadable($this->tempDir.'/foo.txt'));
+        // chmod is noneffective on Windows
+        if (DIRECTORY_SEPARATOR === '\\') {
+            $this->assertTrue($files->isReadable($this->tempDir.'/foo.txt'));
+        } else {
+            @chmod($this->tempDir.'/foo.txt', 0000);
+            $this->assertFalse($files->isReadable($this->tempDir.'/foo.txt'));
+            @chmod($this->tempDir.'/foo.txt', 0777);
+            $this->assertTrue($files->isReadable($this->tempDir.'/foo.txt'));
+        }
+        $this->assertFalse($files->isReadable($this->tempDir.'/doesnotexist.txt'));
     }
 
     public function testGlobFindsFiles()
