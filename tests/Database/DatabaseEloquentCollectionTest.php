@@ -306,7 +306,7 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
         $c = new Collection([new TestEloquentCollectionModel, (object) ['id' => 'something']]);
         $c->getQueueableClass();
     }
-    
+
     public function testAppendIsCalledOnEachModelInTheCollection()
     {
         $mockModel1 = m::mock('Illuminate\Database\Eloquent\Model');

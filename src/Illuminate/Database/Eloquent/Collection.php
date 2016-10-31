@@ -353,7 +353,7 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
-     * Apply append to all models within the collection
+     * Apply append to all models within the collection.
      *
      * @param  array|string  $attributes
      * @return BaseCollection
@@ -365,7 +365,6 @@ class Collection extends BaseCollection implements QueueableCollection
         }
 
         return $this->each(function ($item) use ($attributes) {
-
             if ($item instanceof Model) {
                 call_user_func_array([$item, 'append'], $attributes);
             }
