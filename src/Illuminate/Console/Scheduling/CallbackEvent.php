@@ -10,18 +10,18 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 class CallbackEvent extends Event
 {
     /**
-     * The callback to call.
-     *
-     * @var string
-     */
-    protected $callback;
-
-    /**
      * The cache store implementation.
      *
      * @var \Illuminate\Contracts\Cache\Repository
      */
     protected $cache;
+
+    /**
+     * The callback to call.
+     *
+     * @var string
+     */
+    protected $callback;
 
     /**
      * The parameters to pass to the method.
@@ -33,14 +33,14 @@ class CallbackEvent extends Event
     /**
      * Create a new event instance.
      *
-     * @param  string  $callback
      * @param  \Illuminate\Contracts\Cache\Repository  $cache
+     * @param  string  $callback
      * @param  array  $parameters
      * @return void
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($callback, Cache $cache, array $parameters = [])
+    public function __construct(Cache $cache, $callback, array $parameters = [])
     {
         if (! is_string($callback) && ! is_callable($callback)) {
             throw new InvalidArgumentException(

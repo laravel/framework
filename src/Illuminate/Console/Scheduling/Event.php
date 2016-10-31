@@ -16,18 +16,18 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 class Event
 {
     /**
-     * The command string.
-     *
-     * @var string
-     */
-    public $command;
-
-    /**
      * The cache store implementation.
      *
      * @var \Illuminate\Contracts\Cache\Repository
      */
     protected $cache;
+
+    /**
+     * The command string.
+     *
+     * @var string
+     */
+    public $command;
 
     /**
      * The cron expression representing the event's frequency.
@@ -130,11 +130,11 @@ class Event
     /**
      * Create a new event instance.
      *
-     * @param  string  $command
      * @param  \Illuminate\Contracts\Cache\Repository  $cache
+     * @param  string  $command
      * @return void
      */
-    public function __construct($command, Cache $cache)
+    public function __construct(Cache $cache, $command)
     {
         $this->cache = $cache;
         $this->command = $command;
