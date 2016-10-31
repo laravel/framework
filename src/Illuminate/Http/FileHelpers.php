@@ -2,6 +2,8 @@
 
 namespace Illuminate\Http;
 
+use Ramsey\Uuid\Uuid;
+
 trait FileHelpers
 {
     /**
