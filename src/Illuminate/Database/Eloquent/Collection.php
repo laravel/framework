@@ -355,7 +355,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Apply append to all models within the collection
      *
-     * @param $attributes
+     * @param  array|string  $attributes
      * @return BaseCollection
      */
     public function append($attributes)
