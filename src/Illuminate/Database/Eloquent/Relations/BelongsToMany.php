@@ -1150,7 +1150,7 @@ class BelongsToMany extends Relation
      * @param  bool  $touch
      * @return int
      */
-    public function detach($ids = [], $touch = true)
+    public function detach($ids = null, $touch = true)
     {
         if ($ids instanceof Model) {
             $ids = $ids->getKey();
@@ -1162,13 +1162,16 @@ class BelongsToMany extends Relation
 
         $query = $this->newPivotQuery();
 
-        // If associated IDs were passed to the method we will only delete those
-        // associations, otherwise all of the association ties will be broken.
-        // We'll return the numbers of affected rows when we do the deletes.
-        $ids = (array) $ids;
+        // If any argument is passed for IDs we will only delete those
+        // associations, if it's an empty collection or array, code
+        // will not continue and return zero. If no argument is
+        // given all of the association ties will be broken.
+        if ($ids !== null) {
+            if (count($ids) == 0) {
+                return 0;
+            }
 
-        if (count($ids) > 0) {
-            $query->whereIn($this->otherKey, $ids);
+            $query->whereIn($this->otherKey, (array) $ids);
         }
 
         // Once we have all of the conditions set on the statement, we are ready
@@ -1180,6 +1183,7 @@ class BelongsToMany extends Relation
             $this->touchIfTouching();
         }
 
+        // We'll then return the numbers of affected rows.
         return $results;
     }
 
