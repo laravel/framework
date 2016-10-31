@@ -2,9 +2,9 @@
 
 namespace Illuminate\Database\Console\Migrations;
 
+use Illuminate\Support\Str;
 use Illuminate\Support\Composer;
 use Illuminate\Database\Migrations\MigrationCreator;
-use Illuminate\Support\Str;
 
 class MigrateMakeCommand extends BaseCommand
 {
@@ -124,7 +124,7 @@ class MigrateMakeCommand extends BaseCommand
     }
 
     /**
-     * Create Seeder using the table name for the Seeder name
+     * Create Seeder using the table name for the Seeder name.
      *
      * @param $table
      */
