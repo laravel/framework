@@ -824,7 +824,7 @@ class Grammar extends BaseGrammar
     }
 
     /**
-     * Get the gramar specific operators.
+     * Get the grammar specific operators.
      *
      * @return array
      */
