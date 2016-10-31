@@ -1811,6 +1811,7 @@ class Builder
 
         do {
             $results = $this->forPage($page, $count)->get();
+
             $countResults = $results->count();
 
             if ($countResults == 0) {
@@ -1847,6 +1848,7 @@ class Builder
 
         do {
             $results = $this->forPageAfterId($count, $lastId, $column)->get();
+
             $countResults = $results->count();
 
             if ($countResults == 0) {
