@@ -9,6 +9,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Console\Kernel as KernelContract;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 
@@ -93,7 +94,7 @@ class Kernel implements KernelContract
     protected function defineConsoleSchedule()
     {
         $this->app->instance(
-            'Illuminate\Console\Scheduling\Schedule', $schedule = new Schedule($this->app['cache.store'])
+            'Illuminate\Console\Scheduling\Schedule', $schedule = new Schedule($this->app[Cache::class])
         );
 
         $this->schedule($schedule);

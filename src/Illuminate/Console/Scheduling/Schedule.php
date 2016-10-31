@@ -43,7 +43,7 @@ class Schedule
      */
     public function call($callback, array $parameters = [])
     {
-        $this->events[] = $event = new CallbackEvent($callback, $this->cache, $parameters);
+        $this->events[] = $event = new CallbackEvent($this->cache, $callback, $parameters);
 
         return $event;
     }
@@ -81,7 +81,7 @@ class Schedule
             $command .= ' '.$this->compileParameters($parameters);
         }
 
-        $this->events[] = $event = new Event($command, $this->cache);
+        $this->events[] = $event = new Event($this->cache, $command);
 
         return $event;
     }
