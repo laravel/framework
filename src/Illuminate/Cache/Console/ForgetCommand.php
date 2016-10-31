@@ -61,8 +61,8 @@ class ForgetCommand extends Command
     protected function getArguments()
     {
         return [
-            ['key', InputArgument::REQUIRED, 'The name of the key you would like to clear.'],
-            ['store', InputArgument::OPTIONAL, 'The name of the store you would like to clear.'],
+            ['key', InputArgument::REQUIRED, 'The name of the key.'],
+            ['store', InputArgument::OPTIONAL, 'The name of the store.'],
         ];
     }
 }
