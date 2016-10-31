@@ -426,7 +426,7 @@ if (! function_exists('encrypt')) {
 
 if (! function_exists('env')) {
     /**
-     * Gets the value of an environment variable. Supports boolean, empty, null and base64 prefix.
+     * Gets the value of an environment variable.
      *
      * @param  string  $key
      * @param  mixed   $default
@@ -455,7 +455,7 @@ if (! function_exists('env')) {
                 return;
         }
 
-        if (Str::startsWith($value, 'base64:')) {
+        if (strpos($value, 'base64:') === 0) {
             return base64_decode(substr($value, 7));
         }
 
