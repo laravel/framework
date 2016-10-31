@@ -34,13 +34,13 @@ class CallbackEvent extends Event
      * Create a new event instance.
      *
      * @param  string  $callback
-     * @param  array  $parameters
      * @param  \Illuminate\Contracts\Cache\Repository  $cache
+     * @param  array  $parameters
      * @return void
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($callback, array $parameters = [], Cache $cache)
+    public function __construct($callback, Cache $cache, array $parameters = [])
     {
         if (! is_string($callback) && ! is_callable($callback)) {
             throw new InvalidArgumentException(
