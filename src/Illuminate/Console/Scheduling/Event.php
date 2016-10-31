@@ -11,6 +11,7 @@ use Illuminate\Contracts\Mail\Mailer;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessUtils;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Cache\Repository as Cache;
 
 class Event
 {
@@ -20,6 +21,13 @@ class Event
      * @var string
      */
     public $command;
+
+    /**
+     * The cache store implementation.
+     *
+     * @var \Illuminate\Contracts\Cache\Repository
+     */
+    protected $cache;
 
     /**
      * The cron expression representing the event's frequency.
@@ -123,10 +131,12 @@ class Event
      * Create a new event instance.
      *
      * @param  string  $command
+     * @param  \Illuminate\Contracts\Cache\Repository  $cache
      * @return void
      */
-    public function __construct($command)
+    public function __construct($command, Cache $cache)
     {
+        $this->cache = $cache;
         $this->command = $command;
         $this->output = $this->getDefaultOutput();
     }
@@ -149,10 +159,18 @@ class Event
      */
     public function run(Container $container)
     {
+        if ($this->withoutOverlapping) {
+            $this->cache->put($this->mutexName(), true, 1440);
+        }
+
         if (! $this->runInBackground) {
             $this->runCommandInForeground($container);
         } else {
             $this->runCommandInBackground();
+        }
+
+        if ($this->withoutOverlapping) {
+            $this->cache->forget($this->mutexName());
         }
     }
 
@@ -222,27 +240,19 @@ class Event
 
         $redirect = $this->shouldAppendOutput ? ' >> ' : ' > ';
 
-        if ($this->withoutOverlapping) {
-            if (windows_os()) {
-                $command = '(echo \'\' > "'.$this->mutexPath().'" & '.$this->command.' & del "'.$this->mutexPath().'")'.$redirect.$output.' 2>&1 &';
-            } else {
-                $command = '(touch '.$this->mutexPath().'; '.$this->command.'; rm '.$this->mutexPath().')'.$redirect.$output.' 2>&1 &';
-            }
-        } else {
-            $command = $this->command.$redirect.$output.' 2>&1 &';
-        }
+        $command = $this->command.$redirect.$output.' 2>&1 &';
 
         return $this->user && ! windows_os() ? 'sudo -u '.$this->user.' -- sh -c \''.$command.'\'' : $command;
     }
 
     /**
-     * Get the mutex path for the scheduled command.
+     * Get the mutex name for the scheduled command.
      *
      * @return string
      */
-    protected function mutexPath()
+    protected function mutexName()
     {
-        return storage_path('framework'.DIRECTORY_SEPARATOR.'schedule-'.sha1($this->expression.$this->command));
+        return 'framework'.DIRECTORY_SEPARATOR.'schedule-'.sha1($this->expression.$this->command);
     }
 
     /**
@@ -719,7 +729,7 @@ class Event
         $this->withoutOverlapping = true;
 
         return $this->skip(function () {
-            return file_exists($this->mutexPath());
+            return $this->cache->has($this->mutexName());
         });
     }
 
