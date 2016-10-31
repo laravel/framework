@@ -1734,18 +1734,34 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('select * from [users](1,2)', $builder->toSql());
     }
 
-    public function testChunkPaginatesUsingId()
+    public function testChunkPaginatesUsingIdWithLastChunkComplete()
     {
         $builder = $this->getMockQueryBuilder();
 
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'someIdField')->andReturn($builder);
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 2, 'someIdField')->andReturn($builder);
-        $builder->shouldReceive('forPageAfterId')->once()->with(2, 10, 'someIdField')->andReturn($builder);
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 11, 'someIdField')->andReturn($builder);
 
         $builder->shouldReceive('get')->times(3)->andReturn(
             collect([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]),
-            collect([(object) ['someIdField' => 10]]),
+            collect([(object) ['someIdField' => 10], (object) ['someIdField' => 11]]),
             collect([])
+        );
+
+        $builder->chunkById(2, function ($results) {
+        }, 'someIdField');
+    }
+
+    public function testChunkPaginatesUsingIdWithLastChunkPartial()
+    {
+        $builder = $this->getMockQueryBuilder();
+
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'someIdField')->andReturn($builder);
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 2, 'someIdField')->andReturn($builder);
+
+        $builder->shouldReceive('get')->times(2)->andReturn(
+            collect([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]),
+            collect([(object) ['someIdField' => 10]])
         );
 
         $builder->chunkById(2, function ($results) {
