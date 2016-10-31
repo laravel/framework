@@ -17,6 +17,20 @@ class Schedule
     protected $cache;
 
     /**
+     * The PHP executable.
+     *
+     * @var string
+     */
+    protected $phpBinary;
+
+    /**
+     * The Artisan console path.
+     *
+     * @var string
+     */
+    protected $artisan;
+
+    /**
      * Create a new event instance.
      *
      * @param  \Illuminate\Contracts\Cache\Repository  $cache
@@ -25,6 +39,10 @@ class Schedule
     public function __construct(Cache $cache)
     {
         $this->cache = $cache;
+
+        $this->phpBinary = ProcessUtils::escapeArgument((new PhpExecutableFinder)->find(false));
+
+        $this->artisan = defined('ARTISAN_BINARY') ? ProcessUtils::escapeArgument(ARTISAN_BINARY) : 'artisan';
     }
 
     /**
@@ -61,11 +79,7 @@ class Schedule
             $command = Container::getInstance()->make($command)->getName();
         }
 
-        $binary = ProcessUtils::escapeArgument((new PhpExecutableFinder)->find(false));
-
-        $artisan = defined('ARTISAN_BINARY') ? ProcessUtils::escapeArgument(ARTISAN_BINARY) : 'artisan';
-
-        return $this->exec("{$binary} {$artisan} {$command}", $parameters);
+        return $this->exec("{$this->phpBinary} {$this->artisan} {$command}", $parameters);
     }
 
     /**
@@ -81,7 +95,9 @@ class Schedule
             $command .= ' '.$this->compileParameters($parameters);
         }
 
-        $this->events[] = $event = new Event($this->cache, $command);
+        $cacheForget = "{$this->phpBinary} {$this->artisan} cache:forget";
+
+        $this->events[] = $event = new Event($this->cache, $command, $cacheForget);
 
         return $event;
     }
