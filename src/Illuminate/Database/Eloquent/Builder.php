@@ -223,7 +223,9 @@ class Builder
             return $model;
         }
 
-        return $this->model->newInstance();
+        return $this->model->newInstance()->setConnection(
+            $this->query->getConnection()->getName()
+        );
     }
 
     /**
@@ -239,7 +241,9 @@ class Builder
             return $instance;
         }
 
-        return $this->model->newInstance($attributes + $values);
+        return $this->model->newInstance($attributes + $values)->setConnection(
+            $this->query->getConnection()->getName()
+        );
     }
 
     /**
@@ -255,7 +259,9 @@ class Builder
             return $instance;
         }
 
-        $instance = $this->model->newInstance($attributes + $values);
+        $instance = $this->model->newInstance($attributes + $values)->setConnection(
+            $this->query->getConnection()->getName()
+        );
 
         $instance->save();
 
@@ -304,6 +310,28 @@ class Builder
         }
 
         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    }
+
+    /**
+     * Execute the query and get the first result or call a callback.
+     *
+     * @param  \Closure|array  $columns
+     * @param  \Closure|null  $callback
+     * @return \Illuminate\Database\Eloquent\Model|static|mixed
+     */
+    public function firstOr($columns = ['*'], Closure $callback = null)
+    {
+        if ($columns instanceof Closure) {
+            $callback = $columns;
+
+            $columns = ['*'];
+        }
+
+        if (! is_null($model = $this->first($columns))) {
+            return $model;
+        }
+
+        return call_user_func($callback);
     }
 
     /**
@@ -366,9 +394,17 @@ class Builder
      */
     public function chunk($count, callable $callback)
     {
-        $results = $this->forPage($page = 1, $count)->get();
+        $page = 1;
 
-        while (! $results->isEmpty()) {
+        do {
+            $results = $this->forPage($page, $count)->get();
+
+            $countResults = $results->count();
+
+            if ($countResults == 0) {
+                break;
+            }
+
             // On each chunk result set, we will pass them to the callback and then let the
             // developer take care of everything within the callback, which allows us to
             // keep the memory low for spinning through large result sets for working.
@@ -377,9 +413,7 @@ class Builder
             }
 
             $page++;
-
-            $results = $this->forPage($page, $count)->get();
-        }
+        } while ($countResults == $count);
 
         return true;
     }
@@ -394,19 +428,23 @@ class Builder
      */
     public function chunkById($count, callable $callback, $column = 'id')
     {
-        $lastId = null;
+        $lastId = 0;
 
-        $results = $this->forPageAfterId($count, 0, $column)->get();
+        do {
+            $results = $this->forPageAfterId($count, $lastId, $column)->get();
 
-        while (! $results->isEmpty()) {
+            $countResults = $results->count();
+
+            if ($countResults == 0) {
+                break;
+            }
+
             if (call_user_func($callback, $results) === false) {
                 return false;
             }
 
             $lastId = $results->last()->{$column};
-
-            $results = $this->forPageAfterId($count, $lastId, $column)->get();
-        }
+        } while ($countResults == $count);
 
         return true;
     }

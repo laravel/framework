@@ -559,6 +559,14 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $file = new File(__FILE__, false);
         $v = new Validator($trans, ['name' => $file], ['name' => 'Required']);
         $this->assertTrue($v->passes());
+
+        $file = new File(__FILE__, false);
+        $file2 = new File(__FILE__, false);
+        $v = new Validator($trans, ['files' => [$file, $file2]], ['files.0' => 'Required', 'files.1' => 'Required']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['files' => [$file, $file2]], ['files' => 'Required']);
+        $this->assertTrue($v->passes());
     }
 
     public function testValidateRequiredWith()
@@ -1415,7 +1423,6 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $mock->shouldReceive('getCount')->with('user_types', 'type', 'bar', null, null, [])->andReturn(1);
         $v->setPresenceVerifier($mock);
         $this->assertTrue($v->passes());
-
 
         $trans = $this->getIlluminateArrayTranslator();
         $closure = function () {

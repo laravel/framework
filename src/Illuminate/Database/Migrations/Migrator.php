@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Migrations;
 
-use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
@@ -160,9 +159,7 @@ class Migrator
             return $this->pretendToRun($migration, 'up');
         }
 
-        $this->runMigration(function () use ($migration) {
-            $migration->up();
-        });
+        $this->runMigration($migration, 'up');
 
         // Once we have run a migrations class, we will log that it was run in this
         // repository so that we don't try to run it next time we do a migration
@@ -282,9 +279,7 @@ class Migrator
             return $this->pretendToRun($instance, 'down');
         }
 
-        $this->runMigration(function () use ($instance) {
-            $instance->down();
-        });
+        $this->runMigration($instance, 'down');
 
         // Once we have successfully run the migration "down" we will remove it from
         // the migration repository so it will be considered to have not been run
@@ -364,18 +359,42 @@ class Migrator
     /**
      * Run a migration inside a transaction if the database supports it.
      *
-     * @param  \Closure  $callback
+     * @param  object  $migration
+     * @param  string  $method
      * @return void
      */
-    protected function runMigration(Closure $callback)
+    protected function runMigration($migration, $method)
     {
-        $connection = $this->resolveConnection($this->connection);
+        $name = $migration->getConnection();
 
-        $grammar = $connection->getSchemaGrammar();
+        $connection = $this->resolveConnection($name);
+
+        $callback = function () use ($migration, $method) {
+            $migration->$method();
+        };
+
+        $grammar = $this->getSchemaGrammar($connection);
 
         $grammar->supportsSchemaTransactions()
                     ? $connection->transaction($callback)
                     : $callback();
+    }
+
+    /**
+     * Get the schema grammar out of a migration connection.
+     *
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return \Illuminate\Database\Schema\Grammars\Grammar
+     */
+    protected function getSchemaGrammar($connection)
+    {
+        if (is_null($grammar = $connection->getSchemaGrammar())) {
+            $connection->useDefaultSchemaGrammar();
+
+            $grammar = $connection->getSchemaGrammar();
+        }
+
+        return $grammar;
     }
 
     /**

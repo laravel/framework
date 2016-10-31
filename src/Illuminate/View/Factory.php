@@ -351,13 +351,13 @@ class Factory implements FactoryContract
      */
     public function share($key, $value = null)
     {
-        if (! is_array($key)) {
-            return $this->shared[$key] = $value;
+        $keys = is_array($key) ? $key : [$key => $value];
+
+        foreach ($keys as $key => $value) {
+            $this->shared[$key] = $value;
         }
 
-        foreach ($key as $innerKey => $innerValue) {
-            $this->share($innerKey, $innerValue);
-        }
+        return $value;
     }
 
     /**
@@ -523,7 +523,7 @@ class Factory implements FactoryContract
      */
     public function callComposer(ViewContract $view)
     {
-        $this->events->fire('composing: '.$view->getName(), [$view]);
+        $this->events->fire('composing: '.$view->name(), [$view]);
     }
 
     /**
@@ -534,7 +534,7 @@ class Factory implements FactoryContract
      */
     public function callCreator(ViewContract $view)
     {
-        $this->events->fire('creating: '.$view->getName(), [$view]);
+        $this->events->fire('creating: '.$view->name(), [$view]);
     }
 
     /**
