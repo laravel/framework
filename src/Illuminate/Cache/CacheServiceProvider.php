@@ -4,6 +4,7 @@ namespace Illuminate\Cache;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Cache\Console\ClearCommand;
+use Illuminate\Cache\Console\ForgetCommand;
 
 class CacheServiceProvider extends ServiceProvider
 {
@@ -48,6 +49,12 @@ class CacheServiceProvider extends ServiceProvider
         });
 
         $this->commands('command.cache.clear');
+
+        $this->app->singleton('command.cache.forget', function ($app) {
+            return new ForgetCommand($app['cache']);
+        });
+
+        $this->commands('command.cache.forget');
     }
 
     /**
@@ -58,7 +65,7 @@ class CacheServiceProvider extends ServiceProvider
     public function provides()
     {
         return [
-            'cache', 'cache.store', 'memcached.connector', 'command.cache.clear',
+            'cache', 'cache.store', 'memcached.connector', 'command.cache.clear', 'command.cache.forget'
         ];
     }
 }

@@ -30,6 +30,13 @@ class Event
     public $command;
 
     /**
+     * The cache forget command string.
+     *
+     * @var string
+     */
+    public $cacheForget;
+
+    /**
      * The cron expression representing the event's frequency.
      *
      * @var string
@@ -132,12 +139,14 @@ class Event
      *
      * @param  \Illuminate\Contracts\Cache\Repository  $cache
      * @param  string  $command
+     * @param  string  $cacheForget
      * @return void
      */
-    public function __construct(Cache $cache, $command)
+    public function __construct(Cache $cache, $command, $cacheForget)
     {
         $this->cache = $cache;
         $this->command = $command;
+        $this->cacheForget = $cacheForget;
         $this->output = $this->getDefaultOutput();
     }
 
@@ -167,10 +176,6 @@ class Event
             $this->runCommandInForeground($container);
         } else {
             $this->runCommandInBackground();
-        }
-
-        if ($this->withoutOverlapping) {
-            $this->cache->forget($this->mutexName());
         }
     }
 
@@ -240,7 +245,15 @@ class Event
 
         $redirect = $this->shouldAppendOutput ? ' >> ' : ' > ';
 
-        $command = $this->command.$redirect.$output.' 2>&1 &';
+        if ($this->withoutOverlapping) {
+            if (windows_os()) {
+                $command = '('.$this->command.' & '.$this->cacheForget.' "'.$this->mutexName().'")'.$redirect.$output.' 2>&1 &';
+            } else {
+                $command = '('.$this->command.'; '.$this->cacheForget.' '.$this->mutexName().')'.$redirect.$output.' 2>&1 &';
+            }
+        } else {
+            $command = $this->command.$redirect.$output.' 2>&1 &';
+        }
 
         return $this->user && ! windows_os() ? 'sudo -u '.$this->user.' -- sh -c \''.$command.'\'' : $command;
     }
