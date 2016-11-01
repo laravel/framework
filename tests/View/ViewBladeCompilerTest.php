@@ -710,7 +710,10 @@ empty
         $this->assertEquals("'bar'", $compiler->getViewNameFromExpression("'>bar'"));
 
         $compiler->setView('hadi.badi.zabadi');
-        $this->assertEquals("'hadi.badi.nadi'", $compiler->getViewNameFromExpression(">nadi"));
+        $this->assertEquals("'hadi.badi.nadi'", $compiler->getViewNameFromExpression("'>nadi'"));
+
+        $compiler->setView('hadi.badi.zabadi');
+        $this->assertEquals("'hadi.badi.nadi'", $compiler->getViewNameFromExpression('">nadi"'));
 
         $compiler->setView('foo.bar');
         $this->assertEquals("'foo.bar.baz'", $compiler->getViewNameFromExpression("'foo.bar.baz'"));
