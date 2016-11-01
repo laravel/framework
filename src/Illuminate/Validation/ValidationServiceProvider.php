@@ -6,6 +6,14 @@ use Illuminate\Support\ServiceProvider;
 
 class ValidationServiceProvider extends ServiceProvider
 {
+
+    /**
+     * Assign the services provided by the provider.
+     *
+     * @var array
+     */
+    protected $provides = ['validator', 'validation.presence'];
+
     /**
      * Indicates if loading of the provider is deferred.
      *
@@ -32,13 +40,13 @@ class ValidationServiceProvider extends ServiceProvider
      */
     protected function registerValidationFactory()
     {
-        $this->app->singleton('validator', function ($app) {
+        $this->app->singleton($this->provides[0], function ($app) {
             $validator = new Factory($app['translator'], $app);
 
             // The validation presence verifier is responsible for determining the existence
             // of values in a given data collection, typically a relational database or
             // other persistent data stores. And it is used to check for uniqueness.
-            if (isset($app['validation.presence'])) {
+            if (isset($app[$this->provides[1]])) {
                 $validator->setPresenceVerifier($app['validation.presence']);
             }
 
@@ -53,7 +61,7 @@ class ValidationServiceProvider extends ServiceProvider
      */
     protected function registerPresenceVerifier()
     {
-        $this->app->singleton('validation.presence', function ($app) {
+        $this->app->singleton($this->provides[1], function ($app) {
             return new DatabasePresenceVerifier($app['db']);
         });
     }
@@ -65,8 +73,6 @@ class ValidationServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return [
-            'validator', 'validation.presence',
-        ];
+        return $this->provides;
     }
 }
