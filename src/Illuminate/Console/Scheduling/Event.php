@@ -6,7 +6,6 @@ use Closure;
 use Carbon\Carbon;
 use LogicException;
 use Cron\CronExpression;
-use Illuminate\Console\Application;
 use GuzzleHttp\Client as HttpClient;
 use Illuminate\Contracts\Mail\Mailer;
 use Symfony\Component\Process\Process;
