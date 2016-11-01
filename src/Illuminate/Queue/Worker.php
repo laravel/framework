@@ -307,7 +307,7 @@ class Worker
             $job->delete();
 
             $job->failed($e);
-        } catch(Exception $exception) {
+        } catch (Exception $exception) {
             $e = new RuntimeException($exception->getMessage(), $exception->getCode(), $e);
         }
 
