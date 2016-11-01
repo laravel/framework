@@ -234,7 +234,7 @@ class Worker
             $this->raiseExceptionOccurredJobEvent(
                 $connectionName, $job, $e
             );
-        } catch(Exception $exception) {
+        } catch (Exception $exception) {
             $this->raiseFailedJobEvent($connectionName, $job, $exception);
         } finally {
             if (! $job->isDeleted()) {
