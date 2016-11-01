@@ -62,8 +62,7 @@ class Schedule
         }
 
         return $this->exec(
-            sprintf('%s %s %s', Application::phpBinary(), Application::artisanBinary(), $command),
-            $parameters
+            Application::formatCommandString($command), $parameters
         );
     }
 

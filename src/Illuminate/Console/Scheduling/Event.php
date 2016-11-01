@@ -238,12 +238,12 @@ class Event
         $redirect = $this->shouldAppendOutput ? ' >> ' : ' > ';
 
         if ($this->withoutOverlapping) {
-            $cacheForgetCommand = sprintf('%s %s %s', Application::phpBinary(), Application::artisanBinary(), 'cache:forget');
+            $forget = Appliation::formatCommandString('cache:forget');
 
             if (windows_os()) {
-                $command = '('.$this->command.' & '.$cacheForgetCommand.' "'.$this->mutexName().'")'.$redirect.$output.' 2>&1 &';
+                $command = '('.$this->command.' & '.$forget.' "'.$this->mutexName().'")'.$redirect.$output.' 2>&1 &';
             } else {
-                $command = '('.$this->command.'; '.$cacheForgetCommand.' '.$this->mutexName().')'.$redirect.$output.' 2>&1 &';
+                $command = '('.$this->command.'; '.$forget.' '.$this->mutexName().')'.$redirect.$output.' 2>&1 &';
             }
         } else {
             $command = $this->command.$redirect.$output.' 2>&1 &';
