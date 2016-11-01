@@ -38,9 +38,10 @@ class CompilerEngine extends PhpEngine
      *
      * @param  string  $path
      * @param  array   $data
+     * @param  string  $view
      * @return string
      */
-    public function get($path, array $data = [])
+    public function get($path, array $data = [], $view = null)
     {
         $this->lastCompiled[] = $path;
 
@@ -48,7 +49,7 @@ class CompilerEngine extends PhpEngine
         // it was last compiled, we will re-compile the views so we can evaluate a
         // fresh copy of the view. We'll pass the compiler the path of the view.
         if ($this->compiler->isExpired($path)) {
-            $this->compiler->compile($path);
+            $this->compiler->compile($path, $view);
         }
 
         $compiled = $this->compiler->getCompiledPath($path);

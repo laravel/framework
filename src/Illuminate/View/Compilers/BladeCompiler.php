@@ -32,6 +32,13 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected $path;
 
     /**
+     * The view currently being compiled.
+     *
+     * @var string
+     */
+    protected $view;
+
+    /**
      * All of the available compiler functions.
      *
      * @var array
@@ -103,12 +110,17 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * Compile the view at the given path.
      *
      * @param  string  $path
+     * @param  string  $view
      * @return void
      */
-    public function compile($path = null)
+    public function compile($path = null, $view = null)
     {
         if ($path) {
             $this->setPath($path);
+        }
+
+        if ($view) {
+            $this->setView($view);
         }
 
         if (! is_null($this->cachePath)) {
@@ -137,6 +149,27 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function setPath($path)
     {
         $this->path = $path;
+    }
+
+    /**
+     * Get the view currently being compiled.
+     *
+     * @return string
+     */
+    public function getView()
+    {
+        return $this->view;
+    }
+
+    /**
+     * Set the view currently being compiled.
+     *
+     * @param  string  $view
+     * @return void
+     */
+    public function setView($view)
+    {
+        $this->view = $view;
     }
 
     /**
@@ -886,7 +919,9 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         $expression = $this->stripParentheses($expression);
 
-        return "<?php echo \$__env->make($expression, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
+        $viewName = $this->getViewNameFromExpression($expression);
+
+        return "<?php echo \$__env->make($viewName, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
     }
 
     /**
@@ -899,7 +934,9 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         $expression = $this->stripParentheses($expression);
 
-        return "<?php if (\$__env->exists($expression)) echo \$__env->make($expression, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
+        $viewName = $this->getViewNameFromExpression($expression);
+
+        return "<?php if (\$__env->exists($viewName)) echo \$__env->make($viewName, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
     }
 
     /**
@@ -945,6 +982,23 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         if (Str::startsWith($expression, '(')) {
             $expression = substr($expression, 1, -1);
+        }
+
+        return $expression;
+    }
+
+    /**
+     * Strip the quotes from the given expression.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    public function stripQuotes($expression)
+    {
+        foreach (['\'', '""'] as $quote) {
+            if (Str::startsWith($expression, $quote)) {
+                $expression = substr($expression, 1, - 1);
+            }
         }
 
         return $expression;
@@ -1100,5 +1154,39 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function setEchoFormat($format)
     {
         $this->echoFormat = $format;
+    }
+
+    /**
+     * The base of the view currently being compiled.
+     *
+     * @return string
+     */
+    private function viewBase()
+    {
+        $parts = explode('.', $this->view);
+
+        array_pop($parts);
+
+        if (Str::contains($this->view, '::')) {
+            return empty($parts)
+                   ? strtok($this->view, '::').'::' : implode('.', $parts).'.';
+        }
+
+        return count($parts) > 1 ? implode('.', $parts).'.' : head($parts);
+    }
+
+    /**
+     * Get the view name from the given expression.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    public function getViewNameFromExpression($expression)
+    {
+        if ($this->view && Str::startsWith($stripped = $this->stripQuotes($expression), '>')) {
+            return "'".$this->viewBase().ltrim($stripped, '>')."'";
+        }
+
+        return $expression;
     }
 }

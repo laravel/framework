@@ -146,7 +146,7 @@ class View implements ArrayAccess, ViewContract
      */
     protected function getContents()
     {
-        return $this->engine->get($this->path, $this->gatherData());
+        return $this->engine->get($this->path, $this->gatherData(), $this->view);
     }
 
     /**
