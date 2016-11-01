@@ -119,7 +119,7 @@ class Parser
     }
 
     /**
-     * Parse the token.
+     * Parse the token into its token and description segments.
      *
      * @param  string  $token
      * @return array
