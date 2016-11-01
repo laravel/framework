@@ -1538,7 +1538,7 @@ class Validator implements ValidatorContract
 
         return $attribute;
     }
-    
+
     /**
      * Validate the existence of a relation to its model.
      *
@@ -1553,13 +1553,13 @@ class Validator implements ValidatorContract
 
         $relations = $this->getRelations($parameters);
 
-        if(is_array($value)) {
-            return !$this->checkMultiRelationsExists(
+        if (is_array($value)) {
+            return ! $this->checkMultiRelationsExists(
                 $value, $attribute, $parameters[0], $relations
             );
         }
 
-        return !$this->checkSingleRelationExists(
+        return ! $this->checkSingleRelationExists(
             $value, $attribute, $parameters[0], $relations
         );
     }
@@ -1578,7 +1578,7 @@ class Validator implements ValidatorContract
 
         $relations = $this->getRelations($parameters);
 
-        if(is_array($value)) {
+        if (is_array($value)) {
             return $this->checkMultiRelationsExists(
                 $value, $attribute, $parameters[0], $relations
             );
@@ -1590,7 +1590,7 @@ class Validator implements ValidatorContract
     }
 
     /**
-     * Get Relations for validation
+     * Get Relations for validation.
      *
      * @param  array $parameters
      *
@@ -1604,7 +1604,7 @@ class Validator implements ValidatorContract
     }
 
     /**
-     * This will be used when the value is an array
+     * This will be used when the value is an array.
      *
      * @param  array  $value
      * @param  string $attribute
@@ -1620,8 +1620,8 @@ class Validator implements ValidatorContract
         // This will check if the relations specified for the model exists
         // If in case any of the relations given doesn't exist, false will
         // be returned
-        foreach($collection as $model) {
-            if(!$this->checkIfRelationExists($model, $relations)) {
+        foreach ($collection as $model) {
+            if (! $this->checkIfRelationExists($model, $relations)) {
                 return false;
             }
         }
@@ -1630,7 +1630,7 @@ class Validator implements ValidatorContract
     }
 
     /**
-     * This will be used when only single value is present
+     * This will be used when only single value is present.
      *
      * @param  int|string|array   $value
      * @param  string             $attribute
@@ -1642,13 +1642,15 @@ class Validator implements ValidatorContract
     {
         $model = (new $model)->where(explode('.', $attribute)[0], $value)->first();
 
-        if(!$model) throw new ModelNotFoundException;
+        if (! $model) {
+            throw new ModelNotFoundException;
+        }
 
         return $this->checkIfRelationExists($model, $relations);
     }
 
     /**
-     * Check if the relation exists for that model
+     * Check if the relation exists for that model.
      *
      * @param  Model $model
      * @param  string $relations
@@ -1662,11 +1664,13 @@ class Validator implements ValidatorContract
 
             $relationSet = explode('.', $relationSet);
 
-            foreach($relationSet as $relation) {
+            foreach ($relationSet as $relation) {
                 $builder = $builder->$relation();
             }
 
-            if(!$builder->count()) return false;
+            if (! $builder->count()) {
+                return false;
+            }
         }
 
         return true;
@@ -2778,7 +2782,7 @@ class Validator implements ValidatorContract
 
         return str_replace(':values', implode(' / ', $parameters), $message);
     }
-    
+
     /**
      * Get all attributes.
      *
