@@ -48,6 +48,6 @@ trait FileHelpers
             $path = rtrim($path, '/').'/';
         }
 
-        return $path.Uuid::uuid4()->toString().'.'.$this->guessExtension();
+        return str_replace('-', '', $path.Uuid::uuid4()->toString()).'.'.$this->guessExtension();
     }
 }
