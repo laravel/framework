@@ -238,7 +238,7 @@ class Event
         $redirect = $this->shouldAppendOutput ? ' >> ' : ' > ';
 
         if ($this->withoutOverlapping) {
-            $cacheForgetCommand = sprintf("%s %s %s", Application::phpBinary(), Application::artisanBinary(), 'cache:forget');
+            $cacheForgetCommand = sprintf('%s %s %s', Application::phpBinary(), Application::artisanBinary(), 'cache:forget');
 
             if (windows_os()) {
                 $command = '('.$this->command.' & '.$cacheForgetCommand.' "'.$this->mutexName().'")'.$redirect.$output.' 2>&1 &';
