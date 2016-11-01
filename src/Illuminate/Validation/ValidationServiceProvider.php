@@ -6,7 +6,6 @@ use Illuminate\Support\ServiceProvider;
 
 class ValidationServiceProvider extends ServiceProvider
 {
-
     /**
      * Assign the services provided by the provider.
      *
