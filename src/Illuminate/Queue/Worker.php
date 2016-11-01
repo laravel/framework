@@ -293,6 +293,8 @@ class Worker
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  \Exception  $e
      * @return void
+     *
+     * @throws \Exception
      */
     protected function failJob($connectionName, $job, $e)
     {
@@ -307,9 +309,7 @@ class Worker
             $job->delete();
 
             $job->failed($e);
-        } catch (Exception $exception) {
-            $e = new RuntimeException($exception->getMessage(), $exception->getCode(), $e);
-        }
+        } catch (Exception $e) {}
 
         $this->raiseFailedJobEvent($connectionName, $job, $e);
 
