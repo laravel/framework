@@ -309,7 +309,6 @@ class Worker
 
             $job->failed($e);
         } catch (Exception $e) {
-            
         }
 
         $this->raiseFailedJobEvent($connectionName, $job, $e);
