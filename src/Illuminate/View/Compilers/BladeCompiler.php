@@ -997,7 +997,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         foreach (["'", '"'] as $quote) {
             if (Str::startsWith($expression, $quote)) {
-                $expression = substr($expression, 1, - 1);
+                $expression = substr($expression, 1, -1);
             }
         }
 

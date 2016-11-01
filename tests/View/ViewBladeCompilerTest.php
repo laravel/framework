@@ -719,7 +719,7 @@ empty
         $this->assertEquals("'foo.bar.baz'", $compiler->getViewNameFromExpression("'foo.bar.baz'"));
 
         $compiler->setView('foo.baz');
-        $this->assertEquals("foo(bar)", $compiler->getViewNameFromExpression("foo(bar)"));
+        $this->assertEquals('foo(bar)', $compiler->getViewNameFromExpression('foo(bar)'));
 
         $compiler->setView('namespace::foo');
         $this->assertEquals("'namespace::baz'", $compiler->getViewNameFromExpression("'>baz'"));
