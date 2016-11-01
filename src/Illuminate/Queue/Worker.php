@@ -3,7 +3,6 @@
 namespace Illuminate\Queue;
 
 use Exception;
-use RuntimeException;
 use Throwable;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -309,7 +308,8 @@ class Worker
             $job->delete();
 
             $job->failed($e);
-        } catch (Exception $e) {}
+        } catch (Exception $e) {
+        }
 
         $this->raiseFailedJobEvent($connectionName, $job, $e);
 
