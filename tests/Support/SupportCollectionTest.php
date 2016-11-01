@@ -682,6 +682,27 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([9 => 10], $data[3]->toArray());
     }
 
+    public function testChunkWhenGivenZeroAsSize()
+    {
+        $collection = new Collection([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+
+        $this->assertEquals(
+            [],
+            $collection->chunk(0)->toArray()
+        );
+    }
+
+    public function testChunkWhenGivenLessThanZero()
+    {
+        $collection = new Collection([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->assertEquals(
+            [],
+            $collection->chunk(-1)->toArray()
+        );
+    }
+
     public function testEvery()
     {
         $data = new Collection([
