@@ -235,6 +235,11 @@ class Worker
             $this->raiseExceptionOccurredJobEvent(
                 $connectionName, $job, $e
             );
+<<<<<<< HEAD
+=======
+        } catch (Exception $exception) {
+            $this->raiseFailedJobEvent($connectionName, $job, $exception);
+>>>>>>> origin/fix-queue-failed-job-event
         } finally {
             if (! $job->isDeleted()) {
                 $job->release($options->delay);
