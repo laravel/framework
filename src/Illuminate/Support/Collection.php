@@ -955,6 +955,12 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function chunk($size)
     {
+        if ($size < 0) {
+            throw new InvalidArgumentException(
+                'Size parameter expected to be greater than 0'
+            );
+        }
+
         if ($size == 0) {
             return new static;
         }
