@@ -956,7 +956,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function chunk($size)
     {
         if ($size == 0) {
-            return $this;
+            return new static;
         }
 
         $chunks = [];
