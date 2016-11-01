@@ -1,5 +1,21 @@
 # Release Notes for 5.3.x
 
+## [Unreleased]
+
+### Added
+- Added support for carbon-copy in mail notifications ([#16152](https://github.com/laravel/framework/pull/16152))
+- Added `-r` shortcut to `make:controller` command ([#16141](https://github.com/laravel/framework/pull/16141))
+- Added `HasDatabaseNotifications::readNotifications()` method ([#16164](https://github.com/laravel/framework/pull/16164))
+- Added `broadcastOn()` method to allow notifications to be broadcasted to custom channels ([#16170](https://github.com/laravel/framework/pull/16170))
+
+### Changed
+- Avoid extraneous database query when last `chunk()` is partial ([#16180](https://github.com/laravel/framework/pull/16180))
+- Return unique middleware stack from `Route::gatherMiddleware()` ([#16185](https://github.com/laravel/framework/pull/16185))
+
+### Fixed
+- Bind `double` as `PDO::PARAM_INT` on MySQL connections ([#16069](https://github.com/laravel/framework/pull/16069))
+
+
 ## v5.3.21 (2016-10-26)
 
 ### Added
