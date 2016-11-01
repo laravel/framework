@@ -6,6 +6,7 @@ use Closure;
 use Carbon\Carbon;
 use LogicException;
 use Cron\CronExpression;
+use Illuminate\Console\Application;
 use GuzzleHttp\Client as HttpClient;
 use Illuminate\Contracts\Mail\Mailer;
 use Symfony\Component\Process\Process;
@@ -28,13 +29,6 @@ class Event
      * @var string
      */
     public $command;
-
-    /**
-     * The cache forget command string.
-     *
-     * @var string
-     */
-    public $cacheForget;
 
     /**
      * The cron expression representing the event's frequency.
@@ -139,14 +133,12 @@ class Event
      *
      * @param  \Illuminate\Contracts\Cache\Repository  $cache
      * @param  string  $command
-     * @param  string  $cacheForget
      * @return void
      */
-    public function __construct(Cache $cache, $command, $cacheForget)
+    public function __construct(Cache $cache, $command)
     {
         $this->cache = $cache;
         $this->command = $command;
-        $this->cacheForget = $cacheForget;
         $this->output = $this->getDefaultOutput();
     }
 
@@ -246,10 +238,12 @@ class Event
         $redirect = $this->shouldAppendOutput ? ' >> ' : ' > ';
 
         if ($this->withoutOverlapping) {
+            $cacheForgetCommand = sprintf("%s %s %s", Application::phpBinary(), Application::artisanBinary(), 'cache:forget');
+
             if (windows_os()) {
-                $command = '('.$this->command.' & '.$this->cacheForget.' "'.$this->mutexName().'")'.$redirect.$output.' 2>&1 &';
+                $command = '('.$this->command.' & '.$cacheForgetCommand.' "'.$this->mutexName().'")'.$redirect.$output.' 2>&1 &';
             } else {
-                $command = '('.$this->command.'; '.$this->cacheForget.' '.$this->mutexName().')'.$redirect.$output.' 2>&1 &';
+                $command = '('.$this->command.'; '.$cacheForgetCommand.' '.$this->mutexName().')'.$redirect.$output.' 2>&1 &';
             }
         } else {
             $command = $this->command.$redirect.$output.' 2>&1 &';
