@@ -696,10 +696,9 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
     {
         $collection = new Collection([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
 
-        $this->expectException(InvalidArgumentException::class);
         $this->assertEquals(
             [],
-            $collection->chunk(-1)->toArray()
+            $collection->chunk(0)->toArray()
         );
     }
 
