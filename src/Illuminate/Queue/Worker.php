@@ -3,6 +3,7 @@
 namespace Illuminate\Queue;
 
 use Exception;
+use RuntimeException;
 use Throwable;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -234,8 +235,6 @@ class Worker
             $this->raiseExceptionOccurredJobEvent(
                 $connectionName, $job, $e
             );
-        } catch(Exception $exception) {
-            $this->raiseFailedJobEvent($connectionName, $job, $exception);
         } finally {
             if (! $job->isDeleted()) {
                 $job->release($options->delay);
@@ -266,8 +265,6 @@ class Worker
         );
 
         $this->failJob($connectionName, $job, $e);
-
-        throw $e;
     }
 
     /**
@@ -303,14 +300,20 @@ class Worker
             return;
         }
 
-        // If the job has failed, we will delete it, call the "failed" method and then call
-        // an event indicating the job has failed so it can be logged if needed. This is
-        // to allow every developer to better keep monitor of their failed queue jobs.
-        $job->delete();
+        try {
+            // If the job has failed, we will delete it, call the "failed" method and then call
+            // an event indicating the job has failed so it can be logged if needed. This is
+            // to allow every developer to better keep monitor of their failed queue jobs.
+            $job->delete();
 
-        $job->failed($e);
+            $job->failed($e);
+        } catch(Exception $exception) {
+            $e = new RuntimeException($exception->getMessage(), $exception->getCode(), $e);
+        }
 
         $this->raiseFailedJobEvent($connectionName, $job, $e);
+
+        throw $e;
     }
 
     /**
