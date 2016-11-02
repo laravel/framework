@@ -11,6 +11,7 @@ use Illuminate\Database\SQLiteConnection;
 use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\SqlServerConnection;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 
 class ConnectionFactory
 {
@@ -113,28 +114,22 @@ class ConnectionFactory
     protected function createPdoResolverWithHosts(array $config)
     {
         return function () use ($config) {
-            if (! is_array($config['host'])) {
-                $hosts = [$config['host']];
-            } else {
-                $hosts = $config['host'];
-                shuffle($hosts);
+            $hosts = is_array($config['host']) ? $config['host'] : [$config['host']];
+
+            if (empty($hosts)) {
+                throw new InvalidArgumentException('Database hosts array is empty.');
             }
 
-            $lastHost = end($hosts);
-            foreach ($hosts as $host) {
+            foreach (Arr::shuffle($hosts) as $key => $host) {
                 $config['host'] = $host;
 
                 try {
                     return $this->createConnector($config)->connect($config);
                 } catch (PDOException $e) {
-	                if ($host !== $lastHost) {
-	                    $this->container->make('Illuminate\Contracts\Debug\ExceptionHandler')->report($e);
+	                if (count($hosts) - 1 === $key) {
+	                    $this->container->make(ExceptionHandler::class)->report($e);
                     }
                 }
-            }
-
-            if (empty($hosts)) {
-                throw new InvalidArgumentException('Database hosts array cannot be empty');
             }
 
             throw $e;

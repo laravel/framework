@@ -458,6 +458,19 @@ class Arr
     }
 
     /**
+     * Shuffle the given array and return the result.
+     *
+     * @param  array  $array
+     * @return array
+     */
+    public static function shuffle($array)
+    {
+        shuffle($array);
+
+        return $array;
+    }
+
+    /**
      * Sort the array using the given callback or "dot" notation.
      *
      * @param  array  $array
