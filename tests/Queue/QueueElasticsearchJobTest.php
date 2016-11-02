@@ -33,7 +33,7 @@ class QueueElasticsearchJobTest extends PHPUnit_Framework_TestCase
             'id' => $this->mockId,
             'queue' => $this->queueName,
             'attempts' => 0,
-            'reserved_at' => null,
+            'reserved_at' => 0,
             'available_at' => Carbon::now()->getTimestamp(),
             'created_at' => Carbon::now()->getTimestamp(),
             'payload' => $this->mockPayload,
@@ -68,13 +68,18 @@ class QueueElasticsearchJobTest extends PHPUnit_Framework_TestCase
         $params['index'] = $this->index;
         $params['type'] = $this->queueName;
         $params['id'] = $this->mockId;
-        $params['body']['doc'] = [
-            'available_at' => Carbon::now()->getTimestamp(),
+        $params['body'] = [
+            'id' => $this->mockId,
+            'queue' => $this->queueName,
+            'attempts' => 0,
             'reserved_at' => null,
-            'attempts' => 1
+            'available_at' => Carbon::now()->getTimestamp(),
+            'created_at' => Carbon::now()->getTimestamp(),
+            'payload' => $this->mockPayload,
         ];
 
-        $this->elasticsearch->expects($this->once())->method('update')->with($params);
+        $this->elasticsearch->expects($this->once())->method('delete')->with(['index' => $this->index, 'type' => $this->queueName, 'id' => $this->mockId]);
+        $this->elasticsearch->expects($this->once())->method('index')->with($params);
 
         $job->release();
 

@@ -123,7 +123,7 @@ class ElasticsearchQueue extends Queue implements QueueContract
         $availableAt = $this->getAvailableAt(0);
 
         $records = array_map(function ($job) use ($queue, $data, $availableAt) {
-            return $this->buildElasticsearchRecord(
+            return $this->buildElasticsearchDoc(
                 $queue, $this->createPayload($job, $data), $availableAt
             );
         }, (array) $jobs);
@@ -141,24 +141,7 @@ class ElasticsearchQueue extends Queue implements QueueContract
      */
     public function release($queue, $job, $delay)
     {
-//        return $this->pushToElasticsearch($delay, $queue, $job->payload, $job->attempts);
-
-        $job->attempts = $job->attempts + 1;
-        $job->reserved_at = null;
-        $job->available_at = $this->getAvailableAt($delay);
-
-        $params['index'] = $this->index;
-        $params['type'] = $queue;
-        $params['id'] = $job->id;
-        $params['body']['doc'] = [
-            'available_at' => $job->available_at,
-            'reserved_at' => $job->reserved_at,
-            'attempts' => $job->attempts
-        ];
-
-        $this->elasticsearch->update($params);
-
-        return $job;
+        return $this->pushToElasticsearch($delay, $queue, $job->payload, $job->attempts);
     }
 
     /**
@@ -308,7 +291,7 @@ class ElasticsearchQueue extends Queue implements QueueContract
             'id' => $this->retrieveFromPayload('id',$payload),
             'queue' => $queue,
             'attempts' => $attempts,
-            'reserved_at' => null,
+            'reserved_at' => 0,
             'available_at' => $availableAt,
             'created_at' => $this->getTime(),
             'payload' => $payload,
