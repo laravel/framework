@@ -41,6 +41,11 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
             $table->timestamps();
         });
 
+        $this->schema('default')->create('with_json', function ($table) {
+            $table->increments('id');
+            $table->text('json')->default(json_encode([]));
+        });
+
         $this->schema('second_connection')->create('test_items', function ($table) {
             $table->increments('id');
             $table->timestamps();
@@ -808,6 +813,22 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, EloquentTestPost::count());
     }
 
+    public function testSavingJSONFields()
+    {
+        $model = EloquentTestWithJSON::create(['json' => ['x' => 0]]);
+        $this->assertEquals(['x' => 0], $model->json);
+
+        $model->fillable(['json->y', 'json->a->b']);
+
+        $model->update(['json->y' => '1']);
+        $this->assertArrayNotHasKey('json->y', $model->toArray());
+        $this->assertEquals(['x' => 0, 'y' => 1], $model->json);
+
+        $model->update(['json->a->b' => '3']);
+        $this->assertArrayNotHasKey('json->a->b', $model->toArray());
+        $this->assertEquals(['x' => 0, 'y' => 1, 'a' => ['b' => 3]], $model->json);
+    }
+
     /**
      * @expectedException Exception
      */
@@ -1150,4 +1171,14 @@ class EloquentTestItem extends Eloquent
     protected $guarded = [];
     protected $table = 'test_items';
     protected $connection = 'second_connection';
+}
+
+class EloquentTestWithJSON extends Eloquent
+{
+    protected $guarded = [];
+    protected $table = 'with_json';
+    public $timestamps = false;
+    protected $casts = [
+        'json' => 'array',
+    ];
 }

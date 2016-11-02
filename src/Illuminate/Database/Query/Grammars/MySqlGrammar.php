@@ -128,7 +128,7 @@ class MySqlGrammar extends Grammar
 
         $sql = rtrim("update {$table}{$joins} set $columns $where");
 
-        if (isset($query->orders)) {
+        if (! empty($query->orders)) {
             $sql .= ' '.$this->compileOrders($query, $query->orders);
         }
 
@@ -199,7 +199,7 @@ class MySqlGrammar extends Grammar
         } else {
             $sql = trim("delete from $table $where");
 
-            if (isset($query->orders)) {
+            if (! empty($query->orders)) {
                 $sql .= ' '.$this->compileOrders($query, $query->orders);
             }
 

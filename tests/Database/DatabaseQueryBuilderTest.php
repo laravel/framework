@@ -598,6 +598,12 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $builder->select('*')->from('users')->orderBy('email')->orderBy('age', 'desc');
         $this->assertEquals('select * from "users" order by "email" asc, "age" desc', $builder->toSql());
 
+        $builder->orders = null;
+        $this->assertEquals('select * from "users"', $builder->toSql());
+
+        $builder->orders = [];
+        $this->assertEquals('select * from "users"', $builder->toSql());
+
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->orderBy('email')->orderByRaw('"age" ? desc', ['foo']);
         $this->assertEquals('select * from "users" order by "email" asc, "age" ? desc', $builder->toSql());
