@@ -1036,6 +1036,87 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('EloquentModelSaveStub', $relation->getQuery()->getModel());
     }
 
+    public function testRelationsWithVariedConnections()
+    {
+        // Has one
+        $model = new EloquentModelStub;
+        $model->setConnection('non_default');
+        $this->addMockConnection($model);
+        $relation = $model->hasOne('EloquentNoConnectionModelStub');
+        $this->assertEquals('non_default', $relation->getRelated()->getConnectionName());
+
+        $model = new EloquentModelStub;
+        $model->setConnection('non_default');
+        $this->addMockConnection($model);
+        $relation = $model->hasOne('EloquentDifferentConnectionModelStub');
+        $this->assertEquals('different_connection', $relation->getRelated()->getConnectionName());
+
+        // Morph One
+        $model = new EloquentModelStub;
+        $model->setConnection('non_default');
+        $this->addMockConnection($model);
+        $relation = $model->morphOne('EloquentNoConnectionModelStub', 'type');
+        $this->assertEquals('non_default', $relation->getRelated()->getConnectionName());
+
+        $model = new EloquentModelStub;
+        $model->setConnection('non_default');
+        $this->addMockConnection($model);
+        $relation = $model->morphOne('EloquentDifferentConnectionModelStub', 'type');
+        $this->assertEquals('different_connection', $relation->getRelated()->getConnectionName());
+
+        // Belongs to
+        $model = new EloquentModelStub;
+        $model->setConnection('non_default');
+        $this->addMockConnection($model);
+        $relation = $model->belongsTo('EloquentNoConnectionModelStub');
+        $this->assertEquals('non_default', $relation->getRelated()->getConnectionName());
+
+        $model = new EloquentModelStub;
+        $model->setConnection('non_default');
+        $this->addMockConnection($model);
+        $relation = $model->belongsTo('EloquentDifferentConnectionModelStub');
+        $this->assertEquals('different_connection', $relation->getRelated()->getConnectionName());
+
+        // has many
+        $model = new EloquentModelStub;
+        $model->setConnection('non_default');
+        $this->addMockConnection($model);
+        $relation = $model->hasMany('EloquentNoConnectionModelStub');
+        $this->assertEquals('non_default', $relation->getRelated()->getConnectionName());
+
+        $model = new EloquentModelStub;
+        $model->setConnection('non_default');
+        $this->addMockConnection($model);
+        $relation = $model->hasMany('EloquentDifferentConnectionModelStub');
+        $this->assertEquals('different_connection', $relation->getRelated()->getConnectionName());
+
+        // has many through
+        $model = new EloquentModelStub;
+        $model->setConnection('non_default');
+        $this->addMockConnection($model);
+        $relation = $model->hasManyThrough('EloquentNoConnectionModelStub', 'EloquentModelSaveStub');
+        $this->assertEquals('non_default', $relation->getRelated()->getConnectionName());
+
+        $model = new EloquentModelStub;
+        $model->setConnection('non_default');
+        $this->addMockConnection($model);
+        $relation = $model->hasManyThrough('EloquentDifferentConnectionModelStub', 'EloquentModelSaveStub');
+        $this->assertEquals('different_connection', $relation->getRelated()->getConnectionName());
+
+        // belongs to many
+        $model = new EloquentModelStub;
+        $model->setConnection('non_default');
+        $this->addMockConnection($model);
+        $relation = $model->belongsToMany('EloquentNoConnectionModelStub');
+        $this->assertEquals('non_default', $relation->getRelated()->getConnectionName());
+
+        $model = new EloquentModelStub;
+        $model->setConnection('non_default');
+        $this->addMockConnection($model);
+        $relation = $model->belongsToMany('EloquentDifferentConnectionModelStub');
+        $this->assertEquals('different_connection', $relation->getRelated()->getConnectionName());
+    }
+
     public function testModelsAssumeTheirName()
     {
         require_once __DIR__.'/stubs/EloquentModelNamespacedStub.php';
@@ -1835,6 +1916,15 @@ class EloquentModelNonIncrementingStub extends Illuminate\Database\Eloquent\Mode
     protected $table = 'stub';
     protected $guarded = [];
     public $incrementing = false;
+}
+
+class EloquentNoConnectionModelStub extends EloquentModelStub
+{
+}
+
+class EloquentDifferentConnectionModelStub extends EloquentModelStub
+{
+    public $connection = 'different_connection';
 }
 
 class EloquentModelSavingEventStub
