@@ -14,6 +14,7 @@ trait ValidatesWhenResolvedTrait
      */
     public function validate()
     {
+        $this->beforeValidation();
         $instance = $this->getValidatorInstance();
 
         if (! $this->passesAuthorization()) {
@@ -21,6 +22,7 @@ trait ValidatesWhenResolvedTrait
         } elseif (! $instance->passes()) {
             $this->failedValidation($instance);
         }
+        $this->afterValidation();
     }
 
     /**
@@ -70,5 +72,25 @@ trait ValidatesWhenResolvedTrait
     protected function failedAuthorization()
     {
         throw new UnauthorizedException;
+    }
+
+    /**
+     * Provide a hook for taking action before validation
+     *
+     * @return void
+     */
+    protected function beforeValidation()
+    {
+        // no default action
+    }
+
+    /**
+     * Provide a hook for taking action after validation
+     *
+     * @return void
+     */
+    protected function afterValidation()
+    {
+        // no default action
     }
 }
