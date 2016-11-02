@@ -2,8 +2,6 @@
 
 namespace Illuminate\Http;
 
-use Ramsey\Uuid\Uuid;
-
 trait FileHelpers
 {
     /**
@@ -48,6 +46,6 @@ trait FileHelpers
             $path = rtrim($path, '/').'/';
         }
 
-        return str_replace('-', '', $path.Uuid::uuid4()->toString()).'.'.$this->guessExtension();
+        return str_replace('-', '', $path.str_random(32)).'.'.$this->guessExtension();
     }
 }
