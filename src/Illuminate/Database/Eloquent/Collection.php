@@ -218,6 +218,19 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Append attributes to the entire collection.
+     *
+     * @param  array|string  $attributes
+     * @return $this
+     */
+    public function append($attributes)
+    {
+        return $this->each(function ($model) use ($attributes) {
+            $model->append($attributes);
+        });
+    }
+
+    /**
      * Make the given, typically visible, attributes hidden across the entire collection.
      *
      * @param  array|string  $attributes
