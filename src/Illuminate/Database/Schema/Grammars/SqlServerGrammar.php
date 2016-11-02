@@ -584,7 +584,7 @@ class SqlServerGrammar extends Grammar
         return 'nvarchar(17)';
     }
 
-     /**
+    /**
      * Get the SQL for a collation column modifier.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
