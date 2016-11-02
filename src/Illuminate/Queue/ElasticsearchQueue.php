@@ -155,12 +155,15 @@ class ElasticsearchQueue extends Queue implements QueueContract
      */
     protected function pushToElasticsearch($delay, $queue, $payload, $attempts = 0)
     {
+
+        $queue = $this->getQueue($queue);
+
         $attributes = $this->buildElasticsearchDoc(
-            $this->getQueue($queue), $payload, $this->getAvailableAt($delay), $attempts
+            $queue, $payload, $this->getAvailableAt($delay), $attempts
         );
 
         $params['index'] = $this->index;
-        $params['type'] = $this->getQueue($queue);
+        $params['type'] = $queue;
         $params['id'] = $attributes['id'];
         $params['body'] = $attributes;
 
@@ -289,7 +292,7 @@ class ElasticsearchQueue extends Queue implements QueueContract
     {
         return [
             'id' => $this->retrieveFromPayload('id',$payload),
-            'queue' => $queue,
+            'queue' => $this->getQueue($queue),
             'attempts' => $attempts,
             'reserved_at' => 0,
             'available_at' => $availableAt,

@@ -13,6 +13,7 @@ class QueueElasticsearchQueueTest extends PHPUnit_Framework_TestCase
     private $mockPayload;
     private $mockDelay;
     private $mockId;
+    private $queue;
 
     public function tearDown()
     {
@@ -29,14 +30,13 @@ class QueueElasticsearchQueueTest extends PHPUnit_Framework_TestCase
         $this->mockId = '1111';
         $this->mockPayload = json_encode(['id' => $this->mockId, 'job' => $this->mockJob, 'data' => $this->mockData]);
         $this->mockDelay = 10;
+        $this->queue = $this->getMockBuilder('Illuminate\Queue\ElasticsearchQueue')->setMethods(['getQueue','createPayload'])->setConstructorArgs([$this->elasticsearch, $this->index, $this->queueName, 60])->getMock();
+        $this->queue->setContainer(m::mock('Illuminate\Container\Container'));
     }
 
     public function testPopProperlyPopsJobOffOfElasticsearch()
     {
-        $queue = $this->getMockBuilder('Illuminate\Queue\ElasticsearchQueue')->setMethods(['getQueue'])->setConstructorArgs([$this->elasticsearch, $this->index, $this->queueName, 60])->getMock();
-        $queue->setContainer(m::mock('Illuminate\Container\Container'));
-
-        $queue->expects($this->atLeastOnce())->method('getQueue')->with($this->queueName)->will($this->returnValue($this->queueName));
+        $this->queue->expects($this->atLeastOnce())->method('getQueue')->with($this->queueName)->will($this->returnValue($this->queueName));
 
         $params['index'] = $this->index;
         $params['type'] = $this->queueName;
@@ -54,7 +54,7 @@ class QueueElasticsearchQueueTest extends PHPUnit_Framework_TestCase
 
         $this->elasticsearch->expects($this->once())->method('search')->with($params);
 
-        $queue->pop($this->queueName);
+        $this->queue->pop($this->queueName);
     }
 
     public function testDelayedPushProperlyPushesJobOntoElasticsearch()
@@ -63,11 +63,8 @@ class QueueElasticsearchQueueTest extends PHPUnit_Framework_TestCase
 
         $delay = 10;
 
-        $queue = $this->getMockBuilder('Illuminate\Queue\ElasticsearchQueue')->setMethods(['getQueue','createPayload'])->setConstructorArgs([$this->elasticsearch, $this->index, $this->queueName, 60])->getMock();
-        $queue->setContainer(m::mock('Illuminate\Container\Container'));
-
-        $queue->expects($this->once())->method('createPayload')->with($this->mockJob, $this->mockData)->will($this->returnValue($this->mockPayload));
-        $queue->expects($this->atLeastOnce())->method('getQueue')->with($this->queueName)->will($this->returnValue($this->queueName));
+        $this->queue->expects($this->once())->method('createPayload')->with($this->mockJob, $this->mockData)->will($this->returnValue($this->mockPayload));
+        $this->queue->expects($this->atLeastOnce())->method('getQueue')->with($this->queueName)->will($this->returnValue($this->queueName));
 
         $params['index'] = $this->index;
         $params['type'] = $this->queueName;
@@ -76,7 +73,7 @@ class QueueElasticsearchQueueTest extends PHPUnit_Framework_TestCase
             'id' => $this->mockId,
             'queue' => $this->queueName,
             'attempts' => 0,
-            'reserved_at' => null,
+            'reserved_at' => 0,
             'available_at' => $now->getTimestamp()+$delay,
             'created_at' => $now->getTimestamp(),
             'payload' => $this->mockPayload,
@@ -84,7 +81,7 @@ class QueueElasticsearchQueueTest extends PHPUnit_Framework_TestCase
 
         $this->elasticsearch->expects($this->once())->method('index')->with($params);
 
-        $id = $queue->later($delay, $this->mockJob, $this->mockData, $this->queueName);
+        $id = $this->queue->later($delay, $this->mockJob, $this->mockData, $this->queueName);
 
         $this->assertEquals($this->mockId, $id);
     }
@@ -93,11 +90,8 @@ class QueueElasticsearchQueueTest extends PHPUnit_Framework_TestCase
     {
         $now = Carbon::now();
 
-        $queue = $this->getMockBuilder('Illuminate\Queue\ElasticsearchQueue')->setMethods(['getQueue','createPayload'])->setConstructorArgs([$this->elasticsearch, $this->index, $this->queueName, 60])->getMock();
-        $queue->setContainer(m::mock('Illuminate\Container\Container'));
-
-        $queue->expects($this->once())->method('createPayload')->with($this->mockJob, $this->mockData)->will($this->returnValue($this->mockPayload));
-        $queue->expects($this->atLeastOnce())->method('getQueue')->with($this->queueName)->will($this->returnValue($this->queueName));
+        $this->queue->expects($this->once())->method('createPayload')->with($this->mockJob, $this->mockData)->will($this->returnValue($this->mockPayload));
+        $this->queue->expects($this->atLeastOnce())->method('getQueue')->with($this->queueName)->will($this->returnValue($this->queueName));
 
         $params['index'] = $this->index;
         $params['type'] = $this->queueName;
@@ -106,7 +100,7 @@ class QueueElasticsearchQueueTest extends PHPUnit_Framework_TestCase
             'id' => $this->mockId,
             'queue' => $this->queueName,
             'attempts' => 0,
-            'reserved_at' => null,
+            'reserved_at' => 0,
             'available_at' => $now->getTimestamp(),
             'created_at' => $now->getTimestamp(),
             'payload' => $this->mockPayload,
@@ -114,7 +108,7 @@ class QueueElasticsearchQueueTest extends PHPUnit_Framework_TestCase
 
         $this->elasticsearch->expects($this->once())->method('index')->with($params);
 
-        $id = $queue->push($this->mockJob, $this->mockData, $this->queueName);
+        $id = $this->queue->push($this->mockJob, $this->mockData, $this->queueName);
 
         $this->assertEquals($this->mockId, $id);
     }

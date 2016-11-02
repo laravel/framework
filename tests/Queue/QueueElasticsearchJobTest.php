@@ -25,8 +25,7 @@ class QueueElasticsearchJobTest extends PHPUnit_Framework_TestCase
         $this->mockData = ['data'];
         $this->mockId = '1111';
         $this->mockPayload = json_encode(['id' => $this->mockId, 'job' => $this->mockJob, 'data' => $this->mockData]);
-
-        $this->queue = $this->getMockBuilder('Illuminate\Queue\ElasticsearchQueue')->setMethods(['getQueue'])->setConstructorArgs([$this->elasticsearch, $this->index, $this->queueName, 60])->getMock();
+        $this->queue = new Illuminate\Queue\ElasticsearchQueue($this->elasticsearch, $this->index, $this->queueName, 60);
         $this->mockContainer = m::mock('Illuminate\Container\Container');
 
         $this->mockJobData = [
@@ -72,7 +71,7 @@ class QueueElasticsearchJobTest extends PHPUnit_Framework_TestCase
             'id' => $this->mockId,
             'queue' => $this->queueName,
             'attempts' => 0,
-            'reserved_at' => null,
+            'reserved_at' => 0,
             'available_at' => Carbon::now()->getTimestamp(),
             'created_at' => Carbon::now()->getTimestamp(),
             'payload' => $this->mockPayload,
