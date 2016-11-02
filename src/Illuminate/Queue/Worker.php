@@ -264,6 +264,8 @@ class Worker
         );
 
         $this->failJob($connectionName, $job, $e);
+
+        throw $e;
     }
 
     /**
@@ -292,8 +294,6 @@ class Worker
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  \Exception  $e
      * @return void
-     *
-     * @throws \Exception
      */
     protected function failJob($connectionName, $job, $e)
     {
@@ -308,12 +308,10 @@ class Worker
             $job->delete();
 
             $job->failed($e);
-        } catch (Exception $e) {
+        } catch (Exception $exception) {
         }
 
         $this->raiseFailedJobEvent($connectionName, $job, $e);
-
-        throw $e;
     }
 
     /**
