@@ -532,6 +532,10 @@ class Grammar extends BaseGrammar
      */
     protected function compileOrders(Builder $query, $orders)
     {
+        if (empty($orders)) {
+            return '';
+        }
+
         return 'order by '.implode(', ', array_map(function ($order) {
             if (isset($order['sql'])) {
                 return $order['sql'];
@@ -590,7 +594,7 @@ class Grammar extends BaseGrammar
             $sql .= $this->compileUnion($union);
         }
 
-        if (isset($query->unionOrders)) {
+        if (! empty($query->unionOrders)) {
             $sql .= ' '.$this->compileOrders($query, $query->unionOrders);
         }
 
