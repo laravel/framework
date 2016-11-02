@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Connectors;
 
 use PDO;
+use PDOException;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Illuminate\Database\MySqlConnection;
@@ -96,6 +97,58 @@ class ConnectionFactory
      */
     protected function createPdoResolver(array $config)
     {
+        if (array_key_exists('host', $config)) {
+            return $this->createPdoResolverWithHosts($config);
+        }
+
+        return $this->createPdoResolverWithoutHosts($config);
+    }
+
+    /**
+     * Create a new Closure that resolves to a PDO instance with a specific host or an array of hosts.
+     *
+     * @param  array  $config
+     * @return \Closure
+     */
+    protected function createPdoResolverWithHosts(array $config)
+    {
+        return function () use ($config) {
+            if (! is_array($config['host'])) {
+                $hosts = [$config['host']];
+            } else {
+                $hosts = $config['host'];
+                shuffle($hosts);
+            }
+
+            $lastHost = end($hosts);
+            foreach ($hosts as $host) {
+                $config['host'] = $host;
+
+                try {
+                    return $this->createConnector($config)->connect($config);
+                } catch (PDOException $e) {
+	                if ($host !== $lastHost) {
+	                    $this->container->make('Illuminate\Contracts\Debug\ExceptionHandler')->report($e);
+                    }
+                }
+            }
+
+            if (empty($hosts)) {
+                throw new InvalidArgumentException('Database hosts array cannot be empty');
+            }
+
+            throw $e;
+        };
+    }
+
+    /**
+     * Create a new Closure that resolves to a PDO instance where there is no configured host.
+     *
+     * @param  array  $config
+     * @return \Closure
+     */
+    protected function createPdoResolverWithoutHosts(array $config)
+    {
         return function () use ($config) {
             return $this->createConnector($config)->connect($config);
         };
@@ -110,12 +163,6 @@ class ConnectionFactory
     protected function getReadConfig(array $config)
     {
         $readConfig = $this->getReadWriteConfig($config, 'read');
-
-        if (isset($readConfig['host']) && is_array($readConfig['host'])) {
-            $readConfig['host'] = count($readConfig['host']) > 1
-                ? $readConfig['host'][array_rand($readConfig['host'])]
-                : $readConfig['host'][0];
-        }
 
         return $this->mergeReadWriteConfig($config, $readConfig);
     }
