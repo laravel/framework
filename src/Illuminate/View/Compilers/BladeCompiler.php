@@ -997,7 +997,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function stripQuotes($expression)
     {
         if (Str::startsWith($expression, ["'", '"'])) {
-            $expression = substr($expression, 1, - 1);
+            $expression = substr($expression, 1, -1);
         }
 
         return $expression;
