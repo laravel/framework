@@ -63,7 +63,7 @@ class ElasticsearchQueue extends Queue implements QueueContract
      */
     public function size($queue = null)
     {
-        $result = $this->elasticsearch->search(['index'=>$this->index,'type'=>$this->getQueue($queue)]);
+        $result = $this->elasticsearch->search(['index'=>$this->index, 'type' => $this->getQueue($queue)]);
 
         return $result['hits']['total'];
     }
@@ -184,7 +184,7 @@ class ElasticsearchQueue extends Queue implements QueueContract
 
         if ($job = $this->getNextAvailableJob($queue)) {
 
-            $job = $this->markJobAsReserved($job,$queue);
+            $job = $this->markJobAsReserved($job, $queue);
 
             return new ElasticsearchJob(
                 $this->container, $this, $job, $queue
@@ -214,11 +214,11 @@ class ElasticsearchQueue extends Queue implements QueueContract
           ]
         ];
         $params['size'] = 1;
-        $params['sort'] = ['reserved_at:desc','available_at:desc'];
+        $params['sort'] = ['reserved_at:desc', 'available_at:desc'];
 
         $result = $this->elasticsearch->search($params);
 
-        if($result['hits']['total']) {
+        if ($result['hits']['total']) {
             $job = $result['hits']['hits'][0]['_source'];
         }
 
@@ -232,7 +232,7 @@ class ElasticsearchQueue extends Queue implements QueueContract
      * @param $queue
      * @return mixed
      */
-    protected function markJobAsReserved($job,$queue = null)
+    protected function markJobAsReserved($job, $queue = null)
     {
         $job->attempts = $job->attempts + 1;
         $job->reserved_at = $this->getTime();
@@ -242,7 +242,7 @@ class ElasticsearchQueue extends Queue implements QueueContract
         $params['id'] = $job->id;
         $params['body']['doc'] = [
             'reserved_at' => $job->reserved_at,
-            'attempts' => $job->attempts
+            'attempts' => $job->attempts,
         ];
 
         $this->elasticsearch->update($params);
@@ -260,7 +260,7 @@ class ElasticsearchQueue extends Queue implements QueueContract
     public function deleteReserved($queue, $id)
     {
         $params['index'] = $this->index;
-        $params['type'] =  $queue;
+        $params['type'] = $queue;
         $params['id'] = $id;
 
         $this->elasticsearch->delete($params);
@@ -291,7 +291,7 @@ class ElasticsearchQueue extends Queue implements QueueContract
     protected function buildElasticsearchDoc($queue, $payload, $availableAt, $attempts = 0)
     {
         return [
-            'id' => $this->retrieveFromPayload('id',$payload),
+            'id' => $this->retrieveFromPayload('id', $payload),
             'queue' => $this->getQueue($queue),
             'attempts' => $attempts,
             'reserved_at' => 0,
@@ -323,7 +323,7 @@ class ElasticsearchQueue extends Queue implements QueueContract
      * @param $payload
      * @return mixed
      */
-    protected function retrieveFromPayload($field,$payload)
+    protected function retrieveFromPayload($field, $payload)
     {
         $payload = json_decode($payload);
 

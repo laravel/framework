@@ -30,7 +30,7 @@ class QueueElasticsearchQueueTest extends PHPUnit_Framework_TestCase
         $this->mockId = '1111';
         $this->mockPayload = json_encode(['id' => $this->mockId, 'job' => $this->mockJob, 'data' => $this->mockData]);
         $this->mockDelay = 10;
-        $this->queue = $this->getMockBuilder('Illuminate\Queue\ElasticsearchQueue')->setMethods(['getQueue','createPayload'])->setConstructorArgs([$this->elasticsearch, $this->index, $this->queueName, 60])->getMock();
+        $this->queue = $this->getMockBuilder('Illuminate\Queue\ElasticsearchQueue')->setMethods(['getQueue', 'createPayload'])->setConstructorArgs([$this->elasticsearch, $this->index, $this->queueName, 60])->getMock();
         $this->queue->setContainer(m::mock('Illuminate\Container\Container'));
     }
 
@@ -45,12 +45,12 @@ class QueueElasticsearchQueueTest extends PHPUnit_Framework_TestCase
                 'range' => [
                     'reserved_at' => [
                         'lte' => Carbon::now()->subSeconds(60)->getTimestamp(),
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ];
         $params['size'] = 1;
-        $params['sort'] = ['reserved_at:desc','available_at:desc'];
+        $params['sort'] = ['reserved_at:desc', 'available_at:desc'];
 
         $this->elasticsearch->expects($this->once())->method('search')->with($params);
 
@@ -74,7 +74,7 @@ class QueueElasticsearchQueueTest extends PHPUnit_Framework_TestCase
             'queue' => $this->queueName,
             'attempts' => 0,
             'reserved_at' => 0,
-            'available_at' => $now->getTimestamp()+$delay,
+            'available_at' => $now->addSeconds($delay)->getTimestamp(),
             'created_at' => $now->getTimestamp(),
             'payload' => $this->mockPayload,
         ];
@@ -112,5 +112,4 @@ class QueueElasticsearchQueueTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals($this->mockId, $id);
     }
-
 }
