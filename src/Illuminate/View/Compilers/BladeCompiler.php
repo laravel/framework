@@ -5,6 +5,7 @@ namespace Illuminate\View\Compilers;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\View\Factory as ViewFactory;
+use Illuminate\View\ViewFinderInterface;
 
 class BladeCompiler extends Compiler implements CompilerInterface
 {
@@ -995,10 +996,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     public function stripQuotes($expression)
     {
-        foreach (["'", '"'] as $quote) {
-            if (Str::startsWith($expression, $quote)) {
-                $expression = substr($expression, 1, -1);
-            }
+        if (Str::startsWith($expression, ["'", '"'])) {
+            $expression = substr($expression, 1, - 1);
         }
 
         return $expression;
@@ -1163,13 +1162,15 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     private function viewBase()
     {
+        $namespaceDelimiter = ViewFinderInterface::HINT_PATH_DELIMITER;
+
         $parts = explode('.', $this->view);
 
         array_pop($parts);
 
-        if (Str::contains($this->view, '::')) {
+        if (Str::contains($this->view, $namespaceDelimiter)) {
             return empty($parts)
-                   ? strtok($this->view, '::').'::' : implode('.', $parts).'.';
+                   ? strtok($this->view, $namespaceDelimiter).$namespaceDelimiter : implode('.', $parts).'.';
         }
 
         return count($parts) > 1 ? implode('.', $parts).'.' : head($parts);
@@ -1183,8 +1184,10 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     public function getViewNameFromExpression($expression)
     {
-        if ($this->view && Str::startsWith($stripped = $this->stripQuotes($expression), '>')) {
-            return "'".$this->viewBase().ltrim($stripped, '>')."'";
+        $relativePathDelimiter = ViewFinderInterface::RELATIVE_PATH_DELIMITER;
+
+        if ($this->view && Str::startsWith($stripped = $this->stripQuotes($expression), $relativePathDelimiter)) {
+            return "'".$this->viewBase().ltrim($stripped, $relativePathDelimiter)."'";
         }
 
         return $expression;

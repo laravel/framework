@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\View\ViewFinderInterface;
 use Mockery as m;
 use Illuminate\View\Compilers\BladeCompiler;
 
@@ -700,20 +701,22 @@ empty
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
 
+        $delimiter = ViewFinderInterface::RELATIVE_PATH_DELIMITER;
+
         $compiler->setView(null);
         $this->assertEquals("'bar'", $compiler->getViewNameFromExpression("'bar'"));
 
         $compiler->setView(null);
-        $this->assertEquals("'>bar'", $compiler->getViewNameFromExpression("'>bar'"));
+        $this->assertEquals("'{$delimiter}bar'", $compiler->getViewNameFromExpression("'{$delimiter}bar'"));
 
         $compiler->setView('foo');
-        $this->assertEquals("'bar'", $compiler->getViewNameFromExpression("'>bar'"));
+        $this->assertEquals("'bar'", $compiler->getViewNameFromExpression("'{$delimiter}bar'"));
 
         $compiler->setView('hadi.badi.zabadi');
-        $this->assertEquals("'hadi.badi.nadi'", $compiler->getViewNameFromExpression("'>nadi'"));
+        $this->assertEquals("'hadi.badi.nadi'", $compiler->getViewNameFromExpression("'{$delimiter}nadi'"));
 
         $compiler->setView('hadi.badi.zabadi');
-        $this->assertEquals("'hadi.badi.nadi'", $compiler->getViewNameFromExpression('">nadi"'));
+        $this->assertEquals("'hadi.badi.nadi'", $compiler->getViewNameFromExpression('"'.$delimiter.'nadi"'));
 
         $compiler->setView('foo.bar');
         $this->assertEquals("'foo.bar.baz'", $compiler->getViewNameFromExpression("'foo.bar.baz'"));
@@ -722,10 +725,10 @@ empty
         $this->assertEquals('foo(bar)', $compiler->getViewNameFromExpression('foo(bar)'));
 
         $compiler->setView('namespace::foo');
-        $this->assertEquals("'namespace::baz'", $compiler->getViewNameFromExpression("'>baz'"));
+        $this->assertEquals("'namespace::baz'", $compiler->getViewNameFromExpression("'{$delimiter}baz'"));
 
         $compiler->setView('namespace::foo.bar');
-        $this->assertEquals("'namespace::foo.baz'", $compiler->getViewNameFromExpression("'>baz'"));
+        $this->assertEquals("'namespace::foo.baz'", $compiler->getViewNameFromExpression("'{$delimiter}baz'"));
     }
 
     public function testShowEachAreCompiled()

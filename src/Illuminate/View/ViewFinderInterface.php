@@ -12,6 +12,13 @@ interface ViewFinderInterface
     const HINT_PATH_DELIMITER = '::';
 
     /**
+     * Relative path delimiter value.
+     *
+     * @var string
+     */
+    const RELATIVE_PATH_DELIMITER = ':';
+
+    /**
      * Get the fully qualified location of the view.
      *
      * @param  string  $view
