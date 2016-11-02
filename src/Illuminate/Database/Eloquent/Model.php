@@ -2877,7 +2877,30 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $value = $this->asJson($value);
         }
 
+        if (Str::contains($key, '->')) {
+            return $this->jsonSetAttribute($key, $value);
+        }
+
         $this->attributes[$key] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Set a given JSON attribute on the model.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function jsonSetAttribute($key, $value){
+        list($key, $path) = explode('->', $key, 2);
+
+        $arrayValue = isset($this->attributes[$key]) ? $this->fromJson($this->attributes[$key]) : [];
+
+        Arr::set($arrayValue, str_replace('->', '.', $path), $value);
+
+        $this->attributes[$key] = $this->asJson($arrayValue);
 
         return $this;
     }
