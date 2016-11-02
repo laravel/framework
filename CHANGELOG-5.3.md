@@ -2,6 +2,18 @@
 
 ## [Unreleased]
 
+### Changed
+- Dried-up console parser and extract token parsing ([#16197](https://github.com/laravel/framework/pull/16197))
+- Support empty array for query builder `orders` property ([#16225](https://github.com/laravel/framework/pull/16225))
+- Properly handle filling JSON attributes on Eloquent models ([#16228](https://github.com/laravel/framework/pull/16228))
+
+### Fixed
+- Catch errors when handling a failed job ([#16212](https://github.com/laravel/framework/pull/16212))
+- Return array from `Translator::sortReplacements()` ([#16221](https://github.com/laravel/framework/pull/16221))
+
+
+## v5.3.22 (2016-11-01)
+
 ### Added
 - Added support for carbon-copy in mail notifications ([#16152](https://github.com/laravel/framework/pull/16152))
 - Added `-r` shortcut to `make:controller` command ([#16141](https://github.com/laravel/framework/pull/16141))
@@ -11,6 +23,7 @@
 ### Changed
 - Avoid extraneous database query when last `chunk()` is partial ([#16180](https://github.com/laravel/framework/pull/16180))
 - Return unique middleware stack from `Route::gatherMiddleware()` ([#16185](https://github.com/laravel/framework/pull/16185))
+- Return early when `Collection::chunk()` size zero or less ([#16206](https://github.com/laravel/framework/pull/16206), [46ebd7f](https://github.com/laravel/framework/commit/46ebd7fa1f35eeb37af891abfc611f7262c91c29))
 
 ### Fixed
 - Bind `double` as `PDO::PARAM_INT` on MySQL connections ([#16069](https://github.com/laravel/framework/pull/16069))
