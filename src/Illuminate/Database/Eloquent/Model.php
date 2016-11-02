@@ -2415,14 +2415,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  int  $options
      * @return string
      *
-     * @throws \InvalidArgumentException
+     * @throws JsonEncodingException
      */
     public function toJson($options = 0)
     {
         $json = json_encode($this->jsonSerialize(), $options);
 
         if (JSON_ERROR_NONE !== json_last_error()) {
-            throw new InvalidArgumentException(json_last_error_msg());
+            throw JsonEncodingException::forModel($this, json_last_error_msg());
         }
 
         return $json;
