@@ -1708,9 +1708,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // instead of the string version of the event. This provides for a custom
         // "object-based" event more consistent with the rest of the framework.
         if (isset($this->events[$event])) {
-            return static::$dispatcher->$method(
+            $result = static::$dispatcher->$method(
                 new $this->events[$event]($this)
             );
+
+            if (! is_null($result)) {
+                return $result;
+            }
         }
 
         // We will append the names of the class to the event to distinguish it from
