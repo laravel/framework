@@ -1039,7 +1039,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $john->friends()->attach($jule, ['friend_level_id' => 3]);
 
         $johnWithFriends = EloquentTestUserWithCustomFriendPivot::with('friends')->find(1);
-        
+
         $this->assertCount(3, $johnWithFriends->friends);
         $this->assertEquals('friend', $johnWithFriends->friends->find(3)->pivot->level->level);
         $this->assertEquals('Jule Doe', $johnWithFriends->friends->find(4)->pivot->friend->name);
@@ -1233,10 +1233,10 @@ class EloquentTestFriendPivot extends Pivot
     protected $table = 'friends';
     protected $guarded = [];
     protected $include = [
-        'user_id', 'friend_id', 'friend_level_id'
+        'user_id', 'friend_id', 'friend_level_id',
     ];
     protected $with = [
-        'user', 'friend', 'level'
+        'user', 'friend', 'level',
     ];
 
     public function user()
