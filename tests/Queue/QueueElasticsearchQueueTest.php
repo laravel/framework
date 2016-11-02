@@ -59,8 +59,6 @@ class QueueElasticsearchQueueTest extends PHPUnit_Framework_TestCase
 
     public function testDelayedPushProperlyPushesJobOntoElasticsearch()
     {
-        $now = Carbon::now();
-
         $delay = 10;
 
         $this->queue->expects($this->once())->method('createPayload')->with($this->mockJob, $this->mockData)->will($this->returnValue($this->mockPayload));
@@ -74,8 +72,8 @@ class QueueElasticsearchQueueTest extends PHPUnit_Framework_TestCase
             'queue' => $this->queueName,
             'attempts' => 0,
             'reserved_at' => 0,
-            'available_at' => $now->addSeconds($delay)->getTimestamp(),
-            'created_at' => $now->getTimestamp(),
+            'available_at' =>  Carbon::now()->addSeconds($delay)->getTimestamp(),
+            'created_at' =>  Carbon::now()->getTimestamp(),
             'payload' => $this->mockPayload,
         ];
 
