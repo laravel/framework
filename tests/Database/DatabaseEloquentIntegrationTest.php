@@ -813,7 +813,8 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, EloquentTestPost::count());
     }
 
-    public function testSavingJSONFields(){
+    public function testSavingJSONFields()
+    {
         $model = EloquentTestWithJSON::create(['json' => ['x' => 0]]);
         $this->assertEquals(['x' => 0], $model->json);
 
@@ -1178,6 +1179,6 @@ class EloquentTestWithJSON extends Eloquent
     protected $table = 'with_json';
     public $timestamps = false;
     protected $casts = [
-        'json' => 'array'
+        'json' => 'array',
     ];
 }
