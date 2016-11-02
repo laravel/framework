@@ -76,7 +76,7 @@
         "aws/aws-sdk-php": "~3.0",
         "mockery/mockery": "~0.9.4",
         "pda/pheanstalk": "~3.0",
-        "elasticsearch/elasticsearch": "~5.0",
+        "elasticsearch/elasticsearch": "~2.0.0|~5.0.0",
         "phpunit/phpunit": "~5.4",
         "predis/predis": "~1.0",
         "symfony/css-selector": "3.1.*",
