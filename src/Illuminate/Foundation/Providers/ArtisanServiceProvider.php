@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Providers;
 
+use Illuminate\Foundation\Console\ScopeMakeCommand;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Queue\Console\TableCommand;
 use Illuminate\Auth\Console\MakeAuthCommand;
@@ -100,6 +101,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'QueueFailedTable' => 'command.queue.failed-table',
         'QueueTable' => 'command.queue.table',
         'RequestMake' => 'command.request.make',
+        'ScopeMake' => 'command.scope.make',
         'SeederMake' => 'command.seeder.make',
         'SessionTable' => 'command.session.table',
         'Serve' => 'command.serve',
@@ -301,6 +303,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.job.make', function ($app) {
             return new JobMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerScopeMakeCommand()
+    {
+        $this->app->singleton('command.scope.make', function ($app) {
+            return new ScopeMakeCommand($app['files']);
         });
     }
 
