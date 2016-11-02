@@ -35,7 +35,7 @@ trait FileHelpers
     }
 
     /**
-     * Get a filename for the file that is the MD5 hash of the contents.
+     * Get a filename for the file.
      *
      * @param  string  $path
      * @return string
@@ -46,6 +46,6 @@ trait FileHelpers
             $path = rtrim($path, '/').'/';
         }
 
-        return $path.md5_file($this->getRealPath()).'.'.$this->guessExtension();
+        return $path.str_random(32).'.'.$this->guessExtension();
     }
 }
