@@ -46,6 +46,6 @@ trait FileHelpers
             $path = rtrim($path, '/').'/';
         }
 
-        return str_replace('-', '', $path.str_random(32)).'.'.$this->guessExtension();
+        return $path.str_random(32).'.'.$this->guessExtension();
     }
 }
