@@ -1,5 +1,17 @@
 # Release Notes for 5.3.x
 
+## [Unreleased]
+
+### Changed
+- Dried-up console parser and extract token parsing ([#16197](https://github.com/laravel/framework/pull/16197))
+- Support empty array for query builder `orders` property ([#16225](https://github.com/laravel/framework/pull/16225))
+- Properly handle filling JSON attributes on Eloquent models ([#16228](https://github.com/laravel/framework/pull/16228))
+
+### Fixed
+- Catch errors when handling a failed job ([#16212](https://github.com/laravel/framework/pull/16212))
+- Return array from `Translator::sortReplacements()` ([#16221](https://github.com/laravel/framework/pull/16221))
+
+
 ## v5.3.22 (2016-11-01)
 
 ### Added
