@@ -308,10 +308,9 @@ class Worker
             $job->delete();
 
             $job->failed($e);
-        } catch (Exception $exception) {
+        } finally {
+            $this->raiseFailedJobEvent($connectionName, $job, $e);
         }
-
-        $this->raiseFailedJobEvent($connectionName, $job, $e);
     }
 
     /**
