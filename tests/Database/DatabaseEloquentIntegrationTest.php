@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
 
@@ -62,6 +63,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
             $this->schema($connection)->create('friends', function ($table) {
                 $table->integer('user_id');
                 $table->integer('friend_id');
+                $table->integer('friend_level_id')->nullable();
             });
 
             $this->schema($connection)->create('posts', function ($table) {
@@ -69,6 +71,12 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
                 $table->integer('user_id');
                 $table->integer('parent_id')->nullable();
                 $table->string('name');
+                $table->timestamps();
+            });
+
+            $this->schema($connection)->create('friend_levels', function ($table) {
+                $table->increments('id');
+                $table->string('level');
                 $table->timestamps();
             });
 
@@ -92,6 +100,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
             $this->schema($connection)->drop('users');
             $this->schema($connection)->drop('friends');
             $this->schema($connection)->drop('posts');
+            $this->schema($connection)->drop('friend_levels');
             $this->schema($connection)->drop('photos');
         }
 
@@ -1014,6 +1023,28 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('EloquentTestItem', $item);
     }
 
+    public function testBelongsToManyCustomPivot()
+    {
+        $john = EloquentTestUserWithCustomFriendPivot::create(['id' => 1, 'name' => 'John Doe', 'email' => 'johndoe@example.com']);
+        $jane = EloquentTestUserWithCustomFriendPivot::create(['id' => 2, 'name' => 'Jane Doe', 'email' => 'janedoe@example.com']);
+        $jack = EloquentTestUserWithCustomFriendPivot::create(['id' => 3, 'name' => 'Jack Doe', 'email' => 'jackdoe@example.com']);
+        $jule = EloquentTestUserWithCustomFriendPivot::create(['id' => 4, 'name' => 'Jule Doe', 'email' => 'juledoe@example.com']);
+
+        EloquentTestFriendLevel::create(['id' => 1, 'level' => 'acquaintance']);
+        EloquentTestFriendLevel::create(['id' => 2, 'level' => 'friend']);
+        EloquentTestFriendLevel::create(['id' => 3, 'level' => 'bff']);
+
+        $john->friends()->attach($jane, ['friend_level_id' => 1]);
+        $john->friends()->attach($jack, ['friend_level_id' => 2]);
+        $john->friends()->attach($jule, ['friend_level_id' => 3]);
+
+        $johnWithFriends = EloquentTestUserWithCustomFriendPivot::with('friends')->find(1);
+        
+        $this->assertCount(3, $johnWithFriends->friends);
+        $this->assertEquals('friend', $johnWithFriends->friends->find(3)->pivot->level->level);
+        $this->assertEquals('Jule Doe', $johnWithFriends->friends->find(4)->pivot->friend->name);
+    }
+
     /**
      * Helpers...
      */
@@ -1086,6 +1117,14 @@ class EloquentTestUser extends Eloquent
     }
 }
 
+class EloquentTestUserWithCustomFriendPivot extends EloquentTestUser
+{
+    public function friends()
+    {
+        return $this->belongsToMany('EloquentTestUser', 'friends', 'user_id', 'friend_id')->using('EloquentTestFriendPivot');
+    }
+}
+
 class EloquentTestUserWithGlobalScope extends EloquentTestUser
 {
     public static function boot()
@@ -1136,6 +1175,12 @@ class EloquentTestPost extends Eloquent
     }
 }
 
+class EloquentTestFriendLevel extends Eloquent
+{
+    protected $table = 'friend_levels';
+    protected $guarded = [];
+}
+
 class EloquentTestPhoto extends Eloquent
 {
     protected $table = 'photos';
@@ -1181,4 +1226,31 @@ class EloquentTestWithJSON extends Eloquent
     protected $casts = [
         'json' => 'array',
     ];
+}
+
+class EloquentTestFriendPivot extends Pivot
+{
+    protected $table = 'friends';
+    protected $guarded = [];
+    protected $include = [
+        'user_id', 'friend_id', 'friend_level_id'
+    ];
+    protected $with = [
+        'user', 'friend', 'level'
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(EloquentTestUser::class);
+    }
+
+    public function friend()
+    {
+        return $this->belongsTo(EloquentTestUser::class);
+    }
+
+    public function level()
+    {
+        return $this->belongsTo(EloquentTestFriendLevel::class, 'friend_level_id');
+    }
 }
