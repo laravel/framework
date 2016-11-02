@@ -731,6 +731,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $instance = new $related;
 
+        if (! $instance->getConnectionName()) {
+            $instance->setConnection($this->connection);
+        }
+
         $localKey = $localKey ?: $this->getKeyName();
 
         return new HasOne($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey);
@@ -749,6 +753,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function morphOne($related, $name, $type = null, $id = null, $localKey = null)
     {
         $instance = new $related;
+
+        if (! $instance->getConnectionName()) {
+            $instance->setConnection($this->connection);
+        }
 
         list($type, $id) = $this->getMorphs($name, $type, $id);
 
@@ -787,6 +795,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         }
 
         $instance = new $related;
+
+        if (! $instance->getConnectionName()) {
+            $instance->setConnection($this->connection);
+        }
 
         // Once we have the foreign key names, we'll just create a new Eloquent query
         // for the related models and returns the relationship instance which will
@@ -836,6 +848,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
             $instance = new $class;
 
+            if (! $instance->getConnectionName()) {
+                $instance->setConnection($this->connection);
+            }
+
             return new MorphTo(
                 $instance->newQuery(), $this, $id, $instance->getKeyName(), $type, $name
             );
@@ -867,6 +883,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $instance = new $related;
 
+        if (! $instance->getConnectionName()) {
+            $instance->setConnection($this->connection);
+        }
+
         $localKey = $localKey ?: $this->getKeyName();
 
         return new HasMany($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey);
@@ -892,7 +912,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $localKey = $localKey ?: $this->getKeyName();
 
-        return new HasManyThrough((new $related)->newQuery(), $this, $through, $firstKey, $secondKey, $localKey);
+        $instance = new $related;
+
+        if (! $instance->getConnectionName()) {
+            $instance->setConnection($this->connection);
+        }
+
+        return new HasManyThrough($instance->newQuery(), $this, $through, $firstKey, $secondKey, $localKey);
     }
 
     /**
@@ -908,6 +934,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function morphMany($related, $name, $type = null, $id = null, $localKey = null)
     {
         $instance = new $related;
+
+        if (! $instance->getConnectionName()) {
+            $instance->setConnection($this->connection);
+        }
 
         // Here we will gather up the morph type and ID for the relationship so that we
         // can properly query the intermediate table of a relation. Finally, we will
@@ -947,6 +977,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $instance = new $related;
 
+        if (! $instance->getConnectionName()) {
+            $instance->setConnection($this->connection);
+        }
+
         $otherKey = $otherKey ?: $instance->getForeignKey();
 
         // If no table name was provided, we can guess it by concatenating the two
@@ -985,6 +1019,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $foreignKey = $foreignKey ?: $name.'_id';
 
         $instance = new $related;
+
+        if (! $instance->getConnectionName()) {
+            $instance->setConnection($this->connection);
+        }
 
         $otherKey = $otherKey ?: $instance->getForeignKey();
 
@@ -1670,9 +1708,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // instead of the string version of the event. This provides for a custom
         // "object-based" event more consistent with the rest of the framework.
         if (isset($this->events[$event])) {
-            return static::$dispatcher->$method(
+            $result = static::$dispatcher->$method(
                 new $this->events[$event]($this)
             );
+
+            if (! is_null($result)) {
+                return $result;
+            }
         }
 
         // We will append the names of the class to the event to distinguish it from
@@ -2414,10 +2456,18 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @param  int  $options
      * @return string
+     *
+     * @throws JsonEncodingException
      */
     public function toJson($options = 0)
     {
-        return json_encode($this->jsonSerialize(), $options);
+        $json = json_encode($this->jsonSerialize(), $options);
+
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            throw JsonEncodingException::forModel($this, json_last_error_msg());
+        }
+
+        return $json;
     }
 
     /**
@@ -2895,7 +2945,34 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $value = $this->asJson($value);
         }
 
+        // If this attribute contains a JSON ->, we'll set the proper value in the
+        // attribute's underlying array. This takes care of properly nesting an
+        // attribute in the array's value in the case of deeply nested items.
+        if (Str::contains($key, '->')) {
+            return $this->fillJsonAttribute($key, $value);
+        }
+
         $this->attributes[$key] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Set a given JSON attribute on the model.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function fillJsonAttribute($key, $value)
+    {
+        list($key, $path) = explode('->', $key, 2);
+
+        $arrayValue = isset($this->attributes[$key]) ? $this->fromJson($this->attributes[$key]) : [];
+
+        Arr::set($arrayValue, str_replace('->', '.', $path), $value);
+
+        $this->attributes[$key] = $this->asJson($arrayValue);
 
         return $this;
     }

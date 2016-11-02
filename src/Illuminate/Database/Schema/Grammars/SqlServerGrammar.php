@@ -12,7 +12,7 @@ class SqlServerGrammar extends Grammar
      *
      * @var array
      */
-    protected $modifiers = ['Increment', 'Nullable', 'Default'];
+    protected $modifiers = ['Increment', 'Collate', 'Nullable', 'Default'];
 
     /**
      * The columns available as serials.
@@ -582,6 +582,20 @@ class SqlServerGrammar extends Grammar
     protected function typeMacAddress(Fluent $column)
     {
         return 'nvarchar(17)';
+    }
+
+    /**
+     * Get the SQL for a collation column modifier.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string|null
+     */
+    protected function modifyCollate(Blueprint $blueprint, Fluent $column)
+    {
+        if (! is_null($column->collation)) {
+            return ' collate '.$column->collation;
+        }
     }
 
     /**

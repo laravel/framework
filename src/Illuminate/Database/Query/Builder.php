@@ -1876,7 +1876,7 @@ class Builder
      */
     public function each(callable $callback, $count = 1000)
     {
-        if (is_null($this->orders) && is_null($this->unionOrders)) {
+        if (empty($this->orders) && empty($this->unionOrders)) {
             throw new RuntimeException('You must specify an orderBy clause when using the "each" function.');
         }
 
