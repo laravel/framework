@@ -40,7 +40,7 @@ class GateTest extends PHPUnit_Framework_TestCase
 
         $this->assertFalse($gate->check('foo'));
     }
-    
+
     public function test_basic_closures_allows_guests_if_specified()
     {
         $gate = $this->getGateForGuest();
@@ -383,7 +383,7 @@ class GateTest extends PHPUnit_Framework_TestCase
     protected function getGateForGuest()
     {
         return new Gate(new Container, function () {
-            return null;
+            // null (no user)
         });
     }
 }
