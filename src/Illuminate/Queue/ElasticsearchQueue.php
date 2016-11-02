@@ -155,7 +155,6 @@ class ElasticsearchQueue extends Queue implements QueueContract
      */
     protected function pushToElasticsearch($delay, $queue, $payload, $attempts = 0)
     {
-
         $queue = $this->getQueue($queue);
 
         $attributes = $this->buildElasticsearchDoc(
@@ -183,7 +182,6 @@ class ElasticsearchQueue extends Queue implements QueueContract
         $queue = $this->getQueue($queue);
 
         if ($job = $this->getNextAvailableJob($queue)) {
-
             $job = $this->markJobAsReserved($job, $queue);
 
             return new ElasticsearchJob(
