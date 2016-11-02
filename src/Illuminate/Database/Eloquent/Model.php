@@ -2893,7 +2893,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  mixed  $value
      * @return $this
      */
-    public function jsonSetAttribute($key, $value){
+    public function jsonSetAttribute($key, $value)
+    {
         list($key, $path) = explode('->', $key, 2);
 
         $arrayValue = isset($this->attributes[$key]) ? $this->fromJson($this->attributes[$key]) : [];
