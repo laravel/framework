@@ -584,18 +584,6 @@ class SqlServerGrammar extends Grammar
         return 'nvarchar(17)';
     }
 
-    /**
-     * Get the SQL for a nullable column modifier.
-     *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $column
-     * @return string|null
-     */
-    protected function modifyNullable(Blueprint $blueprint, Fluent $column)
-    {
-        return $column->nullable ? ' null' : ' not null';
-    }
-
      /**
      * Get the SQL for a collation column modifier.
      *
@@ -609,7 +597,19 @@ class SqlServerGrammar extends Grammar
             return ' collate '.$column->collation;
         }
     }
-    
+
+    /**
+     * Get the SQL for a nullable column modifier.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string|null
+     */
+    protected function modifyNullable(Blueprint $blueprint, Fluent $column)
+    {
+        return $column->nullable ? ' null' : ' not null';
+    }
+
     /**
      * Get the SQL for a default column modifier.
      *
