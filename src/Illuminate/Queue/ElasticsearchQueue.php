@@ -63,7 +63,7 @@ class ElasticsearchQueue extends Queue implements QueueContract
      */
     public function size($queue = null)
     {
-        $result = $this->elasticsearch->search(['index'=>$this->index, 'type' => $this->getQueue($queue)]);
+        $result = $this->elasticsearch->search(['index' => $this->index, 'type' => $this->getQueue($queue)]);
 
         return $result['hits']['total'];
     }
@@ -209,9 +209,9 @@ class ElasticsearchQueue extends Queue implements QueueContract
               'range' => [
                   'reserved_at' => [
                       'lte' => Carbon::now()->subSeconds($this->expire)->getTimestamp(),
-                  ]
-              ]
-          ]
+                  ],
+              ],
+          ],
         ];
         $params['size'] = 1;
         $params['sort'] = ['reserved_at:desc', 'available_at:desc'];

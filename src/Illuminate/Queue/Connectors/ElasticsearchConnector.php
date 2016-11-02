@@ -7,7 +7,6 @@ use Illuminate\Queue\ElasticsearchQueue;
 
 class ElasticsearchConnector implements ConnectorInterface
 {
-
     /**
      * Establish a queue connection.
      *
