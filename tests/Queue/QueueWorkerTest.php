@@ -243,6 +243,11 @@ class WorkerFakeJob
         return [];
     }
 
+    public function retries()
+    {
+        return null;
+    }
+
     public function delete()
     {
         $this->deleted = true;
