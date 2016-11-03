@@ -120,8 +120,6 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
         }
 
         $this->exists = true;
-
-        return true;
     }
 
     /**
@@ -159,8 +157,6 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
     public function destroy($sessionId)
     {
         $this->getQuery()->where('id', $sessionId)->delete();
-
-        return true;
     }
 
     /**
