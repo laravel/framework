@@ -4,6 +4,7 @@ namespace Illuminate\Support\Testing\Fakes;
 
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\Mail\Mailer;
+use Illuminate\Contracts\Mail\Mailable;
 use PHPUnit_Framework_Assert as PHPUnit;
 
 class MailFake implements Mailer
@@ -201,7 +202,27 @@ class MailFake implements Mailer
      */
     public function send($view, array $data = [], $callback = null)
     {
-        //
+        if ($view instanceof Mailable) {
+            $view->build();
+
+            $mailable = new MailableFake;
+
+            $mailable->mailable = $view;
+
+            if ($recipients = $view->getTo()) {
+                $mailable->to($recipients);
+            }
+
+            if ($recipients = $view->getBcc()) {
+                $mailable->bcc($recipients);
+            }
+
+            if ($recipients = $view->getCc()) {
+                $mailable->cc($recipients);
+            }
+
+            $this->mailables[] = $mailable;
+        }
     }
 
     /**
@@ -212,5 +233,19 @@ class MailFake implements Mailer
     public function failures()
     {
         //
+    }
+
+    /**
+     * Queue a new e-mail message for sending.
+     *
+     * @param  string|array  $view
+     * @param  array  $data
+     * @param  \Closure|string  $callback
+     * @param  string|null  $queue
+     * @return mixed
+     */
+    public function queue($view, array $data = [], $callback = null, $queue = null)
+    {
+        $this->send($view);
     }
 }
