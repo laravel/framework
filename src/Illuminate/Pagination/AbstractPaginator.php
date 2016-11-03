@@ -60,6 +60,13 @@ abstract class AbstractPaginator implements Htmlable
     protected $pageName = 'page';
 
     /**
+     * The number to determine how many items on each side of the center item (current page).
+     *
+     * @var int
+     */
+    protected $onEachSide = 3;
+
+    /**
      * The current page resolver callback.
      *
      * @var \Closure
