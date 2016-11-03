@@ -31,6 +31,13 @@ class LogWriterTest extends PHPUnit_Framework_TestCase
         $writer->useErrorLog();
     }
 
+    public function testNullLogHandlerCanBeAdded()
+    {
+        $writer = new Writer($monolog = m::mock('Monolog\Logger'));
+        $monolog->shouldReceive('pushHandler')->once()->with(m::type('Monolog\Handler\NullHandler'));
+        $writer->useNull();
+    }
+
     public function testMethodsPassErrorAdditionsToMonolog()
     {
         $writer = new Writer($monolog = m::mock('Monolog\Logger'));
