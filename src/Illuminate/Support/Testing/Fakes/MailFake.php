@@ -206,16 +206,18 @@ class MailFake implements Mailer
             $mailable->mailable = $view;
 
             if ($recipients = $view->getTo()) {
-                $this->mailables[] = $mailable->to($recipients);
+                $mailable->to($recipients);
             }
 
             if ($recipients = $view->getBcc()) {
-                $this->mailables[] = $mailable->bcc($recipients);
+                $mailable->bcc($recipients);
             }
 
             if ($recipients = $view->getCc()) {
-                $this->mailables[] = $mailable->cc($recipients);
+                $mailable->cc($recipients);
             }
+
+            $this->mailables[] = $mailable;
         }
     }
 
