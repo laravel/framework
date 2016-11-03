@@ -235,7 +235,7 @@ class Writer implements LogContract, PsrLoggerInterface
     }
 
     /**
-     * Register a null log handler (disable logging)
+     * Register a null log handler (disable logging).
      *
      * @return void
      */
