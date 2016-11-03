@@ -698,7 +698,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [],
-            $collection->chunk(0)->toArray()
+            $collection->chunk(-1)->toArray()
         );
     }
 
