@@ -7,6 +7,7 @@ use RuntimeException;
 use InvalidArgumentException;
 use Monolog\Handler\SyslogHandler;
 use Monolog\Handler\StreamHandler;
+use Monolog\Handler\NullHandler;
 use Monolog\Logger as MonologLogger;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\ErrorLogHandler;
