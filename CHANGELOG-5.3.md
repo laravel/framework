@@ -187,6 +187,7 @@
 
 ### Changed
 - Removed forking and pcntl requirements while still supporting timeouts ([#15650](https://github.com/laravel/framework/pull/15650))
+- Set exception handler first thing in `WorkCommand::runWorker()` ([99994fe](https://github.com/laravel/framework/commit/99994fe23c1215d5a8e798da03947e6a5502b8f9))
 
 
 ## v5.3.11 (2016-09-27)
@@ -234,6 +235,8 @@
 - Prevent calling `Model` methods when calling them as attributes ([#15438](https://github.com/laravel/framework/pull/15438))
 - Default `$callback` to `null` in eloquent builder `whereHas()` ([#15475](https://github.com/laravel/framework/pull/15475))
 - Support newlines in Blade's `@foreach` ([#15485](https://github.com/laravel/framework/pull/15485))
+- Try to reconnect if connection is lost during database transaction ([#15511](https://github.com/laravel/framework/pull/15511))
+- Renamed `InteractsWithQueue::failed()` to `fail()` ([e1d60e0](https://github.com/laravel/framework/commit/e1d60e0fe120a7898527fb997aa2fb9de263190c))
 
 ### Fixed
 - Reverted "Allow passing a `Closure` to `View::share()` [#15312](https://github.com/laravel/framework/pull/15312)" ([#15312](https://github.com/laravel/framework/pull/15312))
