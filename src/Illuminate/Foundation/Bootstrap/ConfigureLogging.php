@@ -129,8 +129,6 @@ class ConfigureLogging
      */
     protected function configureNullHandler(Application $app, Writer $log)
     {
-        $config = $app->make('config');
-
         $log->useNull();
     }
 }
