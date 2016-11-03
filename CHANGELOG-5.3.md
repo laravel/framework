@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+- Added database slave failover ([#15553](https://github.com/laravel/framework/pull/15553), [ed28c7f](https://github.com/laravel/framework/commit/ed28c7fa11d3754d618606bf8fc2f00690cfff66))
+- Added `Arr::shuffle($array)` ([ed28c7f](https://github.com/laravel/framework/commit/ed28c7fa11d3754d618606bf8fc2f00690cfff66))
+
 ### Changed
 - Dried-up console parser and extract token parsing ([#16197](https://github.com/laravel/framework/pull/16197))
 - Support empty array for query builder `orders` property ([#16225](https://github.com/laravel/framework/pull/16225))
@@ -10,6 +14,8 @@
 ### Fixed
 - Catch errors when handling a failed job ([#16212](https://github.com/laravel/framework/pull/16212))
 - Return array from `Translator::sortReplacements()` ([#16221](https://github.com/laravel/framework/pull/16221))
+- Don't use multi-byte functions in `UrlGenerator::to()` ([#16081](https://github.com/laravel/framework/pull/16081))
+- Support configuration files as symbolic links ([#16080](https://github.com/laravel/framework/pull/16080))
 
 
 ## v5.3.22 (2016-11-01)
