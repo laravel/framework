@@ -228,4 +228,18 @@ class MailFake implements Mailer
     {
         //
     }
+
+    /**
+     * Queue a new e-mail message for sending.
+     *
+     * @param  string|array  $view
+     * @param  array  $data
+     * @param  \Closure|string  $callback
+     * @param  string|null  $queue
+     * @return mixed
+     */
+    public function queue($view, array $data = [], $callback = null, $queue = null)
+    {
+        $this->send($view);
+    }
 }
