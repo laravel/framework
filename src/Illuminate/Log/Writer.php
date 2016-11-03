@@ -242,8 +242,6 @@ class Writer implements LogContract, PsrLoggerInterface
     public function useNull()
     {
         $this->monolog->pushHandler($handler = new NullHandler());
-
-        $handler->setFormatter($this->getDefaultFormatter());
     }
 
     /**
