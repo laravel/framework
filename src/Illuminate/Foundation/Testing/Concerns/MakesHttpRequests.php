@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use PHPUnit_Framework_Assert as PHPUnit;
+use Illuminate\Foundation\Testing\TestResponse;
 use PHPUnit_Framework_ExpectationFailedException;
 use Illuminate\Contracts\Http\Kernel as HttpKernel;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
@@ -226,27 +227,6 @@ trait MakesHttpRequests
     }
 
     /**
-     * Extract the file uploads from the given data array.
-     *
-     * @param  array  $data
-     * @return array
-     */
-    protected function extractFilesFromDataArray(&$data)
-    {
-        $files = [];
-
-        foreach ($data as $key => $value) {
-            if ($value instanceof SymfonyUploadedFile) {
-                $files[$key] = $value;
-
-                unset($data[$key]);
-            }
-        }
-
-        return $files;
-    }
-
-    /**
      * Call the given URI and return the Response.
      *
      * @param  string  $method
@@ -262,9 +242,11 @@ trait MakesHttpRequests
     {
         $kernel = $this->app->make(HttpKernel::class);
 
+        $files = array_merge($files, $this->extractFilesFromDataArray($parameters));
+
         $symfonyRequest = SymfonyRequest::create(
             $this->prepareUrlForRequest($uri), $method, $parameters,
-            $cookies, $this->filterFiles($files), array_replace($this->serverVariables, $server), $content
+            $cookies, $files, array_replace($this->serverVariables, $server), $content
         );
 
         $response = $kernel->handle(
@@ -273,7 +255,7 @@ trait MakesHttpRequests
 
         $kernel->terminate($request, $response);
 
-        return $response;
+        return TestResponse::fromBaseResponse($response);
     }
 
     /**
@@ -320,29 +302,21 @@ trait MakesHttpRequests
     }
 
     /**
-     * Filter the given array of files, removing any empty values.
+     * Extract the file uploads from the given data array.
      *
-     * @param  array  $files
-     * @return mixed
+     * @param  array  $data
+     * @return array
      */
-    protected function filterFiles($files)
+    protected function extractFilesFromDataArray(&$data)
     {
-        foreach ($files as $key => $file) {
-            if ($file instanceof UploadedFile) {
-                continue;
+        $files = [];
+
+        foreach ($data as $key => $value) {
+            if ($value instanceof SymfonyUploadedFile) {
+                $files[$key] = $value;
+
+                unset($data[$key]);
             }
-
-            if (is_array($file)) {
-                if (! isset($file['name'])) {
-                    $files[$key] = $this->filterFiles($files[$key]);
-                } elseif (isset($files[$key]['error']) && $files[$key]['error'] !== 0) {
-                    unset($files[$key]);
-                }
-
-                continue;
-            }
-
-            unset($files[$key]);
         }
 
         return $files;
