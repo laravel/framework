@@ -202,27 +202,29 @@ class MailFake implements Mailer
      */
     public function send($view, array $data = [], $callback = null)
     {
-        if ($view instanceof Mailable) {
-            $view->build();
-
-            $mailable = new MailableFake;
-
-            $mailable->mailable = $view;
-
-            if ($recipients = $view->getTo()) {
-                $mailable->to($recipients);
-            }
-
-            if ($recipients = $view->getBcc()) {
-                $mailable->bcc($recipients);
-            }
-
-            if ($recipients = $view->getCc()) {
-                $mailable->cc($recipients);
-            }
-
-            $this->mailables[] = $mailable;
+        if (! $view instanceof Mailable) {
+            return;
         }
+
+        $view->build();
+
+        $mailable = new MailableFake;
+
+        $mailable->mailable = $view;
+
+        if ($recipients = $view->getTo()) {
+            $mailable->to($recipients);
+        }
+
+        if ($recipients = $view->getBcc()) {
+            $mailable->bcc($recipients);
+        }
+
+        if ($recipients = $view->getCc()) {
+            $mailable->cc($recipients);
+        }
+
+        $this->mailables[] = $mailable;
     }
 
     /**
