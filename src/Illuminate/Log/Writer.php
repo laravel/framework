@@ -234,6 +234,20 @@ class Writer implements LogContract, PsrLoggerInterface
     }
 
     /**
+     * Register a file log handler.
+     *
+     * @param  string  $path
+     * @param  string  $level
+     * @return void
+     */
+    public function useNull()
+    {
+        $this->monolog->pushHandler($handler = new NullHandler());
+
+        $handler->setFormatter($this->getDefaultFormatter());
+    }
+
+    /**
      * Register a Syslog handler.
      *
      * @param  string  $name

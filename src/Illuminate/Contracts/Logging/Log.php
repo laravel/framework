@@ -95,4 +95,13 @@ interface Log
      * @return void
      */
     public function useDailyFiles($path, $days = 0, $level = 'debug');
+
+    /**
+     * Register a null log handler (disable logging)
+     *
+     * @param  string  $path
+     * @param  string  $level
+     * @return void
+     */
+    public function useNull($path, $level = 'debug');
 }
