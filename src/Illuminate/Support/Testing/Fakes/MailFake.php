@@ -84,6 +84,10 @@ class MailFake implements Mailer
         });
 
         return $recipients->map(function ($recipient) {
+            if (is_array($recipient)) {
+                return $recipient['email'];
+            }
+
             return is_object($recipient) ? $recipient->email : $recipient;
         })->diff($expected)->count() === 0;
     }
