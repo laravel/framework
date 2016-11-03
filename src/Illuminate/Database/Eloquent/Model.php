@@ -164,7 +164,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Set an option on the casts encoding.
      * @link http://php.net/manual/en/json.constants.php
-     * 
+     *
      * @var string
      */
     protected $json_encode_option = 0;
