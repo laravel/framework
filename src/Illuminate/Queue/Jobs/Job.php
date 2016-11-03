@@ -268,6 +268,16 @@ abstract class Job
     }
 
     /**
+     * The number of seconds the job can run.
+     *
+     * @return int
+     */
+    public function timeout()
+    {
+        return $this->getCommand() ? $this->getCommand()->timeout : null;
+    }
+
+    /**
      * Get the name of the queue the job belongs to.
      *
      * @return string
