@@ -12,9 +12,10 @@
 - Added `$values` parameter to `Builder::firstOrNew()` ([#15567](https://github.com/laravel/framework/pull/15567))
 - Allow dependency injection on database seeders `run()` method ([#15959](https://github.com/laravel/framework/pull/15959))
 - Added model binding in broadcasting channel definitions ([#16120](https://github.com/laravel/framework/pull/16120), [515d97c](https://github.com/laravel/framework/commit/515d97c1f3ad4797876979d450304684012142d6))
-- Added support for object-based events for native Eloquent events ([e7a724d](https://github.com/laravel/framework/commit/e7a724d3895f2b24b98c0cafb1650f2193351d83))
+- Added support for object-based events for native Eloquent events ([e7a724d](https://github.com/laravel/framework/commit/e7a724d3895f2b24b98c0cafb1650f2193351d83), [9770d1a](https://github.com/laravel/framework/commit/9770d1a64c1010daf845fcebfcc4695a30d8df2d))
 - Added `base64:` prefix support to `env()` helper ([#16186](https://github.com/laravel/framework/pull/16186))
 - Added `cache:forget` command ([#16201](https://github.com/laravel/framework/pull/16201), [7644977](https://github.com/laravel/framework/commit/76449777741fa1d7669028973958a7e4a5e64f71))
+- Added collation support to `SQLServerGrammar` ([#16227](https://github.com/laravel/framework/pull/16227))
 
 ### Changed
 - Consider interfaces and extended classes in `Gate::resolvePolicyCallback()` ([#15757](https://github.com/laravel/framework/pull/15757))
@@ -29,3 +30,6 @@
 - Only detach all associations if no parameter is passed to `BelongsToMany::detach()` ([#16144](https://github.com/laravel/framework/pull/16144))
 - Improve `Connection::selectOne()` performance by switching to `array_shift()` ([#16188](https://github.com/laravel/framework/pull/16188))
 - Switched from file to cache based Schedule overlap locking ([#16196](https://github.com/laravel/framework/pull/16196), [5973f6c](https://github.com/laravel/framework/commit/5973f6c54ccd0d99e15f055c5a16b19b8c45db91))
+- Throw `JsonEncodingException` when `Model::toJson()` fails ([#16159](https://github.com/laravel/framework/pull/16159), [0bda866](https://github.com/laravel/framework/commit/0bda866a475de524eeff3e7f7471031dd64cf2d3))
+- Use UUID instead of `md5()` for generating file names in `FileHelpers` ([#16193](https://github.com/laravel/framework/pull/16193))
+- Use parent connection if related model doesn't specify one ([#16103](https://github.com/laravel/framework/pull/16103))
