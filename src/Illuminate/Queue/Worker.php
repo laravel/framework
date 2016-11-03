@@ -70,10 +70,14 @@ class Worker
         $lastRestart = $this->getTimestampOfLastQueueRestart();
 
         while (true) {
-            $this->registerTimeoutHandler($options);
+            $job = $this->getNextJob(
+                $this->manager->connection($connectionName), $queue
+            );
 
-            if ($this->daemonShouldRun()) {
-                $this->runNextJob($connectionName, $queue, $options);
+            $this->registerTimeoutHandler($job, $options);
+
+            if ($job && $this->daemonShouldRun()) {
+                $this->runJob($job, $connectionName, $options);
             } else {
                 $this->sleep($options->sleep);
             }
@@ -88,14 +92,17 @@ class Worker
     /**
      * Register the worker timeout handler (PHP 7.1+).
      *
+     * @param  \Illuminate\Contracts\Queue\Job|null  $job
      * @param  WorkerOptions  $options
      * @return void
      */
-    protected function registerTimeoutHandler(WorkerOptions $options)
+    protected function registerTimeoutHandler($job, WorkerOptions $options)
     {
         if (version_compare(PHP_VERSION, '7.1.0') < 0 || ! extension_loaded('pcntl')) {
             return;
         }
+
+        $timeout = $job && $job->timeout() !== null ? $job->timeout() : $options->timeout;
 
         pcntl_async_signals(true);
 
@@ -105,7 +112,7 @@ class Worker
             exit(1);
         });
 
-        pcntl_alarm($options->timeout + $options->sleep);
+        pcntl_alarm($timeout + $options->sleep);
     }
 
     /**
@@ -138,26 +145,39 @@ class Worker
      */
     public function runNextJob($connectionName, $queue, WorkerOptions $options)
     {
-        try {
-            $job = $this->getNextJob(
-                $this->manager->connection($connectionName), $queue
-            );
+        $job = $this->getNextJob(
+            $this->manager->connection($connectionName), $queue
+        );
 
-            // If we're able to pull a job off of the stack, we will process it and then return
-            // from this method. If there is no job on the queue, we will "sleep" the worker
-            // for the specified number of seconds, then keep processing jobs after sleep.
-            if ($job) {
-                return $this->process(
-                    $connectionName, $job, $options
-                );
-            }
+        // If we're able to pull a job off of the stack, we will process it and then return
+        // from this method. If there is no job on the queue, we will "sleep" the worker
+        // for the specified number of seconds, then keep processing jobs after sleep.
+        if ($job) {
+            return $this->runJob($job, $connectionName, $options);
+        }
+
+        $this->sleep($options->sleep);
+    }
+
+    /**
+     * Process the given job.
+     *
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  string  $connectionName
+     * @param  \Illuminate\Queue\WorkerOptions  $options
+     * @return void
+     */
+    protected function runJob($job, $connectionName, WorkerOptions $options)
+    {
+        try {
+            return $this->process(
+                $connectionName, $job, $options
+            );
         } catch (Exception $e) {
             $this->exceptions->report($e);
         } catch (Throwable $e) {
             $this->exceptions->report(new FatalThrowableError($e));
         }
-
-        $this->sleep($options->sleep);
     }
 
     /**
@@ -169,11 +189,19 @@ class Worker
      */
     protected function getNextJob($connection, $queue)
     {
-        foreach (explode(',', $queue) as $queue) {
-            if (! is_null($job = $connection->pop($queue))) {
-                return $job;
+        try {
+            foreach (explode(',', $queue) as $queue) {
+                if (! is_null($job = $connection->pop($queue))) {
+                    return $job;
+                }
             }
+        } catch (Exception $e) {
+            $this->exceptions->report($e);
+        } catch (Throwable $e) {
+            $this->exceptions->report(new FatalThrowableError($e));
         }
+
+        return null;
     }
 
     /**
