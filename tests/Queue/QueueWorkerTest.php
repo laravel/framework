@@ -129,6 +129,22 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
         $this->events->shouldNotHaveReceived('fire', [Mockery::type(JobProcessed::class)]);
     }
 
+    public function test_job_based_max_retries()
+    {
+        $job = new WorkerFakeJob(function ($job) {
+            $job->attempts++;
+        });
+        $job->attempts = 2;
+
+        $job->retries = 10;
+
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+        $worker->runNextJob('default', 'queue', $this->workerOptions(['maxTries' => 1]));
+
+        $this->assertFalse($job->deleted);
+        $this->assertNull($job->failedWith);
+    }
+
     /**
      * Helpers...
      */
@@ -223,6 +239,7 @@ class WorkerFakeJob
     public $callback;
     public $deleted = false;
     public $releaseAfter;
+    public $retries;
     public $attempts = 0;
     public $failedWith;
 
@@ -245,7 +262,7 @@ class WorkerFakeJob
 
     public function retries()
     {
-        return null;
+        return $this->retries;
     }
 
     public function delete()
