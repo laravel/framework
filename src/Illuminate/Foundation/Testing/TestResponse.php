@@ -2,8 +2,10 @@
 
 namespace Illuminate\Foundation\Testing;
 
+use Closure;
 use Illuminate\Support\Str;
 use Illuminate\Http\Response;
+use Illuminate\Contracts\View\View;
 use PHPUnit_Framework_Assert as PHPUnit;
 
 class TestResponse extends Response
@@ -21,6 +23,14 @@ class TestResponse extends Response
         );
 
         $testResponse->headers = $response->headers;
+
+        if (isset($response->original)) {
+            $testResponse->original = $response->original;
+        }
+
+        if (isset($response->exception)) {
+            $testResponse->exception = $response->exception;
+        }
 
         return $testResponse;
     }
@@ -46,8 +56,7 @@ class TestResponse extends Response
     public function assertIsRedirect($uri)
     {
         PHPUnit::assertTrue(
-            $this->isRedirect(),
-            'Response status code ['.$this->status().'] is not a redirect status code.'
+            $this->isRedirect(), 'Response status code ['.$this->status().'] is not a redirect status code.'
         );
 
         PHPUnit::assertEquals(app('url')->to($uri), $this->headers->get('Location'));
@@ -66,10 +75,12 @@ class TestResponse extends Response
             $this->headers->has($headerName), "Header [{$headerName}] not present on response."
         );
 
+        $actual = $this->headers->get($headerName);
+
         if (! is_null($value)) {
             PHPUnit::assertEquals(
                 $this->headers->get($headerName), $value,
-                "Header [{$headerName}] was found, but value [{$this->headers->get($headerName)}] does not match [{$value}]."
+                "Header [{$headerName}] was found, but value [{$actual}] does not match [{$value}]."
             );
         }
 
@@ -147,7 +158,11 @@ class TestResponse extends Response
         $decodedResponse = json_decode($this->getContent(), true);
 
         if (is_null($decodedResponse) || $decodedResponse === false) {
-            PHPUnit::fail('Invalid JSON was returned from the route. Perhaps an exception was thrown?');
+            if ($this->exception) {
+                throw $this->exception;
+            } else {
+                PHPUnit::fail('Invalid JSON was returned from the route.');
+            }
         }
 
         return $decodedResponse;
@@ -173,5 +188,117 @@ class TestResponse extends Response
         }
 
         return trim($expected);
+    }
+
+    /**
+     * Assert that the response view has a given piece of bound data.
+     *
+     * @param  string|array  $key
+     * @param  mixed  $value
+     * @return void
+     */
+    public function assertViewHas($key, $value = null)
+    {
+        if (is_array($key)) {
+            return $this->assertViewHasAll($key);
+        }
+
+        if (! isset($this->original) || ! $this->original instanceof View) {
+            return PHPUnit::assertTrue(false, 'The response is not a view.');
+        }
+
+        if (is_null($value)) {
+            PHPUnit::assertArrayHasKey($key, $this->original->getData());
+        } elseif ($value instanceof Closure) {
+            PHPUnit::assertTrue($value($this->original->$key));
+        } else {
+            PHPUnit::assertEquals($value, $this->original->$key);
+        }
+    }
+
+    /**
+     * Assert that the response view has a given list of bound data.
+     *
+     * @param  array  $bindings
+     * @return void
+     */
+    public function assertViewHasAll(array $bindings)
+    {
+        foreach ($bindings as $key => $value) {
+            if (is_int($key)) {
+                $this->assertViewHas($value);
+            } else {
+                $this->assertViewHas($key, $value);
+            }
+        }
+    }
+
+    /**
+     * Assert that the response view is missing a piece of bound data.
+     *
+     * @param  string  $key
+     * @return void
+     */
+    public function assertViewMissing($key)
+    {
+        if (! isset($this->original) || ! $this->original instanceof View) {
+            return PHPUnit::fail('The response is not a view.');
+        }
+
+        PHPUnit::assertArrayNotHasKey($key, $this->original->getData());
+    }
+
+    /**
+     * Assert that the session has a given value.
+     *
+     * @param  string|array  $key
+     * @param  mixed  $value
+     * @return void
+     */
+    public function assertSessionHas($key, $value = null)
+    {
+        if (is_array($key)) {
+            return $this->assertSessionHasAll($key);
+        }
+
+        if (is_null($value)) {
+            PHPUnit::assertTrue(app('session.store')->has($key), "Session is missing expected key [{$key}].");
+        } else {
+            PHPUnit::assertEquals($value, app('session.store')->get($key));
+        }
+    }
+
+    /**
+     * Assert that the session has a given list of values.
+     *
+     * @param  array  $bindings
+     * @return void
+     */
+    public function assertSessionHasAll(array $bindings)
+    {
+        foreach ($bindings as $key => $value) {
+            if (is_int($key)) {
+                $this->assertSessionHas($value);
+            } else {
+                $this->assertSessionHas($key, $value);
+            }
+        }
+    }
+
+    /**
+     * Assert that the session does not have a given key.
+     *
+     * @param  string|array  $key
+     * @return void
+     */
+    public function assertSessionMissing($key)
+    {
+        if (is_array($key)) {
+            foreach ($key as $value) {
+                $this->assertSessionMissing($value);
+            }
+        } else {
+            PHPUnit::assertFalse(app('session.store')->has($key), "Session has unexpected key [{$key}].");
+        }
     }
 }
