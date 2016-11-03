@@ -99,8 +99,6 @@ interface Log
     /**
      * Register a null log handler (disable logging)
      *
-     * @param  string  $path
-     * @param  string  $level
      * @return void
      */
     public function useNull();
