@@ -103,5 +103,5 @@ interface Log
      * @param  string  $level
      * @return void
      */
-    public function useNull($path, $level = 'debug');
+    public function useNull();
 }

@@ -234,10 +234,8 @@ class Writer implements LogContract, PsrLoggerInterface
     }
 
     /**
-     * Register a file log handler.
+     * Register a null log handler (disable logging)
      *
-     * @param  string  $path
-     * @param  string  $level
      * @return void
      */
     public function useNull()
