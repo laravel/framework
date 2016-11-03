@@ -6,6 +6,7 @@ use Illuminate\Support\Str;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Notifications\Notification;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
 class MailChannel
 {
@@ -43,7 +44,13 @@ class MailChannel
         $message = $notification->toMail($notifiable);
 
         if ($message instanceof Mailable) {
-            return $message->send($this->mailer);
+            if ($message instanceof ShouldQueue and method_exists($this->mailer, 'queue')) {
+                $this->mailer->queue($message);
+            } else {
+                $this->mailer->send($message);
+            }
+
+            return;
         }
 
         $this->mailer->send($message->view, $message->data(), function ($m) use ($notifiable, $notification, $message) {
