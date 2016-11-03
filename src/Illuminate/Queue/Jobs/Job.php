@@ -246,7 +246,8 @@ abstract class Job
      *
      * @return mixed
      */
-    public function getCommand(){
+    public function getCommand()
+    {
         if ($this->command) {
             return $this->command;
         }
@@ -254,7 +255,7 @@ abstract class Job
         $payload = $this->payload();
 
         return $this->command = isset($payload['data']['command'])
-                ? unserialize($payload['data']['command']) : null;
+            ? unserialize($payload['data']['command']) : null;
     }
 
     /**
