@@ -39,7 +39,7 @@ class HigherOrderCollectionProxy
      */
     public function __get($key)
     {
-        return $this->collection->{$this->method}(function($value) use ($key) {
+        return $this->collection->{$this->method}(function ($value) use ($key) {
             return $value->{$key};
         });
     }
@@ -53,7 +53,7 @@ class HigherOrderCollectionProxy
      */
     public function __call($method, $parameters)
     {
-        return $this->collection->{$this->method}(function($value) use ($method, $parameters) {
+        return $this->collection->{$this->method}(function ($value) use ($method, $parameters) {
             return $value->{$method}(...$parameters);
         });
     }
