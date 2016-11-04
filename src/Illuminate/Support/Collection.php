@@ -1266,6 +1266,25 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         return new self($this);
     }
 
+    public function __get($name)
+    {
+        $nameToMethod = [
+            'where' => 'filter',
+            'unless' => 'reject',
+            'do' => 'each',
+            'extract' => 'map',
+            'sum' => 'sum',
+            'inOrderOf' => 'sortBy',
+            'inReverseOrderOf' => 'sortByDesc',
+        ];
+
+        if (isset($nameToMethod[$name])) {
+            throw new \Exception('Not accessible.');
+        }
+
+        return new HigherOrderProxy($this, $nameToMethod[$name]);
+    }
+
     /**
      * Determine if an item exists at an offset.
      *
@@ -1348,5 +1367,38 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         return (array) $items;
+    }
+}
+
+class HigherOrderProxy
+{
+    /**
+     * @var Collection
+     */
+    protected $collection;
+
+    /**
+     * @var string
+     */
+    protected $method;
+
+    public function __construct(Collection $collection, $method)
+    {
+        $this->collection = $collection;
+        $this->method = $method;
+    }
+
+    public function __call($name, $arguments)
+    {
+        return $this->collection->{$this->method}(function($value) use ($name, $arguments) {
+            return call_user_func_array([$value, $name], $arguments);
+        });
+    }
+
+    public function __get($name)
+    {
+        return $this->collection->{$this->method}(function($value) use ($name) {
+            return $value->$name;
+        });
     }
 }
