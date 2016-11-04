@@ -136,7 +136,7 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
         });
         $job->attempts = 2;
 
-        $job->retries = 10;
+        $job->maxTries = 10;
 
         $worker = $this->getWorker('default', ['queue' => [$job]]);
         $worker->runNextJob('default', 'queue', $this->workerOptions(['maxTries' => 1]));
@@ -239,7 +239,7 @@ class WorkerFakeJob
     public $callback;
     public $deleted = false;
     public $releaseAfter;
-    public $retries;
+    public $maxTries;
     public $attempts = 0;
     public $failedWith;
 
@@ -260,9 +260,9 @@ class WorkerFakeJob
         return [];
     }
 
-    public function retries()
+    public function maxTries()
     {
-        return $this->retries;
+        return $this->maxTries;
     }
 
     public function delete()
