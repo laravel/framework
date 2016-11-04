@@ -103,7 +103,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
     public function testFirstMethod()
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[get,take]', [$this->getMockQueryBuilder()]);
-        $builder->shouldReceive('take')->with(1)->andReturn($builder);
+        $builder->shouldReceive('take')->with(1)->andReturnSelf();
         $builder->shouldReceive('get')->with(['*'])->andReturn(new Collection(['bar']));
 
         $result = $builder->first();
@@ -160,9 +160,9 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $chunk1 = new Collection(['foo1', 'foo2']);
         $chunk2 = new Collection(['foo3', 'foo4']);
         $chunk3 = new Collection([]);
-        $builder->shouldReceive('forPage')->once()->with(1, 2)->andReturn($builder);
-        $builder->shouldReceive('forPage')->once()->with(2, 2)->andReturn($builder);
-        $builder->shouldReceive('forPage')->once()->with(3, 2)->andReturn($builder);
+        $builder->shouldReceive('forPage')->once()->with(1, 2)->andReturnSelf();
+        $builder->shouldReceive('forPage')->once()->with(2, 2)->andReturnSelf();
+        $builder->shouldReceive('forPage')->once()->with(3, 2)->andReturnSelf();
         $builder->shouldReceive('get')->times(3)->andReturn($chunk1, $chunk2, $chunk3);
 
         $callbackExecutionAssertor = m::mock('StdClass');
@@ -180,8 +180,8 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[forPage,get]', [$this->getMockQueryBuilder()]);
         $chunk1 = new Collection(['foo1', 'foo2']);
         $chunk2 = new Collection(['foo3']);
-        $builder->shouldReceive('forPage')->once()->with(1, 2)->andReturn($builder);
-        $builder->shouldReceive('forPage')->once()->with(2, 2)->andReturn($builder);
+        $builder->shouldReceive('forPage')->once()->with(1, 2)->andReturnSelf();
+        $builder->shouldReceive('forPage')->once()->with(2, 2)->andReturnSelf();
         $builder->shouldReceive('get')->times(2)->andReturn($chunk1, $chunk2);
 
         $callbackExecutionAssertor = m::mock('StdClass');
@@ -198,7 +198,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[forPage,get]', [$this->getMockQueryBuilder()]);
         $chunk1 = new Collection(['foo1', 'foo2']);
         $chunk2 = new Collection(['foo3']);
-        $builder->shouldReceive('forPage')->once()->with(1, 2)->andReturn($builder);
+        $builder->shouldReceive('forPage')->once()->with(1, 2)->andReturnSelf();
         $builder->shouldReceive('forPage')->never()->with(2, 2);
         $builder->shouldReceive('get')->times(1)->andReturn($chunk1);
 
@@ -216,9 +216,9 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
     public function testChunkPaginatesUsingIdWithLastChunkComplete()
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[forPageAfterId,get]', [$this->getMockQueryBuilder()]);
-        $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'someIdField')->andReturn($builder);
-        $builder->shouldReceive('forPageAfterId')->once()->with(2, 2, 'someIdField')->andReturn($builder);
-        $builder->shouldReceive('forPageAfterId')->once()->with(2, 11, 'someIdField')->andReturn($builder);
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'someIdField')->andReturnSelf();
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 2, 'someIdField')->andReturnSelf();
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 11, 'someIdField')->andReturnSelf();
 
         $builder->shouldReceive('get')->times(3)->andReturn(
             new Collection([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]),
@@ -233,8 +233,8 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
     public function testChunkPaginatesUsingIdWithLastChunkPartial()
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[forPageAfterId,get]', [$this->getMockQueryBuilder()]);
-        $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'someIdField')->andReturn($builder);
-        $builder->shouldReceive('forPageAfterId')->once()->with(2, 2, 'someIdField')->andReturn($builder);
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'someIdField')->andReturnSelf();
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 2, 'someIdField')->andReturnSelf();
 
         $builder->shouldReceive('get')->times(2)->andReturn(
             new Collection([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]),

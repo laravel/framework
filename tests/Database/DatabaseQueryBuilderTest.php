@@ -1535,9 +1535,9 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $parameters = ['corge', 'waldo', 'fred'];
         $builder = m::mock('Illuminate\Database\Query\Builder')->makePartial();
 
-        $builder->shouldReceive('where')->with('foo_bar', '=', $parameters[0], 'and')->once()->andReturn($builder);
-        $builder->shouldReceive('where')->with('baz', '=', $parameters[1], 'and')->once()->andReturn($builder);
-        $builder->shouldReceive('where')->with('qux', '=', $parameters[2], 'or')->once()->andReturn($builder);
+        $builder->shouldReceive('where')->with('foo_bar', '=', $parameters[0], 'and')->once()->andReturnSelf();
+        $builder->shouldReceive('where')->with('baz', '=', $parameters[1], 'and')->once()->andReturnSelf();
+        $builder->shouldReceive('where')->with('qux', '=', $parameters[2], 'or')->once()->andReturnSelf();
 
         $this->assertEquals($builder, $builder->dynamicWhere($method, $parameters));
     }
@@ -1548,9 +1548,9 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $parameters = ['6.1', '4.2', 'Vertical'];
         $builder = m::mock('Illuminate\Database\Query\Builder')->makePartial();
 
-        $builder->shouldReceive('where')->with('ios_version', '=', '6.1', 'and')->once()->andReturn($builder);
-        $builder->shouldReceive('where')->with('android_version', '=', '4.2', 'and')->once()->andReturn($builder);
-        $builder->shouldReceive('where')->with('orientation', '=', 'Vertical', 'or')->once()->andReturn($builder);
+        $builder->shouldReceive('where')->with('ios_version', '=', '6.1', 'and')->once()->andReturnSelf();
+        $builder->shouldReceive('where')->with('android_version', '=', '4.2', 'and')->once()->andReturnSelf();
+        $builder->shouldReceive('where')->with('orientation', '=', 'Vertical', 'or')->once()->andReturnSelf();
 
         $builder->dynamicWhere($method, $parameters);
     }
@@ -1744,9 +1744,9 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     {
         $builder = $this->getMockQueryBuilder();
 
-        $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'someIdField')->andReturn($builder);
-        $builder->shouldReceive('forPageAfterId')->once()->with(2, 2, 'someIdField')->andReturn($builder);
-        $builder->shouldReceive('forPageAfterId')->once()->with(2, 11, 'someIdField')->andReturn($builder);
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'someIdField')->andReturnSelf();
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 2, 'someIdField')->andReturnSelf();
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 11, 'someIdField')->andReturnSelf();
 
         $builder->shouldReceive('get')->times(3)->andReturn(
             collect([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]),
@@ -1762,8 +1762,8 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     {
         $builder = $this->getMockQueryBuilder();
 
-        $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'someIdField')->andReturn($builder);
-        $builder->shouldReceive('forPageAfterId')->once()->with(2, 2, 'someIdField')->andReturn($builder);
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'someIdField')->andReturnSelf();
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 2, 'someIdField')->andReturnSelf();
 
         $builder->shouldReceive('get')->times(2)->andReturn(
             collect([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]),
@@ -1777,8 +1777,8 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testChunkPaginatesUsingIdWithAlias()
     {
         $builder = $this->getMockQueryBuilder();
-        $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'table.id')->andReturn($builder);
-        $builder->shouldReceive('forPageAfterId')->once()->with(2, 10, 'table.id')->andReturn($builder);
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'table.id')->andReturnSelf();
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 10, 'table.id')->andReturnSelf();
         $builder->shouldReceive('get')->times(2)->andReturn(
             collect([(object) ['table_id' => 1], (object) ['table_id' => 10]]),
             collect([])
@@ -1799,7 +1799,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $results = collect([['test' => 'foo'], ['test' => 'bar']]);
 
         $builder->shouldReceive('getCountForPagination')->once()->with($columns)->andReturn(2);
-        $builder->shouldReceive('forPage')->once()->with($page, $perPage)->andReturn($builder);
+        $builder->shouldReceive('forPage')->once()->with($page, $perPage)->andReturnSelf();
         $builder->shouldReceive('get')->once()->andReturn($results);
 
         Paginator::currentPathResolver(function () use ($path) {
@@ -1826,7 +1826,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $results = collect([['test' => 'foo'], ['test' => 'bar']]);
 
         $builder->shouldReceive('getCountForPagination')->once()->with($columns)->andReturn(2);
-        $builder->shouldReceive('forPage')->once()->with($page, $perPage)->andReturn($builder);
+        $builder->shouldReceive('forPage')->once()->with($page, $perPage)->andReturnSelf();
         $builder->shouldReceive('get')->once()->andReturn($results);
 
         Paginator::currentPageResolver(function () use ($path) {
