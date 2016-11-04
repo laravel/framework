@@ -1659,6 +1659,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 class TestSupportCollectionHigherOrderItem
 {
     public $name = 'taylor';
+
     public function uppercase()
     {
         $this->name = strtoupper($this->name);
