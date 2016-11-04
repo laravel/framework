@@ -6,7 +6,6 @@ use Closure;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
-use PHPUnit_Framework_Assert as PHPUnit;
 use Illuminate\Foundation\Testing\TestResponse;
 use PHPUnit_Framework_ExpectationFailedException;
 use Illuminate\Contracts\Http\Kernel as HttpKernel;
@@ -45,19 +44,6 @@ trait MakesHttpRequests
         $this->app->instance('middleware.disable', true);
 
         return $this;
-    }
-
-    /**
-     * Send the given request through the application.
-     *
-     * This method allows you to fully customize the entire Request object.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response  $response
-     */
-    public function handle(Request $request)
-    {
-        return $this->app->prepareResponse($this->app->handle($request));
     }
 
     /**
