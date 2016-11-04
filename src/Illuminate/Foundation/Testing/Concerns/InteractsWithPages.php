@@ -119,7 +119,7 @@ trait InteractsWithPages
      */
     protected function makeRequestUsingForm(Form $form, array $uploads = [])
     {
-        $files = $this->convertUploadsForTesting($form, $uploads);
+        $files = $this->convertUploadsForTesting($form, $this->inputs);
 
         return $this->makeRequest(
             $form->getMethod(), $form->getUri(), $this->extractParametersFromForm($form), [], $files
