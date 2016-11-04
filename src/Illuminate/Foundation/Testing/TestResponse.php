@@ -262,7 +262,10 @@ class TestResponse extends Response
         }
 
         if (is_null($value)) {
-            PHPUnit::assertTrue(app('session.store')->has($key), "Session is missing expected key [{$key}].");
+            PHPUnit::assertTrue(
+                $this->session()->has($key),
+                "Session is missing expected key [{$key}]."
+            );
         } else {
             PHPUnit::assertEquals($value, app('session.store')->get($key));
         }
@@ -298,7 +301,20 @@ class TestResponse extends Response
                 $this->assertSessionMissing($value);
             }
         } else {
-            PHPUnit::assertFalse(app('session.store')->has($key), "Session has unexpected key [{$key}].");
+            PHPUnit::assertFalse(
+                $this->session()->has($key),
+                "Session has unexpected key [{$key}]."
+            );
         }
+    }
+
+    /**
+     * Get the current session store.
+     *
+     * @return \Illuminate\Session\Store
+     */
+    protected function session()
+    {
+        return app('session.store');
     }
 }
