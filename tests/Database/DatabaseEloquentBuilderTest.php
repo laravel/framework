@@ -165,13 +165,13 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $builder->shouldReceive('forPage')->once()->with(3, 2)->andReturnSelf();
         $builder->shouldReceive('get')->times(3)->andReturn($chunk1, $chunk2, $chunk3);
 
-        $callbackExecutionAssertor = m::mock('StdClass');
-        $callbackExecutionAssertor->shouldReceive('doSomething')->with($chunk1)->once();
-        $callbackExecutionAssertor->shouldReceive('doSomething')->with($chunk2)->once();
-        $callbackExecutionAssertor->shouldReceive('doSomething')->with($chunk3)->never();
+        $callbackAssertor = m::mock('StdClass');
+        $callbackAssertor->shouldReceive('doSomething')->with($chunk1)->once();
+        $callbackAssertor->shouldReceive('doSomething')->with($chunk2)->once();
+        $callbackAssertor->shouldReceive('doSomething')->with($chunk3)->never();
 
-        $builder->chunk(2, function ($results) use ($callbackExecutionAssertor) {
-            $callbackExecutionAssertor->doSomething($results);
+        $builder->chunk(2, function ($results) use ($callbackAssertor) {
+            $callbackAssertor->doSomething($results);
         });
     }
 
@@ -184,12 +184,12 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $builder->shouldReceive('forPage')->once()->with(2, 2)->andReturnSelf();
         $builder->shouldReceive('get')->times(2)->andReturn($chunk1, $chunk2);
 
-        $callbackExecutionAssertor = m::mock('StdClass');
-        $callbackExecutionAssertor->shouldReceive('doSomething')->with($chunk1)->once();
-        $callbackExecutionAssertor->shouldReceive('doSomething')->with($chunk2)->once();
+        $callbackAssertor = m::mock('StdClass');
+        $callbackAssertor->shouldReceive('doSomething')->with($chunk1)->once();
+        $callbackAssertor->shouldReceive('doSomething')->with($chunk2)->once();
 
-        $builder->chunk(2, function ($results) use ($callbackExecutionAssertor) {
-            $callbackExecutionAssertor->doSomething($results);
+        $builder->chunk(2, function ($results) use ($callbackAssertor) {
+            $callbackAssertor->doSomething($results);
         });
     }
 
@@ -202,12 +202,12 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $builder->shouldReceive('forPage')->never()->with(2, 2);
         $builder->shouldReceive('get')->times(1)->andReturn($chunk1);
 
-        $callbackExecutionAssertor = m::mock('StdClass');
-        $callbackExecutionAssertor->shouldReceive('doSomething')->with($chunk1)->once();
-        $callbackExecutionAssertor->shouldReceive('doSomething')->with($chunk2)->never();
+        $callbackAssertor = m::mock('StdClass');
+        $callbackAssertor->shouldReceive('doSomething')->with($chunk1)->once();
+        $callbackAssertor->shouldReceive('doSomething')->with($chunk2)->never();
 
-        $builder->chunk(2, function ($results) use ($callbackExecutionAssertor) {
-            $callbackExecutionAssertor->doSomething($results);
+        $builder->chunk(2, function ($results) use ($callbackAssertor) {
+            $callbackAssertor->doSomething($results);
 
             return false;
         });
