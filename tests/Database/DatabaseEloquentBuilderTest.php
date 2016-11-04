@@ -166,9 +166,9 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $builder->shouldReceive('get')->times(3)->andReturn($chunk1, $chunk2, $chunk3);
 
         $callbackAssertor = m::mock('StdClass');
-        $callbackAssertor->shouldReceive('doSomething')->with($chunk1)->once();
-        $callbackAssertor->shouldReceive('doSomething')->with($chunk2)->once();
-        $callbackAssertor->shouldReceive('doSomething')->with($chunk3)->never();
+        $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
+        $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk2);
+        $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk3);
 
         $builder->chunk(2, function ($results) use ($callbackAssertor) {
             $callbackAssertor->doSomething($results);
@@ -185,8 +185,8 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $builder->shouldReceive('get')->times(2)->andReturn($chunk1, $chunk2);
 
         $callbackAssertor = m::mock('StdClass');
-        $callbackAssertor->shouldReceive('doSomething')->with($chunk1)->once();
-        $callbackAssertor->shouldReceive('doSomething')->with($chunk2)->once();
+        $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
+        $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk2);
 
         $builder->chunk(2, function ($results) use ($callbackAssertor) {
             $callbackAssertor->doSomething($results);
@@ -203,8 +203,8 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $builder->shouldReceive('get')->times(1)->andReturn($chunk1);
 
         $callbackAssertor = m::mock('StdClass');
-        $callbackAssertor->shouldReceive('doSomething')->with($chunk1)->once();
-        $callbackAssertor->shouldReceive('doSomething')->with($chunk2)->never();
+        $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
+        $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk2);
 
         $builder->chunk(2, function ($results) use ($callbackAssertor) {
             $callbackAssertor->doSomething($results);
