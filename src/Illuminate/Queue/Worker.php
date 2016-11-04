@@ -102,7 +102,7 @@ class Worker
             return;
         }
 
-        $timeout = $job && $job->timeout() !== null ? $job->timeout() : $options->timeout;
+        $timeout = $job && ! is_null($job->timeout()) ? $job->timeout() : $options->timeout;
 
         pcntl_async_signals(true);
 
@@ -281,7 +281,7 @@ class Worker
      */
     protected function markJobAsFailedIfAlreadyExceedsMaxAttempts($connectionName, $job, $maxTries)
     {
-        $maxTries = $job->retries() !== null ? $job->retries() : $maxTries;
+        $maxTries = ! is_null($job->retries()) ? $job->retries() : $maxTries;
 
         if ($maxTries === 0 || $job->attempts() <= $maxTries) {
             return;
@@ -308,7 +308,7 @@ class Worker
     protected function markJobAsFailedIfHasExceededMaxAttempts(
         $connectionName, $job, $maxTries, $e
     ) {
-        $maxTries = $job->retries() !== null ? $job->retries() : $maxTries;
+        $maxTries = ! is_null($job->retries()) ? $job->retries() : $maxTries;
 
         if ($maxTries === 0 || $job->attempts() < $maxTries) {
             return;
@@ -331,14 +331,16 @@ class Worker
             return;
         }
 
-        // If the job has failed, we will delete it, call the "failed" method and then call
-        // an event indicating the job has failed so it can be logged if needed. This is
-        // to allow every developer to better keep monitor of their failed queue jobs.
-        $job->delete();
+        try {
+            // If the job has failed, we will delete it, call the "failed" method and then call
+            // an event indicating the job has failed so it can be logged if needed. This is
+            // to allow every developer to better keep monitor of their failed queue jobs.
+            $job->delete();
 
-        $job->failed($e);
-
-        $this->raiseFailedJobEvent($connectionName, $job, $e);
+            $job->failed($e);
+        } finally {
+            $this->raiseFailedJobEvent($connectionName, $job, $e);
+        }
     }
 
     /**
