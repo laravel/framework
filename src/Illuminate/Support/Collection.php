@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use Countable;
+use Exception;
 use ArrayAccess;
 use Traversable;
 use ArrayIterator;
@@ -1266,25 +1267,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         return new self($this);
     }
 
-    public function __get($name)
-    {
-        $nameToMethod = [
-            'where' => 'filter',
-            'unless' => 'reject',
-            'do' => 'each',
-            'extract' => 'map',
-            'sum' => 'sum',
-            'inOrderOf' => 'sortBy',
-            'inReverseOrderOf' => 'sortByDesc',
-        ];
-
-        if (isset($nameToMethod[$name])) {
-            throw new \Exception('Not accessible.');
-        }
-
-        return new HigherOrderProxy($this, $nameToMethod[$name]);
-    }
-
     /**
      * Determine if an item exists at an offset.
      *
@@ -1368,37 +1350,24 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         return (array) $items;
     }
-}
-
-class HigherOrderProxy
-{
-    /**
-     * @var Collection
-     */
-    protected $collection;
 
     /**
-     * @var string
+     * Dynamically access collection proxies.
+     *
+     * @param  string  $key
+     * @return mixed
      */
-    protected $method;
-
-    public function __construct(Collection $collection, $method)
+    public function __get($key)
     {
-        $this->collection = $collection;
-        $this->method = $method;
-    }
+        $proxies = [
+            'each', 'map', 'first', 'sortBy',
+            'sortByDesc', 'sum', 'reject', 'filter',
+        ];
 
-    public function __call($name, $arguments)
-    {
-        return $this->collection->{$this->method}(function($value) use ($name, $arguments) {
-            return call_user_func_array([$value, $name], $arguments);
-        });
-    }
+        if (! in_array($key, $proxies)) {
+            throw new Exception("Property [{$key}] does not exist on this collection instance.");
+        }
 
-    public function __get($name)
-    {
-        return $this->collection->{$this->method}(function($value) use ($name) {
-            return $value->$name;
-        });
+        return new HigherOrderCollectionProxy($this, $key);
     }
 }
