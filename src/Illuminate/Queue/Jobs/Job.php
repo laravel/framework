@@ -239,9 +239,9 @@ abstract class Job
      *
      * @return int|null
      */
-    public function retries()
+    public function maxTries()
     {
-        return array_get($this->payload(), 'retries');
+        return array_get($this->payload(), 'maxTries');
     }
 
     /**

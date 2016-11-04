@@ -81,7 +81,7 @@ abstract class Queue
         if (is_object($job)) {
             $payload = json_encode([
                 'job' => 'Illuminate\Queue\CallQueuedHandler@call',
-                'retries' => isset($job->retries) ? $job->retries : null,
+                'maxTries' => isset($job->tries) ? $job->tries : null,
                 'timeout' => isset($job->timeout) ? $job->timeout : null,
                 'data' => [
                     'commandName' => get_class($job),
