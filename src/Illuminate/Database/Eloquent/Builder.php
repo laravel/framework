@@ -1470,6 +1470,12 @@ class Builder
             return $this->callScope([$this->model, $scope], $parameters);
         }
 
+        if (method_exists($this->model, $query = 'query'.ucfirst($method))) {
+            array_unshift($parameters, $this);
+
+            return call_user_func_array([$this->model, $query], $parameters);
+        }
+
         if (in_array($method, $this->passthru)) {
             return call_user_func_array([$this->toBase(), $method], $parameters);
         }
