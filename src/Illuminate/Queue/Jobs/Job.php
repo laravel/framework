@@ -16,13 +16,6 @@ abstract class Job
     protected $instance;
 
     /**
-     * The command instance.
-     *
-     * @var mixed
-     */
-    protected $command;
-
-    /**
      * The IoC container instance.
      *
      * @var \Illuminate\Container\Container
@@ -242,40 +235,23 @@ abstract class Job
     }
 
     /**
-     * The underlying command.
-     *
-     * @return mixed
-     */
-    public function getCommand()
-    {
-        if ($this->command) {
-            return $this->command;
-        }
-
-        $payload = $this->payload();
-
-        return $this->command = isset($payload['data']['command'])
-            ? unserialize($payload['data']['command']) : null;
-    }
-
-    /**
      * The number of times to attempt a job.
      *
-     * @return int
+     * @return int|null
      */
     public function retries()
     {
-        return $this->getCommand() ? $this->getCommand()->retries : null;
+        return array_get($this->payload(), 'retries');
     }
 
     /**
      * The number of seconds the job can run.
      *
-     * @return int
+     * @return int|null
      */
     public function timeout()
     {
-        return $this->getCommand() ? $this->getCommand()->timeout : null;
+        return array_get($this->payload(), 'timeout');
     }
 
     /**
