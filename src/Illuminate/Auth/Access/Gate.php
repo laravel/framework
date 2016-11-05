@@ -90,12 +90,12 @@ class Gate implements GateContract
      *
      * @param  string  $ability
      * @param  callable|string  $callback
-     * @param  bool  $allowGuest
+     * @param  bool  $includeGuest
      * @return $this
      *
      * @throws \InvalidArgumentException
      */
-    public function define($ability, $callback, $allowGuest = false)
+    public function define($ability, $callback, $includeGuest = false)
     {
         if (is_callable($callback)) {
             // Already a callable
@@ -105,7 +105,7 @@ class Gate implements GateContract
             throw new InvalidArgumentException("Callback must be a callable or a 'Class@method' string.");
         }
 
-        $this->abilities[$ability] = compact('callback', 'allowGuest');
+        $this->abilities[$ability] = compact('callback', 'includeGuest');
 
         return $this;
     }
@@ -143,12 +143,12 @@ class Gate implements GateContract
      * Register a callback to run before all Gate checks.
      *
      * @param  callable  $callback
-     * @param  bool  $allowGuest
+     * @param  bool  $includeGuest
      * @return $this
      */
-    public function before(callable $callback, $allowGuest = false)
+    public function before(callable $callback, $includeGuest = false)
     {
-        $this->beforeCallbacks[] = compact('callback', 'allowGuest');
+        $this->beforeCallbacks[] = compact('callback', 'includeGuest');
 
         return $this;
     }
@@ -157,12 +157,12 @@ class Gate implements GateContract
      * Register a callback to run after all Gate checks.
      *
      * @param  callable  $callback
-     * @param  bool  $allowGuest
+     * @param  bool  $includeGuest
      * @return $this
      */
-    public function after(callable $callback, $allowGuest = false)
+    public function after(callable $callback, $includeGuest = false)
     {
-        $this->afterCallbacks[] = compact('callback', 'allowGuest');
+        $this->afterCallbacks[] = compact('callback', 'includeGuest');
 
         return $this;
     }
@@ -281,7 +281,7 @@ class Gate implements GateContract
         $arguments = array_merge([$user, $ability], [$arguments]);
 
         foreach ($this->beforeCallbacks as $before) {
-            if ($user || $before['allowGuest']) {
+            if ($user || $before['includeGuest']) {
                 if (! is_null($result = $before['callback'](...$arguments))) {
                     return $result;
                 }
@@ -303,7 +303,7 @@ class Gate implements GateContract
         $arguments = array_merge([$user, $ability, $result], [$arguments]);
 
         foreach ($this->afterCallbacks as $after) {
-            if ($user || $after['allowGuest']) {
+            if ($user || $after['includeGuest']) {
                 $after['callback'](...$arguments);
             }
         }
@@ -321,7 +321,7 @@ class Gate implements GateContract
     {
         if ($this->firstArgumentCorrespondsToPolicy($arguments)) {
             return $this->resolvePolicyCallback($user, $ability, $arguments);
-        } elseif (isset($this->abilities[$ability]) && ($user || $this->abilities[$ability]['allowGuest'])) {
+        } elseif (isset($this->abilities[$ability]) && ($user || $this->abilities[$ability]['includeGuest'])) {
             return $this->abilities[$ability]['callback'];
         } else {
             return function () {
@@ -362,12 +362,12 @@ class Gate implements GateContract
         return function () use ($user, $ability, $arguments) {
             $instance = $this->getPolicyFor($arguments[0]);
 
-            $allowGuest = isset($instance->allowGuest) ? (array) $instance->allowGuest : [];
+            $includeGuest = isset($instance->includeGuest) ? (array) $instance->includeGuest : [];
 
             // If we receive a non-null result from the before method, we will return it
             // as the final result. This will allow developers to override the checks
             // in the policy to return a result for all rules defined in the class.
-            if (method_exists($instance, 'before') && ($user || in_array('before', $allowGuest))) {
+            if (method_exists($instance, 'before') && ($user || in_array('before', $includeGuest))) {
                 if (! is_null($result = $instance->before($user, $ability, ...$arguments))) {
                     return $result;
                 }
@@ -389,7 +389,7 @@ class Gate implements GateContract
             }
 
             // If we have a user or the ability is allowed to be checked for guests
-            if ($user || in_array($ability, $allowGuest)) {
+            if ($user || in_array($ability, $includeGuest)) {
                 return $instance->{$ability}($user, ...$arguments);
             } else {
                 return false;

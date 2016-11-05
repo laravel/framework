@@ -312,7 +312,7 @@ class GateTest extends PHPUnit_Framework_TestCase
     {
         $gate = $this->getGateForGuest();
 
-        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithAllowGuest::class);
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithIncludeGuest::class);
 
         $this->assertTrue($gate->check('view', new AccessGateTestDummy));
     }
@@ -330,7 +330,7 @@ class GateTest extends PHPUnit_Framework_TestCase
     {
         $gate = $this->getGateForGuest();
 
-        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithAllowGuest::class);
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithIncludeGuest::class);
 
         $this->assertTrue($gate->check('update', new AccessGateTestDummy));
     }
@@ -444,9 +444,9 @@ class AccessGateTestPolicyWithBefore
     }
 }
 
-class AccessGateTestPolicyWithAllowGuest
+class AccessGateTestPolicyWithIncludeGuest
 {
-    public $allowGuest = ['before', 'view'];
+    public $includeGuest = ['before', 'view'];
 
     public function before($user, $ability)
     {
