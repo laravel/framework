@@ -40,7 +40,7 @@ class HigherOrderCollectionProxy
     public function __get($key)
     {
         return $this->collection->{$this->method}(function ($value) use ($key) {
-            return $value->{$key};
+            return data_get($value, $key);
         });
     }
 
