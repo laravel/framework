@@ -1668,6 +1668,20 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(['TAYLOR', 'TAYLOR'], $collection->each->uppercase()->mapName->toArray());
     }
+
+    public function testHigherOrderCollectionMapFromArrays()
+    {
+        $person1 = ['name' => 'Taylor'];
+        $person2 = ['name' => 'Yaz'];
+
+        $collection = collect([$person1, $person2]);
+
+        $this->assertEquals(['Taylor', 'Yaz'], $collection->map->name->toArray());
+
+        $collection = collect([new TestSupportCollectionHigherOrderItem, new TestSupportCollectionHigherOrderItem]);
+
+        $this->assertEquals(['TAYLOR', 'TAYLOR'], $collection->each->uppercase()->map->name->toArray());
+    }
 }
 
 class TestSupportCollectionHigherOrderItem
