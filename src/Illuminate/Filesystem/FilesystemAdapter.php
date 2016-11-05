@@ -290,7 +290,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
             $flysystemConfig = $this->driver->getConfig();
 
             if ($flysystemConfig->has('url_root')) {
-                return $flysystemConfig->get('url_root') .'/'. $path;
+                return $flysystemConfig->get('url_root').'/'.$path;
             }
 
             $path = '/storage/'.$path;
