@@ -28,6 +28,15 @@ class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table "users" add "id" int identity primary key not null, "email" nvarchar(255) not null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->create();
+        $blueprint->increments('id');
+        $blueprint->string('email');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar()->setTablePrefix('prefix_'));
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('create table "prefix_users" ("id" int identity primary key not null, "email" nvarchar(255) not null)', $statements[0]);
     }
 
     public function testDropTable()
@@ -38,6 +47,30 @@ class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, count($statements));
         $this->assertEquals('drop table "users"', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->drop();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar()->setTablePrefix('prefix_'));
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('drop table "prefix_users"', $statements[0]);
+    }
+
+    public function testDropTableIfExists()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->dropIfExists();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('if exists (select * from INFORMATION_SCHEMA.TABLES where TABLE_NAME = \'users\') drop table "users"', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->dropIfExists();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar()->setTablePrefix('prefix_'));
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('if exists (select * from INFORMATION_SCHEMA.TABLES where TABLE_NAME = \'prefix_users\') drop table "prefix_users"', $statements[0]);
     }
 
     public function testDropColumn()
