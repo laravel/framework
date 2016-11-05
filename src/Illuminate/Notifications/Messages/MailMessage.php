@@ -47,7 +47,7 @@ class MailMessage extends SimpleMessage
      *
      * @var array
      */
-    public $replyTo= [];
+    public $replyTo = [];
 
     /**
      * The attachments for the message.
