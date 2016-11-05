@@ -1364,8 +1364,21 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             'sortByDesc', 'sum', 'reject', 'filter',
         ];
 
+        $property = null;
+
+        foreach ($proxies as $proxy) {
+            if (starts_with($key, $proxy) && $key !== $proxy) {
+                $property = lcfirst(substr($key, strlen($proxy)));
+                $key = $proxy;
+            }
+        }
+
         if (! in_array($key, $proxies)) {
             throw new Exception("Property [{$key}] does not exist on this collection instance.");
+        }
+
+        if ($property !== null) {
+            return (new HigherOrderCollectionProxy($this, $key))->{$property};
         }
 
         return new HigherOrderCollectionProxy($this, $key);
