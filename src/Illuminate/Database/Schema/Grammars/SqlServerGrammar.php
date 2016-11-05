@@ -55,7 +55,7 @@ class SqlServerGrammar extends Grammar
     {
         $columns = implode(', ', $this->getColumns($blueprint));
 
-        return 'create table '.$this->wrapTable($blueprint)." ($columns)";
+        return 'create table '.$this->wrapTableWithOptionalSchema($blueprint)." ($columns)";
     }
 
     /**
@@ -137,7 +137,7 @@ class SqlServerGrammar extends Grammar
      */
     public function compileDrop(Blueprint $blueprint, Fluent $command)
     {
-        return 'drop table '.$this->wrapTable($blueprint);
+        return 'drop table '.$this->wrapTableWithOptionalSchema($blueprint);
     }
 
     /**
@@ -149,7 +149,35 @@ class SqlServerGrammar extends Grammar
      */
     public function compileDropIfExists(Blueprint $blueprint, Fluent $command)
     {
-        return 'if exists (select * from INFORMATION_SCHEMA.TABLES where TABLE_NAME = \''.$blueprint->getTable().'\') drop table ['.$blueprint->getTable().']';
+        $segments = explode('.', $blueprint->getTable());
+
+        if (isset($segments[1])) {
+            $schema = $segments[0];
+            $table = $this->getTablePrefix().$segments[1];
+            $where = 'TABLE_SCHEMA = \''.str_replace("'", "''", $schema).'\' and TABLE_NAME = \''.str_replace("'", "''", $table).'\'';
+        } else {
+            $table = $this->getTablePrefix().$segments[0];
+            $where = 'TABLE_NAME = \''.str_replace("'", "''", $table).'\'';
+        }
+
+        return 'if exists (select * from INFORMATION_SCHEMA.TABLES where '.$where.') drop table '.$this->wrapTableWithOptionalSchema($blueprint);
+    }
+
+    /**
+     * Wrap a table with optional schema in keyword identifiers.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @return string
+     */
+    protected function wrapTableWithOptionalSchema(Blueprint $blueprint)
+    {
+        $segments = explode('.', $blueprint->getTable());
+
+        if (isset($segments[1])) {
+            return $this->wrap($segments[0]).'.'.$this->wrapTable($segments[1]);
+        }
+
+        return $this->wrapTable($segments[0]);
     }
 
     /**
