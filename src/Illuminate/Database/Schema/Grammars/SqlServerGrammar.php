@@ -149,7 +149,10 @@ class SqlServerGrammar extends Grammar
      */
     public function compileDropIfExists(Blueprint $blueprint, Fluent $command)
     {
-        return 'if exists (select * from INFORMATION_SCHEMA.TABLES where TABLE_NAME = \''.$blueprint->getTable().'\') drop table ['.$blueprint->getTable().']';
+        $table = $this->getTablePrefix().$blueprint->getTable();
+        $where = 'TABLE_NAME = \''.str_replace("'", "''", $table).'\'';
+
+        return 'if exists (select * from INFORMATION_SCHEMA.TABLES where '.$where.') drop table '.$this->wrapTable($blueprint);
     }
 
     /**
