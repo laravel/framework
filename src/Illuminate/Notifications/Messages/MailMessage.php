@@ -43,7 +43,7 @@ class MailMessage extends SimpleMessage
     public $cc = [];
 
     /**
-     * The "reply to" recipients of the message.
+     * The "reply to" information for the message.
      *
      * @var array
      */
