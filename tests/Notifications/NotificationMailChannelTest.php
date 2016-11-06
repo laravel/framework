@@ -211,6 +211,68 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
         $channel->send($notifiable, $notification);
     }
 
+    public function testMessageWithReplyToAddress()
+    {
+        $notification = new NotificationMailChannelTestNotificationWithReplyToAddress;
+        $notifiable = new NotificationMailChannelTestNotifiable;
+
+        $message = $notification->toMail($notifiable);
+        $data = $message->toArray();
+
+        $channel = new Illuminate\Notifications\Channels\MailChannel(
+            $mailer = Mockery::mock(Illuminate\Contracts\Mail\Mailer::class)
+        );
+
+        $views = ['notifications::email', 'notifications::email-plain'];
+
+        $mailer->shouldReceive('send')->with($views, $data, Mockery::on(function ($closure) {
+            $mock = Mockery::mock('Illuminate\Mailer\Message');
+
+            $mock->shouldReceive('subject')->once();
+
+            $mock->shouldReceive('to')->once();
+
+            $mock->shouldReceive('replyTo')->with('test@mail.com', 'Test Man');
+
+            $closure($mock);
+
+            return true;
+        }));
+
+        $channel->send($notifiable, $notification);
+    }
+
+    public function testMessageWithReplyToAddressAndNoName()
+    {
+        $notification = new NotificationMailChannelTestNotificationWithReplyToAddressNoName;
+        $notifiable = new NotificationMailChannelTestNotifiable;
+
+        $message = $notification->toMail($notifiable);
+        $data = $message->toArray();
+
+        $channel = new Illuminate\Notifications\Channels\MailChannel(
+            $mailer = Mockery::mock(Illuminate\Contracts\Mail\Mailer::class)
+        );
+
+        $views = ['notifications::email', 'notifications::email-plain'];
+
+        $mailer->shouldReceive('send')->with($views, $data, Mockery::on(function ($closure) {
+            $mock = Mockery::mock('Illuminate\Mailer\Message');
+
+            $mock->shouldReceive('subject')->once();
+
+            $mock->shouldReceive('to')->once();
+
+            $mock->shouldReceive('replyTo')->with('test@mail.com', null);
+
+            $closure($mock);
+
+            return true;
+        }));
+
+        $channel->send($notifiable, $notification);
+    }
+
     public function testMessageWithToCcEmails()
     {
         $notification = new NotificationMailChannelTestNotificationWithCcEmails;
@@ -355,6 +417,24 @@ class NotificationMailChannelTestNotificationWithCcEmails extends Notification
     {
         return (new MailMessage)
             ->cc(['cc1@email.com', 'cc2@email.com']);
+    }
+}
+
+class NotificationMailChannelTestNotificationWithReplyToAddress extends Notification
+{
+    public function toMail($notifiable)
+    {
+        return (new MailMessage)
+            ->replyTo('test@mail.com', 'Test Man');
+    }
+}
+
+class NotificationMailChannelTestNotificationWithReplyToAddressNoName extends Notification
+{
+    public function toMail($notifiable)
+    {
+        return (new MailMessage)
+            ->replyTo('test@mail.com');
     }
 }
 
