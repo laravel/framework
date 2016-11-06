@@ -9,14 +9,23 @@ class RoutingSortedMiddlewareTest extends PHPUnit_Framework_TestCase
         $priority = [
             'First',
             'Second',
+            'BeforeThird',
             'Third',
         ];
+
+        $closure = function () {
+        };
+
+        $anotherClosure = function () {
+        };
 
         $middleware = [
             'Something',
             'Something',
             'Something',
             'Something',
+            $closure,
+            $anotherClosure,
             'Second',
             'Otherthing',
             'First:api',
@@ -24,26 +33,28 @@ class RoutingSortedMiddlewareTest extends PHPUnit_Framework_TestCase
             'First:foo,bar',
             'Third',
             'Second',
+            'BeforeThird',
         ];
 
         $expected = [
             'Something',
+            $closure,
+            $anotherClosure,
             'First:api',
             'First:foo,bar',
             'Second',
             'Otherthing',
+            'BeforeThird',
             'Third:foo',
             'Third',
         ];
 
-        $this->assertEquals($expected, (new SortedMiddleware($priority, $middleware))->all());
+        $this->assertEquals($expected, (new SortedMiddleware($middleware))->sortMiddleware($priority)->all());
 
-        $this->assertEquals([], (new SortedMiddleware(['First'], []))->all());
-        $this->assertEquals(['First'], (new SortedMiddleware(['First'], ['First']))->all());
-        $this->assertEquals(['First', 'Second'], (new SortedMiddleware(['First', 'Second'], ['Second', 'First']))->all());
+        $this->assertEquals([], (new SortedMiddleware())->sortMiddleware(['First'])->all());
+        $this->assertEquals(['First'], (new SortedMiddleware(['First']))->sortMiddleware(['First'])->all());
+        $this->assertEquals(['First', 'Second'], (new SortedMiddleware(['Second', 'First']))->sortMiddleware(['First', 'Second'])->all());
 
-        $closure = function () {
-        };
-        $this->assertEquals(['Second', $closure], (new SortedMiddleware(['First', 'Second'], ['Second', $closure]))->all());
+        $this->assertEquals(['Second', $closure], (new SortedMiddleware(['Second', $closure]))->sortMiddleware(['First', 'Second'])->all());
     }
 }

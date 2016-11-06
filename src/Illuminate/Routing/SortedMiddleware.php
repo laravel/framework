@@ -7,81 +7,82 @@ use Illuminate\Support\Collection;
 class SortedMiddleware extends Collection
 {
     /**
-     * Create a new Sorted Middleware container.
-     *
-     * @param  array  $priorityMap
-     * @param  array  $middlewares
-     * @return void
-     */
-    public function __construct(array $priorityMap, $middlewares)
-    {
-        if ($middlewares instanceof Collection) {
-            $middlewares = $middlewares->all();
-        }
-
-        $this->items = $this->sortMiddleware($priorityMap, $middlewares);
-    }
-
-    /**
      * Sort the middlewares by the given priority map.
      *
      * Each call to this method makes one discrete middleware movement if necessary.
      *
      * @param  array  $priorityMap
-     * @param  array  $middlewares
      * @return array
      */
-    protected function sortMiddleware($priorityMap, $middlewares)
+    public function sortMiddleware(array $priorityMap)
+    {
+        // First we need to make sure the middleware are unique.
+        // Then we can group them by their parsed name. We'll
+        // keep the closure middleware in separate groups.
+        $groupedMiddleware = $this->unique()
+            ->groupBy(function ($middleware, $index) {
+                if (! is_string($middleware)) {
+                    return $index;
+                }
+
+                return head(explode(':', $middleware));
+            }, true);
+
+        $sortedGroups = $this->sortGroups($priorityMap, $groupedMiddleware->keys());
+
+        // Now we can reorder the grouped middleware according to the
+        // order of the sorted groups. We need to search the index
+        // of each sorted middleware and sort by that position.
+        $middleware = $groupedMiddleware->sortBy(function ($group, $name) use ($sortedGroups) {
+            return $sortedGroups->search($name);
+        });
+
+        return $middleware->flatten();
+    }
+
+    /**
+     * Sort the middleware groups against a priority map.
+     *
+     * @param  array                          $priorityMap
+     * @param  \Illuminate\Support\Collection $middlewares
+     * @return \Illuminate\Support\Collection
+     */
+    protected function sortGroups(array $priorityMap, Collection $middlewares)
     {
         $lastIndex = 0;
 
-        foreach ($middlewares as $index => $middleware) {
-            if (! is_string($middleware)) {
-                continue;
-            }
+        return collect($priorityMap)
+            ->intersect($middlewares)
+            ->reduce(function ($middlewares, $middleware) use (&$lastIndex) {
+                $index = $middlewares->search($middleware);
 
-            $stripped = head(explode(':', $middleware));
-
-            if (in_array($stripped, $priorityMap)) {
-                $priorityIndex = array_search($stripped, $priorityMap);
-
-                // This middleware is in the priority map. If we have encountered another middleware
-                // that was also in the priority map and was at a lower priority than the current
-                // middleware, we will move this middleware to be above the previous encounter.
-                if (isset($lastPriorityIndex) && $priorityIndex < $lastPriorityIndex) {
-                    return $this->sortMiddleware(
-                        $priorityMap, array_values(
-                            $this->moveMiddleware($middlewares, $index, $lastIndex)
-                        )
-                    );
-
-                // This middleware is in the priority map; but, this is the first middleware we have
-                // encountered from the map thus far. We'll save its current index plus its index
-                // from the priority map so we can compare against them on the next iterations.
-                } else {
-                    $lastIndex = $index;
-                    $lastPriorityIndex = $priorityIndex;
+                // We have encountered a middleware that is at a lower index than the previous encounter,
+                // so we will move the previous encounter just before the current position. Then we'll
+                // increment the current position because it has been shifted by the previous item.
+                if ($index < $lastIndex) {
+                    $middlewares = $this->moveMiddleware($middlewares, $lastIndex, $index++);
                 }
-            }
-        }
 
-        return array_values(array_unique($middlewares, SORT_REGULAR));
+                $lastIndex = $index;
+
+                return $middlewares;
+            }, $middlewares);
     }
 
     /**
      * Splice a middleware into a new position and remove the old entry.
      *
-     * @param  array  $middlewares
-     * @param  int  $from
-     * @param  int  $to
-     * @return array
+     * @param  \Illuminate\Support\Collection $middlewares
+     * @param  int                            $from
+     * @param  int                            $to
+     * @return \Illuminate\Support\Collection
      */
-    protected function moveMiddleware($middlewares, $from, $to)
+    protected function moveMiddleware(Collection $middlewares, $from, $to)
     {
-        array_splice($middlewares, $to, 0, $middlewares[$from]);
+        $item = $middlewares->pull($from);
 
-        unset($middlewares[$from + 1]);
+        $middlewares->splice($to, 0, $item);
 
-        return $middlewares;
+        return $middlewares->values();
     }
 }
