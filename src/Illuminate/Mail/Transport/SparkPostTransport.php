@@ -126,4 +126,25 @@ class SparkPostTransport extends Transport
     {
         return $this->key = $key;
     }
+
+    /**
+     * Get the transmission options being used by the transport.
+     *
+     * @return string
+     */
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
+    /**
+     * Set the transmission options being used by the transport.
+     *
+     * @param  array  $options
+     * @return array
+     */
+    public function setOptions($options)
+    {
+        return $this->options = $options;
+    }
 }
