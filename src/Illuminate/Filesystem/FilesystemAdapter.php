@@ -287,6 +287,12 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
 
             return $adapter->getClient()->getObjectUrl($adapter->getBucket(), $path);
         } elseif ($adapter instanceof LocalAdapter) {
+            $flysystemConfig = $this->driver->getConfig();
+
+            if ($flysystemConfig->has('url_root')) {
+                return $flysystemConfig->get('url_root').'/'.$path;
+            }
+
             $path = '/storage/'.$path;
 
             return Str::contains($path, '/storage/public') ? Str::replaceFirst('/public', '', $path) : $path;
