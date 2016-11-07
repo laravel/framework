@@ -14,7 +14,7 @@ trait ValidatesWhenResolvedTrait
      */
     public function validate()
     {
-        $this->before();
+        $this->prepareForValidation();
 
         $instance = $this->getValidatorInstance();
 
@@ -30,7 +30,7 @@ trait ValidatesWhenResolvedTrait
      *
      * @return void
      */
-    protected function before()
+    protected function prepareForValidation()
     {
         // no default action
     }
