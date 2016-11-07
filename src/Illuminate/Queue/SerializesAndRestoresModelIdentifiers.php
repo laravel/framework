@@ -73,7 +73,7 @@ trait SerializesAndRestoresModelIdentifiers
     {
         return $this->restoresModelsWithoutScopes() ? $model->newQueryWithoutScopes() : $model->newQuery();
     }
-    
+
     /**
      * Determines whether to restore model identifiers w/o scope.
      *
