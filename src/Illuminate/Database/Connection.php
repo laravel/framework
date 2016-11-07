@@ -575,6 +575,12 @@ class Connection implements ConnectionInterface
             // up in the database. Then we'll re-throw the exception so it can
             // be handled how the developer sees fit for their applications.
             catch (Exception $e) {
+                if ($this->causedByDeadlock($e) && $this->transactions > 1) {
+                    --$this->transactions;
+
+                    throw $e;
+                }
+
                 $this->rollBack();
 
                 if ($this->causedByDeadlock($e) && $a < $attempts) {
