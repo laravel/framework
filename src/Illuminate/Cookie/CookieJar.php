@@ -113,16 +113,15 @@ class CookieJar implements JarContract
     /**
      * Queue a cookie to send with the next response.
      *
-     * @param  array  $params
-     *
+     * @param  array  $parameters
      * @return void
      */
-    public function queue(...$params)
+    public function queue(...$parameters)
     {
-        if (head($params) instanceof Cookie) {
-            $cookie = head($params);
+        if (head($parameters) instanceof Cookie) {
+            $cookie = head($parameters);
         } else {
-            $cookie = call_user_func_array([$this, 'make'], $params);
+            $cookie = call_user_func_array([$this, 'make'], $parameters);
         }
 
         $this->queued[$cookie->getName()] = $cookie;
