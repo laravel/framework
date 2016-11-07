@@ -46,7 +46,7 @@ class Rule
      * Get a not_in constraint builder instance.
      *
      * @param  array  $values
-     * @return \Illuminate\Validation\Rules\In
+     * @return \Illuminate\Validation\Rules\NotIn
      */
     public static function notIn(array $values)
     {

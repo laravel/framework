@@ -69,7 +69,7 @@ class DatabaseMigrationRefreshCommandTest extends PHPUnit_Framework_TestCase
 class InputMatcher extends m\Matcher\MatcherAbstract
 {
     /**
-     * @param \Symfony\Component\Console\Input\ArrayInput  $actual
+     * @param  \Symfony\Component\Console\Input\ArrayInput  $actual
      * @return bool
      */
     public function match(&$actual)

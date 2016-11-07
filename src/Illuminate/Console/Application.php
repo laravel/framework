@@ -188,7 +188,7 @@ class Application extends SymfonyApplication implements ApplicationContract
      */
     protected function getEnvironmentOption()
     {
-        $message = 'The environment the command should run under.';
+        $message = 'The environment the command should run under';
 
         return new InputOption('--env', null, InputOption::VALUE_OPTIONAL, $message);
     }

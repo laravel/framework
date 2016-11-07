@@ -102,7 +102,8 @@ class Exists
     /**
      * Register a custom query callback.
      *
-     * @param  \Closure  $callback
+     * @param  \Closure $callback
+     * @return $this
      */
     public function using(Closure $callback)
     {
