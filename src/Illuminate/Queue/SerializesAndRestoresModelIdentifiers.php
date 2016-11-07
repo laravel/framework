@@ -63,7 +63,6 @@ trait SerializesAndRestoresModelIdentifiers
                     ->whereIn($model->getQualifiedKeyName(), $value->id)->get();
     }
 
-
     /**
      * Get the query for restoration.
      *
@@ -74,8 +73,7 @@ trait SerializesAndRestoresModelIdentifiers
     {
         return $this->restoresModelsWithoutScopes() ? $model->newQueryWithoutScopes() : $model->newQuery();
     }
-
-
+    
     /**
      * Determines whether to restore model identifiers w/o scope.
      *
