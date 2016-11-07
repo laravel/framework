@@ -90,21 +90,6 @@ class FoundationFormRequestTest extends PHPUnit_Framework_TestCase
 
         $request->validate($factory);
     }
-
-    public function testValidateFunctionRunsAfterValidationFunctionIfValidationPasses()
-    {
-        $request = FoundationTestFormRequestStub::create('/', 'GET', ['name' => 'abigail']);
-        $request->setContainer($container = new Container);
-        $factory = m::mock('Illuminate\Validation\Factory');
-        $factory->shouldReceive('make')->once()->with(['name' => 'abigail'], ['name' => 'required'], [], [])->andReturn(
-            $validator = m::mock('Illuminate\Validation\Validator')
-        );
-        $container->instance('Illuminate\Contracts\Validation\Factory', $factory);
-        $validator->shouldReceive('passes')->once()->andReturn(true);
-
-        $request->validate($factory);
-        $this->assertSame('Jeffrey', $request->get('name'));
-    }
 }
 
 class FoundationTestFormRequestStub extends Illuminate\Foundation\Http\FormRequest
@@ -117,11 +102,6 @@ class FoundationTestFormRequestStub extends Illuminate\Foundation\Http\FormReque
     public function authorize()
     {
         return true;
-    }
-
-    public function afterValidation()
-    {
-        $this->replace(['name' => 'Jeffrey']);
     }
 }
 
@@ -149,7 +129,7 @@ class FoundationTestFormRequestHooks extends Illuminate\Foundation\Http\FormRequ
         return true;
     }
 
-    public function beforeValidation()
+    public function prepareForValidation()
     {
         $this->replace(['name' => 'Taylor']);
     }
