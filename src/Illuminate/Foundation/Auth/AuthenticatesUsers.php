@@ -65,14 +65,16 @@ trait AuthenticatesUsers
     }
 
     /**
-     * @param Request $request
+     * Attempt to log the user into the application.
+     *
+     * @param  Request  $request
      * @return bool
      */
     protected function attemptLogin(Request $request)
     {
-        $credentials = $this->credentials($request);
-
-        return $this->guard()->attempt($credentials, $request->has('remember'));
+        return $this->guard()->attempt(
+            $this->credentials($request), $request->has('remember')
+        );
     }
 
     /**
