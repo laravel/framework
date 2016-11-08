@@ -155,7 +155,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $builder->shouldReceive('select')->once()->with(['bar', 'baz']);
         $this->assertNotNull($instance->getEagerLoads()['hadi']);
         $this->assertNotNull($instance->getEagerLoads()['foo']);
-        $instance->getEagerLoads()['foo']($builder);
+        $closure = $instance->getEagerLoads()['foo'];
+        $closure($builder);
     }
 
     public function testWithMethodCallsQueryBuilderCorrectlyWithArray()
