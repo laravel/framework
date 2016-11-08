@@ -1743,6 +1743,8 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testChunkWithLastChunkComplete()
     {
         $builder = $this->getMockQueryBuilder();
+        $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+
         $chunk1 = collect(['foo1', 'foo2']);
         $chunk2 = collect(['foo3', 'foo4']);
         $chunk3 = collect([]);
@@ -1764,6 +1766,8 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testChunkWithLastChunkPartial()
     {
         $builder = $this->getMockQueryBuilder();
+        $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+
         $chunk1 = collect(['foo1', 'foo2']);
         $chunk2 = collect(['foo3']);
         $builder->shouldReceive('forPage')->once()->with(1, 2)->andReturnSelf();
@@ -1782,6 +1786,8 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testChunkCanBeStoppedByReturningFalse()
     {
         $builder = $this->getMockQueryBuilder();
+        $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+
         $chunk1 = collect(['foo1', 'foo2']);
         $chunk2 = collect(['foo3']);
         $builder->shouldReceive('forPage')->once()->with(1, 2)->andReturnSelf();
@@ -1802,6 +1808,8 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testChunkPaginatesUsingIdWithLastChunkComplete()
     {
         $builder = $this->getMockQueryBuilder();
+        $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+
         $chunk1 = collect([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]);
         $chunk2 = collect([(object) ['someIdField' => 10], (object) ['someIdField' => 11]]);
         $chunk3 = collect([]);
@@ -1823,6 +1831,8 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testChunkPaginatesUsingIdWithLastChunkPartial()
     {
         $builder = $this->getMockQueryBuilder();
+        $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+
         $chunk1 = collect([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]);
         $chunk2 = collect([(object) ['someIdField' => 10]]);
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'someIdField')->andReturnSelf();
@@ -1841,6 +1851,8 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testChunkPaginatesUsingIdWithAlias()
     {
         $builder = $this->getMockQueryBuilder();
+        $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+
         $chunk1 = collect([(object) ['table_id' => 1], (object) ['table_id' => 10]]);
         $chunk2 = collect([]);
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'table.id')->andReturnSelf();
