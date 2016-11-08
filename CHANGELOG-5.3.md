@@ -5,17 +5,27 @@
 ### Added
 - Added database slave failover ([#15553](https://github.com/laravel/framework/pull/15553), [ed28c7f](https://github.com/laravel/framework/commit/ed28c7fa11d3754d618606bf8fc2f00690cfff66))
 - Added `Arr::shuffle($array)` ([ed28c7f](https://github.com/laravel/framework/commit/ed28c7fa11d3754d618606bf8fc2f00690cfff66))
+- Added `prepareForValidation()` method to `FormRequests` ([#16238](https://github.com/laravel/framework/pull/16238))
+- Support SparkPost transports options to be set at runtime ([#16254](https://github.com/laravel/framework/pull/16254))
+- Support setting `$replyTo` for email notifications ([#16277](https://github.com/laravel/framework/pull/16277))
+- Support `url` configuration parameter to generate filesystem disk URL ([#16281](https://github.com/laravel/framework/pull/16281), [dcff158](https://github.com/laravel/framework/commit/dcff158c63093523eadffc34a9ba8c1f8d4e53c0))
 
 ### Changed
 - Dried-up console parser and extract token parsing ([#16197](https://github.com/laravel/framework/pull/16197))
 - Support empty array for query builder `orders` property ([#16225](https://github.com/laravel/framework/pull/16225))
 - Properly handle filling JSON attributes on Eloquent models ([#16228](https://github.com/laravel/framework/pull/16228))
+- Use `forceReconnection()` method in `Mailer` ([#16298](https://github.com/laravel/framework/pull/16298))
+- Double-quote MySQL JSON expressions ([#16308](https://github.com/laravel/framework/pull/16308))
+- Moved login attempt code to separate method ([#16317](https://github.com/laravel/framework/pull/16317))
+- Escape the regexp delimiter in `Validator::getExplicitKeys()` ([#16309](https://github.com/laravel/framework/pull/16309))
 
 ### Fixed
 - Catch errors when handling a failed job ([#16212](https://github.com/laravel/framework/pull/16212))
 - Return array from `Translator::sortReplacements()` ([#16221](https://github.com/laravel/framework/pull/16221))
 - Don't use multi-byte functions in `UrlGenerator::to()` ([#16081](https://github.com/laravel/framework/pull/16081))
 - Support configuration files as symbolic links ([#16080](https://github.com/laravel/framework/pull/16080))
+- Fixed wrapping and escaping in SQL Server `dropIfExists()` ([#16279](https://github.com/laravel/framework/pull/16279))
+- Throw `ManuallyFailedException` if `InteractsWithQueue::fail()` is called manually ([#16318](https://github.com/laravel/framework/pull/16318), [a20fa97](https://github.com/laravel/framework/commit/a20fa97445be786f9f5f09e2e9b905a00064b2da))
 
 
 ## v5.3.22 (2016-11-01)
