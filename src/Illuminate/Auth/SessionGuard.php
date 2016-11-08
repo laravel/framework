@@ -121,17 +121,18 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
             return $this->user;
         }
 
-        $id = $this->session->get($this->getName());
+        list($id, $passwordHash) = array_pad($this->extractSessionParameters(), 2, null);
 
         // First we will try to load the user using the identifier in the session if
         // one exists. Otherwise we will check for a "remember me" cookie in this
         // request, and if one exists, attempt to retrieve the user using that.
         $user = null;
 
-        if (! is_null($id)) {
-            if ($user = $this->provider->retrieveById($id)) {
-                $this->fireAuthenticatedEvent($user);
-            }
+        if (! is_null($id) && $user = $this->provider->retrieveById($id)) {
+            $this->fireAuthenticatedEvent($user);
+
+            return  $user->getAuthPassword() == $passwordHash
+                            ? $this->user = $user : null;
         }
 
         // If the user is null, but we decrypt a "recaller" cookie we can attempt to
@@ -139,11 +140,11 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         // the application. Once we have a user we can return it to the caller.
         $recaller = $this->getRecaller();
 
-        if (is_null($user) && ! is_null($recaller)) {
+        if (! is_null($recaller)) {
             $user = $this->getUserByRecaller($recaller);
 
             if ($user) {
-                $this->updateSession($user->getAuthIdentifier());
+                $this->updateSession($this->sessionValue($user));
 
                 $this->fireLoginEvent($user, true);
             }
@@ -440,7 +441,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     public function login(AuthenticatableContract $user, $remember = false)
     {
-        $this->updateSession($user->getAuthIdentifier());
+        $this->updateSession($this->sessionValue($user));
 
         // If the user should be permanently "remembered" by the application we will
         // queue a permanent cookie that contains the encrypted copy of the user
@@ -606,6 +607,18 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
 
             $this->getCookieJar()->queue($this->getCookieJar()->forget($recaller));
         }
+    }
+
+    /**
+     * Refresh the session value for the current user.
+     *
+     * @return void
+     */
+    public function refresh()
+    {
+        $this->updateSession(
+            $this->sessionValue($this->getUser())
+        );
     }
 
     /**
@@ -801,5 +814,27 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     public function viaRemember()
     {
         return $this->viaRemember;
+    }
+
+    /**
+     * The session value used to identify the authenticatable.
+     *
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @return string
+     */
+    public function sessionValue($user)
+    {
+        return $user->getAuthIdentifier().'||'.$user->getAuthPassword();
+    }
+
+    /**
+     * Extract the session parameters.
+     *
+     * @return array
+     */
+    protected function extractSessionParameters()
+    {
+        return $this->session->has($this->getName())
+                        ? explode('||', $this->session->get($this->getName())) : [];
     }
 }

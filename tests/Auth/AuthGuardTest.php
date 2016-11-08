@@ -103,7 +103,8 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
         $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
         $mock->expects($this->once())->method('getName')->will($this->returnValue('foo'));
         $user->shouldReceive('getAuthIdentifier')->once()->andReturn('bar');
-        $mock->getSession()->shouldReceive('set')->with('foo', 'bar')->once();
+        $user->shouldReceive('getAuthPassword')->once()->andReturn('baz');
+        $mock->getSession()->shouldReceive('set')->with('foo', 'bar||baz')->once();
         $session->shouldReceive('migrate')->once();
         $mock->login($user);
     }
@@ -118,7 +119,8 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
         $events->shouldReceive('fire')->once()->with(m::type('Illuminate\Auth\Events\Authenticated'));
         $mock->expects($this->once())->method('getName')->will($this->returnValue('foo'));
         $user->shouldReceive('getAuthIdentifier')->once()->andReturn('bar');
-        $mock->getSession()->shouldReceive('set')->with('foo', 'bar')->once();
+        $user->shouldReceive('getAuthPassword')->once()->andReturn('baz');
+        $mock->getSession()->shouldReceive('set')->with('foo', 'bar||baz')->once();
         $session->shouldReceive('migrate')->once();
         $mock->login($user);
     }
@@ -156,7 +158,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
     public function testAuthenticateThrowsWhenUserIsNull()
     {
         $guard = $this->getGuard();
-        $guard->getSession()->shouldReceive('get')->once()->andReturn(null);
+        $guard->getSession()->shouldReceive('has')->once()->andReturn(null);
 
         $guard->authenticate();
     }
@@ -190,18 +192,43 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
     public function testNullIsReturnedForUserIfNoUserFound()
     {
         $mock = $this->getGuard();
-        $mock->getSession()->shouldReceive('get')->once()->andReturn(null);
+        $mock->getSession()->shouldReceive('has')->once()->andReturn(false);
+        $this->assertNull($mock->user());
+    }
+
+    public function testNullIsReturnedForUserIfUserPasswordHashChanged()
+    {
+        $mock = $this->getGuard();
+        $mock->getSession()->shouldReceive('has')->once()->andReturn(true);
+        $mock->getSession()->shouldReceive('get')->once()->andReturn('1||hash');
+        $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
+        $user->shouldReceive('getAuthPassword')->once()->andReturn('diff_hash');
+        $mock->getProvider()->shouldReceive('retrieveById')->once()->with(1)->andReturn($user);
         $this->assertNull($mock->user());
     }
 
     public function testUserIsSetToRetrievedUser()
     {
         $mock = $this->getGuard();
-        $mock->getSession()->shouldReceive('get')->once()->andReturn(1);
+        $mock->getSession()->shouldReceive('has')->once()->andReturn(true);
+        $mock->getSession()->shouldReceive('get')->once()->andReturn('1||baz');
         $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
+        $user->shouldReceive('getAuthPassword')->once()->andReturn('baz');
         $mock->getProvider()->shouldReceive('retrieveById')->once()->with(1)->andReturn($user);
         $this->assertSame($user, $mock->user());
         $this->assertSame($user, $mock->getUser());
+    }
+
+    public function testSessionRefresh()
+    {
+        $mock = $this->getGuard();
+        $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
+        $user->shouldReceive('getAuthIdentifier')->once()->andReturn(1);
+        $user->shouldReceive('getAuthPassword')->once()->andReturn('hash');
+        $mock->getSession()->shouldReceive('set')->once()->with($mock->getName(), '1||hash');
+        $mock->getSession()->shouldReceive('migrate')->once()->with(true);
+        $mock->setUser($user);
+        $mock->refresh();
     }
 
     public function testLogoutRemovesSessionTokenAndRememberMeCookie()
@@ -265,10 +292,11 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
         $foreverCookie = new Symfony\Component\HttpFoundation\Cookie($guard->getRecallerName(), 'foo');
         $cookie->shouldReceive('forever')->once()->with($guard->getRecallerName(), 'foo|recaller')->andReturn($foreverCookie);
         $cookie->shouldReceive('queue')->once()->with($foreverCookie);
-        $guard->getSession()->shouldReceive('set')->once()->with($guard->getName(), 'foo');
+        $guard->getSession()->shouldReceive('set')->once()->with($guard->getName(), 'foo||baz');
         $session->shouldReceive('migrate')->once();
         $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
         $user->shouldReceive('getAuthIdentifier')->andReturn('foo');
+        $user->shouldReceive('getAuthPassword')->andReturn('baz');
         $user->shouldReceive('getRememberToken')->andReturn('recaller');
         $user->shouldReceive('setRememberToken')->never();
         $provider->shouldReceive('updateRememberToken')->never();
@@ -283,10 +311,11 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
         $foreverCookie = new Symfony\Component\HttpFoundation\Cookie($guard->getRecallerName(), 'foo');
         $cookie->shouldReceive('forever')->once()->andReturn($foreverCookie);
         $cookie->shouldReceive('queue')->once()->with($foreverCookie);
-        $guard->getSession()->shouldReceive('set')->once()->with($guard->getName(), 'foo');
+        $guard->getSession()->shouldReceive('set')->once()->with($guard->getName(), 'foo||baz');
         $session->shouldReceive('migrate')->once();
         $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
         $user->shouldReceive('getAuthIdentifier')->andReturn('foo');
+        $user->shouldReceive('getAuthPassword')->andReturn('baz');
         $user->shouldReceive('getRememberToken')->andReturn(null);
         $user->shouldReceive('setRememberToken')->once();
         $provider->shouldReceive('updateRememberToken')->once();
@@ -346,12 +375,13 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
         list($session, $provider, $request, $cookie) = $this->getMocks();
         $request = Symfony\Component\HttpFoundation\Request::create('/', 'GET', [], [$guard->getRecallerName() => 'id|recaller']);
         $guard = new Illuminate\Auth\SessionGuard('default', $provider, $session, $request);
-        $guard->getSession()->shouldReceive('get')->once()->with($guard->getName())->andReturn(null);
         $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
         $guard->getProvider()->shouldReceive('retrieveByToken')->once()->with('id', 'recaller')->andReturn($user);
         $user->shouldReceive('getAuthIdentifier')->once()->andReturn('bar');
-        $guard->getSession()->shouldReceive('set')->with($guard->getName(), 'bar')->once();
+        $user->shouldReceive('getAuthPassword')->once()->andReturn('baz');
+        $guard->getSession()->shouldReceive('set')->with($guard->getName(), 'bar||baz')->once();
         $session->shouldReceive('migrate')->once();
+        $session->shouldReceive('has')->once()->andReturn(false);
         $this->assertSame($user, $guard->user());
         $this->assertTrue($guard->viaRemember());
     }
