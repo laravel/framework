@@ -242,7 +242,11 @@ class MySqlGrammar extends Grammar
 
         $field = $this->wrapValue(array_shift($path));
 
-        return $field.'->'.'"$.'.implode('.', $path).'"';
+        $path = collect($path)->map(function ($part) {
+            return '"'.$part.'"';
+        })->implode('.');
+
+        return sprintf('%s->\'$.%s\'', $field, $path);
     }
 
     /**

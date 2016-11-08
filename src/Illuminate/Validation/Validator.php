@@ -2790,7 +2790,7 @@ class Validator implements ValidatorContract
      */
     protected function getExplicitKeys($attribute)
     {
-        $pattern = str_replace('\*', '([^\.]+)', preg_quote($this->getPrimaryAttribute($attribute)));
+        $pattern = str_replace('\*', '([^\.]+)', preg_quote($this->getPrimaryAttribute($attribute), '/'));
 
         if (preg_match('/^'.$pattern.'/', $attribute, $keys)) {
             array_shift($keys);
