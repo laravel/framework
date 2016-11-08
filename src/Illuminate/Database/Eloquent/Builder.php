@@ -472,7 +472,7 @@ class Builder
     }
 
     /**
-     * Add a generic orderBy clause if the query doesn't already have one.
+     * Add a generic "order by" clause if the query doesn't already have one.
      *
      * @return void
      */
