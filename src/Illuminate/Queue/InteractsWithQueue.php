@@ -38,13 +38,13 @@ trait InteractsWithQueue
     /**
      * Fail the job from the queue.
      *
-     * @param  \Throwable  $e
+     * @param  \Throwable  $exception
      * @return void
      */
-    public function fail($e)
+    public function fail($exception = null)
     {
         if ($this->job) {
-            return $this->job->failed($e);
+            return $this->job->failed($exception ?: new ManuallyFailedException);
         }
     }
 
