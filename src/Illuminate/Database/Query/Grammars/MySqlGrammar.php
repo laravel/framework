@@ -244,9 +244,9 @@ class MySqlGrammar extends Grammar
 
         $path = collect($path)->map(function ($part) {
             return '"'.$part.'"';
-        })->toArray();
+        })->implode('.');
 
-        return sprintf('%s->\'$.%s\'', $field, implode('.', $path));
+        return sprintf('%s->\'$.%s\'', $field, $path);
     }
 
     /**
