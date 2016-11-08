@@ -147,7 +147,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertEmpty($instance->getEagerLoads());
     }
 
-    public function testEager()
+    public function testEagerLoadingWithColumns()
     {
         $model = new EloquentModelWithoutRelationStub;
         $instance = $model->newInstance()->newQuery()->with('foo:bar,baz', 'hadi');
