@@ -39,9 +39,7 @@ trait AuthenticatesUsers
             return $this->sendLockoutResponse($request);
         }
 
-        $credentials = $this->credentials($request);
-
-        if ($this->guard()->attempt($credentials, $request->has('remember'))) {
+        if ($this->attemptLogin($request)) {
             return $this->sendLoginResponse($request);
         }
 
@@ -64,6 +62,17 @@ trait AuthenticatesUsers
         $this->validate($request, [
             $this->username() => 'required', 'password' => 'required',
         ]);
+    }
+
+    /**
+     * @param Request $request
+     * @return bool
+     */
+    protected function attemptLogin(Request $request)
+    {
+        $credentials = $this->credentials($request);
+
+        return $this->guard()->attempt($credentials, $request->has('remember'));
     }
 
     /**
