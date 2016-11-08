@@ -129,13 +129,15 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         $user = null;
 
         if (! is_null($id) && $user = $this->provider->retrieveById($id)) {
+            $this->user = $user;
+
             if ($user->getAuthPassword() == $passwordHash) {
                 $this->fireAuthenticatedEvent($user);
 
-                return $this->user = $user;
+                return $user;
             }
 
-            return null;
+            return $this->logout();
         }
 
         // If the user is null, but we decrypt a "recaller" cookie we can attempt to

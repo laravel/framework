@@ -196,14 +196,17 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
         $this->assertNull($mock->user());
     }
 
-    public function testNullIsReturnedForUserIfUserPasswordHashChanged()
+    public function testNullIsReturnedForUserIfUserPasswordHashChangedAndUserIsLoggedOut()
     {
         $mock = $this->getGuard();
         $mock->getSession()->shouldReceive('has')->once()->andReturn(true);
         $mock->getSession()->shouldReceive('get')->once()->andReturn('1||hash');
+        $mock->getSession()->shouldReceive('remove')->once($mock->getName());
         $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
         $user->shouldReceive('getAuthPassword')->once()->andReturn('diff_hash');
+        $user->shouldReceive('setRememberToken')->once();
         $mock->getProvider()->shouldReceive('retrieveById')->once()->with(1)->andReturn($user);
+        $mock->getProvider()->shouldReceive('updateRememberToken')->once();
         $this->assertNull($mock->user());
     }
 
