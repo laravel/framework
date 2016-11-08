@@ -462,8 +462,6 @@ class Builder
      */
     public function each(callable $callback, $count = 1000)
     {
-        $this->enforceOrderBy();
-
         return $this->chunk($count, function ($results) use ($callback) {
             foreach ($results as $key => $value) {
                 if ($callback($value, $key) === false) {
