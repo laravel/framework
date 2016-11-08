@@ -42,7 +42,7 @@ trait SerializesAndRestoresModelIdentifiers
 
         return is_array($value->id)
                 ? $this->restoreCollection($value)
-                : (new $value->class)->newQuery()->useWritePdo()->findOrFail($value->id);
+                : $this->getQueryForModelRestoration(new $value->class)->useWritePdo()->findOrFail($value->id);
     }
 
     /**
@@ -59,7 +59,28 @@ trait SerializesAndRestoresModelIdentifiers
 
         $model = new $value->class;
 
-        return $model->newQuery()->useWritePdo()
+        return $this->getQueryForModelRestoration($model)->useWritePdo()
                     ->whereIn($model->getQualifiedKeyName(), $value->id)->get();
+    }
+
+    /**
+     * Get the query for restoration.
+     *
+     * @param \Illuminate\Database\Eloquent\Model $model
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    protected function getQueryForModelRestoration($model)
+    {
+        return $this->restoresModelsWithoutScopes() ? $model->newQueryWithoutScopes() : $model->newQuery();
+    }
+
+    /**
+     * Determines whether to restore model identifiers w/o scope.
+     *
+     * @return bool
+     */
+    protected function restoresModelsWithoutScopes()
+    {
+        return true;
     }
 }
