@@ -81,6 +81,6 @@ trait SerializesAndRestoresModelIdentifiers
      */
     protected function restoresModelsWithoutScopes()
     {
-        return false;
+        return true;
     }
 }
