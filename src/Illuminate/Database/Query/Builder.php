@@ -1807,6 +1807,8 @@ class Builder
      */
     public function chunk($count, callable $callback)
     {
+        $this->enforceOrderBy();
+
         $page = 1;
 
         do {
@@ -1842,6 +1844,8 @@ class Builder
      */
     public function chunkById($count, callable $callback, $column = 'id', $alias = null)
     {
+        $this->enforceOrderBy();
+
         $alias = $alias ?: $column;
 
         $lastId = 0;
@@ -1871,15 +1875,9 @@ class Builder
      * @param  callable  $callback
      * @param  int  $count
      * @return bool
-     *
-     * @throws \RuntimeException
      */
     public function each(callable $callback, $count = 1000)
     {
-        if (empty($this->orders) && empty($this->unionOrders)) {
-            throw new RuntimeException('You must specify an orderBy clause when using the "each" function.');
-        }
-
         return $this->chunk($count, function ($results) use ($callback) {
             foreach ($results as $key => $value) {
                 if ($callback($value, $key) === false) {
@@ -1887,6 +1885,20 @@ class Builder
                 }
             }
         });
+    }
+
+    /**
+     * Throw an exception if the query doesn't have an orderBy clause.
+     *
+     * @return void
+     *
+     * @throws \RuntimeException
+     */
+    protected function enforceOrderBy()
+    {
+        if (empty($this->orders) && empty($this->unionOrders)) {
+            throw new RuntimeException('You must specify an orderBy clause when using this function.');
+        }
     }
 
     /**

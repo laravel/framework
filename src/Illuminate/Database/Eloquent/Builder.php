@@ -394,6 +394,8 @@ class Builder
      */
     public function chunk($count, callable $callback)
     {
+        $this->enforceOrderBy();
+
         $page = 1;
 
         do {
@@ -428,6 +430,8 @@ class Builder
      */
     public function chunkById($count, callable $callback, $column = 'id')
     {
+        $this->enforceOrderBy();
+
         $lastId = 0;
 
         do {
@@ -458,10 +462,6 @@ class Builder
      */
     public function each(callable $callback, $count = 1000)
     {
-        if (empty($this->query->orders) && empty($this->query->unionOrders)) {
-            $this->orderBy($this->model->getQualifiedKeyName(), 'asc');
-        }
-
         return $this->chunk($count, function ($results) use ($callback) {
             foreach ($results as $key => $value) {
                 if ($callback($value, $key) === false) {
@@ -469,6 +469,18 @@ class Builder
                 }
             }
         });
+    }
+
+    /**
+     * Add a generic orderBy clause if the query doesn't already have one.
+     *
+     * @return void
+     */
+    protected function enforceOrderBy()
+    {
+        if (empty($this->query->orders) && empty($this->query->unionOrders)) {
+            $this->orderBy($this->model->getQualifiedKeyName(), 'asc');
+        }
     }
 
     /**
