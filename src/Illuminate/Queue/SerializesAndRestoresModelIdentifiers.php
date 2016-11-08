@@ -66,21 +66,11 @@ trait SerializesAndRestoresModelIdentifiers
     /**
      * Get the query for restoration.
      *
-     * @param \Illuminate\Database\Eloquent\Model $model
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return \Illuminate\Database\Eloquent\Builder
      */
     protected function getQueryForModelRestoration($model)
     {
-        return $this->restoresModelsWithoutScopes() ? $model->newQueryWithoutScopes() : $model->newQuery();
-    }
-
-    /**
-     * Determines whether to restore model identifiers w/o scope.
-     *
-     * @return bool
-     */
-    protected function restoresModelsWithoutScopes()
-    {
-        return true;
+        return $model->newQueryWithoutScopes();
     }
 }
