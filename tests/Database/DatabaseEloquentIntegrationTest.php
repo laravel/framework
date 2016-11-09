@@ -1121,7 +1121,8 @@ class EloquentTestUserWithCustomFriendPivot extends EloquentTestUser
 {
     public function friends()
     {
-        return $this->belongsToMany('EloquentTestUser', 'friends', 'user_id', 'friend_id')->using('EloquentTestFriendPivot');
+        return $this->belongsToMany('EloquentTestUser', 'friends', 'user_id', 'friend_id')
+                        ->using('EloquentTestFriendPivot')->withPivot('user_id', 'friend_id', 'friend_level_id');
     }
 }
 
@@ -1232,12 +1233,6 @@ class EloquentTestFriendPivot extends Pivot
 {
     protected $table = 'friends';
     protected $guarded = [];
-    protected $include = [
-        'user_id', 'friend_id', 'friend_level_id',
-    ];
-    protected $with = [
-        'user', 'friend', 'level',
-    ];
 
     public function user()
     {
