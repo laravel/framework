@@ -210,6 +210,28 @@ yield:
         $this->assertEquals("yield:\n@parent\n", $factory->make('extends-variable', ['title' => '@parent'])->render());
     }
 
+    public function testWrapper()
+    {
+        $files = new Filesystem;
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+
+        $files->put($this->tempDir.'/wrapped.php', $compiler->compileString('
+before wrapper
+@wrapper("wrapper")
+    contents
+@endwrapper
+after wrapper
+'));
+        $files->put($this->tempDir.'/wrapper.php', $compiler->compileString('
+before
+@child
+after
+'));
+
+        $factory = $this->prepareCommonFactory();
+        $this->assertEquals("before wrapper\nbefore\n    contents\n\nafter\nafter wrapper\n", $factory->make('wrapped')->render());
+    }
+
     protected function prepareCommonFactory()
     {
         $engine = new CompilerEngine(m::mock('Illuminate\View\Compilers\CompilerInterface'));

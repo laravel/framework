@@ -751,6 +751,18 @@ empty
         $this->assertEquals('<?php echo $__env->yieldContent(\'title\'); ?> - <?php echo e(Config::get(\'site.title\')); ?>', $compiler->compileString("@yield('title') - {{Config::get('site.title')}}"));
     }
 
+    public function testWrapperIsCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@wrapper(\'foo\')
+test
+@endwrapper';
+        $expected = '<?php $__env->beginWrapper(\'foo\'); ?>
+test
+<?php list($name, $child) = $__env->endWrapper(); ?><?php $wrapper = $__env->make($name, array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?><?php echo preg_replace(\'/@child/\', $child, $wrapper); ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
     public function testCustomExtensionsAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
