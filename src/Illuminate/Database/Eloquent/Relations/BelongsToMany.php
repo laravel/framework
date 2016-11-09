@@ -75,7 +75,7 @@ class BelongsToMany extends Relation
     protected $pivotUpdatedAt;
 
     /**
-     * The custom pivot model to use.
+     * The class name of the custom pivot model to use for the relationship.
      *
      * @var string
      */
@@ -107,6 +107,19 @@ class BelongsToMany extends Relation
         $this->relationName = $relationName;
 
         parent::__construct($query, $parent);
+    }
+
+    /**
+     * Specify the custom pivot model to use for the relationship.
+     *
+     * @param  string  $class
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function using($class)
+    {
+        $this->using = $class;
+
+        return $this;
     }
 
     /**
@@ -235,19 +248,6 @@ class BelongsToMany extends Relation
         }
 
         return $this->related->newCollection($models);
-    }
-
-    /**
-     * Set a custom pivot model to use.
-     *
-     * @param  string  $pivotModelName
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    public function using($pivotModelName)
-    {
-        $this->using = $pivotModelName;
-
-        return $this;
     }
 
     /**
@@ -443,28 +443,11 @@ class BelongsToMany extends Relation
         // relationships when they are retrieved and hydrated into the models.
         $columns = [];
 
-        foreach (array_merge($defaults, $this->getPivotModelColumns(), $this->pivotColumns) as $column) {
+        foreach (array_merge($defaults, $this->pivotColumns) as $column) {
             $columns[] = $this->table.'.'.$column.' as pivot_'.$column;
         }
 
         return array_unique($columns);
-    }
-
-    /**
-     * Retrieve necessary columns from the custom pivot model.
-     *
-     * @return array
-     */
-    protected function getPivotModelColumns()
-    {
-        $columns = [];
-
-        if ($this->using) {
-            $customPivotClass = $this->using;
-            $columns = $customPivotClass::getPivotColumns();
-        }
-
-        return $columns;
     }
 
     /**
