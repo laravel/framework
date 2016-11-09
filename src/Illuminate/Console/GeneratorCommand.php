@@ -202,7 +202,9 @@ abstract class GeneratorCommand extends Command
      */
     protected function getNameInput()
     {
-        return trim($this->argument('name'));
+        return strip_extension(
+            trim($this->argument('name'))
+        );
     }
 
     /**

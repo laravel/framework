@@ -824,6 +824,20 @@ if (! function_exists('str_slug')) {
     }
 }
 
+if (! function_exists('strip_extension')) {
+    /**
+     * Removes extension from the end of a file name.
+     *
+     * @param  string  $value
+     * @param  string  $extension
+     * @return string
+     */
+    function strip_extension($value, $extension = 'php')
+    {
+        return Str::stripExtension($value, $extension);
+    }
+}
+
 if (! function_exists('studly_case')) {
     /**
      * Convert a value to studly caps case.
