@@ -945,6 +945,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected function compileWrapper($expression)
     {
         $value = $this->stripParentheses($expression);
+
         return "<?php \$__env->beginWrapper($value); ?>";
     }
 
@@ -955,9 +956,10 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileEndwrapper()
     {
-        $s = "<?php list(\$name, \$child) = \$__env->endWrapper(); ?>";
+        $s = '<?php list($name, $child) = $__env->endWrapper(); ?>';
         $s .= "<?php \$wrapper = \$__env->make(\$name, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
         $s .= "<?php echo preg_replace('/@child/', \$child, \$wrapper); ?>";
+
         return $s;
     }
 

@@ -781,6 +781,7 @@ class Factory implements FactoryContract
     {
         $child = ob_get_clean();
         $name = array_pop($this->wrapperStack);
+
         return [$name, $child];
     }
 
