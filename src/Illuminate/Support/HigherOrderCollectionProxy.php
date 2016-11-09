@@ -27,8 +27,8 @@ class HigherOrderCollectionProxy
      */
     public function __construct(Collection $collection, $method)
     {
-        $this->method = $method;
         $this->collection = $collection;
+        $this->method = $method;
     }
 
     /**
@@ -48,7 +48,7 @@ class HigherOrderCollectionProxy
      * Proxy a method call onto the collection items.
      *
      * @param  string  $method
-     * @param  array  $parameters
+     * @param  array   $parameters
      * @return mixed
      */
     public function __call($method, $parameters)
