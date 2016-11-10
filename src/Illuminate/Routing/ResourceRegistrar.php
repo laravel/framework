@@ -212,8 +212,7 @@ class ResourceRegistrar
         if (isset($options['names'])) {
             if (is_string($options['names'])) {
                 $resource = $options['names'];
-            }
-            elseif (isset($options['names'][$method])) {
+            } elseif (isset($options['names'][$method])) {
                 return $options['names'][$method];
             }
         }
