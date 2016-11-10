@@ -51,6 +51,36 @@ class FoundationMakesHttpRequestsJsonTest extends PHPUnit_Framework_TestCase
         $this->response = new Illuminate\Http\Response(new JsonSerializableSingleResourceStub);
         $this->seeJsonStructure(['*' => ['foo', 'bar', 'foobar']]);
     }
+
+    public function testSeeJsonWithNonJson()
+    {
+        $this->response = new Illuminate\Http\Response(new NonJsonSerializableStub);
+
+        try {
+            $this->seeJson(['foo' => 'bad']);
+        } catch (PHPUnit_Framework_AssertionFailedError $e) {
+            $this->assertStringStartsWith('Invalid JSON', $e->getMessage());
+
+            return;
+        }
+
+        $this->fail('invalid JSON should fail seeJson');
+    }
+
+    public function testSeeJsonEqualsWithNonJson()
+    {
+        $this->response = new Illuminate\Http\Response(new NonJsonSerializableStub);
+
+        try {
+            $this->seeJsonEquals(['foo' => 'bad']);
+        } catch (PHPUnit_Framework_AssertionFailedError $e) {
+            $this->assertStringStartsWith('Invalid JSON', $e->getMessage());
+
+            return;
+        }
+
+        $this->fail('Invalid JSON should fail seeJsonEquals');
+    }
 }
 
 class JsonSerializableMixedResourcesStub implements JsonSerializable
@@ -58,17 +88,17 @@ class JsonSerializableMixedResourcesStub implements JsonSerializable
     public function jsonSerialize()
     {
         return [
-            'foo' => 'bar',
+            'foo'    => 'bar',
             'foobar' => [
                 'foobar_foo' => 'foo',
                 'foobar_bar' => 'bar',
             ],
-            'bars' => [
+            'bars'   => [
                 ['bar' => 'foo 0', 'foo' => 'bar 0'],
                 ['bar' => 'foo 1', 'foo' => 'bar 1'],
                 ['bar' => 'foo 2', 'foo' => 'bar 2'],
             ],
-            'baz' => [
+            'baz'    => [
                 ['foo' => 'bar 0', 'bar' => ['foo' => 'bar 0', 'bar' => 'foo 0']],
                 ['foo' => 'bar 1', 'bar' => ['foo' => 'bar 1', 'bar' => 'foo 1']],
             ],
@@ -86,5 +116,12 @@ class JsonSerializableSingleResourceStub implements JsonSerializable
             ['foo' => 'foo 2', 'bar' => 'bar 2', 'foobar' => 'foobar 2'],
             ['foo' => 'foo 3', 'bar' => 'bar 3', 'foobar' => 'foobar 3'],
         ];
+    }
+}
+
+class NonJsonSerializableStub implements JsonSerializable
+{
+    public function jsonSerialize()
+    {
     }
 }
