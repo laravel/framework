@@ -12,6 +12,9 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
+/**
+ * @mixin \Illuminate\Database\Query\Builder
+ */
 class Builder
 {
     /**
