@@ -7,7 +7,7 @@ use Closure;
 class SlackMessage
 {
     /**
-     * The "level" of the notification (info, success, error, warning).
+     * The "level" of the notification (info, success, warning, error).
      *
      * @var string
      */
@@ -68,6 +68,18 @@ class SlackMessage
     }
 
     /**
+     * Indicate that the notification gives information about a warning.
+     *
+     * @return $this
+     */
+    public function warning()
+    {
+        $this->level = 'warning';
+
+        return $this;
+    }
+
+    /**
      * Indicate that the notification gives information about an error.
      *
      * @return $this
@@ -79,18 +91,6 @@ class SlackMessage
         return $this;
     }
 
-    /**
-     * Indicate that the notification gives information about a warning.
-     *
-     * @return $this
-     */
-    public function warning()
-    {
-        $this->level = 'warning';
-
-        return $this;
-    }
-    
     /**
      * Set a custom user icon for the Slack message.
      *
