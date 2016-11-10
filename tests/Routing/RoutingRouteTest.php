@@ -1008,6 +1008,17 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo'));
         $this->assertTrue($router->getRoutes()->hasNamedRoute('bar'));
+
+        $router = $this->getRouter();
+        $router->resource('foo', 'FooController', ['names' => 'bar']);
+
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('bar.index'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('bar.show'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('bar.create'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('bar.store'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('bar.edit'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('bar.update'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('bar.destroy'));
     }
 
     public function testRouterFiresRoutedEvent()
