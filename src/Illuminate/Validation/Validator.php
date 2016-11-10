@@ -6,6 +6,7 @@ use Closure;
 use DateTime;
 use Countable;
 use Exception;
+use Throwable;
 use DateTimeZone;
 use RuntimeException;
 use DateTimeInterface;
@@ -1975,6 +1976,8 @@ class Validator implements ValidatorContract
         try {
             new DateTimeZone($value);
         } catch (Exception $e) {
+            return false;
+        } catch (Throwable $e) {
             return false;
         }
 
