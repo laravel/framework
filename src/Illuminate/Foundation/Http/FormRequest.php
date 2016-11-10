@@ -99,11 +99,14 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     protected function validationData()
     {
-        $this->request->add($this->route()->parameters());
+        if (method_exists($this,'route')) {
+            $this->request->add($this->route()->parameters());
+            $this->query->add($this->route()->parameters());
 
-        $this->query->add($this->route()->parameters());
+            return array_merge($this->route()->parameters(), $this->all());
+        }
 
-        return array_merge($this->route()->parameters(), $this->all());
+        return $this->all();
     }
 
     /**
