@@ -56,11 +56,11 @@ class DatabaseNotification extends Model
             $this->forceFill(['read_at' => $this->freshTimestamp()])->save();
         }
     }
-    
+
     /**
-     * Returns true if notification has been read
+     * Returns true if notification has been read.
      *
-     * @return boolean
+     * @return bool
      */
     public function hasBeenRead()
     {
