@@ -56,6 +56,16 @@ class DatabaseNotification extends Model
             $this->forceFill(['read_at' => $this->freshTimestamp()])->save();
         }
     }
+    
+    /**
+     * Returns true if notification has been read
+     *
+     * @return boolean
+     */
+    public function hasBeenRead()
+    {
+        return is_null($this->read_at) == false;
+    }
 
     /**
      * Create a new database notification collection instance.
