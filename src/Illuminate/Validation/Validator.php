@@ -1866,7 +1866,7 @@ class Validator implements ValidatorContract
 
         return $this->getDateTimestamp($value) < $date;
     }
-    
+
     /**
      * Validate the date is before or equal to a given date.
      *
@@ -1935,7 +1935,7 @@ class Validator implements ValidatorContract
 
         return $this->getDateTimestamp($value) > $date;
     }
-    
+
     /**
      * Validate the date is after or equal to a given date.
      *
