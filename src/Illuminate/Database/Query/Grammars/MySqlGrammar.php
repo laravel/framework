@@ -166,18 +166,14 @@ class MySqlGrammar extends Grammar
      */
     public function prepareBindingsForUpdate(array $bindings, array $values)
     {
-        $index = 0;
-
         foreach ($values as $column => $value) {
             if ($this->isJsonSelector($column) &&
                 in_array(gettype($value), ['boolean', 'integer', 'double'])) {
-                unset($bindings[$index]);
+                unset($values[$column]);
             }
-
-            $index++;
         }
 
-        return $bindings;
+        return parent::prepareBindingsForUpdate($bindings, $values);
     }
 
     /**

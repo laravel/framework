@@ -5,6 +5,7 @@ namespace Illuminate\Database\Query\Grammars;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Database\Grammar as BaseGrammar;
+use Illuminate\Support\Arr;
 
 class Grammar extends BaseGrammar
 {
@@ -730,7 +731,13 @@ class Grammar extends BaseGrammar
      */
     public function prepareBindingsForUpdate(array $bindings, array $values)
     {
-        return $bindings;
+        $bindingsWithoutJoin = Arr::except($bindings, 'join');
+
+        $preparedBindings = array_values(
+            array_merge($bindings['join'], $values, Arr::flatten($bindingsWithoutJoin))
+        );
+
+        return $preparedBindings;
     }
 
     /**

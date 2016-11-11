@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Arr;
 
 class SqlServerGrammar extends Grammar
 {
@@ -331,6 +332,24 @@ class SqlServerGrammar extends Grammar
         }
 
         return trim("update {$table}{$joins} set $columns $where");
+    }
+
+    /**
+     * Prepare the bindings for an update statement.
+     *
+     * @param  array  $bindings
+     * @param  array  $values
+     * @return array
+     */
+    public function prepareBindingsForUpdate(array $bindings, array $values)
+    {
+        $bindingsWithoutJoin = Arr::except($bindings, 'join');
+
+        $preparedBindings = array_values(
+            array_merge($values, $bindings['join'], Arr::flatten($bindingsWithoutJoin))
+        );
+
+        return $preparedBindings;
     }
 
     /**
