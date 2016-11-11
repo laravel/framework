@@ -2,26 +2,30 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
+use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 
 class HasOne extends HasOneOrMany
 {
     /**
-     * Determine whether getResults should return a default new model instance or not.
+     * Indicates if a default model instance should be used.
      *
-     * @var bool
+     * Alternatively, may be a Closure to execute to retrieve default value.
+     *
+     * @var \Closure|bool
      */
-    protected $withDefault = false;
+    protected $withDefault;
 
     /**
      * Return a new model instance in case the relationship does not exist.
      *
+     * @param  \Closure|bool  $callback
      * @return $this
      */
-    public function withDefault()
+    public function withDefault($callback = true)
     {
-        $this->withDefault = true;
+        $this->withDefault = $callback;
 
         return $this;
     }
@@ -73,7 +77,9 @@ class HasOne extends HasOneOrMany
      */
     protected function getDefaultFor(Model $model)
     {
-        if ($this->withDefault) {
+        if (is_callable($this->withDefault)) {
+            return call_user_func($this->withDefault);
+        } elseif ($this->withDefault === true) {
             return $this->related->newInstance()->setAttribute(
                 $this->getPlainForeignKey(), $model->getAttribute($this->localKey)
             );
