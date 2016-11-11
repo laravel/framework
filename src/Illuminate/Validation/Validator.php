@@ -178,7 +178,7 @@ class Validator implements ValidatorContract
     protected $dependentRules = [
         'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll',
         'RequiredIf', 'RequiredUnless', 'Confirmed', 'Same', 'Different', 'Unique',
-        'Before', 'After',
+        'Before', 'BeforeOrEqual', 'After', 'AfterOrEqual',
     ];
 
     /**
@@ -1869,6 +1869,33 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Validate the date is before or equal to a given date.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @param  array   $parameters
+     * @return bool
+     */
+    protected function validateBeforeOrEqual($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'before');
+
+        if (! is_string($value) && ! is_numeric($value) && ! $value instanceof DateTimeInterface) {
+            return false;
+        }
+
+        if ($format = $this->getDateFormat($attribute)) {
+            return $this->validateBeforeWithFormat($format, $value, $parameters);
+        }
+
+        if (! $date = $this->getDateTimestamp($parameters[0])) {
+            $date = $this->getDateTimestamp($this->getValue($parameters[0]));
+        }
+
+        return $this->getDateTimestamp($value) <= $date;
+    }
+
+    /**
      * Validate the date is before a given date with a given format.
      *
      * @param  string  $format
@@ -1908,6 +1935,33 @@ class Validator implements ValidatorContract
         }
 
         return $this->getDateTimestamp($value) > $date;
+    }
+
+    /**
+     * Validate the date is after or equal to a given date.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @param  array   $parameters
+     * @return bool
+     */
+    protected function validateAfterOrEqual($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'after');
+
+        if (! is_string($value) && ! is_numeric($value) && ! $value instanceof DateTimeInterface) {
+            return false;
+        }
+
+        if ($format = $this->getDateFormat($attribute)) {
+            return $this->validateAfterWithFormat($format, $value, $parameters);
+        }
+
+        if (! $date = $this->getDateTimestamp($parameters[0])) {
+            $date = $this->getDateTimestamp($this->getValue($parameters[0]));
+        }
+
+        return $this->getDateTimestamp($value) >= $date;
     }
 
     /**
