@@ -270,6 +270,21 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('hello my friend nice to see you my friend', $factory->yieldContent('foo'));
     }
 
+    public function testComponentHandling()
+    {
+        $factory = $this->getFactory();
+        $factory->getFinder()->shouldReceive('find')->andReturn(__DIR__.'/fixtures/component.php');
+        $factory->getEngineResolver()->shouldReceive('resolve')->andReturn(new Illuminate\View\Engines\PhpEngine);
+        $factory->getDispatcher()->shouldReceive('fire');
+        $factory->startComponent('component', ['name' => 'Taylor']);
+        $factory->slot('title');
+        echo 'title<hr>';
+        $factory->endSlot();
+        echo 'component';
+        $contents = $factory->renderComponent();
+        $this->assertEquals('title<hr> component Taylor', $contents);
+    }
+
     public function testSingleStackPush()
     {
         $factory = $this->getFactory();
