@@ -685,16 +685,39 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('select * from "users" limit 10 offset 5', $builder->toSql());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->skip(-5)->take(10);
-        $this->assertEquals('select * from "users" limit 10 offset 0', $builder->toSql());
+        $builder->select('*')->from('users')->skip(0)->take(0);
+        $this->assertEquals('select * from "users" limit 0 offset 0', $builder->toSql());
 
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->skip(-5)->take(-10);
+        $this->assertEquals('select * from "users" offset 0', $builder->toSql());
+    }
+
+    public function testForPage()
+    {
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->forPage(2, 15);
         $this->assertEquals('select * from "users" limit 15 offset 15', $builder->toSql());
 
         $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->forPage(0, 15);
+        $this->assertEquals('select * from "users" limit 15 offset 0', $builder->toSql());
+
+        $builder = $this->getBuilder();
         $builder->select('*')->from('users')->forPage(-2, 15);
         $this->assertEquals('select * from "users" limit 15 offset 0', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->forPage(2, 0);
+        $this->assertEquals('select * from "users" limit 0 offset 0', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->forPage(0, 0);
+        $this->assertEquals('select * from "users" limit 0 offset 0', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->forPage(-2, 0);
+        $this->assertEquals('select * from "users" limit 0 offset 0', $builder->toSql());
     }
 
     public function testGetCountForPaginationWithBindings()
