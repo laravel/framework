@@ -1822,6 +1822,21 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         });
     }
 
+    public function testChunkWithCountZero()
+    {
+        $builder = $this->getMockQueryBuilder();
+        $chunk = collect([]);
+        $builder->shouldReceive('forPage')->once()->with(1, 0)->andReturnSelf();
+        $builder->shouldReceive('get')->times(1)->andReturn($chunk);
+
+        $callbackAssertor = m::mock('StdClass');
+        $callbackAssertor->shouldReceive('doSomething')->never();
+
+        $builder->chunk(0, function ($results) use ($callbackAssertor) {
+            $callbackAssertor->doSomething($results);
+        });
+    }
+
     public function testChunkPaginatesUsingIdWithLastChunkComplete()
     {
         $builder = $this->getMockQueryBuilder();
@@ -1857,6 +1872,21 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk2);
 
         $builder->chunkById(2, function ($results) use ($callbackAssertor) {
+            $callbackAssertor->doSomething($results);
+        }, 'someIdField');
+    }
+
+    public function testChunkPaginatesUsingIdWithCountZero()
+    {
+        $builder = $this->getMockQueryBuilder();
+        $chunk = collect([]);
+        $builder->shouldReceive('forPageAfterId')->once()->with(0, 0, 'someIdField')->andReturnSelf();
+        $builder->shouldReceive('get')->times(1)->andReturn($chunk);
+
+        $callbackAssertor = m::mock('StdClass');
+        $callbackAssertor->shouldReceive('doSomething')->never();
+
+        $builder->chunkById(0, function ($results) use ($callbackAssertor) {
             $callbackAssertor->doSomething($results);
         }, 'someIdField');
     }
