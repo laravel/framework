@@ -144,6 +144,13 @@ class Factory implements FactoryContract
     protected $pushStack = [];
 
     /**
+     * The stack of in-progress wrappers.
+     *
+     * @var array
+     */
+    protected $wrapperStack = [];
+
+    /**
      * The number of active rendering operations.
      *
      * @var int
@@ -852,6 +859,32 @@ class Factory implements FactoryContract
     }
 
     /**
+     * Begin a wrapper block.
+     *
+     * @param  string  $name
+     * @return void
+     */
+    public function beginWrapper($name)
+    {
+        if (ob_start()) {
+            $this->wrapperStack[] = $name;
+        }
+    }
+
+    /**
+     * Return the name and content of the wrapper.
+     *
+     * @return string
+     */
+    public function endWrapper()
+    {
+        $child = ob_get_clean();
+        $name = array_pop($this->wrapperStack);
+
+        return [$name, $child];
+    }
+
+    /**
      * Flush all of the section contents.
      *
      * @return void
@@ -865,6 +898,8 @@ class Factory implements FactoryContract
 
         $this->pushes = [];
         $this->pushStack = [];
+
+        $this->wrapperStack = [];
     }
 
     /**

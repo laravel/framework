@@ -980,6 +980,34 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Compile the wrapper statements into valid PHP.
+     *
+     * @param  string  $expression
+     *
+     * @return string
+     */
+    protected function compileWrapper($expression)
+    {
+        $value = $this->stripParentheses($expression);
+
+        return "<?php \$__env->beginWrapper($value); ?>";
+    }
+
+    /**
+     * Compile the endwrapper statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileEndwrapper()
+    {
+        $s = '<?php list($name, $child) = $__env->endWrapper(); ?>';
+        $s .= "<?php \$wrapper = \$__env->make(\$name, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
+        $s .= "<?php echo preg_replace('/@child/', \$child, \$wrapper); ?>";
+
+        return $s;
+    }
+
+    /**
      * Strip the parentheses from the given expression.
      *
      * @param  string  $expression
