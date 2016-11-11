@@ -32,12 +32,15 @@ class SesTransport extends Transport
     {
         $this->beforeSendPerformed($message);
 
-        $this->ses->sendRawEmail([
+        $headers = $message->getHeaders();
+
+        // Send the message to SES, storing the SES message id in X-SES-Message-ID
+        $headers->addTextHeader('X-SES-Message-ID',$this->ses->sendRawEmail([
             'Source' => key($message->getSender() ?: $message->getFrom()),
             'RawMessage' => [
                 'Data' => $message->toString(),
             ],
-        ]);
+        ])->get('MessageId'));
 
         $this->sendPerformed($message);
 
