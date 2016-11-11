@@ -7,6 +7,7 @@ use Countable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use Illuminate\Support\HtmlString;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\View\Engines\EngineResolver;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -92,6 +93,34 @@ class Factory implements FactoryContract
      * @var array
      */
     protected $sectionStack = [];
+
+    /**
+     * The components being rendered.
+     *
+     * @var array
+     */
+    protected $componentStack = [];
+
+    /**
+     * The original data passed to the component.
+     *
+     * @var array
+     */
+    protected $componentData = [];
+
+    /**
+     * The slot contents for the component.
+     *
+     * @var array
+     */
+    protected $slots = [];
+
+    /**
+     * The names of the slots being rendered.
+     *
+     * @var array
+     */
+    protected $slotStack = [];
 
     /**
      * The stack of in-progress loops.
@@ -681,6 +710,75 @@ class Factory implements FactoryContract
     }
 
     /**
+     * Start a component rendering process.
+     *
+     * @param  string  $name
+     * @param  array  $data
+     * @return void
+     */
+    public function startComponent($name, array $data = [])
+    {
+        if (ob_start()) {
+            $this->componentStack[] = $name;
+
+            $this->componentData[$name] = $data;
+
+            $this->slots[$name] = [];
+        }
+    }
+
+    /**
+     * Render the current component.
+     *
+     * @return string
+     */
+    public function renderComponent()
+    {
+        $contents = ob_get_clean();
+
+        $name = array_pop($this->componentStack);
+
+        $baseData = $this->componentData[$name];
+
+        $data = array_merge(
+            $baseData, ['slot' => new HtmlString($contents)], $this->slots[$name]
+        );
+
+        return tap($this->make($name, $data)->render(), function () use ($name) {
+            unset($this->slots[$name]);
+            unset($this->slotStack[$name]);
+            unset($this->componentData[$name]);
+        });
+    }
+
+    /**
+     * Start the slot rendering process.
+     *
+     * @param  string  $name
+     * @return void
+     */
+    public function slot($name)
+    {
+        if (ob_start()) {
+            $this->slots[last($this->componentStack)][$name] = '';
+
+            $this->slotStack[last($this->componentStack)][] = $name;
+        }
+    }
+
+    /**
+     * Save the slot content for rendering.
+     *
+     * @return void
+     */
+    public function endSlot()
+    {
+        $current = last($this->componentStack);
+
+        $this->slots[$current][array_pop($this->slotStack[$current])] = new HtmlString(ob_get_clean());
+    }
+
+    /**
      * Start injecting content into a push section.
      *
      * @param  string  $section
@@ -729,6 +827,7 @@ class Factory implements FactoryContract
         if (! isset($this->pushes[$section])) {
             $this->pushes[$section] = [];
         }
+
         if (! isset($this->pushes[$section][$this->renderCount])) {
             $this->pushes[$section][$this->renderCount] = $content;
         } else {
