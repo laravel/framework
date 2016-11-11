@@ -1877,21 +1877,23 @@ class Validator implements ValidatorContract
      */
     protected function validateBeforeOrEqual($attribute, $value, $parameters)
     {
-        $this->requireParameterCount(1, $parameters, 'before');
+        $this->requireParameterCount(1, $parameters, 'before_or_equal');
 
         if (! is_string($value) && ! is_numeric($value) && ! $value instanceof DateTimeInterface) {
             return false;
         }
 
         if ($format = $this->getDateFormat($attribute)) {
-            return $this->validateBeforeWithFormat($format, $value, $parameters);
+            return $this->validateBeforeOrEqualWithFormat($format, $value, $parameters);
         }
 
         if (! $date = $this->getDateTimestamp($parameters[0])) {
             $date = $this->getDateTimestamp($this->getValue($parameters[0]));
         }
 
-        return $this->getDateTimestamp($value) <= $date;
+        $value = $this->getDateTimestamp($value);
+
+        return ($value && $date) && ($value <= $date);
     }
 
     /**
@@ -1907,6 +1909,21 @@ class Validator implements ValidatorContract
         $param = $this->getValue($parameters[0]) ?: $parameters[0];
 
         return $this->checkDateTimeOrder($format, $value, $param);
+    }
+
+    /**
+     * Validate the date is before or equal to a given date with a given format.
+     *
+     * @param  string  $format
+     * @param  mixed   $value
+     * @param  array   $parameters
+     * @return bool
+     */
+    protected function validateBeforeOrEqualWithFormat($format, $value, $parameters)
+    {
+        $param = $this->getValue($parameters[0]) ?: $parameters[0];
+
+        return $this->checkDateTimeOrder($format, $value, $param, true);
     }
 
     /**
@@ -1946,21 +1963,23 @@ class Validator implements ValidatorContract
      */
     protected function validateAfterOrEqual($attribute, $value, $parameters)
     {
-        $this->requireParameterCount(1, $parameters, 'after');
+        $this->requireParameterCount(1, $parameters, 'after_or_equal');
 
         if (! is_string($value) && ! is_numeric($value) && ! $value instanceof DateTimeInterface) {
             return false;
         }
 
         if ($format = $this->getDateFormat($attribute)) {
-            return $this->validateAfterWithFormat($format, $value, $parameters);
+            return $this->validateAfterOrEqualWithFormat($format, $value, $parameters);
         }
 
         if (! $date = $this->getDateTimestamp($parameters[0])) {
             $date = $this->getDateTimestamp($this->getValue($parameters[0]));
         }
 
-        return $this->getDateTimestamp($value) >= $date;
+        $value = $this->getDateTimestamp($value);
+
+        return ($value && $date) && ($value >= $date);
     }
 
     /**
@@ -1979,6 +1998,21 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Validate the date is after or equal to a given date with a given format.
+     *
+     * @param  string  $format
+     * @param  mixed   $value
+     * @param  array   $parameters
+     * @return bool
+     */
+    protected function validateAfterOrEqualWithFormat($format, $value, $parameters)
+    {
+        $param = $this->getValue($parameters[0]) ?: $parameters[0];
+
+        return $this->checkDateTimeOrder($format, $param, $value, true);
+    }
+
+    /**
      * Given two date/time strings, check that one is after the other.
      *
      * @param  string  $format
@@ -1986,11 +2020,15 @@ class Validator implements ValidatorContract
      * @param  string  $after
      * @return bool
      */
-    protected function checkDateTimeOrder($format, $before, $after)
+    protected function checkDateTimeOrder($format, $before, $after, $allowEqual = false)
     {
         $before = $this->getDateTimeWithOptionalFormat($format, $before);
 
         $after = $this->getDateTimeWithOptionalFormat($format, $after);
+
+        if ($allowEqual) {
+            return ($before && $after) && ($after >= $before);
+        }
 
         return ($before && $after) && ($after > $before);
     }
