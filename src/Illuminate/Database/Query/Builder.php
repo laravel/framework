@@ -2160,13 +2160,11 @@ class Builder
      */
     public function update(array $values)
     {
-        $rawBindings = $this->getRawBindings();
+        $bindings = Arr::except($this->bindings, 'join');
 
-        $joinBindings = $rawBindings['join'];
-
-        unset($rawBindings['join']);
-
-        $bindings = array_values(array_merge($joinBindings, $values, Arr::flatten($rawBindings)));
+        $bindings = array_values(
+            array_merge($this->bindings['join'], $values, Arr::flatten($bindings))
+        );
 
         $sql = $this->grammar->compileUpdate($this, $values);
 
