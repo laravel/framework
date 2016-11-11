@@ -2063,6 +2063,9 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
         $v = new Validator($trans, ['foo' => 'GMT'], ['foo' => 'Timezone']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => ['this_is_not_a_timezone']], ['foo' => 'Timezone']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateRegex()
