@@ -41,14 +41,12 @@ class PusherBroadcaster extends Broadcaster
             throw new HttpException(403);
         }
 
-        if (Str::startsWith($request->channel_name, 'private-')) {
-            return parent::verifyUserCanAccessChannel(
-                $request, Str::replaceFirst('private-', '', $request->channel_name)
-            );
-        }
+        $channelName = Str::startsWith($request->channel_name, 'private-')
+                            ? Str::replaceFirst('private-', '', $request->channel_name)
+                            : Str::replaceFirst('presence-', '', $request->channel_name);
 
         return parent::verifyUserCanAccessChannel(
-            $request, Str::replaceFirst('presence-', '', $request->channel_name)
+            $request, $channelName
         );
     }
 
