@@ -62,8 +62,8 @@ class MailSesTransportTest extends PHPUnit_Framework_TestCase
     }
 }
 
-class sendRawEmailMock {
-
+class sendRawEmailMock
+{
     protected $getResponse = null;
 
     public function __construct($responseValue)
@@ -72,7 +72,7 @@ class sendRawEmailMock {
     }
 
     /**
-     * Mock the get() call for the sendRawEmail response
+     * Mock the get() call for the sendRawEmail response.
      * @param  [type] $key [description]
      * @return [type]      [description]
      */
