@@ -903,6 +903,50 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Compile the component statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileComponent($expression)
+    {
+        return "<?php \$__env->startComponent{$expression}; ?>";
+    }
+
+    /**
+     * Compile the end component statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileEndComponent($expression)
+    {
+        return "<?php echo \$__env->renderComponent(); ?>";
+    }
+
+    /**
+     * Compile the slot statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileSlot($expression)
+    {
+        return "<?php \$__env->slot{$expression}; ?>";
+    }
+
+    /**
+     * Compile the end slot statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileEndSlot($expression)
+    {
+        return "<?php \$__env->endSlot(); ?>";
+    }
+
+    /**
      * Compile the stack statements into the content.
      *
      * @param  string  $expression
