@@ -295,7 +295,7 @@ trait MakesHttpRequests
     public function seeJsonEquals(array $data)
     {
         $actual = json_encode(Arr::sortRecursive(
-            json_decode($this->response->getContent(), true)
+            (array) $this->decodeResponseJson()
         ));
 
         $this->assertEquals(json_encode(Arr::sortRecursive($data)), $actual);
@@ -321,9 +321,7 @@ trait MakesHttpRequests
         }
 
         try {
-            $this->seeJsonEquals($data);
-
-            return $this;
+            return $this->seeJsonEquals($data);
         } catch (PHPUnit_Framework_ExpectationFailedException $e) {
             return $this->seeJsonContains($data, $negate);
         }
@@ -354,7 +352,7 @@ trait MakesHttpRequests
         }
 
         if (! $responseData) {
-            $responseData = json_decode($this->response->getContent(), true);
+            $responseData = $this->decodeResponseJson();
         }
 
         foreach ($structure as $key => $value) {
