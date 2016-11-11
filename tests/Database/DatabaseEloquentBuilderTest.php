@@ -222,6 +222,8 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
     public function testChunkWithCountZero()
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[forPage,get]', [$this->getMockQueryBuilder()]);
+        $builder->getQuery()->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+
         $chunk = new Collection([]);
         $builder->shouldReceive('forPage')->once()->with(1, 0)->andReturnSelf();
         $builder->shouldReceive('get')->times(1)->andReturn($chunk);
@@ -280,6 +282,8 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
     public function testChunkPaginatesUsingIdWithCountZero()
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[forPageAfterId,get]', [$this->getMockQueryBuilder()]);
+        $builder->getQuery()->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+
         $chunk = new Collection([]);
         $builder->shouldReceive('forPageAfterId')->once()->with(0, 0, 'someIdField')->andReturnSelf();
         $builder->shouldReceive('get')->times(1)->andReturn($chunk);
