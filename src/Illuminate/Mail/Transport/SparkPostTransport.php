@@ -143,7 +143,7 @@ class SparkPostTransport extends Transport
      * @param  array  $options
      * @return array
      */
-    public function setOptions($options)
+    public function setOptions(array $options)
     {
         return $this->options = $options;
     }
