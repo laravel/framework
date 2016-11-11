@@ -921,7 +921,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileEndComponent($expression)
     {
-        return "<?php echo \$__env->renderComponent(); ?>";
+        return '<?php echo $__env->renderComponent(); ?>';
     }
 
     /**
@@ -943,7 +943,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileEndSlot($expression)
     {
-        return "<?php \$__env->endSlot(); ?>";
+        return '<?php $__env->endSlot(); ?>';
     }
 
     /**
