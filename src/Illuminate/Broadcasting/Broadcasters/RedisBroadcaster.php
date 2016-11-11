@@ -49,8 +49,14 @@ class RedisBroadcaster extends Broadcaster
             throw new HttpException(403);
         }
 
+        if (Str::startsWith($request->channel_name, 'private-')) {
+            return parent::verifyUserCanAccessChannel(
+                $request, Str::replaceFirst('private-', '', $request->channel_name)
+            );
+        }
+
         return parent::verifyUserCanAccessChannel(
-            $request, str_replace(['private-', 'presence-'], '', $request->channel_name)
+            $request, Str::replaceFirst('presence-', '', $request->channel_name)
         );
     }
 
