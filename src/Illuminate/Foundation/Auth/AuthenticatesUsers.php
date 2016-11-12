@@ -112,7 +112,7 @@ trait AuthenticatesUsers
      */
     public function authenticated(Request $request, $user)
     {
-        return redirect()->intended($this->redirectPath();
+        return redirect()->intended($this->redirectPath());
     }
 
     /**
