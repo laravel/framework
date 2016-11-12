@@ -195,13 +195,11 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     public function choice($key, $number, $locale = null)
     {
-        $line = $this->get($key, $replace, $locale = $locale ?: $this->locale ?: $this->fallback);
+        $line = $this->get($key, $locale = $locale ?: $this->locale ?: $this->fallback);
 
         if (is_array($number) || $number instanceof Countable) {
             $number = count($number);
         }
-
-        $replace['count'] = $number;
 
         return $this->getSelector()->choose($line, $number, $locale);
     }
@@ -230,6 +228,8 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     public function transChoice($key, $number, array $replace = [], $locale = null)
     {
+        $replace['count'] = $number;
+        
         return $this->format($this->choice($key, $number, $locale), $replace);
     }
 
