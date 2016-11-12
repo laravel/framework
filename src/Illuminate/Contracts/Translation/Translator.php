@@ -4,7 +4,6 @@ namespace Illuminate\Contracts\Translation;
 
 interface Translator
 {
-
     /**
      * Determine if a translation exists.
      *

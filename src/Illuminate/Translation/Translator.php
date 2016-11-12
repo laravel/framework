@@ -62,7 +62,6 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         $this->locale = $locale;
     }
 
-
     /**
      * Determine if a translation exists for a given locale.
      *
@@ -76,7 +75,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function has($key, $locale = null, $fallback = true)
     {
@@ -84,7 +83,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function get($key, $locale = null, $fallback = true)
     {
@@ -154,7 +153,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function format($line, array $replace)
     {
@@ -229,7 +228,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     public function transChoice($key, $number, array $replace = [], $locale = null)
     {
         $replace['count'] = $number;
-        
+
         return $this->format($this->choice($key, $number, $locale), $replace);
     }
 

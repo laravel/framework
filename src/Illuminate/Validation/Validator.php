@@ -2186,7 +2186,7 @@ class Validator implements ValidatorContract
             [
                 'attribute' => $value,
                 'ATTRIBUTE' => Str::upper($value),
-                'Attribute' => Str::ucfirst($value)
+                'Attribute' => Str::ucfirst($value),
             ]
         );
 
@@ -2326,7 +2326,7 @@ class Validator implements ValidatorContract
     protected function replaceDateFormat($message, $attribute, $rule, $parameters)
     {
         return [
-            'format' => $parameters[0]
+            'format' => $parameters[0],
         ];
     }
 
@@ -2356,7 +2356,7 @@ class Validator implements ValidatorContract
     protected function replaceDigits($message, $attribute, $rule, $parameters)
     {
         return [
-            'digits' => $parameters[0]
+            'digits' => $parameters[0],
         ];
     }
 
@@ -2386,7 +2386,7 @@ class Validator implements ValidatorContract
     protected function replaceMin($message, $attribute, $rule, $parameters)
     {
         return [
-            'min' => $parameters[0]
+            'min' => $parameters[0],
         ];
     }
 
@@ -2402,7 +2402,7 @@ class Validator implements ValidatorContract
     protected function replaceMax($message, $attribute, $rule, $parameters)
     {
         return [
-            'max' => $parameters[0]
+            'max' => $parameters[0],
         ];
     }
 
@@ -2422,7 +2422,7 @@ class Validator implements ValidatorContract
         }
 
         return [
-            'values' => implode(', ', $parameters)
+            'values' => implode(', ', $parameters),
         ];
     }
 
@@ -2452,7 +2452,7 @@ class Validator implements ValidatorContract
     protected function replaceInArray($message, $attribute, $rule, $parameters)
     {
         return [
-            'other' => $this->getAttribute($parameters[0])
+            'other' => $this->getAttribute($parameters[0]),
         ];
     }
 
@@ -2498,7 +2498,7 @@ class Validator implements ValidatorContract
     protected function replaceRequiredWith($message, $attribute, $rule, $parameters)
     {
         return [
-            'values' => implode(' / ', $this->getAttributeList($parameters))
+            'values' => implode(' / ', $this->getAttributeList($parameters)),
         ];
     }
 
@@ -2556,7 +2556,7 @@ class Validator implements ValidatorContract
     protected function replaceSize($message, $attribute, $rule, $parameters)
     {
         return [
-            'size' => $parameters[0]
+            'size' => $parameters[0],
         ];
     }
 
