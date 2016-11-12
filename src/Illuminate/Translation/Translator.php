@@ -76,12 +76,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     }
 
     /**
-     * Determine if a translation exists.
-     *
-     * @param  string  $key
-     * @param  string|null  $locale
-     * @param  bool  $fallback
-     * @return bool
+     * @inheritDoc
      */
     public function has($key, $locale = null, $fallback = true)
     {
@@ -89,13 +84,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     }
 
     /**
-     * Get the translation for the given key.
-     *
-     * @param  string  $key
-     * @param  array   $replace
-     * @param  string|null  $locale
-     * @param  bool  $fallback
-     * @return string|array|null
+     * @inheritDoc
      */
     public function get($key, $locale = null, $fallback = true)
     {
@@ -165,11 +154,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     }
 
     /**
-     * Make the place-holder replacements on a line.
-     *
-     * @param  string  $line
-     * @param  array   $replace
-     * @return string
+     * @inheritDoc
      */
     public function format($line, array $replace)
     {

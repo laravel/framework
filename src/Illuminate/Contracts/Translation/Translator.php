@@ -4,8 +4,35 @@ namespace Illuminate\Contracts\Translation;
 
 interface Translator
 {
+
+    /**
+     * Determine if a translation exists.
+     *
+     * @param  string  $key
+     * @param  string|null  $locale
+     * @param  bool  $fallback
+     * @return bool
+     */
     public function has($key, $locale = null);
-    public function get($key, $locale = null);
+
+    /**
+     * Get the translation for the given key.
+     *
+     * @param  string  $key
+     * @param  array   $replace
+     * @param  string|null  $locale
+     * @param  bool  $fallback
+     * @return string|array|null
+     */
+    public function get($key, $locale = null, $fallback = true);
+
+    /**
+     * Make the place-holder replacements on a line.
+     *
+     * @param  string  $line
+     * @param  array   $replace
+     * @return string
+     */
     public function format($line, array $replace);
 
     /**
