@@ -251,7 +251,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     }
 
     /**
-     * Count number of elements or return number
+     * Count number of elements or return number.
      *
      * @param int|array|\Countable $number
      * @return int
