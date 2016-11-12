@@ -4,11 +4,10 @@ use Illuminate\Foundation\Console\ModelMakeCommand;
 
 class ModelMakeCommandTest extends CommandTester
 {
-
-    /** @var  string */
+    /** @var string */
     protected $path;
 
-    /** @var  FilesystemMock */
+    /** @var FilesystemMock */
     protected $filesystem;
 
     public function setUp()
@@ -17,7 +16,7 @@ class ModelMakeCommandTest extends CommandTester
 
         $this->commandClass = ModelMakeCommand::class;
 
-        $this->path = $this->app->path() . '/Foo.php';
+        $this->path = $this->app->path().'/Foo.php';
         $this->filesystem = new FilesystemMock;
     }
 
@@ -70,7 +69,7 @@ class ModelMakeCommandTest extends CommandTester
 
         $this->command->shouldReceive('call')->with('make:migration', [
             'name' => 'create_foos_table',
-            '--create' => 'foos'
+            '--create' => 'foos',
         ])->once();
 
         $output = $this->runCommand([
@@ -92,7 +91,7 @@ class ModelMakeCommandTest extends CommandTester
 
         $this->command->shouldReceive('call')->with('make:controller', [
             'name' => 'FooController',
-            '--resource' => false
+            '--resource' => false,
         ])->once();
 
         $output = $this->runCommand([
@@ -115,7 +114,7 @@ class ModelMakeCommandTest extends CommandTester
 
         $this->command->shouldReceive('call')->with('make:controller', [
             'name' => 'FooController',
-            '--resource' => true
+            '--resource' => true,
         ])->once();
 
         $output = $this->runCommand([

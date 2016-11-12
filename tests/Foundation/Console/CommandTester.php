@@ -9,14 +9,13 @@ use Mockery as m;
 
 abstract class CommandTester extends PHPUnit_Framework_TestCase
 {
-
-    /** @var  string */
+    /** @var string */
     protected $commandClass;
 
-    /** @var  CommandTestApplication */
+    /** @var CommandTestApplication */
     protected $app;
 
-    /** @var  Command */
+    /** @var Command */
     protected $command = null;
 
     public function setUp()
@@ -51,7 +50,7 @@ abstract class CommandTester extends PHPUnit_Framework_TestCase
      */
     protected function runCommand($arguments)
     {
-        if(!$this->command) {
+        if (! $this->command) {
             $this->makeCommand();
         }
 
@@ -71,11 +70,10 @@ abstract class CommandTester extends PHPUnit_Framework_TestCase
 
 class FilesystemMock
 {
-
-    /** @var  \Mockery\Mock */
+    /** @var \Mockery\Mock */
     protected $mock;
 
-    /** @var  \Mockery\Expectation */
+    /** @var \Mockery\Expectation */
     protected $lastExpectation = null;
 
     /**
@@ -102,7 +100,7 @@ class FilesystemMock
      * Expect the file existence to be checked.
      *
      * @param  string  $file
-     * @param  boolean $found
+     * @param  bool $found
      * @return $this
      */
     public function willCheckFile($file, $found)
@@ -145,7 +143,7 @@ class FilesystemMock
      * Expect the directory existence to be checked.
      *
      * @param  string  $directory
-     * @param  boolean $found
+     * @param  bool $found
      * @return $this
      */
     public function willCheckDirectory($directory, $found)
@@ -320,7 +318,7 @@ class FilesystemMock
 
     public function __call($name, $arguments)
     {
-        if(!$this->lastExpectation) {
+        if (! $this->lastExpectation) {
             trigger_error('Call to undefined method '.__CLASS__.'::'.$name.'()', E_USER_ERROR);
         }
 
@@ -332,7 +330,6 @@ class FilesystemMock
 
 class CommandTestApplication extends Application
 {
-
     public function getNamespace()
     {
         return 'App\\';
