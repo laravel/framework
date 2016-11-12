@@ -100,8 +100,7 @@ trait AuthenticatesUsers
 
         $this->clearLoginAttempts($request);
 
-        return $this->authenticated($request, $this->guard()->user())
-                ?: redirect()->intended($this->redirectPath());
+        return $this->authenticated($request, $this->guard()->user());
     }
 
     /**
@@ -109,11 +108,11 @@ trait AuthenticatesUsers
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  mixed  $user
-     * @return mixed
+     * @return \Illuminate\Http\Response
      */
-    protected function authenticated(Request $request, $user)
+    public function authenticated(Request $request, $user)
     {
-        //
+        return redirect()->intended($this->redirectPath();
     }
 
     /**
