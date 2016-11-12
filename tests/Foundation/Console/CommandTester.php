@@ -1,28 +1,64 @@
 <?php
 
+use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
-use Mockery\Matcher\MatcherAbstract;
-use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Mockery as m;
 
 abstract class CommandTester extends PHPUnit_Framework_TestCase
 {
 
-    protected $commandName = 'command:name';
+    /** @var  string */
+    protected $commandClass;
+
+    /** @var  CommandTestApplication */
+    protected $app;
+
+    /** @var  Command */
+    protected $command = null;
+
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->app = $this->makeApp();
+    }
 
     public function tearDown()
     {
         m::close();
     }
 
-    protected function runCommand($command)
+    /**
+     * @return $this
+     */
+    protected function makeCommand()
     {
-        $input = new ArgvInput([$this->commandName, 'Foo']);
+        $this->command = m::mock($this->commandClass.'[call]', func_get_args());
+
+        $this->command->setLaravel($this->app);
+
+        return $this;
+    }
+
+    /**
+     * Execute the command and return the output.
+     *
+     * @param  array  $arguments
+     * @return string
+     */
+    protected function runCommand($arguments)
+    {
+        if(!$this->command) {
+            $this->makeCommand();
+        }
+
+        $input = new ArrayInput($arguments);
         $output = new BufferedOutput();
 
-        $command->run($input, $output);
+        $this->command->run($input, $output);
 
         return $output->fetch();
     }
@@ -38,6 +74,9 @@ class FilesystemMock
 
     /** @var  \Mockery\Mock */
     protected $mock;
+
+    /** @var  \Mockery\Expectation */
+    protected $lastExpectation = null;
 
     /**
      * Create a default mock and store it on the instance.
@@ -68,7 +107,11 @@ class FilesystemMock
      */
     public function willCheckFile($file, $found)
     {
-        $this->mock->shouldReceive('exists')->with($file)->andReturn($found);
+        $this->lastExpectation = $this->mock
+            ->shouldReceive('exists')
+            //->once()
+            ->with($file)
+            ->andReturn($found);
 
         return $this;
     }
@@ -81,7 +124,7 @@ class FilesystemMock
      */
     public function willNotCheckFile($file)
     {
-        $this->mock->shouldNotReceive('exists')->with($file);
+        $this->lastExpectation = $this->mock->shouldNotReceive('exists')->with($file);
 
         return $this;
     }
@@ -93,7 +136,7 @@ class FilesystemMock
      */
     public function willNotCheckAnyFile()
     {
-        $this->mock->shouldNotReceive('exists')->with(m::any());
+        $this->lastExpectation = $this->mock->shouldNotReceive('exists')->with(m::any());
 
         return $this;
     }
@@ -107,7 +150,11 @@ class FilesystemMock
      */
     public function willCheckDirectory($directory, $found)
     {
-        $this->mock->shouldReceive('isDirectory')->with($directory)->andReturn($found);
+        $this->lastExpectation = $this->mock
+            ->shouldReceive('isDirectory')
+            //->once()
+            ->with($directory)
+            ->andReturn($found);
 
         return $this;
     }
@@ -120,7 +167,7 @@ class FilesystemMock
      */
     public function willNotCheckDirectory($directory)
     {
-        $this->mock->shouldNotReceive('isDirectory')->with($directory);
+        $this->lastExpectation = $this->mock->shouldNotReceive('isDirectory')->with($directory);
 
         return $this;
     }
@@ -132,7 +179,7 @@ class FilesystemMock
      */
     public function willNotCheckAnyDirectory()
     {
-        $this->mock->shouldReceive('isDirectory')->with(m::any());
+        $this->lastExpectation = $this->mock->shouldReceive('isDirectory')->with(m::any());
 
         return $this;
     }
@@ -148,7 +195,11 @@ class FilesystemMock
      */
     public function willMakeDirectory($path, $mode = 0755, $recursive = false, $force = false)
     {
-        $this->mock->shouldReceive('makeDirectory')->with($path, $mode, $recursive, $force)->andReturn(true);
+        $this->lastExpectation = $this->mock
+            ->shouldReceive('makeDirectory')
+            //->once()
+            ->with($path, $mode, $recursive, $force)
+            ->andReturn(true);
 
         return $this;
     }
@@ -164,7 +215,7 @@ class FilesystemMock
      */
     public function willNotMakeDirectory($path, $mode = 0755, $recursive = false, $force = false)
     {
-        $this->mock->shouldNotReceive('makeDirectory')->with($path, $mode, $recursive, $force);
+        $this->lastExpectation = $this->mock->shouldNotReceive('makeDirectory')->with($path, $mode, $recursive, $force);
 
         return $this;
     }
@@ -176,7 +227,7 @@ class FilesystemMock
      */
     public function willNotMakeAnyDirectory()
     {
-        $this->mock->shouldNotReceive('makeDirectory')->with(m::any());
+        $this->lastExpectation = $this->mock->shouldNotReceive('makeDirectory')->with(m::any());
 
         return $this;
     }
@@ -190,7 +241,11 @@ class FilesystemMock
      */
     public function willGetFile($file, $content)
     {
-        $this->mock->shouldReceive('get')->with($file)->andReturn($content);
+        $this->lastExpectation = $this->mock
+            ->shouldReceive('get')
+            //->once()
+            ->with($file)
+            ->andReturn($content);
 
         return $this;
     }
@@ -203,7 +258,7 @@ class FilesystemMock
      */
     public function willNotGetFile($file)
     {
-        $this->mock->shouldNotReceive('get')->with($file);
+        $this->lastExpectation = $this->mock->shouldNotReceive('get')->with($file);
 
         return $this;
     }
@@ -215,7 +270,7 @@ class FilesystemMock
      */
     public function willNotGetAnyFile()
     {
-        $this->mock->shouldNotReceive('get')->with(m::any());
+        $this->lastExpectation = $this->mock->shouldNotReceive('get')->with(m::any());
 
         return $this;
     }
@@ -229,7 +284,10 @@ class FilesystemMock
      */
     public function willPutFile($file, $content = null)
     {
-        $this->mock->shouldReceive('put')->with($file, $content ?: m::any());
+        $this->lastExpectation = $this->mock
+            ->shouldReceive('put')
+            //->once()
+            ->with($file, $content ?: m::any());
 
         return $this;
     }
@@ -243,7 +301,7 @@ class FilesystemMock
      */
     public function willNotPutFile($file, $content)
     {
-        $this->mock->shouldNotReceive('put')->with($file, $content ?: m::any());
+        $this->lastExpectation = $this->mock->shouldNotReceive('put')->with($file, $content ?: m::any());
 
         return $this;
     }
@@ -255,7 +313,18 @@ class FilesystemMock
      */
     public function willNotPutAnyFile()
     {
-        $this->mock->shouldNotReceive('put')->with(m::any());
+        $this->lastExpectation = $this->mock->shouldNotReceive('put')->with(m::any());
+
+        return $this;
+    }
+
+    public function __call($name, $arguments)
+    {
+        if(!$this->lastExpectation) {
+            trigger_error('Call to undefined method '.__CLASS__.'::'.$name.'()', E_USER_ERROR);
+        }
+
+        $this->lastExpectation = call_user_func_array([$this->lastExpectation, $name], $arguments);
 
         return $this;
     }
@@ -267,19 +336,5 @@ class CommandTestApplication extends Application
     public function getNamespace()
     {
         return 'App\\';
-    }
-
-    public function makeCommand($command)
-    {
-        $dependencies = array_slice(func_get_args(), 1);
-
-        $command = call_user_func_array(
-            [new ReflectionClass($command), 'newInstance'],
-            $dependencies
-        );
-
-        $command->setLaravel($this);
-
-        return $command;
     }
 }
