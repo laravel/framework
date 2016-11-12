@@ -1488,7 +1488,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         foreach ($this->relations as $name => $models) {
             $relation = $this->$name();
 
-            if ($relation instanceof BelongsTo) {
+            if ($relation instanceof BelongsTo || $relation instanceof BelongsToMany) {
                 continue;
             }
 
