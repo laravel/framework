@@ -41,22 +41,36 @@ class ModelMakeCommand extends GeneratorCommand
         }
 
         if ($this->option('migration')) {
-            $table = Str::plural(Str::snake(class_basename($this->argument('name'))));
-
-            $this->call('make:migration', [
-                'name' => "create_{$table}_table",
-                '--create' => $table,
-            ]);
+            foreach($this->argument('name') as $name) {
+                $this->makeMigration($name);
+            }
         }
 
         if ($this->option('controller')) {
-            $controller = Str::studly(class_basename($this->argument('name')));
-
-            $this->call('make:controller', [
-                'name' => "{$controller}Controller",
-                '--resource' => $this->option('resource'),
-            ]);
+            foreach($this->argument('name') as $name) {
+                $this->makeController($name);
+            }
         }
+    }
+
+    protected function makeMigration($name)
+    {
+        $table = Str::plural(Str::snake(class_basename($name)));
+
+        $this->call('make:migration', [
+            'name' => "create_{$table}_table",
+            '--create' => $table,
+        ]);
+    }
+
+    protected function makeController($name)
+    {
+        $controller = Str::studly(class_basename($name));
+
+        $this->call('make:controller', [
+            'name' => "{$controller}Controller",
+            '--resource' => $this->option('resource'),
+        ]);
     }
 
     /**
