@@ -16,6 +16,10 @@
 - Added `base64:` prefix support to `env()` helper ([#16186](https://github.com/laravel/framework/pull/16186))
 - Added `cache:forget` command ([#16201](https://github.com/laravel/framework/pull/16201), [7644977](https://github.com/laravel/framework/commit/76449777741fa1d7669028973958a7e4a5e64f71))
 - Added collation support to `SQLServerGrammar` ([#16227](https://github.com/laravel/framework/pull/16227))
+- Added custom class support for pivot models ([#14293](https://github.com/laravel/framework/pull/14293), [5459777](https://github.com/laravel/framework/commit/5459777c90ff6d0888bd821027c417d57cc89981))
+- Support job-based queue options ([#16257](https://github.com/laravel/framework/pull/16257), [2382dc3](https://github.com/laravel/framework/commit/2382dc3f374bee7ad966d11ecb35a1429d9a09e8), [ee385fa](https://github.com/laravel/framework/commit/ee385fa5eab0c4642f47636f0e033e982d402bb9))
+- Added higher-oder messages for the collection class ([#16267](https://github.com/laravel/framework/pull/16267), [e276b3d](https://github.com/laravel/framework/commit/e276b3d4bf2a124c4eb5975a8a2724b8c806139a), [2b7ab30](https://github.com/laravel/framework/commit/2b7ab30e0ec56ac4e4093d7f2775da98086c8000), [#16274](https://github.com/laravel/framework/pull/16274))
+- Added Blade components and slots ([e8d2a45](https://github.com/laravel/framework/commit/e8d2a45479abd2ba6b524293ce5cfb599c8bf910))
 
 ### Changed
 - Consider interfaces and extended classes in `Gate::resolvePolicyCallback()` ([#15757](https://github.com/laravel/framework/pull/15757))
@@ -33,3 +37,5 @@
 - Throw `JsonEncodingException` when `Model::toJson()` fails ([#16159](https://github.com/laravel/framework/pull/16159), [0bda866](https://github.com/laravel/framework/commit/0bda866a475de524eeff3e7f7471031dd64cf2d3))
 - Use UUID instead of `md5()` for generating file names in `FileHelpers` ([#16193](https://github.com/laravel/framework/pull/16193))
 - Use parent connection if related model doesn't specify one ([#16103](https://github.com/laravel/framework/pull/16103))
+- Use variable-length method signature for `CookieJar::queue()` ([#16290](https://github.com/laravel/framework/pull/16290), [ddabaaa](https://github.com/laravel/framework/commit/ddabaaa6a8ce16876ddec36be1391eae14649aea))
+- Enforce an `orderBy` clause for `chunk()` and `chunkById()` ([#16283](https://github.com/laravel/framework/pull/16283))
