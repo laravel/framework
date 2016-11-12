@@ -36,7 +36,7 @@ class ModelMakeCommandTest extends CommandTester
 
         $output = $this->runCommand();
 
-        $this->assertContains('Model Foo created successfully', $output);
+        $this->assertContains('Model created successfully', $output);
     }
 
     public function testModelIsNotCreatedIfExists()
@@ -48,7 +48,7 @@ class ModelMakeCommandTest extends CommandTester
 
         $output = $this->runCommand();
 
-        $this->assertContains('Model Foo already exists', $output);
+        $this->assertContains('Model already exists', $output);
     }
 
     public function testDirectoryIsCreatedIfNotExists()
@@ -61,7 +61,7 @@ class ModelMakeCommandTest extends CommandTester
 
         $output = $this->runCommand();
 
-        $this->assertContains('Model Foo created successfully', $output);
+        $this->assertContains('Model created successfully', $output);
     }
 
     protected function runCommand()
