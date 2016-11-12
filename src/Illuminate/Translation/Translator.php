@@ -62,6 +62,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         $this->locale = $locale;
     }
 
+
     /**
      * Determine if a translation exists for a given locale.
      *
@@ -84,7 +85,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     public function has($key, $locale = null, $fallback = true)
     {
-        return $this->get($key, [], $locale, $fallback) !== $key;
+        return $this->get($key, $locale, $fallback) !== $key;
     }
 
     /**
@@ -96,7 +97,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * @param  bool  $fallback
      * @return string|array|null
      */
-    public function get($key, array $replace = [], $locale = null, $fallback = true)
+    public function get($key, $locale = null, $fallback = true)
     {
         list($namespace, $group, $item) = $this->parseKey($key);
 
@@ -109,7 +110,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
             $this->load($namespace, $group, $locale);
 
             $line = $this->getLine(
-                $namespace, $group, $locale, $item, $replace
+                $namespace, $group, $locale, $item
             );
 
             if (! is_null($line)) {
@@ -154,13 +155,11 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * @param  array   $replace
      * @return string|array|null
      */
-    protected function getLine($namespace, $group, $locale, $item, array $replace)
+    protected function getLine($namespace, $group, $locale, $item)
     {
         $line = Arr::get($this->loaded[$namespace][$group][$locale], $item);
 
-        if (is_string($line)) {
-            return $this->makeReplacements($line, $replace);
-        } elseif (is_array($line) && count($line) > 0) {
+        if (is_string($line) || (is_array($line) && count($line) > 0)) {
             return $line;
         }
     }
@@ -172,7 +171,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * @param  array   $replace
      * @return string
      */
-    protected function makeReplacements($line, array $replace)
+    public function format($line, array $replace)
     {
         $replace = $this->sortReplacements($replace);
 
@@ -209,7 +208,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * @param  string  $locale
      * @return string
      */
-    public function choice($key, $number, array $replace = [], $locale = null)
+    public function choice($key, $number, $locale = null)
     {
         $line = $this->get($key, $replace, $locale = $locale ?: $this->locale ?: $this->fallback);
 
@@ -219,7 +218,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
 
         $replace['count'] = $number;
 
-        return $this->makeReplacements($this->getSelector()->choose($line, $number, $locale), $replace);
+        return $this->getSelector()->choose($line, $number, $locale);
     }
 
     /**
@@ -232,7 +231,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     public function trans($key, array $replace = [], $locale = null)
     {
-        return $this->get($key, $replace, $locale);
+        return $this->format($this->get($key, $locale), $replace);
     }
 
     /**
@@ -246,7 +245,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     public function transChoice($key, $number, array $replace = [], $locale = null)
     {
-        return $this->choice($key, $number, $replace, $locale);
+        return $this->format($this->choice($key, $number, $locale), $replace);
     }
 
     /**

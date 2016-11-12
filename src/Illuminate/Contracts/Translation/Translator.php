@@ -4,6 +4,10 @@ namespace Illuminate\Contracts\Translation;
 
 interface Translator
 {
+    public function has($key, $locale = null);
+    public function get($key, $locale = null);
+    public function format($line, array $replace);
+
     /**
      * Get the translation for a given key.
      *
