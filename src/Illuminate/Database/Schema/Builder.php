@@ -123,7 +123,7 @@ class Builder
      *
      * @param  string    $table
      * @param  \Closure  $callback
-     * @return \Illuminate\Database\Schema\Blueprint
+     * @return void
      */
     public function table($table, Closure $callback)
     {
