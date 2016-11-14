@@ -45,13 +45,17 @@ abstract class GeneratorCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return null
+     * @return array
      */
     public function fire()
     {
-        foreach($this->getNameInput() as $name) {
-            $this->generate($name);
+        $generated = [];
+
+        foreach (array_unique($this->getNameInput()) as $name) {
+            $generated[$name] = $this->generate($name);
         }
+
+        return $generated;
     }
 
     protected function generate($rawName)

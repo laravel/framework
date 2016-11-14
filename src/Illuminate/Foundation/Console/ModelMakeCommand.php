@@ -36,18 +36,16 @@ class ModelMakeCommand extends GeneratorCommand
      */
     public function fire()
     {
-        if (parent::fire() === false) {
-            return;
-        }
+        $generated = array_keys(
+            array_filter(parent::fire())
+        );
 
-        if ($this->option('migration')) {
-            foreach($this->argument('name') as $name) {
+        foreach ($generated as $name) {
+            if ($this->option('migration')) {
                 $this->makeMigration($name);
             }
-        }
 
-        if ($this->option('controller')) {
-            foreach($this->argument('name') as $name) {
+            if ($this->option('controller')) {
                 $this->makeController($name);
             }
         }
