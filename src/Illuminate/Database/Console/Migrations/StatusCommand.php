@@ -55,17 +55,19 @@ class StatusCommand extends BaseCommand
             return $this->error('No migrations found.');
         }
 
-        $ran = $this->migrator->getRepository()->getRan();
+        $ran = $this->migrator->getRepository()->getRanWithBatch();
 
         $migrations = Collection::make($this->getAllMigrationFiles())
                             ->map(function ($migration) use ($ran) {
-                                return in_array($this->migrator->getMigrationName($migration), $ran)
-                                        ? ['<info>Y</info>', $this->migrator->getMigrationName($migration)]
-                                        : ['<fg=red>N</fg=red>', $this->migrator->getMigrationName($migration)];
+                                $name = $this->migrator->getMigrationName($migration);
+
+                                return array_key_exists($name, $ran)
+                                        ? ['<info>Y</info>', $name, $ran[$name]]
+                                        : ['<fg=red>N</fg=red>', $name, ''];
                             });
 
         if (count($migrations) > 0) {
-            $this->table(['Ran?', 'Migration'], $migrations);
+            $this->table(['Ran?', 'Migration', 'Batch'], $migrations);
         } else {
             $this->error('No migrations found');
         }
