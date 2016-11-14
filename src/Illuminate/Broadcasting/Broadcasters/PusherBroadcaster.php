@@ -3,6 +3,7 @@
 namespace Illuminate\Broadcasting\Broadcasters;
 
 use Pusher;
+use RuntimeException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -94,7 +95,15 @@ class PusherBroadcaster extends Broadcaster
     {
         $socket = Arr::pull($payload, 'socket');
 
-        $this->pusher->trigger($this->formatChannels($channels), $event, $payload, $socket);
+        $response = $this->pusher->trigger($this->formatChannels($channels), $event, $payload, $socket);
+
+        if ((is_array($response) && $response['status'] == 200) || $response === true) {
+            return;
+        }
+
+        throw new RuntimeException(
+            is_bool($response) ? 'Failed to connect to Pusher.' : $response['body']
+        );
     }
 
     /**
