@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
-use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Arr;
+use Illuminate\Database\Query\Builder;
 
 class SqlServerGrammar extends Grammar
 {
@@ -345,11 +345,9 @@ class SqlServerGrammar extends Grammar
     {
         $bindingsWithoutJoin = Arr::except($bindings, 'join');
 
-        $preparedBindings = array_values(
+        return array_values(
             array_merge($values, $bindings['join'], Arr::flatten($bindingsWithoutJoin))
         );
-
-        return $preparedBindings;
     }
 
     /**
