@@ -78,6 +78,8 @@ class MailgunTransport extends Transport
 
         $this->client->post($this->url, $options);
 
+        $this->sendPerformed($message);
+
         return $this->numberOfRecipients($message);
     }
 
