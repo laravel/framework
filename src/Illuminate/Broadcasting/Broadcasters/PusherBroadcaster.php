@@ -91,7 +91,9 @@ class PusherBroadcaster extends Broadcaster
     {
         $socket = Arr::pull($payload, 'socket');
 
-        if (true === $response = $this->pusher->trigger($this->formatChannels($channels), $event, $payload, $socket)) {
+        $response = $this->pusher->trigger($this->formatChannels($channels), $event, $payload, $socket);
+
+        if ((is_array($response) && $response['status'] == 200) || $response === true) {
             return;
         }
 
