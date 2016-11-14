@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use Countable;
+use Exception;
 use ArrayAccess;
 use Traversable;
 use ArrayIterator;
@@ -1348,5 +1349,25 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         return (array) $items;
+    }
+
+    /**
+     * Dynamically access collection proxies.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    public function __get($key)
+    {
+        $proxies = [
+            'each', 'map', 'first', 'sortBy',
+            'sortByDesc', 'sum', 'reject', 'filter',
+        ];
+
+        if (! in_array($key, $proxies)) {
+            throw new Exception("Property [{$key}] does not exist on this collection instance.");
+        }
+
+        return new HigherOrderCollectionProxy($this, $key);
     }
 }

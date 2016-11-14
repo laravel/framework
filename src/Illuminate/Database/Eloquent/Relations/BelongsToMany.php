@@ -75,6 +75,13 @@ class BelongsToMany extends Relation
     protected $pivotUpdatedAt;
 
     /**
+     * The class name of the custom pivot model to use for the relationship.
+     *
+     * @var string
+     */
+    protected $using;
+
+    /**
      * The count of self joins.
      *
      * @var int
@@ -100,6 +107,19 @@ class BelongsToMany extends Relation
         $this->relationName = $relationName;
 
         parent::__construct($query, $parent);
+    }
+
+    /**
+     * Specify the custom pivot model to use for the relationship.
+     *
+     * @param  string  $class
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function using($class)
+    {
+        $this->using = $class;
+
+        return $this;
     }
 
     /**
@@ -1271,7 +1291,7 @@ class BelongsToMany extends Relation
      */
     public function newPivot(array $attributes = [], $exists = false)
     {
-        $pivot = $this->related->newPivot($this->parent, $attributes, $this->table, $exists);
+        $pivot = $this->related->newPivot($this->parent, $attributes, $this->table, $exists, $this->using);
 
         return $pivot->setPivotKeys($this->foreignKey, $this->otherKey);
     }

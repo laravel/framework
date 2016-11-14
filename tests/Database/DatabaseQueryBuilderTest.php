@@ -685,16 +685,39 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('select * from "users" limit 10 offset 5', $builder->toSql());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->skip(-5)->take(10);
-        $this->assertEquals('select * from "users" limit 10 offset 0', $builder->toSql());
+        $builder->select('*')->from('users')->skip(0)->take(0);
+        $this->assertEquals('select * from "users" limit 0 offset 0', $builder->toSql());
 
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->skip(-5)->take(-10);
+        $this->assertEquals('select * from "users" offset 0', $builder->toSql());
+    }
+
+    public function testForPage()
+    {
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->forPage(2, 15);
         $this->assertEquals('select * from "users" limit 15 offset 15', $builder->toSql());
 
         $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->forPage(0, 15);
+        $this->assertEquals('select * from "users" limit 15 offset 0', $builder->toSql());
+
+        $builder = $this->getBuilder();
         $builder->select('*')->from('users')->forPage(-2, 15);
         $this->assertEquals('select * from "users" limit 15 offset 0', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->forPage(2, 0);
+        $this->assertEquals('select * from "users" limit 0 offset 0', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->forPage(0, 0);
+        $this->assertEquals('select * from "users" limit 0 offset 0', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->forPage(-2, 0);
+        $this->assertEquals('select * from "users" limit 0 offset 0', $builder->toSql());
     }
 
     public function testGetCountForPaginationWithBindings()
@@ -1230,6 +1253,14 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $builder->getConnection()->shouldReceive('update')->once()->with('update "users" inner join "orders" on "users"."id" = "orders"."user_id" set "email" = ?, "name" = ? where "users"."id" = ?', ['foo', 'bar', 1])->andReturn(1);
         $result = $builder->from('users')->join('orders', 'users.id', '=', 'orders.user_id')->where('users.id', '=', 1)->update(['email' => 'foo', 'name' => 'bar']);
         $this->assertEquals(1, $result);
+
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" inner join "orders" on "users"."id" = "orders"."user_id" and "users"."id" = ? set "email" = ?, "name" = ?', [1, 'foo', 'bar'])->andReturn(1);
+        $result = $builder->from('users')->join('orders', function ($join) {
+            $join->on('users.id', '=', 'orders.user_id')
+                ->where('users.id', '=', 1);
+        })->update(['email' => 'foo', 'name' => 'bar']);
+        $this->assertEquals(1, $result);
     }
 
     public function testUpdateMethodWithJoinsOnSqlServer()
@@ -1237,6 +1268,46 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $builder = $this->getSqlServerBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update [users] set [email] = ?, [name] = ? from [users] inner join [orders] on [users].[id] = [orders].[user_id] where [users].[id] = ?', ['foo', 'bar', 1])->andReturn(1);
         $result = $builder->from('users')->join('orders', 'users.id', '=', 'orders.user_id')->where('users.id', '=', 1)->update(['email' => 'foo', 'name' => 'bar']);
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update [users] set [email] = ?, [name] = ? from [users] inner join [orders] on [users].[id] = [orders].[user_id] and [users].[id] = ?', ['foo', 'bar', 1])->andReturn(1);
+        $result = $builder->from('users')->join('orders', function ($join) {
+            $join->on('users.id', '=', 'orders.user_id')
+                ->where('users.id', '=', 1);
+        })->update(['email' => 'foo', 'name' => 'bar']);
+        $this->assertEquals(1, $result);
+    }
+
+    public function testUpdateMethodWithJoinsOnMySql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update `users` inner join `orders` on `users`.`id` = `orders`.`user_id` set `email` = ?, `name` = ? where `users`.`id` = ?', ['foo', 'bar', 1])->andReturn(1);
+        $result = $builder->from('users')->join('orders', 'users.id', '=', 'orders.user_id')->where('users.id', '=', 1)->update(['email' => 'foo', 'name' => 'bar']);
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update `users` inner join `orders` on `users`.`id` = `orders`.`user_id` and `users`.`id` = ? set `email` = ?, `name` = ?', [1, 'foo', 'bar'])->andReturn(1);
+        $result = $builder->from('users')->join('orders', function ($join) {
+            $join->on('users.id', '=', 'orders.user_id')
+                ->where('users.id', '=', 1);
+        })->update(['email' => 'foo', 'name' => 'bar']);
+        $this->assertEquals(1, $result);
+    }
+
+    public function testUpdateMethodWithJoinsOnSQLite()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" inner join "orders" on "users"."id" = "orders"."user_id" set "email" = ?, "name" = ? where "users"."id" = ?', ['foo', 'bar', 1])->andReturn(1);
+        $result = $builder->from('users')->join('orders', 'users.id', '=', 'orders.user_id')->where('users.id', '=', 1)->update(['email' => 'foo', 'name' => 'bar']);
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" inner join "orders" on "users"."id" = "orders"."user_id" and "users"."id" = ? set "email" = ?, "name" = ?', [1, 'foo', 'bar'])->andReturn(1);
+        $result = $builder->from('users')->join('orders', function ($join) {
+            $join->on('users.id', '=', 'orders.user_id')
+                ->where('users.id', '=', 1);
+        })->update(['email' => 'foo', 'name' => 'bar']);
         $this->assertEquals(1, $result);
     }
 
@@ -1261,6 +1332,14 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? from "orders" where "users"."id" = ? and "users"."id" = "orders"."user_id"', ['foo', 'bar', 1])->andReturn(1);
         $result = $builder->from('users')->join('orders', 'users.id', '=', 'orders.user_id')->where('users.id', '=', 1)->update(['email' => 'foo', 'name' => 'bar']);
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? from "orders" where "users"."id" = "orders"."user_id" and "users"."id" = ?', ['foo', 'bar', 1])->andReturn(1);
+        $result = $builder->from('users')->join('orders', function ($join) {
+            $join->on('users.id', '=', 'orders.user_id')
+                ->where('users.id', '=', 1);
+        })->update(['email' => 'foo', 'name' => 'bar']);
         $this->assertEquals(1, $result);
     }
 
@@ -1408,7 +1487,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     {
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->where('items->sku', '=', 'foo-bar');
-        $this->assertEquals('select * from `users` where `items`->"$.sku" = ?', $builder->toSql());
+        $this->assertEquals('select * from `users` where `items`->\'$."sku"\' = ?', $builder->toSql());
         $this->assertCount(1, $builder->getRawBindings()['where']);
         $this->assertEquals('foo-bar', $builder->getRawBindings()['where'][0]);
     }
@@ -1417,28 +1496,28 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     {
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->where('items->price', '=', 1);
-        $this->assertEquals('select * from `users` where `items`->"$.price" = ?', $builder->toSql());
+        $this->assertEquals('select * from `users` where `items`->\'$."price"\' = ?', $builder->toSql());
     }
 
     public function testMySqlWrappingJsonWithDouble()
     {
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->where('items->price', '=', 1.5);
-        $this->assertEquals('select * from `users` where `items`->"$.price" = ?', $builder->toSql());
+        $this->assertEquals('select * from `users` where `items`->\'$."price"\' = ?', $builder->toSql());
     }
 
     public function testMySqlWrappingJsonWithBoolean()
     {
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->where('items->available', '=', true);
-        $this->assertEquals('select * from `users` where `items`->"$.available" = true', $builder->toSql());
+        $this->assertEquals('select * from `users` where `items`->\'$."available"\' = true', $builder->toSql());
     }
 
     public function testMySqlWrappingJsonWithBooleanAndIntegerThatLooksLikeOne()
     {
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->where('items->available', '=', true)->where('items->active', '=', false)->where('items->number_available', '=', 0);
-        $this->assertEquals('select * from `users` where `items`->"$.available" = true and `items`->"$.active" = false and `items`->"$.number_available" = ?', $builder->toSql());
+        $this->assertEquals('select * from `users` where `items`->\'$."available"\' = true and `items`->\'$."active"\' = false and `items`->\'$."number_available"\' = ?', $builder->toSql());
     }
 
     public function testMySqlWrappingJson()
@@ -1449,15 +1528,15 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
 
         $builder = $this->getMySqlBuilder();
         $builder->select('items->price')->from('users')->where('items->price', '=', 1)->orderBy('items->price');
-        $this->assertEquals('select `items`->"$.price" from `users` where `items`->"$.price" = ? order by `items`->"$.price" asc', $builder->toSql());
+        $this->assertEquals('select `items`->\'$."price"\' from `users` where `items`->\'$."price"\' = ? order by `items`->\'$."price"\' asc', $builder->toSql());
 
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->where('items->price->in_usd', '=', 1);
-        $this->assertEquals('select * from `users` where `items`->"$.price.in_usd" = ?', $builder->toSql());
+        $this->assertEquals('select * from `users` where `items`->\'$."price"."in_usd"\' = ?', $builder->toSql());
 
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->where('items->price->in_usd', '=', 1)->where('items->age', '=', 2);
-        $this->assertEquals('select * from `users` where `items`->"$.price.in_usd" = ? and `items`->"$.age" = ?', $builder->toSql());
+        $this->assertEquals('select * from `users` where `items`->\'$."price"."in_usd"\' = ? and `items`->\'$."age"\' = ?', $builder->toSql());
     }
 
     public function testPostgresWrappingJson()
@@ -1535,9 +1614,9 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $parameters = ['corge', 'waldo', 'fred'];
         $builder = m::mock('Illuminate\Database\Query\Builder')->makePartial();
 
-        $builder->shouldReceive('where')->with('foo_bar', '=', $parameters[0], 'and')->once()->andReturn($builder);
-        $builder->shouldReceive('where')->with('baz', '=', $parameters[1], 'and')->once()->andReturn($builder);
-        $builder->shouldReceive('where')->with('qux', '=', $parameters[2], 'or')->once()->andReturn($builder);
+        $builder->shouldReceive('where')->with('foo_bar', '=', $parameters[0], 'and')->once()->andReturnSelf();
+        $builder->shouldReceive('where')->with('baz', '=', $parameters[1], 'and')->once()->andReturnSelf();
+        $builder->shouldReceive('where')->with('qux', '=', $parameters[2], 'or')->once()->andReturnSelf();
 
         $this->assertEquals($builder, $builder->dynamicWhere($method, $parameters));
     }
@@ -1548,9 +1627,9 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $parameters = ['6.1', '4.2', 'Vertical'];
         $builder = m::mock('Illuminate\Database\Query\Builder')->makePartial();
 
-        $builder->shouldReceive('where')->with('ios_version', '=', '6.1', 'and')->once()->andReturn($builder);
-        $builder->shouldReceive('where')->with('android_version', '=', '4.2', 'and')->once()->andReturn($builder);
-        $builder->shouldReceive('where')->with('orientation', '=', 'Vertical', 'or')->once()->andReturn($builder);
+        $builder->shouldReceive('where')->with('ios_version', '=', '6.1', 'and')->once()->andReturnSelf();
+        $builder->shouldReceive('where')->with('android_version', '=', '4.2', 'and')->once()->andReturnSelf();
+        $builder->shouldReceive('where')->with('orientation', '=', 'Vertical', 'or')->once()->andReturnSelf();
 
         $builder->dynamicWhere($method, $parameters);
     }
@@ -1740,50 +1819,165 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('select * from [users](1,2)', $builder->toSql());
     }
 
+    public function testChunkWithLastChunkComplete()
+    {
+        $builder = $this->getMockQueryBuilder();
+        $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+
+        $chunk1 = collect(['foo1', 'foo2']);
+        $chunk2 = collect(['foo3', 'foo4']);
+        $chunk3 = collect([]);
+        $builder->shouldReceive('forPage')->once()->with(1, 2)->andReturnSelf();
+        $builder->shouldReceive('forPage')->once()->with(2, 2)->andReturnSelf();
+        $builder->shouldReceive('forPage')->once()->with(3, 2)->andReturnSelf();
+        $builder->shouldReceive('get')->times(3)->andReturn($chunk1, $chunk2, $chunk3);
+
+        $callbackAssertor = m::mock('StdClass');
+        $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
+        $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk2);
+        $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk3);
+
+        $builder->chunk(2, function ($results) use ($callbackAssertor) {
+            $callbackAssertor->doSomething($results);
+        });
+    }
+
+    public function testChunkWithLastChunkPartial()
+    {
+        $builder = $this->getMockQueryBuilder();
+        $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+
+        $chunk1 = collect(['foo1', 'foo2']);
+        $chunk2 = collect(['foo3']);
+        $builder->shouldReceive('forPage')->once()->with(1, 2)->andReturnSelf();
+        $builder->shouldReceive('forPage')->once()->with(2, 2)->andReturnSelf();
+        $builder->shouldReceive('get')->times(2)->andReturn($chunk1, $chunk2);
+
+        $callbackAssertor = m::mock('StdClass');
+        $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
+        $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk2);
+
+        $builder->chunk(2, function ($results) use ($callbackAssertor) {
+            $callbackAssertor->doSomething($results);
+        });
+    }
+
+    public function testChunkCanBeStoppedByReturningFalse()
+    {
+        $builder = $this->getMockQueryBuilder();
+        $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+
+        $chunk1 = collect(['foo1', 'foo2']);
+        $chunk2 = collect(['foo3']);
+        $builder->shouldReceive('forPage')->once()->with(1, 2)->andReturnSelf();
+        $builder->shouldReceive('forPage')->never()->with(2, 2);
+        $builder->shouldReceive('get')->times(1)->andReturn($chunk1);
+
+        $callbackAssertor = m::mock('StdClass');
+        $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
+        $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk2);
+
+        $builder->chunk(2, function ($results) use ($callbackAssertor) {
+            $callbackAssertor->doSomething($results);
+
+            return false;
+        });
+    }
+
+    public function testChunkWithCountZero()
+    {
+        $builder = $this->getMockQueryBuilder();
+        $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+
+        $chunk = collect([]);
+        $builder->shouldReceive('forPage')->once()->with(1, 0)->andReturnSelf();
+        $builder->shouldReceive('get')->times(1)->andReturn($chunk);
+
+        $callbackAssertor = m::mock('StdClass');
+        $callbackAssertor->shouldReceive('doSomething')->never();
+
+        $builder->chunk(0, function ($results) use ($callbackAssertor) {
+            $callbackAssertor->doSomething($results);
+        });
+    }
+
     public function testChunkPaginatesUsingIdWithLastChunkComplete()
     {
         $builder = $this->getMockQueryBuilder();
+        $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
 
-        $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'someIdField')->andReturn($builder);
-        $builder->shouldReceive('forPageAfterId')->once()->with(2, 2, 'someIdField')->andReturn($builder);
-        $builder->shouldReceive('forPageAfterId')->once()->with(2, 11, 'someIdField')->andReturn($builder);
+        $chunk1 = collect([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]);
+        $chunk2 = collect([(object) ['someIdField' => 10], (object) ['someIdField' => 11]]);
+        $chunk3 = collect([]);
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'someIdField')->andReturnSelf();
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 2, 'someIdField')->andReturnSelf();
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 11, 'someIdField')->andReturnSelf();
+        $builder->shouldReceive('get')->times(3)->andReturn($chunk1, $chunk2, $chunk3);
 
-        $builder->shouldReceive('get')->times(3)->andReturn(
-            collect([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]),
-            collect([(object) ['someIdField' => 10], (object) ['someIdField' => 11]]),
-            collect([])
-        );
+        $callbackAssertor = m::mock('StdClass');
+        $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
+        $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk2);
+        $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk3);
 
-        $builder->chunkById(2, function ($results) {
+        $builder->chunkById(2, function ($results) use ($callbackAssertor) {
+            $callbackAssertor->doSomething($results);
         }, 'someIdField');
     }
 
     public function testChunkPaginatesUsingIdWithLastChunkPartial()
     {
         $builder = $this->getMockQueryBuilder();
+        $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
 
-        $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'someIdField')->andReturn($builder);
-        $builder->shouldReceive('forPageAfterId')->once()->with(2, 2, 'someIdField')->andReturn($builder);
+        $chunk1 = collect([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]);
+        $chunk2 = collect([(object) ['someIdField' => 10]]);
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'someIdField')->andReturnSelf();
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 2, 'someIdField')->andReturnSelf();
+        $builder->shouldReceive('get')->times(2)->andReturn($chunk1, $chunk2);
 
-        $builder->shouldReceive('get')->times(2)->andReturn(
-            collect([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]),
-            collect([(object) ['someIdField' => 10]])
-        );
+        $callbackAssertor = m::mock('StdClass');
+        $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
+        $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk2);
 
-        $builder->chunkById(2, function ($results) {
+        $builder->chunkById(2, function ($results) use ($callbackAssertor) {
+            $callbackAssertor->doSomething($results);
+        }, 'someIdField');
+    }
+
+    public function testChunkPaginatesUsingIdWithCountZero()
+    {
+        $builder = $this->getMockQueryBuilder();
+        $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+
+        $chunk = collect([]);
+        $builder->shouldReceive('forPageAfterId')->once()->with(0, 0, 'someIdField')->andReturnSelf();
+        $builder->shouldReceive('get')->times(1)->andReturn($chunk);
+
+        $callbackAssertor = m::mock('StdClass');
+        $callbackAssertor->shouldReceive('doSomething')->never();
+
+        $builder->chunkById(0, function ($results) use ($callbackAssertor) {
+            $callbackAssertor->doSomething($results);
         }, 'someIdField');
     }
 
     public function testChunkPaginatesUsingIdWithAlias()
     {
         $builder = $this->getMockQueryBuilder();
-        $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'table.id')->andReturn($builder);
-        $builder->shouldReceive('forPageAfterId')->once()->with(2, 10, 'table.id')->andReturn($builder);
-        $builder->shouldReceive('get')->times(2)->andReturn(
-            collect([(object) ['table_id' => 1], (object) ['table_id' => 10]]),
-            collect([])
-        );
-        $builder->chunkById(2, function ($results) {
+        $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+
+        $chunk1 = collect([(object) ['table_id' => 1], (object) ['table_id' => 10]]);
+        $chunk2 = collect([]);
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'table.id')->andReturnSelf();
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 10, 'table.id')->andReturnSelf();
+        $builder->shouldReceive('get')->times(2)->andReturn($chunk1, $chunk2);
+
+        $callbackAssertor = m::mock('StdClass');
+        $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
+        $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk2);
+
+        $builder->chunkById(2, function ($results) use ($callbackAssertor) {
+            $callbackAssertor->doSomething($results);
         }, 'table.id', 'table_id');
     }
 
@@ -1799,7 +1993,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $results = collect([['test' => 'foo'], ['test' => 'bar']]);
 
         $builder->shouldReceive('getCountForPagination')->once()->with($columns)->andReturn(2);
-        $builder->shouldReceive('forPage')->once()->with($page, $perPage)->andReturn($builder);
+        $builder->shouldReceive('forPage')->once()->with($page, $perPage)->andReturnSelf();
         $builder->shouldReceive('get')->once()->andReturn($results);
 
         Paginator::currentPathResolver(function () use ($path) {
@@ -1826,7 +2020,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $results = collect([['test' => 'foo'], ['test' => 'bar']]);
 
         $builder->shouldReceive('getCountForPagination')->once()->with($columns)->andReturn(2);
-        $builder->shouldReceive('forPage')->once()->with($page, $perPage)->andReturn($builder);
+        $builder->shouldReceive('forPage')->once()->with($page, $perPage)->andReturnSelf();
         $builder->shouldReceive('get')->once()->andReturn($results);
 
         Paginator::currentPageResolver(function () use ($path) {

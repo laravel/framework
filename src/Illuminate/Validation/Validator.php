@@ -6,6 +6,7 @@ use Closure;
 use DateTime;
 use Countable;
 use Exception;
+use Throwable;
 use DateTimeZone;
 use RuntimeException;
 use DateTimeInterface;
@@ -1976,6 +1977,8 @@ class Validator implements ValidatorContract
             new DateTimeZone($value);
         } catch (Exception $e) {
             return false;
+        } catch (Throwable $e) {
+            return false;
         }
 
         return true;
@@ -2790,7 +2793,7 @@ class Validator implements ValidatorContract
      */
     protected function getExplicitKeys($attribute)
     {
-        $pattern = str_replace('\*', '([^\.]+)', preg_quote($this->getPrimaryAttribute($attribute)));
+        $pattern = str_replace('\*', '([^\.]+)', preg_quote($this->getPrimaryAttribute($attribute), '/'));
 
         if (preg_match('/^'.$pattern.'/', $attribute, $keys)) {
             array_shift($keys);

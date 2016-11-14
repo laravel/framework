@@ -63,8 +63,8 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a GET request, expecting a JSON response.
      *
-     * @param string $uri
-     * @param array $headers
+     * @param  string  $uri
+     * @param  array  $headers
      * @return $this
      */
     public function getJson($uri, array $headers = [])
@@ -90,9 +90,9 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a POST request, expecting a JSON response.
      *
-     * @param string $uri
-     * @param array  $data
-     * @param array  $headers
+     * @param  string  $uri
+     * @param  array  $data
+     * @param  array  $headers
      * @return $this
      */
     public function postJson($uri, array $data = [], array $headers = [])
@@ -118,9 +118,9 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a PUT request, expecting a JSON response.
      *
-     * @param string $uri
-     * @param array  $data
-     * @param array  $headers
+     * @param  string  $uri
+     * @param  array  $data
+     * @param  array  $headers
      * @return $this
      */
     public function putJson($uri, array $data = [], array $headers = [])
@@ -146,9 +146,9 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a PATCH request, expecting a JSON response.
      *
-     * @param string $uri
-     * @param array  $data
-     * @param array  $headers
+     * @param  string  $uri
+     * @param  array  $data
+     * @param  array  $headers
      * @return $this
      */
     public function patchJson($uri, array $data = [], array $headers = [])
@@ -174,9 +174,9 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a DELETE request, expecting a JSON response.
      *
-     * @param string $uri
-     * @param array  $data
-     * @param array  $headers
+     * @param  string  $uri
+     * @param  array  $data
+     * @param  array  $headers
      * @return $this
      */
     public function deleteJson($uri, array $data = [], array $headers = [])
@@ -185,7 +185,7 @@ trait MakesHttpRequests
     }
 
     /**
-     * Visit the given URI with a JSON request.
+     * Call the given URI with a JSON request.
      *
      * @param  string  $method
      * @param  string  $uri
@@ -217,10 +217,10 @@ trait MakesHttpRequests
      *
      * @param  string  $method
      * @param  string  $uri
-     * @param  array   $parameters
-     * @param  array   $cookies
-     * @param  array   $files
-     * @param  array   $server
+     * @param  array  $parameters
+     * @param  array  $cookies
+     * @param  array  $files
+     * @param  array  $server
      * @param  string  $content
      * @return \Illuminate\Http\Response
      */
