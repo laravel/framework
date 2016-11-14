@@ -3,7 +3,6 @@
 namespace Illuminate\Support\Facades;
 
 /**
- *
  * @method static string version()
  * @method static string basePath()
  * @method static string environment()
