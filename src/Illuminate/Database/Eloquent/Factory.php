@@ -60,7 +60,7 @@ class Factory implements ArrayAccess
      * @param  string  $class
      * @param  string  $name
      * @param  callable  $attributes
-     * @return void
+     * @return $this
      */
     public function defineAs($class, $name, callable $attributes)
     {
@@ -73,11 +73,13 @@ class Factory implements ArrayAccess
      * @param  string  $class
      * @param  callable  $attributes
      * @param  string  $name
-     * @return void
+     * @return $this
      */
     public function define($class, callable $attributes, $name = 'default')
     {
         $this->definitions[$class][$name] = $attributes;
+
+        return $this;
     }
 
     /**
@@ -86,11 +88,13 @@ class Factory implements ArrayAccess
      * @param  string  $class
      * @param  string  $state
      * @param  callable  $attributes
-     * @return void
+     * @return $this
      */
     public function state($class, $state, callable $attributes)
     {
         $this->states[$class][$state] = $attributes;
+
+        return $this;
     }
 
     /**

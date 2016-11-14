@@ -56,6 +56,8 @@ class MandrillTransport extends Transport
 
         $this->client->post('https://mandrillapp.com/api/1.0/messages/send-raw.json', $options);
 
+        $this->sendPerformed($message);
+
         return $this->numberOfRecipients($message);
     }
 
