@@ -741,7 +741,7 @@ class Factory implements FactoryContract
         $baseData = $this->componentData[$name];
 
         $data = array_merge(
-            $baseData, ['slot' => new HtmlString($contents)], $this->slots[$name]
+            $baseData, ['slot' => new HtmlString(trim($contents))], $this->slots[$name]
         );
 
         return tap($this->make($name, $data)->render(), function () use ($name) {
@@ -775,7 +775,7 @@ class Factory implements FactoryContract
     {
         $current = last($this->componentStack);
 
-        $this->slots[$current][array_pop($this->slotStack[$current])] = new HtmlString(ob_get_clean());
+        $this->slots[$current][array_pop($this->slotStack[$current])] = new HtmlString(trim(ob_get_clean()));
     }
 
     /**
