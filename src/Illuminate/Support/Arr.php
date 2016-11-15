@@ -196,7 +196,7 @@ class Arr
      *
      * @param  array  $array
      * @param  array|string  $keys
-     * @return void
+     * @return void|null
      */
     public static function forget(&$array, $keys)
     {

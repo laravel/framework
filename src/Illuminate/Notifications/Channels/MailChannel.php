@@ -32,7 +32,7 @@ class MailChannel
      *
      * @param  mixed  $notifiable
      * @param  \Illuminate\Notifications\Notification  $notification
-     * @return void
+     * @return void|null
      */
     public function send($notifiable, Notification $notification)
     {

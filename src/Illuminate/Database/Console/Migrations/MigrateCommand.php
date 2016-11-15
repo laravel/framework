@@ -47,7 +47,7 @@ class MigrateCommand extends BaseCommand
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return void|null
      */
     public function fire()
     {

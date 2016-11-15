@@ -88,7 +88,7 @@ class Worker
      * Register the worker timeout handler (PHP 7.1+).
      *
      * @param  WorkerOptions  $options
-     * @return void
+     * @return void|null
      */
     protected function registerTimeoutHandler(WorkerOptions $options)
     {
@@ -250,7 +250,7 @@ class Worker
      * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  int  $maxTries
-     * @return void
+     * @return void|null
      */
     protected function markJobAsFailedIfAlreadyExceedsMaxAttempts($connectionName, $job, $maxTries)
     {
@@ -274,7 +274,7 @@ class Worker
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  int  $maxTries
      * @param  \Exception  $e
-     * @return void
+     * @return void|null
      */
     protected function markJobAsFailedIfHasExceededMaxAttempts(
         $connectionName, $job, $maxTries, $e
@@ -292,7 +292,7 @@ class Worker
      * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  \Exception  $e
-     * @return void
+     * @return void|null
      */
     protected function failJob($connectionName, $job, $e)
     {

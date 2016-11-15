@@ -1244,7 +1244,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Remove all of the event listeners for the model.
      *
-     * @return void
+     * @return void|null
      */
     public static function flushEventListeners()
     {

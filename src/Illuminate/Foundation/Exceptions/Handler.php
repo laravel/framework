@@ -52,7 +52,7 @@ class Handler implements ExceptionHandlerContract
      * Report or log an exception.
      *
      * @param  \Exception  $e
-     * @return void
+     * @return void|null
      *
      * @throws \Exception
      */

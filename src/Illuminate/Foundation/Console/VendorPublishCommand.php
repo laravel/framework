@@ -97,7 +97,7 @@ class VendorPublishCommand extends Command
      *
      * @param  string  $from
      * @param  string  $to
-     * @return void
+     * @return void|null
      */
     protected function publishFile($from, $to)
     {

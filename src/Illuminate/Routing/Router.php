@@ -908,7 +908,7 @@ class Router implements RegistrarContract
      * @param  string  $key
      * @param  string  $class
      * @param  \Closure|null  $callback
-     * @return void
+     * @return void|null
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */

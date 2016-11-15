@@ -51,7 +51,7 @@ class BroadcastManager implements FactoryContract
      * Register the routes for handling broadcast authentication and sockets.
      *
      * @param  array|null  $attributes
-     * @return void
+     * @return void|null
      */
     public function routes(array $attributes = null)
     {

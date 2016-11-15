@@ -22,7 +22,7 @@ class NotificationFake implements NotificationFactory
      * @param  mixed  $notifiable
      * @param  string  $notification
      * @param  callable|null  $callback
-     * @return void
+     * @return void|null
      */
     public function assertSentTo($notifiable, $notification, $callback = null)
     {
@@ -46,7 +46,7 @@ class NotificationFake implements NotificationFactory
      * @param  mixed  $notifiable
      * @param  string  $notification
      * @param  callable|null  $callback
-     * @return void
+     * @return void|null
      */
     public function assertNotSentTo($notifiable, $notification, $callback = null)
     {

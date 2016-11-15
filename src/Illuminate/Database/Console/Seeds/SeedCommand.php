@@ -49,7 +49,7 @@ class SeedCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return void|null
      */
     public function fire()
     {
