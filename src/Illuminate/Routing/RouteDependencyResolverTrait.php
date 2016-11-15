@@ -51,18 +51,30 @@ trait RouteDependencyResolverTrait
      */
     public function resolveMethodDependencies(array $parameters, ReflectionFunctionAbstract $reflector)
     {
-        $originalParameters = $parameters;
-
-        foreach ($reflector->getParameters() as $key => $parameter) {
-            $instance = $this->transformDependency(
-                $parameter, $parameters, $originalParameters
-            );
-
-            if (! is_null($instance)) {
-                $this->spliceIntoParameters($parameters, $key, $instance);
+        $originalParameters  = $parameters;
+        // Is method have arguments
+        if ($reflectorParameters = $reflector->getParameters()) {
+            // Build parameters using arguments on the method using ReflectionMethod
+            $parameters = array();
+            foreach ($reflector->getParameters() as $key => $parameter) {
+                // Is parameter valid ( not exist in $originalParameters )
+                $parameterName = $parameter->getName();
+                if (!array_key_exists($parameterName, $originalParameters)) {
+                    if ($ReflectionClass = $parameter->getClass()) {
+                        // Set default value for argument with Type Hinting
+                        $className    = $ReflectionClass->name;
+                        $defaultValue = $this->container->make($className);
+                    } else {
+                        // Set default value for argument without Type Hinting
+                        $defaultValue = ($parameter->isDefaultValueAvailable()) ? $parameter->getDefaultValue() : null;
+                    }
+                } else {
+                    $defaultValue = $originalParameters[$parameterName];
+                }
+                // Add parameter to parameters
+                $parameters[$parameterName] = $defaultValue;
             }
         }
-
         return $parameters;
     }
 
