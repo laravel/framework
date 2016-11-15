@@ -106,7 +106,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      */
     public function putFile($path, $file, $visibility = null, $mimeType = null)
     {
-        return $this->putFileAs($path, $file, $file->hashName(), $visibility);
+        return $this->putFileAs($path, $file, $file->hashName(), $visibility, $mimeType);
     }
 
     /**
