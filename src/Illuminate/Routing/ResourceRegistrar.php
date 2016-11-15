@@ -209,8 +209,12 @@ class ResourceRegistrar
      */
     protected function getResourceName($resource, $method, $options)
     {
-        if (isset($options['names'][$method])) {
-            return $options['names'][$method];
+        if (isset($options['names'])) {
+            if (is_string($options['names'])) {
+                $resource = $options['names'];
+            } elseif (isset($options['names'][$method])) {
+                return $options['names'][$method];
+            }
         }
 
         // If a global prefix has been assigned to all names for this resource, we will
