@@ -796,6 +796,21 @@ if (! function_exists('trans_choice')) {
     }
 }
 
+if (! function_exists('__')) {
+    /**
+     * Translate the given message.
+     *
+     * @param  string  $id
+     * @param  array   $replace
+     * @param  string  $locale
+     * @return \Illuminate\Contracts\Translation\Translator|string
+     */
+    function __($id = null, $replace = [], $locale = null)
+    {
+        return app('translator')->getJson($id, $replace, $locale);
+    }
+}
+
 if (! function_exists('url')) {
     /**
      * Generate a url for the application.
