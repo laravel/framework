@@ -84,7 +84,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
         if ($visibility = $this->parseVisibility($visibility)) {
             $config['visibility'] = $visibility;
         }
-        if (!empty($mimeType)) {
+        if (! empty($mimeType)) {
             $config['mimetype'] = $mimeType;
         }
 
