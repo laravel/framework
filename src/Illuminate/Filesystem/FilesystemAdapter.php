@@ -71,18 +71,21 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      * @param  string  $path
      * @param  string|resource  $contents
      * @param  string  $visibility
+     * @param  string  $mimeType
      * @return bool
      */
-    public function put($path, $contents, $visibility = null)
+    public function put($path, $contents, $visibility = null, $mimeType = null)
     {
         if ($contents instanceof File || $contents instanceof UploadedFile) {
             return $this->putFile($path, $contents, $visibility);
         }
 
+        $config = [];
         if ($visibility = $this->parseVisibility($visibility)) {
-            $config = ['visibility' => $visibility];
-        } else {
-            $config = [];
+            $config['visibility'] = $visibility;
+        }
+        if (!empty($mimeType)) {
+            $config['mimetype'] = $mimeType;
         }
 
         if (is_resource($contents)) {
