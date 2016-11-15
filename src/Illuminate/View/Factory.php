@@ -848,7 +848,7 @@ class Factory implements FactoryContract
             return $default;
         }
 
-        return implode(array_reverse($this->pushes[$section]));
+        return implode($this->pushes[$section]);
     }
 
     /**
