@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Eloquent;
 
 use Closure;
-use DateTime;
 use Exception;
 use ArrayAccess;
 use Carbon\Carbon;
