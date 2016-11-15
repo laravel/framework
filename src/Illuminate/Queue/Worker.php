@@ -4,7 +4,6 @@ namespace Illuminate\Queue;
 
 use Exception;
 use Throwable;
-use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Symfony\Component\Debug\Exception\FatalThrowableError;

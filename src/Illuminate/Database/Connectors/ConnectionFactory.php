@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Connectors;
 
-use PDO;
 use PDOException;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;

@@ -1,6 +1,6 @@
 # Release Notes for 5.3.x
 
-## [Unreleased]
+## v5.3.23 (2016-11-14)
 
 ### Added
 - Added database slave failover ([#15553](https://github.com/laravel/framework/pull/15553), [ed28c7f](https://github.com/laravel/framework/commit/ed28c7fa11d3754d618606bf8fc2f00690cfff66))
@@ -13,6 +13,7 @@
 - Allow loading specific columns while eager-loading Eloquent relationships ([#16327](https://github.com/laravel/framework/pull/16327))
 - Allow Eloquent `HasOne` relationships to return a "default model" ([#16198](https://github.com/laravel/framework/pull/16198), [9b59f67](https://github.com/laravel/framework/commit/9b59f67daeb63bad11af9b70b4a35c6435240ff7))
 - Allow `SlackAttachment` color override ([#16360](https://github.com/laravel/framework/pull/16360))
+- Allow chaining factory calls to `define()` and `state()` ([#16389](https://github.com/laravel/framework/pull/16389))
 
 ### Changed
 - Dried-up console parser and extract token parsing ([#16197](https://github.com/laravel/framework/pull/16197))
@@ -27,6 +28,7 @@
 - Fail test, instead of throwing an exception when `seeJson()` fails ([#16350](https://github.com/laravel/framework/pull/16350))
 - Call `sendPerformed()` for all mail transports ([#16366](https://github.com/laravel/framework/pull/16366))
 - Add `X-SES-Message-ID` header in `SesTransport::send()` ([#16366](https://github.com/laravel/framework/pull/16366))
+- Throw `BroadcastException` when `PusherBroadcaster::broadcast()` fails ([#16398](https://github.com/laravel/framework/pull/16398))
 
 ### Fixed
 - Catch errors when handling a failed job ([#16212](https://github.com/laravel/framework/pull/16212))
@@ -36,7 +38,8 @@
 - Fixed wrapping and escaping in SQL Server `dropIfExists()` ([#16279](https://github.com/laravel/framework/pull/16279))
 - Throw `ManuallyFailedException` if `InteractsWithQueue::fail()` is called manually ([#16318](https://github.com/laravel/framework/pull/16318), [a20fa97](https://github.com/laravel/framework/commit/a20fa97445be786f9f5f09e2e9b905a00064b2da))
 - Catch `Throwable` in timezone validation ([#16344](https://github.com/laravel/framework/pull/16344))
-- Fix `Auth::onceUsingId()` by reversing the order of retrieving the id in `SessionGuard` ([#16373](https://github.com/laravel/framework/pull/16373))
+- Fixed `Auth::onceUsingId()` by reversing the order of retrieving the id in `SessionGuard` ([#16373](https://github.com/laravel/framework/pull/16373))
+- Fixed bindings on update statements with advanced joins ([#16368](https://github.com/laravel/framework/pull/16368))
 
 
 ## v5.3.22 (2016-11-01)
