@@ -829,7 +829,7 @@ class Connection implements ConnectionInterface
      */
     protected function reconnectIfMissingConnection()
     {
-        if (is_null($this->getPdo()) || is_null($this->getReadPdo())) {
+        if (is_null($this->pdo)) {
             $this->reconnect();
         }
     }
