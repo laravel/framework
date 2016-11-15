@@ -127,7 +127,7 @@ class FileLoader implements LoaderInterface
     protected function loadJson($path, $locale)
     {
         if ($this->files->exists($full = "{$path}/{$locale}.json")) {
-            return (array) json_decode($this->files->get($full));
+            return json_decode($this->files->get($full), true);
         }
 
         return [];
