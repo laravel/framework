@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Collection;
 
-class BelongsTo extends Relation
+class BelongsTo extends Relation implements MutableRelation
 {
     /**
      * The foreign key of the parent model.
@@ -64,6 +64,18 @@ class BelongsTo extends Relation
     public function getResults()
     {
         return $this->query->first();
+    }
+
+    /**
+     * Set the the relationship value.
+     *
+     * @param $value
+     *
+     * @return void
+     */
+    public function setValue($value)
+    {
+        $this->associate($value);
     }
 
     /**

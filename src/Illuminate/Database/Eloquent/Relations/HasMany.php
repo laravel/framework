@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 
 class HasMany extends HasOneOrMany
 {
@@ -14,6 +15,18 @@ class HasMany extends HasOneOrMany
     public function getResults()
     {
         return $this->query->get();
+    }
+
+    /**
+     * Set the the relationship value.
+     *
+     * @param $value
+     *
+     * @return void
+     */
+    public function setValue($value)
+    {
+        $this->saveMany($value instanceof Model ? [$value] : $value);
     }
 
     /**
