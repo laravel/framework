@@ -101,9 +101,10 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      * @param  string  $path
      * @param  \Illuminate\Http\UploadedFile  $file
      * @param  string  $visibility
+     * @param  string  $mimeType
      * @return string|false
      */
-    public function putFile($path, $file, $visibility = null)
+    public function putFile($path, $file, $visibility = null, $mimeType = null)
     {
         return $this->putFileAs($path, $file, $file->hashName(), $visibility);
     }
@@ -115,13 +116,14 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      * @param  \Illuminate\Http\File|\Illuminate\Http\UploadedFile  $file
      * @param  string  $name
      * @param  string  $visibility
+     * @param  string  $mimeType
      * @return string|false
      */
-    public function putFileAs($path, $file, $name, $visibility = null)
+    public function putFileAs($path, $file, $name, $visibility = null, $mimeType = null)
     {
         $stream = fopen($file->getRealPath(), 'r+');
 
-        $result = $this->put($path = trim($path.'/'.$name, '/'), $stream, $visibility);
+        $result = $this->put($path = trim($path.'/'.$name, '/'), $stream, $visibility, $mimeType);
 
         if (is_resource($stream)) {
             fclose($stream);
