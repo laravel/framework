@@ -46,13 +46,14 @@ class Redirector
     /**
      * Create a new redirect response to the previous location.
      *
-     * @param  int    $status
-     * @param  array  $headers
+     * @param  int   $status
+     * @param  array $headers
+     * @param  bool  $fallback
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function back($status = 302, $headers = [])
+    public function back($status = 302, $headers = [], $fallback = false)
     {
-        $back = $this->generator->previous();
+        $back = $this->generator->previous($fallback);
 
         return $this->createRedirect($back, $status, $headers);
     }
