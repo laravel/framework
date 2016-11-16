@@ -74,7 +74,7 @@ class ScheduleRunCommand extends Command
                 break;
             }
 
-            //pause for a minimum of one second.
+            // pause for a minimum of one second.
             $sleepTime = max(1, $interval - (time() - $start));
             sleep($sleepTime);
         }
