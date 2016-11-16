@@ -42,6 +42,16 @@ class ResourceRegistrar
     protected static $singularParameters = true;
 
     /**
+     * Uri translations.
+     *
+     * @var array
+     */
+    protected static $uriTranslations = [
+        'create' => 'create',
+        'edit' => 'edit',
+    ];
+
+    /**
      * Create a new resource registrar instance.
      *
      * @param  \Illuminate\Routing\Router  $router
@@ -290,7 +300,7 @@ class ResourceRegistrar
      */
     protected function addResourceCreate($name, $base, $controller, $options)
     {
-        $uri = $this->getResourceUri($name).'/create';
+        $uri = $this->getResourceUri($name).'/'.static::$uriTranslations['create'];
 
         $action = $this->getResourceAction($name, $controller, 'create', $options);
 
@@ -344,7 +354,7 @@ class ResourceRegistrar
      */
     protected function addResourceEdit($name, $base, $controller, $options)
     {
-        $uri = $this->getResourceUri($name).'/{'.$base.'}/edit';
+        $uri = $this->getResourceUri($name).'/{'.$base.'}/'.static::$uriTranslations['edit'];
 
         $action = $this->getResourceAction($name, $controller, 'edit', $options);
 
@@ -417,5 +427,26 @@ class ResourceRegistrar
     public static function setParameters(array $parameters = [])
     {
         static::$parameterMap = $parameters;
+    }
+
+    /**
+     * Get the uri translations.
+     *
+     * @return array
+     */
+    public static function getUriTranslations()
+    {
+        return static::$uriTranslations;
+    }
+
+    /**
+     * Set the uri translations.
+     *
+     * @param  array $translations
+     * @return void
+     */
+    public static function setUriTranslations(array $translations = [])
+    {
+        static::$uriTranslations = array_merge(static::$uriTranslations, $translations);
     }
 }
