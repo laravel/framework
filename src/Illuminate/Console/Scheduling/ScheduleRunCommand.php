@@ -49,8 +49,8 @@ class ScheduleRunCommand extends Command
     public function getOptions()
     {
         return [
-            ['loop', 'l', InputOption::VALUE_NONE, 'Don\'t terminate. Run forever'],
-            ['interval', null, InputOption::VALUE_REQUIRED, 'Run every interval seconds. Default: 60', 60],
+            ['daemon', null, InputOption::VALUE_NONE, 'Run schedule in daemon mode'],
+            ['interval', null, InputOption::VALUE_REQUIRED, 'Run every interval seconds', 60],
         ];
     }
 
@@ -61,7 +61,7 @@ class ScheduleRunCommand extends Command
      */
     public function fire()
     {
-        $loop = $this->option('loop');
+        $daemon = $this->option('daemon');
         $interval = $this->option('interval');
         if (! is_numeric($interval)) {
             $this->error('Interval must be a positive number');
@@ -70,7 +70,7 @@ class ScheduleRunCommand extends Command
         while (true) {
             $start = time();
             $this->doScheduleDueEvents();
-            if (! $loop) {
+            if (! $daemon) {
                 break;
             }
 
