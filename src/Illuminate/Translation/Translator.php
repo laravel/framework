@@ -88,33 +88,6 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     }
 
     /**
-     * Get the JSON translation for a given key.
-     *
-     * @param  string  $key
-     * @param  array   $replace
-     * @param  string  $locale
-     * @return string
-     */
-    public function getJson($key, array $replace = [], $locale = null)
-    {
-        $locale = $locale ?: $this->locale;
-
-        $this->load('*', '*', $locale);
-
-        $line = Arr::get($this->loaded['*']['*'][$locale], $key);
-
-        if (! isset($line)) {
-            $alternativeLine = $this->get($key, $replace, $locale);
-
-            if ($alternativeLine != $key) {
-                return $alternativeLine;
-            }
-        }
-
-        return $this->makeJsonReplacements($line ?: $key, $replace);
-    }
-
-    /**
      * Get the translation for the given key.
      *
      * @param  string  $key
@@ -152,6 +125,34 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         }
 
         return $line;
+    }
+
+    /**
+     * Get the translation for a given key from the JSON translation files.
+     *
+     * @param  string  $key
+     * @param  array  $replace
+     * @param  string  $locale
+     * @return string
+     */
+    public function getFromJson($key, array $replace = [], $locale = null)
+    {
+        $locale = $locale ?: $this->locale;
+
+        $this->load('*', '*', $locale);
+
+        $line = isset($this->loaded['*']['*'][$locale][$key])
+                    ? $this->loaded['*']['*'][$locale][$key] : null;
+
+        if (! isset($line)) {
+            $fallbackLine = $this->get($key, $replace, $locale);
+
+            if ($fallbackLine !== $key) {
+                return $fallbackLine;
+            }
+        }
+
+        return $this->makeJsonReplacements($line ?: $key, $replace);
     }
 
     /**
@@ -215,7 +216,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     }
 
     /**
-     * Make the place-holder replacements on a JSON line.
+     * Make the place-holder replacements on a JSON loaded line.
      *
      * @param  string  $line
      * @param  array   $replace

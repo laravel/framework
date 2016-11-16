@@ -800,14 +800,14 @@ if (! function_exists('__')) {
     /**
      * Translate the given message.
      *
-     * @param  string  $id
-     * @param  array   $replace
+     * @param  string  $key
+     * @param  array  $replace
      * @param  string  $locale
      * @return \Illuminate\Contracts\Translation\Translator|string
      */
-    function __($id = null, $replace = [], $locale = null)
+    function __($key = null, $replace = [], $locale = null)
     {
-        return app('translator')->getJson($id, $replace, $locale);
+        return app('translator')->getFromJson($key, $replace, $locale);
     }
 }
 
