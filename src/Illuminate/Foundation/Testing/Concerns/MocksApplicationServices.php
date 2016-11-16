@@ -103,7 +103,7 @@ trait MocksApplicationServices
         $mock->shouldReceive('fire')->andReturnUsing(function ($called) {
             $this->firedEvents[] = $called;
         });
-        
+
         $mock->shouldReceive('until');
 
         $this->app->instance('events', $mock);
