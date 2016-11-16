@@ -82,6 +82,8 @@ class ScheduleRunCommand extends Command
 
     /**
      * Trigger due events.
+     *
+     * @return void
      */
     private function doScheduleDueEvents()
     {
