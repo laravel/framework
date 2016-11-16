@@ -57,6 +57,8 @@ class SyncQueue extends Queue implements QueueContract
      * @param  \Illuminate\Queue\Jobs\Job  $queueJob
      * @param  \Exception  $e
      * @return void
+     *
+     * @throws \Exception
      */
     protected function handleSyncException($queueJob, $e)
     {

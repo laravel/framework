@@ -128,6 +128,34 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     }
 
     /**
+     * Get the translation for a given key from the JSON translation files.
+     *
+     * @param  string  $key
+     * @param  array  $replace
+     * @param  string  $locale
+     * @return string
+     */
+    public function getFromJson($key, array $replace = [], $locale = null)
+    {
+        $locale = $locale ?: $this->locale;
+
+        $this->load('*', '*', $locale);
+
+        $line = isset($this->loaded['*']['*'][$locale][$key])
+                    ? $this->loaded['*']['*'][$locale][$key] : null;
+
+        if (! isset($line)) {
+            $fallbackLine = $this->get($key, $replace, $locale);
+
+            if ($fallbackLine !== $key) {
+                return $fallbackLine;
+            }
+        }
+
+        return $this->makeJsonReplacements($line ?: $key, $replace);
+    }
+
+    /**
      * Add translation lines to the given locale.
      *
      * @param  array  $lines
@@ -181,6 +209,28 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
                 [':'.$key, ':'.Str::upper($key), ':'.Str::ucfirst($key)],
                 [$value, Str::upper($value), Str::ucfirst($value)],
                 $line
+            );
+        }
+
+        return $line;
+    }
+
+    /**
+     * Make the place-holder replacements on a JSON loaded line.
+     *
+     * @param  string  $line
+     * @param  array   $replace
+     * @return string
+     */
+    protected function makeJsonReplacements($line, array $replace)
+    {
+        preg_match_all('#:(?:[a-zA-Z1-9]*)#s', $line, $placeholders);
+
+        $placeholders = $placeholders[0];
+
+        foreach ($placeholders as $i => $key) {
+            $line = str_replace_first(
+                $key, isset($replace[$i]) ? $replace[$i] : $key, $line
             );
         }
 
