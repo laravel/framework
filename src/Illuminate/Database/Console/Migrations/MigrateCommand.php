@@ -63,6 +63,7 @@ class MigrateCommand extends BaseCommand
         $this->migrator->run($this->getMigrationPaths(), [
             'pretend' => $this->option('pretend'),
             'step' => $this->option('step'),
+            'ignore' => $this->option('ignore'),
         ]);
 
         // Once the migrator has run we will grab the note output and send it out to
@@ -115,6 +116,8 @@ class MigrateCommand extends BaseCommand
             ['seed', null, InputOption::VALUE_NONE, 'Indicates if the seed task should be re-run.'],
 
             ['step', null, InputOption::VALUE_NONE, 'Force the migrations to be run so they can be rolled back individually.'],
+
+            ['ignore', null, InputOption::VALUE_NONE, 'Continue with migrations even if there are errors.']
         ];
     }
 }
