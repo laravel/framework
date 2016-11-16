@@ -1,5 +1,18 @@
 # Release Notes for 5.3.x
 
+## [Unreleased]
+
+### Added
+- Added `AuthenticateSession` middleware ([fc302a6](https://github.com/laravel/framework/commit/fc302a6667f9dcce53395d01d8e6ba752ea62955))
+- Support arrays in `HasOne::withDefault()` ([#16382](https://github.com/laravel/framework/pull/16382))
+- Define route basename for resources ([#16352](https://github.com/laravel/framework/pull/16352))
+- Added `$fallback` parameter to `Redirector::back()` ([#16426](https://github.com/laravel/framework/pull/16426))
+
+### Fixed
+- Pass `PheanstalkJob` to Pheanstalk's `delete()` method ([#16415](https://github.com/laravel/framework/pull/16415))
+- Don't call PDO callback in `reconnectIfMissingConnection()` until it is needed ([#16422](https://github.com/laravel/framework/pull/16422))
+
+
 ## v5.3.23 (2016-11-14)
 
 ### Added
