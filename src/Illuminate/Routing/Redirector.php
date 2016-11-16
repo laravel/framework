@@ -46,9 +46,9 @@ class Redirector
     /**
      * Create a new redirect response to the previous location.
      *
-     * @param  int   $status
-     * @param  array $headers
-     * @param  bool  $fallback
+     * @param  int    $status
+     * @param  array  $headers
+     * @param  string $fallback
      * @return \Illuminate\Http\RedirectResponse
      */
     public function back($status = 302, $headers = [], $fallback = false)
