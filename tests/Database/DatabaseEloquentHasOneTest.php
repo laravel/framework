@@ -23,13 +23,51 @@ class DatabaseEloquentHasOneTest extends PHPUnit_Framework_TestCase
 
         $this->builder->shouldReceive('first')->once()->andReturnNull();
 
-        $newModel = m::mock('Illuminate\Database\Eloquent\Model');
-
-        $newModel->shouldReceive('setAttribute')->once()->with('foreign_key', 1)->andReturn($newModel);
+        $newModel = new EloquentHasOneModelStub();
 
         $this->related->shouldReceive('newInstance')->once()->andReturn($newModel);
 
-        $this->assertInstanceOf('Illuminate\Database\Eloquent\Model', $relation->getResults());
+        $this->assertSame($newModel, $relation->getResults());
+
+        $this->assertSame(1, $newModel->getAttribute('foreign_key'));
+    }
+
+    public function testHasOneWithDynamicDefault()
+    {
+        $relation = $this->getRelation()->withDefault(function ($newModel) {
+            $newModel->username = 'taylor';
+        });
+
+        $this->builder->shouldReceive('first')->once()->andReturnNull();
+
+        $newModel = new EloquentHasOneModelStub();
+
+        $this->related->shouldReceive('newInstance')->once()->andReturn($newModel);
+
+        $this->assertSame($newModel, $relation->getResults());
+
+        $this->assertSame('taylor', $newModel->username);
+
+        $this->assertSame(1, $newModel->getAttribute('foreign_key'));
+    }
+
+    public function testHasOneWithArrayDefault()
+    {
+        $attributes = ['username' => 'taylor'];
+
+        $relation = $this->getRelation()->withDefault($attributes);
+
+        $this->builder->shouldReceive('first')->once()->andReturnNull();
+
+        $newModel = new EloquentHasOneModelStub();
+
+        $this->related->shouldReceive('newInstance')->once()->andReturn($newModel);
+
+        $this->assertSame($newModel, $relation->getResults());
+
+        $this->assertSame('taylor', $newModel->username);
+
+        $this->assertSame(1, $newModel->getAttribute('foreign_key'));
     }
 
     public function testSaveMethodSetsForeignKeyOnModel()

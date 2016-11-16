@@ -304,18 +304,6 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         echo ', Hello!';
         $factory->stopPush();
         $this->assertEquals('hi, Hello!', $factory->yieldPushContent('foo'));
-
-        // mimic a parent view is rendering
-        $factory->incrementRender();
-        $factory->startPush('foo');
-        echo 'Dear ';
-        $factory->stopPush();
-        $factory->startPush('foo');
-        echo 'friend';
-        $factory->stopPush();
-        $factory->decrementRender();
-
-        $this->assertEquals('Dear friendhi, Hello!', $factory->yieldPushContent('foo'));
     }
 
     public function testSessionAppending()
