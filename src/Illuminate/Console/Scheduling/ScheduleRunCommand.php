@@ -3,6 +3,7 @@
 namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputOption;
 
 class ScheduleRunCommand extends Command
@@ -64,8 +65,7 @@ class ScheduleRunCommand extends Command
         $daemon = $this->option('daemon');
         $interval = $this->option('interval');
         if (! is_numeric($interval)) {
-            $this->error('Interval must be a positive number');
-            exit(1);
+            throw new InvalidArgumentException('Interval must be a positive number');
         }
         while (true) {
             $start = time();
