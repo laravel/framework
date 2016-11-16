@@ -63,8 +63,8 @@ class ScheduleRunCommand extends Command
     {
         $loop = $this->option('loop');
         $interval = $this->option('interval');
-        if (! is_int($interval) && $interval <= 0) {
-            $this->error('Interval must be an 1 <= integer <= 86400');
+        if (! is_numeric($interval)) {
+            $this->error('Interval must be a positive number');
             exit(1);
         }
         while (true) {
