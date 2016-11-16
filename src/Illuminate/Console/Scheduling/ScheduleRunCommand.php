@@ -85,7 +85,7 @@ class ScheduleRunCommand extends Command
      *
      * @return void
      */
-    private function doScheduleDueEvents()
+    protected function doScheduleDueEvents()
     {
         $events = $this->schedule->dueEvents($this->laravel);
 
