@@ -20,6 +20,7 @@
 - Support job-based queue options ([#16257](https://github.com/laravel/framework/pull/16257), [2382dc3](https://github.com/laravel/framework/commit/2382dc3f374bee7ad966d11ecb35a1429d9a09e8), [ee385fa](https://github.com/laravel/framework/commit/ee385fa5eab0c4642f47636f0e033e982d402bb9))
 - Added higher-order messages for the collections ([#16267](https://github.com/laravel/framework/pull/16267), [e276b3d](https://github.com/laravel/framework/commit/e276b3d4bf2a124c4eb5975a8a2724b8c806139a), [2b7ab30](https://github.com/laravel/framework/commit/2b7ab30e0ec56ac4e4093d7f2775da98086c8000), [#16274](https://github.com/laravel/framework/pull/16274))
 - Added Blade components and slots ([e8d2a45](https://github.com/laravel/framework/commit/e8d2a45479abd2ba6b524293ce5cfb599c8bf910))
+- Added JSON loader for translations and `__()` helper ([#16424](https://github.com/laravel/framework/pull/16424))
 
 ### Changed
 - Consider interfaces and extended classes in `Gate::resolvePolicyCallback()` ([#15757](https://github.com/laravel/framework/pull/15757))
@@ -39,3 +40,5 @@
 - Use parent connection if related model doesn't specify one ([#16103](https://github.com/laravel/framework/pull/16103))
 - Use variable-length method signature for `CookieJar::queue()` ([#16290](https://github.com/laravel/framework/pull/16290), [ddabaaa](https://github.com/laravel/framework/commit/ddabaaa6a8ce16876ddec36be1391eae14649aea))
 - Enforce an `orderBy` clause for `chunk()` and `chunkById()` ([#16283](https://github.com/laravel/framework/pull/16283))
+- Don't reverse the order of `@push`ed data ([#16325](https://github.com/laravel/framework/pull/16325))
+- Use the model's primary key instead of `id` in `Model::getForeignKey()` ([#16396](https://github.com/laravel/framework/pull/16396))
