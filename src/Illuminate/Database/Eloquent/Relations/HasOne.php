@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
-use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -77,12 +76,22 @@ class HasOne extends HasOneOrMany
      */
     protected function getDefaultFor(Model $model)
     {
-        if (is_callable($this->withDefault)) {
-            return call_user_func($this->withDefault);
-        } elseif ($this->withDefault === true) {
-            return $this->related->newInstance()->setAttribute(
-                $this->getPlainForeignKey(), $model->getAttribute($this->localKey)
-            );
+        if (! $this->withDefault) {
+            return;
         }
+
+        $instance = $this->related->newInstance()->setAttribute(
+            $this->getPlainForeignKey(), $model->getAttribute($this->localKey)
+        );
+
+        if (is_callable($this->withDefault)) {
+            return call_user_func($this->withDefault, $instance) ?: $instance;
+        }
+
+        if (is_array($this->withDefault)) {
+            $instance->forceFill($this->withDefault);
+        }
+
+        return $instance;
     }
 }
