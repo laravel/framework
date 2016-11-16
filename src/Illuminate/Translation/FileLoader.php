@@ -50,6 +50,10 @@ class FileLoader implements LoaderInterface
      */
     public function load($locale, $group, $namespace = null)
     {
+        if ($group == '*' && $namespace == '*') {
+            return $this->loadJson($this->path, $locale);
+        }
+
         if (is_null($namespace) || $namespace == '*') {
             return $this->loadPath($this->path, $locale, $group);
         }
@@ -108,6 +112,22 @@ class FileLoader implements LoaderInterface
     {
         if ($this->files->exists($full = "{$path}/{$locale}/{$group}.php")) {
             return $this->files->getRequire($full);
+        }
+
+        return [];
+    }
+
+    /**
+     * Load a locale from a given JSON file.
+     *
+     * @param  string  $path
+     * @param  string  $locale
+     * @return array
+     */
+    protected function loadJson($path, $locale)
+    {
+        if ($this->files->exists($full = "{$path}/{$locale}.json")) {
+            return json_decode($this->files->get($full), true);
         }
 
         return [];
