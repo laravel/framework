@@ -139,6 +139,32 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Get the current path for the Router.
+     *
+     * @return string
+     */
+    public function pathForRouter()
+    {
+        $path = $this->path();
+
+        if ($this->locale) {
+            $path = str_replace_first($this->locale.'/', '', $path);
+        }
+
+        return $path;
+    }
+
+    /**
+     * Return the locale of the request.
+     * 
+     * @return string
+     */
+    public function getLocale()
+    {
+        return $this->locale;
+    }
+
+    /**
      * Get the current encoded path info for the request.
      *
      * @return string
@@ -935,6 +961,16 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         } else {
             return $route->parameter($param);
         }
+    }
+
+    /**
+     * Determine if the request locale is the default one.
+     *
+     * @return bool
+     */
+    public function hasDefaultLocale()
+    {
+        return $this->locale == $this->defaultLocale;
     }
 
     /**

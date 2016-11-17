@@ -143,6 +143,8 @@ class Kernel implements KernelContract
 
         $this->bootstrap();
 
+        $request->setDefaultLocale($this->app->getFallbackLocale());
+
         return (new Pipeline($this->app))
                     ->send($request)
                     ->through($this->app->shouldSkipMiddleware() ? [] : $this->middleware)
