@@ -2794,6 +2794,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Determine whether a value should be encrypted.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function isBase64Castable($key)
+    {
+        return $this->hasCast($key, ['base64']);
+    }
+
+    /**
      * Determine whether a value is JSON castable for inbound manipulation.
      *
      * @param  string  $key
@@ -2850,6 +2861,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
                 return new BaseCollection($this->fromJson($value));
             case 'encrypt':
                 return decrypt($value);
+            case 'base64':
+                return base64_decode($value);
             case 'date':
             case 'datetime':
                 return $this->asDateTime($value);
@@ -2887,6 +2900,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         if ($this->isEncryptCastable($key) && ! is_null($value)) {
             $value = $this->asEncrypted($value);
+        }
+
+        if ($this->isBase64Castable($key) && ! is_null($value)) {
+            $value = $this->asBase64($value);
         }
 
         if ($this->isJsonCastable($key) && ! is_null($value)) {
@@ -3061,6 +3078,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected function asEncrypted($value)
     {
         return encrypt($value);
+    }
+
+    /**
+     * Encode the given value.
+     *
+     * @param  mixed  $value
+     * @return string
+     */
+    protected function asBase64($value)
+    {
+        return base64_encode($value);
     }
 
     /**
