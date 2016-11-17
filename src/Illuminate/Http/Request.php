@@ -156,7 +156,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 
     /**
      * Return the locale of the request.
-     * 
+     *
      * @return string
      */
     public function getLocale()
