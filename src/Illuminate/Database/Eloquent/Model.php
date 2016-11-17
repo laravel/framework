@@ -2790,7 +2790,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function isEncryptCastable($key)
     {
-        return $this->hasCast($key, ['encrypt']);
+        return $this->hasCast($key, ['encrypted']);
     }
 
     /**
