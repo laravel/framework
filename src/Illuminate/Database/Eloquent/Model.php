@@ -2799,11 +2799,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param string $key
      * @return bool
      */
-    protected function isEncryptCastable($key) 
+    protected function isEncryptCastable($key)
     {
         return $this->hasCast($key, ['encrypt']);
     }
-    
+
     /**
      * Get the type of cast for a model attribute.
      *
