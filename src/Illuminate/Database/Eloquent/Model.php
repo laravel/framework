@@ -161,6 +161,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected $casts = [];
 
     /**
+     * The attributes that should be encrypted.
+     *
+     * @var array
+     */
+    protected $encrypts = [];
+
+    /**
      * The relationships that should be touched on save.
      *
      * @var array
@@ -2460,6 +2467,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             );
         }
 
+        // Decrypt any attributes that are marked as encryptable before casting.
+        foreach ($this->encrypts as $key) {
+            $attributes[$key] = decrypt($attributes[$key]);
+        }
+
         // Next we will handle any casts that have been setup for this model and cast
         // the values to their appropriate type. If the attribute has a mutator we
         // will not perform the cast on those attributes to avoid any confusion.
@@ -2627,6 +2639,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return $this->mutateAttribute($key, $value);
         }
 
+        // If the attribute is encryptable, decrypt its value before casting.
+        if ($this->isEncryptable($key)) {
+            $value = decrypt($value);
+        }
+
         // If the attribute exists within the cast array, we will convert it to
         // an appropriate native PHP type dependant upon the associated value
         // given with the key in the pair. Dayle made this comment line up.
@@ -2788,9 +2805,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string  $key
      * @return bool
      */
-    protected function isEncryptCastable($key)
+    protected function isEncryptable($key)
     {
-        return $this->hasCast($key, ['encrypted']);
+        return in_array($key, $this->encrypts);
     }
 
     /**
@@ -2848,8 +2865,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
                 return $this->fromJson($value);
             case 'collection':
                 return new BaseCollection($this->fromJson($value));
-            case 'encrypt':
-                return decrypt($value);
             case 'date':
             case 'datetime':
                 return $this->asDateTime($value);
@@ -2885,12 +2900,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $value = $this->fromDateTime($value);
         }
 
-        if ($this->isEncryptCastable($key) && ! is_null($value)) {
-            $value = $this->asEncrypted($value);
-        }
-
         if ($this->isJsonCastable($key) && ! is_null($value)) {
             $value = $this->asJson($value);
+        }
+
+        if ($this->isEncryptable($key) && ! is_null($value)) {
+            $value = $this->asEncrypted($value);
         }
 
         // If this attribute contains a JSON ->, we'll set the proper value in the
