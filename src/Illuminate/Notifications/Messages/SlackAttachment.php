@@ -40,6 +40,13 @@ class SlackAttachment
     public $fields;
 
     /**
+     * The fields containing markdown.
+     *
+     * @var array
+     */
+    public $markdown;
+
+    /**
      * Set the title of the attachment.
      *
      * @param  string  $title
@@ -89,6 +96,19 @@ class SlackAttachment
     public function fields(array $fields)
     {
         $this->fields = $fields;
+
+        return $this;
+    }
+
+    /**
+     * Set the fields containing markdown.
+     *
+     * @param  array  $fields
+     * @return $this
+     */
+    public function markdown(array $fields)
+    {
+        $this->markdown = $fields;
 
         return $this;
     }
