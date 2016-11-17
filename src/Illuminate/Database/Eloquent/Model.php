@@ -2799,7 +2799,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param string $key
      * @return bool
      */
-    protected function isEncryptCastable($key) {
+    protected function isEncryptCastable($key) 
+    {
         return $this->hasCast($key, ['encrypt']);
     }
     
@@ -2853,7 +2854,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             case 'timestamp':
                 return $this->asTimeStamp($value);
             case 'encrypt':
-                return decrypt($value);                
+                return decrypt($value);
             default:
                 return $value;
         }
@@ -2884,10 +2885,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $value = $this->fromDateTime($value);
         }
 
-        if($this->isEncryptCastable($key) && ! is_null($value)) {
+        if ($this->isEncryptCastable($key) && ! is_null($value)) {
             $value = $this->asEncrypted($value);
         }
-        
+
         if ($this->isJsonCastable($key) && ! is_null($value)) {
             $value = $this->asJson($value);
         }
@@ -3061,7 +3062,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         return json_encode($value);
     }
-    
+
     /**
      * Decode the given JSON back into an array or object.
      *
@@ -3075,7 +3076,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Encrypt to given value
+     * Encrypt to given value.
      *
      * @param mixed $value
      * @return string
@@ -3084,7 +3085,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         return encrypt($value);
     }
-    
+
     /**
      * Clone the model into a new, non-existing instance.
      *
