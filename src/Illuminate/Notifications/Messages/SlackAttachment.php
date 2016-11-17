@@ -2,6 +2,8 @@
 
 namespace Illuminate\Notifications\Messages;
 
+use Carbon\Carbon;
+
 class SlackAttachment
 {
     /**
@@ -45,6 +47,20 @@ class SlackAttachment
      * @var array
      */
     public $markdown;
+
+    /**
+     * The attachment's footer.
+     *
+     * @var string
+     */
+    public $footer;
+
+    /**
+     * The attachment's timestamp.
+     *
+     * @var int
+     */
+    public $timestamp;
 
     /**
      * Set the title of the attachment.
@@ -109,6 +125,32 @@ class SlackAttachment
     public function markdown(array $fields)
     {
         $this->markdown = $fields;
+
+        return $this;
+    }
+
+    /**
+     * Set the footer content.
+     *
+     * @param  string  $footer
+     * @return $this
+     */
+    public function footer($footer)
+    {
+        $this->footer = $footer;
+
+        return $this;
+    }
+
+    /**
+     * Set the timestamp.
+     *
+     * @param  Carbon  $timestamp
+     * @return $this
+     */
+    public function timestamp(Carbon $timestamp)
+    {
+        $this->timestamp = $timestamp->timestamp;
 
         return $this;
     }
