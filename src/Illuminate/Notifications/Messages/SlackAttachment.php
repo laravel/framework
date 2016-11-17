@@ -170,7 +170,7 @@ class SlackAttachment
      */
     public function timestamp(Carbon $timestamp)
     {
-        $this->timestamp = $timestamp->timestamp;
+        $this->timestamp = $timestamp->getTimestamp();
 
         return $this;
     }
