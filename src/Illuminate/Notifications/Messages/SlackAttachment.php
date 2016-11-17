@@ -158,7 +158,7 @@ class SlackAttachment
     public function footerIcon($icon)
     {
         $this->footerIcon = $icon;
-        
+
         return $this;
     }
 
