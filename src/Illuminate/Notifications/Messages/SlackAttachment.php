@@ -56,6 +56,13 @@ class SlackAttachment
     public $footer;
 
     /**
+     * The attachment's footer icon.
+     *
+     * @var string
+     */
+    public $footerIcon;
+
+    /**
      * The attachment's timestamp.
      *
      * @var int
@@ -139,6 +146,18 @@ class SlackAttachment
     {
         $this->footer = $footer;
 
+        return $this;
+    }
+
+    /**
+     * Set the footer icon.
+     *
+     * @param  string $icon
+     * @return $this
+     */
+    public function footerIcon($icon)
+    {
+        $this->footerIcon = $icon;
         return $this;
     }
 
