@@ -1,6 +1,7 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Encryption\Encrypter;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -1390,6 +1391,48 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertNull($array['timestampAttribute']);
     }
 
+    public function testModelAttributesAreEncryptedWhenPresentInEncryptsArray()
+    {
+        $app = app();
+
+        $app->instance('encrypter', new Encrypter(str_repeat('a', 16)));
+
+        $model = new EloquentModelEncryptsStub;
+        $model->setDateFormat('Y-m-d H:i:s');
+        $model->simpleAttribute = 'test';
+        $model->intAttribute = '3';
+        $model->jsonAttribute = ['foo' => 'bar'];
+        $model->datetimeAttribute = '1969-07-20 22:56:00';
+
+        $this->assertInternalType('string', $model->simpleAttribute);
+        $this->assertEquals('test', $model->simpleAttribute);
+        $this->assertInternalType('int', $model->intAttribute);
+        $this->assertInternalType('array', $model->jsonAttribute);
+        $this->assertEquals(['foo' => 'bar'], $model->jsonAttribute);
+        $this->assertInstanceOf('Carbon\Carbon', $model->datetimeAttribute);
+        $this->assertEquals('1969-07-20 22:56:00', $model->datetimeAttribute->toDateTimeString());
+
+        $this->assertNotEquals('test', $model->simpleAttributeValue());
+        $this->assertNotEquals('3', $model->intAttributeValue());
+        $this->assertNotEquals('{"foo":"bar"}', $model->jsonAttributeValue());
+        $this->assertNotEquals('1969-07-20 22:56:00', $model->datetimeAttributeValue());
+
+        $this->assertInternalType('string', $model->simpleAttributeValue());
+        $this->assertInternalType('string', $model->intAttributeValue());
+        $this->assertInternalType('string', $model->jsonAttributeValue());
+        $this->assertInternalType('string', $model->datetimeAttributeValue());
+
+        $arr = $model->toArray();
+        $this->assertInternalType('int', $arr['intAttribute']);
+        $this->assertInternalType('array', $arr['jsonAttribute']);
+        $this->assertEquals('test', $arr['simpleAttribute']);
+        $this->assertEquals(3, $arr['intAttribute']);
+        $this->assertEquals(['foo' => 'bar'], $arr['jsonAttribute']);
+        $this->assertEquals('1969-07-20 22:56:00', $arr['datetimeAttribute']);
+
+        $app->forgetInstance('encrypter');
+    }
+
     public function testUpdatingNonExistentModelFails()
     {
         $model = new EloquentModelStub;
@@ -1805,6 +1848,42 @@ class EloquentModelCastingStub extends Model
     public function jsonAttributeValue()
     {
         return $this->attributes['jsonAttribute'];
+    }
+}
+
+class EloquentModelEncryptsStub extends Model
+{
+    protected $casts = [
+        'intAttribute' => 'int',
+        'jsonAttribute' => 'json',
+        'datetimeAttribute' => 'datetime',
+    ];
+
+    protected $encrypts = [
+        'simpleAttribute',
+        'intAttribute',
+        'jsonAttribute',
+        'datetimeAttribute',
+    ];
+
+    public function simpleAttributeValue()
+    {
+        return $this->attributes['simpleAttribute'];
+    }
+
+    public function intAttributeValue()
+    {
+        return $this->attributes['intAttribute'];
+    }
+
+    public function jsonAttributeValue()
+    {
+        return $this->attributes['jsonAttribute'];
+    }
+
+    public function datetimeAttributeValue()
+    {
+        return $this->attributes['datetimeAttribute'];
     }
 }
 
