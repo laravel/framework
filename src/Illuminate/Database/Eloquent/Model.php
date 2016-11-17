@@ -2783,6 +2783,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Determine whether a value should be encrypted.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function isEncryptCastable($key)
+    {
+        return $this->hasCast($key, ['encrypt']);
+    }
+
+    /**
      * Determine whether a value is JSON castable for inbound manipulation.
      *
      * @param  string  $key
@@ -2791,17 +2802,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected function isJsonCastable($key)
     {
         return $this->hasCast($key, ['array', 'json', 'object', 'collection']);
-    }
-
-    /**
-     * Determine whether a value should be encrypted.
-     *
-     * @param string $key
-     * @return bool
-     */
-    protected function isEncryptCastable($key)
-    {
-        return $this->hasCast($key, ['encrypt']);
     }
 
     /**
@@ -2848,13 +2848,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
                 return $this->fromJson($value);
             case 'collection':
                 return new BaseCollection($this->fromJson($value));
+            case 'encrypt':
+                return decrypt($value);
             case 'date':
             case 'datetime':
                 return $this->asDateTime($value);
             case 'timestamp':
                 return $this->asTimeStamp($value);
-            case 'encrypt':
-                return decrypt($value);
             default:
                 return $value;
         }
@@ -3053,6 +3053,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Encrypt the given value.
+     *
+     * @param  mixed  $value
+     * @return string
+     */
+    protected function asEncrypted($value)
+    {
+        return encrypt($value);
+    }
+
+    /**
      * Encode the given value as JSON.
      *
      * @param  mixed  $value
@@ -3073,17 +3084,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function fromJson($value, $asObject = false)
     {
         return json_decode($value, ! $asObject);
-    }
-
-    /**
-     * Encrypt to given value.
-     *
-     * @param mixed $value
-     * @return string
-     */
-    protected function asEncrypted($value)
-    {
-        return encrypt($value);
     }
 
     /**
