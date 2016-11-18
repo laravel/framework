@@ -30,7 +30,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo', '=', 'bar');
         $builder->shouldReceive('first')->with(['column'])->andReturn('baz');
 
-        $result = $builder->findBy('bar', ['column']);
+        $result = $builder->findBy('foo_table.foo', 'bar', ['column']);
         $this->assertEquals('baz', $result);
     }
 
@@ -86,7 +86,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $builder->setModel($this->getMockModel());
         $builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo', '=', 'bar');
         $builder->shouldReceive('first')->with(['column'])->andReturn(null);
-        $result = $builder->findByOrFail('bar', ['column']);
+        $result = $builder->findByOrFail('foo_table.foo', 'bar', ['column']);
     }
 
     /**
