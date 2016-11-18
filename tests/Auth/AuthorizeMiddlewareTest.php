@@ -9,7 +9,6 @@ use Illuminate\Container\Container;
 use Illuminate\Auth\Middleware\Authorize;
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Contracts\Auth\Factory as Auth;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 
@@ -51,10 +50,11 @@ class AuthorizeMiddlewareTest extends PHPUnit_Framework_TestCase
         });
     }
 
+    /**
+     * @expectedException Illuminate\Auth\Access\AuthorizationException
+     */
     public function testSimpleAbilityUnauthorized()
     {
-        $this->setExpectedException(AuthorizationException::class);
-
         $this->gate()->define('view-dashboard', function ($user, $additional = null) {
             $this->assertNull($additional);
 
@@ -89,10 +89,11 @@ class AuthorizeMiddlewareTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($response->content(), 'success');
     }
 
+    /**
+     * @expectedException Illuminate\Auth\Access\AuthorizationException
+     */
     public function testModelTypeUnauthorized()
     {
-        $this->setExpectedException(AuthorizationException::class);
-
         $this->gate()->define('create', function ($user, $model) {
             $this->assertEquals($model, 'App\User');
 
@@ -129,10 +130,11 @@ class AuthorizeMiddlewareTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($response->content(), 'success');
     }
 
+    /**
+     * @expectedException Illuminate\Auth\Access\AuthorizationException
+     */
     public function testModelUnauthorized()
     {
-        $this->setExpectedException(AuthorizationException::class);
-
         $post = new stdClass;
 
         $this->router->bind('post', function () use ($post) {
