@@ -144,6 +144,13 @@ class Factory implements FactoryContract
     protected $pushStack = [];
 
     /**
+     * The translation replacements for the translation being rendered.
+     *
+     * @var array
+     */
+    protected $translationReplacements = [];
+
+    /**
      * The number of active rendering operations.
      *
      * @var int
@@ -849,6 +856,31 @@ class Factory implements FactoryContract
         }
 
         return implode($this->pushes[$section]);
+    }
+
+    /**
+     * Start a translation block.
+     *
+     * @param  array  $replacements
+     * @return void
+     */
+    public function startTranslation($replacements = [])
+    {
+        ob_start();
+
+        $this->translationReplacements = $replacements;
+    }
+
+    /**
+     * Render the current translation.
+     *
+     * @return string
+     */
+    public function renderTranslation()
+    {
+        return $this->container->make('translator')->getFromJson(
+            trim(ob_get_clean()), $this->translationReplacements
+        );
     }
 
     /**

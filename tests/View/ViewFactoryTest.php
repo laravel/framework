@@ -285,6 +285,20 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('title<hr> component Taylor', $contents);
     }
 
+    public function testTranslation()
+    {
+        $container = new Illuminate\Container\Container;
+        $container->instance('translator', $translator = m::mock('StdClass'));
+        $translator->shouldReceive('getFromJson')->with('Foo', ['name' => 'taylor'])->andReturn('Bar');
+        $factory = $this->getFactory();
+        $factory->setContainer($container);
+        $factory->startTranslation(['name' => 'taylor']);
+        echo 'Foo';
+        $string = $factory->renderTranslation();
+
+        $this->assertEquals('Bar', $string);
+    }
+
     public function testSingleStackPush()
     {
         $factory = $this->getFactory();

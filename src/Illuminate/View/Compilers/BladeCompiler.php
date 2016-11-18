@@ -546,7 +546,24 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileLang($expression)
     {
-        return "<?php echo app('translator')->get$expression; ?>";
+        if (is_null($expression)) {
+            return "<?php \$__env->startTranslation(); ?>";
+        } elseif ($expression[1] === '[') {
+            return "<?php \$__env->startTranslation{$expression}; ?>";
+        } else {
+            return "<?php echo app('translator')->get$expression; ?>";
+        }
+    }
+
+    /**
+     * Compile the endlang statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileEndlang()
+    {
+        return '<?php echo $__env->renderTranslation(); ?>';
     }
 
     /**
