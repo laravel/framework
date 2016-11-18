@@ -2783,17 +2783,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Determine whether a value should be encrypted.
-     *
-     * @param  string  $key
-     * @return bool
-     */
-    protected function isEncryptCastable($key)
-    {
-        return $this->hasCast($key, ['encrypted']);
-    }
-
-    /**
      * Determine whether a value is JSON castable for inbound manipulation.
      *
      * @param  string  $key
@@ -2848,8 +2837,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
                 return $this->fromJson($value);
             case 'collection':
                 return new BaseCollection($this->fromJson($value));
-            case 'encrypt':
-                return decrypt($value);
             case 'date':
             case 'datetime':
                 return $this->asDateTime($value);
@@ -2883,10 +2870,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // the connection grammar's date format. We will auto set the values.
         elseif ($value && (in_array($key, $this->getDates()) || $this->isDateCastable($key))) {
             $value = $this->fromDateTime($value);
-        }
-
-        if ($this->isEncryptCastable($key) && ! is_null($value)) {
-            $value = $this->asEncrypted($value);
         }
 
         if ($this->isJsonCastable($key) && ! is_null($value)) {
@@ -3050,17 +3033,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $this->dateFormat = $format;
 
         return $this;
-    }
-
-    /**
-     * Encrypt the given value.
-     *
-     * @param  mixed  $value
-     * @return string
-     */
-    protected function asEncrypted($value)
-    {
-        return encrypt($value);
     }
 
     /**
