@@ -104,8 +104,22 @@ class TranslationTranslatorTest extends PHPUnit_Framework_TestCase
     public function testGetJsonReplaces()
     {
         $t = new Illuminate\Translation\Translator($this->getLoader(), 'en');
-        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn(['foo :message' => 'bar :message']);
-        $this->assertEquals('bar baz', $t->getFromJson('foo :message', ['baz']));
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn(['foo :i:c :u' => 'bar :i:c :u']);
+        $this->assertEquals('bar onetwo three', $t->getFromJson('foo :i:c :u', ['one', 'two', 'three']));
+    }
+
+    public function testGetJsonReplacesForAssociativeInput()
+    {
+        $t = new Illuminate\Translation\Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn(['foo :i :c' => 'bar :i :c']);
+        $this->assertEquals('bar eye see', $t->getFromJson('foo :i :c', ['i' => 'eye', 'c' => 'see']));
+    }
+
+    public function testGetJsonPreservesOrder()
+    {
+        $t = new Illuminate\Translation\Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn(['to :name I give :greeting' => ':greeting :name']);
+        $this->assertEquals('Greetings David', $t->getFromJson('to :name I give :greeting', ['David', 'Greetings']));
     }
 
     public function testGetJsonForNonExistingJsonKeyLooksForRegularKeys()
