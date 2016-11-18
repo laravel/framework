@@ -28,6 +28,7 @@ class UpCommand extends Command
     public function fire()
     {
         @unlink($this->laravel->storagePath().'/framework/down');
+        $this->laravel->events->fire('artisan.up');
 
         $this->info('Application is now live.');
     }
