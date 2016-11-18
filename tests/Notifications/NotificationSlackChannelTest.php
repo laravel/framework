@@ -49,6 +49,10 @@ class NotificationSlackChannelTest extends PHPUnit_Framework_TestCase
                                     'short' => true,
                                 ],
                             ],
+                            'mrkdwn_in' => ['text'],
+                            'footer' => 'Laravel',
+                            'footer_icon' => 'https://laravel.com/fake.png',
+                            'ts' => 1234567890,
                         ],
                     ],
                 ],
@@ -102,11 +106,17 @@ class NotificationSlackChannelTestNotification extends Notification
                     ->to('#ghost-talk')
                     ->content('Content')
                     ->attachment(function ($attachment) {
+                        $timestamp = Mockery::mock('Carbon\Carbon');
+                        $timestamp->shouldReceive('getTimestamp')->andReturn(1234567890);
                         $attachment->title('Laravel', 'https://laravel.com')
                                    ->content('Attachment Content')
                                    ->fields([
                                         'Project' => 'Laravel',
-                                    ]);
+                                    ])
+                                    ->footer('Laravel')
+                                    ->footerIcon('https://laravel.com/fake.png')
+                                    ->markdown(['text'])
+                                    ->timestamp($timestamp);
                     });
     }
 }
