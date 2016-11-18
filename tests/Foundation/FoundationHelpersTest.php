@@ -53,5 +53,4 @@ class FoundationHelpersTest extends PHPUnit_Framework_TestCase
 
         unlink(public_path($file));
     }
-
 }
