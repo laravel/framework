@@ -547,7 +547,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected function compileLang($expression)
     {
         if (is_null($expression)) {
-            return "<?php \$__env->startTranslation(); ?>";
+            return '<?php $__env->startTranslation(); ?>';
         } elseif ($expression[1] === '[') {
             return "<?php \$__env->startTranslation{$expression}; ?>";
         } else {
