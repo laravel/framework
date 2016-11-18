@@ -190,8 +190,8 @@ class Builder
     }
     
     /**
-     * Find a model by a single column
-     * 
+     * Find a model by a single column.
+     *
      * @param  string $column
      * @param  mixed  $value
      * @param  array  $columns
@@ -203,7 +203,7 @@ class Builder
 
         return $this->first($columns);
     }
-
+    
     /**
      * Find a model by its primary key or throw an exception.
      *
@@ -227,10 +227,10 @@ class Builder
 
         throw (new ModelNotFoundException)->setModel(get_class($this->model), $id);
     }
-    
+
     /**
-     * Find a model by a single column
-     * 
+     * Find a model by a single column.
+     *
      * @param  string $column
      * @param  mixed  $value
      * @param  array  $columns
@@ -241,7 +241,7 @@ class Builder
     public function findByOrFail($column, $value, $columns = ['*'])
     {
         $result = $this->findBy($column, $value, $columns);
-        if(! is_null($result)) {
+        if (! is_null($result)) {
             return $result;
         }
 
