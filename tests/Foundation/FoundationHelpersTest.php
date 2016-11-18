@@ -31,10 +31,11 @@ class FoundationHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('default', cache('baz', 'default'));
     }
 
+    /**
+     * @expectedException Exception
+     */
     public function testCacheThrowsAnExceptionIfAnExpirationIsNotProvided()
     {
-        $this->setExpectedException('Exception');
-
         cache(['foo' => 'bar']);
     }
 
@@ -52,4 +53,5 @@ class FoundationHelpersTest extends PHPUnit_Framework_TestCase
 
         unlink(public_path($file));
     }
+
 }
