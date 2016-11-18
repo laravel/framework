@@ -82,6 +82,10 @@ class SlackWebhookChannel
                 'text' => $attachment->content,
                 'title_link' => $attachment->url,
                 'fields' => $this->fields($attachment),
+                'mrkdwn_in' => $attachment->markdown,
+                'footer' => $attachment->footer,
+                'footer_icon' => $attachment->footerIcon,
+                'ts' => $attachment->timestamp,
             ]);
         })->all();
     }

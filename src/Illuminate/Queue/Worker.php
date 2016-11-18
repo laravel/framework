@@ -75,7 +75,7 @@ class Worker
 
             $this->registerTimeoutHandler($job, $options);
 
-            if ($job && $this->daemonShouldRun()) {
+            if ($job && $this->daemonShouldRun($options)) {
                 $this->runJob($job, $connectionName, $options);
             } else {
                 $this->sleep($options->sleep);
@@ -97,7 +97,7 @@ class Worker
      */
     protected function registerTimeoutHandler($job, WorkerOptions $options)
     {
-        if (version_compare(PHP_VERSION, '7.1.0') < 0 || ! extension_loaded('pcntl')) {
+        if ($options->timeout == 0 || version_compare(PHP_VERSION, '7.1.0') < 0 || ! extension_loaded('pcntl')) {
             return;
         }
 
@@ -117,11 +117,12 @@ class Worker
     /**
      * Determine if the daemon should process on this iteration.
      *
+     * @param  WorkerOptions  $options
      * @return bool
      */
-    protected function daemonShouldRun()
+    protected function daemonShouldRun(WorkerOptions $options)
     {
-        if ($this->manager->isDownForMaintenance() ||
+        if (($this->manager->isDownForMaintenance() && ! $options->force) ||
             $this->events->until('illuminate.queue.looping') === false) {
             // If the application is down for maintenance or doesn't want the queues to run
             // we will sleep for one second just in case the developer has it set to not
