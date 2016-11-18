@@ -105,7 +105,7 @@ class TranslationTranslatorTest extends PHPUnit_Framework_TestCase
     {
         $t = new Illuminate\Translation\Translator($this->getLoader(), 'en');
         $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn(['foo :i:c :u' => 'bar :i:c :u']);
-        $this->assertEquals('bar onetwo three', $t->getFromJson('foo :i:c :u', ['one', 'two', 'three']));
+        $this->assertEquals('bar onetwo three', $t->getFromJson('foo :i:c :u', ['i' => 'one', 'c' => 'two', 'u' => 'three']));
     }
 
     public function testGetJsonReplacesForAssociativeInput()
@@ -119,7 +119,7 @@ class TranslationTranslatorTest extends PHPUnit_Framework_TestCase
     {
         $t = new Illuminate\Translation\Translator($this->getLoader(), 'en');
         $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn(['to :name I give :greeting' => ':greeting :name']);
-        $this->assertEquals('Greetings David', $t->getFromJson('to :name I give :greeting', ['David', 'Greetings']));
+        $this->assertEquals('Greetings David', $t->getFromJson('to :name I give :greeting', ['name' => 'David', 'greeting' => 'Greetings']));
     }
 
     public function testGetJsonForNonExistingJsonKeyLooksForRegularKeys()
@@ -151,7 +151,7 @@ class TranslationTranslatorTest extends PHPUnit_Framework_TestCase
         $t = new Illuminate\Translation\Translator($this->getLoader(), 'en');
         $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
         $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo :message', '*')->andReturn([]);
-        $this->assertEquals('foo baz', $t->getFromJson('foo :message', ['baz']));
+        $this->assertEquals('foo baz', $t->getFromJson('foo :message', ['message' => 'baz']));
     }
 
     protected function getLoader()
