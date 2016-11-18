@@ -92,7 +92,7 @@ class Worker
      */
     protected function registerTimeoutHandler(WorkerOptions $options)
     {
-        if (version_compare(PHP_VERSION, '7.1.0') < 0 || ! extension_loaded('pcntl')) {
+        if ($options->timeout == 0 || version_compare(PHP_VERSION, '7.1.0') < 0 || ! extension_loaded('pcntl')) {
             return;
         }
 
