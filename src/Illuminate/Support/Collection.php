@@ -856,6 +856,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Reverse items order.
      *
+     * @param bool $preserve_keys
      * @return static
      */
     public function reverse($preserve_keys = true)
