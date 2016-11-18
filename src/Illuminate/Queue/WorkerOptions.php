@@ -40,7 +40,7 @@ class WorkerOptions
     public $maxTries;
 
     /**
-     * Determine if the worker should run in maintenance mode.
+     * Indicates if the worker should run in maintenance mode.
      *
      * @var bool
      */
@@ -54,15 +54,15 @@ class WorkerOptions
      * @param  int  $timeout
      * @param  int  $sleep
      * @param  int  $maxTries
-     * @param  bool $force
+     * @param  bool  $force
      */
     public function __construct($delay = 0, $memory = 128, $timeout = 60, $sleep = 3, $maxTries = 0, $force = false)
     {
         $this->delay = $delay;
         $this->sleep = $sleep;
+        $this->force = $force;
         $this->memory = $memory;
         $this->timeout = $timeout;
         $this->maxTries = $maxTries;
-        $this->force = $force;
     }
 }
