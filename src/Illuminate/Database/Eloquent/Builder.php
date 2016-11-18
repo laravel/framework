@@ -188,7 +188,7 @@ class Builder
 
         return $this->get($columns);
     }
-    
+
     /**
      * Find a model by a single column.
      *
@@ -203,7 +203,7 @@ class Builder
 
         return $this->first($columns);
     }
-    
+
     /**
      * Find a model by its primary key or throw an exception.
      *
