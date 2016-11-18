@@ -152,7 +152,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
             }
         }
 
-        return $this->makeJsonReplacements($key, $line ?: $key, $replace);
+        return $this->makeReplacements($line ?: $key, $replace);
     }
 
     /**
@@ -209,33 +209,6 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
                 [':'.$key, ':'.Str::upper($key), ':'.Str::ucfirst($key)],
                 [$value, Str::upper($value), Str::ucfirst($value)],
                 $line
-            );
-        }
-
-        return $line;
-    }
-
-    /**
-     * Make the place-holder replacements on a JSON loaded line.
-     *
-     * @param  string  $key
-     * @param  string  $line
-     * @param  array   $replace
-     * @return string
-     */
-    protected function makeJsonReplacements($key, $line, array $replace)
-    {
-        preg_match_all('#:(?:[a-zA-Z1-9]*)#', $key, $placeholders);
-
-        $placeholders = $placeholders[0];
-
-        $keyedReplacements = Arr::isAssoc($replace);
-
-        foreach ($placeholders as $i => $key) {
-            $replacementKey = $keyedReplacements ? str_replace(':', '', $key) : $i;
-
-            $line = str_replace(
-                $key, isset($replace[$replacementKey]) ? $replace[$replacementKey] : $key, $line
             );
         }
 
