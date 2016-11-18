@@ -858,9 +858,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      *
      * @return static
      */
-    public function reverse()
+    public function reverse($preserve_keys = true)
     {
-        return new static(array_reverse($this->items, true));
+        return new static(array_reverse($this->items, $preserve_keys));
     }
 
     /**
