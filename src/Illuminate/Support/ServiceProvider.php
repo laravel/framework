@@ -103,6 +103,19 @@ abstract class ServiceProvider
     }
 
     /**
+     * Register routes.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    protected function loadRoutesFrom($path)
+    {
+        if (!$this->app->routesAreCached()) {
+            require $path;
+        }
+    }
+
+    /**
      * Register paths to be published by the publish command.
      *
      * @param  array  $paths
