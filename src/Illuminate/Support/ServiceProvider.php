@@ -110,7 +110,7 @@ abstract class ServiceProvider
      */
     protected function loadRoutesFrom($path)
     {
-        if (!$this->app->routesAreCached()) {
+        if (! $this->app->routesAreCached()) {
             require $path;
         }
     }
