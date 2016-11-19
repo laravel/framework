@@ -350,7 +350,7 @@ class Connection implements ConnectionInterface
         });
     }
 
-    /*
+    /**
      * Run a select statement against the database and returns a generator.
      *
      * @param  string  $query
