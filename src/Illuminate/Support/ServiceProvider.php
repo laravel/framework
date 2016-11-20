@@ -60,6 +60,19 @@ abstract class ServiceProvider
     }
 
     /**
+     * Load the given routes file if routes are not already cached.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    protected function loadRoutesFrom($path)
+    {
+        if (! $this->app->routesAreCached()) {
+            require $path;
+        }
+    }
+
+    /**
      * Register a view file namespace.
      *
      * @param  string  $path
