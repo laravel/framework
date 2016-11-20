@@ -102,8 +102,8 @@ class PolicyMakeCommand extends GeneratorCommand
      */
     protected function getOptions()
     {
-        return [
+        return array_merge([
             ['model', 'm', InputOption::VALUE_OPTIONAL, 'The model that the policy applies to.'],
-        ];
+        ], parent::getOptions());
     }
 }

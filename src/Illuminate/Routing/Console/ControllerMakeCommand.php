@@ -60,9 +60,9 @@ class ControllerMakeCommand extends GeneratorCommand
      */
     protected function getOptions()
     {
-        return [
+        return array_merge([
             ['resource', 'r', InputOption::VALUE_NONE, 'Generate a resource controller class.'],
-        ];
+        ], parent::getOptions());
     }
 
     /**
