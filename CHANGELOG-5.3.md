@@ -7,10 +7,19 @@
 - Support arrays in `HasOne::withDefault()` ([#16382](https://github.com/laravel/framework/pull/16382))
 - Define route basename for resources ([#16352](https://github.com/laravel/framework/pull/16352))
 - Added `$fallback` parameter to `Redirector::back()` ([#16426](https://github.com/laravel/framework/pull/16426))
+- Added support for footer and markdown in `SlackAttachment` ([#16451](https://github.com/laravel/framework/pull/16451))
+- Added password change feedback auth stubs ([#16461](https://github.com/laravel/framework/pull/16461))
+- Added `name` to default register route ([#16480](https://github.com/laravel/framework/pull/16480))
+- Added `ServiceProvider::loadRoutesFrom()` method ([#16483](https://github.com/laravel/framework/pull/16483))
+
+### Changed
+- Use `getKey()` instead of `$id` in `PusherBroadcaster` ([#16438](https://github.com/laravel/framework/pull/16438))
 
 ### Fixed
 - Pass `PheanstalkJob` to Pheanstalk's `delete()` method ([#16415](https://github.com/laravel/framework/pull/16415))
 - Don't call PDO callback in `reconnectIfMissingConnection()` until it is needed ([#16422](https://github.com/laravel/framework/pull/16422))
+- Don't timeout queue if `--timeout` is set to `0` ([#16465](https://github.com/laravel/framework/pull/16465))
+- Respect `--force` option of `queue:work` in maintenance mode ([#16468](https://github.com/laravel/framework/pull/16468))
 
 
 ## v5.3.23 (2016-11-14)
