@@ -230,7 +230,11 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
 
     public function testChunkPaginatesUsingIdWithLastChunkComplete()
     {
-        $builder = m::mock('Illuminate\Database\Eloquent\Builder[forPageAfterId,get]', [$this->getMockQueryBuilder()]);
+        $baseBuilder = $this->getMockQueryBuilder();
+        $baseBuilder->shouldReceive('getRawBindings')->andReturn([]);
+        $baseBuilder->shouldReceive('setBindings');
+        $builder = m::mock('Illuminate\Database\Eloquent\Builder[forPageAfterId,get]', [$baseBuilder]);
+
         $chunk1 = new Collection([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]);
         $chunk2 = new Collection([(object) ['someIdField' => 10], (object) ['someIdField' => 11]]);
         $chunk3 = new Collection([]);
@@ -251,7 +255,11 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
 
     public function testChunkPaginatesUsingIdWithLastChunkPartial()
     {
-        $builder = m::mock('Illuminate\Database\Eloquent\Builder[forPageAfterId,get]', [$this->getMockQueryBuilder()]);
+        $baseBuilder = $this->getMockQueryBuilder();
+        $baseBuilder->shouldReceive('getRawBindings')->andReturn([]);
+        $baseBuilder->shouldReceive('setBindings');
+        $builder = m::mock('Illuminate\Database\Eloquent\Builder[forPageAfterId,get]', [$baseBuilder]);
+
         $chunk1 = new Collection([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]);
         $chunk2 = new Collection([(object) ['someIdField' => 10]]);
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'someIdField')->andReturnSelf();
@@ -269,7 +277,11 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
 
     public function testChunkPaginatesUsingIdWithCountZero()
     {
-        $builder = m::mock('Illuminate\Database\Eloquent\Builder[forPageAfterId,get]', [$this->getMockQueryBuilder()]);
+        $baseBuilder = $this->getMockQueryBuilder();
+        $baseBuilder->shouldReceive('getRawBindings')->andReturn([]);
+        $baseBuilder->shouldReceive('setBindings');
+        $builder = m::mock('Illuminate\Database\Eloquent\Builder[forPageAfterId,get]', [$baseBuilder]);
+
         $chunk = new Collection([]);
         $builder->shouldReceive('forPageAfterId')->once()->with(0, 0, 'someIdField')->andReturnSelf();
         $builder->shouldReceive('get')->times(1)->andReturn($chunk);
