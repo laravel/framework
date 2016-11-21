@@ -1968,6 +1968,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Get the auto incrementing key type.
+     *
+     * @return string
+     */
+    public function getKeyType()
+    {
+        return $this->keyType;
+    }
+
+    /**
      * Get the value of the model's route key.
      *
      * @return mixed
@@ -2375,16 +2385,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function getIncrementing()
     {
         return $this->incrementing;
-    }
-
-    /**
-     * Get the value indicating the auto incrementing key type.
-     *
-     * @return string
-     */
-    public function getKeyType()
-    {
-        return $this->keyType;
     }
 
     /**
