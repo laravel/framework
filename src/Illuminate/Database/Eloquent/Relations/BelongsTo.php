@@ -175,7 +175,7 @@ class BelongsTo extends Relation
         // fail plus returns zero results, which should be what the developer expects.
         if (count($keys) === 0) {
             return [$this->related->getIncrementing() &&
-                    $this->related->getKeyType() === 'int' ? 0 : null];
+                    $this->related->getKeyType() === 'int' ? 0 : null, ];
         }
 
         return array_values(array_unique($keys));
