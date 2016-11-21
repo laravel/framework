@@ -97,6 +97,14 @@ class DatabaseEloquentBelongsToTest extends PHPUnit_Framework_TestCase
         $relation->addEagerConstraints($models);
     }
 
+    public function testDefaultEagerConstraintsWhenIncrementingAndNonIntKeyType()
+    {
+        $relation = $this->getRelation(null, false, 'string');
+        $relation->getQuery()->shouldReceive('whereIn')->once()->with('relation.id', m::mustBe([null]));
+        $models = [new MissingEloquentBelongsToModelStub, new MissingEloquentBelongsToModelStub];
+        $relation->addEagerConstraints($models);
+    }
+
     public function testDefaultEagerConstraintsWhenNotIncrementing()
     {
         $relation = $this->getRelation(null, false);
@@ -105,12 +113,13 @@ class DatabaseEloquentBelongsToTest extends PHPUnit_Framework_TestCase
         $relation->addEagerConstraints($models);
     }
 
-    protected function getRelation($parent = null, $incrementing = true)
+    protected function getRelation($parent = null, $incrementing = true, $keyType = 'int')
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder');
         $builder->shouldReceive('where')->with('relation.id', '=', 'foreign.value');
         $related = m::mock('Illuminate\Database\Eloquent\Model');
         $related->incrementing = $incrementing;
+        $related->shouldReceive('getKeyType')->andReturn($keyType);
         $related->shouldReceive('getIncrementing')->andReturn($incrementing);
         $related->shouldReceive('getKeyName')->andReturn('id');
         $related->shouldReceive('getTable')->andReturn('relation');
