@@ -433,8 +433,6 @@ class Builder
      */
     public function chunkById($count, callable $callback, $column = 'id')
     {
-        $this->enforceOrderBy();
-
         $lastId = 0;
 
         do {
