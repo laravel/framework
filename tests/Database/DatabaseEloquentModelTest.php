@@ -150,7 +150,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
     public function testEagerLoadingWithColumns()
     {
         $model = new EloquentModelWithoutRelationStub;
-        $instance = $model->newInstance()->newQuery()->with('foo:bar,baz', 'hadi');
+        $instance = $model->newInstance()->newQuery()->with('foo: bar, baz', 'hadi');
         $builder = m::mock(Builder::class);
         $builder->shouldReceive('select')->once()->with(['bar', 'baz']);
         $this->assertNotNull($instance->getEagerLoads()['hadi']);
