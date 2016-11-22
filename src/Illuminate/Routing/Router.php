@@ -284,7 +284,7 @@ class Router implements RegistrarContract
      * @param  array  $options
      * @return void
      */
-    public function auth($options=['login', 'register', 'password'])
+    public function auth(Array $options=['login', 'register', 'password'])
     {
         // Authentication Routes...
         if(in_array('login', $options)){
@@ -300,7 +300,7 @@ class Router implements RegistrarContract
         }
 
         // Password Reset Routes...
-        if(in_array('password', $options)){{
+        if(in_array('password', $options)){
             $this->get('password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm');
             $this->post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail');
             $this->get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm');
