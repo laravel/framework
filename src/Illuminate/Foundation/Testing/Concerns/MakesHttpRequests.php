@@ -396,7 +396,7 @@ trait MakesHttpRequests
             $this->assertEquals($structureFirstLevel, $responseFirstLevel, '', 0.0, 10, true);
         }
 
-        $structureOtherLevels = Arr::where($structure, function ($value) {
+        $structureOtherLevels = array_filter($structure, function ($value) {
             return is_array($value);
         });
 
