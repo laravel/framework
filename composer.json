@@ -113,5 +113,6 @@
         "symfony/dom-crawler": "Required to use most of the crawler integration testing tools (3.2.*).",
         "symfony/psr-http-message-bridge": "Required to psr7 bridging features (0.2.*)."
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
