@@ -188,7 +188,7 @@ if (! function_exists('routes_path')) {
      */
     function routes_path($path = '')
     {
-        return app('path.routes').($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return app()->routesPath().($path ? DIRECTORY_SEPARATOR.$path : $path);
     }
 }
 

@@ -277,7 +277,6 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     {
         $this->instance('path', $this->path());
         $this->instance('path.base', $this->basePath());
-        $this->instance('path.routes', $this->routesPath());
         $this->instance('path.lang', $this->langPath());
         $this->instance('path.config', $this->configPath());
         $this->instance('path.public', $this->publicPath());
