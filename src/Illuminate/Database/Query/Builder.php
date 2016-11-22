@@ -548,6 +548,24 @@ class Builder
     }
 
     /**
+     * Adds an id limit to assist with Eloquent chunkById.
+     * Subsequent calls override existing limit.
+     *
+     * @param string    $column
+     * @param int   $value
+     */
+    protected function chunkIdWhere($column, $value)
+    {
+        $where = compact('column', 'value');
+        $where['type'] = 'Basic';
+        $where['operator'] = '>';
+        $where['boolean'] = 'and';
+        $this->wheres['chunkId'] = $where;
+
+        return $this;
+    }
+
+    /**
      * Add an array of where clauses to the query.
      *
      * @param  array  $column
@@ -1498,9 +1516,9 @@ class Builder
                     return $order['column'] === $column;
                 })->values()->all();
 
-        return $this->where($column, '>', $lastId)
-                    ->orderBy($column, 'asc')
-                    ->take($perPage);
+        return $this->chunkIdWhere($column, $lastId)
+            ->orderBy($column, 'asc')
+            ->take($perPage);
     }
 
     /**
