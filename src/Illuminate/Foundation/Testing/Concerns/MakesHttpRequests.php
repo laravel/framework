@@ -382,7 +382,7 @@ trait MakesHttpRequests
      */
     public function seeJsonStructureEquals(array $structure, $responseData = null)
     {
-        if (!$responseData) {
+        if (! $responseData) {
             $responseData = $this->decodeResponseJson();
         }
 

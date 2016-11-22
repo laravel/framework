@@ -52,7 +52,6 @@ class FoundationMakesHttpRequestsJsonTest extends PHPUnit_Framework_TestCase
         $this->seeJsonStructure(['*' => ['foo', 'bar', 'foobar']]);
     }
 
-
     public function testSeeJsonStructureEquals()
     {
         $this->response = new Illuminate\Http\Response(new JsonSerializableMixedResourcesStub);
