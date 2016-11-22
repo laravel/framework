@@ -83,7 +83,18 @@ class Grammar extends BaseGrammar {
 			$column = 'distinct '.$column;
 		}
 
-		return 'select '.$aggregate['function'].'('.$column.') as aggregate';
+		$sql = 'select ';
+
+		if (count($query->havings) > 0)
+		{
+			$extraColumns = array_diff($query->columns, $aggregate['columns']);
+
+			$sql .= $this->columnize($extraColumns) . ', ';
+		}
+
+		$sql .= $aggregate['function'].'('.$column.') as aggregate';
+
+		return $sql;
 	}
 
 	/**

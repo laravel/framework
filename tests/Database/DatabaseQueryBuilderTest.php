@@ -831,6 +831,30 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testPaginateWithSelectPreservesColumns()
+	{
+		$builder = $this->getBuilder();
+		$connection = $builder->getConnection();
+		$paginator = m::mock('Illuminate\Pagination\Factory');
+		$paginator->shouldReceive('getCurrentPage')->once()->andReturn(1);
+		$connection->shouldReceive('getPaginator')->once()->andReturn($paginator);
+		$connection->shouldReceive('select')->once()
+			->with('select FUNC(foo) AS bar, count(*) as aggregate from "users" having "bar" > ?', array('100'))
+			->andReturn(array(array('aggregate' => 1)));
+		$connection->shouldReceive('select')->once()
+			->with('select FUNC(foo) AS bar, * from "users" having "bar" > ? limit 15 offset 0', array('100'))
+			->andReturn(['results']);
+		$builder->getProcessor()->shouldReceive('processSelect')->twice()->andReturnUsing(function($query, $results) { return $results; });
+		$paginator->shouldReceive('make')->once()->with(['results'], 1, 15)
+			->andReturn('paginated');
+		$builder->from('users');
+		$builder->selectRaw('FUNC(foo) AS bar');
+		$builder->addSelect('*');
+		$builder->having('bar', '>', '100');
+		$this->assertEquals('paginated', $builder->paginate(15));
+	}
+
+
 	public function testQuickPaginateCorrectlyCreatesPaginatorInstance()
 	{
 		$connection = m::mock('Illuminate\Database\ConnectionInterface');
