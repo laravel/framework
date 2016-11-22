@@ -132,7 +132,7 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('<?php echo e($name[\'key or space\']); ?>', $compiler->compileString('{{
             $name[\'key or space\']
         }}'));
-        
+
         $this->assertEquals('<?php echo e($name["key or space"]); ?>', $compiler->compileString('{{{$name["key or space"]}}}'));
         $this->assertEquals('<?php echo e($name["key or space"]); ?>', $compiler->compileString('{{$name["key or space"]}}'));
         $this->assertEquals('<?php echo e($name["key or space"]); ?>', $compiler->compileString('{{ $name["key or space"] }}'));
