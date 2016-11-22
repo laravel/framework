@@ -162,6 +162,20 @@ class Builder {
 	protected $backups = array();
 
 	/**
+	 * List of fields to backup to $this->backups
+	 *
+	 * @var array
+	 */
+	protected $backupFields = array('orders', 'limit', 'offset');
+
+	/**
+	 * List of extended fields to backup to $this->backups
+	 *
+	 * @var array
+	 */
+	protected $backupFieldsMore = array('orders', 'limit', 'offset', 'from', 'wheres', 'groups');
+
+	/**
 	 * The key that should be used when caching the query.
 	 *
 	 * @var string
@@ -1599,27 +1613,16 @@ class Builder {
 	{
 		$paginator = $this->connection->getPaginator();
 
-		if (isset($this->groups))
-		{
-			return $this->groupedPaginate($paginator, $perPage, $columns);
-		}
+		$total = $this->getPaginationCount();
 
-		return $this->ungroupedPaginate($paginator, $perPage, $columns);
-	}
+		// Once we have the total number of records to be paginated, we can grab the
+		// current page and the result array. Then we are ready to create a brand
+		// new Paginator instances for the results which will create the links.
+		$page = $paginator->getCurrentPage($total);
 
-	/**
-	 * Create a paginator for a grouped pagination statement.
-	 *
-	 * @param  \Illuminate\Pagination\Factory  $paginator
-	 * @param  int    $perPage
-	 * @param  array  $columns
-	 * @return \Illuminate\Pagination\Paginator
-	 */
-	protected function groupedPaginate($paginator, $perPage, $columns)
-	{
-		$results = $this->get($columns);
+		$results = $this->forPage($page, $perPage)->get($columns);
 
-		return $this->buildRawPaginator($paginator, $results, $perPage);
+		return $paginator->make($results, $total, $perPage);
 	}
 
 	/**
@@ -1643,43 +1646,38 @@ class Builder {
 	}
 
 	/**
-	 * Create a paginator for an un-grouped pagination statement.
-	 *
-	 * @param  \Illuminate\Pagination\Factory  $paginator
-	 * @param  int    $perPage
-	 * @param  array  $columns
-	 * @return \Illuminate\Pagination\Paginator
-	 */
-	protected function ungroupedPaginate($paginator, $perPage, $columns)
-	{
-		$total = $this->getPaginationCount();
-
-		// Once we have the total number of records to be paginated, we can grab the
-		// current page and the result array. Then we are ready to create a brand
-		// new Paginator instances for the results which will create the links.
-		$page = $paginator->getCurrentPage($total);
-
-		$results = $this->forPage($page, $perPage)->get($columns);
-
-		return $paginator->make($results, $total, $perPage);
-	}
-
-	/**
 	 * Get the count of the total records for pagination.
 	 *
 	 * @return int
 	 */
 	public function getPaginationCount()
 	{
-		$this->backupFieldsForCount();
+		// Do we need to use extended backup for the fields?
+		// This is only needed when there is a group by in the query
+		// Save the main query that we will need for the if we need
+		// grouping of the database query
+		$grouped = isset($this->groups) && $selectSql = $this->toSql();
 
 		// Because some database engines may throw errors if we leave the ordering
 		// statements on the query, we will "back them up" and remove them from
 		// the query. Once we have the count we will put them back onto this.
+		$this->backupFieldsForCount($grouped);
+
+		// Add the magic FROM entry when we have grouping that needs to be
+		// done by the query
+		if ($grouped)
+		{
+			$this->from = \DB::raw("({$selectSql}) as subquery");
+		}
+
+		// Now we actually run the count
 		$total = $this->count();
 
-		$this->restoreFieldsForCount();
+		// Restore the fields that we backed up earlier!
+		$this->restoreFieldsForCount($grouped);
 
+		// Return the total that we promised the method caller as it was
+		// probably important to them.
 		return $total;
 	}
 
@@ -1708,27 +1706,32 @@ class Builder {
 	/**
 	 * Backup certain fields for a pagination count.
 	 *
+	 * @param bool $grouped
 	 * @return void
 	 */
-	protected function backupFieldsForCount()
+	protected function backupFieldsForCount($grouped = false)
 	{
-		foreach (array('orders', 'limit', 'offset') as $field)
+		$fields = $grouped ? $this->backupFieldsMore : $this->backupFields;
+
+		foreach ($fields as $field)
 		{
 			$this->backups[$field] = $this->{$field};
 
 			$this->{$field} = null;
 		}
-
 	}
 
 	/**
 	 * Restore certain fields for a pagination count.
 	 *
+	 * @param bool $grouped
 	 * @return void
 	 */
-	protected function restoreFieldsForCount()
+	protected function restoreFieldsForCount($grouped = false)
 	{
-		foreach (array('orders', 'limit', 'offset') as $field)
+		$fields = $grouped ? $this->backupFieldsMore : $this->backupFields;
+
+		foreach ($fields as $field)
 		{
 			$this->{$field} = $this->backups[$field];
 		}
