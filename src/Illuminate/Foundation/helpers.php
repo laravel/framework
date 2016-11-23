@@ -457,7 +457,7 @@ if (! function_exists('env')) {
         }
 
         if (Str::startsWith($value, ['base64:', "'base64:", '"base64:'])) {
-            return base64_decode(trim($value, '"\''));
+            return base64_decode(substr(trim($value, '"\''), 7));
         }
 
         if (strlen($value) > 1 && Str::startsWith($value, '"') && Str::endsWith($value, '"')) {
