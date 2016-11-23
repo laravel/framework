@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Http;
 
 use Illuminate\Support\Contracts\JsonableInterface;
+use InvalidArgumentException;
 
 class JsonResponse extends \Symfony\Component\HttpFoundation\JsonResponse {
 
@@ -48,6 +49,14 @@ class JsonResponse extends \Symfony\Component\HttpFoundation\JsonResponse {
 		$this->data = $data instanceof JsonableInterface
 								   ? $data->toJson($this->jsonOptions)
 								   : json_encode($data, $this->jsonOptions);
+
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            if (function_exists('json_last_error_msg')) {
+                throw new InvalidArgumentException(json_last_error_msg());
+            } else {
+                throw new InvalidArgumentException('A JSON encoding error occurred', json_last_error());
+            }
+        }
 
 		return $this->update();
 	}
