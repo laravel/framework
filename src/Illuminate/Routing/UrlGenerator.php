@@ -720,6 +720,16 @@ class UrlGenerator implements UrlGeneratorContract
     }
 
     /**
+     * Get the path formatter being used by the URL generator.
+     *
+     * @return \Closure
+     */
+    public function pathFormatter()
+    {
+        return $this->formatPathUsing ?: function ($path) { return $path; };
+    }
+
+    /**
      * Get the request instance.
      *
      * @return \Illuminate\Http\Request
