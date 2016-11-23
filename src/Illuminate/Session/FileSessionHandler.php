@@ -2,6 +2,7 @@
 
 use Symfony\Component\Finder\Finder;
 use Illuminate\Filesystem\Filesystem;
+use Symfony\Component\Finder\Comparator\DateComparator;
 
 class FileSessionHandler implements \SessionHandlerInterface {
 
@@ -20,16 +21,25 @@ class FileSessionHandler implements \SessionHandlerInterface {
 	protected $path;
 
 	/**
+	 * A comparator to validate the session against its lifetime.
+	 *
+	 * @var \Symfony\Component\Finder\Comparator\DateComparator
+	 */
+	protected $comparator;
+
+	/**
 	 * Create a new file driven handler instance.
 	 *
 	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @param  string  $path
+	 * @param  string|int $lifetime The session lifetime in minutes
 	 * @return void
 	 */
-	public function __construct(Filesystem $files, $path)
+	public function __construct(Filesystem $files, $path, $lifetime)
 	{
 		$this->path = $path;
 		$this->files = $files;
+		$this->comparator = new DateComparator('> now - '.$lifetime.' minutes');
 	}
 
 	/**
@@ -53,7 +63,7 @@ class FileSessionHandler implements \SessionHandlerInterface {
 	 */
 	public function read($sessionId)
 	{
-		if ($this->files->exists($path = $this->path.'/'.$sessionId))
+		if ($this->files->exists($path = $this->path.'/'.$sessionId) && $this->comparator->test($this->files->lastModified($path)))
 		{
 			return $this->files->get($path);
 		}
