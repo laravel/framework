@@ -2366,6 +2366,10 @@ class Builder
             $this->bindings[$type][] = $value;
         }
 
+        foreach ($this->bindings[$type] as $key => $binding) {
+            $this->bindings[$type][$key] = quotemeta($binding);
+        }
+
         return $this;
     }
 
