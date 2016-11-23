@@ -280,11 +280,12 @@ class Str {
 	 *
 	 * @param  string  $title
 	 * @param  string  $separator
+	 * @param  bool    $utf8
 	 * @return string
 	 */
-	public static function slug($title, $separator = '-')
+	public static function slug($title, $separator = '-', $utf8 = false)
 	{
-		$title = static::ascii($title);
+		$title = (!$utf8) ? static::ascii($title) : $title;
 
 		// Convert all dashes/underscores into separator
 		$flip = $separator == '-' ? '_' : '-';
@@ -298,6 +299,18 @@ class Str {
 		$title = preg_replace('!['.preg_quote($separator).'\s]+!u', $separator, $title);
 
 		return trim($title, $separator);
+	}
+
+	/**
+	 * Generates a utf-8 supported url friendly slug from a given string
+	 *
+	 * @param $title
+	 * @param $separator
+	 * @return string
+	 */
+	public static function lightSlug($title, $separator = '-')
+	{
+		return self::slug($title, $separator, true);
 	}
 
 	/**
