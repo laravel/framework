@@ -372,4 +372,33 @@ class HtmlBuilder {
 		return $safe;
 	}
 
+	/**
+	 * Returns an HTML tag of type name surrounding the given content.
+	 *
+	 * @param  string  $name
+	 * @param  array   $attributes
+	 * @param  boolean $open
+	 * @return string
+	 */
+	public function tag($name, $attributes = array(), $open = false)
+	{
+		return '<'.$name.$this->attributes($attributes).($open ? '>' : ' />');
+	}
+
+	/**
+	 * Returns an empty HTML tag of type name.
+	 *
+	 * @param  string  $name
+	 * @param  mixed   $content
+	 * @param  array   $attributes
+	 * @param  boolean $escape
+	 * @return string
+	 */
+	public function contentTag($name, $content = null, $attributes = array(), $escape = true)
+	{
+		$content = $escape ? $this->entities($content) : $content;
+
+		return '<'.$name.$this->attributes($attributes).'>'.$content.'</'.$name.'>';
+	}
+
 }

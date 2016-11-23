@@ -1031,3 +1031,36 @@ if ( ! function_exists('with'))
 		return $object;
 	}
 }
+
+if ( ! function_exists('tag'))
+{
+	/**
+	 * Returns an HTML tag of type name surrounding the given content.
+	 *
+	 * @param  string  $name
+	 * @param  array   $attributes
+	 * @param  boolean $open
+	 * @return string
+	 */
+	function tag($name, $attributes = array(), $open = false)
+	{
+		return app('html')->tag($name, $attributes, $open);
+	}
+}
+
+if ( ! function_exists('content_tag'))
+{
+	/**
+	 * Returns an empty HTML tag of type name.
+	 *
+	 * @param  string  $name
+	 * @param  mixed   $content
+	 * @param  array $attributes
+	 * @param  boolean $escape
+	 * @return string
+	 */
+	function content_tag($name, $content = null, $attributes = array(), $escape = true)
+	{
+		return app('html')->contentTag($name, $content, $attributes, $escape);
+	}
+}
