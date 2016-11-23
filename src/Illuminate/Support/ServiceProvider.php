@@ -4,6 +4,9 @@ namespace Illuminate\Support;
 
 use Illuminate\Console\Application as Artisan;
 
+/**
+ * @method register()
+ */
 abstract class ServiceProvider
 {
     /**
