@@ -212,6 +212,11 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('http://foo.com?sort=desc&page=1', $p->getUrl(1));
 	}
 
+	public function testPaginatorGetsIlluminateCollectionAsDefaultCollection()
+	{
+		$p = new Paginator(m::mock('Illuminate\Pagination\Factory'), array(), 0, 0);
+		$this->assertInstanceOf('Illuminate\Support\Collection', $p->getCollection());
+	}
 
 	public function testPaginatorDecoratesCollection()
 	{
@@ -219,6 +224,14 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 		$last = $p->last();
 
 		$this->assertEquals('c', $last);
+	}
+
+	public function testPaginatorSetCollection()
+	{
+		$p = new Paginator(m::mock('Illuminate\Pagination\Factory'), array(), 0, 0);
+		$collection = m::mock('Illuminate\Support\Contracts\ArrayableInterface');
+		$p->setCollection($collection);
+		$this->assertInstanceOf('Illuminate\Support\Contracts\ArrayableInterface', $p->getCollection());
 	}
 
 }

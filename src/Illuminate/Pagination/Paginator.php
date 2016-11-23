@@ -88,6 +88,13 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	protected $fragment;
 
 	/**
+	 * The collection.
+	 * 
+	 * @var mixed
+	 */
+	protected $collection;
+
+	/**
 	 * Create a new Paginator instance.
 	 *
 	 * @param  \Illuminate\Pagination\Factory  $factory
@@ -370,11 +377,11 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	/**
 	 * Get a collection instance containing the items.
 	 *
-	 * @return \Illuminate\Support\Collection
+	 * @return mixed
 	 */
 	public function getCollection()
 	{
-		return new Collection($this->items);
+		return $this->collection ?: new \Illuminate\Support\Collection($this->items);
 	}
 
 	/**
@@ -396,6 +403,17 @@ class Paginator implements ArrayableInterface, ArrayAccess, Countable, IteratorA
 	public function setItems($items)
 	{
 		$this->items = $items;
+	}
+
+	/**
+	 * Set the collection.
+	 * 
+	 * @param ArrayableInterface $class
+	 * @return void
+	 */
+	public function setCollection(ArrayableInterface $collection)
+	{
+		$this->collection = $collection;
 	}
 
 	/**
