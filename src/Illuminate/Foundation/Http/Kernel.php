@@ -6,6 +6,7 @@ use Exception;
 use Throwable;
 use Illuminate\Routing\Router;
 use Illuminate\Routing\Pipeline;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Debug\ExceptionHandler;
@@ -122,6 +123,14 @@ class Kernel implements KernelContract
             $this->reportException($e = new FatalThrowableError($e));
 
             $response = $this->renderException($request, $e);
+        }
+
+        if($this->shouldMakeJsonResponse($request, $response))
+        {
+            $response = new JsonResponse(
+                $response->getContent(),
+                $response->getStatusCode()
+            );
         }
 
         $this->app['events']->fire('kernel.handled', [$request, $response]);
@@ -310,6 +319,18 @@ class Kernel implements KernelContract
     protected function renderException($request, Exception $e)
     {
         return $this->app[ExceptionHandler::class]->render($request, $e);
+    }
+
+    /**
+     * Returns true if the request is asking for a json response and the response is not a JsonResponse.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param \Symfony\Component\HttpFoundation\Response $response
+     * @return bool
+     */
+    protected function shouldMakeJsonResponse($request, $response)
+    {
+        return ($request->ajax() || $request->wantsJson()) && (!$response instanceof JsonResponse);
     }
 
     /**
