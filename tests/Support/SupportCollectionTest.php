@@ -957,6 +957,50 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['first' => 'first-rolyat', 'last' => 'last-llewto'], $data->all());
     }
 
+    public function testTranspose()
+    {
+        $data = new Collection([
+            ['Tyrion Lannister', 'Daenerys Targaryen', 'Meera Reed'],
+            ['Lannister', 'Targaryen', 'Stark'],
+            ['Peter Dinklage', 'Emilia Clarke', 'Ellie Kendrick'],
+        ]);
+        $expected = new Collection([
+            new Collection(['Tyrion Lannister', 'Lannister', 'Peter Dinklage']),
+            new Collection(['Daenerys Targaryen', 'Targaryen', 'Emilia Clarke']),
+            new Collection(['Meera Reed', 'Stark', 'Ellie Kendrick']),
+        ]);
+        $this->assertEquals($expected, $data->transpose());
+    }
+
+    /**
+     * @expectedException LengthException
+     * @expectedExceptionMessage Element size differs (2 should be 3)
+     */
+    public function testTransposeWillEnforceLengthEquality()
+    {
+        $data = new Collection([
+            ['Jack O\'neill', 'Daniel Jackson', 'Samantha Carter'],
+            ['USAF Colonel', 'Archaeologist', 'USAF Captain'],
+            ['Richard Dean Anderson', 'Michael Shanks'],
+        ]);
+        $data->transpose();
+    }
+
+    public function testTransposeRemovesExistingKeys()
+    {
+        $data = new Collection([
+            'names' => ['Henrique', 'Isabela', 'Gabriel'],
+            'ages' => [8, 7, 2],
+            'toys' => ['HotWheels', 'Barbie', 'Lego'],
+        ]);
+        $expected = new Collection([
+            new Collection(['Henrique', 8, 'HotWheels']),
+            new Collection(['Isabela', 7, 'Barbie']),
+            new Collection(['Gabriel', 2, 'Lego']),
+        ]);
+        $this->assertEquals($expected, $data->transpose());
+    }
+
     public function testFirstWithCallback()
     {
         $data = new Collection(['foo', 'bar', 'baz']);

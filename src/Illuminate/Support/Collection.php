@@ -7,6 +7,7 @@ use ArrayAccess;
 use Traversable;
 use ArrayIterator;
 use CachingIterator;
+use LengthException;
 use JsonSerializable;
 use IteratorAggregate;
 use InvalidArgumentException;
@@ -1093,6 +1094,32 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $this->items = $this->map($callback)->all();
 
         return $this;
+    }
+
+    /**
+     * Rotate the array transforming rows into columns
+     * and vice-versa.
+     *
+     * @return static
+     *
+     * @throws \LengthException
+     */
+    public function transpose()
+    {
+        $values = $this->values();
+
+        $expectedLength = count(reset($values));
+        $diffLength = count(array_intersect_key(...$values));
+
+        if ($diffLength !== $expectedLength) {
+            throw new LengthException("Element size differs ({$diffLength} should be {$expectedLength})");
+        }
+
+        $items = array_map(function (...$items) {
+            return new static($items);
+        }, ...$values);
+
+        return new static($items);
     }
 
     /**
