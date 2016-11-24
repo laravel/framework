@@ -182,7 +182,7 @@ class NotificationSlackChannelWithAttachmentFieldBuilderTestNotification extends
                         $attachmentField
                             ->title('Special powers')
                             ->content('Zonda')
-                            ->doNotDisplaySideBySide();
+                            ->dontDisplaySideBySide();
                     });
             });
     }
