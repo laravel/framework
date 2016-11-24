@@ -3,6 +3,7 @@
 namespace Illuminate\Notifications\Channels;
 
 use GuzzleHttp\Client as HttpClient;
+use Illuminate\Notifications\Messages\SlackAttachmentField;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\SlackMessage;
 use Illuminate\Notifications\Messages\SlackAttachment;
@@ -99,6 +100,10 @@ class SlackWebhookChannel
     protected function fields(SlackAttachment $attachment)
     {
         return collect($attachment->fields)->map(function ($value, $key) {
+            if ($value instanceof SlackAttachmentField) {
+                return $value->toArray();
+            }
+
             return ['title' => $key, 'value' => $value, 'short' => true];
         })->values()->all();
     }
