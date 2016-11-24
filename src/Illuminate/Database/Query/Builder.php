@@ -1730,7 +1730,7 @@ class Builder
     }
 
     /**
-     * Backup some fields for the pagination count.
+     * Backup then remove some fields for the pagination count.
      *
      * @return void
      */
