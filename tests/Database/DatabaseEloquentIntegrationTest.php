@@ -230,6 +230,107 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(3, $query->getCountForPagination());
     }
 
+    public function testPaginatePreservesOffsetAndLimitOnInstance()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 3, 'email' => 'foo@gmail.com']);
+
+        Paginator::currentPageResolver(function () {
+            return 1;
+        });
+
+        $query = EloquentTestUser::oldest('id');
+        $models = $query->paginate(2);
+        $models = $query->get();
+        $this->assertEquals(3, $models->count());
+
+        $baseQuery = EloquentTestUser::oldest('id')->getQuery();
+        $models = $baseQuery->paginate(2);
+        $models = $baseQuery->get();
+        $this->assertEquals(3, $models->count());
+    }
+
+    public function testChunkPreservesOffsetAndLimitOnInstance()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 3, 'email' => 'foo@gmail.com']);
+
+        $query = EloquentTestUser::oldest('id');
+        $query->chunk(2, function () {
+        });
+        $models = $query->get();
+        $this->assertEquals(3, $models->count());
+
+        $baseQuery = EloquentTestUser::oldest('id')->getQuery();
+        $baseQuery->chunk(2, function () {
+        });
+        $models = $baseQuery->get();
+        $this->assertEquals(3, $models->count());
+    }
+
+    public function testChunkPreservesOffsetAndLimitOnInstanceWhenEarlyReturn()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 3, 'email' => 'foo@gmail.com']);
+
+        $query = EloquentTestUser::oldest('id');
+        $query->chunk(2, function () {
+            return false;
+        });
+        $models = $query->get();
+        $this->assertEquals(3, $models->count());
+
+        $baseQuery = EloquentTestUser::oldest('id')->getQuery();
+        $baseQuery->chunk(2, function () {
+            return false;
+        });
+        $models = $baseQuery->get();
+        $this->assertEquals(3, $models->count());
+    }
+
+    public function testChunkByIdPreservesOffsetAndLimitOnInstance()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 3, 'email' => 'foo@gmail.com']);
+
+        $query = EloquentTestUser::oldest('id');
+        $query->chunkById(2, function () {
+        });
+        $models = $query->get();
+        $this->assertEquals(3, $models->count());
+
+        $baseQuery = EloquentTestUser::oldest('id')->getQuery();
+        $baseQuery->chunkById(2, function () {
+        });
+        $models = $baseQuery->get();
+        $this->assertEquals(3, $models->count());
+    }
+
+    public function testChunkByIdPreservesOffsetAndLimitOnInstanceWhenEarlyReturn()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 3, 'email' => 'foo@gmail.com']);
+
+        $query = EloquentTestUser::oldest('id');
+        $query->chunkById(2, function () {
+            return false;
+        });
+        $models = $query->get();
+        $this->assertEquals(3, $models->count());
+
+        $baseQuery = EloquentTestUser::oldest('id')->getQuery();
+        $baseQuery->chunkById(2, function () {
+            return false;
+        });
+        $models = $baseQuery->get();
+        $this->assertEquals(3, $models->count());
+    }
+
     public function testFirstOrCreate()
     {
         $user1 = EloquentTestUser::firstOrCreate(['email' => 'taylorotwell@gmail.com']);

@@ -77,6 +77,20 @@ class Builder
     protected $removedScopes = [];
 
     /**
+     * The field backups currently in use.
+     *
+     * @var array
+     */
+    protected $backups = [];
+
+    /**
+     * The binding backups currently in use.
+     *
+     * @var array
+     */
+    protected $bindingBackups = [];
+
+    /**
      * Create a new Eloquent query builder instance.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -376,6 +390,8 @@ class Builder
     {
         $page = 1;
 
+        $this->backupOffsetLimit();
+
         do {
             $results = $this->forPage($page, $count)->get();
 
@@ -389,11 +405,15 @@ class Builder
             // developer take care of everything within the callback, which allows us to
             // keep the memory low for spinning through large result sets for working.
             if (call_user_func($callback, $results) === false) {
+                $this->restoreOffsetLimit();
+
                 return false;
             }
 
             $page++;
         } while ($countResults == $count);
+
+        $this->restoreOffsetLimit();
 
         return true;
     }
@@ -410,6 +430,8 @@ class Builder
     {
         $lastId = 0;
 
+        $this->backupInChunkById();
+
         do {
             $results = $this->forPageAfterId($count, $lastId, $column)->get();
 
@@ -420,11 +442,15 @@ class Builder
             }
 
             if (call_user_func($callback, $results) === false) {
+                $this->restoreInChunkById();
+
                 return false;
             }
 
             $lastId = $results->last()->{$column};
         } while ($countResults == $count);
+
+        $this->restoreInChunkById();
 
         return true;
     }
@@ -449,6 +475,60 @@ class Builder
                 }
             }
         });
+    }
+
+    /**
+     * Backup some fields before the pagination / chunk queries.
+     *
+     * @return void
+     */
+    protected function backupOffsetLimit()
+    {
+        foreach (['offset', 'limit', 'unionOffset', 'unionLimit'] as $property) {
+            $this->backups[$property] = $this->query->{$property};
+        }
+    }
+
+    /**
+     * Restore some fields after the pagination / chunk queries.
+     *
+     * @return void
+     */
+    protected function restoreOffsetLimit()
+    {
+        foreach (['offset', 'limit', 'unionOffset', 'unionLimit'] as $property) {
+            $this->query->{$property} = $this->backups[$property];
+        }
+    }
+
+    /**
+     * Backup some fields before the chunkById queries.
+     *
+     * @return void
+     */
+    protected function backupInChunkById()
+    {
+        foreach (['wheres', 'orders', 'limit', 'unionLimit'] as $property) {
+            $this->backups[$property] = $this->query->{$property};
+        }
+
+        $this->bindingBackups = $this->query->getRawBindings();
+    }
+
+    /**
+     * Restore some fields after the chunkById queries.
+     *
+     * @return void
+     */
+    protected function restoreInChunkById()
+    {
+        foreach (['wheres', 'orders', 'limit', 'unionLimit'] as $property) {
+            $this->query->{$property} = $this->backups[$property];
+        }
+
+        foreach ($this->bindingBackups as $type => $bindings) {
+            $this->query->setBindings($bindings, $type);
+        }
     }
 
     /**
@@ -497,7 +577,11 @@ class Builder
 
         $total = $query->getCountForPagination();
 
+        $this->backupOffsetLimit();
+
         $results = $total ? $this->forPage($page, $perPage)->get($columns) : new Collection;
+
+        $this->restoreOffsetLimit();
 
         return new LengthAwarePaginator($results, $total, $perPage, $page, [
             'path' => Paginator::resolveCurrentPath(),
@@ -520,9 +604,13 @@ class Builder
 
         $perPage = $perPage ?: $this->model->getPerPage();
 
-        $this->skip(($page - 1) * $perPage)->take($perPage + 1);
+        $this->backupOffsetLimit();
 
-        return new Paginator($this->get($columns), $perPage, $page, [
+        $results = $this->skip(($page - 1) * $perPage)->take($perPage + 1)->get($columns);
+
+        $this->restoreOffsetLimit();
+
+        return new Paginator($results, $perPage, $page, [
             'path' => Paginator::resolveCurrentPath(),
             'pageName' => $pageName,
         ]);
