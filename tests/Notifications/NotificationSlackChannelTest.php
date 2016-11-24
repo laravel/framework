@@ -107,7 +107,7 @@ class NotificationSlackChannelTest extends PHPUnit_Framework_TestCase
                                 [
                                     'title' => 'Special powers',
                                     'value' => 'Zonda',
-                                    'short' => false
+                                    'short' => false,
                                 ]
                             ],
                         ],
@@ -178,7 +178,7 @@ class NotificationSlackChannelWithAttachmentFieldBuilderTestNotification extends
                 $attachment->title('Laravel', 'https://laravel.com')
                     ->content('Attachment Content')
                     ->field('Project', 'Laravel')
-                    ->field(function($attachmentField) {
+                    ->field(function ($attachmentField) {
                         $attachmentField
                             ->title('Special powers')
                             ->content('Zonda')
