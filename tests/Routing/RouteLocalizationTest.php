@@ -1,10 +1,9 @@
 <?php
 
-use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Events\Dispatcher;
-use Illuminate\Container\Container;
+use Illuminate\Foundation\Application;
 
 class RouteLocalizationTest extends PHPUnit_Framework_TestCase
 {
@@ -14,7 +13,8 @@ class RouteLocalizationTest extends PHPUnit_Framework_TestCase
     protected $app;
     protected $url;
 
-    public function setup(){
+    public function setup()
+    {
         $this->app = new Application();
     }
 
@@ -29,10 +29,10 @@ class RouteLocalizationTest extends PHPUnit_Framework_TestCase
         $this->app['config']->shouldReceive('get')->with('app.locales')->andReturn(['en', 'ar']);
         $this->app['config']->shouldReceive('get')->with('app.fallback_locale')->andReturn('en');
 
-        $this->app['config']->shouldReceive('set')->with("app.locale", "ar");
+        $this->app['config']->shouldReceive('set')->with('app.locale', 'ar');
         $this->app['translator']->shouldReceive('setLocale')->with('ar');
 
-        $this->app['config']->shouldReceive('set')->with("app.locale", "en");
+        $this->app['config']->shouldReceive('set')->with('app.locale', 'en');
         $this->app['translator']->shouldReceive('setLocale')->with('en');
 
         $this->url->shouldReceive('formatPathUsing');
@@ -66,12 +66,12 @@ class RouteLocalizationTest extends PHPUnit_Framework_TestCase
         $redirector = Mockery::mock('Illuminate\Routing\Redirector');
         $redirector->shouldReceive('to')->once()->with('en/foo', 302, [], null);
 
-        $this->app->bind('redirect', function () use ($redirector){
+        $this->app->bind('redirect', function () use ($redirector) {
             return $redirector;
         });
 
         $this->app['config']->shouldReceive('get')->with('app.fallback_locale')->andReturn('en');
-            $this->app['config']->shouldReceive('get')->with('app.locales')->andReturn(['en', 'ar']);
+        $this->app['config']->shouldReceive('get')->with('app.locales')->andReturn(['en', 'ar']);
 
         $router->get('foo', function () {
             return 'foo';
