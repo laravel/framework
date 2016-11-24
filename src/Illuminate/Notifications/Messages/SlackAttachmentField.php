@@ -65,7 +65,7 @@ class SlackAttachmentField
     /**
      * @return $this
      */
-    public function doNotDisplaySideBySide()
+    public function dontDisplaySideBySide()
     {
         $this->short = false;
 
