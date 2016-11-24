@@ -195,7 +195,7 @@ class Builder
     {
         if (is_array($id)) {
             $this->query->whereIn($this->model->getQualifiedKeyName(), $id);
-            
+
             return $this;
         }
 
