@@ -108,7 +108,7 @@ class NotificationSlackChannelTest extends PHPUnit_Framework_TestCase
                                     'title' => 'Special powers',
                                     'value' => 'Zonda',
                                     'short' => false,
-                                ]
+                                ],
                             ],
                         ],
                     ],
