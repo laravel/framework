@@ -314,7 +314,7 @@ class Router implements RegistrarContract
         if (is_string($attributes)) {
             $attributes = ['prefix' => $attributes];
         }
-        
+
         $this->updateGroupStack($attributes);
 
         // Once we have updated the group stack, we will execute the user Closure and
