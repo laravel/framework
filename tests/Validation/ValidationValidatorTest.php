@@ -1505,6 +1505,18 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
         $v = new Validator($trans, ['ip' => '127.0.0.1'], ['ip' => 'Ip']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['ip' => '127.0.0.1'], ['ip' => 'Ipv4']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['ip' => '::1'], ['ip' => 'Ipv6']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['ip' => '127.0.0.1'], ['ip' => 'Ipv6']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['ip' => '::1'], ['ip' => 'Ipv4']);
+        $this->assertTrue($v->fails());
     }
 
     public function testValidateEmail()

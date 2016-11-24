@@ -1552,6 +1552,30 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Validate that an attribute is a valid IPv4.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @return bool
+     */
+    protected function validateIpv4($attribute, $value)
+    {
+        return filter_var($value, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false;
+    }
+
+    /**
+     * Validate that an attribute is a valid IPv6.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @return bool
+     */
+    protected function validateIpv6($attribute, $value)
+    {
+        return filter_var($value, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false;
+    }
+
+    /**
      * Validate that an attribute is a valid e-mail address.
      *
      * @param  string  $attribute
