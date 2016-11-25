@@ -41,9 +41,10 @@ class Arr
      * Collapse an array of arrays into a single array.
      *
      * @param  array  $array
+     * @param  bool   $reIndex
      * @return array
      */
-    public static function collapse($array)
+    public static function collapse($array, $reIndex = true)
     {
         $results = [];
 
@@ -54,7 +55,7 @@ class Arr
                 continue;
             }
 
-            $results = array_merge($results, $values);
+            $results = $reIndex ? array_merge($results, $values) : ($results + $values);
         }
 
         return $results;
