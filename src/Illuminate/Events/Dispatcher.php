@@ -99,17 +99,17 @@ class Dispatcher {
 	}
 
 	/**
-	 * Register a queued event and payload.
+	 * Register a queued event and listener arguments.
 	 *
 	 * @param  string  $event
-	 * @param  array   $payload
+	 * @param  array   $listenerArgs
 	 * @return void
 	 */
-	public function queue($event, $payload = array())
+	public function queue($event, $listenerArgs = array())
 	{
-		$this->listen($event.'_queue', function() use ($event, $payload)
+		$this->listen($event.'_queue', function() use ($event, $listenerArgs)
 		{
-			$this->fire($event, $payload);
+			$this->fire($event, $listenerArgs);
 		});
 	}
 
@@ -146,12 +146,12 @@ class Dispatcher {
 	 * Fire an event until the first non-null response is returned.
 	 *
 	 * @param  string  $event
-	 * @param  array   $payload
+	 * @param  array   $listenerArgs
 	 * @return mixed
 	 */
-	public function until($event, $payload = array())
+	public function until($event, $listenerArgs = array())
 	{
-		return $this->fire($event, $payload, true);
+		return $this->fire($event, $listenerArgs, true);
 	}
 
 	/**
@@ -179,24 +179,24 @@ class Dispatcher {
 	 * Fire an event and call the listeners.
 	 *
 	 * @param  string  $event
-	 * @param  mixed   $payload
+	 * @param  mixed   $listenerArgs Arguments passed to the listener
 	 * @param  bool    $halt
 	 * @return array|null
 	 */
-	public function fire($event, $payload = array(), $halt = false)
+	public function fire($event, $listenerArgs = array(), $halt = false)
 	{
 		$responses = array();
 
-		// If an array is not given to us as the payload, we will turn it into one so
+		// If an array is not given to us as the listener args, we will turn it into one so
 		// we can easily use call_user_func_array on the listeners, passing in the
-		// payload to each of them so that they receive each of these arguments.
-		if ( ! is_array($payload)) $payload = array($payload);
+		// listener args to each of them so that they receive each of these arguments.
+		if ( ! is_array($listenerArgs)) $listenerArgs = array($listenerArgs);
 
 		$this->firing[] = $event;
 
 		foreach ($this->getListeners($event) as $listener)
 		{
-			$response = call_user_func_array($listener, $payload);
+			$response = call_user_func_array($listener, $listenerArgs);
 
 			// If a response is returned from the listener and event halting is enabled
 			// we will just return this response, and not call the rest of the event
