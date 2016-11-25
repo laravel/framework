@@ -307,7 +307,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function collapse($reIndex = true)
     {
-        return $this->toBase()->collapse();
+        return $this->toBase()->collapse($reIndex);
     }
 
     /**
