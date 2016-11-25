@@ -36,7 +36,7 @@ class AuthServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('auth');
+		return ['auth'];
 	}
 
 }

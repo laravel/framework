@@ -14,7 +14,7 @@ class AuthDatabaseUserProviderTest extends PHPUnit_Framework_TestCase {
 	{
 		$conn = m::mock('Illuminate\Database\Connection');
 		$conn->shouldReceive('table')->once()->with('foo')->andReturn($conn);
-		$conn->shouldReceive('find')->once()->with(1)->andReturn(array('id' => 1, 'name' => 'Dayle'));
+		$conn->shouldReceive('find')->once()->with(1)->andReturn(['id' => 1, 'name' => 'Dayle']);
 		$hasher = m::mock('Illuminate\Hashing\HasherInterface');
 		$provider = new Illuminate\Auth\DatabaseUserProvider($conn, $hasher, 'foo');
 		$user = $provider->retrieveByID(1);
@@ -43,10 +43,10 @@ class AuthDatabaseUserProviderTest extends PHPUnit_Framework_TestCase {
 		$conn = m::mock('Illuminate\Database\Connection');
 		$conn->shouldReceive('table')->once()->with('foo')->andReturn($conn);
 		$conn->shouldReceive('where')->once()->with('username', 'dayle');
-		$conn->shouldReceive('first')->once()->andReturn(array('id' => 1, 'name' => 'taylor'));
+		$conn->shouldReceive('first')->once()->andReturn(['id' => 1, 'name' => 'taylor']);
 		$hasher = m::mock('Illuminate\Hashing\HasherInterface');
 		$provider = new Illuminate\Auth\DatabaseUserProvider($conn, $hasher, 'foo');
-		$user = $provider->retrieveByCredentials(array('username' => 'dayle', 'password' => 'foo'));
+		$user = $provider->retrieveByCredentials(['username' => 'dayle', 'password' => 'foo']);
 
 		$this->assertInstanceOf('Illuminate\Auth\GenericUser', $user);
 		$this->assertEquals(1, $user->getAuthIdentifier());
@@ -62,7 +62,7 @@ class AuthDatabaseUserProviderTest extends PHPUnit_Framework_TestCase {
 		$conn->shouldReceive('first')->once()->andReturn(null);
 		$hasher = m::mock('Illuminate\Hashing\HasherInterface');
 		$provider = new Illuminate\Auth\DatabaseUserProvider($conn, $hasher, 'foo');
-		$user = $provider->retrieveByCredentials(array('username' => 'dayle'));
+		$user = $provider->retrieveByCredentials(['username' => 'dayle']);
 
 		$this->assertNull($user);
 	}
@@ -76,7 +76,7 @@ class AuthDatabaseUserProviderTest extends PHPUnit_Framework_TestCase {
 		$provider = new Illuminate\Auth\DatabaseUserProvider($conn, $hasher, 'foo');
 		$user = m::mock('Illuminate\Auth\UserInterface');
 		$user->shouldReceive('getAuthPassword')->once()->andReturn('hash');
-		$result = $provider->validateCredentials($user, array('password' => 'plain'));
+		$result = $provider->validateCredentials($user, ['password' => 'plain']);
 
 		$this->assertTrue($result);
 	}
