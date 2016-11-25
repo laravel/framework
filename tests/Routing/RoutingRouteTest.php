@@ -77,6 +77,14 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testRouteDispatchingWithParameters()
+	{
+		$router = $this->getRouter();
+		$router->get('api', function() { return Request::has('foo') ? 'true' : 'false'; });
+		$this->assertEquals('true', $router->dispatch(Request::create('api', 'GET', array('foo' => array('bar', 'baz'))))->getContent());
+	}
+
+
 	public function testOptionsResponsesAreGeneratedByDefault()
 	{
 		$router = $this->getRouter();
