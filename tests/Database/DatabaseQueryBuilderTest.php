@@ -27,7 +27,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $builder->getConnection()->shouldReceive('select')->once()->andReturnUsing(function ($sql) {
             $this->assertEquals('select * from "users"', $sql);
         });
-        $builder->getConnection()->shouldReceive('select')->once()->andReturnUsing(function ($sql) {
+        $builder->getConnection()->shouldReceive('select')->twice()->andReturnUsing(function ($sql) {
             $this->assertEquals('select "foo", "bar" from "users"', $sql);
         });
 
@@ -35,6 +35,9 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertNull($builder->columns);
 
         $builder->from('users')->get(['foo', 'bar']);
+        $this->assertNull($builder->columns);
+
+        $builder->from('users')->get('foo', 'bar');
         $this->assertNull($builder->columns);
 
         $this->assertEquals('select * from "users"', $builder->toSql());

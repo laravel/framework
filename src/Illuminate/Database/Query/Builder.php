@@ -1620,7 +1620,7 @@ class Builder
     /**
      * Execute the query as a "select" statement.
      *
-     * @param  array  $columns
+     * @param  array|mixed  $columns
      * @return \Illuminate\Support\Collection
      */
     public function get($columns = ['*'])
@@ -1628,7 +1628,7 @@ class Builder
         $original = $this->columns;
 
         if (is_null($original)) {
-            $this->columns = $columns;
+            $this->columns = is_array($columns) ? $columns : func_get_args();
         }
 
         $results = $this->processor->processSelect($this, $this->runSelect());
