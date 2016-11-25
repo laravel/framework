@@ -46,11 +46,9 @@ class Localize
     {
         $defaultLocale = $this->app['config']->get('app.fallback_locale');
 
-        if (! $this->requestPathHasLocale($request)) {
+        if (! $locale = $this->getLocaleFromRequest($request)) {
             return redirect(trim($defaultLocale.'/'.$request->path(), '/'));
         }
-
-        $locale = $this->getLocaleFromRequest($request);
 
         $this->app->setLocale($locale);
 
@@ -62,25 +60,26 @@ class Localize
     }
 
     /**
-     * Determine if the request path contains locale information.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
-     */
-    protected function requestPathHasLocale($request)
-    {
-        return in_array($request->segment(1), $this->app['config']->get('app.locales'));
-    }
-
-    /**
      * Extract the locale from the given request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return string
+     * @return string|null
      */
     private function getLocaleFromRequest($request)
     {
-        return $this->requestPathHasLocale($request) ?
-                        $request->segment(1) : $this->app['config']->get('app.fallback_locale');
+        if($this->localeIsValid($locale = $request->segment(1))){
+            return $locale;
+        }
+    }
+
+    /**
+     * Determine if the given locale is valid.
+     *
+     * @param  string  $locale
+     * @return bool
+     */
+    private function localeIsValid($locale)
+    {
+        return in_array($locale, $this->app['config']->get('app.locales'));
     }
 }
