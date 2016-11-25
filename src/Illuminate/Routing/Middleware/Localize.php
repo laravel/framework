@@ -67,7 +67,7 @@ class Localize
      */
     private function getLocaleFromRequest($request)
     {
-        if($this->localeIsValid($locale = $request->segment(1))){
+        if ($this->localeIsValid($locale = $request->segment(1))) {
             return $locale;
         }
     }
