@@ -144,11 +144,12 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Collapse the collection of items into a single array.
      *
+     * @param  bool  $reIndex
      * @return static
      */
-    public function collapse()
+    public function collapse($reIndex = true)
     {
-        return new static(Arr::collapse($this->items));
+        return new static(Arr::collapse($this->items, $reIndex));
     }
 
     /**
@@ -616,7 +617,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function mapWithKeys(callable $callback)
     {
-        return $this->flatMap($callback);
+        return $this->map($callback)->collapse(false);
     }
 
     /**
