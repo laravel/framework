@@ -166,7 +166,7 @@ class Builder
             return $this->findMany($id, $columns);
         }
 
-        return $this->byKey($id)->first($columns);
+        return $this->whereKey($id)->first($columns);
     }
 
     /**
@@ -182,7 +182,7 @@ class Builder
             return $this->model->newCollection();
         }
 
-        return $this->byKey($ids)->get($columns);
+        return $this->whereKey($ids)->get($columns);
     }
 
     /**
@@ -191,7 +191,7 @@ class Builder
      * @param  mixed  $id
      * @return $this
      */
-    public function byKey($id)
+    public function whereKey($id)
     {
         if (is_array($id)) {
             $this->query->whereIn($this->model->getQualifiedKeyName(), $id);
