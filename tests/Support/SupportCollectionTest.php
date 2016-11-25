@@ -947,7 +947,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
             $data->all()
         );
     }
-    
+
     public function testMapWithKeysIntegerKeys()
     {
         $data = new Collection([
@@ -959,7 +959,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
             return [$item['id'] => $item];
         });
         $this->assertEquals(
-            [1,2,3],
+            [1, 2, 3],
             $data->keys()->all()
         );
     }
