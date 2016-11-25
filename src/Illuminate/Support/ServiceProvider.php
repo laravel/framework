@@ -180,6 +180,16 @@ abstract class ServiceProvider {
 	}
 
 	/**
+	 * Get the files to be compiled.
+	 * 
+	 * @return array
+	 */
+	public function compiles()
+	{
+		return array();
+	}
+
+	/**
 	 * Determine if the provider is deferred.
 	 *
 	 * @return bool
