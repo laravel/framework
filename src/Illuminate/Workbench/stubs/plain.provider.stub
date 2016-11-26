@@ -5,16 +5,12 @@ use Illuminate\Support\ServiceProvider;
 class {{name}}ServiceProvider extends ServiceProvider {
 
 	/**
-	 * Indicates if loading of the provider is deferred.
-	 *
-	 * @var bool
+	 * {@inheritdoc}
 	 */
 	protected $defer = false;
 
 	/**
-	 * Register the service provider.
-	 *
-	 * @return void
+	 * {@inheritdoc}
 	 */
 	public function register()
 	{
@@ -22,13 +18,11 @@ class {{name}}ServiceProvider extends ServiceProvider {
 	}
 
 	/**
-	 * Get the services provided by the provider.
-	 *
-	 * @return array
+	 * {@inheritdoc}
 	 */
 	public function provides()
 	{
-		return array();
+		return [];
 	}
 
 }
