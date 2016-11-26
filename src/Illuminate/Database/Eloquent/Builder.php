@@ -186,23 +186,6 @@ class Builder
     }
 
     /**
-     * Add where clause with primary key to the query.
-     *
-     * @param  mixed  $id
-     * @return $this
-     */
-    public function whereKey($id)
-    {
-        if (is_array($id)) {
-            $this->query->whereIn($this->model->getQualifiedKeyName(), $id);
-
-            return $this;
-        }
-
-        return $this->where($this->model->getQualifiedKeyName(), '=', $id);
-    }
-
-    /**
      * Find a model by its primary key or throw an exception.
      *
      * @param  mixed  $id
@@ -817,6 +800,23 @@ class Builder
         }
 
         return $builder;
+    }
+
+    /**
+     * Add a where clause on the primary key to the query.
+     *
+     * @param  mixed  $id
+     * @return $this
+     */
+    public function whereKey($id)
+    {
+        if (is_array($id)) {
+            $this->query->whereIn($this->model->getQualifiedKeyName(), $id);
+
+            return $this;
+        }
+
+        return $this->where($this->model->getQualifiedKeyName(), '=', $id);
     }
 
     /**
