@@ -302,11 +302,12 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Collapse the collection of items into a single array.
      *
+     * @param  bool  $reIndex
      * @return \Illuminate\Support\Collection
      */
-    public function collapse()
+    public function collapse($reIndex = true)
     {
-        return $this->toBase()->collapse();
+        return $this->toBase()->collapse($reIndex);
     }
 
     /**

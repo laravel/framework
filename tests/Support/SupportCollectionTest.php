@@ -948,6 +948,22 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         );
     }
 
+    public function testMapWithKeysIntegerKeys()
+    {
+        $data = new Collection([
+            ['id' => 1, 'name' => 'A'],
+            ['id' => 2, 'name' => 'B'],
+            ['id' => 3, 'name' => 'C'],
+        ]);
+        $data = $data->mapWithKeys(function ($item) {
+            return [$item['id'] => $item];
+        });
+        $this->assertEquals(
+            [1, 2, 3],
+            $data->keys()->all()
+        );
+    }
+
     public function testTransform()
     {
         $data = new Collection(['first' => 'taylor', 'last' => 'otwell']);
