@@ -226,7 +226,7 @@ class Builder
      */
     protected function build(Blueprint $blueprint)
     {
-        $blueprint->build($this->connection, $this->grammar);
+        $blueprint->build($this->grammar);
     }
 
     /**
@@ -242,7 +242,7 @@ class Builder
             return call_user_func($this->resolver, $table, $callback);
         }
 
-        return new Blueprint($table, $callback);
+        return new Blueprint($this->connection, $table, $callback);
     }
 
     /**
