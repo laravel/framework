@@ -31,6 +31,13 @@ class Blueprint
     protected $commands = [];
 
     /**
+     * The database connection instance.
+     *
+     * @var \Illuminate\Database\Connection
+     */
+    protected $connection;
+
+    /**
      * The storage engine that should be used for the table.
      *
      * @var string
@@ -57,13 +64,15 @@ class Blueprint
     /**
      * Create a new schema blueprint.
      *
+     * @param  \Illuminate\Database\Connection  $connection
      * @param  string  $table
      * @param  \Closure|null  $callback
      * @return void
      */
-    public function __construct($table, Closure $callback = null)
+    public function __construct(Connection $connection, $table, Closure $callback = null)
     {
         $this->table = $table;
+        $this->connection = $connection;
 
         if (! is_null($callback)) {
             $callback($this);
