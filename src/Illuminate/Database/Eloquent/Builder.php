@@ -166,9 +166,7 @@ class Builder
             return $this->findMany($id, $columns);
         }
 
-        $this->query->where($this->model->getQualifiedKeyName(), '=', $id);
-
-        return $this->first($columns);
+        return $this->whereKey($id)->first($columns);
     }
 
     /**
@@ -184,9 +182,22 @@ class Builder
             return $this->model->newCollection();
         }
 
-        $this->query->whereIn($this->model->getQualifiedKeyName(), $ids);
+        return $this->whereKey($ids)->get($columns);
+    }
 
-        return $this->get($columns);
+    /**
+     * Add where clause with primary key to the query.
+     *
+     * @param  mixed  $id
+     * @return $this
+     */
+    public function whereKey($id)
+    {
+        if (is_array($id)) {
+            $this->query->whereIn($this->model->getQualifiedKeyName(), $id);
+            return $this;
+        }
+        return $this->where($this->model->getQualifiedKeyName(), '=', $id);
     }
 
     /**
