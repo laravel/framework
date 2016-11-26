@@ -37,7 +37,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         file_put_contents($this->tempDir.'/file.txt', 'Hello World');
         $files = new Filesystem();
         $files->setUnixMode($this->tempDir.'/file.txt', 0755);
-        $filePermisson = substr(sprintf('%o', fileperms($this->tempDir.'/file.txt')), - 4);
+        $filePermisson = substr(sprintf('%o', fileperms($this->tempDir.'/file.txt')), -4);
         $this->assertEquals('0755', $filePermisson);
     }
 

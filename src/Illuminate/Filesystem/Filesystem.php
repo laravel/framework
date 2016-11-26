@@ -117,7 +117,7 @@ class Filesystem
      * @param  string  $path
      * @param  bool  $mode
      * @return int
-    */
+     */
     public function setUnixMode($path, $mode)
     {
         return chmod($path, $mode);
@@ -128,7 +128,7 @@ class Filesystem
      *
      * @param  string  $path
      * @return string
-    */
+     */
     public function getUnixMode($path)
     {
         return substr(sprintf('%o', fileperms($path)), -4);
