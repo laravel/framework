@@ -959,7 +959,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
             return [$item['id'] => $item];
         });
         $this->assertEquals(
-            [1,3,2],
+            [1, 3, 2],
             $data->keys()->all()
         );
     }
