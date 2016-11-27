@@ -616,7 +616,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function mapWithKeys(callable $callback)
     {
-        return $this->flatMap($callback);
+        return $this->reduce(function ($items, $item) use($callback) {
+            $item = $callback($item);
+
+            return $items->put(key($item), reset($item));
+        }, new static);
     }
 
     /**
