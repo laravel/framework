@@ -1838,6 +1838,20 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
+	 * Replace all place-holders for the required_with_all rule.
+	 *
+	 * @param  string  $message
+	 * @param  string  $attribute
+	 * @param  string  $rule
+	 * @param  array   $parameters
+	 * @return string
+	 */
+	protected function replaceRequiredWithAll($message, $attribute, $rule, $parameters)
+	{
+		return $this->replaceRequiredWith($message, $attribute, $rule, $parameters);
+	}
+
+	/**
 	 * Replace all place-holders for the required_without rule.
 	 *
 	 * @param  string  $message
