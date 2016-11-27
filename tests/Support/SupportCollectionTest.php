@@ -958,9 +958,32 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $data = $data->mapWithKeys(function ($item) {
             return [$item['id'] => $item];
         });
-        $this->assertEquals(
+        $this->assertSame(
             [1, 3, 2],
             $data->keys()->all()
+        );
+    }
+
+    public function testMapWithKeysMultipleRows()
+    {
+        $data = new Collection([
+            ['id' => 1, 'name' => 'A'],
+            ['id' => 2, 'name' => 'B'],
+            ['id' => 3, 'name' => 'C'],
+        ]);
+        $data = $data->mapWithKeys(function ($item) {
+            return [$item['id'] => $item['name'], $item['name'] => $item['id']];
+        });
+        $this->assertSame(
+            [
+                1 => 'A',
+                'A' => 1,
+                2 => 'B',
+                'B' => 2,
+                3 => 'C',
+                'C' => 3
+            ],
+            $data->all()
         );
     }
 
