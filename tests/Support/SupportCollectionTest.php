@@ -981,7 +981,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
                 2 => 'B',
                 'B' => 2,
                 3 => 'C',
-                'C' => 3
+                'C' => 3,
             ],
             $data->all()
         );
