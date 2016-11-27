@@ -3,8 +3,12 @@
 namespace Illuminate\Log;
 
 use Closure;
+use Gelf\Publisher;
 use RuntimeException;
 use InvalidArgumentException;
+use Gelf\Transport\TcpTransport;
+use Gelf\Transport\UdpTransport;
+use Monolog\Handler\GelfHandler;
 use Monolog\Handler\SyslogHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger as MonologLogger;
@@ -259,6 +263,30 @@ class Writer implements LogContract, PsrLoggerInterface
         );
 
         $handler->setFormatter($this->getDefaultFormatter());
+    }
+
+    /**
+     * Register a Gelf handler.
+     *
+     * @param  string  $host
+     * @param  int  $port
+     * @param  string  $protocol
+     * @param  string  $level
+     * @return \Psr\Log\LoggerInterface
+     */
+    public function useGelf($host, $port = 12201, $protocol = 'udp', $level = 'debug')
+    {
+        if ($protocol === 'udp') {
+            $transport = new UdpTransport($host, $port);
+        } elseif ($protocol === 'tcp') {
+            $transport = new TcpTransport($host, $port);
+        } else {
+            throw new RuntimeException('Gelf transport supports only tcp and udp protocols. Invalid protocol passed.');
+        }
+
+        return $this->monolog->pushHandler(
+            new GelfHandler(new Publisher($transport), $this->parseLevel($level))
+        );
     }
 
     /**
