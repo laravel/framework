@@ -26,7 +26,7 @@ class ServeCommand extends Command {
 	 */
 	public function fire()
 	{
-		$this->checkPhpVersion();
+		$this->checkIsSupported();
 
 		chdir($this->laravel['path.base']);
 
@@ -42,17 +42,17 @@ class ServeCommand extends Command {
 	}
 
 	/**
-	 * Check the current PHP version is >= 5.4.
+	 * Check if the built in web server is supported.
 	 *
 	 * @return void
 	 *
 	 * @throws \Exception
 	 */
-	protected function checkPhpVersion()
+	protected function checkIsSupported()
 	{
-		if (version_compare(PHP_VERSION, '5.4.0', '<'))
+		if (defined('HHVM_VERSION'))
 		{
-			throw new \Exception('This PHP binary is not version 5.4 or greater.');
+			throw new \Exception('The built in web server is not supported on HHVM.');
 		}
 	}
 
