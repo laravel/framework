@@ -32,21 +32,21 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         $this->assertStringEqualsFile($this->tempDir.'/file.txt', 'Hello World');
     }
 
-    public function testSetUnixMode()
+    public function testSetChmod()
     {
         file_put_contents($this->tempDir.'/file.txt', 'Hello World');
         $files = new Filesystem();
-        $files->setUnixMode($this->tempDir.'/file.txt', 0755);
+        $files->chmod($this->tempDir.'/file.txt', 0755);
         $filePermisson = substr(sprintf('%o', fileperms($this->tempDir.'/file.txt')), -4);
         $this->assertEquals('0755', $filePermisson);
     }
 
-    public function testGetUnixMode()
+    public function testGetChmod()
     {
         file_put_contents($this->tempDir.'/file.txt', 'Hello World');
         chmod($this->tempDir.'/file.txt', 0755);
         $files = new Filesystem();
-        $filePermisson = $files->getUnixMode($this->tempDir.'/file.txt');
+        $filePermisson = $files->chmod($this->tempDir.'/file.txt');
         $this->assertEquals('0755', $filePermisson);
     }
 
