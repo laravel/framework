@@ -120,7 +120,7 @@ class Filesystem
      */
     public function chmod($path, $mode = null)
     {
-        if($mode) {
+        if ($mode) {
             return chmod($path, $mode);
         }
 
