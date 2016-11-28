@@ -497,7 +497,9 @@ class Builder
 
         $total = $query->getCountForPagination();
 
-        $results = $total ? $this->forPage($page, $perPage)->get($columns) : new Collection;
+        $results = $total
+            ? $this->forPage($page, $perPage)->get($columns)
+            : $this->model->newCollection();
 
         return new LengthAwarePaginator($results, $total, $perPage, $page, [
             'path' => Paginator::resolveCurrentPath(),
