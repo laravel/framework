@@ -13,90 +13,149 @@ class PaginationFactoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testCreationOfEnvironment()
 	{
-		$env = $this->getFactory();
+		$factory = $this->getFactoryProper();
+		$this->assertInstanceOf('Illuminate\Pagination\Factory', $factory);
 	}
 
 
 	public function testPaginatorCanBeCreated()
 	{
-		$env = $this->getFactory();
+		$factory = $this->getFactoryProper();
 		$request = Illuminate\Http\Request::create('http://foo.com', 'GET');
-		$env->setRequest($request);
+		$factory->setRequest($request);
 
-		$this->assertInstanceOf('Illuminate\Pagination\Paginator', $env->make(array('foo', 'bar'), 2, 2));
+		$this->assertInstanceOf('Illuminate\Pagination\Paginator', $factory->make(array('foo', 'bar'), 2, 2));
 	}
 
 
 	public function testPaginationViewCanBeCreated()
 	{
-		$env = $this->getFactory();
+		$factory = $this->getFactoryProper();
 		$paginator = m::mock('Illuminate\Pagination\Paginator');
-		$env->getViewFactory()->shouldReceive('make')->once()->with('pagination::slider', array('environment' => $env, 'paginator' => $paginator))->andReturn('foo');
+		$factory->getViewFactory()->shouldReceive('make')->once()->with('pagination::slider', array('environment' => $factory, 'paginator' => $paginator))->andReturn('foo');
 
-		$this->assertEquals('foo', $env->getPaginationView($paginator));
+		$this->assertEquals('foo', $factory->getPaginationView($paginator));
 	}
 
 
 	public function testCurrentPageCanBeRetrieved()
 	{
-		$env = $this->getFactory();
+		$factory = $this->getFactoryProper();
 		$request = Illuminate\Http\Request::create('http://foo.com?page=2', 'GET');
-		$env->setRequest($request);
+		$factory->setRequest($request);
 
-		$this->assertEquals(2, $env->getCurrentPage());
+		$this->assertEquals(2, $factory->getCurrentPage());
 
-		$env = $this->getFactory();
+		$factory = $this->getFactoryProper();
 		$request = Illuminate\Http\Request::create('http://foo.com?page=-1', 'GET');
-		$env->setRequest($request);
+		$factory->setRequest($request);
 
-		$this->assertEquals(1, $env->getCurrentPage());
+		$this->assertEquals(1, $factory->getCurrentPage());
 	}
-
 
 	public function testSettingCurrentUrlOverrulesRequest()
 	{
-		$env = $this->getFactory();
+		$factory = $this->getFactoryProper();
 		$request = Illuminate\Http\Request::create('http://foo.com?page=2', 'GET');
-		$env->setRequest($request);
-		$env->setCurrentPage(3);
+		$factory->setRequest($request);
+		$factory->setCurrentPage(3);
 
-		$this->assertEquals(3, $env->getCurrentPage());
+		$this->assertEquals(3, $factory->getCurrentPage());
 	}
 
 
 	public function testCurrentUrlCanBeRetrieved()
 	{
-		$env = $this->getFactory();
+		$factory = $this->getFactoryProper();
 		$request = Illuminate\Http\Request::create('http://foo.com/bar?page=2', 'GET');
-		$env->setRequest($request);
+		$factory->setRequest($request);
 
-		$this->assertEquals('http://foo.com/bar', $env->getCurrentUrl());
+		$this->assertEquals('http://foo.com/bar', $factory->getCurrentUrl());
 
-		$env = $this->getFactory();
+		$factory = $this->getFactoryProper();
 		$request = Illuminate\Http\Request::create('http://foo.com?page=2', 'GET');
-		$env->setRequest($request);
+		$factory->setRequest($request);
 
-		$this->assertEquals('http://foo.com', $env->getCurrentUrl());
+		$this->assertEquals('http://foo.com', $factory->getCurrentUrl());
 	}
 
 
 	public function testOverridingPageParam()
 	{
-		$env = $this->getFactory();
-		$this->assertEquals('page', $env->getPageName());
-		$env->setPageName('foo');
-		$this->assertEquals('foo', $env->getPageName());
+		$factory = $this->getFactoryProper();
+		$this->assertEquals('page', $factory->getPageName());
+		$factory->setPageName('foo');
+		$this->assertEquals('foo', $factory->getPageName());
 	}
 
+	public function testInteractionWithoutRequest()
+	{
+		$factory = $this->getFactoryWithoutRequest();
 
-	protected function getFactory()
+		$perPage = 2;
+		$total = 10;
+
+		// 2 Items, because perPage is 2. Normally the paginate() method would have that covered
+		$items = array(
+			'Item 1',
+			'Item 2',
+		);
+
+		$factory->setBaseUrl('http://example.com/foo');
+		$factory->setCurrentPage(2);
+
+		$paginator = $factory->make($items, $total, $perPage);
+
+		$this->assertEquals(2, $paginator->getCurrentPage());
+		$this->assertEquals(5, $paginator->getLastPage());
+		$this->assertEquals($total, $paginator->getTotal());
+		$this->assertEquals($perPage, $paginator->getPerPage());
+		$this->assertEquals($perPage, $paginator->count());
+	}
+
+	/**
+	 * @expectedException \Exception
+	 * @expectedExceptionMessage No currentPage was provided, and request information is not available
+	 */
+	public function testUnprovidedCurrentPageWithoutRequest()
+	{
+		$factory = $this->getFactoryWithoutRequest();
+
+		$perPage = 2;
+		$total = 10;
+
+		// 2 Items, because perPage is 2. Normally the paginate() method would have that covered
+		$items = array(
+			'Item 1',
+			'Item 2',
+		);
+
+		$factory->setBaseUrl('http://example.com/foo');
+
+		$paginator = $factory->make($items, $total, $perPage);
+
+		$paginator->getCurrentPage();
+	}
+
+	protected function getFactoryWithoutRequest()
+	{
+		$factory = new Factory('page');
+		return $factory;
+	}
+
+	protected function getFactoryProper()
 	{
 		$request = m::mock('Illuminate\Http\Request');
 		$view = m::mock('Illuminate\View\Factory');
-		$trans = m::mock('Symfony\Component\Translation\TranslatorInterface');
 		$view->shouldReceive('addNamespace')->once()->with('pagination', realpath(__DIR__.'/../../src/Illuminate/Pagination').'/views');
+		$trans = m::mock('Symfony\Component\Translation\TranslatorInterface');
 
-		return new Factory($request, $view, $trans, 'page');
+		$factory = new Factory('page');
+		$factory->setRequest($request);
+		$factory->setTranslator($trans);
+		$factory->setupPaginationEnvironment($view);
+
+		return $factory;
 	}
 
 }

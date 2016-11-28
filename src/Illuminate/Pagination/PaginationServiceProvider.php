@@ -20,8 +20,12 @@ class PaginationServiceProvider extends ServiceProvider {
 	{
 		$this->app->bindShared('paginator', function($app)
 		{
-			$paginator = new Factory($app['request'], $app['view'], $app['translator']);
+			$paginator = new Factory();
+			$paginator->setRequest($app['request']);
+			$paginator->setTranslator($app['translator']);
 
+			$paginator->setupPaginationEnvironment($app['view']);
+			
 			$paginator->setViewName($app['config']['view.pagination']);
 
 			$app->refresh('request', $paginator, 'setRequest');

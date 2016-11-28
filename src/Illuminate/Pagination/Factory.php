@@ -65,29 +65,25 @@ class Factory {
 	/**
 	 * Create a new pagination factory.
 	 *
-	 * @param  \Symfony\Component\HttpFoundation\Request  $request
-	 * @param  \Illuminate\View\Factory  $view
-	 * @param  \Symfony\Component\Translation\TranslatorInterface  $trans
 	 * @param  string  $pageName
 	 * @return void
 	 */
-	public function __construct(Request $request, ViewFactory $view, TranslatorInterface $trans, $pageName = 'page')
+	public function __construct($pageName = 'page')
 	{
-		$this->view = $view;
-		$this->trans = $trans;
-		$this->request = $request;
 		$this->pageName = $pageName;
-		$this->setupPaginationEnvironment();
 	}
 
 	/**
 	 * Setup the pagination environment.
 	 *
+	 * @param  \Illuminate\View\Factory  $view
 	 * @return void
 	 */
-	protected function setupPaginationEnvironment()
+	public function setupPaginationEnvironment(ViewFactory $view)
 	{
-		$this->view->addNamespace('pagination', __DIR__.'/views');
+		$view->addNamespace('pagination', __DIR__.'/views');
+
+		$this->setViewFactory($view);
 	}
 
 	/**
@@ -126,7 +122,13 @@ class Factory {
 	 */
 	public function getCurrentPage()
 	{
-		$page = (int) $this->currentPage ?: $this->request->input($this->pageName, 1);
+		if ($this->currentPage) {
+			$page = (int) $this->currentPage;
+		} elseif ( ! is_null($this->request)) {
+			$page = (int) $this->request->input($this->pageName, 1);
+		} else {
+			throw new \Exception('No currentPage was provided, and request information is not available');
+		}
 
 		if ($page < 1 || filter_var($page, FILTER_VALIDATE_INT) === false)
 		{
@@ -284,6 +286,16 @@ class Factory {
 	public function getTranslator()
 	{
 		return $this->trans;
+	}
+
+	/**
+	 * Set the translator instance.
+	 *
+	 * @param \Symfony\Component\Translation\TranslatorInterface $trans
+	 */
+	public function setTranslator($trans)
+	{
+		return $this->trans = $trans;
 	}
 
 }
