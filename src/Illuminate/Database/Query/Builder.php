@@ -553,6 +553,7 @@ class Builder
      *
      * @param string    $column
      * @param int   $value
+     * @return $this
      */
     protected function chunkIdWhere($column, $value)
     {
@@ -1517,8 +1518,8 @@ class Builder
                 })->values()->all();
 
         return $this->chunkIdWhere($column, $lastId)
-            ->orderBy($column, 'asc')
-            ->take($perPage);
+                    ->orderBy($column, 'asc')
+                    ->take($perPage);
     }
 
     /**
