@@ -112,25 +112,18 @@ class Filesystem
     }
 
     /**
-     * Set UNIX mode of a file or directory.
+     * Get or set UNIX mode of a file or directory.
      *
      * @param  string  $path
-     * @param  bool  $mode
-     * @return int
+     * @param  int  $mode
+     * @return mixed
      */
-    public function setUnixMode($path, $mode)
+    public function chmod($path, $mode = null)
     {
-        return chmod($path, $mode);
-    }
+        if($mode) {
+            return chmod($path, $mode);
+        }
 
-    /**
-     * Get UNIX mode of a file or directory.
-     *
-     * @param  string  $path
-     * @return string
-     */
-    public function getUnixMode($path)
-    {
         return substr(sprintf('%o', fileperms($path)), -4);
     }
 
