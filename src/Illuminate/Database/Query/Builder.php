@@ -549,7 +549,8 @@ class Builder
 
     /**
      * Adds an id limit to assist with Eloquent chunkById.
-     * Subsequent calls override existing limit.
+     *
+     * Subsequent calls override previous limit.
      *
      * @param string    $column
      * @param int   $value
