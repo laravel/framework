@@ -81,6 +81,48 @@ class ModelMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Build the class with the given name.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function buildClass($name)
+    {
+        $stub = parent::buildClass($name);
+
+        return $this->replaceTable($stub, $name);
+    }
+
+    /**
+     * Replace the table for the given stub.
+     *
+     * @param  string  $stub
+     * @param  string  $name
+     * @return $this
+     */
+    protected function replaceTable(&$stub, $name)
+    {
+        return str_replace(
+            'DummyTable', $this->getTable($name), $stub
+        );
+    }
+
+    /**
+     * Get the table name for a given model.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function getTable($name)
+    {
+        if ($this->option('table')) {
+            return $this->option('table');
+        }
+
+        return Str::plural(Str::snake(class_basename($name)));
+    }
+
+    /**
      * Get the console command options.
      *
      * @return array
@@ -93,6 +135,8 @@ class ModelMakeCommand extends GeneratorCommand
             ['controller', 'c', InputOption::VALUE_NONE, 'Create a new controller for the model.'],
 
             ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller'],
+
+            ['table', 't', InputOption::VALUE_OPTIONAL, 'Add table parameter to the model.'],
         ];
     }
 }
