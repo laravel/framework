@@ -1,0 +1,5 @@
+@extends('DummyParentView')
+
+@section('DummySection')
+<DumyDiv></DumyDiv>
+@endsection
