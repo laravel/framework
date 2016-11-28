@@ -986,7 +986,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
             $data->all()
         );
     }
-    
+
     public function testMapWithKeysCallbackKey()
     {
         $data = new Collection([
