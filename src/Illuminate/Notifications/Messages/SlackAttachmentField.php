@@ -19,8 +19,7 @@ class SlackAttachmentField
     protected $content;
 
     /**
-     * Whether the content is short enough to fit side by side with
-     * other contents.
+     * Whether the content is short.
      *
      * @var bool
      */
@@ -29,7 +28,7 @@ class SlackAttachmentField
     /**
      * Set the title of the field.
      *
-     * @param string $title
+     * @param  string $title
      * @return $this
      */
     public function title($title)
@@ -42,7 +41,7 @@ class SlackAttachmentField
     /**
      * Set the content of the field.
      *
-     * @param string $content
+     * @param  string $content
      * @return $this
      */
     public function content($content)
@@ -53,19 +52,11 @@ class SlackAttachmentField
     }
 
     /**
+     * Indicates that the content should not be displayed side-by-side with other fields.
+     *
      * @return $this
      */
-    public function displaySideBySide()
-    {
-        $this->short = true;
-
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function dontDisplaySideBySide()
+    public function long()
     {
         $this->short = false;
 

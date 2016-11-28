@@ -3,10 +3,10 @@
 namespace Illuminate\Notifications\Channels;
 
 use GuzzleHttp\Client as HttpClient;
-use Illuminate\Notifications\Messages\SlackAttachmentField;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\SlackMessage;
 use Illuminate\Notifications\Messages\SlackAttachment;
+use Illuminate\Notifications\Messages\SlackAttachmentField;
 
 class SlackWebhookChannel
 {
