@@ -223,9 +223,10 @@ class AppNameCommand extends Command
      */
     protected function setDatabaseFactoryNamespaces()
     {
-        $this->replaceIn(
-            $this->laravel->databasePath().'/factories/ModelFactory.php', $this->currentRoot, $this->argument('name')
-        );
+        $modelFactoryFile = $this->laravel->databasePath().'/factories/ModelFactory.php';
+        if ($this->files->exists($modelFactoryFile)) {
+            $this->replaceIn($modelFactoryFile, $this->currentRoot, $this->argument('name'));
+        }
     }
 
     /**
