@@ -8,9 +8,11 @@ use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Session\SessionManager;
 use Illuminate\Session\SessionInterface;
-use Symfony\Component\HttpFoundation\Cookie;
+use Illuminate\Session\CollectGarbageJob;
 use Illuminate\Session\CookieSessionHandler;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Contracts\Bus\Dispatcher as DispatcherContract;
 
 class StartSession
 {
@@ -20,6 +22,13 @@ class StartSession
      * @var \Illuminate\Session\SessionManager
      */
     protected $manager;
+
+    /**
+     * The bus dispatcher implementation.
+     *
+     * @var \Illuminate\Contracts\Bus\Dispatcher|null
+     */
+    protected $dispatcher;
 
     /**
      * Indicates if the session was handled for the current request.
@@ -32,11 +41,13 @@ class StartSession
      * Create a new session middleware.
      *
      * @param  \Illuminate\Session\SessionManager  $manager
+     * @param  \Illuminate\Contracts\Bus\Dispatcher|null  $dispatcher
      * @return void
      */
-    public function __construct(SessionManager $manager)
+    public function __construct(SessionManager $manager, DispatcherContract $dispatcher = null)
     {
         $this->manager = $manager;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -149,7 +160,11 @@ class StartSession
         // the odds needed to perform garbage collection on any given request. If we do
         // hit it, we'll call this handler to let it delete all the expired sessions.
         if ($this->configHitsLottery($config)) {
-            $session->getHandler()->gc($this->getSessionLifetimeInSeconds());
+            if ($this->dispatcher) {
+                $this->dispatcher->dispatch(new CollectGarbageJob($session->getHandler(), $this->getSessionLifetimeInSeconds()));
+            } else {
+                $session->getHandler()->gc($this->getSessionLifetimeInSeconds());
+            }
         }
     }
 
