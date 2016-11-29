@@ -280,7 +280,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
         $pattern = '/\B@(macro)([ \t]*)(\( ( (?>[^()]+) | (?3) )* \))?/x';
 
         while (preg_match($pattern, $value, $matches)) {
-
             $expression = $this->stripParentheses($matches[3]);
 
             if (Str::endsWith($expression, ')')) {
