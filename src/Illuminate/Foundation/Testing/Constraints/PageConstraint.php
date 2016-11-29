@@ -39,7 +39,10 @@ abstract class PageConstraint extends PHPUnit_Framework_Constraint
      */
     protected function crawler($crawler)
     {
-        return is_object($crawler) ? $crawler : new Crawler($crawler);
+        return is_object($crawler)
+        && ! $crawler instanceof \DOMDocument
+            ? $crawler
+            : new Crawler($crawler);
     }
 
     /**

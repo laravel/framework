@@ -243,8 +243,16 @@ trait InteractsWithPages
             $constraint = new ReversePageConstraint($constraint);
         }
 
+        $encoding = null;
+        if (preg_match('/;\s*charset=\s*([^;]+)\s*(;|$)/', $this->response->headers->get('content-type'), $m)) {
+            $encoding = $m[1];
+        }
+        $dom = new DOMDocument;
+        $html = mb_convert_encoding($this->response->getContent(), 'HTML-ENTITIES', $encoding);
+        $dom->loadHTML($html);
+
         self::assertThat(
-            $this->crawler() ?: $this->response->getContent(),
+            $this->crawler() ?: $dom,
             $constraint, $message
         );
 
