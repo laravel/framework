@@ -3358,16 +3358,12 @@ class Validator implements ValidatorContract
         switch ($operator) {
             case '<':
                 return $first < $second;
-                break;
             case '>':
                 return $first > $second;
-                break;
             case '<=':
                 return $first <= $second;
-                break;
             case '>=':
                 return $first >= $second;
-                break;
             default:
                 throw new \InvalidArgumentException();
         }
