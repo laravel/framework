@@ -114,7 +114,7 @@ class RedisJob extends Job {
 	/**
 	 * Get the underlying queue driver instance.
 	 *
-	 * @return \Illuminate\Redis\Database
+	 * @return \Illuminate\Redis\RedisInterface
 	 */
 	public function getRedisQueue()
 	{

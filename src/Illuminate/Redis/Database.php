@@ -2,7 +2,7 @@
 
 use Predis\Client;
 
-class Database {
+class Database implements RedisInterface {
 
 	/**
 	 * The host address of the database.

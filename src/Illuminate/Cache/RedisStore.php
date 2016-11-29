@@ -1,13 +1,13 @@
 <?php namespace Illuminate\Cache;
 
-use Illuminate\Redis\Database as Redis;
+use Illuminate\Redis\RedisInterface;
 
 class RedisStore extends TaggableStore implements StoreInterface {
 
 	/**
 	 * The Redis database connection.
 	 *
-	 * @var \Illuminate\Redis\Database
+	 * @var \Illuminate\Redis\RedisInterface
 	 */
 	protected $redis;
 
@@ -28,12 +28,12 @@ class RedisStore extends TaggableStore implements StoreInterface {
 	/**
 	 * Create a new Redis store.
 	 *
-	 * @param  \Illuminate\Redis\Database  $redis
+	 * @param  \Illuminate\Redis\RedisInterface  $redis
 	 * @param  string  $prefix
 	 * @param  string  $connection
 	 * @return void
 	 */
-	public function __construct(Redis $redis, $prefix = '', $connection = 'default')
+	public function __construct(RedisInterface $redis, $prefix = '', $connection = 'default')
 	{
 		$this->redis = $redis;
 		$this->connection = $connection;
@@ -144,7 +144,7 @@ class RedisStore extends TaggableStore implements StoreInterface {
 	/**
 	 * Get the Redis connection instance.
 	 *
-	 * @return \Predis\ClientInterface
+	 * @return mixed
 	 */
 	public function connection()
 	{
@@ -165,7 +165,7 @@ class RedisStore extends TaggableStore implements StoreInterface {
 	/**
 	 * Get the Redis database instance.
 	 *
-	 * @return \Illuminate\Redis\Database
+	 * @return \Illuminate\Redis\RedisInterface
 	 */
 	public function getRedis()
 	{
