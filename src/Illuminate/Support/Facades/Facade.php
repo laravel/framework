@@ -100,7 +100,7 @@ abstract class Facade
      * Create a fresh mock instance for the given class.
      *
      * @param  string  $name
-     * @return \Mockery\Expectation
+     * @return \Mockery\MockInterface
      */
     protected static function createMockByName($name)
     {
