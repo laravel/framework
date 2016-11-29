@@ -925,7 +925,7 @@ test';
             ['(((', ')))'],
         ];
     }
-    
+
     protected function getViewFinder()
     {
         return m::mock('Illuminate\View\ViewFinderInterface');

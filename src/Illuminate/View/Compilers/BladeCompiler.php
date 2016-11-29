@@ -302,7 +302,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
             $code = $codeStart.$viewContent."\n".$codeEnd;
 
             $value = Str::replaceFirst($matches[0], $code, $value);
-
         }
 
         return $value;
@@ -1224,6 +1223,5 @@ HTML;
         $view = $namespace.$delimiter.str_replace('/', '.', $view);
 
         return $view;
-
     }
 }
