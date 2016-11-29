@@ -85,6 +85,37 @@ class NotificationSlackChannelTest extends PHPUnit_Framework_TestCase
             ]
         );
     }
+
+    public function testCorrectPayloadWithAttachmentFieldBuilderIsSentToSlack()
+    {
+        $this->validatePayload(
+            new NotificationSlackChannelWithAttachmentFieldBuilderTestNotification,
+            [
+                'json' => [
+                    'text' => 'Content',
+                    'attachments' => [
+                        [
+                            'title' => 'Laravel',
+                            'text' => 'Attachment Content',
+                            'title_link' => 'https://laravel.com',
+                            'fields' => [
+                                [
+                                    'title' => 'Project',
+                                    'value' => 'Laravel',
+                                    'short' => true,
+                                ],
+                                [
+                                    'title' => 'Special powers',
+                                    'value' => 'Zonda',
+                                    'short' => false,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]
+        );
+    }
 }
 
 class NotificationSlackChannelTestNotifiable
@@ -134,5 +165,25 @@ class NotificationSlackChannelWithoutOptionalFieldsTestNotification extends Noti
                                         'Project' => 'Laravel',
                                     ]);
                     });
+    }
+}
+
+class NotificationSlackChannelWithAttachmentFieldBuilderTestNotification extends Notification
+{
+    public function toSlack($notifiable)
+    {
+        return (new SlackMessage)
+            ->content('Content')
+            ->attachment(function ($attachment) {
+                $attachment->title('Laravel', 'https://laravel.com')
+                    ->content('Attachment Content')
+                    ->field('Project', 'Laravel')
+                    ->field(function ($attachmentField) {
+                        $attachmentField
+                            ->title('Special powers')
+                            ->content('Zonda')
+                            ->long();
+                    });
+            });
     }
 }

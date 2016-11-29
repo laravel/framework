@@ -111,6 +111,30 @@ class SlackAttachment
     }
 
     /**
+     * Add a field to the attachment.
+     *
+     * @param  \Closure|array $title
+     * @param  string $content
+     * @return $this
+     */
+    public function field($title, $content = '')
+    {
+        if (is_callable($title)) {
+            $callback = $title;
+
+            $callback($attachmentField = new SlackAttachmentField);
+
+            $this->fields[] = $attachmentField;
+
+            return $this;
+        }
+
+        $this->fields[$title] = $content;
+
+        return $this;
+    }
+
+    /**
      * Set the fields of the attachment.
      *
      * @param  array  $fields
