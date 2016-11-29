@@ -2255,6 +2255,41 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($v->fails());
     }
 
+    public function testWeakBeforeAndAfter()
+    {
+        date_default_timezone_set('UTC');
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => '2012-01-15'], ['x' => 'before_or_equal:2012-01-15']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '2012-01-15'], ['x' => 'before_or_equal:2012-01-16']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '2012-01-15'], ['x' => 'before_or_equal:2012-01-14']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '31/12/2012'], ['x' => 'date_format:d/m/Y|before_or_equal:31/12/2012']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '31/12/2012'], ['x' => 'date_format:d/m/Y|before_or_equal:29/12/2012']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '2012-01-15'], ['x' => 'after_or_equal:2012-01-15']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '2012-01-15'], ['x' => 'after_or_equal:2012-01-14']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '2012-01-15'], ['x' => 'after_or_equal:2012-01-16']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '31/12/2012'], ['x' => 'date_format:d/m/Y|after_or_equal:31/12/2012']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '31/12/2012'], ['x' => 'date_format:d/m/Y|after_or_equal:02/01/2013']);
+        $this->assertTrue($v->fails());
+    }
+
     public function testSometimesAddingRules()
     {
         $trans = $this->getIlluminateArrayTranslator();

@@ -1,6 +1,6 @@
 # Release Notes for 5.3.x
 
-## [Unreleased]
+## v5.3.24 (2016-11-21)
 
 ### Added
 - Added `AuthenticateSession` middleware ([fc302a6](https://github.com/laravel/framework/commit/fc302a6667f9dcce53395d01d8e6ba752ea62955))
