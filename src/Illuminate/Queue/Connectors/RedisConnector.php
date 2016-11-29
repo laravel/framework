@@ -6,9 +6,9 @@ use Illuminate\Queue\RedisQueue;
 class RedisConnector implements ConnectorInterface {
 
 	/**
-	* The Redis database instance.
-	*
-	 * @var \Illuminate\Redis\Database
+	 * The Redis database instance.
+	 *
+	 * @var mixed
 	 */
 	protected $redis;
 
@@ -22,11 +22,11 @@ class RedisConnector implements ConnectorInterface {
 	/**
 	 * Create a new Redis queue connector instance.
 	 *
-	 * @param  \Illuminate\Redis\Database  $redis
-	 * @param  string|null  $connection
+	 * @param mixed $redis
+	 * @param string|null $connection
 	 * @return void
 	 */
-	public function __construct(Database $redis, $connection = null)
+	public function __construct($redis, $connection = null)
 	{
 		$this->redis = $redis;
 		$this->connection = $connection;
