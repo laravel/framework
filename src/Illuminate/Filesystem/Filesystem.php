@@ -112,6 +112,22 @@ class Filesystem
     }
 
     /**
+     * Get or set UNIX mode of a file or directory.
+     *
+     * @param  string  $path
+     * @param  int  $mode
+     * @return mixed
+     */
+    public function chmod($path, $mode = null)
+    {
+        if ($mode) {
+            return chmod($path, $mode);
+        }
+
+        return substr(sprintf('%o', fileperms($path)), -4);
+    }
+
+    /**
      * Prepend to a file.
      *
      * @param  string  $path
