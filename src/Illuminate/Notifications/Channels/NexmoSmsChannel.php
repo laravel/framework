@@ -55,6 +55,7 @@ class NexmoSmsChannel
         }
 
         return $this->nexmo->message()->send([
+            'type' => 'unicode',
             'from' => $message->from ?: $this->from,
             'to' => $to,
             'text' => trim($message->content),
