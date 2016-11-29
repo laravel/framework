@@ -107,7 +107,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected $forelseCounter = 0;
 
     /**
-     * Create a BladeCompiler instance
+     * Create a BladeCompiler instance.
      *
      *
      * @param   Filesystem  $files
@@ -300,7 +300,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
 
             $viewContent = $this->files->get($this->viewFinder->find($view));
 
-            $code = $codeStart . $viewContent . "\n" . $codeEnd;
+            $code = $codeStart.$viewContent."\n".$codeEnd;
 
             $value = Str::replaceFirst($matches[0], $code, $value);
 
@@ -1159,20 +1159,20 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
-     * Macro start code
+     * Macro start code.
      *
      * @return  string
      */
     protected function getMacroStartCode()
     {
-        $codeStart = <<<HTML
+        $codeStart = <<<'HTML'
 <?php 
-call_user_func(function (\$macroName, array \$firstMerging, array \$secondMerging = null) {
-    if (\$secondMerging !== null) {
-        \$firstMerging = array_merge(\$secondMerging, \$firstMerging);
+call_user_func(function ($macroName, array $firstMerging, array $secondMerging = null) {
+    if ($secondMerging !== null) {
+        $firstMerging = array_merge($secondMerging, $firstMerging);
     }
-    \$secondMerging = null;
-    extract(\$firstMerging);
+    $secondMerging = null;
+    extract($firstMerging);
 ?>
 HTML;
 
@@ -1180,7 +1180,7 @@ HTML;
     }
 
     /**
-     * Macro end code
+     * Macro end code.
      *
      * @param   string $expression
      * @return  string
@@ -1191,7 +1191,7 @@ HTML;
     }
 
     /**
-     * Extract findable view from macro
+     * Extract findable view from macro.
      *
      * @param   string $expression
      * @return  string
@@ -1203,13 +1203,11 @@ HTML;
 
         $view = trim($exploded[0]);
 
-        if (!Str::startsWith($view, "'") || !Str::endsWith($view, "'") || substr_count($view, "'") !== 2) {
-
+        if (! Str::startsWith($view, "'") || ! Str::endsWith($view, "'") || substr_count($view, "'") !== 2) {
             // What error to throw ?
             throw new \ErrorException(
                 "The 'macro' directive can only be used with literal strings beginning and ending with \" ' \""
             );
-
         }
 
         $view = str_replace('\'', '', $view);
@@ -1217,16 +1215,14 @@ HTML;
         $delimiter = ViewFinderInterface::HINT_PATH_DELIMITER;
 
         if (strpos($view, $delimiter) === false) {
-
             $view = str_replace('/', '.', $view);
 
             return $view;
-
         }
 
         list($namespace, $view) = explode($delimiter, $view);
 
-        $view = $namespace . $delimiter . str_replace('/', '.', $view);
+        $view = $namespace.$delimiter.str_replace('/', '.', $view);
 
         return $view;
 
