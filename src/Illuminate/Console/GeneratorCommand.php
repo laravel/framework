@@ -87,7 +87,7 @@ abstract class GeneratorCommand extends Command
      */
     protected function getPath($name)
     {
-        $name = str_replace_first($this->laravel->getNamespace(), '', $name);
+        $name = str_replace_first($this->rootNamespace(), '', $name);
 
         return $this->laravel['path'].'/'.str_replace('\\', '/', $name).'.php';
     }
@@ -100,7 +100,7 @@ abstract class GeneratorCommand extends Command
      */
     protected function parseName($name)
     {
-        $rootNamespace = $this->laravel->getNamespace();
+        $rootNamespace = $this->rootNamespace();
 
         if (Str::startsWith($name, $rootNamespace)) {
             return $name;
@@ -164,7 +164,7 @@ abstract class GeneratorCommand extends Command
         );
 
         $stub = str_replace(
-            'DummyRootNamespace', $this->laravel->getNamespace(), $stub
+            'DummyRootNamespace', $this->rootNamespace(), $stub
         );
 
         return $this;
@@ -203,6 +203,16 @@ abstract class GeneratorCommand extends Command
     protected function getNameInput()
     {
         return trim($this->argument('name'));
+    }
+
+    /**
+     * Get the root namespace for the class.
+     *
+     * @return string
+     */
+    protected function rootNamespace()
+    {
+        return $this->laravel->getNamespace();
     }
 
     /**
