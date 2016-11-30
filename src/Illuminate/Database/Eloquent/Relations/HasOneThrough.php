@@ -45,7 +45,6 @@ class HasOneThrough extends Relation
      */
     protected $parentKey;
 
-
     /**
      * Create a new has one through relationship instance.
      *
@@ -57,9 +56,9 @@ class HasOneThrough extends Relation
      */
     public function __construct(Builder $query, Model $farParent, Model $parent, $farParentKey, $parentKey)
     {
-        $this->parentKey    = $parentKey;
+        $this->parentKey = $parentKey;
         $this->farParentKey = $farParentKey;
-        $this->farParent    = $farParent;
+        $this->farParent = $farParent;
 
         parent::__construct($query, $parent);
     }
@@ -118,9 +117,9 @@ class HasOneThrough extends Relation
     {
         $query = $query ?: $this->query;
 
-        $relatedLocalKey     = $this->related->getQualifiedKeyName();
-        $parentForeignKey    = $this->parent->getTable().'.'.$this->parentKey;
-        $parentLocalKey      = $this->parent->getQualifiedKeyName();
+        $relatedLocalKey = $this->related->getQualifiedKeyName();
+        $parentForeignKey = $this->parent->getTable().'.'.$this->parentKey;
+        $parentLocalKey = $this->parent->getQualifiedKeyName();
         $farParentForeignKey = $this->farParent->getTable().'.'.$this->farParentKey;
 
         $query->join($this->parent->getTable(), $parentForeignKey, '=', $relatedLocalKey);
@@ -260,7 +259,7 @@ class HasOneThrough extends Relation
         }
 
         return array_merge($columns, [
-            $this->farParent->getTable().'.'.$this->farParentKey
+            $this->farParent->getTable().'.'.$this->farParentKey,
         ]);
     }
 }
