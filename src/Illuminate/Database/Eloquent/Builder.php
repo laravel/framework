@@ -755,9 +755,9 @@ class Builder
     }
 
     /**
-     * Apply the callback's query changes if the given "value" is true.
+     * Apply the callback's query changes if the given "value" is valid.
      *
-     * @param  bool  $value
+     * @param  mixed  $value
      * @param  \Closure  $callback
      * @param  \Closure  $default
      * @return $this

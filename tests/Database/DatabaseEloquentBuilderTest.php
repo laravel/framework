@@ -580,8 +580,8 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         });
         $this->assertEquals(['foo' => $builder], $builder->delete());
     }
-    
-   public function testWhen()
+
+    public function testWhen()
     {
         $callback = function ($query) {
             return $query->where('id', '=', 1);
