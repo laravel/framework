@@ -42,6 +42,27 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('https://www.foo.com/foo/bar', $url->asset('foo/bar', true));
     }
 
+    public function testBasicGenerationWithFormatting()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
+        );
+
+        /*
+         * Empty Named Route
+         */
+        $route = new Route(['GET'], '/named-route', ['as' => 'plain']);
+        $routes->add($route);
+
+        $url->formatPathUsing(function ($path) {
+            return '/something'.$path;
+        });
+
+        $this->assertEquals('http://www.foo.com/something/foo/bar', $url->to('foo/bar'));
+        $this->assertEquals('/something/named-route', $url->route('plain', [], false));
+    }
+
     public function testBasicRouteGeneration()
     {
         $url = new UrlGenerator(

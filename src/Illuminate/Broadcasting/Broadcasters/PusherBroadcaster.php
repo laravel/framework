@@ -67,7 +67,7 @@ class PusherBroadcaster extends Broadcaster
         } else {
             return $this->decodePusherResponse(
                 $this->pusher->presence_auth(
-                    $request->channel_name, $request->socket_id, $request->user()->id, $result)
+                    $request->channel_name, $request->socket_id, $request->user()->getKey(), $result)
             );
         }
     }
@@ -95,7 +95,7 @@ class PusherBroadcaster extends Broadcaster
     {
         $socket = Arr::pull($payload, 'socket');
 
-        $response = $this->pusher->trigger($this->formatChannels($channels), $event, $payload, $socket);
+        $response = $this->pusher->trigger($this->formatChannels($channels), $event, $payload, $socket, true);
 
         if ((is_array($response) && $response['status'] >= 200 && $response['status'] <= 299)
             || $response === true) {

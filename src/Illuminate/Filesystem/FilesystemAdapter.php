@@ -70,25 +70,23 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      *
      * @param  string  $path
      * @param  string|resource  $contents
-     * @param  string  $visibility
+     * @param  array  $options
      * @return bool
      */
-    public function put($path, $contents, $visibility = null)
+    public function put($path, $contents, $options = [])
     {
-        if ($contents instanceof File || $contents instanceof UploadedFile) {
-            return $this->putFile($path, $contents, $visibility);
+        if (is_string($options)) {
+            $options = ['visibility' => $options];
         }
 
-        if ($visibility = $this->parseVisibility($visibility)) {
-            $config = ['visibility' => $visibility];
-        } else {
-            $config = [];
+        if ($contents instanceof File || $contents instanceof UploadedFile) {
+            return $this->putFile($path, $contents, $options);
         }
 
         if (is_resource($contents)) {
-            return $this->driver->putStream($path, $contents, $config);
+            return $this->driver->putStream($path, $contents, $options);
         } else {
-            return $this->driver->put($path, $contents, $config);
+            return $this->driver->put($path, $contents, $options);
         }
     }
 
@@ -97,12 +95,12 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      *
      * @param  string  $path
      * @param  \Illuminate\Http\UploadedFile  $file
-     * @param  string  $visibility
+     * @param  array  $options
      * @return string|false
      */
-    public function putFile($path, $file, $visibility = null)
+    public function putFile($path, $file, $options = [])
     {
-        return $this->putFileAs($path, $file, $file->hashName(), $visibility);
+        return $this->putFileAs($path, $file, $file->hashName(), $options);
     }
 
     /**
@@ -111,14 +109,14 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      * @param  string  $path
      * @param  \Illuminate\Http\File|\Illuminate\Http\UploadedFile  $file
      * @param  string  $name
-     * @param  string  $visibility
+     * @param  array  $options
      * @return string|false
      */
-    public function putFileAs($path, $file, $name, $visibility = null)
+    public function putFileAs($path, $file, $name, $options = [])
     {
         $stream = fopen($file->getRealPath(), 'r+');
 
-        $result = $this->put($path = trim($path.'/'.$name, '/'), $stream, $visibility);
+        $result = $this->put($path = trim($path.'/'.$name, '/'), $stream, $options);
 
         if (is_resource($stream)) {
             fclose($stream);

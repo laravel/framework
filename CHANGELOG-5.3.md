@@ -1,5 +1,46 @@
 # Release Notes for 5.3.x
 
+## v5.3.25 (2016-11-29)
+
+### Added
+- Added `before_or_equal` and `after_or_equal` validation rules ([#16490](https://github.com/laravel/framework/pull/16490))
+- Added fluent builder for `SlackMessageAttachmentField` ([#16535](https://github.com/laravel/framework/pull/16535), [db4879a](https://github.com/laravel/framework/commit/db4879ae84a3a1959729ac2732ae42cfe377314c))
+- Added the possibility to set and get file permissions in `Filesystem` ([#16560](https://github.com/laravel/framework/pull/16560))
+
+### Changed
+- Added additional `keyType` check to avoid using an invalid type for eager load constraints ([#16452](https://github.com/laravel/framework/pull/16452))
+- Always debug Pusher in `PusherBroadcaster::broadcast()` ([#16493](https://github.com/laravel/framework/pull/16493))
+- Don't pluralize "metadata" ([#16518](https://github.com/laravel/framework/pull/16518))
+- Always pass a collection to `LengthAwarePaginator` from `paginate()` methods ([#16547](https://github.com/laravel/framework/pull/16547))
+- Avoid unexpected connection timeouts when flushing tagged caches on Redis ([#16568](https://github.com/laravel/framework/pull/16568))
+- Enabled unicode support to `NexmoSmsChannel` ([#16577](https://github.com/laravel/framework/pull/16577), [3001640](https://github.com/laravel/framework/commit/30016408a6911afba4aa7739d69948d13612ea06))
+
+### Fixed
+- Fixed view compilation bug when using " or " in strings ([#16506](https://github.com/laravel/framework/pull/16506))
+
+
+## v5.3.24 (2016-11-21)
+
+### Added
+- Added `AuthenticateSession` middleware ([fc302a6](https://github.com/laravel/framework/commit/fc302a6667f9dcce53395d01d8e6ba752ea62955))
+- Support arrays in `HasOne::withDefault()` ([#16382](https://github.com/laravel/framework/pull/16382))
+- Define route basename for resources ([#16352](https://github.com/laravel/framework/pull/16352))
+- Added `$fallback` parameter to `Redirector::back()` ([#16426](https://github.com/laravel/framework/pull/16426))
+- Added support for footer and markdown in `SlackAttachment` ([#16451](https://github.com/laravel/framework/pull/16451))
+- Added password change feedback auth stubs ([#16461](https://github.com/laravel/framework/pull/16461))
+- Added `name` to default register route ([#16480](https://github.com/laravel/framework/pull/16480))
+- Added `ServiceProvider::loadRoutesFrom()` method ([#16483](https://github.com/laravel/framework/pull/16483))
+
+### Changed
+- Use `getKey()` instead of `$id` in `PusherBroadcaster` ([#16438](https://github.com/laravel/framework/pull/16438))
+
+### Fixed
+- Pass `PheanstalkJob` to Pheanstalk's `delete()` method ([#16415](https://github.com/laravel/framework/pull/16415))
+- Don't call PDO callback in `reconnectIfMissingConnection()` until it is needed ([#16422](https://github.com/laravel/framework/pull/16422))
+- Don't timeout queue if `--timeout` is set to `0` ([#16465](https://github.com/laravel/framework/pull/16465))
+- Respect `--force` option of `queue:work` in maintenance mode ([#16468](https://github.com/laravel/framework/pull/16468))
+
+
 ## v5.3.23 (2016-11-14)
 
 ### Added

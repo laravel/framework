@@ -111,7 +111,7 @@ class WorkCommand extends Command
         return new WorkerOptions(
             $this->option('delay'), $this->option('memory'),
             $this->option('timeout'), $this->option('sleep'),
-            $this->option('tries')
+            $this->option('tries'), $this->option('force')
         );
     }
 
