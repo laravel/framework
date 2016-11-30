@@ -467,9 +467,9 @@ class Builder
         $builder = $this;
 
         if ($value) {
-            $builder = call_user_func($callback, $builder);
+            $builder = call_user_func($callback, $builder, $value);
         } elseif ($default) {
-            $builder = call_user_func($default, $builder);
+            $builder = call_user_func($default, $builder, $value);
         }
 
         return $builder;
