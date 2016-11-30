@@ -6,6 +6,7 @@ use Closure;
 use Exception;
 use ArrayAccess;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use LogicException;
 use JsonSerializable;
 use DateTimeInterface;
@@ -724,6 +725,26 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $localKey = $localKey ?: $this->getKeyName();
 
         return new HasOne($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey);
+    }
+
+    /**
+     * Define a one-to-one relationship that goes through an intermediate model.
+     *
+     * @param string      $related      Class name of related Model
+     * @param string      $through      Class name of through Model
+     * @param string|null $farParentKey Foreign key to through
+     * @param string|null $parentKey    Foreign key to related
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOneThrough
+     */
+    public function hasOneThrough($related, $through, $farParentKey = null, $parentKey = null)
+    {
+        $related      = new $related;
+        $through      = new $through;
+        $farParentKey = $farParentKey ?: $through->getForeignKey();
+        $parentKey    = $parentKey    ?: $related->getForeignKey();
+
+        return new HasOneThrough($related->newQuery(), $this, $through, $farParentKey, $parentKey);
     }
 
     /**
