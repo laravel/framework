@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Collection;
 
 /**
  * HasOneThrough relation defines a one-to-one relationship between two models that uses a third
- * intermediate model as the connection:
+ * intermediate model as the connection.
  *
  * <code>
  * select * from Related
@@ -20,8 +20,7 @@ use Illuminate\Database\Eloquent\Collection;
  * </code>
  *
  *
- * @package Illuminate\Database\Eloquent\Relations
- * @author  Peter Scopes <peter.scopes@gmail.com>
+ * @author Peter Scopes <peter.scopes@gmail.com>
  */
 class HasOneThrough extends Relation
 {
@@ -46,7 +45,6 @@ class HasOneThrough extends Relation
      */
     protected $parentKey;
 
-
     /**
      * Create a new has one through relationship instance.
      *
@@ -58,9 +56,9 @@ class HasOneThrough extends Relation
      */
     public function __construct(Builder $query, Model $farParent, Model $parent, $farParentKey, $parentKey)
     {
-        $this->parentKey    = $parentKey;
+        $this->parentKey = $parentKey;
         $this->farParentKey = $farParentKey;
-        $this->farParent    = $farParent;
+        $this->farParent = $farParent;
 
         parent::__construct($query, $parent);
     }
@@ -119,9 +117,9 @@ class HasOneThrough extends Relation
     {
         $query = $query ?: $this->query;
 
-        $relatedLocalKey     = $this->related->getQualifiedKeyName();
-        $parentForeignKey    = $this->parent->getTable().'.'.$this->parentKey;
-        $parentLocalKey      = $this->parent->getQualifiedKeyName();
+        $relatedLocalKey = $this->related->getQualifiedKeyName();
+        $parentForeignKey = $this->parent->getTable().'.'.$this->parentKey;
+        $parentLocalKey = $this->parent->getQualifiedKeyName();
         $farParentForeignKey = $this->farParent->getTable().'.'.$this->farParentKey;
 
         $query->join($this->parent->getTable(), $parentForeignKey, '=', $relatedLocalKey);
@@ -244,8 +242,6 @@ class HasOneThrough extends Relation
 
             return reset($models);
         }
-
-        return null;
     }
 
     /**
@@ -262,7 +258,7 @@ class HasOneThrough extends Relation
 
         return array_merge($columns, [
             $this->parent->getTable().'.'.$this->parentKey,
-            $this->farParent->getTable().'.'.$this->farParentKey
+            $this->farParent->getTable().'.'.$this->farParentKey,
         ]);
     }
 }

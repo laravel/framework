@@ -739,8 +739,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function hasOneThrough($related, $through, $throughForeignKey = null, $relatedForeignKey = null)
     {
-        $related           = new $related;
-        $through           = new $through;
+        $related = new $related;
+        $through = new $through;
         $throughForeignKey = $throughForeignKey ?: $through->getForeignKey();
         $relatedForeignKey = $relatedForeignKey ?: $related->getForeignKey();
 

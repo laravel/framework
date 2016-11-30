@@ -14,7 +14,7 @@ class DatabaseEloquentHasOneThroughTest extends PHPUnit_Framework_TestCase
     public function testRelationIsProperlyInitialized()
     {
         $relation = $this->getRelation();
-        $model    = m::mock('Illuminate\Database\Eloquent\Model');
+        $model = m::mock('Illuminate\Database\Eloquent\Model');
         $model->shouldReceive('setRelation')->once()->with('foo', null);
 
         $models = $relation->initRelation([$model], 'foo');
@@ -101,5 +101,4 @@ class DatabaseEloquentHasOneThroughTest extends PHPUnit_Framework_TestCase
 
 class EloquentHasOneThroughModelStub extends Illuminate\Database\Eloquent\Model
 {
-
 }
