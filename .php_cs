@@ -2,7 +2,7 @@
 
 use Symfony\CS\Config\Config;
 use Symfony\CS\FixerInterface;
-use Symfony\CS\Finder\DefaultFinder;
+use Symfony\CS\Finder;
 
 $fixers = [
     'blankline_after_open_tag',
@@ -71,7 +71,7 @@ $fixers = [
 ];
 
 return Config::create()
-    ->finder(DefaultFinder::create()->in(__DIR__))
+    ->finder(Finder::create()->in(__DIR__))
     ->fixers($fixers)
     ->level(FixerInterface::NONE_LEVEL)
     ->setUsingCache(true);
