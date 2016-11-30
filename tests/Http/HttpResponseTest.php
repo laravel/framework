@@ -146,6 +146,20 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase
         $response = new RedirectResponse('foo.bar');
         $response->doesNotExist('bar');
     }
+
+    public function testGetEncoding()
+    {
+        $response = new Illuminate\Http\Response();
+        $response->header('Content-Type', 'text/html; charset=utf-8');
+        $this->assertEquals('utf-8', $response->getEncoding());
+    }
+
+    public function testNoEncoding()
+    {
+        $response = new Illuminate\Http\Response();
+        $response->header('Content-Type', 'text/html');
+        $this->assertNull($response->getEncoding());
+    }
 }
 
 class JsonableStub implements Jsonable
