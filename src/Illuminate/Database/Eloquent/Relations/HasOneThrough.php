@@ -45,6 +45,7 @@ class HasOneThrough extends Relation
      */
     protected $parentKey;
 
+
     /**
      * Create a new has one through relationship instance.
      *
@@ -56,9 +57,9 @@ class HasOneThrough extends Relation
      */
     public function __construct(Builder $query, Model $farParent, Model $parent, $farParentKey, $parentKey)
     {
-        $this->parentKey = $parentKey;
+        $this->parentKey    = $parentKey;
         $this->farParentKey = $farParentKey;
-        $this->farParent = $farParent;
+        $this->farParent    = $farParent;
 
         parent::__construct($query, $parent);
     }
@@ -117,9 +118,9 @@ class HasOneThrough extends Relation
     {
         $query = $query ?: $this->query;
 
-        $relatedLocalKey = $this->related->getQualifiedKeyName();
-        $parentForeignKey = $this->parent->getTable().'.'.$this->parentKey;
-        $parentLocalKey = $this->parent->getQualifiedKeyName();
+        $relatedLocalKey     = $this->related->getQualifiedKeyName();
+        $parentForeignKey    = $this->parent->getTable().'.'.$this->parentKey;
+        $parentLocalKey      = $this->parent->getQualifiedKeyName();
         $farParentForeignKey = $this->farParent->getTable().'.'.$this->farParentKey;
 
         $query->join($this->parent->getTable(), $parentForeignKey, '=', $relatedLocalKey);
@@ -134,9 +135,10 @@ class HasOneThrough extends Relation
      */
     public function addEagerConstraints(array $models)
     {
-        $table = $this->parent->getTable();
-
-        $this->query->whereIn($table.'.'.$this->parentKey, $this->getKeys($models, $this->related->getKeyName()));
+        $this->query->whereIn(
+            $this->farParent->getQualifiedKeyName(),
+            $this->getKeys($models, $this->farParent->getKeyName())
+        );
     }
 
     /**
@@ -172,7 +174,7 @@ class HasOneThrough extends Relation
         // link them up with their children using the keyed dictionary to make the
         // matching very convenient and easy work. Then we'll just return them.
         foreach ($models as $model) {
-            $key = $model->getKey();
+            $key = $model->{$this->farParentKey};
 
             if (isset($dictionary[$key])) {
                 $value = $dictionary[$key];
@@ -198,7 +200,7 @@ class HasOneThrough extends Relation
         // relationship as this will allow us to quickly access all of the related
         // models without having to do nested looping which will be quite slow.
         foreach ($results as $result) {
-            $dictionary[$result->{$this->parentKey}] = $result;
+            $dictionary[$result->{$this->farParentKey}] = $result;
         }
 
         return $dictionary;
@@ -211,7 +213,7 @@ class HasOneThrough extends Relation
      */
     public function getResults()
     {
-        return $this->first();
+        return $this->get()->first();
     }
 
     /**
@@ -221,7 +223,7 @@ class HasOneThrough extends Relation
      *
      * @return mixed
      */
-    public function first($columns = ['*'])
+    public function get($columns = ['*'])
     {
         // First we'll add the proper select columns onto the query so it is run with
         // the proper columns. Then, we will get the results and hydrate out pivot
@@ -239,9 +241,10 @@ class HasOneThrough extends Relation
         // n + 1 query problem for the developer and also increase performance.
         if (count($models) > 0) {
             $models = $builder->eagerLoadRelations($models);
-
-            return reset($models);
         }
+
+
+        return new Collection($models);
     }
 
     /**
@@ -257,8 +260,7 @@ class HasOneThrough extends Relation
         }
 
         return array_merge($columns, [
-            $this->parent->getTable().'.'.$this->parentKey,
-            $this->farParent->getTable().'.'.$this->farParentKey,
+            $this->farParent->getTable().'.'.$this->farParentKey
         ]);
     }
 }

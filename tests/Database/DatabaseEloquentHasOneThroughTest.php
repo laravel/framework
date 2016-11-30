@@ -25,8 +25,7 @@ class DatabaseEloquentHasOneThroughTest extends PHPUnit_Framework_TestCase
     public function testEagerConstraintsAreProperlyAdded()
     {
         $relation = $this->getRelation();
-        $relation->getQuery()->shouldReceive('whereIn')->once()->with('users.post_id', [1, 2]);
-        $relation->getRelated()->shouldReceive('getKeyName')->once()->andReturn('id');
+        $relation->getQuery()->shouldReceive('whereIn')->once()->with('countries.id', [1, 2]);
         $model1 = new EloquentHasOneThroughModelStub;
         $model1->id = 1;
         $model2 = new EloquentHasOneThroughModelStub;
@@ -40,20 +39,20 @@ class DatabaseEloquentHasOneThroughTest extends PHPUnit_Framework_TestCase
 
         // Countries
         $results1 = new EloquentHasOneThroughModelStub;
-        $results1->post_id = 1;
+        $results1->user_id = 1;
         $results2 = new EloquentHasOneThroughModelStub;
-        $results2->post_id = 2;
+        $results2->user_id = 2;
 
         // Posts
         $model1 = new EloquentHasOneThroughModelStub;
-        $model1->id = 1;
+        $model1->user_id = 1;
         $model2 = new EloquentHasOneThroughModelStub;
-        $model2->id = 2;
+        $model2->user_id = 2;
 
         $models = $relation->match([$model1, $model2], new Collection([$results1, $results2]), 'foo');
 
-        $this->assertEquals(1, $models[0]->foo->post_id);
-        $this->assertEquals(2, $models[1]->foo->post_id);
+        $this->assertEquals(1, $models[0]->foo->user_id);
+        $this->assertEquals(2, $models[1]->foo->user_id);
     }
 
     /**
