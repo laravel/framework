@@ -19,8 +19,6 @@ use Illuminate\Database\Eloquent\Collection;
  * and FarParent.PrimaryKey is not null
  * </code>
  *
- * You can use a <code>Closure</code> to define how to construct the <em>Related Model</em> by setting .
- *
  *
  * @package Illuminate\Database\Eloquent\Relations
  * @author  Peter Scopes <peter.scopes@gmail.com>
