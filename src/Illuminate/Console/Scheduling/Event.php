@@ -120,6 +120,13 @@ class Event
     public $description;
 
     /**
+     * Customized email subject of the event.
+     *
+     * @var string
+     */
+    public $emailSubject;
+
+    /**
      * Create a new event instance.
      *
      * @param  string  $command
@@ -837,12 +844,29 @@ class Event
     }
 
     /**
+     * Set the customized email subject of the event.
+     *
+     * @param  string  $subject
+     * @return $this
+     */
+    public function emailSubject($subject)
+    {
+        $this->emailSubject = $subject;
+
+        return $this;
+    }
+
+    /**
      * Get the e-mail subject line for output results.
      *
      * @return string
      */
     protected function getEmailSubject()
     {
+        if ($this->emailSubject) {
+            return $this->emailSubject;
+        }
+
         if ($this->description) {
             return 'Scheduled Job Output ('.$this->description.')';
         }
