@@ -88,14 +88,15 @@ class Response extends BaseResponse
     }
 
     /**
-     * Return response's encoding
+     * Return response's encoding.
      *
      * @return mixed
      */
     public function getEncoding()
     {
         $r = preg_match('/;\s*charset=\s*([^;]+)\s*$/', $this->headers->get('Content-Type'), $m);
-        if ($r)
+        if ($r) {
             return $m[1];
+        }
     }
 }

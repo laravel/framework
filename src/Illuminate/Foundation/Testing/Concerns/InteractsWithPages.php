@@ -276,7 +276,7 @@ trait InteractsWithPages
     }
 
     /**
-     * Return response content wrapped in DOMDocument
+     * Return response content wrapped in DOMDocument.
      *
      * @return DOMDocument
      */
@@ -287,6 +287,7 @@ trait InteractsWithPages
         $encoding = $this->response->getEncoding();
         $html = mb_convert_encoding($html, 'HTML-ENTITIES', $encoding);
         @$dom->loadHTML($html);
+
         return $dom;
     }
 
