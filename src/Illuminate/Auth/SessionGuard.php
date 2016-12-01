@@ -614,9 +614,11 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     protected function refreshRememberToken(AuthenticatableContract $user)
     {
-        $user->setRememberToken($token = Str::random(60));
+        if (! empty($user->getRememberTokenName())) {
+            $user->setRememberToken($token = Str::random(60));
 
-        $this->provider->updateRememberToken($user, $token);
+            $this->provider->updateRememberToken($user, $token);
+        }
     }
 
     /**
@@ -627,7 +629,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     protected function createRememberTokenIfDoesntExist(AuthenticatableContract $user)
     {
-        if (empty($user->getRememberToken())) {
+        if (! empty($user->getRememberTokenName()) && empty($user->getRememberToken())) {
             $this->refreshRememberToken($user);
         }
     }
