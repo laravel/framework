@@ -140,16 +140,32 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase
             $name["key or space"]
         }}'));
 
+        $this->assertEquals('<?php echo e(isset($name["key"]) ? $name["key"] : "foo"); ?>', $compiler->compileString('{{{$name["key"] or "foo"}}}'));
         $this->assertEquals('<?php echo e(isset($name["key"]) ? $name["key"] : "foo"); ?>', $compiler->compileString('{{ $name["key"] or "foo" }}'));
         $this->assertEquals('<?php echo e(isset($name["key"]) ? $name["key"] : "foo"); ?>', $compiler->compileString('{{$name["key"] or "foo"}}'));
         $this->assertEquals('<?php echo e(isset($name["key"]) ? $name["key"] : "foo"); ?>', $compiler->compileString('{{
             $name["key"] or "foo"
         }}'));
 
+        $this->assertEquals('<?php echo e(isset($name["key or space"]) ? $name["key or space"] : "foo"); ?>', $compiler->compileString('{{{$name["key or space"] or "foo"}}}'));
         $this->assertEquals('<?php echo e(isset($name["key or space"]) ? $name["key or space"] : "foo"); ?>', $compiler->compileString('{{ $name["key or space"] or "foo" }}'));
         $this->assertEquals('<?php echo e(isset($name["key or space"]) ? $name["key or space"] : "foo"); ?>', $compiler->compileString('{{$name["key or space"] or "foo"}}'));
         $this->assertEquals('<?php echo e(isset($name["key or space"]) ? $name["key or space"] : "foo"); ?>', $compiler->compileString('{{
             $name["key or space"] or "foo"
+        }}'));
+
+        $this->assertEquals('<?php echo e(isset($name["key \' or \' space"]) ? $name["key \' or \' space"] : "foo"); ?>', $compiler->compileString('{{{$name["key \' or \' space"] or "foo"}}}'));
+        $this->assertEquals('<?php echo e(isset($name["key \' or \' space"]) ? $name["key \' or \' space"] : "foo"); ?>', $compiler->compileString('{{ $name["key \' or \' space"] or "foo" }}'));
+        $this->assertEquals('<?php echo e(isset($name["key \' or \' space"]) ? $name["key \' or \' space"] : "foo"); ?>', $compiler->compileString('{{$name["key \' or \' space"] or "foo"}}'));
+        $this->assertEquals('<?php echo e(isset($name["key \' or \' space"]) ? $name["key \' or \' space"] : "foo"); ?>', $compiler->compileString('{{
+            $name["key \' or \' space"] or "foo"
+        }}'));
+
+        $this->assertEquals('<?php echo e($name[\'key " or " space\']); ?>', $compiler->compileString('{{{$name[\'key " or " space\']}}}'));
+        $this->assertEquals('<?php echo e($name[\'key " or " space\']); ?>', $compiler->compileString('{{$name[\'key " or " space\']}}'));
+        $this->assertEquals('<?php echo e($name[\'key " or " space\']); ?>', $compiler->compileString('{{ $name[\'key " or " space\'] }}'));
+        $this->assertEquals('<?php echo e($name[\'key " or " space\']); ?>', $compiler->compileString('{{
+            $name[\'key " or " space\']
         }}'));
 
         $this->assertEquals('<?php echo e(isset($name) ? $name : "foo"); ?>', $compiler->compileString('{{ $name or "foo" }}'));
