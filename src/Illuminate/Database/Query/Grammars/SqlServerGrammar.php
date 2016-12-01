@@ -286,8 +286,8 @@ class SqlServerGrammar extends Grammar
             $joins = ' '.$this->compileJoins($query, $query->joins);
 
             return trim("delete $table from {$table}{$joins} $where");
-        } 
-        
+        }
+
         return trim("delete from $table $where");
     }
 
