@@ -195,7 +195,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @var bool
      */
-    public $exists = false;
+    private $exists = false;
 
     /**
      * Indicates if the model was inserted during the current request lifecycle.
@@ -3523,6 +3523,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         }
 
         static::$mutatorCache[$class] = $mutatedAttributes;
+    }
+    
+    /**
+     * Indicates if the model exists.
+     *
+     * @return bool
+     */
+    public function isExists()
+    {
+        return $this->exists;
     }
 
     /**
