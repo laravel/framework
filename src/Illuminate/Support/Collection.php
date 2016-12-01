@@ -433,9 +433,14 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 * @param  mixed     $initial
 	 * @return mixed
 	 */
-	public function reduce(callable $callback, $initial = null)
+	public function reduce(callable $callback = null, $initial = null)
 	{
-		return array_reduce($this->items, $callback, $initial);
+		if ($callback) return array_reduce($this->items, $callback, $initial);
+
+		return new static($this->reduce(function($result, $item)
+		{
+			return array_merge($result, $item);
+		}, []));
 	}
 
 	/**

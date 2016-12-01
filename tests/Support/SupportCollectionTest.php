@@ -294,6 +294,18 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertCount(3, $random);
 	}
 
+	public function testReduce()
+	{
+		$data1 = new Collection([1, 2, 3]);
+		$data2 = new Collection([[1,2,3], [4,5,6], [7,8,9]]);
+
+		$result1 = $data1->reduce(function ($sum, $item){ return $sum + $item; }, 0);
+		$result2 = $data2->reduce()->all();
+
+		$this->assertEquals(6, $result1);
+		$this->assertEquals([1,2,3,4,5,6,7,8,9], $result2);
+	}
+
 
 	public function testRandomOnEmpty()
 	{
