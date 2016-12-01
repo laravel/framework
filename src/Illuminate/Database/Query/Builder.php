@@ -1641,11 +1641,14 @@ class Builder
     /**
      * Run the query as a "select" statement against the connection.
      *
+     * @param  string|null  $sql
      * @return array
      */
-    protected function runSelect()
+    protected function runSelect($sql = null)
     {
-        return $this->connection->select($this->toSql(), $this->getBindings(), ! $this->useWritePdo);
+        $sql = is_null($sql) ? $this->toSql() : $sql;
+
+        return $this->connection->select($sql, $this->getBindings(), ! $this->useWritePdo);
     }
 
     /**
@@ -1949,14 +1952,10 @@ class Builder
      */
     public function exists()
     {
-        $sql = $this->grammar->compileExists($this);
-
-        $results = $this->connection->select($sql, $this->getBindings(), ! $this->useWritePdo);
+        $results = $this->runSelect($this->grammar->compileExists($this));
 
         if (isset($results[0])) {
-            $results = (array) $results[0];
-
-            return (bool) $results['exists'];
+            return (bool) data_get($results, '0.exists');
         }
 
         return false;
