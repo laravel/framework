@@ -38,8 +38,8 @@
     },
     "suggest": {
         "illuminate/filesystem": "Required to use the composer class (5.2.*).",
-        "symfony/process": "Required to use the composer class (3.2.*).",
-        "symfony/var-dumper": "Required to use the dd function (3.2.*)."
+        "symfony/process": "Required to use the composer class (~3.2).",
+        "symfony/var-dumper": "Required to use the dd function (~3.2)."
     },
     "minimum-stability": "dev"
 }
