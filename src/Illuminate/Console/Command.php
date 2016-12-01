@@ -331,6 +331,21 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	}
 
 	/**
+	 * Abort the command.
+	 *
+	 * @param  string|null  $string
+	 * @return void
+	 */
+	protected function abort($string = null)
+	{
+		$string = $string ? : $this->getName().' aborted !';
+
+		$this->error($string);
+
+		exit();
+	}
+
+	/**
 	 * Get the console command arguments.
 	 *
 	 * @return array
