@@ -5,11 +5,11 @@ namespace Illuminate\Auth;
 trait Authenticatable
 {
     /**
-     * Variable containing "remember me" column name.
+     * The column name of the "remember me" token.
      *
      * @var string
      */
-    protected $remember_column = 'remember_token';
+    protected $rememberTokenName = 'remember_token';
 
     /**
      * Get the name of the unique identifier for the user.
@@ -73,6 +73,6 @@ trait Authenticatable
      */
     public function getRememberTokenName()
     {
-        return $this->remember_column;
+        return $this->rememberTokenName;
     }
 }
