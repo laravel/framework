@@ -223,11 +223,9 @@ class AppNameCommand extends Command
      */
     protected function setDatabaseFactoryNamespaces()
     {
-        $modelFactoryFile = $this->laravel->databasePath().'/factories/ModelFactory.php';
-
-        if ($this->files->exists($modelFactoryFile)) {
-            $this->replaceIn($modelFactoryFile, $this->currentRoot, $this->argument('name'));
-        }
+        $this->replaceIn(
+            $this->laravel->databasePath().'/factories/ModelFactory.php', $this->currentRoot, $this->argument('name')
+        );
     }
 
     /**
@@ -240,7 +238,9 @@ class AppNameCommand extends Command
      */
     protected function replaceIn($path, $search, $replace)
     {
-        $this->files->put($path, str_replace($search, $replace, $this->files->get($path)));
+        if ($this->files->exists($path)) {
+            $this->files->put($path, str_replace($search, $replace, $this->files->get($path)));
+        }
     }
 
     /**
