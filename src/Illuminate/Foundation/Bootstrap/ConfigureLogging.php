@@ -119,4 +119,16 @@ class ConfigureLogging
     {
         $log->useErrorLog($app->make('config')->get('app.log_level', 'debug'));
     }
+
+    /**
+     * Configure the Monolog handlers for the application.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @param  \Illuminate\Log\Writer  $log
+     * @return void
+     */
+    protected function configureNullHandler(Application $app, Writer $log)
+    {
+        $log->useNull();
+    }
 }

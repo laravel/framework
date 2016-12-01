@@ -7,6 +7,7 @@ use RuntimeException;
 use InvalidArgumentException;
 use Monolog\Handler\SyslogHandler;
 use Monolog\Handler\StreamHandler;
+use Monolog\Handler\NullHandler;
 use Monolog\Logger as MonologLogger;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\ErrorLogHandler;
@@ -231,6 +232,16 @@ class Writer implements LogContract, PsrLoggerInterface
         );
 
         $handler->setFormatter($this->getDefaultFormatter());
+    }
+
+    /**
+     * Register a null log handler (disable logging).
+     *
+     * @return void
+     */
+    public function useNull()
+    {
+        $this->monolog->pushHandler($handler = new NullHandler());
     }
 
     /**
