@@ -168,6 +168,27 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase
             $name[\'key " or " space\']
         }}'));
 
+        $this->assertEquals('<?php echo e(isset($name["a"]["b"]) ? $name["a"]["b"] : "foo"); ?>', $compiler->compileString('{{{$name["a"]["b"] or "foo"}}}'));
+        $this->assertEquals('<?php echo e(isset($name["a"]["b"]) ? $name["a"]["b"] : "foo"); ?>', $compiler->compileString('{{ $name["a"]["b"] or "foo" }}'));
+        $this->assertEquals('<?php echo e(isset($name["a"]["b"]) ? $name["a"]["b"] : "foo"); ?>', $compiler->compileString('{{$name["a"]["b"] or "foo"}}'));
+        $this->assertEquals('<?php echo e(isset($name["a"]["b"]) ? $name["a"]["b"] : "foo"); ?>', $compiler->compileString('{{
+            $name["a"]["b"] or "foo"
+        }}'));
+
+        $this->assertEquals('<?php echo e(isset($name["a or b"]["c"]) ? $name["a or b"]["c"] : "foo"); ?>', $compiler->compileString('{{{$name["a or b"]["c"] or "foo"}}}'));
+        $this->assertEquals('<?php echo e(isset($name["a or b"]["c"]) ? $name["a or b"]["c"] : "foo"); ?>', $compiler->compileString('{{ $name["a or b"]["c"] or "foo" }}'));
+        $this->assertEquals('<?php echo e(isset($name["a or b"]["c"]) ? $name["a or b"]["c"] : "foo"); ?>', $compiler->compileString('{{$name["a or b"]["c"] or "foo"}}'));
+        $this->assertEquals('<?php echo e(isset($name["a or b"]["c"]) ? $name["a or b"]["c"] : "foo"); ?>', $compiler->compileString('{{
+            $name["a or b"]["c"] or "foo"
+        }}'));
+
+        $this->assertEquals('<?php echo e(isset($name["a"]["b or c"]) ? $name["a"]["b or c"] : "foo"); ?>', $compiler->compileString('{{{$name["a"]["b or c"] or "foo"}}}'));
+        $this->assertEquals('<?php echo e(isset($name["a"]["b or c"]) ? $name["a"]["b or c"] : "foo"); ?>', $compiler->compileString('{{ $name["a"]["b or c"] or "foo" }}'));
+        $this->assertEquals('<?php echo e(isset($name["a"]["b or c"]) ? $name["a"]["b or c"] : "foo"); ?>', $compiler->compileString('{{$name["a"]["b or c"] or "foo"}}'));
+        $this->assertEquals('<?php echo e(isset($name["a"]["b or c"]) ? $name["a"]["b or c"] : "foo"); ?>', $compiler->compileString('{{
+            $name["a"]["b or c"] or "foo"
+        }}'));
+
         $this->assertEquals('<?php echo e(isset($name) ? $name : "foo"); ?>', $compiler->compileString('{{ $name or "foo" }}'));
         $this->assertEquals('<?php echo e(isset($user->name) ? $user->name : "foo"); ?>', $compiler->compileString('{{ $user->name or "foo" }}'));
         $this->assertEquals('<?php echo e(isset($name) ? $name : "foo"); ?>', $compiler->compileString('{{$name or "foo"}}'));
