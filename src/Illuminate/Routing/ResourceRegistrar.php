@@ -58,7 +58,7 @@ class ResourceRegistrar
      * @param  string  $name
      * @param  string  $controller
      * @param  array   $options
-     * @return void
+     * @return void|null
      */
     public function register($name, $controller, array $options = [])
     {

@@ -32,7 +32,7 @@ class DetectEnvironment
      * Detect if a custom environment file matching the APP_ENV exists.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @return void
+     * @return void|null
      */
     protected function checkForSpecificEnvironmentFile($app)
     {

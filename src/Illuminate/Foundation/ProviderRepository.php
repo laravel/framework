@@ -82,7 +82,7 @@ class ProviderRepository
      *
      * @param  string  $provider
      * @param  array  $events
-     * @return void
+     * @return void|null
      */
     protected function registerLoadEvents($provider, array $events)
     {

@@ -89,7 +89,7 @@ class PusherBroadcaster extends Broadcaster
      * @param  array  $channels
      * @param  string  $event
      * @param  array  $payload
-     * @return void
+     * @return void|null
      */
     public function broadcast(array $channels, $event, array $payload = [])
     {

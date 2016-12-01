@@ -258,7 +258,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      * @param  string  $namespace
      * @param  string  $group
      * @param  string  $locale
-     * @return void
+     * @return void|null
      */
     public function load($namespace, $group, $locale)
     {

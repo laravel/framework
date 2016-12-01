@@ -66,7 +66,7 @@ class Repository implements CacheContract, ArrayAccess
      *
      * @param  string  $event
      * @param  array  $payload
-     * @return void
+     * @return void|null
      */
     protected function fireCacheEvent($event, $payload)
     {

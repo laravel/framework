@@ -32,7 +32,7 @@ class ModelMakeCommand extends GeneratorCommand
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return void|null
      */
     public function fire()
     {

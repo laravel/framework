@@ -104,7 +104,7 @@ class Migrator
      *
      * @param  array  $migrations
      * @param  array  $options
-     * @return void
+     * @return void|null
      */
     public function runMigrationList($migrations, array $options = [])
     {

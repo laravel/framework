@@ -646,7 +646,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      * Load the provider for a deferred service.
      *
      * @param  string  $service
-     * @return void
+     * @return void|null
      */
     public function loadDeferredProvider($service)
     {
@@ -735,7 +735,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     /**
      * Boot the application's service providers.
      *
-     * @return void
+     * @return void|null
      */
     public function boot()
     {

@@ -198,7 +198,7 @@ class MailFake implements Mailer
      * @param  string|array  $view
      * @param  array  $data
      * @param  \Closure|string  $callback
-     * @return void
+     * @return void|null
      */
     public function send($view, array $data = [], $callback = null)
     {

@@ -40,7 +40,7 @@ class NexmoSmsChannel
      *
      * @param  mixed  $notifiable
      * @param  \Illuminate\Notifications\Notification  $notification
-     * @return \Nexmo\Message\Message
+     * @return \Nexmo\Message\Message|null
      */
     public function send($notifiable, Notification $notification)
     {
