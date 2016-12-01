@@ -2247,7 +2247,7 @@ class Builder
         // the ID to allow developers to simply and quickly remove a single row
         // from their database without manually specifying the where clauses.
         if (! is_null($id)) {
-            $this->where('id', '=', $id);
+            $this->where($this->from.'.id', '=', $id);
         }
 
         $sql = $this->grammar->compileDelete($this);
