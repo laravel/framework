@@ -904,6 +904,8 @@ class Builder
         // execute those Closures, then we can re-construct the entire sub-selects.
         if ($values instanceof Closure) {
             return $this->whereInSub($column, $values, $boolean, $not);
+        } elseif ($values instanceof Collection) {
+            $values = $values->toArray();
         }
 
         if ($values instanceof Arrayable) {
