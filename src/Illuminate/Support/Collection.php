@@ -732,7 +732,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  callable $callback
      * @return static
      */
-    public function partition(callable $callback) {
+    public function partition(callable $callback)
+    {
         $partitions = [new static(), new static()];
 
         foreach ($this->items as $item) {
