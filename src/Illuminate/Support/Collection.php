@@ -726,8 +726,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Returns an array with two elements. Items in the first element did pass
-     * the given $callback, items in the second element did not.
+     * Partition the collection into two array using the given callback.
      *
      * @param  callable $callback
      * @return array
