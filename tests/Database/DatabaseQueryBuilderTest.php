@@ -671,6 +671,31 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testSubQueryInFrom()
+	{
+		$subquery = $this->getBuilder();
+		$subquery->select(new Raw("concat(first, ' ', last) as name"))->from('contacts')->where('id', '<', 100);
+
+		$builder = $this->getBuilder();
+		$builder->from(array('users' => $subquery))->whereIn('name', array('john doe', 'david smith'));
+		$this->assertEquals('select * from (select concat(first, \' \', last) as name from "contacts" where "id" < ?) AS users where "name" in (?, ?)',
+		$builder->toSql());
+		$this->assertEquals(array(100, 'john doe', 'david smith'), $builder->getBindings());
+	}
+
+
+	public function testSubQueryInJoin()
+	{
+		$subquery = $this->getBuilder();
+		$subquery->select('id')->from('contacts')->where('id', '<', 100);
+
+		$builder = $this->getBuilder();
+		$builder->from('users')->join(array('foo' => $subquery), 'users.id', '=', 'foo.id');
+		$this->assertEquals('select * from "users" inner join (select "id" from "contacts" where "id" < ?) AS foo on "users"."id" = "foo"."id"', $builder->toSql());
+		$this->assertEquals(array(100), $builder->getBindings());
+	}
+
+
 	public function testComplexJoin()
 	{
 		$builder = $this->getBuilder();

@@ -36,6 +36,7 @@ class Builder {
 	 */
 	protected $bindings = array(
 		'select' => [],
+		'from'   => [],
 		'join'   => [],
 		'where'  => [],
 		'having' => [],
@@ -279,13 +280,20 @@ class Builder {
 	/**
 	 * Set the table which the query is targeting.
 	 *
-	 * @param  string  $table
+	 * @param  string|array  $table
 	 * @return $this
 	 */
 	public function from($table)
 	{
-		$this->from = $table;
+		if (is_array($table) && count($table) === 1)
+		{
+			reset($table);
+			list($alias, $subquery) = each($table);
+			$this->setBindings($subquery->getBindings(), 'from');
+			$table = new Expression('(' . $subquery->toSql() . ') AS '. $alias);
+		}
 
+		$this->from = $table;
 		return $this;
 	}
 
@@ -302,6 +310,14 @@ class Builder {
 	 */
 	public function join($table, $one, $operator = null, $two = null, $type = 'inner', $where = false)
 	{
+		if (is_array($table) && count($table) === 1)
+		{
+			reset($table);
+			list($alias, $subquery) = each($table);
+			$this->addBinding($subquery->getBindings(), 'join');
+			$table = new Expression('(' . $subquery->toSql() . ') AS '. $alias);
+		}
+
 		// If the first "column" of the join is really a Closure instance the developer
 		// is trying to build a join with a complex "on" clause containing more than
 		// one condition, so we'll add the join and call a Closure with the query.
