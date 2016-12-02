@@ -39,7 +39,7 @@ class Blueprint
 
     /**
      * The row format for storage engine that should be used for the table.
-     * use full if like to use utf8mb4 encoding
+     * use full if like to use utf8mb4 encoding.
      * @var string
      */
     public $rowFormat;
