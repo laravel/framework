@@ -1645,12 +1645,12 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
     {
         $collection = new Collection(range(1, 10));
 
-        $collection = $collection->partition(function ($i) {
+        list($firstPartition, $secondPartition) = $collection->partition(function ($i) {
             return $i <= 5;
         });
 
-        $this->assertEquals([1, 2, 3, 4, 5], $collection[0]->toArray());
-        $this->assertEquals([6, 7, 8, 9, 10], $collection[1]->toArray());
+        $this->assertEquals([1, 2, 3, 4, 5], $firstPartition->toArray());
+        $this->assertEquals([6, 7, 8, 9, 10], $secondPartition->toArray());
     }
 
     public function testPartitionEmptyCollection()

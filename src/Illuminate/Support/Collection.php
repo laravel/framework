@@ -726,11 +726,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Output a collection with two elements. Items in the first element did pass
+     * Returns an array with two elements. Items in the first element did pass
      * the given $callback, items in the second element did not.
      *
      * @param  callable $callback
-     * @return static
+     * @return array
      */
     public function partition(callable $callback)
     {
@@ -740,7 +740,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             $partitions[! (int) $callback($item)][] = $item;
         }
 
-        return new static($partitions);
+        return $partitions;
     }
 
     /**
