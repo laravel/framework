@@ -726,6 +726,23 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Output a collection with two elements. Items in the first element did pass
+     * the given $callback, items in the second element did not.
+     *
+     * @param  callable $callback
+     * @return static
+     */
+    public function partition(callable $callback) {
+        $partitions = [new static(), new static()];
+
+        foreach ($this->items as $item) {
+            $partitions[! (int) $callback($item)][] = $item;
+        }
+
+        return new static($partitions);
+    }
+
+    /**
      * Pass the collection to the given callback and return the result.
      *
      * @param  callable $callback
