@@ -235,6 +235,24 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Returns true if at least one item in the collection satisifies the callback.
+     *
+     * @param callable $callback
+     *
+     * @return bool
+     */
+    public function some(callable $callback)
+    {
+        foreach ($this->items as $key => $item) {
+            if ($callback($item, $key) === true) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Create a new collection consisting of every n-th element.
      *
      * @param  int  $step

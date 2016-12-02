@@ -524,6 +524,21 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([1, 2, 'foo' => 'bar'], $result);
     }
 
+    public function testSome()
+    {
+        $c = new Collection($original = [1, 2, 'foo' => 'bar', 'bam' => 'baz']);
+
+        $result = $c->some(function ($item, $key) {
+            return is_numeric($item);
+        });
+        $this->assertEquals(true, $result);
+
+        $result = $c->some(function ($item, $key) {
+            return is_array($item);
+        });
+        $this->assertEquals(false, $result);
+    }
+
     public function testIntersectNull()
     {
         $c = new Collection(['id' => 1, 'first_word' => 'Hello']);
