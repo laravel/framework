@@ -99,7 +99,7 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
         $worker->runNextJob('default', 'queue', $this->workerOptions(['maxTries' => 1]));
         $this->assertNull($job->releaseAfter);
         $this->assertTrue($job->deleted);
-        $this->assertEquals(MaxAttemptsExceededException::class, $job->failedWith);
+        $this->assertInstanceOf(MaxAttemptsExceededException::class, $job->failedWith);
         $this->exceptionHandler->shouldHaveReceived('report')->with(Mockery::type(MaxAttemptsExceededException::class));
         $this->events->shouldHaveReceived('fire')->with(Mockery::type(JobExceptionOccurred::class))->once();
         $this->events->shouldHaveReceived('fire')->with(Mockery::type(JobFailed::class))->once();
