@@ -3,11 +3,11 @@
 namespace Illuminate\Queue;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Queue\Console\TableCommand;
 use Illuminate\Queue\Console\RetryCommand;
+use Illuminate\Queue\Console\TableCommand;
 use Illuminate\Queue\Console\ListFailedCommand;
-use Illuminate\Queue\Console\FlushFailedCommand;
 use Illuminate\Queue\Console\FailedTableCommand;
+use Illuminate\Queue\Console\FlushFailedCommand;
 use Illuminate\Queue\Console\ForgetFailedCommand;
 
 class ConsoleServiceProvider extends ServiceProvider

@@ -8,13 +8,13 @@ use Illuminate\Queue\Console\WorkCommand;
 use Illuminate\Queue\Console\ListenCommand;
 use Illuminate\Queue\Console\RestartCommand;
 use Illuminate\Queue\Connectors\SqsConnector;
-use Illuminate\Queue\Console\SubscribeCommand;
+use Illuminate\Queue\Connectors\IronConnector;
 use Illuminate\Queue\Connectors\NullConnector;
 use Illuminate\Queue\Connectors\SyncConnector;
-use Illuminate\Queue\Connectors\IronConnector;
+use Illuminate\Queue\Console\SubscribeCommand;
 use Illuminate\Queue\Connectors\RedisConnector;
-use Illuminate\Queue\Failed\NullFailedJobProvider;
 use Illuminate\Queue\Connectors\DatabaseConnector;
+use Illuminate\Queue\Failed\NullFailedJobProvider;
 use Illuminate\Queue\Connectors\BeanstalkdConnector;
 use Illuminate\Queue\Failed\DatabaseFailedJobProvider;
 

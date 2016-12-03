@@ -1,9 +1,9 @@
 <?php
 
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\ScopeInterface;
+use Illuminate\Database\Eloquent\Model as Eloquent;
 
 class DatabaseCountBindingsTest extends PHPUnit_Framework_TestCase
 {
