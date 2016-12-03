@@ -233,6 +233,32 @@ class HasManyThrough extends Relation {
 
 		return array_merge($columns, array($this->parent->getTable().'.'.$this->firstKey));
 	}
+	
+	/**
+	 * Execute the query and get the first result.
+	 *
+	 * @param  array  $columns
+	 * @return \Illuminate\Database\Eloquent\Model|static|null
+	 */
+	public function first($columns = array('*'))
+	{
+		return $this->take(1)->get($this->getSelectColumns($columns))->first();
+	}
+	
+	/**
+	 * Execute the query and get the first result or throw an exception.
+	 *
+	 * @param  array  $columns
+	 * @return \Illuminate\Database\Eloquent\Model|static
+	 *
+	 * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+	 */
+	public function firstOrFail($columns = array('*'))
+	{
+		if ( ! is_null($model = $this->first($columns))) return $model;
+
+		throw (new ModelNotFoundException)->setModel(get_class($this->model));
+	}
 
 	/**
 	 * Get a paginator for the "select" statement.
