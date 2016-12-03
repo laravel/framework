@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Foundation\Testing\CrawlerTrait;
 use Symfony\Component\DomCrawler\Crawler;
+use Illuminate\Foundation\Testing\CrawlerTrait;
 
 class FoundationCrawlerTraitIntegrationTest extends PHPUnit_Framework_TestCase
 {

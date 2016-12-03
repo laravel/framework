@@ -5,8 +5,8 @@ namespace Illuminate\Queue\Console;
 use Exception;
 use RuntimeException;
 use Illuminate\Support\Str;
-use Illuminate\Queue\IronQueue;
 use Illuminate\Console\Command;
+use Illuminate\Queue\IronQueue;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
