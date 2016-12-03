@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Support\MessageBag;
 use Mockery as m;
+use Illuminate\Support\MessageBag;
 
 class SupportMessageBagTest extends PHPUnit_Framework_TestCase
 {
