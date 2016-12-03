@@ -3,8 +3,8 @@
 namespace Illuminate\Routing;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Routing\Console\MiddlewareMakeCommand;
 use Illuminate\Routing\Console\ControllerMakeCommand;
+use Illuminate\Routing\Console\MiddlewareMakeCommand;
 
 class GeneratorServiceProvider extends ServiceProvider
 {

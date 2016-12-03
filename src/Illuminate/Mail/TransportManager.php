@@ -6,12 +6,12 @@ use Aws\Ses\SesClient;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Manager;
 use GuzzleHttp\Client as HttpClient;
-use Swift_SmtpTransport as SmtpTransport;
 use Swift_MailTransport as MailTransport;
+use Swift_SmtpTransport as SmtpTransport;
 use Illuminate\Mail\Transport\LogTransport;
+use Illuminate\Mail\Transport\SesTransport;
 use Illuminate\Mail\Transport\MailgunTransport;
 use Illuminate\Mail\Transport\MandrillTransport;
-use Illuminate\Mail\Transport\SesTransport;
 use Swift_SendmailTransport as SendmailTransport;
 
 class TransportManager extends Manager
