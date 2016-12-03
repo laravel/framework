@@ -1639,6 +1639,27 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
             })->toArray()
         );
     }
+
+    public function testPartition()
+    {
+        $collection = new Collection(range(1, 10));
+
+        list($firstPartition, $secondPartition) = $collection->partition(function ($i) {
+            return $i <= 5;
+        });
+
+        $this->assertEquals([1, 2, 3, 4, 5], $firstPartition->toArray());
+        $this->assertEquals([6, 7, 8, 9, 10], $secondPartition->toArray());
+    }
+
+    public function testPartitionEmptyCollection()
+    {
+        $collection = new Collection();
+
+        $this->assertCount(2, $collection->partition(function () {
+            return true;
+        }));
+    }
 }
 
 class TestAccessorEloquentTestStub
