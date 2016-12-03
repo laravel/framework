@@ -5,8 +5,8 @@ namespace Illuminate\Queue\Console;
 use Carbon\Carbon;
 use Illuminate\Queue\Worker;
 use Illuminate\Console\Command;
-use Illuminate\Queue\WorkerOptions;
 use Illuminate\Contracts\Queue\Job;
+use Illuminate\Queue\WorkerOptions;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 

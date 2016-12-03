@@ -113,7 +113,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Get the mode of a given key.
      *
-     * @param  null $key
+     * @param  mixed  $key
      * @return array
      */
     public function mode($key = null)

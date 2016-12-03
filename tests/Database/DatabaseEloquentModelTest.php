@@ -828,7 +828,6 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
             $model->toArray()
         );
 
-
         $model = new EloquentModelStub(['meta' => json_encode(['name' => 'Taylor'])]);
         $model->fillable(['meta->name', 'meta->price', 'meta->size->width']);
         $model->fill(['meta->name' => 'foo', 'meta->price' => 'bar', 'meta->size->width' => 'baz']);

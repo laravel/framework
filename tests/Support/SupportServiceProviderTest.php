@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Support\ServiceProvider;
 use Mockery as m;
+use Illuminate\Support\ServiceProvider;
 
 class SupportServiceProviderTest extends PHPUnit_Framework_TestCase
 {
