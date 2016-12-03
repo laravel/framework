@@ -1640,7 +1640,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         );
     }
 
-    public function testPartition()
+    public function testPartitionWithClosure()
     {
         $collection = new Collection(range(1, 10));
 
@@ -1650,6 +1650,19 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals([1, 2, 3, 4, 5], $firstPartition->toArray());
         $this->assertEquals([6, 7, 8, 9, 10], $secondPartition->toArray());
+    }
+
+    public function testPartitionByKey()
+    {
+        $courses = new Collection([
+            ['free' => true, 'title' => 'Basic'], ['free' => false, 'title' => 'Premium'],
+        ]);
+
+        list($free, $premium) = $courses->partition('free');
+
+        $this->assertSame([['free' => true, 'title' => 'Basic']], $free->toArray());
+
+        $this->assertSame([['free' => false, 'title' => 'Premium']], $premium->toArray());
     }
 
     public function testPartitionEmptyCollection()
