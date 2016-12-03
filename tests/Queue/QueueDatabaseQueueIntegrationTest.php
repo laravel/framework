@@ -1,11 +1,11 @@
 <?php
 
-use Illuminate\Database\Capsule\Manager as DB;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Eloquent\Model as Eloquent;
-use \Illuminate\Queue\DatabaseQueue;
 use Carbon\Carbon;
 use Illuminate\Container\Container;
+use \Illuminate\Queue\DatabaseQueue;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Eloquent\Model as Eloquent;
 
 class QueueDatabaseQueueIntegrationTest extends PHPUnit_Framework_TestCase
 {
