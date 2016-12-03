@@ -3,8 +3,8 @@
 namespace Illuminate\Routing;
 
 use Closure;
-use Throwable;
 use Exception;
+use Throwable;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Pipeline\Pipeline as BasePipeline;
