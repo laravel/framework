@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Http\Response;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Routing\Router;
 use Illuminate\Cookie\CookieJar;
 use Illuminate\Events\Dispatcher;
