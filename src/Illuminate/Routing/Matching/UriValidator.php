@@ -18,6 +18,11 @@ class UriValidator implements ValidatorInterface
     {
         $path = $request->path() == '/' ? '/' : '/'.$request->path();
 
+        if ('' !== $route->getCompiled()->getStaticPrefix() &&
+            0 !== strpos($path, $route->getCompiled()->getStaticPrefix())) {
+            return false;
+        }
+
         return preg_match($route->getCompiled()->getRegex(), rawurldecode($path));
     }
 }
