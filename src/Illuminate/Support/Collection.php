@@ -737,6 +737,23 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Partition the collection into two array using the given callback.
+     *
+     * @param  callable  $callback
+     * @return array
+     */
+    public function partition(callable $callback)
+    {
+        $partitions = [new static(), new static()];
+
+        foreach ($this->items as $item) {
+            $partitions[! (int) $callback($item)][] = $item;
+        }
+
+        return $partitions;
+    }
+
+    /**
      * Pass the collection to the given callback and return the result.
      *
      * @param  callable $callback
