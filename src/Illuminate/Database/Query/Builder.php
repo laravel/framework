@@ -1671,14 +1671,15 @@ class Builder {
 	 */
 	public function getPaginationCount()
 	{
-		$this->backupFieldsForCount();
-
 		// Because some database engines may throw errors if we leave the ordering
 		// statements on the query, we will "back them up" and remove them from
 		// the query. Once we have the count we will put them back onto this.
+		$this->backupFieldsForPaginationCount();
+
+		$this->setCacheKeyForPaginationCount();
 		$total = $this->count();
 
-		$this->restoreFieldsForCount();
+		$this->restoreFieldsForPaginationCount();
 
 		return $total;
 	}
@@ -1710,9 +1711,9 @@ class Builder {
 	 *
 	 * @return void
 	 */
-	protected function backupFieldsForCount()
+	protected function backupFieldsForPaginationCount()
 	{
-		foreach (array('orders', 'limit', 'offset') as $field)
+		foreach (array('orders', 'limit', 'offset', 'cacheKey') as $field)
 		{
 			$this->backups[$field] = $this->{$field};
 
@@ -1726,14 +1727,24 @@ class Builder {
 	 *
 	 * @return void
 	 */
-	protected function restoreFieldsForCount()
+	protected function restoreFieldsForPaginationCount()
 	{
-		foreach (array('orders', 'limit', 'offset') as $field)
+		foreach (array('orders', 'limit', 'offset', 'cacheKey') as $field)
 		{
 			$this->{$field} = $this->backups[$field];
 		}
 
 		$this->backups = array();
+	}
+
+	/**
+	 * Modify cacheKey for a pagination count when it set for base query.
+	 *
+	 * @return void
+	 */
+	protected function setCacheKeyForPaginationCount()
+	{
+		$this->cacheKey = $this->backups['cacheKey'] ? $this->backups['cacheKey'].'_paginate' : '';
 	}
 
 	/**
