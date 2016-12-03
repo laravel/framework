@@ -728,7 +728,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Partition the collection into two array using the given callback.
      *
-     * @param  callable $callback
+     * @param  callable  $callback
      * @return array
      */
     public function partition(callable $callback)
