@@ -1,9 +1,9 @@
 <?php
 
-use Illuminate\Container\Container;
-use Illuminate\Database\ConnectionResolverInterface;
-use Illuminate\Database\Console\Seeds\SeedCommand;
 use Illuminate\Database\Seeder;
+use Illuminate\Container\Container;
+use Illuminate\Database\Console\Seeds\SeedCommand;
+use Illuminate\Database\ConnectionResolverInterface;
 
 class SeedCommandTest extends PHPUnit_Framework_TestCase
 {
