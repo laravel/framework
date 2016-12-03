@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Pagination\LengthAwarePaginator;
 use Mockery as m;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Query\Expression as Raw;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
 

@@ -3,8 +3,8 @@
 use Mockery as m;
 use Carbon\Carbon;
 use Illuminate\Validation\Validator;
-use Illuminate\Validation\Rules\Unique;
 use Illuminate\Validation\Rules\Exists;
+use Illuminate\Validation\Rules\Unique;
 use Symfony\Component\HttpFoundation\File\File;
 
 class ValidationValidatorTest extends PHPUnit_Framework_TestCase
