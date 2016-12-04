@@ -72,6 +72,13 @@ class UrlGenerator implements UrlGeneratorContract
     protected $sessionResolver;
 
     /**
+     * Default parameters.
+     *
+     * @var array
+     */
+    protected $defaultParameters = [];
+    
+    /**
      * Characters that should not be URL encoded.
      *
      * @var array
@@ -107,6 +114,26 @@ class UrlGenerator implements UrlGeneratorContract
         $this->setRequest($request);
     }
 
+    /**
+     * Get the default parameters.
+     *
+     * @return array
+     */
+    public function getDefaultParameters()
+    {
+        return $this->defaultParameters;
+    }
+
+    /**
+     * Set the default parameters.
+     *
+     * @return void
+     */
+    public function setDefaultParameters($key, $value)
+    {
+        $this->defaultParameters[$key] = $value;
+    }
+    
     /**
      * Get the full URL for the current request.
      *
@@ -308,7 +335,7 @@ class UrlGenerator implements UrlGeneratorContract
     public function route($name, $parameters = [], $absolute = true)
     {
         if (! is_null($route = $this->routes->getByName($name))) {
-            return $this->toRoute($route, $parameters, $absolute);
+            return $this->toRoute($route, array_merge($this->getDefaultParameters(), $parameters), $absolute);
         }
 
         throw new InvalidArgumentException("Route [{$name}] not defined.");
