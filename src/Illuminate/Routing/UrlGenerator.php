@@ -461,7 +461,7 @@ class UrlGenerator implements UrlGeneratorContract
     protected function replaceRoutableParameters($parameters = [])
     {
         $parameters = array_merge(
-            $this->getDefaultParameters(), 
+            $this->getDefaultParameters(),
             is_array($parameters) ? $parameters : [$parameters]);
 
         foreach ($parameters as $key => $parameter) {
