@@ -77,7 +77,7 @@ class UrlGenerator implements UrlGeneratorContract
      * @var array
      */
     protected $defaultParameters = [];
-    
+
     /**
      * Characters that should not be URL encoded.
      *
@@ -133,7 +133,7 @@ class UrlGenerator implements UrlGeneratorContract
     {
         $this->defaultParameters[$key] = $value;
     }
-    
+
     /**
      * Get the full URL for the current request.
      *
