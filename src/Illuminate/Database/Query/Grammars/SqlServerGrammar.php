@@ -49,6 +49,27 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile a delete statement into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
+     */
+    public function compileDelete(Builder $query)
+    {
+        $table = $this->wrapTable($query->from);
+
+        $where = is_array($query->wheres) ? $this->compileWheres($query) : '';
+
+        if (isset($query->joins)) {
+            $joins = ' '.$this->compileJoins($query, $query->joins);
+
+            return trim("delete $table from {$table}{$joins} $where");
+        }
+
+        return trim("delete from $table $where");
+    }
+
+    /**
      * Compile the "select *" portion of the query.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -268,27 +289,6 @@ class SqlServerGrammar extends Grammar
     public function getDateFormat()
     {
         return 'Y-m-d H:i:s.000';
-    }
-
-    /**
-     * Compile a delete statement into SQL.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @return string
-     */
-    public function compileDelete(Builder $query)
-    {
-        $table = $this->wrapTable($query->from);
-
-        $where = is_array($query->wheres) ? $this->compileWheres($query) : '';
-
-        if (isset($query->joins)) {
-            $joins = ' '.$this->compileJoins($query, $query->joins);
-
-            return trim("delete $table from {$table}{$joins} $where");
-        }
-
-        return trim("delete from $table $where");
     }
 
     /**
