@@ -335,7 +335,7 @@ class UrlGenerator implements UrlGeneratorContract
     public function route($name, $parameters = [], $absolute = true)
     {
         if (! is_null($route = $this->routes->getByName($name))) {
-            return $this->toRoute($route, array_merge($this->getDefaultParameters(), $parameters), $absolute);
+            return $this->toRoute($route, $parameters, $absolute);
         }
 
         throw new InvalidArgumentException("Route [{$name}] not defined.");
@@ -460,7 +460,9 @@ class UrlGenerator implements UrlGeneratorContract
      */
     protected function replaceRoutableParameters($parameters = [])
     {
-        $parameters = is_array($parameters) ? $parameters : [$parameters];
+        $parameters = array_merge(
+            $this->getDefaultParameters(), 
+            is_array($parameters) ? $parameters : [$parameters]);
 
         foreach ($parameters as $key => $parameter) {
             if ($parameter instanceof UrlRoutable) {
