@@ -1,7 +1,6 @@
 <?php
 
 use Mockery as m;
-
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase;

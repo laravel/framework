@@ -29,13 +29,6 @@ class HasInDatabase extends PHPUnit_Framework_Constraint
     protected $data;
 
     /**
-     * Name of the queried database table.
-     *
-     * @var string
-     */
-    protected $table;
-
-    /**
      * Create a new constraint instance.
      *
      * @param  array  $data
@@ -56,8 +49,6 @@ class HasInDatabase extends PHPUnit_Framework_Constraint
      */
     public function matches($table)
     {
-        $this->table = $table;
-
         return $this->database->table($table)->where($this->data)->count() > 0;
     }
 
@@ -71,24 +62,25 @@ class HasInDatabase extends PHPUnit_Framework_Constraint
     {
         return sprintf(
             "a row in the table [%s] matches the attributes %s.\n\n%s",
-            $table, $this->toString(), $this->getAdditionalInfo()
+            $table, $this->toString(), $this->getAdditionalInfo($table)
         );
     }
 
     /**
      * Get additional info about the records found in the database table.
      *
+     * @param  string  $table
      * @return string
      */
-    protected function getAdditionalInfo()
+    protected function getAdditionalInfo($table)
     {
-        $results = $this->database->table($this->table)->get();
+        $results = $this->database->table($table)->get();
 
         if ($results->isEmpty()) {
-            return "The table is empty";
+            return 'The table is empty';
         }
 
-        $description = "Found: " . json_encode($results->take(5));
+        $description = 'Found: '.json_encode($results->take(5));
 
         if ($results->count() > $this->show) {
             $description .= sprintf(' and %s others', $results->count() - $this->show);
