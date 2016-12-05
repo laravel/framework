@@ -65,7 +65,7 @@ class BroadcastNotificationCreated implements ShouldBroadcast
     /**
      * Set broadcasting event name.
      *
-     * @return string 
+     * @return string
      */
     public function broadcastAs()
     {
