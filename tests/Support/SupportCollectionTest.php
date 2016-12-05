@@ -1038,20 +1038,9 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 
     public function testGroupByAttribute()
     {
-        $data = new Collection([['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1'], ['rating' => 2, 'url' => '2']]);
+        $data = new Collection([10 => ['rating' => 1, 'url' => '1'],  20 => ['rating' => 1, 'url' => '1'], 30 => ['rating' => 2, 'url' => '2']]);
 
         $result = $data->groupBy('rating');
-        $this->assertEquals([1 => [['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1']], 2 => [['rating' => 2, 'url' => '2']]], $result->toArray());
-
-        $result = $data->groupBy('url');
-        $this->assertEquals([1 => [['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1']], 2 => [['rating' => 2, 'url' => '2']]], $result->toArray());
-    }
-
-    public function testGroupByAttributePreservingKeys()
-    {
-        $data = new Collection([10 => ['rating' => 1, 'url' => '1'],  20 => ['rating' => 1, 'url' => '1'],  30 => ['rating' => 2, 'url' => '2']]);
-
-        $result = $data->groupBy('rating', true);
 
         $expected_result = [
             1 => [10 => ['rating' => 1, 'url' => '1'], 20 => ['rating' => 1, 'url' => '1']],
@@ -1063,22 +1052,11 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 
     public function testGroupByClosureWhereItemsHaveSingleGroup()
     {
-        $data = new Collection([['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1'], ['rating' => 2, 'url' => '2']]);
-
-        $result = $data->groupBy(function ($item) {
-            return $item['rating'];
-        });
-
-        $this->assertEquals([1 => [['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1']], 2 => [['rating' => 2, 'url' => '2']]], $result->toArray());
-    }
-
-    public function testGroupByClosureWhereItemsHaveSingleGroupPreservingKeys()
-    {
         $data = new Collection([10 => ['rating' => 1, 'url' => '1'], 20 => ['rating' => 1, 'url' => '1'], 30 => ['rating' => 2, 'url' => '2']]);
 
         $result = $data->groupBy(function ($item) {
             return $item['rating'];
-        }, true);
+        });
 
         $expected_result = [
             1 => [10 => ['rating' => 1, 'url' => '1'], 20 => ['rating' => 1, 'url' => '1']],
@@ -1091,35 +1069,6 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
     public function testGroupByClosureWhereItemsHaveMultipleGroups()
     {
         $data = new Collection([
-            ['user' => 1, 'roles' => ['Role_1', 'Role_3']],
-            ['user' => 2, 'roles' => ['Role_1', 'Role_2']],
-            ['user' => 3, 'roles' => ['Role_1']],
-        ]);
-
-        $result = $data->groupBy(function ($item) {
-            return $item['roles'];
-        });
-
-        $expected_result = [
-            'Role_1' => [
-                ['user' => 1, 'roles' => ['Role_1', 'Role_3']],
-                ['user' => 2, 'roles' => ['Role_1', 'Role_2']],
-                ['user' => 3, 'roles' => ['Role_1']],
-            ],
-            'Role_2' => [
-                ['user' => 2, 'roles' => ['Role_1', 'Role_2']],
-            ],
-            'Role_3' => [
-                ['user' => 1, 'roles' => ['Role_1', 'Role_3']],
-            ],
-        ];
-
-        $this->assertEquals($expected_result, $result->toArray());
-    }
-
-    public function testGroupByClosureWhereItemsHaveMultipleGroupsPreservingKeys()
-    {
-        $data = new Collection([
             10 => ['user' => 1, 'roles' => ['Role_1', 'Role_3']],
             20 => ['user' => 2, 'roles' => ['Role_1', 'Role_2']],
             30 => ['user' => 3, 'roles' => ['Role_1']],
@@ -1127,7 +1076,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 
         $result = $data->groupBy(function ($item) {
             return $item['roles'];
-        }, true);
+        });
 
         $expected_result = [
             'Role_1' => [
