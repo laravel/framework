@@ -3,6 +3,7 @@
 namespace Illuminate\Routing;
 
 use Closure;
+use BadMethodCallException;
 
 class RouteRegistrar
 {
@@ -27,6 +28,15 @@ class RouteRegistrar
      */
     protected $passthru = [
         'get', 'post', 'put', 'patch', 'delete', 'options', 'any',
+    ];
+
+    /**
+     * The attributes that can be set through this class.
+     *
+     * @var array
+     */
+    protected $allowedAttributes = [
+        'as', 'domain', 'middleware', 'name', 'namespace', 'prefix',
     ];
 
     /**
@@ -149,6 +159,10 @@ class RouteRegistrar
             return $this->registerRoute($method, ...$parameters);
         }
 
-        return $this->attribute($method, $parameters[0]);
+        if (in_array($method, $this->allowedAttributes)) {
+            return $this->attribute($method, $parameters[0]);
+        }
+
+        throw new BadMethodCallException("Method [{$method}] does not exist.");
     }
 }

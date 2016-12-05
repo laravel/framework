@@ -155,6 +155,26 @@ class RouteRegistrarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('{account}.myapp.com', $this->getRoute()->domain());
     }
 
+    public function testCanRegisterGroupWithDomainAndNamePrefix()
+    {
+        $this->router->domain('{account}.myapp.com')->name('api.')->group(function ($router) {
+            $router->get('users', 'UsersController@index')->name('users');
+        });
+
+        $this->assertEquals('{account}.myapp.com', $this->getRoute()->domain());
+        $this->assertEquals('api.users', $this->getRoute()->getName());
+    }
+
+    /**
+     * @expectedException \BadMethodCallException
+     */
+    public function testRegisteringNonApprovedAttributesThrows()
+    {
+        $this->router->domain('foo')->missing('bar')->group(function ($router) {
+            //
+        });
+    }
+
     public function testCanRegisterResource()
     {
         $this->router->middleware('resource-middleware')
