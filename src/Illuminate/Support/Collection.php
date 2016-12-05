@@ -737,8 +737,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         $callback = $this->valueRetriever($callback);
 
-        foreach ($this->items as $item) {
-            $partitions[(int) ! $callback($item)][] = $item;
+        foreach ($this->items as $key => $item) {
+            $partitions[(int) ! $callback($item)][$key] = $item;
         }
 
         return $partitions;
