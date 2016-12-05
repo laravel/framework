@@ -2,12 +2,9 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
-use Closure;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Foundation\Testing\TestResponse;
-use PHPUnit_Framework_ExpectationFailedException;
 use Illuminate\Contracts\Http\Kernel as HttpKernel;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
