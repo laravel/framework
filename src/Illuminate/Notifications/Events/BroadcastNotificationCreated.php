@@ -61,12 +61,12 @@ class BroadcastNotificationCreated implements ShouldBroadcast
 
         return [new PrivateChannel($this->channelName())];
     }
-    
+
     /**
-    * Set broadcasting event name.
-    *
-    * @return string 
-    */
+     * Set broadcasting event name.
+     *
+     * @return string 
+     */
     public function broadcastAs()
     {
         if (method_exists($this->notification, 'broadcastAs')) {
