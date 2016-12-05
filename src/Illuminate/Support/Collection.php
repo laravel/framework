@@ -113,7 +113,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Get the mode of a given key.
      *
-     * @param  null $key
+     * @param  mixed  $key
      * @return array
      */
     public function mode($key = null)
@@ -734,6 +734,23 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function forPage($page, $perPage)
     {
         return $this->slice(($page - 1) * $perPage, $perPage);
+    }
+
+    /**
+     * Partition the collection into two array using the given callback.
+     *
+     * @param  callable  $callback
+     * @return array
+     */
+    public function partition(callable $callback)
+    {
+        $partitions = [new static(), new static()];
+
+        foreach ($this->items as $item) {
+            $partitions[! (int) $callback($item)][] = $item;
+        }
+
+        return $partitions;
     }
 
     /**

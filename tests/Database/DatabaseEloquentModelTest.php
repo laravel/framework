@@ -207,23 +207,6 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($model->save());
     }
 
-    public function testSaveDoesntUpateTimestampsIfTouchOptionDisabled()
-    {
-        $model = $this->getMockBuilder('EloquentModelStub')->setMethods(['newQueryWithoutScopes', 'updateTimestamps', 'fireModelEvent'])->getMock();
-        $query = m::mock('Illuminate\Database\Eloquent\Builder');
-        $query->shouldReceive('where')->once()->with('id', '=', 1);
-        $query->shouldReceive('update')->once()->with(['name' => 'taylor'])->andReturn(1);
-        $model->expects($this->once())->method('newQueryWithoutScopes')->will($this->returnValue($query));
-        $model->expects($this->never())->method('updateTimestamps');
-        $model->expects($this->any())->method('fireModelEvent')->will($this->returnValue(true));
-
-        $model->id = 1;
-        $model->syncOriginal();
-        $model->name = 'taylor';
-        $model->exists = true;
-        $this->assertTrue($model->save(['touch' => false]));
-    }
-
     public function testSaveIsCancelledIfSavingEventReturnsFalse()
     {
         $model = $this->getMockBuilder('EloquentModelStub')->setMethods(['newQueryWithoutScopes'])->getMock();
@@ -827,7 +810,6 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
             ['meta' => json_encode(['name' => 'foo', 'price' => 'bar', 'size' => ['width' => 'baz']])],
             $model->toArray()
         );
-
 
         $model = new EloquentModelStub(['meta' => json_encode(['name' => 'Taylor'])]);
         $model->fillable(['meta->name', 'meta->price', 'meta->size->width']);

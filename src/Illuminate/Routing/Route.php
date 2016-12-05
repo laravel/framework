@@ -15,8 +15,8 @@ use Illuminate\Routing\Matching\UriValidator;
 use Illuminate\Routing\Matching\HostValidator;
 use Illuminate\Routing\Matching\MethodValidator;
 use Illuminate\Routing\Matching\SchemeValidator;
-use Symfony\Component\Routing\Route as SymfonyRoute;
 use Illuminate\Http\Exception\HttpResponseException;
+use Symfony\Component\Routing\Route as SymfonyRoute;
 
 class Route
 {
@@ -247,6 +247,10 @@ class Route
      */
     protected function compileRoute()
     {
+        if ($this->compiled) {
+            return;
+        }
+
         $optionals = $this->extractOptionalParameters();
 
         $uri = preg_replace('/\{(\w+?)\?\}/', '{$1}', $this->uri);
@@ -995,7 +999,9 @@ class Route
             throw new LogicException("Unable to prepare route [{$this->uri}] for serialization. Uses Closure.");
         }
 
-        unset($this->router, $this->container, $this->compiled);
+        $this->compileRoute();
+
+        unset($this->router, $this->container);
     }
 
     /**

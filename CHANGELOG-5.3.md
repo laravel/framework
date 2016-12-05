@@ -1,5 +1,14 @@
 # Release Notes for 5.3.x
 
+## v5.3.26 (2016-11-30)
+
+### Changed
+- Replaced deprecated `DefaultFinder` class ([#16602](https://github.com/laravel/framework/pull/16602))
+
+### Fixed
+- Reverted [#16506](https://github.com/laravel/framework/pull/16506) ([#16607](https://github.com/laravel/framework/pull/16607))
+
+
 ## v5.3.25 (2016-11-29)
 
 ### Added
