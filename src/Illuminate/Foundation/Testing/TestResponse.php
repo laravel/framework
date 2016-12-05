@@ -40,7 +40,7 @@ class TestResponse extends Response
      *
      * @return void
      */
-    public function assertHasStatus($status)
+    public function assertStatus($status)
     {
         $actual = $this->getStatusCode();
 
@@ -53,7 +53,7 @@ class TestResponse extends Response
      * @param  string  $uri
      * @return void
      */
-    public function assertIsRedirect($uri)
+    public function assertRedirect($uri)
     {
         PHPUnit::assertTrue(
             $this->isRedirect(), 'Response status code ['.$this->status().'] is not a redirect status code.'
@@ -69,7 +69,7 @@ class TestResponse extends Response
      * @param  mixed  $value
      * @return $this
      */
-    public function assertHasHeader($headerName, $value = null)
+    public function assertHeader($headerName, $value = null)
     {
         PHPUnit::assertTrue(
             $this->headers->has($headerName), "Header [{$headerName}] not present on response."
@@ -94,9 +94,9 @@ class TestResponse extends Response
      * @param  mixed  $value
      * @return void
      */
-    public function assertHasPlainCookie($cookieName, $value = null)
+    public function assertPlainCookie($cookieName, $value = null)
     {
-        $this->seeCookie($cookieName, $value, false);
+        $this->assertCookie($cookieName, $value, false);
     }
 
     /**
@@ -107,7 +107,7 @@ class TestResponse extends Response
      * @param  bool  $encrypted
      * @return void
      */
-    public function assertHasCookie($cookieName, $value = null, $encrypted = true)
+    public function assertCookie($cookieName, $value = null, $encrypted = true)
     {
         $headers = $this->headers;
 
