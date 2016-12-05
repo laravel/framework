@@ -132,10 +132,9 @@ class Route
     /**
      * Run the route action and return the response.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
-    public function run(Request $request)
+    public function run()
     {
         $this->container = $this->container ?: new Container;
 
