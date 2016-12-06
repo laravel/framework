@@ -1,5 +1,22 @@
 # Release Notes for 5.3.x
 
+## [Unreleased]
+
+### Added
+- Added `Authenticatable::$rememberTokenName` ([#16617](https://github.com/laravel/framework/pull/16617), [38612c0](https://github.com/laravel/framework/commit/38612c0e88a48cca5744cc464a764b976f79a46d))
+- Added `Collection::partition()` method ([#16627](https://github.com/laravel/framework/pull/16627), [#16644](https://github.com/laravel/framework/pull/16644))
+
+### Changed
+- Added missing `$useReadPdo` argument to `Connection::selectOne()` ([#16625](https://github.com/laravel/framework/pull/16625))
+- Preload some files required by already listed files ([#16648](https://github.com/laravel/framework/pull/16648))
+
+### Fixed
+- Added file existance check to `AppNameCommand::replaceIn()` to fix [#16575](https://github.com/laravel/framework/pull/16575) ([#16592](https://github.com/laravel/framework/pull/16592))
+- Check for `null` in `seeJsonStructure()` ([#16642](https://github.com/laravel/framework/pull/16642))
+- Reverted [#15264](https://github.com/laravel/framework/pull/15264) ([#16660](https://github.com/laravel/framework/pull/16660))
+- Fixed misleading credentials exception when `ExceptionHandler` is not bound in container ([#16666](https://github.com/laravel/framework/pull/16666))
+
+
 ## v5.3.26 (2016-11-30)
 
 ### Changed
