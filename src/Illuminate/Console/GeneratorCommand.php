@@ -4,6 +4,7 @@ namespace Illuminate\Console;
 
 use Illuminate\Support\Str;
 use Illuminate\Filesystem\Filesystem;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
 abstract class GeneratorCommand extends Command
@@ -145,9 +146,23 @@ abstract class GeneratorCommand extends Command
      */
     protected function buildClass($name)
     {
-        $stub = $this->files->get($this->getStub());
+        $stub = $this->files->get($this->resolveStub());
 
         return $this->replaceNamespace($stub, $name)->replaceClass($stub, $name);
+    }
+
+    /**
+     * Resolve the path of the stub.
+     *
+     * @return string
+     */
+    protected function resolveStub()
+    {
+        if ($stub = $this->option('stub')) {
+            return resource_path("stubs/$stub.stub");
+        }
+
+        return $this->getStub();
     }
 
     /**
@@ -214,6 +229,18 @@ abstract class GeneratorCommand extends Command
     {
         return [
             ['name', InputArgument::REQUIRED, 'The name of the class'],
+        ];
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['stub', '', InputOption::VALUE_REQUIRED, 'Use custom stub to generate the class'],
         ];
     }
 }

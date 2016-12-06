@@ -83,8 +83,8 @@ class ConsoleMakeCommand extends GeneratorCommand
      */
     protected function getOptions()
     {
-        return [
+        return array_merge([
             ['command', null, InputOption::VALUE_OPTIONAL, 'The terminal command that should be assigned.', 'command:name'],
-        ];
+        ], parent::getOptions());
     }
 }
