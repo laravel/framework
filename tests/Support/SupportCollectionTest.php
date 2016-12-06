@@ -1769,6 +1769,19 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
             return true;
         }));
     }
+
+    public function testHigherOrderPartition()
+    {
+        $courses = new Collection([
+            'a' => ['free' => true], 'b' => ['free' => false], 'c' => ['free' => true],
+        ]);
+
+        list($free, $premium) = $courses->partition->free;
+
+        $this->assertSame(['a' => ['free' => true], 'c' => ['free' => true]], $free->toArray());
+
+        $this->assertSame(['b' => ['free' => false]], $premium->toArray());
+    }
 }
 
 class TestSupportCollectionHigherOrderItem
