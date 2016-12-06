@@ -163,7 +163,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $router->get('foo/bar', ['middleware' => 'foo', function () {
             return 'hello';
         }]);
-        $router->middleware('foo', function ($request, $next) {
+        $router->aliasMiddleware('foo', function ($request, $next) {
             return 'caught';
         });
         $this->assertEquals('caught', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
@@ -176,7 +176,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
             'uses' => 'RouteTestClosureMiddlewareController@index',
             'middleware' => 'foo',
         ]);
-        $router->middleware('foo', function ($request, $next) {
+        $router->aliasMiddleware('foo', function ($request, $next) {
             $request['foo-middleware'] = 'foo-middleware';
 
             return $next($request);
@@ -234,7 +234,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
             return 'hello';
         }]);
 
-        $router->middleware('two', 'RoutingTestMiddlewareGroupTwo');
+        $router->aliasMiddleware('two', 'RoutingTestMiddlewareGroupTwo');
         $router->middlewareGroup('web', ['RoutingTestMiddlewareGroupOne', 'two:taylor']);
 
         $this->assertEquals('caught taylor', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
@@ -251,7 +251,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
             return 'hello';
         }]);
 
-        $router->middleware('two', 'RoutingTestMiddlewareGroupTwo');
+        $router->aliasMiddleware('two', 'RoutingTestMiddlewareGroupTwo');
         $router->middlewareGroup('first', ['two:abigail']);
         $router->middlewareGroup('web', ['RoutingTestMiddlewareGroupOne', 'first']);
 
