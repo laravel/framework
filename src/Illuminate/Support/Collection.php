@@ -1389,7 +1389,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function __get($key)
     {
         $proxies = [
-            'each', 'map', 'first', 'sortBy',
+            'each', 'map', 'first', 'partition', 'sortBy',
             'sortByDesc', 'sum', 'reject', 'filter',
         ];
 
