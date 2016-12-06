@@ -44,7 +44,7 @@ class ControllerDispatcher
             return $controller->callAction($method, $parameters);
         }
 
-        return call_user_func_array([$controller, $method], $parameters);
+        return $controller->{$method}(...array_values($parameters));
     }
 
     /**

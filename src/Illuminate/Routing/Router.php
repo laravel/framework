@@ -21,7 +21,9 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class Router implements RegistrarContract, BindingRegistrar
 {
-    use Macroable;
+    use Macroable {
+        __call as macroCall;
+    }
 
     /**
      * The event dispatcher instance.
@@ -640,7 +642,7 @@ class Router implements RegistrarContract, BindingRegistrar
                         ->through($middleware)
                         ->then(function ($request) use ($route) {
                             return $this->prepareResponse(
-                                $request, $route->run($request)
+                                $request, $route->run()
                             );
                         });
     }
@@ -846,7 +848,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  string  $class
      * @return $this
      */
-    public function middleware($name, $class)
+    public function aliasMiddleware($name, $class)
     {
         $this->middleware[$name] = $class;
 
@@ -1222,5 +1224,21 @@ class Router implements RegistrarContract, BindingRegistrar
     public function getPatterns()
     {
         return $this->patterns;
+    }
+
+    /**
+     * Dynamically handle calls into the router instance.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
+        }
+
+        return (new RouteRegistrar($this))->attribute($method, $parameters[0]);
     }
 }
