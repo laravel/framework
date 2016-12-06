@@ -10,8 +10,6 @@ env:
     - setup=basic
 
 matrix:
-  allow_failures:
-    - php: 7.1
   fast_finish: true
   include:
     - php: 5.6
