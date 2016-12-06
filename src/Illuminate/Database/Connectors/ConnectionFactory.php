@@ -125,7 +125,7 @@ class ConnectionFactory
                 try {
                     return $this->createConnector($config)->connect($config);
                 } catch (PDOException $e) {
-                    if (count($hosts) - 1 === $key) {
+                    if (count($hosts) - 1 === $key && $this->container->bound(ExceptionHandler::class)) {
                         $this->container->make(ExceptionHandler::class)->report($e);
                     }
                 }

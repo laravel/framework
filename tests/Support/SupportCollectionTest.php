@@ -1731,8 +1731,34 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
             return $i <= 5;
         });
 
-        $this->assertEquals([1, 2, 3, 4, 5], $firstPartition->toArray());
-        $this->assertEquals([6, 7, 8, 9, 10], $secondPartition->toArray());
+        $this->assertEquals([1, 2, 3, 4, 5], $firstPartition->values()->toArray());
+        $this->assertEquals([6, 7, 8, 9, 10], $secondPartition->values()->toArray());
+    }
+
+    public function testPartitionByKey()
+    {
+        $courses = new Collection([
+            ['free' => true, 'title' => 'Basic'], ['free' => false, 'title' => 'Premium'],
+        ]);
+
+        list($free, $premium) = $courses->partition('free');
+
+        $this->assertSame([['free' => true, 'title' => 'Basic']], $free->values()->toArray());
+
+        $this->assertSame([['free' => false, 'title' => 'Premium']], $premium->values()->toArray());
+    }
+
+    public function testPartitionPreservesKeys()
+    {
+        $courses = new Collection([
+            'a' => ['free' => true], 'b' => ['free' => false], 'c' => ['free' => true],
+        ]);
+
+        list($free, $premium) = $courses->partition('free');
+
+        $this->assertSame(['a' => ['free' => true], 'c' => ['free' => true]], $free->toArray());
+
+        $this->assertSame(['b' => ['free' => false]], $premium->toArray());
     }
 
     public function testPartitionEmptyCollection()
