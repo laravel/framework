@@ -10,8 +10,9 @@ abstract class Database implements DatabaseContract
     /**
      * Get a specific Redis connection instance.
      *
-     * @param  string  $name
-     * @return \Predis\ClientInterface|null
+     * @param string $name
+     *
+     * @return \Predis\ClientInterface|\RedisCluster|\Redis|null
      */
     public function connection($name = 'default')
     {
@@ -21,8 +22,9 @@ abstract class Database implements DatabaseContract
     /**
      * Run a command against the Redis database.
      *
-     * @param  string  $method
-     * @param  array   $parameters
+     * @param string $method
+     * @param array  $parameters
+     *
      * @return mixed
      */
     public function command($method, array $parameters = [])
@@ -33,8 +35,9 @@ abstract class Database implements DatabaseContract
     /**
      * Dynamically make a Redis command.
      *
-     * @param  string  $method
-     * @param  array   $parameters
+     * @param string $method
+     * @param array  $parameters
+     *
      * @return mixed
      */
     public function __call($method, $parameters)
