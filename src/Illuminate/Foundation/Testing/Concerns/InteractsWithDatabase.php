@@ -15,7 +15,7 @@ trait InteractsWithDatabase
      * @param  string  $connection
      * @return $this
      */
-    protected function seeInDatabase($table, array $data, $connection = null)
+    protected function assertDatabaseHas($table, array $data, $connection = null)
     {
         $this->assertThat(
             $table, new HasInDatabase($this->getConnection($connection), $data)
@@ -32,7 +32,7 @@ trait InteractsWithDatabase
      * @param  string  $connection
      * @return $this
      */
-    protected function missingFromDatabase($table, array $data, $connection = null)
+    protected function assertDatabaseMissing($table, array $data, $connection = null)
     {
         $constraint = new ReverseConstraint(
             new HasInDatabase($this->getConnection($connection), $data)
@@ -41,32 +41,6 @@ trait InteractsWithDatabase
         $this->assertThat($table, $constraint);
 
         return $this;
-    }
-
-    /**
-     * Assert that a given where condition does not exist in the database.
-     *
-     * @param  string  $table
-     * @param  array  $data
-     * @param  string  $connection
-     * @return $this
-     */
-    protected function dontSeeInDatabase($table, array $data, $connection = null)
-    {
-        return $this->notSeeInDatabase($table, $data, $connection);
-    }
-
-    /**
-     * Assert that a given where condition does not exist in the database.
-     *
-     * @param  string  $table
-     * @param  array  $data
-     * @param  string  $connection
-     * @return $this
-     */
-    protected function notSeeInDatabase($table, array $data, $connection = null)
-    {
-        return $this->missingFromDatabase($table, $data, $connection);
     }
 
     /**
