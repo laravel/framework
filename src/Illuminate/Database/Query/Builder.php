@@ -1493,6 +1493,11 @@ class Builder
      */
     public function forPageAfterId($perPage = 15, $lastId = 0, $column = 'id')
     {
+        $this->wheres = Collection::make($this->wheres)
+                ->reject(function ($where) use ($column) {
+                    return $where['column'] === $column;
+                })->values()->all();
+
         $this->orders = Collection::make($this->orders)
                 ->reject(function ($order) use ($column) {
                     return $order['column'] === $column;
