@@ -42,11 +42,11 @@ class ResourceRegistrar
     protected static $singularParameters = true;
 
     /**
-     * Uri translations.
+     * The verbs used in the resource URIs.
      *
      * @var array
      */
-    protected static $uriTranslations = [
+    protected static $verbs = [
         'create' => 'create',
         'edit' => 'edit',
     ];
@@ -300,7 +300,7 @@ class ResourceRegistrar
      */
     protected function addResourceCreate($name, $base, $controller, $options)
     {
-        $uri = $this->getResourceUri($name).'/'.static::$uriTranslations['create'];
+        $uri = $this->getResourceUri($name).'/'.static::$verbs['create'];
 
         $action = $this->getResourceAction($name, $controller, 'create', $options);
 
@@ -354,7 +354,7 @@ class ResourceRegistrar
      */
     protected function addResourceEdit($name, $base, $controller, $options)
     {
-        $uri = $this->getResourceUri($name).'/{'.$base.'}/'.static::$uriTranslations['edit'];
+        $uri = $this->getResourceUri($name).'/{'.$base.'}/'.static::$verbs['edit'];
 
         $action = $this->getResourceAction($name, $controller, 'edit', $options);
 
@@ -430,23 +430,17 @@ class ResourceRegistrar
     }
 
     /**
-     * Get the uri translations.
+     * Get or set the action verbs used in the resource URIs.
      *
+     * @param  array  $verbs
      * @return array
      */
-    public static function getUriTranslations()
+    public static function verbs(array $verbs = [])
     {
-        return static::$uriTranslations;
-    }
-
-    /**
-     * Set the uri translations.
-     *
-     * @param  array $translations
-     * @return void
-     */
-    public static function setUriTranslations(array $translations = [])
-    {
-        static::$uriTranslations = array_merge(static::$uriTranslations, $translations);
+        if (empty($verbs)) {
+            return static::$verbs;
+        } else {
+            static::$verbs = array_merge(static::$verbs, $verbs);
+        }
     }
 }

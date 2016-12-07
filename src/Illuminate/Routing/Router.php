@@ -248,14 +248,14 @@ class Router implements RegistrarContract
     }
 
     /**
-     * Set the uri translations.
+     * Get or set the verbs used in the resource URIs.
      *
-     * @param  array  $translations
-     * @return void
+     * @param  array  $verbs
+     * @return array|null
      */
-    public function uriTranslations(array $translations = [])
+    public function resourceVerbs(array $verbs = [])
     {
-        ResourceRegistrar::setUriTranslations($translations);
+        return ResourceRegistrar::verbs($verbs);
     }
 
     /**

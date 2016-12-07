@@ -922,7 +922,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('foo-bars/{foo_bar}', $routes[0]->getUri());
         $this->assertEquals('prefix.foo-bars.show', $routes[0]->getName());
 
-        ResourceRegistrar::setUriTranslations([
+        ResourceRegistrar::verbs([
             'create' => 'ajouter',
             'edit' => 'modifier',
         ]);
