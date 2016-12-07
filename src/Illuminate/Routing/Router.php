@@ -251,6 +251,17 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
+     * Get or set the verbs used in the resource URIs.
+     *
+     * @param  array  $verbs
+     * @return array|null
+     */
+    public function resourceVerbs(array $verbs = [])
+    {
+        return ResourceRegistrar::verbs($verbs);
+    }
+
+    /**
      * Register an array of resource controllers.
      *
      * @param  array  $resources

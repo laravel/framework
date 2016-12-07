@@ -42,6 +42,16 @@ class ResourceRegistrar
     protected static $singularParameters = true;
 
     /**
+     * The verbs used in the resource URIs.
+     *
+     * @var array
+     */
+    protected static $verbs = [
+        'create' => 'create',
+        'edit' => 'edit',
+    ];
+
+    /**
      * Create a new resource registrar instance.
      *
      * @param  \Illuminate\Routing\Router  $router
@@ -296,7 +306,7 @@ class ResourceRegistrar
      */
     protected function addResourceCreate($name, $base, $controller, $options)
     {
-        $uri = $this->getResourceUri($name).'/create';
+        $uri = $this->getResourceUri($name).'/'.static::$verbs['create'];
 
         $action = $this->getResourceAction($name, $controller, 'create', $options);
 
@@ -350,7 +360,7 @@ class ResourceRegistrar
      */
     protected function addResourceEdit($name, $base, $controller, $options)
     {
-        $uri = $this->getResourceUri($name).'/{'.$base.'}/edit';
+        $uri = $this->getResourceUri($name).'/{'.$base.'}/'.static::$verbs['edit'];
 
         $action = $this->getResourceAction($name, $controller, 'edit', $options);
 
@@ -423,5 +433,20 @@ class ResourceRegistrar
     public static function setParameters(array $parameters = [])
     {
         static::$parameterMap = $parameters;
+    }
+
+    /**
+     * Get or set the action verbs used in the resource URIs.
+     *
+     * @param  array  $verbs
+     * @return array
+     */
+    public static function verbs(array $verbs = [])
+    {
+        if (empty($verbs)) {
+            return static::$verbs;
+        } else {
+            static::$verbs = array_merge(static::$verbs, $verbs);
+        }
     }
 }

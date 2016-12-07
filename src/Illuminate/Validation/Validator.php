@@ -1394,7 +1394,6 @@ class Validator implements ValidatorContract
 
         return $verifier->getCount(
             $table, $column, $value, $id, $idColumn, $extra
-
         ) == 0;
     }
 
