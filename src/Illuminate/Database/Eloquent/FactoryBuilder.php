@@ -132,14 +132,14 @@ class FactoryBuilder
     public function make(array $attributes = [])
     {
         if ($this->amount < 1) {
-            return new Collection;
+            return (new $this->class)->newCollection();
         }
 
         if ($this->amount === 1) {
             return $this->makeInstance($attributes);
         }
 
-        return new Collection(array_map(function () use ($attributes) {
+        return (new $this->class)->newCollection(array_map(function () use ($attributes) {
             return $this->makeInstance($attributes);
         }, range(1, $this->amount)));
     }
