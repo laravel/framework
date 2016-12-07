@@ -248,6 +248,17 @@ class Router implements RegistrarContract
     }
 
     /**
+     * Set the uri translations.
+     *
+     * @param  array  $translations
+     * @return void
+     */
+    public function uriTranslations(array $translations = [])
+    {
+        ResourceRegistrar::setUriTranslations($translations);
+    }
+
+    /**
      * Register an array of resource controllers.
      *
      * @param  array  $resources
