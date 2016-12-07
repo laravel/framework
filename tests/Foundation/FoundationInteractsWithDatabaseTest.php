@@ -29,7 +29,7 @@ class FoundationInteractsWithDatabaseTest extends PHPUnit_Framework_TestCase
     {
         $this->mockCountBuilder(1);
 
-        $this->seeInDatabase($this->table, $this->data);
+        $this->assertDatabaseHas($this->table, $this->data);
     }
 
     /**
@@ -42,7 +42,7 @@ class FoundationInteractsWithDatabaseTest extends PHPUnit_Framework_TestCase
 
         $builder->shouldReceive('get')->andReturn(collect());
 
-        $this->seeInDatabase($this->table, $this->data);
+        $this->assertDatabaseHas($this->table, $this->data);
     }
 
     /**
@@ -57,7 +57,7 @@ class FoundationInteractsWithDatabaseTest extends PHPUnit_Framework_TestCase
         $builder->shouldReceive('take')->andReturnSelf();
         $builder->shouldReceive('get')->andReturn(collect([['title' => 'Forge']]));
 
-        $this->seeInDatabase($this->table, $this->data);
+        $this->assertDatabaseHas($this->table, $this->data);
     }
 
     /**
@@ -74,14 +74,14 @@ class FoundationInteractsWithDatabaseTest extends PHPUnit_Framework_TestCase
             collect(array_fill(0, 5, 'data'))
         );
 
-        $this->seeInDatabase($this->table, $this->data);
+        $this->assertDatabaseHas($this->table, $this->data);
     }
 
     public function testDontSeeInDatabaseDoesNotFindResults()
     {
         $this->mockCountBuilder(0);
 
-        $this->dontSeeInDatabase($this->table, $this->data);
+        $this->assertDatabaseMissing($this->table, $this->data);
     }
 
     /**
@@ -95,7 +95,7 @@ class FoundationInteractsWithDatabaseTest extends PHPUnit_Framework_TestCase
         $builder->shouldReceive('take')->andReturnSelf();
         $builder->shouldReceive('get')->andReturn(collect([$this->data]));
 
-        $this->dontSeeInDatabase($this->table, $this->data);
+        $this->assertDatabaseMissing($this->table, $this->data);
     }
 
     protected function mockCountBuilder($countResult)
