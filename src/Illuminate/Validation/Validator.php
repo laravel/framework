@@ -1835,9 +1835,9 @@ class Validator implements ValidatorContract
             return false;
         }
 
-        $parsed = date_parse_from_format($parameters[0], $value);
+        $date = DateTime::createFromFormat($parameters[0], $value);
 
-        return $parsed['error_count'] === 0 && $parsed['warning_count'] === 0;
+        return $date && $date->format($parameters[0]) === $value;
     }
 
     /**
