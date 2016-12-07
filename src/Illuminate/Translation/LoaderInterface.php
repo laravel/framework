@@ -22,4 +22,11 @@ interface LoaderInterface
      * @return void
      */
     public function addNamespace($namespace, $hint);
+
+    /**
+     * Get array of all hints.
+     *
+     * @return array
+     */
+    public function getHints();
 }
