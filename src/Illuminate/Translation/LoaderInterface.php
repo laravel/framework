@@ -24,9 +24,9 @@ interface LoaderInterface
     public function addNamespace($namespace, $hint);
 
     /**
-     * Get array of all hints.
+     * Get an array of all the registered namespaces.
      *
      * @return array
      */
-    public function getHints();
+    public function namespaces();
 }

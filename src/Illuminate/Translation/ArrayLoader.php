@@ -43,16 +43,6 @@ class ArrayLoader implements LoaderInterface
     }
 
     /**
-     * Get array of all hints.
-     *
-     * @return array
-     */
-    public function getHints()
-    {
-        return [];
-    }
-
-    /**
      * Add messages to the loader.
      *
      * @param  string  $locale
@@ -68,5 +58,15 @@ class ArrayLoader implements LoaderInterface
         $this->messages[$namespace][$locale][$group] = $messages;
 
         return $this;
+    }
+
+    /**
+     * Get an array of all the registered namespaces.
+     *
+     * @return array
+     */
+    public function namespaces()
+    {
+        return [];
     }
 }

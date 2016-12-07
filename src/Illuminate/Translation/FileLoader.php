@@ -146,11 +146,11 @@ class FileLoader implements LoaderInterface
     }
 
     /**
-     * Get array of all hints.
+     * Get an array of all the registered namespaces.
      *
      * @return array
      */
-    public function getHints()
+    public function namespaces()
     {
         return $this->hints;
     }
