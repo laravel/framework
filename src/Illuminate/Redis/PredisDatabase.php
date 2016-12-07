@@ -18,12 +18,12 @@ class PredisDatabase extends Database
     /**
      * Create a new Redis connection instance.
      *
-     * @param  array  $servers
-     * @return void
+     * @param array $servers
      */
     public function __construct(array $servers = [])
     {
-        $cluster = Arr::pull($servers, 'cluster');
+        $cluster = (bool) Arr::pull($servers, 'cluster');
+        $clusters = (array) Arr::pull($servers, 'clusters');
 
         $options = array_merge(['timeout' => 10.0], (array) Arr::pull($servers, 'options'));
 
@@ -32,25 +32,49 @@ class PredisDatabase extends Database
         } else {
             $this->clients = $this->createSingleClients($servers, $options);
         }
+
+        $this->createClusters($clusters, $options);
+    }
+
+    /**
+     * Create multiple clusters (aggregate clients).
+     *
+     * @param array $clusters
+     * @param array $options
+     */
+    protected function createClusters(array $clusters, array $options = [])
+    {
+        // Merge general options with general cluster options
+        $options = array_merge($options, (array) Arr::pull($clusters, 'options'));
+
+        foreach ($clusters as $connection => $servers) {
+            // Merge specific cluster options with general options
+            $options = array_merge($options, (array) Arr::pull($servers, 'options'));
+
+            $this->clients += $this->createAggregateClient($servers, $options, $connection);
+        }
     }
 
     /**
      * Create a new aggregate client supporting sharding.
      *
-     * @param  array  $servers
-     * @param  array  $options
+     * @param array  $servers
+     * @param array  $options
+     * @param string $connection
+     *
      * @return array
      */
-    protected function createAggregateClient(array $servers, array $options = [])
+    protected function createAggregateClient(array $servers, array $options = [], $connection = 'default')
     {
-        return ['default' => new Client(array_values($servers), $options)];
+        return [$connection => new Client(array_values($servers), $options)];
     }
 
     /**
      * Create an array of single connection clients.
      *
-     * @param  array  $servers
-     * @param  array  $options
+     * @param array $servers
+     * @param array $options
+     *
      * @return array
      */
     protected function createSingleClients(array $servers, array $options = [])
@@ -67,11 +91,10 @@ class PredisDatabase extends Database
     /**
      * Subscribe to a set of given channels for messages.
      *
-     * @param  array|string  $channels
-     * @param  \Closure  $callback
-     * @param  string  $connection
-     * @param  string  $method
-     * @return void
+     * @param array|string $channels
+     * @param \Closure     $callback
+     * @param string       $connection
+     * @param string       $method
      */
     public function subscribe($channels, Closure $callback, $connection = null, $method = 'subscribe')
     {
@@ -91,10 +114,9 @@ class PredisDatabase extends Database
     /**
      * Subscribe to a set of given channels with wildcards.
      *
-     * @param  array|string  $channels
-     * @param  \Closure  $callback
-     * @param  string  $connection
-     * @return void
+     * @param array|string $channels
+     * @param \Closure     $callback
+     * @param string       $connection
      */
     public function psubscribe($channels, Closure $callback, $connection = null)
     {
