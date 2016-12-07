@@ -279,11 +279,12 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 * Write a string as information output.
 	 *
 	 * @param  string  $string
+	 * @param  bool    $newLine
 	 * @return void
 	 */
-	public function info($string)
+	public function info($string, $newLine = true)
 	{
-		$this->output->writeln("<info>$string</info>");
+		$this->output->write("<info>$string</info>", $newLine);
 	}
 
 	/**
@@ -301,33 +302,36 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 * Write a string as comment output.
 	 *
 	 * @param  string  $string
+	 * @param  bool    $newLine
 	 * @return void
 	 */
-	public function comment($string)
+	public function comment($string, $newLine = true)
 	{
-		$this->output->writeln("<comment>$string</comment>");
+		$this->output->write("<comment>$string</comment>", $newLine);
 	}
 
 	/**
 	 * Write a string as question output.
 	 *
 	 * @param  string  $string
+	 * @param  bool    $newLine
 	 * @return void
 	 */
-	public function question($string)
+	public function question($string, $newLine = true)
 	{
-		$this->output->writeln("<question>$string</question>");
+		$this->output->write("<question>$string</question>", $newLine);
 	}
 
 	/**
 	 * Write a string as error output.
 	 *
 	 * @param  string  $string
+	 * @param  bool    $newLine
 	 * @return void
 	 */
-	public function error($string)
+	public function error($string, $newLine = true)
 	{
-		$this->output->writeln("<error>$string</error>");
+		$this->output->write("<error>$string</error>", $newLine);
 	}
 
 	/**
