@@ -269,7 +269,16 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	public function compileEchoDefaults($value)
 	{
-		return preg_replace('/^(?=\$)(.+?)(?:\s+or\s+)(.+?)$/s', 'isset($1) ? $1 : $2', $value);
+		// eliminate spaces after open parenthesises / before close parenthesises
+		$value = preg_replace('/(?|(?:(\()\s+)|(?:\s+(\))))/', '$1', $value);
+
+		do
+		{
+			$value = preg_replace('/^([^"\']*)\s*(\()?(?=\$)(.+?)(?:\s+or\s+)(.+?)(\))?([^"\']*)$/s', '$1$2isset($3) ? $3 : $4$5$6', $value, -1, $count);
+		}
+		while ($count > 0);
+
+		return $value;
 	}
 
 	/**
