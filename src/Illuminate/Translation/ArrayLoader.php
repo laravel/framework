@@ -43,6 +43,16 @@ class ArrayLoader implements LoaderInterface
     }
 
     /**
+     * Get array of all hints.
+     *
+     * @return array
+     */
+    public function getHints()
+    {
+        return [];
+    }
+
+    /**
      * Add messages to the loader.
      *
      * @param  string  $locale
