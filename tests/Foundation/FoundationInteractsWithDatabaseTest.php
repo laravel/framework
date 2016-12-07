@@ -40,33 +40,37 @@ class FoundationInteractsWithDatabaseTest extends PHPUnit_Framework_TestCase
     {
         $builder = $this->mockCountBuilder(0);
 
-        $builder->shouldReceive('get')->once()->andReturn(collect());
+        $builder->shouldReceive('get')->andReturn(collect());
 
         $this->seeInDatabase($this->table, $this->data);
     }
 
     /**
      * @expectedException \PHPUnit_Framework_ExpectationFailedException
-     * @expectedExceptionMessage Found: [{"title":"Forge"}].
      */
     public function testSeeInDatabaseFindsNotMatchingResults()
     {
+        $this->expectExceptionMessage('Found: '.json_encode([['title' => 'Forge']], JSON_PRETTY_PRINT));
+
         $builder = $this->mockCountBuilder(0);
 
-        $builder->shouldReceive('get')->once()->andReturn(collect([['title' => 'Forge']]));
+        $builder->shouldReceive('take')->andReturnSelf();
+        $builder->shouldReceive('get')->andReturn(collect([['title' => 'Forge']]));
 
         $this->seeInDatabase($this->table, $this->data);
     }
 
     /**
      * @expectedException \PHPUnit_Framework_ExpectationFailedException
-     * @expectedExceptionMessage Found: ["data","data","data"] and 2 others.
      */
     public function testSeeInDatabaseFindsManyNotMatchingResults()
     {
+        $this->expectExceptionMessage('Found: '.json_encode(['data', 'data', 'data'], JSON_PRETTY_PRINT).' and 2 others.');
+
         $builder = $this->mockCountBuilder(0);
 
-        $builder->shouldReceive('get')->once()->andReturn(
+        $builder->shouldReceive('take')->andReturnSelf();
+        $builder->shouldReceive('get')->andReturn(
             collect(array_fill(0, 5, 'data'))
         );
 
@@ -88,7 +92,8 @@ class FoundationInteractsWithDatabaseTest extends PHPUnit_Framework_TestCase
     {
         $builder = $this->mockCountBuilder(1);
 
-        $builder->shouldReceive('get')->once()->andReturn(collect([$this->data]));
+        $builder->shouldReceive('take')->andReturnSelf();
+        $builder->shouldReceive('get')->andReturn(collect([$this->data]));
 
         $this->dontSeeInDatabase($this->table, $this->data);
     }

@@ -15,14 +15,14 @@ class HasInDatabase extends PHPUnit_Framework_Constraint
     protected $show = 3;
 
     /**
-     * Database connection.
+     * The database connection.
      *
      * @var \Illuminate\Database\Collection
      */
     protected $database;
 
     /**
-     * Data that will be used to narrow the search in the database table.
+     * The data that will be used to narrow the search in the database table.
      *
      * @var array
      */
@@ -31,10 +31,11 @@ class HasInDatabase extends PHPUnit_Framework_Constraint
     /**
      * Create a new constraint instance.
      *
-     * @param  array  $data
      * @param  \Illuminate\Database\Collection  $database
+     * @param  array  $data
+     * @return void
      */
-    public function __construct(array $data, Connection $database)
+    public function __construct(Connection $database, array $data)
     {
         $this->data = $data;
 
@@ -80,7 +81,7 @@ class HasInDatabase extends PHPUnit_Framework_Constraint
             return 'The table is empty';
         }
 
-        $description = 'Found: '.json_encode($results->take($this->show));
+        $description = 'Found: '.json_encode($results->take($this->show), JSON_PRETTY_PRINT);
 
         if ($results->count() > $this->show) {
             $description .= sprintf(' and %s others', $results->count() - $this->show);

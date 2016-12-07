@@ -13,18 +13,13 @@ trait InteractsWithDatabase
      * @param  string  $table
      * @param  array  $data
      * @param  string  $connection
-     * @param  bool  $reverse
      * @return $this
      */
-    protected function seeInDatabase($table, array $data, $connection = null, $reverse = false)
+    protected function seeInDatabase($table, array $data, $connection = null)
     {
-        $constraint = new HasInDatabase($data, $this->getConnection($connection));
-
-        if ($reverse) {
-            $constraint = new ReverseConstraint($constraint);
-        }
-
-        $this->assertThat($table, $constraint);
+        $this->assertThat(
+            $table, new HasInDatabase($this->getConnection($connection), $data)
+        );
 
         return $this;
     }
@@ -39,7 +34,13 @@ trait InteractsWithDatabase
      */
     protected function missingFromDatabase($table, array $data, $connection = null)
     {
-        return $this->notSeeInDatabase($table, $data, $connection);
+        $constraint = new ReverseConstraint(
+            new HasInDatabase($this->getConnection($connection), $data)
+        );
+
+        $this->assertThat($table, $constraint);
+
+        return $this;
     }
 
     /**
@@ -65,7 +66,7 @@ trait InteractsWithDatabase
      */
     protected function notSeeInDatabase($table, array $data, $connection = null)
     {
-        return $this->seeInDatabase($table, $data, $connection, true);
+        return $this->missingFromDatabase($table, $data, $connection);
     }
 
     /**
