@@ -1834,10 +1834,10 @@ class Validator implements ValidatorContract
         if (! is_string($value) && ! is_numeric($value)) {
             return false;
         }
+        
+        $date = DateTime::createFromFormat($parameters[0], $value);
 
-        $parsed = date_parse_from_format($parameters[0], $value);
-
-        return $parsed['error_count'] === 0 && $parsed['warning_count'] === 0;
+        return $date && $date->format($parameters[0]) === $value;
     }
 
     /**
