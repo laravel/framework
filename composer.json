@@ -26,7 +26,7 @@
         "mtdowling/cron-expression": "~1.0",
         "nesbot/carbon": "~1.20",
         "paragonie/random_compat": "~1.4|~2.0",
-        "psy/psysh": "0.7.*",
+        "psy/psysh": "0.7.*|0.8.*",
         "ramsey/uuid": "~3.0",
         "swiftmailer/swiftmailer": "~5.1",
         "symfony/console": "3.1.*",
