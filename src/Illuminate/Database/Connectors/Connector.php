@@ -106,21 +106,6 @@ class Connector
     }
 
     /**
-     * Determine if the connection is persistent or not.
-     *
-     * @param  array  $options
-     * @return bool
-     */
-    protected function isPersistentConnection($options)
-    {
-        if (isset($options[PDO::ATTR_PERSISTENT]) && $options[PDO::ATTR_PERISISTENT]) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * Create a new PDO connection instance.
      *
      * @return \PDO
@@ -132,5 +117,20 @@ class Connector
         }
 
         return new PDO($dsn, $username, $password, $options);
+    }
+
+    /**
+     * Determine if the connection is persistent.
+     *
+     * @param  array  $options
+     * @return bool
+     */
+    protected function isPersistentConnection($options)
+    {
+        if (isset($options[PDO::ATTR_PERSISTENT]) && $options[PDO::ATTR_PERISISTENT]) {
+            return true;
+        }
+
+        return false;
     }
 }
