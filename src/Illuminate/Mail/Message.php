@@ -96,7 +96,7 @@ class Message
     public function cc($address, $name = null, $override = false)
     {
         if ($override) {
-            $this->swift->setTo($address, $name);
+            $this->swift->setCc($address, $name);
 
             return $this;
         }
@@ -115,7 +115,7 @@ class Message
     public function bcc($address, $name = null, $override = false)
     {
         if ($override) {
-            $this->swift->setTo($address, $name);
+            $this->swift->setBcc($address, $name);
 
             return $this;
         }
