@@ -39,7 +39,6 @@ class PhpRedisConnectionTest extends PHPUnit_Framework_TestCase
 
         $client = $redis->connection('options');
         $this->assertNull($client, 'options parameter should not create as redis server');
-
     }
 
     protected function getRedis($cluster = false)
@@ -94,10 +93,8 @@ class PhpRedisDatabaseStub extends PhpRedisDatabase
 
 class RedisStub
 {
-
 }
 
 class RedisClusterStub
-{
-    
+{  
 }
