@@ -336,6 +336,18 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
+     * Shortcut for creating a prefix route group.
+     *
+     * @param  string  $prefix
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function prefix($prefix, Closure $callback)
+    {
+        $this->group(['prefix' => $prefix], $callback);
+    }
+
+    /**
      * Update the group stack with the given attributes.
      *
      * @param  array  $attributes
@@ -473,7 +485,7 @@ class Router implements RegistrarContract, BindingRegistrar
         }
 
         $route = $this->newRoute(
-            $methods, $this->prefix($uri), $action
+            $methods, $this->appendPrefix($uri), $action
         );
 
         // If we have groups that need to be merged, we will merge them now after this
@@ -509,7 +521,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  string  $uri
      * @return string
      */
-    protected function prefix($uri)
+    protected function appendPrefix($uri)
     {
         return trim(trim($this->getLastGroupPrefix(), '/').'/'.trim($uri, '/'), '/') ?: '/';
     }

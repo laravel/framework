@@ -729,6 +729,19 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $routes[0]->getPrefix());
     }
 
+    public function testPrefixRouteGroupShortcut()
+    {
+        $router = $this->getRouter();
+        $router->prefix('foo', function () use ($router) {
+            $router->get('bar', function () {
+                return 'hello';
+            });
+        });
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+        $this->assertEquals('foo', $routes[0]->getPrefix());
+    }
+
     public function testRouteGroupingWithAs()
     {
         $router = $this->getRouter();
