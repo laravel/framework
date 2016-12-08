@@ -249,6 +249,38 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
+	 * Add rules to be applied to a repeatable indexed array.
+	 *
+	 * @param  string  $attribute
+	 * @param  array   $ruleSet
+	 * @param  array   $messages
+	 * @return void
+	 *
+	 * @throws \InvalidArgumentException
+	 */
+	public function iterate($attribute, array $ruleSet = [], $messages = [])
+	{
+		$payload = array_merge($this->data, $this->files);
+		$input = array_get($payload, $attribute);
+
+		if (!is_null($input) && !is_array($input))
+		{
+			throw new \InvalidArgumentException('Attribute for iterate() must be an array.');
+		}
+
+		if (!$entries = count($input))
+		{
+			//Whatever you're trying to iterate, the payload didn't have any
+			return;
+		}
+
+		for ($i = 0; $i < $entries; $i++)
+		{
+			$this->addIteratedValidationRules($attribute.'.'.$i.'.', $ruleSet, $messages);
+		}
+	}
+
+	/**
 	 * Merge additional rules into a given attribute.
 	 *
 	 * @param  string  $attribute
@@ -2541,6 +2573,69 @@ class Validator implements MessageProviderInterface {
 		{
 			throw new \InvalidArgumentException("Validation rule $rule requires at least $count parameters.");
 		}
+	}
+
+	/**
+	 * Add rules for a particular index of an array.
+	 *
+	 * @param  string  $attribute
+	 * @param  array   $ruleSet
+	 * @param  array   $messages
+	 * @return void
+	 */
+	protected function addIteratedValidationRules($attribute, $ruleSet = [], $messages = [])
+	{
+		foreach ($ruleSet as $field => $rules)
+		{
+			$rules = str_replace('required_with_parent', rtrim('required_with:'.$attribute, '.'), $rules);
+			$rules = is_string($rules) ? explode('|', $rules) : $rules;
+
+			//If it contains nested iterated items, recursively add validation rules for them too.
+			if(isset($rules['iterate']))
+			{
+				$this->iterateNestedRuleSet($attribute.$field, $rules);
+				unset($rules['iterate']);
+			}
+
+			$this->mergeRules($attribute.$field, $rules);
+		}
+
+		$this->addIteratedValidationMessages($attribute, $messages);
+	}
+
+	/**
+	 * Add custom messages to be applied at a particular index of a repeating input array.
+	 *
+	 * @param  string  $attribute
+	 * @param  array   $messages
+	 * @return void
+	 */
+	protected function addIteratedValidationMessages($attribute, $messages = [])
+	{
+		foreach ($messages as $field => $message)
+		{
+			$field_name = $attribute.$field;
+			$messages[$field_name] = $message;
+		}
+
+		$this->setCustomMessages($messages);
+	}
+
+	/**
+	 * Apply the iterate() function to a set of rules and messages.
+	 *
+	 * @see addIteratedValidationRules()
+	 *
+	 * @param  string  $attribute
+	 * @param  array   $rules
+	 * @return void
+	 */
+	protected function iterateNestedRuleSet($attribute, $rules)
+	{
+		$nestedRuleSet = isset($rules['iterate']['rules']) ? $rules['iterate']['rules'] : [];
+		$nestedMessages = isset($rules['iterate']['messages']) ? $rules['iterate']['messages'] : [];
+
+		$this->iterate($attribute, $nestedRuleSet, $nestedMessages);
 	}
 
 	/**
