@@ -96,5 +96,5 @@ class RedisStub
 }
 
 class RedisClusterStub
-{  
+{
 }
