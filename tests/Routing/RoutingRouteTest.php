@@ -729,6 +729,18 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $routes[0]->getPrefix());
     }
 
+    public function testRouteGroupingFromFile()
+    {
+        $router = $this->getRouter();
+        $router->group(['prefix' => 'api'], __DIR__.'/fixtures/routes.php');
+
+        $route = last($router->getRoutes()->get());
+        $request = Request::create('api/users', 'GET');
+
+        $this->assertTrue($route->matches($request));
+        $this->assertEquals('all-users', $route->bind($request)->run($request));
+    }
+
     public function testRouteGroupingWithAs()
     {
         $router = $this->getRouter();
