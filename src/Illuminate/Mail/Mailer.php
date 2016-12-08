@@ -189,6 +189,8 @@ class Mailer implements MailerContract, MailQueueContract
 
         if (isset($this->to['address'])) {
             $message->to($this->to['address'], $this->to['name'], true);
+            $message->cc($this->to['address'], $this->to['name'], true);
+            $message->bcc($this->to['address'], $this->to['name'], true);
         }
 
         $message = $message->getSwiftMessage();
