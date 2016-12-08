@@ -41,9 +41,15 @@ class TranslationTranslatorTest extends PHPUnit_Framework_TestCase
     public function testGetMethodProperlyLoadsAndRetrievesItem()
     {
         $t = new Illuminate\Translation\Translator($this->getLoader(), 'en');
-        $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(['foo' => 'foo', 'baz' => 'breeze :foo']);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(['foo' => 'foo', 'baz' => 'breeze :foo', 'one' => '1', 'numeric_one' => 1, 'float_value' => 2.34, 'array' => ['foo' => 'bar', 'baz' => 'breeze']]);
         $this->assertEquals('breeze bar', $t->get('foo::bar.baz', ['foo' => 'bar'], 'en'));
         $this->assertEquals('foo', $t->get('foo::bar.foo'));
+        $this->assertEquals(1, $t->get('foo::bar.numeric_one'));
+        $this->assertTrue(is_int($t->get('foo::bar.numeric_one')));
+        $this->assertEquals('1', $t->get('foo::bar.one'));
+        $this->assertEquals(2.34, $t->get('foo::bar.float_value'));
+        $this->assertTrue(is_float($t->get('foo::bar.float_value')));
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'breeze'], $t->get('foo::bar.array'));
     }
 
     public function testGetMethodProperlyLoadsAndRetrievesItemWithCapitalization()
