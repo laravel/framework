@@ -7,7 +7,8 @@ use Closure;
 trait ConfirmableTrait
 {
     /**
-     * Confirm before proceeding with the action.
+     * Confirm before proceeding with the action. The default         
+     * is to only ask a user's confirmation in production.
      *
      * @param  string    $warning
      * @param  \Closure|bool|null  $callback
