@@ -97,7 +97,7 @@ class WorkbenchMakeCommand extends Command {
 
 		$config = $this->laravel['config']['workbench'];
 
-		if (is_null($config['email']))
+		if ( ! filter_var($config['email'], FILTER_VALIDATE_EMAIL))
 		{
 			throw new \UnexpectedValueException("Please set the author's email in the workbench configuration file.");
 		}
