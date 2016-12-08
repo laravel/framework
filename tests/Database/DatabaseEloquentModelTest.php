@@ -333,6 +333,10 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('Carbon\Carbon', $model->created_at);
 
 		$model = new EloquentDateModelStub;
+		$model->created_at = '2013-05-22 00:00:00.0000';
+		$this->assertInstanceOf('Carbon\Carbon', $model->created_at);
+
+		$model = new EloquentDateModelStub;
 		$model->created_at = time();
 		$this->assertInstanceOf('Carbon\Carbon', $model->created_at);
 

@@ -5,6 +5,7 @@ use ArrayAccess;
 use Carbon\Carbon;
 use LogicException;
 use JsonSerializable;
+use InvalidArgumentException;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -2633,7 +2634,14 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// can return back the finally formatted DateTime instances to the devs.
 		else
 		{
-			$value = Carbon::createFromFormat($format, $value);
+			try
+			{
+				$value = Carbon::createFromFormat($format, $value);
+			}
+			catch (InvalidArgumentException $e)
+			{
+				$value = new Carbon($value);
+			}
 		}
 
 		return $value->format($format);
@@ -2670,7 +2678,14 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		{
 			$format = $this->getDateFormat();
 
-			return Carbon::createFromFormat($format, $value);
+			try
+			{
+				return Carbon::createFromFormat($format, $value);
+			}
+			catch (InvalidArgumentException $e)
+			{
+				return new Carbon($value);
+			}
 		}
 
 		return Carbon::instance($value);
