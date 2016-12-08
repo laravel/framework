@@ -19,6 +19,7 @@ class PredisDatabase extends Database
      * Create a new Redis connection instance.
      *
      * @param array $servers
+     * @return void
      */
     public function __construct(array $servers = [])
     {
@@ -41,6 +42,7 @@ class PredisDatabase extends Database
      *
      * @param array $clusters
      * @param array $options
+     * @return void
      */
     protected function createClusters(array $clusters, array $options = [])
     {
@@ -61,7 +63,6 @@ class PredisDatabase extends Database
      * @param array  $servers
      * @param array  $options
      * @param string $connection
-     *
      * @return array
      */
     protected function createAggregateClient(array $servers, array $options = [], $connection = 'default')
@@ -74,7 +75,6 @@ class PredisDatabase extends Database
      *
      * @param array $servers
      * @param array $options
-     *
      * @return array
      */
     protected function createSingleClients(array $servers, array $options = [])
@@ -95,6 +95,7 @@ class PredisDatabase extends Database
      * @param \Closure     $callback
      * @param string       $connection
      * @param string       $method
+     * @return void
      */
     public function subscribe($channels, Closure $callback, $connection = null, $method = 'subscribe')
     {
@@ -117,6 +118,7 @@ class PredisDatabase extends Database
      * @param array|string $channels
      * @param \Closure     $callback
      * @param string       $connection
+     * @return void
      */
     public function psubscribe($channels, Closure $callback, $connection = null)
     {

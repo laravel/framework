@@ -56,7 +56,7 @@ class PhpRedisConnectionTest extends PHPUnit_Framework_TestCase
             ],
             'clusters' => [
                 'options' => [
-                    'prefix' => 'cluster:'
+                    'prefix' => 'cluster:',
                 ],
                 'cluster-1' => [
                     [
@@ -70,7 +70,7 @@ class PhpRedisConnectionTest extends PHPUnit_Framework_TestCase
                         'host' => '127.0.0.1',
                         'port' => 6379,
                         'database' => 0,
-                    ]
+                    ],
                 ],
             ],
         ];
@@ -92,6 +92,12 @@ class PhpRedisDatabaseStub extends PhpRedisDatabase
     }
 }
 
-class RedisStub {}
+class RedisStub
+{
 
-class RedisClusterStub {}
+}
+
+class RedisClusterStub
+{
+    
+}
