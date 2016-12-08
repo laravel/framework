@@ -362,4 +362,14 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 		$this->fallback = $fallback;
 	}
 
+	/**
+	 * Get the raw array of loaded translation strings.
+	 *
+	 * @return array
+	 */
+	public function getLoaded()
+	{
+		return $this->loaded;
+	}
+
 }
