@@ -20,6 +20,7 @@ class PhpRedisDatabase extends Database
      * Create a new Redis connection instance.
      *
      * @param array $servers
+     * @return void
      */
     public function __construct(array $servers = [])
     {
@@ -42,6 +43,7 @@ class PhpRedisDatabase extends Database
      *
      * @param array $clusters
      * @param array $options
+     * @return void
      */
     protected function createClusters(array $clusters, array $options = [])
     {
@@ -62,7 +64,6 @@ class PhpRedisDatabase extends Database
      * @param array  $servers
      * @param array  $options
      * @param string $connection
-     *
      * @return array
      */
     protected function createAggregateClient(array $servers, array $options = [], $connection = 'default')
@@ -77,7 +78,6 @@ class PhpRedisDatabase extends Database
      *
      * @param array $servers
      * @param array $options
-     *
      * @return array
      */
     protected function createSingleClients(array $servers, array $options = [])
@@ -96,7 +96,6 @@ class PhpRedisDatabase extends Database
      * Build a single cluster seed string from array.
      *
      * @param array $server
-     *
      * @return string
      */
     protected function buildClusterSeed(array $server)
@@ -127,6 +126,7 @@ class PhpRedisDatabase extends Database
      * @param array|string $channels
      * @param \Closure     $callback
      * @param string       $connection
+     * @return void
      */
     public function psubscribe($channels, Closure $callback, $connection = null)
     {
@@ -138,7 +138,6 @@ class PhpRedisDatabase extends Database
      *
      * @param array $servers
      * @param array $options
-     *
      * @return RedisCluster
      */
     protected function createRedisClusterInstance(array $servers, array $options)
@@ -157,7 +156,6 @@ class PhpRedisDatabase extends Database
      *
      * @param array $server
      * @param array $options
-     *
      * @return Redis
      */
     protected function createRedisInstance(array $server, array $options)
@@ -172,19 +170,19 @@ class PhpRedisDatabase extends Database
             $client->connect($server['host'], $server['port'], $timeout);
         }
 
-        if (!empty($server['prefix'])) {
+        if (! empty($server['prefix'])) {
             $client->setOption(Redis::OPT_PREFIX, $server['prefix']);
         }
 
-        if (!empty($server['read_timeout'])) {
+        if (! empty($server['read_timeout'])) {
             $client->setOption(Redis::OPT_READ_TIMEOUT, $server['read_timeout']);
         }
 
-        if (!empty($server['password'])) {
+        if (! empty($server['password'])) {
             $client->auth($server['password']);
         }
 
-        if (!empty($server['database'])) {
+        if (! empty($server['database'])) {
             $client->select($server['database']);
         }
 
