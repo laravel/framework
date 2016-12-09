@@ -171,4 +171,14 @@ class PostgresGrammar extends Grammar {
 		return array('truncate '.$this->wrapTable($query->from).' restart identity' => array());
 	}
 
+    /**
+     * Get the format for database stored dates.
+     *
+     * @return string
+     */
+    public function getDateFormat()
+    {
+        return 'Y-m-d H:i:s.u';
+    }
+
 }
