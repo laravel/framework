@@ -88,7 +88,6 @@ class DatabaseEloquentHasOneThroughTest extends PHPUnit_Framework_TestCase
         $accountHistory = m::mock('Illuminate\Database\Eloquent\Model');
         $accountHistory->shouldReceive('getTable')->andReturn('account_histories');
 
-
         $builder->shouldReceive('getModel')->andReturn($accountHistory);
 
         return [$builder, $supplier, $account, 'supplier_id', 'account_id'];

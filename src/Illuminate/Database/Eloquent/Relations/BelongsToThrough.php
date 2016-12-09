@@ -242,7 +242,6 @@ class BelongsToThrough extends Relation
             $models = $builder->eagerLoadRelations($models);
         }
 
-
         return new Collection($models);
     }
 

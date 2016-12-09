@@ -58,8 +58,8 @@ class HasOneThrough extends Relation
     public function __construct(Builder $query, Model $farParent, Model $parent, $parentForeignKey, $relatedForeignKey)
     {
         $this->relatedForeignKey = $relatedForeignKey;
-        $this->parentForeignKey  = $parentForeignKey;
-        $this->farParent         = $farParent;
+        $this->parentForeignKey = $parentForeignKey;
+        $this->farParent = $farParent;
 
         parent::__construct($query, $parent);
     }
@@ -241,7 +241,6 @@ class HasOneThrough extends Relation
             $models = $builder->eagerLoadRelations($models);
         }
 
-
         return new Collection($models);
     }
 
@@ -258,7 +257,7 @@ class HasOneThrough extends Relation
         }
 
         return array_merge($columns, [
-            $this->parent->getTable().'.'.$this->parentForeignKey
+            $this->parent->getTable().'.'.$this->parentForeignKey,
         ]);
     }
 }

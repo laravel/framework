@@ -6,7 +6,6 @@ use Closure;
 use Exception;
 use ArrayAccess;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use LogicException;
 use JsonSerializable;
 use DateTimeInterface;
@@ -22,16 +21,17 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection as BaseCollection;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\BelongsToThrough;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\BelongsToThrough;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
@@ -738,7 +738,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasOneThrough
      */
-    public function hasOneThrough($related, $through, $throughForeignKey = null, $relatedForeignKey)
+    public function hasOneThrough($related, $through, $throughForeignKey, $relatedForeignKey)
     {
         $related = new $related;
         $through = new $through;
