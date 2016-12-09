@@ -1641,14 +1641,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Append the names of the class to the event to distinguish it from
      * other model events that are fired, allowing us to listen on each model
-     * event set individually instead of catching event for all the models. 
+     * event set individually instead of catching event for all the models.
      *
      * @param  string  $event
      * @return string
      */
     public static function getModelEvent($event)
     {
-        return "eloquent.{$event}: " . static::class;
+        return "eloquent.{$event}: ".static::class;
     }
 
     /**
@@ -1662,7 +1662,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         if (! isset(static::$dispatcher)) {
             return true;
-        }     
+        }
 
         $method = $halt ? 'until' : 'fire';
 
