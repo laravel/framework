@@ -1,6 +1,7 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Support\HtmlString;
 
 class MailMailerTest extends PHPUnit_Framework_TestCase
 {
@@ -24,6 +25,27 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
         $message->shouldReceive('getSwiftMessage')->once()->andReturn($message);
         $mailer->getSwiftMailer()->shouldReceive('send')->once()->with($message, []);
         $mailer->send('foo', ['data'], function ($m) {
+            $_SERVER['__mailer.test'] = $m;
+        });
+        unset($_SERVER['__mailer.test']);
+    }
+
+    public function testMailerSendSendsMessageWithProperViewContentUsingHtmlStrings()
+    {
+        unset($_SERVER['__mailer.test']);
+        $mailer = $this->getMockBuilder('Illuminate\Mail\Mailer')->setMethods(['createMessage'])->setConstructorArgs($this->getMocks())->getMock();
+        $message = m::mock('Swift_Mime_Message');
+        $mailer->expects($this->once())->method('createMessage')->will($this->returnValue($message));
+        $view = m::mock('StdClass');
+        $mailer->getViewFactory()->shouldReceive('make')->never();
+        $view->shouldReceive('render')->never();
+        $message->shouldReceive('setBody')->once()->with('rendered.view', 'text/html');
+        $message->shouldReceive('addPart')->once()->with('rendered.text', 'text/plain');
+        $message->shouldReceive('setFrom')->never();
+        $this->setSwiftMailer($mailer);
+        $message->shouldReceive('getSwiftMessage')->once()->andReturn($message);
+        $mailer->getSwiftMailer()->shouldReceive('send')->once()->with($message, []);
+        $mailer->send(['html' => new HtmlString('rendered.view'), 'text' => new HtmlString('rendered.text')], ['data'], function ($m) {
             $_SERVER['__mailer.test'] = $m;
         });
         unset($_SERVER['__mailer.test']);
