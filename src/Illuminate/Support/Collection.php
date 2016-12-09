@@ -38,6 +38,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Transform array to collection.
+     *
+     * @param $data
+     * @return Collection|mixed
+     */
+    private function collectionizeArray($data)
+    {
+        return is_array($data) ? $this->make($data) : $data;
+    }
+
+    /**
      * Create a new collection instance if the value isn't one already.
      *
      * @param  mixed  $items
@@ -384,7 +395,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function first(callable $callback = null, $default = null)
     {
-        return Arr::first($this->items, $callback, $default);
+        return $this->collectionizeArray(
+            Arr::first($this->items, $callback, $default)
+        );
     }
 
     /**
@@ -773,7 +786,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function pop()
     {
-        return array_pop($this->items);
+        return $this->collectionizeArray(array_pop($this->items));
     }
 
     /**
@@ -861,7 +874,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function reduce(callable $callback, $initial = null)
     {
-        return array_reduce($this->items, $callback, $initial);
+        $collectionizeCallback = function ($carry, $item) use ($callback) {
+            return $callback($carry, $this->collectionizeArray($item));
+        };
+
+        return array_reduce($this->items, $collectionizeCallback, $initial);
     }
 
     /**
@@ -903,7 +920,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function search($value, $strict = false)
     {
         if (! $this->useAsCallable($value)) {
-            return array_search($value, $this->items, $strict);
+            return $this->collectionizeArray(array_search($value, $this->items, $strict));
         }
 
         foreach ($this->items as $key => $item) {
@@ -922,7 +939,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function shift()
     {
-        return array_shift($this->items);
+        return $this->collectionizeArray(array_shift($this->items));
     }
 
     /**
@@ -1392,6 +1409,14 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             'each', 'map', 'first', 'partition', 'sortBy',
             'sortByDesc', 'sum', 'reject', 'filter',
         ];
+
+        if (property_exists($this, $key)) {
+            return $this->{$key};
+        }
+
+        if (isset($this->items[$key])) {
+            return $this->collectionizeArray($this->items[$key]);
+        }
 
         if (! in_array($key, $proxies)) {
             throw new Exception("Property [{$key}] does not exist on this collection instance.");
