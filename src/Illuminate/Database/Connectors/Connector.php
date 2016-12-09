@@ -127,7 +127,7 @@ class Connector
      */
     protected function isPersistentConnection($options)
     {
-        if (isset($options[PDO::ATTR_PERSISTENT]) && $options[PDO::ATTR_PERISISTENT]) {
+        if (isset($options[PDO::ATTR_PERSISTENT]) && $options[PDO::ATTR_PERSISTENT]) {
             return true;
         }
 
