@@ -486,9 +486,16 @@ class FormBuilder {
 	{
 		$months = array();
 
-		foreach (range(1, 12) as $month)
+		if (\Lang::has('months'))
 		{
-			$months[$month] = strftime($format, mktime(0, 0, 0, $month, 1));
+			$months = \Lang::get('months');
+		}
+		else
+		{
+			foreach (range(1, 12) as $month)
+			{
+				$months[$month] = ucfirst(strftime($format, mktime(0, 0, 0, $month, 1)));
+			}
 		}
 
 		return $this->select($name, $months, $selected, $options);
