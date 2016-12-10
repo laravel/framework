@@ -109,6 +109,13 @@ class UrlGenerator implements UrlGeneratorContract
     ];
 
     /**
+     * Default named parameters.
+     *
+     * @var array
+     */
+    protected $defaultNamedParameters = [];
+
+    /**
      * Create a new URL Generator instance.
      *
      * @param  \Illuminate\Routing\RouteCollection  $routes
@@ -298,6 +305,34 @@ class UrlGenerator implements UrlGeneratorContract
     }
 
     /**
+     * Get the default named parameters.
+     *
+     * @return array
+     */
+    public function getDefaultNamedParameters()
+    {
+        return $this->defaultNamedParameters;
+    }
+
+    /**
+     * Set the default named parameters.
+     *
+     * @param  string|array  $key
+     * @param  mixed  $value
+     * @return void
+     */
+    public function setDefaultNamedParameters($key, $value = null)
+    {
+        if (is_array($key)) {
+            foreach ($key as $k => $v) {
+                $this->defaultNamedParameters[$k] = $v;
+            }
+        } else {
+            $this->defaultNamedParameters[$key] = $value;
+        }
+    }
+
+    /**
      * Force the schema for URLs.
      *
      * @param  string  $schema
@@ -403,8 +438,16 @@ class UrlGenerator implements UrlGeneratorContract
      */
     protected function replaceNamedParameters($path, &$parameters)
     {
-        return preg_replace_callback('/\{(.*?)\??\}/', function ($m) use (&$parameters) {
-            return isset($parameters[$m[1]]) ? Arr::pull($parameters, $m[1]) : $m[0];
+        $defaultNamedParameters = $this->getDefaultNamedParameters();
+
+        return preg_replace_callback('/\{(.*?)\??\}/', function ($m) use (&$parameters, $defaultNamedParameters) {
+            if (isset($parameters[$m[1]])) {
+                return Arr::pull($parameters, $m[1]);
+            } else if (isset($defaultNamedParameters[$m[1]])) {
+                return $defaultNamedParameters[$m[1]];
+            } else {
+                return $m[0];
+            }
         }, $path);
     }
 
