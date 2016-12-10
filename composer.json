@@ -20,6 +20,7 @@
         "ext-openssl": "*",
         "classpreloader/classpreloader": "~3.0",
         "doctrine/inflector": "~1.0",
+        "erusev/parsedown": "~1.6",
         "jeremeamia/superclosure": "~2.2",
         "league/flysystem": "~1.0",
         "monolog/monolog": "~1.11",
@@ -37,6 +38,7 @@
         "symfony/process": "~3.2",
         "symfony/routing": "~3.2",
         "symfony/var-dumper": "~3.2",
+        "tijsverkoyen/css-to-inline-styles": "~2.2",
         "vlucas/phpdotenv": "~2.2"
     },
     "replace": {

@@ -46,6 +46,15 @@ interface ViewFinderInterface
     public function prependNamespace($namespace, $hints);
 
     /**
+     * Replace the namespace hints for the given namespace.
+     *
+     * @param  string  $namespace
+     * @param  string|array  $hints
+     * @return $this
+     */
+    public function replaceNamespace($namespace, $hints);
+
+    /**
      * Add a valid view extension to the finder.
      *
      * @param  string  $extension
