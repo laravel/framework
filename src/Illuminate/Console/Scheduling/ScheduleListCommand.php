@@ -69,11 +69,11 @@ class ScheduleListCommand extends Command
             }
 
             // move description to brackets
-            if (!empty($command) && !empty($desc)) {
-                $desc = '(' . $desc . ')';
+            if (! empty($command) && ! empty($desc)) {
+                $desc = '('.$desc.')';
             }
 
-            $this->line($expression . "\t" . trim($command . ' ' . $desc));
+            $this->line($expression."\t".trim($command.' '.$desc));
         }
     }
 }
