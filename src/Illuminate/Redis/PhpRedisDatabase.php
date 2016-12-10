@@ -19,7 +19,7 @@ class PhpRedisDatabase extends Database
     /**
      * Create a new Redis connection instance.
      *
-     * @param array $servers
+     * @param  array  $servers
      * @return void
      */
     public function __construct(array $servers = [])
@@ -41,8 +41,8 @@ class PhpRedisDatabase extends Database
     /**
      * Create multiple clusters (aggregate clients).
      *
-     * @param array $clusters
-     * @param array $options
+     * @param  array  $clusters
+     * @param  array  $options
      * @return void
      */
     protected function createClusters(array $clusters, array $options = [])
@@ -61,9 +61,9 @@ class PhpRedisDatabase extends Database
     /**
      * Create a new aggregate client supporting sharding.
      *
-     * @param array  $servers
-     * @param array  $options
-     * @param string $connection
+     * @param  array  $servers
+     * @param  array  $options
+     * @param  string  $connection
      * @return array
      */
     protected function createAggregateClient(array $servers, array $options = [], $connection = 'default')
@@ -76,8 +76,8 @@ class PhpRedisDatabase extends Database
     /**
      * Create an array of single connection clients.
      *
-     * @param array $servers
-     * @param array $options
+     * @param  array  $servers
+     * @param  array  $options
      * @return array
      */
     protected function createSingleClients(array $servers, array $options = [])
@@ -95,7 +95,7 @@ class PhpRedisDatabase extends Database
     /**
      * Build a single cluster seed string from array.
      *
-     * @param array $server
+     * @param  array  $server
      * @return string
      */
     protected function buildClusterSeed(array $server)
@@ -110,10 +110,11 @@ class PhpRedisDatabase extends Database
     /**
      * Subscribe to a set of given channels for messages.
      *
-     * @param array|string $channels
-     * @param \Closure     $callback
-     * @param string       $connection
-     * @param string       $method
+     * @param  array|string  $channels
+     * @param  \Closure  $callback
+     * @param  string  $connection
+     * @param  string  $method
+     * @return void
      */
     public function subscribe($channels, Closure $callback, $connection = null, $method = 'subscribe')
     {
@@ -123,9 +124,9 @@ class PhpRedisDatabase extends Database
     /**
      * Subscribe to a set of given channels with wildcards.
      *
-     * @param array|string $channels
-     * @param \Closure     $callback
-     * @param string       $connection
+     * @param  array|string  $channels
+     * @param  \Closure  $callback
+     * @param  string  $connection
      * @return void
      */
     public function psubscribe($channels, Closure $callback, $connection = null)
@@ -136,8 +137,8 @@ class PhpRedisDatabase extends Database
     /**
      * Create a new redis cluster instance.
      *
-     * @param array $servers
-     * @param array $options
+     * @param  array  $servers
+     * @param  array  $options
      * @return RedisCluster
      */
     protected function createRedisClusterInstance(array $servers, array $options)
@@ -154,8 +155,8 @@ class PhpRedisDatabase extends Database
     /**
      * Create a new redis instance.
      *
-     * @param array $server
-     * @param array $options
+     * @param  array  $server
+     * @param  array  $options
      * @return Redis
      */
     protected function createRedisInstance(array $server, array $options)
