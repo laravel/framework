@@ -105,7 +105,6 @@ class Markdown
      */
     public static function trim($text)
     {
-        file_put_contents(base_path('output/'.str_random(5).'.txt'), $text);
         return implode(PHP_EOL, array_map('trim', preg_split("/\r\n|\n|\r/", $text)));
     }
 
