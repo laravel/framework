@@ -51,6 +51,7 @@ class ScheduleListCommand extends Command
 
         if (count($events) === 0) {
             $this->info('No scheduled commands.');
+
             return;
         }
 
