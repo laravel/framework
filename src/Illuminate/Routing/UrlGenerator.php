@@ -163,7 +163,7 @@ class UrlGenerator implements UrlGeneratorContract
 
         if ($url) {
             return $url;
-        } else if ($fallback) {
+        } elseif ($fallback) {
             return $this->to($fallback);
         } else {
             return $this->to('/');
@@ -443,7 +443,7 @@ class UrlGenerator implements UrlGeneratorContract
         return preg_replace_callback('/\{(.*?)\??\}/', function ($m) use (&$parameters, $defaultNamedParameters) {
             if (isset($parameters[$m[1]])) {
                 return Arr::pull($parameters, $m[1]);
-            } else if (isset($defaultNamedParameters[$m[1]])) {
+            } elseif (isset($defaultNamedParameters[$m[1]])) {
                 return $defaultNamedParameters[$m[1]];
             } else {
                 return $m[0];
