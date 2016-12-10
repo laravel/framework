@@ -163,7 +163,7 @@ class UrlGenerator implements UrlGeneratorContract
 
         if ($url) {
             return $url;
-        } elseif ($fallback) {
+        } else if ($fallback) {
             return $this->to($fallback);
         } else {
             return $this->to('/');
