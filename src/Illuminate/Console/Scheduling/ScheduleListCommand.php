@@ -63,12 +63,17 @@ class ScheduleListCommand extends Command
             $command = substr($command, 0, strpos($command, '>'));
             $command = trim(str_replace([PHP_BINARY, 'artisan', '\'', '"'], '', $command));
 
-            // if description contain PHP BINARY, description is empty
-            if (strpos($desc, PHP_BINARY) !== false) {
+            // if description contain 2>&1, it is not really description
+            if (strpos($desc, '2>&1') !== false) {
                 $desc = '';
             }
 
-            $this->line($expression . "\t" . trim($command . ' ') . $desc);
+            // move description to brackets
+            if (!empty($command) && !empty($desc)) {
+                $desc = '(' . $desc . ')';
+            }
+
+            $this->line($expression . "\t" . trim($command . ' ' . $desc));
         }
     }
 }
