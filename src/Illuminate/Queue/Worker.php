@@ -99,8 +99,6 @@ class Worker
         pcntl_async_signals(true);
 
         pcntl_signal(SIGALRM, function () {
-            $this->exceptions->report(new TimeoutException('A queue worker timed out while processing a job.'));
-
             exit(1);
         });
 
