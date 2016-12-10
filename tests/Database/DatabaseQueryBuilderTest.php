@@ -158,6 +158,24 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testWhereBooleanExpression()
+	{
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->
+			where('active', '=', new Illuminate\Database\Query\Expression(false))->
+			where('banned', '=', new Illuminate\Database\Query\Expression(true));
+		$this->assertEquals('select * from "users" where "active" = 0 and "banned" = 1', $builder->toSql());
+		$this->assertEquals(array(), $builder->getBindings());
+	}
+
+	public function testWhereIntegerExpression()
+	{
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->where('num_posts', '=', new Illuminate\Database\Query\Expression(25));
+		$this->assertEquals('select * from "users" where "num_posts" = 25', $builder->toSql());
+		$this->assertEquals(array(), $builder->getBindings());
+	}
+
 	public function testMySqlWrappingProtectsQuotationMarks()
 	{
 		$builder = $this->getMySqlBuilder();
