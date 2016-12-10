@@ -684,6 +684,17 @@ class Blueprint {
 	}
 
 	/**
+	 * Adds a password hash column to the table.
+	 *
+	 * @param  string  $password
+	 * @return \Illuminate\Support\Fluent
+	 */
+	public function password($column = 'password')
+	{
+		return $this->string($column, 60);
+	}
+
+	/**
 	 * Create a new drop index command on the blueprint.
 	 *
 	 * @param  string  $command
