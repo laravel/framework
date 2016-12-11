@@ -4,6 +4,7 @@ namespace Illuminate\Routing;
 
 use Closure;
 use BadMethodCallException;
+use InvalidArgumentException;
 
 class RouteRegistrar
 {
@@ -65,9 +66,15 @@ class RouteRegistrar
      * @param  string  $key
      * @param  mixed  $value
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
     public function attribute($key, $value)
     {
+        if (! in_array($key, $this->allowedAttributes)) {
+            throw new InvalidArgumentException("Attribute [{$key}] does not exist.");
+        }
+
         $this->attributes[array_get($this->aliases, $key, $key)] = $value;
 
         return $this;
