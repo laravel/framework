@@ -27,6 +27,16 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     protected $items = [];
 
     /**
+     * The methods that can be proxied.
+     *
+     * @var array
+     */
+    protected static $proxies = [
+        'each', 'map', 'first', 'partition', 'sortBy',
+        'sortByDesc', 'sum', 'reject', 'filter',
+    ];
+
+    /**
      * Create a new collection.
      *
      * @param  mixed  $items
@@ -46,6 +56,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public static function make($items = [])
     {
         return new static($items);
+    }
+
+    /**
+     * Add a method to the list of proxied methods.
+     *
+     * @param  string  $method
+     * @return void
+     */
+    public static function proxy($method)
+    {
+        static::$proxies[] = $method;
     }
 
     /**
@@ -1388,12 +1409,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function __get($key)
     {
-        $proxies = [
-            'each', 'map', 'first', 'partition', 'sortBy',
-            'sortByDesc', 'sum', 'reject', 'filter',
-        ];
-
-        if (! in_array($key, $proxies)) {
+        if (! in_array($key, static::$proxies)) {
             throw new Exception("Property [{$key}] does not exist on this collection instance.");
         }
 

@@ -834,6 +834,21 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertSame(['a', 'aa', 'aaa'], $c->foo()->all());
     }
 
+    public function testCanAddMethodsToProxy()
+    {
+        Collection::macro('adults', function ($callback) {
+            return $this->filter(function ($item) use ($callback) {
+                return $callback($item) >= 18;
+            });
+        });
+
+        Collection::proxy('adults');
+
+        $c = new Collection([['age' => 3], ['age' => 12], ['age' => 18], ['age' => 56]]);
+
+        $this->assertSame([['age' => 18], ['age' => 56]], $c->adults->age->values()->all());
+    }
+
     public function testMakeMethod()
     {
         $collection = Collection::make('foo');
