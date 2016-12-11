@@ -32,8 +32,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @var array
      */
     protected static $proxies = [
-        'each', 'map', 'first', 'partition', 'sortBy',
-        'sortByDesc', 'sum', 'reject', 'filter',
+        'each', 'filter', 'first', 'map', 'partition',
+        'reject', 'sortBy', 'sortByDesc', 'sum',
     ];
 
     /**
@@ -56,17 +56,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public static function make($items = [])
     {
         return new static($items);
-    }
-
-    /**
-     * Add a method to the list of proxied methods.
-     *
-     * @param  string  $method
-     * @return void
-     */
-    public static function proxy($method)
-    {
-        static::$proxies[] = $method;
     }
 
     /**
@@ -1399,6 +1388,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         return (array) $items;
+    }
+
+    /**
+     * Add a method to the list of proxied methods.
+     *
+     * @param  string  $method
+     * @return void
+     */
+    public static function proxy($method)
+    {
+        static::$proxies[] = $method;
     }
 
     /**
