@@ -38,6 +38,21 @@
                                     <td class="content-cell">
                                         {{ Illuminate\Mail\Markdown::parse($slot) }}
 
+                                        <table class="attributes" width="100%" cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td class="attributes_content">
+                                                    <table width="100%" cellpadding="0" cellspacing="0">
+                                                        <tr>
+                                                            <td class="attributes_item">
+                                                                <p><strong><a href="">Restart your trial</a></strong> - If you didn't get a chance to fully try out the product or need a little more time to evaluate, just let us know. Simply reply to this email and we'll extend your trial period.</p>
+                                                                <p><strong><a href="">Share feedback</a></strong> - If [Product Name] isn't right for you, let us know what you were looking for and we might be able to suggest some alternatives that might be a better fit.</p>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+
                                         {{ $subcopy or '' }}
                                     </td>
                                 </tr>

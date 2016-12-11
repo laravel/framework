@@ -1,6 +1,6 @@
 /* Base */
 
-body, body *:not(html):not(style):not(br):not(tr) {
+body, body *:not(html):not(style):not(br):not(tr):not(code) {
     font-family: Avenir, Helvetica, sans-serif;
     box-sizing: border-box;
 }
@@ -249,4 +249,24 @@ p.sub {
 .promotion p {
     font-size: 15px;
     text-align: center;
+}
+
+
+
+.attributes {
+margin: 0 0 21px;
+}
+
+.attributes_content {
+background-color: #EDEFF2;
+padding: 16px;
+}
+
+.attributes_item {
+padding: 0;
+}
+
+.attributes_item p:last-of-type {
+    margin-bottom: 0;
+    padding-bottom: 0;
 }

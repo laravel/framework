@@ -1,9 +1,9 @@
-{!! strip_tags(Illuminate\Mail\Markdown::trim($header)) !!}
+{!! strip_tags($header) !!}
 
-{!! strip_tags(Illuminate\Mail\Markdown::trim($slot)) !!}
+{!! strip_tags($slot) !!}
 @if (isset($subcopy))
 
-{!! strip_tags(Illuminate\Mail\Markdown::trim($subcopy)) !!}
+{!! strip_tags($subcopy) !!}
 @endif
 
-{!! strip_tags(Illuminate\Mail\Markdown::trim($footer)) !!}
+{!! strip_tags($footer) !!}

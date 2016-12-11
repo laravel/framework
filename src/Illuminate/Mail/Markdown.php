@@ -46,7 +46,7 @@ class Markdown
     }
 
     /**
-     * Render the leaflet template into HTML.
+     * Render the Markdown template into HTML.
      *
      * @param  string  $view
      * @param  array  $data
@@ -69,7 +69,7 @@ class Markdown
     }
 
     /**
-     * Render the leaflet template into HTML.
+     * Render the Markdown template into HTML.
      *
      * @param  string  $view
      * @param  array  $data
@@ -79,9 +79,9 @@ class Markdown
     {
         // Flush view locator cache...
 
-        return $this->view->replaceNamespace(
+        return preg_replace("/[\r\n]{2,}/", "\n\n", $this->view->replaceNamespace(
             'mail', $this->markdownComponentPaths()
-        )->make($view, $data)->render();
+        )->make($view, $data)->render());
     }
 
     /**
@@ -94,18 +94,7 @@ class Markdown
     {
         $parsedown = new Parsedown;
 
-        return new HtmlString($parsedown->text(static::trim($text)));
-    }
-
-    /**
-     * Trim the leading spaces from the given Markdown.
-     *
-     * @param  string  $text
-     * @return string
-     */
-    public static function trim($text)
-    {
-        return implode(PHP_EOL, array_map('trim', preg_split("/\r\n|\n|\r/", $text)));
+        return new HtmlString($parsedown->text($text));
     }
 
     /**
@@ -145,7 +134,7 @@ class Markdown
     }
 
     /**
-     * Register new component paths with Leaflet.
+     * Register new mail component paths.
      *
      * @param  array  $paths
      * @return void
