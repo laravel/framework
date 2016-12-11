@@ -63,7 +63,7 @@ class ScheduleRunCommand extends Command
             ++$eventsRan;
         }
 
-        if (count($events) === 0 || $eventsRan === 0) {
+        if ($eventsRan === 0) {
             $this->info('No scheduled commands are ready to run.');
         }
     }
