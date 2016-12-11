@@ -128,7 +128,8 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
          * With Default Parameter
          */
         $url->defaults(['locale' => 'en']);
-        $route = new Route(['GET'], 'foo', ['as' => 'defaults', 'domain' => '{locale}.example.com', function () {}]);
+        $route = new Route(['GET'], 'foo', ['as' => 'defaults', 'domain' => '{locale}.example.com', function () {
+        }]);
         $routes->add($route);
 
         $this->assertEquals('/', $url->route('plain', [], false));
