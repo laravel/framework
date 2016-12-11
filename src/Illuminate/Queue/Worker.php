@@ -99,6 +99,10 @@ class Worker
         pcntl_async_signals(true);
 
         pcntl_signal(SIGALRM, function () {
+            if (extension_loaded('posix')) {
+                posix_kill(getmypid(), SIGKILL);
+            }
+
             exit(1);
         });
 
