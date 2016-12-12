@@ -2,10 +2,9 @@
 
 namespace Illuminate\Notifications\Channels;
 
+use Closure;
 use Illuminate\Support\Str;
-use Illuminate\Mail\Markdown;
 use Illuminate\Support\HtmlString;
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Notifications\Notification;
@@ -18,6 +17,13 @@ class MailChannel
      * @var \Illuminate\Contracts\Mail\Mailer
      */
     protected $mailer;
+
+    /**
+     * The Markdown resolver callback.
+     *
+     * @var \Closure
+     */
+    protected $markdownResolver;
 
     /**
      * Create a new mail channel instance.
@@ -62,11 +68,11 @@ class MailChannel
      */
     protected function buildView($message)
     {
-        if (! $message->markdown) {
+        if ($message->view) {
             return $message->view;
         }
 
-        $markdown = Container::getInstance()->make(Markdown::class);
+        $markdown = call_user_func($this->markdownResolver);
 
         return [
             'html' => $markdown->render($message->markdown, $message->data()),
@@ -145,5 +151,18 @@ class MailChannel
         foreach ($message->rawAttachments as $attachment) {
             $mailMessage->attachData($attachment['data'], $attachment['name'], $attachment['options']);
         }
+    }
+
+    /**
+     * Set the Markdown resolver callback.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function setMarkdownResolver(Closure $callback)
+    {
+        $this->markdownResolver = $callback;
+
+        return $this;
     }
 }

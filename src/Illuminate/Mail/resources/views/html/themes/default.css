@@ -198,17 +198,20 @@ p.sub {
 }
 
 .button {
-    background-color: #3097D1;
-    border-top: 10px solid #3097D1;
-    border-right: 18px solid #3097D1;
-    border-bottom: 10px solid #3097D1;
-    border-left: 18px solid #3097D1;
     border-radius: 3px;
     box-shadow: 0 2px 3px rgba(0, 0, 0, 0.16);
     color: #FFF;
     display: inline-block;
     text-decoration: none;
     -webkit-text-size-adjust: none;
+}
+
+.button-blue {
+    background-color: #3097D1;
+    border-top: 10px solid #3097D1;
+    border-right: 18px solid #3097D1;
+    border-bottom: 10px solid #3097D1;
+    border-left: 18px solid #3097D1;
 }
 
 .button-green {
@@ -225,6 +228,26 @@ p.sub {
     border-right: 18px solid #bf5329;
     border-bottom: 10px solid #bf5329;
     border-left: 18px solid #bf5329;
+}
+
+/* Panels */
+
+.panel {
+    margin: 0 0 21px;
+}
+
+.panel-content {
+    background-color: #EDEFF2;
+    padding: 16px;
+}
+
+.panel-item {
+    padding: 0;
+}
+
+.panel-item p:last-of-type {
+    margin-bottom: 0;
+    padding-bottom: 0;
 }
 
 /* Promotions */
@@ -249,24 +272,4 @@ p.sub {
 .promotion p {
     font-size: 15px;
     text-align: center;
-}
-
-
-
-.attributes {
-margin: 0 0 21px;
-}
-
-.attributes_content {
-background-color: #EDEFF2;
-padding: 16px;
-}
-
-.attributes_item {
-padding: 0;
-}
-
-.attributes_item p:last-of-type {
-    margin-bottom: 0;
-    padding-bottom: 0;
 }

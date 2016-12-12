@@ -4,6 +4,7 @@ namespace Illuminate\Notifications;
 
 use Ramsey\Uuid\Uuid;
 use InvalidArgumentException;
+use Illuminate\Mail\Markdown;
 use Illuminate\Support\Manager;
 use Nexmo\Client as NexmoClient;
 use Illuminate\Support\Collection;
@@ -187,7 +188,9 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      */
     protected function createMailDriver()
     {
-        return $this->app->make(Channels\MailChannel::class);
+        return $this->app->make(Channels\MailChannel::class)->setMarkdownResolver(function () {
+            return $this->app->make(Markdown::class);
+        });
     }
 
     /**
