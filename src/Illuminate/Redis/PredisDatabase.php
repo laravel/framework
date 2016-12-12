@@ -23,7 +23,8 @@ class PredisDatabase extends Database
      */
     public function __construct(array $servers = [])
     {
-        $cluster = Arr::pull($servers, 'cluster');
+        $cluster = (bool) Arr::pull($servers, 'cluster');
+        $clusters = (array) Arr::pull($servers, 'clusters');
 
         $options = array_merge(['timeout' => 10.0], (array) Arr::pull($servers, 'options'));
 
@@ -32,6 +33,28 @@ class PredisDatabase extends Database
         } else {
             $this->clients = $this->createSingleClients($servers, $options);
         }
+
+        $this->createClusters($clusters, $options);
+    }
+
+    /**
+     * Create multiple clusters (aggregate clients).
+     *
+     * @param  array  $clusters
+     * @param  array  $options
+     * @return void
+     */
+    protected function createClusters(array $clusters, array $options = [])
+    {
+        // Merge general options with general cluster options
+        $options = array_merge($options, (array) Arr::pull($clusters, 'options'));
+
+        foreach ($clusters as $connection => $servers) {
+            // Merge specific cluster options with general options
+            $options = array_merge($options, (array) Arr::pull($servers, 'options'));
+
+            $this->clients += $this->createAggregateClient($servers, $options, $connection);
+        }
     }
 
     /**
@@ -39,11 +62,12 @@ class PredisDatabase extends Database
      *
      * @param  array  $servers
      * @param  array  $options
+     * @param  string  $connection
      * @return array
      */
-    protected function createAggregateClient(array $servers, array $options = [])
+    protected function createAggregateClient(array $servers, array $options = [], $connection = 'default')
     {
-        return ['default' => new Client(array_values($servers), $options)];
+        return [$connection => new Client(array_values($servers), $options)];
     }
 
     /**
