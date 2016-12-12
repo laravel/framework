@@ -31,6 +31,13 @@ class UrlGenerator implements UrlGeneratorContract
     protected $request;
 
     /**
+     * The named parameter defaults.
+     *
+     * @var array
+     */
+    protected $defaultParameters = [];
+
+    /**
      * The forced URL root.
      *
      * @var string
@@ -404,7 +411,13 @@ class UrlGenerator implements UrlGeneratorContract
     protected function replaceNamedParameters($path, &$parameters)
     {
         return preg_replace_callback('/\{(.*?)\??\}/', function ($m) use (&$parameters) {
-            return isset($parameters[$m[1]]) ? Arr::pull($parameters, $m[1]) : $m[0];
+            if (isset($parameters[$m[1]])) {
+                return Arr::pull($parameters, $m[1]);
+            } elseif (isset($this->defaultParameters[$m[1]])) {
+                return $this->defaultParameters[$m[1]];
+            } else {
+                return $m[0];
+            }
         }, $path);
     }
 
@@ -691,6 +704,19 @@ class UrlGenerator implements UrlGeneratorContract
         }
 
         return trim($root.$path, '/');
+    }
+
+    /**
+     * Set the default named parameters used by the URL generator.
+     *
+     * @param  array  $defaults
+     * @return void
+     */
+    public function defaults(array $defaults)
+    {
+        $this->defaultParameters = array_merge(
+            $this->defaultParameters, $defaults
+        );
     }
 
     /**
