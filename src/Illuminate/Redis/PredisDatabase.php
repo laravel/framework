@@ -13,7 +13,7 @@ class PredisDatabase extends Database
      *
      * @var array
      */
-    protected $clients;
+    public $clients;
 
     /**
      * Create a new Redis connection instance.
@@ -23,51 +23,13 @@ class PredisDatabase extends Database
      */
     public function __construct(array $servers = [])
     {
-        $cluster = (bool) Arr::pull($servers, 'cluster');
         $clusters = (array) Arr::pull($servers, 'clusters');
 
         $options = array_merge(['timeout' => 10.0], (array) Arr::pull($servers, 'options'));
 
-        if ($cluster) {
-            $this->clients = $this->createAggregateClient($servers, $options);
-        } else {
-            $this->clients = $this->createSingleClients($servers, $options);
-        }
+        $this->clients = $this->createSingleClients($servers, $options);
 
         $this->createClusters($clusters, $options);
-    }
-
-    /**
-     * Create multiple clusters (aggregate clients).
-     *
-     * @param  array  $clusters
-     * @param  array  $options
-     * @return void
-     */
-    protected function createClusters(array $clusters, array $options = [])
-    {
-        // Merge general options with general cluster options
-        $options = array_merge($options, (array) Arr::pull($clusters, 'options'));
-
-        foreach ($clusters as $connection => $servers) {
-            // Merge specific cluster options with general options
-            $options = array_merge($options, (array) Arr::pull($servers, 'options'));
-
-            $this->clients += $this->createAggregateClient($servers, $options, $connection);
-        }
-    }
-
-    /**
-     * Create a new aggregate client supporting sharding.
-     *
-     * @param  array  $servers
-     * @param  array  $options
-     * @param  string  $connection
-     * @return array
-     */
-    protected function createAggregateClient(array $servers, array $options = [], $connection = 'default')
-    {
-        return [$connection => new Client(array_values($servers), $options)];
     }
 
     /**
@@ -86,6 +48,37 @@ class PredisDatabase extends Database
         }
 
         return $clients;
+    }
+
+    /**
+     * Create multiple clusters (aggregate clients).
+     *
+     * @param  array  $clusters
+     * @param  array  $options
+     * @return void
+     */
+    protected function createClusters(array $clusters, array $options = [])
+    {
+        $options = array_merge($options, (array) Arr::pull($clusters, 'options'));
+
+        foreach ($clusters as $name => $servers) {
+            $this->clients += $this->createAggregateClient($name, $servers, array_merge(
+                $options, (array) Arr::pull($servers, 'options')
+            ));
+        }
+    }
+
+    /**
+     * Create a new aggregate client supporting sharding.
+     *
+     * @param  string  $name
+     * @param  array  $servers
+     * @param  array  $options
+     * @return array
+     */
+    protected function createAggregateClient($name, array $servers, array $options = [])
+    {
+        return [$name => new Client(array_values($servers), $options)];
     }
 
     /**

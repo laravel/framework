@@ -6,7 +6,7 @@ class PhpRedisConnectionTest extends PHPUnit_Framework_TestCase
 {
     public function testPhpRedisNotCreateClusterAndOptionsAndClustersServer()
     {
-        $redis = $this->getRedis(false);
+        $redis = $this->getRedis();
 
         $client = $redis->connection('cluster');
         $this->assertNull($client, 'cluster parameter should not create as redis server');
@@ -20,11 +20,8 @@ class PhpRedisConnectionTest extends PHPUnit_Framework_TestCase
 
     public function testPhpRedisClusterNotCreateClusterAndOptionsServer()
     {
-        $redis = $this->getRedis(true);
-
-        $client = $redis->connection();
-
-        $this->assertInstanceOf(RedisClusterStub::class, $client);
+        $redis = $this->getRedis();
+        $this->assertEquals(['default', 'cluster-1', 'cluster-2'], array_keys($redis->clients));
     }
 
     public function testPhpRedisClusterCreateMultipleClustersAndNotCreateOptionsServer()
@@ -41,10 +38,9 @@ class PhpRedisConnectionTest extends PHPUnit_Framework_TestCase
         $this->assertNull($client, 'options parameter should not create as redis server');
     }
 
-    protected function getRedis($cluster = false)
+    protected function getRedis()
     {
         $servers = [
-            'cluster' => $cluster,
             'default' => [
                 'host' => '127.0.0.1',
                 'port' => 6379,
