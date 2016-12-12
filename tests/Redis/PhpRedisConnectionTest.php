@@ -1,8 +1,10 @@
 <?php
 
-class RedisConnectionTest extends PHPUnit_Framework_TestCase
+use Illuminate\Redis\PhpRedisDatabase;
+
+class PhpRedisConnectionTest extends PHPUnit_Framework_TestCase
 {
-    public function testRedisNotCreateClusterAndOptionsAndClustersServer()
+    public function testPhpRedisNotCreateClusterAndOptionsAndClustersServer()
     {
         $redis = $this->getRedis(false);
 
@@ -16,22 +18,24 @@ class RedisConnectionTest extends PHPUnit_Framework_TestCase
         $this->assertNull($client, 'clusters parameter should not create as redis server');
     }
 
-    public function testRedisClusterNotCreateClusterAndOptionsServer()
+    public function testPhpRedisClusterNotCreateClusterAndOptionsServer()
     {
         $redis = $this->getRedis(true);
+
         $client = $redis->connection();
 
-        $this->assertCount(1, $client->getConnection());
+        $this->assertInstanceOf(RedisClusterStub::class, $client);
     }
 
-    public function testRedisClusterCreateMultipleClustersAndNotCreateOptionsServer()
+    public function testPhpRedisClusterCreateMultipleClustersAndNotCreateOptionsServer()
     {
         $redis = $this->getRedis();
+
         $clusterOne = $redis->connection('cluster-1');
         $clusterTwo = $redis->connection('cluster-2');
 
-        $this->assertCount(1, $clusterOne->getConnection());
-        $this->assertCount(1, $clusterTwo->getConnection());
+        $this->assertInstanceOf(RedisClusterStub::class, $clusterOne);
+        $this->assertInstanceOf(RedisClusterStub::class, $clusterTwo);
 
         $client = $redis->connection('options');
         $this->assertNull($client, 'options parameter should not create as redis server');
@@ -42,8 +46,8 @@ class RedisConnectionTest extends PHPUnit_Framework_TestCase
         $servers = [
             'cluster' => $cluster,
             'default' => [
-                'host'     => '127.0.0.1',
-                'port'     => 6379,
+                'host' => '127.0.0.1',
+                'port' => 6379,
                 'database' => 0,
             ],
             'options' => [
@@ -55,21 +59,42 @@ class RedisConnectionTest extends PHPUnit_Framework_TestCase
                 ],
                 'cluster-1' => [
                     [
-                        'host'     => '127.0.0.1',
-                        'port'     => 6379,
+                        'host' => '127.0.0.1',
+                        'port' => 6379,
                         'database' => 0,
                     ],
                 ],
                 'cluster-2' => [
                     [
-                        'host'     => '127.0.0.1',
-                        'port'     => 6379,
+                        'host' => '127.0.0.1',
+                        'port' => 6379,
                         'database' => 0,
                     ],
                 ],
             ],
         ];
 
-        return new Illuminate\Redis\PredisDatabase($servers);
+        return new PhpRedisDatabaseStub($servers);
     }
+}
+
+class PhpRedisDatabaseStub extends PhpRedisDatabase
+{
+    protected function createRedisClusterInstance(array $servers, array $options)
+    {
+        return new RedisClusterStub();
+    }
+
+    protected function createRedisInstance(array $server, array $options)
+    {
+        return new RedisStub;
+    }
+}
+
+class RedisStub
+{
+}
+
+class RedisClusterStub
+{
 }

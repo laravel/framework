@@ -11,7 +11,7 @@ abstract class Database implements DatabaseContract
      * Get a specific Redis connection instance.
      *
      * @param  string  $name
-     * @return \Predis\ClientInterface|null
+     * @return \Predis\ClientInterface|\RedisCluster|\Redis|null
      */
     public function connection($name = 'default')
     {
