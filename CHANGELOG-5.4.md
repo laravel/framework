@@ -3,29 +3,37 @@
 ## [Unreleased]
 
 ### Added
-- Added Support for PhpRedis ([#15160](https://github.com/laravel/framework/pull/15160))
+- Added support for Markdown emails and notifications ([#16768](https://github.com/laravel/framework/pull/16768))
+- Added support for PhpRedis ([#15160](https://github.com/laravel/framework/pull/15160))
+- Added support for multiple Redis clusters ([#16696](https://github.com/laravel/framework/pull/16696), [464075d](https://github.com/laravel/framework/commit/464075d3c5f152dfc4fc9287595d62dbdc3c6347))
+- Added `RedisStore::add()` to store an item in the cache if the key doesn't exist ([#15877](https://github.com/laravel/framework/pull/15877))
 - Added `retry()` helper ([e3bd359](https://github.com/laravel/framework/commit/e3bd359d52cee0ba8db9673e45a8221c1c1d95d6), [52e9381](https://github.com/laravel/framework/commit/52e9381d3d64631f2842c1d86fee2aa64a6c73ac))
 - Allow rolling back to a given transaction save-point ([#15876](https://github.com/laravel/framework/pull/15876))
 - Added `Container::factory()` method to the Container contract ([#15430](https://github.com/laravel/framework/pull/15430))
-- Added `RedisStore::add()` to store an item in the cache if the key doesn't exist ([#15877](https://github.com/laravel/framework/pull/15877))
-- Replaced Symfony's translator ([#15563](https://github.com/laravel/framework/pull/15563))
 - Added `$values` parameter to `Builder::firstOrNew()` ([#15567](https://github.com/laravel/framework/pull/15567))
 - Allow dependency injection on database seeders `run()` method ([#15959](https://github.com/laravel/framework/pull/15959))
 - Added model binding in broadcasting channel definitions ([#16120](https://github.com/laravel/framework/pull/16120), [515d97c](https://github.com/laravel/framework/commit/515d97c1f3ad4797876979d450304684012142d6))
-- Added support for object-based events for native Eloquent events ([e7a724d](https://github.com/laravel/framework/commit/e7a724d3895f2b24b98c0cafb1650f2193351d83), [9770d1a](https://github.com/laravel/framework/commit/9770d1a64c1010daf845fcebfcc4695a30d8df2d))
 - Added `base64:` prefix support to `env()` helper ([#16186](https://github.com/laravel/framework/pull/16186))
 - Added `cache:forget` command ([#16201](https://github.com/laravel/framework/pull/16201), [7644977](https://github.com/laravel/framework/commit/76449777741fa1d7669028973958a7e4a5e64f71))
 - Added collation support to `SQLServerGrammar` ([#16227](https://github.com/laravel/framework/pull/16227))
 - Added custom class support for pivot models ([#14293](https://github.com/laravel/framework/pull/14293), [5459777](https://github.com/laravel/framework/commit/5459777c90ff6d0888bd821027c417d57cc89981))
 - Support job-based queue options ([#16257](https://github.com/laravel/framework/pull/16257), [2382dc3](https://github.com/laravel/framework/commit/2382dc3f374bee7ad966d11ecb35a1429d9a09e8), [ee385fa](https://github.com/laravel/framework/commit/ee385fa5eab0c4642f47636f0e033e982d402bb9))
+- Added support for object-based events for native Eloquent events ([e7a724d](https://github.com/laravel/framework/commit/e7a724d3895f2b24b98c0cafb1650f2193351d83), [9770d1a](https://github.com/laravel/framework/commit/9770d1a64c1010daf845fcebfcc4695a30d8df2d))
+- Added support for joins when deleting deleting records using SqlServer ([#16618](https://github.com/laravel/framework/pull/16618))
 - Added higher-order messages for the collections ([#16267](https://github.com/laravel/framework/pull/16267), [e276b3d](https://github.com/laravel/framework/commit/e276b3d4bf2a124c4eb5975a8a2724b8c806139a), [2b7ab30](https://github.com/laravel/framework/commit/2b7ab30e0ec56ac4e4093d7f2775da98086c8000), [#16274](https://github.com/laravel/framework/pull/16274), [724950a](https://github.com/laravel/framework/commit/724950a42c225c7b53c56283c01576b050fea37a))
+- Allow collection macros to be proxied ([#16749](https://github.com/laravel/framework/pull/16749))
 - Added Blade components and slots ([e8d2a45](https://github.com/laravel/framework/commit/e8d2a45479abd2ba6b524293ce5cfb599c8bf910))
+- Replaced Symfony's translator ([#15563](https://github.com/laravel/framework/pull/15563))
 - Added JSON loader for translations and `__()` helper ([#16424](https://github.com/laravel/framework/pull/16424), [#16470](https://github.com/laravel/framework/pull/16470), [9437244](https://github.com/laravel/framework/commit/94372447b9de48f5c174db2cf7c81dffb3c0c692))
 - Added support for translation blocks in Blade templates ([7179935](https://github.com/laravel/framework/commit/71799359b7e74995be862e498d1b21841ff55fbc))
+- Added `namespaces()` method to translation loaders ([#16664](https://github.com/laravel/framework/pull/16664), [fe7bbf7](https://github.com/laravel/framework/commit/fe7bbf727834a748b04fcf5145b1137dd45ac4b7))
 - Added IPv4 and IPv6 validators ([#16545](https://github.com/laravel/framework/pull/16545))
 - Added `whereKey()` method ([#16558](https://github.com/laravel/framework/pull/16558))
-- Added support for joins when deleting deleting records using SqlServer ([#16618](https://github.com/laravel/framework/pull/16618))
-- Added support for fluent routes ([#16647](https://github.com/laravel/framework/pull/16647))
+- Allow `Mailer` to email `HtmlString` objects ([882ea28](https://github.com/laravel/framework/commit/882ea283045a7a231ca86c75058ebdea1d160fda))
+- Added support for fluent routes ([#16647](https://github.com/laravel/framework/pull/16647), [#16748](https://github.com/laravel/framework/pull/16748))
+- Allow route groups to be loaded directly from a file ([#16707](https://github.com/laravel/framework/pull/16707))
+- Added named parameters to `UrlGenerator` ([#16736](https://github.com/laravel/framework/pull/16736), [ce4d86b](https://github.com/laravel/framework/commit/ce4d86b48732a707e3909dbc553a2c349c8ecae7))
+
 
 ### Changed
 - Consider interfaces and extended classes in `Gate::resolvePolicyCallback()` ([#15757](https://github.com/laravel/framework/pull/15757))
@@ -53,4 +61,7 @@
 - Changed namespace generation in `GeneratorCommand` ([de9e03d](https://github.com/laravel/framework/commit/de9e03d5bd80d32a936d30ab133d2df0a3fa1d8d))
 - Use `getKeyType()` instead of `$keyType` in `Model` ([#16608](https://github.com/laravel/framework/pull/16608))
 - Compile routes only once ([c8ed0c3](https://github.com/laravel/framework/commit/c8ed0c3a11bf7d8180982a3d32a60364594bbfe1), [b11fbcc](https://github.com/laravel/framework/commit/b11fbcc209b8a57501bac6221728e7ed6c7a82a2))
+
+### Testing
 - Simplified built-in testing for Dusk ([#16667](https://github.com/laravel/framework/pull/16667), [126adb7](https://github.com/laravel/framework/commit/126adb781c204129600363f243b9d73e202d229e), [b6dec26](https://github.com/laravel/framework/commit/b6dec2602d4a7aa1e61667c02c301c8011267a19), [939264f](https://github.com/laravel/framework/commit/939264f91edc5d33da5ce6cf95a271a6f4a2e1f2))
+- Improve database testing methods ([#16679](https://github.com/laravel/framework/pull/16679), [14e9dad](https://github.com/laravel/framework/commit/14e9dad05d09429fab244e2d8f6c49e679a3a975), [f23ac64](https://github.com/laravel/framework/commit/f23ac640fa403ca8d4131c36367b53e123b6b852))
