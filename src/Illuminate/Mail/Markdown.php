@@ -127,7 +127,7 @@ class Markdown
     protected function componentPaths()
     {
         return array_unique(array_merge($this->componentPaths, [
-            __DIR__.'/resources/views'
+            __DIR__.'/resources/views',
         ]));
     }
 

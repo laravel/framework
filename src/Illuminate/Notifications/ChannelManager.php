@@ -3,8 +3,8 @@
 namespace Illuminate\Notifications;
 
 use Ramsey\Uuid\Uuid;
-use InvalidArgumentException;
 use Illuminate\Mail\Markdown;
+use InvalidArgumentException;
 use Illuminate\Support\Manager;
 use Nexmo\Client as NexmoClient;
 use Illuminate\Support\Collection;

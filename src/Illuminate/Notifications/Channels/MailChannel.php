@@ -4,7 +4,6 @@ namespace Illuminate\Notifications\Channels;
 
 use Closure;
 use Illuminate\Support\Str;
-use Illuminate\Support\HtmlString;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Notifications\Notification;
