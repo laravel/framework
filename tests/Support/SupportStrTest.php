@@ -45,6 +45,10 @@ class SupportStrTest extends PHPUnit_Framework_TestCase
         $this->assertFalse(Str::startsWith('jason', ['day']));
         $this->assertFalse(Str::startsWith('jason', ''));
         $this->assertFalse(Str::startsWith('7', ' 7'));
+        $this->assertTrue(Str::startsWith('7a', '7'));
+        $this->assertTrue(Str::startsWith('7a', 7));
+        $this->assertTrue(Str::startsWith('7.12a', 7.12));
+        $this->assertFalse(Str::startsWith('7.12a', 7.13));
     }
 
     public function testEndsWith()
@@ -57,6 +61,10 @@ class SupportStrTest extends PHPUnit_Framework_TestCase
         $this->assertFalse(Str::endsWith('jason', ['no']));
         $this->assertFalse(Str::endsWith('jason', ''));
         $this->assertFalse(Str::endsWith('7', ' 7'));
+        $this->assertTrue(Str::endsWith('a7', '7'));
+        $this->assertTrue(Str::endsWith('a7', 7));
+        $this->assertTrue(Str::endsWith('a7.12', 7.12));
+        $this->assertFalse(Str::endsWith('a7.12', 7.13));
     }
 
     public function testStrContains()
