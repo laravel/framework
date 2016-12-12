@@ -22,6 +22,13 @@ class MailMessage extends SimpleMessage
     public $viewData = [];
 
     /**
+     * The Markdown template to render (if applicable).
+     *
+     * @var string
+     */
+    public $markdown;
+
+    /**
      * The "from" information for the message.
      *
      * @var array
@@ -80,6 +87,21 @@ class MailMessage extends SimpleMessage
     public function view($view, array $data = [])
     {
         $this->view = $view;
+        $this->viewData = $data;
+
+        return $this;
+    }
+
+    /**
+     * Set the Markdown template for the notification.
+     *
+     * @param  string  $view
+     * @param  array  $data
+     * @return $this
+     */
+    public function markdown($view, array $data = [])
+    {
+        $this->markdown = $view;
         $this->viewData = $data;
 
         return $this;

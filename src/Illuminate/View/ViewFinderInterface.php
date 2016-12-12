@@ -61,4 +61,11 @@ interface ViewFinderInterface
      * @return void
      */
     public function addExtension($extension);
+
+    /**
+     * Flush the cache of located views.
+     *
+     * @return void
+     */
+    public function flush();
 }

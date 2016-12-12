@@ -11,6 +11,7 @@ class MailMarkdownTest extends PHPUnit_Framework_TestCase
     {
         $viewFactory = Mockery::mock('Illuminate\View\Factory');
         $markdown = new Illuminate\Mail\Markdown($viewFactory);
+        $viewFactory->shouldReceive('flushFinderCache')->once();
         $viewFactory->shouldReceive('replaceNamespace')->once()->with('mail', $markdown->htmlComponentPaths())->andReturnSelf();
         $viewFactory->shouldReceive('make')->with('view', [])->andReturnSelf();
         $viewFactory->shouldReceive('make')->with('mail::themes.default')->andReturnSelf();
@@ -25,6 +26,7 @@ class MailMarkdownTest extends PHPUnit_Framework_TestCase
     {
         $viewFactory = Mockery::mock('Illuminate\View\Factory');
         $markdown = new Illuminate\Mail\Markdown($viewFactory);
+        $viewFactory->shouldReceive('flushFinderCache')->once();
         $viewFactory->shouldReceive('replaceNamespace')->once()->with('mail', $markdown->markdownComponentPaths())->andReturnSelf();
         $viewFactory->shouldReceive('make')->with('view', [])->andReturnSelf();
         $viewFactory->shouldReceive('render')->andReturn('text');

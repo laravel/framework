@@ -55,17 +55,15 @@ class Markdown
      */
     public function render($view, array $data = [], $inliner = null)
     {
-        // Flush view locator cache...
-
-        $inliner = $inliner ?: new CssToInlineStyles;
+        $this->view->flushFinderCache();
 
         $contents = $this->view->replaceNamespace(
             'mail', $this->htmlComponentPaths()
         )->make($view, $data)->render();
 
-        return $inliner->convert(
+        return new HtmlString(with($inliner ?: new CssToInlineStyles)->convert(
             $contents, $this->view->make('mail::themes.'.$this->theme)->render()
-        );
+        ));
     }
 
     /**
@@ -77,11 +75,11 @@ class Markdown
      */
     public function renderText($view, array $data = [])
     {
-        // Flush view locator cache...
+        $this->view->flushFinderCache();
 
-        return preg_replace("/[\r\n]{2,}/", "\n\n", $this->view->replaceNamespace(
+        return new HtmlString(preg_replace("/[\r\n]{2,}/", "\n\n", $this->view->replaceNamespace(
             'mail', $this->markdownComponentPaths()
-        )->make($view, $data)->render());
+        )->make($view, $data)->render()));
     }
 
     /**

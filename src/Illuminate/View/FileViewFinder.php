@@ -247,6 +247,16 @@ class FileViewFinder implements ViewFinderInterface
     }
 
     /**
+     * Flush the cache of located views.
+     *
+     * @return void
+     */
+    public function flush()
+    {
+        $this->views = [];
+    }
+
+    /**
      * Get the filesystem instance.
      *
      * @return \Illuminate\Filesystem\Filesystem

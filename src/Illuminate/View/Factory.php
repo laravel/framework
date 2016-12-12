@@ -1115,6 +1115,16 @@ class Factory implements FactoryContract
     }
 
     /**
+     * Flush the cache of views located by the finder.
+     *
+     * @return void
+     */
+    public function flushFinderCache()
+    {
+        $this->getFinder()->flush();
+    }
+
+    /**
      * Get the view finder instance.
      *
      * @return \Illuminate\View\ViewFinderInterface
