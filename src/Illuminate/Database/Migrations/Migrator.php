@@ -207,7 +207,7 @@ class Migrator
                 if (! isset($files[$migration->migration])) {
                     continue;
                 }
-                
+
                 $migration = (object) $migration;
 
                 $rolledBack[] = $files[$migration->migration];
