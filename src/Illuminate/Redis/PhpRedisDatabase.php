@@ -14,7 +14,7 @@ class PhpRedisDatabase extends Database
      *
      * @var array
      */
-    protected $clients;
+    public $clients;
 
     /**
      * Create a new Redis connection instance.
@@ -24,53 +24,13 @@ class PhpRedisDatabase extends Database
      */
     public function __construct(array $servers = [])
     {
-        $cluster = Arr::pull($servers, 'cluster');
         $clusters = (array) Arr::pull($servers, 'clusters');
 
         $options = (array) Arr::pull($servers, 'options');
 
-        if ($cluster) {
-            $this->clients = $this->createAggregateClient($servers, $options);
-        } else {
-            $this->clients = $this->createSingleClients($servers, $options);
-        }
+        $this->clients = $this->createSingleClients($servers, $options);
 
         $this->createClusters($clusters, $options);
-    }
-
-    /**
-     * Create multiple clusters (aggregate clients).
-     *
-     * @param  array  $clusters
-     * @param  array  $options
-     * @return void
-     */
-    protected function createClusters(array $clusters, array $options = [])
-    {
-        // Merge general options with general cluster options
-        $options = array_merge($options, (array) Arr::pull($clusters, 'options'));
-
-        foreach ($clusters as $connection => $servers) {
-            // Merge specific cluster options with general options
-            $options = array_merge($options, (array) Arr::pull($servers, 'options'));
-
-            $this->clients += $this->createAggregateClient($servers, $options, $connection);
-        }
-    }
-
-    /**
-     * Create a new aggregate client supporting sharding.
-     *
-     * @param  array  $servers
-     * @param  array  $options
-     * @param  string  $connection
-     * @return array
-     */
-    protected function createAggregateClient(array $servers, array $options = [], $connection = 'default')
-    {
-        $servers = array_map([$this, 'buildClusterSeed'], $servers);
-
-        return [$connection => $this->createRedisClusterInstance($servers, $options)];
     }
 
     /**
@@ -85,11 +45,43 @@ class PhpRedisDatabase extends Database
         $clients = [];
 
         foreach ($servers as $key => $server) {
-            $client = $this->createRedisInstance($server, $options);
-            $clients[$key] = $client;
+            $clients[$key] = $this->createRedisInstance($server, $options);
         }
 
         return $clients;
+    }
+
+    /**
+     * Create multiple clusters (aggregate clients).
+     *
+     * @param  array  $clusters
+     * @param  array  $options
+     * @return void
+     */
+    protected function createClusters(array $clusters, array $options = [])
+    {
+        $options = array_merge($options, (array) Arr::pull($clusters, 'options'));
+
+        foreach ($clusters as $name => $servers) {
+            $this->clients += $this->createAggregateClient($name, $servers, array_merge(
+                $options, (array) Arr::pull($servers, 'options')
+            ));
+        }
+    }
+
+    /**
+     * Create a new aggregate client supporting sharding.
+     *
+     * @param  string  $name
+     * @param  array  $servers
+     * @param  array  $options
+     * @return array
+     */
+    protected function createAggregateClient($name, array $servers, array $options = [])
+    {
+        $servers = array_map([$this, 'buildClusterConnectionString'], $servers);
+
+        return [$name => $this->createRedisClusterInstance($servers, $options)];
     }
 
     /**
@@ -98,13 +90,11 @@ class PhpRedisDatabase extends Database
      * @param  array  $server
      * @return string
      */
-    protected function buildClusterSeed(array $server)
+    protected function buildClusterConnectionString(array $server)
     {
-        $parameters = Arr::only($server, [
+        return $server['host'].':'.$server['port'].'?'.http_build_query(Arr::only($server, [
             'database', 'password', 'prefix', 'read_timeout',
-        ]);
-
-        return $server['host'].':'.$server['port'].'?'.http_build_query($parameters);
+        ]));
     }
 
     /**
@@ -135,33 +125,15 @@ class PhpRedisDatabase extends Database
     }
 
     /**
-     * Create a new redis cluster instance.
-     *
-     * @param  array  $servers
-     * @param  array  $options
-     * @return RedisCluster
-     */
-    protected function createRedisClusterInstance(array $servers, array $options)
-    {
-        return new RedisCluster(
-            null,
-            array_values($servers),
-            Arr::get($options, 'timeout', 0),
-            Arr::get($options, 'read_timeout', 0),
-            isset($options['persistent']) && $options['persistent']
-        );
-    }
-
-    /**
      * Create a new redis instance.
      *
      * @param  array  $server
      * @param  array  $options
-     * @return Redis
+     * @return \Redis
      */
     protected function createRedisInstance(array $server, array $options)
     {
-        $client = new Redis();
+        $client = new Redis;
 
         $timeout = empty($server['timeout']) ? 0 : $server['timeout'];
 
@@ -188,5 +160,23 @@ class PhpRedisDatabase extends Database
         }
 
         return $client;
+    }
+
+    /**
+     * Create a new redis cluster instance.
+     *
+     * @param  array  $servers
+     * @param  array  $options
+     * @return \RedisCluster
+     */
+    protected function createRedisClusterInstance(array $servers, array $options)
+    {
+        return new RedisCluster(
+            null,
+            array_values($servers),
+            Arr::get($options, 'timeout', 0),
+            Arr::get($options, 'read_timeout', 0),
+            isset($options['persistent']) && $options['persistent']
+        );
     }
 }
