@@ -261,6 +261,36 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public static $manyMethods = ['belongsToMany', 'morphToMany', 'morphedByMany'];
 
     /**
+     * The attribute casters.
+     *
+     * @var array
+     */
+    protected static $casters = [
+        'int' => Casters\IntegerCaster::class,
+        'integer' => Casters\IntegerCaster::class,
+        'real' => Casters\FloatCaster::class,
+        'float' => Casters\FloatCaster::class,
+        'double' => Casters\FloatCaster::class,
+        'string' => Casters\StringCaster::class,
+        'bool' => Casters\BooleanCaster::class,
+        'boolean' => Casters\BooleanCaster::class,
+        'object' => Casters\ObjectCaster::class,
+        'array' => Casters\ArrayCaster::class,
+        'json' => Casters\ArrayCaster::class,
+        'collection' => Casters\CollectionCaster::class,
+        'date' => Casters\DateTimeCaster::class,
+        'datetime' => Casters\DateTimeCaster::class,
+        'encrypted' => Casters\EncryptedCaster::class,
+        'timestamp' => Casters\TimestampCaster::class,
+    ];
+    /**
+     * The user defined attribute casters.
+     *
+     * @var array
+     */
+    protected static $customCasters = [];
+
+    /**
      * The name of the "created at" column.
      *
      * @var string
@@ -2865,6 +2895,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Determine whether a value should be encrypted.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function isEncryptCastable($key)
+    {
+        return $this->hasCast($key, ['encrypted']);
+    }
+
+    /**
      * Determine whether a value is JSON castable for inbound manipulation.
      *
      * @param  string  $key
@@ -2883,6 +2924,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function getCastType($key)
     {
+        if(!array_key_exists($key, $this->getCasts())) {
+            return;
+        }
+
         return trim(strtolower($this->getCasts()[$key]));
     }
 
@@ -2899,34 +2944,30 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return $value;
         }
 
-        switch ($this->getCastType($key)) {
-            case 'int':
-            case 'integer':
-                return (int) $value;
-            case 'real':
-            case 'float':
-            case 'double':
-                return (float) $value;
-            case 'string':
-                return (string) $value;
-            case 'bool':
-            case 'boolean':
-                return (bool) $value;
-            case 'object':
-                return $this->fromJson($value, true);
-            case 'array':
-            case 'json':
-                return $this->fromJson($value);
-            case 'collection':
-                return new BaseCollection($this->fromJson($value));
-            case 'date':
-            case 'datetime':
-                return $this->asDateTime($value);
-            case 'timestamp':
-                return $this->asTimeStamp($value);
-            default:
-                return $value;
+        return $this->getCaster($key)->as($value);
+    }
+
+    /**
+     * Get a new caster instance.
+     *
+     * @param  string      $key
+     * @param  string|null $castType
+     *
+     * @return \Illuminate\Database\Eloquent\Casters\AbstractCaster
+     */
+    protected function getCaster($key, $castType = null)
+    {
+        $casters = array_merge(static::$casters, static::$customCasters);
+
+        if (!$castType) {
+            $castType = $this->getCastType($key);
         }
+
+        if (!array_key_exists($castType, $casters)) {
+            throw new InvalidArgumentException($castType);
+        }
+
+        return new $casters[$castType];
     }
 
     /**
@@ -2952,6 +2993,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // the connection grammar's date format. We will auto set the values.
         elseif ($value && (in_array($key, $this->getDates()) || $this->isDateCastable($key))) {
             $value = $this->fromDateTime($value);
+        }
+
+        if ($this->isEncryptCastable($key) && ! is_null($value)) {
+            $value = $this->asEncrypted($value);
         }
 
         if ($this->isJsonCastable($key) && ! is_null($value)) {
@@ -3021,11 +3066,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function fromDateTime($value)
     {
-        $format = $this->getDateFormat();
-
-        $value = $this->asDateTime($value);
-
-        return $value->format($format);
+        return $this->getCaster(null, 'datetime')->options([
+            'format' => $this->getDateFormat()
+        ])->from($value);
     }
 
     /**
@@ -3036,40 +3079,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function asDateTime($value)
     {
-        // If this value is already a Carbon instance, we shall just return it as is.
-        // This prevents us having to re-instantiate a Carbon instance when we know
-        // it already is one, which wouldn't be fulfilled by the DateTime check.
-        if ($value instanceof Carbon) {
-            return $value;
-        }
-
-         // If the value is already a DateTime instance, we will just skip the rest of
-         // these checks since they will be a waste of time, and hinder performance
-         // when checking the field. We will just return the DateTime right away.
-        if ($value instanceof DateTimeInterface) {
-            return new Carbon(
-                $value->format('Y-m-d H:i:s.u'), $value->getTimeZone()
-            );
-        }
-
-        // If this value is an integer, we will assume it is a UNIX timestamp's value
-        // and format a Carbon object from this timestamp. This allows flexibility
-        // when defining your date fields as they might be UNIX timestamps here.
-        if (is_numeric($value)) {
-            return Carbon::createFromTimestamp($value);
-        }
-
-        // If the value is in simply year, month, day format, we will instantiate the
-        // Carbon instances from that format. Again, this provides for simple date
-        // fields on the database, while still supporting Carbonized conversion.
-        if (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})$/', $value)) {
-            return Carbon::createFromFormat('Y-m-d', $value)->startOfDay();
-        }
-
-        // Finally, we will just assume this date is in the format used by default on
-        // the database connection and use that format to create the Carbon object
-        // that is returned back out to the developers after we convert it here.
-        return Carbon::createFromFormat($this->getDateFormat(), $value);
+        return $this->getCaster(null, 'datetime')->options([
+            'format' => $this->getDateFormat()
+        ])->as($value);
     }
 
     /**
@@ -3080,7 +3092,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function asTimeStamp($value)
     {
-        return $this->asDateTime($value)->getTimestamp();
+        return $this->getCaster(null, 'timestamp')->options([
+            'format' => $this->getDateFormat()
+        ])->as($value);
     }
 
     /**
@@ -3118,6 +3132,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Encrypt the given value.
+     *
+     * @param  mixed  $value
+     * @return string
+     */
+    protected function asEncrypted($value)
+    {
+        return $this->getCaster(null, 'encrypted')->as($value);
+    }
+
+    /**
      * Encode the given value as JSON.
      *
      * @param  mixed  $value
@@ -3125,7 +3150,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function asJson($value)
     {
-        return json_encode($value);
+        return $this->getCaster(null, 'json')->as($value);
     }
 
     /**
@@ -3137,7 +3162,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function fromJson($value, $asObject = false)
     {
-        return json_decode($value, ! $asObject);
+        return $this->getCaster(null, 'json')->options([
+            'asObject' => ! $asObject
+        ])->from($value);
     }
 
     /**
