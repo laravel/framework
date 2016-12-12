@@ -71,7 +71,11 @@ class Factory implements FactoryContract
      *
      * @var array
      */
-    protected $extensions = ['blade.php' => 'blade', 'php' => 'php'];
+    protected $extensions = [
+        'blade.php' => 'blade',
+        'php' => 'php',
+        'css' => 'file',
+    ];
 
     /**
      * The view composer events.
@@ -1032,11 +1036,13 @@ class Factory implements FactoryContract
      *
      * @param  string  $namespace
      * @param  string|array  $hints
-     * @return void
+     * @return $this
      */
     public function addNamespace($namespace, $hints)
     {
         $this->finder->addNamespace($namespace, $hints);
+
+        return $this;
     }
 
     /**
@@ -1044,11 +1050,27 @@ class Factory implements FactoryContract
      *
      * @param  string  $namespace
      * @param  string|array  $hints
-     * @return void
+     * @return $this
      */
     public function prependNamespace($namespace, $hints)
     {
         $this->finder->prependNamespace($namespace, $hints);
+
+        return $this;
+    }
+
+    /**
+     * Replace the namespace hints for the given namespace.
+     *
+     * @param  string  $namespace
+     * @param  string|array  $hints
+     * @return $this
+     */
+    public function replaceNamespace($namespace, $hints)
+    {
+        $this->finder->replaceNamespace($namespace, $hints);
+
+        return $this;
     }
 
     /**
@@ -1090,6 +1112,16 @@ class Factory implements FactoryContract
     public function getEngineResolver()
     {
         return $this->engines;
+    }
+
+    /**
+     * Flush the cache of views located by the finder.
+     *
+     * @return void
+     */
+    public function flushFinderCache()
+    {
+        $this->getFinder()->flush();
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Notifications\Channels;
 
+use Closure;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Mail\Mailable;
@@ -15,6 +16,13 @@ class MailChannel
      * @var \Illuminate\Contracts\Mail\Mailer
      */
     protected $mailer;
+
+    /**
+     * The Markdown resolver callback.
+     *
+     * @var \Closure
+     */
+    protected $markdownResolver;
 
     /**
      * Create a new mail channel instance.
@@ -46,42 +54,114 @@ class MailChannel
             return $message->send($this->mailer);
         }
 
-        $this->mailer->send($message->view, $message->data(), function ($m) use ($notifiable, $notification, $message) {
-            $recipients = empty($message->to) ? $notifiable->routeNotificationFor('mail') : $message->to;
-
-            if (! empty($message->from)) {
-                $m->from($message->from[0], isset($message->from[1]) ? $message->from[1] : null);
-            }
-
-            if (is_array($recipients)) {
-                $m->bcc($recipients);
-            } else {
-                $m->to($recipients);
-            }
-
-            if ($message->cc) {
-                $m->cc($message->cc);
-            }
-
-            if (! empty($message->replyTo)) {
-                $m->replyTo($message->replyTo[0], isset($message->replyTo[1]) ? $message->replyTo[1] : null);
-            }
-
-            $m->subject($message->subject ?: Str::title(
-                Str::snake(class_basename($notification), ' ')
-            ));
-
-            foreach ($message->attachments as $attachment) {
-                $m->attach($attachment['file'], $attachment['options']);
-            }
-
-            foreach ($message->rawAttachments as $attachment) {
-                $m->attachData($attachment['data'], $attachment['name'], $attachment['options']);
-            }
-
-            if (! is_null($message->priority)) {
-                $m->setPriority($message->priority);
-            }
+        $this->mailer->send($this->buildView($message), $message->data(), function ($mailMessage) use ($notifiable, $notification, $message) {
+            $this->buildMessage($mailMessage, $notifiable, $notification, $message);
         });
+    }
+
+    /**
+     * Build the notification's view.
+     *
+     * @param  \Illuminate\Notifications\Messages\MailMessage  $message
+     * @return void
+     */
+    protected function buildView($message)
+    {
+        if ($message->view) {
+            return $message->view;
+        }
+
+        $markdown = call_user_func($this->markdownResolver);
+
+        return [
+            'html' => $markdown->render($message->markdown, $message->data()),
+            'text' => $markdown->renderText($message->markdown, $message->data()),
+        ];
+    }
+
+    /**
+     * Build the mail message.
+     *
+     * @param  \Illuminate\Mail\Message  $mailMessage
+     * @param  mixed  $notifiable
+     * @param  \Illuminate\Notifications\Notification  $notification
+     * @param  \Illuminate\Notifications\Messages\MailMessage  $message
+     * @return void
+     */
+    protected function buildMessage($mailMessage, $notifiable, $notification, $message)
+    {
+        $this->addressMessage($mailMessage, $notifiable, $message);
+
+        $mailMessage->subject($message->subject ?: Str::title(
+            Str::snake(class_basename($notification), ' ')
+        ));
+
+        $this->addAttachments($mailMessage, $message);
+
+        if (! is_null($message->priority)) {
+            $mailMessage->setPriority($message->priority);
+        }
+    }
+
+    /**
+     * Address the mail message.
+     *
+     * @param  \Illuminate\Mail\Message  $mailMessage
+     * @param  mixed  $notifiable
+     * @param  \Illuminate\Notifications\Messages\MailMessage  $message
+     * @return void
+     */
+    protected function addressMessage($mailMessage, $notifiable, $message)
+    {
+        $recipients = empty($message->to) ? $notifiable->routeNotificationFor('mail') : $message->to;
+
+        if (! empty($message->from)) {
+            $mailMessage->from($message->from[0], isset($message->from[1]) ? $message->from[1] : null);
+        }
+
+        if (is_array($recipients)) {
+            $mailMessage->bcc($recipients);
+        } else {
+            $mailMessage->to($recipients);
+        }
+
+        if ($message->cc) {
+            $mailMessage->cc($message->cc);
+        }
+
+        if (! empty($message->replyTo)) {
+            $mailMessage->replyTo($message->replyTo[0], isset($message->replyTo[1]) ? $message->replyTo[1] : null);
+        }
+    }
+
+    /**
+     * Add the attachments to the message.
+     *
+     * @param  \Illuminate\Mail\Message  $mailMessage
+     * @param  \Illuminate\Notifications\Messages\MailMessage  $message
+     * @return void
+     */
+    protected function addAttachments($mailMessage, $message)
+    {
+        foreach ($message->attachments as $attachment) {
+            $mailMessage->attach($attachment['file'], $attachment['options']);
+        }
+
+        foreach ($message->rawAttachments as $attachment) {
+            $mailMessage->attachData($attachment['data'], $attachment['name'], $attachment['options']);
+        }
+    }
+
+    /**
+     * Set the Markdown resolver callback.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function setMarkdownResolver(Closure $callback)
+    {
+        $this->markdownResolver = $callback;
+
+        return $this;
     }
 }

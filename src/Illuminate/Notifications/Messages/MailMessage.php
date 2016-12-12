@@ -5,14 +5,11 @@ namespace Illuminate\Notifications\Messages;
 class MailMessage extends SimpleMessage
 {
     /**
-     * The view for the message.
+     * The view to be rendered.
      *
-     * @var string
+     * @var array|string
      */
-    public $view = [
-        'notifications::email',
-        'notifications::email-plain',
-    ];
+    public $view;
 
     /**
      * The view data for the message.
@@ -20,6 +17,13 @@ class MailMessage extends SimpleMessage
      * @var array
      */
     public $viewData = [];
+
+    /**
+     * The Markdown template to render (if applicable).
+     *
+     * @var string
+     */
+    public $markdown = 'notifications::email';
 
     /**
      * The "from" information for the message.
@@ -73,7 +77,7 @@ class MailMessage extends SimpleMessage
     /**
      * Set the view for the mail message.
      *
-     * @param  string  $view
+     * @param  array|string  $view
      * @param  array  $data
      * @return $this
      */
@@ -81,6 +85,25 @@ class MailMessage extends SimpleMessage
     {
         $this->view = $view;
         $this->viewData = $data;
+
+        $this->markdown = null;
+
+        return $this;
+    }
+
+    /**
+     * Set the Markdown template for the notification.
+     *
+     * @param  string  $view
+     * @param  array  $data
+     * @return $this
+     */
+    public function markdown($view, array $data = [])
+    {
+        $this->markdown = $view;
+        $this->viewData = $data;
+
+        $this->view = null;
 
         return $this;
     }
