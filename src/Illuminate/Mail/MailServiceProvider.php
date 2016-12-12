@@ -3,7 +3,6 @@
 namespace Illuminate\Mail;
 
 use Swift_Mailer;
-use Illuminate\Mail\Markdown;
 use Illuminate\Support\ServiceProvider;
 
 class MailServiceProvider extends ServiceProvider
@@ -142,7 +141,7 @@ class MailServiceProvider extends ServiceProvider
     public function provides()
     {
         return [
-            'mailer', 'swift.mailer', 'swift.transport', Markdown::class
+            'mailer', 'swift.mailer', 'swift.transport', Markdown::class,
         ];
     }
 }
