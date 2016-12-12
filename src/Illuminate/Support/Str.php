@@ -403,7 +403,7 @@ class Str
     public static function startsWith($haystack, $needles)
     {
         foreach ((array) $needles as $needle) {
-            if ($needle != '' && strpos($haystack, $needle) === 0) {
+            if ($needle != '' && strpos((string) $haystack, (string) $needle) === 0) {
                 return true;
             }
         }
