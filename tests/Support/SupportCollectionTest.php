@@ -748,6 +748,10 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($c->every(function ($item) {
             return $item === null;
         }));
+
+        $c = new Collection([['active' => true], ['active' => true]]);
+        $this->assertTrue($c->every->active);
+        $this->assertFalse($c->push(['active' => false])->every->active);
     }
 
     public function testExcept()
