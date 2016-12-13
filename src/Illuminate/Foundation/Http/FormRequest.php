@@ -10,6 +10,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Exception\HttpResponseException;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
 use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
