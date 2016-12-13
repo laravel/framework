@@ -581,6 +581,41 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['foo' => $builder], $builder->delete());
     }
 
+    public function testWhen()
+    {
+        $callback = function ($query) {
+            return $query->where('id', '=', 1);
+        };
+
+        $default = function ($query) {
+            return $query->where('id', '=', 2);
+        };
+
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->when(true, $callback);
+        $this->assertEquals('select * from "eloquent_builder_test_model_parent_stubs" where "id" = ?', $builder->toSql());
+        $this->assertEquals([0 => 1], $builder->getBindings());
+
+        $builder = $model->when(false, $callback, $default);
+        $this->assertEquals('select * from "eloquent_builder_test_model_parent_stubs" where "id" = ?', $builder->toSql());
+        $this->assertEquals([0 => 2], $builder->getBindings());
+    }
+
+    public function testWhenWithParameter()
+    {
+        $callback = function ($query, $parameter) {
+            return $query->where('username', '=', $parameter);
+        };
+
+        $username = 'foo';
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->when($username, $callback);
+        $this->assertEquals('select * from "eloquent_builder_test_model_parent_stubs" where "username" = ?', $builder->toSql());
+        $this->assertEquals([0 => 'foo'], $builder->getBindings());
+    }
+
     public function testWithCount()
     {
         $model = new EloquentBuilderTestModelParentStub;

@@ -455,9 +455,9 @@ class Builder
     }
 
     /**
-     * Apply the callback's query changes if the given "value" is true.
+     * Apply the callback's query changes if the given "value" is valid.
      *
-     * @param  bool  $value
+     * @param  mixed  $value
      * @param  \Closure  $callback
      * @param  \Closure  $default
      * @return \Illuminate\Database\Query\Builder
@@ -467,9 +467,9 @@ class Builder
         $builder = $this;
 
         if ($value) {
-            $builder = call_user_func($callback, $builder);
+            $builder = call_user_func($callback, $builder, $value);
         } elseif ($default) {
-            $builder = call_user_func($default, $builder);
+            $builder = call_user_func($default, $builder, $value);
         }
 
         return $builder;
