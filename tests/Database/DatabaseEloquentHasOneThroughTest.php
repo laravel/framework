@@ -55,13 +55,13 @@ class DatabaseEloquentHasOneThroughTest extends PHPUnit_Framework_TestCase
         // Insert accounts
         $this->connection()->insert(
             'insert into accounts (email, eloquent_has_one_through_model_supplier_id) values (\'foobar@example.com\', ?), (\'barfoo@example.com\', ?)',
-            array_column($this->connection()->select('select id from suppliers'), 'id')
+            $this->object_array_column($this->connection()->select('select id from suppliers'), 'id')
         );
 
         // Insert account histories
         $this->connection()->insert(
             'insert into account_histories (title, eloquent_has_one_through_model_account_id) values (\'FooBar\', ?), (\'BarFoo\', ?)',
-            array_column($this->connection()->select('select id from accounts'), 'id')
+            $this->object_array_column($this->connection()->select('select id from accounts'), 'id')
         );
     }
 
@@ -230,6 +230,22 @@ class DatabaseEloquentHasOneThroughTest extends PHPUnit_Framework_TestCase
     protected function schema($connection = 'default')
     {
         return $this->connection($connection)->getSchemaBuilder();
+    }
+
+    /**
+     * @param array  $array array of stdClass
+     * @param string $property
+     *
+     * @return array
+     */
+    protected function object_array_column($array, $property)
+    {
+        $columns = [];
+        foreach ($array as $item) {
+            $columns[] = $item->{$property};
+        }
+
+        return $columns;
     }
 }
 

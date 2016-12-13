@@ -55,13 +55,13 @@ class DatabaseEloquentBelongsToThroughTest extends PHPUnit_Framework_TestCase
         // Insert users
         $this->connection()->insert(
             'insert into users (email, eloquent_belongs_to_through_model_country_id) values (\'foobar@example.com\', ?), (\'barfoo@example.com\', ?)',
-            array_column($this->connection()->select('select id from countries'), 'id')
+            $this->object_array_column($this->connection()->select('select id from countries'), 'id')
         );
 
         // Insert posts
         $this->connection()->insert(
             'insert into posts (title, eloquent_belongs_to_through_model_user_id) values (\'FooBar\', ?), (\'BarFoo\', ?)',
-            array_column($this->connection()->select('select id from users'), 'id')
+            $this->object_array_column($this->connection()->select('select id from users'), 'id')
         );
     }
 
@@ -234,6 +234,22 @@ class DatabaseEloquentBelongsToThroughTest extends PHPUnit_Framework_TestCase
     protected function schema($connection = 'default')
     {
         return $this->connection($connection)->getSchemaBuilder();
+    }
+
+    /**
+     * @param array  $array array of stdClass
+     * @param string $property
+     *
+     * @return array
+     */
+    protected function object_array_column($array, $property)
+    {
+        $columns = [];
+        foreach ($array as $item) {
+            $columns[] = $item->{$property};
+        }
+
+        return $columns;
     }
 }
 
