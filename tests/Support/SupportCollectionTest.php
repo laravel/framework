@@ -726,6 +726,30 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         );
     }
 
+    public function testEvery()
+    {
+        $c = new Collection([]);
+        $this->assertTrue($c->every('key', 'value'));
+        $this->assertTrue($c->every(function () {
+            return false;
+        }));
+
+        $c = new Collection([['age' => 18], ['age' => 20], ['age' => 20]]);
+        $this->assertFalse($c->every('age', 18));
+        $this->assertTrue($c->every('age', '>=', 18));
+        $this->assertTrue($c->every(function ($item) {
+            return $item['age'] >= 18;
+        }));
+        $this->assertFalse($c->every(function ($item) {
+            return $item['age'] >= 20;
+        }));
+
+        $c = new Collection([null, null]);
+        $this->assertTrue($c->every(function ($item) {
+            return $item === null;
+        }));
+    }
+
     public function testExcept()
     {
         $data = new Collection(['first' => 'Taylor', 'last' => 'Otwell', 'email' => 'taylorotwell@gmail.com']);

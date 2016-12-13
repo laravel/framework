@@ -245,6 +245,35 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Determine if all items in the collection pass the given test.
+     *
+     * @param  string|callable  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function every($key, $operator = null, $value = null)
+    {
+        if (func_num_args() == 1) {
+            foreach ($this->items as $k => $v) {
+                if (! $key($v, $k)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        if (func_num_args() == 2) {
+            $value = $operator;
+
+            $operator = '=';
+        }
+
+        return $this->every($this->operatorForWhere($key, $operator, $value));
+    }
+
+    /**
      * Get all items except for those with the specified keys.
      *
      * @param  mixed  $keys
