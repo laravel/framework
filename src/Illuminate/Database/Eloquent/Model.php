@@ -733,19 +733,19 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @param string      $related           Class name of related Model
      * @param string      $through           Class name of through Model
-     * @param string|null $throughForeignKey Foreign key from Through model to $this Model
-     * @param string|null $relatedForeignKey Foreign key from Related model to Through model
+     * @param string|null $thisForeignKey    Foreign key from Through model to $this Model
+     * @param string|null $throughForeignKey Foreign key from Related model to Through model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasOneThrough
      */
-    public function hasOneThrough($related, $through, $throughForeignKey, $relatedForeignKey)
+    public function hasOneThrough($related, $through, $thisForeignKey = null, $throughForeignKey = null)
     {
         $related = new $related;
         $through = new $through;
+        $thisForeignKey = $thisForeignKey ?: $this->getForeignKey();
         $throughForeignKey = $throughForeignKey ?: $through->getForeignKey();
-        $relatedForeignKey = $relatedForeignKey ?: $related->getForeignKey();
 
-        return new HasOneThrough($related->newQuery(), $this, $through, $throughForeignKey, $relatedForeignKey);
+        return new HasOneThrough($related->newQuery(), $this, $through, $thisForeignKey, $throughForeignKey);
     }
 
     /**
