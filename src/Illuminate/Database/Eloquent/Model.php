@@ -1143,7 +1143,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function performDeleteOnModel()
 	{
-		$this->newQuery()->where($this->getKeyName(), $this->getKey())->delete();
+		$attributes = array_only($this->attributes, $this->getKeyName());
+
+		$this->newQuery()->where($attributes)->delete();
 	}
 
 	/**

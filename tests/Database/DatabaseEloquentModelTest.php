@@ -401,7 +401,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	{
 		$model = $this->getMock('Illuminate\Database\Eloquent\Model', array('newQueryWithoutScopes', 'updateTimestamps', 'touchOwners'));
 		$query = m::mock('stdClass');
-		$query->shouldReceive('where')->once()->with('id', 1)->andReturn($query);
+		$query->shouldReceive('where')->once()->with(['id' => 1])->andReturn($query);
 		$query->shouldReceive('delete')->once();
 		$model->expects($this->once())->method('newQueryWithoutScopes')->will($this->returnValue($query));
 		$model->expects($this->once())->method('touchOwners');
