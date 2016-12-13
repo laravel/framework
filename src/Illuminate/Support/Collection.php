@@ -255,8 +255,10 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function every($key, $operator = null, $value = null)
     {
         if (func_num_args() == 1) {
+            $callback = $this->valueRetriever($key);
+
             foreach ($this->items as $k => $v) {
-                if (! $key($v, $k)) {
+                if (! $callback($v, $k)) {
                     return false;
                 }
             }
