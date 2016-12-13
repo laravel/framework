@@ -163,10 +163,10 @@ class Event
             $this->cache->put($this->mutexName(), true, 1440);
         }
 
-        if (! $this->runInBackground) {
-            $this->runCommandInForeground($container);
-        } else {
+        if ($this->runInBackground) {
             $this->runCommandInBackground();
+        } else {
+            $this->runCommandInForeground($container);
         }
     }
 
