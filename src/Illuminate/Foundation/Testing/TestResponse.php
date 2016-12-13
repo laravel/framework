@@ -45,7 +45,7 @@ class TestResponse extends Response
     {
         $actual = $this->getStatusCode();
 
-        PHPUnit::assertTrue($actual === $status, "Expected status code is {$status}, got {$actual}.");
+        PHPUnit::assertTrue($actual === $status, "Expected status code {$status} but received {$actual}.");
     }
 
     /**
