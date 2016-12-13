@@ -371,6 +371,33 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Remove a global scope from the model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Scope|\Closure|string  $scope
+     *
+     * @throws \InvalidArgumentException
+     */
+    public static function removeGlobalScope($scope)
+    {
+        if (is_string($scope)) {
+            unset(static::$globalScopes[static::class][$scope]);
+            return;
+        }
+
+        if ($scope instanceof Closure) {
+            unset(static::$globalScopes[static::class][spl_object_hash($scope)]);
+            return;
+        }
+
+        if ($scope instanceof Scope) {
+            unset(static::$globalScopes[static::class][get_class($scope)]);
+            return;
+        }
+
+        throw new InvalidArgumentException('Global scope must be an instance of Closure or Scope.');
+    }
+
+    /**
      * Determine if a model has a global scope.
      *
      * @param  \Illuminate\Database\Eloquent\Scope|string  $scope
