@@ -36,15 +36,16 @@ class TestResponse extends Response
     }
 
     /**
-     * Assert that the response has an OK status code.
+     * Assert that the response has the given status code.
      *
+     * @param  int  $status
      * @return void
      */
     public function assertStatus($status)
     {
         $actual = $this->getStatusCode();
 
-        PHPUnit::assertTrue($this->isOk(), "Expected status code 200, got {$actual}.");
+        PHPUnit::assertTrue($actual === $status, "Expected status code is {$status}, got {$actual}.");
     }
 
     /**
