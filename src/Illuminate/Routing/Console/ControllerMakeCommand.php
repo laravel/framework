@@ -2,8 +2,8 @@
 
 namespace Illuminate\Routing\Console;
 
-use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;
+use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
 
 class ControllerMakeCommand extends GeneratorCommand
@@ -37,7 +37,7 @@ class ControllerMakeCommand extends GeneratorCommand
     protected function getStub()
     {
         if ($this->option('model')) {
-            return __DIR__ . '/stubs/controller.model.stub';
+            return __DIR__.'/stubs/controller.model.stub';
         } elseif ($this->option('resource')) {
             return __DIR__.'/stubs/controller.stub';
         }
@@ -70,7 +70,7 @@ class ControllerMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Parses the model namespace
+     * Parses the model namespace.
      *
      * @param  string  $modelNamespace
      * @return string
@@ -78,10 +78,10 @@ class ControllerMakeCommand extends GeneratorCommand
     protected function parseModel($modelNamespace)
     {
         if (preg_match('([^A-Za-z0-9_/\\\\])', $modelNamespace)) {
-            $this->line("");
-            $this->error("                                          ");
-            $this->error("  Model name contains invalid characters  ");
-            $this->error("                                          ");
+            $this->line('');
+            $this->error('                                          ');
+            $this->error('  Model name contains invalid characters  ');
+            $this->error('                                          ');
             exit(1);
         }
 
@@ -92,8 +92,8 @@ class ControllerMakeCommand extends GeneratorCommand
         $modelNamespace = trim($modelNamespace, '\\');
         $rootNamespace = $this->laravel->getNamespace();
 
-        if (!Str::startsWith($modelNamespace, $rootNamespace)) {
-            $modelNamespace = $rootNamespace . $modelNamespace;
+        if (! Str::startsWith($modelNamespace, $rootNamespace)) {
+            $modelNamespace = $rootNamespace.$modelNamespace;
         }
 
         return $modelNamespace;
