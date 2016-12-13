@@ -245,30 +245,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Create a new collection consisting of every n-th element.
-     *
-     * @param  int  $step
-     * @param  int  $offset
-     * @return static
-     */
-    public function every($step, $offset = 0)
-    {
-        $new = [];
-
-        $position = 0;
-
-        foreach ($this->items as $item) {
-            if ($position % $step === $offset) {
-                $new[] = $item;
-            }
-
-            $position++;
-        }
-
-        return new static($new);
-    }
-
-    /**
      * Get all items except for those with the specified keys.
      *
      * @param  mixed  $keys
@@ -715,6 +691,30 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
             return is_null($result) || $value < $result ? $value : $result;
         });
+    }
+
+    /**
+     * Create a new collection consisting of every n-th element.
+     *
+     * @param  int  $step
+     * @param  int  $offset
+     * @return static
+     */
+    public function nth($step, $offset = 0)
+    {
+        $new = [];
+
+        $position = 0;
+
+        foreach ($this->items as $item) {
+            if ($position % $step === $offset) {
+                $new[] = $item;
+            }
+
+            $position++;
+        }
+
+        return new static($new);
     }
 
     /**

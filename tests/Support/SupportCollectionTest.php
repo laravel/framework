@@ -726,23 +726,6 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         );
     }
 
-    public function testEvery()
-    {
-        $data = new Collection([
-            6 => 'a',
-            4 => 'b',
-            7 => 'c',
-            1 => 'd',
-            5 => 'e',
-            3 => 'f',
-        ]);
-
-        $this->assertEquals(['a', 'e'], $data->every(4)->all());
-        $this->assertEquals(['b', 'f'], $data->every(4, 1)->all());
-        $this->assertEquals(['c'], $data->every(4, 2)->all());
-        $this->assertEquals(['d'], $data->every(4, 3)->all());
-    }
-
     public function testExcept()
     {
         $data = new Collection(['first' => 'Taylor', 'last' => 'Otwell', 'email' => 'taylorotwell@gmail.com']);
@@ -1040,6 +1023,23 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
             [3, 5, 4],
             $data->keys()->all()
         );
+    }
+
+    public function testNth()
+    {
+        $data = new Collection([
+            6 => 'a',
+            4 => 'b',
+            7 => 'c',
+            1 => 'd',
+            5 => 'e',
+            3 => 'f',
+        ]);
+
+        $this->assertEquals(['a', 'e'], $data->nth(4)->all());
+        $this->assertEquals(['b', 'f'], $data->nth(4, 1)->all());
+        $this->assertEquals(['c'], $data->nth(4, 2)->all());
+        $this->assertEquals(['d'], $data->nth(4, 3)->all());
     }
 
     public function testTransform()
