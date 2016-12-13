@@ -61,13 +61,32 @@ class MailMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Build the class with the given name.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function buildClass($name)
+    {
+        $class = parent::buildClass($name);
+
+        if ($this->option('markdown')) {
+            $class = str_replace('DummyView', $this->option('markdown'), $class);
+        }
+
+        return $class;
+    }
+
+    /**
      * Get the stub file for the generator.
      *
      * @return string
      */
     protected function getStub()
     {
-        return __DIR__.'/stubs/mail.stub';
+        return $this->option('markdown')
+                        ? __DIR__.'/stubs/markdown-mail.stub'
+                        : __DIR__.'/stubs/mail.stub';
     }
 
     /**
