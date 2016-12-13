@@ -2229,7 +2229,7 @@ class Validator implements ValidatorContract
             }
 
             $line = Arr::get(
-                $this->translator->get('validation.attributes'),
+                $this->translator->trans('validation.attributes'),
                 $expectedAttributeName
             );
 
