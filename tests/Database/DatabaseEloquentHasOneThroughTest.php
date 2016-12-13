@@ -1,8 +1,8 @@
 <?php
 
 use Mockery as m;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 
@@ -76,7 +76,6 @@ class DatabaseEloquentHasOneThroughTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     /**
      * Integration test for lazy loading of the $supplier's $accountHistory.
      */
@@ -112,13 +111,11 @@ class DatabaseEloquentHasOneThroughTest extends PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('\Illuminate\Database\Eloquent\Collection', $suppliers);
         foreach ($suppliers as $supplier) {
-
             $this->assertNotNull($supplier->accountHistory);
             $this->assertInstanceOf('EloquentHasOneThroughModelAccountHistory', $supplier->accountHistory);
             $this->assertEquals($supplier->name, $supplier->accountHistory->title);
         }
     }
-
 
     /**
      * Unit test relation is properly initialized.

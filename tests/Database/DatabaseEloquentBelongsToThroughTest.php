@@ -1,8 +1,8 @@
 <?php
 
 use Mockery as m;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\Relations\BelongsToThrough;
 
@@ -76,7 +76,6 @@ class DatabaseEloquentBelongsToThroughTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     /**
      * Integration test for lazy loading of the $post's $country.
      */
@@ -89,7 +88,6 @@ class DatabaseEloquentBelongsToThroughTest extends PHPUnit_Framework_TestCase
         $this->assertNotNull($country);
         $this->assertInstanceOf('EloquentBelongsToThroughModelCountry', $country);
         $this->assertEquals('BarFoo', $country->name);
-
     }
 
     /**
@@ -118,7 +116,6 @@ class DatabaseEloquentBelongsToThroughTest extends PHPUnit_Framework_TestCase
             $this->assertEquals($post->title, $post->country->name);
         }
     }
-
 
     /**
      * Unit test relation is properly initialized.
