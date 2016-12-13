@@ -341,18 +341,23 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * Get a subset containing the provided keys with values from the input data.
      *
      * @param  array|mixed  $keys
+     * @param  mixed  $default
      * @return array
      */
-    public function only($keys)
+    public function only($keys, $default = null)
     {
-        $keys = is_array($keys) ? $keys : func_get_args();
+        if (! is_array($keys)) {
+            $keys = func_get_args();
+
+            $default = null;
+        }
 
         $results = [];
 
         $input = $this->all();
 
         foreach ($keys as $key) {
-            Arr::set($results, $key, data_get($input, $key));
+            Arr::set($results, $key, data_get($input, $key, $default));
         }
 
         return $results;
