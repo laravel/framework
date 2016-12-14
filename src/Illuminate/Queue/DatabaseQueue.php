@@ -5,6 +5,7 @@ namespace Illuminate\Queue;
 use DateTime;
 use Carbon\Carbon;
 use Illuminate\Database\Connection;
+use Illuminate\Database\QueryException;
 use Illuminate\Queue\Jobs\DatabaseJob;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 
@@ -248,10 +249,22 @@ class DatabaseQueue extends Queue implements QueueContract
         $job->attempts = $job->attempts + 1;
         $job->reserved_at = $this->getTime();
 
-        $this->database->table($this->table)->where('id', $job->id)->update([
-            'reserved_at' => $job->reserved_at,
-            'attempts' => $job->attempts,
-        ]);
+        try {
+            $this->database->table($this->table)->where('id', $job->id)->update([
+                'reserved_at' => $job->reserved_at,
+                'attempts' => $job->attempts,
+            ]);
+        } catch (QueryException $e) {
+
+            // out of range
+            if($e->getCode() == '22003') {
+                $this->database->table($this->table)->where('id', $job->id)->update([
+                    'reserved_at' => $job->reserved_at,
+                    'attempts' => --$job->attempts,
+
+                ]);
+            }
+        }
 
         return $job;
     }
