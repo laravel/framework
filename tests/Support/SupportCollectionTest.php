@@ -728,19 +728,31 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 
     public function testEvery()
     {
-        $data = new Collection([
-            6 => 'a',
-            4 => 'b',
-            7 => 'c',
-            1 => 'd',
-            5 => 'e',
-            3 => 'f',
-        ]);
+        $c = new Collection([]);
+        $this->assertTrue($c->every('key', 'value'));
+        $this->assertTrue($c->every(function () {
+            return false;
+        }));
 
-        $this->assertEquals(['a', 'e'], $data->every(4)->all());
-        $this->assertEquals(['b', 'f'], $data->every(4, 1)->all());
-        $this->assertEquals(['c'], $data->every(4, 2)->all());
-        $this->assertEquals(['d'], $data->every(4, 3)->all());
+        $c = new Collection([['age' => 18], ['age' => 20], ['age' => 20]]);
+        $this->assertFalse($c->every('age', 18));
+        $this->assertTrue($c->every('age', '>=', 18));
+        $this->assertTrue($c->every(function ($item) {
+            return $item['age'] >= 18;
+        }));
+        $this->assertFalse($c->every(function ($item) {
+            return $item['age'] >= 20;
+        }));
+
+        $c = new Collection([null, null]);
+        $this->assertTrue($c->every(function ($item) {
+            return $item === null;
+        }));
+
+        $c = new Collection([['active' => true], ['active' => true]]);
+        $this->assertTrue($c->every('active'));
+        $this->assertTrue($c->every->active);
+        $this->assertFalse($c->push(['active' => false])->every->active);
     }
 
     public function testExcept()
@@ -1042,6 +1054,23 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         );
     }
 
+    public function testNth()
+    {
+        $data = new Collection([
+            6 => 'a',
+            4 => 'b',
+            7 => 'c',
+            1 => 'd',
+            5 => 'e',
+            3 => 'f',
+        ]);
+
+        $this->assertEquals(['a', 'e'], $data->nth(4)->all());
+        $this->assertEquals(['b', 'f'], $data->nth(4, 1)->all());
+        $this->assertEquals(['c'], $data->nth(4, 2)->all());
+        $this->assertEquals(['d'], $data->nth(4, 3)->all());
+    }
+
     public function testTransform()
     {
         $data = new Collection(['first' => 'taylor', 'last' => 'otwell']);
@@ -1242,6 +1271,16 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($c->containsStrict('foo'));
         $this->assertFalse($c->containsStrict(null));
         $this->assertTrue($c->containsStrict(''));
+    }
+
+    public function testContainsWithOperator()
+    {
+        $c = new Collection([['v' => 1], ['v' => 3], ['v' => '4'], ['v' => 5]]);
+
+        $this->assertTrue($c->contains('v', '=', 4));
+        $this->assertTrue($c->contains('v', '==', 4));
+        $this->assertFalse($c->contains('v', '===', 4));
+        $this->assertTrue($c->contains('v', '>', 4));
     }
 
     public function testGettingSumFromCollection()

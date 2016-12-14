@@ -330,6 +330,19 @@ class Router implements RegistrarContract, BindingRegistrar
         // Once we have updated the group stack, we'll load the provided routes and
         // merge in the group's attributes when the routes are created. After we
         // have created the routes, we will pop the attributes off the stack.
+        $this->loadRoutes($routes);
+
+        array_pop($this->groupStack);
+    }
+
+    /**
+     * Load the provided routes.
+     *
+     * @param  \Closure|string  $routes
+     * @return void
+     */
+    protected function loadRoutes($routes)
+    {
         if ($routes instanceof Closure) {
             $routes($this);
         } else {
@@ -337,8 +350,6 @@ class Router implements RegistrarContract, BindingRegistrar
 
             require $routes;
         }
-
-        array_pop($this->groupStack);
     }
 
     /**

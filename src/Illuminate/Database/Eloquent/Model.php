@@ -2920,6 +2920,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             case 'collection':
                 return new BaseCollection($this->fromJson($value));
             case 'date':
+                return $this->asDate($value);
             case 'datetime':
                 return $this->asDateTime($value);
             case 'timestamp':
@@ -3026,6 +3027,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $value = $this->asDateTime($value);
 
         return $value->format($format);
+    }
+
+    /**
+     * Return a timestamp as DateTime object with time set to 00:00:00.
+     *
+     * @param  mixed  $value
+     * @return \Carbon\Carbon
+     */
+    protected function asDate($value)
+    {
+        return $this->asDateTime($value)->startOfDay();
     }
 
     /**
