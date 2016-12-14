@@ -30,6 +30,15 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(10, $c->min('foo'));
     }
 
+    public function testContainsWithMultipleArguments()
+    {
+        $c = new Collection([['id' => 1], ['id' => 2]]);
+
+        $this->assertTrue($c->contains('id', 1));
+        $this->assertTrue($c->contains('id', '>=', 2));
+        $this->assertFalse($c->contains('id', '>', 2));
+    }
+
     public function testContainsIndicatesIfModelInArray()
     {
         $mockModel = m::mock('Illuminate\Database\Eloquent\Model');

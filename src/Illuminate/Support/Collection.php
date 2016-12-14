@@ -165,22 +165,27 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Determine if an item exists in the collection.
      *
      * @param  mixed  $key
+     * @param  mixed  $operator
      * @param  mixed  $value
      * @return bool
      */
-    public function contains($key, $value = null)
+    public function contains($key, $operator = null, $value = null)
     {
+        if (func_num_args() == 1) {
+            if ($this->useAsCallable($key)) {
+                return ! is_null($this->first($key));
+            }
+
+            return in_array($key, $this->items);
+        }
+
         if (func_num_args() == 2) {
-            return $this->contains(function ($item) use ($key, $value) {
-                return data_get($item, $key) == $value;
-            });
+            $value = $operator;
+
+            $operator = '=';
         }
 
-        if ($this->useAsCallable($key)) {
-            return ! is_null($this->first($key));
-        }
-
-        return in_array($key, $this->items);
+        return $this->contains($this->operatorForWhere($key, $operator, $value));
     }
 
     /**

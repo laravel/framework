@@ -1244,6 +1244,16 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($c->containsStrict(''));
     }
 
+    public function testContainsWithOperator()
+    {
+        $c = new Collection([['v' => 1], ['v' => 3], ['v' => '4'], ['v' => 5]]);
+
+        $this->assertTrue($c->contains('v', '=', 4));
+        $this->assertTrue($c->contains('v', '==', 4));
+        $this->assertFalse($c->contains('v', '===', 4));
+        $this->assertTrue($c->contains('v', '>', 4));
+    }
+
     public function testGettingSumFromCollection()
     {
         $c = new Collection([(object) ['foo' => 50], (object) ['foo' => 50]]);
