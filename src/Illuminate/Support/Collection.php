@@ -32,7 +32,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @var array
      */
     protected static $proxies = [
-        'each', 'filter', 'first', 'map', 'partition',
+        'each', 'every', 'filter', 'first', 'map', 'partition',
         'reject', 'sortBy', 'sortByDesc', 'sum',
     ];
 
@@ -250,27 +250,34 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Create a new collection consisting of every n-th element.
+     * Determine if all items in the collection pass the given test.
      *
-     * @param  int  $step
-     * @param  int  $offset
-     * @return static
+     * @param  string|callable  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return bool
      */
-    public function every($step, $offset = 0)
+    public function every($key, $operator = null, $value = null)
     {
-        $new = [];
+        if (func_num_args() == 1) {
+            $callback = $this->valueRetriever($key);
 
-        $position = 0;
-
-        foreach ($this->items as $item) {
-            if ($position % $step === $offset) {
-                $new[] = $item;
+            foreach ($this->items as $k => $v) {
+                if (! $callback($v, $k)) {
+                    return false;
+                }
             }
 
-            $position++;
+            return true;
         }
 
-        return new static($new);
+        if (func_num_args() == 2) {
+            $value = $operator;
+
+            $operator = '=';
+        }
+
+        return $this->every($this->operatorForWhere($key, $operator, $value));
     }
 
     /**
@@ -720,6 +727,30 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
             return is_null($result) || $value < $result ? $value : $result;
         });
+    }
+
+    /**
+     * Create a new collection consisting of every n-th element.
+     *
+     * @param  int  $step
+     * @param  int  $offset
+     * @return static
+     */
+    public function nth($step, $offset = 0)
+    {
+        $new = [];
+
+        $position = 0;
+
+        foreach ($this->items as $item) {
+            if ($position % $step === $offset) {
+                $new[] = $item;
+            }
+
+            $position++;
+        }
+
+        return new static($new);
     }
 
     /**
