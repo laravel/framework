@@ -1409,6 +1409,18 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(-14173440, $arr['timestampAttribute']);
     }
 
+    public function testModelDateAttributeCastingResetsTime()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setDateFormat('Y-m-d H:i:s');
+        $model->dateAttribute = '1969-07-20 22:56:00';
+
+        $this->assertEquals('1969-07-20 00:00:00', $model->dateAttribute->toDateTimeString());
+
+        $arr = $model->toArray();
+        $this->assertEquals('1969-07-20 00:00:00', $arr['dateAttribute']);
+    }
+
     public function testModelAttributeCastingPreservesNull()
     {
         $model = new EloquentModelCastingStub;
