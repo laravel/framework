@@ -1409,7 +1409,9 @@ class RoutingTestUserModel extends Model
     }
 }
 
-class RoutingTestExtendedUserModel extends RoutingTestUserModel {}
+class RoutingTestExtendedUserModel extends RoutingTestUserModel
+{
+}
 
 class ActionStub
 {
