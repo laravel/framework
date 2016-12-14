@@ -240,7 +240,7 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
-     * Bind a callback to resolve with Container::call
+     * Bind a callback to resolve with Container::call.
      *
      * @param  string  $method
      * @param  \Closure  $concrete
@@ -252,7 +252,7 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
-     * Call a method that has been bound to the container
+     * Call a method that has been bound to the container.
      *
      * @param  callable  $callback
      * @param  mixed  $default
@@ -260,7 +260,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function callBoundMethod($callback, $default)
     {
-        if (!is_array($callback)) {
+        if (! is_array($callback)) {
             return value($default);
         }
 
@@ -268,7 +268,7 @@ class Container implements ArrayAccess, ContainerContract
 
         $method = $this->normalize("{$class}@{$callback[1]}");
 
-        if (!isset($this->methodBindings[$method])) {
+        if (! isset($this->methodBindings[$method])) {
             return value($default);
         }
 
@@ -548,6 +548,7 @@ class Container implements ArrayAccess, ContainerContract
 
         return $this->callBoundMethod($callback, function () use ($callback, $parameters) {
             $dependencies = $this->getMethodDependencies($callback, $parameters);
+
             return call_user_func_array($callback, $dependencies);
         });
     }
