@@ -19,8 +19,6 @@ class EventTest extends PHPUnit_Framework_TestCase
         $defaultOutput = (DIRECTORY_SEPARATOR == '\\') ? 'NUL' : '/dev/null';
         $this->assertSame("php -i > {$quote}{$defaultOutput}{$quote} 2>&1", $event->buildCommand());
 
-
-
         $quote = (DIRECTORY_SEPARATOR == '\\') ? '"' : "'";
 
         $event = new Event(m::mock('Illuminate\Contracts\Cache\Repository'), 'php -i');
