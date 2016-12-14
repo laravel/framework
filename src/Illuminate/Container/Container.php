@@ -37,6 +37,13 @@ class Container implements ArrayAccess, ContainerContract
     protected $bindings = [];
 
     /**
+     * The container's method bindings.
+     *
+     * @var array
+     */
+    protected $methodBindings = [];
+
+    /**
      * The container's shared instances.
      *
      * @var array
@@ -230,6 +237,42 @@ class Container implements ArrayAccess, ContainerContract
 
             return $container->$method($concrete, $parameters);
         };
+    }
+
+    /**
+     * Bind a callback to resolve with Container::call.
+     *
+     * @param  string  $method
+     * @param  \Closure  $concrete
+     * @return void
+     */
+    public function bindMethod($method, $callback)
+    {
+        $this->methodBindings[$this->normalize($method)] = $callback;
+    }
+
+    /**
+     * Call a method that has been bound to the container.
+     *
+     * @param  callable  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    protected function callBoundMethod($callback, $default)
+    {
+        if (! is_array($callback)) {
+            return value($default);
+        }
+
+        $class = is_string($callback[0]) ? $callback[0] : get_class($callback[0]);
+
+        $method = $this->normalize("{$class}@{$callback[1]}");
+
+        if (! isset($this->methodBindings[$method])) {
+            return value($default);
+        }
+
+        return $this->methodBindings[$method]($callback[0], $this);
     }
 
     /**
@@ -503,9 +546,11 @@ class Container implements ArrayAccess, ContainerContract
             return $this->callClass($callback, $parameters, $defaultMethod);
         }
 
-        $dependencies = $this->getMethodDependencies($callback, $parameters);
+        return $this->callBoundMethod($callback, function () use ($callback, $parameters) {
+            $dependencies = $this->getMethodDependencies($callback, $parameters);
 
-        return call_user_func_array($callback, $dependencies);
+            return call_user_func_array($callback, $dependencies);
+        });
     }
 
     /**
