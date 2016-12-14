@@ -243,36 +243,12 @@ class Container implements ArrayAccess, ContainerContract
      * Bind a callback to resolve with Container::call.
      *
      * @param  string  $method
-     * @param  \Closure  $concrete
+     * @param  \Closure  $callback
      * @return void
      */
     public function bindMethod($method, $callback)
     {
         $this->methodBindings[$this->normalize($method)] = $callback;
-    }
-
-    /**
-     * Call a method that has been bound to the container.
-     *
-     * @param  callable  $callback
-     * @param  mixed  $default
-     * @return mixed
-     */
-    protected function callBoundMethod($callback, $default)
-    {
-        if (! is_array($callback)) {
-            return value($default);
-        }
-
-        $class = is_string($callback[0]) ? $callback[0] : get_class($callback[0]);
-
-        $method = $this->normalize("{$class}@{$callback[1]}");
-
-        if (! isset($this->methodBindings[$method])) {
-            return value($default);
-        }
-
-        return $this->methodBindings[$method]($callback[0], $this);
     }
 
     /**
@@ -646,6 +622,30 @@ class Container implements ArrayAccess, ContainerContract
         }
 
         return $this->call([$this->make($segments[0]), $method], $parameters);
+    }
+
+    /**
+     * Call a method that has been bound to the container.
+     *
+     * @param  callable  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    protected function callBoundMethod($callback, $default)
+    {
+        if (! is_array($callback)) {
+            return value($default);
+        }
+
+        $class = is_string($callback[0]) ? $callback[0] : get_class($callback[0]);
+
+        $method = $this->normalize("{$class}@{$callback[1]}");
+
+        if (! isset($this->methodBindings[$method])) {
+            return value($default);
+        }
+
+        return $this->methodBindings[$method]($callback[0], $this);
     }
 
     /**
