@@ -6,11 +6,9 @@ use Closure;
 use Carbon\Carbon;
 use LogicException;
 use Cron\CronExpression;
-use Illuminate\Console\Application;
 use GuzzleHttp\Client as HttpClient;
 use Illuminate\Contracts\Mail\Mailer;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Process\ProcessUtils;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Cache\Repository as Cache;
 
@@ -107,7 +105,7 @@ class Event
      *
      * @var bool
      */
-    protected $shouldAppendOutput = false;
+    public $shouldAppendOutput = false;
 
     /**
      * The array of callbacks to be run before the event is started.
@@ -149,7 +147,7 @@ class Event
      *
      * @return string
      */
-    protected function getDefaultOutput()
+    public function getDefaultOutput()
     {
         return (DIRECTORY_SEPARATOR == '\\') ? 'NUL' : '/dev/null';
     }
@@ -167,7 +165,7 @@ class Event
         }
 
         if ($this->runInBackground) {
-            $this->runCommandInBackground();
+            $this->runCommandInBackground($container);
         } else {
             $this->runCommandInForeground($container);
         }
@@ -193,10 +191,13 @@ class Event
     /**
      * Run the command in the background.
      *
+     * @param  \Illuminate\Contracts\Container\Container  $container
      * @return void
      */
-    protected function runCommandInBackground()
+    protected function runCommandInBackground(Container $container)
     {
+        $this->callBeforeCallbacks($container);
+
         (new Process(
             $this->buildCommand(), base_path(), null, null, null
         ))->run();
@@ -208,7 +209,7 @@ class Event
      * @param  \Illuminate\Contracts\Container\Container  $container
      * @return void
      */
-    protected function callBeforeCallbacks(Container $container)
+    public function callBeforeCallbacks(Container $container)
     {
         foreach ($this->beforeCallbacks as $callback) {
             $container->call($callback);
@@ -221,7 +222,7 @@ class Event
      * @param  \Illuminate\Contracts\Container\Container  $container
      * @return void
      */
-    protected function callAfterCallbacks(Container $container)
+    public function callAfterCallbacks(Container $container)
     {
         foreach ($this->afterCallbacks as $callback) {
             $container->call($callback);
@@ -235,23 +236,7 @@ class Event
      */
     public function buildCommand()
     {
-        $output = ProcessUtils::escapeArgument($this->output);
-
-        $redirect = $this->shouldAppendOutput ? ' >> ' : ' > ';
-
-        if ($this->withoutOverlapping) {
-            $forget = Application::formatCommandString('cache:forget');
-
-            if (windows_os()) {
-                $command = '('.$this->command.' & '.$forget.' "'.$this->mutexName().'")'.$redirect.$output.' 2>&1 &';
-            } else {
-                $command = '('.$this->command.'; '.$forget.' '.$this->mutexName().')'.$redirect.$output.' 2>&1 &';
-            }
-        } else {
-            $command = $this->command.$redirect.$output.' 2>&1 &';
-        }
-
-        return $this->user && ! windows_os() ? 'sudo -u '.$this->user.' -- sh -c \''.$command.'\'' : $command;
+        return (new CommandBuilder)->buildCommand($this);
     }
 
     /**
@@ -259,7 +244,7 @@ class Event
      *
      * @return string
      */
-    protected function mutexName()
+    public function mutexName()
     {
         return 'framework'.DIRECTORY_SEPARATOR.'schedule-'.sha1($this->expression.$this->command);
     }
@@ -399,7 +384,9 @@ class Event
     {
         $this->withoutOverlapping = true;
 
-        return $this->skip(function () {
+        return $this->then(function () {
+            $this->cache->forget($this->mutexName());
+        })->skip(function () {
             return $this->cache->has($this->mutexName());
         });
     }
