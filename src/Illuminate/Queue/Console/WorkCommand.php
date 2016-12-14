@@ -147,8 +147,7 @@ class WorkCommand extends Command
      */
     protected function writeOutput(Job $job, $state)
     {
-
-        switch($state) {
+        switch ($state) {
             case 'fail':
                 $this->output->writeln('<error>['.Carbon::now()->format('Y-m-d H:i:s').'] Failed:</error> '.$job->resolveName());
                 break;
