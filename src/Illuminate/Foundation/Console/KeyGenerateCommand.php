@@ -59,9 +59,11 @@ class KeyGenerateCommand extends Command
     protected function setKeyInEnvironmentFile($key)
     {
         $currentKey = $this->laravel['config']['app.key'];
+
         if (strlen($currentKey) !== 0 && (! $this->confirmToProceed())) {
             return false;
         }
+
         file_put_contents($this->laravel->environmentFilePath(), str_replace(
             'APP_KEY='.$this->laravel['config']['app.key'],
             'APP_KEY='.$key,
