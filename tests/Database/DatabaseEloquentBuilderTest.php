@@ -809,7 +809,7 @@ class EloquentBuilderTestScopeStub extends Illuminate\Database\Eloquent\Model
 {
     public function scopeApproved($query)
     {
-        $query->where('foo', 'bar');
+        return $query->where('foo', 'bar');
     }
 }
 

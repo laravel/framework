@@ -1226,7 +1226,7 @@ class Builder
         // query as their own isolated nested where statement and avoid issues.
         $originalWhereCount = count($query->wheres);
 
-        $result = call_user_func_array($scope, $parameters) ?: $this;
+        $result = call_user_func_array($scope, $parameters);
 
         if ($this->shouldNestWheresForScope($query, $originalWhereCount)) {
             $this->nestWheresForScope($query, $originalWhereCount);
