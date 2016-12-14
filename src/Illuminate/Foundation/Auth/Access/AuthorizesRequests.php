@@ -48,7 +48,7 @@ trait AuthorizesRequests
      */
     protected function parseAbilityAndArguments($ability, $arguments)
     {
-        if (is_string($ability)) {
+        if (is_string($ability) && (! class_exists($ability))) {
             return [$ability, $arguments];
         }
 
