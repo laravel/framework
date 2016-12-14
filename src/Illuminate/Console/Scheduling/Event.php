@@ -6,6 +6,7 @@ use Closure;
 use Carbon\Carbon;
 use LogicException;
 use Cron\CronExpression;
+use Illuminate\Console\Application;
 use GuzzleHttp\Client as HttpClient;
 use Illuminate\Contracts\Mail\Mailer;
 use Symfony\Component\Process\Process;
@@ -239,7 +240,7 @@ class Event
         $redirect = $this->shouldAppendOutput ? ' >> ' : ' > ';
 
         if ($this->withoutOverlapping) {
-            $forget = Appliation::formatCommandString('cache:forget');
+            $forget = Application::formatCommandString('cache:forget');
 
             if (windows_os()) {
                 $command = '('.$this->command.' & '.$forget.' "'.$this->mutexName().'")'.$redirect.$output.' 2>&1 &';
