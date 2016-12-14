@@ -456,10 +456,6 @@ if (! function_exists('env')) {
                 return;
         }
 
-        if (strpos($value, 'base64:') === 0) {
-            return base64_decode(substr($value, 7));
-        }
-
         if (strlen($value) > 1 && Str::startsWith($value, '"') && Str::endsWith($value, '"')) {
             return substr($value, 1, -1);
         }
