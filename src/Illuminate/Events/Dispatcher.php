@@ -305,7 +305,6 @@ class Dispatcher implements DispatcherContract
         $listeners = isset($this->listeners[$eventName])
                             ? $this->listeners[$eventName] : [];
 
-
         if (class_exists($eventName, false)) {
             $listeners = $this->addInterfaceListeners($eventName, $listeners);
         }
