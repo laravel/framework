@@ -51,6 +51,18 @@ class Dispatcher {
 	}
 
 	/**
+	 * Remove all data contained within the dispatcher.
+	 */
+	public function reset()
+	{
+		$this->container = null;
+		$this->listeners = [];
+		$this->wildcards = [];
+		$this->sorted = [];
+		$this->firing = [];
+	}
+
+	/**
 	 * Register an event listener with the dispatcher.
 	 *
 	 * @param  string|array  $events

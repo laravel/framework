@@ -201,6 +201,26 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	}
 
 	/**
+	 * Remove all data contained within the application.
+	 */
+	public function reset()
+	{
+		$this['events']->reset();
+		$this['view']->reset();
+
+		parent::reset();
+
+		$this->bootingCallbacks = [];
+		$this->bootedCallbacks = [];
+		$this->finishCallbacks = [];
+		$this->shutdownCallbacks = [];
+		$this->middlewares = [];
+		$this->serviceProviders = [];
+		$this->loadedProviders = [];
+		$this->deferredServices = [];
+	}
+
+	/**
 	 * Get the application bootstrap file.
 	 *
 	 * @return string

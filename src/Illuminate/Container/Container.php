@@ -57,6 +57,20 @@ class Container implements ArrayAccess {
 	protected $globalResolvingCallbacks = array();
 
 	/**
+	 * Remove all data contained within the container.
+	 */
+	public function reset()
+	{
+		$this->resolved = [];
+		$this->bindings = [];
+		$this->instances = [];
+		$this->aliases = [];
+		$this->reboundCallbacks = [];
+		$this->resolvingCallbacks = [];
+		$this->globalResolvingCallbacks = [];
+	}
+
+	/**
 	 * Determine if a given string is resolvable.
 	 *
 	 * @param  string  $abstract
