@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing\Console;
 
+use Illuminate\Support\Str;
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -35,7 +36,9 @@ class ControllerMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        if ($this->option('resource')) {
+        if ($this->option('model')) {
+            return __DIR__.'/stubs/controller.model.stub';
+        } elseif ($this->option('resource')) {
             return __DIR__.'/stubs/controller.stub';
         }
 
@@ -62,7 +65,38 @@ class ControllerMakeCommand extends GeneratorCommand
     {
         return [
             ['resource', 'r', InputOption::VALUE_NONE, 'Generate a resource controller class.'],
+            ['model', 'm', InputOption::VALUE_OPTIONAL, 'Use specified model.'],
         ];
+    }
+
+    /**
+     * Parses the model namespace.
+     *
+     * @param  string  $modelNamespace
+     * @return string
+     */
+    protected function parseModel($modelNamespace)
+    {
+        if (preg_match('([^A-Za-z0-9_/\\\\])', $modelNamespace)) {
+            $this->line('');
+            $this->error('                                          ');
+            $this->error('  Model name contains invalid characters  ');
+            $this->error('                                          ');
+            exit(1);
+        }
+
+        if (Str::contains($modelNamespace, '/')) {
+            $modelNamespace = str_replace('/', '\\', $modelNamespace);
+        }
+
+        $modelNamespace = trim($modelNamespace, '\\');
+        $rootNamespace = $this->laravel->getNamespace();
+
+        if (! Str::startsWith($modelNamespace, $rootNamespace)) {
+            $modelNamespace = $rootNamespace.$modelNamespace;
+        }
+
+        return $modelNamespace;
     }
 
     /**
@@ -75,8 +109,21 @@ class ControllerMakeCommand extends GeneratorCommand
      */
     protected function buildClass($name)
     {
-        $namespace = $this->getNamespace($name);
+        $controllerNamespace = $this->getNamespace($name);
 
-        return str_replace("use {$namespace}\Controller;\n", '', parent::buildClass($name));
+        $replace = [];
+        if ($this->option('model')) {
+            $modelNamespace = $this->parseModel($this->option('model'));
+            $modelClass = last(explode('\\', $modelNamespace));
+            $replace = [
+                'DummyModelNamespace' => $modelNamespace,
+                'DummyModelClass' => $modelClass,
+                'DummyModelVariable' => lcfirst($modelClass),
+            ];
+        }
+
+        $replace["use {$controllerNamespace}\Controller;\n"] = '';
+
+        return str_replace(array_keys($replace), array_values($replace), parent::buildClass($name));
     }
 }
