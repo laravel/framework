@@ -1369,6 +1369,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $model->dateAttribute = '1969-07-20';
         $model->datetimeAttribute = '1969-07-20 22:56:00';
         $model->timestampAttribute = '1969-07-20 22:56:00';
+        $model->valueObjectAttribute = new ChildValueObjectStub(1, 2);
 
         $this->assertInternalType('int', $model->intAttribute);
         $this->assertInternalType('float', $model->floatAttribute);
@@ -1389,6 +1390,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('1969-07-20', $model->dateAttribute->toDateString());
         $this->assertEquals('1969-07-20 22:56:00', $model->datetimeAttribute->toDateTimeString());
         $this->assertEquals(-14173440, $model->timestampAttribute);
+        $this->assertInstanceOf(ChildValueObjectStub::class, $model->valueObjectAttribute);
+        $this->assertEquals(new ChildValueObjectStub(1, 2), $model->valueObjectAttribute);
 
         $arr = $model->toArray();
         $this->assertInternalType('int', $arr['intAttribute']);
@@ -1407,6 +1410,42 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('1969-07-20 00:00:00', $arr['dateAttribute']);
         $this->assertEquals('1969-07-20 22:56:00', $arr['datetimeAttribute']);
         $this->assertEquals(-14173440, $arr['timestampAttribute']);
+        $this->assertInstanceOf(ChildValueObjectStub::class, $model['valueObjectAttribute']);
+        $this->assertEquals(new ChildValueObjectStub(1, 2), $model['valueObjectAttribute']);
+    }
+
+    public function testModelValueObjectAttributesAreSetToNullWhenWrongObjectIsProvided()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->valueObjectAttribute = new StdClass();
+        $this->assertNull($model->valueObjectAttribute);
+        $model['valueObjectAttribute'] = new StdClass();
+        $this->assertNull($model['valueObjectAttribute']);
+    }
+
+    public function testModelDateAttributesAreImmutable()
+    {
+        $model = new EloquentModelCastingStub();
+        $model->setDateFormat('Y-m-d H:i:s');
+
+        $model->dateAttribute = '2016-01-03 10:11:12';
+        $this->assertNotSame($model->dateAttribute, $model->dateAttribute);
+        $model->dateAttribute->second = 0;
+        $this->assertEquals(12, $model->dateAttribute->second);
+
+        $model['dateAttribute'] = '2016-01-03 10:11:12';
+        $this->assertNotSame($model['dateAttribute'], $model['dateAttribute']);
+        $model['dateAttribute']->second = 0;
+        $this->assertEquals(12, $model['dateAttribute']->second);
+    }
+
+    public function testModelValueObjectAttributesAreImmutable()
+    {
+        $model = new EloquentModelCastingStub();
+        $model->valueObjectAttribute = new ParentValueObjectStub(1);
+        $this->assertNotSame($model->valueObjectAttribute, $model->valueObjectAttribute);
+        $model->valueObjectAttribute->a = 2;
+        $this->assertEquals(1, $model->valueObjectAttribute->a);
     }
 
     public function testModelDateAttributeCastingResetsTime()
@@ -1435,6 +1474,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $model->dateAttribute = null;
         $model->datetimeAttribute = null;
         $model->timestampAttribute = null;
+        $model->valueObjectAttribute = null;
 
         $attributes = $model->getAttributes();
 
@@ -1449,6 +1489,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertNull($attributes['dateAttribute']);
         $this->assertNull($attributes['datetimeAttribute']);
         $this->assertNull($attributes['timestampAttribute']);
+        $this->assertNull($attributes['valueObjectAttribute']);
 
         $this->assertNull($model->intAttribute);
         $this->assertNull($model->floatAttribute);
@@ -1461,6 +1502,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertNull($model->dateAttribute);
         $this->assertNull($model->datetimeAttribute);
         $this->assertNull($model->timestampAttribute);
+        $this->assertNull($model->valueObjectAttribute);
 
         $array = $model->toArray();
 
@@ -1873,6 +1915,27 @@ class EloquentModelGetMutatorsStub extends Model
     }
 }
 
+class ParentValueObjectStub
+{
+    public $a = 1;
+
+    public function __construct($a)
+    {
+        $this->a = $a;
+    }
+}
+
+class ChildValueObjectStub extends ParentValueObjectStub
+{
+    public $b = 2;
+
+    public function __construct($a, $b)
+    {
+        parent::__construct($a);
+        $this->b = $b;
+    }
+}
+
 class EloquentModelCastingStub extends Model
 {
     protected $casts = [
@@ -1885,8 +1948,9 @@ class EloquentModelCastingStub extends Model
         'arrayAttribute' => 'array',
         'jsonAttribute' => 'json',
         'dateAttribute' => 'date',
-        'datetimeAttribute' => 'datetime',
+        'datetimeAttribute' => 'dateTime',
         'timestampAttribute' => 'timestamp',
+        'valueObjectAttribute' => ParentValueObjectStub::class,
     ];
 
     public function jsonAttributeValue()
