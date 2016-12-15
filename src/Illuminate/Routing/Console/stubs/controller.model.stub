@@ -2,7 +2,7 @@
 
 namespace DummyNamespace;
 
-use DummyModelNamespace;
+use DummyFullModelClass;
 use Illuminate\Http\Request;
 use DummyRootNamespaceHttp\Controllers\Controller;
 
@@ -42,7 +42,7 @@ class DummyClass extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \DummyModelNamespace  $DummyModelVariable
+     * @param  \DummyFullModelClass  $DummyModelVariable
      * @return \Illuminate\Http\Response
      */
     public function show(DummyModelClass $DummyModelVariable)
@@ -53,7 +53,7 @@ class DummyClass extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \DummyModelNamespace  $DummyModelVariable
+     * @param  \DummyFullModelClass  $DummyModelVariable
      * @return \Illuminate\Http\Response
      */
     public function edit(DummyModelClass $DummyModelVariable)
@@ -65,7 +65,7 @@ class DummyClass extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \DummyModelNamespace  $DummyModelVariable
+     * @param  \DummyFullModelClass  $DummyModelVariable
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, DummyModelClass $DummyModelVariable)
@@ -76,7 +76,7 @@ class DummyClass extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \DummyModelNamespace  $DummyModelVariable
+     * @param  \DummyFullModelClass  $DummyModelVariable
      * @return \Illuminate\Http\Response
      */
     public function destroy(DummyModelClass $DummyModelVariable)

@@ -3,6 +3,7 @@
 namespace Illuminate\Routing\Console;
 
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -57,49 +58,6 @@ class ControllerMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['resource', 'r', InputOption::VALUE_NONE, 'Generate a resource controller class.'],
-            ['model', 'm', InputOption::VALUE_OPTIONAL, 'Use specified model.'],
-        ];
-    }
-
-    /**
-     * Parses the model namespace.
-     *
-     * @param  string  $modelNamespace
-     * @return string
-     */
-    protected function parseModel($modelNamespace)
-    {
-        if (preg_match('([^A-Za-z0-9_/\\\\])', $modelNamespace)) {
-            $this->line('');
-            $this->error('                                          ');
-            $this->error('  Model name contains invalid characters  ');
-            $this->error('                                          ');
-            exit(1);
-        }
-
-        if (Str::contains($modelNamespace, '/')) {
-            $modelNamespace = str_replace('/', '\\', $modelNamespace);
-        }
-
-        $modelNamespace = trim($modelNamespace, '\\');
-        $rootNamespace = $this->laravel->getNamespace();
-
-        if (! Str::startsWith($modelNamespace, $rootNamespace)) {
-            $modelNamespace = $rootNamespace.$modelNamespace;
-        }
-
-        return $modelNamespace;
-    }
-
-    /**
      * Build the class with the given name.
      *
      * Remove the base controller import if we are already in base namespace.
@@ -112,18 +70,56 @@ class ControllerMakeCommand extends GeneratorCommand
         $controllerNamespace = $this->getNamespace($name);
 
         $replace = [];
+
         if ($this->option('model')) {
-            $modelNamespace = $this->parseModel($this->option('model'));
-            $modelClass = last(explode('\\', $modelNamespace));
+            $modelClass = $this->parseModel($this->option('model'));
+
             $replace = [
-                'DummyModelNamespace' => $modelNamespace,
-                'DummyModelClass' => $modelClass,
-                'DummyModelVariable' => lcfirst($modelClass),
+                'DummyFullModelClass' => $modelClass,
+                'DummyModelClass' => class_basename($modelClass),
+                'DummyModelVariable' => lcfirst(class_basename($modelClass)),
             ];
         }
 
         $replace["use {$controllerNamespace}\Controller;\n"] = '';
 
-        return str_replace(array_keys($replace), array_values($replace), parent::buildClass($name));
+        return str_replace(
+            array_keys($replace), array_values($replace), parent::buildClass($name)
+        );
+    }
+
+    /**
+     * Get the fully-qualified model class name.
+     *
+     * @param  string  $model
+     * @return string
+     */
+    protected function parseModel($model)
+    {
+        if (preg_match('([^A-Za-z0-9_/\\\\])', $model)) {
+            throw new InvalidArgumentException('Model name contains invalid characters.');
+        }
+
+        $model = trim(str_replace('/', '\\', $model), '\\');
+
+        if (! Str::startsWith($model, $rootNamespace = $this->laravel->getNamespace())) {
+            $model = $rootNamespace.$model;
+        }
+
+        return $model;
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['model', 'm', InputOption::VALUE_OPTIONAL, 'Generate a resource controller for the given model.'],
+
+            ['resource', 'r', InputOption::VALUE_NONE, 'Generate a resource controller class.'],
+        ];
     }
 }
