@@ -68,15 +68,18 @@ class FoundationAuthorizesRequestsTraitTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($_SERVER['_test.authorizes.trait.policy']);
     }
 
+    /**
+     * @group something
+     */
     public function test_policy_method_may_be_guessed_passing_class_name()
     {
         unset($_SERVER['_test.authorizes.trait.policy']);
 
         $gate = $this->getBasicGate();
 
-        $gate->policy(FoundationAuthorizesRequestTestClass::class, FoundationAuthorizesRequestTestPolicy::class);
+        $gate->policy('\\'.FoundationAuthorizesRequestTestClass::class, FoundationAuthorizesRequestTestPolicy::class);
 
-        $response = (new FoundationTestAuthorizeTraitClass)->authorize(FoundationAuthorizesRequestTestClass::class);
+        $response = (new FoundationTestAuthorizeTraitClass)->authorize('\\'.FoundationAuthorizesRequestTestClass::class);
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertTrue($_SERVER['_test.authorizes.trait.policy']);
