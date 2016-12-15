@@ -81,6 +81,21 @@ class FoundationMakesHttpRequestsJsonTest extends PHPUnit_Framework_TestCase
 
         $this->fail('Invalid JSON should fail seeJsonEquals');
     }
+
+    public function testSeeJsonResponseOnString()
+    {
+        $this->response = new Illuminate\Http\Response('foo');
+
+        try {
+            $this->dontSeeJson('foo');
+        } catch (PHPUnit_Framework_AssertionFailedError $e) {
+            $this->assertStringStartsWith('Invalid JSON', $e->getMessage());
+
+            return;
+        }
+
+        $this->fail('Invalid JSON should fail seeJsonEquals');
+    }
 }
 
 class JsonSerializableMixedResourcesStub implements JsonSerializable

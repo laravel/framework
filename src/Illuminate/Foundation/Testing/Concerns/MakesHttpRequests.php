@@ -330,11 +330,15 @@ trait MakesHttpRequests
     /**
      * Assert that the response doesn't contain JSON.
      *
-     * @param  array|null  $data
+     * @param  array|string|null  $data
      * @return $this
      */
-    public function dontSeeJson(array $data = null)
+    public function dontSeeJson($data = null)
     {
+        if (! is_null($data) && ! is_array($data)) {
+            $data = (array) $data;
+        }
+
         return $this->seeJson($data, true);
     }
 
