@@ -4,9 +4,11 @@ namespace Illuminate\Console;
 
 use Closure;
 use Illuminate\Contracts\Events\Dispatcher;
+use Symfony\Component\Process\ProcessUtils;
 use Illuminate\Contracts\Container\Container;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
@@ -54,6 +56,37 @@ class Application extends SymfonyApplication implements ApplicationContract
         $events->fire(new Events\ArtisanStarting($this));
 
         $this->bootstrap();
+    }
+
+    /**
+     * Format the given command as a fully-qualified executable command.
+     *
+     * @param  string  $string
+     * @return string
+     */
+    public static function formatCommandString($string)
+    {
+        return sprintf('%s %s %s', static::phpBinary(), static::artisanBinary(), $string);
+    }
+
+    /**
+     * Determine the proper PHP executable.
+     *
+     * @return string
+     */
+    public static function phpBinary()
+    {
+        return ProcessUtils::escapeArgument((new PhpExecutableFinder)->find(false));
+    }
+
+    /**
+     * Determine the proper Artisan executable.
+     *
+     * @return string
+     */
+    public static function artisanBinary()
+    {
+        return defined('ARTISAN_BINARY') ? ProcessUtils::escapeArgument(ARTISAN_BINARY) : 'artisan';
     }
 
     /**

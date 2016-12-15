@@ -980,6 +980,61 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         );
     }
 
+    public function testMapWithKeysIntegerKeys()
+    {
+        $data = new Collection([
+            ['id' => 1, 'name' => 'A'],
+            ['id' => 3, 'name' => 'B'],
+            ['id' => 2, 'name' => 'C'],
+        ]);
+        $data = $data->mapWithKeys(function ($item) {
+            return [$item['id'] => $item];
+        });
+        $this->assertSame(
+            [1, 3, 2],
+            $data->keys()->all()
+        );
+    }
+
+    public function testMapWithKeysMultipleRows()
+    {
+        $data = new Collection([
+            ['id' => 1, 'name' => 'A'],
+            ['id' => 2, 'name' => 'B'],
+            ['id' => 3, 'name' => 'C'],
+        ]);
+        $data = $data->mapWithKeys(function ($item) {
+            return [$item['id'] => $item['name'], $item['name'] => $item['id']];
+        });
+        $this->assertSame(
+            [
+                1 => 'A',
+                'A' => 1,
+                2 => 'B',
+                'B' => 2,
+                3 => 'C',
+                'C' => 3,
+            ],
+            $data->all()
+        );
+    }
+
+    public function testMapWithKeysCallbackKey()
+    {
+        $data = new Collection([
+            3 => ['id' => 1, 'name' => 'A'],
+            5 => ['id' => 3, 'name' => 'B'],
+            4 => ['id' => 2, 'name' => 'C'],
+        ]);
+        $data = $data->mapWithKeys(function ($item, $key) {
+            return [$key => $item['id']];
+        });
+        $this->assertSame(
+            [3, 5, 4],
+            $data->keys()->all()
+        );
+    }
+
     public function testTransform()
     {
         $data = new Collection(['first' => 'taylor', 'last' => 'otwell']);
@@ -1648,7 +1703,35 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         );
     }
 
-    public function testPartitionWithClosure()
+    public function testHigherOrderCollectionMap()
+    {
+        $person1 = (object) ['name' => 'Taylor'];
+        $person2 = (object) ['name' => 'Yaz'];
+
+        $collection = collect([$person1, $person2]);
+
+        $this->assertEquals(['Taylor', 'Yaz'], $collection->map->name->toArray());
+
+        $collection = collect([new TestSupportCollectionHigherOrderItem, new TestSupportCollectionHigherOrderItem]);
+
+        $this->assertEquals(['TAYLOR', 'TAYLOR'], $collection->each->uppercase()->map->name->toArray());
+    }
+
+    public function testHigherOrderCollectionMapFromArrays()
+    {
+        $person1 = ['name' => 'Taylor'];
+        $person2 = ['name' => 'Yaz'];
+
+        $collection = collect([$person1, $person2]);
+
+        $this->assertEquals(['Taylor', 'Yaz'], $collection->map->name->toArray());
+
+        $collection = collect([new TestSupportCollectionHigherOrderItem, new TestSupportCollectionHigherOrderItem]);
+
+        $this->assertEquals(['TAYLOR', 'TAYLOR'], $collection->each->uppercase()->map->name->toArray());
+    }
+
+    public function testPartition()
     {
         $collection = new Collection(range(1, 10));
 
@@ -1693,6 +1776,29 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertCount(2, $collection->partition(function () {
             return true;
         }));
+    }
+
+    public function testHigherOrderPartition()
+    {
+        $courses = new Collection([
+            'a' => ['free' => true], 'b' => ['free' => false], 'c' => ['free' => true],
+        ]);
+
+        list($free, $premium) = $courses->partition->free;
+
+        $this->assertSame(['a' => ['free' => true], 'c' => ['free' => true]], $free->toArray());
+
+        $this->assertSame(['b' => ['free' => false]], $premium->toArray());
+    }
+}
+
+class TestSupportCollectionHigherOrderItem
+{
+    public $name = 'taylor';
+
+    public function uppercase()
+    {
+        $this->name = strtoupper($this->name);
     }
 }
 

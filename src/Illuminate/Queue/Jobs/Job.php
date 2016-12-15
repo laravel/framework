@@ -235,6 +235,26 @@ abstract class Job
     }
 
     /**
+     * The number of times to attempt a job.
+     *
+     * @return int|null
+     */
+    public function maxTries()
+    {
+        return array_get($this->payload(), 'maxTries');
+    }
+
+    /**
+     * The number of seconds the job can run.
+     *
+     * @return int|null
+     */
+    public function timeout()
+    {
+        return array_get($this->payload(), 'timeout');
+    }
+
+    /**
      * Get the name of the queue the job belongs to.
      *
      * @return string

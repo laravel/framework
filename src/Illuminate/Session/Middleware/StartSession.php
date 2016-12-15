@@ -199,7 +199,7 @@ class StartSession
     /**
      * Get the cookie lifetime in seconds.
      *
-     * @return int
+     * @return \DateTimeInterface
      */
     protected function getCookieExpirationDate()
     {

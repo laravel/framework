@@ -132,10 +132,9 @@ class Route
     /**
      * Run the route action and return the response.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
-    public function run(Request $request)
+    public function run()
     {
         $this->container = $this->container ?: new Container;
 
@@ -247,6 +246,10 @@ class Route
      */
     protected function compileRoute()
     {
+        if ($this->compiled) {
+            return;
+        }
+
         $optionals = $this->extractOptionalParameters();
 
         $uri = preg_replace('/\{(\w+?)\?\}/', '{$1}', $this->uri);
@@ -995,7 +998,9 @@ class Route
             throw new LogicException("Unable to prepare route [{$this->uri}] for serialization. Uses Closure.");
         }
 
-        unset($this->router, $this->container, $this->compiled);
+        $this->compileRoute();
+
+        unset($this->router, $this->container);
     }
 
     /**

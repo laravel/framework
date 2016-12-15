@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Log\LogServiceProvider;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Events\EventServiceProvider;
 use Illuminate\Routing\RoutingServiceProvider;
@@ -25,7 +26,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      *
      * @var string
      */
-    const VERSION = '5.3.26';
+    const VERSION = '5.4.0-Dev';
 
     /**
      * The base path for the Laravel installation.
@@ -140,15 +141,15 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function __construct($basePath = null)
     {
+        if ($basePath) {
+            $this->setBasePath($basePath);
+        }
+
         $this->registerBaseBindings();
 
         $this->registerBaseServiceProviders();
 
         $this->registerCoreContainerAliases();
-
-        if ($basePath) {
-            $this->setBasePath($basePath);
-        }
     }
 
     /**
@@ -183,6 +184,8 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     protected function registerBaseServiceProviders()
     {
         $this->register(new EventServiceProvider($this));
+
+        $this->register(new LogServiceProvider($this));
 
         $this->register(new RoutingServiceProvider($this));
     }
@@ -1089,7 +1092,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             'filesystem.disk'      => ['Illuminate\Contracts\Filesystem\Filesystem'],
             'filesystem.cloud'     => ['Illuminate\Contracts\Filesystem\Cloud'],
             'hash'                 => ['Illuminate\Contracts\Hashing\Hasher'],
-            'translator'           => ['Illuminate\Translation\Translator', 'Symfony\Component\Translation\TranslatorInterface'],
+            'translator'           => ['Illuminate\Translation\Translator', 'Illuminate\Contracts\Translation\Translator'],
             'log'                  => ['Illuminate\Log\Writer', 'Illuminate\Contracts\Logging\Log', 'Psr\Log\LoggerInterface'],
             'mailer'               => ['Illuminate\Mail\Mailer', 'Illuminate\Contracts\Mail\Mailer', 'Illuminate\Contracts\Mail\MailQueue'],
             'auth.password'        => ['Illuminate\Auth\Passwords\PasswordBrokerManager', 'Illuminate\Contracts\Auth\PasswordBrokerFactory'],
@@ -1100,7 +1103,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             'redirect'             => ['Illuminate\Routing\Redirector'],
             'redis'                => ['Illuminate\Redis\Database', 'Illuminate\Contracts\Redis\Database'],
             'request'              => ['Illuminate\Http\Request', 'Symfony\Component\HttpFoundation\Request'],
-            'router'               => ['Illuminate\Routing\Router', 'Illuminate\Contracts\Routing\Registrar'],
+            'router'               => ['Illuminate\Routing\Router', 'Illuminate\Contracts\Routing\Registrar', 'Illuminate\Contracts\Routing\BindingRegistrar'],
             'session'              => ['Illuminate\Session\SessionManager'],
             'session.store'        => ['Illuminate\Session\Store', 'Symfony\Component\HttpFoundation\Session\SessionInterface'],
             'url'                  => ['Illuminate\Routing\UrlGenerator', 'Illuminate\Contracts\Routing\UrlGenerator'],

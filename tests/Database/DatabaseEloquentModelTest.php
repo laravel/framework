@@ -233,9 +233,21 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($model->save());
     }
 
+    public function testEventsCanBeFiredWithCustomEventObjects()
+    {
+        $model = $this->getMockBuilder('EloquentModelEventObjectStub')->setMethods(['newQueryWithoutScopes'])->getMock();
+        $query = m::mock('Illuminate\Database\Eloquent\Builder');
+        $model->expects($this->once())->method('newQueryWithoutScopes')->will($this->returnValue($query));
+        $model->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
+        $events->shouldReceive('until')->once()->with(m::type(EloquentModelSavingEventStub::class))->andReturn(false);
+        $model->exists = true;
+
+        $this->assertFalse($model->save());
+    }
+
     public function testUpdateProcessWithoutTimestamps()
     {
-        $model = $this->getMockBuilder('EloquentModelStub')->setMethods(['newQueryWithoutScopes', 'updateTimestamps', 'fireModelEvent'])->getMock();
+        $model = $this->getMockBuilder('EloquentModelEventObjectStub')->setMethods(['newQueryWithoutScopes', 'updateTimestamps', 'fireModelEvent'])->getMock();
         $model->timestamps = false;
         $query = m::mock('Illuminate\Database\Eloquent\Builder');
         $query->shouldReceive('where')->once()->with('id', '=', 1);
@@ -1016,6 +1028,87 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('table.other', $relation->getOtherKey());
         $this->assertSame($model, $relation->getParent());
         $this->assertInstanceOf('EloquentModelSaveStub', $relation->getQuery()->getModel());
+    }
+
+    public function testRelationsWithVariedConnections()
+    {
+        // Has one
+        $model = new EloquentModelStub;
+        $model->setConnection('non_default');
+        $this->addMockConnection($model);
+        $relation = $model->hasOne('EloquentNoConnectionModelStub');
+        $this->assertEquals('non_default', $relation->getRelated()->getConnectionName());
+
+        $model = new EloquentModelStub;
+        $model->setConnection('non_default');
+        $this->addMockConnection($model);
+        $relation = $model->hasOne('EloquentDifferentConnectionModelStub');
+        $this->assertEquals('different_connection', $relation->getRelated()->getConnectionName());
+
+        // Morph One
+        $model = new EloquentModelStub;
+        $model->setConnection('non_default');
+        $this->addMockConnection($model);
+        $relation = $model->morphOne('EloquentNoConnectionModelStub', 'type');
+        $this->assertEquals('non_default', $relation->getRelated()->getConnectionName());
+
+        $model = new EloquentModelStub;
+        $model->setConnection('non_default');
+        $this->addMockConnection($model);
+        $relation = $model->morphOne('EloquentDifferentConnectionModelStub', 'type');
+        $this->assertEquals('different_connection', $relation->getRelated()->getConnectionName());
+
+        // Belongs to
+        $model = new EloquentModelStub;
+        $model->setConnection('non_default');
+        $this->addMockConnection($model);
+        $relation = $model->belongsTo('EloquentNoConnectionModelStub');
+        $this->assertEquals('non_default', $relation->getRelated()->getConnectionName());
+
+        $model = new EloquentModelStub;
+        $model->setConnection('non_default');
+        $this->addMockConnection($model);
+        $relation = $model->belongsTo('EloquentDifferentConnectionModelStub');
+        $this->assertEquals('different_connection', $relation->getRelated()->getConnectionName());
+
+        // has many
+        $model = new EloquentModelStub;
+        $model->setConnection('non_default');
+        $this->addMockConnection($model);
+        $relation = $model->hasMany('EloquentNoConnectionModelStub');
+        $this->assertEquals('non_default', $relation->getRelated()->getConnectionName());
+
+        $model = new EloquentModelStub;
+        $model->setConnection('non_default');
+        $this->addMockConnection($model);
+        $relation = $model->hasMany('EloquentDifferentConnectionModelStub');
+        $this->assertEquals('different_connection', $relation->getRelated()->getConnectionName());
+
+        // has many through
+        $model = new EloquentModelStub;
+        $model->setConnection('non_default');
+        $this->addMockConnection($model);
+        $relation = $model->hasManyThrough('EloquentNoConnectionModelStub', 'EloquentModelSaveStub');
+        $this->assertEquals('non_default', $relation->getRelated()->getConnectionName());
+
+        $model = new EloquentModelStub;
+        $model->setConnection('non_default');
+        $this->addMockConnection($model);
+        $relation = $model->hasManyThrough('EloquentDifferentConnectionModelStub', 'EloquentModelSaveStub');
+        $this->assertEquals('different_connection', $relation->getRelated()->getConnectionName());
+
+        // belongs to many
+        $model = new EloquentModelStub;
+        $model->setConnection('non_default');
+        $this->addMockConnection($model);
+        $relation = $model->belongsToMany('EloquentNoConnectionModelStub');
+        $this->assertEquals('non_default', $relation->getRelated()->getConnectionName());
+
+        $model = new EloquentModelStub;
+        $model->setConnection('non_default');
+        $this->addMockConnection($model);
+        $relation = $model->belongsToMany('EloquentDifferentConnectionModelStub');
+        $this->assertEquals('different_connection', $relation->getRelated()->getConnectionName());
     }
 
     public function testModelsAssumeTheirName()
@@ -1817,4 +1910,24 @@ class EloquentModelNonIncrementingStub extends Illuminate\Database\Eloquent\Mode
     protected $table = 'stub';
     protected $guarded = [];
     public $incrementing = false;
+}
+
+class EloquentNoConnectionModelStub extends EloquentModelStub
+{
+}
+
+class EloquentDifferentConnectionModelStub extends EloquentModelStub
+{
+    public $connection = 'different_connection';
+}
+
+class EloquentModelSavingEventStub
+{
+}
+
+class EloquentModelEventObjectStub extends Illuminate\Database\Eloquent\Model
+{
+    protected $events = [
+        'saving' => EloquentModelSavingEventStub::class,
+    ];
 }

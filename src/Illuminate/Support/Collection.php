@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use Countable;
+use Exception;
 use ArrayAccess;
 use Traversable;
 use ArrayIterator;
@@ -625,7 +626,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function mapWithKeys(callable $callback)
     {
-        return $this->flatMap($callback);
+        $result = [];
+
+        foreach ($this->items as $key => $value) {
+            $assoc = $callback($value, $key);
+
+            foreach ($assoc as $mapKey => $mapValue) {
+                $result[$mapKey] = $mapValue;
+            }
+        }
+
+        return new static($result);
     }
 
     /**
@@ -1377,5 +1388,25 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         return (array) $items;
+    }
+
+    /**
+     * Dynamically access collection proxies.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    public function __get($key)
+    {
+        $proxies = [
+            'each', 'map', 'first', 'partition', 'sortBy',
+            'sortByDesc', 'sum', 'reject', 'filter',
+        ];
+
+        if (! in_array($key, $proxies)) {
+            throw new Exception("Property [{$key}] does not exist on this collection instance.");
+        }
+
+        return new HigherOrderCollectionProxy($this, $key);
     }
 }

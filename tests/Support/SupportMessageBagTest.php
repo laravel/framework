@@ -188,4 +188,13 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase
         $messageBag = new MessageBag(['country' => 'Azerbaijan', 'capital' => 'Baku']);
         $this->assertEquals(['country' => ['Azerbaijan'], 'capital' => ['Baku']], $messageBag->getMessages());
     }
+
+    public function testFirstFindsMessageForWildcardKey()
+    {
+        $container = new MessageBag;
+        $container->setFormat(':message');
+        $container->add('foo.bar', 'baz');
+        $messages = $container->getMessages();
+        $this->assertEquals('baz', $container->first('foo.*'));
+    }
 }

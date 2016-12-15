@@ -11,6 +11,14 @@ class TestSeeder extends Seeder
     }
 }
 
+class TestDepsSeeder extends Seeder
+{
+    public function run(Mockery\Mock $someDependency)
+    {
+        //
+    }
+}
+
 class DatabaseSeederTest extends PHPUnit_Framework_TestCase
 {
     public function tearDown()
@@ -27,10 +35,10 @@ class DatabaseSeederTest extends PHPUnit_Framework_TestCase
         $command = m::mock('Illuminate\Console\Command');
         $command->shouldReceive('getOutput')->once()->andReturn($output);
         $seeder->setCommand($command);
-        $container->shouldReceive('make')->once()->with('ClassName')->andReturn($child = m::mock('StdClass'));
+        $container->shouldReceive('make')->once()->with('ClassName')->andReturn($child = m::mock(Seeder::class));
         $child->shouldReceive('setContainer')->once()->with($container)->andReturn($child);
         $child->shouldReceive('setCommand')->once()->with($command)->andReturn($child);
-        $child->shouldReceive('run')->once();
+        $child->shouldReceive('__invoke')->once();
 
         $seeder->call('ClassName');
     }
@@ -47,5 +55,18 @@ class DatabaseSeederTest extends PHPUnit_Framework_TestCase
         $seeder = new TestSeeder;
         $command = m::mock('Illuminate\Console\Command');
         $this->assertEquals($seeder->setCommand($command), $seeder);
+    }
+
+    public function testInjectDependenciesOnRunMethod()
+    {
+        $container = m::mock('Illuminate\Container\Container');
+        $container->shouldReceive('call');
+
+        $seeder = new TestDepsSeeder;
+        $seeder->setContainer($container);
+
+        $seeder->__invoke();
+
+        $container->shouldHaveReceived('call')->once()->with([$seeder, 'run']);
     }
 }

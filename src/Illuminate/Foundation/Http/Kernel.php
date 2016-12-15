@@ -36,7 +36,6 @@ class Kernel implements KernelContract
     protected $bootstrappers = [
         'Illuminate\Foundation\Bootstrap\DetectEnvironment',
         'Illuminate\Foundation\Bootstrap\LoadConfiguration',
-        'Illuminate\Foundation\Bootstrap\ConfigureLogging',
         'Illuminate\Foundation\Bootstrap\HandleExceptions',
         'Illuminate\Foundation\Bootstrap\RegisterFacades',
         'Illuminate\Foundation\Bootstrap\RegisterProviders',
@@ -99,7 +98,7 @@ class Kernel implements KernelContract
         }
 
         foreach ($this->routeMiddleware as $key => $middleware) {
-            $router->middleware($key, $middleware);
+            $router->aliasMiddleware($key, $middleware);
         }
     }
 
