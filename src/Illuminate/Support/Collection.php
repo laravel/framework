@@ -649,7 +649,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         $callback = $this->valueRetriever($callback);
 
-        return $this->reduce(function ($result, $item) use ($callback) {
+        return $this->filter()->reduce(function ($result, $item) use ($callback) {
             $value = $callback($item);
 
             return is_null($result) || $value > $result ? $value : $result;
@@ -699,7 +699,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         $callback = $this->valueRetriever($callback);
 
-        return $this->reduce(function ($result, $item) use ($callback) {
+        return $this->filter()->reduce(function ($result, $item) use ($callback) {
             $value = $callback($item);
 
             return is_null($result) || $value < $result ? $value : $result;
