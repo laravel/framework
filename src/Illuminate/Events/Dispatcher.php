@@ -325,7 +325,7 @@ class Dispatcher implements DispatcherContract
     /**
      * Register an event listener with the dispatcher.
      *
-     * @param  mixed  $listener
+     * @param  string|\Closure  $listener
      * @return mixed
      */
     public function makeListener($listener)
@@ -336,16 +336,14 @@ class Dispatcher implements DispatcherContract
     /**
      * Create a class based listener using the IoC container.
      *
-     * @param  mixed  $listener
+     * @param  string  $listener
      * @return \Closure
      */
     public function createClassListener($listener)
     {
-        $container = $this->container;
-
-        return function () use ($listener, $container) {
+        return function () use ($listener) {
             return call_user_func_array(
-                $this->createClassCallable($listener, $container), func_get_args()
+                $this->createClassCallable($listener), func_get_args()
             );
         };
     }
@@ -354,17 +352,16 @@ class Dispatcher implements DispatcherContract
      * Create the class based event callable.
      *
      * @param  string  $listener
-     * @param  \Illuminate\Container\Container  $container
      * @return callable
      */
-    protected function createClassCallable($listener, $container)
+    protected function createClassCallable($listener)
     {
         list($class, $method) = $this->parseClassCallable($listener);
 
         if ($this->handlerShouldBeQueued($class)) {
             return $this->createQueuedHandlerCallable($class, $method);
         } else {
-            return [$container->make($class), $method];
+            return [$this->container->make($class), $method];
         }
     }
 
