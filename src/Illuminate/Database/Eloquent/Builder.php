@@ -1070,6 +1070,18 @@ class Builder
     }
 
     /**
+     * Add subselect queries to average a column value of a relation.
+     *
+     * @param  mixed  $relation
+     * @param  string $column
+     * @return $this
+     */
+    public function withAvg($relation, $column)
+    {
+        return $this->withAggregate('avg', $relation, $column);
+    }
+
+    /**
      * Add subselect queries to count the relations.
      *
      * @param  mixed  $relations
@@ -1077,11 +1089,74 @@ class Builder
      */
     public function withCount($relations)
     {
+        $relations = is_array($relations) ? $relations : func_get_args();
+        return $this->withAggregate('count', $relations, '*');
+    }
+
+    /**
+     * Add subselect queries to get max column value of a relation.
+     *
+     * @param  mixed  $relation
+     * @param  string $column
+     * @return $this
+     */
+    public function withMax($relation, $column)
+    {
+        return $this->withAggregate('max', $relation, $column);
+    }
+
+    /**
+     * Add subselect queries to get min column value of a relation.
+     *
+     * @param  mixed  $relation
+     * @param  string $column
+     * @return $this
+     */
+    public function withMin($relation, $column)
+    {
+        return $this->withAggregate('min', $relation, $column);
+    }
+
+    /**
+     * Add subselect queries to sum a column value of a relation.
+     *
+     * @param  mixed  $relation
+     * @param  string $column
+     * @return $this
+     */
+    public function withSum($relation, $column)
+    {
+        return $this->withAggregate('sum', $relation, $column);
+    }
+
+    /**
+     * Add subselect queries to aggregate a column value of a relation.
+     *
+     * @param  string $aggregate
+     * @param  mixed  $relation
+     * @param  string $column
+     * @return $this
+     */
+    protected function withAggregate($aggregate, $relation, $column)
+    {
+        return $this->withRaw($relation, new Expression($aggregate.'('.$column.')'), $aggregate);
+    }
+
+    /**
+     * Add subselect queries to aggregate all rows or a column value of a relation.
+     *
+     * @param  array|mixed  $relations
+     * @param  mixed        $expression
+     * @param  string       $suffix
+     * @return $this
+     */
+    public function withRaw($relations, $expression, $suffix = null)
+    {
         if (is_null($this->query->columns)) {
             $this->query->select(['*']);
         }
 
-        $relations = is_array($relations) ? $relations : func_get_args();
+        $relations = is_array($relations) ? $relations : [$relations];
 
         foreach ($this->parseWithRelations($relations) as $name => $constraints) {
             // First we will determine if the name has been aliased using an "as" clause on the name
@@ -1095,11 +1170,11 @@ class Builder
 
             $relation = $this->getHasRelationQuery($name);
 
-            // Here we will get the relationship count query and prepare to add it to the main query
-            // as a sub-select. First, we'll get the "has" query and use that to get the relation
-            // count query. We will normalize the relation name then append _count as the name.
-            $query = $relation->getRelationCountQuery(
-                $relation->getRelated()->newQuery(), $this
+            // Here we will get the relationship query and prepare to add it to the main query
+            // as a sub-select. First, we'll get the "has" query and use that to get the raw relation
+            // query.
+            $query = $relation->getRelationQuery(
+                $relation->getRelated()->newQuery(), $this, $expression
             );
 
             $query->callScope($constraints);
@@ -1107,57 +1182,16 @@ class Builder
             $query->mergeModelDefinedRelationConstraints($relation->getQuery());
 
             // Finally we will add the proper result column alias to the query and run the subselect
-            // statement against the query builder. Then we will return the builder instance back
-            // to the developer for further constraint chaining that needs to take place on it.
-            $column = snake_case(isset($alias) ? $alias : $name).'_count';
-
-            $this->selectSub($query->toBase(), $column);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Add subselect queries to sum a column value of a relation.
-     *
-     * @param  mixed  $relations
-     * @return $this
-     */
-    public function withSum($relation, $column)
-    {
-        if (is_null($this->query->columns)) {
-            $this->query->select(['*']);
-        }
-
-        $relation = is_array($relation) ? $relation : [$relation];
-
-        foreach ($this->parseWithRelations($relation) as $name => $constraints) {
-            // First we will determine if the name has been aliased using an "as" clause on the name
-            // and if it has we will extract the actual relationship name and the desired name of
-            // the resulting column. This allows multiple counts on the same relationship name.
-            $segments = explode(' ', $name);
-
-            if (count($segments) == 3 && Str::lower($segments[1]) == 'as') {
-                list($name, $alias) = [$segments[0], $segments[2]];
+            // statement against the query builder. If the alias has not been set, we will normalize
+            // the relation name then append _$suffix as the name. Then we will return the builder
+            // instance back to the developer for further constraint chaining that needs to take
+            // place on it.
+            if (isset($alias)) {
+                $column = snake_case($alias);
+                unset($alias);
+            } else {
+                $column = snake_case($name.'_'.(is_null($suffix) ? 'aggregate' : $suffix));
             }
-
-            $relation = $this->getHasRelationQuery($name);
-
-            // Here we will get the relationship sum query and prepare to add it to the main query
-            // as a sub-select. First, we'll get the "has" query and use that to get the relation
-            // sum query. We will normalize the relation name then append _sum as the name.
-            $query = $relation->getRelationSumQuery(
-                $relation->getRelated()->newQuery(), $column, $this
-            );
-
-            $query->callScope($constraints);
-
-            $query->mergeModelDefinedRelationConstraints($relation->getQuery());
-
-            // Finally we will add the proper result column alias to the query and run the subselect
-            // statement against the query builder. Then we will return the builder instance back
-            // to the developer for further constraint chaining that needs to take place on it.
-            $column = snake_case(isset($alias) ? $alias : $name).'_sum';
 
             $this->selectSub($query->toBase(), $column);
         }
