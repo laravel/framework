@@ -7,6 +7,7 @@ use Swift_Mailer;
 use Swift_Message;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
+use Illuminate\Support\HtmlString;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Container\Container;
@@ -44,6 +45,13 @@ class Mailer implements MailerContract, MailQueueContract
      * @var array
      */
     protected $from;
+
+    /**
+     * The global reply-to address and name.
+     *
+     * @var array
+     */
+    protected $replyTo;
 
     /**
      * The global to address and name.
@@ -98,6 +106,18 @@ class Mailer implements MailerContract, MailQueueContract
     public function alwaysFrom($address, $name = null)
     {
         $this->from = compact('address', 'name');
+    }
+
+    /**
+     * Set the global reply-to address and name.
+     *
+     * @param  string  $address
+     * @param  string|null  $name
+     * @return void
+     */
+    public function alwaysReplyTo($address, $name = null)
+    {
+        $this->replyTo = compact('address', 'name');
     }
 
     /**
@@ -189,6 +209,8 @@ class Mailer implements MailerContract, MailQueueContract
 
         if (isset($this->to['address'])) {
             $message->to($this->to['address'], $this->to['name'], true);
+            $message->cc($this->to['address'], $this->to['name'], true);
+            $message->bcc($this->to['address'], $this->to['name'], true);
         }
 
         $message = $message->getSwiftMessage();
@@ -344,9 +366,9 @@ class Mailer implements MailerContract, MailQueueContract
             return [$view[0], $view[1], null];
         }
 
-        // If the view is an array but doesn't contain numeric keys, we will assume
-        // the views are being explicitly specified and will extract them via
-        // named keys instead, allowing the devs to use one or the other.
+        // If this view is an array but doesn't contain numeric keys, we will assume
+        // the views are being explicitly specified and will extract them via the
+        // named keys instead, allowing the developers to use one or the other.
         if (is_array($view)) {
             return [
                 Arr::get($view, 'html'),
@@ -373,7 +395,7 @@ class Mailer implements MailerContract, MailQueueContract
         try {
             return $this->swift->send($message, $this->failedRecipients);
         } finally {
-            $this->swift->getTransport()->stop();
+            $this->forceReconnection();
         }
     }
 
@@ -415,6 +437,13 @@ class Mailer implements MailerContract, MailQueueContract
             $message->from($this->from['address'], $this->from['name']);
         }
 
+        // When a global reply address was specified we will set this on every message
+        // instances so the developer does not have to repeat themselves every time
+        // they create a new message. We will just go ahead and push the address.
+        if (! empty($this->replyTo['address'])) {
+            $message->replyTo($this->replyTo['address'], $this->replyTo['name']);
+        }
+
         return $message;
     }
 
@@ -427,7 +456,9 @@ class Mailer implements MailerContract, MailQueueContract
      */
     protected function getView($view, $data)
     {
-        return $this->views->make($view, $data)->render();
+        return $view instanceof HtmlString
+                        ? $view->toHtml()
+                        : $this->views->make($view, $data)->render();
     }
 
     /**

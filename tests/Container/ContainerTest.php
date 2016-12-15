@@ -509,6 +509,23 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('taylor', $result[1]);
     }
 
+    public function testCallWithBoundMethod()
+    {
+        $container = new Container;
+        $container->bindMethod('ContainerTestCallStub@unresolvable', function ($stub) {
+            return $stub->unresolvable('foo', 'bar');
+        });
+        $result = $container->call('ContainerTestCallStub@unresolvable');
+        $this->assertEquals(['foo', 'bar'], $result);
+
+        $container = new Container;
+        $container->bindMethod('ContainerTestCallStub@unresolvable', function ($stub) {
+            return $stub->unresolvable('foo', 'bar');
+        });
+        $result = $container->call([new ContainerTestCallStub, 'unresolvable']);
+        $this->assertEquals(['foo', 'bar'], $result);
+    }
+
     public function testContainerCanInjectDifferentImplementationsDependingOnContext()
     {
         $container = new Container;
@@ -809,6 +826,11 @@ class ContainerTestCallStub
     }
 
     public function inject(ContainerConcreteStub $stub, $default = 'taylor')
+    {
+        return func_get_args();
+    }
+
+    public function unresolvable($foo, $bar)
     {
         return func_get_args();
     }

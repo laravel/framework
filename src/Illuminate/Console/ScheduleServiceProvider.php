@@ -20,7 +20,10 @@ class ScheduleServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->commands('Illuminate\Console\Scheduling\ScheduleRunCommand');
+        $this->commands([
+            'Illuminate\Console\Scheduling\ScheduleRunCommand',
+            'Illuminate\Console\Scheduling\ScheduleFinishCommand',
+        ]);
     }
 
     /**
@@ -32,6 +35,7 @@ class ScheduleServiceProvider extends ServiceProvider
     {
         return [
             'Illuminate\Console\Scheduling\ScheduleRunCommand',
+            'Illuminate\Console\Scheduling\ScheduleFinishCommand',
         ];
     }
 }

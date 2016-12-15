@@ -209,7 +209,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
     {
         $factory = $this->getFactory();
         $view = m::mock('Illuminate\View\View');
-        $view->shouldReceive('getName')->once()->andReturn('name');
+        $view->shouldReceive('name')->once()->andReturn('name');
         $factory->getDispatcher()->shouldReceive('fire')->once()->with('composing: name', [$view]);
 
         $factory->callComposer($view);
@@ -243,9 +243,10 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
 
     public function testSectionExtending()
     {
+        $placeholder = Illuminate\View\Factory::parentPlaceholder();
         $factory = $this->getFactory();
         $factory->startSection('foo');
-        echo 'hi @parent';
+        echo 'hi '.$placeholder;
         $factory->stopSection();
         $factory->startSection('foo');
         echo 'there';
@@ -255,17 +256,47 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
 
     public function testSectionMultipleExtending()
     {
+        $placeholder = Illuminate\View\Factory::parentPlaceholder();
         $factory = $this->getFactory();
         $factory->startSection('foo');
-        echo 'hello @parent nice to see you @parent';
+        echo 'hello '.$placeholder.' nice to see you '.$placeholder;
         $factory->stopSection();
         $factory->startSection('foo');
-        echo 'my @parent';
+        echo 'my '.$placeholder;
         $factory->stopSection();
         $factory->startSection('foo');
         echo 'friend';
         $factory->stopSection();
         $this->assertEquals('hello my friend nice to see you my friend', $factory->yieldContent('foo'));
+    }
+
+    public function testComponentHandling()
+    {
+        $factory = $this->getFactory();
+        $factory->getFinder()->shouldReceive('find')->andReturn(__DIR__.'/fixtures/component.php');
+        $factory->getEngineResolver()->shouldReceive('resolve')->andReturn(new Illuminate\View\Engines\PhpEngine);
+        $factory->getDispatcher()->shouldReceive('fire');
+        $factory->startComponent('component', ['name' => 'Taylor']);
+        $factory->slot('title');
+        echo 'title<hr>';
+        $factory->endSlot();
+        echo 'component';
+        $contents = $factory->renderComponent();
+        $this->assertEquals('title<hr> component Taylor', $contents);
+    }
+
+    public function testTranslation()
+    {
+        $container = new Illuminate\Container\Container;
+        $container->instance('translator', $translator = m::mock('StdClass'));
+        $translator->shouldReceive('getFromJson')->with('Foo', ['name' => 'taylor'])->andReturn('Bar');
+        $factory = $this->getFactory();
+        $factory->setContainer($container);
+        $factory->startTranslation(['name' => 'taylor']);
+        echo 'Foo';
+        $string = $factory->renderTranslation();
+
+        $this->assertEquals('Bar', $string);
     }
 
     public function testSingleStackPush()
@@ -287,18 +318,6 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         echo ', Hello!';
         $factory->stopPush();
         $this->assertEquals('hi, Hello!', $factory->yieldPushContent('foo'));
-
-        // mimic a parent view is rendering
-        $factory->incrementRender();
-        $factory->startPush('foo');
-        echo 'Dear ';
-        $factory->stopPush();
-        $factory->startPush('foo');
-        echo 'friend';
-        $factory->stopPush();
-        $factory->decrementRender();
-
-        $this->assertEquals('Dear friendhi, Hello!', $factory->yieldPushContent('foo'));
     }
 
     public function testSessionAppending()

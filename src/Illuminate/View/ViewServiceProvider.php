@@ -4,6 +4,7 @@ namespace Illuminate\View;
 
 use Illuminate\View\Engines\PhpEngine;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\View\Engines\FileEngine;
 use Illuminate\View\Engines\CompilerEngine;
 use Illuminate\View\Engines\EngineResolver;
 use Illuminate\View\Compilers\BladeCompiler;
@@ -37,11 +38,24 @@ class ViewServiceProvider extends ServiceProvider
             // Next we will register the various engines with the resolver so that the
             // environment can resolve the engines it needs for various views based
             // on the extension of view files. We call a method for each engines.
-            foreach (['php', 'blade'] as $engine) {
+            foreach (['file', 'php', 'blade'] as $engine) {
                 $this->{'register'.ucfirst($engine).'Engine'}($resolver);
             }
 
             return $resolver;
+        });
+    }
+
+    /**
+     * Register the file engine implementation.
+     *
+     * @param  \Illuminate\View\Engines\EngineResolver  $resolver
+     * @return void
+     */
+    public function registerFileEngine($resolver)
+    {
+        $resolver->register('file', function () {
+            return new FileEngine;
         });
     }
 

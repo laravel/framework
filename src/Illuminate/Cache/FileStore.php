@@ -5,8 +5,8 @@ namespace Illuminate\Cache;
 use Exception;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Contracts\Cache\Store;
+use Illuminate\Filesystem\Filesystem;
 
 class FileStore implements Store
 {
@@ -182,15 +182,21 @@ class FileStore implements Store
     /**
      * Remove all items from the cache.
      *
-     * @return void
+     * @return bool
      */
     public function flush()
     {
         if ($this->files->isDirectory($this->directory)) {
             foreach ($this->files->directories($this->directory) as $directory) {
-                $this->files->deleteDirectory($directory);
+                if (! $this->files->deleteDirectory($directory)) {
+                    return false;
+                }
             }
+
+            return true;
         }
+
+        return false;
     }
 
     /**

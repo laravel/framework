@@ -163,7 +163,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $router->get('foo/bar', ['middleware' => 'foo', function () {
             return 'hello';
         }]);
-        $router->middleware('foo', function ($request, $next) {
+        $router->aliasMiddleware('foo', function ($request, $next) {
             return 'caught';
         });
         $this->assertEquals('caught', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
@@ -176,7 +176,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
             'uses' => 'RouteTestClosureMiddlewareController@index',
             'middleware' => 'foo',
         ]);
-        $router->middleware('foo', function ($request, $next) {
+        $router->aliasMiddleware('foo', function ($request, $next) {
             $request['foo-middleware'] = 'foo-middleware';
 
             return $next($request);
@@ -234,7 +234,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
             return 'hello';
         }]);
 
-        $router->middleware('two', 'RoutingTestMiddlewareGroupTwo');
+        $router->aliasMiddleware('two', 'RoutingTestMiddlewareGroupTwo');
         $router->middlewareGroup('web', ['RoutingTestMiddlewareGroupOne', 'two:taylor']);
 
         $this->assertEquals('caught taylor', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
@@ -251,7 +251,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
             return 'hello';
         }]);
 
-        $router->middleware('two', 'RoutingTestMiddlewareGroupTwo');
+        $router->aliasMiddleware('two', 'RoutingTestMiddlewareGroupTwo');
         $router->middlewareGroup('first', ['two:abigail']);
         $router->middlewareGroup('web', ['RoutingTestMiddlewareGroupOne', 'first']);
 
@@ -729,6 +729,18 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $routes[0]->getPrefix());
     }
 
+    public function testRouteGroupingFromFile()
+    {
+        $router = $this->getRouter();
+        $router->group(['prefix' => 'api'], __DIR__.'/fixtures/routes.php');
+
+        $route = last($router->getRoutes()->get());
+        $request = Request::create('api/users', 'GET');
+
+        $this->assertTrue($route->matches($request));
+        $this->assertEquals('all-users', $route->bind($request)->run($request));
+    }
+
     public function testRouteGroupingWithAs()
     {
         $router = $this->getRouter();
@@ -921,6 +933,17 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('foo-bars/{foo_bar}', $routes[0]->getUri());
         $this->assertEquals('prefix.foo-bars.show', $routes[0]->getName());
+
+        ResourceRegistrar::verbs([
+            'create' => 'ajouter',
+            'edit' => 'modifier',
+        ]);
+        $router = $this->getRouter();
+        $router->resource('foo', 'FooController');
+        $routes = $router->getRoutes();
+
+        $this->assertEquals('foo/ajouter', $routes->getByName('foo.create')->getUri());
+        $this->assertEquals('foo/{foo}/modifier', $routes->getByName('foo.edit')->getUri());
     }
 
     public function testResourceRoutingParameters()
@@ -1008,6 +1031,17 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo'));
         $this->assertTrue($router->getRoutes()->hasNamedRoute('bar'));
+
+        $router = $this->getRouter();
+        $router->resource('foo', 'FooController', ['names' => 'bar']);
+
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('bar.index'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('bar.show'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('bar.create'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('bar.store'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('bar.edit'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('bar.update'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('bar.destroy'));
     }
 
     public function testRouterFiresRoutedEvent()

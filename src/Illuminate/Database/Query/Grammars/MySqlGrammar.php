@@ -128,7 +128,7 @@ class MySqlGrammar extends Grammar
 
         $sql = rtrim("update {$table}{$joins} set $columns $where");
 
-        if (isset($query->orders)) {
+        if (! empty($query->orders)) {
             $sql .= ' '.$this->compileOrders($query, $query->orders);
         }
 
@@ -166,17 +166,14 @@ class MySqlGrammar extends Grammar
      */
     public function prepareBindingsForUpdate(array $bindings, array $values)
     {
-        $index = 0;
-
         foreach ($values as $column => $value) {
-            if ($this->isJsonSelector($column) && is_bool($value)) {
-                unset($bindings[$index]);
+            if ($this->isJsonSelector($column) &&
+                in_array(gettype($value), ['boolean', 'integer', 'double'])) {
+                unset($values[$column]);
             }
-
-            $index++;
         }
 
-        return $bindings;
+        return parent::prepareBindingsForUpdate($bindings, $values);
     }
 
     /**
@@ -198,7 +195,7 @@ class MySqlGrammar extends Grammar
         } else {
             $sql = trim("delete from $table $where");
 
-            if (isset($query->orders)) {
+            if (! empty($query->orders)) {
                 $sql .= ' '.$this->compileOrders($query, $query->orders);
             }
 
@@ -241,7 +238,11 @@ class MySqlGrammar extends Grammar
 
         $field = $this->wrapValue(array_shift($path));
 
-        return $field.'->'.'"$.'.implode('.', $path).'"';
+        $path = collect($path)->map(function ($part) {
+            return '"'.$part.'"';
+        })->implode('.');
+
+        return sprintf('%s->\'$.%s\'', $field, $path);
     }
 
     /**

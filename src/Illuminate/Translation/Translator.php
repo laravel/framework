@@ -2,6 +2,7 @@
 
 namespace Illuminate\Translation;
 
+use Countable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
@@ -127,6 +128,34 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     }
 
     /**
+     * Get the translation for a given key from the JSON translation files.
+     *
+     * @param  string  $key
+     * @param  array  $replace
+     * @param  string  $locale
+     * @return string
+     */
+    public function getFromJson($key, array $replace = [], $locale = null)
+    {
+        $locale = $locale ?: $this->locale;
+
+        $this->load('*', '*', $locale);
+
+        $line = isset($this->loaded['*']['*'][$locale][$key])
+                    ? $this->loaded['*']['*'][$locale][$key] : null;
+
+        if (! isset($line)) {
+            $fallbackLine = $this->get($key, $replace, $locale);
+
+            if ($fallbackLine !== $key) {
+                return $fallbackLine;
+            }
+        }
+
+        return $this->makeReplacements($line ?: $key, $replace);
+    }
+
+    /**
      * Add translation lines to the given locale.
      *
      * @param  array  $lines
@@ -196,7 +225,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     {
         return (new Collection($replace))->sortBy(function ($value, $key) {
             return mb_strlen($key) * -1;
-        });
+        })->all();
     }
 
     /**
@@ -212,7 +241,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     {
         $line = $this->get($key, $replace, $locale = $locale ?: $this->locale ?: $this->fallback);
 
-        if (is_array($number) || $number instanceof \Countable) {
+        if (is_array($number) || $number instanceof Countable) {
             $number = count($number);
         }
 

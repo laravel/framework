@@ -5,11 +5,11 @@ namespace Illuminate\Foundation\Console;
 use Closure;
 use Exception;
 use Throwable;
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Console\Application as Artisan;
-use Illuminate\Console\Events\ArtisanStarting;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Console\Kernel as KernelContract;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 
@@ -94,7 +94,7 @@ class Kernel implements KernelContract
     protected function defineConsoleSchedule()
     {
         $this->app->instance(
-            'Illuminate\Console\Scheduling\Schedule', $schedule = new Schedule
+            'Illuminate\Console\Scheduling\Schedule', $schedule = new Schedule($this->app[Cache::class])
         );
 
         $this->schedule($schedule);
@@ -180,8 +180,8 @@ class Kernel implements KernelContract
     {
         $command = new ClosureCommand($signature, $callback);
 
-        $this->app['events']->listen(ArtisanStarting::class, function ($event) use ($command) {
-            $event->artisan->add($command);
+        Artisan::starting(function ($artisan) use ($command) {
+            $artisan->add($command);
         });
 
         return $command;
@@ -208,6 +208,12 @@ class Kernel implements KernelContract
     public function call($command, array $parameters = [])
     {
         $this->bootstrap();
+
+        if (! $this->commandsLoaded) {
+            $this->commands();
+
+            $this->commandsLoaded = true;
+        }
 
         return $this->getArtisan()->call($command, $parameters);
     }

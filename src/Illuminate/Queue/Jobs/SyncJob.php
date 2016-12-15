@@ -76,4 +76,14 @@ class SyncJob extends Job implements JobContract
     {
         return '';
     }
+
+    /**
+     * Get the name of the queue the job belongs to.
+     *
+     * @return string
+     */
+    public function getQueue()
+    {
+        return 'sync';
+    }
 }

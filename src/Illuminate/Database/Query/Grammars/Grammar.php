@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
+use Illuminate\Support\Arr;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Database\Grammar as BaseGrammar;
@@ -532,6 +533,10 @@ class Grammar extends BaseGrammar
      */
     protected function compileOrders(Builder $query, $orders)
     {
+        if (empty($orders)) {
+            return '';
+        }
+
         return 'order by '.implode(', ', array_map(function ($order) {
             if (isset($order['sql'])) {
                 return $order['sql'];
@@ -590,7 +595,7 @@ class Grammar extends BaseGrammar
             $sql .= $this->compileUnion($union);
         }
 
-        if (isset($query->unionOrders)) {
+        if (! empty($query->unionOrders)) {
             $sql .= ' '.$this->compileOrders($query, $query->unionOrders);
         }
 
@@ -726,7 +731,11 @@ class Grammar extends BaseGrammar
      */
     public function prepareBindingsForUpdate(array $bindings, array $values)
     {
-        return $bindings;
+        $bindingsWithoutJoin = Arr::except($bindings, 'join');
+
+        return array_values(
+            array_merge($bindings['join'], $values, Arr::flatten($bindingsWithoutJoin))
+        );
     }
 
     /**
@@ -824,7 +833,7 @@ class Grammar extends BaseGrammar
     }
 
     /**
-     * Get the gramar specific operators.
+     * Get the grammar specific operators.
      *
      * @return array
      */

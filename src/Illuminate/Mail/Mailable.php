@@ -57,6 +57,13 @@ class Mailable implements MailableContract
     protected $subject;
 
     /**
+     * The Markdown template for the message (if applicable).
+     *
+     * @var string
+     */
+    protected $markdown;
+
+    /**
      * The view to use for the message.
      *
      * @var string
@@ -129,15 +136,9 @@ class Mailable implements MailableContract
 
         $queueName = property_exists($this, 'queue') ? $this->queue : null;
 
-        if ($queueName) {
-            return $queue->connection($connection)->pushOn(
-                $queueName, new SendQueuedMailable($this)
-            );
-        } else {
-            return $queue->connection($connection)->push(
-                new SendQueuedMailable($this)
-            );
-        }
+        return $queue->connection($connection)->pushOn(
+            $queueName ?: null, new SendQueuedMailable($this)
+        );
     }
 
     /**
@@ -153,15 +154,9 @@ class Mailable implements MailableContract
 
         $queueName = property_exists($this, 'queue') ? $this->queue : null;
 
-        if ($queueName) {
-            return $queue->connection($connection)->laterOn(
-                $queueName, $delay, new SendQueuedMailable($this)
-            );
-        } else {
-            return $queue->connection($connection)->later(
-                $delay, new SendQueuedMailable($this)
-            );
-        }
+        return $queue->connection($connection)->laterOn(
+            $queueName ?: null, $delay, new SendQueuedMailable($this)
+        );
     }
 
     /**
@@ -171,13 +166,34 @@ class Mailable implements MailableContract
      */
     protected function buildView()
     {
+        if (isset($this->markdown)) {
+            return $this->buildMarkdownView();
+        }
+
         if (isset($this->view, $this->textView)) {
             return [$this->view, $this->textView];
         } elseif (isset($this->textView)) {
             return ['text' => $this->textView];
-        } else {
-            return $this->view;
         }
+
+        return $this->view;
+    }
+
+    /**
+     * Build the Markdown view for the message.
+     *
+     * @return array
+     */
+    protected function buildMarkdownView()
+    {
+        $markdown = Container::getInstance()->make(Markdown::class);
+
+        $data = $this->buildViewData();
+
+        return [
+            'html' => $markdown->render($this->markdown, $data),
+            'text' => $markdown->renderText($this->markdown, $data),
+        ];
     }
 
     /**
@@ -416,6 +432,21 @@ class Mailable implements MailableContract
     }
 
     /**
+     * Set the Markdown template for the message.
+     *
+     * @param  string  $view
+     * @param  array  $data
+     * @return $this
+     */
+    public function markdown($view, array $data = [])
+    {
+        $this->markdown = $view;
+        $this->viewData = $data;
+
+        return $this;
+    }
+
+    /**
      * Set the view and view data for the message.
      *
      * @param  string  $view
@@ -503,6 +534,46 @@ class Mailable implements MailableContract
         $this->callbacks[] = $callback;
 
         return $this;
+    }
+
+    /**
+     * Get the sender of the message.
+     *
+     * @return array
+     */
+    public function getFrom()
+    {
+        return $this->from;
+    }
+
+    /**
+     * Get the "to" recipients of the message.
+     *
+     * @return array
+     */
+    public function getTo()
+    {
+        return $this->to;
+    }
+
+    /**
+     * Get the "bcc" recipients of the message.
+     *
+     * @return array
+     */
+    public function getBcc()
+    {
+        return $this->bcc;
+    }
+
+    /**
+     * Get the "cc" recipients of the message.
+     *
+     * @return array
+     */
+    public function getCc()
+    {
+        return $this->cc;
     }
 
     /**

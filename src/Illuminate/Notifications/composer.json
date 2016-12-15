@@ -17,7 +17,9 @@
         "php": ">=5.6.4",
         "illuminate/broadcasting": "5.4.*",
         "illuminate/bus": "5.4.*",
+        "illuminate/container": "5.4.*",
         "illuminate/contracts": "5.4.*",
+        "illuminate/mail": "5.4.*",
         "illuminate/support": "5.4.*",
         "ramsey/uuid": "~3.0"
     },

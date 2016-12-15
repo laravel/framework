@@ -130,7 +130,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
      */
     public function deleteMessage($queue, $id)
     {
-        $this->pheanstalk->useTube($this->getQueue($queue))->delete($id);
+        $this->pheanstalk->useTube($this->getQueue($queue))->delete(new PheanstalkJob($id, ''));
     }
 
     /**

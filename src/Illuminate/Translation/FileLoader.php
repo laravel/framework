@@ -50,6 +50,10 @@ class FileLoader implements LoaderInterface
      */
     public function load($locale, $group, $namespace = null)
     {
+        if ($group == '*' && $namespace == '*') {
+            return $this->loadJsonPath($this->path, $locale);
+        }
+
         if (is_null($namespace) || $namespace == '*') {
             return $this->loadPath($this->path, $locale, $group);
         }
@@ -114,6 +118,22 @@ class FileLoader implements LoaderInterface
     }
 
     /**
+     * Load a locale from the given JSON file path.
+     *
+     * @param  string  $path
+     * @param  string  $locale
+     * @return array
+     */
+    protected function loadJsonPath($path, $locale)
+    {
+        if ($this->files->exists($full = "{$path}/{$locale}.json")) {
+            return json_decode($this->files->get($full), true);
+        }
+
+        return [];
+    }
+
+    /**
      * Add a new namespace to the loader.
      *
      * @param  string  $namespace
@@ -123,5 +143,15 @@ class FileLoader implements LoaderInterface
     public function addNamespace($namespace, $hint)
     {
         $this->hints[$namespace] = $hint;
+    }
+
+    /**
+     * Get an array of all the registered namespaces.
+     *
+     * @return array
+     */
+    public function namespaces()
+    {
+        return $this->hints;
     }
 }

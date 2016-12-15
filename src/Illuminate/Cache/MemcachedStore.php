@@ -4,8 +4,8 @@ namespace Illuminate\Cache;
 
 use Memcached;
 use Carbon\Carbon;
-use Illuminate\Contracts\Cache\Store;
 use ReflectionMethod;
+use Illuminate\Contracts\Cache\Store;
 
 class MemcachedStore extends TaggableStore implements Store
 {
@@ -184,11 +184,11 @@ class MemcachedStore extends TaggableStore implements Store
     /**
      * Remove all items from the cache.
      *
-     * @return void
+     * @return bool
      */
     public function flush()
     {
-        $this->memcached->flush();
+        return $this->memcached->flush();
     }
 
     /**

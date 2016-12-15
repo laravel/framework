@@ -5,7 +5,6 @@ namespace Illuminate\Mail\Jobs;
 use Closure;
 use Illuminate\Support\Str;
 use SuperClosure\Serializer;
-use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Queue\SerializesAndRestoresModelIdentifiers;
 

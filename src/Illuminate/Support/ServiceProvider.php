@@ -2,7 +2,7 @@
 
 namespace Illuminate\Support;
 
-use Illuminate\Console\Events\ArtisanStarting;
+use Illuminate\Console\Application as Artisan;
 
 abstract class ServiceProvider
 {
@@ -57,6 +57,19 @@ abstract class ServiceProvider
         $config = $this->app['config']->get($key, []);
 
         $this->app['config']->set($key, array_merge(require $path, $config));
+    }
+
+    /**
+     * Load the given routes file if routes are not already cached.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    protected function loadRoutesFrom($path)
+    {
+        if (! $this->app->routesAreCached()) {
+            require $path;
+        }
     }
 
     /**
@@ -176,13 +189,8 @@ abstract class ServiceProvider
     {
         $commands = is_array($commands) ? $commands : func_get_args();
 
-        // To register the commands with Artisan, we will grab each of the arguments
-        // passed into the method and listen for Artisan "start" event which will
-        // give us the Artisan console instance which we will give commands to.
-        $events = $this->app['events'];
-
-        $events->listen(ArtisanStarting::class, function ($event) use ($commands) {
-            $event->artisan->resolveCommands($commands);
+        Artisan::starting(function ($artisan) use ($commands) {
+            $artisan->resolveCommands($commands);
         });
     }
 

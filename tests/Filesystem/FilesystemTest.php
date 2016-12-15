@@ -32,6 +32,24 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         $this->assertStringEqualsFile($this->tempDir.'/file.txt', 'Hello World');
     }
 
+    public function testSetChmod()
+    {
+        file_put_contents($this->tempDir.'/file.txt', 'Hello World');
+        $files = new Filesystem();
+        $files->chmod($this->tempDir.'/file.txt', 0755);
+        $filePermisson = substr(sprintf('%o', fileperms($this->tempDir.'/file.txt')), -4);
+        $this->assertEquals('0755', $filePermisson);
+    }
+
+    public function testGetChmod()
+    {
+        file_put_contents($this->tempDir.'/file.txt', 'Hello World');
+        chmod($this->tempDir.'/file.txt', 0755);
+        $files = new Filesystem();
+        $filePermisson = $files->chmod($this->tempDir.'/file.txt');
+        $this->assertEquals('0755', $filePermisson);
+    }
+
     public function testDeleteRemovesFiles()
     {
         file_put_contents($this->tempDir.'/file.txt', 'Hello World');
@@ -271,11 +289,16 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
     {
         file_put_contents($this->tempDir.'/foo.txt', 'foo');
         $files = new Filesystem();
-        @chmod($this->tempDir.'/foo.txt', 0000);
-        $this->assertFalse($files->isReadable($this->tempDir.'/foo.txt'));
-        $this->assertFalse($files->isReadable($this->tempDir.'/bar.txt'));
-        @chmod($this->tempDir.'/foo.txt', 0777);
-        $this->assertTrue($files->isReadable($this->tempDir.'/foo.txt'));
+        // chmod is noneffective on Windows
+        if (DIRECTORY_SEPARATOR === '\\') {
+            $this->assertTrue($files->isReadable($this->tempDir.'/foo.txt'));
+        } else {
+            @chmod($this->tempDir.'/foo.txt', 0000);
+            $this->assertFalse($files->isReadable($this->tempDir.'/foo.txt'));
+            @chmod($this->tempDir.'/foo.txt', 0777);
+            $this->assertTrue($files->isReadable($this->tempDir.'/foo.txt'));
+        }
+        $this->assertFalse($files->isReadable($this->tempDir.'/doesnotexist.txt'));
     }
 
     public function testGlobFindsFiles()
@@ -327,10 +350,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
             $this->markTestSkipped('Skipping since the pcntl extension is not available');
         }
 
-        $content = '';
-        for ($i = 0; $i < 1000000; ++$i) {
-            $content .= $i;
-        }
+        $content = str_repeat('123456', 1000000);
         $result = 1;
 
         for ($i = 1; $i <= 20; ++$i) {

@@ -19,6 +19,13 @@ class NexmoMessage
     public $from;
 
     /**
+     * The message type.
+     *
+     * @var string
+     */
+    public $type = 'text';
+
+    /**
      * Create a new message instance.
      *
      * @param  string  $content
@@ -51,6 +58,18 @@ class NexmoMessage
     public function from($from)
     {
         $this->from = $from;
+
+        return $this;
+    }
+
+    /**
+     * Set the message type.
+     *
+     * @return $this
+     */
+    public function unicode()
+    {
+        $this->type = 'unicode';
 
         return $this;
     }

@@ -26,6 +26,14 @@ class NotificationFake implements NotificationFactory
      */
     public function assertSentTo($notifiable, $notification, $callback = null)
     {
+        if (is_array($notifiable) || $notifiable instanceof Collection) {
+            foreach ($notifiable as $singleNotifiable) {
+                $this->assertSentTo($singleNotifiable, $notification, $callback);
+            }
+
+            return;
+        }
+
         PHPUnit::assertTrue(
             $this->sent($notifiable, $notification, $callback)->count() > 0,
             "The expected [{$notification}] notification was not sent."
@@ -42,6 +50,14 @@ class NotificationFake implements NotificationFactory
      */
     public function assertNotSentTo($notifiable, $notification, $callback = null)
     {
+        if (is_array($notifiable) || $notifiable instanceof Collection) {
+            foreach ($notifiable as $singleNotifiable) {
+                $this->assertNotSentTo($singleNotifiable, $notification, $callback);
+            }
+
+            return;
+        }
+
         PHPUnit::assertTrue(
             $this->sent($notifiable, $notification, $callback)->count() === 0,
             "The unexpected [{$notification}] notification was sent."
@@ -127,7 +143,7 @@ class NotificationFake implements NotificationFactory
         }
 
         foreach ($notifiables as $notifiable) {
-            $notification->id = (string) Uuid::uuid4();
+            $notification->id = Uuid::uuid4()->toString();
 
             $this->notifications[get_class($notifiable)][$notifiable->getKey()][get_class($notification)][] = [
                 'notification' => $notification,

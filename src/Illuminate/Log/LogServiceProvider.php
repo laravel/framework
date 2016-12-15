@@ -4,7 +4,6 @@ namespace Illuminate\Log;
 
 use Monolog\Logger as Monolog;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Contracts\Foundation\Application;
 
 class LogServiceProvider extends ServiceProvider
 {
@@ -15,29 +14,28 @@ class LogServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('log', function ($app) {
-            return $this->createLogger($app);
+        $this->app->singleton('log', function () {
+            return $this->createLogger();
         });
     }
 
     /**
      * Create the logger.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application $app
      * @return \Illuminate\Log\Writer
      */
-    public function createLogger($app)
+    public function createLogger()
     {
         $log = new Writer(
-            new Monolog($app->bound('env') ? $app->environment() : 'production'), $app['events']
+            new Monolog($this->app->bound('env') ? $this->app->environment() : 'production'), $this->app['events']
         );
 
-        if ($app->hasMonologConfigurator()) {
+        if ($this->app->hasMonologConfigurator()) {
             call_user_func(
-                $app->getMonologConfigurator(), $log->getMonolog()
+                $this->app->getMonologConfigurator(), $log->getMonolog()
             );
         } else {
-            $this->configureHandlers($app, $log);
+            $this->configureHandlers($log);
         }
 
         return $log;
@@ -46,11 +44,10 @@ class LogServiceProvider extends ServiceProvider
     /**
      * Configure the Monolog handlers for the application.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @param  \Illuminate\Log\Writer  $log
      * @return void
      */
-    protected function configureHandlers(Application $app, Writer $log)
+    protected function configureHandlers(Writer $log)
     {
         if ($this->app->bound('config')) {
             $handler = $this->app->make('config')->get('app.log');
@@ -60,20 +57,19 @@ class LogServiceProvider extends ServiceProvider
 
         $method = 'configure'.ucfirst($handler).'Handler';
 
-        $this->{$method}($app, $log);
+        $this->{$method}($log);
     }
 
     /**
      * Configure the Monolog handlers for the application.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @param  \Illuminate\Log\Writer  $log
      * @return void
      */
-    protected function configureSingleHandler(Application $app, Writer $log)
+    protected function configureSingleHandler(Writer $log)
     {
         $log->useFiles(
-            $app->storagePath().'/logs/laravel.log',
+            $this->app->storagePath().'/logs/laravel.log',
             $this->logLevel()
         );
     }
@@ -81,14 +77,13 @@ class LogServiceProvider extends ServiceProvider
     /**
      * Configure the Monolog handlers for the application.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @param  \Illuminate\Log\Writer  $log
      * @return void
      */
-    protected function configureDailyHandler(Application $app, Writer $log)
+    protected function configureDailyHandler(Writer $log)
     {
         $log->useDailyFiles(
-            $app->storagePath().'/logs/laravel.log', $this->maxFiles(),
+            $this->app->storagePath().'/logs/laravel.log', $this->maxFiles(),
             $this->logLevel()
         );
     }
@@ -96,11 +91,10 @@ class LogServiceProvider extends ServiceProvider
     /**
      * Configure the Monolog handlers for the application.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @param  \Illuminate\Log\Writer  $log
      * @return void
      */
-    protected function configureSyslogHandler(Application $app, Writer $log)
+    protected function configureSyslogHandler(Writer $log)
     {
         $log->useSyslog('laravel', $this->logLevel());
     }
@@ -108,11 +102,10 @@ class LogServiceProvider extends ServiceProvider
     /**
      * Configure the Monolog handlers for the application.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @param  \Illuminate\Log\Writer  $log
      * @return void
      */
-    protected function configureErrorlogHandler(Application $app, Writer $log)
+    protected function configureErrorlogHandler(Writer $log)
     {
         $log->useErrorLog($this->logLevel());
     }

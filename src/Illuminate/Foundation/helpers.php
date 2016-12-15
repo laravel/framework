@@ -28,7 +28,7 @@ if (! function_exists('abort')) {
      */
     function abort($code, $message = '', array $headers = [])
     {
-        return app()->abort($code, $message, $headers);
+        app()->abort($code, $message, $headers);
     }
 }
 
@@ -157,11 +157,12 @@ if (! function_exists('back')) {
      *
      * @param  int    $status
      * @param  array  $headers
+     * @param  string  $fallback
      * @return \Illuminate\Http\RedirectResponse
      */
-    function back($status = 302, $headers = [])
+    function back($status = 302, $headers = [], $fallback = false)
     {
-        return app('redirect')->back($status, $headers);
+        return app('redirect')->back($status, $headers, $fallback);
     }
 }
 
@@ -426,7 +427,7 @@ if (! function_exists('encrypt')) {
 
 if (! function_exists('env')) {
     /**
-     * Gets the value of an environment variable. Supports boolean, empty and null.
+     * Gets the value of an environment variable.
      *
      * @param  string  $key
      * @param  mixed   $default
@@ -789,6 +790,21 @@ if (! function_exists('trans_choice')) {
     function trans_choice($id, $number, array $replace = [], $locale = null)
     {
         return app('translator')->transChoice($id, $number, $replace, $locale);
+    }
+}
+
+if (! function_exists('__')) {
+    /**
+     * Translate the given message.
+     *
+     * @param  string  $key
+     * @param  array  $replace
+     * @param  string  $locale
+     * @return \Illuminate\Contracts\Translation\Translator|string
+     */
+    function __($key = null, $replace = [], $locale = null)
+    {
+        return app('translator')->getFromJson($key, $replace, $locale);
     }
 }
 

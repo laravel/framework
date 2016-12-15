@@ -5,6 +5,15 @@ use Illuminate\Console\Scheduling\Schedule;
 
 class ConsoleEventSchedulerTest extends PHPUnit_Framework_TestCase
 {
+    public function setUp()
+    {
+        parent::setUp();
+
+        \Illuminate\Container\Container::getInstance()->instance(
+            'Illuminate\Console\Scheduling\Schedule', $this->schedule = new Schedule(m::mock('Illuminate\Contracts\Cache\Repository'))
+        );
+    }
+
     public function tearDown()
     {
         m::close();
@@ -15,13 +24,15 @@ class ConsoleEventSchedulerTest extends PHPUnit_Framework_TestCase
         $escape = '\\' === DIRECTORY_SEPARATOR ? '"' : '\'';
         $escapeReal = '\\' === DIRECTORY_SEPARATOR ? '\\"' : '"';
 
-        $schedule = new Schedule;
+        $schedule = $this->schedule;
         $schedule->exec('path/to/command');
         $schedule->exec('path/to/command -f --foo="bar"');
         $schedule->exec('path/to/command', ['-f']);
         $schedule->exec('path/to/command', ['--foo' => 'bar']);
         $schedule->exec('path/to/command', ['-f', '--foo' => 'bar']);
         $schedule->exec('path/to/command', ['--title' => 'A "real" test']);
+        $schedule->exec('path/to/command', [['one', 'two']]);
+        $schedule->exec('path/to/command', ['-1 minute']);
 
         $events = $schedule->events();
         $this->assertEquals('path/to/command', $events[0]->command);
@@ -30,13 +41,15 @@ class ConsoleEventSchedulerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals("path/to/command --foo={$escape}bar{$escape}", $events[3]->command);
         $this->assertEquals("path/to/command -f --foo={$escape}bar{$escape}", $events[4]->command);
         $this->assertEquals("path/to/command --title={$escape}A {$escapeReal}real{$escapeReal} test{$escape}", $events[5]->command);
+        $this->assertEquals("path/to/command {$escape}one{$escape} {$escape}two{$escape}", $events[6]->command);
+        $this->assertEquals("path/to/command {$escape}-1 minute{$escape}", $events[7]->command);
     }
 
     public function testCommandCreatesNewArtisanCommand()
     {
         $escape = '\\' === DIRECTORY_SEPARATOR ? '"' : '\'';
 
-        $schedule = new Schedule;
+        $schedule = $this->schedule;
         $schedule->command('queue:listen');
         $schedule->command('queue:listen --tries=3');
         $schedule->command('queue:listen', ['--tries' => 3]);
@@ -52,7 +65,7 @@ class ConsoleEventSchedulerTest extends PHPUnit_Framework_TestCase
     {
         $escape = '\\' === DIRECTORY_SEPARATOR ? '"' : '\'';
 
-        $schedule = new Schedule;
+        $schedule = $this->schedule;
         $schedule->command(ConsoleCommandStub::class, ['--force']);
 
         $events = $schedule->events();

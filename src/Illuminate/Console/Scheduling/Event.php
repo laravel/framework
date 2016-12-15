@@ -9,11 +9,20 @@ use Cron\CronExpression;
 use GuzzleHttp\Client as HttpClient;
 use Illuminate\Contracts\Mail\Mailer;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Process\ProcessUtils;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Cache\Repository as Cache;
 
 class Event
 {
+    use ManagesFrequencies;
+
+    /**
+     * The cache store implementation.
+     *
+     * @var \Illuminate\Contracts\Cache\Repository
+     */
+    protected $cache;
+
     /**
      * The command string.
      *
@@ -96,7 +105,7 @@ class Event
      *
      * @var bool
      */
-    protected $shouldAppendOutput = false;
+    public $shouldAppendOutput = false;
 
     /**
      * The array of callbacks to be run before the event is started.
@@ -122,11 +131,13 @@ class Event
     /**
      * Create a new event instance.
      *
+     * @param  \Illuminate\Contracts\Cache\Repository  $cache
      * @param  string  $command
      * @return void
      */
-    public function __construct($command)
+    public function __construct(Cache $cache, $command)
     {
+        $this->cache = $cache;
         $this->command = $command;
         $this->output = $this->getDefaultOutput();
     }
@@ -136,7 +147,7 @@ class Event
      *
      * @return string
      */
-    protected function getDefaultOutput()
+    public function getDefaultOutput()
     {
         return (DIRECTORY_SEPARATOR == '\\') ? 'NUL' : '/dev/null';
     }
@@ -149,10 +160,14 @@ class Event
      */
     public function run(Container $container)
     {
-        if (! $this->runInBackground) {
-            $this->runCommandInForeground($container);
+        if ($this->withoutOverlapping) {
+            $this->cache->put($this->mutexName(), true, 1440);
+        }
+
+        if ($this->runInBackground) {
+            $this->runCommandInBackground($container);
         } else {
-            $this->runCommandInBackground();
+            $this->runCommandInForeground($container);
         }
     }
 
@@ -176,10 +191,13 @@ class Event
     /**
      * Run the command in the background.
      *
+     * @param  \Illuminate\Contracts\Container\Container  $container
      * @return void
      */
-    protected function runCommandInBackground()
+    protected function runCommandInBackground(Container $container)
     {
+        $this->callBeforeCallbacks($container);
+
         (new Process(
             $this->buildCommand(), base_path(), null, null, null
         ))->run();
@@ -191,7 +209,7 @@ class Event
      * @param  \Illuminate\Contracts\Container\Container  $container
      * @return void
      */
-    protected function callBeforeCallbacks(Container $container)
+    public function callBeforeCallbacks(Container $container)
     {
         foreach ($this->beforeCallbacks as $callback) {
             $container->call($callback);
@@ -204,7 +222,7 @@ class Event
      * @param  \Illuminate\Contracts\Container\Container  $container
      * @return void
      */
-    protected function callAfterCallbacks(Container $container)
+    public function callAfterCallbacks(Container $container)
     {
         foreach ($this->afterCallbacks as $callback) {
             $container->call($callback);
@@ -218,31 +236,17 @@ class Event
      */
     public function buildCommand()
     {
-        $output = ProcessUtils::escapeArgument($this->output);
-
-        $redirect = $this->shouldAppendOutput ? ' >> ' : ' > ';
-
-        if ($this->withoutOverlapping) {
-            if (windows_os()) {
-                $command = '(echo \'\' > "'.$this->mutexPath().'" & '.$this->command.' & del "'.$this->mutexPath().'")'.$redirect.$output.' 2>&1 &';
-            } else {
-                $command = '(touch '.$this->mutexPath().'; '.$this->command.'; rm '.$this->mutexPath().')'.$redirect.$output.' 2>&1 &';
-            }
-        } else {
-            $command = $this->command.$redirect.$output.' 2>&1 &';
-        }
-
-        return $this->user && ! windows_os() ? 'sudo -u '.$this->user.' -- sh -c \''.$command.'\'' : $command;
+        return (new CommandBuilder)->buildCommand($this);
     }
 
     /**
-     * Get the mutex path for the scheduled command.
+     * Get the mutex name for the scheduled command.
      *
      * @return string
      */
-    protected function mutexPath()
+    public function mutexName()
     {
-        return storage_path('framework'.DIRECTORY_SEPARATOR.'schedule-'.sha1($this->expression.$this->command));
+        return 'framework'.DIRECTORY_SEPARATOR.'schedule-'.sha1($this->expression.$this->command);
     }
 
     /**
@@ -322,331 +326,6 @@ class Event
     }
 
     /**
-     * The Cron expression representing the event's frequency.
-     *
-     * @param  string  $expression
-     * @return $this
-     */
-    public function cron($expression)
-    {
-        $this->expression = $expression;
-
-        return $this;
-    }
-
-    /**
-     * Schedule the event to run hourly.
-     *
-     * @return $this
-     */
-    public function hourly()
-    {
-        return $this->spliceIntoPosition(1, 0);
-    }
-
-    /**
-     * Schedule the event to run daily.
-     *
-     * @return $this
-     */
-    public function daily()
-    {
-        return $this->spliceIntoPosition(1, 0)
-                    ->spliceIntoPosition(2, 0);
-    }
-
-    /**
-     * Schedule the command at a given time.
-     *
-     * @param  string  $time
-     * @return $this
-     */
-    public function at($time)
-    {
-        return $this->dailyAt($time);
-    }
-
-    /**
-     * Schedule the event to run daily at a given time (10:00, 19:30, etc).
-     *
-     * @param  string  $time
-     * @return $this
-     */
-    public function dailyAt($time)
-    {
-        $segments = explode(':', $time);
-
-        return $this->spliceIntoPosition(2, (int) $segments[0])
-                    ->spliceIntoPosition(1, count($segments) == 2 ? (int) $segments[1] : '0');
-    }
-
-    /**
-     * Schedule the event to run twice daily.
-     *
-     * @param  int  $first
-     * @param  int  $second
-     * @return $this
-     */
-    public function twiceDaily($first = 1, $second = 13)
-    {
-        $hours = $first.','.$second;
-
-        return $this->spliceIntoPosition(1, 0)
-                    ->spliceIntoPosition(2, $hours);
-    }
-
-    /**
-     * Schedule the event to run only on weekdays.
-     *
-     * @return $this
-     */
-    public function weekdays()
-    {
-        return $this->spliceIntoPosition(5, '1-5');
-    }
-
-    /**
-     * Schedule the event to run only on Mondays.
-     *
-     * @return $this
-     */
-    public function mondays()
-    {
-        return $this->days(1);
-    }
-
-    /**
-     * Schedule the event to run only on Tuesdays.
-     *
-     * @return $this
-     */
-    public function tuesdays()
-    {
-        return $this->days(2);
-    }
-
-    /**
-     * Schedule the event to run only on Wednesdays.
-     *
-     * @return $this
-     */
-    public function wednesdays()
-    {
-        return $this->days(3);
-    }
-
-    /**
-     * Schedule the event to run only on Thursdays.
-     *
-     * @return $this
-     */
-    public function thursdays()
-    {
-        return $this->days(4);
-    }
-
-    /**
-     * Schedule the event to run only on Fridays.
-     *
-     * @return $this
-     */
-    public function fridays()
-    {
-        return $this->days(5);
-    }
-
-    /**
-     * Schedule the event to run only on Saturdays.
-     *
-     * @return $this
-     */
-    public function saturdays()
-    {
-        return $this->days(6);
-    }
-
-    /**
-     * Schedule the event to run only on Sundays.
-     *
-     * @return $this
-     */
-    public function sundays()
-    {
-        return $this->days(0);
-    }
-
-    /**
-     * Schedule the event to run weekly.
-     *
-     * @return $this
-     */
-    public function weekly()
-    {
-        return $this->spliceIntoPosition(1, 0)
-                    ->spliceIntoPosition(2, 0)
-                    ->spliceIntoPosition(5, 0);
-    }
-
-    /**
-     * Schedule the event to run weekly on a given day and time.
-     *
-     * @param  int  $day
-     * @param  string  $time
-     * @return $this
-     */
-    public function weeklyOn($day, $time = '0:0')
-    {
-        $this->dailyAt($time);
-
-        return $this->spliceIntoPosition(5, $day);
-    }
-
-    /**
-     * Schedule the event to run monthly.
-     *
-     * @return $this
-     */
-    public function monthly()
-    {
-        return $this->spliceIntoPosition(1, 0)
-                    ->spliceIntoPosition(2, 0)
-                    ->spliceIntoPosition(3, 1);
-    }
-
-    /**
-     * Schedule the event to run monthly on a given day and time.
-     *
-     * @param int  $day
-     * @param string  $time
-     * @return $this
-     */
-    public function monthlyOn($day = 1, $time = '0:0')
-    {
-        $this->dailyAt($time);
-
-        return $this->spliceIntoPosition(3, $day);
-    }
-
-    /**
-     * Schedule the event to run quarterly.
-     *
-     * @return $this
-     */
-    public function quarterly()
-    {
-        return $this->spliceIntoPosition(1, 0)
-                    ->spliceIntoPosition(2, 0)
-                    ->spliceIntoPosition(3, 1)
-                    ->spliceIntoPosition(4, '*/3');
-    }
-
-    /**
-     * Schedule the event to run yearly.
-     *
-     * @return $this
-     */
-    public function yearly()
-    {
-        return $this->spliceIntoPosition(1, 0)
-                    ->spliceIntoPosition(2, 0)
-                    ->spliceIntoPosition(3, 1)
-                    ->spliceIntoPosition(4, 1);
-    }
-
-    /**
-     * Schedule the event to run every minute.
-     *
-     * @return $this
-     */
-    public function everyMinute()
-    {
-        return $this->spliceIntoPosition(1, '*');
-    }
-
-    /**
-     * Schedule the event to run every five minutes.
-     *
-     * @return $this
-     */
-    public function everyFiveMinutes()
-    {
-        return $this->spliceIntoPosition(1, '*/5');
-    }
-
-    /**
-     * Schedule the event to run every ten minutes.
-     *
-     * @return $this
-     */
-    public function everyTenMinutes()
-    {
-        return $this->spliceIntoPosition(1, '*/10');
-    }
-
-    /**
-     * Schedule the event to run every thirty minutes.
-     *
-     * @return $this
-     */
-    public function everyThirtyMinutes()
-    {
-        return $this->spliceIntoPosition(1, '0,30');
-    }
-
-    /**
-     * Set the days of the week the command should run on.
-     *
-     * @param  array|mixed  $days
-     * @return $this
-     */
-    public function days($days)
-    {
-        $days = is_array($days) ? $days : func_get_args();
-
-        return $this->spliceIntoPosition(5, implode(',', $days));
-    }
-
-    /**
-     * Schedule the event to run between start and end time.
-     *
-     * @param  string  $startTime
-     * @param  string  $endTime
-     * @return $this
-     */
-    public function between($startTime, $endTime)
-    {
-        return $this->when($this->inTimeInterval($startTime, $endTime));
-    }
-
-    /**
-     * Schedule the event to not run between start and end time.
-     *
-     * @param  string  $startTime
-     * @param  string  $endTime
-     * @return $this
-     */
-    public function unlessBetween($startTime, $endTime)
-    {
-        return $this->skip($this->inTimeInterval($startTime, $endTime));
-    }
-
-    /**
-     * Schedule the event to run between start and end time.
-     *
-     * @param  string  $startTime
-     * @param  string  $endTime
-     * @return \Closure
-     */
-    private function inTimeInterval($startTime, $endTime)
-    {
-        return function () use ($startTime, $endTime) {
-            $now = Carbon::now()->getTimestamp();
-
-            return $now >= strtotime($startTime) && $now <= strtotime($endTime);
-        };
-    }
-
-    /**
      * State that the command should run in background.
      *
      * @return $this
@@ -654,19 +333,6 @@ class Event
     public function runInBackground()
     {
         $this->runInBackground = true;
-
-        return $this;
-    }
-
-    /**
-     * Set the timezone the date should be evaluated on.
-     *
-     * @param  \DateTimeZone|string  $timezone
-     * @return $this
-     */
-    public function timezone($timezone)
-    {
-        $this->timezone = $timezone;
 
         return $this;
     }
@@ -718,8 +384,10 @@ class Event
     {
         $this->withoutOverlapping = true;
 
-        return $this->skip(function () {
-            return file_exists($this->mutexPath());
+        return $this->then(function () {
+            $this->cache->forget($this->mutexName());
+        })->skip(function () {
+            return $this->cache->has($this->mutexName());
         });
     }
 
@@ -844,7 +512,7 @@ class Event
     protected function getEmailSubject()
     {
         if ($this->description) {
-            return 'Scheduled Job Output ('.$this->description.')';
+            return $this->description;
         }
 
         return 'Scheduled Job Output';
@@ -935,22 +603,6 @@ class Event
         $this->description = $description;
 
         return $this;
-    }
-
-    /**
-     * Splice the given value into the given position of the expression.
-     *
-     * @param  int  $position
-     * @param  string  $value
-     * @return $this
-     */
-    protected function spliceIntoPosition($position, $value)
-    {
-        $segments = explode(' ', $this->expression);
-
-        $segments[$position - 1] = $value;
-
-        return $this->cron(implode(' ', $segments));
     }
 
     /**

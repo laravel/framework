@@ -91,4 +91,13 @@ class CacheApcStoreTest extends PHPUnit_Framework_TestCase
         $store = new Illuminate\Cache\ApcStore($apc);
         $store->forget('foo');
     }
+
+    public function testFlushesCached()
+    {
+        $apc = $this->getMockBuilder('Illuminate\Cache\ApcWrapper')->setMethods(['flush'])->getMock();
+        $apc->expects($this->once())->method('flush')->willReturn(true);
+        $store = new Illuminate\Cache\ApcStore($apc);
+        $result = $store->flush();
+        $this->assertTrue($result);
+    }
 }
