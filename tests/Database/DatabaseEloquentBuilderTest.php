@@ -620,7 +620,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
             $q->where('bam', '>', 'qux');
         }], 'bar')->having('foo_avg', '>=', 1);
 
-        $this->assertEquals('select *, (select avg("bar") from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "bam" > ?) as "foo_avg" from "eloquent_builder_test_model_parent_stubs" where "bar" = ? having "foo_count" >= ?', $builder->toSql());
+        $this->assertEquals('select *, (select avg("bar") from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "bam" > ?) as "foo_avg" from "eloquent_builder_test_model_parent_stubs" where "bar" = ? having "foo_avg" >= ?', $builder->toSql());
         $this->assertEquals(['qux', 'baz', 1], $builder->getBindings());
     }
 
@@ -722,9 +722,9 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $builder = $model->where('bar', 'baz');
         $builder->withMax(['foo' => function ($q) {
             $q->where('bam', '>', 'qux');
-        }], 'bar')->having('foo_avg', '>=', 1);
+        }], 'bar')->having('foo_max', '>=', 1);
 
-        $this->assertEquals('select *, (select max("bar") from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "bam" > ?) as "foo_count" from "eloquent_builder_test_model_parent_stubs" where "bar" = ? having "foo_count" >= ?', $builder->toSql());
+        $this->assertEquals('select *, (select max("bar") from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "bam" > ?) as "foo_max" from "eloquent_builder_test_model_parent_stubs" where "bar" = ? having "foo_max" >= ?', $builder->toSql());
         $this->assertEquals(['qux', 'baz', 1], $builder->getBindings());
     }
 
@@ -774,9 +774,9 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $builder = $model->where('bar', 'baz');
         $builder->withMin(['foo' => function ($q) {
             $q->where('bam', '>', 'qux');
-        }], 'bar')->having('foo_avg', '>=', 1);
+        }], 'bar')->having('foo_min', '>=', 1);
 
-        $this->assertEquals('select *, (select min("bar") from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "bam" > ?) as "foo_min" from "eloquent_builder_test_model_parent_stubs" where "bar" = ? having "foo_count" >= ?', $builder->toSql());
+        $this->assertEquals('select *, (select min("bar") from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "bam" > ?) as "foo_min" from "eloquent_builder_test_model_parent_stubs" where "bar" = ? having "foo_min" >= ?', $builder->toSql());
         $this->assertEquals(['qux', 'baz', 1], $builder->getBindings());
     }
 
@@ -826,9 +826,9 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $builder = $model->where('bar', 'baz');
         $builder->withSum(['foo' => function ($q) {
             $q->where('bam', '>', 'qux');
-        }], 'bar')->having('foo_avg', '>=', 1);
+        }], 'bar')->having('foo_sum', '>=', 1);
 
-        $this->assertEquals('select *, (select sum("bar") from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "bam" > ?) as "foo_sum" from "eloquent_builder_test_model_parent_stubs" where "bar" = ? having "foo_count" >= ?', $builder->toSql());
+        $this->assertEquals('select *, (select sum("bar") from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "bam" > ?) as "foo_sum" from "eloquent_builder_test_model_parent_stubs" where "bar" = ? having "foo_sum" >= ?', $builder->toSql());
         $this->assertEquals(['qux', 'baz', 1], $builder->getBindings());
     }
 
