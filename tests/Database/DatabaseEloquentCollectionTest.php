@@ -19,20 +19,6 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testGettingMaxItemsFromCollection()
-	{
-		$c = new Collection(array((object) array('foo' => 10), (object) array('foo' => 20)));
-		$this->assertEquals(20, $c->max('foo'));
-	}
-
-
-	public function testGettingMinItemsFromCollection()
-	{
-		$c = new Collection(array((object) array('foo' => 10), (object) array('foo' => 20)));
-		$this->assertEquals(10, $c->min('foo'));
-	}
-
-
 	public function testContainsIndicatesIfModelInArray()
 	{
 		$mockModel = m::mock('Illuminate\Database\Eloquent\Model');

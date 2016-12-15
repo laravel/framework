@@ -345,6 +345,19 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Get the max value of a given key.
+	 *
+	 * @param  string|null  $key
+	 * @return mixed
+	 */
+	public function max($key = null)
+	{
+		$keys = static::keyBy($key)->keys();
+
+		return empty($keys) ? null : max($keys);
+	}
+
+	/**
 	 * Merge the collection with the given items.
 	 *
 	 * @param  \Illuminate\Support\Collection|\Illuminate\Support\Contracts\ArrayableInterface|array  $items
@@ -353,6 +366,19 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	public function merge($items)
 	{
 		return new static(array_merge($this->items, $this->getArrayableItems($items)));
+	}
+
+	/**
+	 * Get the min value of a given key.
+	 *
+	 * @param  string|null  $key
+	 * @return mixed
+	 */
+	public function min($key = null)
+	{
+		$keys = static::keyBy($key)->keys();
+
+		return empty($keys) ? null : min($keys);
 	}
 
 	/**
