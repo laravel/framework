@@ -51,7 +51,7 @@ class Mailer implements MailerContract, MailQueueContract
      * @var array
      */
     protected $to;
-    
+
     /**
      * The global reply-to address and name.
      *
@@ -118,7 +118,7 @@ class Mailer implements MailerContract, MailQueueContract
     {
         $this->to = compact('address', 'name');
     }
-    
+
     /**
      * Set the global reply-to address and name.
      *
@@ -435,7 +435,7 @@ class Mailer implements MailerContract, MailQueueContract
         if (! empty($this->from['address'])) {
             $message->from($this->from['address'], $this->from['name']);
         }
-        
+
         // If a global reply-to address has been specified we will set it on every message
         // instances so the developer does not have to repeat themselves every time
         // they create a new message. We will just go ahead and push the address.
