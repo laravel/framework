@@ -51,6 +51,13 @@ class Mailer implements MailerContract, MailQueueContract
      * @var array
      */
     protected $to;
+    
+    /**
+     * The global reply-to address and name.
+     *
+     * @var array
+     */
+    protected $replyTo;
 
     /**
      * The IoC container instance.
@@ -110,6 +117,18 @@ class Mailer implements MailerContract, MailQueueContract
     public function alwaysTo($address, $name = null)
     {
         $this->to = compact('address', 'name');
+    }
+    
+    /**
+     * Set the global reply-to address and name.
+     *
+     * @param  string  $address
+     * @param  string|null  $name
+     * @return void
+     */
+    public function alwaysReplyTo($address, $name = null)
+    {
+        $this->replyTo = compact('address', 'name');
     }
 
     /**
@@ -415,6 +434,13 @@ class Mailer implements MailerContract, MailQueueContract
         // they create a new message. We will just go ahead and push the address.
         if (! empty($this->from['address'])) {
             $message->from($this->from['address'], $this->from['name']);
+        }
+        
+        // If a global reply-to address has been specified we will set it on every message
+        // instances so the developer does not have to repeat themselves every time
+        // they create a new message. We will just go ahead and push the address.
+        if (! empty($this->replyTo['address'])) {
+            $message->replyTo($this->replyTo['address'], $this->replyTo['name']);
         }
 
         return $message;
