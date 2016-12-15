@@ -1090,6 +1090,7 @@ class Builder
     public function withCount($relations)
     {
         $relations = is_array($relations) ? $relations : func_get_args();
+
         return $this->withAggregate('count', $relations, '*');
     }
 
