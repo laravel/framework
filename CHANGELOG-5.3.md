@@ -16,8 +16,6 @@
 - Don't report exceptions inside queue worker signal handler ([#16738](https://github.com/laravel/framework/pull/16738))
 - Kill timed out queue worker process ([#16746](https://github.com/laravel/framework/pull/16746))
 - Removed unnecessary check in `ScheduleRunCommand::fire()` ([#16752](https://github.com/laravel/framework/pull/16752))
-- Improved performance of `Str::startsWith()` ([#16761](https://github.com/laravel/framework/pull/16761))
-- Improved handling of numeric values in `Str::startsWith()` ([#16770](https://github.com/laravel/framework/pull/16770))
 
 ### Fixed
 - Added file existance check to `AppNameCommand::replaceIn()` to fix [#16575](https://github.com/laravel/framework/pull/16575) ([#16592](https://github.com/laravel/framework/pull/16592))
