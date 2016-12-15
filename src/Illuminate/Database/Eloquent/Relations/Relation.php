@@ -149,6 +149,18 @@ abstract class Relation
     }
 
     /**
+     * Add the constraints for a relationship sum query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  string                                 $parent
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function getRelationSumQuery(Builder $query, $column, Builder $parent)
+    {
+        return $this->getRelationQuery($query, $parent, new Expression('sum(' . $columns . ')'));
+    }
+
+    /**
      * Add the constraints for a relationship query.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query

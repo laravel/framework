@@ -1118,6 +1118,54 @@ class Builder
     }
 
     /**
+     * Add subselect queries to sum a column value of a relation.
+     *
+     * @param  mixed  $relations
+     * @return $this
+     */
+    public function withSum($relation, $column)
+    {
+        if (is_null($this->query->columns)) {
+            $this->query->select(['*']);
+        }
+
+        $relation = is_array($relation) ? $relation : [$relation];
+
+        foreach ($this->parseWithRelations($relation) as $name => $constraints) {
+            // First we will determine if the name has been aliased using an "as" clause on the name
+            // and if it has we will extract the actual relationship name and the desired name of
+            // the resulting column. This allows multiple counts on the same relationship name.
+            $segments = explode(' ', $name);
+
+            if (count($segments) == 3 && Str::lower($segments[1]) == 'as') {
+                list($name, $alias) = [$segments[0], $segments[2]];
+            }
+
+            $relation = $this->getHasRelationQuery($name);
+
+            // Here we will get the relationship sum query and prepare to add it to the main query
+            // as a sub-select. First, we'll get the "has" query and use that to get the relation
+            // sum query. We will normalize the relation name then append _sum as the name.
+            $query = $relation->getRelationSumQuery(
+                $relation->getRelated()->newQuery(), $column, $this
+            );
+
+            $query->callScope($constraints);
+
+            $query->mergeModelDefinedRelationConstraints($relation->getQuery());
+
+            // Finally we will add the proper result column alias to the query and run the subselect
+            // statement against the query builder. Then we will return the builder instance back
+            // to the developer for further constraint chaining that needs to take place on it.
+            $column = snake_case(isset($alias) ? $alias : $name) . '_sum';
+
+            $this->selectSub($query->toBase(), $column);
+        }
+
+        return $this;
+    }
+
+    /**
      * Parse a list of relations into individuals.
      *
      * @param  array  $relations
