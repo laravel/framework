@@ -804,7 +804,7 @@ class Router implements RegistrarContract
                 ! $route->getParameter($parameter->name) instanceof Model) {
                 $method = $parameter->isDefaultValueAvailable() ? 'first' : 'firstOrFail';
 
-                $model = $class->newInstance();
+                $model = $this->container->make($class->name);
 
                 $route->setParameter(
                     $parameter->name, $model->where(
