@@ -1140,7 +1140,7 @@ class Builder
      */
     protected function withAggregate($aggregate, $relation, $column)
     {
-        return $this->withRaw($relation, new Expression($aggregate.'('.$column.')'), $aggregate);
+        return $this->withRaw($relation, new Expression($aggregate.'("'.$column.'")'), $aggregate);
     }
 
     /**
