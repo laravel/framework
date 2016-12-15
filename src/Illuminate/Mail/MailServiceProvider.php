@@ -48,6 +48,12 @@ class MailServiceProvider extends ServiceProvider
                 $mailer->alwaysTo($to['address'], $to['name']);
             }
 
+            $replyTo = $app['config']['mail.reply-to'];
+
+            if (is_array($replyTo) && isset($replyTo['address'])) {
+                $mailer->alwaysReplyTo($replyTo['address'], $replyTo['name']);
+            }
+
             return $mailer;
         });
     }
