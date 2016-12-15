@@ -1167,6 +1167,25 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $router->dispatch(Request::create('bar', 'GET'))->getContent();
     }
 
+    public function testImplicitBindingThroughIOC()
+    {
+        $phpunit = $this;
+        $container = new Container;
+        $router = new Router(new Dispatcher, $container);
+        $container->singleton(Registrar::class, function () use ($router) {
+            return $router;
+        });
+
+        $container->bind('RoutingTestUserModel', 'RoutingTestExtendedUserModel');
+        $router->get('foo/{bar}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (RoutingTestUserModel $bar) use ($phpunit) {
+                $phpunit->assertInstanceOf(RoutingTestExtendedUserModel::class, $bar);
+            },
+        ]);
+        $router->dispatch(Request::create('foo/baz', 'GET'))->getContent();
+    }
+
     public function testDispatchingCallableActionClasses()
     {
         $router = $this->getRouter();
@@ -1400,6 +1419,10 @@ class RoutingTestUserModel extends Model
     {
         return $this;
     }
+}
+
+class RoutingTestExtendedUserModel extends RoutingTestUserModel
+{
 }
 
 class ActionStub
