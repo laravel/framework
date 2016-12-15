@@ -1483,6 +1483,9 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $c = new Collection([1, 2, 3, 4, 5]);
         $this->assertEquals(1, $c->min());
 
+        $c = new Collection([1, null, 3, 4, 5]);
+        $this->assertEquals(1, $c->min());
+
         $c = new Collection();
         $this->assertNull($c->min());
     }
