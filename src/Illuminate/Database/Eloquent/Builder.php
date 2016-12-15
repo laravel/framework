@@ -1091,7 +1091,7 @@ class Builder
     {
         $relations = is_array($relations) ? $relations : func_get_args();
 
-        return $this->withAggregate('count', $relations, '*');
+        return $this->withRaw($relations, new Expression('count(*)'), 'count');
     }
 
     /**
