@@ -512,7 +512,7 @@ class Event
     protected function getEmailSubject()
     {
         if ($this->description) {
-            return 'Scheduled Job Output ('.$this->description.')';
+            return $this->description;
         }
 
         return 'Scheduled Job Output';

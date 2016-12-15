@@ -47,6 +47,13 @@ class Mailer implements MailerContract, MailQueueContract
     protected $from;
 
     /**
+     * The global reply-to address and name.
+     *
+     * @var array
+     */
+    protected $replyTo;
+
+    /**
      * The global to address and name.
      *
      * @var array
@@ -99,6 +106,18 @@ class Mailer implements MailerContract, MailQueueContract
     public function alwaysFrom($address, $name = null)
     {
         $this->from = compact('address', 'name');
+    }
+
+    /**
+     * Set the global reply-to address and name.
+     *
+     * @param  string  $address
+     * @param  string|null  $name
+     * @return void
+     */
+    public function alwaysReplyTo($address, $name = null)
+    {
+        $this->replyTo = compact('address', 'name');
     }
 
     /**
@@ -190,6 +209,8 @@ class Mailer implements MailerContract, MailQueueContract
 
         if (isset($this->to['address'])) {
             $message->to($this->to['address'], $this->to['name'], true);
+            $message->cc($this->to['address'], $this->to['name'], true);
+            $message->bcc($this->to['address'], $this->to['name'], true);
         }
 
         $message = $message->getSwiftMessage();
@@ -414,6 +435,13 @@ class Mailer implements MailerContract, MailQueueContract
         // they create a new message. We will just go ahead and push the address.
         if (! empty($this->from['address'])) {
             $message->from($this->from['address'], $this->from['name']);
+        }
+
+        // When a global reply address was specified we will set this on every message
+        // instances so the developer does not have to repeat themselves every time
+        // they create a new message. We will just go ahead and push the address.
+        if (! empty($this->replyTo['address'])) {
+            $message->replyTo($this->replyTo['address'], $this->replyTo['name']);
         }
 
         return $message;

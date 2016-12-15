@@ -5,16 +5,28 @@
 ### Added
 - Added `Authenticatable::$rememberTokenName` ([#16617](https://github.com/laravel/framework/pull/16617), [38612c0](https://github.com/laravel/framework/commit/38612c0e88a48cca5744cc464a764b976f79a46d))
 - Added `Collection::partition()` method ([#16627](https://github.com/laravel/framework/pull/16627), [#16644](https://github.com/laravel/framework/pull/16644))
+- Added resource routes translations ([#16429](https://github.com/laravel/framework/pull/16429), [e91f04b](https://github.com/laravel/framework/commit/e91f04b52603194dbc90dbbaee730e171bee1449))
 
 ### Changed
 - Added missing `$useReadPdo` argument to `Connection::selectOne()` ([#16625](https://github.com/laravel/framework/pull/16625))
 - Preload some files required by already listed files ([#16648](https://github.com/laravel/framework/pull/16648))
+- Clone query for chunking ([53f97a0](https://github.com/laravel/framework/commit/53f97a014da380dc85fb4b0d826475e562d78dcc), [32d0f16](https://github.com/laravel/framework/commit/32d0f164424ab5b4a2bff2ed927812ae49bd8051))
+- Return a regular `PDO` object if a persistent connection is requested ([#16702](https://github.com/laravel/framework/pull/16702), [6b413d5](https://github.com/laravel/framework/commit/6b413d5b416c1e0b629a3036e6c3ad84b3b76a6e))
+- Global `to` address now also applied for the `cc` and `bcc` options of an email ([#16705](https://github.com/laravel/framework/pull/16705))
+- Don't report exceptions inside queue worker signal handler ([#16738](https://github.com/laravel/framework/pull/16738))
+- Kill timed out queue worker process ([#16746](https://github.com/laravel/framework/pull/16746))
+- Removed unnecessary check in `ScheduleRunCommand::fire()` ([#16752](https://github.com/laravel/framework/pull/16752))
+- Improved performance of `Str::startsWith()` ([#16761](https://github.com/laravel/framework/pull/16761))
+- Improved handling of numeric values in `Str::startsWith()` ([#16770](https://github.com/laravel/framework/pull/16770))
 
 ### Fixed
 - Added file existance check to `AppNameCommand::replaceIn()` to fix [#16575](https://github.com/laravel/framework/pull/16575) ([#16592](https://github.com/laravel/framework/pull/16592))
 - Check for `null` in `seeJsonStructure()` ([#16642](https://github.com/laravel/framework/pull/16642))
 - Reverted [#15264](https://github.com/laravel/framework/pull/15264) ([#16660](https://github.com/laravel/framework/pull/16660))
 - Fixed misleading credentials exception when `ExceptionHandler` is not bound in container ([#16666](https://github.com/laravel/framework/pull/16666))
+- Use `sync` as queue name for Sync Queues ([#16681](https://github.com/laravel/framework/pull/16681))
+- Fixed `storedAs()` and `virtualAs()` issue ([#16683](https://github.com/laravel/framework/pull/16683))
+- Fixed false-positive `date_format` validation ([#16692](https://github.com/laravel/framework/pull/16692))
 
 
 ## v5.3.26 (2016-11-30)
