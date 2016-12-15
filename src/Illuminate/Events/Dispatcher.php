@@ -305,12 +305,9 @@ class Dispatcher implements DispatcherContract
         $listeners = isset($this->listeners[$eventName])
                             ? $this->listeners[$eventName] : [];
 
+
         if (class_exists($eventName, false)) {
-            foreach (class_implements($eventName) as $interface) {
-                if (isset($this->listeners[$interface])) {
-                    $listeners = array_merge_recursive($listeners, $this->listeners[$interface]);
-                }
-            }
+            $listeners = $this->addInterfaceListeners($eventName, $listeners);
         }
 
         if ($listeners) {
@@ -320,6 +317,24 @@ class Dispatcher implements DispatcherContract
         } else {
             $this->sorted[$eventName] = [];
         }
+    }
+
+    /**
+     * Add the listeners for the event's interfaces to the given array.
+     *
+     * @param  string  $eventName
+     * @param  array  $listeners
+     * @return array
+     */
+    protected function addInterfaceListeners($eventName, array $listeners = [])
+    {
+        foreach (class_implements($eventName) as $interface) {
+            if (isset($this->listeners[$interface])) {
+                $listeners = array_merge_recursive($listeners, $this->listeners[$interface]);
+            }
+        }
+
+        return $listeners;
     }
 
     /**
