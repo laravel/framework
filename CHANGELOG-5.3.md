@@ -1,11 +1,25 @@
 # Release Notes for 5.3.x
 
-## [Unreleased]
+## v5.3.28 (2016-12-15)
+
+### Changed
+- Refactored `ControllerMakeCommand` class ([59a1ce2](https://github.com/laravel/framework/commit/59a1ce21413221131aaf0086cd1eb7c887c701c0))
+
+### Fixed
+- Fixed implicit Router binding through IoC ([#16802](https://github.com/laravel/framework/pull/16802))
+- `Collection::min()` incorrectly excludes `0` when calculating minimum ([#16821](https://github.com/laravel/framework/pull/16821))
+
+
+## v5.3.27 (2016-12-15)
 
 ### Added
 - Added `Authenticatable::$rememberTokenName` ([#16617](https://github.com/laravel/framework/pull/16617), [38612c0](https://github.com/laravel/framework/commit/38612c0e88a48cca5744cc464a764b976f79a46d))
 - Added `Collection::partition()` method ([#16627](https://github.com/laravel/framework/pull/16627), [#16644](https://github.com/laravel/framework/pull/16644))
 - Added resource routes translations ([#16429](https://github.com/laravel/framework/pull/16429), [e91f04b](https://github.com/laravel/framework/commit/e91f04b52603194dbc90dbbaee730e171bee1449))
+- Allow `TokenGuard` API token to be sent through as input ([#16766](https://github.com/laravel/framework/pull/16766))
+- Added `Collection::isNotEmpty()` ([#16797](https://github.com/laravel/framework/pull/16797))
+- Added "evidence" to the list of uncountable words ([#16788](https://github.com/laravel/framework/pull/16788))
+- Added `reply_to` to mailer config ([#16810](https://github.com/laravel/framework/pull/16810), [dc2ce4f](https://github.com/laravel/framework/commit/dc2ce4f9efb831a304e1c2674aae1dfd819b9c56))
 
 ### Changed
 - Added missing `$useReadPdo` argument to `Connection::selectOne()` ([#16625](https://github.com/laravel/framework/pull/16625))
@@ -16,6 +30,8 @@
 - Don't report exceptions inside queue worker signal handler ([#16738](https://github.com/laravel/framework/pull/16738))
 - Kill timed out queue worker process ([#16746](https://github.com/laravel/framework/pull/16746))
 - Removed unnecessary check in `ScheduleRunCommand::fire()` ([#16752](https://github.com/laravel/framework/pull/16752))
+- Only guess the ability's name if no fully qualified class name was given ([#16807](https://github.com/laravel/framework/pull/16807), [f79839e](https://github.com/laravel/framework/commit/f79839e4b72999a67d5503bbb8437547cab87236))
+- Remove falsy values from array in `min()` and `max()` on `Collection` ([e2d317e](https://github.com/laravel/framework/commit/e2d317efcebbdf6651d89100c0b5d80a925bb2f1))
 
 ### Fixed
 - Added file existance check to `AppNameCommand::replaceIn()` to fix [#16575](https://github.com/laravel/framework/pull/16575) ([#16592](https://github.com/laravel/framework/pull/16592))
@@ -25,6 +41,11 @@
 - Use `sync` as queue name for Sync Queues ([#16681](https://github.com/laravel/framework/pull/16681))
 - Fixed `storedAs()` and `virtualAs()` issue ([#16683](https://github.com/laravel/framework/pull/16683))
 - Fixed false-positive `date_format` validation ([#16692](https://github.com/laravel/framework/pull/16692))
+- Use translator `trans()` method in `Validator` ([#16778](https://github.com/laravel/framework/pull/16778))
+- Fixed runtime error in `RouteServiceProvider` when `Route` facade is not available ([#16775](https://github.com/laravel/framework/pull/16775))
+
+### Removed
+- Removed hard coded prose from scheduled task email subject ([#16790](https://github.com/laravel/framework/pull/16790))
 
 
 ## v5.3.26 (2016-11-30)
