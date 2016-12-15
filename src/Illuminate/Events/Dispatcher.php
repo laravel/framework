@@ -405,29 +405,16 @@ class Dispatcher implements DispatcherContract
     protected function createQueuedHandlerCallable($class, $method)
     {
         return function () use ($class, $method) {
-            $arguments = $this->cloneArgumentsForQueueing(func_get_args());
+            $arguments = array_map(function ($a) {
+                return is_object($a) ? clone $a : $a;
+            }, func_get_args());
 
             if (method_exists($class, 'queue')) {
                 $this->callQueueMethodOnHandler($class, $method, $arguments);
             } else {
-                $this->resolveQueue()->push('Illuminate\Events\CallQueuedHandler@call', [
-                    'class' => $class, 'method' => $method, 'data' => serialize($arguments),
-                ]);
+                $this->queueHandler($class, $method, $arguments);
             }
         };
-    }
-
-    /**
-     * Clone the given arguments for queueing.
-     *
-     * @param  array  $arguments
-     * @return array
-     */
-    protected function cloneArgumentsForQueueing(array $arguments)
-    {
-        return array_map(function ($a) {
-            return is_object($a) ? clone $a : $a;
-        }, $arguments);
     }
 
     /**
@@ -445,6 +432,31 @@ class Dispatcher implements DispatcherContract
         $handler->queue($this->resolveQueue(), 'Illuminate\Events\CallQueuedHandler@call', [
             'class' => $class, 'method' => $method, 'data' => serialize($arguments),
         ]);
+    }
+
+    /**
+     * Queue the handler class.
+     *
+     * @param  string  $class
+     * @param  string  $method
+     * @param  array  $arguments
+     * @return void
+     */
+    protected function queueHandler($class, $method, $arguments)
+    {
+        $handler = (new ReflectionClass($class))->newInstanceWithoutConstructor();
+
+        $connection = isset($handler->connection) ? $handler->connection : null;
+
+        $queue = isset($handler->queue) ? $handler->queue : null;
+
+        $this->resolveQueue()
+                ->connection($connection)
+                ->pushOn($queue, 'Illuminate\Events\CallQueuedHandler@call', [
+                    'class' => $class,
+                    'method' => $method,
+                    'data' => serialize($arguments),
+                ]);
     }
 
     /**
