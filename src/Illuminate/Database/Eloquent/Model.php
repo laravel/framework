@@ -1380,6 +1380,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Simply create factory instances straight from the model
+     *
+     * @param int $amount
+     * @return FactoryBuilder
+     */
+    public static function factory($amount = 0)
+    {
+        return factory(static::class, $amount);
+    }
+
+    /**
      * Increment a column's value by a given amount.
      *
      * @param  string  $column
