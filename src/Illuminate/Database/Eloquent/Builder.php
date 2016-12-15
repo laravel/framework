@@ -1157,7 +1157,7 @@ class Builder
             // Finally we will add the proper result column alias to the query and run the subselect
             // statement against the query builder. Then we will return the builder instance back
             // to the developer for further constraint chaining that needs to take place on it.
-            $column = snake_case(isset($alias) ? $alias : $name) . '_sum';
+            $column = snake_case(isset($alias) ? $alias : $name).'_sum';
 
             $this->selectSub($query->toBase(), $column);
         }

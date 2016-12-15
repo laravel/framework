@@ -157,7 +157,7 @@ abstract class Relation
      */
     public function getRelationSumQuery(Builder $query, $column, Builder $parent)
     {
-        return $this->getRelationQuery($query, $parent, new Expression('sum(' . $columns . ')'));
+        return $this->getRelationQuery($query, $parent, new Expression('sum('.$columns.')'));
     }
 
     /**
