@@ -151,11 +151,15 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase
     {
         $d = new Dispatcher;
         $queue = m::mock('Illuminate\Contracts\Queue\Queue');
-        $queue->shouldReceive('push')->once()->with('Illuminate\Events\CallQueuedHandler@call', [
+
+        $queue->shouldReceive('connection')->once()->with(null)->andReturnSelf();
+
+        $queue->shouldReceive('pushOn')->once()->with(null, 'Illuminate\Events\CallQueuedHandler@call', [
             'class' => 'TestDispatcherQueuedHandler',
             'method' => 'someMethod',
             'data' => serialize(['foo', 'bar']),
         ]);
+
         $d->setQueueResolver(function () use ($queue) {
             return $queue;
         });
