@@ -90,10 +90,17 @@ class Message
      *
      * @param  string|array  $address
      * @param  string|null  $name
+     * @param  bool  $override
      * @return $this
      */
-    public function cc($address, $name = null)
+    public function cc($address, $name = null, $override = false)
     {
+        if ($override) {
+            $this->swift->setCc($address, $name);
+
+            return $this;
+        }
+
         return $this->addAddresses($address, $name, 'Cc');
     }
 
@@ -102,10 +109,17 @@ class Message
      *
      * @param  string|array  $address
      * @param  string|null  $name
+     * @param  bool  $override
      * @return $this
      */
-    public function bcc($address, $name = null)
+    public function bcc($address, $name = null, $override = false)
     {
+        if ($override) {
+            $this->swift->setBcc($address, $name);
+
+            return $this;
+        }
+
         return $this->addAddresses($address, $name, 'Bcc');
     }
 
