@@ -137,6 +137,18 @@ abstract class Relation
     }
 
     /**
+     * Add the constraints for a relationship count query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $parent
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function getRelationCountQuery(Builder $query, Builder $parent)
+    {
+        return $this->getRelationQuery($query, $parent, new Expression('count(*)'));
+    }
+
+    /**
      * Add the constraints for a relationship query.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
