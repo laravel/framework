@@ -89,10 +89,10 @@ class RedisBroadcaster extends Broadcaster
     {
         $connection = $this->redis->connection($this->connection);
 
-        $socket = Arr::pull($payload, 'socket');
-
         $payload = json_encode([
-            'event' => $event, 'data' => $payload, 'socket' => $socket,
+            'event' => $event,
+            'data' => $payload,
+            'socket' => Arr::pull($payload, 'socket'),
         ]);
 
         foreach ($this->formatChannels($channels) as $channel) {
