@@ -328,7 +328,7 @@ trait MakesHttpRequests
     }
 
     /**
-     * Assert that the response doesn't contain JSON.
+     * Assert that the response does not contains JSON.
      *
      * @param  array|null  $data
      * @return $this
