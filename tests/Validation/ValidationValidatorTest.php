@@ -1549,6 +1549,20 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
     }
 
+    /**
+     * @dataProvider validUrls
+     */
+    public function testValidateUrlWithCustomProtocolValidUrls($validUrl)
+    {
+        $v = new Validator($this->getIlluminateArrayTranslator(), [
+            'x' => 'custom-protocol://'.last(explode('://', $validUrl)),
+        ], [
+            'x' => 'Url:protocol=custom-protocol',
+        ]);
+
+        $this->assertTrue($v->passes());
+    }
+
     public function validUrls()
     {
         return [
