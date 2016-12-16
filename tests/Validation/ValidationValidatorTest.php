@@ -2475,13 +2475,18 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
     }
 
-    public function testSometimesFailOnEmptyArrayInImplicitRules()
+    public function testSometimesOnArraysInImplicitRules()
     {
         $trans = $this->getIlluminateArrayTranslator();
 
         $data = ['names' => [['second' => []]]];
         $v = new Validator($trans, $data, ['names.*.second' => 'sometimes|required']);
         $this->assertFalse($v->passes());
+
+        $data = ['names' => [['second' => ['Taylor']]]];
+        $v = new Validator($trans, $data, ['names.*.second' => 'sometimes|required|string']);
+        $this->assertFalse($v->passes());
+        $this->assertEquals(['validation.string'], $v->errors()->get('names.0.second'));
     }
 
     public function testValidateImplicitEachWithAsterisksForRequiredNonExistingKey()
