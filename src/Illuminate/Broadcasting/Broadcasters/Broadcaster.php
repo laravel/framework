@@ -80,11 +80,7 @@ abstract class Broadcaster implements BroadcasterContract
         return collect($this->extractChannelKeys($pattern, $channel))->reject(function ($value, $key) {
             return is_numeric($key);
         })->map(function ($value, $key) use ($callbackParameters) {
-            $newValue = $this->resolveExplicitBindingIfPossible($key, $value);
-
-            return $newValue === $value ? $this->resolveImplicitBindingIfPossible(
-                $key, $value, $callbackParameters
-            ) : $newValue;
+            return $this->resolveBinding($key, $value, $callbackParameters);
         })->values()->all();
     }
 
@@ -100,6 +96,23 @@ abstract class Broadcaster implements BroadcasterContract
         preg_match('/^'.preg_replace('/\{(.*?)\}/', '(?<$1>[^\.]+)', $pattern).'/', $channel, $keys);
 
         return $keys;
+    }
+
+    /**
+     * Resolve the given parameter binding.
+     *
+     * @param  string  $key
+     * @param  string  $value
+     * @param  array  $callbackParameters
+     * @return mixed
+     */
+    protected function resolveBinding($key, $value, $callbackParameters)
+    {
+        $newValue = $this->resolveExplicitBindingIfPossible($key, $value);
+
+        return $newValue === $value ? $this->resolveImplicitBindingIfPossible(
+            $key, $value, $callbackParameters
+        ) : $newValue;
     }
 
     /**
