@@ -173,7 +173,7 @@ class SparkPostTransport extends Transport
     {
         return $this->metadata = $metadata;
     }
-    
+
     /**
      * Get the transmission metadata being used by the transport.
      *
