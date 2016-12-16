@@ -9,7 +9,7 @@ use Illuminate\Routing\Redirector;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Http\Exception\HttpResponseException;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
 use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
@@ -136,11 +136,11 @@ class FormRequest extends Request implements ValidatesWhenResolved
      *
      * @return void
      *
-     * @throws \Illuminate\Http\Exception\HttpResponseException
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     protected function failedAuthorization()
     {
-        throw new HttpResponseException($this->forbiddenResponse());
+        throw new AuthorizationException('This action is unauthorized.');
     }
 
     /**
@@ -158,16 +158,6 @@ class FormRequest extends Request implements ValidatesWhenResolved
         return $this->redirector->to($this->getRedirectUrl())
                                         ->withInput($this->except($this->dontFlash))
                                         ->withErrors($errors, $this->errorBag);
-    }
-
-    /**
-     * Get the response for a forbidden operation.
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function forbiddenResponse()
-    {
-        return new Response('Forbidden', 403);
     }
 
     /**
