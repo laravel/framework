@@ -69,9 +69,9 @@ class DatabaseUserProvider implements UserProvider
     public function retrieveByToken($identifier, $token)
     {
         $user = $this->conn->table($this->table)
-            ->where('id', $identifier)
-            ->where('remember_token', $token)
-            ->first();
+                        ->where('id', $identifier)
+                        ->where('remember_token', $token)
+                        ->first();
 
         return $this->getGenericUser($user);
     }
@@ -139,8 +139,8 @@ class DatabaseUserProvider implements UserProvider
      */
     public function validateCredentials(UserContract $user, array $credentials)
     {
-        $plain = $credentials['password'];
-
-        return $this->hasher->check($plain, $user->getAuthPassword());
+        return $this->hasher->check(
+            $credentials['password'], $user->getAuthPassword()
+        );
     }
 }
