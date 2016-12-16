@@ -155,7 +155,7 @@ class SqlServerConnector extends Connector implements ConnectorInterface
      */
     protected function buildHostString(array $config, $separator)
     {
-        if (isset($config['port'])) {
+        if (isset($config['port']) && ! empty($config['port'])) {
             return $config['host'].$separator.$config['port'];
         } else {
             return $config['host'];
