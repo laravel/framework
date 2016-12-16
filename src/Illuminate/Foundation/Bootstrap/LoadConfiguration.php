@@ -42,7 +42,7 @@ class LoadConfiguration
             return $config->get('app.env', 'production');
         });
 
-        date_default_timezone_set($config['app.timezone']);
+        date_default_timezone_set($config->get('app.timezone', 'UTC'));
 
         mb_internal_encoding('UTF-8');
     }
@@ -71,32 +71,10 @@ class LoadConfiguration
     {
         $files = [];
 
-        $configPath = realpath($app->configPath());
-
-        foreach (Finder::create()->files()->name('*.php')->in($configPath) as $file) {
-            $nesting = $this->getConfigurationNesting($file, $configPath);
-
-            $files[$nesting.basename($file->getRealPath(), '.php')] = $file->getRealPath();
+        foreach (Finder::create()->files()->name('*.php')->in(realpath($app->configPath())) as $file) {
+            $files[basename($file->getRealPath(), '.php')] = $file->getRealPath();
         }
 
         return $files;
-    }
-
-    /**
-     * Get the configuration file nesting path.
-     *
-     * @param  \Symfony\Component\Finder\SplFileInfo  $file
-     * @param  string  $configPath
-     * @return string
-     */
-    protected function getConfigurationNesting(SplFileInfo $file, $configPath)
-    {
-        $directory = $file->getPath();
-
-        if ($tree = trim(str_replace($configPath, '', $directory), DIRECTORY_SEPARATOR)) {
-            $tree = str_replace(DIRECTORY_SEPARATOR, '.', $tree).'.';
-        }
-
-        return $tree;
     }
 }
