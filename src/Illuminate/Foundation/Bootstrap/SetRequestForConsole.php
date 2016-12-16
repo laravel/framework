@@ -15,8 +15,8 @@ class SetRequestForConsole
      */
     public function bootstrap(Application $app)
     {
-        $url = $app->make('config')->get('app.url', 'http://localhost');
-
-        $app->instance('request', Request::create($url, 'GET', [], [], [], $_SERVER));
+        $app->instance('request', Request::create(
+            $app->make('config')->get('app.url', 'http://localhost'), 'GET', [], [], [], $_SERVER
+        ));
     }
 }
