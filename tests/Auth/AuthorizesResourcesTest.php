@@ -32,14 +32,14 @@ class AuthorizesResourcesTest extends PHPUnit_Framework_TestCase
     {
         $controller = new AuthorizesResourcesController();
 
-        $this->assertHasMiddleware($controller, 'edit', 'can:update,user');
+        $this->assertHasMiddleware($controller, 'edit', 'can:edit,user');
     }
 
     public function testUpdateMethod()
     {
         $controller = new AuthorizesResourcesController();
 
-        $this->assertHasMiddleware($controller, 'update', 'can:update,user');
+        $this->assertHasMiddleware($controller, 'update', 'can:edit,user');
     }
 
     public function testDestroyMethod()
