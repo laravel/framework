@@ -619,13 +619,13 @@ class Validator implements ValidatorContract
      */
     protected function passesOptionalCheck($attribute)
     {
-        $data = Arr::dot($this->initializeAttributeOnData($attribute));
-
-        $data = array_merge($data, $this->extractValuesForWildcards(
-            $data, $attribute
-        ));
-
         if ($this->hasRule($attribute, ['Sometimes'])) {
+            $data = Arr::dot($this->initializeAttributeOnData($attribute));
+
+            $data = array_merge($data, $this->extractValuesForWildcards(
+                $data, $attribute
+            ));
+
             return array_key_exists($attribute, $data)
                 || in_array($attribute, array_keys($this->data));
         }
