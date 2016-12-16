@@ -107,8 +107,8 @@ trait AuthorizesRequests
             'show' => 'view',
             'create' => 'create',
             'store' => 'create',
-            'edit' => 'update',
-            'update' => 'update',
+            'edit' => 'edit',
+            'update' => 'edit',
             'destroy' => 'delete',
         ];
     }
