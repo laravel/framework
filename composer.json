@@ -20,7 +20,6 @@
         "ext-openssl": "*",
         "classpreloader/classpreloader": "~3.0",
         "doctrine/inflector": "~1.0",
-        "erusev/parsedown": "~1.6",
         "jeremeamia/superclosure": "~2.2",
         "league/flysystem": "~1.0",
         "monolog/monolog": "~1.11",
@@ -38,7 +37,6 @@
         "symfony/process": "~3.2",
         "symfony/routing": "~3.2",
         "symfony/var-dumper": "~3.2",
-        "tijsverkoyen/css-to-inline-styles": "~2.2",
         "vlucas/phpdotenv": "~2.2"
     },
     "replace": {
@@ -75,12 +73,14 @@
     },
     "require-dev": {
         "aws/aws-sdk-php": "~3.0",
+        "erusev/parsedown": "~1.6",
         "mockery/mockery": "~0.9.4",
         "pda/pheanstalk": "~3.0",
         "phpunit/phpunit": "~5.4",
         "predis/predis": "~1.0",
         "symfony/css-selector": "~3.2",
-        "symfony/dom-crawler": "~3.2"
+        "symfony/dom-crawler": "~3.2",
+        "tijsverkoyen/css-to-inline-styles": "~2.2"
     },
     "autoload": {
         "files": [
@@ -104,6 +104,7 @@
     "suggest": {
         "aws/aws-sdk-php": "Required to use the SQS queue driver and SES mail driver (~3.0).",
         "doctrine/dbal": "Required to rename columns and drop SQLite columns (~2.4).",
+        "erusev/parsedown": "Required to use markdown in mail messages (~1.6)",
         "fzaninotto/faker": "Required to use the eloquent factory builder (~1.4).",
         "guzzlehttp/guzzle": "Required to use the Mailgun and Mandrill mail drivers and the ping methods on schedules (~5.3|~6.0).",
         "league/flysystem-aws-s3-v3": "Required to use the Flysystem S3 driver (~1.0).",
@@ -113,7 +114,8 @@
         "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (~2.0).",
         "symfony/css-selector": "Required to use some of the crawler integration testing tools (~3.2).",
         "symfony/dom-crawler": "Required to use most of the crawler integration testing tools (~3.2).",
-        "symfony/psr-http-message-bridge": "Required to psr7 bridging features (0.2.*)."
+        "symfony/psr-http-message-bridge": "Required to psr7 bridging features (0.2.*).",
+        "tijsverkoyen/css-to-inline-styles": "Required to use markdown in mail messages (~2.2)"
     },
     "minimum-stability": "dev",
     "prefer-stable": true
