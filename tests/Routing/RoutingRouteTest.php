@@ -642,7 +642,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
     public function testModelBindingWithNullReturnDefaultValue()
         {
         $router = $this->getRouter();
-        $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name = null) {
+        $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($bar = null) {
             return 'hello world';
         }]);
         $router->model('bar', 'RouteModelBindingNullStub');
