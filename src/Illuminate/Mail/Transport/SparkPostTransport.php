@@ -179,7 +179,8 @@ class SparkPostTransport extends Transport
      *
      * @return string
      */
-    public function getMetadata(){
+    public function getMetadata()
+    {
         return $this->metadata;
     }
 }
