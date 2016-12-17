@@ -21,6 +21,8 @@ class DatabaseServiceProvider extends ServiceProvider
     {
         Model::setConnectionResolver($this->app['db']);
 
+        Model::setContainer($this->app);
+
         Model::setEventDispatcher($this->app['events']);
     }
 
