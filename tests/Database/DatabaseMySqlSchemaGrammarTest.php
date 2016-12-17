@@ -503,6 +503,17 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(1, count($statements));
 		$this->assertEquals('alter table `users` add `foo` blob not null', $statements[0]);
 	}
+	
+	public function testAddingRememberToken()
+	{
+		$blueprint = new Blueprint('users');
+		$blueprint->remember_token();
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table `users` add `remember_token` varchar(100) null', $statements[0]);
+
+	}
 
 
 	protected function getConnection()
