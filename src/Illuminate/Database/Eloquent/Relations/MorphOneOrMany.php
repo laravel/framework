@@ -49,7 +49,7 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 		{
 			parent::addConstraints();
 
-			$this->query->where($this->morphType, $this->morphClass);
+			$this->query->where($this->morphType, $this->getEscapedMorphClass());
 		}
 	}
 
@@ -64,7 +64,7 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 	{
 		$query = parent::getRelationCountQuery($query, $parent);
 
-		return $query->where($this->morphType, $this->morphClass);
+		return $query->where($this->morphType, $this->getEscapedMorphClass());
 	}
 
 	/**
@@ -77,7 +77,7 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 	{
 		parent::addEagerConstraints($models);
 
-		$this->query->where($this->morphType, $this->morphClass);
+		$this->query->where($this->morphType, $this->getEscapedMorphClass());
 	}
 
 	/**
@@ -155,5 +155,14 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 	{
 		return $this->morphClass;
 	}
-
+	
+	/**
+        * Get the class name of the parent model, escaped for querying.
+        *
+        * @return string
+        */
+        public function getEscapedMorphClass()
+        {
+           return addslashes($this->morphClass);
+        }
 }
