@@ -792,7 +792,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // foreign key name by using the name of the relationship function, which
         // when combined with an "_id" should conventionally match the columns.
         if (is_null($foreignKey)) {
-            $foreignKey = Str::snake($relation).'_' . $instance->getKeyName();
+            $foreignKey = Str::snake($relation).'_'.$instance->getKeyName();
         }
 
         if (! $instance->getConnectionName()) {
