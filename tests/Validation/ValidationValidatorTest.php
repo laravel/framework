@@ -2123,6 +2123,18 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
         $v = new Validator($trans, ['x' => ['Not', 'a', 'date']], ['x' => 'date_format:Y-m-d']);
         $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '2000-01-01T00:00:00Z'], ['x' => 'date_format:Y-m-d\TH:i:sP']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '2000-01-01T00:00:00Z'], ['x' => 'date_format:Y-m-d\TH:i:sP']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '2000-01-01T00:00:00+00'], ['x' => 'date_format:Y-m-d\TH:i:sP']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '2000-01-01T00:00:00+00:30'], ['x' => 'date_format:Y-m-d\TH:i:sP']);
+        $this->assertTrue($v->passes());
     }
 
     public function testBeforeAndAfter()
