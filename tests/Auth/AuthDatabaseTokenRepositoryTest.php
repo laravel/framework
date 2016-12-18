@@ -88,6 +88,9 @@ class AuthDatabaseTokenRepositoryTest extends PHPUnit_Framework_TestCase
 
     protected function getRepo()
     {
-        return new Illuminate\Auth\Passwords\DatabaseTokenRepository(m::mock('Illuminate\Database\Connection'), 'table', 'key');
+        return new Illuminate\Auth\Passwords\DatabaseTokenRepository(
+            m::mock('Illuminate\Database\Connection'), 
+            m::mock('Illuminate\Contracts\Hashing\Hasher'),
+            'table', 'key');
     }
 }
