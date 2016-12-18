@@ -193,7 +193,7 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
     /**
      * Get the hasher instance.
      *
-     * @return \Illuminate\Contracts\Hashing\Hasher 
+     * @return \Illuminate\Contracts\Hashing\Hasher
      */
     public function getHasher()
     {
