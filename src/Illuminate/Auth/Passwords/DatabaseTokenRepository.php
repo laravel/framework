@@ -189,4 +189,14 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
     {
         return $this->connection;
     }
+
+    /**
+     * Get the hasher instance.
+     *
+     * @return \Illuminate\Contracts\Hashing\Hasher 
+     */
+    public function getHasher()
+    {
+        return $this->hasher;
+    }
 }
