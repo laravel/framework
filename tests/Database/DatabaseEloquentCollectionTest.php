@@ -109,6 +109,28 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertSame('taylor', $c->find(2, 'taylor'));
     }
 
+    public function testFindMethodFindsManyModelsById()
+    {
+        $model1 = (new TestEloquentCollectionModel)->forceFill(['id' => 1]);
+        $model2 = (new TestEloquentCollectionModel)->forceFill(['id' => 2]);
+        $model3 = (new TestEloquentCollectionModel)->forceFill(['id' => 3]);
+
+        $c = new Collection;
+        $this->assertInstanceOf(Collection::class, $c->find([]));
+        $this->assertCount(0, $c->find([1]));
+
+        $c->push($model1);
+        $this->assertCount(1, $c->find([1]));
+        $this->assertEquals(1, $c->find([1])->first()->id);
+        $this->assertCount(0, $c->find([2]));
+
+        $c->push($model2)->push($model3);
+        $this->assertCount(1, $c->find([2]));
+        $this->assertEquals(2, $c->find([2])->first()->id);
+        $this->assertCount(2, $c->find([2, 3, 4]));
+        $this->assertEquals([2, 3], $c->find([2, 3, 4])->pluck('id')->all());
+    }
+
     public function testLoadMethodEagerLoadsGivenRelationships()
     {
         $c = $this->getMockBuilder('Illuminate\Database\Eloquent\Collection')->setMethods(['first'])->setConstructorArgs([['foo']])->getMock();
