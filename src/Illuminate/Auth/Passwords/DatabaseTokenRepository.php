@@ -37,14 +37,14 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
      * @var int
      */
     protected $expires;
- 
+
     /**
      * The hasher implementation.
      *
      * @var \Illuminate\Contracts\Hashing\Hasher
      */
     protected $hasher;
-    
+
     /**
      * Create a new token repository instance.
      *
