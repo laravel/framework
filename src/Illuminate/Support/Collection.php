@@ -984,10 +984,10 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Chunk the underlying collection array.
      *
      * @param  int   $size
-     * @param  bool  $preserve_keys
+     * @param  bool  $preserveKeys
      * @return static
      */
-    public function chunk($size, $preserve_keys = true)
+    public function chunk($size, $preserveKeys = true)
     {
         if ($size <= 0) {
             return new static;
@@ -995,7 +995,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         $chunks = [];
 
-        foreach (array_chunk($this->items, $size, $preserve_keys) as $chunk) {
+        foreach (array_chunk($this->items, $size, $preserveKeys) as $chunk) {
             $chunks[] = new static($chunk);
         }
 
