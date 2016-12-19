@@ -1387,13 +1387,18 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, $result);
 
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" where "id" = ?', [1])->andReturn(1);
+        $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" where "users"."id" = ?', [1])->andReturn(1);
         $result = $builder->from('users')->delete(1);
         $this->assertEquals(1, $result);
 
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete from `users` where `email` = ? order by `id` asc limit 1', ['foo'])->andReturn(1);
         $result = $builder->from('users')->where('email', '=', 'foo')->orderBy('id')->take(1)->delete();
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->getConnection()->shouldReceive('delete')->once()->with('delete from [users] where [email] = ?', ['foo'])->andReturn(1);
+        $result = $builder->from('users')->where('email', '=', 'foo')->delete();
         $this->assertEquals(1, $result);
     }
 
@@ -1405,8 +1410,18 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, $result);
 
         $builder = $this->getMySqlBuilder();
-        $builder->getConnection()->shouldReceive('delete')->once()->with('delete `users` from `users` inner join `contacts` on `users`.`id` = `contacts`.`id` where `id` = ?', [1])->andReturn(1);
+        $builder->getConnection()->shouldReceive('delete')->once()->with('delete `users` from `users` inner join `contacts` on `users`.`id` = `contacts`.`id` where `users`.`id` = ?', [1])->andReturn(1);
         $result = $builder->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->orderBy('id')->take(1)->delete(1);
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->getConnection()->shouldReceive('delete')->once()->with('delete [users] from [users] inner join [contacts] on [users].[id] = [contacts].[id] where [email] = ?', ['foo'])->andReturn(1);
+        $result = $builder->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->where('email', '=', 'foo')->delete();
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->getConnection()->shouldReceive('delete')->once()->with('delete [users] from [users] inner join [contacts] on [users].[id] = [contacts].[id] where [users].[id] = ?', [1])->andReturn(1);
+        $result = $builder->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->delete(1);
         $this->assertEquals(1, $result);
     }
 
@@ -1822,6 +1837,8 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testChunkWithLastChunkComplete()
     {
         $builder = $this->getMockQueryBuilder();
+        $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+
         $chunk1 = collect(['foo1', 'foo2']);
         $chunk2 = collect(['foo3', 'foo4']);
         $chunk3 = collect([]);
@@ -1843,6 +1860,8 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testChunkWithLastChunkPartial()
     {
         $builder = $this->getMockQueryBuilder();
+        $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+
         $chunk1 = collect(['foo1', 'foo2']);
         $chunk2 = collect(['foo3']);
         $builder->shouldReceive('forPage')->once()->with(1, 2)->andReturnSelf();
@@ -1861,6 +1880,8 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testChunkCanBeStoppedByReturningFalse()
     {
         $builder = $this->getMockQueryBuilder();
+        $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+
         $chunk1 = collect(['foo1', 'foo2']);
         $chunk2 = collect(['foo3']);
         $builder->shouldReceive('forPage')->once()->with(1, 2)->andReturnSelf();
@@ -1881,6 +1902,8 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testChunkWithCountZero()
     {
         $builder = $this->getMockQueryBuilder();
+        $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+
         $chunk = collect([]);
         $builder->shouldReceive('forPage')->once()->with(1, 0)->andReturnSelf();
         $builder->shouldReceive('get')->times(1)->andReturn($chunk);
@@ -1896,6 +1919,8 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testChunkPaginatesUsingIdWithLastChunkComplete()
     {
         $builder = $this->getMockQueryBuilder();
+        $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+
         $chunk1 = collect([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]);
         $chunk2 = collect([(object) ['someIdField' => 10], (object) ['someIdField' => 11]]);
         $chunk3 = collect([]);
@@ -1917,6 +1942,8 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testChunkPaginatesUsingIdWithLastChunkPartial()
     {
         $builder = $this->getMockQueryBuilder();
+        $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+
         $chunk1 = collect([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]);
         $chunk2 = collect([(object) ['someIdField' => 10]]);
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'someIdField')->andReturnSelf();
@@ -1935,6 +1962,8 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testChunkPaginatesUsingIdWithCountZero()
     {
         $builder = $this->getMockQueryBuilder();
+        $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+
         $chunk = collect([]);
         $builder->shouldReceive('forPageAfterId')->once()->with(0, 0, 'someIdField')->andReturnSelf();
         $builder->shouldReceive('get')->times(1)->andReturn($chunk);
@@ -1950,6 +1979,8 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testChunkPaginatesUsingIdWithAlias()
     {
         $builder = $this->getMockQueryBuilder();
+        $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+
         $chunk1 = collect([(object) ['table_id' => 1], (object) ['table_id' => 10]]);
         $chunk2 = collect([]);
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'table.id')->andReturnSelf();

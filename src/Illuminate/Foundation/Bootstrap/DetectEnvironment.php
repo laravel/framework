@@ -17,14 +17,16 @@ class DetectEnvironment
      */
     public function bootstrap(Application $app)
     {
-        if (! $app->configurationIsCached()) {
-            $this->checkForSpecificEnvironmentFile($app);
+        if ($app->configurationIsCached()) {
+            return;
+        }
 
-            try {
-                (new Dotenv($app->environmentPath(), $app->environmentFile()))->load();
-            } catch (InvalidPathException $e) {
-                //
-            }
+        $this->checkForSpecificEnvironmentFile($app);
+
+        try {
+            (new Dotenv($app->environmentPath(), $app->environmentFile()))->load();
+        } catch (InvalidPathException $e) {
+            //
         }
     }
 
@@ -36,25 +38,19 @@ class DetectEnvironment
      */
     protected function checkForSpecificEnvironmentFile($app)
     {
-        if (php_sapi_name() == 'cli') {
-            $input = new ArgvInput;
-
-            if ($input->hasParameterOption('--env')) {
-                $file = $app->environmentFile().'.'.$input->getParameterOption('--env');
-
-                $this->loadEnvironmentFile($app, $file);
-            }
+        if (php_sapi_name() == 'cli' && with($input = new ArgvInput)->hasParameterOption('--env')) {
+            $this->setEnvironmentFilePath(
+                $app, $app->environmentFile().'.'.$input->getParameterOption('--env')
+            );
         }
 
-        if (! env('APP_ENV')) {
+        if (! env('APP_ENV') || empty($file)) {
             return;
         }
 
-        if (empty($file)) {
-            $file = $app->environmentFile().'.'.env('APP_ENV');
-
-            $this->loadEnvironmentFile($app, $file);
-        }
+        $this->setEnvironmentFilePath(
+            $app, $app->environmentFile().'.'.env('APP_ENV')
+        );
     }
 
     /**
@@ -64,7 +60,7 @@ class DetectEnvironment
      * @param  string  $file
      * @return void
      */
-    protected function loadEnvironmentFile($app, $file)
+    protected function setEnvironmentFilePath($app, $file)
     {
         if (file_exists($app->environmentPath().'/'.$file)) {
             $app->loadEnvironmentFrom($file);

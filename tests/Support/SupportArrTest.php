@@ -24,6 +24,12 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['name' => 'Desk', 'price' => 100], $array);
     }
 
+    public function testArrayPadString()
+    {
+        $this->assertEquals(['surname' => ['padporro', 'padsed', 'padmagni']], Arr::padString(['surname' => ['porro', 'sed', 'magni']], 'pad'));
+        $this->assertEquals(['surname' => ['porropad', 'sedpad', 'magnipad']], Arr::padString(['surname' => ['porro', 'sed', 'magni']], 'pad', false));
+    }
+
     public function testCollapse()
     {
         $data = [['foo', 'bar'], ['baz']];

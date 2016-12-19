@@ -166,9 +166,7 @@ class Builder
             return $this->findMany($id, $columns);
         }
 
-        $this->query->where($this->model->getQualifiedKeyName(), '=', $id);
-
-        return $this->first($columns);
+        return $this->whereKey($id)->first($columns);
     }
 
     /**
@@ -184,9 +182,7 @@ class Builder
             return $this->model->newCollection();
         }
 
-        $this->query->whereIn($this->model->getQualifiedKeyName(), $ids);
-
-        return $this->get($columns);
+        return $this->whereKey($ids)->get($columns);
     }
 
     /**
@@ -235,15 +231,16 @@ class Builder
      * Get the first record matching the attributes or instantiate it.
      *
      * @param  array  $attributes
+     * @param  array  $values
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function firstOrNew(array $attributes)
+    public function firstOrNew(array $attributes, array $values = [])
     {
         if (! is_null($instance = $this->where($attributes)->first())) {
             return $instance;
         }
 
-        return $this->model->newInstance($attributes)->setConnection(
+        return $this->model->newInstance($attributes + $values)->setConnection(
             $this->query->getConnection()->getName()
         );
     }
@@ -315,6 +312,28 @@ class Builder
     }
 
     /**
+     * Execute the query and get the first result or call a callback.
+     *
+     * @param  \Closure|array  $columns
+     * @param  \Closure|null  $callback
+     * @return \Illuminate\Database\Eloquent\Model|static|mixed
+     */
+    public function firstOr($columns = ['*'], Closure $callback = null)
+    {
+        if ($columns instanceof Closure) {
+            $callback = $columns;
+
+            $columns = ['*'];
+        }
+
+        if (! is_null($model = $this->first($columns))) {
+            return $model;
+        }
+
+        return call_user_func($callback);
+    }
+
+    /**
      * Execute the query as a "select" statement.
      *
      * @param  array  $columns
@@ -374,6 +393,8 @@ class Builder
      */
     public function chunk($count, callable $callback)
     {
+        $this->enforceOrderBy();
+
         $page = 1;
 
         do {
@@ -440,10 +461,6 @@ class Builder
      */
     public function each(callable $callback, $count = 1000)
     {
-        if (empty($this->query->orders) && empty($this->query->unionOrders)) {
-            $this->orderBy($this->model->getQualifiedKeyName(), 'asc');
-        }
-
         return $this->chunk($count, function ($results) use ($callback) {
             foreach ($results as $key => $value) {
                 if ($callback($value, $key) === false) {
@@ -451,6 +468,18 @@ class Builder
                 }
             }
         });
+    }
+
+    /**
+     * Add a generic "order by" clause if the query doesn't already have one.
+     *
+     * @return void
+     */
+    protected function enforceOrderBy()
+    {
+        if (empty($this->query->orders) && empty($this->query->unionOrders)) {
+            $this->orderBy($this->model->getQualifiedKeyName(), 'asc');
+        }
     }
 
     /**
@@ -775,6 +804,23 @@ class Builder
         }
 
         return $builder;
+    }
+
+    /**
+     * Add a where clause on the primary key to the query.
+     *
+     * @param  mixed  $id
+     * @return $this
+     */
+    public function whereKey($id)
+    {
+        if (is_array($id)) {
+            $this->query->whereIn($this->model->getQualifiedKeyName(), $id);
+
+            return $this;
+        }
+
+        return $this->where($this->model->getQualifiedKeyName(), '=', $id);
     }
 
     /**

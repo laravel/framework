@@ -306,11 +306,7 @@ class Dispatcher implements DispatcherContract
                             ? $this->listeners[$eventName] : [];
 
         if (class_exists($eventName, false)) {
-            foreach (class_implements($eventName) as $interface) {
-                if (isset($this->listeners[$interface])) {
-                    $listeners = array_merge_recursive($listeners, $this->listeners[$interface]);
-                }
-            }
+            $listeners = $this->addInterfaceListeners($eventName, $listeners);
         }
 
         if ($listeners) {
@@ -323,9 +319,27 @@ class Dispatcher implements DispatcherContract
     }
 
     /**
+     * Add the listeners for the event's interfaces to the given array.
+     *
+     * @param  string  $eventName
+     * @param  array  $listeners
+     * @return array
+     */
+    protected function addInterfaceListeners($eventName, array $listeners = [])
+    {
+        foreach (class_implements($eventName) as $interface) {
+            if (isset($this->listeners[$interface])) {
+                $listeners = array_merge_recursive($listeners, $this->listeners[$interface]);
+            }
+        }
+
+        return $listeners;
+    }
+
+    /**
      * Register an event listener with the dispatcher.
      *
-     * @param  mixed  $listener
+     * @param  string|\Closure  $listener
      * @return mixed
      */
     public function makeListener($listener)
@@ -336,16 +350,14 @@ class Dispatcher implements DispatcherContract
     /**
      * Create a class based listener using the IoC container.
      *
-     * @param  mixed  $listener
+     * @param  string  $listener
      * @return \Closure
      */
     public function createClassListener($listener)
     {
-        $container = $this->container;
-
-        return function () use ($listener, $container) {
+        return function () use ($listener) {
             return call_user_func_array(
-                $this->createClassCallable($listener, $container), func_get_args()
+                $this->createClassCallable($listener), func_get_args()
             );
         };
     }
@@ -354,17 +366,16 @@ class Dispatcher implements DispatcherContract
      * Create the class based event callable.
      *
      * @param  string  $listener
-     * @param  \Illuminate\Container\Container  $container
      * @return callable
      */
-    protected function createClassCallable($listener, $container)
+    protected function createClassCallable($listener)
     {
         list($class, $method) = $this->parseClassCallable($listener);
 
         if ($this->handlerShouldBeQueued($class)) {
             return $this->createQueuedHandlerCallable($class, $method);
         } else {
-            return [$container->make($class), $method];
+            return [$this->container->make($class), $method];
         }
     }
 
@@ -408,29 +419,16 @@ class Dispatcher implements DispatcherContract
     protected function createQueuedHandlerCallable($class, $method)
     {
         return function () use ($class, $method) {
-            $arguments = $this->cloneArgumentsForQueueing(func_get_args());
+            $arguments = array_map(function ($a) {
+                return is_object($a) ? clone $a : $a;
+            }, func_get_args());
 
             if (method_exists($class, 'queue')) {
                 $this->callQueueMethodOnHandler($class, $method, $arguments);
             } else {
-                $this->resolveQueue()->push('Illuminate\Events\CallQueuedHandler@call', [
-                    'class' => $class, 'method' => $method, 'data' => serialize($arguments),
-                ]);
+                $this->queueHandler($class, $method, $arguments);
             }
         };
-    }
-
-    /**
-     * Clone the given arguments for queueing.
-     *
-     * @param  array  $arguments
-     * @return array
-     */
-    protected function cloneArgumentsForQueueing(array $arguments)
-    {
-        return array_map(function ($a) {
-            return is_object($a) ? clone $a : $a;
-        }, $arguments);
     }
 
     /**
@@ -448,6 +446,31 @@ class Dispatcher implements DispatcherContract
         $handler->queue($this->resolveQueue(), 'Illuminate\Events\CallQueuedHandler@call', [
             'class' => $class, 'method' => $method, 'data' => serialize($arguments),
         ]);
+    }
+
+    /**
+     * Queue the handler class.
+     *
+     * @param  string  $class
+     * @param  string  $method
+     * @param  array  $arguments
+     * @return void
+     */
+    protected function queueHandler($class, $method, $arguments)
+    {
+        $handler = (new ReflectionClass($class))->newInstanceWithoutConstructor();
+
+        $connection = isset($handler->connection) ? $handler->connection : null;
+
+        $queue = isset($handler->queue) ? $handler->queue : null;
+
+        $this->resolveQueue()
+                ->connection($connection)
+                ->pushOn($queue, 'Illuminate\Events\CallQueuedHandler@call', [
+                    'class' => $class,
+                    'method' => $method,
+                    'data' => serialize($arguments),
+                ]);
     }
 
     /**

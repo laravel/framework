@@ -4,6 +4,7 @@ namespace Illuminate\View\Compilers;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\View\Factory as ViewFactory;
 
 class BladeCompiler extends Compiler implements CompilerInterface
 {
@@ -405,6 +406,16 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Replace the @parent directive to a placeholder.
+     *
+     * @return string
+     */
+    protected function compileParent()
+    {
+        return ViewFactory::parentPlaceholder();
+    }
+
+    /**
      * Compile the each statements into valid PHP.
      *
      * @param  string  $expression
@@ -535,7 +546,24 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileLang($expression)
     {
-        return "<?php echo app('translator')->get$expression; ?>";
+        if (is_null($expression)) {
+            return '<?php $__env->startTranslation(); ?>';
+        } elseif ($expression[1] === '[') {
+            return "<?php \$__env->startTranslation{$expression}; ?>";
+        } else {
+            return "<?php echo app('translator')->get$expression; ?>";
+        }
+    }
+
+    /**
+     * Compile the endlang statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileEndlang()
+    {
+        return '<?php echo $__env->renderTranslation(); ?>';
     }
 
     /**
@@ -889,6 +917,50 @@ class BladeCompiler extends Compiler implements CompilerInterface
         $expression = $this->stripParentheses($expression);
 
         return "<?php if (\$__env->exists($expression)) echo \$__env->make($expression, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
+    }
+
+    /**
+     * Compile the component statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileComponent($expression)
+    {
+        return "<?php \$__env->startComponent{$expression}; ?>";
+    }
+
+    /**
+     * Compile the end component statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileEndComponent($expression)
+    {
+        return '<?php echo $__env->renderComponent(); ?>';
+    }
+
+    /**
+     * Compile the slot statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileSlot($expression)
+    {
+        return "<?php \$__env->slot{$expression}; ?>";
+    }
+
+    /**
+     * Compile the end slot statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileEndSlot($expression)
+    {
+        return '<?php $__env->endSlot(); ?>';
     }
 
     /**

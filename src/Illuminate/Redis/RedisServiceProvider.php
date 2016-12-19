@@ -2,6 +2,7 @@
 
 namespace Illuminate\Redis;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
 
 class RedisServiceProvider extends ServiceProvider
@@ -21,7 +22,15 @@ class RedisServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton('redis', function ($app) {
-            return new Database($app['config']['database.redis']);
+            $servers = $app['config']['database.redis'];
+
+            $client = Arr::pull($servers, 'client', 'predis');
+
+            if ($client === 'phpredis') {
+                return new PhpRedisDatabase($servers);
+            } else {
+                return new PredisDatabase($servers);
+            }
         });
     }
 

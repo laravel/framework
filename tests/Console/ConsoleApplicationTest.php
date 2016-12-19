@@ -44,7 +44,7 @@ class ConsoleApplicationTest extends PHPUnit_Framework_TestCase
 
     protected function getMockConsole(array $methods)
     {
-        $app = m::mock('Illuminate\Contracts\Foundation\Application', ['version' => '5.3']);
+        $app = m::mock('Illuminate\Contracts\Foundation\Application', ['version' => '5.4']);
         $events = m::mock('Illuminate\Contracts\Events\Dispatcher', ['fire' => null]);
 
         $console = $this->getMockBuilder('Illuminate\Console\Application')->setMethods($methods)->setConstructorArgs([

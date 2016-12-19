@@ -38,6 +38,24 @@ class Arr
     }
 
     /**
+     * Add a string to all array elements.
+     *
+     * @param  array   $array
+     * @param  string  $pad
+     * @param  bool   $before
+     * @return array
+     */
+    public static function padString($array, $pad, $before = true)
+    {
+        return array_map(function($value) use ($pad, $before) {
+            if (is_array($value))
+                return static::padString($value, $pad, $before);
+
+            return $before ? $pad.$value : $value.$pad;
+        }, $array);
+    }
+
+    /**
      * Collapse an array of arrays into a single array.
      *
      * @param  array  $array
