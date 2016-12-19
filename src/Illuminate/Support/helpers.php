@@ -44,6 +44,21 @@ if (! function_exists('array_add')) {
     }
 }
 
+if (! function_exists('array_pad_string')) {
+    /**
+     * Add a string to all array elements.
+     *
+     * @param  array   $array
+     * @param  string  $pad
+     * @param  bool   $before
+     * @return array
+     */
+    function array_pad_string(array $array, $pad, $before = true)
+    {
+        return Arr::padString($array, $pad, $before);
+    }
+}
+
 if (! function_exists('array_collapse')) {
     /**
      * Collapse an array of arrays into a single array.

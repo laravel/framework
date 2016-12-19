@@ -676,6 +676,12 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['developer' => ['name' => 'Ferid']], array_add([], 'developer.name', 'Ferid'));
     }
 
+    public function testArrayPadString()
+    {
+        $this->assertEquals(['surname' => ['padporro', 'padsed', 'padmagni']], array_pad_string(['surname' => ['porro', 'sed', 'magni']], 'pad'));
+        $this->assertEquals(['surname' => ['porropad', 'sedpad', 'magnipad']], array_pad_string(['surname' => ['porro', 'sed', 'magni']], 'pad', false));
+    }
+
     public function testArrayPull()
     {
         $developer = ['firstname' => 'Ferid', 'surname' => 'Mövsümov'];
