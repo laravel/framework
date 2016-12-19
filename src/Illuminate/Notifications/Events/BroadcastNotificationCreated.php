@@ -25,6 +25,13 @@ class BroadcastNotificationCreated implements ShouldBroadcast
     public $notification;
 
     /**
+     * The queue connection.
+     *
+     * @var string
+     */
+    public $connection;
+
+    /**
      * The notification data.
      *
      * @var array
@@ -44,6 +51,10 @@ class BroadcastNotificationCreated implements ShouldBroadcast
         $this->data = $data;
         $this->notifiable = $notifiable;
         $this->notification = $notification;
+
+        if (method_exists($this->notification, 'broadcastNow')) {
+            $this->connection = $this->notification->broadcastNow() ? 'sync' : null;
+        }
     }
 
     /**
