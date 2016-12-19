@@ -72,7 +72,7 @@ class ConsoleMakeCommand extends GeneratorCommand
     protected function getArguments()
     {
         return [
-            ['name', InputArgument::REQUIRED, 'The name of the command.'],
+            ['name', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'The name of the command.'],
         ];
     }
 

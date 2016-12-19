@@ -45,25 +45,36 @@ abstract class GeneratorCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return bool|null
+     * @return array
      */
     public function fire()
     {
-        $name = $this->parseName($this->getNameInput());
+        $generated = [];
+
+        foreach (array_unique($this->getNameInput()) as $name) {
+            $generated[$name] = $this->generate($name);
+        }
+
+        return $generated;
+    }
+
+    protected function generate($rawName)
+    {
+        $name = $this->parseName($rawName);
 
         $path = $this->getPath($name);
 
-        if ($this->alreadyExists($this->getNameInput())) {
-            $this->error($this->type.' already exists!');
+        if ($this->alreadyExists($rawName)) {
+            $this->error($this->type.' '.$rawName.' already exists!');
 
-            return false;
+            return;
         }
 
         $this->makeDirectory($path);
 
         $this->files->put($path, $this->buildClass($name));
 
-        $this->info($this->type.' created successfully.');
+        $this->info($this->type.' '.$rawName.' created successfully.');
     }
 
     /**
@@ -198,11 +209,11 @@ abstract class GeneratorCommand extends Command
     /**
      * Get the desired class name from the input.
      *
-     * @return string
+     * @return array
      */
     protected function getNameInput()
     {
-        return trim($this->argument('name'));
+        return array_map('trim', (array) $this->argument('name'));
     }
 
     /**
@@ -223,7 +234,7 @@ abstract class GeneratorCommand extends Command
     protected function getArguments()
     {
         return [
-            ['name', InputArgument::REQUIRED, 'The name of the class'],
+            ['name', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'The name of the class'],
         ];
     }
 }
