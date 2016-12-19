@@ -1867,7 +1867,7 @@ class Validator implements ValidatorContract
 
         $date = DateTime::createFromFormat($parameters[0], $value);
 
-        return $date && $date->format($parameters[0]) === $value;
+        return $date && $date->format($parameters[0]) == $value;
     }
 
     /**
