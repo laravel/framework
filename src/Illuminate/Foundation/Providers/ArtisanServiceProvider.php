@@ -14,10 +14,10 @@ use Illuminate\Foundation\Console\TinkerCommand;
 use Illuminate\Queue\Console\FailedTableCommand;
 use Illuminate\Foundation\Console\AppNameCommand;
 use Illuminate\Foundation\Console\JobMakeCommand;
+use Illuminate\Database\Console\Seeds\SeedCommand;
 use Illuminate\Foundation\Console\MailMakeCommand;
 use Illuminate\Foundation\Console\OptimizeCommand;
 use Illuminate\Foundation\Console\TestMakeCommand;
-use Illuminate\Database\Console\Seeds\SeedCommand;
 use Illuminate\Foundation\Console\EventMakeCommand;
 use Illuminate\Foundation\Console\ModelMakeCommand;
 use Illuminate\Foundation\Console\RouteListCommand;
@@ -217,7 +217,6 @@ class ArtisanServiceProvider extends ServiceProvider
             return new CacheForgetCommand($app['cache']);
         });
     }
-
 
     /**
      * Register the command.
