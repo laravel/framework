@@ -38,7 +38,7 @@ class Rule
      * @param  bool  $array_keys
      * @return \Illuminate\Validation\Rules\In
      */
-    public static function in(array $values, bool $arrayKeys = null)
+    public static function in(array $values, $arrayKeys = false)
     {
         return new Rules\In($values, $arrayKeys);
     }
@@ -50,7 +50,7 @@ class Rule
      * @param  bool  $array_keys
      * @return \Illuminate\Validation\Rules\NotIn
      */
-    public static function notIn(array $values, bool $arrayKeys = null)
+    public static function notIn(array $values, $arrayKeys = false)
     {
         return new Rules\NotIn($values, $arrayKeys);
     }

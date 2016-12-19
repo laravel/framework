@@ -23,7 +23,7 @@ class In
      * @param  bool  $array_keys
      * @return void
      */
-    public function __construct(array $values, bool $arrayKeys = null)
+    public function __construct(array $values, $arrayKeys = false)
     {
         $this->values = $arrayKeys ? array_keys($values) : $values;
     }
