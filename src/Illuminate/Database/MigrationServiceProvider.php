@@ -11,7 +11,6 @@ use Illuminate\Database\Console\Migrations\InstallCommand;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
 use Illuminate\Database\Console\Migrations\RefreshCommand;
 use Illuminate\Database\Console\Migrations\RollbackCommand;
-use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Illuminate\Database\Migrations\DatabaseMigrationRepository;
 
 class MigrationServiceProvider extends ServiceProvider
@@ -92,7 +91,7 @@ class MigrationServiceProvider extends ServiceProvider
      */
     protected function registerCommands()
     {
-        $commands = ['Migrate', 'Rollback', 'Reset', 'Refresh', 'Install', 'Make', 'Status'];
+        $commands = ['Migrate', 'Rollback', 'Reset', 'Refresh', 'Install', 'Status'];
 
         // We'll simply spin through the list of commands that are migration related
         // and register each one of them with an application container. They will
@@ -105,7 +104,7 @@ class MigrationServiceProvider extends ServiceProvider
         // register them with the Artisan start event so that these are available
         // when the Artisan application actually starts up and is getting used.
         $this->commands(
-            'command.migrate', 'command.migrate.make',
+            'command.migrate',
             'command.migrate.install', 'command.migrate.rollback',
             'command.migrate.reset', 'command.migrate.refresh',
             'command.migrate.status'
@@ -161,25 +160,6 @@ class MigrationServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register the "make" migration command.
-     *
-     * @return void
-     */
-    protected function registerMakeCommand()
-    {
-        $this->app->singleton('command.migrate.make', function ($app) {
-            // Once we have the migration creator registered, we will create the command
-            // and inject the creator. The creator is responsible for the actual file
-            // creation of the migrations, and may be extended by these developers.
-            $creator = $app['migration.creator'];
-
-            $composer = $app['composer'];
-
-            return new MigrateMakeCommand($creator, $composer);
-        });
-    }
-
-    /**
      * Register the "status" migration command.
      *
      * @return void
@@ -215,7 +195,6 @@ class MigrationServiceProvider extends ServiceProvider
             'command.migrate.rollback', 'command.migrate.reset',
             'command.migrate.refresh', 'command.migrate.install',
             'command.migrate.status', 'migration.creator',
-            'command.migrate.make',
         ];
     }
 }
