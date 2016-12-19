@@ -41,6 +41,7 @@ use Illuminate\Foundation\Console\EventGenerateCommand;
 use Illuminate\Foundation\Console\VendorPublishCommand;
 use Illuminate\Database\Console\Seeds\SeederMakeCommand;
 use Illuminate\Foundation\Console\NotificationMakeCommand;
+use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Illuminate\Notifications\Console\NotificationTableCommand;
 
 class ArtisanServiceProvider extends ServiceProvider
@@ -92,6 +93,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'ListenerMake' => 'command.listener.make',
         'MailMake' => 'command.mail.make',
         'MiddlewareMake' => 'command.middleware.make',
+        'MigrateMake' => 'command.migrate.make',
         'ModelMake' => 'command.model.make',
         'NotificationMake' => 'command.notification.make',
         'NotificationTable' => 'command.notification.table',
@@ -347,6 +349,25 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.middleware.make', function ($app) {
             return new MiddlewareMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerMigrateMakeCommand()
+    {
+        $this->app->singleton('command.migrate.make', function ($app) {
+            // Once we have the migration creator registered, we will create the command
+            // and inject the creator. The creator is responsible for the actual file
+            // creation of the migrations, and may be extended by these developers.
+            $creator = $app['migration.creator'];
+
+            $composer = $app['composer'];
+
+            return new MigrateMakeCommand($creator, $composer);
         });
     }
 
