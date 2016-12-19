@@ -20,7 +20,7 @@ class NotIn
      * Create a new "not in" rule instance.
      *
      * @param  array  $values
-     * @param  bool  $array_keys
+     * @param  bool  $arrayKeys
      * @return void
      */
     public function __construct(array $values, $arrayKeys = false)

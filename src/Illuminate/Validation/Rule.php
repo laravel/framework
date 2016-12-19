@@ -35,7 +35,7 @@ class Rule
      * Get an in constraint builder instance.
      *
      * @param  array  $values
-     * @param  bool  $array_keys
+     * @param  bool  $arrayKeys
      * @return \Illuminate\Validation\Rules\In
      */
     public static function in(array $values, $arrayKeys = false)
@@ -47,7 +47,7 @@ class Rule
      * Get a not_in constraint builder instance.
      *
      * @param  array  $values
-     * @param  bool  $array_keys
+     * @param  bool  $arrayKeys
      * @return \Illuminate\Validation\Rules\NotIn
      */
     public static function notIn(array $values, $arrayKeys = false)
