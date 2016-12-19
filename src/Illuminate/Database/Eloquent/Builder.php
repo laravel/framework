@@ -1091,7 +1091,7 @@ class Builder
     {
         $relations = is_array($relations) ? $relations : func_get_args();
 
-        return $this->withAggregate('count', $relations, '*');
+        return $this->withRaw($relations, new Expression('count(*)'), 'count');
     }
 
     /**
@@ -1140,7 +1140,7 @@ class Builder
      */
     protected function withAggregate($aggregate, $relation, $column)
     {
-        return $this->withRaw($relation, new Expression($aggregate.'('.$column.')'), $aggregate);
+        return $this->withRaw($relation, new Expression($aggregate.'('.$this->query->getGrammar()->wrap($column).')'), $aggregate);
     }
 
     /**
