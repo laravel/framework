@@ -79,10 +79,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
         if (method_exists($this, 'validator')) {
             $validator = $this->container->call([$this, 'validator'], compact('factory'));
         } else {
-            $validator = $factory->make(
-                $this->validationData(), $this->container->call([$this, 'rules']),
-                $this->messages(), $this->attributes()
-            );
+            $validator = $this->createDefaultValidator($factory);
         }
 
         if (method_exists($this, 'withValidator')) {
@@ -90,6 +87,20 @@ class FormRequest extends Request implements ValidatesWhenResolved
         }
 
         return $validator;
+    }
+
+    /**
+     * Create the default validator instance.
+     *
+     * @param  \Illuminate\Contracts\Validation\Factory  $factory
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    protected function createDefaultValidator(ValidationFactory $factory)
+    {
+        return $factory->make(
+            $this->validationData(), $this->container->call([$this, 'rules']),
+            $this->messages(), $this->attributes()
+        );
     }
 
     /**
@@ -115,32 +126,6 @@ class FormRequest extends Request implements ValidatesWhenResolved
         throw new ValidationException($validator, $this->response(
             $this->formatErrors($validator)
         ));
-    }
-
-    /**
-     * Determine if the request passes the authorization check.
-     *
-     * @return bool
-     */
-    protected function passesAuthorization()
-    {
-        if (method_exists($this, 'authorize')) {
-            return $this->container->call([$this, 'authorize']);
-        }
-
-        return false;
-    }
-
-    /**
-     * Handle a failed authorization attempt.
-     *
-     * @return void
-     *
-     * @throws \Illuminate\Auth\Access\AuthorizationException
-     */
-    protected function failedAuthorization()
-    {
-        throw new AuthorizationException('This action is unauthorized.');
     }
 
     /**
@@ -192,6 +177,52 @@ class FormRequest extends Request implements ValidatesWhenResolved
     }
 
     /**
+     * Determine if the request passes the authorization check.
+     *
+     * @return bool
+     */
+    protected function passesAuthorization()
+    {
+        if (method_exists($this, 'authorize')) {
+            return $this->container->call([$this, 'authorize']);
+        }
+
+        return false;
+    }
+
+    /**
+     * Handle a failed authorization attempt.
+     *
+     * @return void
+     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    protected function failedAuthorization()
+    {
+        throw new AuthorizationException('This action is unauthorized.');
+    }
+
+    /**
+     * Get custom messages for validator errors.
+     *
+     * @return array
+     */
+    public function messages()
+    {
+        return [];
+    }
+
+    /**
+     * Get custom attributes for validator errors.
+     *
+     * @return array
+     */
+    public function attributes()
+    {
+        return [];
+    }
+
+    /**
      * Set the Redirector instance.
      *
      * @param  \Illuminate\Routing\Redirector  $redirector
@@ -215,25 +246,5 @@ class FormRequest extends Request implements ValidatesWhenResolved
         $this->container = $container;
 
         return $this;
-    }
-
-    /**
-     * Get custom messages for validator errors.
-     *
-     * @return array
-     */
-    public function messages()
-    {
-        return [];
-    }
-
-    /**
-     * Get custom attributes for validator errors.
-     *
-     * @return array
-     */
-    public function attributes()
-    {
-        return [];
     }
 }
