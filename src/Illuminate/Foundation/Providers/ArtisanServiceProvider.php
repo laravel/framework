@@ -114,9 +114,9 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->registerCommands($this->commands);
-
-        $this->registerCommands($this->devCommands);
+        $this->registerCommands(array_merge(
+            $this->commands, $this->devCommands
+        ));
     }
 
     /**
@@ -128,9 +128,7 @@ class ArtisanServiceProvider extends ServiceProvider
     protected function registerCommands(array $commands)
     {
         foreach (array_keys($commands) as $command) {
-            $method = "register{$command}Command";
-
-            call_user_func_array([$this, $method], []);
+            call_user_func_array([$this, "register{$command}Command"], []);
         }
 
         $this->commands(array_values($commands));
@@ -611,10 +609,6 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        if ($this->app->environment('production')) {
-            return array_values($this->commands);
-        } else {
-            return array_merge(array_values($this->commands), array_values($this->devCommands));
-        }
+        return array_merge(array_values($this->commands), array_values($this->devCommands));
     }
 }
