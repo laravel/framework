@@ -638,6 +638,36 @@ if (! function_exists('retry')) {
     }
 }
 
+if (! function_exists('retry_for_time')) {
+    /**
+     * Retry an operation a given number of times.
+     *
+     * @param  int  $timeout
+     * @param  callable  $callback
+     * @param  int  $sleep
+     * @return mixed
+     */
+    function retry_for_time($timeout, $callback, $sleep)
+    {
+        $start = time();
+
+        beginning:
+        try {
+            return $callback();
+        } catch (Exception $e) {
+            if (time() - $start > $timeout) {
+                throw $e;
+            }
+
+            if ($sleep) {
+                usleep($sleep * 1000);
+            }
+
+            goto beginning;
+        }
+    }
+}
+
 if (! function_exists('snake_case')) {
     /**
      * Convert a string to snake case.
