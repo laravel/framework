@@ -2134,18 +2134,18 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($v->fails());
 
         $v = new Validator($trans, ['x' => '00-01-01'], ['x' => 'date_format:Y-m-d']);
-        $this->assertTrue($v->passes());
+        $this->assertTrue($v->fails());
 
         $v = new Validator($trans, ['x' => ['Not', 'a', 'date']], ['x' => 'date_format:Y-m-d']);
         $this->assertTrue($v->fails());
 
-        $v = new Validator($trans, ['x' => '2000-01-01T00:00:00Z'], ['x' => 'date_format:Y-m-d\TH:i:sP']);
+        $v = new Validator($trans, ['x' => '2000-01-01T00:00:00Atlantic/Azores'], ['x' => 'date_format:Y-m-d\TH:i:se']);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['x' => '2000-01-01T00:00:00Z'], ['x' => 'date_format:Y-m-d\TH:i:sP']);
+        $v = new Validator($trans, ['x' => '2000-01-01T00:00:00Z'], ['x' => 'date_format:Y-m-d\TH:i:sT']);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['x' => '2000-01-01T00:00:00+00'], ['x' => 'date_format:Y-m-d\TH:i:sP']);
+        $v = new Validator($trans, ['x' => '2000-01-01T00:00:00+0000'], ['x' => 'date_format:Y-m-d\TH:i:sO']);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['x' => '2000-01-01T00:00:00+00:30'], ['x' => 'date_format:Y-m-d\TH:i:sP']);
