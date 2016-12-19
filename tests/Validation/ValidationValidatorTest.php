@@ -1387,6 +1387,13 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+    public function testValidateExtractAllowedValuesReturnArray(){
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['foo' => 1290, 'boo' => 'array'], ['foo' => 'numeric']);
+
+        $this->assertSame(['foo' => 1290], $v->extract());
+    }
+
 	protected function getTranslator()
 	{
 		return m::mock('Symfony\Component\Translation\TranslatorInterface');

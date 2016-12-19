@@ -325,6 +325,26 @@ class Validator implements MessageProviderInterface {
 		}
 	}
 
+    /**
+     * Handle removing extra values provided in case of data manipulation
+     * rules applied as name of fields allowed in request values
+     *
+     * @return mixed
+     */
+    public function extract()
+    {
+        if(!$this->passes())
+        {
+            return false;
+        }
+
+        $keys = array_keys($this->rules);
+        $allowed = array_fill_keys($keys, null);
+        $result = array_intersect_key($this->data, $allowed);
+
+        return $result;
+    }
+
 	/**
 	 * Returns the data which was valid.
 	 *
