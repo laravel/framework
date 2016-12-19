@@ -80,7 +80,8 @@ class TestNotificationBroadCastedNow extends Notification
         return ['invoice_id' => 1];
     }
 
-    public function broadcastNow(){
+    public function broadcastNow()
+    {
         return true;
     }
 }
