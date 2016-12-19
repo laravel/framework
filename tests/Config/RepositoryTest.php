@@ -43,7 +43,7 @@ class RepositoryTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($this->repository->has('foo'));
     }
 
-    public function testHasIsTFalse()
+    public function testHasIsFalse()
     {
         $this->assertFalse($this->repository->has('not-exist'));
     }
