@@ -559,18 +559,11 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         // application instance automatically for the developer. This is simply
         // a more convenient way of specifying your service provider classes.
         if (is_string($provider)) {
-            $provider = $this->resolveProviderClass($provider);
+            $provider = $this->resolveProvider($provider);
         }
 
         if (method_exists($provider, 'register')) {
             $provider->register();
-        }
-
-        // Once we have registered the service we will iterate through the options
-        // and set each of them on the application so they will be available on
-        // the actual loading of the service objects and for developer usage.
-        foreach ($options as $key => $value) {
-            $this[$key] = $value;
         }
 
         $this->markAsRegistered($provider);
@@ -606,7 +599,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      * @param  string  $provider
      * @return \Illuminate\Support\ServiceProvider
      */
-    public function resolveProviderClass($provider)
+    public function resolveProvider($provider)
     {
         return new $provider($this);
     }
@@ -619,11 +612,9 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     protected function markAsRegistered($provider)
     {
-        $this['events']->fire($class = get_class($provider), [$provider]);
-
         $this->serviceProviders[] = $provider;
 
-        $this->loadedProviders[$class] = true;
+        $this->loadedProviders[get_class($provider)] = true;
     }
 
     /**
@@ -1051,7 +1042,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 
         $this['translator']->setLocale($locale);
 
-        $this['events']->fire('locale.changed', [$locale]);
+        $this['events']->fire(new Events\LocaleUpdated($locale));
     }
 
     /**
