@@ -308,9 +308,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     {
         $value = $this->input($key);
 
-        $boolOrArray = is_bool($value) || is_array($value);
-
-        return ! $boolOrArray && trim((string) $value) === '';
+        return ! is_bool($value) && ! is_array($value) && trim((string) $value) === '';
     }
 
     /**
@@ -455,18 +453,6 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Retrieve a file from the request.
-     *
-     * @param  string  $key
-     * @param  mixed  $default
-     * @return \Illuminate\Http\UploadedFile|array|null
-     */
-    public function file($key = null, $default = null)
-    {
-        return data_get($this->allFiles(), $key, $default);
-    }
-
-    /**
      * Determine if the uploaded data contains a file.
      *
      * @param  string  $key
@@ -485,6 +471,18 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         }
 
         return false;
+    }
+
+    /**
+     * Retrieve a file from the request.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return \Illuminate\Http\UploadedFile|array|null
+     */
+    public function file($key = null, $default = null)
+    {
+        return data_get($this->allFiles(), $key, $default);
     }
 
     /**
@@ -548,15 +546,11 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * Flash the input for the current request to the session.
      *
-     * @param  string  $filter
-     * @param  array   $keys
      * @return void
      */
-    public function flash($filter = null, $keys = [])
+    public function flash()
     {
-        $flash = (! is_null($filter)) ? $this->$filter($keys) : $this->input();
-
-        $this->session()->flashInput($flash);
+        $this->session()->flashInput($this->input());
     }
 
     /**
@@ -567,9 +561,9 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function flashOnly($keys)
     {
-        $keys = is_array($keys) ? $keys : func_get_args();
-
-        return $this->flash('only', $keys);
+        $this->session()->flashInput(
+            $this->only(is_array($keys) ? $keys : func_get_args())
+        );
     }
 
     /**
@@ -580,9 +574,9 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function flashExcept($keys)
     {
-        $keys = is_array($keys) ? $keys : func_get_args();
-
-        return $this->flash('except', $keys);
+        $this->session()->flashInput(
+            $this->except(is_array($keys) ? $keys : func_get_args())
+        );
     }
 
     /**
