@@ -545,16 +545,16 @@ class Filesystem
 
         return true;
     }
-    
+
     /**
-     * Return json_decoded
+     * Return json_decoded.
      *
      * @return bool
      */
     public function jsonDecoded($path)
     {
         return json_decode($this->get($path), true);
-    }    
+    }
 
     /**
      * Empty the specified directory of all files and folders.
