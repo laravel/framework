@@ -5,6 +5,7 @@ namespace Illuminate\Auth\Passwords;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Database\ConnectionInterface;
+use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 
 class DatabaseTokenRepository implements TokenRepositoryInterface
@@ -38,6 +39,13 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
     protected $expires;
 
     /**
+     * The hasher implementation.
+     *
+     * @var \Illuminate\Contracts\Hashing\Hasher
+     */
+    protected $hasher;
+
+    /**
      * Create a new token repository instance.
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
@@ -46,12 +54,13 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
      * @param  int  $expires
      * @return void
      */
-    public function __construct(ConnectionInterface $connection, $table, $hashKey, $expires = 60)
+    public function __construct(ConnectionInterface $connection, HasherContract $hasher, $table, $hashKey, $expires = 60)
     {
         $this->table = $table;
         $this->hashKey = $hashKey;
         $this->expires = $expires * 60;
         $this->connection = $connection;
+        $this->hasher = $hasher;
     }
 
     /**
@@ -96,7 +105,7 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
      */
     protected function getPayload($email, $token)
     {
-        return ['email' => $email, 'token' => $token, 'created_at' => new Carbon];
+        return ['email' => $email, 'token' => $this->hasher->make($token), 'created_at' => new Carbon];
     }
 
     /**
@@ -106,13 +115,13 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
      * @param  string  $token
      * @return bool
      */
-    public function exists(CanResetPasswordContract $user, $token)
+    public function exists(CanResetPasswordContract $user, $userToken)
     {
         $email = $user->getEmailForPasswordReset();
 
-        $token = (array) $this->getTable()->where('email', $email)->where('token', $token)->first();
+        $token = (array) $this->getTable()->where('email', $email)->first();
 
-        return $token && ! $this->tokenExpired($token);
+        return $token && ! $this->tokenExpired($token) && $this->hasher->check($userToken, $token['token']);
     }
 
     /**
@@ -179,5 +188,15 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
     public function getConnection()
     {
         return $this->connection;
+    }
+
+    /**
+     * Get the hasher instance.
+     *
+     * @return \Illuminate\Contracts\Hashing\Hasher
+     */
+    public function getHasher()
+    {
+        return $this->hasher;
     }
 }
