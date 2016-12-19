@@ -23,13 +23,9 @@ class NotIn
      * @param  bool  $array_keys
      * @return void
      */
-    public function __construct(array $values, bool $array_keys = false)
+    public function __construct(array $values, bool $arrayKeys = null)
     {
-        if ($array_keys) {
-            $this->values = array_keys($values);
-        } else {
-            $this->values = $values;
-        }
+        $this->values = $arrayKeys ? array_keys($values) : $values;
     }
 
     /**
@@ -39,6 +35,6 @@ class NotIn
      */
     public function __toString()
     {
-        return $this->rule . ':' . implode(',', $this->values);
+        return $this->rule.':'.implode(',', $this->values);
     }
 }
