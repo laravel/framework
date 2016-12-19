@@ -56,6 +56,28 @@ class Rule
     }
 
     /**
+     * Get an in constraint builder instance for array keys.
+     *
+     * @param  array  $values
+     * @return \Illuminate\Validation\Rules\In
+     */
+    public static function inKeys(array $values)
+    {
+        return new Rules\In($values, true);
+    }
+
+    /**
+     * Get a not_in constraint builder instance for array keys.
+     *
+     * @param  array  $values
+     * @return \Illuminate\Validation\Rules\NotIn
+     */
+    public static function notInKeys(array $values)
+    {
+        return new Rules\NotIn($values, true);
+    }
+
+    /**
      * Get a unique constraint builder instance.
      *
      * @param  string  $table

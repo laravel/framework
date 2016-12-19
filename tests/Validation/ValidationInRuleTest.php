@@ -18,7 +18,7 @@ class ValidationInRuleTest extends PHPUnit_Framework_TestCase
 
     public function testInRuleWorksWithArrayKeys()
     {
-        $rule = Rule::in(['zero' => 0, 'one' => 1, 'two' => 2], true);
+        $rule = Rule::inKeys(['zero' => 0, 'one' => 1, 'two' => 2]);
 
         $this->assertEquals('in:zero,one,two', (string) $rule);
     }
