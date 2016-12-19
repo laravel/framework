@@ -20,11 +20,16 @@ class In
      * Create a new in rule instance.
      *
      * @param  array  $values
+     * @param  bool  $array_keys
      * @return void
      */
-    public function __construct(array $values)
+    public function __construct(array $values, bool $array_keys = false)
     {
-        $this->values = $values;
+        if ($array_keys) {
+            $this->values = array_keys($values);
+        } else {
+            $this->values = $values;
+        }
     }
 
     /**
@@ -34,6 +39,6 @@ class In
      */
     public function __toString()
     {
-        return $this->rule.':'.implode(',', $this->values);
+        return $this->rule . ':' . implode(',', $this->values);
     }
 }

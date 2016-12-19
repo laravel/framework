@@ -35,22 +35,24 @@ class Rule
      * Get an in constraint builder instance.
      *
      * @param  array  $values
+     * @param  bool  $array_keys
      * @return \Illuminate\Validation\Rules\In
      */
-    public static function in(array $values)
+    public static function in(array $values, bool $array_keys = false)
     {
-        return new Rules\In($values);
+        return new Rules\In($values, $array_keys);
     }
 
     /**
      * Get a not_in constraint builder instance.
      *
      * @param  array  $values
+     * @param  bool  $array_keys
      * @return \Illuminate\Validation\Rules\NotIn
      */
-    public static function notIn(array $values)
+    public static function notIn(array $values, bool $array_keys = false)
     {
-        return new Rules\NotIn($values);
+        return new Rules\NotIn($values, $array_keys);
     }
 
     /**
