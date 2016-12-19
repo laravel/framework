@@ -67,6 +67,7 @@ return [
     $basePath.'/vendor/laravel/framework/src/Illuminate/Http/Middleware/FrameGuard.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/VerifyCsrfToken.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/CheckForMaintenanceMode.php',
+    $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/VerifyPostSize.php',
     $basePath.'/vendor/symfony/http-foundation/Request.php',
     $basePath.'/vendor/symfony/http-foundation/ParameterBag.php',
     $basePath.'/vendor/symfony/http-foundation/FileBag.php',

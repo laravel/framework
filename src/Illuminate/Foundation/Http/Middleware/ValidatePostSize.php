@@ -5,7 +5,7 @@ namespace Illuminate\Foundation\Http\Middleware;
 use Closure;
 use Illuminate\Http\Exception\PostTooLargeException;
 
-class VerifyPostSize
+class ValidatePostSize
 {
     /**
      * Handle an incoming request.
