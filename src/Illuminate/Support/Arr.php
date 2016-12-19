@@ -68,7 +68,7 @@ class Arr {
 	{
 		$results = array();
 
-		foreach ($array as $key => $value)
+		foreach ((array)$array as $key => $value)
 		{
 			if (is_array($value))
 			{
