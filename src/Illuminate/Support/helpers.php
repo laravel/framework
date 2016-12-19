@@ -640,7 +640,7 @@ if (! function_exists('retry')) {
 
 if (! function_exists('retry_for_time')) {
     /**
-     * Retry an operation a given number of times.
+     * Retry an operation for a given duration.
      *
      * @param  int  $timeout
      * @param  callable  $callback
