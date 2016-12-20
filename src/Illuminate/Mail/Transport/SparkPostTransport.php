@@ -29,18 +29,27 @@ class SparkPostTransport extends Transport
     protected $options = [];
 
     /**
+     * Transmission metadata.
+     *
+     * @var array
+     */
+    protected $metadata = [];
+
+    /**
      * Create a new SparkPost transport instance.
      *
      * @param  \GuzzleHttp\ClientInterface  $client
      * @param  string  $key
      * @param  array  $options
+     * @param  array  $metadata
      * @return void
      */
-    public function __construct(ClientInterface $client, $key, $options = [])
+    public function __construct(ClientInterface $client, $key, $options = [], $metadata = [])
     {
         $this->key = $key;
         $this->client = $client;
         $this->options = $options;
+        $this->metadata = $metadata;
     }
 
     /**
@@ -68,6 +77,10 @@ class SparkPostTransport extends Transport
 
         if ($this->options) {
             $options['json']['options'] = $this->options;
+        }
+
+        if ($this->metadata) {
+            $options['json']['metadata'] = $this->metadata;
         }
 
         $this->client->post('https://api.sparkpost.com/api/v1/transmissions', $options);
@@ -148,5 +161,26 @@ class SparkPostTransport extends Transport
     public function setOptions(array $options)
     {
         return $this->options = $options;
+    }
+
+    /**
+     * Get the transmission metadata being used by the transport.
+     *
+     * @return string
+     */
+    public function getMetadata()
+    {
+        return $this->metadata;
+    }
+
+    /**
+     * Set the transmission metadata being used by the transport.
+     *
+     * @param  array  $metadata
+     * @return array
+     */
+    public function setMetadata(array $metadata)
+    {
+        return $this->metadata = $metadata;
     }
 }
