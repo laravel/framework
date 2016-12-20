@@ -51,10 +51,6 @@ class BroadcastNotificationCreated implements ShouldBroadcast
         $this->data = $data;
         $this->notifiable = $notifiable;
         $this->notification = $notification;
-
-        if (method_exists($this->notification, 'broadcastNow')) {
-            $this->connection = $this->notification->broadcastNow() ? 'sync' : null;
-        }
     }
 
     /**
