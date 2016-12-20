@@ -61,6 +61,34 @@ class Arr
     }
 
     /**
+     * Determine if an item exists in the collection.
+     *
+     * @param  array  $array
+     * @param  mixed  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function contains($array, $key, $operator = null, $value = null)
+    {
+        if (func_num_args() == 2) {
+            if (static::useAsCallable($key)) {
+                return ! is_null(static::first($array, $key));
+            }
+
+            return in_array($key, $array);
+        }
+
+        if (func_num_args() == 3) {
+            $value = $operator;
+
+            $operator = '=';
+        }
+
+        return static::contains($array, static::operatorForWhere($key, $operator, $value));
+    }
+
+    /**
      * Divide an array into two arrays. One with keys and the other with values.
      *
      * @param  array  $array
@@ -189,6 +217,86 @@ class Arr
                 return array_merge($result, static::flatten($item, $depth - 1));
             }
         }, []);
+    }
+
+    /**
+     * @param $array
+     * @param callable $callback
+     *
+     * @return static
+     */
+    public static function map($array, callable $callback)
+    {
+        $keys = array_keys($array);
+
+        $items = array_map($callback, $array, $keys);
+
+        return array_combine($keys, $items);
+    }
+
+    /**
+     * Run an associative map over each of the items.
+     *
+     * The callback should return an associative array with a single key/value pair.
+     *
+     * @param  array $array
+     * @param  callable  $callback
+     * @return static
+     */
+    public static function mapWithKeys($array, callable $callback)
+    {
+        $result = [];
+
+        foreach ($array as $key => $value) {
+            $assoc = $callback($value, $key);
+
+            foreach ($assoc as $mapKey => $mapValue) {
+                $result[$mapKey] = $mapValue;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Map a collection and flatten the result by a single level.
+     *
+     * @param  array $array
+     * @param  callable  $callback
+     * @return static
+     */
+    public static function flatMap($array, callable $callback)
+    {
+        return static::collapse(static::map($array, $callback));
+    }
+
+    /**
+     * Filter the array using the given callback.
+     *
+     * @param  array  $array
+     * @param  callable  $callback
+     * @return array
+     */
+    public static function filter($array, callable $callback = null)
+    {
+        if (is_null($callback)) {
+            return array_filter($array);
+        }
+
+        return array_filter($array, $callback, ARRAY_FILTER_USE_BOTH);
+    }
+
+    /**
+     * Reduce an array to a single value.
+     *
+     * @param  array  $array
+     * @param  callable  $callback
+     * @param  mixed     $initial
+     * @return mixed
+     */
+    public static function reduce($array, callable $callback = null, $initial = null)
+    {
+        return array_reduce($array, $callback, $initial);
     }
 
     /**
@@ -506,14 +614,61 @@ class Arr
     }
 
     /**
-     * Filter the array using the given callback.
+     * Filter an array by the given key value pair.
      *
      * @param  array  $array
-     * @param  callable  $callback
-     * @return array
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return static
      */
-    public static function where($array, callable $callback)
+    public static function where($array, $key, $operator, $value = null)
     {
-        return array_filter($array, $callback, ARRAY_FILTER_USE_BOTH);
+        if (func_num_args() == 3) {
+            $value = $operator;
+
+            $operator = '=';
+        }
+
+        return static::filter($array, static::operatorForWhere($key, $operator, $value));
+    }
+
+    /**
+     * Get an operator checker callback.
+     *
+     * @param  string  $key
+     * @param  string  $operator
+     * @param  mixed  $value
+     * @return \Closure
+     */
+    protected static function operatorForWhere($key, $operator, $value)
+    {
+        return function ($item) use ($key, $operator, $value) {
+            $retrieved = data_get($item, $key);
+
+            switch ($operator) {
+                default:
+                case '=':
+                case '==':  return $retrieved == $value;
+                case '!=':
+                case '<>':  return $retrieved != $value;
+                case '<':   return $retrieved < $value;
+                case '>':   return $retrieved > $value;
+                case '<=':  return $retrieved <= $value;
+                case '>=':  return $retrieved >= $value;
+                case '===': return $retrieved === $value;
+                case '!==': return $retrieved !== $value;
+            }
+        };
+    }
+
+    /**
+     * Determine if the given value is callable, but not a string.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    protected static function useAsCallable($value)
+    {
+        return ! is_string($value) && is_callable($value);
     }
 }
