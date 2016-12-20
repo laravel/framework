@@ -38,7 +38,11 @@
 - Added `--model` to `make:controller` command to generate resource controller with type-hinted model ([#16787](https://github.com/laravel/framework/pull/16787))
 - Added support for binding methods to the container ([#16800](https://github.com/laravel/framework/pull/16800))
 - Allow queued handlers to specify their queue and connection ([fedd4cd](https://github.com/laravel/framework/commit/fedd4cd4d900656071d44fc1ee9c83e6de986fa8))
-- Added default 503 error page into framework ([855a8aa](https://github.com/laravel/framework/commit/855a8aaca2903015e3fe26f756e73af9f1b98374))
+- Added default 503 error page into framework ([855a8aa](https://github.com/laravel/framework/commit/855a8aaca2903015e3fe26f756e73af9f1b98374), [#16848](https://github.com/laravel/framework/pull/16848))
+- Allow passing an array to `Collection::find()` ([#16849](https://github.com/laravel/framework/pull/16849))
+- Added `FormRequestServiceProvider` ([b892805](https://github.com/laravel/framework/commit/b892805124ecdf4821c2dac7aea4f829ce2248bc))
+- Added `Illuminate\Http\Request\Concerns` traits ([4810e9d](https://github.com/laravel/framework/commit/4810e9d1bc118367f3d70cd6f64f1d4c4acf85ca))
+- Added `Queueable` to queued listener stub ([dcd64b6](https://github.com/laravel/framework/commit/dcd64b6c36d1e545c1c2612764ec280c47fdea97))
 
 ### Changed
 - Consider interfaces and extended classes in `Gate::resolvePolicyCallback()` ([#15757](https://github.com/laravel/framework/pull/15757))
@@ -49,7 +53,6 @@
 - Don't rollback to save-points on deadlock (nested transaction) ([#15932](https://github.com/laravel/framework/pull/15932))
 - Return a database collection from `HasOneOrMany::createMany()` ([#15944](https://github.com/laravel/framework/pull/15944))
 - Refactored Blade `@parent` compilation ([#16033](https://github.com/laravel/framework/pull/16033), [16f72a5](https://github.com/laravel/framework/commit/16f72a5a580b593ac804bc0b2fdcc6eb278e55b2))
-- Removed files hydration in `Validator` ([#16017](https://github.com/laravel/framework/pull/16017))
 - Only detach all associations if no parameter is passed to `BelongsToMany::detach()` ([#16144](https://github.com/laravel/framework/pull/16144))
 - Improve `Connection::selectOne()` performance by switching to `array_shift()` ([#16188](https://github.com/laravel/framework/pull/16188))
 - Switched from file to cache based Schedule overlap locking ([#16196](https://github.com/laravel/framework/pull/16196), [5973f6c](https://github.com/laravel/framework/commit/5973f6c54ccd0d99e15f055c5a16b19b8c45db91))
@@ -70,6 +73,22 @@
 - Require confirmation for `key:generate` command in production ([#16804](https://github.com/laravel/framework/pull/16804))
 - Added `Command::$hidden` and `ScheduleFinishCommand` ([#16806](https://github.com/laravel/framework/pull/16806))
 - Throw `AuthorizationException` in `FormRequest` ([1a75409](https://github.com/laravel/framework/commit/1a7540967ca36f875a262a22b76c2a094b9ba3b4))
+- Made `date_format` validation more percise ([#16858](https://github.com/laravel/framework/pull/16858))
+- Always return a collection when calling `Collection::random()` with a parameter ([#16865](https://github.com/laravel/framework/pull/16865))
+- Moved `kernel.handled` event into `RequestHandled` class ([43a5e5f](https://github.com/laravel/framework/commit/43a5e5f341cc8affd52e77019f50e2d96feb94a5))
+- Moved `locale.changed` event into `LocaleUpdated` class ([3385fdc](https://github.com/laravel/framework/commit/3385fdc0f8e4890ab57261755bcbbf79f9ec828d))
+- Moved `illuminate.log` event into `MessageLogged` class ([57c82d0](https://github.com/laravel/framework/commit/57c82d095c356a0fe0f9381536afec768cdcc072))
+- Renamed `VerifyPostSize` middleware to `ValidatePostSize` ([893a044](https://github.com/laravel/framework/commit/893a044fb10c87095e99081de4d1668bc1e19997))
+- Renamed `getJsonOptions()` to `getEncodingOptions()` on `JsonResponse` ([e689b2a](https://github.com/laravel/framework/commit/e689b2aa06d1d35d2593ffa77f8a56df314f7e49))
+- Moved all framework command registrations into `ArtisanServiceProvider` ([954a333](https://github.com/laravel/framework/commit/954a33371bd7f7597eae6fce2ed1d391a2268099), [baa6054](https://github.com/laravel/framework/commit/baa605424a4448ab4f1c6068d8755ecf83bde665), [87bd2a9](https://github.com/laravel/framework/commit/87bd2a9e6c79715a9c73ca6134074919ede1a0e7))
+- Refactored Mail component and removed `SuperClosure` dependency ([50ab994](https://github.com/laravel/framework/commit/50ab994b5b9c2675eb6cc24412672df5aefd248c), [5dace8f](https://github.com/laravel/framework/commit/5dace8f0d6f6e67b4862abbbae376dcd8a641f00))
+
+### Removed
+- Removed files hydration in `Validator` ([#16017](https://github.com/laravel/framework/pull/16017))
+- Removed `RouteServiceProvider::loadRoutesFrom()` ([0f2b3be](https://github.com/laravel/framework/commit/0f2b3be9b8753ba2813595f9191aa8d8c31886b1))
+
+### Security
+- Secured password reset tokens against timing attacks and compromised databases ([#16850](https://github.com/laravel/framework/pull/16850), [9d674b0](https://github.com/laravel/framework/commit/9d674b053145968ff9060b930a644ddd7851d66f))
 
 ### Testing
 - Simplified built-in testing for Dusk ([#16667](https://github.com/laravel/framework/pull/16667), [126adb7](https://github.com/laravel/framework/commit/126adb781c204129600363f243b9d73e202d229e), [b6dec26](https://github.com/laravel/framework/commit/b6dec2602d4a7aa1e61667c02c301c8011267a19), [939264f](https://github.com/laravel/framework/commit/939264f91edc5d33da5ce6cf95a271a6f4a2e1f2))
