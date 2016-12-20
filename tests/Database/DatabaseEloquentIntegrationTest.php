@@ -87,6 +87,10 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
                 $table->timestamps();
             });
         }
+
+        $this->schema($connection)->create('non_incrementing_users', function ($table) {
+            $table->string('name')->nullable();
+        });
     }
 
     /**
@@ -332,6 +336,14 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('second_connection', $user1->getConnectionName());
         $this->assertEquals('second_connection', $user2->getConnectionName());
         $this->assertEquals(2, EloquentTestUser::on('second_connection')->count());
+    }
+
+    public function testCreatingModelWithEmptyAttributes()
+    {
+        $model = EloquentTestNonIncrementing::create([]);
+
+        $this->assertFalse($model->exists);
+        $this->assertFalse($model->wasRecentlyCreated);
     }
 
     public function testPluck()
@@ -1124,6 +1136,14 @@ class EloquentTestUserWithCustomFriendPivot extends EloquentTestUser
         return $this->belongsToMany('EloquentTestUser', 'friends', 'user_id', 'friend_id')
                         ->using('EloquentTestFriendPivot')->withPivot('user_id', 'friend_id', 'friend_level_id');
     }
+}
+
+class EloquentTestNonIncrementing extends Eloquent
+{
+    protected $table = 'non_incrementing_users';
+    protected $guarded = [];
+    public $incrementing = false;
+    public $timestamps = false;
 }
 
 class EloquentTestUserWithGlobalScope extends EloquentTestUser
