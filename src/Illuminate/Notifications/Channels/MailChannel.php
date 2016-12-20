@@ -5,6 +5,7 @@ namespace Illuminate\Notifications\Channels;
 use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Collection;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Notifications\Notification;
@@ -116,15 +117,7 @@ class MailChannel
     {
         $this->addSender($mailMessage, $message);
 
-        if (is_array($recipients = $this->getRecipients($notifiable, $message))) {
-            $mailMessage->bcc($recipients);
-        } else {
-            $mailMessage->to($recipients);
-        }
-
-        if ($message->cc) {
-            $mailMessage->cc($message->cc);
-        }
+        $mailMessage->bcc($this->getRecipients($notifiable, $message));
     }
 
     /**
@@ -154,7 +147,13 @@ class MailChannel
      */
     protected function getRecipients($notifiable, $message)
     {
-        return empty($message->to) ? $notifiable->routeNotificationFor('mail') : $message->to;
+        if (is_string($recipients = $notifiable->routeNotificationFor('mail'))) {
+            $recipients = [$recipients];
+        }
+
+        return collect($recipients)->map(function ($recipient) {
+            return is_string($recipient) ? $recipient : $recipient->email;
+        })->all();
     }
 
     /**
