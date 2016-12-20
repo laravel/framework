@@ -95,69 +95,6 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
         unset($_SERVER['__mailer.test']);
     }
 
-    public function testMailerCanQueueMessagesToItself()
-    {
-        list($view, $swift) = $this->getMocks();
-        $mailer = new Illuminate\Mail\Mailer($view, $swift);
-        $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Factory'));
-        $queue->shouldReceive('pushOn')->once()->with(null, m::type('Illuminate\Mail\Jobs\HandleQueuedMessage'));
-
-        $mailer->queue('foo', [1], 'callable');
-    }
-
-    public function testMailerCanQueueMessagesToItselfOnAnotherQueue()
-    {
-        list($view, $swift) = $this->getMocks();
-        $mailer = new Illuminate\Mail\Mailer($view, $swift);
-        $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Factory'));
-        $queue->shouldReceive('pushOn')->once()->with('queue', m::type('Illuminate\Mail\Jobs\HandleQueuedMessage'));
-
-        $mailer->queueOn('queue', 'foo', [1], 'callable');
-    }
-
-    public function testMailerCanQueueMessagesToItselfLater()
-    {
-        list($view, $swift) = $this->getMocks();
-        $mailer = new Illuminate\Mail\Mailer($view, $swift);
-        $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Factory'));
-        $queue->shouldReceive('laterOn')->once()->with(null, 10, m::type('Illuminate\Mail\Jobs\HandleQueuedMessage'));
-
-        $mailer->later(10, 'foo', [1], 'callable');
-    }
-
-    public function testMailerCanQueueMessagesToItselfLaterOnAnotherQueue()
-    {
-        list($view, $swift) = $this->getMocks();
-        $mailer = new Illuminate\Mail\Mailer($view, $swift);
-        $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Factory'));
-        $queue->shouldReceive('laterOn')->once()->with('queue', 10, m::type('Illuminate\Mail\Jobs\HandleQueuedMessage'));
-
-        $mailer->laterOn('queue', 10, 'foo', [1], 'callable');
-    }
-
-    public function testMailerCanResolveMailerClasses()
-    {
-        $mailer = $this->getMockBuilder('Illuminate\Mail\Mailer')->setMethods(['createMessage'])->setConstructorArgs($this->getMocks())->getMock();
-        $message = m::mock('Swift_Mime_Message');
-        $mailer->expects($this->once())->method('createMessage')->will($this->returnValue($message));
-        $view = m::mock('StdClass');
-        $container = new Illuminate\Container\Container;
-        $mailer->setContainer($container);
-        $mockMailer = m::mock('StdClass');
-        $container['FooMailer'] = $container->share(function () use ($mockMailer) {
-            return $mockMailer;
-        });
-        $mockMailer->shouldReceive('mail')->once()->with($message);
-        $mailer->getViewFactory()->shouldReceive('make')->once()->with('foo', ['data', 'message' => $message])->andReturn($view);
-        $view->shouldReceive('render')->once()->andReturn('rendered.view');
-        $message->shouldReceive('setBody')->once()->with('rendered.view', 'text/html');
-        $message->shouldReceive('setFrom')->never();
-        $this->setSwiftMailer($mailer);
-        $message->shouldReceive('getSwiftMessage')->once()->andReturn($message);
-        $mailer->getSwiftMailer()->shouldReceive('send')->once()->with($message, []);
-        $mailer->send('foo', ['data'], 'FooMailer');
-    }
-
     public function testGlobalFromIsRespectedOnAllMessages()
     {
         unset($_SERVER['__mailer.test']);
