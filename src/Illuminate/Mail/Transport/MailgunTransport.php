@@ -3,7 +3,6 @@
 namespace Illuminate\Mail\Transport;
 
 use Swift_Mime_Message;
-use GuzzleHttp\Post\PostFile;
 use GuzzleHttp\ClientInterface;
 
 class MailgunTransport extends Transport
@@ -77,7 +76,7 @@ class MailgunTransport extends Transport
     {
         return [
             'auth' => [
-                'api' => $this->key
+                'api' => $this->key,
             ],
             'multipart' => [
                 [
@@ -87,7 +86,7 @@ class MailgunTransport extends Transport
                 [
                     'name' => 'message',
                     'contents' => $message->toString(),
-                    'filename' => 'message.mime'
+                    'filename' => 'message.mime',
                 ],
             ],
         ];
