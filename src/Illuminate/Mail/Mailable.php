@@ -389,11 +389,7 @@ class Mailable implements MailableContract
         }
 
         if ($address instanceof Collection || is_array($address)) {
-            foreach ($address as $user) {
-                $user = $this->parseUser($user);
-
-                $this->{$property}($user->email, isset($user->name) ? $user->name : null);
-            }
+            $this->setArrayOfAddresses($address, $property);
         } else {
             $this->{$property}[] = compact('address', 'name');
         }
@@ -402,12 +398,28 @@ class Mailable implements MailableContract
     }
 
     /**
-     * Parse the given user into an object.
+     * Set an array of message recipients.
+     *
+     * @param  \Illuminate\Support\Collection|array  $users
+     * @param  string  $property
+     * @return void
+     */
+    protected function setArrayOfAddresses($users, $property = 'to')
+    {
+        foreach ($users as $user) {
+            $user = $this->convertUserToObject($user);
+
+            $this->{$property}($user->email, isset($user->name) ? $user->name : null);
+        }
+    }
+
+    /**
+     * Convert the given user into an object.
      *
      * @param  mixed  $user
      * @return object
      */
-    protected function parseUser($user)
+    protected function convertUserToObject($user)
     {
         if (is_array($user)) {
             return (object) $user;

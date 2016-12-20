@@ -4,7 +4,7 @@ namespace Illuminate\Mail;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class MailableMailer
+class PendingMail
 {
     /**
      * The mailer instance.

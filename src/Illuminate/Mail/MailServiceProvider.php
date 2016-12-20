@@ -85,8 +85,6 @@ class MailServiceProvider extends ServiceProvider
      */
     protected function setMailerDependencies($mailer, $app)
     {
-        $mailer->setContainer($app);
-
         if ($app->bound('queue')) {
             $mailer->setQueue($app['queue']);
         }
