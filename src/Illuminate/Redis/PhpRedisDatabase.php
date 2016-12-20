@@ -63,7 +63,7 @@ class PhpRedisDatabase extends Database
         $options = array_merge($options, (array) Arr::pull($clusters, 'options'));
 
         foreach ($clusters as $name => $servers) {
-            $this->clients += $this->createAggregateClient($name, $servers, array_merge(
+            $this->clients[$name] = $this->createAggregateClient($servers, array_merge(
                 $options, (array) Arr::pull($servers, 'options')
             ));
         }
@@ -72,29 +72,15 @@ class PhpRedisDatabase extends Database
     /**
      * Create a new aggregate client supporting sharding.
      *
-     * @param  string  $name
      * @param  array  $servers
      * @param  array  $options
      * @return array
      */
-    protected function createAggregateClient($name, array $servers, array $options = [])
+    protected function createAggregateClient(array $servers, array $options = [])
     {
-        $servers = array_map([$this, 'buildClusterConnectionString'], $servers);
-
-        return [$name => $this->createRedisClusterInstance($servers, $options)];
-    }
-
-    /**
-     * Build a single cluster seed string from array.
-     *
-     * @param  array  $server
-     * @return string
-     */
-    protected function buildClusterConnectionString(array $server)
-    {
-        return $server['host'].':'.$server['port'].'?'.http_build_query(Arr::only($server, [
-            'database', 'password', 'prefix', 'read_timeout',
-        ]));
+        return $this->createRedisClusterInstance(
+            array_map([$this, 'buildClusterConnectionString'], $servers), $options
+        );
     }
 
     /**
@@ -103,12 +89,13 @@ class PhpRedisDatabase extends Database
      * @param  array|string  $channels
      * @param  \Closure  $callback
      * @param  string  $connection
-     * @param  string  $method
      * @return void
      */
-    public function subscribe($channels, Closure $callback, $connection = null, $method = 'subscribe')
+    public function subscribe($channels, Closure $callback, $connection = null)
     {
-        call_user_func_array([$this->connection($connection), $method], (array) $channels, $callback);
+        $this->connection($connection)->subscribe((array) $channels, function ($redis, $channel, $message) use ($callback) {
+            $callback($message, $channel);
+        });
     }
 
     /**
@@ -121,7 +108,9 @@ class PhpRedisDatabase extends Database
      */
     public function psubscribe($channels, Closure $callback, $connection = null)
     {
-        $this->subscribe($channels, $callback, $connection, __FUNCTION__);
+        $this->connection($connection)->psubscribe((array) $channels, function ($redis, $pattern, $channel, $message) use ($callback) {
+            $callback($message, $channel);
+        });
     }
 
     /**
@@ -178,5 +167,18 @@ class PhpRedisDatabase extends Database
             Arr::get($options, 'read_timeout', 0),
             isset($options['persistent']) && $options['persistent']
         );
+    }
+
+    /**
+     * Build a single cluster seed string from array.
+     *
+     * @param  array  $server
+     * @return string
+     */
+    protected function buildClusterConnectionString(array $server)
+    {
+        return $server['host'].':'.$server['port'].'?'.http_build_query(Arr::only($server, [
+            'database', 'password', 'prefix', 'read_timeout',
+        ]));
     }
 }
