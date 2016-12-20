@@ -1,5 +1,24 @@
 # Release Notes for 5.3.x
 
+## [Unreleased]
+
+### Added
+- Added `Blueprint::nullableMorphs()` ([#16879](https://github.com/laravel/framework/pull/16879))
+- Support `BaseCollection` in `BelongsToMany::sync()` ([#16882](https://github.com/laravel/framework/pull/16882))
+
+### Changed
+- Allow SparkPost transport transmission metadata to be set at runtime ([#16838](https://github.com/laravel/framework/pull/16838))
+- Pass keys to `Collection::unique()` callback ([#16883](https://github.com/laravel/framework/pull/16883))
+
+### Fixed
+- Fixed a wildcard issue with `sometimes` validaton rule ([#16826](https://github.com/laravel/framework/pull/16826))
+- Prevent error when SqlServer port is empty ([#16824](https://github.com/laravel/framework/pull/16824))
+- Reverted false-positive fix for `date_format` validation [#16692](https://github.com/laravel/framework/pull/16692) ([#16845](https://github.com/laravel/framework/pull/16845))
+- Fixed `withCount()` aliasing using multiple tables ([#16853](https://github.com/laravel/framework/pull/16853))
+- Fixed broken event interface listening ([#16877](https://github.com/laravel/framework/pull/16877))
+- Fixed empty model creation ([#16864](https://github.com/laravel/framework/pull/16864))
+
+
 ## v5.3.28 (2016-12-15)
 
 ### Changed
