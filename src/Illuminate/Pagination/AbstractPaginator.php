@@ -279,7 +279,7 @@ abstract class AbstractPaginator implements Htmlable
      */
     public function hasPages()
     {
-        return ! ($this->currentPage() == 1 && ! $this->hasMorePages());
+        return $this->currentPage() != 1 || $this->hasMorePages();
     }
 
     /**
