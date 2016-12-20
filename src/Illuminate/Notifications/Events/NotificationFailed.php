@@ -43,9 +43,9 @@ class NotificationFailed
      */
     public function __construct($notifiable, $notification, $channel, $data = [])
     {
+        $this->data = $data;
         $this->channel = $channel;
         $this->notifiable = $notifiable;
         $this->notification = $notification;
-        $this->data = $data;
     }
 }
