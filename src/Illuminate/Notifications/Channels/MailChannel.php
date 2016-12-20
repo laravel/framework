@@ -3,6 +3,7 @@
 namespace Illuminate\Notifications\Channels;
 
 use Closure;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Mail\Mailable;
@@ -113,13 +114,9 @@ class MailChannel
      */
     protected function addressMessage($mailMessage, $notifiable, $message)
     {
-        $recipients = empty($message->to) ? $notifiable->routeNotificationFor('mail') : $message->to;
+        $this->addSender($mailMessage, $message);
 
-        if (! empty($message->from)) {
-            $mailMessage->from($message->from[0], isset($message->from[1]) ? $message->from[1] : null);
-        }
-
-        if (is_array($recipients)) {
+        if (is_array($recipients = $this->getRecipients($notifiable, $message))) {
             $mailMessage->bcc($recipients);
         } else {
             $mailMessage->to($recipients);
@@ -128,10 +125,36 @@ class MailChannel
         if ($message->cc) {
             $mailMessage->cc($message->cc);
         }
+    }
+
+    /**
+     * Add the "from" and "reply to" addresses to the message.
+     *
+     * @param  \Illuminate\Mail\Message  $mailMessage
+     * @param  \Illuminate\Notifications\Messages\MailMessage  $message
+     * @return void
+     */
+    protected function addSender($mailMessage, $message)
+    {
+        if (! empty($message->from)) {
+            $mailMessage->from($message->from[0], Arr::get($message->from, 1));
+        }
 
         if (! empty($message->replyTo)) {
-            $mailMessage->replyTo($message->replyTo[0], isset($message->replyTo[1]) ? $message->replyTo[1] : null);
+            $mailMessage->replyTo($message->replyTo[0], Arr::get($message->replyTo, 1));
         }
+    }
+
+    /**
+     * Get the recipients of the given message.
+     *
+     * @param  mixed  $notifiable
+     * @param  \Illuminate\Notifications\Messages\MailMessage  $message
+     * @return mixed
+     */
+    protected function getRecipients($notifiable, $message)
+    {
+        return empty($message->to) ? $notifiable->routeNotificationFor('mail') : $message->to;
     }
 
     /**
