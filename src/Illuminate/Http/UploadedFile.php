@@ -21,11 +21,7 @@ class UploadedFile extends SymfonyUploadedFile
      */
     public function store($path, $options = [])
     {
-        if (is_string($options)) {
-            $options = ['disk' => $options];
-        }
-
-        return $this->storeAs($path, $this->hashName(), $options);
+        return $this->storeAs($path, $this->hashName(), $this->parseOptions($options));
     }
 
     /**
@@ -37,9 +33,7 @@ class UploadedFile extends SymfonyUploadedFile
      */
     public function storePublicly($path, $options = [])
     {
-        if (is_string($options)) {
-            $options = ['disk' => $options];
-        }
+        $options = $this->parseOptions($options);
 
         $options['visibility'] = 'public';
 
@@ -56,9 +50,7 @@ class UploadedFile extends SymfonyUploadedFile
      */
     public function storePubliclyAs($path, $name, $options = [])
     {
-        if (is_string($options)) {
-            $options = ['disk' => $options];
-        }
+        $options = $this->parseOptions($options);
 
         $options['visibility'] = 'public';
 
@@ -75,11 +67,11 @@ class UploadedFile extends SymfonyUploadedFile
      */
     public function storeAs($path, $name, $options = [])
     {
-        $factory = Container::getInstance()->make(FilesystemFactory::class);
-
         $disk = Arr::pull($options, 'disk');
 
-        return $factory->disk($disk)->putFileAs($path, $this, $name, $options);
+        return Container::getInstance()->make(FilesystemFactory::class)->disk($disk)->putFileAs(
+            $path, $this, $name, $options
+        );
     }
 
     /**
@@ -99,5 +91,20 @@ class UploadedFile extends SymfonyUploadedFile
             $file->getError(),
             $test
         );
+    }
+
+    /**
+     * Parse and format the given options.
+     *
+     * @param  array|string  $options
+     * @return array
+     */
+    protected function parseOptions($options)
+    {
+        if (is_string($options)) {
+            $options = ['disk' => $options];
+        }
+
+        return $options;
     }
 }
