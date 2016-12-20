@@ -44,11 +44,12 @@ class NotificationBroadcastChannelTest extends PHPUnit_Framework_TestCase
         $notification->id = 1;
         $notifiable = Mockery::mock();
 
-        $event = new Illuminate\Notifications\Events\BroadcastNotificationCreated(
-            $notifiable, $notification, $notification->toArray($notifiable)
-        );
-
-        $this->assertEquals('sync', $event->connection);
+        $events = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
+        $events->shouldReceive('fire')->once()->with(Mockery::on(function($event){
+            return $event->connection == 'sync';
+        }));
+        $channel = new BroadcastChannel($events);
+        $channel->send($notifiable, $notification);
     }
 }
 
@@ -80,8 +81,8 @@ class TestNotificationBroadCastedNow extends Notification
         return ['invoice_id' => 1];
     }
 
-    public function broadcastNow()
+    public function toBroadcast()
     {
-        return true;
+        return (new \Illuminate\Notifications\Messages\BroadcastMessage([]))->now();
     }
 }
