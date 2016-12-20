@@ -3,6 +3,8 @@
 namespace Illuminate\Mail;
 
 use Swift_Mailer;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Support\ServiceProvider;
 
 class MailServiceProvider extends ServiceProvider
@@ -36,6 +38,8 @@ class MailServiceProvider extends ServiceProvider
     protected function registerIlluminateMailer()
     {
         $this->app->singleton('mailer', function ($app) {
+            $config = $app->make('config')->get('mail');
+
             // Once we have create the mailer instance, we will set a container instance
             // on the mailer. This allows us to resolve mailer classes via containers
             // for maximum testability on said classes instead of passing Closures.
@@ -43,33 +47,15 @@ class MailServiceProvider extends ServiceProvider
                 $app['view'], $app['swift.mailer'], $app['events']
             );
 
-            $this->setMailerDependencies($mailer, $app);
-
-            // If a "from" address is set, we will set it on the mailer so that all mail
-            // messages sent by the applications will utilize the same "from" address
-            // on each one, which makes the developer's life a lot more convenient.
-            $from = $app->make('config')->get('mail.from');
-
-            if (is_array($from) && isset($from['address'])) {
-                $mailer->alwaysFrom($from['address'], $from['name']);
+            if ($app->bound('queue')) {
+                $mailer->setQueue($app['queue']);
             }
 
-            // If a "to" address is set we will set all mail messages to be delivered to
-            // this single address. This is primarily for easier viewing of emails if
-            // the application developer is still experimenting with the emails UI.
-            $to = $app->make('config')->get('mail.to');
-
-            if (is_array($to) && isset($to['address'])) {
-                $mailer->alwaysTo($to['address'], $to['name']);
-            }
-
-            // If a "reply to" address is set, we will set it on the mailer so that each
-            // message sent by the application will utilize the same address for this
-            // setting. This is more convenient than specifying it on each message.
-            $replyTo = $app['config']['mail.reply_to'];
-
-            if (is_array($replyTo) && isset($replyTo['address'])) {
-                $mailer->alwaysReplyTo($replyTo['address'], $replyTo['name']);
+            // Next we will set all of the global addresses on this mailer, which allows
+            // for easy unification of all "from" addresses as well as easy debugging
+            // of sent messages since they get be sent into a single email address.
+            foreach (['from', 'reply_to', 'to'] as $type) {
+                $this->setGlobalAddress($mailer, $config, $type);
             }
 
             return $mailer;
@@ -77,16 +63,19 @@ class MailServiceProvider extends ServiceProvider
     }
 
     /**
-     * Set a few dependencies on the mailer instance.
+     * Set a global address on the mailer by type.
      *
      * @param  \Illuminate\Mail\Mailer  $mailer
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param  array  $config
+     * @param  string  $type
      * @return void
      */
-    protected function setMailerDependencies($mailer, $app)
+    protected function setGlobalAddress($mailer, array $config, $type)
     {
-        if ($app->bound('queue')) {
-            $mailer->setQueue($app['queue']);
+        $address = Arr::get($config, $type);
+
+        if (is_array($address) && isset($address['address'])) {
+            $mailer->{'always'.Str::studly($type)}($address['address'], $address['name']);
         }
     }
 
