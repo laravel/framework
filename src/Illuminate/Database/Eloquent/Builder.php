@@ -1165,8 +1165,6 @@ class Builder
             // the resulting column. This allows multiple counts on the same relationship name.
             $segments = explode(' ', $name);
 
-            unset($alias);
-
             if (count($segments) == 3 && Str::lower($segments[1]) == 'as') {
                 list($name, $alias) = [$segments[0], $segments[2]];
             }
