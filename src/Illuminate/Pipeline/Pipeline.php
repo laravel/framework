@@ -99,9 +99,11 @@ class Pipeline implements PipelineContract
             return $destination($passable);
         };
 
-        return array_reduce(
+        $pipeline = array_reduce(
             array_reverse($this->pipes), $this->carry(), $destination
-        )($this->passable);
+        );
+
+        return $pipeline($this->passable);
     }
 
     /**
