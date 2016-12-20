@@ -902,7 +902,7 @@ class Blueprint
     }
 
     /**
-     * Add nullable proper columns for a polymorphic table.
+     * Add nullable columns for a polymorphic table.
      *
      * @param  string  $name
      * @param  string|null  $indexName
