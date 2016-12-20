@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Foundation;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Filesystem\FileNotFoundException;
 
 class ProviderRepository {
 
@@ -176,16 +177,18 @@ class ProviderRepository {
 	 */
 	public function loadManifest()
 	{
-		$path = $this->manifestPath.'/services.json';
-
 		// The service manifest is a file containing a JSON representation of every
 		// service provided by the application and whether its provider is using
 		// deferred loading or should be eagerly loaded on each request to us.
-		if ($this->files->exists($path))
+		try
 		{
-			$manifest = json_decode($this->files->get($path), true);
+			$manifest = json_decode($this->files->get($this->manifestPath.'/services.json'), true);
 
 			return array_merge($this->default, $manifest);
+		}
+		catch (FileNotFoundException $e)
+		{
+			//
 		}
 	}
 

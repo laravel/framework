@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Translation;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Filesystem\FileNotFoundException;
 
 class FileLoader implements LoaderInterface {
 
@@ -87,14 +88,16 @@ class FileLoader implements LoaderInterface {
 	 */
 	protected function loadNamespaceOverrides(array $lines, $locale, $group, $namespace)
 	{
-		$file = "{$this->path}/packages/{$locale}/{$namespace}/{$group}.php";
-
-		if ($this->files->exists($file))
+		try
 		{
+			$file = "{$this->path}/packages/{$locale}/{$namespace}/{$group}.php";
+
 			return array_replace_recursive($lines, $this->files->getRequire($file));
 		}
-
-		return $lines;
+		catch (FileNotFoundException $e)
+		{
+			return $lines;
+		}
 	}
 
 	/**
@@ -107,12 +110,16 @@ class FileLoader implements LoaderInterface {
 	 */
 	protected function loadPath($path, $locale, $group)
 	{
-		if ($this->files->exists($full = "{$path}/{$locale}/{$group}.php"))
+		try
 		{
+			$full = "{$path}/{$locale}/{$group}.php";
+
 			return $this->files->getRequire($full);
 		}
-
-		return array();
+		catch (FileNotFoundException $e)
+		{
+			return [];
+		}
 	}
 
 	/**

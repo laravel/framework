@@ -20,7 +20,6 @@ class ConfigFileLoaderTest extends PHPUnit_Framework_TestCase {
 	public function testBasicArrayIsReturned()
 	{
 		$loader = $this->getLoader();
-		$loader->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/app.php')->andReturn(true);
 		$loader->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/local/app.php')->andReturn(false);
 		$loader->getFilesystem()->shouldReceive('getRequire')->once()->with(__DIR__.'/app.php')->andReturn(array('foo' => 'bar'));
 		$array = $loader->load('local', 'app', null);
@@ -32,7 +31,6 @@ class ConfigFileLoaderTest extends PHPUnit_Framework_TestCase {
 	public function testEnvironmentArrayIsMerged()
 	{
 		$loader = $this->getLoader();
-		$loader->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/app.php')->andReturn(true);
 		$loader->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/local/app.php')->andReturn(true);
 		$loader->getFilesystem()->shouldReceive('getRequire')->once()->with(__DIR__.'/app.php')->andReturn(array('foo' => 'bar'));
 		$loader->getFilesystem()->shouldReceive('getRequire')->once()->with(__DIR__.'/local/app.php')->andReturn(array('foo' => 'blah', 'baz' => 'boom'));
@@ -78,9 +76,7 @@ class ConfigFileLoaderTest extends PHPUnit_Framework_TestCase {
 	public function testCascadingPackagesProperlyLoadsFiles()
 	{
 		$loader = $this->getLoader();
-		$loader->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/packages/dayle/rees/group.php')->andReturn(true);
 		$loader->getFilesystem()->shouldReceive('getRequire')->once()->with(__DIR__.'/packages/dayle/rees/group.php')->andReturn(array('bar' => 'baz'));
-		$loader->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/packages/dayle/rees/local/group.php')->andReturn(true);
 		$loader->getFilesystem()->shouldReceive('getRequire')->once()->with(__DIR__.'/packages/dayle/rees/local/group.php')->andReturn(array('foo' => 'boom'));
 		$items = $loader->cascadePackage('local', 'dayle/rees', 'group', array('foo' => 'bar'));
 

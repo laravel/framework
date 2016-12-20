@@ -7,7 +7,7 @@ class CacheFileStoreTest extends PHPUnit_Framework_TestCase {
 	public function testNullIsReturnedIfFileDoesntExist()
 	{
 		$files = $this->mockFilesystem();
-		$files->expects($this->once())->method('exists')->will($this->returnValue(false));
+		$files->expects($this->once())->method('get')->willThrowException(new Exception());
 		$store = new FileStore($files, __DIR__);
 		$value = $store->get('foo');
 		$this->assertNull($value);
@@ -29,7 +29,6 @@ class CacheFileStoreTest extends PHPUnit_Framework_TestCase {
 	public function testExpiredItemsReturnNull()
 	{
 		$files = $this->mockFilesystem();
-		$files->expects($this->once())->method('exists')->will($this->returnValue(true));
 		$contents = '0000000000';
 		$files->expects($this->once())->method('get')->will($this->returnValue($contents));
 		$store = $this->getMock('Illuminate\Cache\FileStore', array('forget'), array($files, __DIR__));
@@ -42,7 +41,6 @@ class CacheFileStoreTest extends PHPUnit_Framework_TestCase {
 	public function testValidItemReturnsContents()
 	{
 		$files = $this->mockFilesystem();
-		$files->expects($this->once())->method('exists')->will($this->returnValue(true));
 		$contents = '9999999999'.serialize('Hello World');
 		$files->expects($this->once())->method('get')->will($this->returnValue($contents));
 		$store = new FileStore($files, __DIR__);

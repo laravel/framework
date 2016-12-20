@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Config;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Filesystem\FileNotFoundException;
 
 class FileLoader implements LoaderInterface {
 
@@ -70,11 +71,13 @@ class FileLoader implements LoaderInterface {
 		// First we'll get the main configuration file for the groups. Once we have
 		// that we can check for any environment specific files, which will get
 		// merged on top of the main arrays to make the environments cascade.
-		$file = "{$path}/{$group}.php";
-
-		if ($this->files->exists($file))
+		try
 		{
-			$items = $this->getRequire($file);
+			$items = $this->files->getRequire("{$path}/{$group}.php");
+		}
+		catch (FileNotFoundException $e)
+		{
+			//
 		}
 
 		// Finally we're ready to check for the environment specific configuration
@@ -157,23 +160,29 @@ class FileLoader implements LoaderInterface {
 		// options so that we will easily "cascade" a package's configurations.
 		$file = "packages/{$package}/{$group}.php";
 
-		if ($this->files->exists($path = $this->defaultPath.'/'.$file))
+		try
 		{
 			$items = array_merge(
-				$items, $this->getRequire($path)
+				$items, $this->getRequire($this->defaultPath.'/'.$file)
 			);
+		}
+		catch (FileNotFoundException $e)
+		{
+			//
 		}
 
 		// Once we have merged the regular package configuration we need to look for
 		// an environment specific configuration file. If one exists, we will get
 		// the contents and merge them on top of this array of options we have.
-		$path = $this->getPackagePath($env, $package, $group);
-
-		if ($this->files->exists($path))
+		try
 		{
 			$items = array_merge(
-				$items, $this->getRequire($path)
+				$items, $this->getRequire($this->getPackagePath($env, $package, $group))
 			);
+		}
+		catch (FileNotFoundException $e)
+		{
+			//
 		}
 
 		return $items;
