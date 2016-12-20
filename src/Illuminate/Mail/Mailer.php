@@ -2,7 +2,6 @@
 
 namespace Illuminate\Mail;
 
-use Closure;
 use Swift_Mailer;
 use Swift_Message;
 use Illuminate\Support\Arr;
@@ -312,7 +311,7 @@ class Mailer implements MailerContract, MailQueueContract
     public function queue($view, array $data = [], $callback = null, $queue = null)
     {
         if (! $view instanceof MailableContract) {
-            throw new InvalidArgumentException("Only mailables may be queued.");
+            throw new InvalidArgumentException('Only mailables may be queued.');
         }
 
         return $view->queue($this->queue);
@@ -361,7 +360,7 @@ class Mailer implements MailerContract, MailQueueContract
     public function later($delay, $view, array $data = [], $callback = null, $queue = null)
     {
         if (! $view instanceof MailableContract) {
-            throw new InvalidArgumentException("Only mailables may be queued.");
+            throw new InvalidArgumentException('Only mailables may be queued.');
         }
 
         return $view->later($delay, $this->queue);
