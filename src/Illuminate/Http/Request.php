@@ -4,7 +4,6 @@ namespace Illuminate\Http;
 
 use Closure;
 use ArrayAccess;
-use SplFileInfo;
 use RuntimeException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
