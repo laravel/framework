@@ -309,10 +309,10 @@ class Dispatcher implements DispatcherContract
             foreach (class_implements($eventName) as $interface) {
                 if (isset($this->listeners[$interface])) {
                     foreach ($this->listeners[$interface] as $priority => $names) {
-                        if (isset($this->listeners[$eventName][$priority])) {
-                            $this->listeners[$eventName][$priority] = array_merge($this->listeners[$eventName][$priority], $names);
+                        if (isset($listeners[$priority])) {
+                            $listeners[$priority] = array_merge($listeners[$priority], $names);
                         } else {
-                            $this->listeners[$eventName][$priority] = $names;
+                            $listeners[$priority] = $names;
                         }
                     }
                 }
