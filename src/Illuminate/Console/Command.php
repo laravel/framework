@@ -104,6 +104,10 @@ class Command extends SymfonyCommand
 
         $this->setHidden($this->hidden);
 
+        if(! empty($this->alias)) {
+            $this->setAliases([ $this->alias ]);
+        }
+
         if (! isset($this->signature)) {
             $this->specifyParameters();
         }
