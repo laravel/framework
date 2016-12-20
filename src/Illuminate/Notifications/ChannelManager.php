@@ -2,19 +2,14 @@
 
 namespace Illuminate\Notifications;
 
-use Ramsey\Uuid\Uuid;
 use Illuminate\Mail\Markdown;
 use InvalidArgumentException;
 use Illuminate\Support\Manager;
 use Nexmo\Client as NexmoClient;
-use Illuminate\Support\Collection;
 use GuzzleHttp\Client as HttpClient;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Bus\Dispatcher as Bus;
 use Nexmo\Client\Credentials\Basic as NexmoCredentials;
-use Illuminate\Database\Eloquent\Collection as ModelCollection;
 use Illuminate\Contracts\Notifications\Factory as FactoryContract;
 use Illuminate\Contracts\Notifications\Dispatcher as DispatcherContract;
 
