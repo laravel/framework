@@ -1078,7 +1078,7 @@ class Builder
     public function withCount($relations)
     {
         if (is_null($this->query->columns)) {
-            $this->query->select(['*']);
+            $this->query->select([$this->query->from.'.*']);
         }
 
         $relations = is_array($relations) ? $relations : func_get_args();
