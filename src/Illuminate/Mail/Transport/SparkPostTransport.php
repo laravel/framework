@@ -164,6 +164,16 @@ class SparkPostTransport extends Transport
     }
 
     /**
+     * Get the transmission metadata being used by the transport.
+     *
+     * @return string
+     */
+    public function getMetadata()
+    {
+        return $this->metadata;
+    }
+
+    /**
      * Set the transmission metadata being used by the transport.
      *
      * @param  array  $metadata
@@ -172,15 +182,5 @@ class SparkPostTransport extends Transport
     public function setMetadata(array $metadata)
     {
         return $this->metadata = $metadata;
-    }
-
-    /**
-     * Get the transmission metadata being used by the transport.
-     *
-     * @return string
-     */
-    public function getMetadata()
-    {
-        return $this->metadata;
     }
 }
