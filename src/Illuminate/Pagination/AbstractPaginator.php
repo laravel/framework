@@ -213,7 +213,7 @@ abstract class AbstractPaginator implements Htmlable
      * @param  string  $value
      * @return $this
      */
-    public function addQuery($key, $value)
+    protected function addQuery($key, $value)
     {
         if ($key !== $this->pageName) {
             $this->query[$key] = $value;
@@ -323,6 +323,17 @@ abstract class AbstractPaginator implements Htmlable
         $this->pageName = $name;
 
         return $this;
+    }
+
+    /**
+     * Set the base path to assign to all URLs.
+     *
+     * @param  string  $path
+     * @return $this
+     */
+    public function withPath($path)
+    {
+        return $this->setPath($path);
     }
 
     /**
