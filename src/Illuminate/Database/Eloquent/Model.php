@@ -1578,6 +1578,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // are. These attribute arrays must contain an "id" column previously placed
         // there by the developer as the manually determined key for these models.
         else {
+            if (empty($attributes)) {
+                return true;
+            }
+
             $query->insert($attributes);
         }
 
