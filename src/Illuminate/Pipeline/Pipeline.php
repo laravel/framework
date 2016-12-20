@@ -95,13 +95,13 @@ class Pipeline implements PipelineContract
      */
     public function then(Closure $destination)
     {
-        $firstSlice = $this->getInitialSlice($destination);
+        $destination = function ($passable) use ($destination) {
+            return $destination($passable);
+        };
 
-        $callable = array_reduce(
-            array_reverse($this->pipes), $this->getSlice(), $firstSlice
-        );
-
-        return $callable($this->passable);
+        return array_reduce(
+            array_reverse($this->pipes), $this->carry(), $destination
+        )($this->passable);
     }
 
     /**
@@ -109,7 +109,7 @@ class Pipeline implements PipelineContract
      *
      * @return \Closure
      */
-    protected function getSlice()
+    protected function carry()
     {
         return function ($stack, $pipe) {
             return function ($passable) use ($stack, $pipe) {
@@ -136,19 +136,6 @@ class Pipeline implements PipelineContract
 
                 return $pipe->{$this->method}(...$parameters);
             };
-        };
-    }
-
-    /**
-     * Get the initial slice to begin the stack call.
-     *
-     * @param  \Closure  $destination
-     * @return \Closure
-     */
-    protected function getInitialSlice(Closure $destination)
-    {
-        return function ($passable) use ($destination) {
-            return $destination($passable);
         };
     }
 
