@@ -6,7 +6,6 @@ use SplFileInfo;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\UploadedFile;
-use Symfony\Component\HttpFoundation\ParameterBag;
 
 trait InteractsWithInput
 {
