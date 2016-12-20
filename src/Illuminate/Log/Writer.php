@@ -11,6 +11,7 @@ use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\ErrorLogHandler;
 use Monolog\Logger as MonologLogger;
 use Monolog\Handler\RotatingFileHandler;
+use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
@@ -275,7 +276,7 @@ class Writer implements LogContract, PsrLoggerInterface
             throw new RuntimeException('Events dispatcher has not been set.');
         }
 
-        $this->dispatcher->listen('illuminate.log', $callback);
+        $this->dispatcher->listen(MessageLogged::class, $callback);
     }
 
     /**
@@ -292,7 +293,7 @@ class Writer implements LogContract, PsrLoggerInterface
         // log listeners. These are useful for building profilers or other tools
         // that aggregate all of the log messages for a given "request" cycle.
         if (isset($this->dispatcher)) {
-            $this->dispatcher->fire('illuminate.log', compact('level', 'message', 'context'));
+            $this->dispatcher->fire(new MessageLogged($level, $message, $context));
         }
     }
 
