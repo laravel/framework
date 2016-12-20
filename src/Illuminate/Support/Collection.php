@@ -892,7 +892,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Get one or more items randomly from the collection.
      *
-     * @param  int  $amount
+     * @param  int|null  $amount
      * @return mixed
      *
      * @throws \InvalidArgumentException
@@ -905,8 +905,12 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         $keys = array_rand($this->items, $amount);
 
-        if ($amount == 1) {
+        if (count(func_get_args()) == 0) {
             return $this->items[$keys];
+        }
+
+        if (! is_array($keys)) {
+            $keys = [$keys];
         }
 
         return new static(array_intersect_key($this->items, array_flip($keys)));
