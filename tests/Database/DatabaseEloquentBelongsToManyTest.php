@@ -628,7 +628,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
         $relation->touchIfTouching();
     }
 
-    public function testSyncMethodConvertsCollectionToArrayOfKeys()
+    public function testSyncMethodConvertsEloquentCollectionToArrayOfKeys()
     {
         $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['attach', 'detach', 'touchIfTouching', 'formatRecordsList'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $query = m::mock('stdClass');
@@ -643,6 +643,21 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
             m::mock(['getKey' => 2]),
             m::mock(['getKey' => 3]),
         ]);
+        $relation->expects($this->once())->method('formatRecordsList')->with([1, 2, 3])->will($this->returnValue([1 => [], 2 => [], 3 => []]));
+        $relation->sync($collection);
+    }
+
+    public function testSyncMethodConvertsBaseCollectionToArrayOfKeys()
+    {
+        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['attach', 'detach', 'touchIfTouching', 'formatRecordsList'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $query = m::mock('stdClass');
+        $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
+        $query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
+        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+        $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
+        $query->shouldReceive('pluck')->once()->with('role_id')->andReturn(new BaseCollection([1, 2, 3]));
+
+        $collection = new BaseCollection([1, 2, 3]);
         $relation->expects($this->once())->method('formatRecordsList')->with([1, 2, 3])->will($this->returnValue([1 => [], 2 => [], 3 => []]));
         $relation->sync($collection);
     }
