@@ -27,18 +27,26 @@ class LogServiceProvider extends ServiceProvider
     public function createLogger()
     {
         $log = new Writer(
-            new Monolog($this->app->bound('env') ? $this->app->environment() : 'production'), $this->app['events']
+            new Monolog($this->channel()), $this->app['events']
         );
 
         if ($this->app->hasMonologConfigurator()) {
-            call_user_func(
-                $this->app->getMonologConfigurator(), $log->getMonolog()
-            );
+            call_user_func($this->app->getMonologConfigurator(), $log->getMonolog());
         } else {
-            $this->configureHandlers($log);
+            $this->configureHandler($log);
         }
 
         return $log;
+    }
+
+    /**
+     * Get the name of the log "channel".
+     *
+     * @return string
+     */
+    protected function channel()
+    {
+        return $this->app->bound('env') ? $this->app->environment() : 'production';
     }
 
     /**
@@ -47,17 +55,9 @@ class LogServiceProvider extends ServiceProvider
      * @param  \Illuminate\Log\Writer  $log
      * @return void
      */
-    protected function configureHandlers(Writer $log)
+    protected function configureHandler(Writer $log)
     {
-        if ($this->app->bound('config')) {
-            $handler = $this->app->make('config')->get('app.log');
-        } else {
-            $handler = 'single';
-        }
-
-        $method = 'configure'.ucfirst($handler).'Handler';
-
-        $this->{$method}($log);
+        $this->{'configure'.ucfirst($this->handler()).'Handler'}($log);
     }
 
     /**
@@ -108,6 +108,20 @@ class LogServiceProvider extends ServiceProvider
     protected function configureErrorlogHandler(Writer $log)
     {
         $log->useErrorLog($this->logLevel());
+    }
+
+    /**
+     * Get the default log handler.
+     *
+     * @return string
+     */
+    protected function handler()
+    {
+        if ($this->app->bound('config')) {
+            return $this->app->make('config')->get('app.log');
+        }
+
+        return 'single';
     }
 
     /**
