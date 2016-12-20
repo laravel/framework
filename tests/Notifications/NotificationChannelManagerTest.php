@@ -2,6 +2,7 @@
 
 use Illuminate\Container\Container;
 use Illuminate\Notifications\Notification;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Notifications\ChannelManager;
 use Illuminate\Contracts\Bus\Dispatcher as Bus;
 
@@ -16,7 +17,8 @@ class NotificationChannelManagerTest extends PHPUnit_Framework_TestCase
     {
         $container = new Container;
         $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
-        $container->instance('events', $events = Mockery::mock());
+        $container->instance(Bus::class, $bus = Mockery::mock());
+        $container->instance(Dispatcher::class, $events = Mockery::mock());
         Container::setInstance($container);
         $manager = Mockery::mock(ChannelManager::class.'[driver]', [$container]);
         $manager->shouldReceive('driver')->andReturn($driver = Mockery::mock());
@@ -31,7 +33,8 @@ class NotificationChannelManagerTest extends PHPUnit_Framework_TestCase
     {
         $container = new Container;
         $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
-        $container->instance('events', $events = Mockery::mock());
+        $container->instance(Bus::class, $bus = Mockery::mock());
+        $container->instance(Dispatcher::class, $events = Mockery::mock());
         Container::setInstance($container);
         $manager = Mockery::mock(ChannelManager::class.'[driver]', [$container]);
         $events->shouldReceive('until')->once()->with(Mockery::type(Illuminate\Notifications\Events\NotificationSending::class))->andReturn(false);
@@ -47,6 +50,7 @@ class NotificationChannelManagerTest extends PHPUnit_Framework_TestCase
     {
         $container = new Container;
         $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
+        $container->instance(Dispatcher::class, $events = Mockery::mock());
         $container->instance(Bus::class, $bus = Mockery::mock());
         $bus->shouldReceive('dispatch')->with(Mockery::type(Illuminate\Notifications\SendQueuedNotifications::class));
         Container::setInstance($container);
