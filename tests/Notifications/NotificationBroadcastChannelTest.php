@@ -45,7 +45,7 @@ class NotificationBroadcastChannelTest extends PHPUnit_Framework_TestCase
         $notifiable = Mockery::mock();
 
         $events = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
-        $events->shouldReceive('fire')->once()->with(Mockery::on(function($event){
+        $events->shouldReceive('fire')->once()->with(Mockery::on(function ($event) {
             return $event->connection == 'sync';
         }));
         $channel = new BroadcastChannel($events);
