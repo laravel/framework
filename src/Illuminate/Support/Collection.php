@@ -1142,12 +1142,12 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return new static(array_unique($this->items, SORT_REGULAR));
         }
 
-        $key = $this->valueRetriever($key);
+        $callback = $this->valueRetriever($key);
 
         $exists = [];
 
-        return $this->reject(function ($item) use ($key, $strict, &$exists) {
-            if (in_array($id = $key($item), $exists, $strict)) {
+        return $this->reject(function ($item, $key) use ($callback, $strict, &$exists) {
+            if (in_array($id = $callback($item, $key), $exists, $strict)) {
                 return true;
             }
 
