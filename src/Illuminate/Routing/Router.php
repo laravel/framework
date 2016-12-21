@@ -276,6 +276,32 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
+     * Update the group stack with the given attributes.
+     *
+     * @param  array  $attributes
+     * @return void
+     */
+    protected function updateGroupStack(array $attributes)
+    {
+        if (! empty($this->groupStack)) {
+            $attributes = RouteGroup::merge($attributes, end($this->groupStack));
+        }
+
+        $this->groupStack[] = $attributes;
+    }
+
+    /**
+     * Merge the given array with the last group stack.
+     *
+     * @param  array  $new
+     * @return array
+     */
+    public function mergeWithLastGroup($new)
+    {
+        return RouteGroup::merge($new, end($this->groupStack));
+    }
+
+    /**
      * Load the provided routes.
      *
      * @param  \Closure|string  $routes
@@ -290,97 +316,6 @@ class Router implements RegistrarContract, BindingRegistrar
 
             require $routes;
         }
-    }
-
-    /**
-     * Update the group stack with the given attributes.
-     *
-     * @param  array  $attributes
-     * @return void
-     */
-    protected function updateGroupStack(array $attributes)
-    {
-        if (! empty($this->groupStack)) {
-            $attributes = $this->mergeGroup($attributes, end($this->groupStack));
-        }
-
-        $this->groupStack[] = $attributes;
-    }
-
-    /**
-     * Merge the given array with the last group stack.
-     *
-     * @param  array  $new
-     * @return array
-     */
-    public function mergeWithLastGroup($new)
-    {
-        return $this->mergeGroup($new, end($this->groupStack));
-    }
-
-    /**
-     * Merge the given group attributes.
-     *
-     * @param  array  $new
-     * @param  array  $old
-     * @return array
-     */
-    public static function mergeGroup($new, $old)
-    {
-        $new['namespace'] = static::formatUsesPrefix($new, $old);
-
-        $new['prefix'] = static::formatGroupPrefix($new, $old);
-
-        if (isset($new['domain'])) {
-            unset($old['domain']);
-        }
-
-        $new['where'] = array_merge(
-            isset($old['where']) ? $old['where'] : [],
-            isset($new['where']) ? $new['where'] : []
-        );
-
-        if (isset($old['as'])) {
-            $new['as'] = $old['as'].(isset($new['as']) ? $new['as'] : '');
-        }
-
-        return array_merge_recursive(Arr::except($old, ['namespace', 'prefix', 'where', 'as']), $new);
-    }
-
-    /**
-     * Format the uses prefix for the new group attributes.
-     *
-     * @param  array  $new
-     * @param  array  $old
-     * @return string|null
-     */
-    protected static function formatUsesPrefix($new, $old)
-    {
-        if (isset($new['namespace'])) {
-            return isset($old['namespace'])
-                    ? trim($old['namespace'], '\\').'\\'.trim($new['namespace'], '\\')
-                    : trim($new['namespace'], '\\');
-        }
-
-        return isset($old['namespace']) ? $old['namespace'] : null;
-    }
-
-    /**
-     * Format the prefix for the new group attributes.
-     *
-     * @param  array  $new
-     * @param  array  $old
-     * @return string|null
-     */
-    protected static function formatGroupPrefix($new, $old)
-    {
-        $oldPrefix = isset($old['prefix']) ? $old['prefix'] : null;
-
-        if (isset($new['prefix'])) {
-            return trim($oldPrefix, '/').'/'.trim($new['prefix'], '/');
-        }
-
-        return $oldPrefix;
     }
 
     /**
@@ -446,6 +381,62 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
+     * Determine if the action is routing to a controller.
+     *
+     * @param  array  $action
+     * @return bool
+     */
+    protected function actionReferencesController($action)
+    {
+        if (! $action instanceof Closure) {
+            return is_string($action) || (isset($action['uses']) && is_string($action['uses']));
+        }
+
+        return false;
+    }
+
+    /**
+     * Add a controller based route action to the action array.
+     *
+     * @param  array|string  $action
+     * @return array
+     */
+    protected function convertToControllerAction($action)
+    {
+        if (is_string($action)) {
+            $action = ['uses' => $action];
+        }
+
+        // Here we'll merge any group "uses" statement if necessary so that the action
+        // has the proper clause for this property. Then we can simply set the name
+        // of the controller on the action and return the action array for usage.
+        if (! empty($this->groupStack)) {
+            $action['uses'] = $this->prependGroupNamespace($action['uses']);
+        }
+
+        // Here we will set this controller name on the action array just so we always
+        // have a copy of it for reference if we need it. This can be used while we
+        // search for a controller name or do some other type of fetch operation.
+        $action['controller'] = $action['uses'];
+
+        return $action;
+    }
+
+    /**
+     * Prepend the last group namespace onto the use clause.
+     *
+     * @param  string  $class
+     * @return string
+     */
+    protected function prependGroupNamespace($class)
+    {
+        $group = end($this->groupStack);
+
+        return isset($group['namespace']) && strpos($class, '\\') !== 0
+                ? $group['namespace'].'\\'.$class : $class;
+    }
+
+    /**
      * Create a new Route object.
      *
      * @param  array|string  $methods
@@ -479,9 +470,9 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     protected function addWhereClausesToRoute($route)
     {
-        $where = isset($route->getAction()['where']) ? $route->getAction()['where'] : [];
-
-        $route->where(array_merge($this->patterns, $where));
+        $route->where(array_merge(
+            $this->patterns, isset($route->getAction()['where']) ? $route->getAction()['where'] : []
+        ));
 
         return $route;
     }
@@ -494,64 +485,7 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     protected function mergeGroupAttributesIntoRoute($route)
     {
-        $action = $this->mergeWithLastGroup($route->getAction());
-
-        $route->setAction($action);
-    }
-
-    /**
-     * Determine if the action is routing to a controller.
-     *
-     * @param  array  $action
-     * @return bool
-     */
-    protected function actionReferencesController($action)
-    {
-        if ($action instanceof Closure) {
-            return false;
-        }
-
-        return is_string($action) || (isset($action['uses']) && is_string($action['uses']));
-    }
-
-    /**
-     * Add a controller based route action to the action array.
-     *
-     * @param  array|string  $action
-     * @return array
-     */
-    protected function convertToControllerAction($action)
-    {
-        if (is_string($action)) {
-            $action = ['uses' => $action];
-        }
-
-        // Here we'll merge any group "uses" statement if necessary so that the action
-        // has the proper clause for this property. Then we can simply set the name
-        // of the controller on the action and return the action array for usage.
-        if (! empty($this->groupStack)) {
-            $action['uses'] = $this->prependGroupUses($action['uses']);
-        }
-
-        // Here we will set this controller name on the action array just so we always
-        // have a copy of it for reference if we need it. This can be used while we
-        // search for a controller name or do some other type of fetch operation.
-        $action['controller'] = $action['uses'];
-
-        return $action;
-    }
-
-    /**
-     * Prepend the last group uses onto the use clause.
-     *
-     * @param  string  $uses
-     * @return string
-     */
-    protected function prependGroupUses($uses)
-    {
-        $group = end($this->groupStack);
-
-        return isset($group['namespace']) && strpos($uses, '\\') !== 0 ? $group['namespace'].'\\'.$uses : $uses;
+        $route->setAction($this->mergeWithLastGroup($route->getAction()));
     }
 
     /**
@@ -592,6 +526,21 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
+     * Find the route matching a given request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Routing\Route
+     */
+    protected function findRoute($request)
+    {
+        $this->current = $route = $this->routes->match($request);
+
+        $this->container->instance('Illuminate\Routing\Route', $route);
+
+        return $route;
+    }
+
+    /**
      * Run the given route within a Stack "onion" instance.
      *
      * @param  \Illuminate\Routing\Route  $route
@@ -616,7 +565,7 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
-     * Gather the middleware for the given route.
+     * Gather the middleware for the given route with resolved class names.
      *
      * @param  \Illuminate\Routing\Route  $route
      * @return array
@@ -624,84 +573,10 @@ class Router implements RegistrarContract, BindingRegistrar
     public function gatherRouteMiddleware(Route $route)
     {
         $middleware = collect($route->gatherMiddleware())->map(function ($name) {
-            return (array) $this->resolveMiddlewareClassName($name);
+            return (array) MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
         })->flatten();
 
         return $this->sortMiddleware($middleware);
-    }
-
-    /**
-     * Resolve the middleware name to a class name(s) preserving passed parameters.
-     *
-     * @param  string  $name
-     * @return string|array
-     */
-    public function resolveMiddlewareClassName($name)
-    {
-        $map = $this->middleware;
-
-        // When the middleware is simply a Closure, we will return this Closure instance
-        // directly so that Closures can be registered as middleware inline, which is
-        // convenient on occasions when the developers are experimenting with them.
-        if ($name instanceof Closure) {
-            return $name;
-        } elseif (isset($map[$name]) && $map[$name] instanceof Closure) {
-            return $map[$name];
-
-        // If the middleware is the name of a middleware group, we will return the array
-        // of middlewares that belong to the group. This allows developers to group a
-        // set of middleware under single keys that can be conveniently referenced.
-        } elseif (isset($this->middlewareGroups[$name])) {
-            return $this->parseMiddlewareGroup($name);
-
-        // Finally, when the middleware is simply a string mapped to a class name the
-        // middleware name will get parsed into the full class name and parameters
-        // which may be run using the Pipeline which accepts this string format.
-        } else {
-            list($name, $parameters) = array_pad(explode(':', $name, 2), 2, null);
-
-            return (isset($map[$name]) ? $map[$name] : $name).
-                   (! is_null($parameters) ? ':'.$parameters : '');
-        }
-    }
-
-    /**
-     * Parse the middleware group and format it for usage.
-     *
-     * @param  string  $name
-     * @return array
-     */
-    protected function parseMiddlewareGroup($name)
-    {
-        $results = [];
-
-        foreach ($this->middlewareGroups[$name] as $middleware) {
-            // If the middleware is another middleware group we will pull in the group and
-            // merge its middleware into the results. This allows groups to conveniently
-            // reference other groups without needing to repeat all their middlewares.
-            if (isset($this->middlewareGroups[$middleware])) {
-                $results = array_merge(
-                    $results, $this->parseMiddlewareGroup($middleware)
-                );
-
-                continue;
-            }
-
-            list($middleware, $parameters) = array_pad(
-                explode(':', $middleware, 2), 2, null
-            );
-
-            // If this middleware is actually a route middleware, we will extract the full
-            // class name out of the middleware list now. Then we'll add the parameters
-            // back onto this class' name so the pipeline will properly extract them.
-            if (isset($this->middleware[$middleware])) {
-                $middleware = $this->middleware[$middleware];
-            }
-
-            $results[] = $middleware.($parameters ? ':'.$parameters : '');
-        }
-
-        return $results;
     }
 
     /**
@@ -716,18 +591,21 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
-     * Find the route matching a given request.
+     * Create a response instance from the given value.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Routing\Route
+     * @param  \Symfony\Component\HttpFoundation\Request  $request
+     * @param  mixed  $response
+     * @return \Illuminate\Http\Response
      */
-    protected function findRoute($request)
+    public function prepareResponse($request, $response)
     {
-        $this->current = $route = $this->routes->match($request);
+        if ($response instanceof PsrResponseInterface) {
+            $response = (new HttpFoundationFactory)->createResponse($response);
+        } elseif (! $response instanceof SymfonyResponse) {
+            $response = new Response($response);
+        }
 
-        $this->container->instance('Illuminate\Routing\Route', $route);
-
-        return $route;
+        return $response->prepare($request);
     }
 
     /**
@@ -927,19 +805,6 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
-     * Get the binding callback for a given binding.
-     *
-     * @param  string  $key
-     * @return \Closure|null
-     */
-    public function getBindingCallback($key)
-    {
-        if (isset($this->binders[$key = str_replace('-', '_', $key)])) {
-            return $this->binders[$key];
-        }
-    }
-
-    /**
      * Create a class based binding using the IoC container.
      *
      * @param  string  $binding
@@ -959,6 +824,29 @@ class Router implements RegistrarContract, BindingRegistrar
 
             return call_user_func($callable, $value, $route);
         };
+    }
+
+    /**
+     * Get the binding callback for a given binding.
+     *
+     * @param  string  $key
+     * @return \Closure|null
+     */
+    public function getBindingCallback($key)
+    {
+        if (isset($this->binders[$key = str_replace('-', '_', $key)])) {
+            return $this->binders[$key];
+        }
+    }
+
+    /**
+     * Get the global "where" patterns.
+     *
+     * @return array
+     */
+    public function getPatterns()
+    {
+        return $this->patterns;
     }
 
     /**
@@ -984,24 +872,6 @@ class Router implements RegistrarContract, BindingRegistrar
         foreach ($patterns as $key => $pattern) {
             $this->pattern($key, $pattern);
         }
-    }
-
-    /**
-     * Create a response instance from the given value.
-     *
-     * @param  \Symfony\Component\HttpFoundation\Request  $request
-     * @param  mixed  $response
-     * @return \Illuminate\Http\Response
-     */
-    public function prepareResponse($request, $response)
-    {
-        if ($response instanceof PsrResponseInterface) {
-            $response = (new HttpFoundationFactory)->createResponse($response);
-        } elseif (! $response instanceof SymfonyResponse) {
-            $response = new Response($response);
-        }
-
-        return $response->prepare($request);
     }
 
     /**
@@ -1238,16 +1108,6 @@ class Router implements RegistrarContract, BindingRegistrar
         $this->routes = $routes;
 
         $this->container->instance('routes', $this->routes);
-    }
-
-    /**
-     * Get the global "where" patterns.
-     *
-     * @return array
-     */
-    public function getPatterns()
-    {
-        return $this->patterns;
     }
 
     /**
