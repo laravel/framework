@@ -412,6 +412,24 @@ class Str
     }
 
     /**
+     * Removes extension from the end of a file name.
+     *
+     * @param  string  $value
+     * @param  string  $extension
+     * @return string
+     */
+    public static function stripExtension($value, $extension = 'php')
+    {
+        $extension = '.' . $extension;
+
+        if (Str::endsWith($value, $extension)) {
+            return str_replace_last($extension, '', $value);
+        }
+
+        return $value;
+    }
+
+    /**
      * Convert a value to studly caps case.
      *
      * @param  string  $value

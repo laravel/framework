@@ -195,6 +195,28 @@ class SupportStrTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('laravel_php_framework_', Str::snake('LaravelPhpFramework_', '_'));
     }
 
+    public function testStripExtension()
+    {
+        // It strips extension if found.
+        $this->assertEquals('foo', Str::stripExtension('foo.php'));
+
+        // It strips only one occurrence of the extension.
+        $this->assertEquals('foo.php', Str::stripExtension('foo.php.php'));
+
+        // It doesn't do anything when extension is not found.
+        $this->assertEquals('foo.php.json', Str::stripExtension('foo.php.json'));
+
+        // It strips extension from a full path.
+        $this->assertEquals('/foo/bar/baz', Str::stripExtension('/foo/bar/baz.php'));
+
+        // It strips extensions other than default.
+        $this->assertEquals('foo', Str::stripExtension('foo.json', 'json'));
+        $this->assertEquals('foo.json', Str::stripExtension('foo.json.json', 'json'));
+        $this->assertEquals('foo.json.php', Str::stripExtension('foo.json.php', 'json'));
+        $this->assertEquals('/foo/bar/baz', Str::stripExtension('/foo/bar/baz.json', 'json'));
+    }
+
+
     public function testStudly()
     {
         $this->assertEquals('LaravelPHPFramework', Str::studly('laravel_p_h_p_framework'));
