@@ -11,7 +11,7 @@
 - Pass keys to `Collection::unique()` callback ([#16883](https://github.com/laravel/framework/pull/16883))
 
 ### Fixed
-- Fixed a wildcard issue with `sometimes` validaton rule ([#16826](https://github.com/laravel/framework/pull/16826))
+- Fixed a wildcard issue with `sometimes` validation rule ([#16826](https://github.com/laravel/framework/pull/16826))
 - Prevent error when SqlServer port is empty ([#16824](https://github.com/laravel/framework/pull/16824))
 - Reverted false-positive fix for `date_format` validation [#16692](https://github.com/laravel/framework/pull/16692) ([#16845](https://github.com/laravel/framework/pull/16845))
 - Fixed `withCount()` aliasing using multiple tables ([#16853](https://github.com/laravel/framework/pull/16853))
