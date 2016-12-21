@@ -855,6 +855,15 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
 
         $router = $this->getRouter();
         $router->group(['namespace' => 'Namespace'], function () use ($router) {
+            $router->get('foo/bar', '\\Controller@action');
+        });
+        $routes = $router->getRoutes()->getRoutes();
+        $action = $routes[0]->getAction();
+
+        $this->assertEquals('\Controller@action', $action['controller']);
+
+        $router = $this->getRouter();
+        $router->group(['namespace' => 'Namespace'], function () use ($router) {
             $router->group(['namespace' => 'Nested'], function () use ($router) {
                 $router->get('foo/bar', 'Controller@action');
             });
@@ -863,6 +872,17 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $action = $routes[0]->getAction();
 
         $this->assertEquals('Namespace\\Nested\\Controller@action', $action['controller']);
+
+        $router = $this->getRouter();
+        $router->group(['namespace' => 'Namespace'], function () use ($router) {
+            $router->group(['namespace' => '\GlobalScope'], function () use ($router) {
+                $router->get('foo/bar', 'Controller@action');
+            });
+        });
+        $routes = $router->getRoutes()->getRoutes();
+        $action = $routes[0]->getAction();
+
+        $this->assertEquals('GlobalScope\\Controller@action', $action['controller']);
 
         $router = $this->getRouter();
         $router->group(['prefix' => 'baz'], function () use ($router) {
