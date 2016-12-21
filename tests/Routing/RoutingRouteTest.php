@@ -751,7 +751,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         });
         $routes = $router->getRoutes();
         $route = $routes->getByName('Foo::bar');
-        $this->assertEquals('foo/bar', $route->getPath());
+        $this->assertEquals('foo/bar', $route->uri());
     }
 
     public function testNestedRouteGroupingWithAs()
@@ -769,7 +769,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         });
         $routes = $router->getRoutes();
         $route = $routes->getByName('Foo::Bar::baz');
-        $this->assertEquals('foo/bar/baz', $route->getPath());
+        $this->assertEquals('foo/bar/baz', $route->uri());
 
         /*
          * nested with layer skipped
@@ -784,7 +784,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         });
         $routes = $router->getRoutes();
         $route = $routes->getByName('Foo::baz');
-        $this->assertEquals('foo/bar/baz', $route->getPath());
+        $this->assertEquals('foo/bar/baz', $route->uri());
     }
 
     public function testRouteMiddlewareMergeWithMiddlewareAttributesAsStrings()

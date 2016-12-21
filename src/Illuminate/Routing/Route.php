@@ -129,6 +129,19 @@ class Route
     }
 
     /**
+     * Parse the route action into a standard array.
+     *
+     * @param  callable|array|null  $action
+     * @return array
+     *
+     * @throws \UnexpectedValueException
+     */
+    protected function parseAction($action)
+    {
+        return RouteAction::parse($this->uri, $action);
+    }
+
+    /**
      * Run the route action and return the response.
      *
      * @return mixed
@@ -248,6 +261,22 @@ class Route
         }
 
         return $this->compiled;
+    }
+
+    /**
+     * Bind the route to a given request for execution.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return $this
+     */
+    public function bind(Request $request)
+    {
+        $this->compileRoute();
+
+        $this->parameters = (new RouteParameterBinder($this))
+                        ->parameters($request);
+
+        return $this;
     }
 
     /**
@@ -378,125 +407,7 @@ class Route
      */
     public function signatureParameters($subClass = null)
     {
-        $action = $this->getAction();
-
-        if (is_string($action['uses'])) {
-            list($class, $method) = explode('@', $action['uses']);
-
-            $parameters = (new ReflectionMethod($class, $method))->getParameters();
-        } else {
-            $parameters = (new ReflectionFunction($action['uses']))->getParameters();
-        }
-
-        return is_null($subClass) ? $parameters : array_filter($parameters, function ($p) use ($subClass) {
-            return $p->getClass() && $p->getClass()->isSubclassOf($subClass);
-        });
-    }
-
-    /**
-     * Bind the route to a given request for execution.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return $this
-     */
-    public function bind(Request $request)
-    {
-        $this->compileRoute();
-
-        $this->parameters = (new RouteParameterBinder($this))
-                        ->parameters($request);
-
-        return $this;
-    }
-
-    /**
-     * Parse the route action into a standard array.
-     *
-     * @param  callable|array|null  $action
-     * @return array
-     *
-     * @throws \UnexpectedValueException
-     */
-    protected function parseAction($action)
-    {
-        // If no action is passed in right away, we assume the user will make use of
-        // fluent routing. In that case, we set a default closure, to be executed
-        // if the user never explicitly sets an action to handle the given uri.
-        if (is_null($action)) {
-            return ['uses' => function () {
-                throw new LogicException("Route for [{$this->uri}] has no action.");
-            }];
-        }
-
-        // If the action is already a Closure instance, we will just set that instance
-        // as the "uses" property, because there is nothing else we need to do when
-        // it is available. Otherwise we will need to find it in the action list.
-        if (is_callable($action)) {
-            return ['uses' => $action];
-        }
-
-        // If no "uses" property has been set, we will dig through the array to find a
-        // Closure instance within this list. We will set the first Closure we come
-        // across into the "uses" property that will get fired off by this route.
-        elseif (! isset($action['uses'])) {
-            $action['uses'] = $this->findCallable($action);
-        }
-
-        if (is_string($action['uses']) && ! Str::contains($action['uses'], '@')) {
-            $action['uses'] = $this->makeInvokableAction($action['uses']);
-        }
-
-        return $action;
-    }
-
-    /**
-     * Find the callable in an action array.
-     *
-     * @param  array  $action
-     * @return callable
-     */
-    protected function findCallable(array $action)
-    {
-        return Arr::first($action, function ($value, $key) {
-            return is_callable($value) && is_numeric($key);
-        });
-    }
-
-    /**
-     * Make an action for an invokable controller.
-     *
-     * @param  string $action
-     * @return string
-     */
-    protected function makeInvokableAction($action)
-    {
-        if (! method_exists($action, '__invoke')) {
-            throw new UnexpectedValueException(sprintf(
-                'Invalid route action: [%s]', $action
-            ));
-        }
-
-        return $action.'@__invoke';
-    }
-
-    /**
-     * Get the route validators for the instance.
-     *
-     * @return array
-     */
-    public static function getValidators()
-    {
-        if (isset(static::$validators)) {
-            return static::$validators;
-        }
-
-        // To match the route, we will use a chain of responsibility pattern with the
-        // validator implementations. We will spin through each one making sure it
-        // passes and then we will know if the route as a whole matches request.
-        return static::$validators = [
-            new UriValidator, new MethodValidator,
-            new SchemeValidator, new HostValidator,
-        ];
+        return RouteSignatureParameters::fromAction($this->action, $subClass);
     }
 
     /**
@@ -557,41 +468,6 @@ class Route
     }
 
     /**
-     * Add a prefix to the route URI.
-     *
-     * @param  string  $prefix
-     * @return $this
-     */
-    public function prefix($prefix)
-    {
-        $uri = rtrim($prefix, '/').'/'.ltrim($this->uri, '/');
-
-        $this->uri = trim($uri, '/');
-
-        return $this;
-    }
-
-    /**
-     * Get the URI associated with the route.
-     *
-     * @return string
-     */
-    public function getPath()
-    {
-        return $this->uri();
-    }
-
-    /**
-     * Get the HTTP verbs the route responds to.
-     *
-     * @return array
-     */
-    public function getMethods()
-    {
-        return $this->methods();
-    }
-
-    /**
      * Get the HTTP verbs the route responds to.
      *
      * @return array
@@ -643,6 +519,31 @@ class Route
     }
 
     /**
+     * Get the prefix of the route instance.
+     *
+     * @return string
+     */
+    public function getPrefix()
+    {
+        return isset($this->action['prefix']) ? $this->action['prefix'] : null;
+    }
+
+    /**
+     * Add a prefix to the route URI.
+     *
+     * @param  string  $prefix
+     * @return $this
+     */
+    public function prefix($prefix)
+    {
+        $uri = rtrim($prefix, '/').'/'.ltrim($this->uri, '/');
+
+        $this->uri = trim($uri, '/');
+
+        return $this;
+    }
+
+    /**
      * Get the URI associated with the route.
      *
      * @return string
@@ -663,16 +564,6 @@ class Route
         $this->uri = $uri;
 
         return $this;
-    }
-
-    /**
-     * Get the prefix of the route instance.
-     *
-     * @return string
-     */
-    public function getPrefix()
-    {
-        return isset($this->action['prefix']) ? $this->action['prefix'] : null;
     }
 
     /**
@@ -813,6 +704,26 @@ class Route
         return ControllerDispatcher::getMiddleware(
             $this->getController(), $this->getControllerMethod()
         );
+    }
+
+    /**
+     * Get the route validators for the instance.
+     *
+     * @return array
+     */
+    public static function getValidators()
+    {
+        if (isset(static::$validators)) {
+            return static::$validators;
+        }
+
+        // To match the route, we will use a chain of responsibility pattern with the
+        // validator implementations. We will spin through each one making sure it
+        // passes and then we will know if the route as a whole matches request.
+        return static::$validators = [
+            new UriValidator, new MethodValidator,
+            new SchemeValidator, new HostValidator,
+        ];
     }
 
     /**
