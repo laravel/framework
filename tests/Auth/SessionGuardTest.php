@@ -1,12 +1,16 @@
 <?php
 
+namespace Illuminate\Tests\Auth;
+
 use Mockery as m;
+use Illuminate\Auth\SessionGuard;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Attempting;
 use Illuminate\Auth\Events\Authenticated;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 
-class AuthGuardTest extends PHPUnit_Framework_TestCase
+class SessionGuardTest extends \PHPUnit_Framework_TestCase
 {
     public function tearDown()
     {
@@ -19,7 +23,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
         $guard = m::mock('Illuminate\Auth\SessionGuard[check,attempt]', ['default', $provider, $session]);
         $guard->shouldReceive('check')->once()->andReturn(false);
         $guard->shouldReceive('attempt')->once()->with(['email' => 'foo@bar.com', 'password' => 'secret'])->andReturn(true);
-        $request = Symfony\Component\HttpFoundation\Request::create('/', 'GET', [], [], [], ['PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret']);
+        $request = Request::create('/', 'GET', [], [], [], ['PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret']);
         $guard->setRequest($request);
 
         $guard->basic('email');
@@ -31,7 +35,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
         $guard = m::mock('Illuminate\Auth\SessionGuard[check]', ['default', $provider, $session]);
         $guard->shouldReceive('check')->once()->andReturn(true);
         $guard->shouldReceive('attempt')->never();
-        $request = Symfony\Component\HttpFoundation\Request::create('/', 'GET', [], [], [], ['PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret']);
+        $request = Request::create('/', 'GET', [], [], [], ['PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret']);
         $guard->setRequest($request);
 
         $guard->basic('email');
@@ -43,7 +47,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
         $guard = m::mock('Illuminate\Auth\SessionGuard[check,attempt]', ['default', $provider, $session]);
         $guard->shouldReceive('check')->once()->andReturn(false);
         $guard->shouldReceive('attempt')->once()->with(['email' => 'foo@bar.com', 'password' => 'secret'])->andReturn(false);
-        $request = Symfony\Component\HttpFoundation\Request::create('/', 'GET', [], [], [], ['PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret']);
+        $request = Request::create('/', 'GET', [], [], [], ['PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret']);
         $guard->setRequest($request);
         $response = $guard->basic('email');
 
@@ -57,7 +61,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
         $guard = m::mock('Illuminate\Auth\SessionGuard[check,attempt]', ['default', $provider, $session]);
         $guard->shouldReceive('check')->once()->andReturn(false);
         $guard->shouldReceive('attempt')->once()->with(['email' => 'foo@bar.com', 'password' => 'secret', 'active' => 1])->andReturn(true);
-        $request = Symfony\Component\HttpFoundation\Request::create('/', 'GET', [], [], [], ['PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret']);
+        $request = Request::create('/', 'GET', [], [], [], ['PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret']);
         $guard->setRequest($request);
 
         $guard->basic('email', ['active' => 1]);
@@ -260,9 +264,9 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
     public function testLoginMethodQueuesCookieWhenRemembering()
     {
         list($session, $provider, $request, $cookie) = $this->getMocks();
-        $guard = new Illuminate\Auth\SessionGuard('default', $provider, $session, $request);
+        $guard = new SessionGuard('default', $provider, $session, $request);
         $guard->setCookieJar($cookie);
-        $foreverCookie = new Symfony\Component\HttpFoundation\Cookie($guard->getRecallerName(), 'foo');
+        $foreverCookie = new Cookie($guard->getRecallerName(), 'foo');
         $cookie->shouldReceive('forever')->once()->with($guard->getRecallerName(), 'foo|recaller')->andReturn($foreverCookie);
         $cookie->shouldReceive('queue')->once()->with($foreverCookie);
         $guard->getSession()->shouldReceive('set')->once()->with($guard->getName(), 'foo');
@@ -278,9 +282,9 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
     public function testLoginMethodCreatesRememberTokenIfOneDoesntExist()
     {
         list($session, $provider, $request, $cookie) = $this->getMocks();
-        $guard = new Illuminate\Auth\SessionGuard('default', $provider, $session, $request);
+        $guard = new SessionGuard('default', $provider, $session, $request);
         $guard->setCookieJar($cookie);
-        $foreverCookie = new Symfony\Component\HttpFoundation\Cookie($guard->getRecallerName(), 'foo');
+        $foreverCookie = new Cookie($guard->getRecallerName(), 'foo');
         $cookie->shouldReceive('forever')->once()->andReturn($foreverCookie);
         $cookie->shouldReceive('queue')->once()->with($foreverCookie);
         $guard->getSession()->shouldReceive('set')->once()->with($guard->getName(), 'foo');
@@ -344,8 +348,8 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
     {
         $guard = $this->getGuard();
         list($session, $provider, $request, $cookie) = $this->getMocks();
-        $request = Symfony\Component\HttpFoundation\Request::create('/', 'GET', [], [$guard->getRecallerName() => 'id|recaller']);
-        $guard = new Illuminate\Auth\SessionGuard('default', $provider, $session, $request);
+        $request = Request::create('/', 'GET', [], [$guard->getRecallerName() => 'id|recaller']);
+        $guard = new SessionGuard('default', $provider, $session, $request);
         $guard->getSession()->shouldReceive('get')->once()->with($guard->getName())->andReturn(null);
         $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
         $guard->getProvider()->shouldReceive('retrieveByToken')->once()->with('id', 'recaller')->andReturn($user);
@@ -360,7 +364,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
     {
         list($session, $provider, $request, $cookie) = $this->getMocks();
 
-        return new Illuminate\Auth\SessionGuard('default', $provider, $session, $request);
+        return new SessionGuard('default', $provider, $session, $request);
     }
 
     protected function getMocks()
@@ -368,13 +372,13 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
         return [
             m::mock('Symfony\Component\HttpFoundation\Session\SessionInterface'),
             m::mock('Illuminate\Contracts\Auth\UserProvider'),
-            Symfony\Component\HttpFoundation\Request::create('/', 'GET'),
+            Request::create('/', 'GET'),
             m::mock('Illuminate\Cookie\CookieJar'),
         ];
     }
 
     protected function getCookieJar()
     {
-        return new Illuminate\Cookie\CookieJar(Request::create('/foo', 'GET'), m::mock('Illuminate\Contracts\Encryption\Encrypter'), ['domain' => 'foo.com', 'path' => '/', 'secure' => false, 'httpOnly' => false]);
+        return new \Illuminate\Cookie\CookieJar(Request::create('/foo', 'GET'), m::mock('Illuminate\Contracts\Encryption\Encrypter'), ['domain' => 'foo.com', 'path' => '/', 'secure' => false, 'httpOnly' => false]);
     }
 }

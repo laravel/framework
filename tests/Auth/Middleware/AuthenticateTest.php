@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Auth\Middleware;
+
 use Mockery as m;
 use Illuminate\Http\Request;
 use Illuminate\Auth\AuthManager;
@@ -9,7 +11,7 @@ use Illuminate\Config\Repository as Config;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Middleware\Authenticate;
 
-class AuthenticateMiddlewareTest extends PHPUnit_Framework_TestCase
+class AuthenticateTest extends \PHPUnit_Framework_TestCase
 {
     protected $auth;
 
@@ -30,7 +32,7 @@ class AuthenticateMiddlewareTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Illuminate\Auth\AuthenticationException
+     * @expectedException \Illuminate\Auth\AuthenticationException
      */
     public function testDefaultUnauthenticatedThrows()
     {
@@ -75,7 +77,7 @@ class AuthenticateMiddlewareTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Illuminate\Auth\AuthenticationException
+     * @expectedException \Illuminate\Auth\AuthenticationException
      */
     public function testMultipleDriversUnauthenticatedThrows()
     {
@@ -161,7 +163,7 @@ class AuthenticateMiddlewareTest extends PHPUnit_Framework_TestCase
     protected function createAuthDriver($authenticated)
     {
         return new RequestGuard(function () use ($authenticated) {
-            return $authenticated ? new stdClass : null;
+            return $authenticated ? new \stdClass : null;
         }, m::mock(Request::class));
     }
 

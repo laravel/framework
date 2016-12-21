@@ -1,11 +1,13 @@
 <?php
 
+namespace Illuminate\Tests\Auth\Access;
+
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Container\Container;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class GateTest extends PHPUnit_Framework_TestCase
+class GateTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @expectedException \InvalidArgumentException
@@ -132,7 +134,7 @@ class GateTest extends PHPUnit_Framework_TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', 'AccessGateTestClass@foo');
+        $gate->define('foo', AccessGateTestClass::class.'@foo');
 
         $this->assertTrue($gate->check('foo'));
     }
@@ -322,7 +324,7 @@ class AccessGateTestPolicy
 
     public function updateDash($user, AccessGateTestDummy $dummy)
     {
-        return $user instanceof StdClass;
+        return $user instanceof \stdClass;
     }
 }
 

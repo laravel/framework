@@ -1,9 +1,11 @@
 <?php
 
+namespace Illuminate\Tests\Auth\Password;
+
 use Mockery as m;
 use Illuminate\Contracts\Auth\PasswordBroker;
 
-class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase
+class PasswordBrokerTest extends \PHPUnit_Framework_TestCase
 {
     public function tearDown()
     {
@@ -20,7 +22,7 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException UnexpectedValueException
+     * @expectedException \UnexpectedValueException
      */
     public function testGetUserThrowsExceptionIfUserDoesntImplementCanResetPassword()
     {
@@ -133,7 +135,7 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase
 
     protected function getBroker($mocks)
     {
-        return new Illuminate\Auth\Passwords\PasswordBroker($mocks['tokens'], $mocks['users'], $mocks['mailer'], $mocks['view']);
+        return new \Illuminate\Auth\Passwords\PasswordBroker($mocks['tokens'], $mocks['users'], $mocks['mailer'], $mocks['view']);
     }
 
     protected function getMocks()

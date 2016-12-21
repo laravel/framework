@@ -1,8 +1,11 @@
 <?php
 
-use Mockery as m;
+namespace Illuminate\Tests\Auth\Password;
 
-class AuthDatabaseTokenRepositoryTest extends PHPUnit_Framework_TestCase
+use Mockery as m;
+use Illuminate\Auth\Passwords\DatabaseTokenRepository;
+
+class DatabaseTokenRepositoryTest extends \PHPUnit_Framework_TestCase
 {
     public function tearDown()
     {
@@ -102,7 +105,7 @@ class AuthDatabaseTokenRepositoryTest extends PHPUnit_Framework_TestCase
 
     protected function getRepo()
     {
-        return new Illuminate\Auth\Passwords\DatabaseTokenRepository(
+        return new DatabaseTokenRepository(
             m::mock('Illuminate\Database\Connection'),
             m::mock('Illuminate\Contracts\Hashing\Hasher'),
             'table', 'key');
