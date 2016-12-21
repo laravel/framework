@@ -123,10 +123,6 @@ class Router implements RegistrarContract, BindingRegistrar
         $this->events = $events;
         $this->routes = new RouteCollection;
         $this->container = $container ?: new Container;
-
-        $this->bind('_missing', function ($v) {
-            return explode('/', $v);
-        });
     }
 
     /**
@@ -229,39 +225,6 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
-     * Set the unmapped global resource parameters to singular.
-     *
-     * @param  bool  $singular
-     * @return void
-     */
-    public function singularResourceParameters($singular = true)
-    {
-        ResourceRegistrar::singularParameters($singular);
-    }
-
-    /**
-     * Set the global resource parameter mapping.
-     *
-     * @param  array  $parameters
-     * @return void
-     */
-    public function resourceParameters(array $parameters = [])
-    {
-        ResourceRegistrar::setParameters($parameters);
-    }
-
-    /**
-     * Get or set the verbs used in the resource URIs.
-     *
-     * @param  array  $verbs
-     * @return array|null
-     */
-    public function resourceVerbs(array $verbs = [])
-    {
-        return ResourceRegistrar::verbs($verbs);
-    }
-
-    /**
      * Register an array of resource controllers.
      *
      * @param  array  $resources
@@ -291,29 +254,6 @@ class Router implements RegistrarContract, BindingRegistrar
         }
 
         $registrar->register($name, $controller, $options);
-    }
-
-    /**
-     * Register the typical authentication routes for an application.
-     *
-     * @return void
-     */
-    public function auth()
-    {
-        // Authentication Routes...
-        $this->get('login', 'Auth\LoginController@showLoginForm')->name('login');
-        $this->post('login', 'Auth\LoginController@login');
-        $this->post('logout', 'Auth\LoginController@logout')->name('logout');
-
-        // Registration Routes...
-        $this->get('register', 'Auth\RegisterController@showRegistrationForm')->name('register');
-        $this->post('register', 'Auth\RegisterController@register');
-
-        // Password Reset Routes...
-        $this->get('password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm');
-        $this->post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail');
-        $this->get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm');
-        $this->post('password/reset', 'Auth\ResetPasswordController@reset');
     }
 
     /**
@@ -1097,6 +1037,16 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
+     * Get the request currently being dispatched.
+     *
+     * @return \Illuminate\Http\Request
+     */
+    public function getCurrentRequest()
+    {
+        return $this->currentRequest;
+    }
+
+    /**
      * Get the currently dispatched route instance.
      *
      * @return \Illuminate\Routing\Route
@@ -1208,13 +1158,59 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
-     * Get the request currently being dispatched.
+     * Register the typical authentication routes for an application.
      *
-     * @return \Illuminate\Http\Request
+     * @return void
      */
-    public function getCurrentRequest()
+    public function auth()
     {
-        return $this->currentRequest;
+        // Authentication Routes...
+        $this->get('login', 'Auth\LoginController@showLoginForm')->name('login');
+        $this->post('login', 'Auth\LoginController@login');
+        $this->post('logout', 'Auth\LoginController@logout')->name('logout');
+
+        // Registration Routes...
+        $this->get('register', 'Auth\RegisterController@showRegistrationForm')->name('register');
+        $this->post('register', 'Auth\RegisterController@register');
+
+        // Password Reset Routes...
+        $this->get('password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm');
+        $this->post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail');
+        $this->get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm');
+        $this->post('password/reset', 'Auth\ResetPasswordController@reset');
+    }
+
+    /**
+     * Set the unmapped global resource parameters to singular.
+     *
+     * @param  bool  $singular
+     * @return void
+     */
+    public function singularResourceParameters($singular = true)
+    {
+        ResourceRegistrar::singularParameters($singular);
+    }
+
+    /**
+     * Set the global resource parameter mapping.
+     *
+     * @param  array  $parameters
+     * @return void
+     */
+    public function resourceParameters(array $parameters = [])
+    {
+        ResourceRegistrar::setParameters($parameters);
+    }
+
+    /**
+     * Get or set the verbs used in the resource URIs.
+     *
+     * @param  array  $verbs
+     * @return array|null
+     */
+    public function resourceVerbs(array $verbs = [])
+    {
+        return ResourceRegistrar::verbs($verbs);
     }
 
     /**
