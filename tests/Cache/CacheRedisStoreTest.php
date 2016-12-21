@@ -140,6 +140,6 @@ class CacheRedisStoreTest extends PHPUnit_Framework_TestCase
 
     protected function getRedis()
     {
-        return new Illuminate\Cache\RedisStore(m::mock('Illuminate\Redis\PredisDatabase'), 'prefix');
+        return new Illuminate\Cache\RedisStore(m::mock('Illuminate\Contracts\Redis\Factory'), 'prefix');
     }
 }

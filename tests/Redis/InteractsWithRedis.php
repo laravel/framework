@@ -1,7 +1,7 @@
 <?php
 
 
-use Illuminate\Redis\PredisDatabase;
+use Illuminate\Redis\RedisManager;
 
 trait InteractsWithRedis
 {
@@ -11,7 +11,7 @@ trait InteractsWithRedis
     private static $connectionFailedOnceWithDefaultsSkip = false;
 
     /**
-     * @var PredisDatabase
+     * @var RedisManager
      */
     private $redis;
 
@@ -26,7 +26,7 @@ trait InteractsWithRedis
             return;
         }
 
-        $this->redis = new PredisDatabase([
+        $this->redis = new RedisManager('predis', [
             'cluster' => false,
             'default' => [
                 'host' => $host,

@@ -1090,7 +1090,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             'queue.connection'     => ['Illuminate\Contracts\Queue\Queue'],
             'queue.failer'         => ['Illuminate\Queue\Failed\FailedJobProviderInterface'],
             'redirect'             => ['Illuminate\Routing\Redirector'],
-            'redis'                => ['Illuminate\Redis\Database', 'Illuminate\Contracts\Redis\Database'],
+            'redis'                => ['Illuminate\Redis\RedisManager', 'Illuminate\Contracts\Redis\Factory'],
             'request'              => ['Illuminate\Http\Request', 'Symfony\Component\HttpFoundation\Request'],
             'router'               => ['Illuminate\Routing\Router', 'Illuminate\Contracts\Routing\Registrar', 'Illuminate\Contracts\Routing\BindingRegistrar'],
             'session'              => ['Illuminate\Session\SessionManager'],
