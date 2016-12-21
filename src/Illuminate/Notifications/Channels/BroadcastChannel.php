@@ -44,7 +44,8 @@ class BroadcastChannel
         );
 
         if ($message instanceof BroadcastMessage) {
-            $event->connection = 'sync';
+            $event->onConnection($message->connection)
+                  ->onQueue($message->queue);
         }
 
         return $this->events->fire($event);
