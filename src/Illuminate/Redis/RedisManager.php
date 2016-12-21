@@ -83,8 +83,7 @@ class RedisManager implements Factory
      */
     protected function connector()
     {
-        switch ($this->driver)
-        {
+        switch ($this->driver) {
             case 'predis':
                 return new Connectors\PredisConnector;
             case 'phpredis':
