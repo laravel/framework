@@ -95,15 +95,24 @@ class Pipeline implements PipelineContract
      */
     public function then(Closure $destination)
     {
-        $destination = function ($passable) use ($destination) {
-            return $destination($passable);
-        };
-
         $pipeline = array_reduce(
-            array_reverse($this->pipes), $this->carry(), $destination
+            array_reverse($this->pipes), $this->carry(), $this->prepareDestination($destination)
         );
 
         return $pipeline($this->passable);
+    }
+
+    /**
+     * Get the final piece of the Closure onion.
+     *
+     * @param  \Closure  $destination
+     * @return \Closure
+     */
+    protected function prepareDestination(Closure $destination)
+    {
+        return function ($passable) use ($destination) {
+            return $destination($passable);
+        };
     }
 
     /**
