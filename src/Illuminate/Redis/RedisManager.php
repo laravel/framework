@@ -66,14 +66,27 @@ class RedisManager implements Factory
         }
 
         if (isset($this->config['clusters'][$name])) {
-            $clusterOptions = Arr::get($this->config, 'clusters.options', []);
-
-            return $this->connector()->connectToCluster(
-                $this->config['clusters'][$name], $clusterOptions, $options
-            );
+            return $this->resolveCluster($name);
         }
 
-        throw new InvalidArgumentException("Redis connection [{$name}] not configured.");
+        throw new InvalidArgumentException(
+            "Redis connection [{$name}] not configured."
+        );
+    }
+
+    /**
+     * Resolve the given cluster connection by name.
+     *
+     * @param  string  $name
+     * @return \Illuminate\Redis\Connection
+     */
+    protected function resolveCluster($name)
+    {
+        $clusterOptions = Arr::get($this->config, 'clusters.options', []);
+
+        return $this->connector()->connectToCluster(
+            $this->config['clusters'][$name], $clusterOptions, $options
+        );
     }
 
     /**
