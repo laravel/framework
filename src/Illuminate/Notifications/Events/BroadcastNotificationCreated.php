@@ -25,6 +25,13 @@ class BroadcastNotificationCreated implements ShouldBroadcast
     public $notification;
 
     /**
+     * The queue connection.
+     *
+     * @var string
+     */
+    public $connection;
+
+    /**
      * The notification data.
      *
      * @var array
