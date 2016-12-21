@@ -70,6 +70,13 @@ class SlackAttachment
     public $timestamp;
 
     /**
+     * A plain-text summary of the attachment.
+     *
+     * @var string
+     */
+    public $fallback;
+
+    /**
      * Set the title of the attachment.
      *
      * @param  string  $title
@@ -171,6 +178,19 @@ class SlackAttachment
     public function timestamp(Carbon $timestamp)
     {
         $this->timestamp = $timestamp->getTimestamp();
+
+        return $this;
+    }
+
+    /**
+     * A plain-text summary of the attachment.
+     *
+     * @param  string  $fallback
+     * @return $this
+     */
+    public function fallback($fallback)
+    {
+        $this->fallback = $fallback;
 
         return $this;
     }

@@ -42,6 +42,7 @@ class NotificationSlackChannelTest extends PHPUnit_Framework_TestCase
                             'title' => 'Laravel',
                             'title_link' => 'https://laravel.com',
                             'text' => 'Attachment Content',
+                            'fallback' => 'Attachment Fallback',
                             'fields' => [
                                 [
                                     'title' => 'Project',
@@ -110,6 +111,7 @@ class NotificationSlackChannelTestNotification extends Notification
                         $timestamp->shouldReceive('getTimestamp')->andReturn(1234567890);
                         $attachment->title('Laravel', 'https://laravel.com')
                                    ->content('Attachment Content')
+                                   ->fallback('Attachment Fallback')
                                    ->fields([
                                         'Project' => 'Laravel',
                                     ])
