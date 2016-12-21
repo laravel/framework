@@ -152,6 +152,17 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         }
     }
 
+    public function testModelsIdsAreNotOverlapped()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestPost::create(['id' => 2, 'user_id' => 1, 'name' => 'Foo']);
+
+        $post = EloquentTestPost::join('users', 'posts.user_id', '=', 'users.id')
+            ->where('user_id', 1)->first();
+
+        $this->assertEquals(2, $post->id);
+    }
+
     public function testBasicModelCollectionRetrieval()
     {
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
