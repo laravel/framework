@@ -119,7 +119,9 @@ class UrlGenerator {
 		// Once we have the scheme we will compile the "tail" by collapsing the values
 		// into a single string delimited by slashes. This just makes it convenient
 		// for passing the array of parameters to this URL as a list of segments.
-		$root = $this->getRootUrl($scheme);
+		// The root should only be calculated for paths without a leading domain (in this case
+		// looking for http presence)
+		$root = (substr($path, 0, 4) !== 'http' ? $this->getRootUrl($scheme) : '');
 
 		return $this->trimUrl($root, $path, $tail);
 	}

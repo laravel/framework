@@ -13,6 +13,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals('http://www.foo.com/foo/bar', $url->to('foo/bar'));
 		$this->assertEquals('https://www.foo.com/foo/bar', $url->to('foo/bar', array(), true));
+		$this->assertEquals('http://www.foo.com/foo baz/bar', $url->to('http://www.foo.com/foo baz/bar'));
 		$this->assertEquals('https://www.foo.com/foo/bar/baz/boom', $url->to('foo/bar', array('baz', 'boom'), true));
 
 		/**
