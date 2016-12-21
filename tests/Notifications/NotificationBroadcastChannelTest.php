@@ -37,6 +37,20 @@ class NotificationBroadcastChannelTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(new PrivateChannel('custom-channel'), $channels[0]);
     }
+
+    public function testNotificationIsBroadcastedNow()
+    {
+        $notification = new TestNotificationBroadCastedNow;
+        $notification->id = 1;
+        $notifiable = Mockery::mock();
+
+        $events = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
+        $events->shouldReceive('fire')->once()->with(Mockery::on(function ($event) {
+            return $event->connection == 'sync';
+        }));
+        $channel = new BroadcastChannel($events);
+        $channel->send($notifiable, $notification);
+    }
 }
 
 class NotificationBroadcastChannelTestNotification extends Notification
@@ -57,5 +71,18 @@ class CustomChannelsTestNotification extends Notification
     public function broadcastOn()
     {
         return [new PrivateChannel('custom-channel')];
+    }
+}
+
+class TestNotificationBroadCastedNow extends Notification
+{
+    public function toArray($notifiable)
+    {
+        return ['invoice_id' => 1];
+    }
+
+    public function toBroadcast()
+    {
+        return (new \Illuminate\Notifications\Messages\BroadcastMessage([]))->onConnection('sync');
     }
 }
