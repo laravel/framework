@@ -324,9 +324,11 @@ class BladeCompiler extends Compiler implements CompilerInterface
             if (Str::contains($match[1], '@')) {
                 $match[0] = isset($match[3]) ? $match[1].$match[3] : $match[1];
             } elseif (isset($this->customDirectives[$match[1]])) {
-                $match[0] = $this->callCustomDirective($match[1], Arr::get($match, 3));
+                $expression = $this->compileArrayDotSyntax(Arr::get($match, 3));
+                $match[0] = $this->callCustomDirective($match[1], $expression);
             } elseif (method_exists($this, $method = 'compile'.ucfirst($match[1]))) {
-                $match[0] = $this->$method(Arr::get($match, 3));
+                $expression = $this->compileArrayDotSyntax(Arr::get($match, 3));
+                $match[0] = $this->$method($expression);
             }
 
             return isset($match[3]) ? $match[0] : $match[0].$match[2];
@@ -402,6 +404,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     public function compileEchoDefaults($value)
     {
+        $value = $this->compileArrayDotSyntax($value);
+
         return preg_replace('/^(?=\$)(.+?)(?:\s+or\s+)(.+?)$/s', 'isset($1) ? $1 : $2', $value);
     }
 
@@ -413,6 +417,29 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected function compileParent()
     {
         return ViewFactory::parentPlaceholder();
+    }
+
+    /**
+     * Compile dotted array access syntax into regular PHP syntax.
+     *
+     * @param  string $value
+     * @return string
+     */
+    protected function compileArrayDotSyntax($value)
+    {
+        $pattern = '/(\$[^.\s]+)\.(-?\w+)(?=([^\'\\\\]*(\\\\.|\'([^\'\\\\]*\\\\.)*[^\'\\\\]*\'))*[^\']*$)/';
+
+        $callback = function ($match) {
+            $format = preg_match('/^-?[0-9]+$/', $match[2]) ? '%s[%s]' : '%s[\'%s\']';
+
+            return sprintf($format, $match[1], $match[2]);
+        };
+
+        while (preg_match($pattern, $value)) {
+            $value = preg_replace_callback($pattern, $callback, $value);
+        }
+
+        return $value;
     }
 
     /**

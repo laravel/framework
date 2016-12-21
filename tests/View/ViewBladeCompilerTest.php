@@ -859,6 +859,46 @@ test';
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
+    public function testArrayDotSyntaxAtEchosAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+
+        $this->assertEquals($compiler->compileString('{!! $foo[\'bar\'] !!}'), $compiler->compileString('{!! $foo.bar !!}'));
+        $this->assertEquals($compiler->compileString('{{ $foo[\'bar\'] }}'), $compiler->compileString('{{ $foo.bar }}'));
+        $this->assertEquals($compiler->compileString('{{ $foo[\'bar\'][\'baz\'] }}'), $compiler->compileString('{{ $foo.bar.baz }}'));
+        $this->assertEquals($compiler->compileString('{{ $foo[$bar][\'baz\'] }}'), $compiler->compileString('{{ $foo[$bar].baz }}'));
+        $this->assertEquals($compiler->compileString('{{ $foo[bar()][\'baz\'] }}'), $compiler->compileString('{{ $foo[bar()].baz }}'));
+        $this->assertEquals($compiler->compileString('{{ $foo[$foo[\'bar\']][\'baz\'] }}'), $compiler->compileString('{{ $foo[$foo.bar].baz }}'));
+        $this->assertEquals($compiler->compileString('{{ $foo[10] }}'), $compiler->compileString('{{ $foo.10 }}'));
+        $this->assertEquals($compiler->compileString('{{ $foo[-1] }}'), $compiler->compileString('{{ $foo.-1 }}'));
+        $this->assertEquals($compiler->compileString('{{ $foo[\'1foo\'] }}'), $compiler->compileString('{{ $foo.1foo }}'));
+
+        $this->assertEquals($compiler->compileString('{{ $foo[\'bar\'] or \'default\' }}'), $compiler->compileString('{{ $foo.bar or \'default\' }}'));
+
+        $this->assertEquals('<?php echo e(\'$foo.bar\'); ?>', $compiler->compileString('{{ \'$foo.bar\' }}'));
+        $this->assertEquals('<?php echo e("$foo[\'bar\']"); ?>', $compiler->compileString('{{ "$foo.bar" }}'));
+        $this->assertEquals('<?php echo e("hi \\\'$foo[\'bar\']\\\'"); ?>', $compiler->compileString('{{ "hi \\\'$foo.bar\\\'" }}'));
+    }
+
+    public function testArrayDotSyntaxAtDirectivesAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+
+        $this->assertEquals($compiler->compileString('@if($foo[\'bar\'])'), $compiler->compileString('@if($foo.bar)'));
+        $this->assertEquals($compiler->compileString('@while(($x = fgets($foo[\'bar\'])) !== false)'), $compiler->compileString('@while(($x = fgets($foo.bar)) !== false)'));
+        $this->assertEquals($compiler->compileString('@for($i = 0; $i < $foo[\'bar\']; $i++)'), $compiler->compileString('@for($i = 0; $i < $foo.bar; $i++)'));
+    }
+
+    public function testArrayDotSyntaxAtCustomDirectivesAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $compiler->directive('customDirective', function ($expression) {
+            return "<?php echo custom_directive({$expression}); ?>";
+        });
+
+        $this->assertEquals($compiler->compileString('@customDirective($foo[\'bar\'])'), $compiler->compileString('@customDirective($foo.bar)'));
+    }
+
     public function testGetTagsProvider()
     {
         return [
