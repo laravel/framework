@@ -112,9 +112,9 @@ class RedisJob extends Job implements JobContract
     }
 
     /**
-     * Get the underlying queue driver instance.
+     * Get the underlying Redis factory implementation.
      *
-     * @return \Illuminate\Contracts\Redis\Database
+     * @return \Illuminate\Contracts\Redis\Factory
      */
     public function getRedisQueue()
     {

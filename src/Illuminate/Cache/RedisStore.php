@@ -3,14 +3,14 @@
 namespace Illuminate\Cache;
 
 use Illuminate\Contracts\Cache\Store;
-use Illuminate\Contracts\Redis\Database;
+use Illuminate\Contracts\Redis\Factory as Redis;
 
 class RedisStore extends TaggableStore implements Store
 {
     /**
-     * The Redis database connection.
+     * The Redis factory implementation.
      *
-     * @var \Illuminate\Contracts\Redis\Database
+     * @var \Illuminate\Contracts\Redis\Factory
      */
     protected $redis;
 
@@ -31,12 +31,12 @@ class RedisStore extends TaggableStore implements Store
     /**
      * Create a new Redis store.
      *
-     * @param  \Illuminate\Contracts\Redis\Database  $redis
+     * @param  \Illuminate\Contracts\Redis\Factory  $redis
      * @param  string  $prefix
      * @param  string  $connection
      * @return void
      */
-    public function __construct(Database $redis, $prefix = '', $connection = 'default')
+    public function __construct(Redis $redis, $prefix = '', $connection = 'default')
     {
         $this->redis = $redis;
         $this->setPrefix($prefix);
