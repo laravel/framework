@@ -193,6 +193,7 @@ class Container implements ArrayAccess, ContainerContract
         // alias with the container so that it can be used as a shortcut for it.
         if (is_array($abstract)) {
             list($abstract, $alias) = $this->extractAlias($abstract);
+            $abstract = $this->normalize($abstract);
 
             $this->alias($abstract, $alias);
         }
@@ -351,6 +352,7 @@ class Container implements ArrayAccess, ContainerContract
         // will be registered with the container so we can resolve it out later.
         if (is_array($abstract)) {
             list($abstract, $alias) = $this->extractAlias($abstract);
+            $abstract = $this->normalize($abstract);
 
             $this->alias($abstract, $alias);
         }
