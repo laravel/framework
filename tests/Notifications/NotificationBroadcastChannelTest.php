@@ -83,6 +83,6 @@ class TestNotificationBroadCastedNow extends Notification
 
     public function toBroadcast()
     {
-        return (new \Illuminate\Notifications\Messages\BroadcastMessage([]))->now();
+        return (new \Illuminate\Notifications\Messages\BroadcastMessage([]))->onConnection('sync');
     }
 }

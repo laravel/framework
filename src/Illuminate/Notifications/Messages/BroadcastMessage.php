@@ -2,21 +2,18 @@
 
 namespace Illuminate\Notifications\Messages;
 
+use Illuminate\Bus\Queueable;
+
 class BroadcastMessage
 {
+    use Queueable;
+
     /**
      * The data for the notification.
      *
      * @var array
      */
     public $data;
-
-    /**
-     * Determine if the message should be broadcasted immediately.
-     *
-     * @var array
-     */
-    public $broadcastNow = false;
 
     /**
      * Create a new message instance.
@@ -38,18 +35,6 @@ class BroadcastMessage
     public function data($data)
     {
         $this->data = $data;
-
-        return $this;
-    }
-
-    /**
-     * Broadcast this message immediately.
-     *
-     * @return $this
-     */
-    public function now()
-    {
-        $this->broadcastNow = true;
 
         return $this;
     }
