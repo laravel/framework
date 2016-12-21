@@ -1031,6 +1031,27 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     }
 
     /**
+     * Get the application fallback locale.
+     *
+     * @return string
+     */
+    public function getFallbackLocale()
+    {
+        return $this['config']->get('app.fallback_locale');
+    }
+
+    /**
+     * Determine if the application supports the given locale.
+     *
+     * @param  string  $Locale
+     * @return bool
+     */
+    public function hasLocale($locale)
+    {
+        return in_array($locale, $this['config']->get('app.locales'));
+    }
+
+    /**
      * Set the current application locale.
      *
      * @param  string  $locale

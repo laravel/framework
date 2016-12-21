@@ -650,6 +650,10 @@ class UrlGenerator implements UrlGeneratorContract
             $root = $this->cachedRoot;
         }
 
+        if ($this->request->getLocale() && ! $this->request->hasDefaultLocale()) {
+            $root .= '/'.$this->request->getLocale();
+        }
+
         $start = Str::startsWith($root, 'http://') ? 'http://' : 'https://';
 
         return preg_replace('~'.$start.'~', $scheme, $root, 1);

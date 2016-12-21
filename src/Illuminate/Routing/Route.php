@@ -525,7 +525,7 @@ class Route
      */
     protected function bindPathParameters(Request $request)
     {
-        preg_match($this->compiled->getRegex(), '/'.$request->decodedPath(), $matches);
+        preg_match($this->compiled->getRegex(), '/'.rawurldecode($request->pathForRouter()), $matches);
 
         return $matches;
     }
