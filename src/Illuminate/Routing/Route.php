@@ -294,11 +294,11 @@ class Route
      */
     public function hasParameter($name)
     {
-        if (! $this->hasParameters()) {
-            return false;
+        if ($this->hasParameters()) {
+            return array_key_exists($name, $this->parameters());
         }
 
-        return array_key_exists($name, $this->parameters());
+        return false;
     }
 
     /**
