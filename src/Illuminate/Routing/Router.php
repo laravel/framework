@@ -294,6 +294,22 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
+     * Localize the registered routes.
+     *
+     * @return void
+     */
+    public function localize()
+    {
+        if ($this->container && $this->container->bound('Illuminate\Routing\RoutesLocalizer')) {
+            $localizer = $this->container->make('Illuminate\Routing\RoutesLocalizer');
+        } else {
+            $localizer = new RoutesLocalizer($this, $this->container['config']);
+        }
+
+        $localizer->localize();
+    }
+
+    /**
      * Register the typical authentication routes for an application.
      *
      * @return void
