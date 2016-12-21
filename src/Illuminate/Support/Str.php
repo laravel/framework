@@ -132,7 +132,7 @@ class Str {
 	 */
 	public static function length($value)
 	{
-		return mb_strlen($value);
+		return mb_strlen($value, 'UTF-8');
 	}
 
 	/**
@@ -145,7 +145,7 @@ class Str {
 	 */
 	public static function limit($value, $limit = 100, $end = '...')
 	{
-		if (mb_strlen($value) <= $limit) return $value;
+		if (static::length($value) <= $limit) return $value;
 
 		return rtrim(mb_substr($value, 0, $limit, 'UTF-8')).$end;
 	}
