@@ -4,12 +4,9 @@ namespace Illuminate\Routing;
 
 use Closure;
 use LogicException;
-use ReflectionMethod;
 use ReflectionFunction;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use UnexpectedValueException;
 use Illuminate\Container\Container;
 use Illuminate\Routing\Matching\UriValidator;
 use Illuminate\Routing\Matching\HostValidator;
