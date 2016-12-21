@@ -59,7 +59,11 @@ trait SoftDeletingTrait {
 
 		$this->{$this->getDeletedAtColumn()} = $time = $this->freshTimestamp();
 
+		$this->fireModelEvent('softDeleting', false);
+
 		$query->update(array($this->getDeletedAtColumn() => $this->fromDateTime($time)));
+
+		$this->fireModelEvent('softDeleted', false);
 	}
 
 	/**
@@ -123,6 +127,28 @@ trait SoftDeletingTrait {
 		$column = $instance->getQualifiedDeletedAtColumn();
 
 		return $instance->newQueryWithoutScope(new SoftDeletingScope)->whereNotNull($column);
+	}
+
+	/**
+	 * Register a soft deleting model event with the dispatcher.
+	 *
+	 * @param  \Closure|string  $callback
+	 * @return void
+	 */
+	public static function softDeleting($callback)
+	{
+		static::registerModelEvent('softDeleting', $callback);
+	}
+
+	/**
+	 * Register a soft deleted model event with the dispatcher.
+	 *
+	 * @param  \Closure|string  $callback
+	 * @return void
+	 */
+	public static function softDeleted($callback)
+	{
+		static::registerModelEvent('softDeleted', $callback);
 	}
 
 	/**
