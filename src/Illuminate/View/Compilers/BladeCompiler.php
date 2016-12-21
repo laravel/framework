@@ -4,6 +4,7 @@ namespace Illuminate\View\Compilers;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\View\ViewFinderInterface;
 use Illuminate\View\Factory as ViewFactory;
 
 class BladeCompiler extends Compiler implements CompilerInterface
@@ -30,6 +31,13 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * @var string
      */
     protected $path;
+
+    /**
+     * The view currently being compiled.
+     *
+     * @var string
+     */
+    protected $view;
 
     /**
      * All of the available compiler functions.
@@ -103,12 +111,17 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * Compile the view at the given path.
      *
      * @param  string  $path
+     * @param  string  $view
      * @return void
      */
-    public function compile($path = null)
+    public function compile($path = null, $view = null)
     {
         if ($path) {
             $this->setPath($path);
+        }
+
+        if ($view) {
+            $this->setView($view);
         }
 
         if (! is_null($this->cachePath)) {
@@ -137,6 +150,27 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function setPath($path)
     {
         $this->path = $path;
+    }
+
+    /**
+     * Get the view currently being compiled.
+     *
+     * @return string
+     */
+    public function getView()
+    {
+        return $this->view;
+    }
+
+    /**
+     * Set the view currently being compiled.
+     *
+     * @param  string  $view
+     * @return void
+     */
+    public function setView($view)
+    {
+        $this->view = $view;
     }
 
     /**
@@ -903,7 +937,9 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         $expression = $this->stripParentheses($expression);
 
-        return "<?php echo \$__env->make($expression, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
+        $viewName = $this->getViewNameFromExpression($expression);
+
+        return "<?php echo \$__env->make($viewName, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
     }
 
     /**
@@ -916,7 +952,9 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         $expression = $this->stripParentheses($expression);
 
-        return "<?php if (\$__env->exists($expression)) echo \$__env->make($expression, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
+        $viewName = $this->getViewNameFromExpression($expression);
+
+        return "<?php if (\$__env->exists($viewName)) echo \$__env->make($viewName, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
     }
 
     /**
@@ -1005,6 +1043,21 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function stripParentheses($expression)
     {
         if (Str::startsWith($expression, '(')) {
+            $expression = substr($expression, 1, -1);
+        }
+
+        return $expression;
+    }
+
+    /**
+     * Strip the quotes from the given expression.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    public function stripQuotes($expression)
+    {
+        if (Str::startsWith($expression, ["'", '"'])) {
             $expression = substr($expression, 1, -1);
         }
 
@@ -1161,5 +1214,43 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function setEchoFormat($format)
     {
         $this->echoFormat = $format;
+    }
+
+    /**
+     * The base of the view currently being compiled.
+     *
+     * @return string
+     */
+    private function viewBase()
+    {
+        $namespaceDelimiter = ViewFinderInterface::HINT_PATH_DELIMITER;
+
+        $parts = explode('.', $this->view);
+
+        array_pop($parts);
+
+        if (Str::contains($this->view, $namespaceDelimiter)) {
+            return empty($parts)
+                   ? strtok($this->view, $namespaceDelimiter).$namespaceDelimiter : implode('.', $parts).'.';
+        }
+
+        return count($parts) > 1 ? implode('.', $parts).'.' : head($parts);
+    }
+
+    /**
+     * Get the view name from the given expression.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    public function getViewNameFromExpression($expression)
+    {
+        $relativePathDelimiter = ViewFinderInterface::RELATIVE_PATH_DELIMITER;
+
+        if ($this->view && Str::startsWith($stripped = $this->stripQuotes($expression), $relativePathDelimiter)) {
+            return "'".$this->viewBase().ltrim($stripped, $relativePathDelimiter)."'";
+        }
+
+        return $expression;
     }
 }

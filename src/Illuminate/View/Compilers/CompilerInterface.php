@@ -24,7 +24,8 @@ interface CompilerInterface
      * Compile the view at the given path.
      *
      * @param  string  $path
+     * @param  string  $view
      * @return void
      */
-    public function compile($path);
+    public function compile($path, $view = null);
 }

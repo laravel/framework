@@ -28,7 +28,7 @@ class ViewTest extends PHPUnit_Framework_TestCase
         $view->getFactory()->shouldReceive('incrementRender')->once()->ordered();
         $view->getFactory()->shouldReceive('callComposer')->once()->ordered()->with($view);
         $view->getFactory()->shouldReceive('getShared')->once()->andReturn(['shared' => 'foo']);
-        $view->getEngine()->shouldReceive('get')->once()->with('path', ['foo' => 'bar', 'shared' => 'foo'])->andReturn('contents');
+        $view->getEngine()->shouldReceive('get')->once()->with('path', ['foo' => 'bar', 'shared' => 'foo'], 'view')->andReturn('contents');
         $view->getFactory()->shouldReceive('decrementRender')->once()->ordered();
         $view->getFactory()->shouldReceive('flushSectionsIfDoneRendering')->once();
 
@@ -84,7 +84,7 @@ class ViewTest extends PHPUnit_Framework_TestCase
         $view->getFactory()->shouldReceive('incrementRender')->twice();
         $view->getFactory()->shouldReceive('callComposer')->twice()->with($view);
         $view->getFactory()->shouldReceive('getShared')->twice()->andReturn(['shared' => 'foo']);
-        $view->getEngine()->shouldReceive('get')->twice()->with('path', ['foo' => 'bar', 'shared' => 'foo'])->andReturn('contents');
+        $view->getEngine()->shouldReceive('get')->twice()->with('path', ['foo' => 'bar', 'shared' => 'foo'], 'view')->andReturn('contents');
         $view->getFactory()->shouldReceive('decrementRender')->twice();
         $view->getFactory()->shouldReceive('flushSectionsIfDoneRendering')->twice();
 

@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\View\ViewFinderInterface;
 use Mockery as m;
 use Illuminate\View\Compilers\BladeCompiler;
 
@@ -673,11 +674,61 @@ empty
         $this->assertEquals('<?php echo $__env->make(name(foo), array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>', $compiler->compileString('@include(name(foo))'));
     }
 
+    public function testRelativeIncludesAreCompiled()
+    {
+        $compiler = m::mock(BladeCompiler::class.'[getViewNameFromExpression]', [$this->getFiles(), __DIR__]);
+        $compiler->shouldReceive('getViewNameFromExpression')->once()->andReturn("'bar'");
+        $compiler->setView('foo');
+        $this->assertEquals('<?php echo $__env->make(\'bar\', array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>', $compiler->compileString('@include(\'>bar\')'));
+    }
+
     public function testIncludeIfsAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $this->assertEquals('<?php if ($__env->exists(\'foo\')) echo $__env->make(\'foo\', array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>', $compiler->compileString('@includeIf(\'foo\')'));
         $this->assertEquals('<?php if ($__env->exists(name(foo))) echo $__env->make(name(foo), array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>', $compiler->compileString('@includeIf(name(foo))'));
+    }
+
+    public function testRelativeIncludeIfsAreCompiled()
+    {
+        $compiler = m::mock(BladeCompiler::class.'[getViewNameFromExpression]', [$this->getFiles(), __DIR__]);
+        $compiler->shouldReceive('getViewNameFromExpression')->once()->andReturn("'bar'");
+        $compiler->setView('foo');
+        $this->assertEquals('<?php if ($__env->exists(\'bar\')) echo $__env->make(\'bar\', array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>', $compiler->compileString('@includeIf(\'foo\')'));
+    }
+
+    public function testGeneratingViewNames()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+
+        $delimiter = ViewFinderInterface::RELATIVE_PATH_DELIMITER;
+
+        $compiler->setView(null);
+        $this->assertEquals("'bar'", $compiler->getViewNameFromExpression("'bar'"));
+
+        $compiler->setView(null);
+        $this->assertEquals("'{$delimiter}bar'", $compiler->getViewNameFromExpression("'{$delimiter}bar'"));
+
+        $compiler->setView('foo');
+        $this->assertEquals("'bar'", $compiler->getViewNameFromExpression("'{$delimiter}bar'"));
+
+        $compiler->setView('hadi.badi.zabadi');
+        $this->assertEquals("'hadi.badi.nadi'", $compiler->getViewNameFromExpression("'{$delimiter}nadi'"));
+
+        $compiler->setView('hadi.badi.zabadi');
+        $this->assertEquals("'hadi.badi.nadi'", $compiler->getViewNameFromExpression('"'.$delimiter.'nadi"'));
+
+        $compiler->setView('foo.bar');
+        $this->assertEquals("'foo.bar.baz'", $compiler->getViewNameFromExpression("'foo.bar.baz'"));
+
+        $compiler->setView('foo.baz');
+        $this->assertEquals('foo(bar)', $compiler->getViewNameFromExpression('foo(bar)'));
+
+        $compiler->setView('namespace::foo');
+        $this->assertEquals("'namespace::baz'", $compiler->getViewNameFromExpression("'{$delimiter}baz'"));
+
+        $compiler->setView('namespace::foo.bar');
+        $this->assertEquals("'namespace::foo.baz'", $compiler->getViewNameFromExpression("'{$delimiter}baz'"));
     }
 
     public function testShowEachAreCompiled()
