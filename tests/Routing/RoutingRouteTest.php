@@ -5,6 +5,7 @@ use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Routing\Controller;
+use Illuminate\Routing\RouteGroup;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Auth\Middleware\Authorize;
@@ -694,23 +695,23 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
     public function testGroupMerging()
     {
         $old = ['prefix' => 'foo/bar/'];
-        $this->assertEquals(['prefix' => 'foo/bar/baz', 'namespace' => null, 'where' => []], Router::mergeGroup(['prefix' => 'baz'], $old));
+        $this->assertEquals(['prefix' => 'foo/bar/baz', 'namespace' => null, 'where' => []], RouteGroup::merge(['prefix' => 'baz'], $old));
 
         $old = ['domain' => 'foo'];
-        $this->assertEquals(['domain' => 'baz', 'prefix' => null, 'namespace' => null, 'where' => []], Router::mergeGroup(['domain' => 'baz'], $old));
+        $this->assertEquals(['domain' => 'baz', 'prefix' => null, 'namespace' => null, 'where' => []], RouteGroup::merge(['domain' => 'baz'], $old));
 
         $old = ['as' => 'foo.'];
-        $this->assertEquals(['as' => 'foo.bar', 'prefix' => null, 'namespace' => null, 'where' => []], Router::mergeGroup(['as' => 'bar'], $old));
+        $this->assertEquals(['as' => 'foo.bar', 'prefix' => null, 'namespace' => null, 'where' => []], RouteGroup::merge(['as' => 'bar'], $old));
 
         $old = ['where' => ['var1' => 'foo', 'var2' => 'bar']];
         $this->assertEquals(['prefix' => null, 'namespace' => null, 'where' => [
             'var1' => 'foo', 'var2' => 'baz', 'var3' => 'qux',
-        ]], Router::mergeGroup(['where' => ['var2' => 'baz', 'var3' => 'qux']], $old));
+        ]], RouteGroup::merge(['where' => ['var2' => 'baz', 'var3' => 'qux']], $old));
 
         $old = [];
         $this->assertEquals(['prefix' => null, 'namespace' => null, 'where' => [
             'var1' => 'foo', 'var2' => 'bar',
-        ]], Router::mergeGroup(['where' => ['var1' => 'foo', 'var2' => 'bar']], $old));
+        ]], RouteGroup::merge(['where' => ['var1' => 'foo', 'var2' => 'bar']], $old));
     }
 
     public function testRouteGrouping()
