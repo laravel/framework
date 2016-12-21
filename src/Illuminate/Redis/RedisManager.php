@@ -85,7 +85,7 @@ class RedisManager implements Factory
         $clusterOptions = Arr::get($this->config, 'clusters.options', []);
 
         return $this->connector()->connectToCluster(
-            $this->config['clusters'][$name], $clusterOptions, $options
+            $this->config['clusters'][$name], $clusterOptions, $this->config
         );
     }
 
