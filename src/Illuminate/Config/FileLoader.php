@@ -48,12 +48,12 @@ class FileLoader implements LoaderInterface {
 	/**
 	 * Load the given configuration group.
 	 *
-	 * @param  string  $environment
+	 * @param  string  $env
 	 * @param  string  $group
 	 * @param  string  $namespace
 	 * @return array
 	 */
-	public function load($environment, $group, $namespace = null)
+	public function load($env, $group, $namespace = null)
 	{
 		$items = array();
 
@@ -80,7 +80,7 @@ class FileLoader implements LoaderInterface {
 		// Finally we're ready to check for the environment specific configuration
 		// file which will be merged on top of the main arrays so that they get
 		// precedence over them if we are currently in an environments setup.
-		$file = "{$path}/{$environment}/{$group}.php";
+		$file = "{$path}/{$env}/{$group}.php";
 
 		if ($this->files->exists($file))
 		{
@@ -225,8 +225,7 @@ class FileLoader implements LoaderInterface {
 	}
 
 	/**
-	 * Returns all registered namespaces with the config
-	 * loader.
+	 * Returns all registered namespaces with the config loader.
 	 *
 	 * @return array
 	 */
