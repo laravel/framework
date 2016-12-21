@@ -821,7 +821,7 @@ class Router implements RegistrarContract, BindingRegistrar
             $class = $parameter->getClass();
 
             if (array_key_exists($parameter->name, $parameters) &&
-                ! $route->getParameter($parameter->name) instanceof Model) {
+                ! $route->parameter($parameter->name) instanceof Model) {
                 $method = $parameter->isDefaultValueAvailable() ? 'first' : 'firstOrFail';
 
                 $model = $this->container->make($class->name);

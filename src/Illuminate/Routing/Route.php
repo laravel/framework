@@ -16,7 +16,6 @@ use Illuminate\Routing\Matching\HostValidator;
 use Illuminate\Routing\Matching\MethodValidator;
 use Illuminate\Routing\Matching\SchemeValidator;
 use Illuminate\Http\Exception\HttpResponseException;
-use Symfony\Component\Routing\Route as SymfonyRoute;
 
 class Route
 {
@@ -27,63 +26,63 @@ class Route
      *
      * @var string
      */
-    protected $uri;
+    public $uri;
 
     /**
      * The HTTP methods the route responds to.
      *
      * @var array
      */
-    protected $methods;
+    public $methods;
 
     /**
      * The route action array.
      *
      * @var array
      */
-    protected $action;
+    public $action;
 
     /**
      * The controller instance.
      *
      * @var mixed
      */
-    protected $controller;
+    public $controller;
 
     /**
      * The default values for the route.
      *
      * @var array
      */
-    protected $defaults = [];
+    public $defaults = [];
 
     /**
      * The regular expression requirements.
      *
      * @var array
      */
-    protected $wheres = [];
+    public $wheres = [];
 
     /**
      * The array of matched parameters.
      *
      * @var array
      */
-    protected $parameters;
+    public $parameters;
 
     /**
      * The parameter names for the route.
      *
      * @var array|null
      */
-    protected $parameterNames;
+    public $parameterNames;
 
     /**
      * The compiled version of the route.
      *
      * @var \Symfony\Component\Routing\CompiledRoute
      */
-    protected $compiled;
+    public $compiled;
 
     /**
      * The router instance used by the route.
@@ -166,13 +165,11 @@ class Route
      */
     protected function runCallable()
     {
-        $parameters = $this->resolveMethodDependencies(
-            $this->parametersWithoutNulls(), new ReflectionFunction($this->action['uses'])
-        );
-
         $callable = $this->action['uses'];
 
-        return $callable(...array_values($parameters));
+        return $callable(...array_values($this->resolveMethodDependencies(
+            $this->parametersWithoutNulls(), new ReflectionFunction($this->action['uses'])
+        )));
     }
 
     /**
@@ -246,101 +243,11 @@ class Route
      */
     protected function compileRoute()
     {
-        if ($this->compiled) {
-            return;
+        if (! $this->compiled) {
+            $this->compiled = (new RouteCompiler($this))->compile();
         }
 
-        $optionals = $this->extractOptionalParameters();
-
-        $uri = preg_replace('/\{(\w+?)\?\}/', '{$1}', $this->uri);
-
-        $this->compiled = (
-            new SymfonyRoute($uri, $optionals, $this->wheres, [], $this->domain() ?: '')
-        )->compile();
-    }
-
-    /**
-     * Get the optional parameters for the route.
-     *
-     * @return array
-     */
-    protected function extractOptionalParameters()
-    {
-        preg_match_all('/\{(\w+?)\?\}/', $this->uri, $matches);
-
-        return isset($matches[1]) ? array_fill_keys($matches[1], null) : [];
-    }
-
-    /**
-     * Get all middleware, including the ones from the controller.
-     *
-     * @return array
-     */
-    public function gatherMiddleware()
-    {
-        return array_unique(array_merge($this->middleware(), $this->controllerMiddleware()), SORT_REGULAR);
-    }
-
-    /**
-     * Get or set the middlewares attached to the route.
-     *
-     * @param  array|string|null $middleware
-     * @return $this|array
-     */
-    public function middleware($middleware = null)
-    {
-        if (is_null($middleware)) {
-            return (array) Arr::get($this->action, 'middleware', []);
-        }
-
-        if (is_string($middleware)) {
-            $middleware = func_get_args();
-        }
-
-        $this->action['middleware'] = array_merge(
-            (array) Arr::get($this->action, 'middleware', []), $middleware
-        );
-
-        return $this;
-    }
-
-    /**
-     * Get the middleware for the route's controller.
-     *
-     * @return array
-     */
-    public function controllerMiddleware()
-    {
-        if (! $this->isControllerAction()) {
-            return [];
-        }
-
-        return ControllerDispatcher::getMiddleware(
-            $this->getController(), $this->getControllerMethod()
-        );
-    }
-
-    /**
-     * Get the parameters that are listed in the route / controller signature.
-     *
-     * @param string|null  $subClass
-     * @return array
-     */
-    public function signatureParameters($subClass = null)
-    {
-        $action = $this->getAction();
-
-        if (is_string($action['uses'])) {
-            list($class, $method) = explode('@', $action['uses']);
-
-            $parameters = (new ReflectionMethod($class, $method))->getParameters();
-        } else {
-            $parameters = (new ReflectionFunction($action['uses']))->getParameters();
-        }
-
-        return is_null($subClass) ? $parameters : array_filter($parameters, function ($p) use ($subClass) {
-            return $p->getClass() && $p->getClass()->isSubclassOf($subClass);
-        });
+        return $this->compiled;
     }
 
     /**
@@ -366,18 +273,6 @@ class Route
         }
 
         return array_key_exists($name, $this->parameters());
-    }
-
-    /**
-     * Get a given parameter from the route.
-     *
-     * @param  string  $name
-     * @param  mixed   $default
-     * @return string|object
-     */
-    public function getParameter($name, $default = null)
-    {
-        return $this->parameter($name, $default);
     }
 
     /**
@@ -473,6 +368,29 @@ class Route
         return array_map(function ($m) {
             return trim($m, '?');
         }, $matches[1]);
+    }
+
+    /**
+     * Get the parameters that are listed in the route / controller signature.
+     *
+     * @param string|null  $subClass
+     * @return array
+     */
+    public function signatureParameters($subClass = null)
+    {
+        $action = $this->getAction();
+
+        if (is_string($action['uses'])) {
+            list($class, $method) = explode('@', $action['uses']);
+
+            $parameters = (new ReflectionMethod($class, $method))->getParameters();
+        } else {
+            $parameters = (new ReflectionFunction($action['uses']))->getParameters();
+        }
+
+        return is_null($subClass) ? $parameters : array_filter($parameters, function ($p) use ($subClass) {
+            return $p->getClass() && $p->getClass()->isSubclassOf($subClass);
+        });
     }
 
     /**
@@ -757,16 +675,6 @@ class Route
     }
 
     /**
-     * Get the URI associated with the route.
-     *
-     * @return string
-     */
-    public function uri()
-    {
-        return $this->uri;
-    }
-
-    /**
      * Get the HTTP verbs the route responds to.
      *
      * @return array
@@ -828,11 +736,11 @@ class Route
     }
 
     /**
-     * Get the URI that the route responds to.
+     * Get the URI associated with the route.
      *
      * @return string
      */
-    public function getUri()
+    public function uri()
     {
         return $this->uri;
     }
@@ -947,6 +855,57 @@ class Route
         $this->action = $action;
 
         return $this;
+    }
+
+    /**
+     * Get all middleware, including the ones from the controller.
+     *
+     * @return array
+     */
+    public function gatherMiddleware()
+    {
+        return array_unique(array_merge(
+            $this->middleware(), $this->controllerMiddleware()
+        ), SORT_REGULAR);
+    }
+
+    /**
+     * Get or set the middlewares attached to the route.
+     *
+     * @param  array|string|null $middleware
+     * @return $this|array
+     */
+    public function middleware($middleware = null)
+    {
+        if (is_null($middleware)) {
+            return (array) Arr::get($this->action, 'middleware', []);
+        }
+
+        if (is_string($middleware)) {
+            $middleware = func_get_args();
+        }
+
+        $this->action['middleware'] = array_merge(
+            (array) Arr::get($this->action, 'middleware', []), $middleware
+        );
+
+        return $this;
+    }
+
+    /**
+     * Get the middleware for the route's controller.
+     *
+     * @return array
+     */
+    public function controllerMiddleware()
+    {
+        if (! $this->isControllerAction()) {
+            return [];
+        }
+
+        return ControllerDispatcher::getMiddleware(
+            $this->getController(), $this->getControllerMethod()
+        );
     }
 
     /**

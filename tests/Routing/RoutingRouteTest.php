@@ -917,21 +917,21 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $routes = $router->getRoutes();
         $routes = $routes->getRoutes();
 
-        $this->assertEquals('foo-bars/{foo_bar}', $routes[0]->getUri());
+        $this->assertEquals('foo-bars/{foo_bar}', $routes[0]->uri());
 
         $router = $this->getRouter();
         $router->resource('foo-bar.foo-baz', 'FooController', ['only' => ['show']]);
         $routes = $router->getRoutes();
         $routes = $routes->getRoutes();
 
-        $this->assertEquals('foo-bar/{foo_bar}/foo-baz/{foo_baz}', $routes[0]->getUri());
+        $this->assertEquals('foo-bar/{foo_bar}/foo-baz/{foo_baz}', $routes[0]->uri());
 
         $router = $this->getRouter();
         $router->resource('foo-bars', 'FooController', ['only' => ['show'], 'as' => 'prefix']);
         $routes = $router->getRoutes();
         $routes = $routes->getRoutes();
 
-        $this->assertEquals('foo-bars/{foo_bar}', $routes[0]->getUri());
+        $this->assertEquals('foo-bars/{foo_bar}', $routes[0]->uri());
         $this->assertEquals('prefix.foo-bars.show', $routes[0]->getName());
 
         ResourceRegistrar::verbs([
@@ -942,8 +942,8 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $router->resource('foo', 'FooController');
         $routes = $router->getRoutes();
 
-        $this->assertEquals('foo/ajouter', $routes->getByName('foo.create')->getUri());
-        $this->assertEquals('foo/{foo}/modifier', $routes->getByName('foo.edit')->getUri());
+        $this->assertEquals('foo/ajouter', $routes->getByName('foo.create')->uri());
+        $this->assertEquals('foo/{foo}/modifier', $routes->getByName('foo.edit')->uri());
     }
 
     public function testResourceRoutingParameters()
@@ -956,8 +956,8 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $routes = $router->getRoutes();
         $routes = $routes->getRoutes();
 
-        $this->assertEquals('foos/{foo}', $routes[3]->getUri());
-        $this->assertEquals('foos/{foo}/bars/{bar}', $routes[10]->getUri());
+        $this->assertEquals('foos/{foo}', $routes[3]->uri());
+        $this->assertEquals('foos/{foo}/bars/{bar}', $routes[10]->uri());
 
         ResourceRegistrar::setParameters(['foos' => 'oof', 'bazs' => 'b']);
 
@@ -966,7 +966,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $routes = $router->getRoutes();
         $routes = $routes->getRoutes();
 
-        $this->assertEquals('bars/{bar}/foos/{oof}/bazs/{b}', $routes[3]->getUri());
+        $this->assertEquals('bars/{bar}/foos/{oof}/bazs/{b}', $routes[3]->uri());
 
         ResourceRegistrar::setParameters();
         ResourceRegistrar::singularParameters(false);
@@ -977,15 +977,15 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $routes = $router->getRoutes();
         $routes = $routes->getRoutes();
 
-        $this->assertEquals('foos/{foo}', $routes[3]->getUri());
-        $this->assertEquals('foos/{foo}/bars/{bar}', $routes[10]->getUri());
+        $this->assertEquals('foos/{foo}', $routes[3]->uri());
+        $this->assertEquals('foos/{foo}/bars/{bar}', $routes[10]->uri());
 
         $router = $this->getRouter();
         $router->resource('foos.bars', 'FooController', ['parameters' => ['foos' => 'foo', 'bars' => 'bar']]);
         $routes = $router->getRoutes();
         $routes = $routes->getRoutes();
 
-        $this->assertEquals('foos/{foo}/bars/{bar}', $routes[3]->getUri());
+        $this->assertEquals('foos/{foo}/bars/{bar}', $routes[3]->uri());
     }
 
     public function testResourceRouteNaming()
@@ -1074,7 +1074,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         unset($_SERVER['__router.request']);
 
         $this->assertInstanceOf('Illuminate\Routing\Route', $_SERVER['__router.route']);
-        $this->assertEquals($_SERVER['__router.route']->getUri(), $route->getUri());
+        $this->assertEquals($_SERVER['__router.route']->uri(), $route->uri());
         unset($_SERVER['__router.route']);
     }
 

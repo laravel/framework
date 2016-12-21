@@ -134,7 +134,7 @@ class RouteRegistrarTest extends PHPUnit_Framework_TestCase
             $router->get('users', 'UsersController@index');
         });
 
-        $this->assertEquals('api/users', $this->getRoute()->getUri());
+        $this->assertEquals('api/users', $this->getRoute()->uri());
     }
 
     public function testCanRegisterGroupWithNamePrefix()
