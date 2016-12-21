@@ -632,24 +632,7 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function substituteImplicitBindings($route)
     {
-        $parameters = $route->parameters();
-
-        foreach ($route->signatureParameters(Model::class) as $parameter) {
-            $class = $parameter->getClass();
-
-            if (array_key_exists($parameter->name, $parameters) &&
-                ! $route->parameter($parameter->name) instanceof Model) {
-                $method = $parameter->isDefaultValueAvailable() ? 'first' : 'firstOrFail';
-
-                $model = $this->container->make($class->name);
-
-                $route->setParameter(
-                    $parameter->name, $model->where(
-                        $model->getRouteKeyName(), $parameters[$parameter->name]
-                    )->{$method}()
-                );
-            }
-        }
+        ImplicitRouteBinding::resolveForRoute($this->container, $route);
     }
 
     /**
@@ -751,6 +734,20 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
+     * Add a new route parameter binder.
+     *
+     * @param  string  $key
+     * @param  string|callable  $binder
+     * @return void
+     */
+    public function bind($key, $binder)
+    {
+        $this->binders[str_replace('-', '_', $key)] = RouteBinding::forCallback(
+            $this->container, $binder
+        );
+    }
+
+    /**
      * Register a model binder for a wildcard.
      *
      * @param  string  $key
@@ -762,67 +759,7 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function model($key, $class, Closure $callback = null)
     {
-        $this->bind($key, function ($value) use ($class, $callback) {
-            if (is_null($value)) {
-                return;
-            }
-
-            // For model binders, we will attempt to retrieve the models using the first
-            // method on the model instance. If we cannot retrieve the models we'll
-            // throw a not found exception otherwise we will return the instance.
-            $instance = $this->container->make($class);
-
-            if ($model = $instance->where($instance->getRouteKeyName(), $value)->first()) {
-                return $model;
-            }
-
-            // If a callback was supplied to the method we will call that to determine
-            // what we should do when the model is not found. This just gives these
-            // developer a little greater flexibility to decide what will happen.
-            if ($callback instanceof Closure) {
-                return call_user_func($callback, $value);
-            }
-
-            throw (new ModelNotFoundException)->setModel($class);
-        });
-    }
-
-    /**
-     * Add a new route parameter binder.
-     *
-     * @param  string  $key
-     * @param  string|callable  $binder
-     * @return void
-     */
-    public function bind($key, $binder)
-    {
-        if (is_string($binder)) {
-            $binder = $this->createClassBinding($binder);
-        }
-
-        $this->binders[str_replace('-', '_', $key)] = $binder;
-    }
-
-    /**
-     * Create a class based binding using the IoC container.
-     *
-     * @param  string  $binding
-     * @return \Closure
-     */
-    public function createClassBinding($binding)
-    {
-        return function ($value, $route) use ($binding) {
-            // If the binding has an @ sign, we will assume it's being used to delimit
-            // the class name from the bind method name. This allows for bindings
-            // to run multiple bind methods in a single class for convenience.
-            $segments = explode('@', $binding);
-
-            $method = count($segments) == 2 ? $segments[1] : 'bind';
-
-            $callable = [$this->container->make($segments[0]), $method];
-
-            return call_user_func($callable, $value, $route);
-        };
+        $this->bind($key, RouteBinding::forModel($this->container, $class, $callback));
     }
 
     /**
