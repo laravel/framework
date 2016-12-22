@@ -153,10 +153,12 @@ class TransportManager extends Manager
 
     /**
      * Create an instance of the Array Swift Transport Driver.
+     *
+     * @return \Illuminate\Mail\Transport\ArrayTransport
      */
     protected function createArrayDriver()
     {
-        return new ArrayTransport();
+        return new ArrayTransport;
     }
 
     /**
