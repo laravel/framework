@@ -4,7 +4,7 @@ namespace Illuminate\Console;
 
 use Illuminate\Container\Container;
 
-trait AppNamespaceDetectorTrait
+trait DetectsApplicationNamespace
 {
     /**
      * Get the application namespace.
