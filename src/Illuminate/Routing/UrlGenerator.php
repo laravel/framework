@@ -3,13 +3,11 @@
 namespace Illuminate\Routing;
 
 use Closure;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Routing\UrlRoutable;
-use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Contracts\Routing\UrlGenerator as UrlGeneratorContract;
 
 class UrlGenerator implements UrlGeneratorContract
@@ -387,7 +385,7 @@ class UrlGenerator implements UrlGeneratorContract
         if (($queryPosition = strpos($path, '?')) !== false) {
             return [
                 substr($path, 0, $queryPosition),
-                substr($path, $queryPosition)
+                substr($path, $queryPosition),
             ];
         }
 
