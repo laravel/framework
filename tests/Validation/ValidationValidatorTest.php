@@ -187,10 +187,10 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
     public function testCustomReplacersAreCalled()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $trans->addLines(['validation.required' => 'foo bar'], 'en');
+        $trans->addLines(['validation.required' => 'foo :bar'], 'en');
         $v = new Validator($trans, ['name' => ''], ['name' => 'Required']);
         $v->addReplacer('required', function ($message, $attribute, $rule, $parameters) {
-            return str_replace('bar', 'taylor', $message);
+            return ['bar' => 'taylor'];
         });
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
@@ -200,12 +200,12 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
     public function testClassBasedCustomReplacers()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $trans->addLines(['validation.foo' => 'foo!'], 'en');
+        $trans->addLines(['validation.required' => ':foo'], 'en');
         $v = new Validator($trans, [], ['name' => 'required']);
         $v->setContainer($container = m::mock('Illuminate\Container\Container'));
         $v->addReplacer('required', 'Foo@bar');
         $container->shouldReceive('make')->once()->with('Foo')->andReturn($foo = m::mock('StdClass'));
-        $foo->shouldReceive('bar')->once()->andReturn('replaced!');
+        $foo->shouldReceive('bar')->once()->andReturn(['foo' => 'replaced!']);
         $v->passes();
         $v->messages()->setFormat(':message');
         $this->assertEquals('replaced!', $v->messages()->first('name'));
