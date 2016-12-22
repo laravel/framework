@@ -28,6 +28,13 @@ class SlackAttachment
     public $content;
 
     /**
+     * A plain-text summary of the attachment.
+     *
+     * @var string
+     */
+    public $fallback;
+
+    /**
      * The attachment's color.
      *
      * @var string
@@ -93,6 +100,19 @@ class SlackAttachment
     public function content($content)
     {
         $this->content = $content;
+
+        return $this;
+    }
+
+    /**
+     * A plain-text summary of the attachment.
+     *
+     * @param  string  $fallback
+     * @return $this
+     */
+    public function fallback($fallback)
+    {
+        $this->fallback = $fallback;
 
         return $this;
     }
