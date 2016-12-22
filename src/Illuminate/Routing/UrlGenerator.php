@@ -324,6 +324,40 @@ class UrlGenerator implements UrlGeneratorContract
     }
 
     /**
+     * Get the URL to a controller action.
+     *
+     * @param  string  $action
+     * @param  mixed   $parameters
+     * @param  bool    $absolute
+     * @return string
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function action($action, $parameters = [], $absolute = true)
+    {
+        if (is_null($route = $this->routes->getByAction($action = $this->formatAction($action)))) {
+            throw new InvalidArgumentException("Action {$action} not defined.");
+        }
+
+        return $this->toRoute($route, $parameters, $absolute);
+    }
+
+    /**
+     * Format the given controller action.
+     *
+     * @param  string  $action
+     * @return string
+     */
+    protected function formatAction($action)
+    {
+        if ($this->rootNamespace && ! (strpos($action, '\\') === 0)) {
+            return $this->rootNamespace.'\\'.$action;
+        } else {
+            return trim($action, '\\');
+        }
+    }
+
+    /**
      * Format the array of URL parameters.
      *
      * @param  mixed|array  $parameters
@@ -343,28 +377,21 @@ class UrlGenerator implements UrlGeneratorContract
     }
 
     /**
-     * Get the URL to a controller action.
+     * Extract the query string from the given path.
      *
-     * @param  string  $action
-     * @param  mixed   $parameters
-     * @param  bool    $absolute
-     * @return string
-     *
-     * @throws \InvalidArgumentException
+     * @param  string  $path
+     * @return array
      */
-    public function action($action, $parameters = [], $absolute = true)
+    protected function extractQueryString($path)
     {
-        if ($this->rootNamespace && ! (strpos($action, '\\') === 0)) {
-            $action = $this->rootNamespace.'\\'.$action;
-        } else {
-            $action = trim($action, '\\');
+        if (($queryPosition = strpos($path, '?')) !== false) {
+            return [
+                substr($path, 0, $queryPosition),
+                substr($path, $queryPosition)
+            ];
         }
 
-        if (! is_null($route = $this->routes->getByAction($action))) {
-            return $this->toRoute($route, $parameters, $absolute);
-        }
-
-        throw new InvalidArgumentException("Action {$action} not defined.");
+        return [$path, ''];
     }
 
     /**
@@ -387,50 +414,6 @@ class UrlGenerator implements UrlGeneratorContract
         $start = Str::startsWith($root, 'http://') ? 'http://' : 'https://';
 
         return preg_replace('~'.$start.'~', $scheme, $root, 1);
-    }
-
-    /**
-     * Extract the query string from the given path.
-     *
-     * @param  string  $path
-     * @return array
-     */
-    protected function extractQueryString($path)
-    {
-        if (($queryPosition = strpos($path, '?')) !== false) {
-            return [
-                substr($path, 0, $queryPosition),
-                substr($path, $queryPosition)
-            ];
-        }
-
-        return [$path, ''];
-    }
-
-    /**
-     * Force the scheme for URLs.
-     *
-     * @param  string  $schema
-     * @return void
-     */
-    public function forceScheme($schema)
-    {
-        $this->cachedSchema = null;
-
-        $this->forceScheme = $schema.'://';
-    }
-
-    /**
-     * Set the forced root URL.
-     *
-     * @param  string  $root
-     * @return void
-     */
-    public function forceRootUrl($root)
-    {
-        $this->forcedRoot = rtrim($root, '/');
-
-        $this->cachedRoot = null;
     }
 
     /**
@@ -493,6 +476,32 @@ class UrlGenerator implements UrlGeneratorContract
     public function defaults(array $defaults)
     {
         $this->routeUrl()->defaults($defaults);
+    }
+
+    /**
+     * Force the scheme for URLs.
+     *
+     * @param  string  $schema
+     * @return void
+     */
+    public function forceScheme($schema)
+    {
+        $this->cachedSchema = null;
+
+        $this->forceScheme = $schema.'://';
+    }
+
+    /**
+     * Set the forced root URL.
+     *
+     * @param  string  $root
+     * @return void
+     */
+    public function forceRootUrl($root)
+    {
+        $this->forcedRoot = rtrim($root, '/');
+
+        $this->cachedRoot = null;
     }
 
     /**
