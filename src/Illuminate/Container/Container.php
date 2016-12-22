@@ -487,7 +487,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function call($callback, array $parameters = [], $defaultMethod = null)
     {
-        return MethodCaller::call($this, $callback, $parameters, $defaultMethod);
+        return BoundMethod::call($this, $callback, $parameters, $defaultMethod);
     }
 
     /**

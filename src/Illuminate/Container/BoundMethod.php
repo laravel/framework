@@ -6,7 +6,7 @@ use ReflectionMethod;
 use ReflectionFunction;
 use InvalidArgumentException;
 
-class MethodCaller
+class BoundMethod
 {
     /**
      * Call the given Closure / class@method and inject its dependencies.
