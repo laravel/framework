@@ -132,25 +132,6 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $container->make('foo'));
         $this->assertEquals('bar', $container->make('baz'));
         $this->assertEquals('bar', $container->make('bat'));
-        $container->bind(['bam' => 'boom'], function () {
-            return 'pow';
-        });
-        $this->assertEquals('pow', $container->make('bam'));
-        $this->assertEquals('pow', $container->make('boom'));
-        $container->instance(['zoom' => 'zing'], 'wow');
-        $this->assertEquals('wow', $container->make('zoom'));
-        $this->assertEquals('wow', $container->make('zing'));
-    }
-
-    public function testShareMethod()
-    {
-        $container = new Container;
-        $closure = $container->share(function () {
-            return new stdClass;
-        });
-        $class1 = $closure($container);
-        $class2 = $closure($container);
-        $this->assertSame($class1, $class2);
     }
 
     public function testBindingsCanBeOverridden()
@@ -174,7 +155,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
 
         $container = new Container;
 
-        $container['foo'] = $container->share(function () {
+        $container->singleton('foo', function () {
             return (object) ['name' => 'taylor'];
         });
         $container->extend('foo', function ($old, $container) {
