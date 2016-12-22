@@ -164,11 +164,19 @@ class Event
             $this->cache->put($this->mutexName(), true, 1440);
         }
 
-        if ($this->runInBackground) {
-            $this->runCommandInBackground($container);
-        } else {
-            $this->runCommandInForeground($container);
-        }
+        $this->runInBackground
+                    ? $this->runCommandInBackground($container)
+                    : $this->runCommandInForeground($container);
+    }
+
+    /**
+     * Get the mutex name for the scheduled command.
+     *
+     * @return string
+     */
+    public function mutexName()
+    {
+        return 'framework'.DIRECTORY_SEPARATOR.'schedule-'.sha1($this->expression.$this->command);
     }
 
     /**
@@ -182,7 +190,7 @@ class Event
         $this->callBeforeCallbacks($container);
 
         (new Process(
-            trim($this->buildCommand(), '& '), base_path(), null, null, null
+            $this->buildCommand(), base_path(), null, null, null
         ))->run();
 
         $this->callAfterCallbacks($container);
@@ -240,16 +248,6 @@ class Event
     }
 
     /**
-     * Get the mutex name for the scheduled command.
-     *
-     * @return string
-     */
-    public function mutexName()
-    {
-        return 'framework'.DIRECTORY_SEPARATOR.'schedule-'.sha1($this->expression.$this->command);
-    }
-
-    /**
      * Determine if the given event should run based on the Cron expression.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
@@ -266,6 +264,16 @@ class Event
     }
 
     /**
+     * Determine if the event runs in maintenance mode.
+     *
+     * @return bool
+     */
+    public function runsInMaintenanceMode()
+    {
+        return $this->evenInMaintenanceMode;
+    }
+
+    /**
      * Determine if the Cron expression passes.
      *
      * @return bool
@@ -279,6 +287,17 @@ class Event
         }
 
         return CronExpression::factory($this->expression)->isDue($date->toDateTimeString());
+    }
+
+    /**
+     * Determine if the event runs in the given environment.
+     *
+     * @param  string  $environment
+     * @return bool
+     */
+    public function runsInEnvironment($environment)
+    {
+        return empty($this->environments) || in_array($environment, $this->environments);
     }
 
     /**
@@ -305,24 +324,136 @@ class Event
     }
 
     /**
-     * Determine if the event runs in the given environment.
+     * Send the output of the command to a given location.
      *
-     * @param  string  $environment
-     * @return bool
+     * @param  string  $location
+     * @param  bool  $append
+     * @return $this
      */
-    public function runsInEnvironment($environment)
+    public function sendOutputTo($location, $append = false)
     {
-        return empty($this->environments) || in_array($environment, $this->environments);
+        $this->output = $location;
+
+        $this->shouldAppendOutput = $append;
+
+        return $this;
     }
 
     /**
-     * Determine if the event runs in maintenance mode.
+     * Append the output of the command to a given location.
      *
-     * @return bool
+     * @param  string  $location
+     * @return $this
      */
-    public function runsInMaintenanceMode()
+    public function appendOutputTo($location)
     {
-        return $this->evenInMaintenanceMode;
+        return $this->sendOutputTo($location, true);
+    }
+
+    /**
+     * E-mail the results of the scheduled operation.
+     *
+     * @param  array|mixed  $addresses
+     * @param  bool  $onlyIfOutputExists
+     * @return $this
+     *
+     * @throws \LogicException
+     */
+    public function emailOutputTo($addresses, $onlyIfOutputExists = false)
+    {
+        $this->ensureOutputIsBeingCapturedForEmail();
+
+        $addresses = is_array($addresses) ? $addresses : func_get_args();
+
+        return $this->then(function (Mailer $mailer) use ($addresses, $onlyIfOutputExists) {
+            $this->emailOutput($mailer, $addresses, $onlyIfOutputExists);
+        });
+    }
+
+    /**
+     * E-mail the results of the scheduled operation if it produces output.
+     *
+     * @param  array|mixed  $addresses
+     * @return $this
+     *
+     * @throws \LogicException
+     */
+    public function emailWrittenOutputTo($addresses)
+    {
+        return $this->emailOutputTo($addresses, true);
+    }
+
+    /**
+     * Ensure that output is being captured for email.
+     *
+     * @return void
+     */
+    protected function ensureOutputIsBeingCapturedForEmail()
+    {
+        if (is_null($this->output) || $this->output == $this->getDefaultOutput()) {
+            $this->sendOutputTo(storage_path('logs/schedule-'.sha1($this->mutexName()).'.log'));
+        }
+    }
+
+    /**
+     * E-mail the output of the event to the recipients.
+     *
+     * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
+     * @param  array  $addresses
+     * @param  bool  $onlyIfOutputExists
+     * @return void
+     */
+    protected function emailOutput(Mailer $mailer, $addresses, $onlyIfOutputExists = false)
+    {
+        $text = file_get_contents($this->output);
+
+        if ($onlyIfOutputExists && empty($text)) {
+            return;
+        }
+
+        $mailer->raw($text, function ($m) use ($addresses) {
+            $m->to($addresses)->subject($this->getEmailSubject());
+        });
+    }
+
+    /**
+     * Get the e-mail subject line for output results.
+     *
+     * @return string
+     */
+    protected function getEmailSubject()
+    {
+        if ($this->description) {
+            return $this->description;
+        }
+
+        return 'Scheduled Job Output';
+    }
+
+    /**
+     * Register a callback to ping a given URL before the job runs.
+     *
+     * @param  string  $url
+     * @return $this
+     */
+    public function pingBefore($url)
+    {
+        return $this->before(function () use ($url) {
+            (new HttpClient)->get($url);
+        });
+    }
+
+    /**
+     * Register a callback to ping a given URL after the job runs.
+     *
+     * @param  string  $url
+     * @return $this
+     */
+    public function thenPing($url)
+    {
+        return $this->then(function () use ($url) {
+            (new HttpClient)->get($url);
+        });
     }
 
     /**
@@ -418,120 +549,6 @@ class Event
     }
 
     /**
-     * Send the output of the command to a given location.
-     *
-     * @param  string  $location
-     * @param  bool  $append
-     * @return $this
-     */
-    public function sendOutputTo($location, $append = false)
-    {
-        $this->output = $location;
-
-        $this->shouldAppendOutput = $append;
-
-        return $this;
-    }
-
-    /**
-     * Append the output of the command to a given location.
-     *
-     * @param  string  $location
-     * @return $this
-     */
-    public function appendOutputTo($location)
-    {
-        return $this->sendOutputTo($location, true);
-    }
-
-    /**
-     * E-mail the results of the scheduled operation.
-     *
-     * @param  array|mixed  $addresses
-     * @param  bool  $onlyIfOutputExists
-     * @return $this
-     *
-     * @throws \LogicException
-     */
-    public function emailOutputTo($addresses, $onlyIfOutputExists = false)
-    {
-        if (is_null($this->output) || $this->output == $this->getDefaultOutput()) {
-            throw new LogicException('Must direct output to a file in order to e-mail results.');
-        }
-
-        $addresses = is_array($addresses) ? $addresses : func_get_args();
-
-        return $this->then(function (Mailer $mailer) use ($addresses, $onlyIfOutputExists) {
-            $this->emailOutput($mailer, $addresses, $onlyIfOutputExists);
-        });
-    }
-
-    /**
-     * E-mail the results of the scheduled operation if it produces output.
-     *
-     * @param  array|mixed  $addresses
-     * @return $this
-     *
-     * @throws \LogicException
-     */
-    public function emailWrittenOutputTo($addresses)
-    {
-        return $this->emailOutputTo($addresses, true);
-    }
-
-    /**
-     * E-mail the output of the event to the recipients.
-     *
-     * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
-     * @param  array  $addresses
-     * @param  bool  $onlyIfOutputExists
-     * @return void
-     */
-    protected function emailOutput(Mailer $mailer, $addresses, $onlyIfOutputExists = false)
-    {
-        $text = file_get_contents($this->output);
-
-        if ($onlyIfOutputExists && empty($text)) {
-            return;
-        }
-
-        $mailer->raw($text, function ($m) use ($addresses) {
-            $m->subject($this->getEmailSubject());
-
-            foreach ($addresses as $address) {
-                $m->to($address);
-            }
-        });
-    }
-
-    /**
-     * Get the e-mail subject line for output results.
-     *
-     * @return string
-     */
-    protected function getEmailSubject()
-    {
-        if ($this->description) {
-            return $this->description;
-        }
-
-        return 'Scheduled Job Output';
-    }
-
-    /**
-     * Register a callback to ping a given URL before the job runs.
-     *
-     * @param  string  $url
-     * @return $this
-     */
-    public function pingBefore($url)
-    {
-        return $this->before(function () use ($url) {
-            (new HttpClient)->get($url);
-        });
-    }
-
-    /**
      * Register a callback to be called before the operation.
      *
      * @param  \Closure  $callback
@@ -542,19 +559,6 @@ class Event
         $this->beforeCallbacks[] = $callback;
 
         return $this;
-    }
-
-    /**
-     * Register a callback to ping a given URL after the job runs.
-     *
-     * @param  string  $url
-     * @return $this
-     */
-    public function thenPing($url)
-    {
-        return $this->then(function () use ($url) {
-            (new HttpClient)->get($url);
-        });
     }
 
     /**
