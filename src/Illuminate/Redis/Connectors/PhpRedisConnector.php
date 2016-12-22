@@ -16,7 +16,7 @@ class PhpRedisConnector
      * @param  array  $config
      * @param  array  $clusterOptions
      * @param  array  $options
-     * @return \Illuminate\Redis\PredisConnection
+     * @return \Illuminate\Redis\PhpRedisConnection
      */
     public function connect(array $config, array $options)
     {
@@ -28,17 +28,18 @@ class PhpRedisConnector
     /**
      * Create a new clustered Predis connection.
      *
-     * @param  array  $config
+     * @param  array  $cluster
      * @param  array  $clusterOptions
-     * @param  array  $options
-     * @return \Illuminate\Redis\PredisClusterConnection
+     * @param  array  $config
+     * @return \Illuminate\Redis\PhpRedisClusterConnection
      */
-    public function connectToCluster(array $config, array $clusterOptions, array $options)
+    public function connectToCluster(array $cluster, array $clusterOptions, array $config)
     {
-        $options = array_merge($options, $clusterOptions, Arr::pull($config, 'options', []));
+        $options = Arr::pull($cluster, 'options', []);
 
         return new PhpRedisClusterConnection($this->createRedisClusterInstance(
-            array_map([$this, 'buildClusterConnectionString'], $config), $options
+            array_map([$this, 'buildClusterConnectionString'], $cluster),
+            array_merge(Arr::get($config, 'options', []), $clusterOptions, $options)
         ));
     }
 
