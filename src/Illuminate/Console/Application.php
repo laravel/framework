@@ -117,7 +117,7 @@ class Application extends SymfonyApplication implements ApplicationContract
      *
      * @param  string  $command
      * @param  array  $parameters
-     * @param  BufferedOutput  $outputBuffer
+     * @param  \Symfony\Component\Console\Output\OutputInterface  $outputBuffer
      * @return int
      */
     public function call($command, array $parameters = [], $outputBuffer = null)
