@@ -52,7 +52,7 @@ class RedisStore extends TaggableStore implements Store
     public function get($key)
     {
         if (! is_null($value = $this->connection()->get($this->prefix.$key))) {
-            return is_numeric($value) ? $value : unserialize($value);
+            return is_numeric($value) ? $value : \unserialize($value);
         }
     }
 
@@ -66,7 +66,7 @@ class RedisStore extends TaggableStore implements Store
      */
     public function put($key, $value, $minutes)
     {
-        $value = is_numeric($value) ? $value : serialize($value);
+        $value = is_numeric($value) ? $value : \serialize($value);
 
         $minutes = max(1, $minutes);
 
@@ -106,7 +106,7 @@ class RedisStore extends TaggableStore implements Store
      */
     public function forever($key, $value)
     {
-        $value = is_numeric($value) ? $value : serialize($value);
+        $value = is_numeric($value) ? $value : \serialize($value);
 
         $this->connection()->set($this->prefix.$key, $value);
     }
