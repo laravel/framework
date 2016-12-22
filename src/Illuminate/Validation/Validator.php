@@ -2178,7 +2178,7 @@ class Validator implements ValidatorContract
     protected function doReplacements($message, $attribute, $rule, $parameters)
     {
         $attributeName = $this->getAttribute($attribute);
-        
+
         $value = $this->getValue($attribute);
 
         $message = str_replace(
