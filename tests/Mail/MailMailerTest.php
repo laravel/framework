@@ -141,7 +141,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase {
 		$message->shouldReceive('getTo')->once()->andReturn(array('taylor@userscape.com' => 'Taylor'));
 		$message->shouldReceive('getSwiftMessage')->once()->andReturn($message);
 		$mailer->getSwiftMailer()->shouldReceive('send')->never();
-		$logger = m::mock('Illuminate\Log\Writer');
+		$logger = m::mock('Psr\Log\LoggerInterface');
 		$logger->shouldReceive('info')->once()->with('Pretending to mail message to: taylor@userscape.com');
 		$mailer->setLogger($logger);
 		$mailer->pretend();
