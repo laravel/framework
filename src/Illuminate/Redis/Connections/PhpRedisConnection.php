@@ -9,7 +9,7 @@ class PhpRedisConnection extends Connection
     /**
      * Create a new Predis connection.
      *
-     * @param  \Predis\Client  $client
+     * @param  \Redis|\RedisCluster  $client
      * @return void
      */
     public function __construct($client)
