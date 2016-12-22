@@ -143,7 +143,9 @@ class Container implements ArrayAccess, ContainerContract
     {
         $abstract = $this->normalize($abstract);
 
-        return isset($this->bindings[$abstract]) || isset($this->instances[$abstract]) || $this->isAlias($abstract);
+        return isset($this->bindings[$abstract]) ||
+               isset($this->instances[$abstract]) ||
+               $this->isAlias($abstract);
     }
 
     /**
@@ -160,7 +162,8 @@ class Container implements ArrayAccess, ContainerContract
             $abstract = $this->getAlias($abstract);
         }
 
-        return isset($this->resolved[$abstract]) || isset($this->instances[$abstract]);
+        return isset($this->resolved[$abstract]) ||
+               isset($this->instances[$abstract]);
     }
 
     /**
@@ -187,15 +190,6 @@ class Container implements ArrayAccess, ContainerContract
         $abstract = $this->normalize($abstract);
 
         $concrete = $this->normalize($concrete);
-
-        // If the given types are actually an array, we will assume an alias is being
-        // defined and will grab this "real" abstract class name and register this
-        // alias with the container so that it can be used as a shortcut for it.
-        if (is_array($abstract)) {
-            list($abstract, $alias) = $this->extractAlias($abstract);
-
-            $this->alias($abstract, $alias);
-        }
 
         // If no concrete type was given, we will simply set the concrete type to the
         // abstract type. After that, the concrete type to be registered as shared
@@ -292,28 +286,6 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
-     * Wrap a Closure such that it is shared.
-     *
-     * @param  \Closure  $closure
-     * @return \Closure
-     */
-    public function share(Closure $closure)
-    {
-        return function ($container) use ($closure) {
-            // We'll simply declare a static variable within the Closures and if it has
-            // not been set we will execute the given Closures to resolve this value
-            // and return it back to these consumers of the method as an instance.
-            static $object;
-
-            if (is_null($object)) {
-                $object = $closure($container);
-            }
-
-            return $object;
-        };
-    }
-
-    /**
      * "Extend" an abstract type in the container.
      *
      * @param  string    $abstract
@@ -344,27 +316,14 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function instance($abstract, $instance)
     {
-        $abstract = $this->normalize($abstract);
-
-        // First, we will extract the alias from the abstract if it is an array so we
-        // are using the correct name when binding the type. If we get an alias it
-        // will be registered with the container so we can resolve it out later.
-        if (is_array($abstract)) {
-            list($abstract, $alias) = $this->extractAlias($abstract);
-
-            $this->alias($abstract, $alias);
-        }
-
-        unset($this->aliases[$abstract]);
+        unset($this->aliases[$abstract = $this->normalize($abstract)]);
 
         // We'll check to determine if this type has been bound before, and if it has
         // we will fire the rebound callbacks registered with the container and it
         // can be updated with consuming classes that have gotten resolved here.
-        $bound = $this->bound($abstract);
-
         $this->instances[$abstract] = $instance;
 
-        if ($bound) {
+        if ($this->bound($abstract)) {
             $this->rebound($abstract);
         }
     }
@@ -420,17 +379,6 @@ class Container implements ArrayAccess, ContainerContract
     public function alias($abstract, $alias)
     {
         $this->aliases[$alias] = $this->normalize($abstract);
-    }
-
-    /**
-     * Extract the type and alias from a given definition.
-     *
-     * @param  array  $definition
-     * @return array
-     */
-    protected function extractAlias(array $definition)
-    {
-        return [key($definition), current($definition)];
     }
 
     /**
