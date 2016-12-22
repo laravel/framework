@@ -37,16 +37,21 @@ class ArrayTransport extends Transport
     }
 
     /**
-     * Return the collection of messages.
+     * Retrieve the collection of messages.
      *
      * @return \Illuminate\Support\Collection
      */
-    public function getMessages()
+    public function messages()
     {
         return $this->messages;
     }
 
-    public function clearMessages()
+    /**
+     * Clear all of the messages from the local collection.
+     *
+     * @return void
+     */
+    public function flush()
     {
         return $this->messages = new Collection;
     }
