@@ -6,10 +6,8 @@ use Closure;
 use ArrayAccess;
 use LogicException;
 use ReflectionClass;
-use ReflectionMethod;
 use ReflectionFunction;
 use ReflectionParameter;
-use InvalidArgumentException;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 
