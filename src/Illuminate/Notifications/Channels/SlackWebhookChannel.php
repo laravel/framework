@@ -81,13 +81,13 @@ class SlackWebhookChannel
                 'color' => $attachment->color ?: $message->color(),
                 'title' => $attachment->title,
                 'text' => $attachment->content,
+                'fallback' => $attachment->fallback,
                 'title_link' => $attachment->url,
                 'fields' => $this->fields($attachment),
                 'mrkdwn_in' => $attachment->markdown,
                 'footer' => $attachment->footer,
                 'footer_icon' => $attachment->footerIcon,
                 'ts' => $attachment->timestamp,
-                'fallback' => $attachment->fallback,
             ]);
         })->all();
     }
