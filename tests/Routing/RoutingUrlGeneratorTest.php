@@ -421,7 +421,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
             $request = Request::create('http://www.foo.com/')
         );
 
-        $url->forceSchema('https');
+        $url->forceScheme('https');
         $route = new Route(['GET'], '/foo', ['as' => 'plain']);
         $routes->add($route);
 
