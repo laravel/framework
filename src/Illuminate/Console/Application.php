@@ -59,17 +59,6 @@ class Application extends SymfonyApplication implements ApplicationContract
     }
 
     /**
-     * Format the given command as a fully-qualified executable command.
-     *
-     * @param  string  $string
-     * @return string
-     */
-    public static function formatCommandString($string)
-    {
-        return sprintf('%s %s %s', static::phpBinary(), static::artisanBinary(), $string);
-    }
-
-    /**
      * Determine the proper PHP executable.
      *
      * @return string
@@ -90,15 +79,14 @@ class Application extends SymfonyApplication implements ApplicationContract
     }
 
     /**
-     * Bootstrap the console application.
+     * Format the given command as a fully-qualified executable command.
      *
-     * @return void
+     * @param  string  $string
+     * @return string
      */
-    protected function bootstrap()
+    public static function formatCommandString($string)
     {
-        foreach (static::$bootstrappers as $bootstrapper) {
-            $bootstrapper($this);
-        }
+        return sprintf('%s %s %s', static::phpBinary(), static::artisanBinary(), $string);
     }
 
     /**
@@ -110,6 +98,18 @@ class Application extends SymfonyApplication implements ApplicationContract
     public static function starting(Closure $callback)
     {
         static::$bootstrappers[] = $callback;
+    }
+
+    /**
+     * Bootstrap the console application.
+     *
+     * @return void
+     */
+    protected function bootstrap()
+    {
+        foreach (static::$bootstrappers as $bootstrapper) {
+            $bootstrapper($this);
+        }
     }
 
     /**
@@ -207,11 +207,9 @@ class Application extends SymfonyApplication implements ApplicationContract
      */
     protected function getDefaultInputDefinition()
     {
-        $definition = parent::getDefaultInputDefinition();
-
-        $definition->addOption($this->getEnvironmentOption());
-
-        return $definition;
+        return tap(parent::getDefaultInputDefinition(), function ($definition) {
+            $definition->addOption($this->getEnvironmentOption());
+        });
     }
 
     /**

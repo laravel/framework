@@ -77,10 +77,10 @@ class Command extends SymfonyCommand
      * @var array
      */
     protected $verbosityMap = [
-        'v'      => OutputInterface::VERBOSITY_VERBOSE,
-        'vv'     => OutputInterface::VERBOSITY_VERY_VERBOSE,
-        'vvv'    => OutputInterface::VERBOSITY_DEBUG,
-        'quiet'  => OutputInterface::VERBOSITY_QUIET,
+        'v' => OutputInterface::VERBOSITY_VERBOSE,
+        'vv' => OutputInterface::VERBOSITY_VERY_VERBOSE,
+        'vvv' => OutputInterface::VERBOSITY_DEBUG,
+        'quiet' => OutputInterface::VERBOSITY_QUIET,
         'normal' => OutputInterface::VERBOSITY_NORMAL,
     ];
 
@@ -100,6 +100,9 @@ class Command extends SymfonyCommand
             parent::__construct($this->name);
         }
 
+        // Once we have constructed the command, we'll set the description and other
+        // related properties of the command. If a signature wasn't used to build
+        // the command we'll set the arguments and the options on this command.
         $this->setDescription($this->description);
 
         $this->setHidden($this->hidden);
@@ -120,6 +123,9 @@ class Command extends SymfonyCommand
 
         parent::__construct($name);
 
+        // After parsing the signature we will spin through the arguments and options
+        // and set them on this command. These will already be changed into proper
+        // instances of these "InputArgument" and "InputOption" Symfony classes.
         foreach ($arguments as $argument) {
             $this->getDefinition()->addArgument($argument);
         }
@@ -157,11 +163,9 @@ class Command extends SymfonyCommand
      */
     public function run(InputInterface $input, OutputInterface $output)
     {
-        $this->input = $input;
-
-        $this->output = new OutputStyle($input, $output);
-
-        return parent::run($input, $output);
+        return parent::run(
+            $this->input = $input, $this->output = new OutputStyle($input, $output)
+        );
     }
 
     /**
@@ -187,11 +191,11 @@ class Command extends SymfonyCommand
      */
     public function call($command, array $arguments = [])
     {
-        $instance = $this->getApplication()->find($command);
-
         $arguments['command'] = $command;
 
-        return $instance->run(new ArrayInput($arguments), $this->output);
+        return $this->getApplication()->find($command)->run(
+            new ArrayInput($arguments), $this->output
+        );
     }
 
     /**
@@ -203,11 +207,11 @@ class Command extends SymfonyCommand
      */
     public function callSilent($command, array $arguments = [])
     {
-        $instance = $this->getApplication()->find($command);
-
         $arguments['command'] = $command;
 
-        return $instance->run(new ArrayInput($arguments), new NullOutput);
+        return $this->getApplication()->find($command)->run(
+            new ArrayInput($arguments), new NullOutput
+        );
     }
 
     /**
@@ -472,6 +476,17 @@ class Command extends SymfonyCommand
     }
 
     /**
+     * Set the verbosity level.
+     *
+     * @param string|int $level
+     * @return void
+     */
+    protected function setVerbosity($level)
+    {
+        $this->verbosity = $this->parseVerbosity($level);
+    }
+
+    /**
      * Get the verbosity level in terms of Symfony's OutputInterface level.
      *
      * @param  string|int  $level
@@ -486,17 +501,6 @@ class Command extends SymfonyCommand
         }
 
         return $level;
-    }
-
-    /**
-     * Set the verbosity level.
-     *
-     * @param string|int $level
-     * @return void
-     */
-    protected function setVerbosity($level)
-    {
-        $this->verbosity = $this->parseVerbosity($level);
     }
 
     /**
