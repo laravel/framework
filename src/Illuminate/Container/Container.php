@@ -234,6 +234,17 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
+     * Determine if the container has a method binding.
+     *
+     * @param  string  $method
+     * @return bool
+     */
+    public function hasMethodBinding($method)
+    {
+        return isset($this->methodBindings[$method]);
+    }
+
+    /**
      * Bind a callback to resolve with Container::call.
      *
      * @param  string  $method
@@ -243,6 +254,18 @@ class Container implements ArrayAccess, ContainerContract
     public function bindMethod($method, $callback)
     {
         $this->methodBindings[$this->normalize($method)] = $callback;
+    }
+
+    /**
+     * Get the method binding for the given method.
+     *
+     * @param  string  $method
+     * @param  mixed  $instance
+     * @return mixed
+     */
+    public function callMethodBinding($method, $instance)
+    {
+        return call_user_func($this->methodBindings[$method], $instance, $this);
     }
 
     /**
@@ -466,134 +489,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function call($callback, array $parameters = [], $defaultMethod = null)
     {
-        if ($this->isCallableWithAtSign($callback) || $defaultMethod) {
-            return $this->callClass($callback, $parameters, $defaultMethod);
-        }
-
-        return $this->callBoundMethod($callback, function () use ($callback, $parameters) {
-            $dependencies = $this->getMethodDependencies($callback, $parameters);
-
-            return call_user_func_array($callback, $dependencies);
-        });
-    }
-
-    /**
-     * Determine if the given string is in Class@method syntax.
-     *
-     * @param  mixed  $callback
-     * @return bool
-     */
-    protected function isCallableWithAtSign($callback)
-    {
-        return is_string($callback) && strpos($callback, '@') !== false;
-    }
-
-    /**
-     * Get all dependencies for a given method.
-     *
-     * @param  callable|string  $callback
-     * @param  array  $parameters
-     * @return array
-     */
-    protected function getMethodDependencies($callback, array $parameters = [])
-    {
-        $dependencies = [];
-
-        foreach ($this->getCallReflector($callback)->getParameters() as $parameter) {
-            $this->addDependencyForCallParameter($parameter, $parameters, $dependencies);
-        }
-
-        return array_merge($dependencies, $parameters);
-    }
-
-    /**
-     * Get the proper reflection instance for the given callback.
-     *
-     * @param  callable|string  $callback
-     * @return \ReflectionFunctionAbstract
-     */
-    protected function getCallReflector($callback)
-    {
-        if (is_string($callback) && strpos($callback, '::') !== false) {
-            $callback = explode('::', $callback);
-        }
-
-        if (is_array($callback)) {
-            return new ReflectionMethod($callback[0], $callback[1]);
-        }
-
-        return new ReflectionFunction($callback);
-    }
-
-    /**
-     * Get the dependency for the given call parameter.
-     *
-     * @param  \ReflectionParameter  $parameter
-     * @param  array  $parameters
-     * @param  array  $dependencies
-     * @return mixed
-     */
-    protected function addDependencyForCallParameter(ReflectionParameter $parameter, array &$parameters, &$dependencies)
-    {
-        if (array_key_exists($parameter->name, $parameters)) {
-            $dependencies[] = $parameters[$parameter->name];
-
-            unset($parameters[$parameter->name]);
-        } elseif ($parameter->getClass()) {
-            $dependencies[] = $this->make($parameter->getClass()->name);
-        } elseif ($parameter->isDefaultValueAvailable()) {
-            $dependencies[] = $parameter->getDefaultValue();
-        }
-    }
-
-    /**
-     * Call a string reference to a class using Class@method syntax.
-     *
-     * @param  string  $target
-     * @param  array  $parameters
-     * @param  string|null  $defaultMethod
-     * @return mixed
-     *
-     * @throws \InvalidArgumentException
-     */
-    protected function callClass($target, array $parameters = [], $defaultMethod = null)
-    {
-        $segments = explode('@', $target);
-
-        // If the listener has an @ sign, we will assume it is being used to delimit
-        // the class name from the handle method name. This allows for handlers
-        // to run multiple handler methods in a single class for convenience.
-        $method = count($segments) == 2 ? $segments[1] : $defaultMethod;
-
-        if (is_null($method)) {
-            throw new InvalidArgumentException('Method not provided.');
-        }
-
-        return $this->call([$this->make($segments[0]), $method], $parameters);
-    }
-
-    /**
-     * Call a method that has been bound to the container.
-     *
-     * @param  callable  $callback
-     * @param  mixed  $default
-     * @return mixed
-     */
-    protected function callBoundMethod($callback, $default)
-    {
-        if (! is_array($callback)) {
-            return value($default);
-        }
-
-        $class = is_string($callback[0]) ? $callback[0] : get_class($callback[0]);
-
-        $method = $this->normalize("{$class}@{$callback[1]}");
-
-        if (! isset($this->methodBindings[$method])) {
-            return value($default);
-        }
-
-        return $this->methodBindings[$method]($callback[0], $this);
+        return MethodCaller::call($this, $callback, $parameters, $defaultMethod);
     }
 
     /**
@@ -701,7 +597,7 @@ class Container implements ArrayAccess, ContainerContract
      * @param  mixed  $service
      * @return mixed
      */
-    protected function normalize($service)
+    public function normalize($service)
     {
         return is_string($service) ? ltrim($service, '\\') : $service;
     }
