@@ -31,5 +31,8 @@
     "suggest": {
         "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (~2.0)."
     },
+    "config": {
+        "sort-packages": true
+    },
     "minimum-stability": "dev"
 }

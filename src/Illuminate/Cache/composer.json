@@ -34,5 +34,8 @@
         "illuminate/filesystem": "Required to use the file cache driver (5.3.*).",
         "illuminate/redis": "Required to use the redis cache driver (5.3.*)."
     },
+    "config": {
+        "sort-packages": true
+    },
     "minimum-stability": "dev"
 }

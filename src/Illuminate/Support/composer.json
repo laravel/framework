@@ -41,5 +41,8 @@
         "symfony/process": "Required to use the composer class (3.1.*).",
         "symfony/var-dumper": "Required to use the dd function (3.1.*)."
     },
+    "config": {
+        "sort-packages": true
+    },
     "minimum-stability": "dev"
 }
