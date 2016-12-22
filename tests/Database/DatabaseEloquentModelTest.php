@@ -127,6 +127,18 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('foo', $result);
 	}
 
+	public function testReloadMethodSyncsNewAttributes()
+	{
+		$model = new EloquentModelReloadStub;
+		$model->foo = 'baz';
+		$this->assertTrue($model->isDirty('foo'));
+
+		$result = $model->reload();
+		$this->assertFalse($model->isDirty('foo'));
+
+		$this->assertEquals($model, $result);
+	}
+
 
 	public function testDestroyMethodCallsQueryBuilderCorrectly()
 	{
@@ -1115,6 +1127,20 @@ class EloquentModelFindManyStub extends Illuminate\Database\Eloquent\Model {
 	{
 		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
 		$mock->shouldReceive('find')->once()->with(array(1, 2), array('*'))->andReturn('foo');
+		return $mock;
+	}
+}
+
+class EloquentModelReloadStub extends Illuminate\Database\Eloquent\Model {
+	public $exists = true;
+	public function getKey()
+	{
+		return 1;
+	}
+	public function newQuery()
+	{
+		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
+		$mock->shouldReceive('find')->once()->with(1, array('foo'))->andReturn($this);
 		return $mock;
 	}
 }
