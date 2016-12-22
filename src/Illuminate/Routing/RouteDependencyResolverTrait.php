@@ -43,7 +43,7 @@ trait RouteDependencyResolverTrait
     }
 
     /**
-     * Resolve the given method's type-hinted dependencies.
+     * Resolve the given method's type-hinted dependencies and other parameters.
      *
      * @param  array  $parameters
      * @param  \ReflectionFunctionAbstract  $reflector
@@ -51,19 +51,33 @@ trait RouteDependencyResolverTrait
      */
     public function resolveMethodDependencies(array $parameters, ReflectionFunctionAbstract $reflector)
     {
-        $originalParameters = $parameters;
+        $arguments = [];
+        $classNames = [];
 
+        // Loop through all method arguments injecting any dependencies or setting default values
         foreach ($reflector->getParameters() as $key => $parameter) {
-            $instance = $this->transformDependency(
-                $parameter, $parameters, $originalParameters
-            );
+            $instance = $this->transformDependency($parameter, $parameters);
 
-            if (! is_null($instance)) {
-                $this->spliceIntoParameters($parameters, $key, $instance);
+            // If no dependency or default value $instance should be null
+            if (is_object($instance)) {
+                $classNames[] = get_class($instance);
             }
+            elseif ($parameter->isDefaultValueAvailable()) {
+                $instance = $parameter->getDefaultValue();
+            }
+
+            $arguments[] = $instance;
         }
 
-        return $parameters;
+        // Remove all found dependencies from $parameters array,
+        // this way we can inject all non object parameters in their respective order
+        $parameters = $this->cleanDependenciesFromParameters($parameters, $classNames);
+
+        if (!empty($parameters)) {
+            return $this->mergeRemainingParameters($arguments, $parameters);
+        }
+
+        return $arguments;
     }
 
     /**
@@ -74,16 +88,65 @@ trait RouteDependencyResolverTrait
      * @param  array  $originalParameters
      * @return mixed
      */
-    protected function transformDependency(ReflectionParameter $parameter, $parameters, $originalParameters)
+    protected function transformDependency(ReflectionParameter $parameter, $parameters)
     {
-        $class = $parameter->getClass();
+        // If the current parameter shouldn't be a class this method will return null
+        if ($class = $parameter->getClass()) {
 
-        // If the parameter has a type-hinted class, we will check to see if it is already in
-        // the list of parameters. If it is we will just skip it as it is probably a model
-        // binding and we do not want to mess with those; otherwise, we resolve it here.
-        if ($class && ! $this->alreadyInParameters($class->name, $parameters)) {
+            // If the parameter has a type-hinted class, we will check to see if it is already in
+            // the list of parameters. If it is we return that class; otherwise, we resolve it here.
+            if ($this->alreadyInParameters($class->name, $parameters)) {
+                return $this->fetchParameterByClassName($class->name, $parameters);
+            }
+
             return $this->container->make($class->name);
         }
+    }
+
+    /**
+     * Remove known classes from an array of parameters
+     *
+     * @param array $originalParameters
+     * @param array $classNames
+     * @return array
+     */
+    protected function cleanDependenciesFromParameters($originalParameters, $classNames)
+    {
+        $parameters = [];
+        // Remove any duplicates from class list
+        $classNames = array_unique($classNames);
+
+        // Create a new parameters array leaving out any classes from the class list
+        foreach ($originalParameters as $key => $parameter) {
+            if (!is_object($parameter) || !in_array(get_class($parameter), $classNames)) {
+                $parameters[$key] = $parameter;
+            }
+        }
+
+        return $parameters;
+    }
+
+    /**
+     * Merge route parameters into method arguments
+     *
+     * @param array $arguments
+     * @param array $parameters
+     * @return array
+     */
+    protected function mergeRemainingParameters($arguments, $parameters)
+    {
+        foreach ($arguments as $key => $argument) {
+            // Arguments that aren't objects will be a default value or null
+            // these values should be filled in order by the parameters
+            if (!is_object($argument)) {
+                $arguments[$key] = array_shift($parameters);
+                if (empty($parameters)) {
+                    break;
+                }
+            }
+        }
+
+        return $arguments;
     }
 
     /**
@@ -95,9 +158,21 @@ trait RouteDependencyResolverTrait
      */
     protected function alreadyInParameters($class, array $parameters)
     {
-        return ! is_null(Arr::first($parameters, function ($value) use ($class) {
+        return ! is_null($this->fetchParameterByClassName($class, $parameters));
+    }
+
+    /**
+     * Return a parameter by its class
+     *
+     * @param string $class
+     * @param array $parameters
+     * @return mixed
+     */
+    protected function fetchParameterByClassName($class, array $parameters)
+    {
+        return Arr::first($parameters, function ($value) use ($class) {
             return $value instanceof $class;
-        }));
+        });
     }
 
     /**
