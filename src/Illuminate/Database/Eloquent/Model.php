@@ -1125,11 +1125,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // correct set of attributes in case the developers wants to check these.
         $key = $instance->getKeyName();
 
-        foreach ($instance->whereIn($key, $ids)->get() as $model) {
-            if ($model->delete()) {
-                $count++;
-            }
-        }
+        $count = $instance->whereIn($key, $ids)->delete();
 
         return $count;
     }
