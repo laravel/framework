@@ -77,8 +77,11 @@ class RouteUrlGenerator
     {
         $domain = $this->getRouteDomain($route, $parameters);
 
+        // First we will construct the entire URI including the root and query string. Once it
+        // has been constructed, we'll make sure we don't have any missing parameters or we
+        // will need to throw the exception to let the developers know one was not given.
         $uri = $this->addQueryString($this->url->format(
-            $root = $this->replaceRoot($route, $domain, $parameters),
+            $root = $this->replaceRootParameters($route, $domain, $parameters),
             $this->replaceRouteParameters($route->uri(), $parameters)
         ), $parameters);
 
@@ -86,9 +89,16 @@ class RouteUrlGenerator
             throw UrlGenerationException::forMissingParameters($route);
         }
 
+        // Once we have ensured that there are no missing parameters in the URI we will encode
+        // the URI and prepare it for returning to the developer. If the URI is supposed to
+        // be absolute, we will return it as-is. Otherwise we will remove the URL's root.
         $uri = strtr(rawurlencode($uri), $this->dontEncode);
 
-        return $absolute ? $uri : '/'.ltrim(str_replace($root, '', $uri), '/');
+        if (! $absolute) {
+            return '/'.ltrim(str_replace($root, '', $uri), '/');
+        }
+
+        return $uri;
     }
 
     /**
@@ -112,18 +122,9 @@ class RouteUrlGenerator
      */
     protected function formatDomain($route, &$parameters)
     {
-        return $this->addPortToDomain($this->getDomainAndScheme($route));
-    }
-
-    /**
-     * Get the domain and scheme for the route.
-     *
-     * @param  \Illuminate\Routing\Route  $route
-     * @return string
-     */
-    protected function getDomainAndScheme($route)
-    {
-        return $this->getRouteScheme($route).$route->domain();
+        return $this->addPortToDomain(
+            $this->getRouteScheme($route).$route->domain()
+        );
     }
 
     /**
@@ -138,9 +139,9 @@ class RouteUrlGenerator
             return 'http://';
         } elseif ($route->httpsOnly()) {
             return 'https://';
+        } else {
+            return $this->url->formatScheme(null);
         }
-
-        return $this->url->formatScheme(null);
     }
 
     /**
@@ -155,11 +156,65 @@ class RouteUrlGenerator
 
         $port = (int) $this->request->getPort();
 
-        if (($secure && $port === 443) || (! $secure && $port === 80)) {
-            return $domain;
-        }
+        return ($secure && $port === 443) || (! $secure && $port === 80)
+                    ? $domain : $domain.':'.$port;
+    }
 
-        return $domain.':'.$port;
+    /**
+     * Replace the parameters on the root path.
+     *
+     * @param  \Illuminate\Routing\Route  $route
+     * @param  string  $domain
+     * @param  array  $parameters
+     * @return string
+     */
+    protected function replaceRootParameters($route, $domain, &$parameters)
+    {
+        $scheme = $this->getRouteScheme($route);
+
+        return $this->replaceRouteParameters(
+            $this->url->formatRoot($scheme, $domain), $parameters
+        );
+    }
+
+    /**
+     * Replace all of the wildcard parameters for a route path.
+     *
+     * @param  string  $path
+     * @param  array  $parameters
+     * @return string
+     */
+    protected function replaceRouteParameters($path, array &$parameters)
+    {
+        $path = $this->replaceNamedParameters($path, $parameters);
+
+        $path = preg_replace_callback('/\{.*?\}/', function ($match) use (&$parameters) {
+            return (empty($parameters) && ! Str::endsWith($match[0], '?}'))
+                        ? $match[0]
+                        : array_shift($parameters);
+        }, $path);
+
+        return trim(preg_replace('/\{.*?\?\}/', '', $path), '/');
+    }
+
+    /**
+     * Replace all of the named parameters in the path.
+     *
+     * @param  string  $path
+     * @param  array  $parameters
+     * @return string
+     */
+    protected function replaceNamedParameters($path, &$parameters)
+    {
+        return preg_replace_callback('/\{(.*?)\??\}/', function ($m) use (&$parameters) {
+            if (isset($parameters[$m[1]])) {
+                return Arr::pull($parameters, $m[1]);
+            } elseif (isset($this->defaultParameters[$m[1]])) {
+                return $this->defaultParameters[$m[1]];
+            } else {
+                return $m[0];
+            }
+        }, $path);
     }
 
     /**
@@ -234,73 +289,6 @@ class RouteUrlGenerator
     protected function getNumericParameters(array $parameters)
     {
         return array_filter($parameters, 'is_numeric', ARRAY_FILTER_USE_KEY);
-    }
-
-    /**
-     * Replace the parameters on the root path.
-     *
-     * @param  \Illuminate\Routing\Route  $route
-     * @param  string  $domain
-     * @param  array  $parameters
-     * @return string
-     */
-    protected function replaceRoot($route, $domain, &$parameters)
-    {
-        return $this->replaceRouteParameters(
-            $this->formatRouteRoot($route, $domain), $parameters
-        );
-    }
-
-    /**
-     * Get the root of the route URL.
-     *
-     * @param  \Illuminate\Routing\Route  $route
-     * @param  string  $domain
-     * @return string
-     */
-    protected function formatRouteRoot($route, $domain)
-    {
-        return $this->url->formatRoot($this->getRouteScheme($route), $domain);
-    }
-
-    /**
-     * Replace all of the wildcard parameters for a route path.
-     *
-     * @param  string  $path
-     * @param  array  $parameters
-     * @return string
-     */
-    protected function replaceRouteParameters($path, array &$parameters)
-    {
-        $path = $this->replaceNamedParameters($path, $parameters);
-
-        $path = preg_replace_callback('/\{.*?\}/', function ($match) use (&$parameters) {
-            return (empty($parameters) && ! Str::endsWith($match[0], '?}'))
-                        ? $match[0]
-                        : array_shift($parameters);
-        }, $path);
-
-        return trim(preg_replace('/\{.*?\?\}/', '', $path), '/');
-    }
-
-    /**
-     * Replace all of the named parameters in the path.
-     *
-     * @param  string  $path
-     * @param  array  $parameters
-     * @return string
-     */
-    protected function replaceNamedParameters($path, &$parameters)
-    {
-        return preg_replace_callback('/\{(.*?)\??\}/', function ($m) use (&$parameters) {
-            if (isset($parameters[$m[1]])) {
-                return Arr::pull($parameters, $m[1]);
-            } elseif (isset($this->defaultParameters[$m[1]])) {
-                return $this->defaultParameters[$m[1]];
-            } else {
-                return $m[0];
-            }
-        }, $path);
     }
 
     /**
