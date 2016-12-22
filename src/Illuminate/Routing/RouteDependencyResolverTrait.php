@@ -106,8 +106,8 @@ trait RouteDependencyResolverTrait
     /**
      * Remove known classes from an array of parameters
      *
-     * @param array $originalParameters
-     * @param array $classNames
+     * @param  array $originalParameters
+     * @param  array $classNames
      * @return array
      */
     protected function cleanDependenciesFromParameters($originalParameters, $classNames)
@@ -129,8 +129,8 @@ trait RouteDependencyResolverTrait
     /**
      * Merge route parameters into method arguments
      *
-     * @param array $arguments
-     * @param array $parameters
+     * @param  array $arguments
+     * @param  array $parameters
      * @return array
      */
     protected function mergeRemainingParameters($arguments, $parameters)
@@ -164,8 +164,8 @@ trait RouteDependencyResolverTrait
     /**
      * Return a parameter by its class
      *
-     * @param string $class
-     * @param array $parameters
+     * @param  string $class
+     * @param  array $parameters
      * @return mixed
      */
     protected function fetchParameterByClassName($class, array $parameters)
@@ -173,20 +173,5 @@ trait RouteDependencyResolverTrait
         return Arr::first($parameters, function ($value) use ($class) {
             return $value instanceof $class;
         });
-    }
-
-    /**
-     * Splice the given value into the parameter list.
-     *
-     * @param  array  $parameters
-     * @param  string  $key
-     * @param  mixed  $instance
-     * @return void
-     */
-    protected function spliceIntoParameters(array &$parameters, $key, $instance)
-    {
-        array_splice(
-            $parameters, $key, 0, [$instance]
-        );
     }
 }
