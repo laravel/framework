@@ -10,6 +10,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Cache\Repository as Cache;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Illuminate\Contracts\Console\Kernel as KernelContract;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 
@@ -203,9 +204,10 @@ class Kernel implements KernelContract
      *
      * @param  string  $command
      * @param  array  $parameters
+     * @param  BufferedOutput  $outputBuffer
      * @return int
      */
-    public function call($command, array $parameters = [])
+    public function call($command, array $parameters = [], $outputBuffer = null)
     {
         $this->bootstrap();
 
@@ -215,7 +217,7 @@ class Kernel implements KernelContract
             $this->commandsLoaded = true;
         }
 
-        return $this->getArtisan()->call($command, $parameters);
+        return $this->getArtisan()->call($command, $parameters, $outputBuffer);
     }
 
     /**
