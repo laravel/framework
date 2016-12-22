@@ -25,13 +25,23 @@ trait ResponseTrait
     }
 
     /**
-     * Get the content of the response.
+     * Get the content for the response.
      *
      * @return string
      */
     public function content()
     {
         return $this->getContent();
+    }
+
+    /**
+     * Get the headers for the response.
+     *
+     * @return \Symfony\Component\HttpFoundation\ResponseHeaderBag
+     */
+    public function headers()
+    {
+        return $this->headers;
     }
 
     /**

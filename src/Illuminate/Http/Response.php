@@ -6,9 +6,10 @@ use ArrayObject;
 use JsonSerializable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Contracts\Http\Response as ResponseContract;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
 
-class Response extends BaseResponse
+class Response extends BaseResponse implements ResponseContract
 {
     use ResponseTrait;
 

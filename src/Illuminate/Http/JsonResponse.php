@@ -6,9 +6,10 @@ use JsonSerializable;
 use InvalidArgumentException;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Http\Response as ResponseContract;
 use Symfony\Component\HttpFoundation\JsonResponse as BaseJsonResponse;
 
-class JsonResponse extends BaseJsonResponse
+class JsonResponse extends BaseJsonResponse implements ResponseContract
 {
     use ResponseTrait;
 
