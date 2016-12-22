@@ -3,6 +3,7 @@
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Session\Store as Session;
 use Illuminate\Support\Traits\MacroableTrait;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 class FormBuilder {
 
@@ -910,18 +911,38 @@ class FormBuilder {
 	 * Get the model value that should be assigned to the field.
 	 *
 	 * @param  string  $name
-	 * @return string
+	 * @return string|null
 	 */
 	protected function getModelValueAttribute($name)
 	{
-		if (is_object($this->model))
+		$segments = explode('.', $this->transformKey($name));
+		$data = $this->model;
+
+		foreach ($segments as $key)
 		{
-			return object_get($this->model, $this->transformKey($name));
+			if (is_array($data))
+			{
+				$data = array_key_exists($key, $data) ? $data[$key] : null;
+			}
+			elseif ($data instanceof EloquentCollection)
+			{
+				$data = $data->find($key);
+			}
+			elseif ($data instanceof \ArrayAccess)
+			{
+				$data = $data->offsetExists($key) ? $data->offsetGet($key) : null;
+			}
+			elseif (is_object($data))
+			{
+				$data = isset($data->$key) ? $data->$key : null;
+			}
+			else
+			{
+				return null;
+			}
 		}
-		elseif (is_array($this->model))
-		{
-			return array_get($this->model, $this->transformKey($name));
-		}
+
+		return $data;
 	}
 
 	/**
