@@ -4,7 +4,6 @@ namespace Illuminate\Console\Scheduling;
 
 use Closure;
 use Carbon\Carbon;
-use LogicException;
 use Cron\CronExpression;
 use GuzzleHttp\Client as HttpClient;
 use Illuminate\Contracts\Mail\Mailer;
