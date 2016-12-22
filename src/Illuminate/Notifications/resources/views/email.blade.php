@@ -15,8 +15,7 @@
     </style>
 </head>
 
-<?php
-
+@php
 $style = [
     /* Layout ------------------------------ */
 
@@ -58,9 +57,9 @@ $style = [
     'button--red' => 'background-color: #dc4d2f;',
     'button--blue' => 'background-color: #3869D4;',
 ];
-?>
+@endphp
 
-<?php $fontFamily = 'font-family: Arial, \'Helvetica Neue\', Helvetica, sans-serif;'; ?>
+@php $fontFamily = 'font-family: Arial, \'Helvetica Neue\', Helvetica, sans-serif;'; @endphp
 
 <body style="{{ $style['body'] }}">
     <table width="100%" cellpadding="0" cellspacing="0">
@@ -107,7 +106,7 @@ $style = [
                                             <table style="{{ $style['body_action'] }}" align="center" width="100%" cellpadding="0" cellspacing="0">
                                                 <tr>
                                                     <td align="center">
-                                                        <?php
+                                                        @php
                                                             switch ($level) {
                                                                 case 'success':
                                                                     $actionColor = 'button--green';
@@ -118,7 +117,7 @@ $style = [
                                                                 default:
                                                                     $actionColor = 'button--blue';
                                                             }
-                                                        ?>
+                                                        @endphp
 
                                                         <a href="{{ $actionUrl }}"
                                                             style="{{ $fontFamily }} {{ $style['button'] }} {{ $style[$actionColor] }}"
