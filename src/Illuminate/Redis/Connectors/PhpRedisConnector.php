@@ -16,7 +16,7 @@ class PhpRedisConnector
      * @param  array  $config
      * @param  array  $clusterOptions
      * @param  array  $options
-     * @return \Illuminate\Redis\PredisConnection
+     * @return \Illuminate\Redis\PhpRedisConnection
      */
     public function connect(array $config, array $options)
     {
@@ -31,7 +31,7 @@ class PhpRedisConnector
      * @param  array  $config
      * @param  array  $clusterOptions
      * @param  array  $options
-     * @return \Illuminate\Redis\PredisClusterConnection
+     * @return \Illuminate\Redis\PhpRedisClusterConnection
      */
     public function connectToCluster(array $config, array $clusterOptions, array $options)
     {

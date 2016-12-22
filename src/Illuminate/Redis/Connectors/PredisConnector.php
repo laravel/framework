@@ -34,8 +34,10 @@ class PredisConnector
      */
     public function connectToCluster(array $config, array $clusterOptions, array $options)
     {
+        $clusterSpecificOptions = Arr::pull($config, 'options', []);
+
         return new PredisClusterConnection(new Client(array_values($config), array_merge(
-            $options, $clusterOptions, Arr::pull($config, 'options', [])
+            $options, $clusterOptions, $clusterSpecificOptions
         )));
     }
 }
