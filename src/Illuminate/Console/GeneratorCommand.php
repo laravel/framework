@@ -49,21 +49,59 @@ abstract class GeneratorCommand extends Command
      */
     public function fire()
     {
-        $name = $this->parseName($this->getNameInput());
+        $name = $this->qualifyClass($this->getNameInput());
 
         $path = $this->getPath($name);
 
+        // First we will check to see if the class already exists. If it does, we don't want
+        // to create the class and overwrite the user's code. So, we will bail out so the
+        // code is untouched. Otherwise, we will continue generating this class' files.
         if ($this->alreadyExists($this->getNameInput())) {
             $this->error($this->type.' already exists!');
 
             return false;
         }
 
+        // Next, we will generate the path to the location where this class' file should get
+        // written. Then, we will build the class and make the proper replacements on the
+        // stub files so that it gets the correctly formatted namespace and class name.
         $this->makeDirectory($path);
 
         $this->files->put($path, $this->buildClass($name));
 
         $this->info($this->type.' created successfully.');
+    }
+
+    /**
+     * Parse the class name and format according to the root namespace.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function qualifyClass($name)
+    {
+        $rootNamespace = $this->rootNamespace();
+
+        if (Str::startsWith($name, $rootNamespace)) {
+            return $name;
+        }
+
+        $name = str_replace('/', '\\', $name);
+
+        return $this->qualifyClass(
+            $this->getDefaultNamespace(trim($rootNamespace, '\\')).'\\'.$name
+        );
+    }
+
+    /**
+     * Get the default namespace for the class.
+     *
+     * @param  string  $rootNamespace
+     * @return string
+     */
+    protected function getDefaultNamespace($rootNamespace)
+    {
+        return $rootNamespace;
     }
 
     /**
@@ -74,9 +112,7 @@ abstract class GeneratorCommand extends Command
      */
     protected function alreadyExists($rawName)
     {
-        $name = $this->parseName($rawName);
-
-        return $this->files->exists($this->getPath($name));
+        return $this->files->exists($this->getPath($this->qualifyClass($rawName)));
     }
 
     /**
@@ -93,38 +129,6 @@ abstract class GeneratorCommand extends Command
     }
 
     /**
-     * Parse the name and format according to the root namespace.
-     *
-     * @param  string  $name
-     * @return string
-     */
-    protected function parseName($name)
-    {
-        $rootNamespace = $this->rootNamespace();
-
-        if (Str::startsWith($name, $rootNamespace)) {
-            return $name;
-        }
-
-        if (Str::contains($name, '/')) {
-            $name = str_replace('/', '\\', $name);
-        }
-
-        return $this->parseName($this->getDefaultNamespace(trim($rootNamespace, '\\')).'\\'.$name);
-    }
-
-    /**
-     * Get the default namespace for the class.
-     *
-     * @param  string  $rootNamespace
-     * @return string
-     */
-    protected function getDefaultNamespace($rootNamespace)
-    {
-        return $rootNamespace;
-    }
-
-    /**
      * Build the directory for the class if necessary.
      *
      * @param  string  $path
@@ -135,6 +139,8 @@ abstract class GeneratorCommand extends Command
         if (! $this->files->isDirectory(dirname($path))) {
             $this->files->makeDirectory(dirname($path), 0777, true, true);
         }
+
+        return $path;
     }
 
     /**
@@ -160,18 +166,16 @@ abstract class GeneratorCommand extends Command
     protected function replaceNamespace(&$stub, $name)
     {
         $stub = str_replace(
-            'DummyNamespace', $this->getNamespace($name), $stub
-        );
-
-        $stub = str_replace(
-            'DummyRootNamespace', $this->rootNamespace(), $stub
+            ['DummyNamespace', 'DummyRootNamespace'],
+            [$this->getNamespace($name), $this->rootNamespace()],
+            $stub
         );
 
         return $this;
     }
 
     /**
-     * Get the full namespace name for a given class.
+     * Get the full namespace for a given class, without the class name.
      *
      * @param  string  $name
      * @return string
