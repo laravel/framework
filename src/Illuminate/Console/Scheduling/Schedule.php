@@ -106,16 +106,6 @@ class Schedule
     }
 
     /**
-     * Get all of the events on the schedule.
-     *
-     * @return array
-     */
-    public function events()
-    {
-        return $this->events;
-    }
-
-    /**
      * Get all of the events on the schedule that are due.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
@@ -123,8 +113,16 @@ class Schedule
      */
     public function dueEvents($app)
     {
-        return array_filter($this->events, function ($event) use ($app) {
-            return $event->isDue($app);
-        });
+        return collect($this->events)->filter->isDue($app);
+    }
+
+    /**
+     * Get all of the events on the schedule.
+     *
+     * @return array
+     */
+    public function events()
+    {
+        return $this->events;
     }
 }

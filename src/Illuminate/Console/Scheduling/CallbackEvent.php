@@ -44,7 +44,7 @@ class CallbackEvent extends Event
     {
         if (! is_string($callback) && ! is_callable($callback)) {
             throw new InvalidArgumentException(
-                'Invalid scheduled callback event. Must be string or callable.'
+                'Invalid scheduled callback event. Must be a string or callable.'
             );
         }
 

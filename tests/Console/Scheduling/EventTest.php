@@ -52,15 +52,4 @@ class EventTest extends PHPUnit_Framework_TestCase
         $event->appendOutputTo('/dev/null');
         $this->assertSame("php -i >> {$quote}/dev/null{$quote} 2>&1", $event->buildCommand());
     }
-
-    /**
-     * @expectedException LogicException
-     */
-    public function testEmailOutputToThrowsExceptionIfOutputFileWasNotSpecified()
-    {
-        $event = new Event(m::mock('Illuminate\Contracts\Cache\Repository'), 'php -i');
-        $event->emailOutputTo('foo@example.com');
-
-        $event->buildCommand();
-    }
 }

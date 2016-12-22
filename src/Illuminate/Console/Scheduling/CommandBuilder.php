@@ -32,7 +32,9 @@ class CommandBuilder
     {
         $output = ProcessUtils::escapeArgument($event->output);
 
-        return $this->finalize($event, $event->command.($event->shouldAppendOutput ? ' >> ' : ' > ').$output.' 2>&1');
+        return $this->ensureCorrectUser(
+            $event, $event->command.($event->shouldAppendOutput ? ' >> ' : ' > ').$output.' 2>&1'
+        );
     }
 
     /**
@@ -49,20 +51,20 @@ class CommandBuilder
 
         $finished = Application::formatCommandString('schedule:finish').' "'.$event->mutexName().'"';
 
-        return $this->finalize($event,
+        return $this->ensureCorrectUser($event,
             '('.$event->command.$redirect.$output.' 2>&1 '.(windows_os() ? '&' : ';').' '.$finished.') > '
             .ProcessUtils::escapeArgument($event->getDefaultOutput()).' 2>&1 &'
         );
     }
 
     /**
-     * Finalize the event's command syntax.
+     * Finalize the event's command syntax with the correct user.
      *
      * @param  \Illuminate\Console\Scheduling\Event  $event
      * @param  string  $command
      * @return string
      */
-    protected function finalize(Event $event, $command)
+    protected function ensureCorrectUser(Event $event, $command)
     {
         return $event->user && ! windows_os() ? 'sudo -u '.$event->user.' -- sh -c \''.$command.'\'' : $command;
     }
