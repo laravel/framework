@@ -12,15 +12,18 @@ use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Routing\BindingRegistrar;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 use Illuminate\Contracts\Routing\Registrar as RegistrarContract;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
-class Router implements RegistrarContract
+class Router implements RegistrarContract, BindingRegistrar
 {
-    use Macroable;
+    use Macroable {
+        __call as macroCall;
+    }
 
     /**
      * The event dispatcher instance.
@@ -317,19 +320,36 @@ class Router implements RegistrarContract
      * Create a route group with shared attributes.
      *
      * @param  array  $attributes
-     * @param  \Closure  $callback
+     * @param  \Closure|string  $routes
      * @return void
      */
-    public function group(array $attributes, Closure $callback)
+    public function group(array $attributes, $routes)
     {
         $this->updateGroupStack($attributes);
 
-        // Once we have updated the group stack, we will execute the user Closure and
-        // merge in the groups attributes when the route is created. After we have
-        // run the callback, we will pop the attributes off of this group stack.
-        call_user_func($callback, $this);
+        // Once we have updated the group stack, we'll load the provided routes and
+        // merge in the group's attributes when the routes are created. After we
+        // have created the routes, we will pop the attributes off the stack.
+        $this->loadRoutes($routes);
 
         array_pop($this->groupStack);
+    }
+
+    /**
+     * Load the provided routes.
+     *
+     * @param  \Closure|string  $routes
+     * @return void
+     */
+    protected function loadRoutes($routes)
+    {
+        if ($routes instanceof Closure) {
+            $routes($this);
+        } else {
+            $router = $this;
+
+            require $routes;
+        }
     }
 
     /**
@@ -650,7 +670,7 @@ class Router implements RegistrarContract
                         ->through($middleware)
                         ->then(function ($request) use ($route) {
                             return $this->prepareResponse(
-                                $request, $route->run($request)
+                                $request, $route->run()
                             );
                         });
     }
@@ -856,7 +876,7 @@ class Router implements RegistrarContract
      * @param  string  $class
      * @return $this
      */
-    public function middleware($name, $class)
+    public function aliasMiddleware($name, $class)
     {
         $this->middleware[$name] = $class;
 
@@ -964,6 +984,19 @@ class Router implements RegistrarContract
         }
 
         $this->binders[str_replace('-', '_', $key)] = $binder;
+    }
+
+    /**
+     * Get the binding callback for a given binding.
+     *
+     * @param  string  $key
+     * @return \Closure|null
+     */
+    public function getBindingCallback($key)
+    {
+        if (isset($this->binders[$key = str_replace('-', '_', $key)])) {
+            return $this->binders[$key];
+        }
     }
 
     /**
@@ -1219,5 +1252,21 @@ class Router implements RegistrarContract
     public function getPatterns()
     {
         return $this->patterns;
+    }
+
+    /**
+     * Dynamically handle calls into the router instance.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
+        }
+
+        return (new RouteRegistrar($this))->attribute($method, $parameters[0]);
     }
 }

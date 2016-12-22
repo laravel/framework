@@ -18,7 +18,7 @@ use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
 use Illuminate\Contracts\Container\Container;
 use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\Translation\TranslatorInterface;
+use Illuminate\Contracts\Translation\Translator;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 
@@ -27,7 +27,7 @@ class Validator implements ValidatorContract
     /**
      * The Translator implementation.
      *
-     * @var \Symfony\Component\Translation\TranslatorInterface
+     * @var \Illuminate\Contracts\Translation\Translator
      */
     protected $translator;
 
@@ -184,21 +184,21 @@ class Validator implements ValidatorContract
     /**
      * Create a new Validator instance.
      *
-     * @param  \Symfony\Component\Translation\TranslatorInterface  $translator
+     * @param  \Illuminate\Contracts\Translation\Translator  $translator
      * @param  array  $data
      * @param  array  $rules
      * @param  array  $messages
      * @param  array  $customAttributes
      * @return void
      */
-    public function __construct(TranslatorInterface $translator, array $data, array $rules,
+    public function __construct(Translator $translator, array $data, array $rules,
                                 array $messages = [], array $customAttributes = [])
     {
         $this->initialRules = $rules;
         $this->translator = $translator;
         $this->customMessages = $messages;
-        $this->customAttributes = $customAttributes;
         $this->data = $this->parseData($data);
+        $this->customAttributes = $customAttributes;
 
         $this->setRules($rules);
     }
@@ -1557,6 +1557,30 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Validate that an attribute is a valid IPv4.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @return bool
+     */
+    protected function validateIpv4($attribute, $value)
+    {
+        return filter_var($value, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false;
+    }
+
+    /**
+     * Validate that an attribute is a valid IPv6.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @return bool
+     */
+    protected function validateIpv6($attribute, $value)
+    {
+        return filter_var($value, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false;
+    }
+
+    /**
      * Validate that an attribute is a valid e-mail address.
      *
      * @param  string  $attribute
@@ -1841,9 +1865,9 @@ class Validator implements ValidatorContract
             return false;
         }
 
-        $parsed = date_parse_from_format($parameters[0], $value);
+        $date = DateTime::createFromFormat($parameters[0], $value);
 
-        return $parsed['error_count'] === 0 && $parsed['warning_count'] === 0;
+        return $date && $date->format($parameters[0]) == $value;
     }
 
     /**
@@ -3095,7 +3119,7 @@ class Validator implements ValidatorContract
     /**
      * Get the Translator implementation.
      *
-     * @return \Symfony\Component\Translation\TranslatorInterface
+     * @return \Illuminate\Contracts\Translation\Translator
      */
     public function getTranslator()
     {
@@ -3105,10 +3129,10 @@ class Validator implements ValidatorContract
     /**
      * Set the Translator implementation.
      *
-     * @param  \Symfony\Component\Translation\TranslatorInterface  $translator
+     * @param  \Illuminate\Contracts\Translation\Translator  $translator
      * @return void
      */
-    public function setTranslator(TranslatorInterface $translator)
+    public function setTranslator(Translator $translator)
     {
         $this->translator = $translator;
     }

@@ -40,14 +40,14 @@ class HttpJsonResponseTest extends PHPUnit_Framework_TestCase
     public function testSetAndRetrieveOptions()
     {
         $response = new Illuminate\Http\JsonResponse(['foo' => 'bar']);
-        $response->setJsonOptions(JSON_PRETTY_PRINT);
-        $this->assertSame(JSON_PRETTY_PRINT, $response->getJsonOptions());
+        $response->setEncodingOptions(JSON_PRETTY_PRINT);
+        $this->assertSame(JSON_PRETTY_PRINT, $response->getEncodingOptions());
     }
 
     public function testSetAndRetrieveDefaultOptions()
     {
         $response = new Illuminate\Http\JsonResponse(['foo' => 'bar']);
-        $this->assertSame(0, $response->getJsonOptions());
+        $this->assertSame(0, $response->getEncodingOptions());
     }
 
     public function testSetAndRetrieveStatusCode()

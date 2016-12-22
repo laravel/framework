@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing;
 
+use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -28,6 +29,13 @@ class UrlGenerator implements UrlGeneratorContract
      * @var \Illuminate\Http\Request
      */
     protected $request;
+
+    /**
+     * The named parameter defaults.
+     *
+     * @var array
+     */
+    protected $defaultParameters = [];
 
     /**
      * The forced URL root.
@@ -70,6 +78,20 @@ class UrlGenerator implements UrlGeneratorContract
      * @var callable
      */
     protected $sessionResolver;
+
+    /**
+     * The callback to use to format hosts.
+     *
+     * @var \Closure
+     */
+    protected $formatHostUsing;
+
+    /**
+     * The callback to use to format paths.
+     *
+     * @var \Closure
+     */
+    protected $formatPathUsing;
 
     /**
      * Characters that should not be URL encoded.
@@ -185,7 +207,7 @@ class UrlGenerator implements UrlGeneratorContract
             $query = '';
         }
 
-        return $this->trimUrl($root, $path, $tail).$query;
+        return $this->buildCompleteUrl($root, $path, $tail).$query;
     }
 
     /**
@@ -330,7 +352,7 @@ class UrlGenerator implements UrlGeneratorContract
 
         $domain = $this->getRouteDomain($route, $parameters);
 
-        $uri = $this->addQueryString($this->trimUrl(
+        $uri = $this->addQueryString($this->buildCompleteUrl(
             $root = $this->replaceRoot($route, $domain, $parameters),
             $this->replaceRouteParameters($route->uri(), $parameters)
         ), $parameters);
@@ -389,7 +411,13 @@ class UrlGenerator implements UrlGeneratorContract
     protected function replaceNamedParameters($path, &$parameters)
     {
         return preg_replace_callback('/\{(.*?)\??\}/', function ($m) use (&$parameters) {
-            return isset($parameters[$m[1]]) ? Arr::pull($parameters, $m[1]) : $m[0];
+            if (isset($parameters[$m[1]])) {
+                return Arr::pull($parameters, $m[1]);
+            } elseif (isset($this->defaultParameters[$m[1]])) {
+                return $this->defaultParameters[$m[1]];
+            } else {
+                return $m[0];
+            }
         }, $path);
     }
 
@@ -402,7 +430,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     protected function addQueryString($uri, array $parameters)
     {
-        // If the URI has a fragment, we will move it to the end of this URI since it will
+        // If the URI has a fragment we will move it to the end of this URI since it will
         // need to come after any query string that may be added to the URL else it is
         // not going to be available. We will remove it then append it back on here.
         if (! is_null($fragment = parse_url($uri, PHP_URL_FRAGMENT))) {
@@ -636,6 +664,7 @@ class UrlGenerator implements UrlGeneratorContract
     public function forceRootUrl($root)
     {
         $this->forcedRoot = rtrim($root, '/');
+
         $this->cachedRoot = null;
     }
 
@@ -662,9 +691,70 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  string  $tail
      * @return string
      */
-    protected function trimUrl($root, $path, $tail = '')
+    protected function buildCompleteUrl($root, $path, $tail = '')
     {
-        return trim($root.'/'.trim($path.'/'.$tail, '/'), '/');
+        $path = '/'.trim($path.'/'.$tail, '/');
+
+        if ($this->formatHostUsing) {
+            $root = call_user_func($this->formatHostUsing, $root);
+        }
+
+        if ($this->formatPathUsing) {
+            $path = call_user_func($this->formatPathUsing, $path);
+        }
+
+        return trim($root.$path, '/');
+    }
+
+    /**
+     * Set the default named parameters used by the URL generator.
+     *
+     * @param  array  $defaults
+     * @return void
+     */
+    public function defaults(array $defaults)
+    {
+        $this->defaultParameters = array_merge(
+            $this->defaultParameters, $defaults
+        );
+    }
+
+    /**
+     * Set a callback to be used to format the host of generated URLs.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function formatHostUsing(Closure $callback)
+    {
+        $this->formatHostUsing = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Set a callback to be used to format the path of generated URLs.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function formatPathUsing(Closure $callback)
+    {
+        $this->formatPathUsing = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Get the path formatter being used by the URL generator.
+     *
+     * @return \Closure
+     */
+    public function pathFormatter()
+    {
+        return $this->formatPathUsing ?: function ($path) {
+            return $path;
+        };
     }
 
     /**

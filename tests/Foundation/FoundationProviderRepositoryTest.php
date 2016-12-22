@@ -17,9 +17,8 @@ class FoundationProviderRepositoryTest extends PHPUnit_Framework_TestCase
         $repo->shouldReceive('loadManifest')->once()->andReturn(['eager' => ['foo'], 'deferred' => ['deferred'], 'providers' => ['providers'], 'when' => []]);
         $repo->shouldReceive('shouldRecompile')->once()->andReturn(false);
         $provider = m::mock('Illuminate\Support\ServiceProvider');
-        $repo->shouldReceive('createProvider')->once()->with('foo')->andReturn($provider);
 
-        $app->shouldReceive('register')->once()->with($provider);
+        $app->shouldReceive('register')->once()->with('foo');
         $app->shouldReceive('runningInConsole')->andReturn(false);
         $app->shouldReceive('addDeferredServices')->once()->with(['deferred']);
 
@@ -48,10 +47,7 @@ class FoundationProviderRepositoryTest extends PHPUnit_Framework_TestCase
             return $manifest;
         });
 
-        // bar mock should be registered with the application since it's eager
-        $repo->shouldReceive('createProvider')->once()->with('bar')->andReturn($barMock);
-
-        $app->shouldReceive('register')->once()->with($barMock);
+        $app->shouldReceive('register')->once()->with('bar');
         $app->shouldReceive('runningInConsole')->andReturn(false);
         $app->shouldReceive('addDeferredServices')->once()->with(['foo.provides1' => 'foo', 'foo.provides2' => 'foo']);
 

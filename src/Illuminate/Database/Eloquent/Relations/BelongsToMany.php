@@ -76,6 +76,13 @@ class BelongsToMany extends Relation
     protected $pivotUpdatedAt;
 
     /**
+     * The class name of the custom pivot model to use for the relationship.
+     *
+     * @var string
+     */
+    protected $using;
+
+    /**
      * The count of self joins.
      *
      * @var int
@@ -101,6 +108,19 @@ class BelongsToMany extends Relation
         $this->relationName = $relationName;
 
         parent::__construct($query, $parent);
+    }
+
+    /**
+     * Specify the custom pivot model to use for the relationship.
+     *
+     * @param  string  $class
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function using($class)
+    {
+        $this->using = $class;
+
+        return $this;
     }
 
     /**
@@ -1155,7 +1175,7 @@ class BelongsToMany extends Relation
      * @param  bool  $touch
      * @return int
      */
-    public function detach($ids = [], $touch = true)
+    public function detach($ids = null, $touch = true)
     {
         if ($ids instanceof Model) {
             $ids = $ids->getKey();
@@ -1170,10 +1190,12 @@ class BelongsToMany extends Relation
         // If associated IDs were passed to the method we will only delete those
         // associations, otherwise all of the association ties will be broken.
         // We'll return the numbers of affected rows when we do the deletes.
-        $ids = (array) $ids;
+        if (! is_null($ids)) {
+            if (count($ids) === 0) {
+                return 0;
+            }
 
-        if (count($ids) > 0) {
-            $query->whereIn($this->otherKey, $ids);
+            $query->whereIn($this->otherKey, (array) $ids);
         }
 
         // Once we have all of the conditions set on the statement, we are ready
@@ -1274,7 +1296,7 @@ class BelongsToMany extends Relation
      */
     public function newPivot(array $attributes = [], $exists = false)
     {
-        $pivot = $this->related->newPivot($this->parent, $attributes, $this->table, $exists);
+        $pivot = $this->related->newPivot($this->parent, $attributes, $this->table, $exists, $this->using);
 
         return $pivot->setPivotKeys($this->foreignKey, $this->otherKey);
     }

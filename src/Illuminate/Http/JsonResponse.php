@@ -42,7 +42,7 @@ class JsonResponse extends BaseJsonResponse
      * Get the json_decoded data from the response.
      *
      * @param  bool  $assoc
-     * @param  int   $depth
+     * @param  int  $depth
      * @return mixed
      */
     public function getData($assoc = false, $depth = 512)
@@ -73,30 +73,9 @@ class JsonResponse extends BaseJsonResponse
     }
 
     /**
-     * Get the JSON encoding options.
-     *
-     * @return int
-     */
-    public function getJsonOptions()
-    {
-        return $this->getEncodingOptions();
-    }
-
-    /**
      * {@inheritdoc}
      */
-    public function setEncodingOptions($encodingOptions)
-    {
-        return $this->setJsonOptions($encodingOptions);
-    }
-
-    /**
-     * Set the JSON encoding options.
-     *
-     * @param  int  $options
-     * @return mixed
-     */
-    public function setJsonOptions($options)
+    public function setEncodingOptions($options)
     {
         $this->encodingOptions = (int) $options;
 

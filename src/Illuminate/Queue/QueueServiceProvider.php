@@ -3,13 +3,11 @@
 namespace Illuminate\Queue;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Queue\Console\WorkCommand;
-use Illuminate\Queue\Console\ListenCommand;
-use Illuminate\Queue\Console\RestartCommand;
 use Illuminate\Queue\Connectors\SqsConnector;
 use Illuminate\Queue\Connectors\NullConnector;
 use Illuminate\Queue\Connectors\SyncConnector;
 use Illuminate\Queue\Connectors\RedisConnector;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Queue\Connectors\DatabaseConnector;
 use Illuminate\Queue\Failed\NullFailedJobProvider;
 use Illuminate\Queue\Connectors\BeanstalkdConnector;
@@ -70,30 +68,11 @@ class QueueServiceProvider extends ServiceProvider
      */
     protected function registerWorker()
     {
-        $this->registerWorkCommand();
-
-        $this->registerRestartCommand();
-
         $this->app->singleton('queue.worker', function ($app) {
             return new Worker(
-                $app['queue'], $app['events'],
-                $app['Illuminate\Contracts\Debug\ExceptionHandler']
+                $app['queue'], $app['events'], $app[ExceptionHandler::class]
             );
         });
-    }
-
-    /**
-     * Register the queue worker console command.
-     *
-     * @return void
-     */
-    protected function registerWorkCommand()
-    {
-        $this->app->singleton('command.queue.work', function ($app) {
-            return new WorkCommand($app['queue.worker']);
-        });
-
-        $this->commands('command.queue.work');
     }
 
     /**
@@ -103,39 +82,9 @@ class QueueServiceProvider extends ServiceProvider
      */
     protected function registerListener()
     {
-        $this->registerListenCommand();
-
         $this->app->singleton('queue.listener', function ($app) {
             return new Listener($app->basePath());
         });
-    }
-
-    /**
-     * Register the queue listener console command.
-     *
-     * @return void
-     */
-    protected function registerListenCommand()
-    {
-        $this->app->singleton('command.queue.listen', function ($app) {
-            return new ListenCommand($app['queue.listener']);
-        });
-
-        $this->commands('command.queue.listen');
-    }
-
-    /**
-     * Register the queue restart console command.
-     *
-     * @return void
-     */
-    public function registerRestartCommand()
-    {
-        $this->app->singleton('command.queue.restart', function () {
-            return new RestartCommand;
-        });
-
-        $this->commands('command.queue.restart');
     }
 
     /**
@@ -257,9 +206,8 @@ class QueueServiceProvider extends ServiceProvider
     public function provides()
     {
         return [
-            'queue', 'queue.worker', 'queue.listener', 'queue.failer',
-            'command.queue.work', 'command.queue.listen',
-            'command.queue.restart', 'queue.connection',
+            'queue', 'queue.worker', 'queue.listener',
+            'queue.failer', 'queue.connection',
         ];
     }
 }

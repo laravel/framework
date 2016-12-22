@@ -3,6 +3,12 @@
 namespace Illuminate\Support\Facades;
 
 /**
+ * @method static int handle(\Symfony\Component\Console\Input\InputInterface $input, \Symfony\Component\Console\Output\OutputInterface $output = null)
+ * @method static int call(string $command, array $parameters = [])
+ * @method static int queue(string $command, array $parameters = [])
+ * @method static array all()
+ * @method static string output()
+ *
  * @see \Illuminate\Contracts\Console\Kernel
  */
 class Artisan extends Facade

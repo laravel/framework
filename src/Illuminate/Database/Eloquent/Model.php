@@ -168,6 +168,15 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected $touches = [];
 
     /**
+     * The event map for the model.
+     *
+     * Allows for object-based events for native Eloquent events.
+     *
+     * @var array
+     */
+    protected $events = [];
+
+    /**
      * User exposed observable events.
      *
      * @var array
@@ -721,6 +730,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $instance = new $related;
 
+        if (! $instance->getConnectionName()) {
+            $instance->setConnection($this->connection);
+        }
+
         $localKey = $localKey ?: $this->getKeyName();
 
         return new HasOne($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey);
@@ -739,6 +752,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function morphOne($related, $name, $type = null, $id = null, $localKey = null)
     {
         $instance = new $related;
+
+        if (! $instance->getConnectionName()) {
+            $instance->setConnection($this->connection);
+        }
 
         list($type, $id) = $this->getMorphs($name, $type, $id);
 
@@ -769,14 +786,18 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $relation = $caller['function'];
         }
 
+        $instance = new $related;
+
         // If no foreign key was supplied, we can use a backtrace to guess the proper
         // foreign key name by using the name of the relationship function, which
         // when combined with an "_id" should conventionally match the columns.
         if (is_null($foreignKey)) {
-            $foreignKey = Str::snake($relation).'_id';
+            $foreignKey = Str::snake($relation).'_'.$instance->getKeyName();
         }
 
-        $instance = new $related;
+        if (! $instance->getConnectionName()) {
+            $instance->setConnection($this->connection);
+        }
 
         // Once we have the foreign key names, we'll just create a new Eloquent query
         // for the related models and returns the relationship instance which will
@@ -826,6 +847,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
             $instance = new $class;
 
+            if (! $instance->getConnectionName()) {
+                $instance->setConnection($this->connection);
+            }
+
             return new MorphTo(
                 $instance->newQuery(), $this, $id, $instance->getKeyName(), $type, $name
             );
@@ -857,6 +882,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $instance = new $related;
 
+        if (! $instance->getConnectionName()) {
+            $instance->setConnection($this->connection);
+        }
+
         $localKey = $localKey ?: $this->getKeyName();
 
         return new HasMany($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey);
@@ -882,7 +911,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $localKey = $localKey ?: $this->getKeyName();
 
-        return new HasManyThrough((new $related)->newQuery(), $this, $through, $firstKey, $secondKey, $localKey);
+        $instance = new $related;
+
+        if (! $instance->getConnectionName()) {
+            $instance->setConnection($this->connection);
+        }
+
+        return new HasManyThrough($instance->newQuery(), $this, $through, $firstKey, $secondKey, $localKey);
     }
 
     /**
@@ -898,6 +933,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function morphMany($related, $name, $type = null, $id = null, $localKey = null)
     {
         $instance = new $related;
+
+        if (! $instance->getConnectionName()) {
+            $instance->setConnection($this->connection);
+        }
 
         // Here we will gather up the morph type and ID for the relationship so that we
         // can properly query the intermediate table of a relation. Finally, we will
@@ -937,6 +976,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $instance = new $related;
 
+        if (! $instance->getConnectionName()) {
+            $instance->setConnection($this->connection);
+        }
+
         $otherKey = $otherKey ?: $instance->getForeignKey();
 
         // If no table name was provided, we can guess it by concatenating the two
@@ -975,6 +1018,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $foreignKey = $foreignKey ?: $name.'_id';
 
         $instance = new $related;
+
+        if (! $instance->getConnectionName()) {
+            $instance->setConnection($this->connection);
+        }
 
         $otherKey = $otherKey ?: $instance->getForeignKey();
 
@@ -1657,12 +1704,25 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return true;
         }
 
+        $method = $halt ? 'until' : 'fire';
+
+        // If a custom event type has been configured for this event we'll fire that
+        // instead of the string version of the event. This provides for a custom
+        // "object-based" event more consistent with the rest of the framework.
+        if (isset($this->events[$event])) {
+            $result = static::$dispatcher->$method(
+                new $this->events[$event]($this)
+            );
+
+            if (! is_null($result)) {
+                return $result;
+            }
+        }
+
         // We will append the names of the class to the event to distinguish it from
         // other model events that are fired, allowing us to listen on each model
         // event set individually instead of catching event for all the models.
         $event = "eloquent.{$event}: ".static::class;
-
-        $method = $halt ? 'until' : 'fire';
 
         return static::$dispatcher->$method($event, $this);
     }
@@ -1883,10 +1943,15 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  array  $attributes
      * @param  string  $table
      * @param  bool  $exists
+     * @param  string|null  $using
      * @return \Illuminate\Database\Eloquent\Relations\Pivot
      */
-    public function newPivot(Model $parent, array $attributes, $table, $exists)
+    public function newPivot(Model $parent, array $attributes, $table, $exists, $using = null)
     {
+        if ($using) {
+            return new $using($parent, $attributes, $table, $exists);
+        }
+
         return new Pivot($parent, $attributes, $table, $exists);
     }
 
@@ -2075,7 +2140,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function getForeignKey()
     {
-        return Str::snake(class_basename($this)).'_id';
+        return Str::snake(class_basename($this)).'_'.$this->primaryKey;
     }
 
     /**
@@ -2408,10 +2473,18 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @param  int  $options
      * @return string
+     *
+     * @throws JsonEncodingException
      */
     public function toJson($options = 0)
     {
-        return json_encode($this->jsonSerialize(), $options);
+        $json = json_encode($this->jsonSerialize(), $options);
+
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            throw JsonEncodingException::forModel($this, json_last_error_msg());
+        }
+
+        return $json;
     }
 
     /**
@@ -2777,7 +2850,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         if ($this->getIncrementing()) {
             return array_merge([
-                $this->getKeyName() => $this->keyType,
+                $this->getKeyName() => $this->getKeyType(),
             ], $this->casts);
         }
 
@@ -2851,6 +2924,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             case 'collection':
                 return new BaseCollection($this->fromJson($value));
             case 'date':
+                return $this->asDate($value);
             case 'datetime':
                 return $this->asDateTime($value);
             case 'timestamp':
@@ -2957,6 +3031,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $value = $this->asDateTime($value);
 
         return $value->format($format);
+    }
+
+    /**
+     * Return a timestamp as DateTime object with time set to 00:00:00.
+     *
+     * @param  mixed  $value
+     * @return \Carbon\Carbon
+     */
+    protected function asDate($value)
+    {
+        return $this->asDateTime($value)->startOfDay();
     }
 
     /**

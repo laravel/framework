@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Log\LogServiceProvider;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Events\EventServiceProvider;
 use Illuminate\Routing\RoutingServiceProvider;
@@ -25,7 +26,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      *
      * @var string
      */
-    const VERSION = '5.3.28';
+    const VERSION = '5.4.0-Dev';
 
     /**
      * The base path for the Laravel installation.
@@ -140,15 +141,15 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function __construct($basePath = null)
     {
+        if ($basePath) {
+            $this->setBasePath($basePath);
+        }
+
         $this->registerBaseBindings();
 
         $this->registerBaseServiceProviders();
 
         $this->registerCoreContainerAliases();
-
-        if ($basePath) {
-            $this->setBasePath($basePath);
-        }
     }
 
     /**
@@ -183,6 +184,8 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     protected function registerBaseServiceProviders()
     {
         $this->register(new EventServiceProvider($this));
+
+        $this->register(new LogServiceProvider($this));
 
         $this->register(new RoutingServiceProvider($this));
     }
@@ -534,9 +537,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function registerConfiguredProviders()
     {
-        $manifestPath = $this->getCachedServicesPath();
-
-        (new ProviderRepository($this, new Filesystem, $manifestPath))
+        (new ProviderRepository($this, new Filesystem, $this->getCachedServicesPath()))
                     ->load($this->config['app.providers']);
     }
 
@@ -558,18 +559,11 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         // application instance automatically for the developer. This is simply
         // a more convenient way of specifying your service provider classes.
         if (is_string($provider)) {
-            $provider = $this->resolveProviderClass($provider);
+            $provider = $this->resolveProvider($provider);
         }
 
         if (method_exists($provider, 'register')) {
             $provider->register();
-        }
-
-        // Once we have registered the service we will iterate through the options
-        // and set each of them on the application so they will be available on
-        // the actual loading of the service objects and for developer usage.
-        foreach ($options as $key => $value) {
-            $this[$key] = $value;
         }
 
         $this->markAsRegistered($provider);
@@ -605,7 +599,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      * @param  string  $provider
      * @return \Illuminate\Support\ServiceProvider
      */
-    public function resolveProviderClass($provider)
+    public function resolveProvider($provider)
     {
         return new $provider($this);
     }
@@ -618,11 +612,9 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     protected function markAsRegistered($provider)
     {
-        $this['events']->fire($class = get_class($provider), [$provider]);
-
         $this->serviceProviders[] = $provider;
 
-        $this->loadedProviders[$class] = true;
+        $this->loadedProviders[get_class($provider)] = true;
     }
 
     /**
@@ -1050,7 +1042,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 
         $this['translator']->setLocale($locale);
 
-        $this['events']->fire('locale.changed', [$locale]);
+        $this['events']->fire(new Events\LocaleUpdated($locale));
     }
 
     /**
@@ -1089,7 +1081,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             'filesystem.disk'      => ['Illuminate\Contracts\Filesystem\Filesystem'],
             'filesystem.cloud'     => ['Illuminate\Contracts\Filesystem\Cloud'],
             'hash'                 => ['Illuminate\Contracts\Hashing\Hasher'],
-            'translator'           => ['Illuminate\Translation\Translator', 'Symfony\Component\Translation\TranslatorInterface'],
+            'translator'           => ['Illuminate\Translation\Translator', 'Illuminate\Contracts\Translation\Translator'],
             'log'                  => ['Illuminate\Log\Writer', 'Illuminate\Contracts\Logging\Log', 'Psr\Log\LoggerInterface'],
             'mailer'               => ['Illuminate\Mail\Mailer', 'Illuminate\Contracts\Mail\Mailer', 'Illuminate\Contracts\Mail\MailQueue'],
             'auth.password'        => ['Illuminate\Auth\Passwords\PasswordBrokerManager', 'Illuminate\Contracts\Auth\PasswordBrokerFactory'],
@@ -1100,7 +1092,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             'redirect'             => ['Illuminate\Routing\Redirector'],
             'redis'                => ['Illuminate\Redis\Database', 'Illuminate\Contracts\Redis\Database'],
             'request'              => ['Illuminate\Http\Request', 'Symfony\Component\HttpFoundation\Request'],
-            'router'               => ['Illuminate\Routing\Router', 'Illuminate\Contracts\Routing\Registrar'],
+            'router'               => ['Illuminate\Routing\Router', 'Illuminate\Contracts\Routing\Registrar', 'Illuminate\Contracts\Routing\BindingRegistrar'],
             'session'              => ['Illuminate\Session\SessionManager'],
             'session.store'        => ['Illuminate\Session\Store', 'Symfony\Component\HttpFoundation\Session\SessionInterface'],
             'url'                  => ['Illuminate\Routing\UrlGenerator', 'Illuminate\Contracts\Routing\UrlGenerator'],

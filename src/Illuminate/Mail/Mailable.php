@@ -57,6 +57,13 @@ class Mailable implements MailableContract
     public $subject;
 
     /**
+     * The Markdown template for the message (if applicable).
+     *
+     * @var string
+     */
+    protected $markdown;
+
+    /**
      * The view to use for the message.
      *
      * @var string
@@ -129,15 +136,9 @@ class Mailable implements MailableContract
 
         $queueName = property_exists($this, 'queue') ? $this->queue : null;
 
-        if ($queueName) {
-            return $queue->connection($connection)->pushOn(
-                $queueName, new SendQueuedMailable($this)
-            );
-        } else {
-            return $queue->connection($connection)->push(
-                new SendQueuedMailable($this)
-            );
-        }
+        return $queue->connection($connection)->pushOn(
+            $queueName ?: null, new SendQueuedMailable($this)
+        );
     }
 
     /**
@@ -153,15 +154,9 @@ class Mailable implements MailableContract
 
         $queueName = property_exists($this, 'queue') ? $this->queue : null;
 
-        if ($queueName) {
-            return $queue->connection($connection)->laterOn(
-                $queueName, $delay, new SendQueuedMailable($this)
-            );
-        } else {
-            return $queue->connection($connection)->later(
-                $delay, new SendQueuedMailable($this)
-            );
-        }
+        return $queue->connection($connection)->laterOn(
+            $queueName ?: null, $delay, new SendQueuedMailable($this)
+        );
     }
 
     /**
@@ -171,13 +166,34 @@ class Mailable implements MailableContract
      */
     protected function buildView()
     {
+        if (isset($this->markdown)) {
+            return $this->buildMarkdownView();
+        }
+
         if (isset($this->view, $this->textView)) {
             return [$this->view, $this->textView];
         } elseif (isset($this->textView)) {
             return ['text' => $this->textView];
-        } else {
-            return $this->view;
         }
+
+        return $this->view;
+    }
+
+    /**
+     * Build the Markdown view for the message.
+     *
+     * @return array
+     */
+    protected function buildMarkdownView()
+    {
+        $markdown = Container::getInstance()->make(Markdown::class);
+
+        $data = $this->buildViewData();
+
+        return [
+            'html' => $markdown->render($this->markdown, $data),
+            'text' => $markdown->renderText($this->markdown, $data),
+        ];
     }
 
     /**
@@ -375,11 +391,7 @@ class Mailable implements MailableContract
         }
 
         if ($address instanceof Collection || is_array($address)) {
-            foreach ($address as $user) {
-                $user = $this->parseUser($user);
-
-                $this->{$property}($user->email, isset($user->name) ? $user->name : null);
-            }
+            $this->setArrayOfAddresses($address, $property);
         } else {
             $this->{$property}[] = compact('address', 'name');
         }
@@ -388,12 +400,28 @@ class Mailable implements MailableContract
     }
 
     /**
-     * Parse the given user into an object.
+     * Set an array of message recipients.
+     *
+     * @param  \Illuminate\Support\Collection|array  $users
+     * @param  string  $property
+     * @return void
+     */
+    protected function setArrayOfAddresses($users, $property = 'to')
+    {
+        foreach ($users as $user) {
+            $user = $this->convertUserToObject($user);
+
+            $this->{$property}($user->email, isset($user->name) ? $user->name : null);
+        }
+    }
+
+    /**
+     * Convert the given user into an object.
      *
      * @param  mixed  $user
      * @return object
      */
-    protected function parseUser($user)
+    protected function convertUserToObject($user)
     {
         if (is_array($user)) {
             return (object) $user;
@@ -413,6 +441,21 @@ class Mailable implements MailableContract
     public function subject($subject)
     {
         $this->subject = $subject;
+
+        return $this;
+    }
+
+    /**
+     * Set the Markdown template for the message.
+     *
+     * @param  string  $view
+     * @param  array  $data
+     * @return $this
+     */
+    public function markdown($view, array $data = [])
+    {
+        $this->markdown = $view;
+        $this->viewData = $data;
 
         return $this;
     }

@@ -74,7 +74,7 @@ class TranslationTranslatorTest extends PHPUnit_Framework_TestCase
     {
         $t = $this->getMockBuilder('Illuminate\Translation\Translator')->setMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
         $t->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo(['replace']), $this->equalTo('en'))->will($this->returnValue('line'));
-        $t->setSelector($selector = m::mock('Symfony\Component\Translation\MessageSelector'));
+        $t->setSelector($selector = m::mock('Illuminate\Translation\MessageSelector'));
         $selector->shouldReceive('choose')->once()->with('line', 10, 'en')->andReturn('choiced');
 
         $t->choice('foo', 10, ['replace']);
@@ -84,7 +84,7 @@ class TranslationTranslatorTest extends PHPUnit_Framework_TestCase
     {
         $t = $this->getMockBuilder('Illuminate\Translation\Translator')->setMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
         $t->expects($this->exactly(2))->method('get')->with($this->equalTo('foo'), $this->equalTo(['replace']), $this->equalTo('en'))->will($this->returnValue('line'));
-        $t->setSelector($selector = m::mock('Symfony\Component\Translation\MessageSelector'));
+        $t->setSelector($selector = m::mock('Illuminate\Translation\MessageSelector'));
         $selector->shouldReceive('choose')->twice()->with('line', 3, 'en')->andReturn('choiced');
 
         $values = ['foo', 'bar', 'baz'];
@@ -92,6 +92,66 @@ class TranslationTranslatorTest extends PHPUnit_Framework_TestCase
 
         $values = new Illuminate\Support\Collection(['foo', 'bar', 'baz']);
         $t->choice('foo', $values, ['replace']);
+    }
+
+    public function testGetJsonMethod()
+    {
+        $t = new Illuminate\Translation\Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn(['foo' => 'one']);
+        $this->assertEquals('one', $t->getFromJson('foo'));
+    }
+
+    public function testGetJsonReplaces()
+    {
+        $t = new Illuminate\Translation\Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn(['foo :i:c :u' => 'bar :i:c :u']);
+        $this->assertEquals('bar onetwo three', $t->getFromJson('foo :i:c :u', ['i' => 'one', 'c' => 'two', 'u' => 'three']));
+    }
+
+    public function testGetJsonReplacesForAssociativeInput()
+    {
+        $t = new Illuminate\Translation\Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn(['foo :i :c' => 'bar :i :c']);
+        $this->assertEquals('bar eye see', $t->getFromJson('foo :i :c', ['i' => 'eye', 'c' => 'see']));
+    }
+
+    public function testGetJsonPreservesOrder()
+    {
+        $t = new Illuminate\Translation\Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn(['to :name I give :greeting' => ':greeting :name']);
+        $this->assertEquals('Greetings David', $t->getFromJson('to :name I give :greeting', ['name' => 'David', 'greeting' => 'Greetings']));
+    }
+
+    public function testGetJsonForNonExistingJsonKeyLooksForRegularKeys()
+    {
+        $t = new Illuminate\Translation\Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo', '*')->andReturn(['bar' => 'one']);
+        $this->assertEquals('one', $t->getFromJson('foo.bar'));
+    }
+
+    public function testGetJsonForNonExistingJsonKeyLooksForRegularKeysAndReplace()
+    {
+        $t = new Illuminate\Translation\Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo', '*')->andReturn(['bar' => 'one :message']);
+        $this->assertEquals('one two', $t->getFromJson('foo.bar', ['message' => 'two']));
+    }
+
+    public function testGetJsonForNonExistingReturnsSameKey()
+    {
+        $t = new Illuminate\Translation\Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'Foo that bar', '*')->andReturn([]);
+        $this->assertEquals('Foo that bar', $t->getFromJson('Foo that bar'));
+    }
+
+    public function testGetJsonForNonExistingReturnsSameKeyAndReplaces()
+    {
+        $t = new Illuminate\Translation\Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo :message', '*')->andReturn([]);
+        $this->assertEquals('foo baz', $t->getFromJson('foo :message', ['message' => 'baz']));
     }
 
     protected function getLoader()

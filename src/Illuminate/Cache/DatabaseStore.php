@@ -218,11 +218,11 @@ class DatabaseStore implements Store
     /**
      * Remove all items from the cache.
      *
-     * @return void
+     * @return bool
      */
     public function flush()
     {
-        $this->table()->delete();
+        return (bool) $this->table()->delete();
     }
 
     /**

@@ -7,6 +7,7 @@ use Countable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use Illuminate\Support\HtmlString;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\View\Engines\EngineResolver;
@@ -70,7 +71,11 @@ class Factory implements FactoryContract
      *
      * @var array
      */
-    protected $extensions = ['blade.php' => 'blade', 'php' => 'php'];
+    protected $extensions = [
+        'blade.php' => 'blade',
+        'php' => 'php',
+        'css' => 'file',
+    ];
 
     /**
      * The view composer events.
@@ -94,6 +99,34 @@ class Factory implements FactoryContract
     protected $sectionStack = [];
 
     /**
+     * The components being rendered.
+     *
+     * @var array
+     */
+    protected $componentStack = [];
+
+    /**
+     * The original data passed to the component.
+     *
+     * @var array
+     */
+    protected $componentData = [];
+
+    /**
+     * The slot contents for the component.
+     *
+     * @var array
+     */
+    protected $slots = [];
+
+    /**
+     * The names of the slots being rendered.
+     *
+     * @var array
+     */
+    protected $slotStack = [];
+
+    /**
      * The stack of in-progress loops.
      *
      * @var array
@@ -115,11 +148,25 @@ class Factory implements FactoryContract
     protected $pushStack = [];
 
     /**
+     * The translation replacements for the translation being rendered.
+     *
+     * @var array
+     */
+    protected $translationReplacements = [];
+
+    /**
      * The number of active rendering operations.
      *
      * @var int
      */
     protected $renderCount = 0;
+
+    /**
+     * The parent placeholder for the request.
+     *
+     * @var string
+     */
+    protected static $parentPlaceholder;
 
     /**
      * Create a new view factory instance.
@@ -631,7 +678,7 @@ class Factory implements FactoryContract
     protected function extendSection($section, $content)
     {
         if (isset($this->sections[$section])) {
-            $content = str_replace('@parent', $content, $this->sections[$section]);
+            $content = str_replace(static::parentPlaceholder(), $content, $this->sections[$section]);
         }
 
         $this->sections[$section] = $content;
@@ -655,8 +702,91 @@ class Factory implements FactoryContract
         $sectionContent = str_replace('@@parent', '--parent--holder--', $sectionContent);
 
         return str_replace(
-            '--parent--holder--', '@parent', str_replace('@parent', '', $sectionContent)
+            '--parent--holder--', '@parent', str_replace(static::parentPlaceholder(), '', $sectionContent)
         );
+    }
+
+    /**
+     * Get the parent placeholder for the current request.
+     *
+     * @return string
+     */
+    public static function parentPlaceholder()
+    {
+        if (! static::$parentPlaceholder) {
+            static::$parentPlaceholder = '##parent-placeholder-'.Str::random(40).'##';
+        }
+
+        return static::$parentPlaceholder;
+    }
+
+    /**
+     * Start a component rendering process.
+     *
+     * @param  string  $name
+     * @param  array  $data
+     * @return void
+     */
+    public function startComponent($name, array $data = [])
+    {
+        if (ob_start()) {
+            $this->componentStack[] = $name;
+
+            $this->componentData[$name] = $data;
+
+            $this->slots[$name] = [];
+        }
+    }
+
+    /**
+     * Render the current component.
+     *
+     * @return string
+     */
+    public function renderComponent()
+    {
+        $contents = ob_get_clean();
+
+        $name = array_pop($this->componentStack);
+
+        $baseData = $this->componentData[$name];
+
+        $data = array_merge(
+            $baseData, ['slot' => new HtmlString(trim($contents))], $this->slots[$name]
+        );
+
+        return tap($this->make($name, $data)->render(), function () use ($name) {
+            unset($this->slots[$name]);
+            unset($this->slotStack[$name]);
+            unset($this->componentData[$name]);
+        });
+    }
+
+    /**
+     * Start the slot rendering process.
+     *
+     * @param  string  $name
+     * @return void
+     */
+    public function slot($name)
+    {
+        if (ob_start()) {
+            $this->slots[last($this->componentStack)][$name] = '';
+
+            $this->slotStack[last($this->componentStack)][] = $name;
+        }
+    }
+
+    /**
+     * Save the slot content for rendering.
+     *
+     * @return void
+     */
+    public function endSlot()
+    {
+        $current = last($this->componentStack);
+
+        $this->slots[$current][array_pop($this->slotStack[$current])] = new HtmlString(trim(ob_get_clean()));
     }
 
     /**
@@ -708,6 +838,7 @@ class Factory implements FactoryContract
         if (! isset($this->pushes[$section])) {
             $this->pushes[$section] = [];
         }
+
         if (! isset($this->pushes[$section][$this->renderCount])) {
             $this->pushes[$section][$this->renderCount] = $content;
         } else {
@@ -728,7 +859,32 @@ class Factory implements FactoryContract
             return $default;
         }
 
-        return implode(array_reverse($this->pushes[$section]));
+        return implode($this->pushes[$section]);
+    }
+
+    /**
+     * Start a translation block.
+     *
+     * @param  array  $replacements
+     * @return void
+     */
+    public function startTranslation($replacements = [])
+    {
+        ob_start();
+
+        $this->translationReplacements = $replacements;
+    }
+
+    /**
+     * Render the current translation.
+     *
+     * @return string
+     */
+    public function renderTranslation()
+    {
+        return $this->container->make('translator')->getFromJson(
+            trim(ob_get_clean()), $this->translationReplacements
+        );
     }
 
     /**
@@ -880,11 +1036,13 @@ class Factory implements FactoryContract
      *
      * @param  string  $namespace
      * @param  string|array  $hints
-     * @return void
+     * @return $this
      */
     public function addNamespace($namespace, $hints)
     {
         $this->finder->addNamespace($namespace, $hints);
+
+        return $this;
     }
 
     /**
@@ -892,11 +1050,27 @@ class Factory implements FactoryContract
      *
      * @param  string  $namespace
      * @param  string|array  $hints
-     * @return void
+     * @return $this
      */
     public function prependNamespace($namespace, $hints)
     {
         $this->finder->prependNamespace($namespace, $hints);
+
+        return $this;
+    }
+
+    /**
+     * Replace the namespace hints for the given namespace.
+     *
+     * @param  string  $namespace
+     * @param  string|array  $hints
+     * @return $this
+     */
+    public function replaceNamespace($namespace, $hints)
+    {
+        $this->finder->replaceNamespace($namespace, $hints);
+
+        return $this;
     }
 
     /**
@@ -938,6 +1112,16 @@ class Factory implements FactoryContract
     public function getEngineResolver()
     {
         return $this->engines;
+    }
+
+    /**
+     * Flush the cache of views located by the finder.
+     *
+     * @return void
+     */
+    public function flushFinderCache()
+    {
+        $this->getFinder()->flush();
     }
 
     /**

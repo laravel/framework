@@ -427,7 +427,7 @@ if (! function_exists('encrypt')) {
 
 if (! function_exists('env')) {
     /**
-     * Gets the value of an environment variable. Supports boolean, empty and null.
+     * Gets the value of an environment variable.
      *
      * @param  string  $key
      * @param  mixed   $default
@@ -763,18 +763,17 @@ if (! function_exists('trans')) {
      * Translate the given message.
      *
      * @param  string  $id
-     * @param  array   $parameters
-     * @param  string  $domain
+     * @param  array   $replace
      * @param  string  $locale
-     * @return \Symfony\Component\Translation\TranslatorInterface|string
+     * @return \Illuminate\Contracts\Translation\Translator|string
      */
-    function trans($id = null, $parameters = [], $domain = 'messages', $locale = null)
+    function trans($id = null, $replace = [], $locale = null)
     {
         if (is_null($id)) {
             return app('translator');
         }
 
-        return app('translator')->trans($id, $parameters, $domain, $locale);
+        return app('translator')->trans($id, $replace, $locale);
     }
 }
 
@@ -784,14 +783,28 @@ if (! function_exists('trans_choice')) {
      *
      * @param  string  $id
      * @param  int|array|\Countable  $number
-     * @param  array   $parameters
-     * @param  string  $domain
+     * @param  array   $replace
      * @param  string  $locale
      * @return string
      */
-    function trans_choice($id, $number, array $parameters = [], $domain = 'messages', $locale = null)
+    function trans_choice($id, $number, array $replace = [], $locale = null)
     {
-        return app('translator')->transChoice($id, $number, $parameters, $domain, $locale);
+        return app('translator')->transChoice($id, $number, $replace, $locale);
+    }
+}
+
+if (! function_exists('__')) {
+    /**
+     * Translate the given message.
+     *
+     * @param  string  $key
+     * @param  array  $replace
+     * @param  string  $locale
+     * @return \Illuminate\Contracts\Translation\Translator|string
+     */
+    function __($key = null, $replace = [], $locale = null)
+    {
+        return app('translator')->getFromJson($key, $replace, $locale);
     }
 }
 

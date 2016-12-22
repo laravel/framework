@@ -11,4 +11,5 @@
 phpunit.xml.dist export-ignore
 CHANGELOG-5.2.md export-ignore
 CHANGELOG-5.3.md export-ignore
+CHANGELOG-5.4.md export-ignore
 CONTRIBUTING.md export-ignore

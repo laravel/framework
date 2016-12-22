@@ -58,6 +58,13 @@ class Command extends SymfonyCommand
     protected $description;
 
     /**
+     * Indicates whether the command should be shown in the Artisan command list.
+     *
+     * @var bool
+     */
+    protected $hidden = false;
+
+    /**
      * The default verbosity of output commands.
      *
      * @var int
@@ -94,6 +101,12 @@ class Command extends SymfonyCommand
         }
 
         $this->setDescription($this->description);
+
+        $this->setHidden($this->hidden);
+
+        if(! empty($this->alias)) {
+            $this->setAliases([ $this->alias ]);
+        }
 
         if (! isset($this->signature)) {
             $this->specifyParameters();

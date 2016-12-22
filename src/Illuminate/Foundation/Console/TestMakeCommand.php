@@ -11,7 +11,7 @@ class TestMakeCommand extends GeneratorCommand
      *
      * @var string
      */
-    protected $name = 'make:test';
+    protected $signature = 'make:test {name : The name of the class} {--unit : Create a unit test}';
 
     /**
      * The console command description.
@@ -34,7 +34,11 @@ class TestMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return __DIR__.'/stubs/test.stub';
+        if ($this->option('unit')) {
+            return __DIR__.'/stubs/unit-test.stub';
+        } else {
+            return __DIR__.'/stubs/test.stub';
+        }
     }
 
     /**
@@ -45,9 +49,9 @@ class TestMakeCommand extends GeneratorCommand
      */
     protected function getPath($name)
     {
-        $name = str_replace($this->laravel->getNamespace(), '', $name);
+        $name = str_replace_first($this->rootNamespace(), '', $name);
 
-        return $this->laravel['path.base'].'/tests/'.str_replace('\\', '/', $name).'.php';
+        return $this->laravel->basePath().'/tests'.str_replace('\\', '/', $name).'.php';
     }
 
     /**
@@ -58,6 +62,20 @@ class TestMakeCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        return $rootNamespace;
+        if ($this->option('unit')) {
+            return $rootNamespace.'\Unit';
+        } else {
+            return $rootNamespace.'\Feature';
+        }
+    }
+
+    /**
+     * Get the root namespace for the class.
+     *
+     * @return string
+     */
+    protected function rootNamespace()
+    {
+        return 'Tests';
     }
 }
