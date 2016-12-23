@@ -6,7 +6,6 @@ use Closure;
 use ArrayAccess;
 use LogicException;
 use ReflectionClass;
-use ReflectionFunction;
 use ReflectionParameter;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
@@ -723,7 +722,7 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
-     * Throw an exception that the concrete is not instantiable
+     * Throw an exception that the concrete is not instantiable.
      *
      * @param  string  $concrete
      * @return void
