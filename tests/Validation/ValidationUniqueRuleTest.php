@@ -11,6 +11,6 @@ class ValidationUniqueRuleTest extends PHPUnit_Framework_TestCase
         $rule = new Illuminate\Validation\Rules\Unique('table', 'column');
         $rule->ignore(1, 'id_column');
         $rule->where('foo', 'bar');
-        $this->assertEquals('unique:table,column,1,id_column,foo,bar', (string) $rule);
+        $this->assertEquals('unique:table,column,"1",id_column,foo,bar', (string) $rule);
     }
 }
