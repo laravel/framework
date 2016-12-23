@@ -91,12 +91,12 @@ class PasswordBroker implements PasswordBrokerContract
             return $user;
         }
 
-        $pass = $credentials['password'];
+        $password = $credentials['password'];
 
-        // Once we have called this callback, we will remove this token row from the
-        // table and return the response from this callback so the user gets sent
-        // to the destination given by the developers from the callback return.
-        $callback($user, $pass);
+        // Once the reset has been validated, we'll call the given callback with the
+        // new password. This gives the user an opportunity to store the password
+        // in their persistent storage. Then we'll delete the token and return.
+        $callback($user, $password);
 
         $this->tokens->delete($credentials['token']);
 
@@ -152,7 +152,8 @@ class PasswordBroker implements PasswordBrokerContract
             ];
 
             return call_user_func(
-                $this->passwordValidator, $credentials) && $password === $confirm;
+                $this->passwordValidator, $credentials
+            ) && $password === $confirm;
         }
 
         return $this->validatePasswordWithDefaults($credentials);
