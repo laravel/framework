@@ -2979,7 +2979,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
          // when checking the field. We will just return the DateTime right away.
         if ($value instanceof DateTimeInterface) {
             return new Carbon(
-                $value->format('Y-m-d H:i:s.u'), $value->getTimeZone()
+                $value->format('Y-m-d H:i:s.u'), $value->getTimezone()
             );
         }
 
