@@ -1850,7 +1850,7 @@ class Validator implements ValidatorContract
      */
     protected function validateNotContains($attribute, $value, $parameters)
     {
-        return !str_contains($value, $parameters);
+        return ! str_contains($value, $parameters);
     }
 
     /**
