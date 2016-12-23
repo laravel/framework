@@ -54,9 +54,9 @@ class StartSession
         // so that the data is ready for an application. Note that the Laravel sessions
         // do not make use of PHP "native" sessions in any way since they are crappy.
         if ($this->sessionConfigured()) {
-            $session = $this->startSession($request);
-
-            $request->setLaravelSession($session);
+            $request->setLaravelSession(
+                $session = $this->startSession($request)
+            );
 
             $this->collectGarbage($session);
         }
@@ -97,13 +97,11 @@ class StartSession
      */
     protected function startSession(Request $request)
     {
-        $session = $this->getSession($request);
+        return tap($this->getSession($request), function ($session) use ($request) {
+            $session->setRequestOnHandler($request);
 
-        $session->setRequestOnHandler($request);
-
-        $session->start();
-
-        return $session;
+            $session->start();
+        });
     }
 
     /**
@@ -114,25 +112,9 @@ class StartSession
      */
     public function getSession(Request $request)
     {
-        $session = $this->manager->driver();
-
-        $session->setId($request->cookies->get($session->getName()));
-
-        return $session;
-    }
-
-    /**
-     * Store the current URL for the request if necessary.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Contracts\Session\Session  $session
-     * @return void
-     */
-    protected function storeCurrentUrl(Request $request, $session)
-    {
-        if ($request->method() === 'GET' && $request->route() && ! $request->ajax()) {
-            $session->setPreviousUrl($request->fullUrl());
-        }
+        return tap($this->manager->driver(), function ($session) use ($request) {
+            $session->setId($request->cookies->get($session->getName()));
+        });
     }
 
     /**
@@ -162,6 +144,20 @@ class StartSession
     protected function configHitsLottery(array $config)
     {
         return random_int(1, $config['lottery'][1]) <= $config['lottery'][0];
+    }
+
+    /**
+     * Store the current URL for the request if necessary.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Contracts\Session\Session  $session
+     * @return void
+     */
+    protected function storeCurrentUrl(Request $request, $session)
+    {
+        if ($request->method() === 'GET' && $request->route() && ! $request->ajax()) {
+            $session->setPreviousUrl($request->fullUrl());
+        }
     }
 
     /**
@@ -238,10 +234,10 @@ class StartSession
      */
     protected function usingCookieSessions()
     {
-        if (! $this->sessionConfigured()) {
-            return false;
+        if ($this->sessionConfigured()) {
+            return $this->manager->driver()->getHandler() instanceof CookieSessionHandler;
         }
 
-        return $this->manager->driver()->getHandler() instanceof CookieSessionHandler;
+        return false;
     }
 }
