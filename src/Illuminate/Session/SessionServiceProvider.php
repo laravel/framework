@@ -43,9 +43,7 @@ class SessionServiceProvider extends ServiceProvider
             // First, we will create the session manager which is responsible for the
             // creation of the various session drivers when they are needed by the
             // application instance, and will resolve them on a lazy load basis.
-            $manager = $app['session'];
-
-            return $manager->driver();
+            return $app->make('session')->driver();
         });
     }
 }
