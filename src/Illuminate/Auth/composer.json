@@ -35,5 +35,8 @@
         "illuminate/queue": "Required to fire login / logout events (5.3.*).",
         "illuminate/session": "Required to use the session based guard (5.3.*)."
     },
+    "config": {
+        "sort-packages": true
+    },
     "minimum-stability": "dev"
 }

@@ -39,5 +39,8 @@
         "illuminate/filesystem": "Required to use the migrations (5.3.*).",
         "illuminate/pagination": "Required to paginate the result set (5.3.*)."
     },
+    "config": {
+        "sort-packages": true
+    },
     "minimum-stability": "dev"
 }
