@@ -34,5 +34,8 @@
     "suggest": {
         "illuminate/console": "Required to use the session:table command (5.3.*)."
     },
+    "config": {
+        "sort-packages": true
+    },
     "minimum-stability": "dev"
 }

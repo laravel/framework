@@ -36,5 +36,8 @@
         "guzzlehttp/guzzle": "Required to use the Mailgun and Mandrill mail drivers (~5.3|~6.0).",
         "jeremeamia/superclosure": "Required to be able to serialize closures (~2.0)."
     },
+    "config": {
+        "sort-packages": true
+    },
     "minimum-stability": "dev"
 }

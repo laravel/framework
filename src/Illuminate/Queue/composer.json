@@ -38,5 +38,8 @@
         "illuminate/redis": "Required to use the Redis queue driver (5.3.*).",
         "pda/pheanstalk": "Required to use the Beanstalk queue driver (~3.0)."
     },
+    "config": {
+        "sort-packages": true
+    },
     "minimum-stability": "dev"
 }

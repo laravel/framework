@@ -15,9 +15,9 @@
     ],
     "require": {
         "php": ">=5.6.4",
-        "illuminate/contracts": "5.3.*",
         "illuminate/broadcasting": "5.3.*",
         "illuminate/bus": "5.3.*",
+        "illuminate/contracts": "5.3.*",
         "illuminate/queue": "5.3.*",
         "illuminate/support": "5.3.*",
         "ramsey/uuid": "~3.0"
@@ -36,6 +36,9 @@
         "guzzlehttp/guzzle": "Required to use the Slack transport.",
         "illuminate/database": "Required to use the database transport (5.3.*).",
         "nexmo/client": "Required to use the Nexmo transport."
+    },
+    "config": {
+        "sort-packages": true
     },
     "minimum-stability": "dev"
 }
