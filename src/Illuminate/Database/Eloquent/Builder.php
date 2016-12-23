@@ -597,8 +597,10 @@ class Builder
      */
     public function delete()
     {
-        if ($onDelete = $this->onDelete) {
-            return $onDelete($this);
+        if (isset($this->onDelete)) {
+            $closure = $this->onDelete;
+
+            return $closure($this);
         }
 
         return $this->toBase()->delete();
@@ -1228,7 +1230,7 @@ class Builder
         // query as their own isolated nested where statement and avoid issues.
         $originalWhereCount = count($query->wheres);
 
-        $result = $scope(...$parameters) ?: $this;
+        $result = $scope(...array_values($parameters)) ?: $this;
 
         if ($this->shouldNestWheresForScope($query, $originalWhereCount)) {
             $this->nestWheresForScope($query, $originalWhereCount);
