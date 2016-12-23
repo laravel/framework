@@ -247,6 +247,20 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected static $unguarded = false;
 
     /**
+     * The cached model collection for class.
+     *
+     * @var \Illuminate\Database\Eloquent\Collection
+     */
+    protected static $cache;
+
+    /**
+     * The columns that are currently cached.
+     *
+     * @var array
+     */
+    protected static $cachedColumns;
+
+    /**
      * The cache of the mutated attributes for each class.
      *
      * @var array
@@ -3496,6 +3510,28 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public static function unsetEventDispatcher()
     {
         static::$dispatcher = null;
+    }
+
+    /**
+     * Cache model collection if not already cached and return results.
+     *
+     * @param  array  $columns
+     * @param  bool  $reset
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     */
+    public static function cache(array $columns = ['*'], $reset = false)
+    {
+        $query = new static;
+
+        // Check if the model cache is currently empty or that the given columns
+        // are not equal to the ones already cached. If both are false, set or
+        // reset the cache, update the columns, and return the collection.
+        if (! static::$cache || ! empty(array_diff($columns, static::$cachedColumns)) || $reset == true) {
+            static::$cache = $query->all($columns);
+            static::$cachedColumns = $columns;
+        }
+
+        return static::$cache;
     }
 
     /**
