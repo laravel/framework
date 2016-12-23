@@ -2099,6 +2099,26 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateContains()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'asdasdf'], ['x' => 'contains:a,x,z']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'asdasdf'], ['x' => 'contains:x,y,z']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testValidateNotContains()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'asdasdf'], ['x' => 'not_contains:a,x,z']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'asdasdf'], ['x' => 'not_contains:x,y,z']);
+        $this->assertTrue($v->passes());
+    }
+
     public function testValidateDateAndFormat()
     {
         date_default_timezone_set('UTC');
