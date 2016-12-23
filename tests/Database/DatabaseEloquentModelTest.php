@@ -342,6 +342,16 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testTimestampsCreatedFromObjectsHandleTimezone()
+	{
+		$model = new EloquentDateModelStub;
+		$testDate = Carbon\Carbon::parse('2000-01-01 12:00:00 PST');
+		$model->created_at = $testDate;
+		$retrievedDate = $model->created_at;
+		$this->assertTrue($testDate->eq($retrievedDate));
+	}
+
+
 	public function testInsertProcess()
 	{
 		$model = $this->getMock('EloquentModelStub', array('newQueryWithoutScopes', 'updateTimestamps'));
