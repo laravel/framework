@@ -328,7 +328,7 @@ if (! function_exists('csrf_token')) {
         $session = app('session');
 
         if (isset($session)) {
-            return $session->getToken();
+            return $session->token();
         }
 
         throw new RuntimeException('Application session store not set.');

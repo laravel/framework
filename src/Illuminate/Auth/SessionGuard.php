@@ -5,13 +5,13 @@ namespace Illuminate\Auth;
 use RuntimeException;
 use Illuminate\Support\Str;
 use Illuminate\Http\Response;
+use Illuminate\Contracts\Session\Session;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Symfony\Component\HttpFoundation\Request;
 use Illuminate\Contracts\Auth\SupportsBasicAuth;
 use Illuminate\Contracts\Cookie\QueueingFactory as CookieJar;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 
 class SessionGuard implements StatefulGuard, SupportsBasicAuth
@@ -44,7 +44,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * The session used by the guard.
      *
-     * @var \Symfony\Component\HttpFoundation\Session\SessionInterface
+     * @var \Illuminate\Contracts\Session\Session
      */
     protected $session;
 
@@ -88,13 +88,13 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      *
      * @param  string  $name
      * @param  \Illuminate\Contracts\Auth\UserProvider  $provider
-     * @param  \Symfony\Component\HttpFoundation\Session\SessionInterface  $session
+     * @param  \Illuminate\Contracts\Session\Session  $session
      * @param  \Symfony\Component\HttpFoundation\Request  $request
      * @return void
      */
     public function __construct($name,
                                 UserProvider $provider,
-                                SessionInterface $session,
+                                Session $session,
                                 Request $request = null)
     {
         $this->name = $name;
@@ -430,7 +430,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     protected function updateSession($id)
     {
-        $this->session->set($this->getName(), $id);
+        $this->session->put($this->getName(), $id);
 
         $this->session->migrate(true);
     }
