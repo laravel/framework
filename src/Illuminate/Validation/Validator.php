@@ -1596,14 +1596,15 @@ class Validator implements ValidatorContract
             'any'   => null,
             'colon' => ['options' => ['separator' => ':']],
             'dash'  => ['options' => ['separator' => '-']],
-            'dot'   => ['options' => ['separator' => '.']]
+            'dot'   => ['options' => ['separator' => '.']],
         ];
 
-        if (!in_array($parameters[0], array_keys($validParams))) {
+        if (! in_array($parameters[0], array_keys($validParams))) {
             return false;
         }
 
         $options = $validParams[$parameters[0]];
+
         return filter_var($value, FILTER_VALIDATE_MAC, $options) !== false;
     }
 
