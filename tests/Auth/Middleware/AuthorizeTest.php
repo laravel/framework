@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Auth\Middleware;
+
 use Mockery as m;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
@@ -12,7 +14,7 @@ use Illuminate\Contracts\Auth\Factory as Auth;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 
-class AuthorizeMiddlewareTest extends PHPUnit_Framework_TestCase
+class AuthorizeTest extends \PHPUnit_Framework_TestCase
 {
     protected $container;
     protected $user;
@@ -26,7 +28,7 @@ class AuthorizeMiddlewareTest extends PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $this->user = new stdClass;
+        $this->user = new \stdClass;
 
         Container::setInstance($this->container = new Container);
 
@@ -51,7 +53,7 @@ class AuthorizeMiddlewareTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Illuminate\Auth\Access\AuthorizationException
+     * @expectedException \Illuminate\Auth\Access\AuthorizationException
      */
     public function testSimpleAbilityUnauthorized()
     {
@@ -90,7 +92,7 @@ class AuthorizeMiddlewareTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Illuminate\Auth\Access\AuthorizationException
+     * @expectedException \Illuminate\Auth\Access\AuthorizationException
      */
     public function testModelTypeUnauthorized()
     {
@@ -131,11 +133,11 @@ class AuthorizeMiddlewareTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Illuminate\Auth\Access\AuthorizationException
+     * @expectedException \Illuminate\Auth\Access\AuthorizationException
      */
     public function testModelUnauthorized()
     {
-        $post = new stdClass;
+        $post = new \stdClass;
 
         $this->router->bind('post', function () use ($post) {
             return $post;
@@ -159,7 +161,7 @@ class AuthorizeMiddlewareTest extends PHPUnit_Framework_TestCase
 
     public function testModelAuthorized()
     {
-        $post = new stdClass;
+        $post = new \stdClass;
 
         $this->router->bind('post', function () use ($post) {
             return $post;

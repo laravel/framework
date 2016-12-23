@@ -1,19 +1,22 @@
 <?php
 
+namespace Illuminate\Tests\Auth;
+
+use Mockery as m;
 use Illuminate\Http\Request;
 use Illuminate\Auth\TokenGuard;
 use Illuminate\Contracts\Auth\UserProvider;
 
-class AuthTokenGuardTest extends PHPUnit_Framework_TestCase
+class TokenGuardTest extends \PHPUnit_Framework_TestCase
 {
     public function tearDown()
     {
-        Mockery::close();
+        m::close();
     }
 
     public function testUserCanBeRetrievedByQueryStringVariable()
     {
-        $provider = Mockery::mock(UserProvider::class);
+        $provider = m::mock(UserProvider::class);
         $user = new AuthTokenGuardTestUser;
         $user->id = 1;
         $provider->shouldReceive('retrieveByCredentials')->once()->with(['api_token' => 'foo'])->andReturn($user);
@@ -31,7 +34,7 @@ class AuthTokenGuardTest extends PHPUnit_Framework_TestCase
 
     public function testUserCanBeRetrievedByAuthHeaders()
     {
-        $provider = Mockery::mock(UserProvider::class);
+        $provider = m::mock(UserProvider::class);
         $provider->shouldReceive('retrieveByCredentials')->once()->with(['api_token' => 'foo'])->andReturn((object) ['id' => 1]);
         $request = Request::create('/', 'GET', [], [], [], ['PHP_AUTH_USER' => 'foo', 'PHP_AUTH_PW' => 'foo']);
 
@@ -44,7 +47,7 @@ class AuthTokenGuardTest extends PHPUnit_Framework_TestCase
 
     public function testUserCanBeRetrievedByBearerToken()
     {
-        $provider = Mockery::mock(UserProvider::class);
+        $provider = m::mock(UserProvider::class);
         $provider->shouldReceive('retrieveByCredentials')->once()->with(['api_token' => 'foo'])->andReturn((object) ['id' => 1]);
         $request = Request::create('/', 'GET', [], [], [], ['HTTP_AUTHORIZATION' => 'Bearer foo']);
 
@@ -57,7 +60,7 @@ class AuthTokenGuardTest extends PHPUnit_Framework_TestCase
 
     public function testValidateCanDetermineIfCredentialsAreValid()
     {
-        $provider = Mockery::mock(UserProvider::class);
+        $provider = m::mock(UserProvider::class);
         $user = new AuthTokenGuardTestUser;
         $user->id = 1;
         $provider->shouldReceive('retrieveByCredentials')->once()->with(['api_token' => 'foo'])->andReturn($user);
@@ -70,7 +73,7 @@ class AuthTokenGuardTest extends PHPUnit_Framework_TestCase
 
     public function testValidateCanDetermineIfCredentialsAreInvalid()
     {
-        $provider = Mockery::mock(UserProvider::class);
+        $provider = m::mock(UserProvider::class);
         $user = new AuthTokenGuardTestUser;
         $user->id = 1;
         $provider->shouldReceive('retrieveByCredentials')->once()->with(['api_token' => 'foo'])->andReturn(null);
@@ -83,7 +86,7 @@ class AuthTokenGuardTest extends PHPUnit_Framework_TestCase
 
     public function testValidateIfApiTokenIsEmpty()
     {
-        $provider = Mockery::mock(UserProvider::class);
+        $provider = m::mock(UserProvider::class);
         $user = new AuthTokenGuardTestUser;
         $user->id = 1;
         $request = Request::create('/', 'GET', ['api_token' => '']);
