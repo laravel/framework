@@ -1581,6 +1581,33 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Validate that an attribute is a valid MAC address.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @param  array   $parameters
+     * @return bool
+     */
+    protected function validateMacAddress($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'mac_address');
+
+        $validParams = [
+            'any'   => null,
+            'colon' => ['options' => ['separator' => ':']],
+            'dash'  => ['options' => ['separator' => '-']],
+            'dot'   => ['options' => ['separator' => '.']]
+        ];
+
+        if (!in_array($parameters[0], array_keys($validParams))) {
+            return false;
+        }
+
+        $options = $validParams[$parameters[0]];
+        return filter_var($value, FILTER_VALIDATE_MAC, $options) !== false;
+    }
+
+    /**
      * Validate that an attribute is a valid e-mail address.
      *
      * @param  string  $attribute

@@ -1519,6 +1519,49 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($v->fails());
     }
 
+    public function testValidateMacAddress()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['mac' => '01-23-45-67-89-ab'], ['mac' => 'MacAddress:any']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['mac' => '01-23-45-67-89-ab'], ['mac' => 'MacAddress:dash']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['mac' => '01-23-45-67-89-ab'], ['mac' => 'MacAddress:foo']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['mac' => '01-23-45-67-89-ab'], ['mac' => 'MacAddress:dot']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['mac' => '01-23-45-67-89-ab'], ['mac' => 'MacAddress:colon']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['mac' => '01-23-45-67-89-AB'], ['mac' => 'MacAddress:any']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['mac' => '01-23-45-67-89-aB'], ['mac' => 'MacAddress:any']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['mac' => '01:23:45:67:89:ab'], ['mac' => 'MacAddress:any']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['mac' => '01:23:45:67:89:AB'], ['mac' => 'MacAddress:any']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['mac' => '01:23:45:67:89:aB'], ['mac' => 'MacAddress:any']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['mac' => '01:23:45-67:89:aB'], ['mac' => 'MacAddress:any']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['mac' => 'xx:23:45:67:89:aB'], ['mac' => 'MacAddress:any']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['mac' => '0123.4567.89ab'], ['mac' => 'MacAddress:any']);
+        $this->assertTrue($v->passes());
+    }
+
     public function testValidateEmail()
     {
         $trans = $this->getIlluminateArrayTranslator();
