@@ -107,8 +107,8 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
      */
     protected function expired($session)
     {
-        return (isset($session->last_activity) &&
-            $session->last_activity < Carbon::now()->subMinutes($this->minutes)->getTimestamp());
+        return isset($session->last_activity) &&
+            $session->last_activity < Carbon::now()->subMinutes($this->minutes)->getTimestamp();
     }
 
     /**
@@ -141,7 +141,7 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
     {
         $payload = [
             'payload' => base64_encode($data),
-            'last_activity' => Carbon::now()->getTimestamp()
+            'last_activity' => Carbon::now()->getTimestamp(),
         ];
 
         if (! $this->container) {
