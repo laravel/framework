@@ -3,7 +3,6 @@
 namespace Illuminate\Translation;
 
 use Illuminate\Support\Str;
-use Illuminate\Support\Collection;
 
 class MessageSelector
 {
@@ -16,29 +15,29 @@ class MessageSelector
      */
     public function choose($line, $number)
     {
-        $parts = explode('|', $line);
+        $segments = explode('|', $line);
 
-        if (($value = $this->extract($parts, $number)) !== null) {
+        if (($value = $this->extract($segments, $number)) !== null) {
             return trim($value);
         }
 
-        $parts = $this->stripConditions($parts);
+        $segments = $this->stripConditions($segments);
 
-        return count($parts) == 1 || $number == 1
-                        ? $parts[0] : $parts[1];
+        return count($segments) == 1 || $number == 1
+                        ? $segments[0] : $segments[1];
     }
 
     /**
      * Extract a translation string using inline conditions.
      *
-     * @param  array  $parts
+     * @param  array  $segments
      * @param  int  $number
      * @return mixed
      */
-    private function extract($parts, $number)
+    private function extract($segments, $number)
     {
-        foreach ($parts as $part) {
-            if (($line = $this->extractFromString($part, $number)) !== null) {
+        foreach ($segments as $part) {
+            if (! is_null($line = $this->extractFromString($part, $number))) {
                 return $line;
             }
         }
@@ -79,15 +78,15 @@ class MessageSelector
     }
 
     /**
-     * Strip the inline condition.
+     * Strip the inline conditions from each segment, just leaving the text.
      *
-     * @param  array  $parts
+     * @param  array  $segments
      * @return array
      */
-    private function stripConditions($parts)
+    private function stripConditions($segments)
     {
-        return Collection::make($parts)->map(function ($part) {
+        return collect($segments)->map(function ($part) {
             return preg_replace('/^[\{\[]([^\[\]\{\}]*)[\}\]]/', '', $part);
-        })->toArray();
+        })->all();
     }
 }
