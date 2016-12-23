@@ -97,7 +97,7 @@ class BoundMethod
     {
         $class = is_string($callback[0]) ? $callback[0] : get_class($callback[0]);
 
-        return $container->normalize("{$class}@{$callback[1]}");
+        return "{$class}@{$callback[1]}";
     }
 
     /**
