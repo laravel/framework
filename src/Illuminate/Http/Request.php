@@ -392,6 +392,17 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Set the session instance on the request.
+     *
+     * @param  \Illuminate\Contracts\Session\Session  $session
+     * @return void
+     */
+    public function setLaravelSession($session)
+    {
+        $this->session = $session;
+    }
+
+    /**
      * Get the user making the request.
      *
      * @param  string|null  $guard
