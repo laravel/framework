@@ -5,10 +5,21 @@
 ### Added
 - Added `Blueprint::nullableMorphs()` ([#16879](https://github.com/laravel/framework/pull/16879))
 - Support `BaseCollection` in `BelongsToMany::sync()` ([#16882](https://github.com/laravel/framework/pull/16882))
+- Added `--model` flag to `make:controller` command ([#16787](https://github.com/laravel/framework/pull/16787))
+- Allow notifications to be broadcasted now instead of using the queue ([#16867](https://github.com/laravel/framework/pull/16867), [40f30f1](https://github.com/laravel/framework/commit/40f30f1a2131904eb4f6e6c456823e7b2cb726eb))
+- Support `redirectTo()` in `RedirectsUsers` ([#16896](https://github.com/laravel/framework/pull/16896))
+- Added `ArrayTransport` to mail component to store Swift messages in memory ([#16906](https://github.com/laravel/framework/pull/16906), [69d3d04](https://github.com/laravel/framework/commit/69d3d0463cf6bd114d2beecd8480556efb168678))
+- Added fallback to `SlackAttachment` notification ([#16912](https://github.com/laravel/framework/pull/16912))
+- Added `Macroable` trait to `RedirectResponse` ([#16929](https://github.com/laravel/framework/pull/16929))
 
 ### Changed
 - Allow SparkPost transport transmission metadata to be set at runtime ([#16838](https://github.com/laravel/framework/pull/16838))
 - Pass keys to `Collection::unique()` callback ([#16883](https://github.com/laravel/framework/pull/16883))
+- Support calling `MailFake::send()` when `build()` has dependencies ([#16918](https://github.com/laravel/framework/pull/16918))
+- Changed `Mailable` properties visibility to public ([#16916](https://github.com/laravel/framework/pull/16916))
+- Bind `serve` command to `127.0.0.1` instead of `localhost` ([#16937](https://github.com/laravel/framework/pull/16937))
+- Added `old('remember')` call to `login.stub` ([#16944](https://github.com/laravel/framework/pull/16944))
+- Check for `db` before setting presence verifier in `ValidationServiceProvider` ([038840d](https://github.com/laravel/framework/commit/038840d477e606735f9179d97eeb20639450e8ae))
 
 ### Fixed
 - Fixed a wildcard issue with `sometimes` validation rule ([#16826](https://github.com/laravel/framework/pull/16826))
@@ -17,6 +28,7 @@
 - Fixed `withCount()` aliasing using multiple tables ([#16853](https://github.com/laravel/framework/pull/16853))
 - Fixed broken event interface listening ([#16877](https://github.com/laravel/framework/pull/16877))
 - Fixed empty model creation ([#16864](https://github.com/laravel/framework/pull/16864))
+- Fixed column overlapping on using `withCount()` on `BelongsToMany` ([#16895](https://github.com/laravel/framework/pull/16895))
 
 
 ## v5.3.28 (2016-12-15)
@@ -53,7 +65,7 @@
 - Remove falsy values from array in `min()` and `max()` on `Collection` ([e2d317e](https://github.com/laravel/framework/commit/e2d317efcebbdf6651d89100c0b5d80a925bb2f1))
 
 ### Fixed
-- Added file existance check to `AppNameCommand::replaceIn()` to fix [#16575](https://github.com/laravel/framework/pull/16575) ([#16592](https://github.com/laravel/framework/pull/16592))
+- Added file existence check to `AppNameCommand::replaceIn()` to fix [#16575](https://github.com/laravel/framework/pull/16575) ([#16592](https://github.com/laravel/framework/pull/16592))
 - Check for `null` in `seeJsonStructure()` ([#16642](https://github.com/laravel/framework/pull/16642))
 - Reverted [#15264](https://github.com/laravel/framework/pull/15264) ([#16660](https://github.com/laravel/framework/pull/16660))
 - Fixed misleading credentials exception when `ExceptionHandler` is not bound in container ([#16666](https://github.com/laravel/framework/pull/16666))
@@ -333,7 +345,7 @@
 - Added missing `$minutes` property on `CookieSessionHandler` ([#15664](https://github.com/laravel/framework/pull/15664))
 
 ### Changed
-- Removed forking and pcntl requirements while still supporting timeouts ([#15650](https://github.com/laravel/framework/pull/15650))
+- Removed forking and PCNTL requirements while still supporting timeouts ([#15650](https://github.com/laravel/framework/pull/15650))
 - Set exception handler first thing in `WorkCommand::runWorker()` ([99994fe](https://github.com/laravel/framework/commit/99994fe23c1215d5a8e798da03947e6a5502b8f9))
 
 
