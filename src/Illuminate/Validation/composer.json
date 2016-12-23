@@ -33,5 +33,8 @@
     "suggest": {
         "illuminate/database": "Required to use the database presence verifier (5.4.*)."
     },
+    "config": {
+        "sort-packages": true
+    },
     "minimum-stability": "dev"
 }
