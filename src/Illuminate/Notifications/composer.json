@@ -39,5 +39,8 @@
         "illuminate/database": "Required to use the database transport (5.4.*).",
         "nexmo/client": "Required to use the Nexmo transport."
     },
+    "config": {
+        "sort-packages": true
+    },
     "minimum-stability": "dev"
 }
