@@ -236,7 +236,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected function compileExtensions($value)
     {
         foreach ($this->extensions as $compiler) {
-            $value = call_user_func($compiler, $value, $this);
+            $value = $compiler($value, $this);
         }
 
         return $value;
@@ -973,7 +973,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
             $value = Str::substr($value, 1, -1);
         }
 
-        return call_user_func($this->customDirectives[$name], trim($value));
+        return $this->customDirectives[$name](trim($value));
     }
 
     /**
