@@ -117,13 +117,14 @@ class Application extends SymfonyApplication implements ApplicationContract
      *
      * @param  string  $command
      * @param  array  $parameters
+     * @param  \Symfony\Component\Console\Output\OutputInterface  $outputBuffer
      * @return int
      */
-    public function call($command, array $parameters = [])
+    public function call($command, array $parameters = [], $outputBuffer = null)
     {
         $parameters = collect($parameters)->prepend($command);
 
-        $this->lastOutput = new BufferedOutput;
+        $this->lastOutput = $outputBuffer ?: new BufferedOutput;
 
         $this->setCatchExceptions(false);
 
