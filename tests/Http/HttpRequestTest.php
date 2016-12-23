@@ -478,7 +478,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $request = Request::create('/', 'GET');
         $session = m::mock('Illuminate\Session\Store');
         $session->shouldReceive('getOldInput')->once()->with('foo', 'bar')->andReturn('boom');
-        $request->setSession($session);
+        $request->setLaravelSession($session);
         $this->assertEquals('boom', $request->old('foo', 'bar'));
     }
 
@@ -487,7 +487,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $request = Request::create('/', 'GET');
         $session = m::mock('Illuminate\Session\Store');
         $session->shouldReceive('flashInput')->once();
-        $request->setSession($session);
+        $request->setLaravelSession($session);
         $request->flush();
     }
 
@@ -739,7 +739,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $session = m::mock('Illuminate\Session\Store');
         $session->shouldReceive('flashInput')->once()->with(['name' => 'Taylor', 'email' => 'foo']);
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
-        $request->setSession($session);
+        $request->setLaravelSession($session);
         $request->flash();
     }
 
@@ -748,7 +748,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $session = m::mock('Illuminate\Session\Store');
         $session->shouldReceive('flashInput')->once()->with(['name' => 'Taylor']);
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
-        $request->setSession($session);
+        $request->setLaravelSession($session);
         $request->flashOnly(['name']);
     }
 
@@ -757,7 +757,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $session = m::mock('Illuminate\Session\Store');
         $session->shouldReceive('flashInput')->once()->with(['name' => 'Taylor']);
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
-        $request->setSession($session);
+        $request->setLaravelSession($session);
         $request->flashExcept(['email']);
     }
 }

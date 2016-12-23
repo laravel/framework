@@ -7,7 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Session\SessionManager;
-use Illuminate\Session\SessionInterface;
+use Illuminate\Contracts\Session\Session;
 use Illuminate\Session\CookieSessionHandler;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
@@ -56,7 +56,7 @@ class StartSession
         if ($this->sessionConfigured()) {
             $session = $this->startSession($request);
 
-            $request->setSession($session);
+            $request->setLaravelSession($session);
 
             $this->collectGarbage($session);
         }
@@ -93,7 +93,7 @@ class StartSession
      * Start the session for the given request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Session\SessionInterface
+     * @return \Illuminate\Contracts\Session\Session
      */
     protected function startSession(Request $request)
     {
@@ -110,7 +110,7 @@ class StartSession
      * Get the session implementation from the manager.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Session\SessionInterface
+     * @return \Illuminate\Contracts\Session\Session
      */
     public function getSession(Request $request)
     {
@@ -125,7 +125,7 @@ class StartSession
      * Store the current URL for the request if necessary.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Session\SessionInterface  $session
+     * @param  \Illuminate\Contracts\Session\Session  $session
      * @return void
      */
     protected function storeCurrentUrl(Request $request, $session)
@@ -138,10 +138,10 @@ class StartSession
     /**
      * Remove the garbage from the session if necessary.
      *
-     * @param  \Illuminate\Session\SessionInterface  $session
+     * @param  \Illuminate\Contracts\Session\Session  $session
      * @return void
      */
-    protected function collectGarbage(SessionInterface $session)
+    protected function collectGarbage(Session $session)
     {
         $config = $this->manager->getSessionConfig();
 
@@ -168,10 +168,10 @@ class StartSession
      * Add the session cookie to the application response.
      *
      * @param  \Symfony\Component\HttpFoundation\Response  $response
-     * @param  \Illuminate\Session\SessionInterface  $session
+     * @param  \Illuminate\Contracts\Session\Session  $session
      * @return void
      */
-    protected function addCookieToResponse(Response $response, SessionInterface $session)
+    protected function addCookieToResponse(Response $response, Session $session)
     {
         if ($this->usingCookieSessions()) {
             $this->manager->driver()->save();
