@@ -388,7 +388,7 @@ class Builder
             // On each chunk result set, we will pass them to the callback and then let the
             // developer take care of everything within the callback, which allows us to
             // keep the memory low for spinning through large result sets for working.
-            if (call_user_func($callback, $results) === false) {
+            if ($callback($results) === false) {
                 return false;
             }
 
@@ -421,7 +421,7 @@ class Builder
                 break;
             }
 
-            if (call_user_func($callback, $results) === false) {
+            if ($callback($results) === false) {
                 return false;
             }
 
@@ -598,7 +598,9 @@ class Builder
     public function delete()
     {
         if (isset($this->onDelete)) {
-            return call_user_func($this->onDelete, $this);
+            $closure = $this->onDelete;
+
+            return $closure($this);
         }
 
         return $this->toBase()->delete();
@@ -677,7 +679,7 @@ class Builder
 
         $relation->addEagerConstraints($models);
 
-        call_user_func($constraints, $relation);
+        $constraints($relation);
 
         $models = $relation->initRelation($models, $name);
 
@@ -769,9 +771,9 @@ class Builder
         $builder = $this;
 
         if ($value) {
-            $builder = call_user_func($callback, $builder);
+            $builder = $callback($builder);
         } elseif ($default) {
-            $builder = call_user_func($default, $builder);
+            $builder = $default($builder);
         }
 
         return $builder;
@@ -791,11 +793,11 @@ class Builder
         if ($column instanceof Closure) {
             $query = $this->model->newQueryWithoutScopes();
 
-            call_user_func($column, $query);
+            $column($query);
 
             $this->query->addNestedWhereQuery($query->getQuery(), $boolean);
         } else {
-            call_user_func_array([$this->query, 'where'], func_get_args());
+            $this->query->where(...func_get_args());
         }
 
         return $this;
@@ -1228,7 +1230,7 @@ class Builder
         // query as their own isolated nested where statement and avoid issues.
         $originalWhereCount = count($query->wheres);
 
-        $result = call_user_func_array($scope, $parameters) ?: $this;
+        $result = $scope(...array_values($parameters)) ?: $this;
 
         if ($this->shouldNestWheresForScope($query, $originalWhereCount)) {
             $this->nestWheresForScope($query, $originalWhereCount);
@@ -1457,7 +1459,7 @@ class Builder
         if (isset($this->macros[$method])) {
             array_unshift($parameters, $this);
 
-            return call_user_func_array($this->macros[$method], $parameters);
+            return $this->macros[$method](...$parameters);
         }
 
         if (method_exists($this->model, $scope = 'scope'.ucfirst($method))) {
@@ -1465,10 +1467,10 @@ class Builder
         }
 
         if (in_array($method, $this->passthru)) {
-            return call_user_func_array([$this->toBase(), $method], $parameters);
+            return $this->toBase()->$method(...$parameters);
         }
 
-        call_user_func_array([$this->query, $method], $parameters);
+        $this->query->$method(...$parameters);
 
         return $this;
     }
