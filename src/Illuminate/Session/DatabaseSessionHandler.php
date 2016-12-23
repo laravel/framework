@@ -3,6 +3,7 @@
 namespace Illuminate\Session;
 
 use Carbon\Carbon;
+use Illuminate\Support\Arr;
 use SessionHandlerInterface;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Database\ConnectionInterface;
@@ -85,12 +86,10 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
     {
         $session = (object) $this->getQuery()->find($sessionId);
 
-        if (isset($session->last_activity)) {
-            if ($session->last_activity < Carbon::now()->subMinutes($this->minutes)->getTimestamp()) {
-                $this->exists = true;
+        if ($this->expired($session)) {
+            $this->exists = true;
 
-                return;
-            }
+            return;
         }
 
         if (isset($session->payload)) {
@@ -98,6 +97,18 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
 
             return base64_decode($session->payload);
         }
+    }
+
+    /**
+     * Determine if the session is expired.
+     *
+     * @param  StdClass  $session
+     * @return bool
+     */
+    protected function expired($session)
+    {
+        return (isset($session->last_activity) &&
+            $session->last_activity < Carbon::now()->subMinutes($this->minutes)->getTimestamp());
     }
 
     /**
@@ -114,14 +125,10 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
         if ($this->exists) {
             $this->getQuery()->where('id', $sessionId)->update($payload);
         } else {
-            $payload['id'] = $sessionId;
-
-            $this->getQuery()->insert($payload);
+            $this->getQuery()->insert(Arr::set($payload, 'id', $sessionId));
         }
 
-        $this->exists = true;
-
-        return true;
+        return $this->exists = true;
     }
 
     /**
@@ -132,25 +139,82 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
      */
     protected function getDefaultPayload($data)
     {
-        $payload = ['payload' => base64_encode($data), 'last_activity' => Carbon::now()->getTimestamp()];
+        $payload = [
+            'payload' => base64_encode($data),
+            'last_activity' => Carbon::now()->getTimestamp()
+        ];
 
-        if (! $container = $this->container) {
+        if (! $this->container) {
             return $payload;
         }
 
-        if ($container->bound(Guard::class)) {
-            $payload['user_id'] = $container->make(Guard::class)->id();
+        return tap($payload, function ($payload) {
+            $this->addUserInformation($payload)
+                 ->addRequestInformation($payload);
+        });
+    }
+
+    /**
+     * Add the user information to the session payload.
+     *
+     * @param  array  $payload
+     * @return $this
+     */
+    protected function addUserInformation(&$payload)
+    {
+        if ($this->container->bound(Guard::class)) {
+            $payload['user_id'] = $this->userId();
         }
 
-        if ($container->bound('request')) {
-            $payload['ip_address'] = $container->make('request')->ip();
+        return $this;
+    }
 
-            $payload['user_agent'] = substr(
-                (string) $container->make('request')->header('User-Agent'), 0, 500
-            );
+    /**
+     * Get the currently authenticated user's ID.
+     *
+     * @return mixed
+     */
+    protected function userId()
+    {
+        return $this->container->make(Guard::class)->id();
+    }
+
+    /**
+     * Add the request information to the session payload.
+     *
+     * @param  array  $payload
+     * @return $this
+     */
+    protected function addRequestInformation(&$payload)
+    {
+        if ($this->container->bound('request')) {
+            $payload = array_merge($payload, [
+                'ip_address' => $this->ipAddress(),
+                'user_agent' => $this->userAgent(),
+            ]);
         }
 
-        return $payload;
+        return $this;
+    }
+
+    /**
+     * Get the IP address for the current request.
+     *
+     * @return string
+     */
+    protected function ipAddress()
+    {
+        return $this->container->make('request')->ip();
+    }
+
+    /**
+     * Get the user agent for the current request.
+     *
+     * @return string
+     */
+    protected function userAgent()
+    {
+        return substr((string) $this->container->make('request')->header('User-Agent'), 0, 500);
     }
 
     /**
