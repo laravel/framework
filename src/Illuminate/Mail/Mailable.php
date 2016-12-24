@@ -341,6 +341,18 @@ class Mailable implements MailableContract
     }
 
     /**
+     * Determine if the given recipient is set on the mailable.
+     *
+     * @param  object|array|string  $address
+     * @param  string|null  $name
+     * @return bool
+     */
+    public function hasTo($address, $name = null)
+    {
+        return $this->hasRecipient($address, $name, 'to');
+    }
+
+    /**
      * Set the recipients of the message.
      *
      * @param  object|array|string  $address
@@ -353,6 +365,18 @@ class Mailable implements MailableContract
     }
 
     /**
+     * Determine if the given recipient is set on the mailable.
+     *
+     * @param  object|array|string  $address
+     * @param  string|null  $name
+     * @return bool
+     */
+    public function hasCc($address, $name = null)
+    {
+        return $this->hasRecipient($address, $name, 'cc');
+    }
+
+    /**
      * Set the recipients of the message.
      *
      * @param  object|array|string  $address
@@ -362,6 +386,18 @@ class Mailable implements MailableContract
     public function bcc($address, $name = null)
     {
         return $this->setAddress($address, $name, 'bcc');
+    }
+
+    /**
+     * Determine if the given recipient is set on the mailable.
+     *
+     * @param  object|array|string  $address
+     * @param  string|null  $name
+     * @return bool
+     */
+    public function hasBcc($address, $name = null)
+    {
+        return $this->hasRecipient($address, $name, 'bcc');
     }
 
     /**
@@ -431,6 +467,34 @@ class Mailable implements MailableContract
         }
 
         return $recipient;
+    }
+
+    /**
+     * Determine if the given recipient is set on the mailable.
+     *
+     * @param  object|array|string  $address
+     * @param  string|null  $name
+     * @param  string  $property
+     * @return bool
+     */
+    protected function hasRecipient($address, $name = null, $property = 'to')
+    {
+        $expected = $this->normalizeRecipient(
+            $this->addressesToArray($address, $name)[0]
+        );
+
+        $expected = [
+            'name' => isset($expected->name) ? $expected->name : null,
+            'address' => $expected->email,
+        ];
+
+        return collect($this->{$property})->contains(function ($actual) use ($expected) {
+            if (! isset($expected['name'])) {
+                return $actual['address'] == $expected['address'];
+            } else {
+                return $actual == $expected;
+            }
+        });
     }
 
     /**
