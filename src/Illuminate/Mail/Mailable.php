@@ -405,9 +405,9 @@ class Mailable implements MailableContract
     }
 
     /**
-     * Convert the given user into an object.
+     * Convert the given recipient into an object.
      *
-     * @param  mixed  $user
+     * @param  mixed  $recipient
      * @return object
      */
     protected function normalizeRecipient($recipient)
