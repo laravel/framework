@@ -379,6 +379,8 @@ class Mailable implements MailableContract
     /**
      * Set the recipients of the message.
      *
+     * All recipients are stored internally as [['name' => ?, 'address' => ?]]
+     *
      * @param  object|array|string  $address
      * @param  string|null  $name
      * @param  string  $property
@@ -393,7 +395,7 @@ class Mailable implements MailableContract
         if ($address instanceof Collection || is_array($address)) {
             $this->setArrayOfAddresses($address, $property);
         } else {
-            $this->{$property}[] = compact('address', 'name');
+            $this->{$property}[] = compact('name', 'address');
         }
 
         return $this;
