@@ -397,7 +397,9 @@ class Router implements RegistrarContract
     protected static function formatUsesPrefix($new, $old)
     {
         if (isset($new['resetnamespace']) && $new['resetnamespace'] == true) {
-            return trim($new['namespace'], '\\');
+            return isset($new['namespace'])
+                    ? trim($new['namespace'], '\\')
+                    : null;
         } else {
             if (isset($new['namespace'])) {
                 return isset($old['namespace'])
