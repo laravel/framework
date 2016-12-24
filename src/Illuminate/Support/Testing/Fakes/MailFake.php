@@ -159,11 +159,11 @@ class MailFake implements Mailer
      * Begin the process of mailing a mailable class instance.
      *
      * @param  mixed  $users
-     * @return MailableMailer
+     * @return \Illuminate\Mail\PendingMail
      */
     public function to($users)
     {
-        $this->mailables[] = $mailable = (new MailableFake)->to($users);
+        $this->mailables[] = $mailable = (new PendingMailFake)->to($users);
 
         return $mailable;
     }
@@ -172,11 +172,11 @@ class MailFake implements Mailer
      * Begin the process of mailing a mailable class instance.
      *
      * @param  mixed  $users
-     * @return MailableMailer
+     * @return \Illuminate\Mail\PendingMail
      */
     public function bcc($users)
     {
-        $this->mailables[] = $mailable = (new MailableFake)->bcc($users);
+        $this->mailables[] = $mailable = (new PendingMailFake)->bcc($users);
 
         return $mailable;
     }
@@ -209,7 +209,7 @@ class MailFake implements Mailer
 
         Container::getInstance()->call([$view, 'build']);
 
-        $mailable = new MailableFake;
+        $mailable = new PendingMailFake;
 
         $mailable->mailable = $view;
 
