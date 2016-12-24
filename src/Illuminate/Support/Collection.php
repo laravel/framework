@@ -95,29 +95,12 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Get the median of a given key.
      *
-     * @param  null $key
+     * @param string|null $key
      * @return mixed|null
      */
     public function median($key = null)
     {
-        $count = $this->count();
-
-        if ($count == 0) {
-            return;
-        }
-
-        $values = with(isset($key) ? $this->pluck($key) : $this)
-                    ->sort()->values();
-
-        $middle = (int) ($count / 2);
-
-        if ($count % 2) {
-            return $values->get($middle);
-        }
-
-        return (new static([
-            $values->get($middle - 1), $values->get($middle),
-        ]))->average();
+        return Arr::median(with(isset($key) ? $this->pluck($key) : $this)->items);
     }
 
     /**
