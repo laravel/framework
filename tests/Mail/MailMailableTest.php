@@ -9,26 +9,37 @@ class MailMailableTest extends PHPUnit_Framework_TestCase
         $mailable = new WelcomeMailableStub;
         $mailable->to('taylor@laravel.com');
         $this->assertEquals([['name' => null, 'address' => 'taylor@laravel.com']], $mailable->to);
+        $this->assertTrue($mailable->hasTo('taylor@laravel.com'));
 
         $mailable = new WelcomeMailableStub;
         $mailable->to('taylor@laravel.com', 'Taylor Otwell');
         $this->assertEquals([['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com']], $mailable->to);
+        $this->assertTrue($mailable->hasTo('taylor@laravel.com', 'Taylor Otwell'));
+        $this->assertTrue($mailable->hasTo('taylor@laravel.com'));
 
         $mailable = new WelcomeMailableStub;
         $mailable->to(['taylor@laravel.com']);
         $this->assertEquals([['name' => null, 'address' => 'taylor@laravel.com']], $mailable->to);
+        $this->assertTrue($mailable->hasTo('taylor@laravel.com'));
+        $this->assertFalse($mailable->hasTo('taylor@laravel.com', 'Taylor Otwell'));
 
         $mailable = new WelcomeMailableStub;
         $mailable->to([['name' => 'Taylor Otwell', 'email' => 'taylor@laravel.com']]);
         $this->assertEquals([['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com']], $mailable->to);
+        $this->assertTrue($mailable->hasTo('taylor@laravel.com', 'Taylor Otwell'));
+        $this->assertTrue($mailable->hasTo('taylor@laravel.com'));
 
         $mailable = new WelcomeMailableStub;
         $mailable->to(new MailableTestUserStub);
         $this->assertEquals([['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com']], $mailable->to);
+        $this->assertTrue($mailable->hasTo(new MailableTestUserStub));
+        $this->assertTrue($mailable->hasTo('taylor@laravel.com'));
 
         $mailable = new WelcomeMailableStub;
         $mailable->to(collect([new MailableTestUserStub]));
         $this->assertEquals([['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com']], $mailable->to);
+        $this->assertTrue($mailable->hasTo(new MailableTestUserStub));
+        $this->assertTrue($mailable->hasTo('taylor@laravel.com'));
 
         $mailable = new WelcomeMailableStub;
         $mailable->to(collect([new MailableTestUserStub, new MailableTestUserStub]));
@@ -36,6 +47,8 @@ class MailMailableTest extends PHPUnit_Framework_TestCase
             ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
             ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
         ], $mailable->to);
+        $this->assertTrue($mailable->hasTo(new MailableTestUserStub));
+        $this->assertTrue($mailable->hasTo('taylor@laravel.com'));
     }
 
     public function testMailableBuildsViewData()
