@@ -437,6 +437,78 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expect, Arr::sortRecursive($array));
     }
 
+    public function testMedian()
+    {
+        $array = range(1, 3);
+        shuffle($array);
+
+        static::assertEquals(2, Arr::median($array));
+
+        $array = range(1, 4);
+        shuffle($array);
+
+        static::assertEquals(2, Arr::median($array));
+    }
+
+    public function testMedianOfStrings()
+    {
+        $array = [
+            '1996-01-06 14:39:17',
+            '1983-05-14 07:51:14',
+            '1983-05-14 07:52:43',
+        ];
+
+        static::assertEquals('1983-05-14 07:52:43', Arr::median($array));
+    }
+
+    public function testNthOrderSimple()
+    {
+        $array = range(1, 20);
+        shuffle($array);
+
+        static::assertEquals(1, Arr::nthOrder($array, 0));
+        static::assertEquals(5, Arr::nthOrder($array, 4));
+        static::assertEquals(10, Arr::nthOrder($array, 9));
+    }
+
+    public function testNthOrderIntegerCallback()
+    {
+        $array = [
+            [1],
+            [8],
+            [7],
+            [2],
+        ];
+
+        static::assertEquals([2], Arr::nthOrder($array, 1, 0));
+    }
+
+    public function testNthOrderStringCallback()
+    {
+        $array = [
+            ['foo' => 1],
+            ['foo' => 8],
+            ['foo' => 7],
+            ['foo' => 2],
+        ];
+
+        static::assertEquals(['foo' => 2], Arr::nthOrder($array, 1, 'foo'));
+    }
+
+    public function testNthOrderCallableCallback()
+    {
+        $array = [
+            ['foo' => 1],
+            ['foo' => 8],
+            ['foo' => 7],
+            ['foo' => 2],
+        ];
+
+        static::assertEquals(['foo' => 2], Arr::nthOrder($array, 1, function ($a, $b) {
+            return $a['foo'] - $b['foo'];
+        }));
+    }
+
     public function testWhere()
     {
         $array = [100, '200', 300, '400', 500];
