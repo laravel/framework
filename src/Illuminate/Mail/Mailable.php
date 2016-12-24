@@ -397,7 +397,7 @@ class Mailable implements MailableContract
 
             $this->{$property}[] = [
                 'name' => isset($recipient->name) ? $recipient->name : null,
-                'address' => $recipient->email
+                'address' => $recipient->email,
             ];
         }
 
