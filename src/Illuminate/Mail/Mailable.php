@@ -388,33 +388,20 @@ class Mailable implements MailableContract
      */
     protected function setAddress($address, $name = null, $property = 'to')
     {
-        if (is_object($address) && ! $address instanceof Collection) {
+        if (! is_array($address) && ! $address instanceof Collection) {
             $address = [$address];
         }
 
-        if ($address instanceof Collection || is_array($address)) {
-            $this->setArrayOfAddresses($address, $property);
-        } else {
-            $this->{$property}[] = compact('name', 'address');
+        foreach ($address as $recipient) {
+            $recipient = $this->normalizeRecipient($recipient);
+
+            $this->{$property}[] = [
+                'name' => isset($recipient->name) ? $recipient->name : null,
+                'address' => $recipient->email
+            ];
         }
 
         return $this;
-    }
-
-    /**
-     * Set an array of message recipients.
-     *
-     * @param  \Illuminate\Support\Collection|array  $users
-     * @param  string  $property
-     * @return void
-     */
-    protected function setArrayOfAddresses($users, $property = 'to')
-    {
-        foreach ($users as $user) {
-            $user = $this->convertUserToObject($user);
-
-            $this->{$property}($user->email, isset($user->name) ? $user->name : null);
-        }
     }
 
     /**
@@ -423,15 +410,15 @@ class Mailable implements MailableContract
      * @param  mixed  $user
      * @return object
      */
-    protected function convertUserToObject($user)
+    protected function normalizeRecipient($recipient)
     {
-        if (is_array($user)) {
-            return (object) $user;
-        } elseif (is_string($user)) {
-            return (object) ['email' => $user];
+        if (is_array($recipient)) {
+            return (object) $recipient;
+        } elseif (is_string($recipient)) {
+            return (object) ['email' => $recipient];
         }
 
-        return $user;
+        return $recipient;
     }
 
     /**
