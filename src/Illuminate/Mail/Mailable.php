@@ -388,7 +388,7 @@ class Mailable implements MailableContract
      */
     protected function setAddress($address, $name = null, $property = 'to')
     {
-        foreach ($this->recipientToArray($address, $name) as $recipient) {
+        foreach ($this->addressesToArray($address, $name) as $recipient) {
             $recipient = $this->normalizeRecipient($recipient);
 
             $this->{$property}[] = [
@@ -407,7 +407,7 @@ class Mailable implements MailableContract
      * @param  string|null  $name
      * @return array
      */
-    protected function recipientToArray($address, $name)
+    protected function addressesToArray($address, $name)
     {
         if (! is_array($address) && ! $address instanceof Collection) {
             $address = is_string($name) ? [['name' => $name, 'email' => $address]] : [$address];
