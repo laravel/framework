@@ -3,9 +3,9 @@
 namespace Illuminate\Support\Testing\Fakes;
 
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\MailableMailer;
+use Illuminate\Mail\PendingMail;
 
-class MailableFake extends MailableMailer
+class PendingMailFake extends PendingMail
 {
     /**
      * The mailable instance.
