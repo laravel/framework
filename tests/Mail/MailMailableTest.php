@@ -15,7 +15,7 @@ class MailMailableTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([['name' => null, 'address' => 'taylor@laravel.com']], $mailable->to);
 
         $mailable = new WelcomeMailableStub;
-        $mailable->to([['name' => 'Taylor Otwell', 'email' => 'taylor@laravel.com']]);;
+        $mailable->to([['name' => 'Taylor Otwell', 'email' => 'taylor@laravel.com']]);
         $this->assertEquals([['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com']], $mailable->to);
 
         $mailable = new WelcomeMailableStub;
@@ -30,7 +30,7 @@ class MailMailableTest extends PHPUnit_Framework_TestCase
         $mailable->to(collect([new MailableTestUserStub, new MailableTestUserStub]));
         $this->assertEquals([
             ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
-            ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com']
+            ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
         ], $mailable->to);
     }
 
