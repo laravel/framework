@@ -8,20 +8,14 @@ use Illuminate\Mail\PendingMail;
 class PendingMailFake extends PendingMail
 {
     /**
-     * The mailable instance.
-     *
-     * @var mixed
-     */
-    public $mailable;
-
-    /**
      * Create a new instance.
      *
+     * @param  \Illuminate\Support\Testing\Fakes\MailFake
      * @return void
      */
-    public function __construct()
+    public function __construct($mailer)
     {
-        //
+        $this->mailer = $mailer;
     }
 
     /**
@@ -43,7 +37,7 @@ class PendingMailFake extends PendingMail
      */
     public function sendNow(Mailable $mailable)
     {
-        $this->mailable = $mailable;
+        $this->mailer->send($this->fill($mailable));
     }
 
     /**
@@ -55,15 +49,5 @@ class PendingMailFake extends PendingMail
     public function queue(Mailable $mailable)
     {
         return $this->sendNow($mailable);
-    }
-
-    /**
-     * Get the recipient information for the mailable.
-     *
-     * @return array
-     */
-    public function getRecipients()
-    {
-        return ['to' => $this->to, 'cc' => $this->cc, 'bcc' => $this->bcc];
     }
 }
