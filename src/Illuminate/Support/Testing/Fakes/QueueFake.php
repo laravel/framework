@@ -44,11 +44,7 @@ class QueueFake implements Queue
                 return false;
             }
 
-            if ($callback) {
-                return $callback(...func_get_args());
-            }
-
-            return true;
+            return $callback ? $callback(...func_get_args()) : true;
         });
     }
 
