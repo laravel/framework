@@ -33,68 +33,6 @@ class MailFake implements Mailer
     }
 
     /**
-     * Assert if a mailable was sent based on a truth-test callback.
-     *
-     * @param  mixed  $users
-     * @param  string  $mailable
-     * @param  callable|null  $callback
-     * @return void
-     */
-    public function assertSentTo($users, $mailable, $callback = null)
-    {
-        $users = $this->formatRecipients($users);
-
-        return $this->assertSent($mailable, function ($mailable, $to) use ($users, $callback) {
-            if (! $this->recipientsMatch($users, $this->formatRecipients($to))) {
-                return false;
-            }
-
-            if (! is_null($callback)) {
-                return $callback(...func_get_args());
-            }
-
-            return true;
-        });
-    }
-
-    /**
-     * Format the recipients into a collection.
-     *
-     * @param  mixed  $recipients
-     * @return \Illuminate\Support\Collection
-     */
-    protected function formatRecipients($recipients)
-    {
-        if ($recipients instanceof Collection) {
-            return $recipients;
-        }
-
-        return collect(is_array($recipients) ? $recipients : [$recipients]);
-    }
-
-    /**
-     * Determine if two given recipient lists match.
-     *
-     * @param  \Illuminate\Support\Collection  $expected
-     * @param  \Illuminate\Support\Collection  $recipients
-     * @return bool
-     */
-    protected function recipientsMatch($expected, $recipients)
-    {
-        $expected = $expected->map(function ($expected) {
-            return is_object($expected) ? $expected->email : $expected;
-        });
-
-        return $recipients->map(function ($recipient) {
-            if (is_array($recipient)) {
-                return $recipient['email'];
-            }
-
-            return is_object($recipient) ? $recipient->email : $recipient;
-        })->diff($expected)->count() === 0;
-    }
-
-    /**
      * Determine if a mailable was sent based on a truth-test callback.
      *
      * @param  string  $mailable
@@ -127,7 +65,7 @@ class MailFake implements Mailer
         };
 
         return $this->mailablesOf($mailable)->filter(function ($mailable) use ($callback) {
-            return $callback($mailable->mailable, ...array_values($mailable->getRecipients()));
+            return $callback($mailable);
         });
     }
 
@@ -150,8 +88,8 @@ class MailFake implements Mailer
      */
     protected function mailablesOf($type)
     {
-        return collect($this->mailables)->filter(function ($m) use ($type) {
-            return $m->mailable instanceof $type;
+        return collect($this->mailables)->filter(function ($mailable) use ($type) {
+            return $mailable instanceof $type;
         });
     }
 
@@ -163,9 +101,7 @@ class MailFake implements Mailer
      */
     public function to($users)
     {
-        $this->mailables[] = $mailable = (new PendingMailFake)->to($users);
-
-        return $mailable;
+        return (new PendingMailFake($this))->to($users);
     }
 
     /**
@@ -176,9 +112,7 @@ class MailFake implements Mailer
      */
     public function bcc($users)
     {
-        $this->mailables[] = $mailable = (new PendingMailFake)->bcc($users);
-
-        return $mailable;
+        return (new PendingMailFake($this))->bcc($users);
     }
 
     /**
@@ -207,35 +141,7 @@ class MailFake implements Mailer
             return;
         }
 
-        Container::getInstance()->call([$view, 'build']);
-
-        $mailable = new PendingMailFake;
-
-        $mailable->mailable = $view;
-
-        if ($recipients = $view->to) {
-            $mailable->to($recipients);
-        }
-
-        if ($recipients = $view->bcc) {
-            $mailable->bcc($recipients);
-        }
-
-        if ($recipients = $view->cc) {
-            $mailable->cc($recipients);
-        }
-
-        $this->mailables[] = $mailable;
-    }
-
-    /**
-     * Get the array of failed recipients.
-     *
-     * @return array
-     */
-    public function failures()
-    {
-        //
+        $this->mailables[] = $view;
     }
 
     /**
@@ -250,5 +156,15 @@ class MailFake implements Mailer
     public function queue($view, array $data = [], $callback = null, $queue = null)
     {
         $this->send($view);
+    }
+
+    /**
+     * Get the array of failed recipients.
+     *
+     * @return array
+     */
+    public function failures()
+    {
+        //
     }
 }
