@@ -324,6 +324,8 @@ class Worker
     /**
      * Mark the given job as failed and raise the relevant event.
      *
+     * Note: Any change to this method should also be made to InteractsWithQueue.
+     *
      * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  \Exception  $e
