@@ -20,7 +20,7 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface
      *
      * @var string
      */
-    protected $connection = null;
+    protected $connection;
 
     /**
      * Create a new database presence verifier.
