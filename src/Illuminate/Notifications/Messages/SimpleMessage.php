@@ -23,9 +23,9 @@ class SimpleMessage
     /**
      * The notification's greeting.
      *
-     * @var string|null
+     * @var string
      */
-    public $greeting = null;
+    public $greeting;
 
     /**
      * The "intro" lines of the notification.
