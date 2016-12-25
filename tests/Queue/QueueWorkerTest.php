@@ -242,6 +242,7 @@ class WorkerFakeJob
     public $maxTries;
     public $attempts = 0;
     public $failedWith;
+    public $connectionName;
 
     public function __construct($callback = null)
     {
@@ -288,6 +289,11 @@ class WorkerFakeJob
     public function failed($e)
     {
         $this->failedWith = $e;
+    }
+
+    public function setConnectionName($name)
+    {
+        $this->connectionName = $name;
     }
 
     public function testJobSleepsWhenAnExceptionIsThrownForADaemonWorker()
