@@ -142,5 +142,5 @@ class AnotherEloquentBelongsToModelStub extends Illuminate\Database\Eloquent\Mod
 
 class MissingEloquentBelongsToModelStub extends Illuminate\Database\Eloquent\Model
 {
-    public $foreign_key = null;
+    public $foreign_key;
 }

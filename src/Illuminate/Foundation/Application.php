@@ -130,7 +130,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      *
      * @var string
      */
-    protected $namespace = null;
+    protected $namespace;
 
     /**
      * Create a new Illuminate application instance.

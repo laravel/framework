@@ -164,7 +164,7 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
  */
 class InsomniacWorker extends Illuminate\Queue\Worker
 {
-    public $sleptFor = null;
+    public $sleptFor;
 
     public function sleep($seconds)
     {
