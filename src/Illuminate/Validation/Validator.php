@@ -16,6 +16,7 @@ use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
+use Illuminate\Validation\Rules\Rule;
 use Illuminate\Contracts\Container\Container;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -79,6 +80,13 @@ class Validator implements ValidatorContract
      * @var array
      */
     protected $rules;
+
+    /**
+     * The name of the current rule being evaluated.
+     *
+     * @var string
+     */
+    protected $currentRule;
 
     /**
      * The array of wildcard attributes with their asterisks expanded.
@@ -1435,6 +1443,10 @@ class Validator implements ValidatorContract
      */
     protected function getUniqueExtra($parameters)
     {
+        if ($this->currentRule instanceof Rule) {
+            return $parameters[4];
+        }
+
         if (isset($parameters[4])) {
             return $this->getExtraConditions(array_slice($parameters, 4));
         }
@@ -1506,6 +1518,10 @@ class Validator implements ValidatorContract
      */
     protected function getExtraExistConditions(array $parameters)
     {
+        if ($this->currentRule instanceof Rule) {
+            return $parameters[2];
+        }
+
         return $this->getExtraConditions(array_values(array_slice($parameters, 2)));
     }
 
@@ -2687,6 +2703,10 @@ class Validator implements ValidatorContract
      */
     protected function parseRule($rules)
     {
+        if ($rules instanceof Rule) {
+            return $rules->toArray();
+        }
+
         if (is_array($rules)) {
             $rules = $this->parseArrayRule($rules);
         } else {
@@ -2755,6 +2775,11 @@ class Validator implements ValidatorContract
      */
     protected function parseNamedParameters($parameters)
     {
+        // If the current rule is a Rule object, then the parameters are already parsed.
+        if ($this->currentRule instanceof Rule) {
+            return $parameters;
+        }
+
         return array_reduce($parameters, function ($result, $item) {
             list($key, $value) = array_pad(explode('=', $item, 2), 2, null);
 

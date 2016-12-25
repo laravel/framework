@@ -2,7 +2,7 @@
 
 namespace Illuminate\Validation\Rules;
 
-class Dimensions
+class Dimensions implements Rule
 {
     /**
      * The constraints for the dimensions rule.
@@ -111,6 +111,11 @@ class Dimensions
         $this->constraints['ratio'] = $value;
 
         return $this;
+    }
+
+    public function toArray()
+    {
+        return ['dimensions', $this->constraints];
     }
 
     /**

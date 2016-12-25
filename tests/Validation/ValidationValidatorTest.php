@@ -14,6 +14,21 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
+    public function testCanExtractRuleAndParametersFromARuleObject()
+    {
+        $rule = m::mock(\Illuminate\Validation\Rules\Rule::class);
+
+        // Why 6 times?
+        $rule->shouldReceive('toArray')->times(6)->andReturn(['max', [120]]);
+
+        $rule->shouldReceive('__toString')->never();
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['age' => 30], ['age' => $rule]);
+
+        $this->assertTrue($v->passes());
+    }
+
     public function testSometimesWorksOnNestedArrays()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -1900,6 +1915,20 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
         $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:ratio=1']);
         $this->assertTrue($v->fails());
+    }
+
+    public function testValidateImageDimensionsObject()
+    {
+        $uploadedFile = new \Symfony\Component\HttpFoundation\File\UploadedFile(__DIR__.'/fixtures/image.gif', '', null, null, null, true);
+
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, [], [
+            'file' => \Illuminate\Validation\Rule::dimensions(['min_width' => 2, 'min_heigh' => 2]),
+        ]);
+        $v->setFiles(['file' => $uploadedFile]);
+
+        $this->assertTrue($v->passes());
     }
 
     /**
