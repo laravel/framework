@@ -686,7 +686,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(empty($request->undefined), true);
 
         // Simulates Route parameters.
-        $request = Request::create('/example/bar', 'GET', ['xyz' => 'overwrited']);
+        $request = Request::create('/example/bar', 'GET', ['xyz' => 'overwritten']);
         $request->setRouteResolver(function () use ($request) {
             $route = new Route('GET', '/example/{foo}/{xyz?}/{undefined?}', []);
             $route->bind($request);
@@ -704,9 +704,9 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(isset($request->undefined), false);
         $this->assertEquals(empty($request->undefined), true);
 
-        // Special case: router parameter 'xyz' is 'overwrited' by QueryString, then it ISSET and is NOT EMPTY.
+        // Special case: router parameter 'xyz' is 'overwritten' by QueryString, then it ISSET and is NOT EMPTY.
         // Basically, QueryStrings have priority over router parameters.
-        $this->assertEquals($request->xyz, 'overwrited');
+        $this->assertEquals($request->xyz, 'overwritten');
         $this->assertEquals(isset($request->foo), true);
         $this->assertEquals(empty($request->foo), false);
 
