@@ -29,7 +29,7 @@ class SendQueuedNotifications implements ShouldQueue
      *
      * @var array
      */
-    protected $channels = null;
+    protected $channels;
 
     /**
      * Create a new job instance.
