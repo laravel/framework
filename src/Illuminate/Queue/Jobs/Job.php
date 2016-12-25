@@ -23,6 +23,11 @@ abstract class Job
     protected $container;
 
     /**
+     * The name of the connection the job belongs to.
+     */
+    protected $connectionName;
+
+    /**
      * The name of the queue the job belongs to.
      *
      * @var string
@@ -252,6 +257,27 @@ abstract class Job
     public function timeout()
     {
         return array_get($this->payload(), 'timeout');
+    }
+
+    /**
+     * Get the name of the connection the job belongs to.
+     *
+     * @return string
+     */
+    public function getConnectionName()
+    {
+        return $this->connectionName;
+    }
+
+    /**
+     * Set the name of the connection the job belongs to.
+     *
+     * @param  string  $name
+     * @return void
+     */
+    public function setConnectionName($name)
+    {
+        $this->connectionName = $name;
     }
 
     /**
