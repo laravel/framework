@@ -68,7 +68,7 @@ class MailMessage extends SimpleMessage
      *
      * @var int
      */
-    public $priority = null;
+    public $priority;
 
     /**
      * Set the view for the mail message.

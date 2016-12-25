@@ -50,7 +50,7 @@ abstract class AbstractPaginator implements Htmlable
      *
      * @var string|null
      */
-    protected $fragment = null;
+    protected $fragment;
 
     /**
      * The query string variable used to store the page.
