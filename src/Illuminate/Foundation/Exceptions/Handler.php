@@ -38,11 +38,11 @@ class Handler implements ExceptionHandlerContract
     protected $dontReport = [];
 
     /**
-     * The prefix for views of error-pages
+     * The prefix for views of error-pages.
      *
      * @var string
      */
-    protected $prefixViewError = "errors";
+    protected $prefixViewError = 'errors';
 
     /**
      * Create a new exception handler instance.
