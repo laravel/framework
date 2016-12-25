@@ -552,6 +552,10 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, ['name' => 'foo'], ['name' => 'Required']);
         $this->assertTrue($v->passes());
 
+        // numerical keys are preserved
+        $v = new Validator($trans, ['1' => 'foo'], ['1' => 'Required']);
+        $this->assertTrue($v->passes());
+
         $file = new File('', false);
         $v = new Validator($trans, ['name' => $file], ['name' => 'Required']);
         $this->assertFalse($v->passes());
