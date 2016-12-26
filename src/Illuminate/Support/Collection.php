@@ -845,6 +845,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         if ($max > 0) {
             $max = ($max <= $amount) ? $amount + 1 : $max;
+            
             return $this->random(mt_rand($amount, $max));
         }
 
