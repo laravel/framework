@@ -32,18 +32,18 @@ class Validator implements ValidatorContract
     protected $translator;
 
     /**
-     * The Presence Verifier implementation.
-     *
-     * @var \Illuminate\Validation\PresenceVerifierInterface
-     */
-    protected $presenceVerifier;
-
-    /**
      * The container instance.
      *
      * @var \Illuminate\Contracts\Container\Container
      */
     protected $container;
+
+    /**
+     * The Presence Verifier implementation.
+     *
+     * @var \Illuminate\Validation\PresenceVerifierInterface
+     */
+    protected $presenceVerifier;
 
     /**
      * The failed validation rules.
