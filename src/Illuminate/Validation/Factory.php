@@ -93,7 +93,9 @@ class Factory implements FactoryContract
         // The presence verifier is responsible for checking the unique and exists data
         // for the validator. It is behind an interface so that multiple versions of
         // it may be written besides database. We'll inject it into the validator.
-        $validator = $this->resolve($data, $rules, $messages, $customAttributes);
+        $validator = $this->resolve(
+            $data, $rules, $messages, $customAttributes
+        );
 
         if (! is_null($this->verifier)) {
             $validator->setPresenceVerifier($this->verifier);
@@ -128,28 +130,6 @@ class Factory implements FactoryContract
     }
 
     /**
-     * Add the extensions to a validator instance.
-     *
-     * @param  \Illuminate\Validation\Validator  $validator
-     * @return void
-     */
-    protected function addExtensions(Validator $validator)
-    {
-        $validator->addExtensions($this->extensions);
-
-        // Next, we will add the implicit extensions, which are similar to the required
-        // and accepted rule in that they are run even if the attributes is not in a
-        // array of data that is given to a validator instances via instantiation.
-        $implicit = $this->implicitExtensions;
-
-        $validator->addImplicitExtensions($implicit);
-
-        $validator->addReplacers($this->replacers);
-
-        $validator->setFallbackMessages($this->fallbackMessages);
-    }
-
-    /**
      * Resolve a new Validator instance.
      *
      * @param  array  $data
@@ -165,6 +145,26 @@ class Factory implements FactoryContract
         }
 
         return call_user_func($this->resolver, $this->translator, $data, $rules, $messages, $customAttributes);
+    }
+
+    /**
+     * Add the extensions to a validator instance.
+     *
+     * @param  \Illuminate\Validation\Validator  $validator
+     * @return void
+     */
+    protected function addExtensions(Validator $validator)
+    {
+        $validator->addExtensions($this->extensions);
+
+        // Next, we will add the implicit extensions, which are similar to the required
+        // and accepted rule in that they are run even if the attributes is not in a
+        // array of data that is given to a validator instances via instantiation.
+        $validator->addImplicitExtensions($this->implicitExtensions);
+
+        $validator->addReplacers($this->replacers);
+
+        $validator->setFallbackMessages($this->fallbackMessages);
     }
 
     /**
