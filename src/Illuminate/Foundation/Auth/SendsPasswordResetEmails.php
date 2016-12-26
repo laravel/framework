@@ -34,13 +34,34 @@ trait SendsPasswordResetEmails
             $request->only('email')
         );
 
-        if ($response === Password::RESET_LINK_SENT) {
-            return back()->with('status', trans($response));
-        }
-
-        // If an error was returned by the password broker, we will get this message
-        // translated so we can notify a user of the problem. We'll redirect back
-        // to where the users came from so they can attempt this process again.
+        // If the password reset link was successfully send, we will redirect
+        // the user back to the application's password forgot view. If there is an error
+        // we can redirect them back to where they came from with their error message.
+        return $response == Password::RESET_LINK_SENT
+                    ? $this->sendResetLinkResponse($response)
+                    : $this->sendResetLinkFailedResponse($request, $response);
+    }
+    
+    /**
+     * Get the response for a successful password reset link.
+     *
+     * @param  string  $response
+     * @return \Illuminate\Http\Response
+     */
+    protected function sendResetLinkResponse($response)
+    {
+        return back()->with('status', trans($response));
+    }
+    
+    /**
+     * Get the response for a failed password reset link.
+     *
+     * @param  \Illuminate\Http\Request
+     * @param  string  $response
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    protected function sendResetLinkFailedResponse(Request $request, $response)
+    {
         return back()->withErrors(
             ['email' => trans($response)]
         );
