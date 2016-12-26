@@ -41,7 +41,7 @@ trait SendsPasswordResetEmails
                     ? $this->sendResetLinkResponse($response)
                     : $this->sendResetLinkFailedResponse($request, $response);
     }
-    
+
     /**
      * Get the response for a successful password reset link.
      *
@@ -52,7 +52,7 @@ trait SendsPasswordResetEmails
     {
         return back()->with('status', trans($response));
     }
-    
+
     /**
      * Get the response for a failed password reset link.
      *
