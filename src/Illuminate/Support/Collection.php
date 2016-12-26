@@ -172,20 +172,14 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function contains($key, $operator = null, $value = null)
     {
         if (func_num_args() == 1) {
-            if ($this->useAsCallable($key)) {
-                return ! is_null($this->first($key));
-            }
-
-            return in_array($key, $this->items);
+            return Arr::contains($this->items, $key);
         }
 
         if (func_num_args() == 2) {
-            $value = $operator;
-
-            $operator = '=';
+            return Arr::contains($this->items, $key, $operator);
         }
 
-        return $this->contains($this->operatorForWhere($key, $operator, $value));
+        return Arr::contains($this->items, $key, $operator, $value);
     }
 
     /**
@@ -301,11 +295,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function filter(callable $callback = null)
     {
-        if ($callback) {
-            return new static(Arr::where($this->items, $callback));
-        }
-
-        return new static(array_filter($this->items));
+        return new static(Arr::filter($this->items, $callback));
     }
 
     /**
@@ -319,12 +309,10 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function where($key, $operator, $value = null)
     {
         if (func_num_args() == 2) {
-            $value = $operator;
-
-            $operator = '=';
+            return new static(Arr::where($this->items, $key, $operator));
         }
 
-        return $this->filter($this->operatorForWhere($key, $operator, $value));
+        return new static(Arr::where($this->items, $key, $operator, $value));
     }
 
     /**
@@ -631,11 +619,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function map(callable $callback)
     {
-        $keys = array_keys($this->items);
-
-        $items = array_map($callback, $this->items, $keys);
-
-        return new static(array_combine($keys, $items));
+        return new static(Arr::map($this->items, $callback));
     }
 
     /**
@@ -648,17 +632,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function mapWithKeys(callable $callback)
     {
-        $result = [];
-
-        foreach ($this->items as $key => $value) {
-            $assoc = $callback($value, $key);
-
-            foreach ($assoc as $mapKey => $mapValue) {
-                $result[$mapKey] = $mapValue;
-            }
-        }
-
-        return new static($result);
+        return new static(Arr::mapWithKeys($this->items, $callback));
     }
 
     /**
@@ -669,7 +643,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function flatMap(callable $callback)
     {
-        return $this->map($callback)->collapse();
+        return new static(Arr::flatMap($this->items, $callback));
     }
 
     /**
@@ -925,7 +899,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function reduce(callable $callback, $initial = null)
     {
-        return array_reduce($this->items, $callback, $initial);
+        return Arr::reduce($this->items, $callback, $initial);
     }
 
     /**

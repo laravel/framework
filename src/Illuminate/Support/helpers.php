@@ -290,13 +290,14 @@ if (! function_exists('array_sort_recursive')) {
 
 if (! function_exists('array_where')) {
     /**
-     * Filter the array using the given callback.
+     * Filter an array by the given key value pair.
      *
      * @param  array  $array
-     * @param  callable  $callback
-     * @return array
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return static
      */
-    function array_where($array, callable $callback)
+    function array_where($array, $key, $operator, $value = null)
     {
         return Arr::where($array, $callback);
     }
