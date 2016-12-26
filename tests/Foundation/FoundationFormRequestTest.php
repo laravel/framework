@@ -90,6 +90,15 @@ class FoundationFormRequestTest extends PHPUnit_Framework_TestCase
 
         $request->validate($factory);
     }
+
+    public function testOnlyRulesValuesMethod()
+    {
+        $request = FoundationTestFormRequestStub::create('/', 'GET', ['name' => 'Taylor', 'age' => 25]);
+        $this->assertEquals(['name' => 'Taylor'], $request->onlyRulesValues());
+
+        $request = FoundationTestFormRequestWithEmptyRules::create('/', 'GET', ['name' => 'abigail', 'age' => 25]);
+        $this->assertEquals([], $request->onlyRulesValues());
+    }
 }
 
 class FoundationTestFormRequestStub extends Illuminate\Foundation\Http\FormRequest
@@ -132,5 +141,17 @@ class FoundationTestFormRequestHooks extends Illuminate\Foundation\Http\FormRequ
     public function prepareForValidation()
     {
         $this->replace(['name' => 'Taylor']);
+    }
+}
+class FoundationTestFormRequestWithEmptyRules extends Illuminate\Foundation\Http\FormRequest
+{
+    public function rules()
+    {
+        return [];
+    }
+
+    public function authorize()
+    {
+        return true;
     }
 }
