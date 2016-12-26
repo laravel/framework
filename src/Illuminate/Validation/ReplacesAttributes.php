@@ -2,25 +2,7 @@
 
 namespace Illuminate\Validation;
 
-use Closure;
-use DateTime;
-use Countable;
-use Exception;
-use Throwable;
-use DateTimeZone;
-use RuntimeException;
-use DateTimeInterface;
-use BadMethodCallException;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use InvalidArgumentException;
-use Illuminate\Support\Fluent;
-use Illuminate\Support\MessageBag;
-use Illuminate\Contracts\Container\Container;
-use Symfony\Component\HttpFoundation\File\File;
-use Illuminate\Contracts\Translation\Translator;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 
 trait ReplacesAttributes
 {
@@ -346,27 +328,5 @@ trait ReplacesAttributes
     protected function replaceAfter($message, $attribute, $rule, $parameters)
     {
         return $this->replaceBefore($message, $attribute, $rule, $parameters);
-    }
-
-    /**
-     * Get the displayable name of the value.
-     *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @return string
-     */
-    public function getDisplayableValue($attribute, $value)
-    {
-        if (isset($this->customValues[$attribute][$value])) {
-            return $this->customValues[$attribute][$value];
-        }
-
-        $key = "validation.values.{$attribute}.{$value}";
-
-        if (($line = $this->translator->trans($key)) !== $key) {
-            return $line;
-        }
-
-        return $value;
     }
 }

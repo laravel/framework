@@ -2,32 +2,13 @@
 
 namespace Illuminate\Validation;
 
-use Closure;
-use DateTime;
-use Countable;
-use Exception;
-use Throwable;
-use DateTimeZone;
-use RuntimeException;
-use DateTimeInterface;
-use BadMethodCallException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use InvalidArgumentException;
-use Illuminate\Support\Fluent;
-use Illuminate\Support\MessageBag;
-use Illuminate\Contracts\Container\Container;
-use Symfony\Component\HttpFoundation\File\File;
-use Illuminate\Contracts\Translation\Translator;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 
 class ValidationRuleParser
 {
     /**
      * The data being validated.
-     *
-     * Needed in order to properly explode array rules.
      *
      * @var array
      */
@@ -46,7 +27,7 @@ class ValidationRuleParser
      * @param  array  $data
      * @return void
      */
-    public function __construct($data)
+    public function __construct(array $data)
     {
         $this->data = $data;
     }
@@ -54,9 +35,10 @@ class ValidationRuleParser
     /**
      * Parse the human-friendly rules into a full rules array for the validator.
      *
+     * @param  array  $rules
      * @return StdClass
      */
-    public function parse($rules)
+    public function explode($rules)
     {
         $this->implicitAttributes = [];
 
@@ -69,7 +51,7 @@ class ValidationRuleParser
     }
 
     /**
-     * Explode the rules into an array of rules.
+     * Explode the rules into an array of explicit rules.
      *
      * @param  array  $rules
      * @return array
@@ -78,17 +60,11 @@ class ValidationRuleParser
     {
         foreach ($rules as $key => $rule) {
             if (Str::contains($key, '*')) {
-                $rules = $this->each($rules, $key, [$rule]);
+                $rules = $this->explodeWildcardRules($rules, $key, [$rule]);
 
                 unset($rules[$key]);
             } else {
-                if (is_string($rule)) {
-                    $rules[$key] = explode('|', $rule);
-                } elseif (is_object($rule)) {
-                    $rules[$key] = [$rule];
-                } else {
-                    $rules[$key] = $rule;
-                }
+                $rules[$key] = $this->explodeExplicitRule($rule);
             }
         }
 
@@ -96,15 +72,31 @@ class ValidationRuleParser
     }
 
     /**
+     * Explode the explicit rule into an array if necessary.
+     *
+     * @param  mixed  $rule
+     * @return array
+     */
+    protected function explodeExplicitRule($rule)
+    {
+        if (is_string($rule)) {
+            return explode('|', $rule);
+        } elseif (is_object($rule)) {
+            return [$rule];
+        } else {
+            return $rule;
+        }
+    }
+
+    /**
      * Define a set of rules that apply to each element in an array attribute.
      *
+     * @param  array  $results
      * @param  string  $attribute
      * @param  string|array  $rules
-     * @return void
-     *
-     * @throws \InvalidArgumentException
+     * @return array
      */
-    public function each($masterRules, $attribute, $rules)
+    protected function explodeWildcardRules($results, $attribute, $rules)
     {
         $pattern = str_replace('\*', '[^\.]+', preg_quote($attribute));
 
@@ -112,54 +104,142 @@ class ValidationRuleParser
 
         foreach ($data as $key => $value) {
             if (Str::startsWith($key, $attribute) || (bool) preg_match('/^'.$pattern.'\z/', $key)) {
-                foreach ((array) $rules as $ruleKey => $ruleValue) {
-                    if (! is_string($ruleKey) || Str::endsWith($key, $ruleKey)) {
-                        $this->implicitAttributes[$attribute][] = $key;
+                foreach ((array) $rules as $rule) {
+                    $this->implicitAttributes[$attribute][] = $key;
 
-                        $masterRules = $this->mergeRules($masterRules, $key, $ruleValue);
-                    }
+                    $results = $this->mergeRules($results, $key, $rule);
                 }
             }
         }
 
-        return $masterRules;
+        return $results;
     }
 
     /**
      * Merge additional rules into a given attribute(s).
      *
-     * @param  string  $attribute
+     * @param  array  $results
+     * @param  string|array  $attribute
      * @param  string|array  $rules
      * @return array
      */
-    public function mergeRules($masterRules, $attribute, $rules = [])
+    public function mergeRules($results, $attribute, $rules = [])
     {
         if (is_array($attribute)) {
-            foreach ($attribute as $innerAttribute => $innerRules) {
-                $masterRules = $this->mergeRulesForAttribute($masterRules, $innerAttribute, $innerRules);
+            foreach ((array) $attribute as $innerAttribute => $innerRules) {
+                $results = $this->mergeRulesForAttribute($results, $innerAttribute, $innerRules);
             }
 
-            return $masterRules;
+            return $results;
         }
 
-        return $this->mergeRulesForAttribute($masterRules, $attribute, $rules);
+        return $this->mergeRulesForAttribute(
+            $results, $attribute, $rules
+        );
     }
 
     /**
      * Merge additional rules into a given attribute.
      *
+     * @param  array  $results
      * @param  string  $attribute
      * @param  string|array  $rules
-     * @return $this
+     * @return array
      */
-    protected function mergeRulesForAttribute($masterRules, $attribute, $rules)
+    protected function mergeRulesForAttribute($results, $attribute, $rules)
     {
-        $current = isset($masterRules[$attribute]) ? $masterRules[$attribute] : [];
-
         $merge = head($this->explodeRules([$rules]));
 
-        $masterRules[$attribute] = array_merge($current, $merge);
+        $results[$attribute] = array_merge(
+            isset($results[$attribute]) ? $results[$attribute] : [], $merge
+        );
 
-        return $masterRules;
+        return $results;
+    }
+
+    /**
+     * Extract the rule name and parameters from a rule.
+     *
+     * @param  array|string  $rules
+     * @return array
+     */
+    public static function parse($rules)
+    {
+        if (is_array($rules)) {
+            $rules = static::parseArrayRule($rules);
+        } else {
+            $rules = static::parseStringRule($rules);
+        }
+
+        $rules[0] = static::normalizeRule($rules[0]);
+
+        return $rules;
+    }
+
+    /**
+     * Parse an array based rule.
+     *
+     * @param  array  $rules
+     * @return array
+     */
+    protected static function parseArrayRule(array $rules)
+    {
+        return [Str::studly(trim(Arr::get($rules, 0))), array_slice($rules, 1)];
+    }
+
+    /**
+     * Parse a string based rule.
+     *
+     * @param  string  $rules
+     * @return array
+     */
+    protected static function parseStringRule($rules)
+    {
+        $parameters = [];
+
+        // The format for specifying validation rules and parameters follows an
+        // easy {rule}:{parameters} formatting convention. For instance the
+        // rule "Max:3" states that the value may only be three letters.
+        if (strpos($rules, ':') !== false) {
+            list($rules, $parameter) = explode(':', $rules, 2);
+
+            $parameters = static::parseParameters($rules, $parameter);
+        }
+
+        return [Str::studly(trim($rules)), $parameters];
+    }
+
+    /**
+     * Parse a parameter list.
+     *
+     * @param  string  $rule
+     * @param  string  $parameter
+     * @return array
+     */
+    protected static function parseParameters($rule, $parameter)
+    {
+        if (strtolower($rule) == 'regex') {
+            return [$parameter];
+        }
+
+        return str_getcsv($parameter);
+    }
+
+    /**
+     * Normalizes a rule so that we can accept short types.
+     *
+     * @param  string  $rule
+     * @return string
+     */
+    protected static function normalizeRule($rule)
+    {
+        switch ($rule) {
+            case 'Int':
+                return 'Integer';
+            case 'Bool':
+                return 'Boolean';
+            default:
+                return $rule;
+        }
     }
 }
