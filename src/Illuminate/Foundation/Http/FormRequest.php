@@ -111,7 +111,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
     {
         $rules = $this->rules();
 
-        if (!empty($rules)) {
+        if (! empty($rules)) {
             return $this->only(array_keys($rules));
         }
 
