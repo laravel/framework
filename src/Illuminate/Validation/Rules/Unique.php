@@ -173,7 +173,7 @@ class Unique
         return rtrim(sprintf('unique:%s,%s,%s,%s,%s',
             $this->table,
             $this->column,
-            $this->ignore ?: 'NULL',
+            $this->ignore ? '"'.$this->ignore.'"' : 'NULL',
             $this->idColumn,
             $this->formatWheres()
         ), ',');
