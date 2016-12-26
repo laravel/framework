@@ -836,6 +836,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Get one or more items randomly from the collection.
      *
      * @param  int  $amount
+     * @param  int $max
      * @return mixed
      *
      * @throws \InvalidArgumentException
