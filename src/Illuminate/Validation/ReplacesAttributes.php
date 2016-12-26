@@ -347,4 +347,26 @@ trait ReplacesAttributes
     {
         return $this->replaceBefore($message, $attribute, $rule, $parameters);
     }
+
+    /**
+     * Get the displayable name of the value.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @return string
+     */
+    public function getDisplayableValue($attribute, $value)
+    {
+        if (isset($this->customValues[$attribute][$value])) {
+            return $this->customValues[$attribute][$value];
+        }
+
+        $key = "validation.values.{$attribute}.{$value}";
+
+        if (($line = $this->translator->trans($key)) !== $key) {
+            return $line;
+        }
+
+        return $value;
+    }
 }
