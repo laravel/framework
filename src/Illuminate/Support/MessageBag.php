@@ -146,7 +146,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
     {
         $messages = is_null($key) ? $this->all($format) : $this->get($key, $format);
 
-        $firstMessage = array_first($messages, null, '') ;
+        $firstMessage = array_first($messages, null, '');
 
         return is_array($firstMessage) ? array_first($firstMessage) : $firstMessage;
     }
