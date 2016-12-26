@@ -840,8 +840,13 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      *
      * @throws \InvalidArgumentException
      */
-    public function random($amount = 1)
+    public function random($amount = 1, $max = 0)
     {
+        if ($max > 0) {
+            $max = ($max <= $amount) ? $amount + 1 : $max;
+            return $this->random(mt_rand($amount, $max));
+        }
+
         if ($amount > ($count = $this->count())) {
             throw new InvalidArgumentException("You requested {$amount} items, but there are only {$count} items in the collection");
         }
