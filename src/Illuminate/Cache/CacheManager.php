@@ -90,7 +90,11 @@ class CacheManager extends Manager {
 	{
 		$redis = $this->app['redis'];
 
-		return $this->repository(new RedisStore($redis, $this->getPrefix()));
+		// We allow the developer to specify which connection should be used
+		// to store the cached items.
+		$connection = $this->app['config']['cache.connection'];
+
+		return $this->repository(new RedisStore($redis, $this->getPrefix(), $connection));
 	}
 
 	/**
