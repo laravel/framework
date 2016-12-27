@@ -337,6 +337,20 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
         $c = new Collection([new TestEloquentCollectionModel, (object) ['id' => 'something']]);
         $c->getQueueableClass();
     }
+
+    public function testKeyByReturnsBaseCollectionToSupportKeyOrientedChains()
+    {
+        $one = (new TestEloquentCollectionModel)->forceFill(['name' => 'phone']);
+        $two = (new TestEloquentCollectionModel)->forceFill(['name' => 'address']);
+        $three = (new TestEloquentCollectionModel)->forceFill(['name' => 'unit']);
+        $four = (new TestEloquentCollectionModel)->forceFill(['name' => 'unit']);
+
+        $c = new Collection([$one, $two, $three, $four]);
+
+        $this->assertEquals(BaseCollection::class, get_class($c->keyBy('name')));
+        $this->assertEquals(3, $c->keyBy('name')->count());
+        $this->assertArrayHasKey('phone', $c->keyBy('name'));
+    }
 }
 
 class TestEloquentCollectionModel extends Illuminate\Database\Eloquent\Model

@@ -102,6 +102,11 @@ class Collection extends BaseCollection implements QueueableCollection
         }, $this->items);
     }
 
+    public function keyBy($keyBy)
+    {
+        return $this->toBase()->keyBy($keyBy);
+    }
+
     /**
      * Merge the collection with the given items.
      *
