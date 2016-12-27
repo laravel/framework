@@ -34,9 +34,6 @@ trait SendsPasswordResetEmails
             $request->only('email')
         );
 
-        // If the password reset link was successfully send, we will redirect
-        // the user back to the application's password forgot view. If there is an error
-        // we can redirect them back to where they came from with their error message.
         return $response == Password::RESET_LINK_SENT
                     ? $this->sendResetLinkResponse($response)
                     : $this->sendResetLinkFailedResponse($request, $response);
