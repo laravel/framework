@@ -401,7 +401,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
         $v = new Validator($trans, ['name' => ['', ''], 'lang' => ['en' => '']], [
             'name.*' => 'required|max:255',
-            'lang.*' => 'required|max:255'
+            'lang.*' => 'required|max:255',
         ]);
 
         $this->assertFalse($v->passes());
