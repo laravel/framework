@@ -110,6 +110,12 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     protected function validationData()
     {
+        if (method_exists($this, 'sanitize')) {
+            $this->merge(
+                $this->container->call([$this, 'sanitize'])
+            );
+        }
+
         return $this->all();
     }
 
