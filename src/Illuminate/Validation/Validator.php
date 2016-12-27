@@ -17,7 +17,8 @@ use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 
 class Validator implements ValidatorContract
 {
-    use FormatsMessages, ValidatesAttributes;
+    use Concerns\FormatsMessages,
+        Concerns\ValidatesAttributes;
 
     /**
      * The Translator implementation.
