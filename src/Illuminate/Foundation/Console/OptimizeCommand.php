@@ -68,6 +68,8 @@ class OptimizeCommand extends Command
     protected function getOptions()
     {
         return [
+            ['force', null, InputOption::VALUE_NONE, 'Force the compiled class file to be written (deprecated).'],
+
             ['psr', null, InputOption::VALUE_NONE, 'Do not optimize Composer dump-autoload.'],
         ];
     }
