@@ -366,6 +366,25 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Get the primary attribute name.
+     *
+     * For example, if "name.0" is given, "name.*" will be returned.
+     *
+     * @param  string  $attribute
+     * @return string
+     */
+    protected function getPrimaryAttribute($attribute)
+    {
+        foreach ($this->implicitAttributes as $unparsed => $parsed) {
+            if (in_array($attribute, $parsed)) {
+                return $unparsed;
+            }
+        }
+
+        return $attribute;
+    }
+
+    /**
      * Replace each field parameter which has asterisks with the given keys.
      *
      * @param  array  $parameters
@@ -481,7 +500,7 @@ class Validator implements ValidatorContract
      */
     protected function addFailure($attribute, $rule, $parameters)
     {
-        $this->messages->add($attribute, $this->doReplacements(
+        $this->messages->add($attribute, $this->makeReplacements(
             $this->getMessage($attribute, $rule), $attribute, $rule, $parameters
         ));
 
@@ -533,22 +552,47 @@ class Validator implements ValidatorContract
     }
 
     /**
-     * Get the primary attribute name.
+     * Get the failed validation rules.
      *
-     * For example, if "name.0" is given, "name.*" will be returned.
-     *
-     * @param  string  $attribute
-     * @return string
+     * @return array
      */
-    protected function getPrimaryAttribute($attribute)
+    public function failed()
     {
-        foreach ($this->implicitAttributes as $unparsed => $parsed) {
-            if (in_array($attribute, $parsed)) {
-                return $unparsed;
-            }
+        return $this->failedRules;
+    }
+
+    /**
+     * Get the message container for the validator.
+     *
+     * @return \Illuminate\Support\MessageBag
+     */
+    public function messages()
+    {
+        if (! $this->messages) {
+            $this->passes();
         }
 
-        return $attribute;
+        return $this->messages;
+    }
+
+    /**
+     * An alternative more semantic shortcut to the message container.
+     *
+     * @return \Illuminate\Support\MessageBag
+     */
+    public function errors()
+    {
+        return $this->messages();
+    }
+
+    /**
+     * Get the messages for the instance.
+     *
+     * @return \Illuminate\Support\MessageBag
+     */
+    public function getMessageBag()
+    {
+        return $this->messages();
     }
 
     /**
@@ -786,6 +830,17 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Set the custom messages for the validator.
+     *
+     * @param  array  $messages
+     * @return void
+     */
+    public function setCustomMessages(array $messages)
+    {
+        $this->customMessages = array_merge($this->customMessages, $messages);
+    }
+
+    /**
      * Set the custom attributes on the validator.
      *
      * @param  array  $attributes
@@ -799,30 +854,6 @@ class Validator implements ValidatorContract
     }
 
     /**
-     * Set the custom values on the validator.
-     *
-     * @param  array  $values
-     * @return $this
-     */
-    public function setValueNames(array $values)
-    {
-        $this->customValues = $values;
-
-        return $this;
-    }
-
-    /**
-     * Set the custom messages for the validator.
-     *
-     * @param  array  $messages
-     * @return void
-     */
-    public function setCustomMessages(array $messages)
-    {
-        $this->customMessages = array_merge($this->customMessages, $messages);
-    }
-
-    /**
      * Add custom attributes to the validator.
      *
      * @param  array  $customAttributes
@@ -831,6 +862,19 @@ class Validator implements ValidatorContract
     public function addCustomAttributes(array $customAttributes)
     {
         $this->customAttributes = array_merge($this->customAttributes, $customAttributes);
+
+        return $this;
+    }
+
+    /**
+     * Set the custom values on the validator.
+     *
+     * @param  array  $values
+     * @return $this
+     */
+    public function setValueNames(array $values)
+    {
+        $this->customValues = $values;
 
         return $this;
     }
@@ -857,50 +901,6 @@ class Validator implements ValidatorContract
     public function setFallbackMessages(array $messages)
     {
         $this->fallbackMessages = $messages;
-    }
-
-    /**
-     * Get the failed validation rules.
-     *
-     * @return array
-     */
-    public function failed()
-    {
-        return $this->failedRules;
-    }
-
-    /**
-     * Get the message container for the validator.
-     *
-     * @return \Illuminate\Support\MessageBag
-     */
-    public function messages()
-    {
-        if (! $this->messages) {
-            $this->passes();
-        }
-
-        return $this->messages;
-    }
-
-    /**
-     * An alternative more semantic shortcut to the message container.
-     *
-     * @return \Illuminate\Support\MessageBag
-     */
-    public function errors()
-    {
-        return $this->messages();
-    }
-
-    /**
-     * Get the messages for the instance.
-     *
-     * @return \Illuminate\Support\MessageBag
-     */
-    public function getMessageBag()
-    {
-        return $this->messages();
     }
 
     /**

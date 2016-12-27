@@ -37,9 +37,9 @@ trait FormatsMessages
      */
     protected function getMessage($attribute, $rule)
     {
-        $lowerRule = Str::snake($rule);
-
-        $inlineMessage = $this->getInlineMessage($attribute, $lowerRule);
+        $inlineMessage = $this->getFromLocalArray(
+            $attribute, $lowerRule = Str::snake($rule)
+        );
 
         // First we will retrieve the custom message for the validation rule if one
         // exists. If a custom validation message is being used we'll return the
@@ -48,9 +48,9 @@ trait FormatsMessages
             return $inlineMessage;
         }
 
-        $customKey = "validation.custom.{$attribute}.{$lowerRule}";
-
-        $customMessage = $this->getCustomMessageFromTranslator($customKey);
+        $customMessage = $this->getCustomMessageFromTranslator(
+            $customKey = "validation.custom.{$attribute}.{$lowerRule}"
+        );
 
         // First we check for a custom defined validation message for the attribute
         // and rule. This allows the developer to specify specific messages for
@@ -75,7 +75,7 @@ trait FormatsMessages
             return $value;
         }
 
-        return $this->getInlineMessage(
+        return $this->getFromLocalArray(
             $attribute, $lowerRule, $this->fallbackMessages
         ) ?: $key;
     }
@@ -88,7 +88,7 @@ trait FormatsMessages
      * @param  array   $source
      * @return string|null
      */
-    protected function getInlineMessage($attribute, $lowerRule, $source = null)
+    protected function getFromLocalArray($attribute, $lowerRule, $source = null)
     {
         $source = $source ?: $this->customMessages;
 
@@ -109,28 +109,44 @@ trait FormatsMessages
     /**
      * Get the custom error message from translator.
      *
-     * @param  string  $customKey
+     * @param  string  $key
      * @return string
      */
-    protected function getCustomMessageFromTranslator($customKey)
+    protected function getCustomMessageFromTranslator($key)
     {
-        if (($message = $this->translator->trans($customKey)) !== $customKey) {
+        if (($message = $this->translator->trans($key)) !== $key) {
             return $message;
         }
 
-        $shortKey = preg_replace('/^validation\.custom\./', '', $customKey);
-
-        $customMessages = Arr::dot(
-            (array) $this->translator->trans('validation.custom')
+        // If an exact match was not found for the key, we will collapse all of these
+        // messages and loop through them and try to find a wildcard match for the
+        // given key. Otherwise, we will simply return the key's value back out.
+        $shortKey = preg_replace(
+            '/^validation\.custom\./', '', $key
         );
 
-        foreach ($customMessages as $key => $message) {
-            if ($shortKey === $key || (Str::contains($key, ['*']) && Str::is($key, $shortKey))) {
+        return $this->getWildcardCustomMessages(Arr::dot(
+            (array) $this->translator->trans('validation.custom')
+        ), $shortKey, $key);
+    }
+
+    /**
+     * Check the given messages for a wildcard key.
+     *
+     * @param  array  $messages
+     * @param  string  $search
+     * @param  string  $default
+     * @return string
+     */
+    protected function getWildcardCustomMessages($messages, $search, $default)
+    {
+        foreach ($messages as $key => $message) {
+            if ($search === $key || (Str::contains($key, ['*']) && Str::is($key, $search))) {
                 return $message;
             }
         }
 
-        return $customKey;
+        return $default;
     }
 
     /**
@@ -185,20 +201,16 @@ trait FormatsMessages
      * @param  array   $parameters
      * @return string
      */
-    protected function doReplacements($message, $attribute, $rule, $parameters)
+    public function makeReplacements($message, $attribute, $rule, $parameters)
     {
-        $value = $this->getAttribute($attribute);
-
-        $message = str_replace(
-            [':attribute', ':ATTRIBUTE', ':Attribute'],
-            [$value, Str::upper($value), Str::ucfirst($value)],
-            $message
+        $message = $this->replaceAttributePlaceholder(
+            $message, $this->getDisplayableAttribute($attribute)
         );
 
         if (isset($this->replacers[Str::snake($rule)])) {
-            $message = $this->callReplacer($message, $attribute, Str::snake($rule), $parameters);
+            return $this->callReplacer($message, $attribute, Str::snake($rule), $parameters);
         } elseif (method_exists($this, $replacer = "replace{$rule}")) {
-            $message = $this->$replacer($message, $attribute, $rule, $parameters);
+            return $this->$replacer($message, $attribute, $rule, $parameters);
         }
 
         return $message;
@@ -210,41 +222,64 @@ trait FormatsMessages
      * @param  string  $attribute
      * @return string
      */
-    protected function getAttribute($attribute)
+    protected function getDisplayableAttribute($attribute)
     {
         $primaryAttribute = $this->getPrimaryAttribute($attribute);
 
-        $expectedAttributes = $attribute != $primaryAttribute ? [$attribute, $primaryAttribute] : [$attribute];
+        $expectedAttributes = $attribute != $primaryAttribute
+                    ? [$attribute, $primaryAttribute] : [$attribute];
 
-        foreach ($expectedAttributes as $expectedAttributeName) {
-            // The developer may dynamically specify the array of custom attributes
-            // on this Validator instance. If the attribute exists in this array
-            // it takes precedence over all other ways we can pull attributes.
-            if (isset($this->customAttributes[$expectedAttributeName])) {
-                return $this->customAttributes[$expectedAttributeName];
+        foreach ($expectedAttributes as $name) {
+            // The developer may dynamically specify the array of custom attributes on this
+            // validator instance. If the attribute exists in this array it is used over
+            // the other ways of pulling the attribute name for this given attributes.
+            if (isset($this->customAttributes[$name])) {
+                return $this->customAttributes[$name];
             }
 
-            $line = Arr::get(
-                $this->translator->trans('validation.attributes'),
-                $expectedAttributeName
-            );
-
-            // We allow for the developer to specify language lines for each of the
-            // attributes allowing for more displayable counterparts of each of
-            // the attributes. This provides the ability for simple formats.
-            if ($line) {
+            // We allow for a developer to specify language lines for any attribute in this
+            // application, which allows flexibility for displaying a unique displayable
+            // version of the attribute name instead of the name used in an HTTP POST.
+            if ($line = $this->getAttributeFromTranslations($name)) {
                 return $line;
             }
         }
 
-        // When no language line has been specified for the attribute and it is
-        // also an implicit attribute we will display the raw attribute name
-        // and not modify it with any replacements before we display this.
+        // When no language line has been specified for the attribute and it is also
+        // an implicit attribute we will display the raw attribute's name and not
+        // modify it with any of these replacements before we display the name.
         if (isset($this->implicitAttributes[$primaryAttribute])) {
             return $attribute;
         }
 
         return str_replace('_', ' ', Str::snake($attribute));
+    }
+
+    /**
+     * Get the given attribute from the attribute translations.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function getAttributeFromTranslations($name)
+    {
+        return Arr::get($this->translator->trans('validation.attributes'), $name);
+    }
+
+    /**
+     * Replace the :attribute placeholder in the given message.
+     *
+     * @param  string  $message
+     * @param  string  $value
+     * @return string
+     */
+    protected function replaceAttributePlaceholder($message, $value)
+    {
+        return str_replace(
+            [':attribute', ':ATTRIBUTE', ':Attribute'],
+            [$value, Str::upper($value), Str::ucfirst($value)],
+            $message
+        );
     }
 
     /**
@@ -283,7 +318,7 @@ trait FormatsMessages
         // this is convenient when replacing lists of parameters like some of the
         // replacement functions do when formatting out the validation message.
         foreach ($values as $key => $value) {
-            $attributes[$key] = $this->getAttribute($value);
+            $attributes[$key] = $this->getDisplayableAttribute($value);
         }
 
         return $attributes;

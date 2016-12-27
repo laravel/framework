@@ -147,7 +147,7 @@ trait ReplacesAttributes
      */
     protected function replaceInArray($message, $attribute, $rule, $parameters)
     {
-        return str_replace(':other', $this->getAttribute($parameters[0]), $message);
+        return str_replace(':other', $this->getDisplayableAttribute($parameters[0]), $message);
     }
 
     /**
@@ -189,9 +189,7 @@ trait ReplacesAttributes
      */
     protected function replaceRequiredWith($message, $attribute, $rule, $parameters)
     {
-        $parameters = $this->getAttributeList($parameters);
-
-        return str_replace(':values', implode(' / ', $parameters), $message);
+        return str_replace(':values', implode(' / ', $this->getAttributeList($parameters)), $message);
     }
 
     /**
@@ -263,7 +261,7 @@ trait ReplacesAttributes
     {
         $parameters[1] = $this->getDisplayableValue($parameters[0], Arr::get($this->data, $parameters[0]));
 
-        $parameters[0] = $this->getAttribute($parameters[0]);
+        $parameters[0] = $this->getDisplayableAttribute($parameters[0]);
 
         return str_replace([':other', ':value'], $parameters, $message);
     }
@@ -279,7 +277,7 @@ trait ReplacesAttributes
      */
     protected function replaceRequiredUnless($message, $attribute, $rule, $parameters)
     {
-        $other = $this->getAttribute(array_shift($parameters));
+        $other = $this->getDisplayableAttribute(array_shift($parameters));
 
         return str_replace([':other', ':values'], [$other, implode(', ', $parameters)], $message);
     }
@@ -295,7 +293,7 @@ trait ReplacesAttributes
      */
     protected function replaceSame($message, $attribute, $rule, $parameters)
     {
-        return str_replace(':other', $this->getAttribute($parameters[0]), $message);
+        return str_replace(':other', $this->getDisplayableAttribute($parameters[0]), $message);
     }
 
     /**
@@ -310,7 +308,7 @@ trait ReplacesAttributes
     protected function replaceBefore($message, $attribute, $rule, $parameters)
     {
         if (! (strtotime($parameters[0]))) {
-            return str_replace(':date', $this->getAttribute($parameters[0]), $message);
+            return str_replace(':date', $this->getDisplayableAttribute($parameters[0]), $message);
         }
 
         return str_replace(':date', $parameters[0], $message);
