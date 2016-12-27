@@ -45,18 +45,15 @@ trait ManagesLoops
      */
     public function incrementLoopIndices()
     {
-        $loop = &$this->loopsStack[count($this->loopsStack) - 1];
+        $loop = $this->loopsStack[$index = count($this->loopsStack) - 1];
 
-        $loop['iteration']++;
-        $loop['index'] = $loop['iteration'] - 1;
-
-        $loop['first'] = $loop['iteration'] == 1;
-
-        if (isset($loop['count'])) {
-            $loop['remaining']--;
-
-            $loop['last'] = $loop['iteration'] == $loop['count'];
-        }
+        $this->loopsStack[$index] = array_merge($this->loopsStack[$index], [
+            'iteration' => $loop['iteration'] + 1,
+            'index' => $loop['iteration'],
+            'first' => $loop['iteration'] == 0,
+            'remaining' => isset($loop['count']) ? $loop['remaining'] - 1 : null,
+            'last' => isset($loop['count']) ? $loop['iteration'] == $loop['count'] - 1 : null,
+        ]);
     }
 
     /**
