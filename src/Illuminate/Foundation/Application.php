@@ -861,16 +861,6 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     }
 
     /**
-     * Get the path to the cached "compiled.php" file.
-     *
-     * @return string
-     */
-    public function getCachedCompilePath()
-    {
-        return $this->bootstrapPath().'/cache/compiled.php';
-    }
-
-    /**
      * Get the path to the cached services.php file.
      *
      * @return string
