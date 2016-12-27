@@ -949,6 +949,20 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Get the Presence Verifier implementation.
+     *
+     * @return \Illuminate\Validation\PresenceVerifierInterface
+     *
+     * @throws \RuntimeException
+     */
+    protected function getPresenceVerifierFor($connection)
+    {
+        return tap($this->getPresenceVerifier(), function ($verifier) use ($connection) {
+            $verifier->setConnection($connection);
+        });
+    }
+
+    /**
      * Set the Presence Verifier implementation.
      *
      * @param  \Illuminate\Validation\PresenceVerifierInterface  $presenceVerifier
