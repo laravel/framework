@@ -1828,6 +1828,32 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Validate that an attribute contains at least one of a list of list of substrings.
+     *
+     * @param $attribute
+     * @param $value
+     * @param $parameters
+     * @return bool
+     */
+    protected function validateContains($attribute, $value, $parameters)
+    {
+        return str_contains($value, $parameters);
+    }
+
+    /**
+     * Validate that an attribute contains none of a list of list of substrings.
+     *
+     * @param $attribute
+     * @param $value
+     * @param $parameters
+     * @return bool
+     */
+    protected function validateNotContains($attribute, $value, $parameters)
+    {
+        return ! str_contains($value, $parameters);
+    }
+
+    /**
      * Validate that an attribute is a valid date.
      *
      * @param  string  $attribute
