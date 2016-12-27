@@ -194,7 +194,7 @@ class MemcachedStore extends TaggableStore implements Store
     /**
      * Get the UNIX timestamp for the given number of minutes.
      *
-     * @parma  int  $minutes
+     * @param  int  $minutes
      * @return int
      */
     protected function toTimestamp($minutes)
