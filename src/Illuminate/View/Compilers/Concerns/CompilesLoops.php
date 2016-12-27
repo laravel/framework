@@ -22,7 +22,7 @@ trait CompilesLoops
 
         $initLoop = "\$__currentLoopData = {$iteratee}; \$__env->addLoop(\$__currentLoopData);";
 
-        $iterateLoop = '$__env->incrementLoopIndices(); $loop = $__env->getFirstLoop();';
+        $iterateLoop = '$__env->incrementLoopIndices(); $loop = $__env->getLastLoop();';
 
         return "<?php {$empty} = true; {$initLoop} foreach(\$__currentLoopData as {$iteration}): {$iterateLoop} {$empty} = false; ?>";
     }
@@ -37,7 +37,7 @@ trait CompilesLoops
     {
         $empty = '$__empty_'.$this->forElseCounter--;
 
-        return "<?php endforeach; \$__env->popLoop(); \$loop = \$__env->getFirstLoop(); if ({$empty}): ?>";
+        return "<?php endforeach; \$__env->popLoop(); \$loop = \$__env->getLastLoop(); if ({$empty}): ?>";
     }
 
     /**
@@ -78,7 +78,7 @@ trait CompilesLoops
 
         $initLoop = "\$__currentLoopData = {$iteratee}; \$__env->addLoop(\$__currentLoopData);";
 
-        $iterateLoop = '$__env->incrementLoopIndices(); $loop = $__env->getFirstLoop();';
+        $iterateLoop = '$__env->incrementLoopIndices(); $loop = $__env->getLastLoop();';
 
         return "<?php {$initLoop} foreach(\$__currentLoopData as {$iteration}): {$iterateLoop} ?>";
     }
@@ -124,7 +124,7 @@ trait CompilesLoops
      */
     protected function compileEndforeach($expression)
     {
-        return '<?php endforeach; $__env->popLoop(); $loop = $__env->getFirstLoop(); ?>';
+        return '<?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>';
     }
 
     /**

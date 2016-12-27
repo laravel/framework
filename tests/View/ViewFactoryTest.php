@@ -63,28 +63,6 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('empty', $factory->renderEach('view', [], 'iterator', 'foo'));
     }
 
-    public function testAddANamedViews()
-    {
-        $factory = $this->getFactory();
-        $factory->name('bar', 'foo');
-
-        $this->assertEquals(['foo' => 'bar'], $factory->getNames());
-    }
-
-    public function testMakeAViewFromNamedView()
-    {
-        $factory = $this->getFactory();
-        $factory->getFinder()->shouldReceive('find')->once()->with('view')->andReturn('path.php');
-        $factory->getEngineResolver()->shouldReceive('resolve')->once()->with('php')->andReturn($engine = m::mock('Illuminate\View\Engines\EngineInterface'));
-        $factory->getFinder()->shouldReceive('addExtension')->once()->with('php');
-        $factory->getDispatcher()->shouldReceive('fire');
-        $factory->addExtension('php', 'php');
-        $factory->name('view', 'foo');
-        $view = $factory->of('foo', ['data']);
-
-        $this->assertSame($engine, $view->getEngine());
-    }
-
     public function testRawStringsMayBeReturnedFromRenderEach()
     {
         $this->assertEquals('foo', $this->getFactory()->renderEach('foo', [], 'item', 'raw|foo'));
@@ -396,19 +374,6 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         $factory->getDispatcher()->shouldReceive('fire');
         $factory->make('vendor/package::foo/bar');
         $factory->make('vendor/package::foo.bar');
-    }
-
-    public function testMakeWithAlias()
-    {
-        $factory = $this->getFactory();
-        $factory->alias('real', 'alias');
-        $factory->getFinder()->shouldReceive('find')->once()->with('real')->andReturn('path.php');
-        $factory->getEngineResolver()->shouldReceive('resolve')->once()->with('php')->andReturn(m::mock('Illuminate\View\Engines\EngineInterface'));
-        $factory->getDispatcher()->shouldReceive('fire');
-
-        $view = $factory->make('alias');
-
-        $this->assertEquals('real', $view->getName());
     }
 
     /**
