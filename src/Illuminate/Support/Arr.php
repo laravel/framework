@@ -82,6 +82,22 @@ class Arr {
 
 		return $results;
 	}
+	
+	/**
+	 * Transform an array with dots notation to a multi-dimensional array
+	 * 
+	 * @param array $arrayDotted
+	 * @return array
+	 */
+	public static function dot_array($arrayDotted){
+		$array = array();
+        
+		foreach ($arrayDotted as $key => $value) {
+			static::set($array, $key, $value);
+        	}
+
+		return $array;
+	}
 
 	/**
 	 * Get all of the given array except for a specified array of items.

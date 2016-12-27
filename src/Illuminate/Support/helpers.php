@@ -514,6 +514,20 @@ if ( ! function_exists('dd'))
 	}
 }
 
+if( ! function_exists('dot_array')){
+
+	/**
+	* Transform an array with dot notation into a multi-dimensional array
+	* 
+	* @param array $arrayDotted
+	* @return array
+	*/
+	function dot_array($arrayDotted)
+	{
+		return Arr::dot_array($arrayDotted);
+	}
+}
+
 if ( ! function_exists('e'))
 {
 	/**
