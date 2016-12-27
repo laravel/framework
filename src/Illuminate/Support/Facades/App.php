@@ -13,7 +13,6 @@ namespace Illuminate\Support\Facades;
  * @method static void boot()
  * @method static void booting(mixed $callback)
  * @method static void booted(mixed $callback)
- * @method static string getCachedCompilePath()
  * @method static string getCachedServicesPath()
  *
  * @see \Illuminate\Foundation\Application

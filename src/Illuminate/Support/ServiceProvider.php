@@ -266,6 +266,8 @@ abstract class ServiceProvider
     /**
      * Get a list of files that should be compiled for the package.
      *
+     * @deprecated
+     *
      * @return array
      */
     public static function compiles()
