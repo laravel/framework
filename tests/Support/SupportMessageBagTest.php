@@ -74,6 +74,24 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $container->first('foo'));
     }
 
+    public function testFirstReturnsEmptyStringIfNoMessagesFound()
+    {
+        $container = new MessageBag;
+        $container->setFormat(':message');
+        $messages = $container->getMessages();
+        $this->assertEquals('', $container->first('foo'));
+    }
+
+    public function testFirstReturnsSingleMessageFromDotKeys()
+    {
+        $container = new MessageBag;
+        $container->setFormat(':message');
+        $container->add('name.first', 'jon');
+        $container->add('name.last', 'snow');
+        $messages = $container->getMessages();
+        $this->assertEquals('jon', $container->first('name.*'));
+    }
+
     public function testHasIndicatesExistence()
     {
         $container = new MessageBag;
