@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use Countable;
 use JsonSerializable;
+use Illuminate\Support\Arr;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\MessageProvider;
@@ -146,9 +147,9 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
     {
         $messages = is_null($key) ? $this->all($format) : $this->get($key, $format);
 
-        $firstMessage = array_first($messages, null, '');
+        $firstMessage = Arr::first($messages, null, '');
 
-        return is_array($firstMessage) ? array_first($firstMessage) : $firstMessage;
+        return is_array($firstMessage) ? Arr::first($firstMessage) : $firstMessage;
     }
 
     /**
