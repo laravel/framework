@@ -833,18 +833,6 @@ empty
         return m::mock('Illuminate\Filesystem\Filesystem');
     }
 
-    public function testRetrieveDefaultContentTags()
-    {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $this->assertEquals(['{{', '}}'], $compiler->getContentTags());
-    }
-
-    public function testRetrieveDefaultEscapedContentTags()
-    {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $this->assertEquals(['{{{', '}}}'], $compiler->getEscapedContentTags());
-    }
-
     public function testSequentialCompileStringCalls()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
