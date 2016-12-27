@@ -1268,6 +1268,11 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($c->contains('date'));
         $this->assertTrue($c->contains('class'));
         $this->assertFalse($c->contains('foo'));
+
+        $c = new Collection([['a' => false, 'b' => false], ['a' => true, 'b' => false]]);
+
+        $this->assertTrue($c->contains->a);
+        $this->assertFalse($c->contains->b);
     }
 
     public function testContainsStrict()
