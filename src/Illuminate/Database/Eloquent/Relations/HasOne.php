@@ -94,7 +94,7 @@ class HasOne extends HasOneOrMany
 
         return $instance;
     }
-    
+
     /**
      * Attach a model instance to the parent model.
      *
@@ -104,15 +104,14 @@ class HasOne extends HasOneOrMany
     public function save(Model $model)
     {
         $this->deleteOldRelation($model);
-        
+
         $model->setAttribute($this->getPlainForeignKey(), $this->getParentKey());
-        
+
         return $model->save() ? $model : false;
     }
-    
-    
+
     /**
-     * It's impossible to attach many models to hasOne relation
+     * It's impossible to attach many models to hasOne relation.
      *
      * @param \Traversable|array $models
      *
@@ -123,7 +122,7 @@ class HasOne extends HasOneOrMany
     {
         throw new \LogicException('Can\'t attach many models to hasOne relation');
     }
-    
+
     /**
      * Create a new instance of the related model.
      *
@@ -136,19 +135,18 @@ class HasOne extends HasOneOrMany
         // that we do not have to worry about a mass accessor rules blocking sets
         // on the models. Otherwise, some of these attributes will not get set.
         $instance = $this->related->newInstance($attributes);
-        
+
         $this->deleteOldRelation($instance);
-        
+
         $instance->setAttribute($this->getPlainForeignKey(), $this->getParentKey());
-        
+
         $instance->save();
-        
+
         return $instance;
     }
-    
-    
+
     /**
-     * It's impossible to create many models with hasOne relation
+     * It's impossible to create many models with hasOne relation.
      *
      * @param array $array
      *
@@ -159,9 +157,9 @@ class HasOne extends HasOneOrMany
     {
         throw new \LogicException('Can\'t create many models with hasOne relation');
     }
-    
+
     /**
-     * Delete old relation if exists
+     * Delete old relation if exists.
      *
      * @param Model $model
      *
@@ -171,7 +169,7 @@ class HasOne extends HasOneOrMany
     {
         $existingModel = $model->newQuery()
             ->where($this->getPlainForeignKey(), $this->getParentKey())->first();
-        
+
         return $existingModel ? (bool) $existingModel->delete() : true;
     }
 }
