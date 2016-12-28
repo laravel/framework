@@ -4,7 +4,7 @@ namespace Illuminate\Validation\Rules;
 
 use Closure;
 
-class Unique
+class Unique extends Rule
 {
     /**
      * The table to run the query against.
@@ -164,11 +164,11 @@ class Unique
     }
 
     /**
-     * Convert the rule to a validation string.
+     * The string representation of the rule.
      *
      * @return string
      */
-    public function __toString()
+    public function toString()
     {
         return rtrim(sprintf('unique:%s,%s,%s,%s,%s',
             $this->table,
