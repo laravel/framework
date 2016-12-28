@@ -2,7 +2,7 @@
 
 namespace Illuminate\Validation\Rules;
 
-class Dimensions
+class Dimensions extends Rule
 {
     /**
      * The constraints for the dimensions rule.
@@ -114,11 +114,11 @@ class Dimensions
     }
 
     /**
-     * Convert the rule to a validation string.
+     * The string representation of the rule.
      *
      * @return string
      */
-    public function __toString()
+    public function toString()
     {
         $result = '';
 

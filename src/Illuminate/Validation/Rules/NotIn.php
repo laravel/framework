@@ -2,7 +2,7 @@
 
 namespace Illuminate\Validation\Rules;
 
-class NotIn
+class NotIn extends Rule
 {
     /**
      * The name of the rule.
@@ -28,11 +28,11 @@ class NotIn
     }
 
     /**
-     * Convert the rule to a validation string.
+     * The string representation of the rule.
      *
      * @return string
      */
-    public function __toString()
+    public function toString()
     {
         return $this->rule.':'.implode(',', $this->values);
     }

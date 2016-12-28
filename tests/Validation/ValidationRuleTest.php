@@ -13,4 +13,17 @@ class ValidationRuleTest extends PHPUnit_Framework_TestCase
         $c = Rule::phone();
         $this->assertSame('regex:/^([0-9\s\-\+\(\)]*)$/', $c);
     }
+
+    public function testChainingFluentRules()
+    {
+        $this->assertSame(
+            'in:1,2,3|not_in:5,6',
+            (string) Rule::in([1, 2, 3])->and()->notIn([5, 6])
+        );
+
+        $this->assertSame(
+            'exists:users,name,foo,bar|in:1,2',
+            (string) Rule::exists('users', 'name')->where('foo', 'bar')->and()->in([1, 2])
+        );
+    }
 }
