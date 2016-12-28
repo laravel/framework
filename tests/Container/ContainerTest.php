@@ -197,6 +197,8 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
 
     public function testExtendIsLazyInitialized()
     {
+        ContainerLazyExtendStub::$initialized = false;
+
         $container = new Container;
         $container->bind('ContainerLazyExtendStub');
         $container->extend('ContainerLazyExtendStub', function ($obj, $container) {
