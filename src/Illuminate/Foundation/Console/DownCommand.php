@@ -13,7 +13,7 @@ class DownCommand extends Command
      * @var string
      */
     protected $signature = 'down {--message= : The message for the maintenance mode. }
-            {--retry= : The number of seconds after which the request may be retried.}';
+                                 {--retry= : The number of seconds after which the request may be retried.}';
 
     /**
      * The console command description.

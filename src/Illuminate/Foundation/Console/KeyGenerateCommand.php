@@ -15,8 +15,8 @@ class KeyGenerateCommand extends Command
      * @var string
      */
     protected $signature = 'key:generate
-                            {--show : Display the key instead of modifying files}
-                            {--force : Force the operation to run when in production}';
+                    {--show : Display the key instead of modifying files}
+                    {--force : Force the operation to run when in production}';
 
     /**
      * The console command description.
@@ -64,13 +64,24 @@ class KeyGenerateCommand extends Command
             return false;
         }
 
+        $this->writeNewEnvironmentFileWith($key);
+
+        return true;
+    }
+
+    /**
+     * Write a new environment file with the given key.
+     *
+     * @param  string  $key
+     * @return void
+     */
+    protected function writeNewEnvironmentFileWith($key)
+    {
         file_put_contents($this->laravel->environmentFilePath(), str_replace(
             'APP_KEY='.$this->laravel['config']['app.key'],
             'APP_KEY='.$key,
             file_get_contents($this->laravel->environmentFilePath())
         ));
-
-        return true;
     }
 
     /**
