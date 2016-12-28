@@ -372,4 +372,26 @@ class HtmlBuilder {
 		return $safe;
 	}
 
+	/**
+	 * Create a Twitter share link
+	 *
+	 * @param  string  $url
+	 * @param  string  $text
+	 * @param  string  $title
+	 * @param  array   $attributes
+	 * @return string
+	 *
+	 */
+
+	public function twitterLink($url,$text,$title = null, $attributes = array())
+	{
+		if (is_null($url) || $url === false) $url = ' \'\' ';
+
+		$text = urlencode($text);
+
+		$parsed_url = 'https://twitter.com/share?url=' . $url . '&amp;text=' . $text; 
+
+		return '<a href="' . $parsed_url . '" ' . $this->attributes($attributes) . '>' . $this->entities($title) . '</a>';
+	}
+
 }
