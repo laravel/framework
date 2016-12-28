@@ -28,20 +28,25 @@ class LoadConfiguration
             $loadedFromCache = true;
         }
 
-        $app->instance('config', $config = new Repository($items));
-
         // Next we will spin through all of the configuration files in the configuration
         // directory and load each one into the repository. This will make all of the
         // options available to the developer for use in various parts of this app.
+        $app->instance('config', $config = new Repository($items));
+
         if (! isset($loadedFromCache)) {
             $this->loadConfigurationFiles($app, $config);
         }
 
+        // Finally, we will set the application's environment based on the configuration
+        // values that were loaded. We will pass a callback which will be used to get
+        // the environment in a web context where an "--env" switch is not present.
         $app->detectEnvironment(function () use ($config) {
             return $config->get('app.env', 'production');
         });
 
-        $this->setPhpConfiguration($config);
+        date_default_timezone_set($config->get('app.timezone', 'UTC'));
+
+        mb_internal_encoding('UTF-8');
     }
 
     /**
@@ -73,18 +78,5 @@ class LoadConfiguration
         }
 
         return $files;
-    }
-
-    /**
-     * Set a few PHP configuration options.
-     *
-     * @param  \Illuminate\Contracts\Config\Repository  $config
-     * @return void
-     */
-    protected function setPhpConfiguration(RepositoryContract $config)
-    {
-        date_default_timezone_set($config->get('app.timezone', 'UTC'));
-
-        mb_internal_encoding('UTF-8');
     }
 }

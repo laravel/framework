@@ -145,8 +145,8 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase
         $closure = function () {
         };
         $app->afterLoadingEnvironment($closure);
-        $this->assertArrayHasKey(0, $app['events']->getListeners('bootstrapped: Illuminate\Foundation\Bootstrap\DetectEnvironment'));
-        $this->assertSame($closure, $app['events']->getListeners('bootstrapped: Illuminate\Foundation\Bootstrap\DetectEnvironment')[0]);
+        $this->assertArrayHasKey(0, $app['events']->getListeners('bootstrapped: Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables'));
+        $this->assertSame($closure, $app['events']->getListeners('bootstrapped: Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables')[0]);
     }
 
     public function testBeforeBootstrappingAddsClosure()
