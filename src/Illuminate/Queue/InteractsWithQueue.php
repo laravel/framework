@@ -45,18 +45,8 @@ trait InteractsWithQueue
      */
     public function fail($exception = null)
     {
-        if (! $this->job || $this->job->isDeleted()) {
-            return;
-        }
-
-        try {
-            $this->job->delete();
-
-            $this->job->failed($e);
-        } finally {
-            Container::getInstance()->make(Dispatcher::class)->fire(new Events\JobFailed(
-                $this->job->getConnectionName(), $this->job, $exception ?: new ManuallyFailedException
-            ));
+        if ($this->job) {
+            FailingJob::handle($this->job->getConnectionName(), $this->job, $exception);
         }
     }
 

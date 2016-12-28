@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Container\Container;
 use Illuminate\Queue\WorkerOptions;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
@@ -14,10 +15,20 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
     public $events;
     public $exceptionHandler;
 
-    public function __construct()
+    public function setUp()
     {
         $this->events = Mockery::spy(Dispatcher::class);
         $this->exceptionHandler = Mockery::spy(ExceptionHandler::class);
+
+        Container::setInstance($container = new Container);
+
+        $container->instance(Dispatcher::class, $this->events);
+        $container->instance(ExceptionHandler::class, $this->exceptionHandler);
+    }
+
+    public function tearDown()
+    {
+        Container::setInstance();
     }
 
     public function test_job_can_be_fired()
@@ -115,6 +126,7 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
         $job = new WorkerFakeJob(function ($job) {
             $job->attempts++;
         });
+
         $job->attempts = 2;
 
         $worker = $this->getWorker('default', ['queue' => [$job]]);
@@ -167,6 +179,7 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
     private function workerOptions(array $overrides = [])
     {
         $options = new WorkerOptions;
+
         foreach ($overrides as $key => $value) {
             $options->{$key} = $value;
         }

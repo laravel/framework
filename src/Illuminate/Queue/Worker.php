@@ -324,8 +324,6 @@ class Worker
     /**
      * Mark the given job as failed and raise the relevant event.
      *
-     * Note: Any change to this method should also be made to InteractsWithQueue.
-     *
      * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  \Exception  $e
@@ -333,20 +331,7 @@ class Worker
      */
     protected function failJob($connectionName, $job, $e)
     {
-        if ($job->isDeleted()) {
-            return;
-        }
-
-        try {
-            // If the job has failed, we will delete it, call the "failed" method and then call
-            // an event indicating the job has failed so it can be logged if needed. This is
-            // to allow every developer to better keep monitor of their failed queue jobs.
-            $job->delete();
-
-            $job->failed($e);
-        } finally {
-            $this->raiseFailedJobEvent($connectionName, $job, $e);
-        }
+        return FailingJob::handle($connectionName, $job, $e);
     }
 
     /**
