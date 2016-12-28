@@ -24,8 +24,8 @@ class VendorPublishCommand extends Command
      * @var string
      */
     protected $signature = 'vendor:publish {--force : Overwrite any existing files.}
-            {--provider= : The service provider that has assets you want to publish.}
-            {--tag=* : One or many tags that have assets you want to publish.}';
+                    {--provider= : The service provider that has assets you want to publish.}
+                    {--tag=* : One or many tags that have assets you want to publish.}';
 
     /**
      * The console command description.
@@ -54,9 +54,7 @@ class VendorPublishCommand extends Command
      */
     public function fire()
     {
-        $tags = $this->option('tag');
-
-        $tags = $tags ?: [null];
+        $tags = $this->option('tag') ?: [null];
 
         foreach ((array) $tags as $tag) {
             $this->publishTag($tag);
@@ -71,25 +69,42 @@ class VendorPublishCommand extends Command
      */
     protected function publishTag($tag)
     {
-        $paths = ServiceProvider::pathsToPublish(
+        foreach ($this->pathsToPublish($tag) as $from => $to) {
+            $this->publishItem($from, $to);
+        }
+
+        $this->info('Publishing complete.');
+    }
+
+    /**
+     * Get all of the paths to publish.
+     *
+     * @param  string  $tag
+     * @return array
+     */
+    protected function pathsToPublish($tag)
+    {
+        return ServiceProvider::pathsToPublish(
             $this->option('provider'), $tag
         );
+    }
 
-        if (empty($paths)) {
-            return $this->comment("Nothing to publish for tag [{$tag}].");
+    /**
+     * Publish the given item from and to the given location.
+     *
+     * @param  string  $from
+     * @param  string  $to
+     * @return void
+     */
+    protected function publishItem($from, $to)
+    {
+        if ($this->files->isFile($from)) {
+            return $this->publishFile($from, $to);
+        } elseif ($this->files->isDirectory($from)) {
+            return $this->publishDirectory($from, $to);
         }
 
-        foreach ($paths as $from => $to) {
-            if ($this->files->isFile($from)) {
-                $this->publishFile($from, $to);
-            } elseif ($this->files->isDirectory($from)) {
-                $this->publishDirectory($from, $to);
-            } else {
-                $this->error("Can't locate path: <{$from}>");
-            }
-        }
-
-        $this->info("Publishing complete for tag [{$tag}]!");
+        $this->error("Can't locate path: <{$from}>");
     }
 
     /**
@@ -101,15 +116,13 @@ class VendorPublishCommand extends Command
      */
     protected function publishFile($from, $to)
     {
-        if ($this->files->exists($to) && ! $this->option('force')) {
-            return;
+        if (! $this->files->exists($to) || $this->option('force')) {
+            $this->createParentDirectory(dirname($to));
+
+            $this->files->copy($from, $to);
+
+            $this->status($from, $to, 'File');
         }
-
-        $this->createParentDirectory(dirname($to));
-
-        $this->files->copy($from, $to);
-
-        $this->status($from, $to, 'File');
     }
 
     /**
@@ -121,18 +134,27 @@ class VendorPublishCommand extends Command
      */
     protected function publishDirectory($from, $to)
     {
-        $manager = new MountManager([
+        $this->moveManagedFiles(new MountManager([
             'from' => new Flysystem(new LocalAdapter($from)),
             'to' => new Flysystem(new LocalAdapter($to)),
-        ]);
+        ]));
 
+        $this->status($from, $to, 'Directory');
+    }
+
+    /**
+     * Move all the files in the given MountManager.
+     *
+     * @param  \League\Flysystem\MountManager  $manager
+     * @return void
+     */
+    protected function moveManagedFiles($manager)
+    {
         foreach ($manager->listContents('from://', true) as $file) {
             if ($file['type'] === 'file' && (! $manager->has('to://'.$file['path']) || $this->option('force'))) {
                 $manager->put('to://'.$file['path'], $manager->read('from://'.$file['path']));
             }
         }
-
-        $this->status($from, $to, 'Directory');
     }
 
     /**
