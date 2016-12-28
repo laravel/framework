@@ -1191,7 +1191,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
     /**
      * Rotate the multidimensional array,
-     * turning the rows into columns and the columns into rows
+     * turning the rows into columns and the columns into rows.
      *
      * @return static
      *
@@ -1199,7 +1199,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function transpose()
     {
-        if (count($this->items, COUNT_RECURSIVE) <= count($this->items)*2) {
+        if (count($this->items, COUNT_RECURSIVE) <= count($this->items) * 2) {
             throw new \LengthException('Collection is not multidimensional with at least one child each!');
         }
 
@@ -1209,6 +1209,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             if (count(array_filter($items)) != $arrayLength) {
                 throw new \LengthException('The child collections do not have an even length!');
             }
+
             return new static($items);
         }, ...$this->values());
 
