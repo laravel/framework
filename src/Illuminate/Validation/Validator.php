@@ -1497,7 +1497,7 @@ class Validator implements ValidatorContract
             if (count($value) === count($value, COUNT_RECURSIVE)) {
                 return $verifier->getMultiCount($table, $column, $value, $extra);
             }
-            
+
             return $verifier->getMultiCount($table, $column, array_keys($value), $extra);
         }
 
