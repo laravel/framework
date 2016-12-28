@@ -129,7 +129,7 @@ trait ManagesLayouts
     protected function extendSection($section, $content)
     {
         if (isset($this->sections[$section])) {
-            $content = str_replace(static::parentPlaceholder(), $content, $this->sections[$section]);
+            $content = str_replace(static::parentPlaceholder($section), $content, $this->sections[$section]);
         }
 
         $this->sections[$section] = $content;
@@ -153,19 +153,20 @@ trait ManagesLayouts
         $sectionContent = str_replace('@@parent', '--parent--holder--', $sectionContent);
 
         return str_replace(
-            '--parent--holder--', '@parent', str_replace(static::parentPlaceholder(), '', $sectionContent)
+            '--parent--holder--', '@parent', str_replace(static::parentPlaceholder($section), '', $sectionContent)
         );
     }
 
     /**
      * Get the parent placeholder for the current request.
      *
+     * @param  string  $section
      * @return string
      */
-    public static function parentPlaceholder()
+    public static function parentPlaceholder($section = '')
     {
         if (! static::$parentPlaceholder) {
-            static::$parentPlaceholder = '##parent-placeholder-'.Str::random(40).'##';
+            static::$parentPlaceholder = '##parent-placeholder-'.sha1($section).'##';
         }
 
         return static::$parentPlaceholder;
