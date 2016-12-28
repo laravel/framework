@@ -56,8 +56,18 @@ class CompilerEngine extends PhpEngine
         // Once we have the path to the compiled file, we will evaluate the paths with
         // typical PHP just like any other templates. We also keep a stack of views
         // which have been rendered for right exception messages to be generated.
-        $results = $this->evaluatePath($compiled, $data);
-
+        $results  = $this->evaluatePath($compiled, $data);
+        if (env("THEME_HINT_ENABLED")) {
+            ob_start();
+            ?>
+            <div class="container-view" style="position: relative; border: 1px solid red; padding: 28px 0px;">
+                <div class="description" style="position: absolute; top: 0px; background: red; color: #fff; width: 100%; padding: 5px; line-height: normal;"><?php echo $path; ?></div>
+                <div class="content" style="padding: 0px 10px;"><?php echo $results; ?></div>
+            </div>
+            <?php
+            $results = ob_get_contents();
+            ob_end_clean();
+        }
         array_pop($this->lastCompiled);
 
         return $results;
