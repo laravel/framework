@@ -41,9 +41,7 @@ class LoadConfiguration
             return $config->get('app.env', 'production');
         });
 
-        date_default_timezone_set($config->get('app.timezone', 'UTC'));
-
-        mb_internal_encoding('UTF-8');
+        $this->setPhpConfiguration($config);
     }
 
     /**
@@ -75,5 +73,18 @@ class LoadConfiguration
         }
 
         return $files;
+    }
+
+    /**
+     * Set a few PHP configuration options.
+     *
+     * @param  \Illuminate\Contracts\Config\Repository  $config
+     * @return void
+     */
+    protected function setPhpConfiguration(RepositoryContract $config)
+    {
+        date_default_timezone_set($config->get('app.timezone', 'UTC'));
+
+        mb_internal_encoding('UTF-8');
     }
 }
