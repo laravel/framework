@@ -1110,35 +1110,57 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
     public function testTranspose()
     {
         $data = new Collection([
-            [1, 4, 7],
-            [2, 5, 8],
-            [3, 6, 9],
+            ['Tyrion Lannister', 'Daenerys Targaryen', 'Meera Reed'],
+            ['Lannister', 'Targaryen', 'Stark'],
+            ['Peter Dinklage', 'Emilia Clarke', 'Ellie Kendrick'],
         ]);
-        $data = $data->transpose();
-        $this->assertEquals([
-            [1, 2, 3],
-            [4, 5, 6],
-            [7, 8, 9],
-        ], $data->toArray());
+        $expected = new Collection([
+            new Collection(['Tyrion Lannister', 'Lannister', 'Peter Dinklage']),
+            new Collection(['Daenerys Targaryen', 'Targaryen', 'Emilia Clarke']),
+            new Collection(['Meera Reed', 'Stark', 'Ellie Kendrick']),
+        ]);
+        $this->assertEquals($expected, $data->transpose());
+    }
 
+    public function testTransposeRemovesExistingKeys()
+    {
+        $data = new Collection([
+            'names' => ['Henrique', 'Isabela', 'Gabriel'],
+            'ages' => [8, 7, 2],
+            'toys' => ['HotWheels', 'Barbie', 'Lego'],
+        ]);
+        $expected = new Collection([
+            new Collection(['Henrique', 8, 'HotWheels']),
+            new Collection(['Isabela', 7, 'Barbie']),
+            new Collection(['Gabriel', 2, 'Lego']),
+        ]);
+        $this->assertEquals($expected, $data->transpose());
+    }
+
+    public function testTransposeWillEnforceLengthEquality()
+    {
+        $data = new Collection([
+            ['Jack O\'neill', 'Daniel Jackson', 'Samantha Carter'],
+            ['USAF Colonel', 'Archaeologist', 'USAF Captain'],
+            ['Richard Dean Anderson', 'Michael Shanks'],
+        ]);
+
+        try {
+            $data->transpose();
+            $this->fail('Transpose didn\'t enforce length equality!');
+        } catch (LengthException $exception) {
+            $this->assertEquals('The child collections do not have an even length!', $exception->getMessage());
+        }
+    }
+
+    public function testTransposeWillEnforceMultiDimensionalArrays()
+    {
         $data = new Collection([1, 2, 3]);
         try {
             $data->transpose();
-            $this->fail('Exception not thrown on one dimensional collection!');
+            $this->fail('Transpose didn\t enforce multidimensional collection!');
         } catch (LengthException $exception) {
             $this->assertEquals('Collection is not multidimensional with at least one child each!', $exception->getMessage());
-        }
-
-        $data = new Collection([
-            [1, 4],
-            [2],
-            [3],
-        ]);
-        try {
-            $data->transpose();
-            $this->fail('Exception not thrown on one dimensional collection!');
-        } catch (LengthException $exception) {
-            $this->assertEquals('The child collections do not have an even length!', $exception->getMessage());
         }
     }
 

@@ -1202,14 +1202,13 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         $arrayLength = count(reset($this->items));
-        $items = [];
-        foreach ($this->items as $key => $item) {
-            if (count($item) != $arrayLength) {
+
+        $items = array_map(function (...$items) use ($arrayLength) {
+            if (count(array_filter($items)) != $arrayLength) {
                 throw new \LengthException('The child collections do not have an even length!');
             }
-
-            $items[] = new static(array_column($this->items, $key));
-        }
+            return new static($items);
+        }, ...$this->values());
 
         return new static($items);
     }
