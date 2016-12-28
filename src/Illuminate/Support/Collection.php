@@ -85,7 +85,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Get the median of a given key.
      *
      * @param  null $key
-     * @return mixed|null
+     * @return mixed
      */
     public function median($key = null)
     {
@@ -859,7 +859,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Reduce the collection to a single value.
      *
      * @param  callable  $callback
-     * @param  mixed     $initial
+     * @param  mixed  $initial
      * @return mixed
      */
     public function reduce(callable $callback, $initial = null)
@@ -900,7 +900,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Search the collection for a given value and return the corresponding key if successful.
      *
      * @param  mixed  $value
-     * @param  bool   $strict
+     * @param  bool  $strict
      * @return mixed
      */
     public function search($value, $strict = false)
@@ -931,7 +931,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Shuffle the items in the collection.
      *
-     * @param int $seed
+     * @param  int  $seed
      * @return static
      */
     public function shuffle($seed = null)
@@ -954,8 +954,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Slice the underlying collection array.
      *
-     * @param  int   $offset
-     * @param  int   $length
+     * @param  int  $offset
+     * @param  int  $length
      * @return static
      */
     public function slice($offset, $length = null)
@@ -983,7 +983,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Chunk the underlying collection array.
      *
-     * @param  int   $size
+     * @param  int  $size
      * @return static
      */
     public function chunk($size)
@@ -1022,7 +1022,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Sort the collection using the given callback.
      *
      * @param  callable|string  $callback
-     * @param  int   $options
+     * @param  int  $options
      * @param  bool  $descending
      * @return static
      */
@@ -1133,7 +1133,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      *
      * @param  string|callable|null  $key
      * @param  bool  $strict
-     *
      * @return static
      */
     public function unique($key = null, $strict = false)
