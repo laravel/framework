@@ -82,23 +82,19 @@ class RouteListCommand extends Command
      */
     protected function getRoutes()
     {
-        $results = [];
-
-        foreach ($this->routes as $route) {
-            $results[] = $this->getRouteInformation($route);
-        }
+        $routes = collect($this->routes)->map(function ($route) {
+            return $this->getRouteInformation($route);
+        })->all();
 
         if ($sort = $this->option('sort')) {
-            $results = Arr::sort($results, function ($value) use ($sort) {
-                return $value[$sort];
-            });
+            $routes = $this->sortRoutes($sort, $routes);
         }
 
         if ($this->option('reverse')) {
-            $results = array_reverse($results);
+            $routes = array_reverse($routes);
         }
 
-        return array_filter($results);
+        return array_filter($routes);
     }
 
     /**
@@ -117,6 +113,20 @@ class RouteListCommand extends Command
             'action' => $route->getActionName(),
             'middleware' => $this->getMiddleware($route),
         ]);
+    }
+
+    /**
+     * Sort the routes by a given element.
+     *
+     * @param  string  $sort
+     * @param  array  $routes
+     * @return array
+     */
+    protected function sortRoutes($sort, $routes)
+    {
+        return Arr::sort($routes, function ($route) use ($sort) {
+            return $route[$sort];
+        });
     }
 
     /**
