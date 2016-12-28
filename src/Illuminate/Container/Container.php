@@ -432,6 +432,8 @@ class Container implements ArrayAccess {
 			$object = $this->make($concrete, $parameters);
 		}
 
+		if (is_object($object)) $this->resolveTraits($object);
+
 		// If the requested type is registered as a singleton we'll want to cache off
 		// the instances in "memory" so we can return it later without creating an
 		// entirely new instance of an object on each subsequent request for it.
@@ -445,6 +447,39 @@ class Container implements ArrayAccess {
 		$this->resolved[$abstract] = true;
 
 		return $object;
+	}
+
+	/**
+	 * Recursively resolve an object's traits.
+	 *
+	 * @param  object  $object
+	 * @return void
+	 */
+	protected function resolveTraits($object)
+	{
+		foreach (class_uses_recursive(get_class($object)) as $trait)
+		{
+			if (method_exists($object, $method = 'construct'.class_basename($trait)))
+			{
+				$this->resolveMethod($object, $method);
+			}
+		}
+	}
+
+	/**
+	 * Resolve a method with its dependencies.
+	 *
+	 * @param  object  $object
+	 * @param  string  $method
+	 * @return void
+	 */
+	public function resolveMethod($object, $method)
+	{
+		$reflectorMethod = (new ReflectionClass($object))->getMethod($method);
+
+		$parameters = $this->getDependencies($reflectorMethod->getParameters());
+
+		call_user_func_array([$object, $method], $parameters);
 	}
 
 	/**
