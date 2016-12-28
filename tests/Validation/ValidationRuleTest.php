@@ -18,12 +18,12 @@ class ValidationRuleTest extends PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             'in:1,2,3|not_in:5,6',
-            (string) Rule::in([1, 2, 3])->and()->notIn([5, 6])
+            (string) Rule::in([1, 2, 3])->also()->notIn([5, 6])
         );
 
         $this->assertSame(
             'exists:users,name,foo,bar|in:1,2',
-            (string) Rule::exists('users', 'name')->where('foo', 'bar')->and()->in([1, 2])
+            (string) Rule::exists('users', 'name')->where('foo', 'bar')->also()->in([1, 2])
         );
     }
 }

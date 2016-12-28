@@ -18,7 +18,7 @@ abstract class Rule
      *
      * @return \Illuminate\Validation\Rule
      */
-    public function and()
+    public function also()
     {
         ValidationRule::$output .= (string) $this.'|';
 
