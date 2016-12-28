@@ -425,10 +425,15 @@ class Builder
      * @param  int  $count
      * @param  callable  $callback
      * @param  string  $column
+     * @param  string|null  $alias
      * @return bool
      */
-    public function chunkById($count, callable $callback, $column = 'id')
+    public function chunkById($count, callable $callback, $column = null, $alias = null)
     {
+        $column = is_null($column) ? $this->getModel()->getKeyName() : $column;
+
+        $alias = is_null($alias) ? $column : $alias;
+
         $lastId = 0;
 
         do {
@@ -446,7 +451,7 @@ class Builder
                 return false;
             }
 
-            $lastId = $results->last()->{$column};
+            $lastId = $results->last()->{$alias};
         } while ($countResults == $count);
 
         return true;
