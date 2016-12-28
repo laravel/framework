@@ -5,6 +5,7 @@ namespace Illuminate\Support;
 use Countable;
 use Exception;
 use ArrayAccess;
+use LengthException;
 use Traversable;
 use ArrayIterator;
 use CachingIterator;
@@ -1190,24 +1191,23 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Rotate the multidimensional array,
-     * turning the rows into columns and the columns into rows.
+     * Rotate the multidimensional array, turning the rows into columns and the columns into rows.
      *
      * @return static
      *
-     * @throws \LengthException
+     * @throws LengthException
      */
     public function transpose()
     {
         if (count($this->items, COUNT_RECURSIVE) <= count($this->items) * 2) {
-            throw new \LengthException('Collection is not multidimensional with at least one child each!');
+            throw new LengthException('Collection is not multidimensional with at least one child each!');
         }
 
         $arrayLength = count(reset($this->items));
 
         $items = array_map(function (...$items) use ($arrayLength) {
             if (count(array_filter($items)) != $arrayLength) {
-                throw new \LengthException('The child collections do not have an even length!');
+                throw new LengthException('The child collections do not have an even length!');
             }
 
             return new static($items);
