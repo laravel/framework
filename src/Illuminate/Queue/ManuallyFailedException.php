@@ -6,4 +6,5 @@ use RuntimeException;
 
 class ManuallyFailedException extends RuntimeException
 {
+    //
 }
