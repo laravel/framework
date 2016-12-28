@@ -23,6 +23,16 @@ interface Queue
     public function push($job, $data = '', $queue = null);
 
     /**
+     * Push a new job onto the queue.
+     *
+     * @param  string  $queue
+     * @param  string  $job
+     * @param  mixed   $data
+     * @return mixed
+     */
+    public function pushOn($queue, $job, $data = '');
+
+    /**
      * Push a raw payload onto the queue.
      *
      * @param  string  $payload
@@ -42,16 +52,6 @@ interface Queue
      * @return mixed
      */
     public function later($delay, $job, $data = '', $queue = null);
-
-    /**
-     * Push a new job onto the queue.
-     *
-     * @param  string  $queue
-     * @param  string  $job
-     * @param  mixed   $data
-     * @return mixed
-     */
-    public function pushOn($queue, $job, $data = '');
 
     /**
      * Push a new job onto the queue after a delay.

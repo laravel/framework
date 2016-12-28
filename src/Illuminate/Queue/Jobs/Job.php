@@ -141,7 +141,7 @@ abstract class Job
     }
 
     /**
-     * Call the failed method on the job instance.
+     * Process an exception that caused the job to fail.
      *
      * @param  \Exception  $e
      * @return void
@@ -209,6 +209,8 @@ abstract class Job
 
     /**
      * Get the resolved name of the queued job class.
+     *
+     * Resolves the name of "wrapped" jobs such as class-based handlers.
      *
      * @return string
      */

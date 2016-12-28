@@ -97,11 +97,14 @@ class BeanstalkdQueue extends Queue implements QueueContract
      */
     public function later($delay, $job, $data = '', $queue = null)
     {
-        $payload = $this->createPayload($job, $data);
-
         $pheanstalk = $this->pheanstalk->useTube($this->getQueue($queue));
 
-        return $pheanstalk->put($payload, Pheanstalk::DEFAULT_PRIORITY, $this->getSeconds($delay), $this->timeToRun);
+        return $pheanstalk->put(
+            $this->createPayload($job, $data),
+            Pheanstalk::DEFAULT_PRIORITY,
+            $this->getSeconds($delay),
+            $this->timeToRun
+        );
     }
 
     /**
@@ -130,7 +133,9 @@ class BeanstalkdQueue extends Queue implements QueueContract
      */
     public function deleteMessage($queue, $id)
     {
-        $this->pheanstalk->useTube($this->getQueue($queue))->delete(new PheanstalkJob($id, ''));
+        $queue = $this->getQueue($queue);
+
+        $this->pheanstalk->useTube($queue)->delete(new PheanstalkJob($id, ''));
     }
 
     /**
