@@ -2,7 +2,6 @@
 
 namespace Illuminate\View\Concerns;
 
-use Illuminate\Support\Str;
 use InvalidArgumentException;
 
 trait ManagesLayouts
