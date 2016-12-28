@@ -595,10 +595,10 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
 
         $container->when('ContainerTestContextInjectOne')->needs('IContainerContractStub')->give('ContainerTestContextInjectInstantiations');
 
-        $container->make("ContainerTestContextInjectOne");
-        $container->make("ContainerTestContextInjectOne");
-        $container->make("ContainerTestContextInjectOne");
-        $container->make("ContainerTestContextInjectOne");
+        $container->make('ContainerTestContextInjectOne');
+        $container->make('ContainerTestContextInjectOne');
+        $container->make('ContainerTestContextInjectOne');
+        $container->make('ContainerTestContextInjectOne');
 
         $this->assertEquals(1, ContainerTestContextInjectInstantiations::$instantiations);
     }
