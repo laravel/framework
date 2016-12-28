@@ -2,8 +2,6 @@
 
 namespace Illuminate\Queue;
 
-use Illuminate\Container\Container;
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\Job as JobContract;
 
 trait InteractsWithQueue
