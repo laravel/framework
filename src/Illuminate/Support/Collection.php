@@ -1195,7 +1195,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      *
      * @return static
      *
-     * @throws LengthException
+     * @throws \LengthException
      */
     public function transpose()
     {
