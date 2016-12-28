@@ -11,7 +11,7 @@ abstract class Rule
      *
      * @return string
      */
-    abstract function toString();
+    abstract public function toString();
 
     /**
      * Add the rule to the stack and continue.
