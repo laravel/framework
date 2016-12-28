@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
-use Symfony\Component\Process\ProcessUtils;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\PhpExecutableFinder;
 
@@ -38,13 +37,11 @@ class ServeCommand extends Command
 
         $port = $this->input->getOption('port');
 
-        $base = ProcessUtils::escapeArgument($this->laravel->basePath());
+        $base = $this->laravel->basePath();
 
-        $binary = ProcessUtils::escapeArgument((new PhpExecutableFinder)->find(false));
+        $binary = (new PhpExecutableFinder)->find(false);
 
-        $this->info("Laravel development server started on http://{$host}:{$port}/");
-
-        passthru("{$binary} -S {$host}:{$port} {$base}/server.php");
+        pcntl_exec($binary, ['-S', "{$host}:{$port}", "{$base}/server.php"]);
     }
 
     /**
