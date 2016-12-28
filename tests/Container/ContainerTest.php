@@ -914,7 +914,7 @@ function containerTestInject(ContainerConcreteStub $stub, $default = 'taylor')
 
 class ContainerTestContextInjectInstantiations implements IContainerContractStub
 {
-    public static $instantiations = 0;
+    public static $instantiations;
 
     public function __construct()
     {

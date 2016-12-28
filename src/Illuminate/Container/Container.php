@@ -53,6 +53,13 @@ class Container implements ArrayAccess, ContainerContract
      * @var array
      */
     protected $aliases = [];
+
+    /**
+     * A flipped cache of registered type aliases
+     * used during contextual binding lookup
+     *
+     * @var array
+     */
     protected $aliasAbstracts = [];
 
     /**
@@ -353,7 +360,13 @@ class Container implements ArrayAccess, ContainerContract
         }
     }
 
-    private function removeAbstractAlias($searched)
+    /**
+     * Remove an alias from the contextual binding alias cache
+     *
+     * @param  string  $searched
+     * @return void
+     */
+    protected function removeAbstractAlias($searched)
     {
         if (! isset($this->aliases[$searched])) {
             return;
