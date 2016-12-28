@@ -7,7 +7,7 @@ use Dotenv\Exception\InvalidPathException;
 use Symfony\Component\Console\Input\ArgvInput;
 use Illuminate\Contracts\Foundation\Application;
 
-class DetectEnvironment
+class LoadEnvironmentVariables
 {
     /**
      * Bootstrap the given application.
