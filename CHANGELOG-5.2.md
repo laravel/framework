@@ -1,5 +1,11 @@
 # Release Notes
 
+## [Unreleased]
+
+### Fixed
+- Fixed deferring write connection ([#16673](https://github.com/laravel/framework/pull/16673))
+
+
 ## v5.2.45 (2016-08-26)
 
 ### Fixed
