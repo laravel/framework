@@ -585,7 +585,7 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     protected function sortMiddleware(Collection $middlewares)
     {
-        return (new SortedMiddleware($this->middlewarePriority, $middlewares))->all();
+        return (new SortedMiddleware($middlewares))->sortMiddleware($this->middlewarePriority)->all();
     }
 
     /**
