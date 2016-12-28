@@ -89,15 +89,15 @@ class View implements ArrayAccess, ViewContract
             // Once we have the contents of the view, we will flush the sections if we are
             // done rendering all views so that there is nothing left hanging over when
             // another view gets rendered in the future by the application developer.
-            $this->factory->flushSectionsIfDoneRendering();
+            $this->factory->flushStateIfDoneRendering();
 
             return ! is_null($response) ? $response : $contents;
         } catch (Exception $e) {
-            $this->factory->flushSections();
+            $this->factory->flushState();
 
             throw $e;
         } catch (Throwable $e) {
-            $this->factory->flushSections();
+            $this->factory->flushState();
 
             throw $e;
         }

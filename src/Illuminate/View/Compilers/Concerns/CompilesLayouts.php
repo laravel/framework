@@ -7,6 +7,13 @@ use Illuminate\View\Factory as ViewFactory;
 trait CompilesLayouts
 {
     /**
+     * The name of the last section that was started.
+     *
+     * @var string
+     */
+    protected $lastSection;
+
+    /**
      * Compile the extends statements into valid PHP.
      *
      * @param  string  $expression
@@ -31,6 +38,8 @@ trait CompilesLayouts
      */
     protected function compileSection($expression)
     {
+        $this->lastSection = trim($expression, "()'");
+
         return "<?php \$__env->startSection{$expression}; ?>";
     }
 
@@ -41,7 +50,7 @@ trait CompilesLayouts
      */
     protected function compileParent()
     {
-        return ViewFactory::parentPlaceholder();
+        return ViewFactory::parentPlaceholder($this->lastSection ?: '');
     }
 
     /**
