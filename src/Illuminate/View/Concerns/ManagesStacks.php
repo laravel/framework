@@ -84,10 +84,21 @@ trait ManagesStacks
      */
     public function yieldPushContent($section, $default = '')
     {
-        if (! isset($this->pushes[$section])) {
-            return $default;
+        if (isset($this->pushes[$section])) {
+            return implode($this->pushes[$section]);
         }
 
-        return implode($this->pushes[$section]);
+        return $default;
+    }
+
+    /**
+     * Flush all of the stacks.
+     *
+     * @return void
+     */
+    public function flushStacks()
+    {
+        $this->pushes = [];
+        $this->pushStack = [];
     }
 }

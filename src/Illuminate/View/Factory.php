@@ -404,6 +404,31 @@ class Factory implements FactoryContract
     }
 
     /**
+     * Flush all of the factory state like sections and stacks.
+     *
+     * @return void
+     */
+    public function flushState()
+    {
+        $this->renderCount = 0;
+
+        $this->flushSections();
+        $this->flushStacks();
+    }
+
+    /**
+     * Flush all of the section contents if done rendering.
+     *
+     * @return void
+     */
+    public function flushStateIfDoneRendering()
+    {
+        if ($this->doneRendering()) {
+            $this->flushState();
+        }
+    }
+
+    /**
      * Get the extension to engine bindings.
      *
      * @return array

@@ -172,34 +172,6 @@ trait ManagesLayouts
     }
 
     /**
-     * Flush all of the section contents.
-     *
-     * @return void
-     */
-    public function flushSections()
-    {
-        $this->renderCount = 0;
-
-        $this->sections = [];
-        $this->sectionStack = [];
-
-        $this->pushes = [];
-        $this->pushStack = [];
-    }
-
-    /**
-     * Flush all of the section contents if done rendering.
-     *
-     * @return void
-     */
-    public function flushSectionsIfDoneRendering()
-    {
-        if ($this->doneRendering()) {
-            $this->flushSections();
-        }
-    }
-
-    /**
      * Check if section exists.
      *
      * @param  string  $name
@@ -218,5 +190,16 @@ trait ManagesLayouts
     public function getSections()
     {
         return $this->sections;
+    }
+
+    /**
+     * Flush all of the sections.
+     *
+     * @return void
+     */
+    public function flushSections()
+    {
+        $this->sections = [];
+        $this->sectionStack = [];
     }
 }
