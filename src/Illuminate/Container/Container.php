@@ -56,7 +56,7 @@ class Container implements ArrayAccess, ContainerContract
 
     /**
      * A flipped cache of registered type aliases
-     * used during contextual binding lookup
+     * used during contextual binding lookup.
      *
      * @var array
      */
@@ -361,7 +361,7 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
-     * Remove an alias from the contextual binding alias cache
+     * Remove an alias from the contextual binding alias cache.
      *
      * @param  string  $searched
      * @return void
