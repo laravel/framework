@@ -125,7 +125,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function when($concrete)
     {
-        return new ContextualBindingBuilder($this, $concrete);
+        return new ContextualBindingBuilder($this, $this->getAlias($concrete));
     }
 
     /**
@@ -278,7 +278,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function addContextualBinding($concrete, $abstract, $implementation)
     {
-        $this->contextual[$concrete][$abstract] = $implementation;
+        $this->contextual[$concrete][$this->getAlias($abstract)] = $implementation;
     }
 
     /**
@@ -319,6 +319,8 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function extend($abstract, Closure $closure)
     {
+        $abstract = $this->getAlias($abstract);
+
         if (isset($this->instances[$abstract])) {
             $this->instances[$abstract] = $closure($this->instances[$abstract], $this);
 
@@ -411,7 +413,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function rebinding($abstract, Closure $callback)
     {
-        $this->reboundCallbacks[$abstract][] = $callback;
+        $this->reboundCallbacks[$abstract = $this->getAlias($abstract)][] = $callback;
 
         if ($this->bound($abstract)) {
             return $this->make($abstract);
@@ -766,6 +768,10 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function resolving($abstract, Closure $callback = null)
     {
+        if (is_string($abstract)) {
+            $abstract = $this->getAlias($abstract);
+        }
+
         if (is_null($callback) && $abstract instanceof Closure) {
             $this->globalResolvingCallbacks[] = $abstract;
         } else {
@@ -782,6 +788,10 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function afterResolving($abstract, Closure $callback = null)
     {
+        if (is_string($abstract)) {
+            $abstract = $this->getAlias($abstract);
+        }
+
         if ($abstract instanceof Closure && is_null($callback)) {
             $this->globalAfterResolvingCallbacks[] = $abstract;
         } else {
@@ -898,6 +908,8 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function getExtenders($abstract)
     {
+        $abstract = $this->getAlias($abstract);
+
         if (isset($this->extenders[$abstract])) {
             return $this->extenders[$abstract];
         }

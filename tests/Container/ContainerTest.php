@@ -604,6 +604,54 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
         $factory = $container->factory('name');
         $this->assertEquals($container->make('name'), $factory());
     }
+
+    public function testExtensionWorksOnAliasedBindings()
+    {
+        $container = new Container;
+        $container->singleton('something', function () {
+            return 'some value';
+        });
+        $container->alias('something', 'something-alias');
+        $container->extend('something-alias', function ($value) {
+            return $value.' extended';
+        });
+
+        $this->assertEquals('some value extended', $container->make('something'));
+    }
+
+    public function testContextualBindingWorksWithAliasedTargets()
+    {
+        $container = new Container;
+
+        $container->bind('IContainerContractStub', 'ContainerImplementationStub');
+        $container->alias('IContainerContractStub', 'interface-stub');
+
+        $container->alias('ContainerImplementationStub', 'stub-1');
+
+        $container->when('ContainerTestContextInjectOne')->needs('interface-stub')->give('stub-1');
+        $container->when('ContainerTestContextInjectTwo')->needs('interface-stub')->give('ContainerImplementationStubTwo');
+
+        $one = $container->make('ContainerTestContextInjectOne');
+        $two = $container->make('ContainerTestContextInjectTwo');
+
+        $this->assertInstanceOf('ContainerImplementationStub', $one->impl);
+        $this->assertInstanceOf('ContainerImplementationStubTwo', $two->impl);
+    }
+
+    public function testResolvingCallbacksShouldBeFiredWhenCalledWithAliases()
+    {
+        $container = new Container;
+        $container->alias('StdClass', 'std');
+        $container->resolving('std', function ($object) {
+            return $object->name = 'taylor';
+        });
+        $container->bind('foo', function () {
+            return new StdClass;
+        });
+        $instance = $container->make('foo');
+
+        $this->assertEquals('taylor', $instance->name);
+    }
 }
 
 class ContainerConcreteStub
