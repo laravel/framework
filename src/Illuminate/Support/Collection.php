@@ -1194,6 +1194,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * turning the rows into columns and the columns into rows
      *
      * @return static
+     *
+     * @throws \LengthException
      */
     public function transpose()
     {
