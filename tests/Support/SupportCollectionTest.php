@@ -1107,6 +1107,41 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['first' => 'first-rolyat', 'last' => 'last-llewto'], $data->all());
     }
 
+    public function testTranspose()
+    {
+        $data = new Collection([
+            [1, 4, 7],
+            [2, 5, 8],
+            [3, 6, 9],
+        ]);
+        $data = $data->transpose();
+        $this->assertEquals([
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9],
+        ], $data->toArray());
+
+        $data = new Collection([1, 2, 3]);
+        try {
+            $data->transpose();
+            $this->fail('Exception not thrown on one dimensional collection!');
+        } catch (LengthException $exception) {
+            $this->assertEquals('Collection is not multidimensional with at least one child each!', $exception->getMessage());
+        }
+
+        $data = new Collection([
+            [1, 4],
+            [2],
+            [3],
+        ]);
+        try {
+            $data->transpose();
+            $this->fail('Exception not thrown on one dimensional collection!');
+        } catch (LengthException $exception) {
+            $this->assertEquals('The child collections do not have an even length!', $exception->getMessage());
+        }
+    }
+
     public function testGroupByAttribute()
     {
         $data = new Collection([['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1'], ['rating' => 2, 'url' => '2']]);

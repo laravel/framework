@@ -1190,6 +1190,31 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Rotate the multidimensional array,
+     * turning the rows into columns and the columns into rows
+     *
+     * @return static
+     */
+    public function transpose()
+    {
+        if (count($this->items, COUNT_RECURSIVE) <= count($this->items)*2) {
+            throw new \LengthException('Collection is not multidimensional with at least one child each!');
+        }
+
+        $arrayLength = count(reset($this->items));
+        $items = [];
+        foreach ($this->items as $key => $item) {
+            if (count($item) != $arrayLength) {
+                throw new \LengthException('The child collections do not have an even length!');
+            }
+
+            $items[] = new static(array_column($this->items, $key));
+        }
+
+        return new static($items);
+    }
+
+    /**
      * Return only unique items from the collection array.
      *
      * @param  string|callable|null  $key
