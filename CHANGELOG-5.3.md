@@ -11,6 +11,7 @@
 - Added `ArrayTransport` to mail component to store Swift messages in memory ([#16906](https://github.com/laravel/framework/pull/16906), [69d3d04](https://github.com/laravel/framework/commit/69d3d0463cf6bd114d2beecd8480556efb168678))
 - Added fallback to `SlackAttachment` notification ([#16912](https://github.com/laravel/framework/pull/16912))
 - Added `Macroable` trait to `RedirectResponse` ([#16929](https://github.com/laravel/framework/pull/16929))
+- Support namespaces when using `make:policy --model` ([#16981](https://github.com/laravel/framework/pull/16981))
 
 ### Changed
 - Allow SparkPost transport transmission metadata to be set at runtime ([#16838](https://github.com/laravel/framework/pull/16838))
@@ -20,6 +21,8 @@
 - Bind `serve` command to `127.0.0.1` instead of `localhost` ([#16937](https://github.com/laravel/framework/pull/16937))
 - Added `old('remember')` call to `login.stub` ([#16944](https://github.com/laravel/framework/pull/16944))
 - Check for `db` before setting presence verifier in `ValidationServiceProvider` ([038840d](https://github.com/laravel/framework/commit/038840d477e606735f9179d97eeb20639450e8ae))
+- Make Eloquent's `getTimeZone()` method call adhere to `DateTimeInterface` ([#16955](https://github.com/laravel/framework/pull/16955))
+- Support customizable response in `SendsPasswordResetEmails` ([#16982](https://github.com/laravel/framework/pull/16982))
 
 ### Fixed
 - Fixed a wildcard issue with `sometimes` validation rule ([#16826](https://github.com/laravel/framework/pull/16826))
@@ -29,6 +32,7 @@
 - Fixed broken event interface listening ([#16877](https://github.com/laravel/framework/pull/16877))
 - Fixed empty model creation ([#16864](https://github.com/laravel/framework/pull/16864))
 - Fixed column overlapping on using `withCount()` on `BelongsToMany` ([#16895](https://github.com/laravel/framework/pull/16895))
+- Fixed `Unique::ignore()` issue ([#16948](https://github.com/laravel/framework/pull/16948))
 
 
 ## v5.3.28 (2016-12-15)
