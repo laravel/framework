@@ -69,11 +69,13 @@ trait ManagesLoops
     /**
      * Get an instance of the last loop in the stack.
      *
-     * @return array
+     * @return \stdClass
      */
     public function getLastLoop()
     {
-        return ($last = Arr::last($this->loopsStack)) ? (object) $last : null;
+        if ($last = Arr::last($this->loopsStack)) {
+            return (object) $last;
+        }
     }
 
     /**
