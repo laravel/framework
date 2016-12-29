@@ -2,8 +2,6 @@
 
 namespace Illuminate\Queue\Jobs;
 
-use DateTime;
-use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Queue\CalculatesDelays;
 
