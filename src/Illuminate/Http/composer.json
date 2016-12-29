@@ -14,7 +14,7 @@
         }
     ],
     "require": {
-        "php": ">=5.6.4",
+        "php": ">=7.0",
         "illuminate/session": "5.5.*",
         "illuminate/support": "5.5.*",
         "symfony/http-foundation": "~3.2",
