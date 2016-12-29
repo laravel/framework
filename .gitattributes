@@ -1,7 +1,6 @@
 * text=auto
 
 /.github export-ignore
-/build export-ignore
 /tests export-ignore
 .editorconfig export-ignore
 .gitattributes export-ignore
