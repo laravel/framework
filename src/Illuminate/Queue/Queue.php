@@ -74,29 +74,51 @@ abstract class Queue
      * @param  string  $queue
      * @return string
      *
-     * @throws \InvalidArgumentException
+     * @throws \Illuminate\Queue\InvalidPayloadException
      */
     protected function createPayload($job, $data = '', $queue = null)
     {
-        if (is_object($job)) {
-            $payload = json_encode([
-                'job' => 'Illuminate\Queue\CallQueuedHandler@call',
-                'maxTries' => isset($job->tries) ? $job->tries : null,
-                'timeout' => isset($job->timeout) ? $job->timeout : null,
-                'data' => [
-                    'commandName' => get_class($job),
-                    'command' => serialize(clone $job),
-                ],
-            ]);
-        } else {
-            $payload = json_encode($this->createPlainPayload($job, $data));
-        }
+        $payload = json_encode($this->createPayloadArray($job, $data, $queue));
 
         if (JSON_ERROR_NONE !== json_last_error()) {
-            throw new InvalidArgumentException('Unable to create payload: '.json_last_error_msg());
+            throw new InvalidPayloadException;
         }
 
         return $payload;
+    }
+
+    /**
+     * Create a payload array from the given job and data.
+     *
+     * @param  string  $job
+     * @param  mixed   $data
+     * @param  string  $queue
+     * @return array
+     */
+    protected function createPayloadArray($job, $data = '', $queue = null)
+    {
+        return is_object($job)
+                    ? $this->createObjectPayload($job)
+                    : $this->createPlainPayload($job, $data);
+    }
+
+    /**
+     * Create a payload for an object-based queue handler.
+     *
+     * @param  mixed  $job
+     * @return array
+     */
+    protected function createObjectPayload($job)
+    {
+        return [
+            'job' => 'Illuminate\Queue\CallQueuedHandler@call',
+            'maxTries' => isset($job->tries) ? $job->tries : null,
+            'timeout' => isset($job->timeout) ? $job->timeout : null,
+            'data' => [
+                'commandName' => get_class($job),
+                'command' => serialize(clone $job),
+            ],
+        ];
     }
 
     /**
@@ -119,20 +141,20 @@ abstract class Queue
      * @param  string  $value
      * @return string
      *
-     * @throws \InvalidArgumentException
+     * @throws \Illuminate\Queue\InvalidPayloadException
      */
-    protected function setMeta($payload, $key, $value)
-    {
-        $payload = json_decode($payload, true);
+    // protected function setMeta($payload, $key, $value)
+    // {
+    //     $payload = json_decode($payload, true);
 
-        $payload = json_encode(Arr::set($payload, $key, $value));
+    //     $payload = json_encode(Arr::set($payload, $key, $value));
 
-        if (JSON_ERROR_NONE !== json_last_error()) {
-            throw new InvalidArgumentException('Unable to create payload: '.json_last_error_msg());
-        }
+    //     if (JSON_ERROR_NONE !== json_last_error()) {
+    //         throw new InvalidPayloadException;
+    //     }
 
-        return $payload;
-    }
+    //     return $payload;
+    // }
 
     /**
      * Set the IoC container instance.

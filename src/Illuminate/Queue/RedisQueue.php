@@ -195,13 +195,12 @@ class RedisQueue extends Queue implements QueueContract
      * @param  string  $queue
      * @return string
      */
-    protected function createPayload($job, $data = '', $queue = null)
+    protected function createPayloadArray($job, $data = '', $queue = null)
     {
-        $payload = $this->setMeta(
-            parent::createPayload($job, $data), 'id', $this->getRandomId()
-        );
-
-        return $this->setMeta($payload, 'attempts', 1);
+        return array_merge(parent::createPayloadArray($job, $data, $queue), [
+            'id' => $this->getRandomId(),
+            'attempts' => 1,
+        ]);
     }
 
     /**

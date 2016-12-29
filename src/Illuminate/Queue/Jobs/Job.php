@@ -58,22 +58,9 @@ abstract class Job
     {
         $payload = $this->payload();
 
-        list($class, $method) = $this->parseJob($payload['job']);
+        list($class, $method) = JobName::parse($payload['job']);
 
-        $this->instance = $this->resolve($class);
-
-        $this->instance->{$method}($this, $payload['data']);
-    }
-
-    /**
-     * Resolve the given job handler.
-     *
-     * @param  string  $class
-     * @return mixed
-     */
-    protected function resolve($class)
-    {
-        return $this->container->make($class);
+        ($this->instance = $this->resolve($class))->{$method}($this, $payload['data']);
     }
 
     /**
@@ -137,60 +124,22 @@ abstract class Job
     {
         $payload = $this->payload();
 
-        list($class, $method) = $this->parseJob($payload['job']);
+        list($class, $method) = JobName::parse($payload['job']);
 
-        $this->instance = $this->resolve($class);
-
-        if (method_exists($this->instance, 'failed')) {
+        if (method_exists($this->instance = $this->resolve($class), 'failed')) {
             $this->instance->failed($payload['data'], $e);
         }
     }
 
     /**
-     * Parse the job declaration into class and method.
+     * Resolve the given class.
      *
-     * @param  string  $job
-     * @return array
+     * @param  string  $class
+     * @return mixed
      */
-    protected function parseJob($job)
+    protected function resolve($class)
     {
-        $segments = explode('@', $job);
-
-        return count($segments) > 1 ? $segments : [$segments[0], 'fire'];
-    }
-
-    /**
-     * Get the name of the queued job class.
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->payload()['job'];
-    }
-
-    /**
-     * Get the resolved name of the queued job class.
-     *
-     * Resolves the name of "wrapped" jobs such as class-based handlers.
-     *
-     * @return string
-     */
-    public function resolveName()
-    {
-        $name = $this->getName();
-
-        $payload = $this->payload();
-
-        if ($name === 'Illuminate\Queue\CallQueuedHandler@call') {
-            return Arr::get($payload, 'data.commandName', $name);
-        }
-
-        if ($name === 'Illuminate\Events\CallQueuedHandler@call') {
-            return $payload['data']['class'].'@'.$payload['data']['method'];
-        }
-
-        return $name;
+        return $this->container->make($class);
     }
 
     /**
@@ -221,6 +170,28 @@ abstract class Job
     public function timeout()
     {
         return array_get($this->payload(), 'timeout');
+    }
+
+    /**
+     * Get the name of the queued job class.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->payload()['job'];
+    }
+
+    /**
+     * Get the resolved name of the queued job class.
+     *
+     * Resolves the name of "wrapped" jobs such as class-based handlers.
+     *
+     * @return string
+     */
+    public function resolveName()
+    {
+        return JobName::resolve($this->getName(), $this->payload());
     }
 
     /**

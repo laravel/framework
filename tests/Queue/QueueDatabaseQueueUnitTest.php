@@ -76,20 +76,6 @@ class QueueDatabaseQueueUnitTest extends PHPUnit_Framework_TestCase
         ]);
     }
 
-    public function testFailureToCreatePayloadAfterAddingMeta()
-    {
-        $this->expectException('InvalidArgumentException');
-
-        $queue = $this->getMockForAbstractClass('Illuminate\Queue\Queue');
-        $class = new ReflectionClass('Illuminate\Queue\Queue');
-
-        $setMeta = $class->getMethod('setMeta');
-        $setMeta->setAccessible(true);
-        $setMeta->invokeArgs($queue, [
-            json_encode(['valid']), 'key', "\xc3\x28",
-        ]);
-    }
-
     public function testBulkBatchPushesOntoDatabase()
     {
         $database = m::mock('Illuminate\Database\Connection');
