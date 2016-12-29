@@ -7,6 +7,10 @@ class LuaScripts
     /**
      * Get the Lua script for computing the size of queue.
      *
+     * KEYS[1] - The name of the primary queue
+     * KEYS[2] - The name of the "delayed" queue
+     * KEYS[3] - The name of the "reserved" queue
+     *
      * @return string
      */
     public static function size()
@@ -19,19 +23,27 @@ LUA;
     /**
      * Get the Lua script for popping the next job off of the queue.
      *
+     * KEYS[1] - The queue to pop jobs from, for example: queues:foo
+     * KEYS[2] - The queue to place reserved jobs on, for example: queues:foo:reserved
+     * ARGV[1] - The time at which the reserved job will expire
+     *
      * @return string
      */
     public static function pop()
     {
         return <<<'LUA'
+-- Pop the first job off of the queue...
 local job = redis.call('lpop', KEYS[1])
 local reserved = false
+
 if(job ~= false) then
+    -- Increment the attempt count and place job on the reserved queue...
     reserved = cjson.decode(job)
     reserved['attempts'] = reserved['attempts'] + 1
     reserved = cjson.encode(reserved)
     redis.call('zadd', KEYS[2], ARGV[1], reserved)
 end
+
 return {job, reserved}
 LUA;
     }
@@ -39,13 +51,22 @@ LUA;
     /**
      * Get the Lua script for releasing reserved jobs.
      *
+     * KEYS[1] - The "delayed" queue we release jobs onto, for example: queues:foo:delayed
+     * KEYS[2] - The queue the jobs are currently on, for example: queues:foo:reserved
+     * ARGV[1] - The raw payload of the job to add to the "delayed" queue
+     * ARGV[2] - The UNIX timestamp at which the job should become available
+     *
      * @return string
      */
     public static function release()
     {
         return <<<'LUA'
+-- Remove the job from the current queue...
 redis.call('zrem', KEYS[2], ARGV[1])
+
+-- Add the job onto the "delayed" queue...
 redis.call('zadd', KEYS[1], ARGV[2], ARGV[1])
+
 return true
 LUA;
     }
@@ -62,6 +83,7 @@ LUA;
     public static function migrateExpiredJobs()
     {
         return <<<'LUA'
+-- Get all of the jobs with an expired "score"...
 local val = redis.call('zrangebyscore', KEYS[1], '-inf', ARGV[1])
 
 -- If we have values in the array, we will remove them from the first queue
