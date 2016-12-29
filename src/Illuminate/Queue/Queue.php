@@ -3,7 +3,6 @@
 namespace Illuminate\Queue;
 
 use Illuminate\Support\Arr;
-use InvalidArgumentException;
 use Illuminate\Container\Container;
 
 abstract class Queue
