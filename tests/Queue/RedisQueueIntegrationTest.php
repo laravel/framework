@@ -68,7 +68,7 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($job, unserialize(json_decode($redisJob->getRawBody())->data->command));
         $this->assertEquals(1, $redisJob->attempts());
         $this->assertEquals($job, unserialize(json_decode($redisJob->getReservedJob())->data->command));
-        $this->assertEquals(2, json_decode($redisJob->getReservedJob())->attempts);
+        $this->assertEquals(1, json_decode($redisJob->getReservedJob())->attempts);
         $this->assertEquals($redisJob->getJobId(), json_decode($redisJob->getReservedJob())->id);
 
         // Check reserved queue
@@ -216,7 +216,7 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
 
         $decoded = json_decode($payload);
 
-        $this->assertEquals(2, $decoded->attempts);
+        $this->assertEquals(1, $decoded->attempts);
         $this->assertEquals($job, unserialize($decoded->data->command));
 
         //check if the queue has no ready item yet
