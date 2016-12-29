@@ -63,6 +63,7 @@ class QueueDatabaseQueueIntegrationTest extends PHPUnit_Framework_TestCase
             $table->unsignedInteger('reserved_at')->nullable();
             $table->unsignedInteger('available_at');
             $table->unsignedInteger('created_at');
+            $table->string('reserved_by')->nullable()->unique();
             $table->index(['queue', 'reserved_at']);
         });
     }
@@ -112,6 +113,7 @@ class QueueDatabaseQueueIntegrationTest extends PHPUnit_Framework_TestCase
                 'reserved_at' => null,
                 'available_at' => Carbon::now()->subSeconds(1)->getTimestamp(),
                 'created_at' => Carbon::now()->getTimestamp(),
+                'reserved_by' => null,
             ]);
 
         $popped_job = $this->queue->pop($mock_queue_name);
@@ -132,6 +134,7 @@ class QueueDatabaseQueueIntegrationTest extends PHPUnit_Framework_TestCase
             'reserved_at' => null,
             'available_at' => Carbon::now()->subSeconds(1)->getTimestamp(),
             'created_at' => Carbon::now()->getTimestamp(),
+            'reserved_by' => null,
         ];
 
         $this->connection()->table('jobs')->insert($job);
@@ -159,6 +162,7 @@ class QueueDatabaseQueueIntegrationTest extends PHPUnit_Framework_TestCase
                 'reserved_at' => null,
                 'available_at' => Carbon::now()->addSeconds(60)->getTimestamp(),
                 'created_at' => Carbon::now()->getTimestamp(),
+                'reserved_by' => null,
             ]);
 
         $popped_job = $this->queue->pop($mock_queue_name);
@@ -181,6 +185,7 @@ class QueueDatabaseQueueIntegrationTest extends PHPUnit_Framework_TestCase
                 'reserved_at' => Carbon::now()->subDay()->getTimestamp(),
                 'available_at' => Carbon::now()->addDay()->getTimestamp(),
                 'created_at' => Carbon::now()->getTimestamp(),
+                'reserved_by' => 'foobar',
             ]);
 
         $popped_job = $this->queue->pop($mock_queue_name);
@@ -203,6 +208,7 @@ class QueueDatabaseQueueIntegrationTest extends PHPUnit_Framework_TestCase
                 'reserved_at' => Carbon::now()->addDay()->getTimestamp(),
                 'available_at' => Carbon::now()->subDay()->getTimestamp(),
                 'created_at' => Carbon::now()->getTimestamp(),
+                'reserved_by' => 'foobar',
             ]);
 
         $popped_job = $this->queue->pop($mock_queue_name);

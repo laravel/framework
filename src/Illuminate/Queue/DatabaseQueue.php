@@ -5,6 +5,7 @@ namespace Illuminate\Queue;
 use DateTime;
 use Carbon\Carbon;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Queue\Jobs\DatabaseJob;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 
@@ -172,40 +173,109 @@ class DatabaseQueue extends Queue implements QueueContract
     {
         $queue = $this->getQueue($queue);
 
-        $this->database->beginTransaction();
-
-        if ($job = $this->getNextAvailableJob($queue)) {
-            $job = $this->markJobAsReserved($job);
-
-            $this->database->commit();
-
+        if ($job = $this->reserveNextAvailableJob($queue)) {
             return new DatabaseJob(
                 $this->container, $this, $job, $queue
             );
         }
-
-        $this->database->commit();
     }
 
     /**
-     * Get the next available job for the queue.
+     * Reserve the next available job in the queue.
      *
      * @param  string|null  $queue
      * @return \StdClass|null
      */
-    protected function getNextAvailableJob($queue)
+    protected function reserveNextAvailableJob($queue)
     {
-        $job = $this->database->table($this->table)
+        switch ($this->database->getDriverName()) {
+            case 'mysql':
+                return $this->reserveNextAvailableJobWithUpdateLimit($queue);
+            default:
+                return $this->reserveNextAvailableJobWithLocking($queue);
+        }
+    }
+
+    /**
+     * Reserve the next available job in the queue using standard locking.
+     *
+     * @param  string|null  $queue
+     * @return \StdClass|null
+     */
+    protected function reserveNextAvailableJobWithLocking($queue)
+    {
+        $this->database->beginTransaction();
+
+        $job = $this->nextAvailableJobQuery($queue)
                     ->lockForUpdate()
-                    ->where('queue', $this->getQueue($queue))
-                    ->where(function ($query) {
-                        $this->isAvailable($query);
-                        $this->isReservedButExpired($query);
-                    })
-                    ->orderBy('id', 'asc')
                     ->first();
 
-        return $job ? (object) $job : null;
+        if ($job) {
+            $job = (object) $job;
+            // These fields are manually set since otherwise we'd need to refresh
+            // the record.
+            $job->attempts = $job->attempts + 1;
+            $job->reserved_at = $this->getTime();
+
+            $this->database->table($this->table)
+                          ->where('id', $job->id)
+                          ->update([
+                              'attempts' => $job->attempts,
+                              'reserved_at' => $job->reserved_at,
+                          ]);
+        }
+
+        $this->database->commit();
+
+        return $job;
+    }
+
+    /**
+     * Reserve the next available job in the queue in an optimized way for query
+     * engines that support UPDATE ... LIMIT.
+     *
+     * @param  string|null  $queue
+     * @return \StdClass|null
+     */
+    protected function reserveNextAvailableJobWithUpdateLimit($queue)
+    {
+        $reserved_by = md5(gethostname()).'_'.getmypid();
+
+        $count = $this->nextAvailableJobQuery($queue)
+                      ->update([
+                          'attempts' => new Expression('attempts + 1'),
+                          'reserved_at' => $this->getTime(),
+                          'reserved_by' => $reserved_by,
+                      ]);
+
+        if ($count == 0) {
+            return;
+        }
+
+        $job = $this->database->table($this->table)
+                    ->where('reserved_by', $reserved_by)
+                    ->first();
+
+        return (object) $job;
+    }
+
+    /**
+     * Return the query for finiding the next availabe job in the given queue.
+     *
+     * @param  string|null  $queue
+     * @return \Illuminate\Database\Query\Builder
+     */
+    protected function nextAvailableJobQuery($queue)
+    {
+        return $this->database->table($this->table)
+                              ->lockForUpdate()
+                              ->where('queue', $this->getQueue($queue))
+                              ->where(function ($query) {
+                                  $this->isAvailable($query);
+                                  $this->isReservedButExpired($query);
+                              })
+                              ->orderBy('id', 'asc')
+                              ->limit(1);
     }
 
     /**
@@ -235,25 +305,6 @@ class DatabaseQueue extends Queue implements QueueContract
         $query->orWhere(function ($query) use ($expiration) {
             $query->where('reserved_at', '<=', $expiration);
         });
-    }
-
-    /**
-     * Mark the given job ID as reserved.
-     *
-     * @param \stdClass $job
-     * @return \stdClass
-     */
-    protected function markJobAsReserved($job)
-    {
-        $job->attempts = $job->attempts + 1;
-        $job->reserved_at = $this->getTime();
-
-        $this->database->table($this->table)->where('id', $job->id)->update([
-            'reserved_at' => $job->reserved_at,
-            'attempts' => $job->attempts,
-        ]);
-
-        return $job;
     }
 
     /**
@@ -304,6 +355,7 @@ class DatabaseQueue extends Queue implements QueueContract
             'reserved_at' => null,
             'available_at' => $availableAt,
             'created_at' => $this->getTime(),
+            'reserved_by' => null,
             'payload' => $payload,
         ];
     }
