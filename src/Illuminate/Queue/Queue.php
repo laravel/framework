@@ -2,7 +2,6 @@
 
 namespace Illuminate\Queue;
 
-use Illuminate\Support\Arr;
 use Illuminate\Container\Container;
 
 abstract class Queue
