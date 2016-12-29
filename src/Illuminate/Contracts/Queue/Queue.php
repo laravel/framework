@@ -65,6 +65,16 @@ interface Queue
     public function laterOn($queue, $delay, $job, $data = '');
 
     /**
+     * Push an array of jobs onto the queue.
+     *
+     * @param  array   $jobs
+     * @param  mixed   $data
+     * @param  string  $queue
+     * @return mixed
+     */
+    public function bulk($jobs, $data = '', $queue = null);
+
+    /**
      * Pop the next job off of the queue.
      *
      * @param  string  $queue
