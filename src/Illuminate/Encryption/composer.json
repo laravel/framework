@@ -18,8 +18,7 @@
         "ext-mbstring": "*",
         "ext-openssl": "*",
         "illuminate/contracts": "5.5.*",
-        "illuminate/support": "5.5.*",
-        "paragonie/random_compat": "~1.4|~2.0"
+        "illuminate/support": "5.5.*"
     },
     "autoload": {
         "psr-4": {
