@@ -21,6 +21,19 @@ trait CalculatesDelays
     }
 
     /**
+     * Get the "available at" UNIX timestamp.
+     *
+     * @param  \DateTimeInterface|int  $delay
+     * @return int
+     */
+    protected function availableAt($delay = 0)
+    {
+        return $delay instanceof DateTimeInterface
+                            ? $delay->getTimestamp()
+                            : Carbon::now()->addSeconds($delay)->getTimestamp();
+    }
+
+    /**
      * Get the current system time as a UNIX timestamp.
      *
      * @return int
