@@ -133,29 +133,6 @@ abstract class Queue
     }
 
     /**
-     * Set additional meta on a payload string.
-     *
-     * @param  string  $payload
-     * @param  string  $key
-     * @param  string  $value
-     * @return string
-     *
-     * @throws \Illuminate\Queue\InvalidPayloadException
-     */
-    // protected function setMeta($payload, $key, $value)
-    // {
-    //     $payload = json_decode($payload, true);
-
-    //     $payload = json_encode(Arr::set($payload, $key, $value));
-
-    //     if (JSON_ERROR_NONE !== json_last_error()) {
-    //         throw new InvalidPayloadException;
-    //     }
-
-    //     return $payload;
-    // }
-
-    /**
      * Set the IoC container instance.
      *
      * @param  \Illuminate\Container\Container  $container
