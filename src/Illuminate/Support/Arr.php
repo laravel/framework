@@ -506,6 +506,109 @@ class Arr
     }
 
     /**
+     * @param array $items
+     * @param callable|int|string|null $callback
+     * @return mixed
+     */
+    public static function median($items, $callback = null)
+    {
+        return static::nthOrder($items, (int) ((count($items) - 1) / 2), $callback);
+    }
+
+    /**
+     * Returns the element with the requested zero-based nth order statistic from the passed array.
+     *
+     * @param array $items
+     * @param int $n
+     * @param callable|int|string|null $callback
+     * @return mixed
+     */
+    public static function nthOrder($items, $n, $callback = null)
+    {
+        $count = count($items);
+
+        if ($n < 0 || $n >= $count) {
+            return null;
+        }
+
+        $values = array_values($items);
+
+        return static::select($values, 0, $count - 1, $n, $callback);
+    }
+
+    /**
+     * @param array $items
+     * @param int $start
+     * @param int $end
+     * @param int $nthOrder
+     * @param callable|int|string|null $callback
+     * @return mixed
+     */
+    private static function select(&$items, $start, $end, $nthOrder, $callback = null)
+    {
+        if ($start === $end) {
+            return $items[$start];
+        }
+
+        $pivot = static::partition($items, $start, $end, random_int($start, $end), $callback);
+
+        if ($nthOrder === $pivot) {
+            return $items[$pivot];
+        }
+
+        if ($nthOrder < $pivot) {
+            return static::select($items, $start, $pivot - 1, $nthOrder, $callback);
+        }
+
+        return static::select($items, $pivot + 1, $end, $nthOrder, $callback);
+    }
+
+    /**
+     * Rearranges a subarray in place, so that the element index described by the index `$reference` is in its sorted
+     * position in the subarray, all elements less than that element are in lower positions, and all elements greater
+     * than that element are in higher positions. Returns the new index of this element.
+     *
+     * @param array $items Array to be rearranged, with sequential integer indexes starting at zero.
+     * @param int $start Starting index of the subarray to rearrange.
+     * @param int $end Ending index of the subarray to rearrange.
+     * @param int $reference Index of the reference element
+     * @param callable|int|string|null $callback
+     * @return int
+     */
+    private static function partition(&$items, $start, $end, $reference, $callback = null)
+    {
+        list($items[$end], $items[$reference]) = [$items[$reference], $items[$end]];
+
+        $pivot = $items[$end];
+        $lower = $start;
+
+        for ($i = $start; $i < $end; $i++) {
+            if (is_string($callback)) {
+                $comparisonValue = array_get($items[$i], $callback);
+                $pivotValue = array_get($pivot, $callback);
+            } elseif (is_int($callback)) {
+                $comparisonValue = $items[$i][$callback];
+                $pivotValue = $pivot[$callback];
+            } elseif (is_callable($callback)) {
+                $comparisonValue = $callback($items[$i], $pivot);
+                $pivotValue = 0;
+            } else {
+                $comparisonValue = $items[$i];
+                $pivotValue = $pivot;
+            }
+
+            if ($comparisonValue < $pivotValue) {
+                list($items[$lower], $items[$i]) = [$items[$i], $items[$lower]];
+                $lower++;
+            }
+        }
+
+        list($items[$lower], $items[$end]) = [$items[$end], $items[$lower]];
+
+        return $lower;
+    }
+
+    /**
      * Filter the array using the given callback.
      *
      * @param  array  $array
