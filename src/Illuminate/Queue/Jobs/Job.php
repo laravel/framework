@@ -5,9 +5,12 @@ namespace Illuminate\Queue\Jobs;
 use DateTime;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
+use Illuminate\Queue\CalculatesDelays;
 
 abstract class Job
 {
+    use CalculatesDelays;
+
     /**
      * The job handler instance.
      *
@@ -21,18 +24,6 @@ abstract class Job
      * @var \Illuminate\Container\Container
      */
     protected $container;
-
-    /**
-     * The name of the connection the job belongs to.
-     */
-    protected $connectionName;
-
-    /**
-     * The name of the queue the job belongs to.
-     *
-     * @var string
-     */
-    protected $queue;
 
     /**
      * Indicates if the job has been deleted.
@@ -49,18 +40,16 @@ abstract class Job
     protected $released = false;
 
     /**
-     * Get the number of times the job has been attempted.
-     *
-     * @return int
+     * The name of the connection the job belongs to.
      */
-    abstract public function attempts();
+    protected $connectionName;
 
     /**
-     * Get the raw body string for the job.
+     * The name of the queue the job belongs to.
      *
-     * @return string
+     * @var string
      */
-    abstract public function getRawBody();
+    protected $queue;
 
     /**
      * Fire the job.
@@ -170,31 +159,6 @@ abstract class Job
         $segments = explode('@', $job);
 
         return count($segments) > 1 ? $segments : [$segments[0], 'fire'];
-    }
-
-    /**
-     * Calculate the number of seconds with the given delay.
-     *
-     * @param  \DateTime|int  $delay
-     * @return int
-     */
-    protected function getSeconds($delay)
-    {
-        if ($delay instanceof DateTime) {
-            return max(0, $delay->getTimestamp() - $this->getTime());
-        }
-
-        return (int) $delay;
-    }
-
-    /**
-     * Get the current system time.
-     *
-     * @return int
-     */
-    protected function getTime()
-    {
-        return Carbon::now()->getTimestamp();
     }
 
     /**

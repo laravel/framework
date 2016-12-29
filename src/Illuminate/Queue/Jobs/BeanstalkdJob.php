@@ -51,18 +51,6 @@ class BeanstalkdJob extends Job implements JobContract
     }
 
     /**
-     * Delete the job from the queue.
-     *
-     * @return void
-     */
-    public function delete()
-    {
-        parent::delete();
-
-        $this->pheanstalk->delete($this->job);
-    }
-
-    /**
      * Release the job back into the queue.
      *
      * @param  int   $delay
@@ -87,6 +75,18 @@ class BeanstalkdJob extends Job implements JobContract
         parent::release();
 
         $this->pheanstalk->bury($this->job);
+    }
+
+    /**
+     * Delete the job from the queue.
+     *
+     * @return void
+     */
+    public function delete()
+    {
+        parent::delete();
+
+        $this->pheanstalk->delete($this->job);
     }
 
     /**

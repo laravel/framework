@@ -98,14 +98,10 @@ class SqsQueue extends Queue implements QueueContract
      */
     public function later($delay, $job, $data = '', $queue = null)
     {
-        $payload = $this->createPayload($job, $data);
-
-        $delay = $this->getSeconds($delay);
-
         return $this->sqs->sendMessage([
             'QueueUrl' => $this->getQueue($queue),
-            'MessageBody' => $payload,
-            'DelaySeconds' => $delay,
+            'MessageBody' => $this->createPayload($job, $data),
+            'DelaySeconds' => $this->secondsUntil($delay),
         ])->get('MessageId');
     }
 

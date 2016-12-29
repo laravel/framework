@@ -22,10 +22,10 @@ class QueueRedisQueueTest extends PHPUnit_Framework_TestCase
 
     public function testDelayedPushProperlyPushesJobOntoRedis()
     {
-        $queue = $this->getMockBuilder('Illuminate\Queue\RedisQueue')->setMethods(['getSeconds', 'getTime', 'getRandomId'])->setConstructorArgs([$redis = m::mock('Illuminate\Contracts\Redis\Factory'), 'default'])->getMock();
+        $queue = $this->getMockBuilder('Illuminate\Queue\RedisQueue')->setMethods(['secondsUntil', 'currentTime', 'getRandomId'])->setConstructorArgs([$redis = m::mock('Illuminate\Contracts\Redis\Factory'), 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->will($this->returnValue('foo'));
-        $queue->expects($this->once())->method('getSeconds')->with(1)->will($this->returnValue(1));
-        $queue->expects($this->once())->method('getTime')->will($this->returnValue(1));
+        $queue->expects($this->once())->method('secondsUntil')->with(1)->will($this->returnValue(1));
+        $queue->expects($this->once())->method('currentTime')->will($this->returnValue(1));
 
         $redis->shouldReceive('connection')->once()->andReturn($redis);
         $redis->shouldReceive('zadd')->once()->with(
@@ -41,10 +41,10 @@ class QueueRedisQueueTest extends PHPUnit_Framework_TestCase
     public function testDelayedPushWithDateTimeProperlyPushesJobOntoRedis()
     {
         $date = Carbon\Carbon::now();
-        $queue = $this->getMockBuilder('Illuminate\Queue\RedisQueue')->setMethods(['getSeconds', 'getTime', 'getRandomId'])->setConstructorArgs([$redis = m::mock('Illuminate\Contracts\Redis\Factory'), 'default'])->getMock();
+        $queue = $this->getMockBuilder('Illuminate\Queue\RedisQueue')->setMethods(['secondsUntil', 'currentTime', 'getRandomId'])->setConstructorArgs([$redis = m::mock('Illuminate\Contracts\Redis\Factory'), 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->will($this->returnValue('foo'));
-        $queue->expects($this->once())->method('getSeconds')->with($date)->will($this->returnValue(1));
-        $queue->expects($this->once())->method('getTime')->will($this->returnValue(1));
+        $queue->expects($this->once())->method('secondsUntil')->with($date)->will($this->returnValue(1));
+        $queue->expects($this->once())->method('currentTime')->will($this->returnValue(1));
 
         $redis->shouldReceive('connection')->once()->andReturn($redis);
         $redis->shouldReceive('zadd')->once()->with(

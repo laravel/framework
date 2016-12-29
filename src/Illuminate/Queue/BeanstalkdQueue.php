@@ -102,7 +102,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
         return $pheanstalk->put(
             $this->createPayload($job, $data),
             Pheanstalk::DEFAULT_PRIORITY,
-            $this->getSeconds($delay),
+            $this->secondsUntil($delay),
             $this->timeToRun
         );
     }
