@@ -2,7 +2,6 @@
 
 namespace Illuminate\Queue;
 
-use DateTime;
 use Carbon\Carbon;
 use Illuminate\Database\Connection;
 use Illuminate\Queue\Jobs\DatabaseJob;
