@@ -130,7 +130,7 @@ class RedisQueue extends Queue implements QueueContract
     {
         return array_merge(parent::createPayloadArray($job, $data, $queue), [
             'id' => $this->getRandomId(),
-            'attempts' => 1,
+            'attempts' => 0,
         ]);
     }
 
