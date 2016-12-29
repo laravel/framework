@@ -97,7 +97,7 @@ abstract class Queue
     {
         return is_object($job)
                     ? $this->createObjectPayload($job)
-                    : $this->createPlainPayload($job, $data);
+                    : $this->createStringPayload($job, $data);
     }
 
     /**
@@ -120,13 +120,13 @@ abstract class Queue
     }
 
     /**
-     * Create a typical, "plain" queue payload array.
+     * Create a typical, string based queue payload array.
      *
      * @param  string  $job
      * @param  mixed  $data
      * @return array
      */
-    protected function createPlainPayload($job, $data)
+    protected function createStringPayload($job, $data)
     {
         return ['job' => $job, 'data' => $data];
     }
