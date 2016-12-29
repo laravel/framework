@@ -59,7 +59,7 @@ abstract class Job
 
         list($class, $method) = JobName::parse($payload['job']);
 
-        ($this->instance = $this->resolve($class))->{$method}($this, $payload['data']);
+        with($this->instance = $this->resolve($class))->{$method}($this, $payload['data']);
     }
 
     /**
