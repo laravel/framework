@@ -65,7 +65,9 @@ class RedisQueue extends Queue implements QueueContract
     {
         $queue = $this->getQueue($queue);
 
-        return $this->getConnection()->eval(LuaScripts::size(), 3, $queue, $queue.':delayed', $queue.':reserved');
+        return $this->getConnection()->eval(
+            LuaScripts::size(), 3, $queue, $queue.':delayed', $queue.':reserved'
+        );
     }
 
     /**
@@ -110,10 +112,26 @@ class RedisQueue extends Queue implements QueueContract
         $payload = $this->createPayload($job, $data);
 
         $this->getConnection()->zadd(
-            $this->getQueue($queue).':delayed', $this->currentTime() + $this->secondsUntil($delay), $payload
+            $this->getQueue($queue).':delayed', $this->availableAt($delay), $payload
         );
 
         return Arr::get(json_decode($payload, true), 'id');
+    }
+
+    /**
+     * Create a payload string from the given job and data.
+     *
+     * @param  string  $job
+     * @param  mixed   $data
+     * @param  string  $queue
+     * @return string
+     */
+    protected function createPayloadArray($job, $data = '', $queue = null)
+    {
+        return array_merge(parent::createPayloadArray($job, $data, $queue), [
+            'id' => $this->getRandomId(),
+            'attempts' => 1,
+        ]);
     }
 
     /**
@@ -144,6 +162,20 @@ class RedisQueue extends Queue implements QueueContract
     }
 
     /**
+     * Migrate the delayed jobs that are ready to the regular queue.
+     *
+     * @param  string  $from
+     * @param  string  $to
+     * @return void
+     */
+    public function migrateExpiredJobs($from, $to)
+    {
+        $this->getConnection()->eval(
+            LuaScripts::migrateExpiredJobs(), 2, $from, $to, $this->currentTime()
+        );
+    }
+
+    /**
      * Delete a reserved job from the queue.
      *
      * @param  string  $queue
@@ -171,36 +203,6 @@ class RedisQueue extends Queue implements QueueContract
             LuaScripts::release(), 2, $queue.':delayed', $queue.':reserved',
             $job, $this->currentTime() + $delay
         );
-    }
-
-    /**
-     * Migrate the delayed jobs that are ready to the regular queue.
-     *
-     * @param  string  $from
-     * @param  string  $to
-     * @return void
-     */
-    public function migrateExpiredJobs($from, $to)
-    {
-        $this->getConnection()->eval(
-            LuaScripts::migrateExpiredJobs(), 2, $from, $to, $this->currentTime()
-        );
-    }
-
-    /**
-     * Create a payload string from the given job and data.
-     *
-     * @param  string  $job
-     * @param  mixed   $data
-     * @param  string  $queue
-     * @return string
-     */
-    protected function createPayloadArray($job, $data = '', $queue = null)
-    {
-        return array_merge(parent::createPayloadArray($job, $data, $queue), [
-            'id' => $this->getRandomId(),
-            'attempts' => 1,
-        ]);
     }
 
     /**
