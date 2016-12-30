@@ -99,6 +99,70 @@ class Listener
     }
 
     /**
+     * Create a new Symfony process for the worker.
+     *
+     * @param  string  $connection
+     * @param  string  $queue
+     * @param  int     $delay
+     * @param  int     $memory
+     * @param  int     $timeout
+     * @return \Symfony\Component\Process\Process
+     */
+    public function makeProcess($connection, $queue, $delay, $memory, $timeout)
+    {
+        $command = $this->workerCommand;
+
+        // If the environment is set, we will append it to the command string so the
+        // workers will run under the specified environment. Otherwise, they will
+        // just run under the production environment which is not always right.
+        if (isset($this->environment)) {
+            $command = $this->addEnvironment($command);
+        }
+
+        // Next, we will just format out the worker commands with all of the various
+        // options available for the command. This will produce the final command
+        // line that we will pass into a Symfony process object for processing.
+        $command = $this->formatCommand(
+            $command, $connection, $queue, $delay, $memory
+        );
+
+        return new Process(
+            $command, $this->commandPath, null, null, $timeout
+        );
+    }
+
+    /**
+     * Add the environment option to the given command.
+     *
+     * @param  string  $command
+     * @return string
+     */
+    protected function addEnvironment($command)
+    {
+        return $command.' --env='.ProcessUtils::escapeArgument($this->environment);
+    }
+
+    /**
+     * Format the given command with the listener options.
+     *
+     * @param  string  $command
+     * @param  string  $connection
+     * @param  string  $queue
+     * @param  int     $delay
+     * @param  int     $memory
+     * @return string
+     */
+    protected function formatCommand($command, $connection, $queue, $delay, $memory)
+    {
+        return sprintf(
+            $command,
+            ProcessUtils::escapeArgument($connection),
+            ProcessUtils::escapeArgument($queue),
+            $delay, $memory, $this->sleep, $this->maxTries
+        );
+    }
+
+    /**
      * Run the given process.
      *
      * @param  \Symfony\Component\Process\Process  $process
@@ -111,49 +175,12 @@ class Listener
             $this->handleWorkerOutput($type, $line);
         });
 
-        // Once we have run the job we'll go check if the memory limit has been
-        // exceeded for the script. If it has, we will kill this script so a
-        // process manager will restart this with a clean slate of memory.
+        // Once we have run the job we'll go check if the memory limit has been exceeded
+        // for the script. If it has, we will kill this script so the process manager
+        // will restart this with a clean slate of memory automatically on exiting.
         if ($this->memoryExceeded($memory)) {
             $this->stop();
         }
-    }
-
-    /**
-     * Create a new Symfony process for the worker.
-     *
-     * @param  string  $connection
-     * @param  string  $queue
-     * @param  int     $delay
-     * @param  int     $memory
-     * @param  int     $timeout
-     * @return \Symfony\Component\Process\Process
-     */
-    public function makeProcess($connection, $queue, $delay, $memory, $timeout)
-    {
-        $string = $this->workerCommand;
-
-        // If the environment is set, we will append it to the command string so the
-        // workers will run under the specified environment. Otherwise, they will
-        // just run under the production environment which is not always right.
-        if (isset($this->environment)) {
-            $string .= ' --env='.ProcessUtils::escapeArgument($this->environment);
-        }
-
-        // Next, we will just format out the worker commands with all of the various
-        // options available for the command. This will produce the final command
-        // line that we will pass into a Symfony process object for processing.
-        $command = sprintf(
-            $string,
-            ProcessUtils::escapeArgument($connection),
-            ProcessUtils::escapeArgument($queue),
-            $delay,
-            $memory,
-            $this->sleep,
-            $this->maxTries
-        );
-
-        return new Process($command, $this->commandPath, null, null, $timeout);
     }
 
     /**
@@ -203,16 +230,6 @@ class Listener
     }
 
     /**
-     * Get the current listener environment.
-     *
-     * @return string
-     */
-    public function getEnvironment()
-    {
-        return $this->environment;
-    }
-
-    /**
      * Set the current environment.
      *
      * @param  string  $environment
@@ -221,16 +238,6 @@ class Listener
     public function setEnvironment($environment)
     {
         $this->environment = $environment;
-    }
-
-    /**
-     * Get the amount of seconds to wait before polling the queue.
-     *
-     * @return int
-     */
-    public function getSleep()
-    {
-        return $this->sleep;
     }
 
     /**
