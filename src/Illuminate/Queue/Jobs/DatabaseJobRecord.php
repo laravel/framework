@@ -2,11 +2,11 @@
 
 namespace Illuminate\Queue\Jobs;
 
-use Illuminate\Queue\CalculatesDelays;
+use Illuminate\Queue\InteractsWithTime;
 
 class DatabaseJobRecord
 {
-    use CalculatesDelays;
+    use InteractsWithTime;
 
     /**
      * The underlying job record.

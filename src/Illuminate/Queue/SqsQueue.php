@@ -16,14 +16,14 @@ class SqsQueue extends Queue implements QueueContract
     protected $sqs;
 
     /**
-     * The name of the default tube.
+     * The name of the default queue.
      *
      * @var string
      */
     protected $default;
 
     /**
-     * The sqs prefix url.
+     * The queue URL prefix.
      *
      * @var string
      */
@@ -80,11 +80,9 @@ class SqsQueue extends Queue implements QueueContract
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
-        $response = $this->sqs->sendMessage([
+        return $this->sqs->sendMessage([
             'QueueUrl' => $this->getQueue($queue), 'MessageBody' => $payload,
-        ]);
-
-        return $response->get('MessageId');
+        ])->get('MessageId');
     }
 
     /**
@@ -113,10 +111,8 @@ class SqsQueue extends Queue implements QueueContract
      */
     public function pop($queue = null)
     {
-        $queue = $this->getQueue($queue);
-
         $response = $this->sqs->receiveMessage([
-            'QueueUrl' => $queue,
+            'QueueUrl' => $queue = $this->getQueue($queue),
             'AttributeNames' => ['ApproximateReceiveCount'],
         ]);
 
@@ -135,11 +131,8 @@ class SqsQueue extends Queue implements QueueContract
     {
         $queue = $queue ?: $this->default;
 
-        if (filter_var($queue, FILTER_VALIDATE_URL) !== false) {
-            return $queue;
-        }
-
-        return rtrim($this->prefix, '/').'/'.($queue);
+        return filter_var($queue, FILTER_VALIDATE_URL) === false
+                        ? rtrim($this->prefix, '/').'/'.$queue : $queue;
     }
 
     /**

@@ -5,7 +5,7 @@ namespace Illuminate\Queue;
 use Carbon\Carbon;
 use DateTimeInterface;
 
-trait CalculatesDelays
+trait InteractsWithTime
 {
     /**
      * Get the number of seconds until the given DateTime.

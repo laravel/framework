@@ -37,16 +37,6 @@ class SyncJob extends Job implements JobContract
     }
 
     /**
-     * Get the raw body string for the job.
-     *
-     * @return string
-     */
-    public function getRawBody()
-    {
-        return $this->payload;
-    }
-
-    /**
      * Release the job back into the queue.
      *
      * @param  int   $delay
@@ -75,6 +65,16 @@ class SyncJob extends Job implements JobContract
     public function getJobId()
     {
         return '';
+    }
+
+    /**
+     * Get the raw body string for the job.
+     *
+     * @return string
+     */
+    public function getRawBody()
+    {
+        return $this->payload;
     }
 
     /**

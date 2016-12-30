@@ -59,15 +59,9 @@ class FailedTableCommand extends Command
     {
         $table = $this->laravel['config']['queue.failed.table'];
 
-        $tableClassName = Str::studly($table);
-
-        $fullPath = $this->createBaseMigration($table);
-
-        $stub = str_replace(
-            ['{{table}}', '{{tableClassName}}'], [$table, $tableClassName], $this->files->get(__DIR__.'/stubs/failed_jobs.stub')
+        $this->replaceMigration(
+            $this->createBaseMigration($table), $table, Str::studly($table)
         );
-
-        $this->files->put($fullPath, $stub);
 
         $this->info('Migration created successfully!');
 
@@ -82,10 +76,27 @@ class FailedTableCommand extends Command
      */
     protected function createBaseMigration($table = 'failed_jobs')
     {
-        $name = 'create_'.$table.'_table';
+        return $this->laravel['migration.creator']->create(
+            'create_'.$table.'_table', $this->laravel->databasePath().'/migrations'
+        );
+    }
 
-        $path = $this->laravel->databasePath().'/migrations';
+    /**
+     * Replace the generated migration with the failed job table stub.
+     *
+     * @param  string  $path
+     * @param  string  $table
+     * @param  string  $tableClassName
+     * @return void
+     */
+    protected function replaceMigration($path, $table, $tableClassName)
+    {
+        $stub = str_replace(
+            ['{{table}}', '{{tableClassName}}'],
+            [$table, $tableClassName],
+            $this->files->get(__DIR__.'/stubs/failed_jobs.stub')
+        );
 
-        return $this->laravel['migration.creator']->create($name, $path);
+        $this->files->put($path, $stub);
     }
 }

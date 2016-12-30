@@ -6,7 +6,7 @@ use Illuminate\Container\Container;
 
 abstract class Queue
 {
-    use CalculatesDelays;
+    use InteractsWithTime;
 
     /**
      * The IoC container instance.
