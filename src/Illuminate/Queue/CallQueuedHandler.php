@@ -38,17 +38,31 @@ class CallQueuedHandler
             $job, unserialize($data['command'])
         );
 
+        $this->dispatcher->dispatchNow(
+            $command, $handler = $this->resolveHandler($job, $command)
+        );
+
+        if (! $job->isDeletedOrReleased()) {
+            $job->delete();
+        }
+    }
+
+    /**
+     * Resolve the handler for the given command.
+     *
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  mixed  $command
+     * @return mixed
+     */
+    protected function resolveHandler($job, $command)
+    {
         $handler = $this->dispatcher->getCommandHandler($command) ?: null;
 
         if ($handler) {
             $this->setJobInstanceIfNecessary($job, $handler);
         }
 
-        $this->dispatcher->dispatchNow($command, $handler);
-
-        if (! $job->isDeletedOrReleased()) {
-            $job->delete();
-        }
+        return $handler;
     }
 
     /**
