@@ -16,7 +16,7 @@ class SqsQueue extends Queue implements QueueContract
     protected $sqs;
 
     /**
-     * The name of the default tube.
+     * The name of the default queue.
      *
      * @var string
      */
@@ -111,10 +111,8 @@ class SqsQueue extends Queue implements QueueContract
      */
     public function pop($queue = null)
     {
-        $queue = $this->getQueue($queue);
-
         $response = $this->sqs->receiveMessage([
-            'QueueUrl' => $queue,
+            'QueueUrl' => $queue = $this->getQueue($queue),
             'AttributeNames' => ['ApproximateReceiveCount'],
         ]);
 
@@ -133,11 +131,8 @@ class SqsQueue extends Queue implements QueueContract
     {
         $queue = $queue ?: $this->default;
 
-        if (filter_var($queue, FILTER_VALIDATE_URL) !== false) {
-            return $queue;
-        }
-
-        return rtrim($this->prefix, '/').'/'.$queue;
+        return filter_var($queue, FILTER_VALIDATE_URL) === false
+                        ? rtrim($this->prefix, '/').'/'.$queue : $queue;
     }
 
     /**
