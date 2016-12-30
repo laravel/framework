@@ -60,7 +60,7 @@ class Listener
     public function __construct($commandPath)
     {
         $this->commandPath = $commandPath;
-        $this->workerCommand = $this->buildWorkerCommand();
+        $this->workerCommand = $this->buildCommandTemplate();
     }
 
     /**
@@ -68,15 +68,35 @@ class Listener
      *
      * @return string
      */
-    protected function buildWorkerCommand()
+    protected function buildCommandTemplate()
     {
-        $binary = ProcessUtils::escapeArgument((new PhpExecutableFinder)->find(false));
-
-        $artisan = defined('ARTISAN_BINARY') ? ProcessUtils::escapeArgument(ARTISAN_BINARY) : 'artisan';
-
         $command = 'queue:work %s --once --queue=%s --delay=%s --memory=%s --sleep=%s --tries=%s';
 
-        return "{$binary} {$artisan} {$command}";
+        return "{$this->phpBinary()} {$this->artisanBinary()} {$command}";
+    }
+
+    /**
+     * Get the PHP binary.
+     *
+     * @return string
+     */
+    protected function phpBinary()
+    {
+        return ProcessUtils::escapeArgument(
+            (new PhpExecutableFinder)->find(false)
+        );
+    }
+
+    /**
+     * Get the Artisan binary.
+     *
+     * @return string
+     */
+    protected function artisanBinary()
+    {
+        return defined('ARTISAN_BINARY')
+                        ? ProcessUtils::escapeArgument(ARTISAN_BINARY)
+                        : 'artisan';
     }
 
     /**
@@ -84,17 +104,15 @@ class Listener
      *
      * @param  string  $connection
      * @param  string  $queue
-     * @param  string  $delay
-     * @param  string  $memory
-     * @param  int     $timeout
+     * @param  \Illuminate\Queue\ListenerOptions  $options
      * @return void
      */
-    public function listen($connection, $queue, $delay, $memory, $timeout = 60)
+    public function listen($connection, $queue, ListenerOptions $options)
     {
-        $process = $this->makeProcess($connection, $queue, $delay, $memory, $timeout);
+        $process = $this->makeProcess($connection, $queue, $options);
 
         while (true) {
-            $this->runProcess($process, $memory);
+            $this->runProcess($process, $options->memory);
         }
     }
 
@@ -103,31 +121,29 @@ class Listener
      *
      * @param  string  $connection
      * @param  string  $queue
-     * @param  int     $delay
-     * @param  int     $memory
-     * @param  int     $timeout
+     * @param  \Illuminate\Queue\ListenerOptions  $options
      * @return \Symfony\Component\Process\Process
      */
-    public function makeProcess($connection, $queue, $delay, $memory, $timeout)
+    public function makeProcess($connection, $queue, ListenerOptions $options)
     {
         $command = $this->workerCommand;
 
         // If the environment is set, we will append it to the command string so the
         // workers will run under the specified environment. Otherwise, they will
         // just run under the production environment which is not always right.
-        if (isset($this->environment)) {
-            $command = $this->addEnvironment($command);
+        if (isset($options->environment)) {
+            $command = $this->addEnvironment($command, $options);
         }
 
         // Next, we will just format out the worker commands with all of the various
         // options available for the command. This will produce the final command
         // line that we will pass into a Symfony process object for processing.
         $command = $this->formatCommand(
-            $command, $connection, $queue, $delay, $memory
+            $command, $connection, $queue, $options
         );
 
         return new Process(
-            $command, $this->commandPath, null, null, $timeout
+            $command, $this->commandPath, null, null, $options->timeout
         );
     }
 
@@ -135,11 +151,12 @@ class Listener
      * Add the environment option to the given command.
      *
      * @param  string  $command
+     * @param  \Illuminate\Queue\ListenerOptions  $options
      * @return string
      */
-    protected function addEnvironment($command)
+    protected function addEnvironment($command, ListenerOptions $options)
     {
-        return $command.' --env='.ProcessUtils::escapeArgument($this->environment);
+        return $command.' --env='.ProcessUtils::escapeArgument($options->environment);
     }
 
     /**
@@ -148,17 +165,17 @@ class Listener
      * @param  string  $command
      * @param  string  $connection
      * @param  string  $queue
-     * @param  int     $delay
-     * @param  int     $memory
+     * @param  \Illuminate\Queue\ListenerOptions  $options
      * @return string
      */
-    protected function formatCommand($command, $connection, $queue, $delay, $memory)
+    protected function formatCommand($command, $connection, $queue, ListenerOptions $options)
     {
         return sprintf(
             $command,
             ProcessUtils::escapeArgument($connection),
             ProcessUtils::escapeArgument($queue),
-            $delay, $memory, $this->sleep, $this->maxTries
+            $options->delay, $options->memory,
+            $options->sleep, $options->maxTries
         );
     }
 
@@ -227,38 +244,5 @@ class Listener
     public function setOutputHandler(Closure $outputHandler)
     {
         $this->outputHandler = $outputHandler;
-    }
-
-    /**
-     * Set the current environment.
-     *
-     * @param  string  $environment
-     * @return void
-     */
-    public function setEnvironment($environment)
-    {
-        $this->environment = $environment;
-    }
-
-    /**
-     * Set the amount of seconds to wait before polling the queue.
-     *
-     * @param  int  $sleep
-     * @return void
-     */
-    public function setSleep($sleep)
-    {
-        $this->sleep = $sleep;
-    }
-
-    /**
-     * Set the amount of times to try a job before logging it failed.
-     *
-     * @param  int  $tries
-     * @return void
-     */
-    public function setMaxTries($tries)
-    {
-        $this->maxTries = $tries;
     }
 }
