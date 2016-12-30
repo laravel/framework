@@ -66,7 +66,7 @@ class Worker
      */
     public function daemon($connectionName, $queue, WorkerOptions $options)
     {
-        $this->enableAsnycSignals();
+        $this->listenForSignals();
 
         $lastRestart = $this->getTimestampOfLastQueueRestart();
 
@@ -436,7 +436,7 @@ class Worker
      *
      * @return void
      */
-    protected function enableAsnycSignals()
+    protected function listenForSignals()
     {
         if ($this->supportsAsyncSignals()) {
             pcntl_async_signals(true);
@@ -450,7 +450,8 @@ class Worker
      */
     protected function supportsAsyncSignals()
     {
-        return version_compare(PHP_VERSION, '7.1.0') >= 0 && extension_loaded('pcntl');
+        return version_compare(PHP_VERSION, '7.1.0') >= 0 &&
+               extension_loaded('pcntl');
     }
 
     /**
