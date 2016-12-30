@@ -512,25 +512,4 @@ class Worker
     {
         $this->cache = $cache;
     }
-
-    /**
-     * Get the queue manager instance.
-     *
-     * @return \Illuminate\Queue\QueueManager
-     */
-    public function getManager()
-    {
-        return $this->manager;
-    }
-
-    /**
-     * Set the queue manager instance.
-     *
-     * @param  \Illuminate\Queue\QueueManager  $manager
-     * @return void
-     */
-    public function setManager(QueueManager $manager)
-    {
-        $this->manager = $manager;
-    }
 }
