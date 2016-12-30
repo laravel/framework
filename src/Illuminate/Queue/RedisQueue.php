@@ -193,7 +193,7 @@ class RedisQueue extends Queue implements QueueContract
     {
         return $this->getConnection()->eval(
             LuaScripts::pop(), 2, $queue, $queue.':reserved',
-            $this->currentTime() + $this->retryAfter
+            $this->availableAt($this->retryAfter)
         );
     }
 
@@ -223,7 +223,7 @@ class RedisQueue extends Queue implements QueueContract
 
         $this->getConnection()->eval(
             LuaScripts::release(), 2, $queue.':delayed', $queue.':reserved',
-            $job, $this->currentTime() + $delay
+            $job, $this->availableAt($delay)
         );
     }
 
