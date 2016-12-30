@@ -2,11 +2,11 @@
 
 namespace Illuminate\Queue\Jobs;
 
-use Illuminate\Queue\CalculatesDelays;
+use Illuminate\Queue\InteractsWithTime;
 
 abstract class Job
 {
-    use CalculatesDelays;
+    use InteractsWithTime;
 
     /**
      * The job handler instance.
