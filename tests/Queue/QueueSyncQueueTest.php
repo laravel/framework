@@ -1,6 +1,7 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Container\Container;
 
 class QueueSyncQueueTest extends PHPUnit_Framework_TestCase
 {
@@ -28,9 +29,11 @@ class QueueSyncQueueTest extends PHPUnit_Framework_TestCase
 
         $sync = new Illuminate\Queue\SyncQueue;
         $container = new Illuminate\Container\Container;
+        Container::setInstance($container);
         $events = m::mock('Illuminate\Contracts\Events\Dispatcher');
         $events->shouldReceive('fire')->times(3);
         $container->instance('events', $events);
+        $container->instance('Illuminate\Contracts\Events\Dispatcher', $events);
         $sync->setContainer($container);
 
         try {
@@ -38,6 +41,8 @@ class QueueSyncQueueTest extends PHPUnit_Framework_TestCase
         } catch (Exception $e) {
             $this->assertTrue($_SERVER['__sync.failed']);
         }
+
+        Container::setInstance();
     }
 }
 
