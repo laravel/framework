@@ -821,6 +821,16 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     }
 
     /**
+     * Get the path to the cached services.php file.
+     *
+     * @return string
+     */
+    public function getCachedServicesPath()
+    {
+        return $this->bootstrapPath().'/cache/services.php';
+    }
+
+    /**
      * Determine if the application configuration is cached.
      *
      * @return bool
@@ -858,16 +868,6 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     public function getCachedRoutesPath()
     {
         return $this->bootstrapPath().'/cache/routes.php';
-    }
-
-    /**
-     * Get the path to the cached services.php file.
-     *
-     * @return string
-     */
-    public function getCachedServicesPath()
-    {
-        return $this->bootstrapPath().'/cache/services.php';
     }
 
     /**
@@ -975,6 +975,17 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     public function isDeferredService($service)
     {
         return isset($this->deferredServices[$service]);
+    }
+
+    /**
+     * Configure the real-time facade namespace.
+     *
+     * @param  string  $namespace
+     * @return void
+     */
+    public function provideFacades($namespace)
+    {
+        AliasLoader::setFacadeNamespace($namespace);
     }
 
     /**
