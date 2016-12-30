@@ -36,7 +36,7 @@ class RedisQueue extends Queue implements QueueContract
      *
      * @var int|null
      */
-    protected $expire = 60;
+    protected $retryAfter = 60;
 
     /**
      * Create a new Redis queue instance.
@@ -44,15 +44,15 @@ class RedisQueue extends Queue implements QueueContract
      * @param  \Illuminate\Contracts\Redis\Factory  $redis
      * @param  string  $default
      * @param  string  $connection
-     * @param  int  $expire
+     * @param  int  $retryAfter
      * @return void
      */
-    public function __construct(Redis $redis, $default = 'default', $connection = null, $expire = 60)
+    public function __construct(Redis $redis, $default = 'default', $connection = null, $retryAfter = 60)
     {
         $this->redis = $redis;
-        $this->expire = $expire;
         $this->default = $default;
         $this->connection = $connection;
+        $this->retryAfter = $retryAfter;
     }
 
     /**
@@ -142,22 +142,30 @@ class RedisQueue extends Queue implements QueueContract
      */
     public function pop($queue = null)
     {
-        $original = $queue ?: $this->default;
+        $this->migrate($prefixed = $this->getQueue($queue));
 
-        $queue = $this->getQueue($queue);
-
-        $this->migrateExpiredJobs($queue.':delayed', $queue);
-
-        if (! is_null($this->expire)) {
-            $this->migrateExpiredJobs($queue.':reserved', $queue);
-        }
-
-        list($job, $reserved) = $this->getConnection()->eval(
-            LuaScripts::pop(), 2, $queue, $queue.':reserved', $this->currentTime() + $this->expire
-        );
+        list($job, $reserved) = $this->retrieveNextJob($prefixed);
 
         if ($reserved) {
-            return new RedisJob($this->container, $this, $job, $reserved, $original);
+            return new RedisJob(
+                $this->container, $this, $job,
+                $reserved, $queue ?: $this->default
+            );
+        }
+    }
+
+    /**
+     * Migrate any delayed or expired jobs onto the primary queue.
+     *
+     * @param  string  $queue
+     * @return void
+     */
+    protected function migrate($queue)
+    {
+        $this->migrateExpiredJobs($queue.':delayed', $queue);
+
+        if (! is_null($this->retryAfter)) {
+            $this->migrateExpiredJobs($queue.':reserved', $queue);
         }
     }
 
@@ -172,6 +180,20 @@ class RedisQueue extends Queue implements QueueContract
     {
         $this->getConnection()->eval(
             LuaScripts::migrateExpiredJobs(), 2, $from, $to, $this->currentTime()
+        );
+    }
+
+    /**
+     * Retrieve the next job from the queue.
+     *
+     * @param  string  $queue
+     * @return array
+     */
+    protected function retrieveNextJob($queue)
+    {
+        return $this->getConnection()->eval(
+            LuaScripts::pop(), 2, $queue, $queue.':reserved',
+            $this->currentTime() + $this->retryAfter
         );
     }
 
