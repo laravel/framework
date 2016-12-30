@@ -1,9 +1,10 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Support\MessageBag;
 
-class SupportMessageBagTest extends PHPUnit_Framework_TestCase
+class SupportMessageBagTest extends TestCase
 {
     public function tearDown()
     {

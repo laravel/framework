@@ -1,11 +1,12 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 
-class SupportCollectionTest extends PHPUnit_Framework_TestCase
+class SupportCollectionTest extends TestCase
 {
     public function testFirstReturnsFirstItemInCollection()
     {

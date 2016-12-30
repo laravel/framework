@@ -1,10 +1,11 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
 use Illuminate\Support\HtmlString;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\MailMessage;
 
-class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
+class NotificationMailChannelTest extends TestCase
 {
     public function tearDown()
     {

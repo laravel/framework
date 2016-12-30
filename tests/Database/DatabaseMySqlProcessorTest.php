@@ -1,6 +1,8 @@
 <?php
 
-class DatabaseMySqlProcessorTest extends PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class DatabaseMySqlProcessorTest extends TestCase
 {
     public function testProcessColumnListing()
     {

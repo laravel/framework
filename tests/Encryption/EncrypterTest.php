@@ -1,8 +1,9 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
 use Illuminate\Encryption\Encrypter;
 
-class EncrypterTest extends PHPUnit_Framework_TestCase
+class EncrypterTest extends TestCase
 {
     public function testEncryption()
     {

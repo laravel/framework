@@ -2,8 +2,9 @@
 
 use Mockery as m;
 use Illuminate\Mail\Message;
+use PHPUnit\Framework\TestCase;
 
-class MailMessageTest extends PHPUnit_Framework_TestCase
+class MailMessageTest extends TestCase
 {
     /**
      * @var \Mockery::mock

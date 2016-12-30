@@ -1,9 +1,10 @@
 <?php
 
 use Illuminate\Validation\Rule;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Validation\Rules\NotIn;
 
-class ValidationNotInRuleTest extends PHPUnit_Framework_TestCase
+class ValidationNotInRuleTest extends TestCase
 {
     public function testItCorrectlyFormatsAStringVersionOfTheRule()
     {

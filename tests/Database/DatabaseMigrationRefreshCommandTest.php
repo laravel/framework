@@ -1,6 +1,7 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\Console\Migrations\ResetCommand;
@@ -9,7 +10,7 @@ use Illuminate\Database\Console\Migrations\RefreshCommand;
 use Illuminate\Database\Console\Migrations\RollbackCommand;
 use Symfony\Component\Console\Application as ConsoleApplication;
 
-class DatabaseMigrationRefreshCommandTest extends PHPUnit_Framework_TestCase
+class DatabaseMigrationRefreshCommandTest extends TestCase
 {
     public function tearDown()
     {

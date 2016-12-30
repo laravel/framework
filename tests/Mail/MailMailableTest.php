@@ -1,8 +1,9 @@
 <?php
 
 use Illuminate\Mail\Mailable;
+use PHPUnit\Framework\TestCase;
 
-class MailMailableTest extends PHPUnit_Framework_TestCase
+class MailMailableTest extends TestCase
 {
     public function testMailableSetsRecipientsCorrectly()
     {

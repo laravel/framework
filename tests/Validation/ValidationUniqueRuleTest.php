@@ -1,6 +1,8 @@
 <?php
 
-class ValidationUniqueRuleTest extends PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class ValidationUniqueRuleTest extends TestCase
 {
     public function testItCorrectlyFormatsAStringVersionOfTheRule()
     {

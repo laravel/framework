@@ -1,6 +1,8 @@
 <?php
 
-class BcryptHasherTest extends PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class BcryptHasherTest extends TestCase
 {
     public function testBasicHashing()
     {

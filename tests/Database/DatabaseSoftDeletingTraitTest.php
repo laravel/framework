@@ -1,8 +1,9 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
-class DatabaseSoftDeletingTraitTest extends PHPUnit_Framework_TestCase
+class DatabaseSoftDeletingTraitTest extends TestCase
 {
     public function tearDown()
     {

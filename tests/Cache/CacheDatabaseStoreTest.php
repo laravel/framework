@@ -1,9 +1,10 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\DatabaseStore;
 
-class CacheDatabaseStoreTest extends PHPUnit_Framework_TestCase
+class CacheDatabaseStoreTest extends TestCase
 {
     public function tearDown()
     {

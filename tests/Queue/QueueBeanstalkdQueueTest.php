@@ -1,8 +1,9 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
-class QueueBeanstalkdQueueTest extends PHPUnit_Framework_TestCase
+class QueueBeanstalkdQueueTest extends TestCase
 {
     public function tearDown()
     {

@@ -2,8 +2,9 @@
 
 use Mockery as m;
 use Carbon\Carbon;
+use PHPUnit\Framework\TestCase;
 
-class CacheRepositoryTest extends PHPUnit_Framework_TestCase
+class CacheRepositoryTest extends TestCase
 {
     public function tearDown()
     {

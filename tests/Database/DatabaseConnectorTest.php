@@ -1,8 +1,9 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
-class DatabaseConnectorTest extends PHPUnit_Framework_TestCase
+class DatabaseConnectorTest extends TestCase
 {
     public function tearDown()
     {

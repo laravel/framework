@@ -1,11 +1,12 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Queue\RedisQueue;
 use Illuminate\Container\Container;
 use Illuminate\Queue\Jobs\RedisJob;
 
-class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
+class RedisQueueIntegrationTest extends TestCase
 {
     use InteractsWithRedis;
 

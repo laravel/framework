@@ -1,9 +1,10 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 
-class QueueSyncQueueTest extends PHPUnit_Framework_TestCase
+class QueueSyncQueueTest extends TestCase
 {
     public function tearDown()
     {

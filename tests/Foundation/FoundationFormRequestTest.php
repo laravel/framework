@@ -1,9 +1,10 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 
-class FoundationFormRequestTest extends PHPUnit_Framework_TestCase
+class FoundationFormRequestTest extends TestCase
 {
     public function tearDown()
     {

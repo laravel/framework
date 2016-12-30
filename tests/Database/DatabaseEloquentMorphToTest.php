@@ -1,9 +1,10 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
-class DatabaseEloquentMorphToTest extends PHPUnit_Framework_TestCase
+class DatabaseEloquentMorphToTest extends TestCase
 {
     public function tearDown()
     {

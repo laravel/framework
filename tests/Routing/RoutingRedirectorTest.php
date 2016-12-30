@@ -1,9 +1,10 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Routing\Redirector;
 
-class RoutingRedirectorTest extends PHPUnit_Framework_TestCase
+class RoutingRedirectorTest extends TestCase
 {
     protected $headers;
     protected $request;

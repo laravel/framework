@@ -3,8 +3,9 @@
 use Aws\Result;
 use Mockery as m;
 use Aws\Sqs\SqsClient;
+use PHPUnit\Framework\TestCase;
 
-class QueueSqsQueueTest extends PHPUnit_Framework_TestCase
+class QueueSqsQueueTest extends TestCase
 {
     public function tearDown()
     {

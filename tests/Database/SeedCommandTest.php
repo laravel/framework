@@ -1,11 +1,12 @@
 <?php
 
 use Illuminate\Database\Seeder;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Database\Console\Seeds\SeedCommand;
 use Illuminate\Database\ConnectionResolverInterface;
 
-class SeedCommandTest extends PHPUnit_Framework_TestCase
+class SeedCommandTest extends TestCase
 {
     public function testFire()
     {

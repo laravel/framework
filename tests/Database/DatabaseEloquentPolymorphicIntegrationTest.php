@@ -1,11 +1,12 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
-class DatabaseEloquentPolymorphicIntegrationTest extends PHPUnit_Framework_TestCase
+class DatabaseEloquentPolymorphicIntegrationTest extends TestCase
 {
     public function setUp()
     {

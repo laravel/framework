@@ -1,8 +1,9 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
-class TranslationTranslatorTest extends PHPUnit_Framework_TestCase
+class TranslationTranslatorTest extends TestCase
 {
     public function tearDown()
     {

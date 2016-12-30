@@ -1,10 +1,11 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
 use Illuminate\Database\Console\Migrations\RollbackCommand;
 
-class DatabaseMigrationRollbackCommandTest extends PHPUnit_Framework_TestCase
+class DatabaseMigrationRollbackCommandTest extends TestCase
 {
     public function tearDown()
     {

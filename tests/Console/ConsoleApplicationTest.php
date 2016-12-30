@@ -1,8 +1,9 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
-class ConsoleApplicationTest extends PHPUnit_Framework_TestCase
+class ConsoleApplicationTest extends TestCase
 {
     public function tearDown()
     {
