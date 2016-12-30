@@ -23,7 +23,7 @@ class SqsQueue extends Queue implements QueueContract
     protected $default;
 
     /**
-     * The sqs prefix url.
+     * The queue URL prefix.
      *
      * @var string
      */
@@ -80,11 +80,9 @@ class SqsQueue extends Queue implements QueueContract
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
-        $response = $this->sqs->sendMessage([
+        return $this->sqs->sendMessage([
             'QueueUrl' => $this->getQueue($queue), 'MessageBody' => $payload,
-        ]);
-
-        return $response->get('MessageId');
+        ])->get('MessageId');
     }
 
     /**
@@ -139,7 +137,7 @@ class SqsQueue extends Queue implements QueueContract
             return $queue;
         }
 
-        return rtrim($this->prefix, '/').'/'.($queue);
+        return rtrim($this->prefix, '/').'/'.$queue;
     }
 
     /**
