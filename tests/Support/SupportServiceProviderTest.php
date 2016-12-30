@@ -1,9 +1,10 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Support\ServiceProvider;
 
-class SupportServiceProviderTest extends PHPUnit_Framework_TestCase
+class SupportServiceProviderTest extends TestCase
 {
     public function setUp()
     {

@@ -1,6 +1,7 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Foundation\Application;
@@ -8,7 +9,7 @@ use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithAuthentication;
 
-class FoundationAuthenticationTest extends PHPUnit_Framework_TestCase
+class FoundationAuthenticationTest extends TestCase
 {
     use InteractsWithAuthentication;
 

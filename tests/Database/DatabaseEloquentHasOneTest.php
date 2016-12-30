@@ -1,10 +1,11 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-class DatabaseEloquentHasOneTest extends PHPUnit_Framework_TestCase
+class DatabaseEloquentHasOneTest extends TestCase
 {
     protected $builder;
 

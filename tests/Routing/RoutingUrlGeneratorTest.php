@@ -2,11 +2,12 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Contracts\Routing\UrlRoutable;
 
-class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
+class RoutingUrlGeneratorTest extends TestCase
 {
     public function testBasicGeneration()
     {

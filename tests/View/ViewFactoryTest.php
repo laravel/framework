@@ -2,8 +2,9 @@
 
 use Mockery as m;
 use Illuminate\View\Factory;
+use PHPUnit\Framework\TestCase;
 
-class ViewFactoryTest extends PHPUnit_Framework_TestCase
+class ViewFactoryTest extends TestCase
 {
     public function tearDown()
     {

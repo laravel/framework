@@ -1,12 +1,13 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Validation\Factory;
 use Illuminate\Validation\Validator;
 use Illuminate\Validation\PresenceVerifierInterface;
 use Illuminate\Contracts\Translation\Translator as TranslatorInterface;
 
-class ValidationFactoryTest extends PHPUnit_Framework_TestCase
+class ValidationFactoryTest extends TestCase
 {
     public function tearDown()
     {

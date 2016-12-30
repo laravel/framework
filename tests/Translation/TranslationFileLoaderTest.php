@@ -1,9 +1,10 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Translation\FileLoader;
 
-class TranslationFileLoaderTest extends PHPUnit_Framework_TestCase
+class TranslationFileLoaderTest extends TestCase
 {
     public function tearDown()
     {

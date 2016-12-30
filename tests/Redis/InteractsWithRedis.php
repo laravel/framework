@@ -1,6 +1,5 @@
 <?php
 
-
 use Illuminate\Redis\RedisManager;
 
 trait InteractsWithRedis

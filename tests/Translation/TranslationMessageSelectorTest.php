@@ -1,8 +1,9 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
 use Illuminate\Translation\MessageSelector;
 
-class TranslationMessageSelectorTest extends PHPUnit_Framework_TestCase
+class TranslationMessageSelectorTest extends TestCase
 {
     /**
      * @dataProvider chooseTestData

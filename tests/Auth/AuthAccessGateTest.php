@@ -1,11 +1,12 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Container\Container;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class GateTest extends PHPUnit_Framework_TestCase
+class GateTest extends TestCase
 {
     /**
      * @expectedException \InvalidArgumentException

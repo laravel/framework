@@ -1,10 +1,11 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
 use Illuminate\Notifications\Notification;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Notifications\Channels\BroadcastChannel;
 
-class NotificationBroadcastChannelTest extends PHPUnit_Framework_TestCase
+class NotificationBroadcastChannelTest extends TestCase
 {
     public function tearDown()
     {

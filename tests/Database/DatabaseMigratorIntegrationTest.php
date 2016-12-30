@@ -1,11 +1,12 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Migrations\DatabaseMigrationRepository;
 
-class DatabaseMigratorIntegrationTest extends PHPUnit_Framework_TestCase
+class DatabaseMigratorIntegrationTest extends TestCase
 {
     protected $db;
 

@@ -1,11 +1,12 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as BaseCollection;
 
-class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
+class DatabaseEloquentBuilderTest extends TestCase
 {
     public function tearDown()
     {

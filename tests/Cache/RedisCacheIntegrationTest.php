@@ -1,10 +1,11 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Cache\Repository;
 
-class RedisCacheTest extends PHPUnit_Framework_TestCase
+class RedisCacheTest extends TestCase
 {
     use InteractsWithRedis;
 

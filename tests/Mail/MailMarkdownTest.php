@@ -1,6 +1,8 @@
 <?php
 
-class MailMarkdownTest extends PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class MailMarkdownTest extends TestCase
 {
     public function tearDown()
     {

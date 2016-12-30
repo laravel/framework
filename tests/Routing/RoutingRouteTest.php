@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Routing\Controller;
 use Illuminate\Routing\RouteGroup;
@@ -15,7 +16,7 @@ use Illuminate\Auth\Middleware\Authenticate;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 
-class RoutingRouteTest extends PHPUnit_Framework_TestCase
+class RoutingRouteTest extends TestCase
 {
     public function testBasicDispatchingOfRoutes()
     {
