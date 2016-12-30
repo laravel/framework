@@ -1,9 +1,10 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\ArrayStore;
 
-class CacheTaggedCacheTest extends PHPUnit_Framework_TestCase
+class CacheTaggedCacheTest extends TestCase
 {
     public function tearDown()
     {

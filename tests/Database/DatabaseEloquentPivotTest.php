@@ -1,9 +1,10 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase
+class DatabaseEloquentPivotTest extends TestCase
 {
     public function tearDown()
     {

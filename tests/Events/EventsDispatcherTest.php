@@ -1,9 +1,10 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Events\Dispatcher;
 
-class EventsDispatcherTest extends PHPUnit_Framework_TestCase
+class EventsDispatcherTest extends TestCase
 {
     public function tearDown()
     {

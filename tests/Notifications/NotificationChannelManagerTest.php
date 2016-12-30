@@ -1,12 +1,13 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Notifications\ChannelManager;
 use Illuminate\Contracts\Bus\Dispatcher as Bus;
 
-class NotificationChannelManagerTest extends PHPUnit_Framework_TestCase
+class NotificationChannelManagerTest extends TestCase
 {
     public function tearDown()
     {

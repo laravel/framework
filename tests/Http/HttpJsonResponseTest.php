@@ -1,9 +1,10 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 
-class HttpJsonResponseTest extends PHPUnit_Framework_TestCase
+class HttpJsonResponseTest extends TestCase
 {
     public function testSeAndRetrieveJsonableData()
     {

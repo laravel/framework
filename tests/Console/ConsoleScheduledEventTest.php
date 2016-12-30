@@ -2,9 +2,10 @@
 
 use Mockery as m;
 use Carbon\Carbon;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Console\Scheduling\Event;
 
-class ConsoleScheduledEventTest extends PHPUnit_Framework_TestCase
+class ConsoleScheduledEventTest extends TestCase
 {
     /**
      * The default configuration timezone.

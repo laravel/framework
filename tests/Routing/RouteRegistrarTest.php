@@ -3,10 +3,11 @@
 use Mockery as m;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 
-class RouteRegistrarTest extends PHPUnit_Framework_TestCase
+class RouteRegistrarTest extends TestCase
 {
     /**
      * @var \Illuminate\Routing\Router

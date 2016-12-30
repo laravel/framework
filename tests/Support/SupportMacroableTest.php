@@ -1,8 +1,9 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Traits\Macroable;
 
-class SupportMacroableTest extends PHPUnit_Framework_TestCase
+class SupportMacroableTest extends TestCase
 {
     private $macroable;
 

@@ -1,11 +1,12 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Pagination\UrlWindow;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator as Paginator;
 
-class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
+class PaginationPaginatorTest extends TestCase
 {
     public function tearDown()
     {

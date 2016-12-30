@@ -1,8 +1,9 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
-class DatabaseEloquentGlobalScopesTest extends PHPUnit_Framework_TestCase
+class DatabaseEloquentGlobalScopesTest extends TestCase
 {
     public function tearDown()
     {

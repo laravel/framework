@@ -1,9 +1,10 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Support\HtmlString;
 
-class MailMailerTest extends PHPUnit_Framework_TestCase
+class MailMailerTest extends TestCase
 {
     public function tearDown()
     {

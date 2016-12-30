@@ -1,8 +1,9 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
-class AuthDatabaseTokenRepositoryTest extends PHPUnit_Framework_TestCase
+class AuthDatabaseTokenRepositoryTest extends TestCase
 {
     public function tearDown()
     {

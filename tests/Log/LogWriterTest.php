@@ -2,8 +2,9 @@
 
 use Mockery as m;
 use Illuminate\Log\Writer;
+use PHPUnit\Framework\TestCase;
 
-class LogWriterTest extends PHPUnit_Framework_TestCase
+class LogWriterTest extends TestCase
 {
     public function tearDown()
     {

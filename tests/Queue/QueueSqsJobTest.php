@@ -2,8 +2,9 @@
 
 use Mockery as m;
 use Aws\Sqs\SqsClient;
+use PHPUnit\Framework\TestCase;
 
-class QueueSqsJobTest extends PHPUnit_Framework_TestCase
+class QueueSqsJobTest extends TestCase
 {
     public function setUp()
     {
