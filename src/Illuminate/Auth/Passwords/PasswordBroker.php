@@ -3,7 +3,9 @@
 namespace Illuminate\Auth\Passwords;
 
 use Closure;
+use Carbon\Carbon;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use UnexpectedValueException;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
@@ -12,11 +14,11 @@ use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 class PasswordBroker implements PasswordBrokerContract
 {
     /**
-     * The password token repository.
+     * The application instance.
      *
-     * @var \Illuminate\Auth\Passwords\TokenRepositoryInterface
+     * @var \Illuminate\Foundation\Application
      */
-    protected $tokens;
+    protected $app;
 
     /**
      * The user provider implementation.
@@ -24,6 +26,13 @@ class PasswordBroker implements PasswordBrokerContract
      * @var \Illuminate\Contracts\Auth\UserProvider
      */
     protected $users;
+
+    /**
+     * The number of minutes that the reset token should be considered valid.
+     *
+     * @var int
+     */
+    protected $expiration;
 
     /**
      * The custom password validator callback.
@@ -35,15 +44,15 @@ class PasswordBroker implements PasswordBrokerContract
     /**
      * Create a new password broker instance.
      *
-     * @param  \Illuminate\Auth\Passwords\TokenRepositoryInterface  $tokens
+     * @param  \Illuminate\Foundation\Application  $app
      * @param  \Illuminate\Contracts\Auth\UserProvider  $users
      * @return void
      */
-    public function __construct(TokenRepositoryInterface $tokens,
-                                UserProvider $users)
+    public function __construct($app, UserProvider $users, $expiration)
     {
+        $this->app = $app;
         $this->users = $users;
-        $this->tokens = $tokens;
+        $this->expiration = $expiration;
     }
 
     /**
@@ -63,11 +72,14 @@ class PasswordBroker implements PasswordBrokerContract
             return static::INVALID_USER;
         }
 
+        $expiration = Carbon::now()->addMinutes($this->expiration)->timestamp;
+
         // Once we have the reset token, we are ready to send the message out to this
         // user with a link to reset their password. We will then redirect back to
         // the current URI having nothing set in the session to indicate errors.
         $user->sendPasswordResetNotification(
-            $this->tokens->create($user)
+            $this->createToken($user, $expiration),
+            $expiration
         );
 
         return static::RESET_LINK_SENT;
@@ -95,10 +107,8 @@ class PasswordBroker implements PasswordBrokerContract
 
         // Once the reset has been validated, we'll call the given callback with the
         // new password. This gives the user an opportunity to store the password
-        // in their persistent storage. Then we'll delete the token and return.
+        // in their persistent storage.
         $callback($user, $password);
-
-        $this->tokens->delete($credentials['token']);
 
         return static::PASSWORD_RESET;
     }
@@ -119,8 +129,12 @@ class PasswordBroker implements PasswordBrokerContract
             return static::INVALID_PASSWORD;
         }
 
-        if (! $this->tokens->exists($user, $credentials['token'])) {
+        if (! $this->validateToken($user, $credentials)) {
             return static::INVALID_TOKEN;
+        }
+
+        if (! $this->validateTimestamp($credentials['expiration'])) {
+            return static::EXPIRED_TOKEN;
         }
 
         return $user;
@@ -185,9 +199,7 @@ class PasswordBroker implements PasswordBrokerContract
      */
     public function getUser(array $credentials)
     {
-        $credentials = Arr::except($credentials, ['token']);
-
-        $user = $this->users->retrieveByCredentials($credentials);
+        $user = $this->users->retrieveByCredentials(Arr::only($credentials, ['email']));
 
         if ($user && ! $user instanceof CanResetPasswordContract) {
             throw new UnexpectedValueException('User must implement CanResetPassword interface.');
@@ -200,43 +212,73 @@ class PasswordBroker implements PasswordBrokerContract
      * Create a new password reset token for the given user.
      *
      * @param  CanResetPasswordContract $user
+     * @param  int $expiration
      * @return string
      */
-    public function createToken(CanResetPasswordContract $user)
+    public function createToken(CanResetPasswordContract $user, $expiration)
     {
-        return $this->tokens->create($user);
-    }
+        $payload = $this->buildPayload($user, $user->getEmailForPasswordReset(), $expiration);
 
-    /**
-     * Delete the given password reset token.
-     *
-     * @param  string  $token
-     * @return void
-     */
-    public function deleteToken($token)
-    {
-        $this->tokens->delete($token);
+        return hash_hmac('sha256', $payload, $this->getKey());
     }
 
     /**
      * Validate the given password reset token.
      *
      * @param  CanResetPasswordContract $user
-     * @param  string $token
+     * @param  array $credentials
      * @return bool
      */
-    public function tokenExists(CanResetPasswordContract $user, $token)
+    public function validateToken(CanResetPasswordContract $user, array $credentials)
     {
-        return $this->tokens->exists($user, $token);
+        $payload = $this->buildPayload($user, $credentials['email'], $credentials['expiration']);
+
+        return hash_equals($credentials['token'], hash_hmac('sha256', $payload, $this->getKey()));
     }
 
     /**
-     * Get the password reset token repository implementation.
+     * Validate the given expiration timestamp.
      *
-     * @return \Illuminate\Auth\Passwords\TokenRepositoryInterface
+     * @param  int $expiration
+     * @return bool
      */
-    public function getRepository()
+    public function validateTimestamp($expiration)
     {
-        return $this->tokens;
+        return Carbon::createFromTimestamp($expiration)->isFuture();
+    }
+
+    /**
+     * Return the application key.
+     *
+     * @return string
+     */
+    public function getKey()
+    {
+        $key = $this->app['config']['app.key'];
+
+        if (Str::startsWith($key, 'base64:')) {
+            $key = base64_decode(substr($key, 7));
+        }
+
+        return $key;
+    }
+
+    /**
+     * Returns the payload string containing.
+     *
+     * @param  CanResetPasswordContract  $user
+     * @param  string  $email
+     * @param  int  $expiration
+     * @return string
+     */
+    protected function buildPayload(CanResetPasswordContract $user, $email, $expiration)
+    {
+        return implode(';', [
+            $email,
+            $expiration,
+            $user->getKey(),
+            $user->updated_at->timestamp,
+            $user->password,
+        ]);
     }
 }

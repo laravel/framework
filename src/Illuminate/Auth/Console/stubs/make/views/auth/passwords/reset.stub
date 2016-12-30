@@ -13,10 +13,20 @@
                             {{ session('status') }}
                         </div>
                     @endif
+<<<<<<< HEAD
+=======
+
+                    @if (session('warning'))
+                        <div class="alert alert-warning">
+                            {{ session('warning') }}
+                        </div>
+                    @else
+>>>>>>> Crypto-based password resets
 
                     <form class="form-horizontal" role="form" method="POST" action="{{ url('/password/reset') }}">
                         {{ csrf_field() }}
 
+<<<<<<< HEAD
                         <input type="hidden" name="token" value="{{ $token }}">
 
                         <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
@@ -38,6 +48,17 @@
 
                             <div class="col-md-6">
                                 <input id="password" type="password" class="form-control" name="password" required>
+=======
+                            <input type="hidden" name="email" value="{{ $email }}">
+                            <input type="hidden" name="expiration" value="{{ $expiration }}">
+                            <input type="hidden" name="token" value="{{ $token }}">
+
+                            <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
+                                <label for="password" class="col-md-4 control-label">Password</label>
+
+                                <div class="col-md-6">
+                                    <input id="password" type="password" class="form-control" name="password" required autofocus>
+>>>>>>> Crypto-based password resets
 
                                 @if ($errors->has('password'))
                                     <span class="help-block">
@@ -66,8 +87,13 @@
                                     Reset Password
                                 </button>
                             </div>
+<<<<<<< HEAD
                         </div>
                     </form>
+=======
+                        </form>
+                    @endif
+>>>>>>> Crypto-based password resets
                 </div>
             </div>
         </div>
