@@ -60,7 +60,7 @@ class SyncQueue extends Queue implements QueueContract
      */
     protected function resolveJob($payload, $queue)
     {
-        return new SyncJob($this->container, $payload, $queue);
+        return new SyncJob($this->container, $payload, $this->connectionName, $queue);
     }
 
     /**
@@ -72,7 +72,7 @@ class SyncQueue extends Queue implements QueueContract
     protected function raiseBeforeJobEvent(Job $job)
     {
         if ($this->container->bound('events')) {
-            $this->container['events']->fire(new Events\JobProcessing('sync', $job));
+            $this->container['events']->fire(new Events\JobProcessing($this->connectionName, $job));
         }
     }
 
@@ -85,7 +85,7 @@ class SyncQueue extends Queue implements QueueContract
     protected function raiseAfterJobEvent(Job $job)
     {
         if ($this->container->bound('events')) {
-            $this->container['events']->fire(new Events\JobProcessed('sync', $job));
+            $this->container['events']->fire(new Events\JobProcessed($this->connectionName, $job));
         }
     }
 
@@ -99,7 +99,7 @@ class SyncQueue extends Queue implements QueueContract
     protected function raiseExceptionOccurredJobEvent(Job $job, $e)
     {
         if ($this->container->bound('events')) {
-            $this->container['events']->fire(new Events\JobExceptionOccurred('sync', $job, $e));
+            $this->container['events']->fire(new Events\JobExceptionOccurred($this->connectionName, $job, $e));
         }
     }
 
@@ -116,7 +116,7 @@ class SyncQueue extends Queue implements QueueContract
     {
         $this->raiseExceptionOccurredJobEvent($queueJob, $e);
 
-        FailingJob::handle('sync', $queueJob, $e);
+        FailingJob::handle($this->connectionName, $queueJob, $e);
 
         throw $e;
     }

@@ -87,8 +87,9 @@ class QueueSqsJobTest extends TestCase
         return new Illuminate\Queue\Jobs\SqsJob(
             $this->mockedContainer,
             $this->mockedSqsClient,
-            $this->queueUrl,
-            $this->mockedJobData
+            $this->mockedJobData,
+            'connection-name',
+            $this->queueUrl
         );
     }
 }

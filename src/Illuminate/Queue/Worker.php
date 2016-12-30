@@ -172,8 +172,6 @@ class Worker
         // from this method. If there is no job on the queue, we will "sleep" the worker
         // for the specified number of seconds, then keep processing jobs after sleep.
         if ($job) {
-            $job->setConnectionName($connectionName);
-
             return $this->runJob($job, $connectionName, $options);
         }
 
