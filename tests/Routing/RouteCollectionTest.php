@@ -41,24 +41,6 @@ class RouteCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($inputRoute, $outputRoute);
     }
 
-    public function testRouteCollectionAddRouteChangesCount()
-    {
-        $this->routeCollection->add(new Route('GET', 'foo', [
-            'uses' => 'FooController@index',
-            'as' => 'foo_index',
-        ]));
-        $this->assertCount(1, $this->routeCollection);
-    }
-
-    public function testRouteCollectionIsCountable()
-    {
-        $this->routeCollection->add(new Route('GET', 'foo', [
-            'uses' => 'FooController@index',
-            'as' => 'foo_index',
-        ]));
-        $this->assertCount(1, $this->routeCollection);
-    }
-
     public function testRouteCollectionCanRetrieveByName()
     {
         $this->routeCollection->add($routeIndex = new Route('GET', 'foo/index', [
