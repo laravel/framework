@@ -262,7 +262,7 @@ class DatabaseQueue extends Queue implements QueueContract
         $this->database->commit();
 
         return new DatabaseJob(
-            $this->container, $this, $job, $queue
+            $this->container, $this, $job, $this->connectionName, $queue
         );
     }
 

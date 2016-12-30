@@ -60,6 +60,7 @@ class QueueBeanstalkdJobTest extends TestCase
             m::mock('Illuminate\Container\Container'),
             m::mock('Pheanstalk\Pheanstalk'),
             m::mock('Pheanstalk\Job'),
+            'connection-name',
             'default'
         );
     }

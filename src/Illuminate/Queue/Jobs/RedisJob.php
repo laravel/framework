@@ -44,9 +44,11 @@ class RedisJob extends Job implements JobContract
      * @param  \Illuminate\Queue\RedisQueue  $redis
      * @param  string  $job
      * @param  string  $reserved
+     * @param  string  $connectionName
      * @param  string  $queue
+     * @return void
      */
-    public function __construct(Container $container, RedisQueue $redis, $job, $reserved, $queue)
+    public function __construct(Container $container, RedisQueue $redis, $job, $reserved, $connectionName, $queue)
     {
         // The $job variable is the original job JSON as it existed in the ready queue while
         // the $reserved variable is the raw JSON in the reserved queue. The exact format
@@ -56,6 +58,8 @@ class RedisJob extends Job implements JobContract
         $this->queue = $queue;
         $this->reserved = $reserved;
         $this->container = $container;
+        $this->connectionName = $connectionName;
+
         $this->decoded = $this->payload();
     }
 

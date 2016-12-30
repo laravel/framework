@@ -120,7 +120,9 @@ class BeanstalkdQueue extends Queue implements QueueContract
         $job = $this->pheanstalk->watchOnly($queue)->reserve(0);
 
         if ($job instanceof PheanstalkJob) {
-            return new BeanstalkdJob($this->container, $this->pheanstalk, $job, $queue);
+            return new BeanstalkdJob(
+                $this->container, $this->pheanstalk, $job, $this->connectionName, $queue
+            );
         }
     }
 

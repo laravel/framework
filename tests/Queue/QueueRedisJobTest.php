@@ -44,6 +44,7 @@ class QueueRedisJobTest extends TestCase
             m::mock(Illuminate\Queue\RedisQueue::class),
             json_encode(['job' => 'foo', 'data' => ['data'], 'attempts' => 1]),
             json_encode(['job' => 'foo', 'data' => ['data'], 'attempts' => 2]),
+            'connection-name',
             'default'
         );
     }

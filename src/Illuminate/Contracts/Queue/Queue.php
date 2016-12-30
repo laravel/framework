@@ -81,4 +81,19 @@ interface Queue
      * @return \Illuminate\Contracts\Queue\Job|null
      */
     public function pop($queue = null);
+
+    /**
+     * Get the connection name for the queue.
+     *
+     * @return string
+     */
+    public function getConnectionName();
+
+    /**
+     * Set the connection name for the queue.
+     *
+     * @param  string  $name
+     * @return $this
+     */
+    public function setConnectionName($name);
 }

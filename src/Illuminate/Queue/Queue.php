@@ -23,6 +23,13 @@ abstract class Queue
     protected $encrypter;
 
     /**
+     * The connection name for the queue.
+     *
+     * @var string
+     */
+    protected $connectionName;
+
+    /**
      * Push a new job onto the queue.
      *
      * @param  string  $queue
@@ -129,6 +136,29 @@ abstract class Queue
     protected function createStringPayload($job, $data)
     {
         return ['job' => $job, 'data' => $data];
+    }
+
+    /**
+     * Get the connection name for the queue.
+     *
+     * @return string
+     */
+    public function getConnectionName()
+    {
+        return $this->connectionName;
+    }
+
+    /**
+     * Set the connection name for the queue.
+     *
+     * @param  string  $name
+     * @return $this
+     */
+    public function setConnectionName($name)
+    {
+        $this->connectionName = $name;
+
+        return $this;
     }
 
     /**
