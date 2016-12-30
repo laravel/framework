@@ -52,16 +52,16 @@ class ListenCommand extends Command
     {
         $this->setListenerOptions();
 
-        $delay = $this->input->getOption('delay');
+        $connection = $this->input->getArgument('connection');
 
         // The memory limit is the amount of memory we will allow the script to occupy
         // before killing it and letting a process manager restart it for us, which
         // is to protect us against any memory leaks that will be in the scripts.
         $memory = $this->input->getOption('memory');
 
-        $connection = $this->input->getArgument('connection');
-
         $timeout = $this->input->getOption('timeout');
+
+        $delay = $this->input->getOption('delay');
 
         // We need to get the right queue for the connection which is set in the queue
         // configuration file for the application. We will pull it based on the set
@@ -85,7 +85,9 @@ class ListenCommand extends Command
             $connection = $this->laravel['config']['queue.default'];
         }
 
-        $queue = $this->laravel['config']->get("queue.connections.{$connection}.queue", 'default');
+        $queue = $this->laravel['config']->get(
+            "queue.connections.{$connection}.queue", 'default'
+        );
 
         return $this->input->getOption('queue') ?: $queue;
     }
