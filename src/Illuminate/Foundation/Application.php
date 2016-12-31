@@ -1128,6 +1128,17 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     }
 
     /**
+     * Set the application namespace manually.
+     *
+     * @param  string  $namespace
+     * @return void
+     */
+    public function setNamespace($namespace)
+    {
+        $this->namespace = $namespace;
+    }
+
+    /**
      * Get the application namespace.
      *
      * @return string
