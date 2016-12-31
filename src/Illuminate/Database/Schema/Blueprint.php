@@ -307,6 +307,16 @@ class Blueprint
     }
 
     /**
+     * Indicate that the tracing columns should be dropped.
+     *
+     * @return void
+     */
+    public function dropTracings()
+    {
+        $this->dropColumn('created_by', 'updated_by');
+    }
+
+    /**
      * Indicate that the soft delete column should be dropped.
      *
      * @return void
@@ -819,6 +829,18 @@ class Blueprint
         $this->timestampTz('created_at')->nullable();
 
         $this->timestampTz('updated_at')->nullable();
+    }
+
+    /**
+     * Add nullable creation and update trancing columns to the table.
+     *
+     * @return void
+     */
+    public function tracings()
+    {
+        $this->unsignedInteger('created_by')->nullable();
+
+        $this->unsignedInteger('updated_by')->nullable();
     }
 
     /**

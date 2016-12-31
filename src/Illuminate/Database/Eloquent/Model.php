@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use Illuminate\Support\Facades\Auth;
 use Closure;
 use Exception;
 use ArrayAccess;
@@ -82,6 +83,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @var bool
      */
     public $timestamps = true;
+
+    /**
+     * Indicates if the model should have tracing enabled.
+     *
+     * @var bool
+     */
+    public $tracings = true;
 
     /**
      * The model's attributes.
@@ -273,6 +281,20 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @var string
      */
     const UPDATED_AT = 'updated_at';
+
+    /**
+     * The name of the "created by" column.
+     *
+     * @var string
+     */
+    const CREATED_BY = 'created_by';
+
+    /**
+     * The name of the "updated by" column.
+     *
+     * @var string
+     */
+    const UPDATED_BY = 'updated_by';
 
     /**
      * Create a new Eloquent model instance.
@@ -1579,6 +1601,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $this->updateTimestamps();
         }
 
+        // Next, if tracings are enabled, update the author and last editor of the model.
+        if ($this->tracings) {
+            $this->updateTracings();
+        }
+
         // Once we have run the update operation, we will fire the "updated" event for
         // this model instance. This will allow developers to hook into these after
         // models are updated, giving them a chance to do any special processing.
@@ -1610,6 +1637,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // convenience. After, we will just continue saving these model instances.
         if ($this->timestamps) {
             $this->updateTimestamps();
+        }
+
+        // Next, if tracings are enabled, update the author and last editor of the model.
+        if ($this->tracings) {
+            $this->updateTracings();
         }
 
         // If the model has an incrementing key, we can use the "insertGetId" method on
@@ -1755,7 +1787,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Update the model's update timestamp.
+     * Update the model's update timestamp and tracings.
      *
      * @return bool
      */
@@ -1766,6 +1798,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         }
 
         $this->updateTimestamps();
+
+        $this->updateTracings();
 
         return $this->save();
     }
@@ -1852,6 +1886,70 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function freshTimestampString()
     {
         return $this->fromDateTime($this->freshTimestamp());
+    }
+
+    /**
+     * Update the author and last editor tracings.
+     *
+     * @return void
+     */
+    protected function updateTracings()
+    {
+        if (Auth::check()) {
+            if (! $this->isDirty(static::UPDATED_BY)) {
+                $this->setUpdatedBy(Auth::id());
+            }
+
+            if (! $this->exists && ! $this->isDirty(static::CREATED_BY)) {
+                $this->setCreatedBy(Auth::id());
+            }
+        }
+    }
+
+    /**
+     * Set the value of the "created by" attribute.
+     *
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function setCreatedBy($value)
+    {
+        $this->{static::CREATED_BY} = $value;
+
+        return $this;
+    }
+
+    /**
+     * Set the value of the "updated by" attribute.
+     *
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function setUpdatedBy($value)
+    {
+        $this->{static::UPDATED_BY} = $value;
+
+        return $this;
+    }
+
+    /**
+     * Get the name of the "created by" column.
+     *
+     * @return string
+     */
+    public function getCreatedByColumn()
+    {
+        return static::CREATED_BY;
+    }
+
+    /**
+     * Get the name of the "updated by" column.
+     *
+     * @return string
+     */
+    public function getUpdatedByColumn()
+    {
+        return static::UPDATED_BY;
     }
 
     /**
@@ -2073,6 +2171,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function usesTimestamps()
     {
         return $this->timestamps;
+    }
+
+    /**
+     * Determine if the model uses tracings.
+     *
+     * @return bool
+     */
+    public function usesTracings()
+    {
+        return $this->tracings;
     }
 
     /**
@@ -3168,6 +3276,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $this->getKeyName(),
             $this->getCreatedAtColumn(),
             $this->getUpdatedAtColumn(),
+            $this->getCreatedByColumn(),
+            $this->getUpdatedByColumn(),
         ];
 
         $except = $except ? array_unique(array_merge($except, $defaults)) : $defaults;
