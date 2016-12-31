@@ -31,6 +31,13 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	);
 
 	/**
+	 * Echos matching patterns.
+	 */
+	const ECHO_REGULAR_DEFAULT = '/^(?=\$)(.+?)(?:\s+or\s+)(.+?)$/s';
+	const ECHO_DOTTED          = '/^(?=\$)(.+?)\.([^\$]+?)$/s';
+	const ECHO_DOTTED_DEFAULT  = '/^(?=\$)(.+?)\.([^\$]+?)(?:\s+or\s+)(.+?)$/s';
+	
+	/**
 	 * Array of opening and closing tags for escaped echos.
 	 *
 	 * @var array
@@ -262,6 +269,28 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	}
 
 	/**
+	 * Compile the values for the dotted echo statement.
+	 *
+	 * @param  string $value
+	 * @return string
+	 */
+	public function compileDottedEchos($value)
+	{
+		return preg_replace(static::ECHO_DOTTED, 'data_get($1, "$2")', $value);
+	}
+
+	/**
+	 * Compile the default values for the dotted echo statement.
+	 *
+	 * @param  string $value
+	 * @return string
+	 */
+	public function compileDottedEchoDefaults($value)
+	{
+		return preg_replace(static::ECHO_DOTTED_DEFAULT, 'data_get($1, "$2", $3)', $value);
+	}
+
+	/**
 	 * Compile the default values for the echo statement.
 	 *
 	 * @param  string  $value
@@ -269,7 +298,17 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	public function compileEchoDefaults($value)
 	{
-		return preg_replace('/^(?=\$)(.+?)(?:\s+or\s+)(.+?)$/s', 'isset($1) ? $1 : $2', $value);
+		if (preg_match(static::ECHO_DOTTED_DEFAULT, $value) == 1)
+		{
+			return $this->compileDottedEchoDefaults($value);
+		}
+
+		if (preg_match(static::ECHO_DOTTED, $value) == 1)
+		{
+			return $this->compileDottedEchos($value);
+		}
+
+		return preg_replace(static::ECHO_REGULAR_DEFAULT, 'isset($1) ? $1 : $2', $value);
 	}
 
 	/**

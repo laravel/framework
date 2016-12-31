@@ -132,6 +132,62 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testDottedEchosAreCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$this->assertEquals('<?php echo e(data_get($user, "name")); ?>', $compiler->compileString('{{{$user.name}}}'));
+		$this->assertEquals('<?php echo data_get($user, "name"); ?>', $compiler->compileString('{{$user.name}}'));
+		$this->assertEquals('<?php echo data_get($user, "name"); ?>', $compiler->compileString('{{ $user.name }}'));
+		$this->assertEquals('<?php echo data_get($user, "name"); ?>', $compiler->compileString('{{
+			$user.name
+		}}'));
+
+		// ensure concatenated strings are not interpreted as dotted variables
+		$this->assertEquals('<?php echo e($user.$name); ?>', $compiler->compileString('{{{$user.$name}}}'));
+		$this->assertEquals('<?php echo $user.$name; ?>', $compiler->compileString('{{$user.$name}}'));
+		$this->assertEquals('<?php echo $user.$name; ?>', $compiler->compileString('{{ $user.$name }}'));
+		$this->assertEquals('<?php echo $user.$name; ?>', $compiler->compileString('{{
+			$user.$name
+		}}'));
+
+		$this->assertEquals('<?php echo data_get($user, "name", "foo"); ?>', $compiler->compileString('{{ $user.name or "foo" }}'));
+		$this->assertEquals('<?php echo data_get($user, "name", "foo"); ?>', $compiler->compileString('{{$user.name or "foo"}}'));
+		$this->assertEquals('<?php echo data_get($user, "name", "foo"); ?>', $compiler->compileString('{{
+			$user.name or "foo"
+		}}'));
+
+		$this->assertEquals('<?php echo data_get($user, "name", \'foo\'); ?>', $compiler->compileString('{{ $user.name or \'foo\' }}'));
+		$this->assertEquals('<?php echo data_get($user, "name", \'foo\'); ?>', $compiler->compileString('{{$user.name or \'foo\'}}'));
+		$this->assertEquals('<?php echo data_get($user, "name", \'foo\'); ?>', $compiler->compileString('{{
+			$user.name or \'foo\'
+		}}'));
+
+		$this->assertEquals('<?php echo data_get($user, "age", 90); ?>', $compiler->compileString('{{ $user.age or 90 }}'));
+		$this->assertEquals('<?php echo data_get($user, "age", 90); ?>', $compiler->compileString('{{$user.age or 90}}'));
+		$this->assertEquals('<?php echo data_get($user, "age", 90); ?>', $compiler->compileString('{{
+			$user.age or 90
+		}}'));
+
+		$this->assertEquals('<?php echo data_get($user, "country.currency", "USD"); ?>', $compiler->compileString('{{ $user.country.currency or "USD" }}'));
+		$this->assertEquals('<?php echo data_get($user, "country.currency", "USD"); ?>', $compiler->compileString('{{ $user.country.currency or "USD" }}'));
+		$this->assertEquals('<?php echo data_get($user, "country.currency", "USD"); ?>', $compiler->compileString('{{
+			$user.country.currency or "USD"
+		}}'));
+
+		$this->assertEquals('<?php echo data_get($user, "country.currency", \'USD\'); ?>', $compiler->compileString('{{ $user.country.currency or \'USD\' }}'));
+		$this->assertEquals('<?php echo data_get($user, "country.currency", \'USD\'); ?>', $compiler->compileString('{{$user.country.currency or \'USD\'}}'));
+		$this->assertEquals('<?php echo data_get($user, "country.currency", \'USD\'); ?>', $compiler->compileString('{{
+			$user.country.currency or \'USD\'
+		}}'));
+
+		$this->assertEquals('<?php echo data_get($user, "birthday.month", 12); ?>', $compiler->compileString('{{ $user.birthday.month or 12 }}'));
+		$this->assertEquals('<?php echo data_get($user, "birthday.month", 12); ?>', $compiler->compileString('{{$user.birthday.month or 12}}'));
+		$this->assertEquals('<?php echo data_get($user, "birthday.month", 12); ?>', $compiler->compileString('{{
+			$user.birthday.month or 12
+		}}'));
+	}
+
+
 	public function testEscapedWithAtEchosAreCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
@@ -150,6 +206,20 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testEscapedWithAtDottedEchosAreCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$this->assertEquals('{{$user.name}}', $compiler->compileString('@{{$user.name}}'));
+		$this->assertEquals('{{ $user.name }}', $compiler->compileString('@{{ $user.name }}'));
+		$this->assertEquals('{{
+			$user.name
+		}}',
+			$compiler->compileString('@{{
+			$user.name
+		}}'));
+	}
+
+
 	public function testReversedEchosAreCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
@@ -160,6 +230,20 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{{ $name }}}'));
 		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{{
 			$name
+		}}}'));
+	}
+
+
+	public function testReversedDottedEchosAreCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$compiler->setEscapedContentTags('{{', '}}');
+		$compiler->setContentTags('{{{', '}}}');
+		$this->assertEquals('<?php echo e(data_get($user, "name")); ?>', $compiler->compileString('{{$user.name}}'));
+		$this->assertEquals('<?php echo data_get($user, "name"); ?>', $compiler->compileString('{{{$user.name}}}'));
+		$this->assertEquals('<?php echo data_get($user, "name"); ?>', $compiler->compileString('{{{ $user.name }}}'));
+		$this->assertEquals('<?php echo data_get($user, "name"); ?>', $compiler->compileString('{{{
+			$user.name
 		}}}'));
 	}
 
