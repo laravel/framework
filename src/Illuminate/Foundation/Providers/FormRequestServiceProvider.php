@@ -57,7 +57,7 @@ class FormRequestServiceProvider extends ServiceProvider
         );
 
         if ($session = $current->getSession()) {
-            $form->setSession($session);
+            $form->setLaravelSession($session);
         }
 
         $form->setUserResolver($current->getUserResolver());
