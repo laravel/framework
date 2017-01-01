@@ -439,6 +439,18 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a "where week of year" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    public function whereWeekOfYear(Builder $query, $where)
+    {
+        return $this->dateBasedWhere('WEEKOFYEAR', $query, $where);
+    }
+
+    /**
      * Compile a date based where clause.
      *
      * @param  string  $type
