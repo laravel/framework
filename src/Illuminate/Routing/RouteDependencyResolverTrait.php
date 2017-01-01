@@ -61,8 +61,7 @@ trait RouteDependencyResolverTrait
             // If no dependency or default value $instance should be null
             if (is_object($instance)) {
                 $classNames[] = get_class($instance);
-            }
-            elseif ($parameter->isDefaultValueAvailable()) {
+            } elseif ($parameter->isDefaultValueAvailable()) {
                 $instance = $parameter->getDefaultValue();
             }
 
@@ -73,7 +72,7 @@ trait RouteDependencyResolverTrait
         // this way we can inject all non object parameters in their respective order
         $parameters = $this->cleanDependenciesFromParameters($parameters, $classNames);
 
-        if (!empty($parameters)) {
+        if (! empty($parameters)) {
             return $this->mergeRemainingParameters($arguments, $parameters);
         }
 
@@ -104,7 +103,7 @@ trait RouteDependencyResolverTrait
     }
 
     /**
-     * Remove known classes from an array of parameters
+     * Remove known classes from an array of parameters.
      *
      * @param  array $originalParameters
      * @param  array $classNames
@@ -118,7 +117,7 @@ trait RouteDependencyResolverTrait
 
         // Create a new parameters array leaving out any classes from the class list
         foreach ($originalParameters as $key => $parameter) {
-            if (!is_object($parameter) || !in_array(get_class($parameter), $classNames)) {
+            if (! is_object($parameter) || ! in_array(get_class($parameter), $classNames)) {
                 $parameters[$key] = $parameter;
             }
         }
@@ -127,7 +126,7 @@ trait RouteDependencyResolverTrait
     }
 
     /**
-     * Merge route parameters into method arguments
+     * Merge route parameters into method arguments.
      *
      * @param  array $arguments
      * @param  array $parameters
@@ -138,7 +137,7 @@ trait RouteDependencyResolverTrait
         foreach ($arguments as $key => $argument) {
             // Arguments that aren't objects will be a default value or null
             // these values should be filled in order by the parameters
-            if (!is_object($argument)) {
+            if (! is_object($argument)) {
                 $arguments[$key] = array_shift($parameters);
                 if (empty($parameters)) {
                     break;
@@ -162,7 +161,7 @@ trait RouteDependencyResolverTrait
     }
 
     /**
-     * Return a parameter by its class
+     * Return a parameter by its class.
      *
      * @param  string $class
      * @param  array $parameters

@@ -318,7 +318,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $_SERVER['__test.route_inject'][1]);
         $this->assertEquals('test', $_SERVER['__test.route_inject'][2]);
         $this->assertArrayHasKey(3, $_SERVER['__test.route_inject']);
-        $this->assertInstanceOf('\Illuminate\Http\Request', $_SERVER['__test.route_inject'][3]);
+        $this->assertInstanceOf('Illuminate\Http\Request', $_SERVER['__test.route_inject'][3]);
 
         unset($_SERVER['__test.route_inject']);
     }
