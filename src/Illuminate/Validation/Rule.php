@@ -9,6 +9,13 @@ class Rule
     use Macroable;
 
     /**
+     * The string representation of the rules.
+     *
+     * @var string
+     */
+    public static $output;
+
+    /**
      * Get a dimensions constraint builder instance.
      *
      * @param  array  $constraints

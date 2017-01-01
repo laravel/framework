@@ -4,7 +4,7 @@ namespace Illuminate\Validation\Rules;
 
 use Closure;
 
-class Exists
+class Exists extends Rule
 {
     /**
      * The table to run the query against.
@@ -135,11 +135,11 @@ class Exists
     }
 
     /**
-     * Convert the rule to a validation string.
+     * The string representation of the rule.
      *
      * @return string
      */
-    public function __toString()
+    public function toString()
     {
         return rtrim(sprintf('exists:%s,%s,%s',
             $this->table,
