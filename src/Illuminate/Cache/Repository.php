@@ -82,6 +82,9 @@ class Repository implements CacheContract, ArrayAccess
 
         $value = $this->store->get($this->itemKey($key));
 
+        // If we could not find the cache value, we will fire the missed event and get
+        // the default value for this cache value. This default could be a callback
+        // so we will execute the value function which will resolve it if needed.
         if (is_null($value) || $value === false) {
             $this->event(new CacheMissed($key));
 
@@ -103,25 +106,40 @@ class Repository implements CacheContract, ArrayAccess
      */
     public function many(array $keys)
     {
-        $normalizedKeys = [];
+        $values = $this->store->many(collect($keys)->map(function ($value, $key) {
+            return is_string($key) ? $key : $value;
+        })->values()->all());
 
-        foreach ($keys as $key => $value) {
-            $normalizedKeys[] = is_string($key) ? $key : $value;
+        return collect($values)->map(function ($value, $key) use ($keys) {
+            return $this->handleManyResult($keys, $key, $value);
+        })->all();
+    }
+
+    /**
+     * Handle a result for the "many" method.
+     *
+     * @param  array  $keys
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function handleManyResult($keys, $key, $value)
+    {
+        // If we could not find the cache value, we will fire the missed event and get
+        // the default value for this cache value. This default could be a callback
+        // so we will execute the value function which will resolve it if needed.
+        if (is_null($value) || $value === false) {
+            $this->event(new CacheMissed($key));
+
+            return isset($keys[$key]) ? value($keys[$key]) : null;
         }
 
-        $values = $this->store->many($normalizedKeys);
+        // If we found a valid value we will fire the "hit" event and return the value
+        // back from this function. The "hit" event gives developers an opportunity
+        // to listen for every possible cache "hit" throughout this applications.
+        $this->event(new CacheHit($key, $value));
 
-        foreach ($values as $key => &$value) {
-            if (is_null($value) || $value === false) {
-                $this->event(new CacheMissed($key));
-
-                $value = isset($keys[$key]) ? value($keys[$key]) : null;
-            } else {
-                $this->event(new CacheHit($key, $value));
-            }
-        }
-
-        return $values;
+        return $value;
     }
 
     /**
