@@ -128,9 +128,7 @@ class FileStore implements Store
      */
     public function forget($key)
     {
-        $file = $this->path($key);
-
-        if ($this->files->exists($file)) {
+        if ($this->files->exists($file = $this->path($key))) {
             return $this->files->delete($file);
         }
 
@@ -144,17 +142,17 @@ class FileStore implements Store
      */
     public function flush()
     {
-        if ($this->files->isDirectory($this->directory)) {
-            foreach ($this->files->directories($this->directory) as $directory) {
-                if (! $this->files->deleteDirectory($directory)) {
-                    return false;
-                }
-            }
-
-            return true;
+        if (! $this->files->isDirectory($this->directory)) {
+            return false;
         }
 
-        return false;
+        foreach ($this->files->directories($this->directory) as $directory) {
+            if (! $this->files->deleteDirectory($directory)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
