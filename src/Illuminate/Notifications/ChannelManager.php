@@ -50,7 +50,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      * @param  mixed  $notification
      * @return void
      */
-    public function sendNow($notifiables, $notification, array $channels = null)
+    public function sendNow($notifiables, $notification, array $use_channels = null)
     {
         $notifiables = $this->formatNotifiables($notifiables);
 
@@ -59,7 +59,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
         foreach ($notifiables as $notifiable) {
             $notificationId = Uuid::uuid4()->toString();
 
-            $channels = $channels ?: $notification->via($notifiable);
+            $channels = $use_channels ?: $notification->via($notifiable);
 
             if (empty($channels)) {
                 continue;
