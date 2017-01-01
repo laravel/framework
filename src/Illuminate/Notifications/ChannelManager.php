@@ -59,13 +59,13 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
         foreach ($notifiables as $notifiable) {
             $notificationId = Uuid::uuid4()->toString();
 
-            $channels = $channels ?: $notification->via($notifiable);
+            $viaChannels = $channels ?: $notification->via($notifiable);
 
-            if (empty($channels)) {
+            if (empty($viaChannels)) {
                 continue;
             }
 
-            foreach ($channels as $channel) {
+            foreach ($viaChannels as $channel) {
                 $notification = clone $original;
 
                 if (! $notification->id) {
