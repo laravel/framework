@@ -694,7 +694,7 @@ class Container implements ArrayAccess, ContainerContract
             return $parameter->getDefaultValue();
         }
 
-        return $this->unresolvablePrimitive($parameter);
+        $this->unresolvablePrimitive($parameter);
     }
 
     /**
@@ -729,7 +729,7 @@ class Container implements ArrayAccess, ContainerContract
      * @param  string  $concrete
      * @return void
      *
-     * @throws \Illuminate\Container\BindingResolutionException
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function notInstantiable($concrete)
     {
@@ -750,7 +750,7 @@ class Container implements ArrayAccess, ContainerContract
      * @param  \ReflectionParameter  $parameter
      * @return void
      *
-     * @throws \Illuminate\Container\BindingResolutionException
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function unresolvablePrimitive(ReflectionParameter $parameter)
     {
