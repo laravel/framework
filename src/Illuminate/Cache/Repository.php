@@ -7,8 +7,12 @@ use DateTime;
 use ArrayAccess;
 use Carbon\Carbon;
 use BadMethodCallException;
+use Illuminate\Cache\Events\CacheHit;
 use Illuminate\Contracts\Cache\Store;
+use Illuminate\Cache\Events\KeyWritten;
+use Illuminate\Cache\Events\CacheMissed;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Cache\Events\KeyForgotten;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 
@@ -51,58 +55,6 @@ class Repository implements CacheContract, ArrayAccess
     }
 
     /**
-     * Set the event dispatcher instance.
-     *
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
-     * @return void
-     */
-    public function setEventDispatcher(Dispatcher $events)
-    {
-        $this->events = $events;
-    }
-
-    /**
-     * Fire an event for this cache instance.
-     *
-     * @param  string  $event
-     * @param  array  $payload
-     * @return void
-     */
-    protected function fireCacheEvent($event, $payload)
-    {
-        if (! isset($this->events)) {
-            return;
-        }
-
-        switch ($event) {
-            case 'hit':
-                if (count($payload) == 2) {
-                    $payload[] = [];
-                }
-
-                return $this->events->fire(new Events\CacheHit($payload[0], $payload[1], $payload[2]));
-            case 'missed':
-                if (count($payload) == 1) {
-                    $payload[] = [];
-                }
-
-                return $this->events->fire(new Events\CacheMissed($payload[0], $payload[1]));
-            case 'delete':
-                if (count($payload) == 1) {
-                    $payload[] = [];
-                }
-
-                return $this->events->fire(new Events\KeyForgotten($payload[0], $payload[1]));
-            case 'write':
-                if (count($payload) == 3) {
-                    $payload[] = [];
-                }
-
-                return $this->events->fire(new Events\KeyWritten($payload[0], $payload[1], $payload[2], $payload[3]));
-        }
-    }
-
-    /**
      * Determine if an item exists in the cache.
      *
      * @param  string  $key
@@ -131,11 +83,11 @@ class Repository implements CacheContract, ArrayAccess
         $value = $this->store->get($this->itemKey($key));
 
         if (is_null($value) || $value === false) {
-            $this->fireCacheEvent('missed', [$key]);
+            $this->event(new CacheMissed($key));
 
             $value = value($default);
         } else {
-            $this->fireCacheEvent('hit', [$key, $value]);
+            $this->event(new CacheHit($key, $value));
         }
 
         return $value;
@@ -161,11 +113,11 @@ class Repository implements CacheContract, ArrayAccess
 
         foreach ($values as $key => &$value) {
             if (is_null($value) || $value === false) {
-                $this->fireCacheEvent('missed', [$key]);
+                $this->event(new CacheMissed($key));
 
                 $value = isset($keys[$key]) ? value($keys[$key]) : null;
             } else {
-                $this->fireCacheEvent('hit', [$key, $value]);
+                $this->event(new CacheHit($key, $value));
             }
         }
 
@@ -181,11 +133,9 @@ class Repository implements CacheContract, ArrayAccess
      */
     public function pull($key, $default = null)
     {
-        $value = $this->get($key, $default);
-
-        $this->forget($key);
-
-        return $value;
+        return tap($this->get($key, $default), function ($value) use ($key) {
+            $this->forget($key);
+        });
     }
 
     /**
@@ -202,12 +152,10 @@ class Repository implements CacheContract, ArrayAccess
             return $this->putMany($key, $value);
         }
 
-        $minutes = $this->getMinutes($minutes);
-
-        if (! is_null($minutes)) {
+        if (! is_null($minutes = $this->getMinutes($minutes))) {
             $this->store->put($this->itemKey($key), $value, $minutes);
 
-            $this->fireCacheEvent('write', [$key, $value, $minutes]);
+            $this->event(new KeyWritten($key, $value, $minutes));
         }
     }
 
@@ -220,13 +168,11 @@ class Repository implements CacheContract, ArrayAccess
      */
     public function putMany(array $values, $minutes)
     {
-        $minutes = $this->getMinutes($minutes);
-
-        if (! is_null($minutes)) {
+        if (! is_null($minutes = $this->getMinutes($minutes))) {
             $this->store->putMany($values, $minutes);
 
             foreach ($values as $key => $value) {
-                $this->fireCacheEvent('write', [$key, $value, $minutes]);
+                $this->event(new KeyWritten($key, $value, $minutes));
             }
         }
     }
@@ -241,9 +187,7 @@ class Repository implements CacheContract, ArrayAccess
      */
     public function add($key, $value, $minutes)
     {
-        $minutes = $this->getMinutes($minutes);
-
-        if (is_null($minutes)) {
+        if (is_null($minutes = $this->getMinutes($minutes))) {
             return false;
         }
 
@@ -297,7 +241,7 @@ class Repository implements CacheContract, ArrayAccess
     {
         $this->store->forever($this->itemKey($key), $value);
 
-        $this->fireCacheEvent('write', [$key, $value, 0]);
+        $this->event(new KeyWritten($key, $value, 0));
     }
 
     /**
@@ -367,11 +311,9 @@ class Repository implements CacheContract, ArrayAccess
      */
     public function forget($key)
     {
-        $success = $this->store->forget($this->itemKey($key));
-
-        $this->fireCacheEvent('delete', [$key]);
-
-        return $success;
+        return tap($this->store->forget($this->itemKey($key)), function () use ($key) {
+            $this->event(new KeyForgotten($key));
+        });
     }
 
     /**
@@ -439,6 +381,30 @@ class Repository implements CacheContract, ArrayAccess
     public function getStore()
     {
         return $this->store;
+    }
+
+    /**
+     * Fire an event for this cache instance.
+     *
+     * @param  string  $event
+     * @return void
+     */
+    protected function event($event)
+    {
+        if (isset($this->events)) {
+            $this->events->fire($event);
+        }
+    }
+
+    /**
+     * Set the event dispatcher instance.
+     *
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
+     * @return void
+     */
+    public function setEventDispatcher(Dispatcher $events)
+    {
+        $this->events = $events;
     }
 
     /**
