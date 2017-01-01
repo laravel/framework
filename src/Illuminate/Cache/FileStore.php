@@ -175,7 +175,7 @@ class FileStore implements Store
                 $contents = $this->files->get($path, true), 0, 10
             );
         } catch (Exception $e) {
-            return ['data' => null, 'time' => null];
+            return $this->emptyPayload();
         }
 
         // If the current time is greater than expiration timestamps we will delete
@@ -184,7 +184,7 @@ class FileStore implements Store
         if (Carbon::now()->getTimestamp() >= $expire) {
             $this->forget($key);
 
-            return ['data' => null, 'time' => null];
+            return $this->emptyPayload();
         }
 
         $data = unserialize(substr($contents, 10));
@@ -195,6 +195,16 @@ class FileStore implements Store
         $time = ($expire - Carbon::now()->getTimestamp()) / 60;
 
         return compact('data', 'time');
+    }
+
+    /**
+     * Get a default empty payload for the cache.
+     *
+     * @return array
+     */
+    protected function emptyPayload()
+    {
+        return ['data' => null, 'time' => null];
     }
 
     /**
