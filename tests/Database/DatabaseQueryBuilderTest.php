@@ -188,6 +188,10 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->whereyear('created_at', 1);
         $this->assertEquals('select * from `users` where year(`created_at`) = ?', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereWeekOfYear('created_at', 1);
+        $this->assertEquals('select * from `users` where WEEKOFYEAR(`created_at`) = ?', $builder->toSql());
     }
 
     public function testWhereDayMySql()
@@ -212,6 +216,14 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $builder->select('*')->from('users')->whereYear('created_at', '=', 2014);
         $this->assertEquals('select * from `users` where year(`created_at`) = ?', $builder->toSql());
         $this->assertEquals([0 => 2014], $builder->getBindings());
+    }
+
+    public function testWhereWeekOfYearMySql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereWeekOfYear('created_at', '=', 32);
+        $this->assertEquals('select * from `users` where WEEKOFYEAR(`created_at`) = ?', $builder->toSql());
+        $this->assertEquals([0 => 32], $builder->getBindings());
     }
 
     public function testWhereTimeMySql()
@@ -254,6 +266,14 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([0 => 2014], $builder->getBindings());
     }
 
+    public function testWhereWeekOfYearPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereWeekOfYear('created_at', '=', 32);
+        $this->assertEquals('select * from "users" where extract(WEEKOFYEAR from "created_at") = ?', $builder->toSql());
+        $this->assertEquals([0 => 32], $builder->getBindings());
+    }
+
     public function testWhereDaySqlite()
     {
         $builder = $this->getSQLiteBuilder();
@@ -278,6 +298,14 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([0 => 2014], $builder->getBindings());
     }
 
+    public function testWhereWeekOfYearSqlite()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->whereWeekOfYear('created_at', '=', 32);
+        $this->assertEquals('select * from "users" where strftime(\'WEEKOFYEAR\', "created_at") = ?', $builder->toSql());
+        $this->assertEquals([0 => 32], $builder->getBindings());
+    }
+
     public function testWhereDaySqlServer()
     {
         $builder = $this->getSqlServerBuilder();
@@ -300,6 +328,14 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $builder->select('*')->from('users')->whereYear('created_at', '=', 2014);
         $this->assertEquals('select * from [users] where year([created_at]) = ?', $builder->toSql());
         $this->assertEquals([0 => 2014], $builder->getBindings());
+    }
+
+    public function testWhereWeekOfYearSqlServer()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereWeekOfYear('created_at', '=', 32);
+        $this->assertEquals('select * from [users] where WEEKOFYEAR([created_at]) = ?', $builder->toSql());
+        $this->assertEquals([0 => 32], $builder->getBindings());
     }
 
     public function testWhereBetweens()
