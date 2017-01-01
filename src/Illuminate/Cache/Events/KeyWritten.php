@@ -2,7 +2,7 @@
 
 namespace Illuminate\Cache\Events;
 
-class KeyWritten
+class KeyWritten extends CacheEvent
 {
     /**
      * The key that was written.

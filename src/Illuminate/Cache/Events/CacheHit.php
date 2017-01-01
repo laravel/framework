@@ -2,7 +2,7 @@
 
 namespace Illuminate\Cache\Events;
 
-class CacheHit
+class CacheHit extends CacheEvent
 {
     /**
      * The key that was hit.
