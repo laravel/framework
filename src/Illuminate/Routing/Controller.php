@@ -72,7 +72,7 @@ abstract class Controller
     {
         $names = array_column($this->middleware, 'middleware');
 
-        return !(false === array_search($middleware, $names));
+        return ! (false === array_search($middleware, $names));
     }
 
     /**
