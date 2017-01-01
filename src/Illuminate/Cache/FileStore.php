@@ -36,7 +36,7 @@ class FileStore implements Store
     public function __construct(Filesystem $files, $directory)
     {
         $this->files = $files;
-        $this->directory = $directory.'/data';
+        $this->directory = $directory;
     }
 
     /**
