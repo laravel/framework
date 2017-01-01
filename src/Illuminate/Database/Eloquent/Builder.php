@@ -300,7 +300,7 @@ class Builder {
 
 		$perPage = $perPage ?: $this->model->getPerPage();
 
-		$this->query->skip(($page - 1) * $perPage)->take($perPage + 1);
+		$this->query->skip(($page - 1) * $perPage)->take($perPage);
 
 		return $paginator->make($this->get($columns)->all(), $perPage);
 	}

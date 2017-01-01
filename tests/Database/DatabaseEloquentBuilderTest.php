@@ -275,7 +275,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$conn->shouldReceive('getPaginator')->once()->andReturn($paginator);
 		$query->expects($this->once())->method('getConnection')->will($this->returnValue($conn));
 		$query->expects($this->once())->method('skip')->with(0)->will($this->returnValue($query));
-		$query->expects($this->once())->method('take')->with(16)->will($this->returnValue($query));
+		$query->expects($this->once())->method('take')->with(15)->will($this->returnValue($query));
 		$builder->expects($this->once())->method('get')->with($this->equalTo(array('*')))->will($this->returnValue(new Collection(array('results'))));
 		$paginator->shouldReceive('make')->once()->with(array('results'), 15)->andReturn(array('results'));
 
