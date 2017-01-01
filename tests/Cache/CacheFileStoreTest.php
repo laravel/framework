@@ -19,7 +19,7 @@ class CacheFileStoreTest extends TestCase
     {
         $files = $this->mockFilesystem();
         $hash = sha1('foo');
-        $full_dir = __DIR__.'/data/'.substr($hash, 0, 2).'/'.substr($hash, 2, 2);
+        $full_dir = __DIR__.'/'.substr($hash, 0, 2).'/'.substr($hash, 2, 2);
         $files->expects($this->once())->method('makeDirectory')->with($this->equalTo($full_dir), $this->equalTo(0777), $this->equalTo(true));
         $files->expects($this->once())->method('put')->with($this->equalTo($full_dir.'/'.$hash));
         $store = new FileStore($files, __DIR__);
@@ -54,7 +54,7 @@ class CacheFileStoreTest extends TestCase
         $contents = '1111111111'.serialize('Hello World');
         $hash = sha1('foo');
         $cache_dir = substr($hash, 0, 2).'/'.substr($hash, 2, 2);
-        $files->expects($this->once())->method('put')->with($this->equalTo(__DIR__.'/data/'.$cache_dir.'/'.$hash), $this->equalTo($contents));
+        $files->expects($this->once())->method('put')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$hash), $this->equalTo($contents));
         $store->put('foo', 'Hello World', 10);
     }
 
@@ -64,7 +64,7 @@ class CacheFileStoreTest extends TestCase
         $contents = '9999999999'.serialize('Hello World');
         $hash = sha1('foo');
         $cache_dir = substr($hash, 0, 2).'/'.substr($hash, 2, 2);
-        $files->expects($this->once())->method('put')->with($this->equalTo(__DIR__.'/data/'.$cache_dir.'/'.$hash), $this->equalTo($contents));
+        $files->expects($this->once())->method('put')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$hash), $this->equalTo($contents));
         $store = new FileStore($files, __DIR__);
         $store->forever('foo', 'Hello World', 10);
     }
@@ -90,7 +90,7 @@ class CacheFileStoreTest extends TestCase
         $files->expects($this->once())->method('get')->will($this->returnValue($initialValue));
         $hash = sha1('foo');
         $cache_dir = substr($hash, 0, 2).'/'.substr($hash, 2, 2);
-        $files->expects($this->once())->method('put')->with($this->equalTo(__DIR__.'/data/'.$cache_dir.'/'.$hash), $this->equalTo($valueAfterIncrement));
+        $files->expects($this->once())->method('put')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$hash), $this->equalTo($valueAfterIncrement));
         $store->increment('foo');
     }
 
@@ -99,7 +99,7 @@ class CacheFileStoreTest extends TestCase
         $files = $this->mockFilesystem();
         $hash = sha1('foobull');
         $cache_dir = substr($hash, 0, 2).'/'.substr($hash, 2, 2);
-        $files->expects($this->once())->method('exists')->with($this->equalTo(__DIR__.'/data/'.$cache_dir.'/'.$hash))->will($this->returnValue(false));
+        $files->expects($this->once())->method('exists')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$hash))->will($this->returnValue(false));
         $store = new FileStore($files, __DIR__);
         $store->forget('foobull');
     }
@@ -111,16 +111,16 @@ class CacheFileStoreTest extends TestCase
         $cache_dir = substr($hash, 0, 2).'/'.substr($hash, 2, 2);
         $store = new FileStore($files, __DIR__);
         $store->put('foobar', 'Hello Baby', 10);
-        $files->expects($this->once())->method('exists')->with($this->equalTo(__DIR__.'/data/'.$cache_dir.'/'.$hash))->will($this->returnValue(true));
-        $files->expects($this->once())->method('delete')->with($this->equalTo(__DIR__.'/data/'.$cache_dir.'/'.$hash));
+        $files->expects($this->once())->method('exists')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$hash))->will($this->returnValue(true));
+        $files->expects($this->once())->method('delete')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$hash));
         $store->forget('foobar');
     }
 
     public function testFlushCleansDirectory()
     {
         $files = $this->mockFilesystem();
-        $files->expects($this->once())->method('isDirectory')->with($this->equalTo(__DIR__.'/data'))->will($this->returnValue(true));
-        $files->expects($this->once())->method('directories')->with($this->equalTo(__DIR__.'/data'))->will($this->returnValue(['foo']));
+        $files->expects($this->once())->method('isDirectory')->with($this->equalTo(__DIR__))->will($this->returnValue(true));
+        $files->expects($this->once())->method('directories')->with($this->equalTo(__DIR__))->will($this->returnValue(['foo']));
         $files->expects($this->once())->method('deleteDirectory')->with($this->equalTo('foo'))->will($this->returnValue(true));
 
         $store = new FileStore($files, __DIR__);
@@ -131,8 +131,8 @@ class CacheFileStoreTest extends TestCase
     public function testFlushFailsDirectoryClean()
     {
         $files = $this->mockFilesystem();
-        $files->expects($this->once())->method('isDirectory')->with($this->equalTo(__DIR__.'/data'))->will($this->returnValue(true));
-        $files->expects($this->once())->method('directories')->with($this->equalTo(__DIR__.'/data'))->will($this->returnValue(['foo']));
+        $files->expects($this->once())->method('isDirectory')->with($this->equalTo(__DIR__))->will($this->returnValue(true));
+        $files->expects($this->once())->method('directories')->with($this->equalTo(__DIR__))->will($this->returnValue(['foo']));
         $files->expects($this->once())->method('deleteDirectory')->with($this->equalTo('foo'))->will($this->returnValue(false));
 
         $store = new FileStore($files, __DIR__);
@@ -143,7 +143,7 @@ class CacheFileStoreTest extends TestCase
     public function testFlushIgnoreNonExistingDirectory()
     {
         $files = $this->mockFilesystem();
-        $files->expects($this->once())->method('isDirectory')->with($this->equalTo(__DIR__.'--wrong/data'))->will($this->returnValue(false));
+        $files->expects($this->once())->method('isDirectory')->with($this->equalTo(__DIR__.'--wrong'))->will($this->returnValue(false));
 
         $store = new FileStore($files, __DIR__.'--wrong');
         $result = $store->flush();
