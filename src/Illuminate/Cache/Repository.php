@@ -282,9 +282,9 @@ class Repository implements CacheContract, ArrayAccess
     {
         $value = $this->get($key);
 
-        // If the item exists in the cache we will just return this immediately
-        // otherwise we will execute the given Closure and cache the result
-        // of that execution for the given number of minutes in storage.
+        // If the item exists in the cache we will just return this immediately and if
+        // not we will execute the given Closure and cache the result of that for a
+        // given number of minutes so it's available for all subsequent requests.
         if (! is_null($value) && $value !== false) {
             return $value;
         }
@@ -317,9 +317,9 @@ class Repository implements CacheContract, ArrayAccess
     {
         $value = $this->get($key);
 
-        // If the item exists in the cache we will just return this immediately
-        // otherwise we will execute the given Closure and cache the result
-        // of that execution for the given number of minutes. It's easy.
+        // If the item exists in the cache we will just return this immediately and if
+        // not we will execute the given Closure and cache the result of that for a
+        // given number of minutes so it's available for all subsequent requests.
         if (! is_null($value) && $value !== false) {
             return $value;
         }
@@ -352,19 +352,17 @@ class Repository implements CacheContract, ArrayAccess
      */
     public function tags($names)
     {
-        if (method_exists($this->store, 'tags')) {
-            $taggedCache = $this->store->tags($names);
-
-            if (! is_null($this->events)) {
-                $taggedCache->setEventDispatcher($this->events);
-            }
-
-            $taggedCache->setDefaultCacheTime($this->default);
-
-            return $taggedCache;
+        if (! method_exists($this->store, 'tags')) {
+            throw new BadMethodCallException('This cache store does not support tagging.');
         }
 
-        throw new BadMethodCallException('This cache store does not support tagging.');
+        $cache = $this->store->tags($names);
+
+        if (! is_null($this->events)) {
+            $cache->setEventDispatcher($this->events);
+        }
+
+        return $cache->setDefaultCacheTime($this->default);
     }
 
     /**
@@ -392,11 +390,13 @@ class Repository implements CacheContract, ArrayAccess
      * Set the default cache time in minutes.
      *
      * @param  float|int  $minutes
-     * @return void
+     * @return $this
      */
     public function setDefaultCacheTime($minutes)
     {
         $this->default = $minutes;
+
+        return $this;
     }
 
     /**
