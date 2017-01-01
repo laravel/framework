@@ -84,7 +84,7 @@ class FileStore implements Store
 
         // Next, we'll extract the number of minutes that are remaining for a cache
         // so that we can properly retain the time for things like the increment
-        // operation that may be performed on the cache.
+        // operation that may be performed on this cache on a later operation.
         $time = ($expire - Carbon::now()->getTimestamp()) / 60;
 
         return compact('data', 'time');

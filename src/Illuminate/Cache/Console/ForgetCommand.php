@@ -48,7 +48,9 @@ class ForgetCommand extends Command
      */
     public function handle()
     {
-        $this->cache->store($this->argument('store'))->forget($this->argument('key'));
+        $this->cache->store($this->argument('store'))->forget(
+            $this->argument('key')
+        );
 
         $this->info('The ['.$this->argument('key').'] key has been removed from the cache.');
     }
