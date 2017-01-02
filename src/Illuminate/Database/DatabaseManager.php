@@ -151,10 +151,6 @@ class DatabaseManager implements ConnectionResolverInterface
         // First we'll set the fetch mode and a few other dependencies of the database
         // connection. This method basically just configures and prepares it to get
         // used by the application. Once we're finished we'll return it back out.
-        $connection->setFetchMode(
-            $this->app['config']['database.fetch']
-        );
-
         if ($this->app->bound('events')) {
             $connection->setEventDispatcher($this->app['events']);
         }
