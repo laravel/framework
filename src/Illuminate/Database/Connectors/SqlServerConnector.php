@@ -53,6 +53,18 @@ class SqlServerConnector extends Connector implements ConnectorInterface
     }
 
     /**
+     * Determine if the database configuration prefers ODBC.
+     *
+     * @param  array  $config
+     * @return bool
+     */
+    protected function prefersOdbc(array $config)
+    {
+        return in_array('odbc', $this->getAvailableDrivers()) &&
+               array_get($config, 'odbc') === true;
+    }
+
+    /**
      * Get the DSN string for a DbLib connection.
      *
      * @param  array  $config
@@ -70,18 +82,6 @@ class SqlServerConnector extends Connector implements ConnectorInterface
         );
 
         return $this->buildConnectString('dblib', $arguments);
-    }
-
-    /**
-     * Determine if the database configuration prefers ODBC.
-     *
-     * @param  array  $config
-     * @return bool
-     */
-    protected function prefersOdbc(array $config)
-    {
-        return in_array('odbc', $this->getAvailableDrivers()) &&
-               array_get($config, 'odbc') === true;
     }
 
     /**
