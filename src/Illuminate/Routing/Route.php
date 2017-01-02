@@ -670,15 +670,9 @@ class Route
             return $this->computedMiddleware;
         }
 
-        // Set incase of an exception, so next time this
-        // method is called, the exception is not rethrown.
-        $this->computedMiddleware = [];
-
-        $this->computedMiddleware = array_unique(array_merge(
+        return $this->computedMiddleware = array_unique(array_merge(
             $this->middleware(), $this->controllerMiddleware()
         ), SORT_REGULAR);
-
-        return $this->computedMiddleware;
     }
 
     /**
