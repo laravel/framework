@@ -1,19 +1,18 @@
 <?php
 
-use Illuminate\Console\Scheduling\ManagesFrequencies;
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Console\Scheduling\ManagesFrequencies;
 
 class FrequencyTest extends TestCase
 {
-    /**
+    /*
      * @var \Illuminate\Console\Scheduling\Event
      */
     protected $event;
 
     public function setUp()
     {
-        /**
+        /*
          * Fake the Illuminate\Console\Scheduling\Event class
          */
         $this->event = new class {
@@ -36,7 +35,7 @@ class FrequencyTest extends TestCase
 
     public function testEveryFiveMinutes()
     {
-        $this->assertEquals("*/5 * * * * *", $this->event->everyFiveMinutes()->getExpression());
+        $this->assertEquals('*/5 * * * * *', $this->event->everyFiveMinutes()->getExpression());
     }
 
     public function testDaily()
