@@ -297,7 +297,7 @@ class Connection implements ConnectionInterface
      */
     public function select($query, $bindings = [], $useReadPdo = true)
     {
-        return $this->run($query, $bindings, function ($me, $query, $bindings) use ($useReadPdo) {
+        return $this->run($query, $bindings, function ($query, $bindings) use ($useReadPdo) {
             if ($this->pretending()) {
                 return [];
             }
@@ -325,8 +325,8 @@ class Connection implements ConnectionInterface
      */
     public function cursor($query, $bindings = [], $useReadPdo = true)
     {
-        $statement = $this->run($query, $bindings, function ($me, $query, $bindings) use ($useReadPdo) {
-            if ($me->pretending()) {
+        $statement = $this->run($query, $bindings, function ($query, $bindings) use ($useReadPdo) {
+            if ($this->pretending()) {
                 return [];
             }
 
@@ -338,8 +338,8 @@ class Connection implements ConnectionInterface
 
             $statement->setFetchMode($this->fetchMode);
 
-            $me->bindValues(
-                $statement, $me->prepareBindings($bindings)
+            $this->bindValues(
+                $statement, $this->prepareBindings($bindings)
             );
 
             // Next, we'll execute the query against the database and return the statement
@@ -428,14 +428,14 @@ class Connection implements ConnectionInterface
      */
     public function statement($query, $bindings = [])
     {
-        return $this->run($query, $bindings, function ($me, $query, $bindings) {
-            if ($me->pretending()) {
+        return $this->run($query, $bindings, function ($query, $bindings) {
+            if ($this->pretending()) {
                 return true;
             }
 
             $statement = $this->getPdo()->prepare($query);
 
-            $this->bindValues($statement, $me->prepareBindings($bindings));
+            $this->bindValues($statement, $this->prepareBindings($bindings));
 
             return $statement->execute();
         });
@@ -450,17 +450,17 @@ class Connection implements ConnectionInterface
      */
     public function affectingStatement($query, $bindings = [])
     {
-        return $this->run($query, $bindings, function ($me, $query, $bindings) {
-            if ($me->pretending()) {
+        return $this->run($query, $bindings, function ($query, $bindings) {
+            if ($this->pretending()) {
                 return 0;
             }
 
             // For update or delete statements, we want to get the number of rows affected
             // by the statement and return that back to the developer. We'll first need
             // to execute the statement and then we'll use PDO to fetch the affected.
-            $statement = $me->getPdo()->prepare($query);
+            $statement = $this->getPdo()->prepare($query);
 
-            $this->bindValues($statement, $me->prepareBindings($bindings));
+            $this->bindValues($statement, $this->prepareBindings($bindings));
 
             $statement->execute();
 
@@ -476,12 +476,12 @@ class Connection implements ConnectionInterface
      */
     public function unprepared($query)
     {
-        return $this->run($query, [], function ($me, $query) {
-            if ($me->pretending()) {
+        return $this->run($query, [], function ($query) {
+            if ($this->pretending()) {
                 return true;
             }
 
-            return (bool) $me->getPdo()->exec($query);
+            return (bool) $this->getPdo()->exec($query);
         });
     }
 
@@ -729,7 +729,7 @@ class Connection implements ConnectionInterface
         // run the SQL against the PDO connection. Then we can calculate the time it
         // took to execute and log the query SQL, bindings and time in our memory.
         try {
-            $result = $callback($this, $query, $bindings);
+            $result = $callback($query, $bindings);
         }
 
         // If an exception occurs when attempting to run a query, we'll format the error
