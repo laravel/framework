@@ -113,7 +113,7 @@ class Handler implements ExceptionHandlerContract
         } elseif ($e instanceof AuthenticationException) {
             return $this->unauthenticated($request, $e);
         } elseif ($e instanceof AuthorizationException) {
-            return $this->unauthorized($request, $e);            
+            return $this->unauthorized($request, $e);
         } elseif ($e instanceof ValidationException) {
             return $this->convertValidationExceptionToResponse($e, $request);
         }
