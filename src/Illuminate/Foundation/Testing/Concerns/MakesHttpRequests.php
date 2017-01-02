@@ -268,20 +268,26 @@ trait MakesHttpRequests
      */
     protected function transformHeadersToServerVars(array $headers)
     {
-        $server = [];
-        $prefix = 'HTTP_';
-
-        foreach ($headers as $name => $value) {
+        return collect($headers)->mapWithKeys(function ($value, $name) {
             $name = strtr(strtoupper($name), '-', '_');
 
-            if (! Str::startsWith($name, $prefix) && $name != 'CONTENT_TYPE') {
-                $name = $prefix.$name;
-            }
+            return [$this->formatServerHeaderKey($name) => $value];
+        })->all();
+    }
 
-            $server[$name] = $value;
+    /**
+     * Format the header name for the server array.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function formatServerHeaderKey($name)
+    {
+        if (! Str::startsWith($name, 'HTTP_') && $name != 'CONTENT_TYPE') {
+            return 'HTTP_'.$name;
         }
 
-        return $server;
+        return $name;
     }
 
     /**
