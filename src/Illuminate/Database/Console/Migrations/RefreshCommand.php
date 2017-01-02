@@ -44,18 +44,16 @@ class RefreshCommand extends Command
         // If the "batch" flag is specified it means we only want to rollback and re-run
         // the last batch of migrations. This allows the developer to easily rollback
         // a number of migrations without counting steps or rolling back them all.
-
         $batch = $this->input->getOption('batch');
 
         // If the "step" option is specified it means we only want to rollback a small
         // number of migrations before migrating again. For example, the user might
         // only rollback and remigrate the latest four migrations instead of all.
-
         $step = $this->input->getOption('step') ?: 0;
 
         if ($batch) {
             $this->call('migrate:rollback', [
-                '--database' => $database, '--force' => $force, '--path' => $path
+                '--database' => $database, '--force' => $force, '--path' => $path,
             ]);
         } elseif ($step > 0) {
             $this->call('migrate:rollback', [
