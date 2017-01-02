@@ -1,9 +1,10 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\SlackMessage;
 
-class NotificationSlackChannelTest extends PHPUnit_Framework_TestCase
+class NotificationSlackChannelTest extends TestCase
 {
     public function tearDown()
     {

@@ -1,11 +1,12 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Connectors\ConnectionFactory;
 
-class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase
+class DatabaseConnectionFactoryTest extends TestCase
 {
     protected $db;
 

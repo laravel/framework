@@ -1,8 +1,9 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
-class CacheRedisStoreTest extends PHPUnit_Framework_TestCase
+class CacheRedisStoreTest extends TestCase
 {
     public function tearDown()
     {

@@ -1,8 +1,9 @@
 <?php
 
 use Illuminate\Support\Fluent;
+use PHPUnit\Framework\TestCase;
 
-class SupportFluentTest extends PHPUnit_Framework_TestCase
+class SupportFluentTest extends TestCase
 {
     public function testAttributesAreSetByConstructor()
     {

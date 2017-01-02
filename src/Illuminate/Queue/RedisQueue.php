@@ -149,7 +149,7 @@ class RedisQueue extends Queue implements QueueContract
         if ($reserved) {
             return new RedisJob(
                 $this->container, $this, $job,
-                $reserved, $queue ?: $this->default
+                $reserved, $this->connectionName, $queue ?: $this->default
             );
         }
     }

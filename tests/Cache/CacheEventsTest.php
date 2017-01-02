@@ -1,12 +1,13 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\Events\CacheHit;
 use Illuminate\Cache\Events\KeyWritten;
 use Illuminate\Cache\Events\CacheMissed;
 use Illuminate\Cache\Events\KeyForgotten;
 
-class CacheEventTest extends PHPUnit_Framework_TestCase
+class CacheEventTest extends TestCase
 {
     public function tearDown()
     {

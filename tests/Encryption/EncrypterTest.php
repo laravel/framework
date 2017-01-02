@@ -1,8 +1,9 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
 use Illuminate\Encryption\Encrypter;
 
-class EncrypterTest extends PHPUnit_Framework_TestCase
+class EncrypterTest extends TestCase
 {
     public function testEncryption()
     {
@@ -10,6 +11,14 @@ class EncrypterTest extends PHPUnit_Framework_TestCase
         $encrypted = $e->encrypt('foo');
         $this->assertNotEquals('foo', $encrypted);
         $this->assertEquals('foo', $e->decrypt($encrypted));
+    }
+
+    public function testRawStringEncryption()
+    {
+        $e = new Encrypter(str_repeat('a', 16));
+        $encrypted = $e->encryptString('foo');
+        $this->assertNotEquals('foo', $encrypted);
+        $this->assertEquals('foo', $e->decryptString($encrypted));
     }
 
     public function testEncryptionUsingBase64EncodedKey()

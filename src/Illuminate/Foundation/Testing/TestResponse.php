@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation\Testing;
 
 use Closure;
-use Illuminate\Support\Str;
 use Illuminate\Http\Response;
 use Illuminate\Contracts\View\View;
 use PHPUnit_Framework_Assert as PHPUnit;
@@ -45,7 +44,10 @@ class TestResponse extends Response
     {
         $actual = $this->getStatusCode();
 
-        PHPUnit::assertTrue($actual === $status, "Expected status code {$status} but received {$actual}.");
+        PHPUnit::assertTrue(
+            $actual === $status,
+            "Expected status code {$status} but received {$actual}."
+        );
     }
 
     /**
@@ -110,20 +112,12 @@ class TestResponse extends Response
      */
     public function assertCookie($cookieName, $value = null, $encrypted = true)
     {
-        $headers = $this->headers;
+        PHPUnit::assertTrue(
+            $exists = $this->hasCookie($cookieName),
+            "Cookie [{$cookieName}] not present on response."
+        );
 
-        $exist = false;
-
-        foreach ($headers->getCookies() as $cookie) {
-            if ($cookie->getName() === $cookieName) {
-                $exist = true;
-                break;
-            }
-        }
-
-        PHPUnit::assertTrue($exist, "Cookie [{$cookieName}] not present on response.");
-
-        if (! $exist || is_null($value)) {
+        if (! $exists || is_null($value)) {
             return $this;
         }
 
@@ -136,6 +130,23 @@ class TestResponse extends Response
             $actual, $value,
             "Cookie [{$cookieName}] was found, but value [{$actual}] does not match [{$value}]."
         );
+    }
+
+    /**
+     * Determine if the response has a given cookie.
+     *
+     * @param  string  $cookieName
+     * @return bool
+     */
+    protected function hasCookie($cookieName)
+    {
+        foreach ($this->headers->getCookies() as $cookie) {
+            if ($cookie->getName() === $cookieName) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -170,28 +181,6 @@ class TestResponse extends Response
     }
 
     /**
-     * Format the given key and value into a JSON string for expectation checks.
-     *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @return string
-     */
-    protected function formatToExpectedJson($key, $value)
-    {
-        $expected = json_encode([$key => $value]);
-
-        if (Str::startsWith($expected, '{')) {
-            $expected = substr($expected, 1);
-        }
-
-        if (Str::endsWith($expected, '}')) {
-            $expected = substr($expected, 0, -1);
-        }
-
-        return trim($expected);
-    }
-
-    /**
      * Assert that the response view has a given piece of bound data.
      *
      * @param  string|array  $key
@@ -204,9 +193,7 @@ class TestResponse extends Response
             return $this->assertViewHasAll($key);
         }
 
-        if (! isset($this->original) || ! $this->original instanceof View) {
-            return PHPUnit::assertTrue(false, 'The response is not a view.');
-        }
+        $this->ensureResponseHasView();
 
         if (is_null($value)) {
             PHPUnit::assertArrayHasKey($key, $this->original->getData());
@@ -242,11 +229,21 @@ class TestResponse extends Response
      */
     public function assertViewMissing($key)
     {
+        $this->ensureResponseHasView();
+
+        PHPUnit::assertArrayNotHasKey($key, $this->original->getData());
+    }
+
+    /**
+     * Ensure that the response has a view as its original content.
+     *
+     * @return void
+     */
+    protected function ensureResponseHasView()
+    {
         if (! isset($this->original) || ! $this->original instanceof View) {
             return PHPUnit::fail('The response is not a view.');
         }
-
-        PHPUnit::assertArrayNotHasKey($key, $this->original->getData());
     }
 
     /**

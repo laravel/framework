@@ -1,8 +1,9 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\MemcachedStore;
 
-class CacheMemcachedStoreTest extends PHPUnit_Framework_TestCase
+class CacheMemcachedStoreTest extends TestCase
 {
     public function testGetReturnsNullWhenNotFound()
     {

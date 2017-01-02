@@ -1,9 +1,10 @@
 <?php
 
 use Illuminate\Routing\Route;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Routing\RouteCollection;
 
-class RouteCollectionTest extends PHPUnit_Framework_TestCase
+class RouteCollectionTest extends TestCase
 {
     /**
      * @var \Illuminate\Routing\RouteCollection
@@ -39,24 +40,6 @@ class RouteCollectionTest extends PHPUnit_Framework_TestCase
         ]));
         $this->assertInstanceOf(Route::class, $outputRoute);
         $this->assertEquals($inputRoute, $outputRoute);
-    }
-
-    public function testRouteCollectionAddRouteChangesCount()
-    {
-        $this->routeCollection->add(new Route('GET', 'foo', [
-            'uses' => 'FooController@index',
-            'as' => 'foo_index',
-        ]));
-        $this->assertCount(1, $this->routeCollection);
-    }
-
-    public function testRouteCollectionIsCountable()
-    {
-        $this->routeCollection->add(new Route('GET', 'foo', [
-            'uses' => 'FooController@index',
-            'as' => 'foo_index',
-        ]));
-        $this->assertCount(1, $this->routeCollection);
     }
 
     public function testRouteCollectionCanRetrieveByName()

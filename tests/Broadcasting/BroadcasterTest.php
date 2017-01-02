@@ -1,12 +1,13 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Routing\BindingRegistrar;
 use Illuminate\Broadcasting\Broadcasters\Broadcaster;
 
-class BroadcasterTest extends PHPUnit_Framework_TestCase
+class BroadcasterTest extends TestCase
 {
     public function tearDown()
     {

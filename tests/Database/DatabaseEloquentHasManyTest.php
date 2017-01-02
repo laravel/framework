@@ -1,10 +1,11 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase
+class DatabaseEloquentHasManyTest extends TestCase
 {
     public function tearDown()
     {

@@ -1,8 +1,9 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
-class SessionStoreTest extends PHPUnit_Framework_TestCase
+class SessionStoreTest extends TestCase
 {
     public function tearDown()
     {

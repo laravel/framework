@@ -1,5 +1,6 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Queue\WorkerOptions;
 use Illuminate\Queue\Events\JobFailed;
@@ -10,7 +11,7 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\MaxAttemptsExceededException;
 
-class QueueWorkerTest extends PHPUnit_Framework_TestCase
+class QueueWorkerTest extends TestCase
 {
     public $events;
     public $exceptionHandler;

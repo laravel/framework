@@ -2,10 +2,11 @@
 
 use Mockery as m;
 use Illuminate\Http\Request;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Contracts\Support\Jsonable;
 
-class HttpResponseTest extends PHPUnit_Framework_TestCase
+class HttpResponseTest extends TestCase
 {
     public function tearDown()
     {

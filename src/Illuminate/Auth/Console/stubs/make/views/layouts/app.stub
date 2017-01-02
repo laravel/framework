@@ -78,7 +78,7 @@
             </div>
         </nav>
 
-        @yield('content')
+        {{ $slot }}
     </div>
 
     <!-- Scripts -->

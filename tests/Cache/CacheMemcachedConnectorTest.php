@@ -1,8 +1,9 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
-class CacheMemcachedConnectorTest extends PHPUnit_Framework_TestCase
+class CacheMemcachedConnectorTest extends TestCase
 {
     public function tearDown()
     {

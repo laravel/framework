@@ -40,7 +40,7 @@ class RateLimiter
         }
 
         if ($this->attempts($key) > $maxAttempts) {
-            $this->cache->add($key.':lockout', Carbon::now()->getTimestamp() + ($decayMinutes * 60), $decayMinutes);
+            $this->lockout($key, $decayMinutes);
 
             $this->resetAttempts($key);
 
@@ -48,6 +48,19 @@ class RateLimiter
         }
 
         return false;
+    }
+
+    /**
+     * Add the lockout key to the cache.
+     *
+     * @param  int  $decayMinutes
+     * @return void
+     */
+    protected function lockout($key, $decayMinutes)
+    {
+        $this->cache->add(
+            $key.':lockout', Carbon::now()->getTimestamp() + ($decayMinutes * 60), $decayMinutes
+        );
     }
 
     /**

@@ -1,8 +1,9 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
-class QueueBeanstalkdJobTest extends PHPUnit_Framework_TestCase
+class QueueBeanstalkdJobTest extends TestCase
 {
     public function tearDown()
     {
@@ -59,6 +60,7 @@ class QueueBeanstalkdJobTest extends PHPUnit_Framework_TestCase
             m::mock('Illuminate\Container\Container'),
             m::mock('Pheanstalk\Pheanstalk'),
             m::mock('Pheanstalk\Job'),
+            'connection-name',
             'default'
         );
     }

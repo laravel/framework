@@ -204,17 +204,6 @@ abstract class Job
     }
 
     /**
-     * Set the name of the connection the job belongs to.
-     *
-     * @param  string  $name
-     * @return void
-     */
-    public function setConnectionName($name)
-    {
-        $this->connectionName = $name;
-    }
-
-    /**
      * Get the name of the queue the job belongs to.
      *
      * @return string

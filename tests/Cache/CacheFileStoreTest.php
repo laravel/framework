@@ -1,9 +1,10 @@
 <?php
 
 use Illuminate\Cache\FileStore;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
-class CacheFileStoreTest extends PHPUnit_Framework_TestCase
+class CacheFileStoreTest extends TestCase
 {
     public function testNullIsReturnedIfFileDoesntExist()
     {

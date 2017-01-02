@@ -687,10 +687,9 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      * (Overriding Container::make)
      *
      * @param  string  $abstract
-     * @param  array   $parameters
      * @return mixed
      */
-    public function make($abstract, array $parameters = [])
+    public function make($abstract)
     {
         $abstract = $this->getAlias($abstract);
 
@@ -698,7 +697,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             $this->loadDeferredProvider($abstract);
         }
 
-        return parent::make($abstract, $parameters);
+        return parent::make($abstract);
     }
 
     /**
@@ -821,6 +820,16 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     }
 
     /**
+     * Get the path to the cached services.php file.
+     *
+     * @return string
+     */
+    public function getCachedServicesPath()
+    {
+        return $this->bootstrapPath().'/cache/services.php';
+    }
+
+    /**
      * Determine if the application configuration is cached.
      *
      * @return bool
@@ -858,16 +867,6 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     public function getCachedRoutesPath()
     {
         return $this->bootstrapPath().'/cache/routes.php';
-    }
-
-    /**
-     * Get the path to the cached services.php file.
-     *
-     * @return string
-     */
-    public function getCachedServicesPath()
-    {
-        return $this->bootstrapPath().'/cache/services.php';
     }
 
     /**
@@ -975,6 +974,17 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     public function isDeferredService($service)
     {
         return isset($this->deferredServices[$service]);
+    }
+
+    /**
+     * Configure the real-time facade namespace.
+     *
+     * @param  string  $namespace
+     * @return void
+     */
+    public function provideFacades($namespace)
+    {
+        AliasLoader::setFacadeNamespace($namespace);
     }
 
     /**

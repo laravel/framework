@@ -1,8 +1,9 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
-class QueueRedisQueueTest extends PHPUnit_Framework_TestCase
+class QueueRedisQueueTest extends TestCase
 {
     public function tearDown()
     {

@@ -1,8 +1,9 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
-class FoundationEnvironmentDetectorTest extends PHPUnit_Framework_TestCase
+class FoundationEnvironmentDetectorTest extends TestCase
 {
     public function tearDown()
     {

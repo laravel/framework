@@ -1,12 +1,13 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Container\Container;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 
-class FoundationAuthorizesRequestsTraitTest extends PHPUnit_Framework_TestCase
+class FoundationAuthorizesRequestsTraitTest extends TestCase
 {
     public function test_basic_gate_check()
     {

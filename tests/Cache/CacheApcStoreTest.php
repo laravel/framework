@@ -1,6 +1,8 @@
 <?php
 
-class CacheApcStoreTest extends PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class CacheApcStoreTest extends TestCase
 {
     public function testGetReturnsNullWhenNotFound()
     {

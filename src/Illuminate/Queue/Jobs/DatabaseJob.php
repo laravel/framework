@@ -28,15 +28,17 @@ class DatabaseJob extends Job implements JobContract
      * @param  \Illuminate\Container\Container  $container
      * @param  \Illuminate\Queue\DatabaseQueue  $database
      * @param  \StdClass  $job
+     * @param  string  $connectionName
      * @param  string  $queue
      * @return void
      */
-    public function __construct(Container $container, DatabaseQueue $database, $job, $queue)
+    public function __construct(Container $container, DatabaseQueue $database, $job, $connectionName, $queue)
     {
         $this->job = $job;
         $this->queue = $queue;
         $this->database = $database;
         $this->container = $container;
+        $this->connectionName = $connectionName;
     }
 
     /**
