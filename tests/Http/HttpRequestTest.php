@@ -645,6 +645,10 @@ class HttpRequestTest extends TestCase
 
     public function testCreateFromBase()
     {
+        $query = [
+            'foobar' => 'bar'
+        ];
+
         $body = [
             'foo' => 'bar',
             'baz' => ['qux'],
@@ -654,11 +658,17 @@ class HttpRequestTest extends TestCase
             'CONTENT_TYPE' => 'application/json',
         ];
 
-        $base = SymfonyRequest::create('/', 'GET', [], [], [], $server, json_encode($body));
+        $base = SymfonyRequest::create('/', 'GET', $query, [], [], $server, json_encode($body));
 
         $request = Request::createFromBase($base);
 
         $this->assertEquals($request->request->all(), $body);
+
+        $base = SymfonyRequest::create('/', 'GET', $query, [], [], [], null);
+
+        $request = Request::createFromBase($base);
+
+        $this->assertEquals($request->request->all(), []);
     }
 
     /**
