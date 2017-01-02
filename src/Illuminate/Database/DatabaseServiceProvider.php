@@ -9,6 +9,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Database\Eloquent\QueueEntityResolver;
 use Illuminate\Database\Eloquent\Factory as EloquentFactory;
+use Illuminate\Database\Eloquent\TypeCaster as TypeCasterFactory;
 
 class DatabaseServiceProvider extends ServiceProvider
 {
@@ -36,6 +37,8 @@ class DatabaseServiceProvider extends ServiceProvider
         $this->registerEloquentFactory();
 
         $this->registerQueueableEntityResolver();
+
+        $this->registerTypeCasterFactory();
 
         // The connection factory is used to create the actual connection instances on
         // the database. We will inject the factory into the manager so that it may
@@ -85,4 +88,29 @@ class DatabaseServiceProvider extends ServiceProvider
             return new QueueEntityResolver;
         });
     }
+
+    /**
+     * Register the Type Caster factory.
+     *
+     * @return void
+     */
+    protected function registerTypeCasterFactory()
+    {
+        $this->app->singleton('typecaster', function ($app) {
+            return new TypeCasterFactory($app);
+        });
+    }
+
+    /**
+     * Get the services provided by the provider.
+     *
+     * @return array
+     */
+    public function provides()
+    {
+        return [
+            'typecaster',
+        ];
+    }
 }
+

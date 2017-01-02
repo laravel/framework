@@ -2929,9 +2929,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
                 return $this->asDateTime($value);
             case 'timestamp':
                 return $this->asTimeStamp($value);
-            default:
-                return $value;
         }
+
+        if ($this->castExists($key)) {
+            return $this->asCustom($key, $value);
+        }
+
+        return $value;
     }
 
     /**
@@ -3097,6 +3101,76 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected function asTimeStamp($value)
     {
         return $this->asDateTime($value)->getTimestamp();
+    }
+
+    /**
+     * Return the custom cast object.
+     *
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function asCustom($key, $value)
+    {
+        $cast = $this->castClass($key);
+
+        if ($value instanceof $cast) {
+            return $value;
+        }
+
+        $reflectionClass = new \ReflectionClass($cast);
+
+        return $reflectionClass->newInstanceArgs([$value] + $this->castParameters($key));
+    }
+
+    /**
+     * Has a custom cast type been defined for a model attribute and does it exist.
+     *
+     * @param  string $key
+     * @return bool
+     */
+    protected function castExists($key)
+    {
+        if (! $this->castClass($key)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Return the fully qualified custom class.
+     *
+     * @param  string $key
+     * @return string
+     */
+    protected function castClass($key)
+    {
+        if (strpos($cast = $this->getCasts()[$key], ',') !== false) {
+            $parameters = explode(',', $cast);
+
+            $cast = $parameters[0];
+        }
+
+        if (class_exists($cast)) {
+            return $cast;
+        }
+    }
+
+    /**
+     * Return an array of custom cast parameters.
+     *
+     * @param  string $key
+     * @return array
+     */
+    protected function castParameters($key)
+    {
+        if (strpos($cast = $this->getCasts()[$key], ',') !== false) {
+            $parameters = explode(',', $cast);
+
+            return $parameters;
+        }
+
+        return [];
     }
 
     /**
