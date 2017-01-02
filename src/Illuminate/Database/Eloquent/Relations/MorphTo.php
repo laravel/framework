@@ -3,6 +3,7 @@
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Collection as BaseCollection;
 
 class MorphTo extends BelongsTo {
@@ -51,6 +52,37 @@ class MorphTo extends BelongsTo {
 		$this->morphType = $type;
 
 		parent::__construct($query, $parent, $foreignKey, $otherKey, $relation);
+	}
+
+	/**
+	 * Add the constraints for a relationship count query.
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @param  \Illuminate\Database\Eloquent\Builder  $parent
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function getRelationCountQuery(Builder $query, Builder $parent)
+	{
+		$query->select(new Expression('count(*)'));
+
+		$model = $query->getModel();
+
+		$otherKey = $this->wrap($model->getQualifiedKeyName());
+
+		return $query->where([
+			$this->getQualifiedForeignKey() => new Expression($otherKey),
+			$this->getQualifiedMorphType() => $model->getMorphClass()
+		]);
+	}
+
+	/**
+	 * Get the fully qualified morph type expression of the relationship.
+	 *
+	 * @return string
+	 */
+	protected function getQualifiedMorphType()
+	{
+		return $this->parent->getTable().'.'.$this->morphType;
 	}
 
 	/**
