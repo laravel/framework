@@ -1119,7 +1119,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Drop the first {$limit} items from the collection.
      *
      * @param  int  $limit
-     * @return  static
+     * @return static
      */
     public function drop($limit)
     {
