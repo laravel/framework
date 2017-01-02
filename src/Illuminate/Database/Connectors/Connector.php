@@ -26,19 +26,6 @@ class Connector
     ];
 
     /**
-     * Get the PDO options based on the configuration.
-     *
-     * @param  array  $config
-     * @return array
-     */
-    public function getOptions(array $config)
-    {
-        $options = Arr::get($config, 'options', []);
-
-        return array_diff_key($this->options, $options) + $options;
-    }
-
-    /**
      * Create a new PDO connection.
      *
      * @param  string  $dsn
@@ -48,61 +35,15 @@ class Connector
      */
     public function createConnection($dsn, array $config, array $options)
     {
-        $username = Arr::get($config, 'username');
-
-        $password = Arr::get($config, 'password');
-
         try {
-            $pdo = $this->createPdoConnection($dsn, $username, $password, $options);
+            return $this->createPdoConnection(
+                $dsn, Arr::get($config, 'username'), Arr::get($config, 'password'), $options
+            );
         } catch (Exception $e) {
-            $pdo = $this->tryAgainIfCausedByLostConnection(
+            return $this->tryAgainIfCausedByLostConnection(
                 $e, $dsn, $username, $password, $options
             );
         }
-
-        return $pdo;
-    }
-
-    /**
-     * Get the default PDO connection options.
-     *
-     * @return array
-     */
-    public function getDefaultOptions()
-    {
-        return $this->options;
-    }
-
-    /**
-     * Set the default PDO connection options.
-     *
-     * @param  array  $options
-     * @return void
-     */
-    public function setDefaultOptions(array $options)
-    {
-        $this->options = $options;
-    }
-
-    /**
-     * Handle an exception that occurred during connect execution.
-     *
-     * @param  \Exception  $e
-     * @param  string  $dsn
-     * @param  string  $username
-     * @param  string  $password
-     * @param  array   $options
-     * @return \PDO
-     *
-     * @throws \Exception
-     */
-    protected function tryAgainIfCausedByLostConnection(Exception $e, $dsn, $username, $password, $options)
-    {
-        if ($this->causedByLostConnection($e)) {
-            return $this->createPdoConnection($dsn, $username, $password, $options);
-        }
-
-        throw $e;
     }
 
     /**
@@ -127,10 +68,62 @@ class Connector
      */
     protected function isPersistentConnection($options)
     {
-        if (isset($options[PDO::ATTR_PERSISTENT]) && $options[PDO::ATTR_PERSISTENT]) {
-            return true;
+        return isset($options[PDO::ATTR_PERSISTENT]) &&
+               $options[PDO::ATTR_PERSISTENT];
+    }
+
+    /**
+     * Handle an exception that occurred during connect execution.
+     *
+     * @param  \Exception  $e
+     * @param  string  $dsn
+     * @param  string  $username
+     * @param  string  $password
+     * @param  array   $options
+     * @return \PDO
+     *
+     * @throws \Exception
+     */
+    protected function tryAgainIfCausedByLostConnection(Exception $e, $dsn, $username, $password, $options)
+    {
+        if ($this->causedByLostConnection($e)) {
+            return $this->createPdoConnection($dsn, $username, $password, $options);
         }
 
-        return false;
+        throw $e;
+    }
+
+    /**
+     * Get the PDO options based on the configuration.
+     *
+     * @param  array  $config
+     * @return array
+     */
+    public function getOptions(array $config)
+    {
+        $options = Arr::get($config, 'options', []);
+
+        return array_diff_key($this->options, $options) + $options;
+    }
+
+    /**
+     * Get the default PDO connection options.
+     *
+     * @return array
+     */
+    public function getDefaultOptions()
+    {
+        return $this->options;
+    }
+
+    /**
+     * Set the default PDO connection options.
+     *
+     * @param  array  $options
+     * @return void
+     */
+    public function setDefaultOptions(array $options)
+    {
+        $this->options = $options;
     }
 }
