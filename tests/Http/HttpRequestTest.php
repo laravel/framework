@@ -646,7 +646,7 @@ class HttpRequestTest extends TestCase
     public function testCreateFromBase()
     {
         $query = [
-            'foobar' => 'bar'
+            'foobar' => 'bar',
         ];
 
         $body = [
