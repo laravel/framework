@@ -289,6 +289,17 @@ trait ManagesFrequencies
     }
 
     /**
+     * Schedule the event to run every X minutes.
+     *
+     * @param  int  $x
+     * @return $this
+     */
+    public function everyXMinutes($x)
+    {
+        return $this->spliceIntoPosition(1, "*/{$x}");
+    }
+
+    /**
      * Schedule the event to run every five minutes.
      *
      * @return $this
