@@ -33,10 +33,20 @@ class DatabaseServiceProvider extends ServiceProvider
     {
         Model::clearBootedModels();
 
+        $this->registerPrimaryServices();
+
         $this->registerEloquentFactory();
 
         $this->registerQueueableEntityResolver();
+    }
 
+    /**
+     * Register the primary database bindings.
+     *
+     * @return void
+     */
+    protected function registerPrimaryServices()
+    {
         // The connection factory is used to create the actual connection instances on
         // the database. We will inject the factory into the manager so that it may
         // make the connections while they are actually needed and not of before.
