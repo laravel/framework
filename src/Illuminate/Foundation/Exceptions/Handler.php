@@ -112,6 +112,8 @@ class Handler implements ExceptionHandlerContract
             return $e->getResponse();
         } elseif ($e instanceof AuthenticationException) {
             return $this->unauthenticated($request, $e);
+        } elseif ($e instanceof AuthorizationException) {
+            return $this->unauthorized($request, $e);            
         } elseif ($e instanceof ValidationException) {
             return $this->convertValidationExceptionToResponse($e, $request);
         }
@@ -129,8 +131,6 @@ class Handler implements ExceptionHandlerContract
     {
         if ($e instanceof ModelNotFoundException) {
             $e = new NotFoundHttpException($e->getMessage(), $e);
-        } elseif ($e instanceof AuthorizationException) {
-            $e = new HttpException(403, $e->getMessage());
         }
 
         return $e;
