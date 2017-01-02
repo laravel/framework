@@ -249,13 +249,13 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileEscapedEchos($value)
 	{
-		$pattern = sprintf('/%s\s*(.+?)\s*%s(\r?\n)?/s', $this->escapedTags[0], $this->escapedTags[1]);
+		$pattern = sprintf('/(@)?%s\s*(.+?)\s*%s(\r?\n)?/s', $this->escapedTags[0], $this->escapedTags[1]);
 
 		$callback = function($matches)
 		{
-			$whitespace = empty($matches[2]) ? '' : $matches[2].$matches[2];
+			$whitespace = empty($matches[3]) ? '' : $matches[3].$matches[3];
 
-			return '<?php echo e('.$this->compileEchoDefaults($matches[1]).'); ?>'.$whitespace;
+			return $matches[1] ? substr($matches[0], 1) : '<?php echo e('.$this->compileEchoDefaults($matches[2]).'); ?>'.$whitespace;
 		};
 
 		return preg_replace_callback($pattern, $callback, $value);
