@@ -33,7 +33,7 @@ class DatabaseServiceProvider extends ServiceProvider
     {
         Model::clearBootedModels();
 
-        $this->registerPrimaryServices();
+        $this->registerConnectionServices();
 
         $this->registerEloquentFactory();
 
@@ -45,7 +45,7 @@ class DatabaseServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function registerPrimaryServices()
+    protected function registerConnectionServices()
     {
         // The connection factory is used to create the actual connection instances on
         // the database. We will inject the factory into the manager so that it may
