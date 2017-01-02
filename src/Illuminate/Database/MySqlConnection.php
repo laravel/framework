@@ -12,6 +12,16 @@ use Illuminate\Database\Schema\Grammars\MySqlGrammar as SchemaGrammar;
 class MySqlConnection extends Connection
 {
     /**
+     * Get the default query grammar instance.
+     *
+     * @return \Illuminate\Database\Query\Grammars\MySqlGrammar
+     */
+    protected function getDefaultQueryGrammar()
+    {
+        return $this->withTablePrefix(new QueryGrammar);
+    }
+
+    /**
      * Get a schema builder instance for the connection.
      *
      * @return \Illuminate\Database\Schema\MySqlBuilder
@@ -23,16 +33,6 @@ class MySqlConnection extends Connection
         }
 
         return new MySqlBuilder($this);
-    }
-
-    /**
-     * Get the default query grammar instance.
-     *
-     * @return \Illuminate\Database\Query\Grammars\MySqlGrammar
-     */
-    protected function getDefaultQueryGrammar()
-    {
-        return $this->withTablePrefix(new QueryGrammar);
     }
 
     /**

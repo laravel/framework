@@ -36,6 +36,27 @@ class Connection implements ConnectionInterface
     protected $readPdo;
 
     /**
+     * The name of the connected database.
+     *
+     * @var string
+     */
+    protected $database;
+
+    /**
+     * The table prefix for the connection.
+     *
+     * @var string
+     */
+    protected $tablePrefix = '';
+
+    /**
+     * The database connection configuration options.
+     *
+     * @var array
+     */
+    protected $config = [];
+
+    /**
      * The reconnector instance for the connection.
      *
      * @var callable
@@ -78,20 +99,6 @@ class Connection implements ConnectionInterface
     protected $fetchMode = PDO::FETCH_OBJ;
 
     /**
-     * The argument for the fetch mode.
-     *
-     * @var mixed
-     */
-    protected $fetchArgument;
-
-    /**
-     * The constructor arguments for the PDO::FETCH_CLASS fetch mode.
-     *
-     * @var array
-     */
-    protected $fetchConstructorArgument = [];
-
-    /**
      * The number of active transactions.
      *
      * @var int
@@ -120,32 +127,11 @@ class Connection implements ConnectionInterface
     protected $pretending = false;
 
     /**
-     * The name of the connected database.
-     *
-     * @var string
-     */
-    protected $database;
-
-    /**
      * The instance of Doctrine connection.
      *
      * @var \Doctrine\DBAL\Connection
      */
     protected $doctrineConnection;
-
-    /**
-     * The table prefix for the connection.
-     *
-     * @var string
-     */
-    protected $tablePrefix = '';
-
-    /**
-     * The database connection configuration options.
-     *
-     * @var array
-     */
-    protected $config = [];
 
     /**
      * Create a new database connection instance.
@@ -275,17 +261,6 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Get a new raw query expression.
-     *
-     * @param  mixed  $value
-     * @return \Illuminate\Database\Query\Expression
-     */
-    public function raw($value)
-    {
-        return new Expression($value);
-    }
-
-    /**
      * Run a select statement and return a single result.
      *
      * @param  string  $query
@@ -323,7 +298,7 @@ class Connection implements ConnectionInterface
     public function select($query, $bindings = [], $useReadPdo = true)
     {
         return $this->run($query, $bindings, function ($me, $query, $bindings) use ($useReadPdo) {
-            if ($me->pretending()) {
+            if ($this->pretending()) {
                 return [];
             }
 
@@ -332,22 +307,11 @@ class Connection implements ConnectionInterface
             // row from the database table, and will either be an array or objects.
             $statement = $this->getPdoForSelect($useReadPdo)->prepare($query);
 
-            $me->bindValues($statement, $me->prepareBindings($bindings));
+            $this->bindValues($statement, $this->prepareBindings($bindings));
 
             $statement->execute();
 
-            $fetchMode = $me->getFetchMode();
-            $fetchArgument = $me->getFetchArgument();
-            $fetchConstructorArgument = $me->getFetchConstructorArgument();
-
-            if ($fetchMode === PDO::FETCH_CLASS && ! isset($fetchArgument)) {
-                $fetchArgument = 'StdClass';
-                $fetchConstructorArgument = null;
-            }
-
-            return isset($fetchArgument)
-                ? $statement->fetchAll($fetchMode, $fetchArgument, $fetchConstructorArgument)
-                : $statement->fetchAll($fetchMode);
+            return $statement->fetchAll($this->fetchMode);
         });
     }
 
@@ -366,25 +330,21 @@ class Connection implements ConnectionInterface
                 return [];
             }
 
-            $statement = $this->getPdoForSelect($useReadPdo)->prepare($query);
+            // First we will create a statement for the query. Then, we will set the fetch
+            // mode and prepare the bindings for the query. Once that's done we will be
+            // ready to execute the query against the database and return the cursor.
+            $statement = $this->getPdoForSelect($useReadPdo)
+                            ->prepare($query);
 
-            $fetchMode = $me->getFetchMode();
-            $fetchArgument = $me->getFetchArgument();
-            $fetchConstructorArgument = $me->getFetchConstructorArgument();
+            $statement->setFetchMode($this->fetchMode);
 
-            if ($fetchMode === PDO::FETCH_CLASS && ! isset($fetchArgument)) {
-                $fetchArgument = 'StdClass';
-                $fetchConstructorArgument = null;
-            }
+            $me->bindValues(
+                $statement, $me->prepareBindings($bindings)
+            );
 
-            if (isset($fetchArgument)) {
-                $statement->setFetchMode($fetchMode, $fetchArgument, $fetchConstructorArgument);
-            } else {
-                $statement->setFetchMode($fetchMode);
-            }
-
-            $me->bindValues($statement, $me->prepareBindings($bindings));
-
+            // Next, we'll execute the query against the database and return the statement
+            // so we can return the cursor. The cursor will use a PHP generator to give
+            // back one row at a time without using a bunch of memory to render them.
             $statement->execute();
 
             return $statement;
@@ -901,6 +861,17 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Get a new raw query expression.
+     *
+     * @param  mixed  $value
+     * @return \Illuminate\Database\Query\Expression
+     */
+    public function raw($value)
+    {
+        return new Expression($value);
+    }
+
+    /**
      * Get the elapsed time since a given starting point.
      *
      * @param  int    $start
@@ -1159,51 +1130,6 @@ class Connection implements ConnectionInterface
     public function pretending()
     {
         return $this->pretending === true;
-    }
-
-    /**
-     * Get the default fetch mode for the connection.
-     *
-     * @return int
-     */
-    public function getFetchMode()
-    {
-        return $this->fetchMode;
-    }
-
-    /**
-     * Get the fetch argument to be applied when selecting.
-     *
-     * @return mixed
-     */
-    public function getFetchArgument()
-    {
-        return $this->fetchArgument;
-    }
-
-    /**
-     * Get custom constructor arguments for the PDO::FETCH_CLASS fetch mode.
-     *
-     * @return array
-     */
-    public function getFetchConstructorArgument()
-    {
-        return $this->fetchConstructorArgument;
-    }
-
-    /**
-     * Set the default fetch mode for the connection, and optional arguments for the given fetch mode.
-     *
-     * @param  int  $fetchMode
-     * @param  mixed  $fetchArgument
-     * @param  array  $fetchConstructorArgument
-     * @return int
-     */
-    public function setFetchMode($fetchMode, $fetchArgument = null, array $fetchConstructorArgument = [])
-    {
-        $this->fetchMode = $fetchMode;
-        $this->fetchArgument = $fetchArgument;
-        $this->fetchConstructorArgument = $fetchConstructorArgument;
     }
 
     /**
