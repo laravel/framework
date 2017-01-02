@@ -1740,7 +1740,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 
     public function testDropNegativeLimit()
     {
-        $expected = [2 => 'baz'];
+        $expected = [0 => 'foo'];
         $collection = new Collection(['foo', 'bar', 'baz']);
 
         $this->assertEquals($expected, $collection->drop(-2)->toArray());

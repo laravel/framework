@@ -1124,10 +1124,10 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function drop($limit)
     {
         if ($limit < 0) {
-            $limit = abs($limit);
+            return $this->slice(0, $limit);
         }
 
-        return $this->slice($limit, $this->count());
+        return $this->slice($limit);
     }
 
     /**
