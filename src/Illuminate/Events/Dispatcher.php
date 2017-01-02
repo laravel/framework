@@ -180,9 +180,32 @@ class Dispatcher implements DispatcherContract
      *
      * @return string
      */
+    public function dispatching()
+    {
+        return $this->firing();
+    }
+
+    /**
+     * Get the event that is currently firing.
+     *
+     * @return string
+     */
     public function firing()
     {
         return last($this->firing);
+    }
+
+    /**
+     * Fire an event and call the listeners.
+     *
+     * @param  string|object  $event
+     * @param  mixed  $payload
+     * @param  bool  $halt
+     * @return array|null
+     */
+    public function dispatch($event, $payload = [], $halt = false)
+    {
+        return $this->fire($event, $payload, $halt);
     }
 
     /**
