@@ -9,6 +9,6 @@ interface ExceptionDisplayerInterface {
 	 *
 	 * @param  \Exception  $exception
 	 */
-	public function display(Exception $exception);
+	public function display(\Throwable $exception);
 
 }
