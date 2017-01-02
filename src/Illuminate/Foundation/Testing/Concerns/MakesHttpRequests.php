@@ -2,12 +2,12 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
-use Illuminate\Foundation\Testing\TestResponse;
 use Illuminate\Contracts\Http\Kernel as HttpKernel;
-use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use Illuminate\Foundation\Testing\TestResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
+use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 trait MakesHttpRequests
 {
@@ -77,11 +77,11 @@ trait MakesHttpRequests
      * @param  array  $headers
      * @return $this
      */
-    public function post($uri, array $data = [], array $headers = [])
+    public function post($uri, array $data = [], array $headers = [], array $files = [])
     {
         $server = $this->transformHeadersToServerVars($headers);
 
-        return $this->call('POST', $uri, $data, [], [], $server);
+        return $this->call('POST', $uri, $data, [], $files, $server);
     }
 
     /**
@@ -105,11 +105,11 @@ trait MakesHttpRequests
      * @param  array  $headers
      * @return $this
      */
-    public function put($uri, array $data = [], array $headers = [])
+    public function put($uri, array $data = [], array $headers = [], array $files = [])
     {
         $server = $this->transformHeadersToServerVars($headers);
 
-        return $this->call('PUT', $uri, $data, [], [], $server);
+        return $this->call('PUT', $uri, $data, [], $files, $server);
     }
 
     /**
@@ -133,11 +133,11 @@ trait MakesHttpRequests
      * @param  array  $headers
      * @return $this
      */
-    public function patch($uri, array $data = [], array $headers = [])
+    public function patch($uri, array $data = [], array $headers = [], array $files = [])
     {
         $server = $this->transformHeadersToServerVars($headers);
 
-        return $this->call('PATCH', $uri, $data, [], [], $server);
+        return $this->call('PATCH', $uri, $data, [], $files, $server);
     }
 
     /**
@@ -253,8 +253,8 @@ trait MakesHttpRequests
             $uri = substr($uri, 1);
         }
 
-        if (! Str::startsWith($uri, 'http')) {
-            $uri = config('app.url').'/'.$uri;
+        if (!Str::startsWith($uri, 'http')) {
+            $uri = config('app.url') . '/' . $uri;
         }
 
         return trim($uri, '/');
@@ -274,8 +274,8 @@ trait MakesHttpRequests
         foreach ($headers as $name => $value) {
             $name = strtr(strtoupper($name), '-', '_');
 
-            if (! Str::startsWith($name, $prefix) && $name != 'CONTENT_TYPE') {
-                $name = $prefix.$name;
+            if (!Str::startsWith($name, $prefix) && $name != 'CONTENT_TYPE') {
+                $name = $prefix . $name;
             }
 
             $server[$name] = $value;
