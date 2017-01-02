@@ -1,7 +1,8 @@
 <?php
 
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Console\Scheduling\ManagesFrequencies;
+use Illuminate\Console\Scheduling\Event;
 
 class FrequencyTest extends TestCase
 {
@@ -12,19 +13,10 @@ class FrequencyTest extends TestCase
 
     public function setUp()
     {
-        /*
-         * Fake the Illuminate\Console\Scheduling\Event class
-         */
-        $this->event = new class {
-            use ManagesFrequencies;
-
-            public $expression = '* * * * * *';
-
-            public function getExpression()
-            {
-                return $this->expression;
-            }
-        };
+        $this->event = new Event(
+            m::mock('Illuminate\Contracts\Cache\Repository'),
+            'php foo'
+        );
     }
 
     public function testEveryMinute()
