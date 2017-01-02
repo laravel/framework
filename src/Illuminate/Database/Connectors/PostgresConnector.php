@@ -164,7 +164,7 @@ class PostgresConnector extends Connector implements ConnectorInterface
     protected function addSslOptions($dsn, array $config)
     {
         foreach (['sslmode', 'sslcert', 'sslkey', 'sslrootcert'] as $option) {
-            if (isset($config[$options])) {
+            if (isset($config[$option])) {
                 $dsn .= ";{$option}={$config[$option]}";
             }
         }
