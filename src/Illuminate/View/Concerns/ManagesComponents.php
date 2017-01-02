@@ -46,9 +46,9 @@ trait ManagesComponents
         if (ob_start()) {
             $this->componentStack[] = $name;
 
-            $this->componentData[$name] = $data;
+            $this->componentData[$this->currentComponent()] = $data;
 
-            $this->slots[$name] = [];
+            $this->slots[$this->currentComponent()] = [];
         }
     }
 
@@ -61,9 +61,7 @@ trait ManagesComponents
     {
         $name = array_pop($this->componentStack);
 
-        return tap($this->make($name, $this->componentData($name))->render(), function () use ($name) {
-            $this->resetComponent($name);
-        });
+        return $this->make($name, $this->componentData($name))->render();
     }
 
     /**
@@ -74,9 +72,11 @@ trait ManagesComponents
      */
     protected function componentData($name)
     {
-        $slot = ['slot' => new HtmlString(trim(ob_get_clean()))];
-
-        return array_merge($this->componentData[$name], $slot, $this->slots[$name]);
+        return array_merge(
+            $this->componentData[count($this->componentStack)],
+            ['slot' => new HtmlString(trim(ob_get_clean()))],
+            $this->slots[count($this->componentStack)]
+        );
     }
 
     /**
@@ -88,9 +88,9 @@ trait ManagesComponents
     public function slot($name)
     {
         if (ob_start()) {
-            $this->slots[last($this->componentStack)][$name] = '';
+            $this->slots[$this->currentComponent()][$name] = '';
 
-            $this->slotStack[last($this->componentStack)][] = $name;
+            $this->slotStack[$this->currentComponent()][] = $name;
         }
     }
 
@@ -103,21 +103,21 @@ trait ManagesComponents
     {
         $current = last($this->componentStack);
 
-        $currentSlot = array_pop($this->slotStack[$current]);
+        $currentSlot = array_pop(
+            $this->slotStack[$this->currentComponent()]
+        );
 
-        $this->slots[$current][$currentSlot] = new HtmlString(trim(ob_get_clean()));
+        $this->slots[$this->currentComponent()]
+                    [$currentSlot] = new HtmlString(trim(ob_get_clean()));
     }
 
     /**
-     * Reset the state for the given component.
+     * Get the index for the current component.
      *
-     * @param  string  $name
-     * @return void
+     * @return int
      */
-    protected function resetComponent($name)
+    protected function currentComponent()
     {
-        unset($this->slots[$name]);
-        unset($this->slotStack[$name]);
-        unset($this->componentData[$name]);
+        return count($this->componentStack) - 1;
     }
 }
