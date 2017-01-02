@@ -66,6 +66,8 @@ class FileStore implements StoreInterface {
 		}
 		catch (\Exception $e)
 		{
+			$this->forget($key);
+
 			return array('data' => null, 'time' => null);
 		}
 
@@ -79,7 +81,16 @@ class FileStore implements StoreInterface {
 			return array('data' => null, 'time' => null);
 		}
 
-		$data = unserialize(substr($contents, 10));
+		// Stored cache may be corrupted
+		$contents = substr($contents, 10);
+		if( ! is_serialized($contents))
+		{
+			$this->forget($key);
+
+			return array('data' => null, 'time' => null);
+		}
+
+		$data = unserialize( $contents );
 
 		// Next, we'll extract the number of minutes that are remaining for a cache
 		// so that we can properly retain the time for things like the increment
@@ -103,7 +114,7 @@ class FileStore implements StoreInterface {
 
 		$this->createCacheDirectory($path = $this->path($key));
 
-		$this->files->put($path, $value);
+		$this->files->put($path, $value, true);
 	}
 
 	/**
