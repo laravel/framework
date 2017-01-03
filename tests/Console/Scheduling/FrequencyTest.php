@@ -107,7 +107,7 @@ class FrequencyTest extends TestCase
 
     public function testFrequencyMacro()
     {
-        Event::macro('everyXMinutes', function($x) {
+        Event::macro('everyXMinutes', function ($x) {
             return $this->spliceIntoPosition(1, "*/{$x}");
         });
 
