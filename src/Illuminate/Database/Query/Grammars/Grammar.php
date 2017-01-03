@@ -44,13 +44,21 @@ class Grammar extends BaseGrammar
      */
     public function compileSelect(Builder $query)
     {
+        // If the query does not have any columns set, we'll set the columns to the
+        // * character to just get all of the columns from the database. Then we
+        // can build the query and concatenate all the pieces together as one.
         $original = $query->columns;
 
         if (is_null($query->columns)) {
             $query->columns = ['*'];
         }
 
-        $sql = trim($this->concatenate($this->compileComponents($query)));
+        // To compile the query, we'll spin through each component of the query and
+        // see if that component exists. If it does we'll just call the compiler
+        // function for the component which is responsible for making the SQL.
+        $sql = trim($this->concatenate(
+            $this->compileComponents($query))
+        );
 
         $query->columns = $original;
 
@@ -144,17 +152,11 @@ class Grammar extends BaseGrammar
      */
     protected function compileJoins(Builder $query, $joins)
     {
-        $sql = [];
-
-        foreach ($joins as $join) {
-            $conditions = $this->compileWheres($join);
-
+        return collect($joins)->map(function ($join) use ($query) {
             $table = $this->wrapTable($join->table);
 
-            $sql[] = trim("{$join->type} join {$table} {$conditions}");
-        }
-
-        return implode(' ', $sql);
+            return trim("{$join->type} join {$table} {$this->compileWheres($join)}");
+        })->implode(' ');
     }
 
     /**
