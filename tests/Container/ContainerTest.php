@@ -121,7 +121,6 @@ class ContainerContainerTest extends TestCase
     {
         $container = new Container;
         $container['foo'] = 'bar';
-        $foo = $container['foo'];
         $container['foo'] = 'baz';
         $this->assertEquals('baz', $container['foo']);
     }
