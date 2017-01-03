@@ -22,18 +22,18 @@ trait ManagesTransactions
         for ($currentAttempt = 1; $currentAttempt <= $attempts; $currentAttempt++) {
             $this->beginTransaction();
 
-            // We'll simply execute the given callback within a try / catch block
-            // and if we catch any exception we can rollback the transaction
-            // so that none of the changes are persisted to the database.
+            // We'll simply execute the given callback within a try / catch block and if we
+            // catch any exception we can rollback this transaction so that none of this
+            // gets actually persisted to a database or stored in a permanent fashion.
             try {
                 return tap($callback($this), function ($result) {
                     $this->commit();
                 });
             }
 
-            // If we catch an exception, we will roll back so nothing gets messed
-            // up in the database. Then we'll re-throw the exception so it can
-            // be handled how the developer sees fit for their applications.
+            // If we catch an exception we'll rollback this transaction and try again if we
+            // are not out of attempts. If we are out of attempts we will just throw the
+            // exception back out and let the developer handle an uncaught exceptions.
             catch (Exception $e) {
                 $this->handleTransactionException(
                     $e, $currentAttempt, $attempts
