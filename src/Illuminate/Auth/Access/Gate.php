@@ -197,12 +197,10 @@ class Gate implements GateContract
     public function check($ability, $arguments = [])
     {
         try {
-            $result = $this->raw($ability, $arguments);
+            return (bool) $this->raw($ability, $arguments);
         } catch (AuthorizationException $e) {
             return false;
         }
-
-        return (bool) $result;
     }
 
     /**
