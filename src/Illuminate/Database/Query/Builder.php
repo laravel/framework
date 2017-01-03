@@ -479,6 +479,22 @@ class Builder
     }
 
     /**
+     * Merge an array of where clauses and bindings.
+     *
+     * @param  array  $wheres
+     * @param  array  $bindings
+     * @return void
+     */
+    public function mergeWheres($wheres, $bindings)
+    {
+        $this->wheres = array_merge((array) $this->wheres, (array) $wheres);
+
+        $this->bindings['where'] = array_values(
+            array_merge($this->bindings['where'], (array) $bindings)
+        );
+    }
+
+    /**
      * Add a basic where clause to the query.
      *
      * @param  string|array|\Closure  $column
@@ -2123,46 +2139,35 @@ class Builder
      */
     public function insert(array $values)
     {
+        // Since every insert gets treated like a batch insert, we will make sure the
+        // bindings are structured in a way that is convenient when building these
+        // inserts statements by verifying these elements are actually an array.
         if (empty($values)) {
             return true;
         }
 
-        // Since every insert gets treated like a batch insert, we will make sure the
-        // bindings are structured in a way that is convenient for building these
-        // inserts statements by verifying the elements are actually an array.
         if (! is_array(reset($values))) {
             $values = [$values];
         }
 
-        // Since every insert gets treated like a batch insert, we will make sure the
-        // bindings are structured in a way that is convenient for building these
-        // inserts statements by verifying the elements are actually an array.
+        // Here, we will sort the insert keys for every record so that each insert is
+        // in the same order for the record. We need to make sure this is the case
+        // so there are not any errors or problems when inserting these records.
         else {
             foreach ($values as $key => $value) {
                 ksort($value);
+
                 $values[$key] = $value;
             }
         }
 
-        // We'll treat every insert like a batch insert so we can easily insert each
-        // of the records into the database consistently. This will make it much
-        // easier on the grammars to just handle one type of record insertion.
-        $bindings = [];
-
-        foreach ($values as $record) {
-            foreach ($record as $value) {
-                $bindings[] = $value;
-            }
-        }
-
-        $sql = $this->grammar->compileInsert($this, $values);
-
-        // Once we have compiled the insert statement's SQL we can execute it on the
-        // connection and return a result as a boolean success indicator as that
-        // is the same type of result returned by the raw connection instance.
-        $bindings = $this->cleanBindings($bindings);
-
-        return $this->connection->insert($sql, $bindings);
+        // Finally, we will run this query against the database connection and return
+        // the results. We will need to also flatten these bindings before running
+        // the query so they are all in one huge, flattened array for execution.
+        return $this->connection->insert(
+            $this->grammar->compileInsert($this, $values),
+            $this->cleanBindings(Arr::flatten($values, 1))
+        );
     }
 
     /**
@@ -2262,16 +2267,16 @@ class Builder
      */
     public function delete($id = null)
     {
-        // If an ID is passed to the method, we will set the where clause to check
-        // the ID to allow developers to simply and quickly remove a single row
-        // from their database without manually specifying the where clauses.
+        // If an ID is passed to the method, we will set the where clause to check the
+        // ID to let developers to simply and quickly remove a single row from this
+        // database without manually specifying the "where" clauses on the query.
         if (! is_null($id)) {
             $this->where($this->from.'.id', '=', $id);
         }
 
-        $sql = $this->grammar->compileDelete($this);
-
-        return $this->connection->delete($sql, $this->getBindings());
+        return $this->connection->delete(
+            $this->grammar->compileDelete($this), $this->getBindings()
+        );
     }
 
     /**
@@ -2294,33 +2299,6 @@ class Builder
     public function newQuery()
     {
         return new static($this->connection, $this->grammar, $this->processor);
-    }
-
-    /**
-     * Merge an array of where clauses and bindings.
-     *
-     * @param  array  $wheres
-     * @param  array  $bindings
-     * @return void
-     */
-    public function mergeWheres($wheres, $bindings)
-    {
-        $this->wheres = array_merge((array) $this->wheres, (array) $wheres);
-
-        $this->bindings['where'] = array_values(array_merge($this->bindings['where'], (array) $bindings));
-    }
-
-    /**
-     * Remove all of the expressions from a list of bindings.
-     *
-     * @param  array  $bindings
-     * @return array
-     */
-    protected function cleanBindings(array $bindings)
-    {
-        return array_values(array_filter($bindings, function ($binding) {
-            return ! $binding instanceof Expression;
-        }));
     }
 
     /**
@@ -2409,6 +2387,19 @@ class Builder
         $this->bindings = array_merge_recursive($this->bindings, $query->bindings);
 
         return $this;
+    }
+
+    /**
+     * Remove all of the expressions from a list of bindings.
+     *
+     * @param  array  $bindings
+     * @return array
+     */
+    protected function cleanBindings(array $bindings)
+    {
+        return array_values(array_filter($bindings, function ($binding) {
+            return ! $binding instanceof Expression;
+        }));
     }
 
     /**
