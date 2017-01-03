@@ -80,11 +80,11 @@ class NotificationSender
         foreach ($notifiables as $notifiable) {
             $notificationId = Uuid::uuid4()->toString();
 
-            if (empty($channels = $channels ?: $notification->via($notifiable))) {
+            if (empty($viaChannels = $channels ?: $notification->via($notifiable))) {
                 continue;
             }
 
-            foreach ($channels as $channel) {
+            foreach ($viaChannels as $channel) {
                 $this->sendToNotifiable($notifiable, $notificationId, clone $original, $channel);
             }
         }
