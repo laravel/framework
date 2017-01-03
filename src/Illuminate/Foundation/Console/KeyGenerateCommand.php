@@ -51,11 +51,17 @@ class KeyGenerateCommand extends Command
      */
     protected function setKeyInEnvironmentFile($key)
     {
-        file_put_contents($this->laravel->environmentFilePath(), str_replace(
-            'APP_KEY='.$this->laravel['config']['app.key'],
-            'APP_KEY='.$key,
-            file_get_contents($this->laravel->environmentFilePath())
-        ));
+        $contents = file_get_contents($this->laravel->environmentFilePath());
+        $prefix = 'APP_KEY=';
+        if(strpos($contents, $prefix) === false) {
+            $search = $contents;
+            $replace = $prefix.$key . "\n" . $contents;
+        } else {
+            $search = $prefix.$this->laravel['config']['app.key'];
+            $replace = $prefix.$key;
+        }
+
+        file_put_contents($this->laravel->environmentFilePath(), str_replace($search, $replace, $contents));
     }
 
     /**
