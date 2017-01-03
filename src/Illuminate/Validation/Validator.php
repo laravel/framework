@@ -1338,8 +1338,10 @@ class Validator implements ValidatorContract
 
         $attributeData = $this->extractDataFromPath($explicitPath);
 
-        $data = Arr::where(Arr::dot($attributeData), function ($value, $key) use ($attribute, $attributeName) {
-            return $key != $attribute && Str::is($attributeName, $key);
+        $pattern = str_replace('\*', '[^.]+', preg_quote($attributeName, '#'));
+
+        $data = Arr::where(Arr::dot($attributeData), function ($value, $key) use ($attribute, $attributeName, $pattern) {
+            return $key != $attribute && (bool) preg_match('#^'.$pattern.'\z#u', $key);
         });
 
         return ! in_array($value, array_values($data));
