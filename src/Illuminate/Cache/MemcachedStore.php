@@ -199,7 +199,7 @@ class MemcachedStore extends TaggableStore implements Store
      */
     protected function toTimestamp($minutes)
     {
-        return $minutes > 0 ? Carbon::now()->addMinutes($minutes)->getTimestamp() : 0;
+        return $minutes > 0 ? Carbon::now()->addSeconds($minutes * 60)->getTimestamp() : 0;
     }
 
     /**
