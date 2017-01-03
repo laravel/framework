@@ -192,6 +192,7 @@ class Builder
     protected $operators = [
         '=', '<', '>', '<=', '>=', '<>', '!=',
         'like', 'like binary', 'not like', 'between', 'ilike',
+        'in', 'not in',
         '&', '|', '^', '<<', '>>',
         'rlike', 'regexp', 'not regexp',
         '~', '~*', '!~', '!~*', 'similar to',
@@ -493,6 +494,12 @@ class Builder
             return $this->addArrayOfWheres($column, $boolean);
         }
 
+        // If the operator is an array, we will assume it is an array of possible values
+        // for column and can perform whereIn query.
+        if (is_array($operator)) {
+            return $this->whereIn($column, $operator, $boolean);
+        }
+
         // Here we will make some assumptions about the operator. If only 2 values are
         // passed to the method, we will assume that the operator is an equals sign
         // and keep going. Otherwise, we'll require the operator to be passed in.
@@ -529,10 +536,7 @@ class Builder
             return $this->whereNull($column, $boolean, $operator != '=');
         }
 
-        // Now that we are working with just a simple query we can put the elements
-        // in our array and add the query binding to our array of bindings that
-        // will be bound to each SQL statements when it is finally executed.
-        $type = 'Basic';
+        $type = $this->determineWhereType($operator, $value);
 
         if (Str::contains($column, '->') && is_bool($value)) {
             $value = new Expression($value ? 'true' : 'false');
@@ -540,8 +544,13 @@ class Builder
 
         $this->wheres[] = compact('type', 'column', 'operator', 'value', 'boolean');
 
-        if (! $value instanceof Expression) {
+        // Now that we are working with just a simple query we can put the elements
+        // in our array and depending on the type of value add the query binding or bindings to our array of bindings
+        // that will be bound to each SQL statements when it is finally executed.
+        if (! $value instanceof Expression && ! is_array($value)) {
             $this->addBinding($value, 'where');
+        } elseif (is_array($value)) {
+            $this->addBindings($value, 'where');
         }
 
         return $this;
@@ -910,13 +919,9 @@ class Builder
             $values = $values->toArray();
         }
 
-        $this->wheres[] = compact('type', 'column', 'values', 'boolean');
+        $this->wheres[] = array_merge(compact('type', 'column', 'boolean'), ['value' => $values]);
 
-        foreach ($values as $value) {
-            if (! $value instanceof Expression) {
-                $this->addBinding($value, 'where');
-            }
-        }
+        $this->addBindings($values, 'where');
 
         return $this;
     }
@@ -1183,6 +1188,28 @@ class Builder
         $this->addBinding($value, 'where');
 
         return $this;
+    }
+
+    /**
+     * Intuitive approximation based on operator and value type.
+     *
+     * @param string $operator
+     * @param mixed $value
+     * @return string
+     */
+    protected function determineWhereType($operator, $value)
+    {
+        $operator = strtolower($operator);
+
+        if (in_array($operator, ['in', '=']) && is_array($value)) {
+            return 'In';
+        }
+
+        if (in_array($operator, ['not in', '!=']) && is_array($value)) {
+            return 'NotIn';
+        }
+
+        return 'Basic';
     }
 
     /**
@@ -2376,6 +2403,24 @@ class Builder
             $this->bindings[$type] = array_values(array_merge($this->bindings[$type], $value));
         } else {
             $this->bindings[$type][] = $value;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add an array of bindings to the query.
+     *
+     * @param array $values
+     * @param string $type
+     * @return $this
+     */
+    public function addBindings(array $values, $type = 'where')
+    {
+        foreach ($values as $value) {
+            if (! $value instanceof Expression) {
+                $this->addBinding($value, $type);
+            }
         }
 
         return $this;

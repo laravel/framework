@@ -351,6 +351,36 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->where('id', '=', 1)->orWhereIn('id', [1, 2, 3]);
         $this->assertEquals('select * from "users" where "id" = ? or "id" in (?, ?, ?)', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 1, 2 => 2, 3 => 3], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', [1, 2, 3]);
+        $this->assertEquals('select * from "users" where "id" in (?, ?, ?)', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2, 2 => 3], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 2)->where('id', [1, 2, 3]);
+        $this->assertEquals('select * from "users" where "id" = ? and "id" in (?, ?, ?)', $builder->toSql());
+        $this->assertEquals([0 => 2, 1 => 1, 2 => 2, 3 => 3], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', 'in', [1, 2, 3]);
+        $this->assertEquals('select * from "users" where "id" in (?, ?, ?)', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2, 2 => 3], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->where('id', 'in', [1, 2, 3]);
+        $this->assertEquals('select * from "users" where "id" = ? and "id" in (?, ?, ?)', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 1, 2 => 2, 3 => 3], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', [1, 2, 3]);
+        $this->assertEquals('select * from "users" where "id" in (?, ?, ?)', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2, 2 => 3], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 3)->where('id', '=', [1, 2, 3]);
+        $this->assertEquals('select * from "users" where "id" = ? and "id" in (?, ?, ?)', $builder->toSql());
+        $this->assertEquals([0 => 3, 1 => 1, 2 => 2, 3 => 3], $builder->getBindings());
     }
 
     public function testBasicWhereNotIns()
@@ -364,6 +394,26 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->where('id', '=', 1)->orWhereNotIn('id', [1, 2, 3]);
         $this->assertEquals('select * from "users" where "id" = ? or "id" not in (?, ?, ?)', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 1, 2 => 2, 3 => 3], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '!=', [1, 2, 3]);
+        $this->assertEquals('select * from "users" where "id" not in (?, ?, ?)', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2, 2 => 3], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '!=', [1, 2, 3])->orWhereNotIn('id', [1, 2, 3]);
+        $this->assertEquals('select * from "users" where "id" not in (?, ?, ?) or "id" not in (?, ?, ?)', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2, 2 => 3, 3 => 1, 4 => 2, 5 => 3], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', 'not in', [1, 2, 3]);
+        $this->assertEquals('select * from "users" where "id" not in (?, ?, ?)', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2, 2 => 3], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 3)->where('id', 'not in', [1, 2, 3]);
+        $this->assertEquals('select * from "users" where "id" = ? and "id" not in (?, ?, ?)', $builder->toSql());
+        $this->assertEquals([0 => 3, 1 => 1, 2 => 2, 3 => 3], $builder->getBindings());
     }
 
     public function testRawWhereIns()

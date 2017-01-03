@@ -299,11 +299,11 @@ class Grammar extends BaseGrammar
      */
     protected function whereIn(Builder $query, $where)
     {
-        if (empty($where['values'])) {
+        if (empty($where['value'])) {
             return '0 = 1';
         }
 
-        $values = $this->parameterize($where['values']);
+        $values = $this->parameterize($where['value']);
 
         return $this->wrap($where['column']).' in ('.$values.')';
     }
@@ -317,11 +317,11 @@ class Grammar extends BaseGrammar
      */
     protected function whereNotIn(Builder $query, $where)
     {
-        if (empty($where['values'])) {
+        if (empty($where['value'])) {
             return '1 = 1';
         }
 
-        $values = $this->parameterize($where['values']);
+        $values = $this->parameterize($where['value']);
 
         return $this->wrap($where['column']).' not in ('.$values.')';
     }
