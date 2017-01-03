@@ -28,28 +28,28 @@ class Builder
      *
      * @var \Illuminate\Database\Connection
      */
-    protected $connection;
+    public $connection;
 
     /**
      * The database query grammar instance.
      *
      * @var \Illuminate\Database\Query\Grammars\Grammar
      */
-    protected $grammar;
+    public $grammar;
 
     /**
      * The database query post processor instance.
      *
      * @var \Illuminate\Database\Query\Processors\Processor
      */
-    protected $processor;
+    public $processor;
 
     /**
      * The current query value bindings.
      *
      * @var array
      */
-    protected $bindings = [
+    public $bindings = [
         'select' => [],
         'join'   => [],
         'where'  => [],
@@ -171,25 +171,11 @@ class Builder
     public $lock;
 
     /**
-     * The field backups currently in use.
-     *
-     * @var array
-     */
-    protected $backups = [];
-
-    /**
-     * The binding backups currently in use.
-     *
-     * @var array
-     */
-    protected $bindingBackups = [];
-
-    /**
      * All of the available clause operators.
      *
      * @var array
      */
-    protected $operators = [
+    public $operators = [
         '=', '<', '>', '<=', '>=', '<>', '!=',
         'like', 'like binary', 'not like', 'between', 'ilike',
         '&', '|', '^', '<<', '>>',
@@ -203,7 +189,7 @@ class Builder
      *
      * @var bool
      */
-    protected $useWritePdo = false;
+    public $useWritePdo = false;
 
     /**
      * Create a new query builder instance.
@@ -1757,51 +1743,34 @@ class Builder
      */
     public function getCountForPagination($columns = ['*'])
     {
-        $this->backupFieldsForCount();
+        $results = $this->runPaginationCountQuery($columns);
 
-        $this->aggregate = ['function' => 'count', 'columns' => $this->clearSelectAliases($columns)];
-
-        $results = $this->get()->all();
-
-        $this->aggregate = null;
-
-        $this->restoreFieldsForCount();
-
+        // Once we have run the pagination count query, we will get the resulting count and
+        // take into account what type of query it was. When there is a group by we will
+        // just return the count of the entire results set since that will be correct.
         if (isset($this->groups)) {
             return count($results);
-        }
-
-        if (! isset($results[0])) {
+        } elseif (! isset($results[0])) {
             return 0;
+        } elseif (is_object($results[0])) {
+            return (int) $results[0]->aggregate;
+        } else {
+            return (int) array_change_key_case((array) $results[0])['aggregate'];
         }
-
-        $item = $results[0];
-
-        if (is_object($item)) {
-            return (int) $item->aggregate;
-        }
-
-        return (int) array_change_key_case((array) $item)['aggregate'];
     }
 
     /**
-     * Backup then remove some fields for the pagination count.
+     * Run a pagiantion count query.
      *
-     * @return void
+     * @param  array  $columns
+     * @return array
      */
-    protected function backupFieldsForCount()
+    protected function runPaginationCountQuery($columns = ['*'])
     {
-        foreach (['orders', 'limit', 'offset', 'columns'] as $field) {
-            $this->backups[$field] = $this->{$field};
-
-            $this->{$field} = null;
-        }
-
-        foreach (['order', 'select'] as $key) {
-            $this->bindingBackups[$key] = $this->bindings[$key];
-
-            $this->bindings[$key] = [];
-        }
+        return $this->cloneWithout(['columns', 'orders', 'limit', 'offset'])
+                    ->cloneWithoutBindings(['select', 'order'])
+                    ->setAggregate('count', $this->withoutSelectAliases($columns))
+                    ->get()->all();
     }
 
     /**
@@ -1810,31 +1779,12 @@ class Builder
      * @param  array  $columns
      * @return array
      */
-    protected function clearSelectAliases(array $columns)
+    protected function withoutSelectAliases(array $columns)
     {
         return array_map(function ($column) {
             return is_string($column) && ($aliasPosition = strpos(strtolower($column), ' as ')) !== false
                     ? substr($column, 0, $aliasPosition) : $column;
         }, $columns);
-    }
-
-    /**
-     * Restore some fields after the pagination count.
-     *
-     * @return void
-     */
-    protected function restoreFieldsForCount()
-    {
-        foreach (['orders', 'limit', 'offset', 'columns'] as $field) {
-            $this->{$field} = $this->backups[$field];
-        }
-
-        foreach (['order', 'select'] as $key) {
-            $this->bindings[$key] = $this->bindingBackups[$key];
-        }
-
-        $this->backups = [];
-        $this->bindingBackups = [];
     }
 
     /**
@@ -2100,27 +2050,10 @@ class Builder
      */
     public function aggregate($function, $columns = ['*'])
     {
-        $this->aggregate = compact('function', 'columns');
-
-        $previousColumns = $this->columns;
-
-        // We will also back up the select bindings since the select clause will be
-        // removed when performing the aggregate function. Once the query is run
-        // we will add the bindings back onto this query so they can get used.
-        $previousSelectBindings = $this->bindings['select'];
-
-        $this->bindings['select'] = [];
-
-        $results = $this->get($columns);
-
-        // Once we have executed the query, we will reset the aggregate property so
-        // that more select queries can be executed against the database without
-        // the aggregate value getting in the way when the grammar builds it.
-        $this->aggregate = null;
-
-        $this->columns = $previousColumns;
-
-        $this->bindings['select'] = $previousSelectBindings;
+        $results = $this->cloneWithout(['columns'])
+                        ->cloneWithoutBindings(['select'])
+                        ->setAggregate($function, $columns)
+                        ->get($columns);
 
         if (! $results->isEmpty()) {
             return array_change_key_case((array) $results[0])['aggregate'];
@@ -2151,6 +2084,20 @@ class Builder
         }
 
         return (float) $result;
+    }
+
+    /**
+     * Set the aggregate property without running the query.
+     *
+     * @param  string  $function
+     * @param  array  $columns
+     * @return $this
+     */
+    protected function setAggregate($function, $columns)
+    {
+        $this->aggregate = compact('function', 'columns');
+
+        return $this;
     }
 
     /**
@@ -2489,6 +2436,36 @@ class Builder
         $this->useWritePdo = true;
 
         return $this;
+    }
+
+    /**
+     * Clone the query without the given properties.
+     *
+     * @param  array  $except
+     * @return static
+     */
+    public function cloneWithout(array $except)
+    {
+        return tap(clone $this, function ($clone) use ($except) {
+            foreach ($except as $property) {
+                $clone->{$property} = null;
+            }
+        });
+    }
+
+    /**
+     * Clone the query without the given bindings.
+     *
+     * @param  array  $except
+     * @return static
+     */
+    public function cloneWithoutBindings(array $except)
+    {
+        return tap(clone $this, function ($clone) use ($except) {
+            foreach ($except as $type) {
+                $clone->bindings[$type] = [];
+            }
+        });
     }
 
     /**
