@@ -5,7 +5,6 @@ namespace Illuminate\Database;
 use PDO;
 use Closure;
 use Exception;
-use Throwable;
 use LogicException;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
@@ -479,7 +478,7 @@ class Connection implements ConnectionInterface
      */
     public function pretend(Closure $callback)
     {
-        return $this->withFreshQueryLog(function() use ($callback) {
+        return $this->withFreshQueryLog(function () use ($callback) {
             $this->pretending = true;
 
             // Basically to make the database connection "pretend", we will just return
@@ -783,7 +782,6 @@ class Connection implements ConnectionInterface
         if (isset($this->events)) {
             $this->events->fire($event);
         }
-
     }
 
     /**
