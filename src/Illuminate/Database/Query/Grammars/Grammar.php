@@ -502,7 +502,7 @@ class Grammar extends BaseGrammar
         // If the having clause is "raw", we can just return the clause straight away
         // without doing any more processing on it. Otherwise, we will compile the
         // clause into SQL based on the components that make it up from builder.
-        if ($having['type'] === 'raw') {
+        if ($having['type'] === 'Raw') {
             return $having['boolean'].' '.$having['sql'];
         }
 
