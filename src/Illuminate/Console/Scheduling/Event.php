@@ -14,8 +14,7 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 
 class Event
 {
-    use Macroable;
-    use ManagesFrequencies;
+    use Macroable, ManagesFrequencies;
 
     /**
      * The cache store implementation.
