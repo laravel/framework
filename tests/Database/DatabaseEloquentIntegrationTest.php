@@ -46,6 +46,15 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
             $table->text('json')->default(json_encode([]));
         });
 
+        $this->schema('default')->create('datetimes', function ($table) {
+            $table->increments('id');
+            $table->string('as_iso_string');
+            $table->datetime('as_datetime');
+            $table->datetimeTz('as_datetime_tz');
+            $table->timestamp('as_timestamp');
+            $table->timestampTz('as_timestamp_tz');
+        });
+
         $this->schema('second_connection')->create('test_items', function ($table) {
             $table->increments('id');
             $table->timestamps();
@@ -150,6 +159,25 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         foreach ($records as $record) {
             $this->assertEquals(1, $record->id);
         }
+    }
+
+    public function testDateTimeRetrieval()
+    {
+        $dt = \Carbon\Carbon::now('America/Chicago');
+        EloquentTestDateTimes::create([
+            'as_iso_string' => $dt->toIso8601String(),
+            'as_datetime' => $dt,
+            'as_datetime_tz' => $dt,
+            'as_timestamp'=> $dt,
+            'as_timestamp_tz'=> $dt,
+        ]);
+
+        $object = EloquentTestDateTimes::where('as_iso_string', $dt->toIso8601String())->first();
+        $this->assertEquals($dt->tz, $object->as_timestamp_tz->tz);
+        $this->assertTrue($object->as_datetime->eq($dt));
+        $this->assertTrue($object->as_datetime_tz->eq($dt));
+        $this->assertTrue($object->as_timestamp->eq($dt));
+        $this->assertTrue($object->as_timestamp_tz->eq($dt));
     }
 
     public function testBasicModelCollectionRetrieval()
@@ -1200,5 +1228,16 @@ class EloquentTestWithJSON extends Eloquent
     public $timestamps = false;
     protected $casts = [
         'json' => 'array',
+    ];
+}
+
+class EloquentTestDateTimes extends Eloquent
+{
+    protected $table = 'datetimes';
+    protected $guarded = [];
+    public $timestamps = false;
+    protected $dates = [
+        'as_datetime', 'as_datetime_tz',
+        'as_timestamp', 'as_timestamp_tz'
     ];
 }
