@@ -209,7 +209,6 @@ class ConnectionFactory
      */
     protected function createConnection($driver, PDO $connection, $database, $prefix = '', array $config = [])
     {
-
         switch ($driver) {
             case 'mysql':
                 return new MySqlConnection($connection, $database, $prefix, $config);
