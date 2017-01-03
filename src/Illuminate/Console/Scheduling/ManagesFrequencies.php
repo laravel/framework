@@ -131,6 +131,16 @@ trait ManagesFrequencies
     }
 
     /**
+     * Schedule the event to run only on weekends.
+     *
+     * @return $this
+     */
+    public function weekends()
+    {
+        return $this->spliceIntoPosition(5, '0,6');
+    }
+
+    /**
      * Schedule the event to run only on Mondays.
      *
      * @return $this
