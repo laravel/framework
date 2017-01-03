@@ -1817,6 +1817,9 @@ class Builder
         $page = 1;
 
         do {
+            // We'll execute the query for the given page and get the results. If there are
+            // no results we can just break and return from here. When there are results
+            // we will call the callback with the current chunk of these results here.
             $results = $this->forPage($page, $count)->get();
 
             $countResults = $results->count();
@@ -1856,6 +1859,9 @@ class Builder
         do {
             $clone = clone $this;
 
+            // We'll execute the query for the given page and get the results. If there are
+            // no results we can just break and return from here. When there are results
+            // we will call the callback with the current chunk of these results here.
             $results = $clone->forPageAfterId($count, $lastId, $column)->get();
 
             $countResults = $results->count();
@@ -1864,6 +1870,9 @@ class Builder
                 break;
             }
 
+            // On each chunk result set, we will pass them to the callback and then let the
+            // developer take care of everything within the callback, which allows us to
+            // keep the memory low for spinning through large result sets for working.
             if (call_user_func($callback, $results) === false) {
                 return false;
             }
@@ -1872,6 +1881,20 @@ class Builder
         } while ($countResults == $count);
 
         return true;
+    }
+
+    /**
+     * Throw an exception if the query doesn't have an orderBy clause.
+     *
+     * @return void
+     *
+     * @throws \RuntimeException
+     */
+    protected function enforceOrderBy()
+    {
+        if (empty($this->orders) && empty($this->unionOrders)) {
+            throw new RuntimeException('You must specify an orderBy clause when using this function.');
+        }
     }
 
     /**
@@ -1890,20 +1913,6 @@ class Builder
                 }
             }
         });
-    }
-
-    /**
-     * Throw an exception if the query doesn't have an orderBy clause.
-     *
-     * @return void
-     *
-     * @throws \RuntimeException
-     */
-    protected function enforceOrderBy()
-    {
-        if (empty($this->orders) && empty($this->unionOrders)) {
-            throw new RuntimeException('You must specify an orderBy clause when using this function.');
-        }
     }
 
     /**
@@ -1956,10 +1965,13 @@ class Builder
      */
     public function exists()
     {
-        $sql = $this->grammar->compileExists($this);
+        $results = $this->connection->select(
+            $this->grammar->compileExists($this), $this->getBindings(), ! $this->useWritePdo
+        );
 
-        $results = $this->connection->select($sql, $this->getBindings(), ! $this->useWritePdo);
-
+        // If the results has rows, we will get the row and see if the exists column is a
+        // boolean true. If there is no results for this query we will return false as
+        // there are no rows for this query at all and we can return that info here.
         if (isset($results[0])) {
             $results = (array) $results[0];
 
@@ -2071,6 +2083,9 @@ class Builder
     {
         $result = $this->aggregate($function, $columns);
 
+        // If there is no result, we can obviously just return 0 here. Next, we will check
+        // if the result is an integer or float. If it is already one of these two data
+        // types we can just return the result as-is, otherwise we will convert this.
         if (! $result) {
             return 0;
         }
@@ -2079,11 +2094,11 @@ class Builder
             return $result;
         }
 
-        if (strpos((string) $result, '.') === false) {
-            return (int) $result;
-        }
-
-        return (float) $result;
+        // If the result doesn't contain a decimal place, we will assume it is an int then
+        // cast it to one. When it does we will cast it to a float since it needs to be
+        // cast to the expected data type for the developers out of pure convenience.
+        return strpos((string) $result, '.') === false
+                ? (int) $result : (float) $result;
     }
 
     /**
