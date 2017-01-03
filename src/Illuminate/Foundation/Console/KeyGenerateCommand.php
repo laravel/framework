@@ -53,9 +53,9 @@ class KeyGenerateCommand extends Command
     {
         $contents = file_get_contents($this->laravel->environmentFilePath());
         $prefix = 'APP_KEY=';
-        if(strpos($contents, $prefix) === false) {
+        if (strpos($contents, $prefix) === false) {
             $search = $contents;
-            $replace = $prefix.$key . "\n" . $contents;
+            $replace = $prefix.$key."\n".$contents;
         } else {
             $search = $prefix.$this->laravel['config']['app.key'];
             $replace = $prefix.$key;
