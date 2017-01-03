@@ -62,7 +62,6 @@ class Gate implements GateContract
      * @param  array  $policies
      * @param  array  $beforeCallbacks
      * @param  array  $afterCallbacks
-     * @return void
      */
     public function __construct(Container $container, callable $userResolver, array $abilities = [],
                                 array $policies = [], array $beforeCallbacks = [], array $afterCallbacks = [])
