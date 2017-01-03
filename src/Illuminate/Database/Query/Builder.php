@@ -1082,6 +1082,24 @@ class Builder
     }
 
     /**
+     * Add a "where week of year" statement to the query.
+     *
+     * @param  string  $column
+     * @param  string  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function whereWeekOfYear($column, $operator, $value = null, $boolean = 'and')
+    {
+        list($value, $operator) = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() == 2
+        );
+
+        return $this->addDateBasedWhere('WeekOfYear', $column, $operator, $value, $boolean);
+    }
+
+    /**
      * Add a date based (year, month, day, time) statement to the query.
      *
      * @param  string  $type
