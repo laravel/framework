@@ -63,7 +63,7 @@ class BroadcasterTest extends TestCase
         $broadcaster = new FakeBroadcaster();
         $callback = function ($user, BroadcasterTestEloquentModelNotFoundStub $model) {
         };
-        $parameters = $broadcaster->extractAuthParameters('asd.{model}', 'asd.1', $callback);
+        $broadcaster->extractAuthParameters('asd.{model}', 'asd.1', $callback);
     }
 }
 
