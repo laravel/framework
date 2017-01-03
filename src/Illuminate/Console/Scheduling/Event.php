@@ -8,11 +8,13 @@ use Cron\CronExpression;
 use GuzzleHttp\Client as HttpClient;
 use Illuminate\Contracts\Mail\Mailer;
 use Symfony\Component\Process\Process;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Cache\Repository as Cache;
 
 class Event
 {
+    use Macroable;
     use ManagesFrequencies;
 
     /**
