@@ -52,9 +52,9 @@ class MySqlGrammar extends Grammar
      */
     protected function compileUnion(array $union)
     {
-        $joiner = $union['all'] ? ' union all ' : ' union ';
+        $conjuction = $union['all'] ? ' union all ' : ' union ';
 
-        return $joiner.'('.$union['query']->toSql().')';
+        return $conjuction.'('.$union['query']->toSql().')';
     }
 
     /**
@@ -95,30 +95,18 @@ class MySqlGrammar extends Grammar
     {
         $table = $this->wrapTable($query->from);
 
-        $columns = [];
-
         // Each one of the columns in the update statements needs to be wrapped in the
         // keyword identifiers, also a place-holder needs to be created for each of
         // the values in the list of bindings so we can make the sets statements.
-        foreach ($values as $key => $value) {
-            if ($this->isJsonSelector($key)) {
-                $columns[] = $this->compileJsonUpdateColumn(
-                    $key, new JsonExpression($value)
-                );
-            } else {
-                $columns[] = $this->wrap($key).' = '.$this->parameter($value);
-            }
-        }
-
-        $columns = implode(', ', $columns);
+        $columns = $this->compileUpdateColumns($values);
 
         // If the query has any "join" clauses, we will setup the joins on the builder
         // and compile them so we can attach them to this update, as update queries
         // can get join statements to attach to other tables when they're needed.
+        $joins = '';
+
         if (isset($query->joins)) {
             $joins = ' '.$this->compileJoins($query, $query->joins);
-        } else {
-            $joins = '';
         }
 
         // Of course, update queries may also be constrained by where clauses so we'll
@@ -128,15 +116,38 @@ class MySqlGrammar extends Grammar
 
         $sql = rtrim("update {$table}{$joins} set $columns $where");
 
+        // If the query has an order by clause we will compile it since MySQL supports
+        // order bys on update statements. We'll compile them using the typical way
+        // of compiling order bys. Then they will be appended to the SQL queries.
         if (! empty($query->orders)) {
             $sql .= ' '.$this->compileOrders($query, $query->orders);
         }
 
+        // Updates on MySQL also supports "limits", which allow you to easily update a
+        // single record very easily. This is not supported by all database engines
+        // so we have customized this update compiler here in order to add it in.
         if (isset($query->limit)) {
             $sql .= ' '.$this->compileLimit($query, $query->limit);
         }
 
         return rtrim($sql);
+    }
+
+    /**
+     * Compile all of the columns for an update statement.
+     *
+     * @param  array  $value
+     * @return string
+     */
+    protected function compileUpdateColumns($values)
+    {
+        return collect($values)->map(function ($value, $key) {
+            if ($this->isJsonSelector($key)) {
+                return $this->compileJsonUpdateColumn($key, new JsonExpression($value));
+            } else {
+                return $this->wrap($key).' = '.$this->parameter($value);
+            }
+        })->implode(', ');
     }
 
     /**
