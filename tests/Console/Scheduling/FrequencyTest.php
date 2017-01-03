@@ -104,4 +104,13 @@ class FrequencyTest extends TestCase
     {
         $this->assertEquals('* * * * 6 *', $this->event->saturdays()->getExpression());
     }
+
+    public function testFrequencyMacro()
+    {
+        Event::macro('everyXMinutes', function($x) {
+            return $this->spliceIntoPosition(1, "*/{$x}");
+        });
+
+        $this->assertEquals('*/6 * * * * *', $this->event->everyXMinutes(6)->getExpression());
+    }
 }
