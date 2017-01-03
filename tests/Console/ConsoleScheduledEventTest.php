@@ -57,6 +57,9 @@ class ConsoleScheduledEventTest extends TestCase
         $this->assertEquals('*/5 * * * * *', $event->everyFiveMinutes()->getExpression());
 
         $event = new Event(m::mock('Illuminate\Contracts\Cache\Repository'), 'php foo');
+        $this->assertEquals('*/6 * * * * *', $event->everyXMinutes(6)->getExpression());
+
+        $event = new Event(m::mock('Illuminate\Contracts\Cache\Repository'), 'php foo');
         $this->assertEquals('0 0 * * * *', $event->daily()->getExpression());
 
         $event = new Event(m::mock('Illuminate\Contracts\Cache\Repository'), 'php foo');
