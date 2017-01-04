@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Cookie;
+
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Cookie\CookieJar;
