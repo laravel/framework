@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Cache;
+
 use Mockery as m;
 use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
@@ -128,9 +130,9 @@ class CacheRepositoryTest extends TestCase
 
     public function testCacheAddCallsRedisStoreAdd()
     {
-        $store = m::mock(Illuminate\Cache\RedisStore::class);
+        $store = m::mock(\Illuminate\Cache\RedisStore::class);
         $store->shouldReceive('add')->once()->with('k', 'v', 60)->andReturn(true);
-        $repository = new Illuminate\Cache\Repository($store);
+        $repository = new \Illuminate\Cache\Repository($store);
         $this->assertTrue($repository->add('k', 'v', 60));
     }
 
@@ -145,8 +147,8 @@ class CacheRepositoryTest extends TestCase
 
     protected function getRepository()
     {
-        $dispatcher = new Illuminate\Events\Dispatcher(m::mock('Illuminate\Container\Container'));
-        $repository = new Illuminate\Cache\Repository(m::mock('Illuminate\Contracts\Cache\Store'));
+        $dispatcher = new \Illuminate\Events\Dispatcher(m::mock('Illuminate\Container\Container'));
+        $repository = new \Illuminate\Cache\Repository(m::mock('Illuminate\Contracts\Cache\Store'));
 
         $repository->setEventDispatcher($dispatcher);
 

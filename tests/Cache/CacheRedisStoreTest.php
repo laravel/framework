@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Cache;
+
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -141,6 +143,6 @@ class CacheRedisStoreTest extends TestCase
 
     protected function getRedis()
     {
-        return new Illuminate\Cache\RedisStore(m::mock('Illuminate\Contracts\Redis\Factory'), 'prefix');
+        return new \Illuminate\Cache\RedisStore(m::mock('Illuminate\Contracts\Redis\Factory'), 'prefix');
     }
 }

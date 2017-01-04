@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Cache;
+
 use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\ArrayStore;
 
