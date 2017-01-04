@@ -89,9 +89,9 @@
         }
     },
     "autoload-dev": {
-        "files": [
-            "tests/Redis/InteractsWithRedis.php"
-        ]
+        "psr-4": {
+            "Illuminate\\Tests\\": "tests/"
+        }
     },
     "extra": {
         "branch-alias": {
