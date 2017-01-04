@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Config;
+
 use PHPUnit\Framework\TestCase;
 use Illuminate\Config\Repository;
 
