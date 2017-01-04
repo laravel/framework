@@ -38,7 +38,7 @@ class SQLiteGrammar extends Grammar
      * @param  string  $table
      * @return string
      */
-    public function compileColumnExists($table)
+    public function compileColumnListing($table)
     {
         return 'pragma table_info('.str_replace('.', '__', $table).')';
     }
