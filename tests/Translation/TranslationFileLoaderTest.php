@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Translation;
+
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Translation\FileLoader;
