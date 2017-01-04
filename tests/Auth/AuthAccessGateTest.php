@@ -1,15 +1,19 @@
 <?php
 
+namespace Illuminate\Tests\Auth;
+
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Container\Container;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use StdClass;
 
 class GateTest extends TestCase
 {
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException InvalidArgumentException
      */
     public function test_gate_throws_exception_on_invalid_callback_type()
     {
@@ -133,7 +137,7 @@ class GateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', 'AccessGateTestClass@foo');
+        $gate->define('foo', '\Illuminate\Tests\Auth\AccessGateTestClass@foo');
 
         $this->assertTrue($gate->check('foo'));
     }

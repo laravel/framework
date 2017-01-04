@@ -1,5 +1,8 @@
 <?php
 
+namespace Illuminate\Tests\Auth;
+
+use Illuminate\Auth\Passwords\DatabaseTokenRepository;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -103,7 +106,7 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
 
     protected function getRepo()
     {
-        return new Illuminate\Auth\Passwords\DatabaseTokenRepository(
+        return new DatabaseTokenRepository(
             m::mock('Illuminate\Database\Connection'),
             m::mock('Illuminate\Contracts\Hashing\Hasher'),
             'table', 'key');

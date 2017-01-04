@@ -1,5 +1,8 @@
 <?php
 
+namespace Illuminate\Tests\Auth;
+
+use Illuminate\Auth\DatabaseUserProvider;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -16,7 +19,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $conn->shouldReceive('table')->once()->with('foo')->andReturn($conn);
         $conn->shouldReceive('find')->once()->with(1)->andReturn(['id' => 1, 'name' => 'Dayle']);
         $hasher = m::mock('Illuminate\Contracts\Hashing\Hasher');
-        $provider = new Illuminate\Auth\DatabaseUserProvider($conn, $hasher, 'foo');
+        $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
         $user = $provider->retrieveById(1);
 
         $this->assertInstanceOf('Illuminate\Auth\GenericUser', $user);
@@ -30,7 +33,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $conn->shouldReceive('table')->once()->with('foo')->andReturn($conn);
         $conn->shouldReceive('find')->once()->with(1)->andReturn(null);
         $hasher = m::mock('Illuminate\Contracts\Hashing\Hasher');
-        $provider = new Illuminate\Auth\DatabaseUserProvider($conn, $hasher, 'foo');
+        $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
         $user = $provider->retrieveById(1);
 
         $this->assertNull($user);
@@ -43,7 +46,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $conn->shouldReceive('where')->once()->with('username', 'dayle');
         $conn->shouldReceive('first')->once()->andReturn(['id' => 1, 'name' => 'taylor']);
         $hasher = m::mock('Illuminate\Contracts\Hashing\Hasher');
-        $provider = new Illuminate\Auth\DatabaseUserProvider($conn, $hasher, 'foo');
+        $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
         $user = $provider->retrieveByCredentials(['username' => 'dayle', 'password' => 'foo']);
 
         $this->assertInstanceOf('Illuminate\Auth\GenericUser', $user);
@@ -58,7 +61,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $conn->shouldReceive('where')->once()->with('username', 'dayle');
         $conn->shouldReceive('first')->once()->andReturn(null);
         $hasher = m::mock('Illuminate\Contracts\Hashing\Hasher');
-        $provider = new Illuminate\Auth\DatabaseUserProvider($conn, $hasher, 'foo');
+        $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
         $user = $provider->retrieveByCredentials(['username' => 'dayle']);
 
         $this->assertNull($user);
@@ -69,7 +72,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $conn = m::mock('Illuminate\Database\Connection');
         $hasher = m::mock('Illuminate\Contracts\Hashing\Hasher');
         $hasher->shouldReceive('check')->once()->with('plain', 'hash')->andReturn(true);
-        $provider = new Illuminate\Auth\DatabaseUserProvider($conn, $hasher, 'foo');
+        $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
         $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
         $user->shouldReceive('getAuthPassword')->once()->andReturn('hash');
         $result = $provider->validateCredentials($user, ['password' => 'plain']);

@@ -1,7 +1,10 @@
 <?php
 
+namespace Illuminate\Tests\Auth;
+
 use Illuminate\Http\Request;
 use Illuminate\Auth\TokenGuard;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\Auth\UserProvider;
 

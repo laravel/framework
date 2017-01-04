@@ -1,7 +1,10 @@
 <?php
 
+namespace Illuminate\Tests\Auth;
+
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Auth\EloquentUserProvider;
 
 class AuthEloquentUserProviderTest extends TestCase
 {
@@ -40,7 +43,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $conn = m::mock('Illuminate\Database\Connection');
         $hasher = m::mock('Illuminate\Contracts\Hashing\Hasher');
         $hasher->shouldReceive('check')->once()->with('plain', 'hash')->andReturn(true);
-        $provider = new Illuminate\Auth\EloquentUserProvider($hasher, 'foo');
+        $provider = new EloquentUserProvider($hasher, 'foo');
         $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
         $user->shouldReceive('getAuthPassword')->once()->andReturn('hash');
         $result = $provider->validateCredentials($user, ['password' => 'plain']);
@@ -51,10 +54,10 @@ class AuthEloquentUserProviderTest extends TestCase
     public function testModelsCanBeCreated()
     {
         $hasher = m::mock('Illuminate\Contracts\Hashing\Hasher');
-        $provider = new Illuminate\Auth\EloquentUserProvider($hasher, 'EloquentProviderUserStub');
+        $provider = new EloquentUserProvider($hasher, 'Illuminate\Tests\Auth\EloquentProviderUserStub');
         $model = $provider->createModel();
 
-        $this->assertInstanceOf('EloquentProviderUserStub', $model);
+        $this->assertInstanceOf('Illuminate\Tests\Auth\EloquentProviderUserStub', $model);
     }
 
     protected function getProviderMock()

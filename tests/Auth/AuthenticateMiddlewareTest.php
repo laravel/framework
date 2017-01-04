@@ -1,5 +1,8 @@
 <?php
 
+namespace Illuminate\Tests\Auth;
+
+use stdClass;
 use Mockery as m;
 use Illuminate\Http\Request;
 use PHPUnit\Framework\TestCase;
@@ -31,7 +34,7 @@ class AuthenticateMiddlewareTest extends TestCase
     }
 
     /**
-     * @expectedException Illuminate\Auth\AuthenticationException
+     * @expectedException \Illuminate\Auth\AuthenticationException
      */
     public function testDefaultUnauthenticatedThrows()
     {
@@ -76,7 +79,7 @@ class AuthenticateMiddlewareTest extends TestCase
     }
 
     /**
-     * @expectedException Illuminate\Auth\AuthenticationException
+     * @expectedException \Illuminate\Auth\AuthenticationException
      */
     public function testMultipleDriversUnauthenticatedThrows()
     {
@@ -172,7 +175,7 @@ class AuthenticateMiddlewareTest extends TestCase
      * @param  string  ...$guards
      * @return void
      *
-     * @throws \Illuminate\Auth\AuthenticationException
+     * @throws AuthenticationException
      */
     protected function authenticate(...$guards)
     {
