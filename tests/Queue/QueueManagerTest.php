@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Queue;
+
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Queue\QueueManager;

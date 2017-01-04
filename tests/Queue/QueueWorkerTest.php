@@ -1,5 +1,8 @@
 <?php
 
+namespace Illuminate\Tests\Queue;
+
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Queue\WorkerOptions;
@@ -10,6 +13,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\MaxAttemptsExceededException;
+use RuntimeException;
 
 class QueueWorkerTest extends TestCase
 {
@@ -192,7 +196,7 @@ class QueueWorkerTest extends TestCase
 /**
  * Fakes.
  */
-class InsomniacWorker extends Illuminate\Queue\Worker
+class InsomniacWorker extends \Illuminate\Queue\Worker
 {
     public $sleptFor;
 
@@ -202,7 +206,7 @@ class InsomniacWorker extends Illuminate\Queue\Worker
     }
 }
 
-class WorkerFakeManager extends Illuminate\Queue\QueueManager
+class WorkerFakeManager extends \Illuminate\Queue\QueueManager
 {
     public $connections = [];
 

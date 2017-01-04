@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Queue;
+
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -40,7 +42,7 @@ class QueueRedisQueueTest extends TestCase
 
     public function testDelayedPushWithDateTimeProperlyPushesJobOntoRedis()
     {
-        $date = Carbon\Carbon::now();
+        $date = \Carbon\Carbon::now();
         $queue = $this->getMockBuilder('Illuminate\Queue\RedisQueue')->setMethods(['availableAt', 'getRandomId'])->setConstructorArgs([$redis = m::mock('Illuminate\Contracts\Redis\Factory'), 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->will($this->returnValue('foo'));
         $queue->expects($this->once())->method('availableAt')->with($date)->will($this->returnValue(2));
