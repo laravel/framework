@@ -2,7 +2,7 @@
 
 namespace Illuminate\Cache\Events;
 
-class CacheMissed extends AbstractCacheEvent
+class CacheMissed extends CacheEvent
 {
     //
 }
