@@ -12,7 +12,7 @@ class DatabaseEloquentIntegrationWithTablePrefixTest
      */
     public function setUp()
     {
-        $db = new DB;
+        $db = new DB();
 
         $db->addConnection([
             'driver'    => 'sqlite',

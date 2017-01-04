@@ -48,13 +48,14 @@ class ResourceRegistrar
      */
     protected static $verbs = [
         'create' => 'create',
-        'edit' => 'edit',
+        'edit'   => 'edit',
     ];
 
     /**
      * Create a new resource registrar instance.
      *
-     * @param  \Illuminate\Routing\Router  $router
+     * @param \Illuminate\Routing\Router $router
+     *
      * @return void
      */
     public function __construct(Router $router)
@@ -65,14 +66,15 @@ class ResourceRegistrar
     /**
      * Route a resource to a controller.
      *
-     * @param  string  $name
-     * @param  string  $controller
-     * @param  array   $options
+     * @param string $name
+     * @param string $controller
+     * @param array  $options
+     *
      * @return void
      */
     public function register($name, $controller, array $options = [])
     {
-        if (isset($options['parameters']) && ! isset($this->parameters)) {
+        if (isset($options['parameters']) && !isset($this->parameters)) {
             $this->parameters = $options['parameters'];
         }
 
@@ -100,9 +102,10 @@ class ResourceRegistrar
     /**
      * Build a set of prefixed resource routes.
      *
-     * @param  string  $name
-     * @param  string  $controller
-     * @param  array   $options
+     * @param string $name
+     * @param string $controller
+     * @param array  $options
+     *
      * @return void
      */
     protected function prefixedResource($name, $controller, array $options)
@@ -122,7 +125,8 @@ class ResourceRegistrar
     /**
      * Extract the resource and prefix from a resource name.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return array
      */
     protected function getResourcePrefix($name)
@@ -140,8 +144,9 @@ class ResourceRegistrar
     /**
      * Get the applicable resource methods.
      *
-     * @param  array  $defaults
-     * @param  array  $options
+     * @param array $defaults
+     * @param array $options
+     *
      * @return array
      */
     protected function getResourceMethods($defaults, $options)
@@ -158,12 +163,13 @@ class ResourceRegistrar
     /**
      * Get the base resource URI for a given resource.
      *
-     * @param  string  $resource
+     * @param string $resource
+     *
      * @return string
      */
     public function getResourceUri($resource)
     {
-        if (! Str::contains($resource, '.')) {
+        if (!Str::contains($resource, '.')) {
             return $resource;
         }
 
@@ -180,7 +186,8 @@ class ResourceRegistrar
     /**
      * Get the URI for a nested resource segment array.
      *
-     * @param  array   $segments
+     * @param array $segments
+     *
      * @return string
      */
     protected function getNestedResourceUri(array $segments)
@@ -196,10 +203,11 @@ class ResourceRegistrar
     /**
      * Get the action array for a resource route.
      *
-     * @param  string  $resource
-     * @param  string  $controller
-     * @param  string  $method
-     * @param  array   $options
+     * @param string $resource
+     * @param string $controller
+     * @param string $method
+     * @param array  $options
+     *
      * @return array
      */
     protected function getResourceAction($resource, $controller, $method, $options)
@@ -212,9 +220,10 @@ class ResourceRegistrar
     /**
      * Get the name for a given resource.
      *
-     * @param  string  $resource
-     * @param  string  $method
-     * @param  array   $options
+     * @param string $resource
+     * @param string $method
+     * @param array  $options
+     *
      * @return string
      */
     protected function getResourceName($resource, $method, $options)
@@ -232,7 +241,7 @@ class ResourceRegistrar
         // the resource action. Otherwise we'll just use an empty string for here.
         $prefix = isset($options['as']) ? $options['as'].'.' : '';
 
-        if (! $this->router->hasGroupStack()) {
+        if (!$this->router->hasGroupStack()) {
             return $prefix.$resource.'.'.$method;
         }
 
@@ -242,9 +251,10 @@ class ResourceRegistrar
     /**
      * Get the resource name for a grouped resource.
      *
-     * @param  string  $prefix
-     * @param  string  $resource
-     * @param  string  $method
+     * @param string $prefix
+     * @param string $resource
+     * @param string $method
+     *
      * @return string
      */
     protected function getGroupResourceName($prefix, $resource, $method)
@@ -255,7 +265,8 @@ class ResourceRegistrar
     /**
      * Format a resource parameter for usage.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     public function getResourceWildcard($value)
@@ -274,10 +285,11 @@ class ResourceRegistrar
     /**
      * Add the index method for a resourceful route.
      *
-     * @param  string  $name
-     * @param  string  $base
-     * @param  string  $controller
-     * @param  array   $options
+     * @param string $name
+     * @param string $base
+     * @param string $controller
+     * @param array  $options
+     *
      * @return \Illuminate\Routing\Route
      */
     protected function addResourceIndex($name, $base, $controller, $options)
@@ -292,10 +304,11 @@ class ResourceRegistrar
     /**
      * Add the create method for a resourceful route.
      *
-     * @param  string  $name
-     * @param  string  $base
-     * @param  string  $controller
-     * @param  array   $options
+     * @param string $name
+     * @param string $base
+     * @param string $controller
+     * @param array  $options
+     *
      * @return \Illuminate\Routing\Route
      */
     protected function addResourceCreate($name, $base, $controller, $options)
@@ -310,10 +323,11 @@ class ResourceRegistrar
     /**
      * Add the store method for a resourceful route.
      *
-     * @param  string  $name
-     * @param  string  $base
-     * @param  string  $controller
-     * @param  array   $options
+     * @param string $name
+     * @param string $base
+     * @param string $controller
+     * @param array  $options
+     *
      * @return \Illuminate\Routing\Route
      */
     protected function addResourceStore($name, $base, $controller, $options)
@@ -328,10 +342,11 @@ class ResourceRegistrar
     /**
      * Add the show method for a resourceful route.
      *
-     * @param  string  $name
-     * @param  string  $base
-     * @param  string  $controller
-     * @param  array   $options
+     * @param string $name
+     * @param string $base
+     * @param string $controller
+     * @param array  $options
+     *
      * @return \Illuminate\Routing\Route
      */
     protected function addResourceShow($name, $base, $controller, $options)
@@ -346,10 +361,11 @@ class ResourceRegistrar
     /**
      * Add the edit method for a resourceful route.
      *
-     * @param  string  $name
-     * @param  string  $base
-     * @param  string  $controller
-     * @param  array   $options
+     * @param string $name
+     * @param string $base
+     * @param string $controller
+     * @param array  $options
+     *
      * @return \Illuminate\Routing\Route
      */
     protected function addResourceEdit($name, $base, $controller, $options)
@@ -364,10 +380,11 @@ class ResourceRegistrar
     /**
      * Add the update method for a resourceful route.
      *
-     * @param  string  $name
-     * @param  string  $base
-     * @param  string  $controller
-     * @param  array   $options
+     * @param string $name
+     * @param string $base
+     * @param string $controller
+     * @param array  $options
+     *
      * @return \Illuminate\Routing\Route
      */
     protected function addResourceUpdate($name, $base, $controller, $options)
@@ -382,10 +399,11 @@ class ResourceRegistrar
     /**
      * Add the destroy method for a resourceful route.
      *
-     * @param  string  $name
-     * @param  string  $base
-     * @param  string  $controller
-     * @param  array   $options
+     * @param string $name
+     * @param string $base
+     * @param string $controller
+     * @param array  $options
+     *
      * @return \Illuminate\Routing\Route
      */
     protected function addResourceDestroy($name, $base, $controller, $options)
@@ -400,7 +418,8 @@ class ResourceRegistrar
     /**
      * Set or unset the unmapped global parameters to singular.
      *
-     * @param  bool  $singular
+     * @param bool $singular
+     *
      * @return void
      */
     public static function singularParameters($singular = true)
@@ -421,7 +440,8 @@ class ResourceRegistrar
     /**
      * Set the global parameter mapping.
      *
-     * @param  array $parameters
+     * @param array $parameters
+     *
      * @return void
      */
     public static function setParameters(array $parameters = [])
@@ -432,7 +452,8 @@ class ResourceRegistrar
     /**
      * Get or set the action verbs used in the resource URIs.
      *
-     * @param  array  $verbs
+     * @param array $verbs
+     *
      * @return array
      */
     public static function verbs(array $verbs = [])

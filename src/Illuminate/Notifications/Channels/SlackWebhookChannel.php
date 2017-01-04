@@ -3,10 +3,10 @@
 namespace Illuminate\Notifications\Channels;
 
 use GuzzleHttp\Client as HttpClient;
-use Illuminate\Notifications\Notification;
-use Illuminate\Notifications\Messages\SlackMessage;
 use Illuminate\Notifications\Messages\SlackAttachment;
 use Illuminate\Notifications\Messages\SlackAttachmentField;
+use Illuminate\Notifications\Messages\SlackMessage;
+use Illuminate\Notifications\Notification;
 
 class SlackWebhookChannel
 {
@@ -20,7 +20,8 @@ class SlackWebhookChannel
     /**
      * Create a new Slack channel instance.
      *
-     * @param  \GuzzleHttp\Client  $http
+     * @param \GuzzleHttp\Client $http
+     *
      * @return void
      */
     public function __construct(HttpClient $http)
@@ -31,13 +32,14 @@ class SlackWebhookChannel
     /**
      * Send the given notification.
      *
-     * @param  mixed  $notifiable
-     * @param  \Illuminate\Notifications\Notification  $notification
+     * @param mixed                                  $notifiable
+     * @param \Illuminate\Notifications\Notification $notification
+     *
      * @return \Psr\Http\Message\ResponseInterface
      */
     public function send($notifiable, Notification $notification)
     {
-        if (! $url = $notifiable->routeNotificationFor('slack')) {
+        if (!$url = $notifiable->routeNotificationFor('slack')) {
             return;
         }
 
@@ -49,20 +51,21 @@ class SlackWebhookChannel
     /**
      * Build up a JSON payload for the Slack webhook.
      *
-     * @param  \Illuminate\Notifications\Messages\SlackMessage  $message
+     * @param \Illuminate\Notifications\Messages\SlackMessage $message
+     *
      * @return array
      */
     protected function buildJsonPayload(SlackMessage $message)
     {
         $optionalFields = array_filter([
-            'username' => data_get($message, 'username'),
+            'username'   => data_get($message, 'username'),
             'icon_emoji' => data_get($message, 'icon'),
-            'channel' => data_get($message, 'channel'),
+            'channel'    => data_get($message, 'channel'),
         ]);
 
         return array_merge([
             'json' => array_merge([
-                'text' => $message->content,
+                'text'        => $message->content,
                 'attachments' => $this->attachments($message),
             ], $optionalFields),
         ], $message->http);
@@ -71,23 +74,24 @@ class SlackWebhookChannel
     /**
      * Format the message's attachments.
      *
-     * @param  \Illuminate\Notifications\Messages\SlackMessage  $message
+     * @param \Illuminate\Notifications\Messages\SlackMessage $message
+     *
      * @return array
      */
     protected function attachments(SlackMessage $message)
     {
         return collect($message->attachments)->map(function ($attachment) use ($message) {
             return array_filter([
-                'color' => $attachment->color ?: $message->color(),
-                'title' => $attachment->title,
-                'text' => $attachment->content,
-                'fallback' => $attachment->fallback,
-                'title_link' => $attachment->url,
-                'fields' => $this->fields($attachment),
-                'mrkdwn_in' => $attachment->markdown,
-                'footer' => $attachment->footer,
+                'color'       => $attachment->color ?: $message->color(),
+                'title'       => $attachment->title,
+                'text'        => $attachment->content,
+                'fallback'    => $attachment->fallback,
+                'title_link'  => $attachment->url,
+                'fields'      => $this->fields($attachment),
+                'mrkdwn_in'   => $attachment->markdown,
+                'footer'      => $attachment->footer,
                 'footer_icon' => $attachment->footerIcon,
-                'ts' => $attachment->timestamp,
+                'ts'          => $attachment->timestamp,
             ]);
         })->all();
     }
@@ -95,7 +99,8 @@ class SlackWebhookChannel
     /**
      * Format the attachment's fields.
      *
-     * @param  \Illuminate\Notifications\Messages\SlackAttachment  $attachment
+     * @param \Illuminate\Notifications\Messages\SlackAttachment $attachment
+     *
      * @return array
      */
     protected function fields(SlackAttachment $attachment)

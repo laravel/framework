@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Mockery as m;
 
 class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase
 {

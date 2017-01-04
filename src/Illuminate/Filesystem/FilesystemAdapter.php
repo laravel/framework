@@ -2,20 +2,20 @@
 
 namespace Illuminate\Filesystem;
 
-use RuntimeException;
+use Illuminate\Contracts\Filesystem\Cloud as CloudFilesystemContract;
+use Illuminate\Contracts\Filesystem\FileNotFoundException as ContractFileNotFoundException;
+use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
 use Illuminate\Http\File;
-use Illuminate\Support\Str;
-use InvalidArgumentException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use InvalidArgumentException;
+use League\Flysystem\Adapter\Local as LocalAdapter;
 use League\Flysystem\AdapterInterface;
-use League\Flysystem\FilesystemInterface;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\FileNotFoundException;
-use League\Flysystem\Adapter\Local as LocalAdapter;
-use Illuminate\Contracts\Filesystem\Cloud as CloudFilesystemContract;
-use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
-use Illuminate\Contracts\Filesystem\FileNotFoundException as ContractFileNotFoundException;
+use League\Flysystem\FilesystemInterface;
+use RuntimeException;
 
 class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
 {
@@ -29,7 +29,8 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Create a new filesystem adapter instance.
      *
-     * @param  \League\Flysystem\FilesystemInterface  $driver
+     * @param \League\Flysystem\FilesystemInterface $driver
+     *
      * @return void
      */
     public function __construct(FilesystemInterface $driver)
@@ -40,7 +41,8 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Determine if a file exists.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return bool
      */
     public function exists($path)
@@ -51,10 +53,11 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Get the contents of a file.
      *
-     * @param  string  $path
-     * @return string
+     * @param string $path
      *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     *
+     * @return string
      */
     public function get($path)
     {
@@ -68,9 +71,10 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Write the contents of a file.
      *
-     * @param  string  $path
-     * @param  string|resource  $contents
-     * @param  string  $visibility
+     * @param string          $path
+     * @param string|resource $contents
+     * @param string          $visibility
+     *
      * @return bool
      */
     public function put($path, $contents, $visibility = null)
@@ -95,9 +99,10 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Store the uploaded file on the disk.
      *
-     * @param  string  $path
-     * @param  \Illuminate\Http\UploadedFile  $file
-     * @param  string  $visibility
+     * @param string                        $path
+     * @param \Illuminate\Http\UploadedFile $file
+     * @param string                        $visibility
+     *
      * @return string|false
      */
     public function putFile($path, $file, $visibility = null)
@@ -108,10 +113,11 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Store the uploaded file on the disk with a given name.
      *
-     * @param  string  $path
-     * @param  \Illuminate\Http\File|\Illuminate\Http\UploadedFile  $file
-     * @param  string  $name
-     * @param  string  $visibility
+     * @param string                                              $path
+     * @param \Illuminate\Http\File|\Illuminate\Http\UploadedFile $file
+     * @param string                                              $name
+     * @param string                                              $visibility
+     *
      * @return string|false
      */
     public function putFileAs($path, $file, $name, $visibility = null)
@@ -130,7 +136,8 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Get the visibility for the given path.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string
      */
     public function getVisibility($path)
@@ -145,8 +152,9 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Set the visibility for the given path.
      *
-     * @param  string  $path
-     * @param  string  $visibility
+     * @param string $path
+     * @param string $visibility
+     *
      * @return void
      */
     public function setVisibility($path, $visibility)
@@ -157,9 +165,10 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Prepend to a file.
      *
-     * @param  string  $path
-     * @param  string  $data
-     * @param  string  $separator
+     * @param string $path
+     * @param string $data
+     * @param string $separator
+     *
      * @return int
      */
     public function prepend($path, $data, $separator = PHP_EOL)
@@ -174,9 +183,10 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Append to a file.
      *
-     * @param  string  $path
-     * @param  string  $data
-     * @param  string  $separator
+     * @param string $path
+     * @param string $data
+     * @param string $separator
+     *
      * @return int
      */
     public function append($path, $data, $separator = PHP_EOL)
@@ -191,7 +201,8 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Delete the file at a given path.
      *
-     * @param  string|array  $paths
+     * @param string|array $paths
+     *
      * @return bool
      */
     public function delete($paths)
@@ -202,7 +213,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
 
         foreach ($paths as $path) {
             try {
-                if (! $this->driver->delete($path)) {
+                if (!$this->driver->delete($path)) {
                     $success = false;
                 }
             } catch (FileNotFoundException $e) {
@@ -216,8 +227,9 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Copy a file to a new location.
      *
-     * @param  string  $from
-     * @param  string  $to
+     * @param string $from
+     * @param string $to
+     *
      * @return bool
      */
     public function copy($from, $to)
@@ -228,8 +240,9 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Move a file to a new location.
      *
-     * @param  string  $from
-     * @param  string  $to
+     * @param string $from
+     * @param string $to
+     *
      * @return bool
      */
     public function move($from, $to)
@@ -240,7 +253,8 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Get the file size of a given file.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return int
      */
     public function size($path)
@@ -251,7 +265,8 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Get the mime-type of a given file.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string|false
      */
     public function mimeType($path)
@@ -262,7 +277,8 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Get the file's last modification time.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return int
      */
     public function lastModified($path)
@@ -273,7 +289,8 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Get the URL for the file at the given path.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string
      */
     public function url($path)
@@ -305,8 +322,9 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Get an array of all files in a directory.
      *
-     * @param  string|null  $directory
-     * @param  bool  $recursive
+     * @param string|null $directory
+     * @param bool        $recursive
+     *
      * @return array
      */
     public function files($directory = null, $recursive = false)
@@ -319,7 +337,8 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Get all of the files from the given directory (recursive).
      *
-     * @param  string|null  $directory
+     * @param string|null $directory
+     *
      * @return array
      */
     public function allFiles($directory = null)
@@ -330,8 +349,9 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Get all of the directories within a given directory.
      *
-     * @param  string|null  $directory
-     * @param  bool  $recursive
+     * @param string|null $directory
+     * @param bool        $recursive
+     *
      * @return array
      */
     public function directories($directory = null, $recursive = false)
@@ -344,7 +364,8 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Get all (recursive) of the directories within a given directory.
      *
-     * @param  string|null  $directory
+     * @param string|null $directory
+     *
      * @return array
      */
     public function allDirectories($directory = null)
@@ -355,7 +376,8 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Create a directory.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return bool
      */
     public function makeDirectory($path)
@@ -366,7 +388,8 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Recursively delete a directory.
      *
-     * @param  string  $directory
+     * @param string $directory
+     *
      * @return bool
      */
     public function deleteDirectory($directory)
@@ -387,8 +410,9 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Filter directory contents by type.
      *
-     * @param  array  $contents
-     * @param  string  $type
+     * @param array  $contents
+     * @param string $type
+     *
      * @return array
      */
     protected function filterContentsByType($contents, $type)
@@ -403,10 +427,11 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Parse the given visibility value.
      *
-     * @param  string|null  $visibility
-     * @return string|null
+     * @param string|null $visibility
      *
      * @throws \InvalidArgumentException
+     *
+     * @return string|null
      */
     protected function parseVisibility($visibility)
     {
@@ -427,11 +452,12 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Pass dynamic methods call onto Flysystem.
      *
-     * @param  string  $method
-     * @param  array  $parameters
-     * @return mixed
+     * @param string $method
+     * @param array  $parameters
      *
      * @throws \BadMethodCallException
+     *
+     * @return mixed
      */
     public function __call($method, array $parameters)
     {

@@ -6,14 +6,14 @@ class MailMailableTest extends PHPUnit_Framework_TestCase
 {
     public function testMailableBuildsViewData()
     {
-        $mailable = new WelcomeMailableStub;
+        $mailable = new WelcomeMailableStub();
 
         $mailable->build();
 
         $expected = [
             'first_name' => 'Taylor',
-            'last_name' => 'Otwell',
-            'framework' => 'Laravel',
+            'last_name'  => 'Otwell',
+            'framework'  => 'Laravel',
         ];
 
         $this->assertSame($expected, $mailable->buildViewData());

@@ -2,8 +2,8 @@
 
 namespace Illuminate\Mail\Transport;
 
-use Swift_Mime_Message;
 use GuzzleHttp\ClientInterface;
+use Swift_Mime_Message;
 
 class MandrillTransport extends Transport
 {
@@ -24,8 +24,9 @@ class MandrillTransport extends Transport
     /**
      * Create a new Mandrill transport instance.
      *
-     * @param  \GuzzleHttp\ClientInterface  $client
-     * @param  string  $key
+     * @param \GuzzleHttp\ClientInterface $client
+     * @param string                      $key
+     *
      * @return void
      */
     public function __construct(ClientInterface $client, $key)
@@ -42,10 +43,10 @@ class MandrillTransport extends Transport
         $this->beforeSendPerformed($message);
 
         $data = [
-            'key' => $this->key,
-            'to' => $this->getToAddresses($message),
+            'key'         => $this->key,
+            'to'          => $this->getToAddresses($message),
             'raw_message' => $message->toString(),
-            'async' => true,
+            'async'       => true,
         ];
 
         if (version_compare(ClientInterface::VERSION, '6') === 1) {
@@ -66,7 +67,8 @@ class MandrillTransport extends Transport
      *
      * Note that Mandrill still respects CC, BCC headers in raw message itself.
      *
-     * @param  \Swift_Mime_Message $message
+     * @param \Swift_Mime_Message $message
+     *
      * @return array
      */
     protected function getToAddresses(Swift_Mime_Message $message)
@@ -101,7 +103,8 @@ class MandrillTransport extends Transport
     /**
      * Set the API key being used by the transport.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return string
      */
     public function setKey($key)

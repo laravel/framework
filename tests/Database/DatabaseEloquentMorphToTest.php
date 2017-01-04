@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Mockery as m;
 
 class DatabaseEloquentMorphToTest extends PHPUnit_Framework_TestCase
 {
@@ -88,7 +88,7 @@ class DatabaseEloquentMorphToTest extends PHPUnit_Framework_TestCase
         $related->shouldReceive('getKeyName')->andReturn('id');
         $related->shouldReceive('getTable')->andReturn('relation');
         $builder->shouldReceive('getModel')->andReturn($related);
-        $parent = $parent ?: new EloquentMorphToModelStub;
+        $parent = $parent ?: new EloquentMorphToModelStub();
         $morphTo = m::mock('Illuminate\Database\Eloquent\Relations\MorphTo[createModelByType]', [$builder, $parent, 'foreign_key', 'id', 'morph_type', 'relation']);
 
         return $morphTo;

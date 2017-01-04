@@ -10,13 +10,14 @@ class MemcachedConnector
     /**
      * Create a new Memcached connection.
      *
-     * @param  array  $servers
-     * @param  string|null  $connectionId
-     * @param  array  $options
-     * @param  array  $credentials
-     * @return \Memcached
+     * @param array       $servers
+     * @param string|null $connectionId
+     * @param array       $options
+     * @param array       $credentials
      *
      * @throws \RuntimeException
+     *
+     * @return \Memcached
      */
     public function connect(
         array $servers, $connectionId = null,
@@ -26,7 +27,7 @@ class MemcachedConnector
             $connectionId, $credentials, $options
         );
 
-        if (! $memcached->getServerList()) {
+        if (!$memcached->getServerList()) {
             // For each server in the array, we'll just extract the configuration and add
             // the server to the Memcached connection. Once we have added all of these
             // servers we'll verify the connection is successful and return it back.
@@ -43,9 +44,10 @@ class MemcachedConnector
     /**
      * Get a new Memcached instance.
      *
-     * @param  string|null  $connectionId
-     * @param  array  $credentials
-     * @param  array  $options
+     * @param string|null $connectionId
+     * @param array       $credentials
+     * @param array       $options
+     *
      * @return \Memcached
      */
     protected function getMemcached($connectionId, array $credentials, array $options)
@@ -66,19 +68,21 @@ class MemcachedConnector
     /**
      * Create the Memcached instance.
      *
-     * @param  string|null  $connectionId
+     * @param string|null $connectionId
+     *
      * @return \Memcached
      */
     protected function createMemcachedInstance($connectionId)
     {
-        return empty($connectionId) ? new Memcached : new Memcached($connectionId);
+        return empty($connectionId) ? new Memcached() : new Memcached($connectionId);
     }
 
     /**
      * Set the SASL credentials on the Memcached connection.
      *
-     * @param  \Memcached  $memcached
-     * @param  array  $credentials
+     * @param \Memcached $memcached
+     * @param array      $credentials
+     *
      * @return void
      */
     protected function setCredentials($memcached, $credentials)
@@ -93,14 +97,15 @@ class MemcachedConnector
     /**
      * Validate the given Memcached connection.
      *
-     * @param  \Memcached  $memcached
+     * @param \Memcached $memcached
+     *
      * @return \Memcached
      */
     protected function validateConnection($memcached)
     {
         $status = $memcached->getVersion();
 
-        if (! is_array($status)) {
+        if (!is_array($status)) {
             throw new RuntimeException('No Memcached servers added.');
         }
 

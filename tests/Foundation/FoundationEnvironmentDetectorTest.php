@@ -11,7 +11,7 @@ class FoundationEnvironmentDetectorTest extends PHPUnit_Framework_TestCase
 
     public function testClosureCanBeUsedForCustomEnvironmentDetection()
     {
-        $env = new Illuminate\Foundation\EnvironmentDetector;
+        $env = new Illuminate\Foundation\EnvironmentDetector();
 
         $result = $env->detect(function () {
             return 'foobar';
@@ -21,7 +21,7 @@ class FoundationEnvironmentDetectorTest extends PHPUnit_Framework_TestCase
 
     public function testConsoleEnvironmentDetection()
     {
-        $env = new Illuminate\Foundation\EnvironmentDetector;
+        $env = new Illuminate\Foundation\EnvironmentDetector();
 
         $result = $env->detect(function () {
             return 'foobar';

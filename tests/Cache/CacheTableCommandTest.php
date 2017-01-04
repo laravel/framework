@@ -1,8 +1,8 @@
 <?php
 
-use Mockery as m;
-use Illuminate\Foundation\Application;
 use Illuminate\Cache\Console\CacheTableCommand;
+use Illuminate\Foundation\Application;
+use Mockery as m;
 
 class CacheTableCommandTest extends PHPUnit_Framework_TestCase
 {
@@ -34,7 +34,7 @@ class CacheTableCommandTest extends PHPUnit_Framework_TestCase
 
     protected function runCommand($command, $input = [])
     {
-        return $command->run(new Symfony\Component\Console\Input\ArrayInput($input), new Symfony\Component\Console\Output\NullOutput);
+        return $command->run(new Symfony\Component\Console\Input\ArrayInput($input), new Symfony\Component\Console\Output\NullOutput());
     }
 }
 

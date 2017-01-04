@@ -9,7 +9,8 @@ interface Container
     /**
      * Determine if the given abstract type has been bound.
      *
-     * @param  string  $abstract
+     * @param string $abstract
+     *
      * @return bool
      */
     public function bound($abstract);
@@ -17,8 +18,9 @@ interface Container
     /**
      * Alias a type to a different name.
      *
-     * @param  string  $abstract
-     * @param  string  $alias
+     * @param string $abstract
+     * @param string $alias
+     *
      * @return void
      */
     public function alias($abstract, $alias);
@@ -26,8 +28,9 @@ interface Container
     /**
      * Assign a set of tags to a given binding.
      *
-     * @param  array|string  $abstracts
+     * @param array|string $abstracts
      * @param  array|mixed   ...$tags
+     *
      * @return void
      */
     public function tag($abstracts, $tags);
@@ -35,7 +38,8 @@ interface Container
     /**
      * Resolve all of the bindings for a given tag.
      *
-     * @param  array  $tag
+     * @param array $tag
+     *
      * @return array
      */
     public function tagged($tag);
@@ -43,9 +47,10 @@ interface Container
     /**
      * Register a binding with the container.
      *
-     * @param  string|array  $abstract
-     * @param  \Closure|string|null  $concrete
-     * @param  bool  $shared
+     * @param string|array         $abstract
+     * @param \Closure|string|null $concrete
+     * @param bool                 $shared
+     *
      * @return void
      */
     public function bind($abstract, $concrete = null, $shared = false);
@@ -53,9 +58,10 @@ interface Container
     /**
      * Register a binding if it hasn't already been registered.
      *
-     * @param  string  $abstract
-     * @param  \Closure|string|null  $concrete
-     * @param  bool  $shared
+     * @param string               $abstract
+     * @param \Closure|string|null $concrete
+     * @param bool                 $shared
+     *
      * @return void
      */
     public function bindIf($abstract, $concrete = null, $shared = false);
@@ -63,8 +69,9 @@ interface Container
     /**
      * Register a shared binding in the container.
      *
-     * @param  string|array  $abstract
-     * @param  \Closure|string|null  $concrete
+     * @param string|array         $abstract
+     * @param \Closure|string|null $concrete
+     *
      * @return void
      */
     public function singleton($abstract, $concrete = null);
@@ -72,19 +79,21 @@ interface Container
     /**
      * "Extend" an abstract type in the container.
      *
-     * @param  string    $abstract
-     * @param  \Closure  $closure
-     * @return void
+     * @param string   $abstract
+     * @param \Closure $closure
      *
      * @throws \InvalidArgumentException
+     *
+     * @return void
      */
     public function extend($abstract, Closure $closure);
 
     /**
      * Register an existing instance as shared in the container.
      *
-     * @param  string  $abstract
-     * @param  mixed   $instance
+     * @param string $abstract
+     * @param mixed  $instance
+     *
      * @return void
      */
     public function instance($abstract, $instance);
@@ -92,7 +101,8 @@ interface Container
     /**
      * Define a contextual binding.
      *
-     * @param  string  $concrete
+     * @param string $concrete
+     *
      * @return \Illuminate\Contracts\Container\ContextualBindingBuilder
      */
     public function when($concrete);
@@ -100,8 +110,9 @@ interface Container
     /**
      * Resolve the given type from the container.
      *
-     * @param  string  $abstract
-     * @param  array   $parameters
+     * @param string $abstract
+     * @param array  $parameters
+     *
      * @return mixed
      */
     public function make($abstract, array $parameters = []);
@@ -109,9 +120,10 @@ interface Container
     /**
      * Call the given Closure / class@method and inject its dependencies.
      *
-     * @param  callable|string  $callback
-     * @param  array  $parameters
-     * @param  string|null  $defaultMethod
+     * @param callable|string $callback
+     * @param array           $parameters
+     * @param string|null     $defaultMethod
+     *
      * @return mixed
      */
     public function call($callback, array $parameters = [], $defaultMethod = null);
@@ -119,7 +131,8 @@ interface Container
     /**
      * Determine if the given abstract type has been resolved.
      *
-     * @param  string $abstract
+     * @param string $abstract
+     *
      * @return bool
      */
     public function resolved($abstract);
@@ -127,8 +140,9 @@ interface Container
     /**
      * Register a new resolving callback.
      *
-     * @param  string    $abstract
-     * @param  \Closure|null  $callback
+     * @param string        $abstract
+     * @param \Closure|null $callback
+     *
      * @return void
      */
     public function resolving($abstract, Closure $callback = null);
@@ -136,8 +150,9 @@ interface Container
     /**
      * Register a new after resolving callback.
      *
-     * @param  string    $abstract
-     * @param  \Closure|null  $callback
+     * @param string        $abstract
+     * @param \Closure|null $callback
+     *
      * @return void
      */
     public function afterResolving($abstract, Closure $callback = null);

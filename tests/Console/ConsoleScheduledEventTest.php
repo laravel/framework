@@ -1,8 +1,8 @@
 <?php
 
-use Mockery as m;
 use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Event;
+use Mockery as m;
 
 class ConsoleScheduledEventTest extends PHPUnit_Framework_TestCase
 {

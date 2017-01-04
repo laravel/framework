@@ -2,8 +2,8 @@
 
 namespace Illuminate\Mail;
 
-use Swift_Mailer;
 use Illuminate\Support\ServiceProvider;
+use Swift_Mailer;
 
 class MailServiceProvider extends ServiceProvider
 {
@@ -64,8 +64,9 @@ class MailServiceProvider extends ServiceProvider
     /**
      * Set a few dependencies on the mailer instance.
      *
-     * @param  \Illuminate\Mail\Mailer  $mailer
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param \Illuminate\Mail\Mailer            $mailer
+     * @param \Illuminate\Foundation\Application $app
+     *
      * @return void
      */
     protected function setMailerDependencies($mailer, $app)

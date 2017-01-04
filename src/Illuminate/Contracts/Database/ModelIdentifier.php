@@ -23,8 +23,9 @@ class ModelIdentifier
     /**
      * Create a new model identifier.
      *
-     * @param  string  $class
-     * @param  mixed  $id
+     * @param string $class
+     * @param mixed  $id
+     *
      * @return void
      */
     public function __construct($class, $id)

@@ -4,7 +4,7 @@ class DatabaseSQLiteProcessorTest extends PHPUnit_Framework_TestCase
 {
     public function testProcessColumnListing()
     {
-        $processor = new Illuminate\Database\Query\Processors\SQLiteProcessor;
+        $processor = new Illuminate\Database\Query\Processors\SQLiteProcessor();
 
         $listing = [['name' => 'id'], ['name' => 'name'], ['name' => 'email']];
         $expected = ['id', 'name', 'email'];

@@ -1,8 +1,8 @@
 <?php
 
+use Illuminate\Foundation\Testing\Concerns\InteractsWithPages;
 use Mockery as m;
 use Symfony\Component\DomCrawler\Crawler;
-use Illuminate\Foundation\Testing\Concerns\InteractsWithPages;
 
 class FoundationInteractsWithPagesUnitTest extends PHPUnit_Framework_TestCase
 {

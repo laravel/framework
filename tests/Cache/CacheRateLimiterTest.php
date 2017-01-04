@@ -1,8 +1,8 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Contracts\Cache\Repository as Cache;
+use Mockery as m;
 
 class CacheRateLimiterTest extends PHPUnit_Framework_TestCase
 {

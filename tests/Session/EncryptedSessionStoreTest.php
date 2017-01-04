@@ -20,8 +20,8 @@ class EncryptedSessionStoreTest extends PHPUnit_Framework_TestCase
         $session->now('qux', 'norf');
         $serialized = serialize([
             '_token' => $session->token(),
-            'foo' => 'bar',
-            'baz' => 'boom',
+            'foo'    => 'bar',
+            'baz'    => 'boom',
             '_flash' => [
                 'new' => [],
                 'old' => ['baz'],

@@ -14,7 +14,8 @@ class HasSource extends PageConstraint
     /**
      * Create a new constraint instance.
      *
-     * @param  string  $source
+     * @param string $source
+     *
      * @return void
      */
     public function __construct($source)
@@ -25,7 +26,8 @@ class HasSource extends PageConstraint
     /**
      * Check if the source is found in the given crawler.
      *
-     * @param  \Symfony\Component\DomCrawler\Crawler|string  $crawler
+     * @param \Symfony\Component\DomCrawler\Crawler|string $crawler
+     *
      * @return bool
      */
     protected function matches($crawler)

@@ -1,13 +1,13 @@
 <?php
 
-use Illuminate\Queue\WorkerOptions;
+use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
-use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\MaxAttemptsExceededException;
+use Illuminate\Queue\WorkerOptions;
 
 class QueueWorkerTest extends PHPUnit_Framework_TestCase
 {
@@ -22,8 +22,8 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
 
     public function test_job_can_be_fired()
     {
-        $worker = $this->getWorker('default', ['queue' => [$job = new WorkerFakeJob]]);
-        $worker->runNextJob('default', 'queue', new WorkerOptions);
+        $worker = $this->getWorker('default', ['queue' => [$job = new WorkerFakeJob()]]);
+        $worker->runNextJob('default', 'queue', new WorkerOptions());
         $this->assertTrue($job->fired);
         $this->events->shouldHaveReceived('fire')->with(Mockery::type(JobProcessing::class))->once();
         $this->events->shouldHaveReceived('fire')->with(Mockery::type(JobProcessed::class))->once();
@@ -32,26 +32,26 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
     public function test_job_can_be_fired_based_on_priority()
     {
         $worker = $this->getWorker('default', [
-            'high' => [$highJob = new WorkerFakeJob, $secondHighJob = new WorkerFakeJob], 'low' => [$lowJob = new WorkerFakeJob],
+            'high' => [$highJob = new WorkerFakeJob(), $secondHighJob = new WorkerFakeJob()], 'low' => [$lowJob = new WorkerFakeJob()],
         ]);
 
-        $worker->runNextJob('default', 'high,low', new WorkerOptions);
+        $worker->runNextJob('default', 'high,low', new WorkerOptions());
         $this->assertTrue($highJob->fired);
         $this->assertFalse($secondHighJob->fired);
         $this->assertFalse($lowJob->fired);
 
-        $worker->runNextJob('default', 'high,low', new WorkerOptions);
+        $worker->runNextJob('default', 'high,low', new WorkerOptions());
         $this->assertTrue($secondHighJob->fired);
         $this->assertFalse($lowJob->fired);
 
-        $worker->runNextJob('default', 'high,low', new WorkerOptions);
+        $worker->runNextJob('default', 'high,low', new WorkerOptions());
         $this->assertTrue($lowJob->fired);
     }
 
     public function test_exception_is_reported_if_connection_throws_exception_on_job_pop()
     {
         $worker = new InsomniacWorker(
-            new WorkerFakeManager('default', new BrokenQueueConnection($e = new RuntimeException)),
+            new WorkerFakeManager('default', new BrokenQueueConnection($e = new RuntimeException())),
             $this->events,
             $this->exceptionHandler
         );
@@ -70,7 +70,7 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
 
     public function test_job_is_released_on_exception()
     {
-        $e = new RuntimeException;
+        $e = new RuntimeException();
 
         $job = new WorkerFakeJob(function () use ($e) {
             throw $e;
@@ -88,7 +88,7 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
 
     public function test_job_is_not_released_if_it_has_exceeded_max_attempts()
     {
-        $e = new RuntimeException;
+        $e = new RuntimeException();
 
         $job = new WorkerFakeJob(function ($job) use ($e) {
             // In normal use this would be incremented by being popped off the queue
@@ -150,7 +150,7 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
 
     private function workerOptions(array $overrides = [])
     {
-        $options = new WorkerOptions;
+        $options = new WorkerOptions();
         foreach ($overrides as $key => $value) {
             $options->{$key} = $value;
         }
@@ -273,7 +273,7 @@ class WorkerFakeJob
         $exceptionHandler = m::mock('Illuminate\Contracts\Debug\ExceptionHandler');
         $job = m::mock('Illuminate\Contracts\Queue\Job');
         $job->shouldReceive('fire')->once()->andReturnUsing(function () {
-            throw new RuntimeException;
+            throw new RuntimeException();
         });
         $worker = m::mock('Illuminate\Queue\Worker', [$manager = m::mock('Illuminate\Queue\QueueManager')])->makePartial();
         $manager->shouldReceive('connection')->once()->with('connection')->andReturn($connection = m::mock('StdClass'));

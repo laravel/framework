@@ -1,12 +1,12 @@
 <?php
 
-use Illuminate\Events\Dispatcher;
-use Mockery\MockInterface as Mock;
-use Illuminate\Foundation\Application;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Testing\TestCase;
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Testing\TestCase;
+use Mockery\MockInterface as Mock;
 
 class FoundationExpectsModelEventsTest extends TestCase
 {
@@ -14,9 +14,9 @@ class FoundationExpectsModelEventsTest extends TestCase
     {
         Model::clearBootedModels();
 
-        $app = new Application;
+        $app = new Application();
 
-        $db = new DB;
+        $db = new DB();
 
         $db->addConnection([
             'driver'    => 'sqlite',
@@ -168,7 +168,7 @@ class FoundationExpectsModelEventsTest extends TestCase
             'deleted',
         ]);
 
-        EloquentTestModel::observe(new EloquentTestModelFailingObserver);
+        EloquentTestModel::observe(new EloquentTestModelFailingObserver());
 
         EloquentTestModel::create(['field' => 1]);
     }

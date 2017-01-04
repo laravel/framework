@@ -1,8 +1,8 @@
 <?php
 
-use Mockery as m;
-use Illuminate\Foundation\Application;
 use Illuminate\Database\Console\Migrations\RollbackCommand;
+use Illuminate\Foundation\Application;
+use Mockery as m;
 
 class DatabaseMigrationRollbackCommandTest extends PHPUnit_Framework_TestCase
 {
@@ -69,7 +69,7 @@ class DatabaseMigrationRollbackCommandTest extends PHPUnit_Framework_TestCase
 
     protected function runCommand($command, $input = [])
     {
-        return $command->run(new Symfony\Component\Console\Input\ArrayInput($input), new Symfony\Component\Console\Output\NullOutput);
+        return $command->run(new Symfony\Component\Console\Input\ArrayInput($input), new Symfony\Component\Console\Output\NullOutput());
     }
 }
 

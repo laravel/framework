@@ -30,7 +30,8 @@ class ScheduleRunCommand extends Command
     /**
      * Create a new command instance.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
+     * @param \Illuminate\Console\Scheduling\Schedule $schedule
+     *
      * @return void
      */
     public function __construct(Schedule $schedule)
@@ -50,7 +51,7 @@ class ScheduleRunCommand extends Command
         $eventsRan = false;
 
         foreach ($this->schedule->dueEvents($this->laravel) as $event) {
-            if (! $event->filtersPass($this->laravel)) {
+            if (!$event->filtersPass($this->laravel)) {
                 continue;
             }
 
@@ -61,7 +62,7 @@ class ScheduleRunCommand extends Command
             $eventsRan = true;
         }
 
-        if (! $eventsRan) {
+        if (!$eventsRan) {
             $this->info('No scheduled commands are ready to run.');
         }
     }

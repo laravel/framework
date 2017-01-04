@@ -1,10 +1,10 @@
 <?php
 
-use Mockery as m;
-use Illuminate\View\Factory;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\View\Engines\CompilerEngine;
 use Illuminate\View\Compilers\BladeCompiler;
+use Illuminate\View\Engines\CompilerEngine;
+use Illuminate\View\Factory;
+use Mockery as m;
 
 class ViewFlowTest extends PHPUnit_Framework_TestCase
 {
@@ -12,17 +12,17 @@ class ViewFlowTest extends PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $files = new Filesystem;
+        $files = new Filesystem();
         $this->tempDir = __DIR__.'/tmp';
 
-        if (! $files->exists($this->tempDir)) {
+        if (!$files->exists($this->tempDir)) {
             $files->makeDirectory($this->tempDir);
         }
     }
 
     public function tearDown()
     {
-        $files = new Filesystem;
+        $files = new Filesystem();
         $files->deleteDirectory($this->tempDir);
 
         m::close();
@@ -30,7 +30,7 @@ class ViewFlowTest extends PHPUnit_Framework_TestCase
 
     public function testPushWithExtend()
     {
-        $files = new Filesystem;
+        $files = new Filesystem();
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
 
         $files->put($this->tempDir.'/child.php', $compiler->compileString('
@@ -51,7 +51,7 @@ Hello
 
     public function testPushWithMultipleExtends()
     {
-        $files = new Filesystem;
+        $files = new Filesystem();
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
 
         $files->put($this->tempDir.'/a.php', $compiler->compileString('
@@ -76,7 +76,7 @@ c
 
     public function testPushWithInputAndExtend()
     {
-        $files = new Filesystem;
+        $files = new Filesystem();
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
 
         $files->put($this->tempDir.'/aa.php', $compiler->compileString('
@@ -101,7 +101,7 @@ c
 
     public function testExtends()
     {
-        $files = new Filesystem;
+        $files = new Filesystem();
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
 
         $files->put($this->tempDir.'/extends-a.php', $compiler->compileString('
@@ -127,7 +127,7 @@ c
 
     public function testExtendsWithParent()
     {
-        $files = new Filesystem;
+        $files = new Filesystem();
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
 
         $files->put($this->tempDir.'/extends-layout.php', $compiler->compileString('
@@ -153,7 +153,7 @@ child
 
     public function testExtendsWithVariable()
     {
-        $files = new Filesystem;
+        $files = new Filesystem();
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
 
         $files->put($this->tempDir.'/extends-variable-layout.php', $compiler->compileString('

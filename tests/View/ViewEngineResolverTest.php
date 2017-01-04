@@ -4,9 +4,9 @@ class ViewEngineResolverTest extends PHPUnit_Framework_TestCase
 {
     public function testResolversMayBeResolved()
     {
-        $resolver = new Illuminate\View\Engines\EngineResolver;
+        $resolver = new Illuminate\View\Engines\EngineResolver();
         $resolver->register('foo', function () {
-            return new StdClass;
+            return new StdClass();
         });
         $result = $resolver->resolve('foo');
 
@@ -18,7 +18,7 @@ class ViewEngineResolverTest extends PHPUnit_Framework_TestCase
      */
     public function testResolverThrowsExceptionOnUnknownEngine()
     {
-        $resolver = new Illuminate\View\Engines\EngineResolver;
+        $resolver = new Illuminate\View\Engines\EngineResolver();
         $resolver->resolve('foo');
     }
 }

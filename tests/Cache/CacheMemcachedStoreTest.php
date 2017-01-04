@@ -6,7 +6,7 @@ class CacheMemcachedStoreTest extends PHPUnit_Framework_TestCase
 {
     public function testGetReturnsNullWhenNotFound()
     {
-        if (! class_exists(Memcached::class)) {
+        if (!class_exists(Memcached::class)) {
             $this->markTestSkipped('Memcached module not installed');
         }
 
@@ -19,7 +19,7 @@ class CacheMemcachedStoreTest extends PHPUnit_Framework_TestCase
 
     public function testMemcacheValueIsReturned()
     {
-        if (! class_exists(Memcached::class)) {
+        if (!class_exists(Memcached::class)) {
             $this->markTestSkipped('Memcached module not installed');
         }
 
@@ -32,7 +32,7 @@ class CacheMemcachedStoreTest extends PHPUnit_Framework_TestCase
 
     public function testMemcacheGetMultiValuesAreReturnedWithCorrectKeys()
     {
-        if (! class_exists(Memcached::class)) {
+        if (!class_exists(Memcached::class)) {
             $this->markTestSkipped('Memcached module not installed');
         }
 
@@ -55,7 +55,7 @@ class CacheMemcachedStoreTest extends PHPUnit_Framework_TestCase
 
     public function testSetMethodProperlyCallsMemcache()
     {
-        if (! class_exists(Memcached::class)) {
+        if (!class_exists(Memcached::class)) {
             $this->markTestSkipped('Memcached module not installed');
         }
 
@@ -69,7 +69,7 @@ class CacheMemcachedStoreTest extends PHPUnit_Framework_TestCase
 
     public function testIncrementMethodProperlyCallsMemcache()
     {
-        if (! class_exists(Memcached::class)) {
+        if (!class_exists(Memcached::class)) {
             $this->markTestSkipped('Memcached module not installed');
         }
 
@@ -81,7 +81,7 @@ class CacheMemcachedStoreTest extends PHPUnit_Framework_TestCase
 
     public function testDecrementMethodProperlyCallsMemcache()
     {
-        if (! class_exists(Memcached::class)) {
+        if (!class_exists(Memcached::class)) {
             $this->markTestSkipped('Memcached module not installed');
         }
 
@@ -93,7 +93,7 @@ class CacheMemcachedStoreTest extends PHPUnit_Framework_TestCase
 
     public function testStoreItemForeverProperlyCallsMemcached()
     {
-        if (! class_exists(Memcached::class)) {
+        if (!class_exists(Memcached::class)) {
             $this->markTestSkipped('Memcached module not installed');
         }
 
@@ -105,7 +105,7 @@ class CacheMemcachedStoreTest extends PHPUnit_Framework_TestCase
 
     public function testForgetMethodProperlyCallsMemcache()
     {
-        if (! class_exists(Memcached::class)) {
+        if (!class_exists(Memcached::class)) {
             $this->markTestSkipped('Memcached module not installed');
         }
 
@@ -117,7 +117,7 @@ class CacheMemcachedStoreTest extends PHPUnit_Framework_TestCase
 
     public function testGetAndSetPrefix()
     {
-        if (! class_exists(Memcached::class)) {
+        if (!class_exists(Memcached::class)) {
             $this->markTestSkipped('Memcached module not installed');
         }
 

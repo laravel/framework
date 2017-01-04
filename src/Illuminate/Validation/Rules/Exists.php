@@ -37,8 +37,9 @@ class Exists
     /**
      * Create a new exists rule instance.
      *
-     * @param  string  $table
-     * @param  string  $column
+     * @param string $table
+     * @param string $column
+     *
      * @return void
      */
     public function __construct($table, $column = 'NULL')
@@ -50,8 +51,9 @@ class Exists
     /**
      * Set a "where" constraint on the query.
      *
-     * @param  string  $column
-     * @param  string  $value
+     * @param string $column
+     * @param string $value
+     *
      * @return $this
      */
     public function where($column, $value = null)
@@ -68,8 +70,9 @@ class Exists
     /**
      * Set a "where not" constraint on the query.
      *
-     * @param  string  $column
-     * @param  string  $value
+     * @param string $column
+     * @param string $value
+     *
      * @return $this
      */
     public function whereNot($column, $value)
@@ -80,7 +83,8 @@ class Exists
     /**
      * Set a "where null" constraint on the query.
      *
-     * @param  string  $column
+     * @param string $column
+     *
      * @return $this
      */
     public function whereNull($column)
@@ -91,7 +95,8 @@ class Exists
     /**
      * Set a "where not null" constraint on the query.
      *
-     * @param  string  $column
+     * @param string $column
+     *
      * @return $this
      */
     public function whereNotNull($column)
@@ -102,7 +107,8 @@ class Exists
     /**
      * Register a custom query callback.
      *
-     * @param  \Closure $callback
+     * @param \Closure $callback
+     *
      * @return $this
      */
     public function using(Closure $callback)

@@ -1,13 +1,13 @@
 <?php
 
-use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 
 class HttpJsonResponseTest extends PHPUnit_Framework_TestCase
 {
     public function testSeAndRetrieveJsonableData()
     {
-        $response = new Illuminate\Http\JsonResponse(new JsonResponseTestJsonableObject);
+        $response = new Illuminate\Http\JsonResponse(new JsonResponseTestJsonableObject());
         $data = $response->getData();
         $this->assertInstanceOf('StdClass', $data);
         $this->assertEquals('bar', $data->foo);
@@ -15,7 +15,7 @@ class HttpJsonResponseTest extends PHPUnit_Framework_TestCase
 
     public function testSeAndRetrieveJsonSerializeData()
     {
-        $response = new Illuminate\Http\JsonResponse(new JsonResponseTestJsonSerializeObject);
+        $response = new Illuminate\Http\JsonResponse(new JsonResponseTestJsonSerializeObject());
         $data = $response->getData();
         $this->assertInstanceOf('StdClass', $data);
         $this->assertEquals('bar', $data->foo);
@@ -23,7 +23,7 @@ class HttpJsonResponseTest extends PHPUnit_Framework_TestCase
 
     public function testSeAndRetrieveArrayableData()
     {
-        $response = new Illuminate\Http\JsonResponse(new JsonResponseTestArrayableObject);
+        $response = new Illuminate\Http\JsonResponse(new JsonResponseTestArrayableObject());
         $data = $response->getData();
         $this->assertInstanceOf('StdClass', $data);
         $this->assertEquals('bar', $data->foo);

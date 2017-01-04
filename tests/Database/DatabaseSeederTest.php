@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Database\Seeder;
+use Mockery as m;
 
 class TestSeeder extends Seeder
 {
@@ -20,7 +20,7 @@ class DatabaseSeederTest extends PHPUnit_Framework_TestCase
 
     public function testCallResolveTheClassAndCallsRun()
     {
-        $seeder = new TestSeeder;
+        $seeder = new TestSeeder();
         $seeder->setContainer($container = m::mock('Illuminate\Container\Container'));
         $output = m::mock('Symfony\Component\Console\Output\OutputInterface');
         $output->shouldReceive('writeln')->once()->andReturn('foo');
@@ -37,14 +37,14 @@ class DatabaseSeederTest extends PHPUnit_Framework_TestCase
 
     public function testSetContainer()
     {
-        $seeder = new TestSeeder;
+        $seeder = new TestSeeder();
         $container = m::mock('Illuminate\Container\Container');
         $this->assertEquals($seeder->setContainer($container), $seeder);
     }
 
     public function testSetCommand()
     {
-        $seeder = new TestSeeder;
+        $seeder = new TestSeeder();
         $command = m::mock('Illuminate\Console\Command');
         $this->assertEquals($seeder->setCommand($command), $seeder);
     }

@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Cache\ArrayStore;
+use Mockery as m;
 
 class CacheTaggedCacheTest extends PHPUnit_Framework_TestCase
 {
@@ -12,7 +12,7 @@ class CacheTaggedCacheTest extends PHPUnit_Framework_TestCase
 
     public function testCacheCanBeSavedWithMultipleTags()
     {
-        $store = new ArrayStore;
+        $store = new ArrayStore();
         $tags = ['bop', 'zap'];
         $store->tags($tags)->put('foo', 'bar', 10);
         $this->assertEquals('bar', $store->tags($tags)->get('foo'));
@@ -20,7 +20,7 @@ class CacheTaggedCacheTest extends PHPUnit_Framework_TestCase
 
     public function testCacheCanBeSetWithDatetimeArgument()
     {
-        $store = new ArrayStore;
+        $store = new ArrayStore();
         $tags = ['bop', 'zap'];
         $duration = new DateTime();
         $duration->add(new DateInterval('PT10M'));
@@ -30,7 +30,7 @@ class CacheTaggedCacheTest extends PHPUnit_Framework_TestCase
 
     public function testCacheSavedWithMultipleTagsCanBeFlushed()
     {
-        $store = new ArrayStore;
+        $store = new ArrayStore();
         $tags1 = ['bop', 'zap'];
         $store->tags($tags1)->put('foo', 'bar', 10);
         $tags2 = ['bam', 'pow'];
@@ -42,14 +42,14 @@ class CacheTaggedCacheTest extends PHPUnit_Framework_TestCase
 
     public function testTagsWithStringArgument()
     {
-        $store = new ArrayStore;
+        $store = new ArrayStore();
         $store->tags('bop')->put('foo', 'bar', 10);
         $this->assertEquals('bar', $store->tags('bop')->get('foo'));
     }
 
     public function testTagsCacheForever()
     {
-        $store = new ArrayStore;
+        $store = new ArrayStore();
         $tags = ['bop', 'zap'];
         $store->tags($tags)->forever('foo', 'bar');
         $this->assertEquals('bar', $store->tags($tags)->get('foo'));

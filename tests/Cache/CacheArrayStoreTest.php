@@ -6,14 +6,14 @@ class CacheArrayStoreTest extends PHPUnit_Framework_TestCase
 {
     public function testItemsCanBeSetAndRetrieved()
     {
-        $store = new ArrayStore;
+        $store = new ArrayStore();
         $store->put('foo', 'bar', 10);
         $this->assertEquals('bar', $store->get('foo'));
     }
 
     public function testMultipleItemsCanBeSetAndRetrieved()
     {
-        $store = new ArrayStore;
+        $store = new ArrayStore();
         $store->put('foo', 'bar', 10);
         $store->putMany([
             'fizz'  => 'buz',
@@ -36,7 +36,7 @@ class CacheArrayStoreTest extends PHPUnit_Framework_TestCase
 
     public function testValuesCanBeIncremented()
     {
-        $store = new ArrayStore;
+        $store = new ArrayStore();
         $store->put('foo', 1, 10);
         $store->increment('foo');
         $this->assertEquals(2, $store->get('foo'));
@@ -44,7 +44,7 @@ class CacheArrayStoreTest extends PHPUnit_Framework_TestCase
 
     public function testValuesCanBeDecremented()
     {
-        $store = new ArrayStore;
+        $store = new ArrayStore();
         $store->put('foo', 1, 10);
         $store->decrement('foo');
         $this->assertEquals(0, $store->get('foo'));
@@ -52,7 +52,7 @@ class CacheArrayStoreTest extends PHPUnit_Framework_TestCase
 
     public function testItemsCanBeRemoved()
     {
-        $store = new ArrayStore;
+        $store = new ArrayStore();
         $store->put('foo', 'bar', 10);
         $store->forget('foo');
         $this->assertNull($store->get('foo'));
@@ -60,7 +60,7 @@ class CacheArrayStoreTest extends PHPUnit_Framework_TestCase
 
     public function testItemsCanBeFlushed()
     {
-        $store = new ArrayStore;
+        $store = new ArrayStore();
         $store->put('foo', 'bar', 10);
         $store->put('baz', 'boom', 10);
         $store->flush();
@@ -70,7 +70,7 @@ class CacheArrayStoreTest extends PHPUnit_Framework_TestCase
 
     public function testCacheKey()
     {
-        $store = new ArrayStore;
+        $store = new ArrayStore();
         $this->assertEmpty($store->getPrefix());
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Database\Schema\Blueprint;
+use Mockery as m;
 
 class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase
 {
@@ -550,6 +550,6 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase
 
     public function getGrammar()
     {
-        return new Illuminate\Database\Schema\Grammars\PostgresGrammar;
+        return new Illuminate\Database\Schema\Grammars\PostgresGrammar();
     }
 }

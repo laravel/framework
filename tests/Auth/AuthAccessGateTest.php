@@ -1,9 +1,9 @@
 <?php
 
 use Illuminate\Auth\Access\Gate;
-use Illuminate\Container\Container;
-use Illuminate\Auth\Access\Response;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Auth\Access\Response;
+use Illuminate\Container\Container;
 
 class GateTest extends PHPUnit_Framework_TestCase
 {
@@ -100,7 +100,7 @@ class GateTest extends PHPUnit_Framework_TestCase
     {
         $gate = $this->getBasicGate();
 
-        $dummy = new AccessGateTestDummy;
+        $dummy = new AccessGateTestDummy();
 
         $gate->define('foo', function ($user, $x) use ($dummy) {
             $this->assertEquals($dummy, $x);
@@ -115,8 +115,8 @@ class GateTest extends PHPUnit_Framework_TestCase
     {
         $gate = $this->getBasicGate();
 
-        $dummy1 = new AccessGateTestDummy;
-        $dummy2 = new AccessGateTestDummy;
+        $dummy1 = new AccessGateTestDummy();
+        $dummy2 = new AccessGateTestDummy();
 
         $gate->define('foo', function ($user, $x, $y) use ($dummy1, $dummy2) {
             $this->assertEquals($dummy1, $x);
@@ -143,7 +143,7 @@ class GateTest extends PHPUnit_Framework_TestCase
 
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
 
-        $this->assertTrue($gate->check('update', new AccessGateTestDummy));
+        $this->assertTrue($gate->check('update', new AccessGateTestDummy()));
     }
 
     public function test_policy_converts_dash_to_camel()
@@ -152,7 +152,7 @@ class GateTest extends PHPUnit_Framework_TestCase
 
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
 
-        $this->assertTrue($gate->check('update-dash', new AccessGateTestDummy));
+        $this->assertTrue($gate->check('update-dash', new AccessGateTestDummy()));
     }
 
     public function test_policy_default_to_false_if_method_does_not_exist()
@@ -161,7 +161,7 @@ class GateTest extends PHPUnit_Framework_TestCase
 
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
 
-        $this->assertFalse($gate->check('nonexistent_method', new AccessGateTestDummy));
+        $this->assertFalse($gate->check('nonexistent_method', new AccessGateTestDummy()));
     }
 
     public function test_policy_classes_can_be_defined_to_handle_checks_for_given_class_name()
@@ -179,7 +179,7 @@ class GateTest extends PHPUnit_Framework_TestCase
 
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithBefore::class);
 
-        $this->assertTrue($gate->check('update', new AccessGateTestDummy));
+        $this->assertTrue($gate->check('update', new AccessGateTestDummy()));
     }
 
     public function test_policies_always_override_closures_with_same_name()
@@ -192,7 +192,7 @@ class GateTest extends PHPUnit_Framework_TestCase
 
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
 
-        $this->assertTrue($gate->check('update', new AccessGateTestDummy));
+        $this->assertTrue($gate->check('update', new AccessGateTestDummy()));
     }
 
     public function test_for_user_method_attaches_a_new_user_to_a_new_gate_instance()
@@ -218,7 +218,7 @@ class GateTest extends PHPUnit_Framework_TestCase
 
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
 
-        $gate->authorize('create', new AccessGateTestDummy);
+        $gate->authorize('create', new AccessGateTestDummy());
     }
 
     public function test_authorize_returns_allowed_response()
@@ -227,8 +227,8 @@ class GateTest extends PHPUnit_Framework_TestCase
 
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
 
-        $check = $gate->check('create', new AccessGateTestDummy);
-        $response = $gate->authorize('create', new AccessGateTestDummy);
+        $check = $gate->check('create', new AccessGateTestDummy());
+        $response = $gate->authorize('create', new AccessGateTestDummy());
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertNull($response->message());
@@ -241,7 +241,7 @@ class GateTest extends PHPUnit_Framework_TestCase
 
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
 
-        $response = $gate->authorize('update', new AccessGateTestDummy);
+        $response = $gate->authorize('update', new AccessGateTestDummy());
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertNull($response->message());
@@ -249,7 +249,7 @@ class GateTest extends PHPUnit_Framework_TestCase
 
     protected function getBasicGate($isAdmin = false)
     {
-        return new Gate(new Container, function () use ($isAdmin) {
+        return new Gate(new Container(), function () use ($isAdmin) {
             return (object) ['id' => 1, 'isAdmin' => $isAdmin];
         });
     }
@@ -284,12 +284,12 @@ class AccessGateTestPolicy
 
     public function updateAny($user, AccessGateTestDummy $dummy)
     {
-        return ! $user->isAdmin;
+        return !$user->isAdmin;
     }
 
     public function update($user, AccessGateTestDummy $dummy)
     {
-        return ! $user->isAdmin;
+        return !$user->isAdmin;
     }
 
     public function updateDash($user, AccessGateTestDummy $dummy)

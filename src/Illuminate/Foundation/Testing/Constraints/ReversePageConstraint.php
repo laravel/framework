@@ -14,7 +14,8 @@ class ReversePageConstraint extends PageConstraint
     /**
      * Create a new reverse page constraint instance.
      *
-     * @param  \Illuminate\Foundation\Testing\Constraints\PageConstraint  $pageConstraint
+     * @param \Illuminate\Foundation\Testing\Constraints\PageConstraint $pageConstraint
+     *
      * @return void
      */
     public function __construct(PageConstraint $pageConstraint)
@@ -25,12 +26,13 @@ class ReversePageConstraint extends PageConstraint
     /**
      * Reverse the original page constraint result.
      *
-     * @param  \Symfony\Component\DomCrawler\Crawler  $crawler
+     * @param \Symfony\Component\DomCrawler\Crawler $crawler
+     *
      * @return bool
      */
     public function matches($crawler)
     {
-        return ! $this->pageConstraint->matches($crawler);
+        return !$this->pageConstraint->matches($crawler);
     }
 
     /**

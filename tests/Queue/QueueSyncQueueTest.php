@@ -13,8 +13,8 @@ class QueueSyncQueueTest extends PHPUnit_Framework_TestCase
     {
         unset($_SERVER['__sync.test']);
 
-        $sync = new Illuminate\Queue\SyncQueue;
-        $container = new Illuminate\Container\Container;
+        $sync = new Illuminate\Queue\SyncQueue();
+        $container = new Illuminate\Container\Container();
         $sync->setContainer($container);
 
         $sync->push('SyncQueueTestHandler', ['foo' => 'bar']);
@@ -26,8 +26,8 @@ class QueueSyncQueueTest extends PHPUnit_Framework_TestCase
     {
         unset($_SERVER['__sync.failed']);
 
-        $sync = new Illuminate\Queue\SyncQueue;
-        $container = new Illuminate\Container\Container;
+        $sync = new Illuminate\Queue\SyncQueue();
+        $container = new Illuminate\Container\Container();
         $events = m::mock('Illuminate\Contracts\Events\Dispatcher');
         $events->shouldReceive('fire')->times(3);
         $container->instance('events', $events);

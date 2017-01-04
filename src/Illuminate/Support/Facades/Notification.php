@@ -16,7 +16,7 @@ class Notification extends Facade
      */
     public static function fake()
     {
-        static::swap(new NotificationFake);
+        static::swap(new NotificationFake());
     }
 
     /**

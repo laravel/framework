@@ -23,7 +23,8 @@ trait AuthenticatesUsers
     /**
      * Handle a login request to the application.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
+     *
      * @return \Illuminate\Http\Response
      */
     public function login(Request $request)
@@ -54,7 +55,8 @@ trait AuthenticatesUsers
     /**
      * Validate the user login request.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
+     *
      * @return void
      */
     protected function validateLogin(Request $request)
@@ -67,7 +69,8 @@ trait AuthenticatesUsers
     /**
      * Attempt to log the user into the application.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
+     *
      * @return bool
      */
     protected function attemptLogin(Request $request)
@@ -80,7 +83,8 @@ trait AuthenticatesUsers
     /**
      * Get the needed authorization credentials from the request.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
+     *
      * @return array
      */
     protected function credentials(Request $request)
@@ -91,7 +95,8 @@ trait AuthenticatesUsers
     /**
      * Send the response after the user was authenticated.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
+     *
      * @return \Illuminate\Http\Response
      */
     protected function sendLoginResponse(Request $request)
@@ -107,8 +112,9 @@ trait AuthenticatesUsers
     /**
      * The user has been authenticated.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  mixed  $user
+     * @param \Illuminate\Http\Request $request
+     * @param mixed                    $user
+     *
      * @return mixed
      */
     protected function authenticated(Request $request, $user)
@@ -119,7 +125,8 @@ trait AuthenticatesUsers
     /**
      * Get the failed login response instance.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
+     *
      * @return \Illuminate\Http\RedirectResponse
      */
     protected function sendFailedLoginResponse(Request $request)
@@ -144,7 +151,8 @@ trait AuthenticatesUsers
     /**
      * Log the user out of the application.
      *
-     * @param \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
+     *
      * @return \Illuminate\Http\Response
      */
     public function logout(Request $request)

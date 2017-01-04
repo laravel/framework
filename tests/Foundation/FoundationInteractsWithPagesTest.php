@@ -1,9 +1,9 @@
 <?php
 
-use Mockery as m;
-use Illuminate\Http\Response;
-use Symfony\Component\DomCrawler\Crawler;
 use Illuminate\Foundation\Testing\Concerns\MakesHttpRequests;
+use Illuminate\Http\Response;
+use Mockery as m;
+use Symfony\Component\DomCrawler\Crawler;
 
 class FoundationInteractsWithPagesTest extends PHPUnit_Framework_TestCase
 {
@@ -455,7 +455,8 @@ class FoundationInteractsWithPagesTest extends PHPUnit_Framework_TestCase
     /**
      * Make sure that the HTML will be encoded as UTF-8 by the Symfony crawler.
      *
-     * @param  string  $content
+     * @param string $content
+     *
      * @return string
      */
     protected function getHtmlTemplate($content)

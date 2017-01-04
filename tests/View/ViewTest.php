@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\View\View;
+use Mockery as m;
 
 class ViewTest extends PHPUnit_Framework_TestCase
 {
@@ -137,7 +137,7 @@ class ViewTest extends PHPUnit_Framework_TestCase
 
     public function testViewConstructedWithObjectData()
     {
-        $view = $this->getView(new DataObjectStub);
+        $view = $this->getView(new DataObjectStub());
         $this->assertInstanceOf('ArrayAccess', $view);
         $this->assertTrue($view->offsetExists('foo'));
         $this->assertEquals($view->offsetGet('foo'), 'bar');

@@ -16,7 +16,7 @@ class Bus extends Facade
      */
     public static function fake()
     {
-        static::swap(new BusFake);
+        static::swap(new BusFake());
     }
 
     /**
