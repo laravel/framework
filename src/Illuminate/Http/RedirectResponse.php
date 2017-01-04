@@ -33,16 +33,6 @@ class RedirectResponse extends BaseRedirectResponse
     protected $session;
 
     /**
-     * Get the original response content.
-     *
-     * @return null
-     */
-    public function getOriginalContent()
-    {
-        return;
-    }
-
-    /**
      * Flash a piece of data to the session.
      *
      * @param  string|array  $key
@@ -165,6 +155,16 @@ class RedirectResponse extends BaseRedirectResponse
     }
 
     /**
+     * Get the original response content.
+     *
+     * @return null
+     */
+    public function getOriginalContent()
+    {
+        return;
+    }
+
+    /**
      * Get the request instance.
      *
      * @return \Illuminate\Http\Request|null
@@ -225,6 +225,8 @@ class RedirectResponse extends BaseRedirectResponse
             return $this->with(Str::snake(substr($method, 4)), $parameters[0]);
         }
 
-        throw new BadMethodCallException("Method [$method] does not exist on Redirect.");
+        throw new BadMethodCallException(
+            "Method [$method] does not exist on Redirect."
+        );
     }
 }
