@@ -161,7 +161,6 @@ class RedirectResponse extends BaseRedirectResponse
      */
     public function getOriginalContent()
     {
-        return;
     }
 
     /**
