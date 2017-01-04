@@ -29,7 +29,7 @@ class MySqlBuilder extends Builder
      */
     public function getColumnListing($table)
     {
-        $sql = $this->grammar->compileColumnExists();
+        $sql = $this->grammar->compileColumnListing();
 
         $database = $this->connection->getDatabaseName();
 
