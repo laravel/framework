@@ -888,7 +888,7 @@ class Route
      */
     public function view($view){
         $this->action = $this->parseAction(function() use($view){
-            return view($view);
+            return app('view')->render($view);
         });
         return $this;
     }
