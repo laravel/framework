@@ -78,31 +78,31 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf(StandAloneCommand::class, $response);
     }
 
-	public function testOnConnectionOnJobWhenDispatching()
-	{
-		$container = new Container;
-		$container->singleton('config', function () {
-			return new Config([
-				'queue' => [
-					'default' => 'null',
-					'connections' => [
-						'null' => ['driver' => 'null'],
-					],
-				],
-			]);
-		});
+    public function testOnConnectionOnJobWhenDispatching()
+    {
+        $container = new Container;
+        $container->singleton('config', function () {
+            return new Config([
+                'queue' => [
+                    'default' => 'null',
+                    'connections' => [
+                        'null' => ['driver' => 'null'],
+                    ],
+                ],
+            ]);
+        });
 
-		$dispatcher = new Dispatcher($container, function () {
-			$mock = m::mock('Illuminate\Contracts\Queue\Queue');
-			$mock->shouldReceive('push')->once();
+        $dispatcher = new Dispatcher($container, function () {
+            $mock = m::mock('Illuminate\Contracts\Queue\Queue');
+            $mock->shouldReceive('push')->once();
 
-			return $mock;
-		});
+            return $mock;
+        });
 
-		$job = (new ShouldNotBeDispatched)->onConnection('null');
+        $job = (new ShouldNotBeDispatched)->onConnection('null');
 
-		$dispatcher->dispatch($job);
-	}
+        $dispatcher->dispatch($job);
+    }
 }
 
 class BusInjectionStub
@@ -152,11 +152,11 @@ class StandAloneHandler
 
 class ShouldNotBeDispatched implements Illuminate\Contracts\Queue\ShouldQueue
 {
-	use Illuminate\Bus\Queueable,
-		Illuminate\Queue\InteractsWithQueue;
+    use Illuminate\Bus\Queueable,
+        Illuminate\Queue\InteractsWithQueue;
 
-	public function handle()
-	{
-		throw new RuntimeException('This should not be run');
-	}
+    public function handle()
+    {
+        throw new RuntimeException('This should not be run');
+    }
 }
