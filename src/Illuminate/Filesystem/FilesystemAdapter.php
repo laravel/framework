@@ -327,6 +327,16 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
             return trim($config->get('url'), '/').'/'.ltrim($path, '/');
         }
 
+        // If the visibility of the file system is public and the developer chose to use a sub-folder
+        // in the local storage, then we need to grab the sub-folders specified after public for the
+        // symbolic link to fully resolve the file path.
+        if ($config->get('visibility') == 'public' && ! Str::endsWith($path, 'public')) {
+            $adapter = $this->driver->getAdapter();
+            $needle = 'public/';
+
+            return '/storage/'.Str::substr($adapter->getPathPrefix(), strpos($adapter->getPathPrefix(), $needle) + strlen($needle)).$path;
+        }
+
         $path = '/storage/'.$path;
 
         // If the path contains "storage/public", it probably means the developer is using
