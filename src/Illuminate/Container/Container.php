@@ -55,6 +55,14 @@ class Container implements ArrayAccess, ContainerContract
     protected $aliases = [];
 
     /**
+     * A flipped cache of registered type aliases
+     * used during contextual binding lookup.
+     *
+     * @var array
+     */
+    protected $aliasAbstracts = [];
+
+    /**
      * The extension closures for services.
      *
      * @var array
@@ -339,6 +347,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function instance($abstract, $instance)
     {
+        $this->removeAbstractAlias($abstract);
         unset($this->aliases[$abstract]);
 
         // We'll check to determine if this type has been bound before, and if it has
@@ -348,6 +357,29 @@ class Container implements ArrayAccess, ContainerContract
 
         if ($this->bound($abstract)) {
             $this->rebound($abstract);
+        }
+    }
+
+    /**
+     * Remove an alias from the contextual binding alias cache.
+     *
+     * @param  string  $searched
+     * @return void
+     */
+    protected function removeAbstractAlias($searched)
+    {
+        if (! isset($this->aliases[$searched])) {
+            return;
+        }
+
+        foreach ($this->aliasAbstracts as $abstract => $aliases) {
+            foreach ($aliases as $index => $alias) {
+                if ($alias !== $searched) {
+                    continue;
+                }
+
+                unset($this->aliasAbstracts[$abstract][$index]);
+            }
         }
     }
 
@@ -402,6 +434,7 @@ class Container implements ArrayAccess, ContainerContract
     public function alias($abstract, $alias)
     {
         $this->aliases[$alias] = $abstract;
+        $this->aliasAbstracts[$abstract][] = $alias;
     }
 
     /**
@@ -515,10 +548,12 @@ class Container implements ArrayAccess, ContainerContract
     {
         $abstract = $this->getAlias($abstract);
 
+        $needsContextualBuild = ! is_null($this->getContextualConcrete($abstract));
+
         // If an instance of the type is currently being managed as a singleton we'll
         // just return an existing instance instead of instantiating new instances
         // so the developer can keep using the same objects instance every time.
-        if (isset($this->instances[$abstract])) {
+        if (isset($this->instances[$abstract]) && ! $needsContextualBuild) {
             return $this->instances[$abstract];
         }
 
@@ -543,7 +578,7 @@ class Container implements ArrayAccess, ContainerContract
         // If the requested type is registered as a singleton we'll want to cache off
         // the instances in "memory" so we can return it later without creating an
         // entirely new instance of an object on each subsequent request for it.
-        if ($this->isShared($abstract)) {
+        if ($this->isShared($abstract) && ! $needsContextualBuild) {
             $this->instances[$abstract] = $object;
         }
 
@@ -586,6 +621,19 @@ class Container implements ArrayAccess, ContainerContract
     {
         if (isset($this->contextual[end($this->buildStack)][$abstract])) {
             return $this->contextual[end($this->buildStack)][$abstract];
+        }
+
+        if (empty($this->aliasAbstracts[$abstract])) {
+            return;
+        }
+
+        // If the abstract is an alias then lookup will
+        // fail because it is using the wrong abstract.
+        // Look for a binding that matches an alias
+        foreach ($this->aliasAbstracts[$abstract] as $alias) {
+            if (isset($this->contextual[end($this->buildStack)][$alias])) {
+                return $this->contextual[end($this->buildStack)][$alias];
+            }
         }
     }
 
@@ -960,6 +1008,7 @@ class Container implements ArrayAccess, ContainerContract
         $this->resolved = [];
         $this->bindings = [];
         $this->instances = [];
+        $this->aliasAbstracts = [];
     }
 
     /**
