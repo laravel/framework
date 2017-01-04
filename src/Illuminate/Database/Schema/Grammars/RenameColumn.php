@@ -61,7 +61,7 @@ class RenameColumn
     protected static function setRenamedColumns(TableDiff $tableDiff, Fluent $command, Column $column)
     {
         $tableDiff->renamedColumns = [
-            $command->from => new Column($command->to, $column->getType(), $column->toArray())
+            $command->from => new Column($command->to, $column->getType(), $column->toArray()),
         ];
 
         return $tableDiff;
