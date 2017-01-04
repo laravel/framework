@@ -222,11 +222,9 @@ abstract class Grammar extends BaseGrammar
      */
     public function wrapTable($table)
     {
-        if ($table instanceof Blueprint) {
-            $table = $table->getTable();
-        }
-
-        return parent::wrapTable($table);
+        return parent::wrapTable(
+            $table instanceof Blueprint ? $table->getTable() : $table
+        );
     }
 
     /**
@@ -234,11 +232,9 @@ abstract class Grammar extends BaseGrammar
      */
     public function wrap($value, $prefixAlias = false)
     {
-        if ($value instanceof Fluent) {
-            $value = $value->name;
-        }
-
-        return parent::wrap($value, $prefixAlias);
+        return parent::wrap(
+            $value instanceof Fluent ? $value->name : $value, $prefixAlias
+        );
     }
 
     /**
