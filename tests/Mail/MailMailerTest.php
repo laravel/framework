@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Mail;
+
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\HtmlString;
@@ -132,7 +134,7 @@ class MailMailerTest extends TestCase
 
     protected function getMailer()
     {
-        return new Illuminate\Mail\Mailer(m::mock('Illuminate\Contracts\View\Factory'), m::mock('Swift_Mailer'));
+        return new \Illuminate\Mail\Mailer(m::mock('Illuminate\Contracts\View\Factory'), m::mock('Swift_Mailer'));
     }
 
     public function setSwiftMailer($mailer)
