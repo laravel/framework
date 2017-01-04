@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Routing;
+
 use Mockery as m;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
@@ -89,7 +91,7 @@ class RouteRegistrarTest extends TestCase
     public function testCanRegisterRouteWithControllerAction()
     {
         $this->router->middleware('controller-middleware')
-                     ->get('users', 'RouteRegistrarControllerStub@index');
+                     ->get('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub@index');
 
         $this->seeResponse('controller', Request::create('users', 'GET'));
         $this->seeMiddleware('controller-middleware');
@@ -98,7 +100,7 @@ class RouteRegistrarTest extends TestCase
     public function testCanRegisterRouteWithArrayAndControllerAction()
     {
         $this->router->middleware('controller-middleware')->put('users', [
-            'uses' => 'RouteRegistrarControllerStub@index',
+            'uses' => 'Illuminate\Tests\Routing\RouteRegistrarControllerStub@index',
         ]);
 
         $this->seeResponse('controller', Request::create('users', 'PUT'));
@@ -179,7 +181,7 @@ class RouteRegistrarTest extends TestCase
     public function testCanRegisterResource()
     {
         $this->router->middleware('resource-middleware')
-                     ->resource('users', 'RouteRegistrarControllerStub');
+                     ->resource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub');
 
         $this->seeResponse('deleted', Request::create('users/1', 'DELETE'));
         $this->seeMiddleware('resource-middleware');

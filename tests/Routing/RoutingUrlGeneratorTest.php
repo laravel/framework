@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Routing;
+
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use PHPUnit\Framework\TestCase;
@@ -384,7 +386,7 @@ class RoutingUrlGeneratorTest extends TestCase
     }
 
     /**
-     * @expectedException Illuminate\Routing\Exceptions\UrlGenerationException
+     * @expectedException \Illuminate\Routing\Exceptions\UrlGenerationException
      */
     public function testUrlGenerationForControllersRequiresPassingOfRequiredParameters()
     {
