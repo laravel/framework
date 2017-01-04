@@ -150,7 +150,7 @@ class StandAloneHandler
     }
 }
 
-class ShouldNotBeDispatched
+class ShouldNotBeDispatched implements Illuminate\Contracts\Queue\ShouldQueue
 {
 	use Illuminate\Bus\Queueable,
 		Illuminate\Queue\InteractsWithQueue;
