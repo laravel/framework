@@ -113,6 +113,17 @@ abstract class Grammar extends BaseGrammar
     }
 
     /**
+     * Get the SQL for the column data type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function getType(Fluent $column)
+    {
+        return $this->{'type'.ucfirst($column->type)}($column);
+    }
+
+    /**
      * Add the column modifiers to the definition.
      *
      * @param  string  $sql
@@ -159,17 +170,6 @@ abstract class Grammar extends BaseGrammar
         return array_filter($blueprint->getCommands(), function ($value) use ($name) {
             return $value->name == $name;
         });
-    }
-
-    /**
-     * Get the SQL for the column data type.
-     *
-     * @param  \Illuminate\Support\Fluent  $column
-     * @return string
-     */
-    protected function getType(Fluent $column)
-    {
-        return $this->{'type'.ucfirst($column->type)}($column);
     }
 
     /**
