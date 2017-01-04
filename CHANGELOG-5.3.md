@@ -23,6 +23,9 @@
 - Check for `db` before setting presence verifier in `ValidationServiceProvider` ([038840d](https://github.com/laravel/framework/commit/038840d477e606735f9179d97eeb20639450e8ae))
 - Make Eloquent's `getTimeZone()` method call adhere to `DateTimeInterface` ([#16955](https://github.com/laravel/framework/pull/16955))
 - Support customizable response in `SendsPasswordResetEmails` ([#16982](https://github.com/laravel/framework/pull/16982))
+- Stricter comparison when replacing URL for `LocalAdapter` ([#17097](https://github.com/laravel/framework/pull/17097))
+- Use `notification()` relationship in `HasDatabaseNotifications` ([#17093](https://github.com/laravel/framework/pull/17093))
+- Allow float value as expiration in Memcached cache store ([#17106](https://github.com/laravel/framework/pull/17106))
 
 ### Fixed
 - Fixed a wildcard issue with `sometimes` validation rule ([#16826](https://github.com/laravel/framework/pull/16826))
@@ -33,7 +36,9 @@
 - Fixed empty model creation ([#16864](https://github.com/laravel/framework/pull/16864))
 - Fixed column overlapping on using `withCount()` on `BelongsToMany` ([#16895](https://github.com/laravel/framework/pull/16895))
 - Fixed `Unique::ignore()` issue ([#16948](https://github.com/laravel/framework/pull/16948))
-
+- Fixed logic in `ChannelManager::sendNow()` if `$channels` is `null` ([#17068](https://github.com/laravel/framework/pull/17068))
+- Fixed validating distinct for nested keys ([#17102](https://github.com/laravel/framework/pull/17102))
+- Fixed `HasManyThrough::updateOrCreate()` ([#17105](https://github.com/laravel/framework/pull/17105))
 
 ## v5.3.28 (2016-12-15)
 
