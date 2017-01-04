@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\View;
+
 use Mockery as m;
 use Illuminate\View\View;
 use PHPUnit\Framework\TestCase;
@@ -212,7 +214,7 @@ class ViewTest extends TestCase
         $qu = $view->errors->get('qu');
         $this->assertEquals($qu[0], 'ux');
         $data = ['foo' => 'baz'];
-        $this->assertSame($view, $view->withErrors(new Illuminate\Support\MessageBag($data)));
+        $this->assertSame($view, $view->withErrors(new \Illuminate\Support\MessageBag($data)));
         $foo = $view->errors->get('foo');
         $this->assertEquals($foo[0], 'baz');
     }
