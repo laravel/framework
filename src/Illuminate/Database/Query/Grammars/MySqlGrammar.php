@@ -77,11 +77,11 @@ class MySqlGrammar extends Grammar
      */
     protected function compileLock(Builder $query, $value)
     {
-        if (is_string($value)) {
-            return $value;
+        if (! is_string($value)) {
+            return $value ? 'for update' : 'lock in share mode';
         }
 
-        return $value ? 'for update' : 'lock in share mode';
+        return $value;
     }
 
     /**
@@ -171,18 +171,18 @@ class MySqlGrammar extends Grammar
     /**
      * Prepare the bindings for an update statement.
      *
+     * Booleans, integers, and doubles are inserted into JSON updates as raw values.
+     *
      * @param  array  $bindings
      * @param  array  $values
      * @return array
      */
     public function prepareBindingsForUpdate(array $bindings, array $values)
     {
-        foreach ($values as $column => $value) {
-            if ($this->isJsonSelector($column) &&
-                in_array(gettype($value), ['boolean', 'integer', 'double'])) {
-                unset($values[$column]);
-            }
-        }
+        $values = collect($values)->reject(function ($value, $column) {
+            return $this->isJsonSelector($column) &&
+                in_array(gettype($value), ['boolean', 'integer', 'double']);
+        })->all();
 
         return parent::prepareBindingsForUpdate($bindings, $values);
     }
@@ -199,23 +199,50 @@ class MySqlGrammar extends Grammar
 
         $where = is_array($query->wheres) ? $this->compileWheres($query) : '';
 
-        if (isset($query->joins)) {
-            $joins = ' '.$this->compileJoins($query, $query->joins);
+        return isset($query->joins)
+                    ? $this->compileDeleteWithJoins($query, $table, $where)
+                    : $this->compileDeleteWithoutJoins($query, $table, $where);
+    }
 
-            $sql = trim("delete $table from {$table}{$joins} $where");
-        } else {
-            $sql = trim("delete from $table $where");
+    /**
+     * Compile a delete query that does not use joins.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  string  $table
+     * @param  array  $where
+     * @return string
+     */
+    protected function compileDeleteWithoutJoins($query, $table, $where)
+    {
+        $sql = trim("delete from {$table} {$where}");
 
-            if (! empty($query->orders)) {
-                $sql .= ' '.$this->compileOrders($query, $query->orders);
-            }
+        // When using MySQL, delete statements may contain order by statements and limits
+        // so we will compile both of those here. Once we have finished compiling this
+        // we will return the completed SQL statement so it will be executed for us.
+        if (! empty($query->orders)) {
+            $sql .= ' '.$this->compileOrders($query, $query->orders);
+        }
 
-            if (isset($query->limit)) {
-                $sql .= ' '.$this->compileLimit($query, $query->limit);
-            }
+        if (isset($query->limit)) {
+            $sql .= ' '.$this->compileLimit($query, $query->limit);
         }
 
         return $sql;
+    }
+
+    /**
+     * Compile a delete query that uses joins.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  string  $table
+     * @param  array  $where
+     * @return string
+     */
+    protected function compileDeleteWithJoins($query, $table, $where)
+    {
+        $joins = ' '.$this->compileJoins($query, $query->joins);
+
+        return trim("delete {$table} from {$table}{$joins} {$where}");
     }
 
     /**
@@ -230,6 +257,9 @@ class MySqlGrammar extends Grammar
             return $value;
         }
 
+        // If the given value is a JSON selector we will wrap it differently than a
+        // traditional value. We will need to split this path and wrap each part
+        // wrapped, etc. Otherwise, we will simply wrap the value as a string.
         if ($this->isJsonSelector($value)) {
             return $this->wrapJsonSelector($value);
         }
@@ -249,11 +279,9 @@ class MySqlGrammar extends Grammar
 
         $field = $this->wrapValue(array_shift($path));
 
-        $path = collect($path)->map(function ($part) {
+        return sprintf('%s->\'$.%s\'', $field, collect($path)->map(function ($part) {
             return '"'.$part.'"';
-        })->implode('.');
-
-        return sprintf('%s->\'$.%s\'', $field, $path);
+        })->implode('.'));
     }
 
     /**
