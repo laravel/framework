@@ -1,5 +1,8 @@
 <?php
 
+namespace Illuminate\Tests\Notifications;
+
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Notifications\Notification;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -30,7 +33,7 @@ class NotificationBroadcastChannelTest extends TestCase
         $notification->id = 1;
         $notifiable = Mockery::mock();
 
-        $event = new Illuminate\Notifications\Events\BroadcastNotificationCreated(
+        $event = new \Illuminate\Notifications\Events\BroadcastNotificationCreated(
             $notifiable, $notification, $notification->toArray($notifiable)
         );
 

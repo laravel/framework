@@ -1,5 +1,8 @@
 <?php
 
+namespace Illuminate\Tests\Notifications;
+
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Channels\DatabaseChannel;
