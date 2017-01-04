@@ -40,7 +40,7 @@ class MySqlGrammar extends Grammar
      *
      * @return string
      */
-    public function compileColumnExists()
+    public function compileColumnListing()
     {
         return 'select column_name from information_schema.columns where table_schema = ? and table_name = ?';
     }
@@ -791,10 +791,10 @@ class MySqlGrammar extends Grammar
      */
     protected function wrapValue($value)
     {
-        if ($value === '*') {
-            return $value;
+        if ($value !== '*') {
+            return '`'.str_replace('`', '``', $value).'`';
         }
 
-        return '`'.str_replace('`', '``', $value).'`';
+        return $value;
     }
 }

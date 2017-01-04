@@ -44,7 +44,7 @@ class PostgresGrammar extends Grammar
      * @param  string  $table
      * @return string
      */
-    public function compileColumnExists($table)
+    public function compileColumnListing($table)
     {
         return "select column_name from information_schema.columns where table_name = '$table'";
     }

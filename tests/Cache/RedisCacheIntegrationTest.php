@@ -5,7 +5,7 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Cache\Repository;
 
-class RedisCacheTest extends TestCase
+class RedisCacheIntegrationTest extends TestCase
 {
     use InteractsWithRedis;
 

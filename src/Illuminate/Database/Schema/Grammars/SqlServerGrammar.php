@@ -37,7 +37,7 @@ class SqlServerGrammar extends Grammar
      * @param  string  $table
      * @return string
      */
-    public function compileColumnExists($table)
+    public function compileColumnListing($table)
     {
         return "select col.name from sys.columns as col
                 join sys.objects as obj on col.object_id = obj.object_id

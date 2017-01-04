@@ -17,6 +17,7 @@
 ### Authentication
 - Secured password reset tokens against timing attacks and compromised databases ([#16850](https://github.com/laravel/framework/pull/16850), [9d674b0](https://github.com/laravel/framework/commit/9d674b053145968ff9060b930a644ddd7851d66f))
 - Refactored authentication component ([7b48bfc](https://github.com/laravel/framework/commit/7b48bfccf9ed12c71461651bbf52a3214b58d82e), [5c4541b](https://github.com/laravel/framework/commit/5c4541bc43f22b0d99c5cc6db38781060bff836f))
+- Switched to components for auth view subs ([78891d5](https://github.com/laravel/framework/commit/78891d56198081d84bb268f88ce3e03989375e1b))
 - Added names to password reset routes ([#16988](https://github.com/laravel/framework/pull/16988))
 
 ## Authorization
@@ -36,7 +37,7 @@
 ### Cache
 - Added `RedisStore::add()` to store an item in the cache if the key doesn't exist ([#15877](https://github.com/laravel/framework/pull/15877))
 - Added `cache:forget` command ([#16201](https://github.com/laravel/framework/pull/16201), [7644977](https://github.com/laravel/framework/commit/76449777741fa1d7669028973958a7e4a5e64f71))
-- Refactored cache events ([b7454f0](https://github.com/laravel/framework/commit/b7454f0e67720c702d8f201fd6ca81db6837d461))
+- Refactored cache events ([b7454f0](https://github.com/laravel/framework/commit/b7454f0e67720c702d8f201fd6ca81db6837d461), [#17120](https://github.com/laravel/framework/pull/17120))
 - `Cache::flush()` now returns boolean ([#15831](https://github.com/laravel/framework/pull/15831), [057492d](https://github.com/laravel/framework/commit/057492d31c569e96a3ba2f99722112a9762c6071))
 
 ### Collections
@@ -60,13 +61,15 @@
 - Support passing output buffer to `Artisan::call()` ([#16930](https://github.com/laravel/framework/pull/16930))
 - Moved `tinker` into an external package ([#17002](https://github.com/laravel/framework/pull/17002))
 - Refactored queue commands ([07a9402](https://github.com/laravel/framework/commit/07a9402f5d1b2fb5dedc22751a59914ebcf41562), [a82a25f](https://github.com/laravel/framework/commit/a82a25f58252eab6831a0efde35a17403710abdc), [f2beb2b](https://github.com/laravel/framework/commit/f2beb2bbce11433283ba52744dbe7134aa55cbfa))
+- Allow tasks to be scheduled on weekends ([#17085](https://github.com/laravel/framework/pull/17085))
+- Allow console events to be macroable ([#17107](https://github.com/laravel/framework/pull/17107))
 
 ### Container
 - Added `Container::factory()` method to the Container contract ([#15430](https://github.com/laravel/framework/pull/15430))
 - Added support for binding methods to the container ([#16800](https://github.com/laravel/framework/pull/16800), [1fa8ea0](https://github.com/laravel/framework/commit/1fa8ea02c096d09bea909b7bffa24b861dc76240))
 - Trigger callback when binding an extension or resolving callback to an alias ([c99098f](https://github.com/laravel/framework/commit/c99098fc85c9633db578f70fba454184609c515d))
 - Support contextual binding with aliases ([c99098f](https://github.com/laravel/framework/commit/c99098fc85c9633db578f70fba454184609c515d))
-- Removed `$parameters` from `app()` and `resolve()` helper ([#17060](https://github.com/laravel/framework/pull/17060))
+- Removed `$parameters` from `Application::make()` and `app()`/`resolve()` helpers ([#17071](https://github.com/laravel/framework/pull/17071), [#17060](https://github.com/laravel/framework/pull/17060))
 - Removed `Container::share()` ([1a1969b](https://github.com/laravel/framework/commit/1a1969b6e6f793c3b2a479362641487ee9cbf736))
 - Removed `Container::normalize()` ([ff993b8](https://github.com/laravel/framework/commit/ff993b806dcb21ba8a5367594e87d113338c1670))
 
@@ -78,6 +81,7 @@
 - Added collation support to `SQLServerGrammar` ([#16227](https://github.com/laravel/framework/pull/16227))
 - Don't rollback to save-points on deadlock (nested transaction) ([#15932](https://github.com/laravel/framework/pull/15932))
 - Improve `Connection::selectOne()` performance by switching to `array_shift()` ([#16188](https://github.com/laravel/framework/pull/16188))
+- Refactored database components ([5ba9db8](https://github.com/laravel/framework/commit/5ba9db8f120ef1c7c92f997cae15820e537de543), [2313820](https://github.com/laravel/framework/commit/2313820ccbe6b997474bae99b92f0d936df5d3f6), [ace9702](https://github.com/laravel/framework/commit/ace9702a1a7b17cb33b2f61eb46973de5e4111e6), [dd41098](https://github.com/laravel/framework/commit/dd4109815787fbd0bd802a7e301daf1f3865d956), [7ddb6fe](https://github.com/laravel/framework/commit/7ddb6fe9780459a2f02ea7e246dc7f644bf7ea58), [03f3c8c](https://github.com/laravel/framework/commit/03f3c8cbe87f6ab9c6acdde3e9463f134bf491f9), [b2a4159](https://github.com/laravel/framework/commit/b2a415971061e9d722e40aefceefa8b834fcb632), [cc7eab0](https://github.com/laravel/framework/commit/cc7eab09932143a8b75d5a71d1b23d37b2bbebdd), [bd0e895](https://github.com/laravel/framework/commit/bd0e8952dc73b11fe9a7d5b019161ac22f93cf78), [c743dae](https://github.com/laravel/framework/commit/c743dae9acc17046a54c8eaf8f8846e539f5958a))
 
 ### Eloquent
 - Added support for object-based events for native Eloquent events ([e7a724d](https://github.com/laravel/framework/commit/e7a724d3895f2b24b98c0cafb1650f2193351d83), [9770d1a](https://github.com/laravel/framework/commit/9770d1a64c1010daf845fcebfcc4695a30d8df2d))
@@ -96,13 +100,14 @@
 ### Events
 - Allow queued handlers to specify their queue and connection ([fedd4cd](https://github.com/laravel/framework/commit/fedd4cd4d900656071d44fc1ee9c83e6de986fa8))
 - Converted `locale.changed` event into `LocaleUpdated` class ([3385fdc](https://github.com/laravel/framework/commit/3385fdc0f8e4890ab57261755bcbbf79f9ec828d))
+- Unified wording ([2dcde69](https://github.com/laravel/framework/commit/2dcde6983ffbb4faf1c238544b51831b33c3a857))
 
 ### Filesystem
 - Use UUID instead of `md5()` for generating file names in `FileHelpers` ([#16193](https://github.com/laravel/framework/pull/16193))
 - Allow array of options on `Filesystem` operations ([481f760](https://github.com/laravel/framework/commit/481f76000c861e3e2540dcdda986fb44622ccbbe))
 
 ### HTTP
-- Refactored session component ([66976ba](https://github.com/laravel/framework/commit/66976ba3f559ee6ede4cc865ea995996cd42ee1b))
+- Refactored session component ([66976ba](https://github.com/laravel/framework/commit/66976ba3f559ee6ede4cc865ea995996cd42ee1b), [d9e0a6a](https://github.com/laravel/framework/commit/d9e0a6a03891d16ed6a71151354445fbdc9e6f50))
 - Added `Illuminate\Http\Request\Concerns` traits ([4810e9d](https://github.com/laravel/framework/commit/4810e9d1bc118367f3d70cd6f64f1d4c4acf85ca))
 - Use variable-length method signature for `CookieJar::queue()` ([#16290](https://github.com/laravel/framework/pull/16290), [ddabaaa](https://github.com/laravel/framework/commit/ddabaaa6a8ce16876ddec36be1391eae14649aea))
 - Added `FormRequestServiceProvider` ([b892805](https://github.com/laravel/framework/commit/b892805124ecdf4821c2dac7aea4f829ce2248bc))
@@ -139,7 +144,7 @@
 - Removed `RouteServiceProvider::loadRoutesFrom()` ([0f2b3be](https://github.com/laravel/framework/commit/0f2b3be9b8753ba2813595f9191aa8d8c31886b1))
 - Allow route groups to be loaded directly from a file ([#16707](https://github.com/laravel/framework/pull/16707), [#16792](https://github.com/laravel/framework/pull/16792))
 - Added named parameters to `UrlGenerator` ([#16736](https://github.com/laravel/framework/pull/16736), [ce4d86b](https://github.com/laravel/framework/commit/ce4d86b48732a707e3909dbc553a2c349c8ecae7))
-- Refactored Route component ([b75aca6](https://github.com/laravel/framework/commit/b75aca6a203590068161835945213fd1a39c7080), [9d3ff16](https://github.com/laravel/framework/commit/9d3ff161fd3929f9a106f007ce63fffdd118d490), [c906ed9](https://github.com/laravel/framework/commit/c906ed933713df22e4356cf4ea274f19b15d1ab7), [0f7985c](https://github.com/laravel/framework/commit/0f7985c888abb0a1824e87b32ab3d8feaca5fecf), [0f7985c](https://github.com/laravel/framework/commit/0f7985c888abb0a1824e87b32ab3d8feaca5fecf))
+- Refactored Route component ([b75aca6](https://github.com/laravel/framework/commit/b75aca6a203590068161835945213fd1a39c7080), [9d3ff16](https://github.com/laravel/framework/commit/9d3ff161fd3929f9a106f007ce63fffdd118d490), [c906ed9](https://github.com/laravel/framework/commit/c906ed933713df22e4356cf4ea274f19b15d1ab7), [0f7985c](https://github.com/laravel/framework/commit/0f7985c888abb0a1824e87b32ab3d8feaca5fecf), [0f7985c](https://github.com/laravel/framework/commit/0f7985c888abb0a1824e87b32ab3d8feaca5fecf), [3f4221f](https://github.com/laravel/framework/commit/3f4221fe07c3e9d12eb814c144c1ffca09b577da))
 - Refactored Router component ([eecf6ec](https://github.com/laravel/framework/commit/eecf6eca8b4a0cfdf8ec2b0148ee726b8b67c6bb), [b208a4f](https://github.com/laravel/framework/commit/b208a4fc3b35da167a2dcb9b581d9e072d20ec92), [21de409](https://github.com/laravel/framework/commit/21de40971cd81712b398ef3895357843fd34250d), [e75730e](https://github.com/laravel/framework/commit/e75730ec192bb2927a46f37ef854ba8c7372cac6))
 - Refactored Router URL generator component ([39e8c83](https://github.com/laravel/framework/commit/39e8c83af778d8086b0b5e8f4f2e21331b015b39), [098da0d](https://github.com/laravel/framework/commit/098da0d6b4c20104c60b969b9a7f10ac5ff50c8e))
 - Removed `RouteDependencyResolverTrait::callWithDependencies()` ([f7f13fa](https://github.com/laravel/framework/commit/f7f13fab9a451bc2249fc0709b6cf1fa6b7c795a))

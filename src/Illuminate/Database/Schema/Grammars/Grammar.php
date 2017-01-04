@@ -34,48 +34,7 @@ abstract class Grammar extends BaseGrammar
      */
     public function compileRenameColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        $schema = $connection->getDoctrineSchemaManager();
-
-        $table = $this->getTablePrefix().$blueprint->getTable();
-
-        $column = $connection->getDoctrineColumn($table, $command->from);
-
-        $tableDiff = $this->getRenamedDiff($blueprint, $command, $column, $schema);
-
-        return (array) $schema->getDatabasePlatform()->getAlterTableSQL($tableDiff);
-    }
-
-    /**
-     * Get a new column instance with the new column name.
-     *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
-     * @param  \Doctrine\DBAL\Schema\Column  $column
-     * @param  \Doctrine\DBAL\Schema\AbstractSchemaManager  $schema
-     * @return \Doctrine\DBAL\Schema\TableDiff
-     */
-    protected function getRenamedDiff(Blueprint $blueprint, Fluent $command, Column $column, SchemaManager $schema)
-    {
-        $tableDiff = $this->getDoctrineTableDiff($blueprint, $schema);
-
-        return $this->setRenamedColumns($tableDiff, $command, $column);
-    }
-
-    /**
-     * Set the renamed columns on the table diff.
-     *
-     * @param  \Doctrine\DBAL\Schema\TableDiff  $tableDiff
-     * @param  \Illuminate\Support\Fluent  $command
-     * @param  \Doctrine\DBAL\Schema\Column  $column
-     * @return \Doctrine\DBAL\Schema\TableDiff
-     */
-    protected function setRenamedColumns(TableDiff $tableDiff, Fluent $command, Column $column)
-    {
-        $newColumn = new Column($command->to, $column->getType(), $column->toArray());
-
-        $tableDiff->renamedColumns = [$command->from => $newColumn];
-
-        return $tableDiff;
+        return RenameColumn::compile($this, $blueprint, $command, $connection);
     }
 
     /**
@@ -222,11 +181,9 @@ abstract class Grammar extends BaseGrammar
      */
     public function wrapTable($table)
     {
-        if ($table instanceof Blueprint) {
-            $table = $table->getTable();
-        }
-
-        return parent::wrapTable($table);
+        return parent::wrapTable(
+            $table instanceof Blueprint ? $table->getTable() : $table
+        );
     }
 
     /**
@@ -234,11 +191,9 @@ abstract class Grammar extends BaseGrammar
      */
     public function wrap($value, $prefixAlias = false)
     {
-        if ($value instanceof Fluent) {
-            $value = $value->name;
-        }
-
-        return parent::wrap($value, $prefixAlias);
+        return parent::wrap(
+            $value instanceof Fluent ? $value->name : $value, $prefixAlias
+        );
     }
 
     /**
@@ -267,7 +222,7 @@ abstract class Grammar extends BaseGrammar
      * @param  \Doctrine\DBAL\Schema\AbstractSchemaManager  $schema
      * @return \Doctrine\DBAL\Schema\TableDiff
      */
-    protected function getDoctrineTableDiff(Blueprint $blueprint, SchemaManager $schema)
+    public function getDoctrineTableDiff(Blueprint $blueprint, SchemaManager $schema)
     {
         $table = $this->getTablePrefix().$blueprint->getTable();
 
