@@ -37,6 +37,7 @@ class RenameColumn
     /**
      * Get a new column instance with the new column name.
      *
+     * @param  \Illuminate\Database\Schema\Grammars\Grammar  $grammar
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
      * @param  \Doctrine\DBAL\Schema\Column  $column
