@@ -59,22 +59,22 @@ abstract class Grammar extends BaseGrammar
      */
     public function compileForeign(Blueprint $blueprint, Fluent $command)
     {
-        $table = $this->wrapTable($blueprint);
-
-        $index = $this->wrap($command->index);
-
-        $on = $this->wrapTable($command->on);
-
         // We need to prepare several of the elements of the foreign key definition
         // before we can create the SQL, such as wrapping the tables and convert
         // an array of columns to comma-delimited strings for the SQL queries.
-        $columns = $this->columnize($command->columns);
+        $sql = sprintf("alter table %s add constraint %s ",
+            $this->wrapTable($blueprint),
+            $this->wrap($command->index)
+        );
 
-        $onColumns = $this->columnize((array) $command->references);
-
-        $sql = "alter table {$table} add constraint {$index} ";
-
-        $sql .= "foreign key ({$columns}) references {$on} ({$onColumns})";
+        // Once we have the initial portion of the SQL statement we will add on the
+        // key name, table name, and referenced columns. These will complete the
+        // main portion of the SQL statement and this SQL will almost be done.
+        $sql .= sprintf("foreign key (%s) references %s (%s)",
+            $this->columnize($command->columns),
+            $this->wrapTable($command->on),
+            $this->columnize((array) $command->references)
+        );
 
         // Once we have the basic foreign key creation statement constructed we can
         // build out the syntax for what should happen on an update or delete of
@@ -225,11 +225,9 @@ abstract class Grammar extends BaseGrammar
             return $value;
         }
 
-        if (is_bool($value)) {
-            return "'".(int) $value."'";
-        }
-
-        return "'".strval($value)."'";
+        return is_bool($value)
+                    ? "'".(int) $value."'"
+                    : "'".strval($value)."'";
     }
 
     /**
