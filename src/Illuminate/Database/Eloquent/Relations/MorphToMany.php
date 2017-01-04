@@ -2,9 +2,9 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class MorphToMany extends BelongsToMany
 {
@@ -34,15 +34,14 @@ class MorphToMany extends BelongsToMany
     /**
      * Create a new morph to many relationship instance.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param \Illuminate\Database\Eloquent\Model   $parent
-     * @param string                                $name
-     * @param string                                $table
-     * @param string                                $foreignKey
-     * @param string                                $otherKey
-     * @param string                                $relationName
-     * @param bool                                  $inverse
-     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  string  $name
+     * @param  string  $table
+     * @param  string  $foreignKey
+     * @param  string  $otherKey
+     * @param  string  $relationName
+     * @param  bool  $inverse
      * @return void
      */
     public function __construct(Builder $query, Model $parent, $name, $table, $foreignKey, $otherKey, $relationName = null, $inverse = false)
@@ -71,10 +70,9 @@ class MorphToMany extends BelongsToMany
     /**
      * Add the constraints for a relationship count query.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param \Illuminate\Database\Eloquent\Builder $parent
-     * @param array|mixed                           $columns
-     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $parent
+     * @param  array|mixed  $columns
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function getRelationQuery(Builder $query, Builder $parent, $columns = ['*'])
@@ -87,8 +85,7 @@ class MorphToMany extends BelongsToMany
     /**
      * Set the constraints for an eager load of the relation.
      *
-     * @param array $models
-     *
+     * @param  array  $models
      * @return void
      */
     public function addEagerConstraints(array $models)
@@ -101,9 +98,8 @@ class MorphToMany extends BelongsToMany
     /**
      * Create a new pivot attachment record.
      *
-     * @param int  $id
-     * @param bool $timed
-     *
+     * @param  int   $id
+     * @param  bool  $timed
      * @return array
      */
     protected function createAttachRecord($id, $timed)
@@ -128,9 +124,8 @@ class MorphToMany extends BelongsToMany
     /**
      * Create a new pivot model instance.
      *
-     * @param array $attributes
-     * @param bool  $exists
-     *
+     * @param  array  $attributes
+     * @param  bool   $exists
      * @return \Illuminate\Database\Eloquent\Relations\Pivot
      */
     public function newPivot(array $attributes = [], $exists = false)

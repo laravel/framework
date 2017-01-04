@@ -2,8 +2,8 @@
 
 namespace Illuminate\Mail\Transport;
 
-use GuzzleHttp\ClientInterface;
 use Swift_Mime_Message;
+use GuzzleHttp\ClientInterface;
 
 class SparkPostTransport extends Transport
 {
@@ -38,11 +38,10 @@ class SparkPostTransport extends Transport
     /**
      * Create a new SparkPost transport instance.
      *
-     * @param \GuzzleHttp\ClientInterface $client
-     * @param string                      $key
-     * @param array                       $options
-     * @param array                       $metadata
-     *
+     * @param  \GuzzleHttp\ClientInterface  $client
+     * @param  string  $key
+     * @param  array  $options
+     * @param  array  $metadata
      * @return void
      */
     public function __construct(ClientInterface $client, $key, $options = [], $metadata = [])
@@ -70,7 +69,7 @@ class SparkPostTransport extends Transport
             ],
             'json' => [
                 'recipients' => $recipients,
-                'content'    => [
+                'content' => [
                     'email_rfc822' => $message->toString(),
                 ],
             ],
@@ -96,8 +95,7 @@ class SparkPostTransport extends Transport
      *
      * Note that SparkPost still respects CC, BCC headers in raw message itself.
      *
-     * @param \Swift_Mime_Message $message
-     *
+     * @param  \Swift_Mime_Message $message
      * @return array
      */
     protected function getRecipients(Swift_Mime_Message $message)
@@ -136,8 +134,7 @@ class SparkPostTransport extends Transport
     /**
      * Set the API key being used by the transport.
      *
-     * @param string $key
-     *
+     * @param  string  $key
      * @return string
      */
     public function setKey($key)
@@ -158,8 +155,7 @@ class SparkPostTransport extends Transport
     /**
      * Set the transmission options being used by the transport.
      *
-     * @param array $options
-     *
+     * @param  array  $options
      * @return array
      */
     public function setOptions(array $options)
@@ -180,8 +176,7 @@ class SparkPostTransport extends Transport
     /**
      * Set the transmission metadata being used by the transport.
      *
-     * @param array $metadata
-     *
+     * @param  array  $metadata
      * @return array
      */
     public function setMetadata(array $metadata)

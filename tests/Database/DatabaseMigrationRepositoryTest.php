@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Database\Migrations\DatabaseMigrationRepository;
-use Illuminate\Support\Collection;
 use Mockery as m;
+use Illuminate\Support\Collection;
+use Illuminate\Database\Migrations\DatabaseMigrationRepository;
 
 class DatabaseMigrationRepositoryTest extends PHPUnit_Framework_TestCase
 {

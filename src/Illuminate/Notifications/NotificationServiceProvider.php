@@ -2,9 +2,9 @@
 
 namespace Illuminate\Notifications;
 
-use Illuminate\Contracts\Notifications\Dispatcher as DispatcherContract;
-use Illuminate\Contracts\Notifications\Factory as FactoryContract;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Notifications\Factory as FactoryContract;
+use Illuminate\Contracts\Notifications\Dispatcher as DispatcherContract;
 
 class NotificationServiceProvider extends ServiceProvider
 {

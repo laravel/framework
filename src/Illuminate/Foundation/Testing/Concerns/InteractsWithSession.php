@@ -9,8 +9,7 @@ trait InteractsWithSession
     /**
      * Set the session to the given array.
      *
-     * @param array $data
-     *
+     * @param  array  $data
      * @return $this
      */
     public function withSession(array $data)
@@ -23,8 +22,7 @@ trait InteractsWithSession
     /**
      * Set the session to the given array.
      *
-     * @param array $data
-     *
+     * @param  array  $data
      * @return $this
      */
     public function session(array $data)
@@ -45,7 +43,7 @@ trait InteractsWithSession
      */
     protected function startSession()
     {
-        if (!$this->app['session']->isStarted()) {
+        if (! $this->app['session']->isStarted()) {
             $this->app['session']->start();
         }
 
@@ -69,9 +67,8 @@ trait InteractsWithSession
     /**
      * Assert that the session has a given value.
      *
-     * @param string|array $key
-     * @param mixed        $value
-     *
+     * @param  string|array  $key
+     * @param  mixed  $value
      * @return $this
      */
     public function seeInSession($key, $value = null)
@@ -84,9 +81,8 @@ trait InteractsWithSession
     /**
      * Assert that the session has a given value.
      *
-     * @param string|array $key
-     * @param mixed        $value
-     *
+     * @param  string|array  $key
+     * @param  mixed  $value
      * @return $this
      */
     public function assertSessionHas($key, $value = null)
@@ -107,8 +103,7 @@ trait InteractsWithSession
     /**
      * Assert that the session has a given list of values.
      *
-     * @param array $bindings
-     *
+     * @param  array  $bindings
      * @return $this
      */
     public function assertSessionHasAll(array $bindings)
@@ -127,8 +122,7 @@ trait InteractsWithSession
     /**
      * Assert that the session does not have a given key.
      *
-     * @param string|array $key
-     *
+     * @param  string|array  $key
      * @return $this
      */
     public function assertSessionMissing($key)
@@ -147,9 +141,8 @@ trait InteractsWithSession
     /**
      * Assert that the session has errors bound.
      *
-     * @param string|array $bindings
-     * @param mixed        $format
-     *
+     * @param  string|array  $bindings
+     * @param  mixed  $format
      * @return $this
      */
     public function assertSessionHasErrors($bindings = [], $format = null)

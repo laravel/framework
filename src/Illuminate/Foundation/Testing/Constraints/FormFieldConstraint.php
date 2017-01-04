@@ -23,9 +23,8 @@ abstract class FormFieldConstraint extends PageConstraint
     /**
      * Create a new constraint instance.
      *
-     * @param string $selector
-     * @param mixed  $value
-     *
+     * @param  string  $selector
+     * @param  mixed  $value
      * @return void
      */
     public function __construct($selector, $value)
@@ -46,11 +45,10 @@ abstract class FormFieldConstraint extends PageConstraint
     /**
      * Get the form field.
      *
-     * @param \Symfony\Component\DomCrawler\Crawler $crawler
+     * @param  \Symfony\Component\DomCrawler\Crawler  $crawler
+     * @return \Symfony\Component\DomCrawler\Crawler
      *
      * @throws \PHPUnit_Framework_ExpectationFailedException
-     *
-     * @return \Symfony\Component\DomCrawler\Crawler
      */
     protected function field(Crawler $crawler)
     {

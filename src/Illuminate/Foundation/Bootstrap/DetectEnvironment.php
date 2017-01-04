@@ -4,21 +4,20 @@ namespace Illuminate\Foundation\Bootstrap;
 
 use Dotenv\Dotenv;
 use Dotenv\Exception\InvalidPathException;
-use Illuminate\Contracts\Foundation\Application;
 use Symfony\Component\Console\Input\ArgvInput;
+use Illuminate\Contracts\Foundation\Application;
 
 class DetectEnvironment
 {
     /**
      * Bootstrap the given application.
      *
-     * @param \Illuminate\Contracts\Foundation\Application $app
-     *
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
     public function bootstrap(Application $app)
     {
-        if (!$app->configurationIsCached()) {
+        if (! $app->configurationIsCached()) {
             $this->checkForSpecificEnvironmentFile($app);
 
             try {
@@ -32,14 +31,13 @@ class DetectEnvironment
     /**
      * Detect if a custom environment file matching the APP_ENV exists.
      *
-     * @param \Illuminate\Contracts\Foundation\Application $app
-     *
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
     protected function checkForSpecificEnvironmentFile($app)
     {
         if (php_sapi_name() == 'cli') {
-            $input = new ArgvInput();
+            $input = new ArgvInput;
 
             if ($input->hasParameterOption('--env')) {
                 $file = $app->environmentFile().'.'.$input->getParameterOption('--env');
@@ -48,7 +46,7 @@ class DetectEnvironment
             }
         }
 
-        if (!env('APP_ENV')) {
+        if (! env('APP_ENV')) {
             return;
         }
 
@@ -62,9 +60,8 @@ class DetectEnvironment
     /**
      * Load a custom environment file.
      *
-     * @param \Illuminate\Contracts\Foundation\Application $app
-     * @param string                                       $file
-     *
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @param  string  $file
      * @return void
      */
     protected function loadEnvironmentFile($app, $file)

@@ -18,8 +18,7 @@ class AuthenticateSession
     /**
      * Create a new middleware instance.
      *
-     * @param \Illuminate\Contracts\Auth\Factory $auth
-     *
+     * @param  \Illuminate\Contracts\Auth\Factory  $auth
      * @return void
      */
     public function __construct(AuthFactory $auth)
@@ -30,22 +29,21 @@ class AuthenticateSession
     /**
      * Handle an incoming request.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param \Closure                 $next
-     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
      * @return mixed
      */
     public function handle($request, Closure $next)
     {
-        if (!$request->user() || !$request->session()) {
+        if (! $request->user() || ! $request->session()) {
             return $next($request);
         }
 
-        if (!$request->session()->has('password_hash') && $this->auth->viaRemember()) {
+        if (! $request->session()->has('password_hash') && $this->auth->viaRemember()) {
             $this->logout($request);
         }
 
-        if (!$request->session()->has('password_hash')) {
+        if (! $request->session()->has('password_hash')) {
             $this->storePasswordHashInSession($request);
         }
 
@@ -61,8 +59,7 @@ class AuthenticateSession
     /**
      * Store the user's current password hash in the session.
      *
-     * @param \Illuminate\Http\Request $request
-     *
+     * @param  \Illuminate\Http\Request  $request
      * @return void
      */
     protected function storePasswordHashInSession($request)
@@ -75,11 +72,10 @@ class AuthenticateSession
     /**
      * Log the user out of the application.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
+     * @return void
      *
      * @throws \Illuminate\Auth\AuthenticationException
-     *
-     * @return void
      */
     protected function logout($request)
     {
@@ -87,6 +83,6 @@ class AuthenticateSession
 
         $request->session()->flush();
 
-        throw new AuthenticationException();
+        throw new AuthenticationException;
     }
 }

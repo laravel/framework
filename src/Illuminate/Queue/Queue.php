@@ -2,11 +2,11 @@
 
 namespace Illuminate\Queue;
 
-use Carbon\Carbon;
 use DateTime;
-use Illuminate\Container\Container;
+use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
+use Illuminate\Container\Container;
 
 abstract class Queue
 {
@@ -27,10 +27,9 @@ abstract class Queue
     /**
      * Push a new job onto the queue.
      *
-     * @param string $queue
-     * @param string $job
-     * @param mixed  $data
-     *
+     * @param  string  $queue
+     * @param  string  $job
+     * @param  mixed   $data
      * @return mixed
      */
     public function pushOn($queue, $job, $data = '')
@@ -41,11 +40,10 @@ abstract class Queue
     /**
      * Push a new job onto the queue after a delay.
      *
-     * @param string        $queue
-     * @param \DateTime|int $delay
-     * @param string        $job
-     * @param mixed         $data
-     *
+     * @param  string  $queue
+     * @param  \DateTime|int  $delay
+     * @param  string  $job
+     * @param  mixed   $data
      * @return mixed
      */
     public function laterOn($queue, $delay, $job, $data = '')
@@ -56,10 +54,9 @@ abstract class Queue
     /**
      * Push an array of jobs onto the queue.
      *
-     * @param array  $jobs
-     * @param mixed  $data
-     * @param string $queue
-     *
+     * @param  array   $jobs
+     * @param  mixed   $data
+     * @param  string  $queue
      * @return mixed
      */
     public function bulk($jobs, $data = '', $queue = null)
@@ -72,22 +69,21 @@ abstract class Queue
     /**
      * Create a payload string from the given job and data.
      *
-     * @param string $job
-     * @param mixed  $data
-     * @param string $queue
+     * @param  string  $job
+     * @param  mixed   $data
+     * @param  string  $queue
+     * @return string
      *
      * @throws \InvalidArgumentException
-     *
-     * @return string
      */
     protected function createPayload($job, $data = '', $queue = null)
     {
         if (is_object($job)) {
             $payload = json_encode([
-                'job'  => 'Illuminate\Queue\CallQueuedHandler@call',
+                'job' => 'Illuminate\Queue\CallQueuedHandler@call',
                 'data' => [
                     'commandName' => get_class($job),
-                    'command'     => serialize(clone $job),
+                    'command' => serialize(clone $job),
                 ],
             ]);
         } else {
@@ -104,9 +100,8 @@ abstract class Queue
     /**
      * Create a typical, "plain" queue payload array.
      *
-     * @param string $job
-     * @param mixed  $data
-     *
+     * @param  string  $job
+     * @param  mixed  $data
      * @return array
      */
     protected function createPlainPayload($job, $data)
@@ -117,13 +112,12 @@ abstract class Queue
     /**
      * Set additional meta on a payload string.
      *
-     * @param string $payload
-     * @param string $key
-     * @param string $value
+     * @param  string  $payload
+     * @param  string  $key
+     * @param  string  $value
+     * @return string
      *
      * @throws \InvalidArgumentException
-     *
-     * @return string
      */
     protected function setMeta($payload, $key, $value)
     {
@@ -141,8 +135,7 @@ abstract class Queue
     /**
      * Calculate the number of seconds with the given delay.
      *
-     * @param \DateTime|int $delay
-     *
+     * @param  \DateTime|int  $delay
      * @return int
      */
     protected function getSeconds($delay)
@@ -167,8 +160,7 @@ abstract class Queue
     /**
      * Set the IoC container instance.
      *
-     * @param \Illuminate\Container\Container $container
-     *
+     * @param  \Illuminate\Container\Container  $container
      * @return void
      */
     public function setContainer(Container $container)

@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Http\Exceptions;
 
-use Carbon\Carbon;
 use Exception;
+use Carbon\Carbon;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 class MaintenanceModeException extends ServiceUnavailableHttpException
@@ -32,12 +32,11 @@ class MaintenanceModeException extends ServiceUnavailableHttpException
     /**
      * Create a new exception instance.
      *
-     * @param int        $time
-     * @param int        $retryAfter
-     * @param string     $message
-     * @param \Exception $previous
-     * @param int        $code
-     *
+     * @param  int  $time
+     * @param  int  $retryAfter
+     * @param  string  $message
+     * @param  \Exception  $previous
+     * @param  int  $code
      * @return void
      */
     public function __construct($time, $retryAfter = null, $message = null, Exception $previous = null, $code = 0)

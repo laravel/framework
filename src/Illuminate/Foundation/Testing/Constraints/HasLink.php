@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Testing\Constraints;
 
-use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\URL;
 
 class HasLink extends PageConstraint
 {
@@ -24,9 +24,8 @@ class HasLink extends PageConstraint
     /**
      * Create a new constraint instance.
      *
-     * @param string      $text
-     * @param string|null $url
-     *
+     * @param  string  $text
+     * @param  string|null  $url
      * @return void
      */
     public function __construct($text, $url = null)
@@ -38,8 +37,7 @@ class HasLink extends PageConstraint
     /**
      * Check if the link is found in the given crawler.
      *
-     * @param \Symfony\Component\DomCrawler\Crawler|string $crawler
-     *
+     * @param  \Symfony\Component\DomCrawler\Crawler|string  $crawler
      * @return bool
      */
     public function matches($crawler)
@@ -77,7 +75,7 @@ class HasLink extends PageConstraint
      */
     protected function absoluteUrl()
     {
-        if (!Str::startsWith($this->url, ['http', 'https'])) {
+        if (! Str::startsWith($this->url, ['http', 'https'])) {
             return URL::to($this->url);
         }
 

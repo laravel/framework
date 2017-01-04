@@ -2,8 +2,8 @@
 
 namespace Illuminate\Mail\Transport;
 
-use Illuminate\Support\Collection;
 use Swift_Mime_Message;
+use Illuminate\Support\Collection;
 
 class ArrayTransport extends Transport
 {
@@ -21,7 +21,7 @@ class ArrayTransport extends Transport
      */
     public function __construct()
     {
-        $this->messages = new Collection();
+        $this->messages = new Collection;
     }
 
     /**
@@ -53,6 +53,6 @@ class ArrayTransport extends Transport
      */
     public function flush()
     {
-        return $this->messages = new Collection();
+        return $this->messages = new Collection;
     }
 }

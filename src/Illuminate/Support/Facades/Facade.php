@@ -3,8 +3,8 @@
 namespace Illuminate\Support\Facades;
 
 use Mockery;
-use Mockery\MockInterface;
 use RuntimeException;
+use Mockery\MockInterface;
 
 abstract class Facade
 {
@@ -25,8 +25,7 @@ abstract class Facade
     /**
      * Hotswap the underlying instance behind the facade.
      *
-     * @param mixed $instance
-     *
+     * @param  mixed  $instance
      * @return void
      */
     public static function swap($instance)
@@ -81,8 +80,7 @@ abstract class Facade
     /**
      * Create a fresh mock instance for the given class.
      *
-     * @param string $name
-     *
+     * @param  string  $name
      * @return \Mockery\Expectation
      */
     protected static function createFreshMockInstance($name)
@@ -101,8 +99,7 @@ abstract class Facade
     /**
      * Create a fresh mock instance for the given class.
      *
-     * @param string $name
-     *
+     * @param  string  $name
      * @return \Mockery\MockInterface
      */
     protected static function createMockByName($name)
@@ -150,9 +147,9 @@ abstract class Facade
     /**
      * Get the registered name of the component.
      *
-     * @throws \RuntimeException
-     *
      * @return string
+     *
+     * @throws \RuntimeException
      */
     protected static function getFacadeAccessor()
     {
@@ -162,8 +159,7 @@ abstract class Facade
     /**
      * Resolve the facade root instance from the container.
      *
-     * @param string|object $name
-     *
+     * @param  string|object  $name
      * @return mixed
      */
     protected static function resolveFacadeInstance($name)
@@ -182,8 +178,7 @@ abstract class Facade
     /**
      * Clear a resolved facade instance.
      *
-     * @param string $name
-     *
+     * @param  string  $name
      * @return void
      */
     public static function clearResolvedInstance($name)
@@ -214,8 +209,7 @@ abstract class Facade
     /**
      * Set the application instance.
      *
-     * @param \Illuminate\Contracts\Foundation\Application $app
-     *
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
     public static function setFacadeApplication($app)
@@ -226,18 +220,17 @@ abstract class Facade
     /**
      * Handle dynamic, static calls to the object.
      *
-     * @param string $method
-     * @param array  $args
+     * @param  string  $method
+     * @param  array   $args
+     * @return mixed
      *
      * @throws \RuntimeException
-     *
-     * @return mixed
      */
     public static function __callStatic($method, $args)
     {
         $instance = static::getFacadeRoot();
 
-        if (!$instance) {
+        if (! $instance) {
             throw new RuntimeException('A facade root has not been set.');
         }
 

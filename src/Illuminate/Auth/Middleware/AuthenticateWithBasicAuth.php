@@ -17,8 +17,7 @@ class AuthenticateWithBasicAuth
     /**
      * Create a new middleware instance.
      *
-     * @param \Illuminate\Contracts\Auth\Factory $auth
-     *
+     * @param  \Illuminate\Contracts\Auth\Factory  $auth
      * @return void
      */
     public function __construct(AuthFactory $auth)
@@ -29,10 +28,9 @@ class AuthenticateWithBasicAuth
     /**
      * Handle an incoming request.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param \Closure                 $next
-     * @param string|null              $guard
-     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
+     * @param  string|null  $guard
      * @return mixed
      */
     public function handle($request, Closure $next, $guard = null)

@@ -25,9 +25,8 @@ class Login
     /**
      * Create a new event instance.
      *
-     * @param \Illuminate\Contracts\Auth\Authenticatable $user
-     * @param bool                                       $remember
-     *
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  bool  $remember
      * @return void
      */
     public function __construct($user, $remember)

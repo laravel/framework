@@ -21,8 +21,7 @@ class ConnectionResolver implements ConnectionResolverInterface
     /**
      * Create a new connection resolver instance.
      *
-     * @param array $connections
-     *
+     * @param  array  $connections
      * @return void
      */
     public function __construct(array $connections = [])
@@ -35,8 +34,7 @@ class ConnectionResolver implements ConnectionResolverInterface
     /**
      * Get a database connection instance.
      *
-     * @param string $name
-     *
+     * @param  string  $name
      * @return \Illuminate\Database\ConnectionInterface
      */
     public function connection($name = null)
@@ -51,9 +49,8 @@ class ConnectionResolver implements ConnectionResolverInterface
     /**
      * Add a connection to the resolver.
      *
-     * @param string                                   $name
-     * @param \Illuminate\Database\ConnectionInterface $connection
-     *
+     * @param  string  $name
+     * @param  \Illuminate\Database\ConnectionInterface  $connection
      * @return void
      */
     public function addConnection($name, ConnectionInterface $connection)
@@ -64,8 +61,7 @@ class ConnectionResolver implements ConnectionResolverInterface
     /**
      * Check if a connection has been registered.
      *
-     * @param string $name
-     *
+     * @param  string  $name
      * @return bool
      */
     public function hasConnection($name)
@@ -86,8 +82,7 @@ class ConnectionResolver implements ConnectionResolverInterface
     /**
      * Set the default connection name.
      *
-     * @param string $name
-     *
+     * @param  string  $name
      * @return void
      */
     public function setDefaultConnection($name)

@@ -1,9 +1,9 @@
 <?php
 
+use Mockery as m;
+use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Attempting;
 use Illuminate\Auth\Events\Authenticated;
-use Illuminate\Auth\Events\Failed;
-use Mockery as m;
 use Symfony\Component\HttpFoundation\Request;
 
 class AuthGuardTest extends PHPUnit_Framework_TestCase

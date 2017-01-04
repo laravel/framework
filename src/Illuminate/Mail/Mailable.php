@@ -2,15 +2,15 @@
 
 namespace Illuminate\Mail;
 
-use BadMethodCallException;
-use Illuminate\Container\Container;
-use Illuminate\Contracts\Mail\Mailable as MailableContract;
-use Illuminate\Contracts\Mail\Mailer as MailerContract;
-use Illuminate\Contracts\Queue\Factory as Queue;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionProperty;
+use BadMethodCallException;
+use Illuminate\Support\Str;
+use Illuminate\Support\Collection;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Queue\Factory as Queue;
+use Illuminate\Contracts\Mail\Mailer as MailerContract;
+use Illuminate\Contracts\Mail\Mailable as MailableContract;
 
 class Mailable implements MailableContract
 {
@@ -101,8 +101,7 @@ class Mailable implements MailableContract
     /**
      * Send the message using the given mailer.
      *
-     * @param \Illuminate\Contracts\Mail\Mailer $mailer
-     *
+     * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
      * @return void
      */
     public function send(MailerContract $mailer)
@@ -121,8 +120,7 @@ class Mailable implements MailableContract
     /**
      * Queue the message for sending.
      *
-     * @param \Illuminate\Contracts\Queue\Factory $queue
-     *
+     * @param  \Illuminate\Contracts\Queue\Factory  $queue
      * @return mixed
      */
     public function queue(Queue $queue)
@@ -145,9 +143,8 @@ class Mailable implements MailableContract
     /**
      * Deliver the queued message after the given delay.
      *
-     * @param \DateTime|int $delay
-     * @param Queue         $queue
-     *
+     * @param  \DateTime|int  $delay
+     * @param  Queue  $queue
      * @return mixed
      */
     public function later($delay, Queue $queue)
@@ -204,13 +201,12 @@ class Mailable implements MailableContract
     /**
      * Add the sender to the message.
      *
-     * @param \Illuminate\Mail\Message $message
-     *
+     * @param  \Illuminate\Mail\Message  $message
      * @return $this
      */
     protected function buildFrom($message)
     {
-        if (!empty($this->from)) {
+        if (! empty($this->from)) {
             $message->from($this->from[0]['address'], $this->from[0]['name']);
         }
 
@@ -220,8 +216,7 @@ class Mailable implements MailableContract
     /**
      * Add all of the recipients to the message.
      *
-     * @param \Illuminate\Mail\Message $message
-     *
+     * @param  \Illuminate\Mail\Message  $message
      * @return $this
      */
     protected function buildRecipients($message)
@@ -238,8 +233,7 @@ class Mailable implements MailableContract
     /**
      * Set the subject for the message.
      *
-     * @param \Illuminate\Mail\Message $message
-     *
+     * @param  \Illuminate\Mail\Message  $message
      * @return $this
      */
     protected function buildSubject($message)
@@ -256,8 +250,7 @@ class Mailable implements MailableContract
     /**
      * Add all of the attachments to the message.
      *
-     * @param \Illuminate\Mail\Message $message
-     *
+     * @param  \Illuminate\Mail\Message  $message
      * @return $this
      */
     protected function buildAttachments($message)
@@ -278,8 +271,7 @@ class Mailable implements MailableContract
     /**
      * Run the callbacks for the message.
      *
-     * @param \Illuminate\Mail\Message $message
-     *
+     * @param  \Illuminate\Mail\Message  $message
      * @return $this
      */
     protected function runCallbacks($message)
@@ -296,8 +288,7 @@ class Mailable implements MailableContract
      *
      * The value is an integer where 1 is the highest priority and 5 is the lowest.
      *
-     * @param int $level
-     *
+     * @param  int  $level
      * @return $this
      */
     public function priority($level = 3)
@@ -312,9 +303,8 @@ class Mailable implements MailableContract
     /**
      * Set the sender of the message.
      *
-     * @param object|array|string $address
-     * @param string|null         $name
-     *
+     * @param  object|array|string  $address
+     * @param  string|null  $name
      * @return $this
      */
     public function from($address, $name = null)
@@ -325,9 +315,8 @@ class Mailable implements MailableContract
     /**
      * Set the recipients of the message.
      *
-     * @param object|array|string $address
-     * @param string|null         $name
-     *
+     * @param  object|array|string  $address
+     * @param  string|null  $name
      * @return $this
      */
     public function to($address, $name = null)
@@ -338,9 +327,8 @@ class Mailable implements MailableContract
     /**
      * Set the recipients of the message.
      *
-     * @param object|array|string $address
-     * @param string|null         $name
-     *
+     * @param  object|array|string  $address
+     * @param  string|null  $name
      * @return $this
      */
     public function cc($address, $name = null)
@@ -351,9 +339,8 @@ class Mailable implements MailableContract
     /**
      * Set the recipients of the message.
      *
-     * @param object|array|string $address
-     * @param string|null         $name
-     *
+     * @param  object|array|string  $address
+     * @param  string|null  $name
      * @return $this
      */
     public function bcc($address, $name = null)
@@ -364,9 +351,8 @@ class Mailable implements MailableContract
     /**
      * Set the "reply to" address of the message.
      *
-     * @param object|array|string $address
-     * @param string|null         $name
-     *
+     * @param  object|array|string  $address
+     * @param  string|null  $name
      * @return $this
      */
     public function replyTo($address, $name = null)
@@ -377,15 +363,14 @@ class Mailable implements MailableContract
     /**
      * Set the recipients of the message.
      *
-     * @param object|array|string $address
-     * @param string|null         $name
-     * @param string              $property
-     *
+     * @param  object|array|string  $address
+     * @param  string|null  $name
+     * @param  string  $property
      * @return $this
      */
     protected function setAddress($address, $name = null, $property = 'to')
     {
-        if (is_object($address) && !$address instanceof Collection) {
+        if (is_object($address) && ! $address instanceof Collection) {
             $address = [$address];
         }
 
@@ -405,8 +390,7 @@ class Mailable implements MailableContract
     /**
      * Parse the given user into an object.
      *
-     * @param mixed $user
-     *
+     * @param  mixed  $user
      * @return object
      */
     protected function parseUser($user)
@@ -423,8 +407,7 @@ class Mailable implements MailableContract
     /**
      * Set the subject of the message.
      *
-     * @param string $subject
-     *
+     * @param  string  $subject
      * @return $this
      */
     public function subject($subject)
@@ -437,9 +420,8 @@ class Mailable implements MailableContract
     /**
      * Set the view and view data for the message.
      *
-     * @param string $view
-     * @param array  $data
-     *
+     * @param  string  $view
+     * @param  array  $data
      * @return $this
      */
     public function view($view, array $data = [])
@@ -453,9 +435,8 @@ class Mailable implements MailableContract
     /**
      * Set the plain text view for the message.
      *
-     * @param string $textView
-     * @param array  $data
-     *
+     * @param  string  $textView
+     * @param  array  $data
      * @return $this
      */
     public function text($textView, array $data = [])
@@ -469,9 +450,8 @@ class Mailable implements MailableContract
     /**
      * Set the view data for the message.
      *
-     * @param string|array $key
-     * @param mixed        $value
-     *
+     * @param  string|array  $key
+     * @param  mixed   $value
      * @return $this
      */
     public function with($key, $value = null)
@@ -488,9 +468,8 @@ class Mailable implements MailableContract
     /**
      * Attach a file to the message.
      *
-     * @param string $file
-     * @param array  $options
-     *
+     * @param  string  $file
+     * @param  array  $options
      * @return $this
      */
     public function attach($file, array $options = [])
@@ -503,10 +482,9 @@ class Mailable implements MailableContract
     /**
      * Attach in-memory data as an attachment.
      *
-     * @param string $data
-     * @param string $name
-     * @param array  $options
-     *
+     * @param  string  $data
+     * @param  string  $name
+     * @param  array  $options
      * @return $this
      */
     public function attachData($data, $name, array $options = [])
@@ -519,8 +497,7 @@ class Mailable implements MailableContract
     /**
      * Register a callback to be called with the Swift message instance.
      *
-     * @param callable $callback
-     *
+     * @param  callable  $callback
      * @return $this
      */
     public function withSwiftMessage($callback)
@@ -533,12 +510,11 @@ class Mailable implements MailableContract
     /**
      * Dynamically bind parameters to the message.
      *
-     * @param string $method
-     * @param array  $parameters
+     * @param  string  $method
+     * @param  array   $parameters
+     * @return $this
      *
      * @throws \BadMethodCallException
-     *
-     * @return $this
      */
     public function __call($method, $parameters)
     {

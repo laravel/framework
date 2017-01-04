@@ -1,8 +1,8 @@
 <?php
 
+use Mockery as m;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Mockery as m;
 
 class DatabaseEloquentHasOneTest extends PHPUnit_Framework_TestCase
 {
@@ -117,9 +117,9 @@ class DatabaseEloquentHasOneTest extends PHPUnit_Framework_TestCase
     {
         $relation = $this->getRelation();
         $relation->getQuery()->shouldReceive('whereIn')->once()->with('table.foreign_key', [1, 2]);
-        $model1 = new EloquentHasOneModelStub();
+        $model1 = new EloquentHasOneModelStub;
         $model1->id = 1;
-        $model2 = new EloquentHasOneModelStub();
+        $model2 = new EloquentHasOneModelStub;
         $model2->id = 2;
         $relation->addEagerConstraints([$model1, $model2]);
     }
@@ -128,16 +128,16 @@ class DatabaseEloquentHasOneTest extends PHPUnit_Framework_TestCase
     {
         $relation = $this->getRelation();
 
-        $result1 = new EloquentHasOneModelStub();
+        $result1 = new EloquentHasOneModelStub;
         $result1->foreign_key = 1;
-        $result2 = new EloquentHasOneModelStub();
+        $result2 = new EloquentHasOneModelStub;
         $result2->foreign_key = 2;
 
-        $model1 = new EloquentHasOneModelStub();
+        $model1 = new EloquentHasOneModelStub;
         $model1->id = 1;
-        $model2 = new EloquentHasOneModelStub();
+        $model2 = new EloquentHasOneModelStub;
         $model2->id = 2;
-        $model3 = new EloquentHasOneModelStub();
+        $model3 = new EloquentHasOneModelStub;
         $model3->id = 3;
 
         $models = $relation->match([$model1, $model2, $model3], new Collection([$result1, $result2]), 'foo');

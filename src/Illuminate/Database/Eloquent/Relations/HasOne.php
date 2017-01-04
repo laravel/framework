@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Collection;
 
 class HasOne extends HasOneOrMany
 {
@@ -19,8 +19,7 @@ class HasOne extends HasOneOrMany
     /**
      * Return a new model instance in case the relationship does not exist.
      *
-     * @param \Closure|bool $callback
-     *
+     * @param  \Closure|bool  $callback
      * @return $this
      */
     public function withDefault($callback = true)
@@ -43,9 +42,8 @@ class HasOne extends HasOneOrMany
     /**
      * Initialize the relation on a set of models.
      *
-     * @param array  $models
-     * @param string $relation
-     *
+     * @param  array   $models
+     * @param  string  $relation
      * @return array
      */
     public function initRelation(array $models, $relation)
@@ -60,10 +58,9 @@ class HasOne extends HasOneOrMany
     /**
      * Match the eagerly loaded results to their parents.
      *
-     * @param array                                    $models
-     * @param \Illuminate\Database\Eloquent\Collection $results
-     * @param string                                   $relation
-     *
+     * @param  array  $models
+     * @param  \Illuminate\Database\Eloquent\Collection  $results
+     * @param  string  $relation
      * @return array
      */
     public function match(array $models, Collection $results, $relation)
@@ -74,13 +71,12 @@ class HasOne extends HasOneOrMany
     /**
      * Get the default value for this relation.
      *
-     * @param \Illuminate\Database\Eloquent\Model $model
-     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return \Illuminate\Database\Eloquent\Model|null
      */
     protected function getDefaultFor(Model $model)
     {
-        if (!$this->withDefault) {
+        if (! $this->withDefault) {
             return;
         }
 

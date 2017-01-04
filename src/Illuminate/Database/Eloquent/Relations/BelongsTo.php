@@ -2,10 +2,10 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Database\Eloquent\Collection;
 
 class BelongsTo extends Relation
 {
@@ -40,12 +40,11 @@ class BelongsTo extends Relation
     /**
      * Create a new belongs to relationship instance.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param \Illuminate\Database\Eloquent\Model   $parent
-     * @param string                                $foreignKey
-     * @param string                                $otherKey
-     * @param string                                $relation
-     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  string  $foreignKey
+     * @param  string  $otherKey
+     * @param  string  $relation
      * @return void
      */
     public function __construct(Builder $query, Model $parent, $foreignKey, $otherKey, $relation)
@@ -87,10 +86,9 @@ class BelongsTo extends Relation
     /**
      * Add the constraints for a relationship query.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param \Illuminate\Database\Eloquent\Builder $parent
-     * @param array|mixed                           $columns
-     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $parent
+     * @param  array|mixed  $columns
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function getRelationQuery(Builder $query, Builder $parent, $columns = ['*'])
@@ -109,10 +107,9 @@ class BelongsTo extends Relation
     /**
      * Add the constraints for a relationship query on the same table.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param \Illuminate\Database\Eloquent\Builder $parent
-     * @param array|mixed                           $columns
-     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $parent
+     * @param  array|mixed  $columns
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function getRelationQueryForSelfRelation(Builder $query, Builder $parent, $columns = ['*'])
@@ -141,8 +138,7 @@ class BelongsTo extends Relation
     /**
      * Set the constraints for an eager load of the relation.
      *
-     * @param array $models
-     *
+     * @param  array  $models
      * @return void
      */
     public function addEagerConstraints(array $models)
@@ -158,8 +154,7 @@ class BelongsTo extends Relation
     /**
      * Gather the keys from an array of related models.
      *
-     * @param array $models
-     *
+     * @param  array  $models
      * @return array
      */
     protected function getEagerModelKeys(array $models)
@@ -170,7 +165,7 @@ class BelongsTo extends Relation
         // to query for via the eager loading query. We will add them to an array then
         // execute a "where in" statement to gather up all of those related records.
         foreach ($models as $model) {
-            if (!is_null($value = $model->{$this->foreignKey})) {
+            if (! is_null($value = $model->{$this->foreignKey})) {
                 $keys[] = $value;
             }
         }
@@ -189,9 +184,8 @@ class BelongsTo extends Relation
     /**
      * Initialize the relation on a set of models.
      *
-     * @param array  $models
-     * @param string $relation
-     *
+     * @param  array   $models
+     * @param  string  $relation
      * @return array
      */
     public function initRelation(array $models, $relation)
@@ -206,10 +200,9 @@ class BelongsTo extends Relation
     /**
      * Match the eagerly loaded results to their parents.
      *
-     * @param array                                    $models
-     * @param \Illuminate\Database\Eloquent\Collection $results
-     * @param string                                   $relation
-     *
+     * @param  array   $models
+     * @param  \Illuminate\Database\Eloquent\Collection  $results
+     * @param  string  $relation
      * @return array
      */
     public function match(array $models, Collection $results, $relation)
@@ -242,8 +235,7 @@ class BelongsTo extends Relation
     /**
      * Associate the model instance to the given parent.
      *
-     * @param \Illuminate\Database\Eloquent\Model|int $model
-     *
+     * @param  \Illuminate\Database\Eloquent\Model|int  $model
      * @return \Illuminate\Database\Eloquent\Model
      */
     public function associate($model)
@@ -274,8 +266,7 @@ class BelongsTo extends Relation
     /**
      * Update the parent model on the relationship.
      *
-     * @param array $attributes
-     *
+     * @param  array  $attributes
      * @return mixed
      */
     public function update(array $attributes)

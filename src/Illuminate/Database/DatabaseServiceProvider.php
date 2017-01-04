@@ -4,11 +4,11 @@ namespace Illuminate\Database;
 
 use Faker\Factory as FakerFactory;
 use Faker\Generator as FakerGenerator;
-use Illuminate\Database\Connectors\ConnectionFactory;
-use Illuminate\Database\Eloquent\Factory as EloquentFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\QueueEntityResolver;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Database\Connectors\ConnectionFactory;
+use Illuminate\Database\Eloquent\QueueEntityResolver;
+use Illuminate\Database\Eloquent\Factory as EloquentFactory;
 
 class DatabaseServiceProvider extends ServiceProvider
 {
@@ -82,7 +82,7 @@ class DatabaseServiceProvider extends ServiceProvider
     protected function registerQueueableEntityResolver()
     {
         $this->app->singleton('Illuminate\Contracts\Queue\EntityResolver', function () {
-            return new QueueEntityResolver();
+            return new QueueEntityResolver;
         });
     }
 }

@@ -23,10 +23,9 @@ interface Validator extends MessageProvider
     /**
      * Add conditions to a given field based on a Closure.
      *
-     * @param string       $attribute
-     * @param string|array $rules
-     * @param callable     $callback
-     *
+     * @param  string  $attribute
+     * @param  string|array  $rules
+     * @param  callable  $callback
      * @return void
      */
     public function sometimes($attribute, $rules, callable $callback);
@@ -34,8 +33,7 @@ interface Validator extends MessageProvider
     /**
      * After an after validation callback.
      *
-     * @param callable|string $callback
-     *
+     * @param  callable|string  $callback
      * @return $this
      */
     public function after($callback);

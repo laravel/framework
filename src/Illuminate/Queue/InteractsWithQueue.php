@@ -38,22 +38,20 @@ trait InteractsWithQueue
     /**
      * Fail the job from the queue.
      *
-     * @param \Throwable $exception
-     *
+     * @param  \Throwable  $exception
      * @return void
      */
     public function fail($exception = null)
     {
         if ($this->job) {
-            return $this->job->failed($exception ?: new ManuallyFailedException());
+            return $this->job->failed($exception ?: new ManuallyFailedException);
         }
     }
 
     /**
      * Release the job back into the queue.
      *
-     * @param int $delay
-     *
+     * @param  int   $delay
      * @return void
      */
     public function release($delay = 0)
@@ -66,8 +64,7 @@ trait InteractsWithQueue
     /**
      * Set the base queue job instance.
      *
-     * @param \Illuminate\Contracts\Queue\Job $job
-     *
+     * @param  \Illuminate\Contracts\Queue\Job  $job
      * @return $this
      */
     public function setJob(JobContract $job)

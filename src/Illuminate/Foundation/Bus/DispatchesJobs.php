@@ -9,8 +9,7 @@ trait DispatchesJobs
     /**
      * Dispatch a job to its appropriate handler.
      *
-     * @param mixed $job
-     *
+     * @param  mixed  $job
      * @return mixed
      */
     protected function dispatch($job)
@@ -21,8 +20,7 @@ trait DispatchesJobs
     /**
      * Dispatch a command to its appropriate handler in the current process.
      *
-     * @param mixed $job
-     *
+     * @param  mixed  $job
      * @return mixed
      */
     public function dispatchNow($job)

@@ -17,9 +17,9 @@ class RepositoryTest extends PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->repository = new Repository($this->config = [
-            'foo'       => 'bar',
-            'bar'       => 'baz',
-            'null'      => null,
+            'foo' => 'bar',
+            'bar' => 'baz',
+            'null' => null,
             'associate' => [
                 'x' => 'xxx',
                 'y' => 'yyy',

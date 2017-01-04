@@ -14,8 +14,7 @@ class HasText extends PageConstraint
     /**
      * Create a new constraint instance.
      *
-     * @param string $text
-     *
+     * @param  string  $text
      * @return void
      */
     public function __construct($text)
@@ -26,8 +25,7 @@ class HasText extends PageConstraint
     /**
      * Check if the plain text is found in the given crawler.
      *
-     * @param \Symfony\Component\DomCrawler\Crawler|string $crawler
-     *
+     * @param  \Symfony\Component\DomCrawler\Crawler|string  $crawler
      * @return bool
      */
     protected function matches($crawler)

@@ -23,9 +23,8 @@ class HasInElement extends PageConstraint
     /**
      * Create a new constraint instance.
      *
-     * @param string $element
-     * @param string $text
-     *
+     * @param  string  $element
+     * @param  string  $text
      * @return void
      */
     public function __construct($element, $text)
@@ -37,8 +36,7 @@ class HasInElement extends PageConstraint
     /**
      * Check if the source or text is found within the element in the given crawler.
      *
-     * @param \Symfony\Component\DomCrawler\Crawler|string $crawler
-     *
+     * @param  \Symfony\Component\DomCrawler\Crawler|string  $crawler
      * @return bool
      */
     public function matches($crawler)

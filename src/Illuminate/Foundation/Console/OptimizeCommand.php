@@ -2,11 +2,11 @@
 
 namespace Illuminate\Foundation\Console;
 
-use ClassPreloader\Exceptions\VisitorExceptionInterface;
 use ClassPreloader\Factory;
 use Illuminate\Console\Command;
 use Illuminate\Support\Composer;
 use Symfony\Component\Console\Input\InputOption;
+use ClassPreloader\Exceptions\VisitorExceptionInterface;
 
 class OptimizeCommand extends Command
 {
@@ -34,8 +34,7 @@ class OptimizeCommand extends Command
     /**
      * Create a new optimize command instance.
      *
-     * @param \Illuminate\Support\Composer $composer
-     *
+     * @param  \Illuminate\Support\Composer  $composer
      * @return void
      */
     public function __construct(Composer $composer)
@@ -60,7 +59,7 @@ class OptimizeCommand extends Command
             $this->composer->dumpOptimized();
         }
 
-        if ($this->option('force') || !$this->laravel['config']['app.debug']) {
+        if ($this->option('force') || ! $this->laravel['config']['app.debug']) {
             $this->info('Compiling common classes');
             $this->compileClasses();
         } else {
@@ -75,7 +74,7 @@ class OptimizeCommand extends Command
      */
     protected function compileClasses()
     {
-        $preloader = (new Factory())->create(['skip' => true]);
+        $preloader = (new Factory)->create(['skip' => true]);
 
         $handle = $preloader->prepareOutput($this->laravel->getCachedCompilePath());
 

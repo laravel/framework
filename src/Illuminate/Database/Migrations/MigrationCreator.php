@@ -3,9 +3,9 @@
 namespace Illuminate\Database\Migrations;
 
 use Closure;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use Illuminate\Filesystem\Filesystem;
 
 class MigrationCreator
 {
@@ -26,8 +26,7 @@ class MigrationCreator
     /**
      * Create a new migration creator instance.
      *
-     * @param \Illuminate\Filesystem\Filesystem $files
-     *
+     * @param  \Illuminate\Filesystem\Filesystem  $files
      * @return void
      */
     public function __construct(Filesystem $files)
@@ -38,14 +37,12 @@ class MigrationCreator
     /**
      * Create a new migration at the given path.
      *
-     * @param string $name
-     * @param string $path
-     * @param string $table
-     * @param bool   $create
-     *
-     * @throws \Exception
-     *
+     * @param  string  $name
+     * @param  string  $path
+     * @param  string  $table
+     * @param  bool    $create
      * @return string
+     * @throws \Exception
      */
     public function create($name, $path, $table = null, $create = false)
     {
@@ -68,11 +65,10 @@ class MigrationCreator
     /**
      * Ensure that a migration with the given name doesn't already exist.
      *
-     * @param string $name
+     * @param  string  $name
+     * @return void
      *
      * @throws \InvalidArgumentException
-     *
-     * @return void
      */
     protected function ensureMigrationDoesntAlreadyExist($name)
     {
@@ -84,9 +80,8 @@ class MigrationCreator
     /**
      * Get the migration stub file.
      *
-     * @param string $table
-     * @param bool   $create
-     *
+     * @param  string  $table
+     * @param  bool    $create
      * @return string
      */
     protected function getStub($table, $create)
@@ -108,10 +103,9 @@ class MigrationCreator
     /**
      * Populate the place-holders in the migration stub.
      *
-     * @param string $name
-     * @param string $stub
-     * @param string $table
-     *
+     * @param  string  $name
+     * @param  string  $stub
+     * @param  string  $table
      * @return string
      */
     protected function populateStub($name, $stub, $table)
@@ -121,7 +115,7 @@ class MigrationCreator
         // Here we will replace the table place-holders with the table specified by
         // the developer, which is useful for quickly creating a tables creation
         // or update migration from the console instead of typing it manually.
-        if (!is_null($table)) {
+        if (! is_null($table)) {
             $stub = str_replace('DummyTable', $table, $stub);
         }
 
@@ -131,8 +125,7 @@ class MigrationCreator
     /**
      * Get the class name of a migration name.
      *
-     * @param string $name
-     *
+     * @param  string  $name
      * @return string
      */
     protected function getClassName($name)
@@ -155,8 +148,7 @@ class MigrationCreator
     /**
      * Register a post migration create hook.
      *
-     * @param \Closure $callback
-     *
+     * @param  \Closure  $callback
      * @return void
      */
     public function afterCreate(Closure $callback)
@@ -167,9 +159,8 @@ class MigrationCreator
     /**
      * Get the full path name to the migration.
      *
-     * @param string $name
-     * @param string $path
-     *
+     * @param  string  $name
+     * @param  string  $path
      * @return string
      */
     protected function getPath($name, $path)
