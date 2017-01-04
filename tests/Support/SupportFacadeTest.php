@@ -1,13 +1,17 @@
 <?php
 
+namespace Illuminate\Tests\Support;
+
+use ArrayAccess;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class SupportFacadeTest extends TestCase
 {
     public function setUp()
     {
-        Illuminate\Support\Facades\Facade::clearResolvedInstances();
+        \Illuminate\Support\Facades\Facade::clearResolvedInstances();
         FacadeStub::setFacadeApplication(null);
     }
 
@@ -54,7 +58,7 @@ class SupportFacadeTest extends TestCase
     }
 }
 
-class FacadeStub extends Illuminate\Support\Facades\Facade
+class FacadeStub extends \Illuminate\Support\Facades\Facade
 {
     protected static function getFacadeAccessor()
     {

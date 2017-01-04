@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Support;
+
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\MessageBag;
