@@ -791,10 +791,10 @@ class MySqlGrammar extends Grammar
      */
     protected function wrapValue($value)
     {
-        if ($value === '*') {
-            return $value;
+        if ($value !== '*') {
+            return '`'.str_replace('`', '``', $value).'`';
         }
 
-        return '`'.str_replace('`', '``', $value).'`';
+        return $value;
     }
 }
