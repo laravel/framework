@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Log;
+
 use Mockery as m;
 use Illuminate\Log\Writer;
 use PHPUnit\Framework\TestCase;
@@ -42,10 +44,10 @@ class LogWriterTest extends TestCase
 
     public function testWriterFiresEventsDispatcher()
     {
-        $writer = new Writer($monolog = m::mock('Monolog\Logger'), $events = new Illuminate\Events\Dispatcher);
+        $writer = new Writer($monolog = m::mock('Monolog\Logger'), $events = new \Illuminate\Events\Dispatcher);
         $monolog->shouldReceive('error')->once()->with('foo', []);
 
-        $events->listen(Illuminate\Log\Events\MessageLogged::class, function ($event) {
+        $events->listen(\Illuminate\Log\Events\MessageLogged::class, function ($event) {
             $_SERVER['__log.level'] = $event->level;
             $_SERVER['__log.message'] = $event->message;
             $_SERVER['__log.context'] = $event->context;
@@ -80,7 +82,7 @@ class LogWriterTest extends TestCase
         $callback = function () {
             return 'success';
         };
-        $events->shouldReceive('listen')->with(Illuminate\Log\Events\MessageLogged::class, $callback)->once();
+        $events->shouldReceive('listen')->with(\Illuminate\Log\Events\MessageLogged::class, $callback)->once();
 
         $writer->listen($callback);
     }
