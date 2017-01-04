@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Foundation;
+
 use PHPUnit\Framework\TestCase;
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Container\Container;
@@ -28,7 +30,7 @@ class FoundationAuthorizesRequestsTraitTest extends TestCase
     }
 
     /**
-     * @expectedException Illuminate\Auth\Access\AuthorizationException
+     * @expectedException \Illuminate\Auth\Access\AuthorizationException
      */
     public function test_exception_is_thrown_if_gate_check_fails()
     {
