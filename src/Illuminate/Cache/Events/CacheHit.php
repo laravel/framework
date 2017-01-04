@@ -2,7 +2,7 @@
 
 namespace Illuminate\Cache\Events;
 
-class CacheHit extends AbstractCacheEvent
+class CacheHit extends CacheEvent
 {
     /**
      * The value that was retrieved.
@@ -22,6 +22,7 @@ class CacheHit extends AbstractCacheEvent
     public function __construct($key, $value, array $tags = [])
     {
         parent::__construct($key, $tags);
+
         $this->value = $value;
     }
 }
