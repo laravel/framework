@@ -77,8 +77,8 @@ class KeyGenerateCommand extends Command
      */
     protected function writeNewEnvironmentFileWith($key)
     {
-        file_put_contents($this->laravel->environmentFilePath(), str_replace(
-            'APP_KEY='.$this->laravel['config']['app.key'],
+        file_put_contents($this->laravel->environmentFilePath(), preg_replace(
+            '/\bAPP_KEY=\B/i'.$this->laravel['config']['app.key'],
             'APP_KEY='.$key,
             file_get_contents($this->laravel->environmentFilePath())
         ));
