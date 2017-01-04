@@ -18,7 +18,7 @@ class DatabaseMigrationCreatorTest extends TestCase
             $_SERVER['__migration.creator'] = true;
         });
         $creator->expects($this->any())->method('getDatePrefix')->will($this->returnValue('foo'));
-        $creator->getFilesystem()->shouldReceive('get')->once()->with($creator->getStubPath().'/blank.stub')->andReturn('DummyClass');
+        $creator->getFilesystem()->shouldReceive('get')->once()->with($creator->stubPath().'/blank.stub')->andReturn('DummyClass');
         $creator->getFilesystem()->shouldReceive('put')->once()->with('foo/foo_create_bar.php', 'CreateBar');
 
         $creator->create('create_bar', 'foo');
@@ -32,7 +32,7 @@ class DatabaseMigrationCreatorTest extends TestCase
     {
         $creator = $this->getCreator();
         $creator->expects($this->any())->method('getDatePrefix')->will($this->returnValue('foo'));
-        $creator->getFilesystem()->shouldReceive('get')->once()->with($creator->getStubPath().'/update.stub')->andReturn('DummyClass DummyTable');
+        $creator->getFilesystem()->shouldReceive('get')->once()->with($creator->stubPath().'/update.stub')->andReturn('DummyClass DummyTable');
         $creator->getFilesystem()->shouldReceive('put')->once()->with('foo/foo_create_bar.php', 'CreateBar baz');
 
         $creator->create('create_bar', 'foo', 'baz');
@@ -42,7 +42,7 @@ class DatabaseMigrationCreatorTest extends TestCase
     {
         $creator = $this->getCreator();
         $creator->expects($this->any())->method('getDatePrefix')->will($this->returnValue('foo'));
-        $creator->getFilesystem()->shouldReceive('get')->once()->with($creator->getStubPath().'/create.stub')->andReturn('DummyClass DummyTable');
+        $creator->getFilesystem()->shouldReceive('get')->once()->with($creator->stubPath().'/create.stub')->andReturn('DummyClass DummyTable');
         $creator->getFilesystem()->shouldReceive('put')->once()->with('foo/foo_create_bar.php', 'CreateBar baz');
 
         $creator->create('create_bar', 'foo', 'baz', true);

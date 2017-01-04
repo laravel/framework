@@ -70,7 +70,7 @@ class Migrator
     }
 
     /**
-     * Run the outstanding migrations at a given path.
+     * Run the pending migrations at a given path.
      *
      * @param  array|string  $paths
      * @param  array  $options
@@ -80,23 +80,36 @@ class Migrator
     {
         $this->notes = [];
 
-        $files = $this->getMigrationFiles($paths);
-
         // Once we grab all of the migration files for the path, we will compare them
         // against the migrations that have already been run for this package then
         // run each of the outstanding migrations against a database connection.
-        $ran = $this->repository->getRan();
+        $files = $this->getMigrationFiles($paths);
 
-        $migrations = Collection::make($files)
-                        ->reject(function ($file) use ($ran) {
-                            return in_array($this->getMigrationName($file), $ran);
-                        })->values()->all();
+        $this->requireFiles($migrations = $this->pendingMigrations(
+            $files, $this->repository->getRan()
+        ));
 
-        $this->requireFiles($migrations);
-
+        // Once we have all these migrations that are outstanding we are ready to run
+        // we will go ahead and run them "up". This will execute each migration as
+        // an operation against a database. Then we'll return this list of them.
         $this->runMigrationList($migrations, $options);
 
         return $migrations;
+    }
+
+    /**
+     * Get the migration files that have not yet run.
+     *
+     * @param  array  $files
+     * @param  array  $ran
+     * @return array
+     */
+    protected function pendingMigrations($files, $ran)
+    {
+        return Collection::make($files)
+                ->reject(function ($file) use ($ran) {
+                    return in_array($this->getMigrationName($file), $ran);
+                })->values()->all();
     }
 
     /**
@@ -290,36 +303,6 @@ class Migrator
     }
 
     /**
-     * Get all of the migration files in a given path.
-     *
-     * @param  string|array  $paths
-     * @return array
-     */
-    public function getMigrationFiles($paths)
-    {
-        return Collection::make($paths)->flatMap(function ($path) {
-            return $this->files->glob($path.'/*_*.php');
-        })->filter()->sortBy(function ($file) {
-            return $this->getMigrationName($file);
-        })->values()->keyBy(function ($file) {
-            return $this->getMigrationName($file);
-        })->all();
-    }
-
-    /**
-     * Require in all the migration files in a given path.
-     *
-     * @param  array   $files
-     * @return void
-     */
-    public function requireFiles(array $files)
-    {
-        foreach ($files as $file) {
-            $this->files->requireOnce($file);
-        }
-    }
-
-    /**
      * Pretend to run the migrations.
      *
      * @param  object  $migration
@@ -408,6 +391,36 @@ class Migrator
         $class = Str::studly(implode('_', array_slice(explode('_', $file), 4)));
 
         return new $class;
+    }
+
+    /**
+     * Get all of the migration files in a given path.
+     *
+     * @param  string|array  $paths
+     * @return array
+     */
+    public function getMigrationFiles($paths)
+    {
+        return Collection::make($paths)->flatMap(function ($path) {
+            return $this->files->glob($path.'/*_*.php');
+        })->filter()->sortBy(function ($file) {
+            return $this->getMigrationName($file);
+        })->values()->keyBy(function ($file) {
+            return $this->getMigrationName($file);
+        })->all();
+    }
+
+    /**
+     * Require in all the migration files in a given path.
+     *
+     * @param  array   $files
+     * @return void
+     */
+    public function requireFiles(array $files)
+    {
+        foreach ($files as $file) {
+            $this->files->requireOnce($file);
+        }
     }
 
     /**
