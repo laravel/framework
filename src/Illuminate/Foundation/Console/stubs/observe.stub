@@ -1,0 +1,120 @@
+<?php
+
+namespace DummyNamespace;
+
+use NamespacedDummyModel;
+
+class DummyClass
+{
+
+    /**
+     * Listen to the dummyModelName creating event.
+     *
+     * @param  \NamespacedDummyModel $dummyModelName
+     * @return void
+     */
+    public function creating(DummyModel $dummyModelName)
+    {
+        //
+    }
+
+    /**
+     * Listen to the dummyModelName created event.
+     *
+     * @param  \NamespacedDummyModel $dummyModelName
+     * @return void
+     */
+    public function created(DummyModel $dummyModelName)
+    {
+        //
+    }
+
+    /**
+     * Listen to the dummyModelName updating event.
+     *
+     * @param  \NamespacedDummyModel $dummyModelName
+     * @return void
+     */
+    public function updating(DummyModel $dummyModelName)
+    {
+        //
+    }
+
+    /**
+     * Listen to the dummyModelName updated event.
+     *
+     * @param  \NamespacedDummyModel $dummyModelName
+     * @return void
+     */
+    public function updated(DummyModel $dummyModelName)
+    {
+        //
+    }
+
+    /**
+     * Listen to the dummyModelName saving event.
+     *
+     * @param  \NamespacedDummyModel $dummyModelName
+     * @return void
+     */
+    public function saving(DummyModel $dummyModelName)
+    {
+        //
+    }
+
+    /**
+     * Listen to the dummyModelName saved event.
+     *
+     * @param  \NamespacedDummyModel $dummyModelName
+     * @return void
+     */
+    public function saved(DummyModel $dummyModelName)
+    {
+        //
+    }
+
+    /**
+     * Listen to the dummyModelName deleting event.
+     *
+     * @param  \NamespacedDummyModel $dummyModelName
+     * @return void
+     */
+    public function deleting(DummyModel $dummyModelName)
+    {
+        //
+    }
+
+    /**
+     * Listen to the dummyModelName deleted event.
+     *
+     * @param  \NamespacedDummyModel $dummyModelName
+     * @return void
+     */
+    public function deleted(DummyModel $dummyModelName)
+    {
+        //
+    }
+
+    /**
+     * Listen to the dummyModelName restoring event.
+     *
+     * @param  \NamespacedDummyModel $dummyModelName
+     * @return void
+     */
+    public function restoring(DummyModel $dummyModelName)
+    {
+        //
+    }
+
+    /**
+     * Listen to the dummyModelName restored event.
+     *
+     * @param  \NamespacedDummyModel $dummyModelName
+     * @return void
+     */
+    public function restored(DummyModel $dummyModelName)
+    {
+        //
+    }
+
+}
