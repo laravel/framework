@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Console;
+
 use Mockery as m;
 use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;

@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Console;
+
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Console\Scheduling\Schedule;
@@ -85,7 +87,7 @@ class FooClassStub
     }
 }
 
-class ConsoleCommandStub extends Illuminate\Console\Command
+class ConsoleCommandStub extends \Illuminate\Console\Command
 {
     protected $signature = 'foo:bar';
 

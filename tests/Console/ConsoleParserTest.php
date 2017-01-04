@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Console;
+
 use Illuminate\Console\Parser;
 use PHPUnit\Framework\TestCase;
 
