@@ -8,6 +8,13 @@ use Illuminate\Http\Exception\HttpResponseException;
 trait ResponseTrait
 {
     /**
+     * The original content of the response.
+     *
+     * @var mixed
+     */
+    public $original;
+
+    /**
      * The exception that triggered the error response (if applicable).
      *
      * @var \Exception|null
@@ -32,6 +39,16 @@ trait ResponseTrait
     public function content()
     {
         return $this->getContent();
+    }
+
+    /**
+     * Get the original response content.
+     *
+     * @return mixed
+     */
+    public function getOriginalContent()
+    {
+        return $this->original;
     }
 
     /**

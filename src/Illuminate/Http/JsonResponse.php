@@ -22,6 +22,8 @@ class JsonResponse extends BaseJsonResponse
      */
     public function __construct($data = null, $status = 200, $headers = [], $options = 0)
     {
+        $this->original = $data;
+
         $this->encodingOptions = $options;
 
         parent::__construct($data, $status, $headers);
@@ -55,6 +57,8 @@ class JsonResponse extends BaseJsonResponse
      */
     public function setData($data = [])
     {
+        $this->original = $data;
+
         if ($data instanceof Arrayable) {
             $this->data = json_encode($data->toArray(), $this->encodingOptions);
         } elseif ($data instanceof Jsonable) {
