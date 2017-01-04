@@ -33,6 +33,16 @@ class RedirectResponse extends BaseRedirectResponse
     protected $session;
 
     /**
+     * Get the original response content.
+     *
+     * @return null
+     */
+    public function getOriginalContent()
+    {
+        return;
+    }
+
+    /**
      * Flash a piece of data to the session.
      *
      * @param  string|array  $key
