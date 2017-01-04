@@ -9,7 +9,8 @@ interface Mailable
     /**
      * Send the message using the given mailer.
      *
-     * @param  Mailer  $mailer
+     * @param Mailer $mailer
+     *
      * @return void
      */
     public function send(Mailer $mailer);
@@ -17,7 +18,8 @@ interface Mailable
     /**
      * Queue the given message.
      *
-     * @param  Queue  $queue
+     * @param Queue $queue
+     *
      * @return mixed
      */
     public function queue(Queue $queue);
@@ -25,8 +27,9 @@ interface Mailable
     /**
      * Deliver the queued message after the given delay.
      *
-     * @param  \DateTime|int  $delay
-     * @param  Queue  $queue
+     * @param \DateTime|int $delay
+     * @param Queue         $queue
+     *
      * @return mixed
      */
     public function later($delay, Queue $queue);

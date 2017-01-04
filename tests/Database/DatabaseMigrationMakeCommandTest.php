@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
+use Mockery as m;
 
 class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase
 {
@@ -17,7 +17,7 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase
             $composer = m::mock('Illuminate\Support\Composer'),
             __DIR__.'/vendor'
         );
-        $app = new Illuminate\Foundation\Application;
+        $app = new Illuminate\Foundation\Application();
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $creator->shouldReceive('create')->once()->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', null, false);
@@ -33,7 +33,7 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase
             m::mock('Illuminate\Support\Composer')->shouldIgnoreMissing(),
             __DIR__.'/vendor'
         );
-        $app = new Illuminate\Foundation\Application;
+        $app = new Illuminate\Foundation\Application();
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $creator->shouldReceive('create')->once()->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', null, false);
@@ -48,7 +48,7 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase
             m::mock('Illuminate\Support\Composer')->shouldIgnoreMissing(),
             __DIR__.'/vendor'
         );
-        $app = new Illuminate\Foundation\Application;
+        $app = new Illuminate\Foundation\Application();
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $creator->shouldReceive('create')->once()->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'users', true);
@@ -63,7 +63,7 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase
             m::mock('Illuminate\Support\Composer')->shouldIgnoreMissing(),
             __DIR__.'/vendor'
         );
-        $app = new Illuminate\Foundation\Application;
+        $app = new Illuminate\Foundation\Application();
         $command->setLaravel($app);
         $app->setBasePath('/home/laravel');
         $creator->shouldReceive('create')->once()->with('create_foo', '/home/laravel/vendor/laravel-package/migrations', 'users', true);
@@ -72,6 +72,6 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase
 
     protected function runCommand($command, $input = [])
     {
-        return $command->run(new Symfony\Component\Console\Input\ArrayInput($input), new Symfony\Component\Console\Output\NullOutput);
+        return $command->run(new Symfony\Component\Console\Input\ArrayInput($input), new Symfony\Component\Console\Output\NullOutput());
     }
 }

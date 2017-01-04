@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
 class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
 {
@@ -12,8 +12,8 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
 
     public function testMailIsSentByChannel()
     {
-        $notification = new NotificationMailChannelTestNotification;
-        $notifiable = new NotificationMailChannelTestNotifiable;
+        $notification = new NotificationMailChannelTestNotification();
+        $notifiable = new NotificationMailChannelTestNotifiable();
 
         $message = $notification->toMail($notifiable);
         $data = $message->toArray();
@@ -31,8 +31,8 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
 
     public function testMessageWithSubject()
     {
-        $notification = new NotificationMailChannelTestNotification;
-        $notifiable = new NotificationMailChannelTestNotifiable;
+        $notification = new NotificationMailChannelTestNotification();
+        $notifiable = new NotificationMailChannelTestNotifiable();
 
         $message = $notification->toMail($notifiable);
         $data = $message->toArray();
@@ -62,8 +62,8 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
 
     public function testMessageWithoutSubjectAutogeneratesSubjectFromClassName()
     {
-        $notification = new NotificationMailChannelTestNotificationNoSubject;
-        $notifiable = new NotificationMailChannelTestNotifiable;
+        $notification = new NotificationMailChannelTestNotificationNoSubject();
+        $notifiable = new NotificationMailChannelTestNotifiable();
 
         $message = $notification->toMail($notifiable);
         $data = $message->toArray();
@@ -91,8 +91,8 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
 
     public function testMessageWithMultipleSenders()
     {
-        $notification = new NotificationMailChannelTestNotification;
-        $notifiable = new NotificationMailChannelTestNotifiableMultipleEmails;
+        $notification = new NotificationMailChannelTestNotification();
+        $notifiable = new NotificationMailChannelTestNotifiableMultipleEmails();
 
         $message = $notification->toMail($notifiable);
         $data = $message->toArray();
@@ -122,8 +122,8 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
 
     public function testMessageWithFromAddress()
     {
-        $notification = new NotificationMailChannelTestNotificationWithFromAddress;
-        $notifiable = new NotificationMailChannelTestNotifiable;
+        $notification = new NotificationMailChannelTestNotificationWithFromAddress();
+        $notifiable = new NotificationMailChannelTestNotifiable();
 
         $message = $notification->toMail($notifiable);
         $data = $message->toArray();
@@ -153,8 +153,8 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
 
     public function testMessageWithFromAddressAndNoName()
     {
-        $notification = new NotificationMailChannelTestNotificationWithFromAddressNoName;
-        $notifiable = new NotificationMailChannelTestNotifiable;
+        $notification = new NotificationMailChannelTestNotificationWithFromAddressNoName();
+        $notifiable = new NotificationMailChannelTestNotifiable();
 
         $message = $notification->toMail($notifiable);
         $data = $message->toArray();
@@ -184,8 +184,8 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
 
     public function testMessageWithToAddress()
     {
-        $notification = new NotificationMailChannelTestNotificationWithToAddress;
-        $notifiable = new NotificationMailChannelTestNotifiable;
+        $notification = new NotificationMailChannelTestNotificationWithToAddress();
+        $notifiable = new NotificationMailChannelTestNotifiable();
 
         $message = $notification->toMail($notifiable);
         $data = $message->toArray();
@@ -213,8 +213,8 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
 
     public function testMessageWithReplyToAddress()
     {
-        $notification = new NotificationMailChannelTestNotificationWithReplyToAddress;
-        $notifiable = new NotificationMailChannelTestNotifiable;
+        $notification = new NotificationMailChannelTestNotificationWithReplyToAddress();
+        $notifiable = new NotificationMailChannelTestNotifiable();
 
         $message = $notification->toMail($notifiable);
         $data = $message->toArray();
@@ -244,8 +244,8 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
 
     public function testMessageWithReplyToAddressAndNoName()
     {
-        $notification = new NotificationMailChannelTestNotificationWithReplyToAddressNoName;
-        $notifiable = new NotificationMailChannelTestNotifiable;
+        $notification = new NotificationMailChannelTestNotificationWithReplyToAddressNoName();
+        $notifiable = new NotificationMailChannelTestNotifiable();
 
         $message = $notification->toMail($notifiable);
         $data = $message->toArray();
@@ -275,8 +275,8 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
 
     public function testMessageWithToCcEmails()
     {
-        $notification = new NotificationMailChannelTestNotificationWithCcEmails;
-        $notifiable = new NotificationMailChannelTestNotifiable;
+        $notification = new NotificationMailChannelTestNotificationWithCcEmails();
+        $notifiable = new NotificationMailChannelTestNotifiable();
 
         $message = $notification->toMail($notifiable);
         $data = $message->toArray();
@@ -306,8 +306,8 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
 
     public function testMessageWithPriority()
     {
-        $notification = new NotificationMailChannelTestNotificationWithPriority;
-        $notifiable = new NotificationMailChannelTestNotifiable;
+        $notification = new NotificationMailChannelTestNotificationWithPriority();
+        $notifiable = new NotificationMailChannelTestNotifiable();
 
         $message = $notification->toMail($notifiable);
         $data = $message->toArray();
@@ -337,8 +337,8 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
 
     public function testMessageWithMailableContract()
     {
-        $notification = new NotificationMailChannelTestNotificationWithMailableContract;
-        $notifiable = new NotificationMailChannelTestNotifiable;
+        $notification = new NotificationMailChannelTestNotificationWithMailableContract();
+        $notifiable = new NotificationMailChannelTestNotifiable();
 
         $channel = new Illuminate\Notifications\Channels\MailChannel(
             $mailer = Mockery::mock(Illuminate\Contracts\Mail\Mailer::class)
@@ -371,7 +371,7 @@ class NotificationMailChannelTestNotification extends Notification
 {
     public function toMail($notifiable)
     {
-        return (new MailMessage)
+        return (new MailMessage())
             ->subject('test subject');
     }
 }
@@ -380,7 +380,7 @@ class NotificationMailChannelTestNotificationNoSubject extends Notification
 {
     public function toMail($notifiable)
     {
-        return new MailMessage;
+        return new MailMessage();
     }
 }
 
@@ -388,7 +388,7 @@ class NotificationMailChannelTestNotificationWithFromAddress extends Notificatio
 {
     public function toMail($notifiable)
     {
-        return (new MailMessage)
+        return (new MailMessage())
             ->from('test@mail.com', 'Test Man');
     }
 }
@@ -397,7 +397,7 @@ class NotificationMailChannelTestNotificationWithFromAddressNoName extends Notif
 {
     public function toMail($notifiable)
     {
-        return (new MailMessage)
+        return (new MailMessage())
             ->from('test@mail.com');
     }
 }
@@ -406,7 +406,7 @@ class NotificationMailChannelTestNotificationWithToAddress extends Notification
 {
     public function toMail($notifiable)
     {
-        return (new MailMessage)
+        return (new MailMessage())
             ->to('jeffrey@laracasts.com');
     }
 }
@@ -415,7 +415,7 @@ class NotificationMailChannelTestNotificationWithCcEmails extends Notification
 {
     public function toMail($notifiable)
     {
-        return (new MailMessage)
+        return (new MailMessage())
             ->cc(['cc1@email.com', 'cc2@email.com']);
     }
 }
@@ -424,7 +424,7 @@ class NotificationMailChannelTestNotificationWithReplyToAddress extends Notifica
 {
     public function toMail($notifiable)
     {
-        return (new MailMessage)
+        return (new MailMessage())
             ->replyTo('test@mail.com', 'Test Man');
     }
 }
@@ -433,7 +433,7 @@ class NotificationMailChannelTestNotificationWithReplyToAddressNoName extends No
 {
     public function toMail($notifiable)
     {
-        return (new MailMessage)
+        return (new MailMessage())
             ->replyTo('test@mail.com');
     }
 }
@@ -442,7 +442,7 @@ class NotificationMailChannelTestNotificationWithPriority extends Notification
 {
     public function toMail($notifiable)
     {
-        return (new MailMessage)
+        return (new MailMessage())
             ->priority(1);
     }
 }
@@ -454,7 +454,7 @@ class NotificationMailChannelTestNotificationWithMailableContract extends Notifi
         $mock = Mockery::mock(Illuminate\Contracts\Mail\Mailable::class);
 
         $mock->shouldReceive('send')->once()->with(Mockery::on(function ($mailer) {
-            if (! $mailer instanceof Illuminate\Contracts\Mail\Mailer) {
+            if (!$mailer instanceof Illuminate\Contracts\Mail\Mailer) {
                 return false;
             }
 

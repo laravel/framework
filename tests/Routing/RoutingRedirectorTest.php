@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Routing\Redirector;
+use Mockery as m;
 
 class RoutingRedirectorTest extends PHPUnit_Framework_TestCase
 {

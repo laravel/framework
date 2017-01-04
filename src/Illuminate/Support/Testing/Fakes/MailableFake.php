@@ -27,7 +27,8 @@ class MailableFake extends MailableMailer
     /**
      * Send a new mailable message instance.
      *
-     * @param  Mailable  $mailable
+     * @param Mailable $mailable
+     *
      * @return mixed
      */
     public function send(Mailable $mailable)
@@ -38,7 +39,8 @@ class MailableFake extends MailableMailer
     /**
      * Send a mailable message immediately.
      *
-     * @param  Mailable  $mailable
+     * @param Mailable $mailable
+     *
      * @return mixed
      */
     public function sendNow(Mailable $mailable)
@@ -49,7 +51,8 @@ class MailableFake extends MailableMailer
     /**
      * Push the given mailable onto the queue.
      *
-     * @param  Mailable  $mailable
+     * @param Mailable $mailable
+     *
      * @return mixed
      */
     public function queue(Mailable $mailable)

@@ -82,7 +82,8 @@ class SimpleMessage
     /**
      * Set the "level" of the notification (success, error, etc.).
      *
-     * @param  string  $level
+     * @param string $level
+     *
      * @return $this
      */
     public function level($level)
@@ -95,7 +96,8 @@ class SimpleMessage
     /**
      * Set the subject of the notification.
      *
-     * @param  string  $subject
+     * @param string $subject
+     *
      * @return $this
      */
     public function subject($subject)
@@ -108,7 +110,8 @@ class SimpleMessage
     /**
      * Set the greeting of the notification.
      *
-     * @param  string  $greeting
+     * @param string $greeting
+     *
      * @return $this
      */
     public function greeting($greeting)
@@ -121,7 +124,8 @@ class SimpleMessage
     /**
      * Add a line of text to the notification.
      *
-     * @param  \Illuminate\Notifications\Action|string  $line
+     * @param \Illuminate\Notifications\Action|string $line
+     *
      * @return $this
      */
     public function line($line)
@@ -132,14 +136,15 @@ class SimpleMessage
     /**
      * Add a line of text to the notification.
      *
-     * @param  \Illuminate\Notifications\Action|string|array  $line
+     * @param \Illuminate\Notifications\Action|string|array $line
+     *
      * @return $this
      */
     public function with($line)
     {
         if ($line instanceof Action) {
             $this->action($line->text, $line->url);
-        } elseif (! $this->actionText) {
+        } elseif (!$this->actionText) {
             $this->introLines[] = $this->formatLine($line);
         } else {
             $this->outroLines[] = $this->formatLine($line);
@@ -151,7 +156,8 @@ class SimpleMessage
     /**
      * Format the given line of text.
      *
-     * @param  string|array  $line
+     * @param string|array $line
+     *
      * @return string
      */
     protected function formatLine($line)
@@ -166,8 +172,9 @@ class SimpleMessage
     /**
      * Configure the "call to action" button.
      *
-     * @param  string  $text
-     * @param  string  $url
+     * @param string $text
+     * @param string $url
+     *
      * @return $this
      */
     public function action($text, $url)
@@ -186,13 +193,13 @@ class SimpleMessage
     public function toArray()
     {
         return [
-            'level' => $this->level,
-            'subject' => $this->subject,
-            'greeting' => $this->greeting,
+            'level'      => $this->level,
+            'subject'    => $this->subject,
+            'greeting'   => $this->greeting,
             'introLines' => $this->introLines,
             'outroLines' => $this->outroLines,
             'actionText' => $this->actionText,
-            'actionUrl' => $this->actionUrl,
+            'actionUrl'  => $this->actionUrl,
         ];
     }
 }

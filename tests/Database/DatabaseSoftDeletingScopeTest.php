@@ -24,7 +24,7 @@ class DatabaseSoftDeletingScopeTest extends PHPUnit_Framework_TestCase
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder');
         $builder->shouldDeferMissing();
-        $scope = new Illuminate\Database\Eloquent\SoftDeletingScope;
+        $scope = new Illuminate\Database\Eloquent\SoftDeletingScope();
         $scope->extend($builder);
         $callback = $builder->getMacro('forceDelete');
         $givenBuilder = m::mock('Illuminate\Database\Eloquent\Builder');
@@ -38,7 +38,7 @@ class DatabaseSoftDeletingScopeTest extends PHPUnit_Framework_TestCase
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder');
         $builder->shouldDeferMissing();
-        $scope = new Illuminate\Database\Eloquent\SoftDeletingScope;
+        $scope = new Illuminate\Database\Eloquent\SoftDeletingScope();
         $scope->extend($builder);
         $callback = $builder->getMacro('restore');
         $givenBuilder = m::mock('Illuminate\Database\Eloquent\Builder');

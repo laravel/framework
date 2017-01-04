@@ -10,11 +10,11 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(Arr::accessible([]));
         $this->assertTrue(Arr::accessible([1, 2]));
         $this->assertTrue(Arr::accessible(['a' => 1, 'b' => 2]));
-        $this->assertTrue(Arr::accessible(new Collection));
+        $this->assertTrue(Arr::accessible(new Collection()));
 
         $this->assertFalse(Arr::accessible(null));
         $this->assertFalse(Arr::accessible('abc'));
-        $this->assertFalse(Arr::accessible(new stdClass));
+        $this->assertFalse(Arr::accessible(new stdClass()));
         $this->assertFalse(Arr::accessible((object) ['a' => 1, 'b' => 2]));
     }
 
@@ -310,12 +310,12 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $test2 = Arr::pluck($array, null, 'name');
 
         $this->assertEquals([
-            'Taylor' => 'developer',
+            'Taylor'  => 'developer',
             'Abigail' => 'developer',
         ], $test1);
 
         $this->assertEquals([
-            'Taylor' => ['name' => 'Taylor', 'role' => 'developer'],
+            'Taylor'  => ['name' => 'Taylor', 'role' => 'developer'],
             'Abigail' => ['name' => 'Abigail', 'role' => 'developer'],
         ], $test2);
     }
@@ -392,7 +392,7 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
                 ],
                 [
                     'name' => 'jane',
-                    'age' => 25,
+                    'age'  => 25,
                 ],
             ],
             'repositories' => [
@@ -423,12 +423,12 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
             ],
             'users' => [
                 [
-                    'age' => 25,
+                    'age'  => 25,
                     'name' => 'jane',
                 ],
                 [
-                    'mail' => 'joe@example.com',
-                    'name' => 'joe',
+                    'mail'    => 'joe@example.com',
+                    'name'    => 'joe',
                     'numbers' => [0, 1, 2],
                 ],
             ],

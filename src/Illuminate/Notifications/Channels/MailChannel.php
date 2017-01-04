@@ -2,10 +2,10 @@
 
 namespace Illuminate\Notifications\Channels;
 
-use Illuminate\Support\Str;
-use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Mail\Mailable;
+use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Str;
 
 class MailChannel
 {
@@ -19,7 +19,8 @@ class MailChannel
     /**
      * Create a new mail channel instance.
      *
-     * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
+     * @param \Illuminate\Contracts\Mail\Mailer $mailer
+     *
      * @return void
      */
     public function __construct(Mailer $mailer)
@@ -30,13 +31,14 @@ class MailChannel
     /**
      * Send the given notification.
      *
-     * @param  mixed  $notifiable
-     * @param  \Illuminate\Notifications\Notification  $notification
+     * @param mixed                                  $notifiable
+     * @param \Illuminate\Notifications\Notification $notification
+     *
      * @return void
      */
     public function send($notifiable, Notification $notification)
     {
-        if (! $notifiable->routeNotificationFor('mail')) {
+        if (!$notifiable->routeNotificationFor('mail')) {
             return;
         }
 
@@ -49,7 +51,7 @@ class MailChannel
         $this->mailer->send($message->view, $message->data(), function ($m) use ($notifiable, $notification, $message) {
             $recipients = empty($message->to) ? $notifiable->routeNotificationFor('mail') : $message->to;
 
-            if (! empty($message->from)) {
+            if (!empty($message->from)) {
                 $m->from($message->from[0], isset($message->from[1]) ? $message->from[1] : null);
             }
 
@@ -63,7 +65,7 @@ class MailChannel
                 $m->cc($message->cc);
             }
 
-            if (! empty($message->replyTo)) {
+            if (!empty($message->replyTo)) {
                 $m->replyTo($message->replyTo[0], isset($message->replyTo[1]) ? $message->replyTo[1] : null);
             }
 
@@ -79,7 +81,7 @@ class MailChannel
                 $m->attachData($attachment['data'], $attachment['name'], $attachment['options']);
             }
 
-            if (! is_null($message->priority)) {
+            if (!is_null($message->priority)) {
                 $m->setPriority($message->priority);
             }
         });

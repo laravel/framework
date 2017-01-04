@@ -1,9 +1,9 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Validation\Factory;
-use Illuminate\Validation\Validator;
 use Illuminate\Validation\PresenceVerifierInterface;
+use Illuminate\Validation\Validator;
+use Mockery as m;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class ValidationFactoryTest extends PHPUnit_Framework_TestCase

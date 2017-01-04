@@ -99,19 +99,19 @@ class QueueDatabaseQueueUnitTest extends PHPUnit_Framework_TestCase
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock('StdClass'));
         $query->shouldReceive('insert')->once()->andReturnUsing(function ($records) {
             $this->assertEquals([[
-                'queue' => 'queue',
-                'payload' => json_encode(['job' => 'foo', 'data' => ['data']]),
-                'attempts' => 0,
-                'reserved_at' => null,
+                'queue'        => 'queue',
+                'payload'      => json_encode(['job' => 'foo', 'data' => ['data']]),
+                'attempts'     => 0,
+                'reserved_at'  => null,
                 'available_at' => 'available',
-                'created_at' => 'created',
+                'created_at'   => 'created',
             ], [
-                'queue' => 'queue',
-                'payload' => json_encode(['job' => 'bar', 'data' => ['data']]),
-                'attempts' => 0,
-                'reserved_at' => null,
+                'queue'        => 'queue',
+                'payload'      => json_encode(['job' => 'bar', 'data' => ['data']]),
+                'attempts'     => 0,
+                'reserved_at'  => null,
                 'available_at' => 'available',
-                'created_at' => 'created',
+                'created_at'   => 'created',
             ]], $records);
         });
 

@@ -17,7 +17,7 @@ class BroadcastEventTest extends PHPUnit_Framework_TestCase
             ['test-channel'], 'TestBroadcastEvent', ['firstName' => 'Taylor', 'lastName' => 'Otwell', 'collection' => ['foo' => 'bar']]
         );
 
-        $event = new TestBroadcastEvent;
+        $event = new TestBroadcastEvent();
         $serializedEvent = serialize($event);
         $jobData = ['event' => $serializedEvent];
 
@@ -35,7 +35,7 @@ class BroadcastEventTest extends PHPUnit_Framework_TestCase
             ['test-channel'], 'TestBroadcastEventWithManualData', ['name' => 'Taylor', 'socket' => null]
         );
 
-        $event = new TestBroadcastEventWithManualData;
+        $event = new TestBroadcastEventWithManualData();
         $serializedEvent = serialize($event);
         $jobData = ['event' => $serializedEvent];
 

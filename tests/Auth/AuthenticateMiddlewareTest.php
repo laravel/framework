@@ -1,13 +1,13 @@
 <?php
 
-use Mockery as m;
-use Illuminate\Http\Request;
-use Illuminate\Auth\AuthManager;
-use Illuminate\Auth\RequestGuard;
-use Illuminate\Container\Container;
-use Illuminate\Config\Repository as Config;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Auth\AuthManager;
 use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Auth\RequestGuard;
+use Illuminate\Config\Repository as Config;
+use Illuminate\Container\Container;
+use Illuminate\Http\Request;
+use Mockery as m;
 
 class AuthenticateMiddlewareTest extends PHPUnit_Framework_TestCase
 {
@@ -20,7 +20,7 @@ class AuthenticateMiddlewareTest extends PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $container = Container::setInstance(new Container);
+        $container = Container::setInstance(new Container());
 
         $this->auth = new AuthManager($container);
 
@@ -126,8 +126,8 @@ class AuthenticateMiddlewareTest extends PHPUnit_Framework_TestCase
         return new Config([
             'auth' => [
                 'defaults' => ['guard' => 'default'],
-                'guards' => [
-                    'default' => ['driver' => 'default'],
+                'guards'   => [
+                    'default'   => ['driver' => 'default'],
                     'secondary' => ['driver' => 'secondary'],
                 ],
             ],
@@ -137,8 +137,9 @@ class AuthenticateMiddlewareTest extends PHPUnit_Framework_TestCase
     /**
      * Create and register a new auth driver with the auth manager.
      *
-     * @param  string  $name
-     * @param  bool  $authenticated
+     * @param string $name
+     * @param bool   $authenticated
+     *
      * @return \Illuminate\Auth\RequestGuard
      */
     protected function registerAuthDriver($name, $authenticated)
@@ -155,13 +156,14 @@ class AuthenticateMiddlewareTest extends PHPUnit_Framework_TestCase
     /**
      * Create a new auth driver.
      *
-     * @param  bool  $authenticated
+     * @param bool $authenticated
+     *
      * @return \Illuminate\Auth\RequestGuard
      */
     protected function createAuthDriver($authenticated)
     {
         return new RequestGuard(function () use ($authenticated) {
-            return $authenticated ? new stdClass : null;
+            return $authenticated ? new stdClass() : null;
         }, m::mock(Request::class));
     }
 
@@ -169,9 +171,10 @@ class AuthenticateMiddlewareTest extends PHPUnit_Framework_TestCase
      * Call the authenticate middleware with the given guards.
      *
      * @param  string  ...$guards
-     * @return void
      *
      * @throws \Illuminate\Auth\AuthenticationException
+     *
+     * @return void
      */
     protected function authenticate(...$guards)
     {

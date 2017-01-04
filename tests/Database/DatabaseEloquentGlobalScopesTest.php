@@ -166,7 +166,7 @@ class EloquentGlobalScopesTestModel extends Illuminate\Database\Eloquent\Model
 
     public static function boot()
     {
-        static::addGlobalScope(new ActiveScope);
+        static::addGlobalScope(new ActiveScope());
 
         parent::boot();
     }

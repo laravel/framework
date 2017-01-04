@@ -57,12 +57,12 @@ class CacheMemcachedConnectorTest extends PHPUnit_Framework_TestCase
 
     public function testServersAreAddedCorrectlyWithValidOptions()
     {
-        if (! class_exists('Memcached')) {
+        if (!class_exists('Memcached')) {
             $this->markTestSkipped('Memcached module not installed');
         }
 
         $validOptions = [
-            Memcached::OPT_NO_BLOCK => true,
+            Memcached::OPT_NO_BLOCK        => true,
             Memcached::OPT_CONNECT_TIMEOUT => 2000,
         ];
 
@@ -81,7 +81,7 @@ class CacheMemcachedConnectorTest extends PHPUnit_Framework_TestCase
 
     public function testServersAreAddedCorrectlyWithSaslCredentials()
     {
-        if (! class_exists('Memcached')) {
+        if (!class_exists('Memcached')) {
             $this->markTestSkipped('Memcached module not installed');
         }
 

@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\View\Factory;
+use Mockery as m;
 
 class ViewFactoryTest extends PHPUnit_Framework_TestCase
 {
@@ -18,7 +18,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         $factory->getFinder()->shouldReceive('find')->once()->with('view')->andReturn('path.php');
         $factory->getEngineResolver()->shouldReceive('resolve')->once()->with('php')->andReturn($engine = m::mock('Illuminate\View\Engines\EngineInterface'));
         $factory->getFinder()->shouldReceive('addExtension')->once()->with('php');
-        $factory->setDispatcher(new Illuminate\Events\Dispatcher);
+        $factory->setDispatcher(new Illuminate\Events\Dispatcher());
         $factory->creator('view', function ($view) {
             $_SERVER['__test.view'] = $view;
         });
@@ -166,7 +166,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         $factory->getDispatcher()->shouldReceive('listen')->once()->with('composing: qux', m::type('Closure'));
         $factory->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type('Closure'));
         $composers = $factory->composers([
-            'foo' => 'bar',
+            'foo'     => 'bar',
             'baz@baz' => ['qux', 'foo'],
         ]);
 
@@ -456,13 +456,13 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
 
         $expectedLoop = [
             'iteration' => 0,
-            'index' => 0,
+            'index'     => 0,
             'remaining' => 3,
-            'count' => 3,
-            'first' => true,
-            'last' => false,
-            'depth' => 1,
-            'parent' => null,
+            'count'     => 3,
+            'first'     => true,
+            'last'      => false,
+            'depth'     => 1,
+            'parent'    => null,
         ];
 
         $this->assertEquals([$expectedLoop], $factory->getLoopStack());
@@ -471,13 +471,13 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
 
         $secondExpectedLoop = [
             'iteration' => 0,
-            'index' => 0,
+            'index'     => 0,
             'remaining' => 4,
-            'count' => 4,
-            'first' => true,
-            'last' => false,
-            'depth' => 2,
-            'parent' => (object) $expectedLoop,
+            'count'     => 4,
+            'first'     => true,
+            'last'      => false,
+            'depth'     => 2,
+            'parent'    => (object) $expectedLoop,
         ];
         $this->assertEquals([$expectedLoop, $secondExpectedLoop], $factory->getLoopStack());
 
@@ -494,13 +494,13 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
 
         $expectedLoop = [
             'iteration' => 0,
-            'index' => 0,
+            'index'     => 0,
             'remaining' => null,
-            'count' => null,
-            'first' => true,
-            'last' => null,
-            'depth' => 1,
-            'parent' => null,
+            'count'     => null,
+            'first'     => true,
+            'last'      => null,
+            'depth'     => 1,
+            'parent'    => null,
         ];
 
         $this->assertEquals([$expectedLoop], $factory->getLoopStack());

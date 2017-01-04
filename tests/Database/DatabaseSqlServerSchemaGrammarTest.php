@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Database\Schema\Blueprint;
+use Mockery as m;
 
 class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase
 {
@@ -573,6 +573,6 @@ class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase
 
     public function getGrammar()
     {
-        return new Illuminate\Database\Schema\Grammars\SqlServerGrammar;
+        return new Illuminate\Database\Schema\Grammars\SqlServerGrammar();
     }
 }

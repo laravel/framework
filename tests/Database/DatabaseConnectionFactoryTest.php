@@ -1,9 +1,9 @@
 <?php
 
-use Mockery as m;
-use Illuminate\Database\Connection;
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Connectors\ConnectionFactory;
+use Mockery as m;
 
 class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase
 {
@@ -11,16 +11,16 @@ class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->db = new DB;
+        $this->db = new DB();
 
         $this->db->addConnection([
-            'driver' => 'sqlite',
+            'driver'   => 'sqlite',
             'database' => ':memory:',
         ]);
 
         $this->db->addConnection([
             'driver' => 'sqlite',
-            'read' => [
+            'read'   => [
                 'database'  => ':memory:',
             ],
             'write' => [

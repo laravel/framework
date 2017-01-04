@@ -2,11 +2,11 @@
 
 namespace Illuminate\Database\Connectors;
 
-use PDO;
-use Exception;
-use Illuminate\Support\Arr;
 use Doctrine\DBAL\Driver\PDOConnection;
+use Exception;
 use Illuminate\Database\DetectsLostConnections;
+use Illuminate\Support\Arr;
+use PDO;
 
 class Connector
 {
@@ -18,17 +18,18 @@ class Connector
      * @var array
      */
     protected $options = [
-        PDO::ATTR_CASE => PDO::CASE_NATURAL,
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
+        PDO::ATTR_CASE              => PDO::CASE_NATURAL,
+        PDO::ATTR_ERRMODE           => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_ORACLE_NULLS      => PDO::NULL_NATURAL,
         PDO::ATTR_STRINGIFY_FETCHES => false,
-        PDO::ATTR_EMULATE_PREPARES => false,
+        PDO::ATTR_EMULATE_PREPARES  => false,
     ];
 
     /**
      * Get the PDO options based on the configuration.
      *
-     * @param  array  $config
+     * @param array $config
+     *
      * @return array
      */
     public function getOptions(array $config)
@@ -41,9 +42,10 @@ class Connector
     /**
      * Create a new PDO connection.
      *
-     * @param  string  $dsn
-     * @param  array   $config
-     * @param  array   $options
+     * @param string $dsn
+     * @param array  $config
+     * @param array  $options
+     *
      * @return \PDO
      */
     public function createConnection($dsn, array $config, array $options)
@@ -76,7 +78,8 @@ class Connector
     /**
      * Set the default PDO connection options.
      *
-     * @param  array  $options
+     * @param array $options
+     *
      * @return void
      */
     public function setDefaultOptions(array $options)
@@ -87,14 +90,15 @@ class Connector
     /**
      * Handle an exception that occurred during connect execution.
      *
-     * @param  \Exception  $e
-     * @param  string  $dsn
-     * @param  string  $username
-     * @param  string  $password
-     * @param  array   $options
-     * @return \PDO
+     * @param \Exception $e
+     * @param string     $dsn
+     * @param string     $username
+     * @param string     $password
+     * @param array      $options
      *
      * @throws \Exception
+     *
+     * @return \PDO
      */
     protected function tryAgainIfCausedByLostConnection(Exception $e, $dsn, $username, $password, $options)
     {
@@ -112,7 +116,7 @@ class Connector
      */
     protected function createPdoConnection($dsn, $username, $password, $options)
     {
-        if (class_exists(PDOConnection::class) && ! $this->isPersistentConnection($options)) {
+        if (class_exists(PDOConnection::class) && !$this->isPersistentConnection($options)) {
             return new PDOConnection($dsn, $username, $password, $options);
         }
 
@@ -122,7 +126,8 @@ class Connector
     /**
      * Determine if the connection is persistent.
      *
-     * @param  array  $options
+     * @param array $options
+     *
      * @return bool
      */
     protected function isPersistentConnection($options)

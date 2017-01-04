@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\View\Engines\PhpEngine;
+use Mockery as m;
 
 class ViewPhpEngineTest extends PHPUnit_Framework_TestCase
 {
@@ -12,7 +12,7 @@ class ViewPhpEngineTest extends PHPUnit_Framework_TestCase
 
     public function testViewsMayBeProperlyRendered()
     {
-        $engine = new PhpEngine;
+        $engine = new PhpEngine();
         $this->assertEquals('Hello World
 ', $engine->get(__DIR__.'/fixtures/basic.php'));
     }

@@ -119,7 +119,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
         $message = m::mock('Swift_Mime_Message');
         $mailer->expects($this->once())->method('createMessage')->will($this->returnValue($message));
         $view = m::mock('StdClass');
-        $container = new Illuminate\Container\Container;
+        $container = new Illuminate\Container\Container();
         $mailer->setContainer($container);
         $mockMailer = m::mock('StdClass');
         $container['FooMailer'] = $container->share(function () use ($mockMailer) {
@@ -161,7 +161,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
         $view = m::mock('StdClass');
         $mailer->getViewFactory()->shouldReceive('make')->once()->andReturn($view);
         $view->shouldReceive('render')->once()->andReturn('rendered.view');
-        $swift = new FailingSwiftMailerStub;
+        $swift = new FailingSwiftMailerStub();
         $mailer->setSwiftMailer($swift);
 
         $mailer->send('foo', ['data'], function ($m) {

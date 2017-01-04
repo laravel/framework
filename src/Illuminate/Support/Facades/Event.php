@@ -16,7 +16,7 @@ class Event extends Facade
      */
     public static function fake()
     {
-        static::swap(new EventFake);
+        static::swap(new EventFake());
     }
 
     /**

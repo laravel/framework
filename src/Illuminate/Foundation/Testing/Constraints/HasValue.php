@@ -19,7 +19,8 @@ class HasValue extends FormFieldConstraint
     /**
      * Check if the input contains the expected value.
      *
-     * @param  \Symfony\Component\DomCrawler\Crawler|string  $crawler
+     * @param \Symfony\Component\DomCrawler\Crawler|string $crawler
+     *
      * @return bool
      */
     public function matches($crawler)
@@ -32,10 +33,11 @@ class HasValue extends FormFieldConstraint
     /**
      * Get the value of an input or textarea.
      *
-     * @param  \Symfony\Component\DomCrawler\Crawler  $crawler
-     * @return string
+     * @param \Symfony\Component\DomCrawler\Crawler $crawler
      *
      * @throws \PHPUnit_Framework_ExpectationFailedException
+     *
+     * @return string
      */
     public function getInputOrTextAreaValue(Crawler $crawler)
     {

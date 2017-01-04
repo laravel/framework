@@ -21,8 +21,9 @@ class KeyForgotten
     /**
      * Create a new event instance.
      *
-     * @param  string  $key
-     * @param  array  $tags
+     * @param string $key
+     * @param array  $tags
+     *
      * @return void
      */
     public function __construct($key, $tags = [])

@@ -2,25 +2,25 @@
 
 namespace Illuminate\Validation;
 
-use Closure;
-use DateTime;
-use Countable;
-use Exception;
-use Throwable;
-use DateTimeZone;
-use RuntimeException;
-use DateTimeInterface;
 use BadMethodCallException;
+use Closure;
+use Countable;
+use DateTime;
+use DateTimeInterface;
+use DateTimeZone;
+use Exception;
+use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use InvalidArgumentException;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
-use Illuminate\Contracts\Container\Container;
+use Illuminate\Support\Str;
+use InvalidArgumentException;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Illuminate\Contracts\Validation\Validator as ValidatorContract;
+use Symfony\Component\Translation\TranslatorInterface;
+use Throwable;
 
 class Validator implements ValidatorContract
 {
@@ -184,11 +184,12 @@ class Validator implements ValidatorContract
     /**
      * Create a new Validator instance.
      *
-     * @param  \Symfony\Component\Translation\TranslatorInterface  $translator
-     * @param  array  $data
-     * @param  array  $rules
-     * @param  array  $messages
-     * @param  array  $customAttributes
+     * @param \Symfony\Component\Translation\TranslatorInterface $translator
+     * @param array                                              $data
+     * @param array                                              $rules
+     * @param array                                              $messages
+     * @param array                                              $customAttributes
+     *
      * @return void
      */
     public function __construct(TranslatorInterface $translator, array $data, array $rules,
@@ -206,7 +207,8 @@ class Validator implements ValidatorContract
     /**
      * Parse the data array.
      *
-     * @param  array  $data
+     * @param array $data
+     *
      * @return array
      */
     public function parseData(array $data)
@@ -231,7 +233,8 @@ class Validator implements ValidatorContract
     /**
      * Explode the rules into an array of rules.
      *
-     * @param  array  $rules
+     * @param array $rules
+     *
      * @return array
      */
     protected function explodeRules(array $rules)
@@ -258,7 +261,8 @@ class Validator implements ValidatorContract
     /**
      * After an after validation callback.
      *
-     * @param  callable|string  $callback
+     * @param callable|string $callback
+     *
      * @return $this
      */
     public function after($callback)
@@ -273,9 +277,10 @@ class Validator implements ValidatorContract
     /**
      * Add conditions to a given field based on a Closure.
      *
-     * @param  string  $attribute
-     * @param  string|array  $rules
-     * @param  callable  $callback
+     * @param string       $attribute
+     * @param string|array $rules
+     * @param callable     $callback
+     *
      * @return void
      */
     public function sometimes($attribute, $rules, callable $callback)
@@ -296,11 +301,12 @@ class Validator implements ValidatorContract
     /**
      * Define a set of rules that apply to each element in an array attribute.
      *
-     * @param  string  $attribute
-     * @param  string|array  $rules
-     * @return void
+     * @param string       $attribute
+     * @param string|array $rules
      *
      * @throws \InvalidArgumentException
+     *
+     * @return void
      */
     public function each($attribute, $rules)
     {
@@ -315,7 +321,7 @@ class Validator implements ValidatorContract
         foreach ($data as $key => $value) {
             if (Str::startsWith($key, $attribute) || (bool) preg_match('/^'.$pattern.'\z/', $key)) {
                 foreach ((array) $rules as $ruleKey => $ruleValue) {
-                    if (! is_string($ruleKey) || Str::endsWith($key, $ruleKey)) {
+                    if (!is_string($ruleKey) || Str::endsWith($key, $ruleKey)) {
                         $this->implicitAttributes[$attribute][] = $key;
 
                         $this->mergeRules($key, $ruleValue);
@@ -328,7 +334,8 @@ class Validator implements ValidatorContract
     /**
      * Gather a copy of the attribute data filled with any missing attributes.
      *
-     * @param  string  $attribute
+     * @param string $attribute
+     *
      * @return array
      */
     protected function initializeAttributeOnData($attribute)
@@ -337,7 +344,7 @@ class Validator implements ValidatorContract
 
         $data = $this->extractDataFromPath($explicitPath);
 
-        if (! Str::contains($attribute, '*') || Str::endsWith($attribute, '*')) {
+        if (!Str::contains($attribute, '*') || Str::endsWith($attribute, '*')) {
             return $data;
         }
 
@@ -347,8 +354,9 @@ class Validator implements ValidatorContract
     /**
      * Get all of the exact attribute values for a given wildcard attribute.
      *
-     * @param  array  $data
-     * @param  string  $attribute
+     * @param array  $data
+     * @param string $attribute
+     *
      * @return array
      */
     public function extractValuesForWildcards($data, $attribute)
@@ -377,8 +385,9 @@ class Validator implements ValidatorContract
     /**
      * Merge additional rules into a given attribute(s).
      *
-     * @param  string  $attribute
-     * @param  string|array  $rules
+     * @param string       $attribute
+     * @param string|array $rules
+     *
      * @return $this
      */
     public function mergeRules($attribute, $rules = [])
@@ -397,8 +406,9 @@ class Validator implements ValidatorContract
     /**
      * Merge additional rules into a given attribute.
      *
-     * @param  string  $attribute
-     * @param  string|array  $rules
+     * @param string       $attribute
+     * @param string|array $rules
+     *
      * @return $this
      */
     protected function mergeRulesForAttribute($attribute, $rules)
@@ -419,7 +429,7 @@ class Validator implements ValidatorContract
      */
     public function passes()
     {
-        $this->messages = new MessageBag;
+        $this->messages = new MessageBag();
 
         // We'll spin through each rule, validating the attributes attached to that
         // rule. Any error messages will be added to the containers with each of
@@ -453,15 +463,15 @@ class Validator implements ValidatorContract
      */
     public function fails()
     {
-        return ! $this->passes();
+        return !$this->passes();
     }
 
     /**
      * Run the validator's rules against its data.
      *
-     * @return void
-     *
      * @throws \Illuminate\Validation\ValidationException
+     *
+     * @return void
      */
     public function validate()
     {
@@ -473,8 +483,9 @@ class Validator implements ValidatorContract
     /**
      * Validate a given attribute against a rule.
      *
-     * @param  string  $attribute
-     * @param  string  $rule
+     * @param string $attribute
+     * @param string $rule
+     *
      * @return void
      */
     protected function validateAttribute($attribute, $rule)
@@ -501,7 +512,7 @@ class Validator implements ValidatorContract
         // and if it wasn't we will add a failure for the attribute. Files may not successfully
         // upload if they are too large based on PHP's settings so we will bail in this case.
         if (
-            $value instanceof UploadedFile && ! $value->isValid() &&
+            $value instanceof UploadedFile && !$value->isValid() &&
             $this->hasRule($attribute, array_merge($this->fileRules, $this->implicitRules))
         ) {
             return $this->addFailure($attribute, 'uploaded', []);
@@ -514,7 +525,7 @@ class Validator implements ValidatorContract
 
         $method = "validate{$rule}";
 
-        if ($validatable && ! $this->$method($attribute, $value, $parameters, $this)) {
+        if ($validatable && !$this->$method($attribute, $value, $parameters, $this)) {
             $this->addFailure($attribute, $rule, $parameters);
         }
     }
@@ -526,7 +537,7 @@ class Validator implements ValidatorContract
      */
     public function valid()
     {
-        if (! $this->messages) {
+        if (!$this->messages) {
             $this->passes();
         }
 
@@ -542,7 +553,7 @@ class Validator implements ValidatorContract
      */
     public function invalid()
     {
-        if (! $this->messages) {
+        if (!$this->messages) {
             $this->passes();
         }
 
@@ -570,7 +581,8 @@ class Validator implements ValidatorContract
     /**
      * Get the value of a given attribute.
      *
-     * @param  string  $attribute
+     * @param string $attribute
+     *
      * @return mixed
      */
     protected function getValue($attribute)
@@ -581,9 +593,10 @@ class Validator implements ValidatorContract
     /**
      * Determine if the attribute is validatable.
      *
-     * @param  string  $rule
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param string $rule
+     * @param string $attribute
+     * @param mixed  $value
+     *
      * @return bool
      */
     protected function isValidatable($rule, $attribute, $value)
@@ -597,9 +610,10 @@ class Validator implements ValidatorContract
     /**
      * Determine if the field is present, or the rule implies required.
      *
-     * @param  string  $rule
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param string $rule
+     * @param string $attribute
+     * @param mixed  $value
+     *
      * @return bool
      */
     protected function presentOrRuleIsImplicit($rule, $attribute, $value)
@@ -614,7 +628,8 @@ class Validator implements ValidatorContract
     /**
      * Determine if the attribute passes any optional check.
      *
-     * @param  string  $attribute
+     * @param string $attribute
+     *
      * @return bool
      */
     protected function passesOptionalCheck($attribute)
@@ -636,23 +651,25 @@ class Validator implements ValidatorContract
     /**
      * Determine if the attribute fails the nullable check.
      *
-     * @param  string  $attribute
-     * @param  mixed  $value
+     * @param string $attribute
+     * @param mixed  $value
+     *
      * @return bool
      */
     protected function isNotNullIfMarkedAsNullable($attribute, $value)
     {
-        if (! $this->hasRule($attribute, ['Nullable'])) {
+        if (!$this->hasRule($attribute, ['Nullable'])) {
             return true;
         }
 
-        return ! is_null($value);
+        return !is_null($value);
     }
 
     /**
      * Determine if a given rule implies the attribute is required.
      *
-     * @param  string  $rule
+     * @param string $rule
+     *
      * @return bool
      */
     protected function isImplicit($rule)
@@ -665,22 +682,24 @@ class Validator implements ValidatorContract
      *
      * This is to avoid possible database type comparison errors.
      *
-     * @param  string  $rule
-     * @param  string  $attribute
+     * @param string $rule
+     * @param string $attribute
+     *
      * @return bool
      */
     protected function hasNotFailedPreviousRuleIfPresenceRule($rule, $attribute)
     {
         return in_array($rule, ['Unique', 'Exists'])
-                        ? ! $this->messages->has($attribute) : true;
+                        ? !$this->messages->has($attribute) : true;
     }
 
     /**
      * Add a failed rule and error message to the collection.
      *
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
      * @return void
      */
     protected function addFailure($attribute, $rule, $parameters)
@@ -693,9 +712,10 @@ class Validator implements ValidatorContract
     /**
      * Add an error message to the validator's collection of messages.
      *
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
      * @return void
      */
     protected function addError($attribute, $rule, $parameters)
@@ -746,7 +766,8 @@ class Validator implements ValidatorContract
     /**
      * Check if we should stop further validations on a given attribute.
      *
-     * @param  string  $attribute
+     * @param string $attribute
+     *
      * @return bool
      */
     protected function shouldStopValidating($attribute)
@@ -771,8 +792,9 @@ class Validator implements ValidatorContract
     /**
      * Validate that a required attribute exists.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param string $attribute
+     * @param mixed  $value
+     *
      * @return bool
      */
     protected function validateRequired($attribute, $value)
@@ -793,8 +815,9 @@ class Validator implements ValidatorContract
     /**
      * Validate that an attribute exists even if not filled.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param string $attribute
+     * @param mixed  $value
+     *
      * @return bool
      */
     protected function validatePresent($attribute, $value)
@@ -805,8 +828,9 @@ class Validator implements ValidatorContract
     /**
      * Validate the given attribute is filled if it is present.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param string $attribute
+     * @param mixed  $value
+     *
      * @return bool
      */
     protected function validateFilled($attribute, $value)
@@ -821,13 +845,14 @@ class Validator implements ValidatorContract
     /**
      * Determine if any of the given attributes fail the required test.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return bool
      */
     protected function anyFailingRequired(array $attributes)
     {
         foreach ($attributes as $key) {
-            if (! $this->validateRequired($key, $this->getValue($key))) {
+            if (!$this->validateRequired($key, $this->getValue($key))) {
                 return true;
             }
         }
@@ -838,7 +863,8 @@ class Validator implements ValidatorContract
     /**
      * Determine if all of the given attributes fail the required test.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return bool
      */
     protected function allFailingRequired(array $attributes)
@@ -855,14 +881,15 @@ class Validator implements ValidatorContract
     /**
      * Validate that an attribute exists when any other attribute exists.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  mixed   $parameters
+     * @param string $attribute
+     * @param mixed  $value
+     * @param mixed  $parameters
+     *
      * @return bool
      */
     protected function validateRequiredWith($attribute, $value, $parameters)
     {
-        if (! $this->allFailingRequired($parameters)) {
+        if (!$this->allFailingRequired($parameters)) {
             return $this->validateRequired($attribute, $value);
         }
 
@@ -872,14 +899,15 @@ class Validator implements ValidatorContract
     /**
      * Validate that an attribute exists when all other attributes exists.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  mixed   $parameters
+     * @param string $attribute
+     * @param mixed  $value
+     * @param mixed  $parameters
+     *
      * @return bool
      */
     protected function validateRequiredWithAll($attribute, $value, $parameters)
     {
-        if (! $this->anyFailingRequired($parameters)) {
+        if (!$this->anyFailingRequired($parameters)) {
             return $this->validateRequired($attribute, $value);
         }
 
@@ -889,9 +917,10 @@ class Validator implements ValidatorContract
     /**
      * Validate that an attribute exists when another attribute does not.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  mixed   $parameters
+     * @param string $attribute
+     * @param mixed  $value
+     * @param mixed  $parameters
+     *
      * @return bool
      */
     protected function validateRequiredWithout($attribute, $value, $parameters)
@@ -906,9 +935,10 @@ class Validator implements ValidatorContract
     /**
      * Validate that an attribute exists when all other attributes do not.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  mixed   $parameters
+     * @param string $attribute
+     * @param mixed  $value
+     * @param mixed  $parameters
+     *
      * @return bool
      */
     protected function validateRequiredWithoutAll($attribute, $value, $parameters)
@@ -923,9 +953,10 @@ class Validator implements ValidatorContract
     /**
      * Validate that an attribute exists when another attribute has a given value.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  mixed   $parameters
+     * @param string $attribute
+     * @param mixed  $value
+     * @param mixed  $parameters
+     *
      * @return bool
      */
     protected function validateRequiredIf($attribute, $value, $parameters)
@@ -956,9 +987,10 @@ class Validator implements ValidatorContract
     /**
      * Validate that an attribute exists when another attribute does not have a given value.
      *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @param  mixed  $parameters
+     * @param string $attribute
+     * @param mixed  $value
+     * @param mixed  $parameters
+     *
      * @return bool
      */
     protected function validateRequiredUnless($attribute, $value, $parameters)
@@ -969,7 +1001,7 @@ class Validator implements ValidatorContract
 
         $values = array_slice($parameters, 1);
 
-        if (! in_array($data, $values)) {
+        if (!in_array($data, $values)) {
             return $this->validateRequired($attribute, $value);
         }
 
@@ -979,7 +1011,8 @@ class Validator implements ValidatorContract
     /**
      * Get the number of attributes in a list that are present.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return int
      */
     protected function getPresentCount($attributes)
@@ -998,9 +1031,10 @@ class Validator implements ValidatorContract
     /**
      * Validate that the values of an attribute is in another attribute.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  array   $parameters
+     * @param string $attribute
+     * @param mixed  $value
+     * @param array  $parameters
+     *
      * @return bool
      */
     protected function validateInArray($attribute, $value, $parameters)
@@ -1021,8 +1055,9 @@ class Validator implements ValidatorContract
     /**
      * Validate that an attribute has a matching confirmation.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param string $attribute
+     * @param mixed  $value
+     *
      * @return bool
      */
     protected function validateConfirmed($attribute, $value)
@@ -1033,9 +1068,10 @@ class Validator implements ValidatorContract
     /**
      * Validate that two attributes match.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  array   $parameters
+     * @param string $attribute
+     * @param mixed  $value
+     * @param array  $parameters
+     *
      * @return bool
      */
     protected function validateSame($attribute, $value, $parameters)
@@ -1050,9 +1086,10 @@ class Validator implements ValidatorContract
     /**
      * Validate that an attribute is different from another attribute.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  array   $parameters
+     * @param string $attribute
+     * @param mixed  $value
+     * @param array  $parameters
+     *
      * @return bool
      */
     protected function validateDifferent($attribute, $value, $parameters)
@@ -1069,8 +1106,9 @@ class Validator implements ValidatorContract
      *
      * This validation rule implies the attribute is "required".
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param string $attribute
+     * @param mixed  $value
+     *
      * @return bool
      */
     protected function validateAccepted($attribute, $value)
@@ -1083,8 +1121,9 @@ class Validator implements ValidatorContract
     /**
      * Validate that an attribute is an array.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param string $attribute
+     * @param mixed  $value
+     *
      * @return bool
      */
     protected function validateArray($attribute, $value)
@@ -1095,8 +1134,9 @@ class Validator implements ValidatorContract
     /**
      * Validate that an attribute is a boolean.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param string $attribute
+     * @param mixed  $value
+     *
      * @return bool
      */
     protected function validateBoolean($attribute, $value)
@@ -1109,8 +1149,9 @@ class Validator implements ValidatorContract
     /**
      * Validate that an attribute is an integer.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param string $attribute
+     * @param mixed  $value
+     *
      * @return bool
      */
     protected function validateInteger($attribute, $value)
@@ -1121,8 +1162,9 @@ class Validator implements ValidatorContract
     /**
      * Validate that an attribute is numeric.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param string $attribute
+     * @param mixed  $value
+     *
      * @return bool
      */
     protected function validateNumeric($attribute, $value)
@@ -1133,8 +1175,9 @@ class Validator implements ValidatorContract
     /**
      * Validate that an attribute is a string.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param string $attribute
+     * @param mixed  $value
+     *
      * @return bool
      */
     protected function validateString($attribute, $value)
@@ -1145,13 +1188,14 @@ class Validator implements ValidatorContract
     /**
      * Validate the attribute is a valid JSON string.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param string $attribute
+     * @param mixed  $value
+     *
      * @return bool
      */
     protected function validateJson($attribute, $value)
     {
-        if (! is_scalar($value) && ! method_exists($value, '__toString')) {
+        if (!is_scalar($value) && !method_exists($value, '__toString')) {
             return false;
         }
 
@@ -1163,25 +1207,27 @@ class Validator implements ValidatorContract
     /**
      * Validate that an attribute has a given number of digits.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  array   $parameters
+     * @param string $attribute
+     * @param mixed  $value
+     * @param array  $parameters
+     *
      * @return bool
      */
     protected function validateDigits($attribute, $value, $parameters)
     {
         $this->requireParameterCount(1, $parameters, 'digits');
 
-        return ! preg_match('/[^0-9]/', $value)
+        return !preg_match('/[^0-9]/', $value)
             && strlen((string) $value) == $parameters[0];
     }
 
     /**
      * Validate that an attribute is between a given number of digits.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  array   $parameters
+     * @param string $attribute
+     * @param mixed  $value
+     * @param array  $parameters
+     *
      * @return bool
      */
     protected function validateDigitsBetween($attribute, $value, $parameters)
@@ -1190,16 +1236,17 @@ class Validator implements ValidatorContract
 
         $length = strlen((string) $value);
 
-        return ! preg_match('/[^0-9]/', $value)
+        return !preg_match('/[^0-9]/', $value)
           && $length >= $parameters[0] && $length <= $parameters[1];
     }
 
     /**
      * Validate the size of an attribute.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  array   $parameters
+     * @param string $attribute
+     * @param mixed  $value
+     * @param array  $parameters
+     *
      * @return bool
      */
     protected function validateSize($attribute, $value, $parameters)
@@ -1212,9 +1259,10 @@ class Validator implements ValidatorContract
     /**
      * Validate the size of an attribute is between a set of values.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  array   $parameters
+     * @param string $attribute
+     * @param mixed  $value
+     * @param array  $parameters
+     *
      * @return bool
      */
     protected function validateBetween($attribute, $value, $parameters)
@@ -1229,9 +1277,10 @@ class Validator implements ValidatorContract
     /**
      * Validate the size of an attribute is greater than a minimum value.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  array   $parameters
+     * @param string $attribute
+     * @param mixed  $value
+     * @param array  $parameters
+     *
      * @return bool
      */
     protected function validateMin($attribute, $value, $parameters)
@@ -1244,16 +1293,17 @@ class Validator implements ValidatorContract
     /**
      * Validate the size of an attribute is less than a maximum value.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  array   $parameters
+     * @param string $attribute
+     * @param mixed  $value
+     * @param array  $parameters
+     *
      * @return bool
      */
     protected function validateMax($attribute, $value, $parameters)
     {
         $this->requireParameterCount(1, $parameters, 'max');
 
-        if ($value instanceof UploadedFile && ! $value->isValid()) {
+        if ($value instanceof UploadedFile && !$value->isValid()) {
             return false;
         }
 
@@ -1263,8 +1313,9 @@ class Validator implements ValidatorContract
     /**
      * Get the size of an attribute.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param string $attribute
+     * @param mixed  $value
+     *
      * @return mixed
      */
     protected function getSize($attribute, $value)
@@ -1289,9 +1340,10 @@ class Validator implements ValidatorContract
     /**
      * Validate an attribute is contained within a list of values.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  array   $parameters
+     * @param string $attribute
+     * @param mixed  $value
+     * @param array  $parameters
+     *
      * @return bool
      */
     protected function validateIn($attribute, $value, $parameters)
@@ -1306,28 +1358,30 @@ class Validator implements ValidatorContract
             return count(array_diff($value, $parameters)) == 0;
         }
 
-        return ! is_array($value) && in_array((string) $value, $parameters);
+        return !is_array($value) && in_array((string) $value, $parameters);
     }
 
     /**
      * Validate an attribute is not contained within a list of values.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  array   $parameters
+     * @param string $attribute
+     * @param mixed  $value
+     * @param array  $parameters
+     *
      * @return bool
      */
     protected function validateNotIn($attribute, $value, $parameters)
     {
-        return ! $this->validateIn($attribute, $value, $parameters);
+        return !$this->validateIn($attribute, $value, $parameters);
     }
 
     /**
      * Validate an attribute is unique among other values.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  array   $parameters
+     * @param string $attribute
+     * @param mixed  $value
+     * @param array  $parameters
+     *
      * @return bool
      */
     protected function validateDistinct($attribute, $value, $parameters)
@@ -1344,7 +1398,7 @@ class Validator implements ValidatorContract
             return $key != $attribute && (bool) preg_match('#^'.$pattern.'\z#u', $key);
         });
 
-        return ! in_array($value, array_values($data));
+        return !in_array($value, array_values($data));
     }
 
     /**
@@ -1352,9 +1406,10 @@ class Validator implements ValidatorContract
      *
      * If a database column is not specified, the attribute will be used.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  array   $parameters
+     * @param string $attribute
+     * @param mixed  $value
+     * @param array  $parameters
+     *
      * @return bool
      */
     protected function validateUnique($attribute, $value, $parameters)
@@ -1408,7 +1463,8 @@ class Validator implements ValidatorContract
     /**
      * Parse the connection / table for the unique / exists rules.
      *
-     * @param  string  $table
+     * @param string $table
+     *
      * @return array
      */
     protected function parseTable($table)
@@ -1419,7 +1475,8 @@ class Validator implements ValidatorContract
     /**
      * Get the excluded ID column and value for the unique rule.
      *
-     * @param  array  $parameters
+     * @param array $parameters
+     *
      * @return array
      */
     protected function getUniqueIds($parameters)
@@ -1432,7 +1489,8 @@ class Validator implements ValidatorContract
     /**
      * Get the extra conditions for a unique rule.
      *
-     * @param  array  $parameters
+     * @param array $parameters
+     *
      * @return array
      */
     protected function getUniqueExtra($parameters)
@@ -1447,9 +1505,10 @@ class Validator implements ValidatorContract
     /**
      * Validate the existence of an attribute value in a database table.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  array   $parameters
+     * @param string $attribute
+     * @param mixed  $value
+     * @param array  $parameters
+     *
      * @return bool
      */
     protected function validateExists($attribute, $value, $parameters)
@@ -1474,11 +1533,12 @@ class Validator implements ValidatorContract
     /**
      * Get the number of records that exist in storage.
      *
-     * @param  mixed   $connection
-     * @param  string  $table
-     * @param  string  $column
-     * @param  mixed   $value
-     * @param  array   $parameters
+     * @param mixed  $connection
+     * @param string $table
+     * @param string $column
+     * @param mixed  $value
+     * @param array  $parameters
+     *
      * @return int
      */
     protected function getExistCount($connection, $table, $column, $value, $parameters)
@@ -1503,7 +1563,8 @@ class Validator implements ValidatorContract
     /**
      * Get the extra exist conditions.
      *
-     * @param  array  $parameters
+     * @param array $parameters
+     *
      * @return array
      */
     protected function getExtraExistConditions(array $parameters)
@@ -1514,7 +1575,8 @@ class Validator implements ValidatorContract
     /**
      * Get the extra conditions for a unique / exists rule.
      *
-     * @param  array  $segments
+     * @param array $segments
+     *
      * @return array
      */
     protected function getExtraConditions(array $segments)
@@ -1533,13 +1595,14 @@ class Validator implements ValidatorContract
     /**
      * Guess the database column from the given attribute name.
      *
-     * @param  string  $attribute
+     * @param string $attribute
+     *
      * @return string
      */
     public function guessColumnForQuery($attribute)
     {
         if (in_array($attribute, array_collapse($this->implicitAttributes))
-                && ! is_numeric($last = last(explode('.', $attribute)))) {
+                && !is_numeric($last = last(explode('.', $attribute)))) {
             return $last;
         }
 
@@ -1549,8 +1612,9 @@ class Validator implements ValidatorContract
     /**
      * Validate that an attribute is a valid IP.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param string $attribute
+     * @param mixed  $value
+     *
      * @return bool
      */
     protected function validateIp($attribute, $value)
@@ -1561,8 +1625,9 @@ class Validator implements ValidatorContract
     /**
      * Validate that an attribute is a valid e-mail address.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param string $attribute
+     * @param mixed  $value
+     *
      * @return bool
      */
     protected function validateEmail($attribute, $value)
@@ -1573,8 +1638,9 @@ class Validator implements ValidatorContract
     /**
      * Validate that an attribute is a valid URL.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param string $attribute
+     * @param mixed  $value
+     *
      * @return bool
      */
     protected function validateUrl($attribute, $value)
@@ -1606,13 +1672,14 @@ class Validator implements ValidatorContract
     /**
      * Validate that an attribute is an active URL.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param string $attribute
+     * @param mixed  $value
+     *
      * @return bool
      */
     protected function validateActiveUrl($attribute, $value)
     {
-        if (! is_string($value)) {
+        if (!is_string($value)) {
             return false;
         }
 
@@ -1630,8 +1697,9 @@ class Validator implements ValidatorContract
     /**
      * Validate the given value is a valid file.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param string $attribute
+     * @param mixed  $value
+     *
      * @return bool
      */
     protected function validateFile($attribute, $value)
@@ -1642,8 +1710,9 @@ class Validator implements ValidatorContract
     /**
      * Validate the MIME type of a file is an image MIME type.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param string $attribute
+     * @param mixed  $value
+     *
      * @return bool
      */
     protected function validateImage($attribute, $value)
@@ -1654,14 +1723,15 @@ class Validator implements ValidatorContract
     /**
      * Validate the dimensions of an image matches the given values.
      *
-     * @param  string $attribute
-     * @param  mixed $value
-     * @param  array $parameters
+     * @param string $attribute
+     * @param mixed  $value
+     * @param array  $parameters
+     *
      * @return bool
      */
     protected function validateDimensions($attribute, $value, $parameters)
     {
-        if (! $this->isAValidFileInstance($value) || ! $sizeDetails = getimagesize($value->getRealPath())) {
+        if (!$this->isAValidFileInstance($value) || !$sizeDetails = getimagesize($value->getRealPath())) {
             return false;
         }
 
@@ -1696,14 +1766,15 @@ class Validator implements ValidatorContract
     /**
      * Validate the guessed extension of a file upload is in a set of file extensions.
      *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @param  array   $parameters
+     * @param string $attribute
+     * @param mixed  $value
+     * @param array  $parameters
+     *
      * @return bool
      */
     protected function validateMimes($attribute, $value, $parameters)
     {
-        if (! $this->isAValidFileInstance($value)) {
+        if (!$this->isAValidFileInstance($value)) {
             return false;
         }
 
@@ -1713,14 +1784,15 @@ class Validator implements ValidatorContract
     /**
      * Validate the MIME type of a file upload attribute is in a set of MIME types.
      *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @param  array  $parameters
+     * @param string $attribute
+     * @param mixed  $value
+     * @param array  $parameters
+     *
      * @return bool
      */
     protected function validateMimetypes($attribute, $value, $parameters)
     {
-        if (! $this->isAValidFileInstance($value)) {
+        if (!$this->isAValidFileInstance($value)) {
             return false;
         }
 
@@ -1730,12 +1802,13 @@ class Validator implements ValidatorContract
     /**
      * Check that the given value is a valid file instance.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return bool
      */
     public function isAValidFileInstance($value)
     {
-        if ($value instanceof UploadedFile && ! $value->isValid()) {
+        if ($value instanceof UploadedFile && !$value->isValid()) {
             return false;
         }
 
@@ -1745,8 +1818,9 @@ class Validator implements ValidatorContract
     /**
      * Validate that an attribute contains only alphabetic characters.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param string $attribute
+     * @param mixed  $value
+     *
      * @return bool
      */
     protected function validateAlpha($attribute, $value)
@@ -1757,13 +1831,14 @@ class Validator implements ValidatorContract
     /**
      * Validate that an attribute contains only alpha-numeric characters.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param string $attribute
+     * @param mixed  $value
+     *
      * @return bool
      */
     protected function validateAlphaNum($attribute, $value)
     {
-        if (! is_string($value) && ! is_numeric($value)) {
+        if (!is_string($value) && !is_numeric($value)) {
             return false;
         }
 
@@ -1773,13 +1848,14 @@ class Validator implements ValidatorContract
     /**
      * Validate that an attribute contains only alpha-numeric characters, dashes, and underscores.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param string $attribute
+     * @param mixed  $value
+     *
      * @return bool
      */
     protected function validateAlphaDash($attribute, $value)
     {
-        if (! is_string($value) && ! is_numeric($value)) {
+        if (!is_string($value) && !is_numeric($value)) {
             return false;
         }
 
@@ -1789,14 +1865,15 @@ class Validator implements ValidatorContract
     /**
      * Validate that an attribute passes a regular expression check.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  array   $parameters
+     * @param string $attribute
+     * @param mixed  $value
+     * @param array  $parameters
+     *
      * @return bool
      */
     protected function validateRegex($attribute, $value, $parameters)
     {
-        if (! is_string($value) && ! is_numeric($value)) {
+        if (!is_string($value) && !is_numeric($value)) {
             return false;
         }
 
@@ -1808,8 +1885,9 @@ class Validator implements ValidatorContract
     /**
      * Validate that an attribute is a valid date.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param string $attribute
+     * @param mixed  $value
+     *
      * @return bool
      */
     protected function validateDate($attribute, $value)
@@ -1818,7 +1896,7 @@ class Validator implements ValidatorContract
             return true;
         }
 
-        if ((! is_string($value) && ! is_numeric($value)) || strtotime($value) === false) {
+        if ((!is_string($value) && !is_numeric($value)) || strtotime($value) === false) {
             return false;
         }
 
@@ -1830,16 +1908,17 @@ class Validator implements ValidatorContract
     /**
      * Validate that an attribute matches a date format.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  array   $parameters
+     * @param string $attribute
+     * @param mixed  $value
+     * @param array  $parameters
+     *
      * @return bool
      */
     protected function validateDateFormat($attribute, $value, $parameters)
     {
         $this->requireParameterCount(1, $parameters, 'date_format');
 
-        if (! is_string($value) && ! is_numeric($value)) {
+        if (!is_string($value) && !is_numeric($value)) {
             return false;
         }
 
@@ -1851,9 +1930,10 @@ class Validator implements ValidatorContract
     /**
      * Validate the date is before a given date.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  array   $parameters
+     * @param string $attribute
+     * @param mixed  $value
+     * @param array  $parameters
+     *
      * @return bool
      */
     protected function validateBefore($attribute, $value, $parameters)
@@ -1866,9 +1946,10 @@ class Validator implements ValidatorContract
     /**
      * Validate the date is before or equal a given date.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  array   $parameters
+     * @param string $attribute
+     * @param mixed  $value
+     * @param array  $parameters
+     *
      * @return bool
      */
     protected function validateBeforeOrEqual($attribute, $value, $parameters)
@@ -1881,9 +1962,10 @@ class Validator implements ValidatorContract
     /**
      * Validate the date is after a given date.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  array   $parameters
+     * @param string $attribute
+     * @param mixed  $value
+     * @param array  $parameters
+     *
      * @return bool
      */
     protected function validateAfter($attribute, $value, $parameters)
@@ -1896,9 +1978,10 @@ class Validator implements ValidatorContract
     /**
      * Validate the date is equal or after a given date.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  array   $parameters
+     * @param string $attribute
+     * @param mixed  $value
+     * @param array  $parameters
+     *
      * @return bool
      */
     protected function validateAfterOrEqual($attribute, $value, $parameters)
@@ -1911,15 +1994,16 @@ class Validator implements ValidatorContract
     /**
      * Compare a given date against another using an operator.
      *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @param  array  $parameters
-     * @param  string  $operator
+     * @param string $attribute
+     * @param mixed  $value
+     * @param array  $parameters
+     * @param string $operator
+     *
      * @return bool
      */
     protected function compareDates($attribute, $value, $parameters, $operator)
     {
-        if (! is_string($value) && ! is_numeric($value) && ! $value instanceof DateTimeInterface) {
+        if (!is_string($value) && !is_numeric($value) && !$value instanceof DateTimeInterface) {
             return false;
         }
 
@@ -1929,7 +2013,7 @@ class Validator implements ValidatorContract
             return $this->checkDateTimeOrder($format, $value, $param, $operator);
         }
 
-        if (! $date = $this->getDateTimestamp($parameters[0])) {
+        if (!$date = $this->getDateTimestamp($parameters[0])) {
             $date = $this->getDateTimestamp($this->getValue($parameters[0]));
         }
 
@@ -1939,10 +2023,11 @@ class Validator implements ValidatorContract
     /**
      * Given two date/time strings, check that one is after the other.
      *
-     * @param  string  $format
-     * @param  string  $first
-     * @param  string  $second
-     * @param  string  $operator
+     * @param string $format
+     * @param string $first
+     * @param string $second
+     * @param string $operator
+     *
      * @return bool
      */
     protected function checkDateTimeOrder($format, $first, $second, $operator)
@@ -1957,8 +2042,9 @@ class Validator implements ValidatorContract
     /**
      * Get a DateTime instance from a string.
      *
-     * @param  string  $format
-     * @param  string  $value
+     * @param string $format
+     * @param string $value
+     *
      * @return \DateTime|null
      */
     protected function getDateTimeWithOptionalFormat($format, $value)
@@ -1979,8 +2065,9 @@ class Validator implements ValidatorContract
     /**
      * Validate that an attribute is a valid timezone.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param string $attribute
+     * @param mixed  $value
+     *
      * @return bool
      */
     protected function validateTimezone($attribute, $value)
@@ -1999,7 +2086,8 @@ class Validator implements ValidatorContract
     /**
      * Get the date format for an attribute if it has one.
      *
-     * @param  string  $attribute
+     * @param string $attribute
+     *
      * @return string|null
      */
     protected function getDateFormat($attribute)
@@ -2012,7 +2100,8 @@ class Validator implements ValidatorContract
     /**
      * Get the date timestamp.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return int
      */
     protected function getDateTimestamp($value)
@@ -2023,8 +2112,9 @@ class Validator implements ValidatorContract
     /**
      * Get the validation message for an attribute and rule.
      *
-     * @param  string  $attribute
-     * @param  string  $rule
+     * @param string $attribute
+     * @param string $rule
+     *
      * @return string
      */
     protected function getMessage($attribute, $rule)
@@ -2036,7 +2126,7 @@ class Validator implements ValidatorContract
         // First we will retrieve the custom message for the validation rule if one
         // exists. If a custom validation message is being used we'll return the
         // custom message, otherwise we'll keep searching for a valid message.
-        if (! is_null($inlineMessage)) {
+        if (!is_null($inlineMessage)) {
             return $inlineMessage;
         }
 
@@ -2075,9 +2165,10 @@ class Validator implements ValidatorContract
     /**
      * Get the inline message for a rule if it exists.
      *
-     * @param  string  $attribute
-     * @param  string  $lowerRule
-     * @param  array   $source
+     * @param string $attribute
+     * @param string $lowerRule
+     * @param array  $source
+     *
      * @return string|null
      */
     protected function getInlineMessage($attribute, $lowerRule, $source = null)
@@ -2101,7 +2192,8 @@ class Validator implements ValidatorContract
     /**
      * Get the custom error message from translator.
      *
-     * @param  string  $customKey
+     * @param string $customKey
+     *
      * @return string
      */
     protected function getCustomMessageFromTranslator($customKey)
@@ -2128,8 +2220,9 @@ class Validator implements ValidatorContract
     /**
      * Get the proper error message for an attribute and size rule.
      *
-     * @param  string  $attribute
-     * @param  string  $rule
+     * @param string $attribute
+     * @param string $rule
+     *
      * @return string
      */
     protected function getSizeMessage($attribute, $rule)
@@ -2149,7 +2242,8 @@ class Validator implements ValidatorContract
     /**
      * Get the data type of the given attribute.
      *
-     * @param  string  $attribute
+     * @param string $attribute
+     *
      * @return string
      */
     protected function getAttributeType($attribute)
@@ -2171,10 +2265,11 @@ class Validator implements ValidatorContract
     /**
      * Replace all error message place-holders with actual values.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
      * @return string
      */
     protected function doReplacements($message, $attribute, $rule, $parameters)
@@ -2199,7 +2294,8 @@ class Validator implements ValidatorContract
     /**
      * Transform an array of attributes to their displayable form.
      *
-     * @param  array  $values
+     * @param array $values
+     *
      * @return array
      */
     protected function getAttributeList(array $values)
@@ -2219,7 +2315,8 @@ class Validator implements ValidatorContract
     /**
      * Get the displayable name of the attribute.
      *
-     * @param  string  $attribute
+     * @param string $attribute
+     *
      * @return string
      */
     protected function getAttribute($attribute)
@@ -2264,7 +2361,8 @@ class Validator implements ValidatorContract
      *
      * For example, if "name.0" is given, "name.*" will be returned.
      *
-     * @param  string  $attribute
+     * @param string $attribute
+     *
      * @return string
      */
     protected function getPrimaryAttribute($attribute)
@@ -2281,8 +2379,9 @@ class Validator implements ValidatorContract
     /**
      * Get the displayable name of the value.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param string $attribute
+     * @param mixed  $value
+     *
      * @return string
      */
     public function getDisplayableValue($attribute, $value)
@@ -2303,10 +2402,11 @@ class Validator implements ValidatorContract
     /**
      * Replace all place-holders for the between rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
      * @return string
      */
     protected function replaceBetween($message, $attribute, $rule, $parameters)
@@ -2317,10 +2417,11 @@ class Validator implements ValidatorContract
     /**
      * Replace all place-holders for the date_format rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
      * @return string
      */
     protected function replaceDateFormat($message, $attribute, $rule, $parameters)
@@ -2331,10 +2432,11 @@ class Validator implements ValidatorContract
     /**
      * Replace all place-holders for the different rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
      * @return string
      */
     protected function replaceDifferent($message, $attribute, $rule, $parameters)
@@ -2345,10 +2447,11 @@ class Validator implements ValidatorContract
     /**
      * Replace all place-holders for the digits rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
      * @return string
      */
     protected function replaceDigits($message, $attribute, $rule, $parameters)
@@ -2359,10 +2462,11 @@ class Validator implements ValidatorContract
     /**
      * Replace all place-holders for the digits (between) rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
      * @return string
      */
     protected function replaceDigitsBetween($message, $attribute, $rule, $parameters)
@@ -2373,10 +2477,11 @@ class Validator implements ValidatorContract
     /**
      * Replace all place-holders for the min rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
      * @return string
      */
     protected function replaceMin($message, $attribute, $rule, $parameters)
@@ -2387,10 +2492,11 @@ class Validator implements ValidatorContract
     /**
      * Replace all place-holders for the max rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
      * @return string
      */
     protected function replaceMax($message, $attribute, $rule, $parameters)
@@ -2401,10 +2507,11 @@ class Validator implements ValidatorContract
     /**
      * Replace all place-holders for the in rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
      * @return string
      */
     protected function replaceIn($message, $attribute, $rule, $parameters)
@@ -2419,10 +2526,11 @@ class Validator implements ValidatorContract
     /**
      * Replace all place-holders for the not_in rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
      * @return string
      */
     protected function replaceNotIn($message, $attribute, $rule, $parameters)
@@ -2433,10 +2541,11 @@ class Validator implements ValidatorContract
     /**
      * Replace all place-holders for the in_array rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
      * @return string
      */
     protected function replaceInArray($message, $attribute, $rule, $parameters)
@@ -2447,10 +2556,11 @@ class Validator implements ValidatorContract
     /**
      * Replace all place-holders for the mimetypes rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
      * @return string
      */
     protected function replaceMimetypes($message, $attribute, $rule, $parameters)
@@ -2461,10 +2571,11 @@ class Validator implements ValidatorContract
     /**
      * Replace all place-holders for the mimes rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
      * @return string
      */
     protected function replaceMimes($message, $attribute, $rule, $parameters)
@@ -2475,10 +2586,11 @@ class Validator implements ValidatorContract
     /**
      * Replace all place-holders for the required_with rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
      * @return string
      */
     protected function replaceRequiredWith($message, $attribute, $rule, $parameters)
@@ -2491,10 +2603,11 @@ class Validator implements ValidatorContract
     /**
      * Replace all place-holders for the required_with_all rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
      * @return string
      */
     protected function replaceRequiredWithAll($message, $attribute, $rule, $parameters)
@@ -2505,10 +2618,11 @@ class Validator implements ValidatorContract
     /**
      * Replace all place-holders for the required_without rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
      * @return string
      */
     protected function replaceRequiredWithout($message, $attribute, $rule, $parameters)
@@ -2519,10 +2633,11 @@ class Validator implements ValidatorContract
     /**
      * Replace all place-holders for the required_without_all rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
      * @return string
      */
     protected function replaceRequiredWithoutAll($message, $attribute, $rule, $parameters)
@@ -2533,10 +2648,11 @@ class Validator implements ValidatorContract
     /**
      * Replace all place-holders for the size rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
      * @return string
      */
     protected function replaceSize($message, $attribute, $rule, $parameters)
@@ -2547,10 +2663,11 @@ class Validator implements ValidatorContract
     /**
      * Replace all place-holders for the required_if rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
      * @return string
      */
     protected function replaceRequiredIf($message, $attribute, $rule, $parameters)
@@ -2565,10 +2682,11 @@ class Validator implements ValidatorContract
     /**
      * Replace all place-holders for the required_unless rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
      * @return string
      */
     protected function replaceRequiredUnless($message, $attribute, $rule, $parameters)
@@ -2581,10 +2699,11 @@ class Validator implements ValidatorContract
     /**
      * Replace all place-holders for the same rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
      * @return string
      */
     protected function replaceSame($message, $attribute, $rule, $parameters)
@@ -2595,15 +2714,16 @@ class Validator implements ValidatorContract
     /**
      * Replace all place-holders for the before rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
      * @return string
      */
     protected function replaceBefore($message, $attribute, $rule, $parameters)
     {
-        if (! (strtotime($parameters[0]))) {
+        if (!(strtotime($parameters[0]))) {
             return str_replace(':date', $this->getAttribute($parameters[0]), $message);
         }
 
@@ -2613,10 +2733,11 @@ class Validator implements ValidatorContract
     /**
      * Replace all place-holders for the after rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
      * @return string
      */
     protected function replaceAfter($message, $attribute, $rule, $parameters)
@@ -2637,7 +2758,8 @@ class Validator implements ValidatorContract
     /**
      * Checks if an attribute exists.
      *
-     * @param  string  $attribute
+     * @param string $attribute
+     *
      * @return bool
      */
     public function hasAttribute($attribute)
@@ -2648,25 +2770,27 @@ class Validator implements ValidatorContract
     /**
      * Determine if the given attribute has a rule in the given set.
      *
-     * @param  string  $attribute
-     * @param  string|array  $rules
+     * @param string       $attribute
+     * @param string|array $rules
+     *
      * @return bool
      */
     public function hasRule($attribute, $rules)
     {
-        return ! is_null($this->getRule($attribute, $rules));
+        return !is_null($this->getRule($attribute, $rules));
     }
 
     /**
      * Get a rule and its parameters for a given attribute.
      *
-     * @param  string  $attribute
-     * @param  string|array  $rules
+     * @param string       $attribute
+     * @param string|array $rules
+     *
      * @return array|null
      */
     protected function getRule($attribute, $rules)
     {
-        if (! array_key_exists($attribute, $this->rules)) {
+        if (!array_key_exists($attribute, $this->rules)) {
             return;
         }
 
@@ -2684,7 +2808,8 @@ class Validator implements ValidatorContract
     /**
      * Extract the rule name and parameters from a rule.
      *
-     * @param  array|string  $rules
+     * @param array|string $rules
+     *
      * @return array
      */
     protected function parseRule($rules)
@@ -2703,7 +2828,8 @@ class Validator implements ValidatorContract
     /**
      * Parse an array based rule.
      *
-     * @param  array  $rules
+     * @param array $rules
+     *
      * @return array
      */
     protected function parseArrayRule(array $rules)
@@ -2714,7 +2840,8 @@ class Validator implements ValidatorContract
     /**
      * Parse a string based rule.
      *
-     * @param  string  $rules
+     * @param string $rules
+     *
      * @return array
      */
     protected function parseStringRule($rules)
@@ -2736,8 +2863,9 @@ class Validator implements ValidatorContract
     /**
      * Parse a parameter list.
      *
-     * @param  string  $rule
-     * @param  string  $parameter
+     * @param string $rule
+     * @param string $parameter
+     *
      * @return array
      */
     protected function parseParameters($rule, $parameter)
@@ -2752,7 +2880,8 @@ class Validator implements ValidatorContract
     /**
      * Parse named parameters to $key => $value items.
      *
-     * @param  array  $parameters
+     * @param array $parameters
+     *
      * @return array
      */
     protected function parseNamedParameters($parameters)
@@ -2769,7 +2898,8 @@ class Validator implements ValidatorContract
     /**
      * Normalizes a rule so that we can accept short types.
      *
-     * @param  string  $rule
+     * @param string $rule
+     *
      * @return string
      */
     protected function normalizeRule($rule)
@@ -2787,7 +2917,8 @@ class Validator implements ValidatorContract
     /**
      * Determine if the given rule depends on other fields.
      *
-     * @param  string  $rule
+     * @param string $rule
+     *
      * @return bool
      */
     protected function dependsOnOtherFields($rule)
@@ -2800,7 +2931,8 @@ class Validator implements ValidatorContract
      *
      * E.g. 'foo.1.bar.spark.baz' -> [1, 'spark'] for 'foo.*.bar.*.baz'
      *
-     * @param  string  $attribute
+     * @param string $attribute
+     *
      * @return array
      */
     protected function getExplicitKeys($attribute)
@@ -2823,7 +2955,8 @@ class Validator implements ValidatorContract
      *
      * Allows us to not spin through all of the flattened data for some operations.
      *
-     * @param  string  $attribute
+     * @param string $attribute
+     *
      * @return string
      */
     protected function getLeadingExplicitAttributePath($attribute)
@@ -2836,7 +2969,8 @@ class Validator implements ValidatorContract
      *
      * Used to extract a sub-section of the data for faster iteration.
      *
-     * @param  string  $attribute
+     * @param string $attribute
+     *
      * @return array
      */
     protected function extractDataFromPath($attribute)
@@ -2855,8 +2989,9 @@ class Validator implements ValidatorContract
     /**
      * Replace each field parameter which has asterisks with the given keys.
      *
-     * @param  array  $parameters
-     * @param  array  $keys
+     * @param array $parameters
+     * @param array $keys
+     *
      * @return array
      */
     protected function replaceAsterisksInParameters(array $parameters, array $keys)
@@ -2871,8 +3006,9 @@ class Validator implements ValidatorContract
      *
      * E.g. 'foo.*.bar.*.baz', [1, 'spark'] -> foo.1.bar.spark.baz
      *
-     * @param  string  $field
-     * @param  array  $keys
+     * @param string $field
+     * @param array  $keys
+     *
      * @return string
      */
     protected function replaceAsterisksWithKeys($field, array $keys)
@@ -2893,7 +3029,8 @@ class Validator implements ValidatorContract
     /**
      * Register an array of custom validator extensions.
      *
-     * @param  array  $extensions
+     * @param array $extensions
+     *
      * @return void
      */
     public function addExtensions(array $extensions)
@@ -2910,7 +3047,8 @@ class Validator implements ValidatorContract
     /**
      * Register an array of custom implicit validator extensions.
      *
-     * @param  array  $extensions
+     * @param array $extensions
+     *
      * @return void
      */
     public function addImplicitExtensions(array $extensions)
@@ -2925,8 +3063,9 @@ class Validator implements ValidatorContract
     /**
      * Register a custom validator extension.
      *
-     * @param  string  $rule
-     * @param  \Closure|string  $extension
+     * @param string          $rule
+     * @param \Closure|string $extension
+     *
      * @return void
      */
     public function addExtension($rule, $extension)
@@ -2937,8 +3076,9 @@ class Validator implements ValidatorContract
     /**
      * Register a custom implicit validator extension.
      *
-     * @param  string   $rule
-     * @param  \Closure|string  $extension
+     * @param string          $rule
+     * @param \Closure|string $extension
+     *
      * @return void
      */
     public function addImplicitExtension($rule, $extension)
@@ -2961,7 +3101,8 @@ class Validator implements ValidatorContract
     /**
      * Register an array of custom validator message replacers.
      *
-     * @param  array  $replacers
+     * @param array $replacers
+     *
      * @return void
      */
     public function addReplacers(array $replacers)
@@ -2978,8 +3119,9 @@ class Validator implements ValidatorContract
     /**
      * Register a custom validator message replacer.
      *
-     * @param  string  $rule
-     * @param  \Closure|string  $replacer
+     * @param string          $rule
+     * @param \Closure|string $replacer
+     *
      * @return void
      */
     public function addReplacer($rule, $replacer)
@@ -3000,7 +3142,8 @@ class Validator implements ValidatorContract
     /**
      * Set the data under validation.
      *
-     * @param  array  $data
+     * @param array $data
+     *
      * @return $this
      */
     public function setData(array $data)
@@ -3025,7 +3168,8 @@ class Validator implements ValidatorContract
     /**
      * Set the validation rules.
      *
-     * @param  array  $rules
+     * @param array $rules
+     *
      * @return $this
      */
     public function setRules(array $rules)
@@ -3044,7 +3188,8 @@ class Validator implements ValidatorContract
     /**
      * Set the custom attributes on the validator.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return $this
      */
     public function setAttributeNames(array $attributes)
@@ -3057,7 +3202,8 @@ class Validator implements ValidatorContract
     /**
      * Set the custom values on the validator.
      *
-     * @param  array  $values
+     * @param array $values
+     *
      * @return $this
      */
     public function setValueNames(array $values)
@@ -3070,13 +3216,13 @@ class Validator implements ValidatorContract
     /**
      * Get the Presence Verifier implementation.
      *
-     * @return \Illuminate\Validation\PresenceVerifierInterface
-     *
      * @throws \RuntimeException
+     *
+     * @return \Illuminate\Validation\PresenceVerifierInterface
      */
     public function getPresenceVerifier()
     {
-        if (! isset($this->presenceVerifier)) {
+        if (!isset($this->presenceVerifier)) {
             throw new RuntimeException('Presence verifier has not been set.');
         }
 
@@ -3086,7 +3232,8 @@ class Validator implements ValidatorContract
     /**
      * Set the Presence Verifier implementation.
      *
-     * @param  \Illuminate\Validation\PresenceVerifierInterface  $presenceVerifier
+     * @param \Illuminate\Validation\PresenceVerifierInterface $presenceVerifier
+     *
      * @return void
      */
     public function setPresenceVerifier(PresenceVerifierInterface $presenceVerifier)
@@ -3107,7 +3254,8 @@ class Validator implements ValidatorContract
     /**
      * Set the Translator implementation.
      *
-     * @param  \Symfony\Component\Translation\TranslatorInterface  $translator
+     * @param \Symfony\Component\Translation\TranslatorInterface $translator
+     *
      * @return void
      */
     public function setTranslator(TranslatorInterface $translator)
@@ -3128,7 +3276,8 @@ class Validator implements ValidatorContract
     /**
      * Set the custom messages for the validator.
      *
-     * @param  array  $messages
+     * @param array $messages
+     *
      * @return void
      */
     public function setCustomMessages(array $messages)
@@ -3149,7 +3298,8 @@ class Validator implements ValidatorContract
     /**
      * Add custom attributes to the validator.
      *
-     * @param  array  $customAttributes
+     * @param array $customAttributes
+     *
      * @return $this
      */
     public function addCustomAttributes(array $customAttributes)
@@ -3172,7 +3322,8 @@ class Validator implements ValidatorContract
     /**
      * Add the custom values for the validator.
      *
-     * @param  array  $customValues
+     * @param array $customValues
+     *
      * @return $this
      */
     public function addCustomValues(array $customValues)
@@ -3195,7 +3346,8 @@ class Validator implements ValidatorContract
     /**
      * Set the fallback messages for the validator.
      *
-     * @param  array  $messages
+     * @param array $messages
+     *
      * @return void
      */
     public function setFallbackMessages(array $messages)
@@ -3220,7 +3372,7 @@ class Validator implements ValidatorContract
      */
     public function messages()
     {
-        if (! $this->messages) {
+        if (!$this->messages) {
             $this->passes();
         }
 
@@ -3250,7 +3402,8 @@ class Validator implements ValidatorContract
     /**
      * Set the IoC container instance.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @param \Illuminate\Contracts\Container\Container $container
+     *
      * @return void
      */
     public function setContainer(Container $container)
@@ -3261,8 +3414,9 @@ class Validator implements ValidatorContract
     /**
      * Call a custom validator extension.
      *
-     * @param  string  $rule
-     * @param  array   $parameters
+     * @param string $rule
+     * @param array  $parameters
+     *
      * @return bool|null
      */
     protected function callExtension($rule, $parameters)
@@ -3279,8 +3433,9 @@ class Validator implements ValidatorContract
     /**
      * Call a class based validator extension.
      *
-     * @param  string  $callback
-     * @param  array   $parameters
+     * @param string $callback
+     * @param array  $parameters
+     *
      * @return bool
      */
     protected function callClassBasedExtension($callback, $parameters)
@@ -3297,10 +3452,11 @@ class Validator implements ValidatorContract
     /**
      * Call a custom validator message replacer.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
      * @return string|null
      */
     protected function callReplacer($message, $attribute, $rule, $parameters)
@@ -3317,11 +3473,12 @@ class Validator implements ValidatorContract
     /**
      * Call a class based validator message replacer.
      *
-     * @param  string  $callback
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
+     * @param string $callback
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
      * @return string
      */
     protected function callClassBasedReplacer($callback, $message, $attribute, $rule, $parameters)
@@ -3338,12 +3495,13 @@ class Validator implements ValidatorContract
     /**
      * Require a certain number of parameters to be present.
      *
-     * @param  int    $count
-     * @param  array  $parameters
-     * @param  string  $rule
-     * @return void
+     * @param int    $count
+     * @param array  $parameters
+     * @param string $rule
      *
      * @throws \InvalidArgumentException
+     *
+     * @return void
      */
     protected function requireParameterCount($count, $parameters, $rule)
     {
@@ -3355,9 +3513,10 @@ class Validator implements ValidatorContract
     /**
      * Determine if a comparison passes between the given values.
      *
-     * @param  mixed  $first
-     * @param  mixed  $second
-     * @param  string  $operator
+     * @param mixed  $first
+     * @param mixed  $second
+     * @param string $operator
+     *
      * @return bool
      */
     protected function compare($first, $second, $operator)
@@ -3379,11 +3538,12 @@ class Validator implements ValidatorContract
     /**
      * Handle dynamic calls to class methods.
      *
-     * @param  string  $method
-     * @param  array   $parameters
-     * @return mixed
+     * @param string $method
+     * @param array  $parameters
      *
      * @throws \BadMethodCallException
+     *
+     * @return mixed
      */
     public function __call($method, $parameters)
     {

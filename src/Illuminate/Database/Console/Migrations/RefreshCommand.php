@@ -31,7 +31,7 @@ class RefreshCommand extends Command
      */
     public function fire()
     {
-        if (! $this->confirmToProceed()) {
+        if (!$this->confirmToProceed()) {
             return;
         }
 
@@ -61,8 +61,8 @@ class RefreshCommand extends Command
         // them in succession. We'll also see if we need to re-seed the database.
         $this->call('migrate', [
             '--database' => $database,
-            '--force' => $force,
-            '--path' => $path,
+            '--force'    => $force,
+            '--path'     => $path,
         ]);
 
         if ($this->needsSeeding()) {
@@ -83,7 +83,8 @@ class RefreshCommand extends Command
     /**
      * Run the database seeder command.
      *
-     * @param  string  $database
+     * @param string $database
+     *
      * @return void
      */
     protected function runSeeder($database)

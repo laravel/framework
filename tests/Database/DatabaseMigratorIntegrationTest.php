@@ -1,9 +1,9 @@
 <?php
 
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Migrations\DatabaseMigrationRepository;
+use Illuminate\Database\Migrations\Migrator;
+use Illuminate\Filesystem\Filesystem;
 
 class DatabaseMigratorIntegrationTest extends PHPUnit_Framework_TestCase
 {
@@ -16,7 +16,7 @@ class DatabaseMigratorIntegrationTest extends PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->db = $db = new DB;
+        $this->db = $db = new DB();
 
         $db->addConnection([
             'driver'    => 'sqlite',
@@ -25,17 +25,17 @@ class DatabaseMigratorIntegrationTest extends PHPUnit_Framework_TestCase
 
         $db->setAsGlobal();
 
-        $container = new Illuminate\Container\Container;
+        $container = new Illuminate\Container\Container();
         $container->instance('db', $db->getDatabaseManager());
         Illuminate\Support\Facades\Facade::setFacadeApplication($container);
 
         $this->migrator = new Migrator(
             $repository = new DatabaseMigrationRepository($db->getDatabaseManager(), 'migrations'),
             $db->getDatabaseManager(),
-            new Filesystem
+            new Filesystem()
         );
 
-        if (! $repository->repositoryExists()) {
+        if (!$repository->repositoryExists()) {
             $repository->createRepository();
         }
     }

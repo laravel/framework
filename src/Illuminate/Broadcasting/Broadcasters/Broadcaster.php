@@ -2,9 +2,9 @@
 
 namespace Illuminate\Broadcasting\Broadcasters;
 
+use Illuminate\Contracts\Broadcasting\Broadcaster as BroadcasterContract;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Illuminate\Contracts\Broadcasting\Broadcaster as BroadcasterContract;
 
 abstract class Broadcaster implements BroadcasterContract
 {
@@ -18,8 +18,9 @@ abstract class Broadcaster implements BroadcasterContract
     /**
      * Register a channel authenticator.
      *
-     * @param  string  $channel
-     * @param  callable  $callback
+     * @param string   $channel
+     * @param callable $callback
+     *
      * @return $this
      */
     public function channel($channel, callable $callback)
@@ -32,14 +33,15 @@ abstract class Broadcaster implements BroadcasterContract
     /**
      * Authenticate the incoming request for a given channel.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $channel
+     * @param \Illuminate\Http\Request $request
+     * @param string                   $channel
+     *
      * @return mixed
      */
     protected function verifyUserCanAccessChannel($request, $channel)
     {
         foreach ($this->channels as $pattern => $callback) {
-            if (! Str::is($pattern, $channel)) {
+            if (!Str::is($pattern, $channel)) {
                 continue;
             }
 
@@ -56,13 +58,14 @@ abstract class Broadcaster implements BroadcasterContract
     /**
      * Extract the parameters from the given pattern and channel.
      *
-     * @param  string  $pattern
-     * @param  string  $channel
+     * @param string $pattern
+     * @param string $channel
+     *
      * @return array
      */
     protected function extractAuthParameters($pattern, $channel)
     {
-        if (! Str::contains($pattern, '*')) {
+        if (!Str::contains($pattern, '*')) {
             return [];
         }
 
@@ -80,7 +83,8 @@ abstract class Broadcaster implements BroadcasterContract
     /**
      * Format the channel array into an array of strings.
      *
-     * @param  array  $channels
+     * @param array $channels
+     *
      * @return array
      */
     protected function formatChannels(array $channels)

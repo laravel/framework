@@ -1,10 +1,10 @@
 <?php
 
-use Mockery as m;
 use Carbon\Carbon;
-use Illuminate\Validation\Validator;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
+use Illuminate\Validation\Validator;
+use Mockery as m;
 use Symfony\Component\HttpFoundation\File\File;
 
 class ValidationValidatorTest extends PHPUnit_Framework_TestCase
@@ -30,7 +30,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => 'bar', 'baz' => 'boom'], ['foo' => 'Same:baz']);
-        $v->setContainer(new Illuminate\Container\Container);
+        $v->setContainer(new Illuminate\Container\Container());
         $v->after(function ($validator) {
             $_SERVER['__validator.after.test'] = true;
 
@@ -271,7 +271,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines([
-            'validation.string' => ':attribute must be a string!',
+            'validation.string'            => ':attribute must be a string!',
             'validation.attributes.name.*' => 'Any name',
         ], 'en');
         $v = new Validator($trans, ['name' => ['Jon', 2]], ['name.*' => 'string']);
@@ -341,7 +341,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $trans->addLines(['validation.in' => ':attribute must be included in :values.'], 'en');
         $customValues = [
             'type' => [
-                '5' => 'Short',
+                '5'   => 'Short',
                 '300' => 'Long',
             ],
         ];
@@ -356,7 +356,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $trans->addLines(['validation.in' => ':attribute must be included in :values.'], 'en');
         $customValues = [
             'type' => [
-                '5' => 'Short',
+                '5'   => 'Short',
                 '300' => 'Long',
             ],
         ];
@@ -372,7 +372,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $trans->getLoader()->addMessages('en', 'validation', [
             'required' => 'required!',
-            'custom' => [
+            'custom'   => [
                 'name' => [
                     'required' => 'really required!',
                 ],
@@ -389,7 +389,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $trans->getLoader()->addMessages('en', 'validation', [
             'required' => 'required!',
-            'custom' => [
+            'custom'   => [
                 'name.*' => [
                     'required' => 'all are really required!',
                 ],
@@ -413,7 +413,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $trans->getLoader()->addMessages('en', 'validation', [
             'required' => 'required!',
-            'custom' => [
+            'custom'   => [
                 'validation' => [
                     'custom.*' => [
                         'integer' => 'should be integer!',
@@ -1432,7 +1432,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         };
         $v = new Validator($trans, [['email' => 'foo', 'type' => 'bar']], [
             '*.email' => (new Unique('users'))->where($closure),
-            '*.type' => (new Exists('user_types'))->where($closure),
+            '*.type'  => (new Exists('user_types'))->where($closure),
         ]);
         $mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
         $mock->shouldReceive('setConnection')->twice()->with(null);
@@ -2432,28 +2432,28 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
         // pipe rules fails
         $v = new Validator($trans, $data, [
-            'foo' => 'Array',
+            'foo'   => 'Array',
             'foo.*' => 'Numeric|Min:6|Max:16',
         ]);
         $this->assertFalse($v->passes());
 
         // pipe passes
         $v = new Validator($trans, $data, [
-            'foo' => 'Array',
+            'foo'   => 'Array',
             'foo.*' => 'Numeric|Min:4|Max:16',
         ]);
         $this->assertTrue($v->passes());
 
         // array rules fails
         $v = new Validator($trans, $data, [
-            'foo' => 'Array',
+            'foo'   => 'Array',
             'foo.*' => ['Numeric', 'Min:6', 'Max:16'],
         ]);
         $this->assertFalse($v->passes());
 
         // array rules passes
         $v = new Validator($trans, $data, [
-            'foo' => 'Array',
+            'foo'   => 'Array',
             'foo.*' => ['Numeric', 'Min:4', 'Max:16'],
         ]);
         $this->assertTrue($v->passes());
@@ -2617,12 +2617,12 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans,
-            ['foo' => [['name' => 'first', 'votes' => [1, 2]], ['name' => 'second', 'votes' => ['something', 2]]]],
+            ['foo'         => [['name' => 'first', 'votes' => [1, 2]], ['name' => 'second', 'votes' => ['something', 2]]]],
             ['foo.*.votes' => ['Required', 'Size:2']]);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans,
-            ['foo' => [['name' => 'first', 'votes' => [1, 2, 3]], ['name' => 'second', 'votes' => ['something', 2]]]],
+            ['foo'         => [['name' => 'first', 'votes' => [1, 2, 3]], ['name' => 'second', 'votes' => ['something', 2]]]],
             ['foo.*.votes' => ['Required', 'Size:2']]);
         $this->assertFalse($v->passes());
     }
@@ -2634,13 +2634,13 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $data = [
             'products' => [
                 [
-                    'price' => 2,
+                    'price'   => 2,
                     'options' => [
                         ['price' => 1],
                     ],
                 ],
                 [
-                    'price' => 2,
+                    'price'   => 2,
                     'options' => [
                         ['price' => 0],
                     ],
@@ -3234,18 +3234,18 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
         $v = new Validator($trans,
             [
-                'name' => 'Carlos',
-                'age' => 'unknown',
+                'name'   => 'Carlos',
+                'age'    => 'unknown',
                 'gender' => 'male',
             ],
             [
-                'name' => 'required',
+                'name'   => 'required',
                 'gender' => 'in:male,female',
-                'age' => 'required|int',
+                'age'    => 'required|int',
             ]);
 
         $this->assertEquals($v->valid(), [
-            'name' => 'Carlos',
+            'name'   => 'Carlos',
             'gender' => 'male',
         ]);
     }
@@ -3275,7 +3275,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
     public function getIlluminateArrayTranslator()
     {
         return new Illuminate\Translation\Translator(
-            new Illuminate\Translation\ArrayLoader, 'en'
+            new Illuminate\Translation\ArrayLoader(), 'en'
         );
     }
 }

@@ -7,7 +7,8 @@ class PostgresBuilder extends Builder
     /**
      * Determine if the given table exists.
      *
-     * @param  string  $table
+     * @param string $table
+     *
      * @return bool
      */
     public function hasTable($table)

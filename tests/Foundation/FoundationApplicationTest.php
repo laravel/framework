@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Foundation\Application;
+use Mockery as m;
 
 class FoundationApplicationTest extends PHPUnit_Framework_TestCase
 {
@@ -12,7 +12,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase
 
     public function testSetLocaleSetsLocaleAndFiresLocaleChangedEvent()
     {
-        $app = new Application;
+        $app = new Application();
         $app['config'] = $config = m::mock('StdClass');
         $config->shouldReceive('set')->once()->with('app.locale', 'foo');
         $app['translator'] = $trans = m::mock('StdClass');
@@ -28,7 +28,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase
         $provider = m::mock('ApplicationBasicServiceProviderStub');
         $class = get_class($provider);
         $provider->shouldReceive('register')->once();
-        $app = new Application;
+        $app = new Application();
         $app->register($provider);
 
         $this->assertTrue(in_array($class, $app->getLoadedProviders()));
@@ -39,7 +39,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase
         $provider = m::mock('Illuminate\Support\ServiceProvider');
         $class = get_class($provider);
         $provider->shouldReceive('register')->never();
-        $app = new Application;
+        $app = new Application();
         $app->register($provider);
 
         $this->assertTrue(in_array($class, $app->getLoadedProviders()));
@@ -47,7 +47,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase
 
     public function testDeferredServicesMarkedAsBound()
     {
-        $app = new Application;
+        $app = new Application();
         $app->setDeferredServices(['foo' => 'ApplicationDeferredServiceProviderStub']);
         $this->assertTrue($app->bound('foo'));
         $this->assertEquals('foo', $app->make('foo'));
@@ -55,7 +55,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase
 
     public function testDeferredServicesAreSharedProperly()
     {
-        $app = new Application;
+        $app = new Application();
         $app->setDeferredServices(['foo' => 'ApplicationDeferredSharedServiceProviderStub']);
         $this->assertTrue($app->bound('foo'));
         $one = $app->make('foo');
@@ -67,7 +67,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase
 
     public function testDeferredServicesCanBeExtended()
     {
-        $app = new Application;
+        $app = new Application();
         $app->setDeferredServices(['foo' => 'ApplicationDeferredServiceProviderStub']);
         $app->extend('foo', function ($instance, $container) {
             return $instance.'bar';
@@ -77,7 +77,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase
 
     public function testDeferredServiceProviderIsRegisteredOnlyOnce()
     {
-        $app = new Application;
+        $app = new Application();
         $app->setDeferredServices(['foo' => 'ApplicationDeferredServiceProviderCountStub']);
         $obj = $app->make('foo');
         $this->assertInstanceOf('StdClass', $obj);
@@ -88,7 +88,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase
     public function testDeferredServicesAreLazilyInitialized()
     {
         ApplicationDeferredServiceProviderStub::$initialized = false;
-        $app = new Application;
+        $app = new Application();
         $app->setDeferredServices(['foo' => 'ApplicationDeferredServiceProviderStub']);
         $this->assertTrue($app->bound('foo'));
         $this->assertFalse(ApplicationDeferredServiceProviderStub::$initialized);
@@ -102,7 +102,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase
 
     public function testDeferredServicesCanRegisterFactories()
     {
-        $app = new Application;
+        $app = new Application();
         $app->setDeferredServices(['foo' => 'ApplicationFactoryProviderStub']);
         $this->assertTrue($app->bound('foo'));
         $this->assertEquals(1, $app->make('foo'));
@@ -112,7 +112,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase
 
     public function testSingleProviderCanProvideMultipleDeferredServices()
     {
-        $app = new Application;
+        $app = new Application();
         $app->setDeferredServices([
             'foo' => 'ApplicationMultiProviderStub',
             'bar' => 'ApplicationMultiProviderStub',
@@ -123,7 +123,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase
 
     public function testEnvironment()
     {
-        $app = new Application;
+        $app = new Application();
         $app['env'] = 'foo';
 
         $this->assertEquals('foo', $app->environment());
@@ -141,7 +141,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase
 
     public function testMethodAfterLoadingEnvironmentAddsClosure()
     {
-        $app = new Application;
+        $app = new Application();
         $closure = function () {
         };
         $app->afterLoadingEnvironment($closure);
@@ -151,7 +151,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase
 
     public function testBeforeBootstrappingAddsClosure()
     {
-        $app = new Application;
+        $app = new Application();
         $closure = function () {
         };
         $app->beforeBootstrapping('Illuminate\Foundation\Bootstrap\RegisterFacades', $closure);
@@ -161,7 +161,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase
 
     public function testAfterBootstrappingAddsClosure()
     {
-        $app = new Application;
+        $app = new Application();
         $closure = function () {
         };
         $app->afterBootstrapping('Illuminate\Foundation\Bootstrap\RegisterFacades', $closure);
@@ -190,7 +190,7 @@ class ApplicationDeferredSharedServiceProviderStub extends Illuminate\Support\Se
     public function register()
     {
         $this->app->singleton('foo', function () {
-            return new StdClass;
+            return new StdClass();
         });
     }
 }
@@ -203,7 +203,7 @@ class ApplicationDeferredServiceProviderCountStub extends Illuminate\Support\Ser
     public function register()
     {
         static::$count++;
-        $this->app['foo'] = new StdClass;
+        $this->app['foo'] = new StdClass();
     }
 }
 

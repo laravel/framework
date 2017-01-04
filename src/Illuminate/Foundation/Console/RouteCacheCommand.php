@@ -32,7 +32,8 @@ class RouteCacheCommand extends Command
     /**
      * Create a new route command instance.
      *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
+     * @param \Illuminate\Filesystem\Filesystem $files
+     *
      * @return void
      */
     public function __construct(Filesystem $files)
@@ -85,7 +86,8 @@ class RouteCacheCommand extends Command
     /**
      * Build the route cache file.
      *
-     * @param  \Illuminate\Routing\RouteCollection  $routes
+     * @param \Illuminate\Routing\RouteCollection $routes
+     *
      * @return string
      */
     protected function buildRouteCacheFile(RouteCollection $routes)

@@ -3,16 +3,17 @@
 namespace Illuminate\Foundation\Testing\Constraints;
 
 use PHPUnit_Framework_Constraint;
-use Symfony\Component\DomCrawler\Crawler;
-use SebastianBergmann\Comparator\ComparisonFailure;
 use PHPUnit_Framework_ExpectationFailedException as FailedExpection;
+use SebastianBergmann\Comparator\ComparisonFailure;
+use Symfony\Component\DomCrawler\Crawler;
 
 abstract class PageConstraint extends PHPUnit_Framework_Constraint
 {
     /**
      * Make sure we obtain the HTML from the crawler or the response.
      *
-     * @param  \Symfony\Component\DomCrawler\Crawler|string  $crawler
+     * @param \Symfony\Component\DomCrawler\Crawler|string $crawler
+     *
      * @return string
      */
     protected function html($crawler)
@@ -23,7 +24,8 @@ abstract class PageConstraint extends PHPUnit_Framework_Constraint
     /**
      * Make sure we obtain the HTML from the crawler or the response.
      *
-     * @param  \Symfony\Component\DomCrawler\Crawler|string  $crawler
+     * @param \Symfony\Component\DomCrawler\Crawler|string $crawler
+     *
      * @return string
      */
     protected function text($crawler)
@@ -34,7 +36,8 @@ abstract class PageConstraint extends PHPUnit_Framework_Constraint
     /**
      * Create a crawler instance if the given value is not already a Crawler.
      *
-     * @param  \Symfony\Component\DomCrawler\Crawler|string  $crawler
+     * @param \Symfony\Component\DomCrawler\Crawler|string $crawler
+     *
      * @return \Symfony\Component\DomCrawler\Crawler
      */
     protected function crawler($crawler)
@@ -45,7 +48,8 @@ abstract class PageConstraint extends PHPUnit_Framework_Constraint
     /**
      * Get the escaped text pattern for the constraint.
      *
-     * @param  string  $text
+     * @param string $text
+     *
      * @return string
      */
     protected function getEscapedPattern($text)
@@ -61,12 +65,13 @@ abstract class PageConstraint extends PHPUnit_Framework_Constraint
     /**
      * Throw an exception for the given comparison and test description.
      *
-     * @param  \Symfony\Component\DomCrawler\Crawler|string  $crawler
-     * @param  string  $description
-     * @param  \SebastianBergmann\Comparator\ComparisonFailure|null  $comparisonFailure
-     * @return void
+     * @param \Symfony\Component\DomCrawler\Crawler|string         $crawler
+     * @param string                                               $description
+     * @param \SebastianBergmann\Comparator\ComparisonFailure|null $comparisonFailure
      *
      * @throws \PHPUnit_Framework_ExpectationFailedException
+     *
+     * @return void
      */
     protected function fail($crawler, $description, ComparisonFailure $comparisonFailure = null)
     {
@@ -77,7 +82,7 @@ abstract class PageConstraint extends PHPUnit_Framework_Constraint
             $html, $this->getFailureDescription()
         );
 
-        if (! empty($description)) {
+        if (!empty($description)) {
             $failureDescription .= ": {$description}";
         }
 

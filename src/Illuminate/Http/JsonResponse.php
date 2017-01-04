@@ -2,10 +2,10 @@
 
 namespace Illuminate\Http;
 
-use JsonSerializable;
-use InvalidArgumentException;
-use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
+use InvalidArgumentException;
+use JsonSerializable;
 use Symfony\Component\HttpFoundation\JsonResponse as BaseJsonResponse;
 
 class JsonResponse extends BaseJsonResponse
@@ -15,10 +15,10 @@ class JsonResponse extends BaseJsonResponse
     /**
      * Constructor.
      *
-     * @param  mixed  $data
-     * @param  int    $status
-     * @param  array  $headers
-     * @param  int    $options
+     * @param mixed $data
+     * @param int   $status
+     * @param array $headers
+     * @param int   $options
      */
     public function __construct($data = null, $status = 200, $headers = [], $options = 0)
     {
@@ -30,7 +30,8 @@ class JsonResponse extends BaseJsonResponse
     /**
      * Sets the JSONP callback.
      *
-     * @param  string|null  $callback
+     * @param string|null $callback
+     *
      * @return $this
      */
     public function withCallback($callback = null)
@@ -41,8 +42,9 @@ class JsonResponse extends BaseJsonResponse
     /**
      * Get the json_decoded data from the response.
      *
-     * @param  bool  $assoc
-     * @param  int   $depth
+     * @param bool $assoc
+     * @param int  $depth
+     *
      * @return mixed
      */
     public function getData($assoc = false, $depth = 512)
@@ -93,7 +95,8 @@ class JsonResponse extends BaseJsonResponse
     /**
      * Set the JSON encoding options.
      *
-     * @param  int  $options
+     * @param int $options
+     *
      * @return mixed
      */
     public function setJsonOptions($options)

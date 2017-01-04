@@ -2,11 +2,11 @@
 
 namespace Illuminate\Broadcasting;
 
-use ReflectionClass;
-use ReflectionProperty;
+use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Broadcasting\Broadcaster;
+use ReflectionClass;
+use ReflectionProperty;
 
 class BroadcastEvent
 {
@@ -20,7 +20,8 @@ class BroadcastEvent
     /**
      * Create a new job handler instance.
      *
-     * @param  \Illuminate\Contracts\Broadcasting\Broadcaster  $broadcaster
+     * @param \Illuminate\Contracts\Broadcasting\Broadcaster $broadcaster
+     *
      * @return void
      */
     public function __construct(Broadcaster $broadcaster)
@@ -31,8 +32,9 @@ class BroadcastEvent
     /**
      * Handle the queued job.
      *
-     * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  array  $data
+     * @param \Illuminate\Contracts\Queue\Job $job
+     * @param array                           $data
+     *
      * @return void
      */
     public function fire(Job $job, array $data)
@@ -44,7 +46,7 @@ class BroadcastEvent
 
         $channels = $event->broadcastOn();
 
-        if (! is_array($channels)) {
+        if (!is_array($channels)) {
             $channels = [$channels];
         }
 
@@ -58,7 +60,8 @@ class BroadcastEvent
     /**
      * Get the payload for the given event.
      *
-     * @param  mixed  $event
+     * @param mixed $event
+     *
      * @return array
      */
     protected function getPayloadFromEvent($event)
@@ -81,7 +84,8 @@ class BroadcastEvent
     /**
      * Format the given value for a property.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return mixed
      */
     protected function formatProperty($value)

@@ -12,16 +12,17 @@ class PostgresConnector extends Connector implements ConnectorInterface
      * @var array
      */
     protected $options = [
-        PDO::ATTR_CASE => PDO::CASE_NATURAL,
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
+        PDO::ATTR_CASE              => PDO::CASE_NATURAL,
+        PDO::ATTR_ERRMODE           => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_ORACLE_NULLS      => PDO::NULL_NATURAL,
         PDO::ATTR_STRINGIFY_FETCHES => false,
     ];
 
     /**
      * Establish a database connection.
      *
-     * @param  array  $config
+     * @param array $config
+     *
      * @return \PDO
      */
     public function connect(array $config)
@@ -72,7 +73,8 @@ class PostgresConnector extends Connector implements ConnectorInterface
     /**
      * Create a DSN string from a configuration.
      *
-     * @param  array   $config
+     * @param array $config
+     *
      * @return string
      */
     protected function getDsn(array $config)
@@ -115,7 +117,8 @@ class PostgresConnector extends Connector implements ConnectorInterface
     /**
      * Format the schema for the DSN.
      *
-     * @param  array|string  $schema
+     * @param array|string $schema
+     *
      * @return string
      */
     protected function formatSchema($schema)

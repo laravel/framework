@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Foundation\Application;
+use Mockery as m;
 
 class FoundationHelpersTest extends PHPUnit_Framework_TestCase
 {
@@ -12,7 +12,7 @@ class FoundationHelpersTest extends PHPUnit_Framework_TestCase
 
     public function testCache()
     {
-        $app = new Application;
+        $app = new Application();
         $app['cache'] = $cache = m::mock('StdClass');
 
         // 1. cache()

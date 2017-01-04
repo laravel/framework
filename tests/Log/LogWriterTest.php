@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Log\Writer;
+use Mockery as m;
 
 class LogWriterTest extends PHPUnit_Framework_TestCase
 {
@@ -41,7 +41,7 @@ class LogWriterTest extends PHPUnit_Framework_TestCase
 
     public function testWriterFiresEventsDispatcher()
     {
-        $writer = new Writer($monolog = m::mock('Monolog\Logger'), $events = new Illuminate\Events\Dispatcher);
+        $writer = new Writer($monolog = m::mock('Monolog\Logger'), $events = new Illuminate\Events\Dispatcher());
         $monolog->shouldReceive('error')->once()->with('foo', []);
 
         $events->listen('illuminate.log', function ($level, $message, array $context = []) {

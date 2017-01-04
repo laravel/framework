@@ -79,8 +79,9 @@ class SlackAttachment
     /**
      * Set the title of the attachment.
      *
-     * @param  string  $title
-     * @param  string  $url
+     * @param string $title
+     * @param string $url
+     *
      * @return $this
      */
     public function title($title, $url = null)
@@ -94,7 +95,8 @@ class SlackAttachment
     /**
      * Set the content (text) of the attachment.
      *
-     * @param  string  $content
+     * @param string $content
+     *
      * @return $this
      */
     public function content($content)
@@ -107,7 +109,8 @@ class SlackAttachment
     /**
      * A plain-text summary of the attachment.
      *
-     * @param  string  $fallback
+     * @param string $fallback
+     *
      * @return $this
      */
     public function fallback($fallback)
@@ -120,7 +123,8 @@ class SlackAttachment
     /**
      * Set the color of the attachment.
      *
-     * @param  string  $color
+     * @param string $color
+     *
      * @return $this
      */
     public function color($color)
@@ -133,8 +137,9 @@ class SlackAttachment
     /**
      * Add a field to the attachment.
      *
-     * @param  \Closure|array $title
-     * @param  string $content
+     * @param \Closure|array $title
+     * @param string         $content
+     *
      * @return $this
      */
     public function field($title, $content = '')
@@ -142,7 +147,7 @@ class SlackAttachment
         if (is_callable($title)) {
             $callback = $title;
 
-            $callback($attachmentField = new SlackAttachmentField);
+            $callback($attachmentField = new SlackAttachmentField());
 
             $this->fields[] = $attachmentField;
 
@@ -157,7 +162,8 @@ class SlackAttachment
     /**
      * Set the fields of the attachment.
      *
-     * @param  array  $fields
+     * @param array $fields
+     *
      * @return $this
      */
     public function fields(array $fields)
@@ -170,7 +176,8 @@ class SlackAttachment
     /**
      * Set the fields containing markdown.
      *
-     * @param  array  $fields
+     * @param array $fields
+     *
      * @return $this
      */
     public function markdown(array $fields)
@@ -183,7 +190,8 @@ class SlackAttachment
     /**
      * Set the footer content.
      *
-     * @param  string  $footer
+     * @param string $footer
+     *
      * @return $this
      */
     public function footer($footer)
@@ -196,7 +204,8 @@ class SlackAttachment
     /**
      * Set the footer icon.
      *
-     * @param  string $icon
+     * @param string $icon
+     *
      * @return $this
      */
     public function footerIcon($icon)
@@ -209,7 +218,8 @@ class SlackAttachment
     /**
      * Set the timestamp.
      *
-     * @param  Carbon  $timestamp
+     * @param Carbon $timestamp
+     *
      * @return $this
      */
     public function timestamp(Carbon $timestamp)

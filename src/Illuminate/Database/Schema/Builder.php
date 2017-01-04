@@ -31,7 +31,8 @@ class Builder
     /**
      * Create a new database Schema manager.
      *
-     * @param  \Illuminate\Database\Connection  $connection
+     * @param \Illuminate\Database\Connection $connection
+     *
      * @return void
      */
     public function __construct(Connection $connection)
@@ -43,7 +44,8 @@ class Builder
     /**
      * Determine if the given table exists.
      *
-     * @param  string  $table
+     * @param string $table
+     *
      * @return bool
      */
     public function hasTable($table)
@@ -58,8 +60,9 @@ class Builder
     /**
      * Determine if the given table has a given column.
      *
-     * @param  string  $table
-     * @param  string  $column
+     * @param string $table
+     * @param string $column
+     *
      * @return bool
      */
     public function hasColumn($table, $column)
@@ -72,8 +75,9 @@ class Builder
     /**
      * Determine if the given table has given columns.
      *
-     * @param  string  $table
-     * @param  array   $columns
+     * @param string $table
+     * @param array  $columns
+     *
      * @return bool
      */
     public function hasColumns($table, array $columns)
@@ -81,7 +85,7 @@ class Builder
         $tableColumns = array_map('strtolower', $this->getColumnListing($table));
 
         foreach ($columns as $column) {
-            if (! in_array(strtolower($column), $tableColumns)) {
+            if (!in_array(strtolower($column), $tableColumns)) {
                 return false;
             }
         }
@@ -92,8 +96,9 @@ class Builder
     /**
      * Get the data type for the given column name.
      *
-     * @param  string  $table
-     * @param  string  $column
+     * @param string $table
+     * @param string $column
+     *
      * @return string
      */
     public function getColumnType($table, $column)
@@ -106,7 +111,8 @@ class Builder
     /**
      * Get the column listing for a given table.
      *
-     * @param  string  $table
+     * @param string $table
+     *
      * @return array
      */
     public function getColumnListing($table)
@@ -121,8 +127,9 @@ class Builder
     /**
      * Modify a table on the schema.
      *
-     * @param  string    $table
-     * @param  \Closure  $callback
+     * @param string   $table
+     * @param \Closure $callback
+     *
      * @return void
      */
     public function table($table, Closure $callback)
@@ -133,8 +140,9 @@ class Builder
     /**
      * Create a new table on the schema.
      *
-     * @param  string    $table
-     * @param  \Closure  $callback
+     * @param string   $table
+     * @param \Closure $callback
+     *
      * @return void
      */
     public function create($table, Closure $callback)
@@ -151,7 +159,8 @@ class Builder
     /**
      * Drop a table from the schema.
      *
-     * @param  string  $table
+     * @param string $table
+     *
      * @return void
      */
     public function drop($table)
@@ -166,7 +175,8 @@ class Builder
     /**
      * Drop a table from the schema if it exists.
      *
-     * @param  string  $table
+     * @param string $table
+     *
      * @return void
      */
     public function dropIfExists($table)
@@ -181,8 +191,9 @@ class Builder
     /**
      * Rename a table on the schema.
      *
-     * @param  string  $from
-     * @param  string  $to
+     * @param string $from
+     * @param string $to
+     *
      * @return void
      */
     public function rename($from, $to)
@@ -221,7 +232,8 @@ class Builder
     /**
      * Execute the blueprint to build / modify the table.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param \Illuminate\Database\Schema\Blueprint $blueprint
+     *
      * @return void
      */
     protected function build(Blueprint $blueprint)
@@ -232,8 +244,9 @@ class Builder
     /**
      * Create a new command set with a Closure.
      *
-     * @param  string  $table
-     * @param  \Closure|null  $callback
+     * @param string        $table
+     * @param \Closure|null $callback
+     *
      * @return \Illuminate\Database\Schema\Blueprint
      */
     protected function createBlueprint($table, Closure $callback = null)
@@ -258,7 +271,8 @@ class Builder
     /**
      * Set the database connection instance.
      *
-     * @param  \Illuminate\Database\Connection  $connection
+     * @param \Illuminate\Database\Connection $connection
+     *
      * @return $this
      */
     public function setConnection(Connection $connection)
@@ -271,7 +285,8 @@ class Builder
     /**
      * Set the Schema Blueprint resolver callback.
      *
-     * @param  \Closure  $resolver
+     * @param \Closure $resolver
+     *
      * @return void
      */
     public function blueprintResolver(Closure $resolver)

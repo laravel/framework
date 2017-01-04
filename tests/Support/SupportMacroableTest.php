@@ -42,7 +42,7 @@ class SupportMacroableTest extends PHPUnit_Framework_TestCase
         TestMacroable::macro('tryStatic', function () {
             return static::getProtectedStatic();
         });
-        $instance = new TestMacroable;
+        $instance = new TestMacroable();
 
         $result = $instance->tryInstance();
         $this->assertEquals('instance', $result);

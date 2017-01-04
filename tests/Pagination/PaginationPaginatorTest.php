@@ -1,9 +1,9 @@
 <?php
 
-use Mockery as m;
-use Illuminate\Pagination\UrlWindow;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator as Paginator;
+use Illuminate\Pagination\UrlWindow;
+use Mockery as m;
 
 class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
 {
@@ -108,7 +108,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['item3', 'item4'], $p->items());
 
         $this->assertEquals([
-            'per_page' => 2, 'current_page' => 2, 'next_page_url' => '/?page=3',
+            'per_page'      => 2, 'current_page' => 2, 'next_page_url' => '/?page=3',
             'prev_page_url' => '/?page=1', 'from' => 3, 'to' => 4, 'data' => ['item3', 'item4'],
         ], $p->toArray());
     }

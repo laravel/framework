@@ -16,7 +16,8 @@ class QueuedJob
     /**
      * Create a new job instance.
      *
-     * @param  \Illuminate\Contracts\Console\Kernel  $kernel
+     * @param \Illuminate\Contracts\Console\Kernel $kernel
+     *
      * @return void
      */
     public function __construct(KernelContract $kernel)
@@ -27,8 +28,9 @@ class QueuedJob
     /**
      * Fire the job.
      *
-     * @param  \Illuminate\Queue\Jobs\Job  $job
-     * @param  array  $data
+     * @param \Illuminate\Queue\Jobs\Job $job
+     * @param array                      $data
+     *
      * @return void
      */
     public function fire($job, $data)

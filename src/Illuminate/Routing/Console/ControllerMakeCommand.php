@@ -2,9 +2,9 @@
 
 namespace Illuminate\Routing\Console;
 
+use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
 
 class ControllerMakeCommand extends GeneratorCommand
@@ -49,7 +49,8 @@ class ControllerMakeCommand extends GeneratorCommand
     /**
      * Get the default namespace for the class.
      *
-     * @param  string  $rootNamespace
+     * @param string $rootNamespace
+     *
      * @return string
      */
     protected function getDefaultNamespace($rootNamespace)
@@ -62,7 +63,8 @@ class ControllerMakeCommand extends GeneratorCommand
      *
      * Remove the base controller import if we are already in base namespace.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return string
      */
     protected function buildClass($name)
@@ -76,8 +78,8 @@ class ControllerMakeCommand extends GeneratorCommand
 
             $replace = [
                 'DummyFullModelClass' => $modelClass,
-                'DummyModelClass' => class_basename($modelClass),
-                'DummyModelVariable' => lcfirst(class_basename($modelClass)),
+                'DummyModelClass'     => class_basename($modelClass),
+                'DummyModelVariable'  => lcfirst(class_basename($modelClass)),
             ];
         }
 
@@ -91,7 +93,8 @@ class ControllerMakeCommand extends GeneratorCommand
     /**
      * Get the fully-qualified model class name.
      *
-     * @param  string  $model
+     * @param string $model
+     *
      * @return string
      */
     protected function parseModel($model)
@@ -102,7 +105,7 @@ class ControllerMakeCommand extends GeneratorCommand
 
         $model = trim(str_replace('/', '\\', $model), '\\');
 
-        if (! Str::startsWith($model, $rootNamespace = $this->laravel->getNamespace())) {
+        if (!Str::startsWith($model, $rootNamespace = $this->laravel->getNamespace())) {
             $model = $rootNamespace.$model;
         }
 

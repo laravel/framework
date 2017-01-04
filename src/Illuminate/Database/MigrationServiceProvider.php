@@ -2,17 +2,17 @@
 
 namespace Illuminate\Database;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Database\Migrations\Migrator;
-use Illuminate\Database\Migrations\MigrationCreator;
-use Illuminate\Database\Console\Migrations\ResetCommand;
-use Illuminate\Database\Console\Migrations\StatusCommand;
 use Illuminate\Database\Console\Migrations\InstallCommand;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
-use Illuminate\Database\Console\Migrations\RefreshCommand;
-use Illuminate\Database\Console\Migrations\RollbackCommand;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
+use Illuminate\Database\Console\Migrations\RefreshCommand;
+use Illuminate\Database\Console\Migrations\ResetCommand;
+use Illuminate\Database\Console\Migrations\RollbackCommand;
+use Illuminate\Database\Console\Migrations\StatusCommand;
 use Illuminate\Database\Migrations\DatabaseMigrationRepository;
+use Illuminate\Database\Migrations\MigrationCreator;
+use Illuminate\Database\Migrations\Migrator;
+use Illuminate\Support\ServiceProvider;
 
 class MigrationServiceProvider extends ServiceProvider
 {
@@ -156,7 +156,7 @@ class MigrationServiceProvider extends ServiceProvider
     protected function registerRefreshCommand()
     {
         $this->app->singleton('command.migrate.refresh', function () {
-            return new RefreshCommand;
+            return new RefreshCommand();
         });
     }
 

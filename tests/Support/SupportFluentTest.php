@@ -55,7 +55,7 @@ class SupportFluentTest extends PHPUnit_Framework_TestCase
 
     public function testMagicMethodsCanBeUsedToSetAttributes()
     {
-        $fluent = new Fluent;
+        $fluent = new Fluent();
 
         $fluent->name = 'Taylor';
         $fluent->developer();

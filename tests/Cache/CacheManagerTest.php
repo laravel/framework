@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Cache\CacheManager;
+use Mockery as m;
 
 class CacheManagerTest extends PHPUnit_Framework_TestCase
 {

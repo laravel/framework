@@ -2,10 +2,10 @@
 
 namespace Illuminate\Queue\Console;
 
-use Illuminate\Queue\Listener;
 use Illuminate\Console\Command;
-use Symfony\Component\Console\Input\InputOption;
+use Illuminate\Queue\Listener;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
 class ListenCommand extends Command
 {
@@ -33,7 +33,8 @@ class ListenCommand extends Command
     /**
      * Create a new queue listen command.
      *
-     * @param  \Illuminate\Queue\Listener  $listener
+     * @param \Illuminate\Queue\Listener $listener
+     *
      * @return void
      */
     public function __construct(Listener $listener)
@@ -76,7 +77,8 @@ class ListenCommand extends Command
     /**
      * Get the name of the queue connection to listen on.
      *
-     * @param  string  $connection
+     * @param string $connection
+     *
      * @return string
      */
     protected function getQueue($connection)

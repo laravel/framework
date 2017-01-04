@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\NexmoMessage;
+use Illuminate\Notifications\Notification;
 
 class NotificationNexmoChannelTest extends PHPUnit_Framework_TestCase
 {
@@ -12,8 +12,8 @@ class NotificationNexmoChannelTest extends PHPUnit_Framework_TestCase
 
     public function testSmsIsSentViaNexmo()
     {
-        $notification = new NotificationNexmoChannelTestNotification;
-        $notifiable = new NotificationNexmoChannelTestNotifiable;
+        $notification = new NotificationNexmoChannelTestNotification();
+        $notifiable = new NotificationNexmoChannelTestNotifiable();
 
         $channel = new Illuminate\Notifications\Channels\NexmoSmsChannel(
             $nexmo = Mockery::mock(Nexmo\Client::class), '4444444444'
@@ -22,7 +22,7 @@ class NotificationNexmoChannelTest extends PHPUnit_Framework_TestCase
         $nexmo->shouldReceive('message->send')->with([
             'type' => 'text',
             'from' => '4444444444',
-            'to' => '5555555555',
+            'to'   => '5555555555',
             'text' => 'this is my message',
         ]);
 
@@ -31,8 +31,8 @@ class NotificationNexmoChannelTest extends PHPUnit_Framework_TestCase
 
     public function testSmsIsSentViaNexmoWithCustomFrom()
     {
-        $notification = new NotificationNexmoChannelTestCustomFromNotification;
-        $notifiable = new NotificationNexmoChannelTestNotifiable;
+        $notification = new NotificationNexmoChannelTestCustomFromNotification();
+        $notifiable = new NotificationNexmoChannelTestNotifiable();
 
         $channel = new Illuminate\Notifications\Channels\NexmoSmsChannel(
             $nexmo = Mockery::mock(Nexmo\Client::class), '4444444444'
@@ -41,7 +41,7 @@ class NotificationNexmoChannelTest extends PHPUnit_Framework_TestCase
         $nexmo->shouldReceive('message->send')->with([
             'type' => 'unicode',
             'from' => '5554443333',
-            'to' => '5555555555',
+            'to'   => '5555555555',
             'text' => 'this is my message',
         ]);
 

@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Illuminate\Support\Str;
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
 
 class ListenerMakeCommand extends GeneratorCommand
@@ -36,7 +36,7 @@ class ListenerMakeCommand extends GeneratorCommand
      */
     public function fire()
     {
-        if (! $this->option('event')) {
+        if (!$this->option('event')) {
             return $this->error('Missing required option: --event');
         }
 
@@ -46,7 +46,8 @@ class ListenerMakeCommand extends GeneratorCommand
     /**
      * Build the class with the given name.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return string
      */
     protected function buildClass($name)
@@ -55,7 +56,7 @@ class ListenerMakeCommand extends GeneratorCommand
 
         $event = $this->option('event');
 
-        if (! Str::startsWith($event, $this->laravel->getNamespace()) && ! Str::startsWith($event, 'Illuminate')) {
+        if (!Str::startsWith($event, $this->laravel->getNamespace()) && !Str::startsWith($event, 'Illuminate')) {
             $event = $this->laravel->getNamespace().'Events\\'.$event;
         }
 
@@ -87,7 +88,8 @@ class ListenerMakeCommand extends GeneratorCommand
     /**
      * Determine if the class already exists.
      *
-     * @param  string  $rawName
+     * @param string $rawName
+     *
      * @return bool
      */
     protected function alreadyExists($rawName)
@@ -98,7 +100,8 @@ class ListenerMakeCommand extends GeneratorCommand
     /**
      * Get the default namespace for the class.
      *
-     * @param  string  $rootNamespace
+     * @param string $rootNamespace
+     *
      * @return string
      */
     protected function getDefaultNamespace($rootNamespace)

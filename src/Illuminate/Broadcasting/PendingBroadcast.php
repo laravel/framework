@@ -23,8 +23,9 @@ class PendingBroadcast
     /**
      * Create a new pending broadcast instance.
      *
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
-     * @param  mixed  $event
+     * @param \Illuminate\Contracts\Events\Dispatcher $events
+     * @param mixed                                   $event
+     *
      * @return void
      */
     public function __construct(Dispatcher $events, $event)

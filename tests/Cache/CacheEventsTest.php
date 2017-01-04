@@ -1,10 +1,10 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Cache\Events\CacheHit;
-use Illuminate\Cache\Events\KeyWritten;
 use Illuminate\Cache\Events\CacheMissed;
 use Illuminate\Cache\Events\KeyForgotten;
+use Illuminate\Cache\Events\KeyWritten;
+use Mockery as m;
 
 class CacheEventTest extends PHPUnit_Framework_TestCase
 {
@@ -158,7 +158,7 @@ class CacheEventTest extends PHPUnit_Framework_TestCase
     protected function assertEventMatches($eventClass, $properties = [])
     {
         return m::on(function ($event) use ($eventClass, $properties) {
-            if (! $event instanceof $eventClass) {
+            if (!$event instanceof $eventClass) {
                 return false;
             }
 

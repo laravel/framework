@@ -2,10 +2,10 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
-use Mockery;
 use Exception;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Notifications\Dispatcher as NotificationDispatcher;
+use Illuminate\Database\Eloquent\Model;
+use Mockery;
 
 trait MocksApplicationServices
 {
@@ -42,10 +42,11 @@ trait MocksApplicationServices
      *
      * These events will be mocked, so that handlers will not actually be executed.
      *
-     * @param  array|string  $events
-     * @return $this
+     * @param array|string $events
      *
      * @throws \Exception
+     *
+     * @return $this
      */
     public function expectsEvents($events)
     {
@@ -71,7 +72,8 @@ trait MocksApplicationServices
      *
      * These events will be mocked, so that handlers will not actually be executed.
      *
-     * @param  array|string  $events
+     * @param array|string $events
+     *
      * @return $this
      */
     public function doesntExpectEvents($events)
@@ -114,11 +116,12 @@ trait MocksApplicationServices
      *
      * These events will be mocked, so that handlers will not actually be executed.
      *
-     * @param  string  $model
-     * @param  array|string  $events
-     * @return $this
+     * @param string       $model
+     * @param array|string $events
      *
      * @throws \Exception
+     *
+     * @return $this
      */
     public function expectsModelEvents($model, $events)
     {
@@ -144,11 +147,12 @@ trait MocksApplicationServices
      *
      * These events will be mocked, so that handlers will not actually be executed.
      *
-     * @param  string  $model
-     * @param  array|string  $events
-     * @return $this
+     * @param string       $model
+     * @param array|string $events
      *
      * @throws \Exception
+     *
+     * @return $this
      */
     public function doesntExpectModelEvents($model, $events)
     {
@@ -170,8 +174,9 @@ trait MocksApplicationServices
     /**
      * Convert a model and a list of events into the Eloquent's format.
      *
-     * @param  string  $model
-     * @param  array|string  $events
+     * @param string       $model
+     * @param array|string $events
+     *
      * @return string[]
      */
     private function formatModelEvents($model, $events)
@@ -214,7 +219,8 @@ trait MocksApplicationServices
     /**
      * Specify a list of observers that will not run for the given operation.
      *
-     * @param  array|string  $observers
+     * @param array|string $observers
+     *
      * @return $this
      */
     public function withoutObservers($observers)
@@ -233,7 +239,8 @@ trait MocksApplicationServices
     /**
      * Filter the given events against the fired events.
      *
-     * @param  array  $events
+     * @param array $events
+     *
      * @return array
      */
     protected function getFiredEvents(array $events)
@@ -244,7 +251,8 @@ trait MocksApplicationServices
     /**
      * Filter the given events against the fired events.
      *
-     * @param  array  $events
+     * @param array $events
+     *
      * @return array
      */
     protected function getFiredModelEvents(array $events)
@@ -257,7 +265,8 @@ trait MocksApplicationServices
      *
      * These jobs will be mocked, so that handlers will not actually be executed.
      *
-     * @param  array|string  $jobs
+     * @param array|string $jobs
+     *
      * @return $this
      */
     protected function expectsJobs($jobs)
@@ -284,7 +293,8 @@ trait MocksApplicationServices
      *
      * These jobs will be mocked, so that handlers will not actually be executed.
      *
-     * @param  array|string  $jobs
+     * @param array|string $jobs
+     *
      * @return $this
      */
     protected function doesntExpectJobs($jobs)
@@ -327,7 +337,8 @@ trait MocksApplicationServices
     /**
      * Filter the given jobs against the dispatched jobs.
      *
-     * @param  array  $jobs
+     * @param array $jobs
+     *
      * @return array
      */
     protected function getDispatchedJobs(array $jobs)
@@ -338,8 +349,9 @@ trait MocksApplicationServices
     /**
      * Filter the given classes against an array of dispatched classes.
      *
-     * @param  array  $classes
-     * @param  array  $dispatched
+     * @param array $classes
+     * @param array $dispatched
+     *
      * @return array
      */
     protected function getDispatched(array $classes, array $dispatched)
@@ -352,8 +364,9 @@ trait MocksApplicationServices
     /**
      * Check if the given class exists in an array of dispatched classes.
      *
-     * @param  string  $needle
-     * @param  array  $haystack
+     * @param string $needle
+     * @param array  $haystack
+     *
      * @return bool
      */
     protected function wasDispatched($needle, array $haystack)
@@ -391,8 +404,9 @@ trait MocksApplicationServices
     /**
      * Specify a notification that is expected to be dispatched.
      *
-     * @param  mixed  $notifiable
-     * @param  string  $notification
+     * @param mixed  $notifiable
+     * @param string $notification
+     *
      * @return $this
      */
     protected function expectsNotification($notifiable, $notification)

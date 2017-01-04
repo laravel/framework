@@ -20,7 +20,8 @@ class IsSelected extends FormFieldConstraint
     /**
      * Determine if the select or radio element is selected.
      *
-     * @param  \Symfony\Component\DomCrawler\Crawler|string  $crawler
+     * @param \Symfony\Component\DomCrawler\Crawler|string $crawler
+     *
      * @return bool
      */
     protected function matches($crawler)
@@ -33,10 +34,11 @@ class IsSelected extends FormFieldConstraint
     /**
      * Get the selected value of a select field or radio group.
      *
-     * @param  \Symfony\Component\DomCrawler\Crawler  $crawler
-     * @return array
+     * @param \Symfony\Component\DomCrawler\Crawler $crawler
      *
      * @throws \PHPUnit_Framework_ExpectationFailedException
+     *
+     * @return array
      */
     public function getSelectedValue(Crawler $crawler)
     {
@@ -50,7 +52,8 @@ class IsSelected extends FormFieldConstraint
     /**
      * Get the selected value from a select field.
      *
-     * @param  \Symfony\Component\DomCrawler\Crawler  $select
+     * @param \Symfony\Component\DomCrawler\Crawler $select
+     *
      * @return array
      */
     protected function getSelectedValueFromSelect(Crawler $select)
@@ -75,7 +78,8 @@ class IsSelected extends FormFieldConstraint
     /**
      * Get the selected value from an option element.
      *
-     * @param  \DOMElement  $option
+     * @param \DOMElement $option
+     *
      * @return string
      */
     protected function getOptionValue(DOMElement $option)
@@ -90,7 +94,8 @@ class IsSelected extends FormFieldConstraint
     /**
      * Get the checked value from a radio group.
      *
-     * @param  \Symfony\Component\DomCrawler\Crawler  $radioGroup
+     * @param \Symfony\Component\DomCrawler\Crawler $radioGroup
+     *
      * @return string|null
      */
     protected function getCheckedValueFromRadioGroup(Crawler $radioGroup)

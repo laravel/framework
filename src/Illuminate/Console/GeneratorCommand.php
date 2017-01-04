@@ -2,8 +2,8 @@
 
 namespace Illuminate\Console;
 
-use Illuminate\Support\Str;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
 
 abstract class GeneratorCommand extends Command
@@ -25,7 +25,8 @@ abstract class GeneratorCommand extends Command
     /**
      * Create a new controller creator command instance.
      *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
+     * @param \Illuminate\Filesystem\Filesystem $files
+     *
      * @return void
      */
     public function __construct(Filesystem $files)
@@ -69,7 +70,8 @@ abstract class GeneratorCommand extends Command
     /**
      * Determine if the class already exists.
      *
-     * @param  string  $rawName
+     * @param string $rawName
+     *
      * @return bool
      */
     protected function alreadyExists($rawName)
@@ -82,7 +84,8 @@ abstract class GeneratorCommand extends Command
     /**
      * Get the destination class path.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return string
      */
     protected function getPath($name)
@@ -95,7 +98,8 @@ abstract class GeneratorCommand extends Command
     /**
      * Parse the name and format according to the root namespace.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return string
      */
     protected function parseName($name)
@@ -116,7 +120,8 @@ abstract class GeneratorCommand extends Command
     /**
      * Get the default namespace for the class.
      *
-     * @param  string  $rootNamespace
+     * @param string $rootNamespace
+     *
      * @return string
      */
     protected function getDefaultNamespace($rootNamespace)
@@ -127,12 +132,13 @@ abstract class GeneratorCommand extends Command
     /**
      * Build the directory for the class if necessary.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string
      */
     protected function makeDirectory($path)
     {
-        if (! $this->files->isDirectory(dirname($path))) {
+        if (!$this->files->isDirectory(dirname($path))) {
             $this->files->makeDirectory(dirname($path), 0777, true, true);
         }
     }
@@ -140,7 +146,8 @@ abstract class GeneratorCommand extends Command
     /**
      * Build the class with the given name.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return string
      */
     protected function buildClass($name)
@@ -153,8 +160,9 @@ abstract class GeneratorCommand extends Command
     /**
      * Replace the namespace for the given stub.
      *
-     * @param  string  $stub
-     * @param  string  $name
+     * @param string $stub
+     * @param string $name
+     *
      * @return $this
      */
     protected function replaceNamespace(&$stub, $name)
@@ -173,7 +181,8 @@ abstract class GeneratorCommand extends Command
     /**
      * Get the full namespace name for a given class.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return string
      */
     protected function getNamespace($name)
@@ -184,8 +193,9 @@ abstract class GeneratorCommand extends Command
     /**
      * Replace the class name for the given stub.
      *
-     * @param  string  $stub
-     * @param  string  $name
+     * @param string $stub
+     * @param string $name
+     *
      * @return string
      */
     protected function replaceClass($stub, $name)

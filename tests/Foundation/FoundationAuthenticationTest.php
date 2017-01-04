@@ -1,12 +1,12 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Auth\AuthManager;
-use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Foundation\Application;
-use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithAuthentication;
+use Mockery as m;
 
 class FoundationAuthenticationTest extends PHPUnit_Framework_TestCase
 {
@@ -21,7 +21,7 @@ class FoundationAuthenticationTest extends PHPUnit_Framework_TestCase
      * @return array
      */
     protected $credentials = [
-        'email' => 'someone@laravel.com',
+        'email'    => 'someone@laravel.com',
         'password' => 'secret_password',
     ];
 
@@ -119,7 +119,7 @@ class FoundationAuthenticationTest extends PHPUnit_Framework_TestCase
     public function testDontSeeCredentials()
     {
         $credentials = [
-            'email' => 'invalid',
+            'email'    => 'invalid',
             'password' => 'credentials',
         ];
 

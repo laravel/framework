@@ -18,7 +18,7 @@ trait SoftDeletes
      */
     public static function bootSoftDeletes()
     {
-        static::addGlobalScope(new SoftDeletingScope);
+        static::addGlobalScope(new SoftDeletingScope());
     }
 
     /**
@@ -100,13 +100,14 @@ trait SoftDeletes
      */
     public function trashed()
     {
-        return ! is_null($this->{$this->getDeletedAtColumn()});
+        return !is_null($this->{$this->getDeletedAtColumn()});
     }
 
     /**
      * Register a restoring model event with the dispatcher.
      *
-     * @param  \Closure|string  $callback
+     * @param \Closure|string $callback
+     *
      * @return void
      */
     public static function restoring($callback)
@@ -117,7 +118,8 @@ trait SoftDeletes
     /**
      * Register a restored model event with the dispatcher.
      *
-     * @param  \Closure|string  $callback
+     * @param \Closure|string $callback
+     *
      * @return void
      */
     public static function restored($callback)

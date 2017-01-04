@@ -23,8 +23,9 @@ class HasElement extends PageConstraint
     /**
      * Create a new constraint instance.
      *
-     * @param  string  $selector
-     * @param  array  $attributes
+     * @param string $selector
+     * @param array  $attributes
+     *
      * @return void
      */
     public function __construct($selector, array $attributes = [])
@@ -36,7 +37,8 @@ class HasElement extends PageConstraint
     /**
      * Check if the element is found in the given crawler.
      *
-     * @param  \Symfony\Component\DomCrawler\Crawler|string  $crawler
+     * @param \Symfony\Component\DomCrawler\Crawler|string $crawler
+     *
      * @return bool
      */
     public function matches($crawler)
@@ -61,7 +63,8 @@ class HasElement extends PageConstraint
     /**
      * Determines if the given element has the attributes.
      *
-     * @param  \Symfony\Component\DomCrawler\Crawler  $element
+     * @param \Symfony\Component\DomCrawler\Crawler $element
+     *
      * @return bool
      */
     protected function hasAttributes(Crawler $element)
@@ -90,7 +93,7 @@ class HasElement extends PageConstraint
     {
         $message = "the element [{$this->selector}]";
 
-        if (! empty($this->attributes)) {
+        if (!empty($this->attributes)) {
             $message .= ' with the attributes '.json_encode($this->attributes);
         }
 

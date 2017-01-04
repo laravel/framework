@@ -18,7 +18,7 @@ class DatabaseProcessorTest extends PHPUnit_Framework_TestCase
         $connection->shouldReceive('getPdo')->once()->andReturn($pdo);
         $builder = m::mock('Illuminate\Database\Query\Builder');
         $builder->shouldReceive('getConnection')->andReturn($connection);
-        $processor = new Illuminate\Database\Query\Processors\Processor;
+        $processor = new Illuminate\Database\Query\Processors\Processor();
         $result = $processor->processInsertGetId($builder, 'sql', ['foo'], 'id');
         $this->assertSame(1, $result);
     }
