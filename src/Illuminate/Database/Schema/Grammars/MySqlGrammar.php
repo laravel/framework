@@ -203,7 +203,7 @@ class MySqlGrammar extends Grammar
      */
     protected function compileKey(Blueprint $blueprint, Fluent $command, $type)
     {
-        return sprintf("alter table %s add %s %s%s(%s)",
+        return sprintf('alter table %s add %s %s%s(%s)',
             $this->wrapTable($blueprint),
             $type,
             $this->wrap($command->index),
