@@ -30,11 +30,11 @@ use Illuminate\Foundation\Console\ConfigClearCommand;
 use Illuminate\Foundation\Console\ConsoleMakeCommand;
 use Illuminate\Foundation\Console\EnvironmentCommand;
 use Illuminate\Foundation\Console\KeyGenerateCommand;
+use Illuminate\Foundation\Console\ObserveMakeCommand;
 use Illuminate\Foundation\Console\RequestMakeCommand;
 use Illuminate\Foundation\Console\StorageLinkCommand;
 use Illuminate\Routing\Console\ControllerMakeCommand;
 use Illuminate\Routing\Console\MiddlewareMakeCommand;
-use Illuminate\Foundation\Console\ObserveMakeCommand;
 use Illuminate\Foundation\Console\ListenerMakeCommand;
 use Illuminate\Foundation\Console\ProviderMakeCommand;
 use Illuminate\Foundation\Console\ClearCompiledCommand;
@@ -605,8 +605,8 @@ class ArtisanServiceProvider extends ServiceProvider
             return new NotificationTableCommand($app['files'], $app['composer']);
         });
     }
-    
-     /**
+
+    /**
      * Register the command.
      *
      * @return void
