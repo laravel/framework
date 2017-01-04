@@ -43,10 +43,10 @@ class HttpJsonResponseTest extends TestCase
 
     public function testGetOriginalContent()
     {
-        $response = new Illuminate\Http\JsonResponse(new JsonResponseTestArrayableObject);
+        $response = new \Illuminate\Http\JsonResponse(new JsonResponseTestArrayableObject);
         $this->assertInstanceOf(JsonResponseTestArrayableObject::class, $response->getOriginalContent());
 
-        $response = new Illuminate\Http\JsonResponse;
+        $response = new \Illuminate\Http\JsonResponse;
         $response->setData(new JsonResponseTestArrayableObject);
         $this->assertInstanceOf(JsonResponseTestArrayableObject::class, $response->getOriginalContent());
     }
