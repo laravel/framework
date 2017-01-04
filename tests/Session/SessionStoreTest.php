@@ -1,7 +1,10 @@
 <?php
 
+namespace Illuminate\Tests\Session;
+
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 class SessionStoreTest extends TestCase
 {
@@ -284,10 +287,10 @@ class SessionStoreTest extends TestCase
         $this->assertFalse($session->handlerNeedsRequest());
         $session->getHandler()->shouldReceive('setRequest')->never();
 
-        $session = new Illuminate\Session\Store('test', m::mock(new Illuminate\Session\CookieSessionHandler(new Illuminate\Cookie\CookieJar(), 60)));
+        $session = new \Illuminate\Session\Store('test', m::mock(new \Illuminate\Session\CookieSessionHandler(new \Illuminate\Cookie\CookieJar(), 60)));
         $this->assertTrue($session->handlerNeedsRequest());
         $session->getHandler()->shouldReceive('setRequest')->once();
-        $request = new Symfony\Component\HttpFoundation\Request();
+        $request = new \Symfony\Component\HttpFoundation\Request();
         $session->setRequestOnHandler($request);
     }
 
