@@ -25,11 +25,10 @@ class SqsJob extends Job implements JobContract
     /**
      * Create a new job instance.
      *
-     * @param \Illuminate\Container\Container $container
-     * @param \Aws\Sqs\SqsClient              $sqs
-     * @param string                          $queue
-     * @param array                           $job
-     *
+     * @param  \Illuminate\Container\Container  $container
+     * @param  \Aws\Sqs\SqsClient  $sqs
+     * @param  string  $queue
+     * @param  array   $job
      * @return void
      */
     public function __construct(Container $container,
@@ -70,8 +69,7 @@ class SqsJob extends Job implements JobContract
     /**
      * Release the job back into the queue.
      *
-     * @param int $delay
-     *
+     * @param  int   $delay
      * @return void
      */
     public function release($delay = 0)
@@ -79,8 +77,8 @@ class SqsJob extends Job implements JobContract
         parent::release($delay);
 
         $this->sqs->changeMessageVisibility([
-            'QueueUrl'          => $this->queue,
-            'ReceiptHandle'     => $this->job['ReceiptHandle'],
+            'QueueUrl' => $this->queue,
+            'ReceiptHandle' => $this->job['ReceiptHandle'],
             'VisibilityTimeout' => $delay,
         ]);
     }

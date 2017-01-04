@@ -14,8 +14,7 @@ class ControllerMiddlewareOptions
     /**
      * Create a new middleware option instance.
      *
-     * @param array $options
-     *
+     * @param  array  $options
      * @return void
      */
     public function __construct(array &$options)
@@ -26,8 +25,7 @@ class ControllerMiddlewareOptions
     /**
      * Set the controller methods the middleware should apply to.
      *
-     * @param array|string|dynamic $methods
-     *
+     * @param  array|string|dynamic  $methods
      * @return $this
      */
     public function only($methods)
@@ -40,8 +38,7 @@ class ControllerMiddlewareOptions
     /**
      * Set the controller methods the middleware should exclude.
      *
-     * @param array|string|dynamic $methods
-     *
+     * @param  array|string|dynamic  $methods
      * @return $this
      */
     public function except($methods)

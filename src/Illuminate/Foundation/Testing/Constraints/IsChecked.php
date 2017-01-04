@@ -7,8 +7,7 @@ class IsChecked extends FormFieldConstraint
     /**
      * Create a new constraint instance.
      *
-     * @param string $selector
-     *
+     * @param  string  $selector
      * @return void
      */
     public function __construct($selector)
@@ -29,15 +28,14 @@ class IsChecked extends FormFieldConstraint
     /**
      * Determine if the checkbox is checked.
      *
-     * @param \Symfony\Component\DomCrawler\Crawler|string $crawler
-     *
+     * @param  \Symfony\Component\DomCrawler\Crawler|string  $crawler
      * @return bool
      */
     public function matches($crawler)
     {
         $crawler = $this->crawler($crawler);
 
-        return !is_null($this->field($crawler)->attr('checked'));
+        return ! is_null($this->field($crawler)->attr('checked'));
     }
 
     /**

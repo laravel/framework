@@ -28,8 +28,7 @@ class SlackAttachmentField
     /**
      * Set the title of the field.
      *
-     * @param string $title
-     *
+     * @param  string $title
      * @return $this
      */
     public function title($title)
@@ -42,8 +41,7 @@ class SlackAttachmentField
     /**
      * Set the content of the field.
      *
-     * @param string $content
-     *
+     * @param  string $content
      * @return $this
      */
     public function content($content)

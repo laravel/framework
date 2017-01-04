@@ -2,8 +2,8 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
-use Illuminate\Contracts\Events\Dispatcher;
 use PHPUnit_Framework_Assert as PHPUnit;
+use Illuminate\Contracts\Events\Dispatcher;
 
 class EventFake implements Dispatcher
 {
@@ -17,9 +17,8 @@ class EventFake implements Dispatcher
     /**
      * Assert if an event was fired based on a truth-test callback.
      *
-     * @param string        $event
-     * @param callable|null $callback
-     *
+     * @param  string  $event
+     * @param  callable|null  $callback
      * @return void
      */
     public function assertFired($event, $callback = null)
@@ -33,9 +32,8 @@ class EventFake implements Dispatcher
     /**
      * Determine if an event was fired based on a truth-test callback.
      *
-     * @param string        $event
-     * @param callable|null $callback
-     *
+     * @param  string  $event
+     * @param  callable|null  $callback
      * @return void
      */
     public function assertNotFired($event, $callback = null)
@@ -49,14 +47,13 @@ class EventFake implements Dispatcher
     /**
      * Get all of the events matching a truth-test callback.
      *
-     * @param string        $event
-     * @param callable|null $callback
-     *
+     * @param  string  $event
+     * @param  callable|null  $callback
      * @return \Illuminate\Support\Collection
      */
     public function fired($event, $callback = null)
     {
-        if (!$this->hasFired($event)) {
+        if (! $this->hasFired($event)) {
             return collect();
         }
 
@@ -74,20 +71,18 @@ class EventFake implements Dispatcher
     /**
      * Determine if the given event has been fired.
      *
-     * @param string $event
-     *
+     * @param  string  $event
      * @return bool
      */
     public function hasFired($event)
     {
-        return isset($this->events[$event]) && !empty($this->events[$event]);
+        return isset($this->events[$event]) && ! empty($this->events[$event]);
     }
 
     /**
      * Map the "fire" method arguments for inspection.
      *
-     * @param array $arguments
-     *
+     * @param  array  $arguments
      * @return array
      */
     protected function mapEventArguments($arguments)
@@ -102,10 +97,9 @@ class EventFake implements Dispatcher
     /**
      * Register an event listener with the dispatcher.
      *
-     * @param string|array $events
-     * @param mixed        $listener
-     * @param int          $priority
-     *
+     * @param  string|array  $events
+     * @param  mixed  $listener
+     * @param  int  $priority
      * @return void
      */
     public function listen($events, $listener, $priority = 0)
@@ -116,8 +110,7 @@ class EventFake implements Dispatcher
     /**
      * Determine if a given event has listeners.
      *
-     * @param string $eventName
-     *
+     * @param  string  $eventName
      * @return bool
      */
     public function hasListeners($eventName)
@@ -128,9 +121,8 @@ class EventFake implements Dispatcher
     /**
      * Register an event and payload to be fired later.
      *
-     * @param string $event
-     * @param array  $payload
-     *
+     * @param  string  $event
+     * @param  array  $payload
      * @return void
      */
     public function push($event, $payload = [])
@@ -141,8 +133,7 @@ class EventFake implements Dispatcher
     /**
      * Register an event subscriber with the dispatcher.
      *
-     * @param object|string $subscriber
-     *
+     * @param  object|string  $subscriber
      * @return void
      */
     public function subscribe($subscriber)
@@ -153,9 +144,8 @@ class EventFake implements Dispatcher
     /**
      * Fire an event until the first non-null response is returned.
      *
-     * @param string $event
-     * @param array  $payload
-     *
+     * @param  string  $event
+     * @param  array  $payload
      * @return mixed
      */
     public function until($event, $payload = [])
@@ -166,8 +156,7 @@ class EventFake implements Dispatcher
     /**
      * Flush a set of pushed events.
      *
-     * @param string $event
-     *
+     * @param  string  $event
      * @return void
      */
     public function flush($event)
@@ -178,10 +167,9 @@ class EventFake implements Dispatcher
     /**
      * Fire an event and call the listeners.
      *
-     * @param string|object $event
-     * @param mixed         $payload
-     * @param bool          $halt
-     *
+     * @param  string|object  $event
+     * @param  mixed  $payload
+     * @param  bool  $halt
      * @return array|null
      */
     public function fire($event, $payload = [], $halt = false)
@@ -204,8 +192,7 @@ class EventFake implements Dispatcher
     /**
      * Remove a set of listeners from the dispatcher.
      *
-     * @param string $event
-     *
+     * @param  string  $event
      * @return void
      */
     public function forget($event)

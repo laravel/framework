@@ -17,8 +17,7 @@ class SesTransport extends Transport
     /**
      * Create a new SES transport instance.
      *
-     * @param \Aws\Ses\SesClient $ses
-     *
+     * @param  \Aws\Ses\SesClient  $ses
      * @return void
      */
     public function __construct(SesClient $ses)
@@ -36,7 +35,7 @@ class SesTransport extends Transport
         $headers = $message->getHeaders();
 
         $headers->addTextHeader('X-SES-Message-ID', $this->ses->sendRawEmail([
-            'Source'     => key($message->getSender() ?: $message->getFrom()),
+            'Source' => key($message->getSender() ?: $message->getFrom()),
             'RawMessage' => [
                 'Data' => $message->toString(),
             ],

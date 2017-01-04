@@ -2,15 +2,15 @@
 
 namespace Illuminate\Pagination;
 
-use ArrayAccess;
 use Countable;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator as LengthAwarePaginatorContract;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Support\Jsonable;
+use ArrayAccess;
+use JsonSerializable;
+use IteratorAggregate;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
-use IteratorAggregate;
-use JsonSerializable;
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator as LengthAwarePaginatorContract;
 
 class LengthAwarePaginator extends AbstractPaginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate, JsonSerializable, Jsonable, LengthAwarePaginatorContract
 {
@@ -31,12 +31,11 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
     /**
      * Create a new paginator instance.
      *
-     * @param mixed    $items
-     * @param int      $total
-     * @param int      $perPage
-     * @param int|null $currentPage
-     * @param array    $options     (path, query, fragment, pageName)
-     *
+     * @param  mixed  $items
+     * @param  int  $total
+     * @param  int  $perPage
+     * @param  int|null  $currentPage
+     * @param  array  $options (path, query, fragment, pageName)
      * @return void
      */
     public function __construct($items, $total, $perPage, $currentPage = null, array $options = [])
@@ -56,9 +55,8 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
     /**
      * Get the current page for the request.
      *
-     * @param int    $currentPage
-     * @param string $pageName
-     *
+     * @param  int  $currentPage
+     * @param  string  $pageName
      * @return int
      */
     protected function setCurrentPage($currentPage, $pageName)
@@ -113,8 +111,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
     /**
      * Render the paginator using the given view.
      *
-     * @param string $view
-     *
+     * @param  string  $view
      * @return string
      */
     public function links($view = null)
@@ -125,8 +122,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
     /**
      * Render the paginator using the given view.
      *
-     * @param string $view
-     *
+     * @param  string  $view
      * @return string
      */
     public function render($view = null)
@@ -143,7 +139,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
 
         return new HtmlString(static::viewFactory()->make($view ?: static::$defaultView, [
             'paginator' => $this,
-            'elements'  => array_filter($elements),
+            'elements' => array_filter($elements),
         ])->render());
     }
 
@@ -155,15 +151,15 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
     public function toArray()
     {
         return [
-            'total'         => $this->total(),
-            'per_page'      => $this->perPage(),
-            'current_page'  => $this->currentPage(),
-            'last_page'     => $this->lastPage(),
+            'total' => $this->total(),
+            'per_page' => $this->perPage(),
+            'current_page' => $this->currentPage(),
+            'last_page' => $this->lastPage(),
             'next_page_url' => $this->nextPageUrl(),
             'prev_page_url' => $this->previousPageUrl(),
-            'from'          => $this->firstItem(),
-            'to'            => $this->lastItem(),
-            'data'          => $this->items->toArray(),
+            'from' => $this->firstItem(),
+            'to' => $this->lastItem(),
+            'data' => $this->items->toArray(),
         ];
     }
 
@@ -180,8 +176,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
     /**
      * Convert the object to its JSON representation.
      *
-     * @param int $options
-     *
+     * @param  int  $options
      * @return string
      */
     public function toJson($options = 0)

@@ -1,18 +1,18 @@
 <?php
 
-use Illuminate\Auth\Middleware\Authenticate;
-use Illuminate\Auth\Middleware\Authorize;
-use Illuminate\Container\Container;
-use Illuminate\Contracts\Routing\Registrar;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Events\Dispatcher;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
-use Illuminate\Routing\Middleware\SubstituteBindings;
-use Illuminate\Routing\ResourceRegistrar;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Routing\Controller;
+use Illuminate\Container\Container;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Auth\Middleware\Authorize;
+use Illuminate\Routing\ResourceRegistrar;
+use Illuminate\Contracts\Routing\Registrar;
+use Illuminate\Auth\Middleware\Authenticate;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Routing\Middleware\SubstituteBindings;
 
 class RoutingRouteTest extends PHPUnit_Framework_TestCase
 {
@@ -173,7 +173,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
     {
         $router = $this->getRouter();
         $router->get('foo/bar', [
-            'uses'       => 'RouteTestClosureMiddlewareController@index',
+            'uses' => 'RouteTestClosureMiddlewareController@index',
             'middleware' => 'foo',
         ]);
         $router->middleware('foo', function ($request, $next) {
@@ -678,8 +678,8 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
 
     public function testModelBindingThroughIOC()
     {
-        $container = new Container();
-        $router = new Router(new Dispatcher(), $container);
+        $container = new Container;
+        $router = new Router(new Dispatcher, $container);
         $container->singleton(Registrar::class, function () use ($router) {
             return $router;
         });
@@ -924,7 +924,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
 
         ResourceRegistrar::verbs([
             'create' => 'ajouter',
-            'edit'   => 'modifier',
+            'edit' => 'modifier',
         ]);
         $router = $this->getRouter();
         $router->resource('foo', 'FooController');
@@ -1014,7 +1014,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $router = $this->getRouter();
         $router->resource('foo', 'FooController', ['names' => [
             'index' => 'foo',
-            'show'  => 'bar',
+            'show' => 'bar',
         ]]);
 
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo'));
@@ -1034,8 +1034,8 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
 
     public function testRouterFiresRoutedEvent()
     {
-        $container = new Container();
-        $router = new Router(new Dispatcher(), $container);
+        $container = new Container;
+        $router = new Router(new Dispatcher, $container);
         $container->singleton(Registrar::class, function () use ($router) {
             return $router;
         });
@@ -1124,7 +1124,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $router = $this->getRouter();
         $router->get('foo/{bar}', [
             'middleware' => SubstituteBindings::class,
-            'uses'       => function (RoutingTestUserModel $bar) use ($phpunit) {
+            'uses' => function (RoutingTestUserModel $bar) use ($phpunit) {
                 $phpunit->assertInstanceOf(RoutingTestUserModel::class, $bar);
 
                 return $bar->value;
@@ -1139,7 +1139,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $router = $this->getRouter();
         $router->get('foo/{bar?}', [
             'middleware' => SubstituteBindings::class,
-            'uses'       => function (RoutingTestUserModel $bar = null) use ($phpunit) {
+            'uses' => function (RoutingTestUserModel $bar = null) use ($phpunit) {
                 $phpunit->assertInstanceOf(RoutingTestUserModel::class, $bar);
 
                 return $bar->value;
@@ -1158,8 +1158,8 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
     public function testImplicitBindingThroughIOC()
     {
         $phpunit = $this;
-        $container = new Container();
-        $router = new Router(new Dispatcher(), $container);
+        $container = new Container;
+        $router = new Router(new Dispatcher, $container);
         $container->singleton(Registrar::class, function () use ($router) {
             return $router;
         });
@@ -1167,7 +1167,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $container->bind('RoutingTestUserModel', 'RoutingTestExtendedUserModel');
         $router->get('foo/{bar}', [
             'middleware' => SubstituteBindings::class,
-            'uses'       => function (RoutingTestUserModel $bar) use ($phpunit) {
+            'uses' => function (RoutingTestUserModel $bar) use ($phpunit) {
                 $phpunit->assertInstanceOf(RoutingTestExtendedUserModel::class, $bar);
             },
         ]);
@@ -1190,9 +1190,9 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
 
     protected function getRouter()
     {
-        $container = new Container();
+        $container = new Container;
 
-        $router = new Router(new Dispatcher(), $container);
+        $router = new Router(new Dispatcher, $container);
 
         $container->singleton(Registrar::class, function () use ($router) {
             return $router;

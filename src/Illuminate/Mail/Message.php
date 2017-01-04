@@ -2,8 +2,8 @@
 
 namespace Illuminate\Mail;
 
-use Swift_Attachment;
 use Swift_Image;
+use Swift_Attachment;
 
 class Message
 {
@@ -17,8 +17,7 @@ class Message
     /**
      * Create a new message instance.
      *
-     * @param \Swift_Message $swift
-     *
+     * @param  \Swift_Message  $swift
      * @return void
      */
     public function __construct($swift)
@@ -29,9 +28,8 @@ class Message
     /**
      * Add a "from" address to the message.
      *
-     * @param string|array $address
-     * @param string|null  $name
-     *
+     * @param  string|array  $address
+     * @param  string|null  $name
      * @return $this
      */
     public function from($address, $name = null)
@@ -44,9 +42,8 @@ class Message
     /**
      * Set the "sender" of the message.
      *
-     * @param string|array $address
-     * @param string|null  $name
-     *
+     * @param  string|array  $address
+     * @param  string|null  $name
      * @return $this
      */
     public function sender($address, $name = null)
@@ -59,8 +56,7 @@ class Message
     /**
      * Set the "return path" of the message.
      *
-     * @param string $address
-     *
+     * @param  string  $address
      * @return $this
      */
     public function returnPath($address)
@@ -73,10 +69,9 @@ class Message
     /**
      * Add a recipient to the message.
      *
-     * @param string|array $address
-     * @param string|null  $name
-     * @param bool         $override
-     *
+     * @param  string|array  $address
+     * @param  string|null  $name
+     * @param  bool  $override
      * @return $this
      */
     public function to($address, $name = null, $override = false)
@@ -93,10 +88,9 @@ class Message
     /**
      * Add a carbon copy to the message.
      *
-     * @param string|array $address
-     * @param string|null  $name
-     * @param bool         $override
-     *
+     * @param  string|array  $address
+     * @param  string|null  $name
+     * @param  bool  $override
      * @return $this
      */
     public function cc($address, $name = null, $override = false)
@@ -113,10 +107,9 @@ class Message
     /**
      * Add a blind carbon copy to the message.
      *
-     * @param string|array $address
-     * @param string|null  $name
-     * @param bool         $override
-     *
+     * @param  string|array  $address
+     * @param  string|null  $name
+     * @param  bool  $override
      * @return $this
      */
     public function bcc($address, $name = null, $override = false)
@@ -133,9 +126,8 @@ class Message
     /**
      * Add a reply to address to the message.
      *
-     * @param string|array $address
-     * @param string|null  $name
-     *
+     * @param  string|array  $address
+     * @param  string|null  $name
      * @return $this
      */
     public function replyTo($address, $name = null)
@@ -146,10 +138,9 @@ class Message
     /**
      * Add a recipient to the message.
      *
-     * @param string|array $address
-     * @param string       $name
-     * @param string       $type
-     *
+     * @param  string|array  $address
+     * @param  string  $name
+     * @param  string  $type
      * @return $this
      */
     protected function addAddresses($address, $name, $type)
@@ -166,8 +157,7 @@ class Message
     /**
      * Set the subject of the message.
      *
-     * @param string $subject
-     *
+     * @param  string  $subject
      * @return $this
      */
     public function subject($subject)
@@ -180,8 +170,7 @@ class Message
     /**
      * Set the message priority level.
      *
-     * @param int $level
-     *
+     * @param  int  $level
      * @return $this
      */
     public function priority($level)
@@ -194,9 +183,8 @@ class Message
     /**
      * Attach a file to the message.
      *
-     * @param string $file
-     * @param array  $options
-     *
+     * @param  string  $file
+     * @param  array  $options
      * @return $this
      */
     public function attach($file, array $options = [])
@@ -209,8 +197,7 @@ class Message
     /**
      * Create a Swift Attachment instance.
      *
-     * @param string $file
-     *
+     * @param  string  $file
      * @return \Swift_Attachment
      */
     protected function createAttachmentFromPath($file)
@@ -221,10 +208,9 @@ class Message
     /**
      * Attach in-memory data as an attachment.
      *
-     * @param string $data
-     * @param string $name
-     * @param array  $options
-     *
+     * @param  string  $data
+     * @param  string  $name
+     * @param  array  $options
      * @return $this
      */
     public function attachData($data, $name, array $options = [])
@@ -237,9 +223,8 @@ class Message
     /**
      * Create a Swift Attachment instance from data.
      *
-     * @param string $data
-     * @param string $name
-     *
+     * @param  string  $data
+     * @param  string  $name
      * @return \Swift_Attachment
      */
     protected function createAttachmentFromData($data, $name)
@@ -250,8 +235,7 @@ class Message
     /**
      * Embed a file in the message and get the CID.
      *
-     * @param string $file
-     *
+     * @param  string  $file
      * @return string
      */
     public function embed($file)
@@ -262,10 +246,9 @@ class Message
     /**
      * Embed in-memory data in the message and get the CID.
      *
-     * @param string      $data
-     * @param string      $name
-     * @param string|null $contentType
-     *
+     * @param  string  $data
+     * @param  string  $name
+     * @param  string|null  $contentType
      * @return string
      */
     public function embedData($data, $name, $contentType = null)
@@ -278,9 +261,8 @@ class Message
     /**
      * Prepare and attach the given attachment.
      *
-     * @param \Swift_Attachment $attachment
-     * @param array             $options
-     *
+     * @param  \Swift_Attachment  $attachment
+     * @param  array  $options
      * @return $this
      */
     protected function prepAttachment($attachment, $options = [])
@@ -317,9 +299,8 @@ class Message
     /**
      * Dynamically pass missing methods to the Swift instance.
      *
-     * @param string $method
-     * @param array  $parameters
-     *
+     * @param  string  $method
+     * @param  array  $parameters
      * @return mixed
      */
     public function __call($method, $parameters)

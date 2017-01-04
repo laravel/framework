@@ -14,8 +14,7 @@ interface ViewFinderInterface
     /**
      * Get the fully qualified location of the view.
      *
-     * @param string $view
-     *
+     * @param  string  $view
      * @return string
      */
     public function find($view);
@@ -23,8 +22,7 @@ interface ViewFinderInterface
     /**
      * Add a location to the finder.
      *
-     * @param string $location
-     *
+     * @param  string  $location
      * @return void
      */
     public function addLocation($location);
@@ -32,9 +30,8 @@ interface ViewFinderInterface
     /**
      * Add a namespace hint to the finder.
      *
-     * @param string       $namespace
-     * @param string|array $hints
-     *
+     * @param  string  $namespace
+     * @param  string|array  $hints
      * @return void
      */
     public function addNamespace($namespace, $hints);
@@ -42,9 +39,8 @@ interface ViewFinderInterface
     /**
      * Prepend a namespace hint to the finder.
      *
-     * @param string       $namespace
-     * @param string|array $hints
-     *
+     * @param  string  $namespace
+     * @param  string|array  $hints
      * @return void
      */
     public function prependNamespace($namespace, $hints);
@@ -52,8 +48,7 @@ interface ViewFinderInterface
     /**
      * Add a valid view extension to the finder.
      *
-     * @param string $extension
-     *
+     * @param  string  $extension
      * @return void
      */
     public function addExtension($extension);

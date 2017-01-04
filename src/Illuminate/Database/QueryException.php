@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database;
 
-use Illuminate\Support\Str;
 use PDOException;
+use Illuminate\Support\Str;
 
 class QueryException extends PDOException
 {
@@ -24,10 +24,9 @@ class QueryException extends PDOException
     /**
      * Create a new query exception instance.
      *
-     * @param string     $sql
-     * @param array      $bindings
-     * @param \Exception $previous
-     *
+     * @param  string  $sql
+     * @param  array  $bindings
+     * @param  \Exception $previous
      * @return void
      */
     public function __construct($sql, array $bindings, $previous)
@@ -48,10 +47,9 @@ class QueryException extends PDOException
     /**
      * Format the SQL error message.
      *
-     * @param string     $sql
-     * @param array      $bindings
-     * @param \Exception $previous
-     *
+     * @param  string  $sql
+     * @param  array  $bindings
+     * @param  \Exception $previous
      * @return string
      */
     protected function formatMessage($sql, $bindings, $previous)

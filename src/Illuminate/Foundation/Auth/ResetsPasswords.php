@@ -2,10 +2,10 @@
 
 namespace Illuminate\Foundation\Auth;
 
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Str;
 
 trait ResetsPasswords
 {
@@ -16,9 +16,8 @@ trait ResetsPasswords
      *
      * If no token is present, display the link request form.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param string|null              $token
-     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string|null  $token
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function showResetForm(Request $request, $token = null)
@@ -31,8 +30,7 @@ trait ResetsPasswords
     /**
      * Reset the given user's password.
      *
-     * @param \Illuminate\Http\Request $request
-     *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function reset(Request $request)
@@ -64,8 +62,8 @@ trait ResetsPasswords
     protected function rules()
     {
         return [
-            'token'    => 'required',
-            'email'    => 'required|email',
+            'token' => 'required',
+            'email' => 'required|email',
             'password' => 'required|confirmed|min:6',
         ];
     }
@@ -83,8 +81,7 @@ trait ResetsPasswords
     /**
      * Get the password reset credentials from the request.
      *
-     * @param \Illuminate\Http\Request $request
-     *
+     * @param  \Illuminate\Http\Request  $request
      * @return array
      */
     protected function credentials(Request $request)
@@ -97,15 +94,14 @@ trait ResetsPasswords
     /**
      * Reset the given user's password.
      *
-     * @param \Illuminate\Contracts\Auth\CanResetPassword $user
-     * @param string                                      $password
-     *
+     * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
+     * @param  string  $password
      * @return void
      */
     protected function resetPassword($user, $password)
     {
         $user->forceFill([
-            'password'       => bcrypt($password),
+            'password' => bcrypt($password),
             'remember_token' => Str::random(60),
         ])->save();
 
@@ -115,8 +111,7 @@ trait ResetsPasswords
     /**
      * Get the response for a successful password reset.
      *
-     * @param string $response
-     *
+     * @param  string  $response
      * @return \Illuminate\Http\RedirectResponse
      */
     protected function sendResetResponse($response)
@@ -129,8 +124,7 @@ trait ResetsPasswords
      * Get the response for a failed password reset.
      *
      * @param  \Illuminate\Http\Request
-     * @param string $response
-     *
+     * @param  string  $response
      * @return \Illuminate\Http\RedirectResponse
      */
     protected function sendResetFailedResponse(Request $request, $response)

@@ -1,8 +1,8 @@
 <?php
 
+use Illuminate\Notifications\Notification;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Notifications\Channels\BroadcastChannel;
-use Illuminate\Notifications\Notification;
 
 class NotificationBroadcastChannelTest extends PHPUnit_Framework_TestCase
 {
@@ -13,7 +13,7 @@ class NotificationBroadcastChannelTest extends PHPUnit_Framework_TestCase
 
     public function testDatabaseChannelCreatesDatabaseRecordWithProperData()
     {
-        $notification = new NotificationBroadcastChannelTestNotification();
+        $notification = new NotificationBroadcastChannelTestNotification;
         $notification->id = 1;
         $notifiable = Mockery::mock();
 
@@ -25,7 +25,7 @@ class NotificationBroadcastChannelTest extends PHPUnit_Framework_TestCase
 
     public function testNotificationIsBroadcastedOnCustomChannels()
     {
-        $notification = new CustomChannelsTestNotification();
+        $notification = new CustomChannelsTestNotification;
         $notification->id = 1;
         $notifiable = Mockery::mock();
 
@@ -40,7 +40,7 @@ class NotificationBroadcastChannelTest extends PHPUnit_Framework_TestCase
 
     public function testNotificationIsBroadcastedNow()
     {
-        $notification = new TestNotificationBroadCastedNow();
+        $notification = new TestNotificationBroadCastedNow;
         $notification->id = 1;
         $notifiable = Mockery::mock();
 

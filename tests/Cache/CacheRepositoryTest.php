@@ -1,7 +1,7 @@
 <?php
 
-use Carbon\Carbon;
 use Mockery as m;
+use Carbon\Carbon;
 
 class CacheRepositoryTest extends PHPUnit_Framework_TestCase
 {

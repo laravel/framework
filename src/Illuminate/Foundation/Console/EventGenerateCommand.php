@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Illuminate\Console\Command;
 use Illuminate\Support\Str;
+use Illuminate\Console\Command;
 
 class EventGenerateCommand extends Command
 {
@@ -33,7 +33,7 @@ class EventGenerateCommand extends Command
         );
 
         foreach ($provider->listens() as $event => $listeners) {
-            if (!Str::contains($event, '\\')) {
+            if (! Str::contains($event, '\\')) {
                 continue;
             }
 

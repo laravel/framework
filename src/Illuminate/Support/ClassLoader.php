@@ -21,8 +21,7 @@ class ClassLoader
     /**
      * Load the given class file.
      *
-     * @param string $class
-     *
+     * @param  string  $class
      * @return bool
      */
     public static function load($class)
@@ -43,8 +42,7 @@ class ClassLoader
     /**
      * Get the normal file name for a class.
      *
-     * @param string $class
-     *
+     * @param  string  $class
      * @return string
      */
     public static function normalizeClass($class)
@@ -63,7 +61,7 @@ class ClassLoader
      */
     public static function register()
     {
-        if (!static::$registered) {
+        if (! static::$registered) {
             static::$registered = spl_autoload_register([static::class, 'load']);
         }
     }
@@ -71,8 +69,7 @@ class ClassLoader
     /**
      * Add directories to the class loader.
      *
-     * @param string|array $directories
-     *
+     * @param  string|array  $directories
      * @return void
      */
     public static function addDirectories($directories)
@@ -83,8 +80,7 @@ class ClassLoader
     /**
      * Remove directories from the class loader.
      *
-     * @param string|array $directories
-     *
+     * @param  string|array  $directories
      * @return void
      */
     public static function removeDirectories($directories = null)

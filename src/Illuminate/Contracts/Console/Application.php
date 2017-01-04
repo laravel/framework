@@ -7,9 +7,8 @@ interface Application
     /**
      * Call a console application command.
      *
-     * @param string $command
-     * @param array  $parameters
-     *
+     * @param  string  $command
+     * @param  array  $parameters
      * @return int
      */
     public function call($command, array $parameters = []);

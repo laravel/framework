@@ -2,11 +2,11 @@
 
 namespace Illuminate\Notifications\Channels;
 
-use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Notifications\Events\BroadcastNotificationCreated;
-use Illuminate\Notifications\Messages\BroadcastMessage;
-use Illuminate\Notifications\Notification;
 use RuntimeException;
+use Illuminate\Notifications\Notification;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Notifications\Messages\BroadcastMessage;
+use Illuminate\Notifications\Events\BroadcastNotificationCreated;
 
 class BroadcastChannel
 {
@@ -20,8 +20,7 @@ class BroadcastChannel
     /**
      * Create a new database channel.
      *
-     * @param \Illuminate\Contracts\Events\Dispatcher $events
-     *
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @return void
      */
     public function __construct(Dispatcher $events)
@@ -32,9 +31,8 @@ class BroadcastChannel
     /**
      * Send the given notification.
      *
-     * @param mixed                                  $notifiable
-     * @param \Illuminate\Notifications\Notification $notification
-     *
+     * @param  mixed  $notifiable
+     * @param  \Illuminate\Notifications\Notification  $notification
      * @return array|null
      */
     public function send($notifiable, Notification $notification)
@@ -56,12 +54,11 @@ class BroadcastChannel
     /**
      * Get the data for the notification.
      *
-     * @param mixed                                  $notifiable
-     * @param \Illuminate\Notifications\Notification $notification
+     * @param  mixed  $notifiable
+     * @param  \Illuminate\Notifications\Notification  $notification
+     * @return mixed
      *
      * @throws \RuntimeException
-     *
-     * @return mixed
      */
     protected function getData($notifiable, Notification $notification)
     {

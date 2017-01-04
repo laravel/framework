@@ -28,8 +28,7 @@ interface Job
     /**
      * Release the job back into the queue.
      *
-     * @param int $delay
-     *
+     * @param  int   $delay
      * @return void
      */
     public function release($delay = 0);
@@ -65,8 +64,7 @@ interface Job
     /**
      * Call the failed method on the job instance.
      *
-     * @param \Throwable $e
-     *
+     * @param  \Throwable  $e
      * @return void
      */
     public function failed($e);

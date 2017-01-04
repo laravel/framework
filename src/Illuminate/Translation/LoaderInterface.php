@@ -7,10 +7,9 @@ interface LoaderInterface
     /**
      * Load the messages for the given locale.
      *
-     * @param string $locale
-     * @param string $group
-     * @param string $namespace
-     *
+     * @param  string  $locale
+     * @param  string  $group
+     * @param  string  $namespace
      * @return array
      */
     public function load($locale, $group, $namespace = null);
@@ -18,9 +17,8 @@ interface LoaderInterface
     /**
      * Add a new namespace to the loader.
      *
-     * @param string $namespace
-     * @param string $hint
-     *
+     * @param  string  $namespace
+     * @param  string  $hint
      * @return void
      */
     public function addNamespace($namespace, $hint);

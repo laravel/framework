@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Console\Scheduling\Schedule;
 use Mockery as m;
+use Illuminate\Console\Scheduling\Schedule;
 
 class ConsoleEventSchedulerTest extends PHPUnit_Framework_TestCase
 {
@@ -15,7 +15,7 @@ class ConsoleEventSchedulerTest extends PHPUnit_Framework_TestCase
         $escape = '\\' === DIRECTORY_SEPARATOR ? '"' : '\'';
         $escapeReal = '\\' === DIRECTORY_SEPARATOR ? '\\"' : '"';
 
-        $schedule = new Schedule();
+        $schedule = new Schedule;
         $schedule->exec('path/to/command');
         $schedule->exec('path/to/command -f --foo="bar"');
         $schedule->exec('path/to/command', ['-f']);
@@ -40,7 +40,7 @@ class ConsoleEventSchedulerTest extends PHPUnit_Framework_TestCase
     {
         $escape = '\\' === DIRECTORY_SEPARATOR ? '"' : '\'';
 
-        $schedule = new Schedule();
+        $schedule = new Schedule;
         $schedule->command('queue:listen');
         $schedule->command('queue:listen --tries=3');
         $schedule->command('queue:listen', ['--tries' => 3]);
@@ -56,7 +56,7 @@ class ConsoleEventSchedulerTest extends PHPUnit_Framework_TestCase
     {
         $escape = '\\' === DIRECTORY_SEPARATOR ? '"' : '\'';
 
-        $schedule = new Schedule();
+        $schedule = new Schedule;
         $schedule->command(ConsoleCommandStub::class, ['--force']);
 
         $events = $schedule->events();

@@ -3,10 +3,10 @@
 namespace Illuminate\Session;
 
 use Carbon\Carbon;
-use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Contracts\Container\Container;
-use Illuminate\Database\ConnectionInterface;
 use SessionHandlerInterface;
+use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Database\ConnectionInterface;
+use Illuminate\Contracts\Container\Container;
 
 class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareInterface
 {
@@ -48,11 +48,10 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
     /**
      * Create a new database session handler instance.
      *
-     * @param \Illuminate\Database\ConnectionInterface       $connection
-     * @param string                                         $table
-     * @param int                                            $minutes
-     * @param \Illuminate\Contracts\Container\Container|null $container
-     *
+     * @param  \Illuminate\Database\ConnectionInterface  $connection
+     * @param  string  $table
+     * @param  int  $minutes
+     * @param  \Illuminate\Contracts\Container\Container|null  $container
      * @return void
      */
     public function __construct(ConnectionInterface $connection, $table, $minutes, Container $container = null)
@@ -108,7 +107,7 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
     {
         $payload = $this->getDefaultPayload($data);
 
-        if (!$this->exists) {
+        if (! $this->exists) {
             $this->read($sessionId);
         }
 
@@ -128,15 +127,14 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
     /**
      * Get the default payload for the session.
      *
-     * @param string $data
-     *
+     * @param  string  $data
      * @return array
      */
     protected function getDefaultPayload($data)
     {
         $payload = ['payload' => base64_encode($data), 'last_activity' => Carbon::now()->getTimestamp()];
 
-        if (!$container = $this->container) {
+        if (! $container = $this->container) {
             return $payload;
         }
 
@@ -186,8 +184,7 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
     /**
      * Set the existence state for the session.
      *
-     * @param bool $value
-     *
+     * @param  bool  $value
      * @return $this
      */
     public function setExists($value)

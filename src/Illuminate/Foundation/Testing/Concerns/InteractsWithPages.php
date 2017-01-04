@@ -3,22 +3,22 @@
 namespace Illuminate\Foundation\Testing\Concerns;
 
 use Closure;
-use Illuminate\Foundation\Testing\Constraints\HasElement;
-use Illuminate\Foundation\Testing\Constraints\HasInElement;
+use InvalidArgumentException;
+use Illuminate\Http\UploadedFile;
+use Symfony\Component\DomCrawler\Form;
+use Symfony\Component\DomCrawler\Crawler;
+use Illuminate\Foundation\Testing\HttpException;
 use Illuminate\Foundation\Testing\Constraints\HasLink;
-use Illuminate\Foundation\Testing\Constraints\HasSource;
 use Illuminate\Foundation\Testing\Constraints\HasText;
 use Illuminate\Foundation\Testing\Constraints\HasValue;
+use Illuminate\Foundation\Testing\Constraints\HasSource;
 use Illuminate\Foundation\Testing\Constraints\IsChecked;
+use Illuminate\Foundation\Testing\Constraints\HasElement;
 use Illuminate\Foundation\Testing\Constraints\IsSelected;
+use Illuminate\Foundation\Testing\Constraints\HasInElement;
 use Illuminate\Foundation\Testing\Constraints\PageConstraint;
 use Illuminate\Foundation\Testing\Constraints\ReversePageConstraint;
-use Illuminate\Foundation\Testing\HttpException;
-use Illuminate\Http\UploadedFile;
-use InvalidArgumentException;
 use PHPUnit_Framework_ExpectationFailedException as PHPUnitException;
-use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\DomCrawler\Form;
 
 trait InteractsWithPages
 {
@@ -53,8 +53,7 @@ trait InteractsWithPages
     /**
      * Visit the given URI with a GET request.
      *
-     * @param string $uri
-     *
+     * @param  string  $uri
      * @return $this
      */
     public function visit($uri)
@@ -65,9 +64,8 @@ trait InteractsWithPages
     /**
      * Visit the given named route with a GET request.
      *
-     * @param string $route
-     * @param array  $parameters
-     *
+     * @param  string  $route
+     * @param  array  $parameters
      * @return $this
      */
     public function visitRoute($route, $parameters = [])
@@ -78,12 +76,11 @@ trait InteractsWithPages
     /**
      * Make a request to the application and create a Crawler instance.
      *
-     * @param string $method
-     * @param string $uri
-     * @param array  $parameters
-     * @param array  $cookies
-     * @param array  $files
-     *
+     * @param  string  $method
+     * @param  string  $uri
+     * @param  array  $parameters
+     * @param  array  $cookies
+     * @param  array  $files
      * @return $this
      */
     protected function makeRequest($method, $uri, $parameters = [], $cookies = [], $files = [])
@@ -118,9 +115,8 @@ trait InteractsWithPages
     /**
      * Make a request to the application using the given form.
      *
-     * @param \Symfony\Component\DomCrawler\Form $form
-     * @param array                              $uploads
-     *
+     * @param  \Symfony\Component\DomCrawler\Form  $form
+     * @param  array  $uploads
      * @return $this
      */
     protected function makeRequestUsingForm(Form $form, array $uploads = [])
@@ -135,8 +131,7 @@ trait InteractsWithPages
     /**
      * Extract the parameters from the given form.
      *
-     * @param \Symfony\Component\DomCrawler\Form $form
-     *
+     * @param  \Symfony\Component\DomCrawler\Form  $form
      * @return array
      */
     protected function extractParametersFromForm(Form $form)
@@ -177,8 +172,7 @@ trait InteractsWithPages
     /**
      * Assert that the current page matches a given URI.
      *
-     * @param string $uri
-     *
+     * @param  string  $uri
      * @return $this
      */
     protected function seePageIs($uri)
@@ -195,9 +189,8 @@ trait InteractsWithPages
     /**
      * Assert that the current page matches a given named route.
      *
-     * @param string $route
-     * @param array  $parameters
-     *
+     * @param  string  $route
+     * @param  array  $parameters
      * @return $this
      */
     protected function seeRouteIs($route, $parameters = [])
@@ -208,12 +201,11 @@ trait InteractsWithPages
     /**
      * Assert that a given page successfully loaded.
      *
-     * @param string      $uri
-     * @param string|null $message
+     * @param  string  $uri
+     * @param  string|null  $message
+     * @return $this
      *
      * @throws \Illuminate\Foundation\Testing\HttpException
-     *
-     * @return $this
      */
     protected function assertPageLoaded($uri, $message = null)
     {
@@ -236,9 +228,8 @@ trait InteractsWithPages
     /**
      * Narrow the test content to a specific area of the page.
      *
-     * @param string   $element
-     * @param \Closure $callback
-     *
+     * @param  string  $element
+     * @param  \Closure  $callback
      * @return $this
      */
     public function within($element, Closure $callback)
@@ -259,7 +250,7 @@ trait InteractsWithPages
      */
     protected function crawler()
     {
-        if (!empty($this->subCrawlers)) {
+        if (! empty($this->subCrawlers)) {
             return end($this->subCrawlers);
         }
 
@@ -269,10 +260,9 @@ trait InteractsWithPages
     /**
      * Assert the given constraint.
      *
-     * @param \Illuminate\Foundation\Testing\Constraints\PageConstraint $constraint
-     * @param bool                                                      $reverse
-     * @param string                                                    $message
-     *
+     * @param  \Illuminate\Foundation\Testing\Constraints\PageConstraint  $constraint
+     * @param  bool  $reverse
+     * @param  string  $message
      * @return $this
      */
     protected function assertInPage(PageConstraint $constraint, $reverse = false, $message = '')
@@ -292,9 +282,8 @@ trait InteractsWithPages
     /**
      * Assert that a given string is seen on the current HTML.
      *
-     * @param string $text
-     * @param bool   $negate
-     *
+     * @param  string  $text
+     * @param  bool  $negate
      * @return $this
      */
     public function see($text, $negate = false)
@@ -305,8 +294,7 @@ trait InteractsWithPages
     /**
      * Assert that a given string is not seen on the current HTML.
      *
-     * @param string $text
-     *
+     * @param  string  $text
      * @return $this
      */
     public function dontSee($text)
@@ -317,10 +305,9 @@ trait InteractsWithPages
     /**
      * Assert that an element is present on the page.
      *
-     * @param string $selector
-     * @param array  $attributes
-     * @param bool   $negate
-     *
+     * @param  string  $selector
+     * @param  array  $attributes
+     * @param  bool  $negate
      * @return $this
      */
     public function seeElement($selector, array $attributes = [], $negate = false)
@@ -331,9 +318,8 @@ trait InteractsWithPages
     /**
      * Assert that an element is not present on the page.
      *
-     * @param string $selector
-     * @param array  $attributes
-     *
+     * @param  string  $selector
+     * @param  array  $attributes
      * @return $this
      */
     public function dontSeeElement($selector, array $attributes = [])
@@ -344,9 +330,8 @@ trait InteractsWithPages
     /**
      * Assert that a given string is seen on the current text.
      *
-     * @param string $text
-     * @param bool   $negate
-     *
+     * @param  string  $text
+     * @param  bool  $negate
      * @return $this
      */
     public function seeText($text, $negate = false)
@@ -357,8 +342,7 @@ trait InteractsWithPages
     /**
      * Assert that a given string is not seen on the current text.
      *
-     * @param string $text
-     *
+     * @param  string  $text
      * @return $this
      */
     public function dontSeeText($text)
@@ -369,10 +353,9 @@ trait InteractsWithPages
     /**
      * Assert that a given string is seen inside an element.
      *
-     * @param string $element
-     * @param string $text
-     * @param bool   $negate
-     *
+     * @param  string  $element
+     * @param  string  $text
+     * @param  bool  $negate
      * @return $this
      */
     public function seeInElement($element, $text, $negate = false)
@@ -383,9 +366,8 @@ trait InteractsWithPages
     /**
      * Assert that a given string is not seen inside an element.
      *
-     * @param string $element
-     * @param string $text
-     *
+     * @param  string  $element
+     * @param  string  $text
      * @return $this
      */
     public function dontSeeInElement($element, $text)
@@ -396,10 +378,9 @@ trait InteractsWithPages
     /**
      * Assert that a given link is seen on the page.
      *
-     * @param string      $text
-     * @param string|null $url
-     * @param bool        $negate
-     *
+     * @param  string $text
+     * @param  string|null $url
+     * @param  bool  $negate
      * @return $this
      */
     public function seeLink($text, $url = null, $negate = false)
@@ -410,9 +391,8 @@ trait InteractsWithPages
     /**
      * Assert that a given link is not seen on the page.
      *
-     * @param string      $text
-     * @param string|null $url
-     *
+     * @param  string  $text
+     * @param  string|null  $url
      * @return $this
      */
     public function dontSeeLink($text, $url = null)
@@ -423,10 +403,9 @@ trait InteractsWithPages
     /**
      * Assert that an input field contains the given value.
      *
-     * @param string $selector
-     * @param string $expected
-     * @param bool   $negate
-     *
+     * @param  string  $selector
+     * @param  string  $expected
+     * @param  bool  $negate
      * @return $this
      */
     public function seeInField($selector, $expected, $negate = false)
@@ -437,9 +416,8 @@ trait InteractsWithPages
     /**
      * Assert that an input field does not contain the given value.
      *
-     * @param string $selector
-     * @param string $value
-     *
+     * @param  string  $selector
+     * @param  string  $value
      * @return $this
      */
     public function dontSeeInField($selector, $value)
@@ -450,10 +428,9 @@ trait InteractsWithPages
     /**
      * Assert that the expected value is selected.
      *
-     * @param string $selector
-     * @param string $value
-     * @param bool   $negate
-     *
+     * @param  string  $selector
+     * @param  string  $value
+     * @param  bool  $negate
      * @return $this
      */
     public function seeIsSelected($selector, $value, $negate = false)
@@ -464,9 +441,8 @@ trait InteractsWithPages
     /**
      * Assert that the given value is not selected.
      *
-     * @param string $selector
-     * @param string $value
-     *
+     * @param  string  $selector
+     * @param  string  $value
      * @return $this
      */
     public function dontSeeIsSelected($selector, $value)
@@ -477,9 +453,8 @@ trait InteractsWithPages
     /**
      * Assert that the given checkbox is selected.
      *
-     * @param string $selector
-     * @param bool   $negate
-     *
+     * @param  string  $selector
+     * @param  bool  $negate
      * @return $this
      */
     public function seeIsChecked($selector, $negate = false)
@@ -490,8 +465,7 @@ trait InteractsWithPages
     /**
      * Assert that the given checkbox is not selected.
      *
-     * @param string $selector
-     *
+     * @param  string  $selector
      * @return $this
      */
     public function dontSeeIsChecked($selector)
@@ -502,20 +476,19 @@ trait InteractsWithPages
     /**
      * Click a link with the given body, name, or ID attribute.
      *
-     * @param string $name
+     * @param  string  $name
+     * @return $this
      *
      * @throws \InvalidArgumentException
-     *
-     * @return $this
      */
     protected function click($name)
     {
         $link = $this->crawler()->selectLink($name);
 
-        if (!count($link)) {
+        if (! count($link)) {
             $link = $this->filterByNameOrId($name, 'a');
 
-            if (!count($link)) {
+            if (! count($link)) {
                 throw new InvalidArgumentException(
                     "Could not find a link with a body, name, or ID attribute of [{$name}]."
                 );
@@ -530,9 +503,8 @@ trait InteractsWithPages
     /**
      * Fill an input field with the given text.
      *
-     * @param string $text
-     * @param string $element
-     *
+     * @param  string  $text
+     * @param  string  $element
      * @return $this
      */
     protected function type($text, $element)
@@ -543,8 +515,7 @@ trait InteractsWithPages
     /**
      * Check a checkbox on the page.
      *
-     * @param string $element
-     *
+     * @param  string  $element
      * @return $this
      */
     protected function check($element)
@@ -555,8 +526,7 @@ trait InteractsWithPages
     /**
      * Uncheck a checkbox on the page.
      *
-     * @param string $element
-     *
+     * @param  string  $element
      * @return $this
      */
     protected function uncheck($element)
@@ -567,9 +537,8 @@ trait InteractsWithPages
     /**
      * Select an option from a drop-down.
      *
-     * @param string $option
-     * @param string $element
-     *
+     * @param  string  $option
+     * @param  string  $element
      * @return $this
      */
     protected function select($option, $element)
@@ -580,9 +549,8 @@ trait InteractsWithPages
     /**
      * Attach a file to a form field on the page.
      *
-     * @param string $absolutePath
-     * @param string $element
-     *
+     * @param  string  $absolutePath
+     * @param  string  $element
      * @return $this
      */
     protected function attach($absolutePath, $element)
@@ -595,8 +563,7 @@ trait InteractsWithPages
     /**
      * Submit a form using the button with the given text value.
      *
-     * @param string $buttonText
-     *
+     * @param  string  $buttonText
      * @return $this
      */
     protected function press($buttonText)
@@ -607,10 +574,9 @@ trait InteractsWithPages
     /**
      * Submit a form on the page with the given input.
      *
-     * @param string $buttonText
-     * @param array  $inputs
-     * @param array  $uploads
-     *
+     * @param  string  $buttonText
+     * @param  array  $inputs
+     * @param  array  $uploads
      * @return $this
      */
     protected function submitForm($buttonText, $inputs = [], $uploads = [])
@@ -623,14 +589,13 @@ trait InteractsWithPages
     /**
      * Fill the form with the given data.
      *
-     * @param string $buttonText
-     * @param array  $inputs
-     *
+     * @param  string  $buttonText
+     * @param  array  $inputs
      * @return \Symfony\Component\DomCrawler\Form
      */
     protected function fillForm($buttonText, $inputs = [])
     {
-        if (!is_string($buttonText)) {
+        if (! is_string($buttonText)) {
             $inputs = $buttonText;
 
             $buttonText = null;
@@ -642,11 +607,10 @@ trait InteractsWithPages
     /**
      * Get the form from the page with the given submit button text.
      *
-     * @param string|null $buttonText
+     * @param  string|null  $buttonText
+     * @return \Symfony\Component\DomCrawler\Form
      *
      * @throws \InvalidArgumentException
-     *
-     * @return \Symfony\Component\DomCrawler\Form
      */
     protected function getForm($buttonText = null)
     {
@@ -666,9 +630,8 @@ trait InteractsWithPages
     /**
      * Store a form input in the local array.
      *
-     * @param string $element
-     * @param string $text
-     *
+     * @param  string  $element
+     * @param  string  $text
      * @return $this
      */
     protected function storeInput($element, $text)
@@ -685,17 +648,16 @@ trait InteractsWithPages
     /**
      * Assert that a filtered Crawler returns nodes.
      *
-     * @param string $filter
+     * @param  string  $filter
+     * @return $this
      *
      * @throws \InvalidArgumentException
-     *
-     * @return $this
      */
     protected function assertFilterProducesResults($filter)
     {
         $crawler = $this->filterByNameOrId($filter);
 
-        if (!count($crawler)) {
+        if (! count($crawler)) {
             throw new InvalidArgumentException(
                 "Nothing matched the filter [{$filter}] CSS query provided for [{$this->currentUri}]."
             );
@@ -707,9 +669,8 @@ trait InteractsWithPages
     /**
      * Filter elements according to the given name or ID attribute.
      *
-     * @param string       $name
-     * @param array|string $elements
-     *
+     * @param  string  $name
+     * @param  array|string  $elements
      * @return \Symfony\Component\DomCrawler\Crawler
      */
     protected function filterByNameOrId($name, $elements = '*')
@@ -730,9 +691,8 @@ trait InteractsWithPages
     /**
      * Convert the given uploads to UploadedFile instances.
      *
-     * @param \Symfony\Component\DomCrawler\Form $form
-     * @param array                              $uploads
-     *
+     * @param  \Symfony\Component\DomCrawler\Form  $form
+     * @param  array  $uploads
      * @return array
      */
     protected function convertUploadsForTesting(Form $form, array $uploads)
@@ -761,9 +721,9 @@ trait InteractsWithPages
     /**
      * Store an array based file upload with the proper nested array structure.
      *
-     * @param array  $uploads
-     * @param string $key
-     * @param mixed  $file
+     * @param  array  $uploads
+     * @param  string  $key
+     * @param  mixed  $file
      */
     protected function prepareArrayBasedFileInput(&$uploads, $key, $file)
     {
@@ -785,10 +745,9 @@ trait InteractsWithPages
     /**
      * Create an UploadedFile instance for testing.
      *
-     * @param array  $file
-     * @param array  $uploads
-     * @param string $name
-     *
+     * @param  array  $file
+     * @param  array  $uploads
+     * @param  string  $name
      * @return \Illuminate\Http\UploadedFile
      */
     protected function getUploadedFileForTesting($file, $uploads, $name)

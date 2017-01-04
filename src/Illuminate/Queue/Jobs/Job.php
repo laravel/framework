@@ -2,8 +2,8 @@
 
 namespace Illuminate\Queue\Jobs;
 
-use Carbon\Carbon;
 use DateTime;
+use Carbon\Carbon;
 use Illuminate\Support\Arr;
 
 abstract class Job
@@ -76,8 +76,7 @@ abstract class Job
     /**
      * Resolve the given job handler.
      *
-     * @param string $class
-     *
+     * @param  string  $class
      * @return mixed
      */
     protected function resolve($class)
@@ -108,8 +107,7 @@ abstract class Job
     /**
      * Release the job back into the queue.
      *
-     * @param int $delay
-     *
+     * @param  int   $delay
      * @return void
      */
     public function release($delay = 0)
@@ -140,8 +138,7 @@ abstract class Job
     /**
      * Call the failed method on the job instance.
      *
-     * @param \Exception $e
-     *
+     * @param  \Exception  $e
      * @return void
      */
     public function failed($e)
@@ -160,8 +157,7 @@ abstract class Job
     /**
      * Parse the job declaration into class and method.
      *
-     * @param string $job
-     *
+     * @param  string  $job
      * @return array
      */
     protected function parseJob($job)
@@ -174,8 +170,7 @@ abstract class Job
     /**
      * Calculate the number of seconds with the given delay.
      *
-     * @param \DateTime|int $delay
-     *
+     * @param  \DateTime|int  $delay
      * @return int
      */
     protected function getSeconds($delay)

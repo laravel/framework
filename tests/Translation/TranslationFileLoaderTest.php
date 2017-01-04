@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Translation\FileLoader;
 use Mockery as m;
+use Illuminate\Translation\FileLoader;
 
 class TranslationFileLoaderTest extends PHPUnit_Framework_TestCase
 {

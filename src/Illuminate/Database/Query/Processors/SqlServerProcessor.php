@@ -11,11 +11,10 @@ class SqlServerProcessor extends Processor
     /**
      * Process an "insert get ID" query.
      *
-     * @param \Illuminate\Database\Query\Builder $query
-     * @param string                             $sql
-     * @param array                              $values
-     * @param string                             $sequence
-     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  string  $sql
+     * @param  array   $values
+     * @param  string  $sequence
      * @return int
      */
     public function processInsertGetId(Builder $query, $sql, $values, $sequence = null)
@@ -36,17 +35,15 @@ class SqlServerProcessor extends Processor
     /**
      * Process an "insert get ID" query for ODBC.
      *
-     * @param \Illuminate\Database\Connection $connection
-     *
-     * @throws \Exception
-     *
+     * @param  \Illuminate\Database\Connection  $connection
      * @return int
+     * @throws \Exception
      */
     protected function processInsertGetIdForOdbc(Connection $connection)
     {
         $result = $connection->selectFromWriteConnection('SELECT CAST(COALESCE(SCOPE_IDENTITY(), @@IDENTITY) AS int) AS insertid');
 
-        if (!$result) {
+        if (! $result) {
             throw new Exception('Unable to retrieve lastInsertID for ODBC.');
         }
 
@@ -58,8 +55,7 @@ class SqlServerProcessor extends Processor
     /**
      * Process the results of a column listing query.
      *
-     * @param array $results
-     *
+     * @param  array  $results
      * @return array
      */
     public function processColumnListing($results)

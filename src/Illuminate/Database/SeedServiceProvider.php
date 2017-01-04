@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database;
 
-use Illuminate\Database\Console\Seeds\SeedCommand;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Database\Console\Seeds\SeedCommand;
 
 class SeedServiceProvider extends ServiceProvider
 {

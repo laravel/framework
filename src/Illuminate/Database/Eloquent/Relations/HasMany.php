@@ -19,9 +19,8 @@ class HasMany extends HasOneOrMany
     /**
      * Initialize the relation on a set of models.
      *
-     * @param array  $models
-     * @param string $relation
-     *
+     * @param  array   $models
+     * @param  string  $relation
      * @return array
      */
     public function initRelation(array $models, $relation)
@@ -36,10 +35,9 @@ class HasMany extends HasOneOrMany
     /**
      * Match the eagerly loaded results to their parents.
      *
-     * @param array                                    $models
-     * @param \Illuminate\Database\Eloquent\Collection $results
-     * @param string                                   $relation
-     *
+     * @param  array   $models
+     * @param  \Illuminate\Database\Eloquent\Collection  $results
+     * @param  string  $relation
      * @return array
      */
     public function match(array $models, Collection $results, $relation)

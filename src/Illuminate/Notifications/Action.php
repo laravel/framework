@@ -21,9 +21,8 @@ class Action
     /**
      * Create a new action instance.
      *
-     * @param string $text
-     * @param string $url
-     *
+     * @param  string  $text
+     * @param  string  $url
      * @return void
      */
     public function __construct($text, $url)

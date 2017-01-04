@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Mail\Message;
 use Mockery as m;
+use Illuminate\Mail\Message;
 
 class MailMessageTest extends PHPUnit_Framework_TestCase
 {

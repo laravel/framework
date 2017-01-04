@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;
+use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
 
 class ModelMakeCommand extends GeneratorCommand
@@ -44,7 +44,7 @@ class ModelMakeCommand extends GeneratorCommand
             $table = Str::plural(Str::snake(class_basename($this->argument('name'))));
 
             $this->call('make:migration', [
-                'name'     => "create_{$table}_table",
+                'name' => "create_{$table}_table",
                 '--create' => $table,
             ]);
         }
@@ -53,7 +53,7 @@ class ModelMakeCommand extends GeneratorCommand
             $controller = Str::studly(class_basename($this->argument('name')));
 
             $this->call('make:controller', [
-                'name'       => "{$controller}Controller",
+                'name' => "{$controller}Controller",
                 '--resource' => $this->option('resource'),
             ]);
         }
@@ -72,8 +72,7 @@ class ModelMakeCommand extends GeneratorCommand
     /**
      * Get the default namespace for the class.
      *
-     * @param string $rootNamespace
-     *
+     * @param  string  $rootNamespace
      * @return string
      */
     protected function getDefaultNamespace($rootNamespace)

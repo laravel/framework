@@ -31,8 +31,7 @@ abstract class Seeder
     /**
      * Seed the given connection from the given path.
      *
-     * @param string $class
-     *
+     * @param  string  $class
      * @return void
      */
     public function call($class)
@@ -47,8 +46,7 @@ abstract class Seeder
     /**
      * Resolve an instance of the given seeder class.
      *
-     * @param string $class
-     *
+     * @param  string  $class
      * @return \Illuminate\Database\Seeder
      */
     protected function resolve($class)
@@ -58,7 +56,7 @@ abstract class Seeder
 
             $instance->setContainer($this->container);
         } else {
-            $instance = new $class();
+            $instance = new $class;
         }
 
         if (isset($this->command)) {
@@ -71,8 +69,7 @@ abstract class Seeder
     /**
      * Set the IoC container instance.
      *
-     * @param \Illuminate\Container\Container $container
-     *
+     * @param  \Illuminate\Container\Container  $container
      * @return $this
      */
     public function setContainer(Container $container)
@@ -85,8 +82,7 @@ abstract class Seeder
     /**
      * Set the console command instance.
      *
-     * @param \Illuminate\Console\Command $command
-     *
+     * @param  \Illuminate\Console\Command  $command
      * @return $this
      */
     public function setCommand(Command $command)

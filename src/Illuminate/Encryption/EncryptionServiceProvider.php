@@ -2,8 +2,8 @@
 
 namespace Illuminate\Encryption;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Illuminate\Support\ServiceProvider;
 
 class EncryptionServiceProvider extends ServiceProvider
 {

@@ -20,9 +20,8 @@ class SQLiteGrammar extends Grammar
     /**
      * Compile an insert statement into SQL.
      *
-     * @param \Illuminate\Database\Query\Builder $query
-     * @param array                              $values
-     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $values
      * @return string
      */
     public function compileInsert(Builder $query, array $values)
@@ -32,7 +31,7 @@ class SQLiteGrammar extends Grammar
         // basic routine regardless of an amount of records given to us to insert.
         $table = $this->wrapTable($query->from);
 
-        if (!is_array(reset($values))) {
+        if (! is_array(reset($values))) {
             $values = [$values];
         }
 
@@ -62,8 +61,7 @@ class SQLiteGrammar extends Grammar
     /**
      * Compile a truncate table statement into SQL.
      *
-     * @param \Illuminate\Database\Query\Builder $query
-     *
+     * @param  \Illuminate\Database\Query\Builder  $query
      * @return array
      */
     public function compileTruncate(Builder $query)
@@ -78,9 +76,8 @@ class SQLiteGrammar extends Grammar
     /**
      * Compile a "where date" clause.
      *
-     * @param \Illuminate\Database\Query\Builder $query
-     * @param array                              $where
-     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
      * @return string
      */
     protected function whereDate(Builder $query, $where)
@@ -91,9 +88,8 @@ class SQLiteGrammar extends Grammar
     /**
      * Compile a "where day" clause.
      *
-     * @param \Illuminate\Database\Query\Builder $query
-     * @param array                              $where
-     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
      * @return string
      */
     protected function whereDay(Builder $query, $where)
@@ -104,9 +100,8 @@ class SQLiteGrammar extends Grammar
     /**
      * Compile a "where month" clause.
      *
-     * @param \Illuminate\Database\Query\Builder $query
-     * @param array                              $where
-     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
      * @return string
      */
     protected function whereMonth(Builder $query, $where)
@@ -117,9 +112,8 @@ class SQLiteGrammar extends Grammar
     /**
      * Compile a "where year" clause.
      *
-     * @param \Illuminate\Database\Query\Builder $query
-     * @param array                              $where
-     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
      * @return string
      */
     protected function whereYear(Builder $query, $where)
@@ -130,10 +124,9 @@ class SQLiteGrammar extends Grammar
     /**
      * Compile a date based where clause.
      *
-     * @param string                             $type
-     * @param \Illuminate\Database\Query\Builder $query
-     * @param array                              $where
-     *
+     * @param  string  $type
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
      * @return string
      */
     protected function dateBasedWhere($type, Builder $query, $where)

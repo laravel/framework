@@ -9,9 +9,8 @@ class SortedMiddleware extends Collection
     /**
      * Create a new Sorted Middleware container.
      *
-     * @param array $priorityMap
-     * @param array $middlewares
-     *
+     * @param  array  $priorityMap
+     * @param  array  $middlewares
      * @return void
      */
     public function __construct(array $priorityMap, $middlewares)
@@ -28,9 +27,8 @@ class SortedMiddleware extends Collection
      *
      * Each call to this method makes one discrete middleware movement if necessary.
      *
-     * @param array $priorityMap
-     * @param array $middlewares
-     *
+     * @param  array  $priorityMap
+     * @param  array  $middlewares
      * @return array
      */
     protected function sortMiddleware($priorityMap, $middlewares)
@@ -38,7 +36,7 @@ class SortedMiddleware extends Collection
         $lastIndex = 0;
 
         foreach ($middlewares as $index => $middleware) {
-            if (!is_string($middleware)) {
+            if (! is_string($middleware)) {
                 continue;
             }
 
@@ -73,10 +71,9 @@ class SortedMiddleware extends Collection
     /**
      * Splice a middleware into a new position and remove the old entry.
      *
-     * @param array $middlewares
-     * @param int   $from
-     * @param int   $to
-     *
+     * @param  array  $middlewares
+     * @param  int  $from
+     * @param  int  $to
      * @return array
      */
     protected function moveMiddleware($middlewares, $from, $to)

@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database\Console\Migrations;
 
-use Illuminate\Database\Migrations\MigrationCreator;
 use Illuminate\Support\Composer;
+use Illuminate\Database\Migrations\MigrationCreator;
 
 class MigrateMakeCommand extends BaseCommand
 {
@@ -41,9 +41,8 @@ class MigrateMakeCommand extends BaseCommand
     /**
      * Create a new migration install command instance.
      *
-     * @param \Illuminate\Database\Migrations\MigrationCreator $creator
-     * @param \Illuminate\Support\Composer                     $composer
-     *
+     * @param  \Illuminate\Database\Migrations\MigrationCreator  $creator
+     * @param  \Illuminate\Support\Composer  $composer
      * @return void
      */
     public function __construct(MigrationCreator $creator, Composer $composer)
@@ -70,7 +69,7 @@ class MigrateMakeCommand extends BaseCommand
 
         $create = $this->input->getOption('create') ?: false;
 
-        if (!$table && is_string($create)) {
+        if (! $table && is_string($create)) {
             $table = $create;
 
             $create = true;
@@ -87,10 +86,9 @@ class MigrateMakeCommand extends BaseCommand
     /**
      * Write the migration file to disk.
      *
-     * @param string $name
-     * @param string $table
-     * @param bool   $create
-     *
+     * @param  string  $name
+     * @param  string  $table
+     * @param  bool    $create
      * @return string
      */
     protected function writeMigration($name, $table, $create)
@@ -109,7 +107,7 @@ class MigrateMakeCommand extends BaseCommand
      */
     protected function getMigrationPath()
     {
-        if (!is_null($targetPath = $this->input->getOption('path'))) {
+        if (! is_null($targetPath = $this->input->getOption('path'))) {
             return $this->laravel->basePath().'/'.$targetPath;
         }
 

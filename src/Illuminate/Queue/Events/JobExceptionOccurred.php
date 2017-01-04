@@ -28,10 +28,9 @@ class JobExceptionOccurred
     /**
      * Create a new event instance.
      *
-     * @param string                          $connectionName
-     * @param \Illuminate\Contracts\Queue\Job $job
-     * @param \Exception                      $exception
-     *
+     * @param  string  $connectionName
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  \Exception  $exception
      * @return void
      */
     public function __construct($connectionName, $job, $exception)
