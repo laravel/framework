@@ -1,10 +1,14 @@
 <?php
 
+namespace Illuminate\Tests\Database;
+
+use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Connectors\ConnectionFactory;
+use ReflectionProperty;
 
 class DatabaseConnectionFactoryTest extends TestCase
 {

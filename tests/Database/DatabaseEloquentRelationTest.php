@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Database;
+
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Grammar;
@@ -30,13 +32,13 @@ class DatabaseEloquentRelationTest extends TestCase
         $builder = m::mock(Builder::class);
         $parent = m::mock(Model::class);
         $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
-        $builder->shouldReceive('getModel')->andReturn($related = m::mock(StdClass::class));
+        $builder->shouldReceive('getModel')->andReturn($related = m::mock(\StdClass::class));
         $builder->shouldReceive('whereNotNull');
         $builder->shouldReceive('where');
         $relation = new HasOne($builder, $parent, 'foreign_key', 'id');
         $related->shouldReceive('getTable')->andReturn('table');
         $related->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
-        $now = Carbon\Carbon::now();
+        $now = \Carbon\Carbon::now();
         $related->shouldReceive('freshTimestampString')->andReturn($now);
         $builder->shouldReceive('update')->once()->with(['updated_at' => $now]);
 
@@ -48,7 +50,7 @@ class DatabaseEloquentRelationTest extends TestCase
         Relation::morphMap([EloquentRelationResetModelStub::class]);
 
         $this->assertEquals([
-            'reset' => 'EloquentRelationResetModelStub',
+            'reset' => 'Illuminate\Tests\Database\EloquentRelationResetModelStub',
         ], Relation::morphMap());
 
         Relation::morphMap([], false);
@@ -73,13 +75,13 @@ class DatabaseEloquentRelationTest extends TestCase
      */
     public function testDonNotRunParentModelGlobalScopes()
     {
-        /* @var Mockery\MockInterface $parent */
+        /* @var \Mockery\MockInterface $parent */
         $eloquentBuilder = m::mock(Builder::class);
         $queryBuilder = m::mock(QueryBuilder::class);
         $parent = m::mock(EloquentRelationResetModelStub::class)->makePartial();
         $grammar = m::mock(Grammar::class);
 
-        $eloquentBuilder->shouldReceive('getModel')->andReturn($related = m::mock(StdClass::class));
+        $eloquentBuilder->shouldReceive('getModel')->andReturn($related = m::mock(\StdClass::class));
         $eloquentBuilder->shouldReceive('getQuery')->andReturn($queryBuilder);
         $queryBuilder->shouldReceive('getGrammar')->andReturn($grammar);
         $grammar->shouldReceive('wrap');
@@ -116,7 +118,7 @@ class EloquentRelationStub extends Relation
     {
     }
 
-    public function match(array $models, Illuminate\Database\Eloquent\Collection $results, $relation)
+    public function match(array $models, \Illuminate\Database\Eloquent\Collection $results, $relation)
     {
     }
 

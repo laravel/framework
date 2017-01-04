@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Database;
+
 use Mockery as m;
 use Illuminate\Database\Seeder;
 use PHPUnit\Framework\TestCase;

@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Database;
+
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -96,7 +98,7 @@ class DatabaseEloquentMorphToTest extends TestCase
     }
 }
 
-class EloquentMorphToModelStub extends Illuminate\Database\Eloquent\Model
+class EloquentMorphToModelStub extends \Illuminate\Database\Eloquent\Model
 {
     public $foreign_key = 'foreign.value';
 }

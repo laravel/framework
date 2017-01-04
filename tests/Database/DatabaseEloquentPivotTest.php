@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Database;
+
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Relations\Pivot;
@@ -106,7 +108,7 @@ class DatabaseEloquentPivotTest extends TestCase
     }
 }
 
-class DatabaseEloquentPivotTestDateStub extends Illuminate\Database\Eloquent\Relations\Pivot
+class DatabaseEloquentPivotTestDateStub extends \Illuminate\Database\Eloquent\Relations\Pivot
 {
     public function getDates()
     {
@@ -114,7 +116,7 @@ class DatabaseEloquentPivotTestDateStub extends Illuminate\Database\Eloquent\Rel
     }
 }
 
-class DatabaseEloquentPivotTestMutatorStub extends Illuminate\Database\Eloquent\Relations\Pivot
+class DatabaseEloquentPivotTestMutatorStub extends \Illuminate\Database\Eloquent\Relations\Pivot
 {
     private $mutatorCalled = false;
 
@@ -131,7 +133,7 @@ class DatabaseEloquentPivotTestMutatorStub extends Illuminate\Database\Eloquent\
     }
 }
 
-class DatabaseEloquentPivotTestJsonCastStub extends Illuminate\Database\Eloquent\Relations\Pivot
+class DatabaseEloquentPivotTestJsonCastStub extends \Illuminate\Database\Eloquent\Relations\Pivot
 {
     protected $casts = [
         'foo' => 'json',

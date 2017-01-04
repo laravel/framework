@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Database;
+
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Collection;
@@ -331,7 +333,7 @@ class DatabaseEloquentCollectionTest extends TestCase
     }
 
     /**
-     * @expectedException LogicException
+     * @expectedException \LogicException
      */
     public function testQueueableCollectionImplementationThrowsExceptionOnMultipleModelTypes()
     {
@@ -340,7 +342,7 @@ class DatabaseEloquentCollectionTest extends TestCase
     }
 }
 
-class TestEloquentCollectionModel extends Illuminate\Database\Eloquent\Model
+class TestEloquentCollectionModel extends \Illuminate\Database\Eloquent\Model
 {
     protected $visible = ['visible'];
     protected $hidden = ['hidden'];
