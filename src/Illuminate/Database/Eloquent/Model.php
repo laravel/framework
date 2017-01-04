@@ -2062,7 +2062,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function getRouteKeyName()
     {
-        return $this->getKeyName();
+        return array_get(config('database'), 'route_key_name', $this->getKeyName());
     }
 
     /**
