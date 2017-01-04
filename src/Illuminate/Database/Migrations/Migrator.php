@@ -303,43 +303,6 @@ class Migrator
     }
 
     /**
-     * Pretend to run the migrations.
-     *
-     * @param  object  $migration
-     * @param  string  $method
-     * @return void
-     */
-    protected function pretendToRun($migration, $method)
-    {
-        foreach ($this->getQueries($migration, $method) as $query) {
-            $name = get_class($migration);
-
-            $this->note("<info>{$name}:</info> {$query['query']}");
-        }
-    }
-
-    /**
-     * Get all of the queries that would be run for a migration.
-     *
-     * @param  object  $migration
-     * @param  string  $method
-     * @return array
-     */
-    protected function getQueries($migration, $method)
-    {
-        $connection = $migration->getConnection();
-
-        // Now that we have the connections we can resolve it and pretend to run the
-        // queries against the database returning the array of raw SQL statements
-        // that would get fired against the database system for this migration.
-        $db = $this->resolveConnection($connection);
-
-        return $db->pretend(function () use ($migration, $method) {
-            $migration->$method();
-        });
-    }
-
-    /**
      * Run a migration inside a transaction if the database supports it.
      *
      * @param  object  $migration
@@ -364,20 +327,40 @@ class Migrator
     }
 
     /**
-     * Get the schema grammar out of a migration connection.
+     * Pretend to run the migrations.
      *
-     * @param  \Illuminate\Database\Connection  $connection
-     * @return \Illuminate\Database\Schema\Grammars\Grammar
+     * @param  object  $migration
+     * @param  string  $method
+     * @return void
      */
-    protected function getSchemaGrammar($connection)
+    protected function pretendToRun($migration, $method)
     {
-        if (is_null($grammar = $connection->getSchemaGrammar())) {
-            $connection->useDefaultSchemaGrammar();
+        foreach ($this->getQueries($migration, $method) as $query) {
+            $name = get_class($migration);
 
-            $grammar = $connection->getSchemaGrammar();
+            $this->note("<info>{$name}:</info> {$query['query']}");
         }
+    }
 
-        return $grammar;
+    /**
+     * Get all of the queries that would be run for a migration.
+     *
+     * @param  object  $migration
+     * @param  string  $method
+     * @return array
+     */
+    protected function getQueries($migration, $method)
+    {
+        // Now that we have the connections we can resolve it and pretend to run the
+        // queries against the database returning the array of raw SQL statements
+        // that would get fired against the database system for this migration.
+        $db = $this->resolveConnection(
+            $connection = $migration->getConnection()
+        );
+
+        return $db->pretend(function () use ($migration, $method) {
+            $migration->$method();
+        });
     }
 
     /**
@@ -435,50 +418,14 @@ class Migrator
     }
 
     /**
-     * Raise a note event for the migrator.
-     *
-     * @param  string  $message
-     * @return void
-     */
-    protected function note($message)
-    {
-        $this->notes[] = $message;
-    }
-
-    /**
-     * Get the notes for the last operation.
-     *
-     * @return array
-     */
-    public function getNotes()
-    {
-        return $this->notes;
-    }
-
-    /**
-     * Resolve the database connection instance.
-     *
-     * @param  string  $connection
-     * @return \Illuminate\Database\Connection
-     */
-    public function resolveConnection($connection)
-    {
-        return $this->resolver->connection($connection ?: $this->connection);
-    }
-
-    /**
      * Register a custom migration path.
-     *
-     * These path will not automatically be applied.
      *
      * @param  string  $path
      * @return void
      */
     public function path($path)
     {
-        $this->paths[] = $path;
-
-        $this->paths = array_unique($this->paths);
+        $this->paths = array_unique(array_merge($this->paths, [$path]));
     }
 
     /**
@@ -502,6 +449,34 @@ class Migrator
         $this->repository->setSource($name);
 
         $this->connection = $name;
+    }
+
+    /**
+     * Resolve the database connection instance.
+     *
+     * @param  string  $connection
+     * @return \Illuminate\Database\Connection
+     */
+    public function resolveConnection($connection)
+    {
+        return $this->resolver->connection($connection ?: $this->connection);
+    }
+
+    /**
+     * Get the schema grammar out of a migration connection.
+     *
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return \Illuminate\Database\Schema\Grammars\Grammar
+     */
+    protected function getSchemaGrammar($connection)
+    {
+        if (is_null($grammar = $connection->getSchemaGrammar())) {
+            $connection->useDefaultSchemaGrammar();
+
+            $grammar = $connection->getSchemaGrammar();
+        }
+
+        return $grammar;
     }
 
     /**
@@ -532,5 +507,26 @@ class Migrator
     public function getFilesystem()
     {
         return $this->files;
+    }
+
+    /**
+     * Raise a note event for the migrator.
+     *
+     * @param  string  $message
+     * @return void
+     */
+    protected function note($message)
+    {
+        $this->notes[] = $message;
+    }
+
+    /**
+     * Get the notes for the last operation.
+     *
+     * @return array
+     */
+    public function getNotes()
+    {
+        return $this->notes;
     }
 }
