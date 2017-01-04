@@ -20,7 +20,7 @@ class ObserveMakeCommand extends GeneratorCommand
      *
      * @var string
      */
-    protected $description = 'Create a new observe class';
+    protected $description = 'Create a new model observer class';
 
     /**
      * The type of class being generated.
@@ -115,7 +115,7 @@ class ObserveMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['model', 'm', InputOption::VALUE_OPTIONAL, 'The model that the observe applies to.'],
+            ['model', 'm', InputOption::VALUE_REQUIRED, 'The model that the observe applies to.'],
         ];
     }
 }
