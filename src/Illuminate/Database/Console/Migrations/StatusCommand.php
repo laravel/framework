@@ -59,9 +59,11 @@ class StatusCommand extends BaseCommand
 
         $migrations = Collection::make($this->getAllMigrationFiles())
                             ->map(function ($migration) use ($ran) {
-                                return in_array($this->migrator->getMigrationName($migration), $ran)
-                                        ? ['<info>Y</info>', $this->migrator->getMigrationName($migration)]
-                                        : ['<fg=red>N</fg=red>', $this->migrator->getMigrationName($migration)];
+                                $migrationName = $this->migrator->getMigrationName($migration);
+
+                                return in_array($migrationName, $ran)
+                                        ? ['<info>Y</info>', $migrationName]
+                                        : ['<fg=red>N</fg=red>', $migrationName];
                             });
 
         if (count($migrations) > 0) {
