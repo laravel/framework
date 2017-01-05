@@ -80,7 +80,7 @@ class DatabaseEloquentIntegrationWithTablePrefixTest extends TestCase
         EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
         EloquentTestUser::create(['email' => 'abigailotwell@gmail.com']);
 
-        $models = EloquentTestUser::hydrateRaw('SELECT * FROM prefix_users WHERE email = ?', ['abigailotwell@gmail.com']);
+        $models = EloquentTestUser::fromQuery('SELECT * FROM prefix_users WHERE email = ?', ['abigailotwell@gmail.com']);
 
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $models);
         $this->assertInstanceOf('EloquentTestUser', $models[0]);
