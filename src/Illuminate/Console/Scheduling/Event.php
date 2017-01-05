@@ -347,7 +347,7 @@ class Event
     /**
      * Schedule the event to run hourly at a given offset in the hour.
      *
-     * @param  string  $offset
+     * @param  int  $offset
      * @return $this
      */
     public function hourlyAt($offset)
