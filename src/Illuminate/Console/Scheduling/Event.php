@@ -344,6 +344,17 @@ class Event
         return $this->spliceIntoPosition(1, 0);
     }
 
+   /**
+     * Schedule the event to run hourly at a given offset in the hour.
+     *
+     * @param  string  $offset     
+     * @return $this
+     */
+    public function hourlyAt($offset)
+    {
+        return $this->spliceIntoPosition(1, $offset);
+    }
+
     /**
      * Schedule the event to run daily.
      *
