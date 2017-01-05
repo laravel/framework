@@ -63,13 +63,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected $keyType = 'int';
 
     /**
-     * The number of models to return for pagination.
-     *
-     * @var int
-     */
-    protected $perPage = 15;
-
-    /**
      * Indicates if the IDs are auto-incrementing.
      *
      * @var bool
@@ -84,13 +77,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public $timestamps = true;
 
     /**
-     * The model's attributes.
-     *
-     * @var array
-     */
-    protected $attributes = [];
-
-    /**
      * The model attribute's original state.
      *
      * @var array
@@ -98,11 +84,25 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected $original = [];
 
     /**
+     * The model's attributes.
+     *
+     * @var array
+     */
+    protected $attributes = [];
+
+    /**
      * The loaded relationships for the model.
      *
      * @var array
      */
     protected $relations = [];
+
+    /**
+     * The relations to eager load on every query.
+     *
+     * @var array
+     */
+    protected $with = [];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -184,11 +184,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected $observables = [];
 
     /**
-     * The relations to eager load on every query.
+     * The number of models to return for pagination.
      *
-     * @var array
+     * @var int
      */
-    protected $with = [];
+    protected $perPage = 15;
 
     /**
      * Indicates if the model exists.
