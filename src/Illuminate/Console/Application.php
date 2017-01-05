@@ -112,6 +112,16 @@ class Application extends SymfonyApplication implements ApplicationContract
         }
     }
 
+    /*
+     * Clear the console application bootstrappers.
+     *
+     * @return void
+     */
+    public static function forgetBootstrappers()
+    {
+        static::$bootstrappers = [];
+    }
+
     /**
      * Run an Artisan console command by name.
      *
