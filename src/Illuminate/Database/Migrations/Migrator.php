@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Migrations;
 
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
@@ -123,11 +124,13 @@ class Migrator
 
         $step = Arr::get($options, 'step', false);
 
+        $ignore = Arr::get($options, 'ignore', false);
+
         // Once we have the array of migrations, we will spin through them and run the
         // migrations "up" so the changes are made to the databases. We'll then log
         // that the migration was run so we don't repeat it next time we execute.
         foreach ($migrations as $file) {
-            $this->runUp($file, $batch, $pretend);
+            $this->runUp($file, $batch, $pretend, $ignore);
 
             // If we are stepping through the migrations, then we will increment the
             // batch value for each individual migration that is run. That way we
@@ -144,9 +147,10 @@ class Migrator
      * @param  string  $file
      * @param  int     $batch
      * @param  bool    $pretend
+     * @param  bool    $ignore
      * @return void
      */
-    protected function runUp($file, $batch, $pretend)
+    protected function runUp($file, $batch, $pretend, $ignore)
     {
         $file = $this->getMigrationName($file);
 
@@ -159,7 +163,13 @@ class Migrator
             return $this->pretendToRun($migration, 'up');
         }
 
-        $this->runMigration($migration, 'up');
+        try {
+            $this->runMigration($migration, 'up');
+        } catch (QueryException $e) {
+            if (!$ignore) {
+                throw $e;
+            }
+        }
 
         // Once we have run a migrations class, we will log that it was run in this
         // repository so that we don't try to run it next time we do a migration
