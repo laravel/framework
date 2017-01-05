@@ -30,6 +30,7 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\BelongsToThrough;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
@@ -807,6 +808,37 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $otherKey = $otherKey ?: $instance->getKeyName();
 
         return new BelongsTo($query, $this, $foreignKey, $otherKey, $relation);
+    }
+
+    /**
+     * Define a belongs-to-through relationship.
+     *
+     * @param  string  $related
+     * @param  string|array  $through
+     * @param  string|null  $localKey
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToThrough
+     */
+    public function belongsToThrough($related, $through, $localKey = null)
+    {
+        $related = new $related;
+        $models = [];
+        foreach ((array) $through as $key => $model) {
+            $object = new $model;
+            if (! ($object instanceof self)) {
+                throw new InvalidArgumentException(
+                    'Through model should be instance of \\Iluminate\\Database\\Eloquent\\Model.'
+                );
+            }
+            $models[] = $object;
+        }
+
+        if (empty($through)) {
+            throw new InvalidArgumentException('Provide one or more through model.');
+        }
+
+        $models[] = $this;
+
+        return new BelongsToThrough($related->newQuery(), $this, $models, $localKey);
     }
 
     /**
