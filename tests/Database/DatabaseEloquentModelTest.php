@@ -105,7 +105,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testHydrateRawMakesRawQuery()
     {
-        $collection = EloquentModelHydrateRawStub::hydrateRaw('SELECT ?', ['foo']);
+        $collection = EloquentModelHydrateRawStub::fromQuery('SELECT ?', ['foo']);
         $this->assertEquals('hydrated', $collection);
     }
 
