@@ -71,7 +71,7 @@ class KeyGenerateCommand extends Command
     }
 
     /**
-     * Get a regex pattern that will match env APP_KEY with any random key
+     * Get a regex pattern that will match env APP_KEY with any random key.
      *
      * @return string
      */
