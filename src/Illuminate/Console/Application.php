@@ -84,7 +84,7 @@ class Application extends SymfonyApplication implements ApplicationContract
      *
      * @return void
      */
-    public static function clearBootstrappers()
+    public static function forgetBootstrappers()
     {
         static::$bootstrappers = [];
     }
