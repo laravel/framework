@@ -33,6 +33,16 @@ trait HasRelationships
     protected $touches = [];
 
     /**
+     * The many to many relationship methods.
+     *
+     * @var array
+     */
+    public static $manyMethods = [
+        'belongsToMany', 'morphToMany', 'morphedByMany',
+        'guessBelongsToManyRelation', 'findFirstMethodThatIsntRelation'
+    ];
+
+    /**
      * Define a one-to-one relationship.
      *
      * @param  string  $related
@@ -156,16 +166,16 @@ trait HasRelationships
     /**
      * Define a polymorphic, inverse one-to-one or many relationship.
      *
-     * @param  string  $class
+     * @param  string  $target
      * @param  string  $name
      * @param  string  $type
      * @param  string  $id
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
-    protected function morphInstanceTo($class, $name, $type, $id)
+    protected function morphInstanceTo($target, $name, $type, $id)
     {
         $instance = $this->newRelatedInstance(
-            $this->getActualClassNameForMorph($class)
+            $this->getActualClassNameForMorph($target)
         );
 
         return new MorphTo(
@@ -206,17 +216,15 @@ trait HasRelationships
      */
     public function hasMany($related, $foreignKey = null, $localKey = null)
     {
+        $instance = $this->newRelatedInstance($related);
+
         $foreignKey = $foreignKey ?: $this->getForeignKey();
-
-        $instance = new $related;
-
-        if (! $instance->getConnectionName()) {
-            $instance->setConnection($this->connection);
-        }
 
         $localKey = $localKey ?: $this->getKeyName();
 
-        return new HasMany($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey);
+        return new HasMany(
+            $instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey
+        );
     }
 
     /**
@@ -239,11 +247,7 @@ trait HasRelationships
 
         $localKey = $localKey ?: $this->getKeyName();
 
-        $instance = new $related;
-
-        if (! $instance->getConnectionName()) {
-            $instance->setConnection($this->connection);
-        }
+        $instance = $this->newRelatedInstance($related);
 
         return new HasManyThrough($instance->newQuery(), $this, $through, $firstKey, $secondKey, $localKey);
     }
@@ -260,11 +264,7 @@ trait HasRelationships
      */
     public function morphMany($related, $name, $type = null, $id = null, $localKey = null)
     {
-        $instance = new $related;
-
-        if (! $instance->getConnectionName()) {
-            $instance->setConnection($this->connection);
-        }
+        $instance = $this->newRelatedInstance($related);
 
         // Here we will gather up the morph type and ID for the relationship so that we
         // can properly query the intermediate table of a relation. Finally, we will
@@ -294,19 +294,15 @@ trait HasRelationships
         // name of the calling function. We will use that function name as the
         // title of this relation since that is a great convention to apply.
         if (is_null($relation)) {
-            $relation = $this->getBelongsToManyCaller();
+            $relation = $this->guessBelongsToManyRelation();
         }
 
         // First, we'll need to determine the foreign key and "other key" for the
         // relationship. Once we have determined the keys we'll make the query
         // instances as well as the relationship instances we need for this.
+        $instance = $this->newRelatedInstance($related);
+
         $foreignKey = $foreignKey ?: $this->getForeignKey();
-
-        $instance = new $related;
-
-        if (! $instance->getConnectionName()) {
-            $instance->setConnection($this->connection);
-        }
 
         $otherKey = $otherKey ?: $instance->getForeignKey();
 
@@ -317,12 +313,9 @@ trait HasRelationships
             $table = $this->joiningTable($related);
         }
 
-        // Now we're ready to create a new query builder for the related model and
-        // the relationship instances for the relation. The relations will set
-        // appropriate query constraint and entirely manages the hydrations.
-        $query = $instance->newQuery();
-
-        return new BelongsToMany($query, $this, $table, $foreignKey, $otherKey, $relation);
+        return new BelongsToMany(
+            $instance->newQuery(), $this, $table, $foreignKey, $otherKey, $relation
+        );
     }
 
     /**
@@ -338,31 +331,25 @@ trait HasRelationships
      */
     public function morphToMany($related, $name, $table = null, $foreignKey = null, $otherKey = null, $inverse = false)
     {
-        $caller = $this->getBelongsToManyCaller();
+        $caller = $this->guessBelongsToManyRelation();
 
         // First, we will need to determine the foreign key and "other key" for the
         // relationship. Once we have determined the keys we will make the query
         // instances, as well as the relationship instances we need for these.
+        $instance = $this->newRelatedInstance($related);
+
         $foreignKey = $foreignKey ?: $name.'_id';
-
-        $instance = new $related;
-
-        if (! $instance->getConnectionName()) {
-            $instance->setConnection($this->connection);
-        }
 
         $otherKey = $otherKey ?: $instance->getForeignKey();
 
         // Now we're ready to create a new query builder for this related model and
         // the relationship instances for this relation. This relations will set
         // appropriate query constraints then entirely manages the hydrations.
-        $query = $instance->newQuery();
-
         $table = $table ?: Str::plural($name);
 
         return new MorphToMany(
-            $query, $this, $name, $table, $foreignKey,
-            $otherKey, $caller, $inverse
+            $instance->newQuery(), $this, $name, $table,
+            $foreignKey, $otherKey, $caller, $inverse
         );
     }
 
@@ -393,14 +380,10 @@ trait HasRelationships
      *
      * @return string
      */
-    protected function getBelongsToManyCaller()
+    protected function guessBelongsToManyRelation()
     {
-        $self = __FUNCTION__;
-
-        $caller = Arr::first(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), function ($trace) use ($self) {
-            $caller = $trace['function'];
-
-            return ! in_array($caller, Model::$manyMethods) && $caller != $self;
+        $caller = Arr::first(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), function ($trace) {
+            return ! in_array($trace['function'], Model::$manyMethods);
         });
 
         return ! is_null($caller) ? $caller['function'] : null;
@@ -417,11 +400,10 @@ trait HasRelationships
         // The joining table name, by convention, is simply the snake cased models
         // sorted alphabetically and concatenated with an underscore, so we can
         // just sort the models and join them together to get the table name.
-        $base = Str::snake(class_basename($this));
-
-        $related = Str::snake(class_basename($related));
-
-        $models = [$related, $base];
+        $models = [
+            Str::snake(class_basename($related)),
+            Str::snake(class_basename($this))
+        ];
 
         // Now that we have the model names in an array we can just sort them and
         // use the implode function to join them together with an underscores,
@@ -429,6 +411,83 @@ trait HasRelationships
         sort($models);
 
         return strtolower(implode('_', $models));
+    }
+
+    /**
+     * Determine if the model touches a given relation.
+     *
+     * @param  string  $relation
+     * @return bool
+     */
+    public function touches($relation)
+    {
+        return in_array($relation, $this->touches);
+    }
+
+    /**
+     * Touch the owning relations of the model.
+     *
+     * @return void
+     */
+    public function touchOwners()
+    {
+        foreach ($this->touches as $relation) {
+            $this->$relation()->touch();
+
+            if ($this->$relation instanceof self) {
+                $this->$relation->fireModelEvent('saved', false);
+
+                $this->$relation->touchOwners();
+            } elseif ($this->$relation instanceof Collection) {
+                $this->$relation->each(function (Model $relation) {
+                    $relation->touchOwners();
+                });
+            }
+        }
+    }
+
+    /**
+     * Get the polymorphic relationship columns.
+     *
+     * @param  string  $name
+     * @param  string  $type
+     * @param  string  $id
+     * @return array
+     */
+    protected function getMorphs($name, $type, $id)
+    {
+        return [$type ?: $name.'_type', $id ?: $name.'_id'];
+    }
+
+    /**
+     * Get the class name for polymorphic relations.
+     *
+     * @return string
+     */
+    public function getMorphClass()
+    {
+        $morphMap = Relation::morphMap();
+
+        if (! empty($morphMap) && in_array(static::class, $morphMap)) {
+            return array_search(static::class, $morphMap, true);
+        }
+
+        return static::class;
+    }
+
+    /**
+     * Create a new model instance for a related model.
+     *
+     * @param  string  $class
+     * @return mixed
+     */
+    protected function newRelatedInstance($class)
+    {
+        return tap(new $class, function ($instance) {
+            if (! $instance->getConnectionName()) {
+                $instance->setConnection($this->connection);
+            }
+        });
     }
 
     /**
@@ -488,89 +547,6 @@ trait HasRelationships
         $this->relations = $relations;
 
         return $this;
-    }
-
-    /**
-     * Get the polymorphic relationship columns.
-     *
-     * @param  string  $name
-     * @param  string  $type
-     * @param  string  $id
-     * @return array
-     */
-    protected function getMorphs($name, $type, $id)
-    {
-        $type = $type ?: $name.'_type';
-
-        $id = $id ?: $name.'_id';
-
-        return [$type, $id];
-    }
-
-    /**
-     * Get the class name for polymorphic relations.
-     *
-     * @return string
-     */
-    public function getMorphClass()
-    {
-        $morphMap = Relation::morphMap();
-
-        $class = static::class;
-
-        if (! empty($morphMap) && in_array($class, $morphMap)) {
-            return array_search($class, $morphMap, true);
-        }
-
-        return $class;
-    }
-
-    /**
-     * Create a new model instance for a related model.
-     *
-     * @param  string  $class
-     * @return mixed
-     */
-    protected function newRelatedInstance($class)
-    {
-        return tap(new $class, function ($instance) {
-            if (! $instance->getConnectionName()) {
-                $instance->setConnection($this->connection);
-            }
-        });
-    }
-
-    /**
-     * Determine if the model touches a given relation.
-     *
-     * @param  string  $relation
-     * @return bool
-     */
-    public function touches($relation)
-    {
-        return in_array($relation, $this->touches);
-    }
-
-    /**
-     * Touch the owning relations of the model.
-     *
-     * @return void
-     */
-    public function touchOwners()
-    {
-        foreach ($this->touches as $relation) {
-            $this->$relation()->touch();
-
-            if ($this->$relation instanceof self) {
-                $this->$relation->fireModelEvent('saved', false);
-
-                $this->$relation->touchOwners();
-            } elseif ($this->$relation instanceof Collection) {
-                $this->$relation->each(function (Model $relation) {
-                    $relation->touchOwners();
-                });
-            }
-        }
     }
 
     /**
