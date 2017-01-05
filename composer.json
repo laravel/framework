@@ -89,7 +89,8 @@
     },
     "autoload-dev": {
         "files": [
-            "tests/Redis/InteractsWithRedis.php"
+            "tests/Redis/InteractsWithRedis.php",
+            "tests/Foundation/Console/CommandTester.php"
         ]
     },
     "extra": {
