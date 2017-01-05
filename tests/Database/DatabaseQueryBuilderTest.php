@@ -640,6 +640,13 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals('select "category", count(*) as "total" from "item" where "department" = ? group by "category" having "total" > ?', $builder->toSql());
     }
 
+    public function testHavingShortcut()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->having('email', 1)->orHaving('email', 2);
+        $this->assertEquals('select * from "users" having "email" = ? or "email" = ?', $builder->toSql());
+    }
+
     public function testHavingFollowedBySelectGet()
     {
         $builder = $this->getBuilder();
