@@ -206,7 +206,9 @@ class Builder
             return $result;
         }
 
-        throw (new ModelNotFoundException)->setModel(get_class($this->model), $id);
+        throw (new ModelNotFoundException)->setModel(
+            get_class($this->model), $id
+        );
     }
 
     /**
@@ -276,11 +278,9 @@ class Builder
      */
     public function updateOrCreate(array $attributes, array $values = [])
     {
-        $instance = $this->firstOrNew($attributes);
-
-        $instance->fill($values)->save();
-
-        return $instance;
+        return tap($this->firstOrNew($attributes), function ($instance) use ($values) {
+            $instance->fill($values)->save();
+        });
     }
 
     /**
