@@ -222,27 +222,29 @@ class UrlWindow
 
     /**
      * Determine if the first Element of the Slider is too near from the end of the Start arrays.
-     * @param  int  $onEachSide
      * 
+     * @param  int  $onEachSide
      * @return bool
      */
     protected function isSliderTooNearToStart($onEachSide)
     {
         $sliderKeys = array_keys($this->getAdjacentUrlRange($onEachSide));
         $firstKeys = array_keys($this->getStart());
+
         return ($sliderKeys[0] - $firstKeys[count($firstKeys) - 1]) === 2;
     }
 
     /**
      * Determine if the last Element of the Slider is too near from the start of the Finish arrays.
-     * @param  int  $onEachSide
      * 
+     * @param  int  $onEachSide
      * @return bool
      */
     protected function isSliderTooNearToEnd($onEachSide)
     {
         $sliderKeys = array_keys($this->getAdjacentUrlRange($onEachSide));
         $lastKeys = array_keys($this->getFinish());
+
         return ($lastKeys[0] - $sliderKeys[count($sliderKeys) - 1]) === 2;
     } 
 }
