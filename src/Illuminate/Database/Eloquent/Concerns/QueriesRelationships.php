@@ -34,7 +34,7 @@ trait QueriesRelationships
         // optimize the subquery to only run a "where exists" clause instead of
         // the full "count" clause. This will make the query run much faster.
         $queryType = $this->shouldRunExistsQuery($operator, $count)
-                ? 'getRelationQuery' : 'getRelationCountQuery';
+                ? 'getRelationExistenceQuery' : 'getRelationExistenceCountQuery';
 
         $query = $relation->{$queryType}($relation->getRelated()->newQuery(), $this);
 
@@ -220,7 +220,7 @@ trait QueriesRelationships
             // Here we will get the relationship count query and prepare to add it to the main query
             // as a sub-select. First, we'll get the "has" query and use that to get the relation
             // count query. We will normalize the relation name then append _count as the name.
-            $query = $relation->getRelationCountQuery(
+            $query = $relation->getRelationExistenceCountQuery(
                 $relation->getRelated()->newQuery(), $this
             );
 

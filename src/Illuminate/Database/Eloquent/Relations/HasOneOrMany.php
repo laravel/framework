@@ -312,38 +312,36 @@ abstract class HasOneOrMany extends Relation
      * Add the constraints for a relationship query.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Builder  $parent
+     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
      * @param  array|mixed  $columns
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function getRelationQuery(Builder $query, Builder $parent, $columns = ['*'])
+    public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
     {
-        if ($parent->getQuery()->from == $query->getQuery()->from) {
-            return $this->getRelationQueryForSelfRelation($query, $parent, $columns);
+        if ($query->getQuery()->from == $parentQuery->getQuery()->from) {
+            return $this->getRelationExistenceQueryForSelfRelation($query, $parentQuery, $columns);
         }
 
-        return parent::getRelationQuery($query, $parent, $columns);
+        return parent::getRelationExistenceQuery($query, $parentQuery, $columns);
     }
 
     /**
      * Add the constraints for a relationship query on the same table.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Builder  $parent
+     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
      * @param  array|mixed  $columns
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function getRelationQueryForSelfRelation(Builder $query, Builder $parent, $columns = ['*'])
+    public function getRelationExistenceQueryForSelfRelation(Builder $query, Builder $parentQuery, $columns = ['*'])
     {
-        $query->select($columns);
-
         $query->from($query->getModel()->getTable().' as '.$hash = $this->getRelationCountHash());
 
         $query->getModel()->setTable($hash);
 
-        $key = $this->wrap($this->getQualifiedParentKeyName());
-
-        return $query->where($hash.'.'.$this->getForeignKeyName(), '=', new Expression($key));
+        return $query->select($columns)->whereColumn(
+            $this->getQualifiedParentKeyName(), '=', $hash.'.'.$this->getForeignKeyName()
+        );
     }
 
     /**
@@ -361,7 +359,7 @@ abstract class HasOneOrMany extends Relation
      *
      * @return string
      */
-    public function getHasCompareKey()
+    public function getExistenceCompareKey()
     {
         return $this->getQualifiedForeignKeyName();
     }
