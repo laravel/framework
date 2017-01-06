@@ -82,11 +82,11 @@ class HasManyThrough extends Relation
      * Add the constraints for a relationship query.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Builder  $parent
+     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
      * @param  array|mixed  $columns
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function getRelationQuery(Builder $query, Builder $parent, $columns = ['*'])
+    public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
     {
         $parentTable = $this->parent->getTable();
 
@@ -94,9 +94,9 @@ class HasManyThrough extends Relation
 
         $query->select($columns);
 
-        $key = $this->wrap($parentTable.'.'.$this->firstKey);
-
-        return $query->where($this->getHasCompareKey(), '=', new Expression($key));
+        return $query->whereColumn(
+            $this->getExistenceCompareKey(), '=', $parentTable.'.'.$this->firstKey
+        );
     }
 
     /**
@@ -420,7 +420,7 @@ class HasManyThrough extends Relation
      *
      * @return string
      */
-    public function getHasCompareKey()
+    public function getExistenceCompareKey()
     {
         return $this->farParent->getQualifiedKeyName();
     }

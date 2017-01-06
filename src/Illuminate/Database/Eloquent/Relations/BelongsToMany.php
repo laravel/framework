@@ -369,30 +369,30 @@ class BelongsToMany extends Relation
      * Add the constraints for a relationship query.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Builder  $parent
+     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
      * @param  array|mixed  $columns
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function getRelationQuery(Builder $query, Builder $parent, $columns = ['*'])
+    public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
     {
-        if ($parent->getQuery()->from == $query->getQuery()->from) {
-            return $this->getRelationQueryForSelfJoin($query, $parent, $columns);
+        if ($parentQuery->getQuery()->from == $query->getQuery()->from) {
+            return $this->getRelationExistenceQueryForSelfJoin($query, $parentQuery, $columns);
         }
 
         $this->setJoin($query);
 
-        return parent::getRelationQuery($query, $parent, $columns);
+        return parent::getRelationExistenceQuery($query, $parentQuery, $columns);
     }
 
     /**
      * Add the constraints for a relationship query on the same table.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Builder  $parent
+     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
      * @param  array|mixed  $columns
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function getRelationQueryForSelfJoin(Builder $query, Builder $parent, $columns = ['*'])
+    public function getRelationExistenceQueryForSelfJoin(Builder $query, Builder $parentQuery, $columns = ['*'])
     {
         $query->select($columns);
 
@@ -402,7 +402,7 @@ class BelongsToMany extends Relation
 
         $this->setJoin($query);
 
-        return parent::getRelationQuery($query, $parent, $columns);
+        return parent::getRelationExistenceQuery($query, $parentQuery, $columns);
     }
 
     /**
@@ -1377,7 +1377,7 @@ class BelongsToMany extends Relation
      *
      * @return string
      */
-    public function getHasCompareKey()
+    public function getExistenceCompareKey()
     {
         return $this->getForeignKey();
     }

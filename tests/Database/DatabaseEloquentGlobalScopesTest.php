@@ -99,7 +99,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
     {
         $query = EloquentGlobalScopesWithRelationModel::has('related')->where('bar', 'baz');
 
-        $subQuery = 'select * from "table" where "table"."related_id" = "table2"."id" and "foo" = ? and "active" = ?';
+        $subQuery = 'select * from "table" where "table2"."id" = "table"."related_id" and "foo" = ? and "active" = ?';
         $mainQuery = 'select * from "table2" where exists ('.$subQuery.') and "bar" = ? and "active" = ? order by "name" asc';
 
         $this->assertEquals($mainQuery, $query->toSql());

@@ -790,7 +790,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $sql = preg_replace($aliasRegex, $alias, $sql);
 
-        $this->assertContains('"self_related_stubs"."parent_id" = "self_alias_hash"."id"', $sql);
+        $this->assertContains('"self_alias_hash"."id" = "self_related_stubs"."parent_id"', $sql);
     }
 
     protected function mockConnectionForModel($model, $database)

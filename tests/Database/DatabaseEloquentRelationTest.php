@@ -64,30 +64,6 @@ class DatabaseEloquentRelationTest extends TestCase
 
         Relation::morphMap([], false);
     }
-
-    /**
-     * Testing to ensure loop does not occur during relational queries in global scopes.
-     *
-     * Executing parent model's global scopes could result in an infinite loop when the
-     * parent model's global scope utilizes a relation in a query like has or whereHas
-     */
-    public function testDonNotRunParentModelGlobalScopes()
-    {
-        /* @var Mockery\MockInterface $parent */
-        $eloquentBuilder = m::mock(Builder::class);
-        $queryBuilder = m::mock(QueryBuilder::class);
-        $parent = m::mock(EloquentRelationResetModelStub::class)->makePartial();
-        $grammar = m::mock(Grammar::class);
-
-        $eloquentBuilder->shouldReceive('getModel')->andReturn($related = m::mock(StdClass::class));
-        $eloquentBuilder->shouldReceive('getQuery')->andReturn($queryBuilder);
-        $queryBuilder->shouldReceive('getGrammar')->andReturn($grammar);
-        $grammar->shouldReceive('wrap');
-        $parent->shouldReceive('newQueryWithoutScopes')->andReturn($eloquentBuilder);
-
-        $relation = new EloquentRelationStub($eloquentBuilder, $parent);
-        $relation->wrap('test');
-    }
 }
 
 class EloquentRelationResetModelStub extends Model
