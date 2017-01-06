@@ -32,7 +32,7 @@ class TaggedCache extends Repository
     /**
      * {@inheritdoc}
      */
-    protected function fireCacheEvent($event, $payload)
+    protected function fireCacheEvent($event, array $payload)
     {
         $payload[] = $this->tags->getNames();
 

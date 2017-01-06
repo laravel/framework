@@ -339,7 +339,7 @@ abstract class Relation
      * @param  array   $parameters
      * @return mixed
      */
-    public function __call($method, $parameters)
+    public function __call($method, array $parameters)
     {
         $result = call_user_func_array([$this->query, $method], $parameters);
 
