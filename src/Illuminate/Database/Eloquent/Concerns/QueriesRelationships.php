@@ -33,7 +33,7 @@ trait QueriesRelationships
         // If we only need to check for the existence of the relation, then we can optimize
         // the subquery to only run a "where exists" clause instead of this full "count"
         // clause. This will make these queries run much faster compared with a count.
-        $method = $this->shouldRunExistsQuery($operator, $count)
+        $method = $this->canUseExistsForExistenceCheck($operator, $count)
                         ? 'getRelationExistenceQuery'
                         : 'getRelationExistenceCountQuery';
 
@@ -209,7 +209,7 @@ trait QueriesRelationships
     {
         $hasQuery->mergeConstraintsFrom($relation->getQuery());
 
-        return $this->shouldRunExistsQuery($operator, $count)
+        return $this->canUseExistsForExistenceCheck($operator, $count)
                 ? $this->addWhereExistsQuery($hasQuery->toBase(), $boolean, $not = ($operator === '<' && $count === 1))
                 : $this->addWhereCountQuery($hasQuery->toBase(), $operator, $count, $boolean);
     }
@@ -277,7 +277,7 @@ trait QueriesRelationships
      * @param  int  $count
      * @return bool
      */
-    protected function shouldRunExistsQuery($operator, $count)
+    protected function canUseExistsForExistenceCheck($operator, $count)
     {
         return ($operator === '>=' || $operator === '<') && $count === 1;
     }
