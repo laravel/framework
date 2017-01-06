@@ -84,10 +84,9 @@ trait RouteDependencyResolverTrait
      *
      * @param  \ReflectionParameter  $parameter
      * @param  array  $parameters
-     * @param  array  $originalParameters
      * @return mixed
      */
-    protected function transformDependency(ReflectionParameter $parameter, $parameters)
+    protected function transformDependency(ReflectionParameter $parameter, array $parameters)
     {
         // If the current parameter shouldn't be a class this method will return null
         if ($class = $parameter->getClass()) {
