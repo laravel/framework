@@ -972,7 +972,7 @@ class Builder
     }
 
     /**
-     * Add the given scopes to the current builder instance.
+     * Call the given local model scopes.
      *
      * @param  array  $scopes
      * @return mixed
@@ -982,12 +982,19 @@ class Builder
         $builder = $this;
 
         foreach ($scopes as $scope => $parameters) {
+            // If the scope key is an integer, then the scope was passed as the value and
+            // the parameter list is empty, so we will format the scope name and these
+            // parameters here. Then, we'll be ready to call the scope on the model.
             if (is_int($scope)) {
                 list($scope, $parameters) = [$parameters, []];
             }
 
+            // Next we'll pass the scope callback to the callScope method which will take
+            // care of groping the "wheres" correctly so the logical order doesn't get
+            // messed up when adding scopes. Then we'll return back out the builder.
             $builder = $builder->callScope(
-                [$this->model, 'scope'.ucfirst($scope)], (array) $parameters
+                [$this->model, 'scope'.ucfirst($scope)],
+                (array) $parameters
             );
         }
 
@@ -1009,9 +1016,17 @@ class Builder
 
         foreach ($this->scopes as $scope) {
             $builder->callScope(function (Builder $builder) use ($scope) {
+                // If the scope is a Closure we will just go ahead and call the scope with the
+                // builder instance. The "callScope" method will properly group the clauses
+                // that are added to this query so "where" clauses maintain proper logic.
                 if ($scope instanceof Closure) {
                     $scope($builder);
-                } elseif ($scope instanceof Scope) {
+                }
+
+                // If the scope is a scope object, we will call the apply method on this scope
+                // passing in the builder and the model instance. After we run all of these
+                // scopes we will return back the builder instance to the outside caller.
+                if ($scope instanceof Scope) {
                     $scope->apply($builder, $this->getModel());
                 }
             });
@@ -1041,10 +1056,10 @@ class Builder
         $result = $scope(...array_values($parameters)) ?: $this;
 
         if (count($query->wheres) > $originalWhereCount) {
-            $this->nestWheresForScope($query, $originalWhereCount);
+            $this->addNewWheresWithinGroup($query, $originalWhereCount);
         }
 
-        return $result;
+        return $this;
     }
 
     /**
@@ -1054,7 +1069,7 @@ class Builder
      * @param  int  $originalWhereCount
      * @return void
      */
-    protected function nestWheresForScope(QueryBuilder $query, $originalWhereCount)
+    protected function addNewWheresWithinGroup(QueryBuilder $query, $originalWhereCount)
     {
         // Here, we totally remove all of the where clauses since we are going to
         // rebuild them as nested queries by slicing the groups of wheres into
@@ -1063,12 +1078,12 @@ class Builder
 
         $query->wheres = [];
 
-        $this->addNestedWhereSlice(
-            $query, $allWheres, 0, $originalWhereCount
+        $this->groupWhereSliceForScope(
+            $query, array_slice($allWheres, 0, $originalWhereCount)
         );
 
-        $this->addNestedWhereSlice(
-            $query, $allWheres, $originalWhereCount
+        $this->groupWhereSliceForScope(
+            $query, array_slice($allWheres, $originalWhereCount)
         );
     }
 
@@ -1076,22 +1091,20 @@ class Builder
      * Slice where conditions at the given offset and add them to the query as a nested condition.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $wheres
-     * @param  int  $offset
-     * @param  int  $length
+     * @param  array  $whereSlice
      * @return void
      */
-    protected function addNestedWhereSlice(QueryBuilder $query, $wheres, $offset, $length = null)
+    protected function groupWhereSliceForScope(QueryBuilder $query, $whereSlice)
     {
-        $whereSlice = array_slice($wheres, $offset, $length);
-
         $whereBooleans = collect($whereSlice)->pluck('boolean');
 
         // Here we'll check if the given subset of where clauses contains any "or"
         // booleans and in this case create a nested where expression. That way
         // we don't add any unnecessary nesting thus keeping the query clean.
         if ($whereBooleans->contains('or')) {
-            $query->wheres[] = $this->nestWhereSlice($whereSlice, $whereBooleans->first());
+            $query->wheres[] = $this->createNestedWhere(
+                $whereSlice, $whereBooleans->first()
+            );
         } else {
             $query->wheres = array_merge($query->wheres, $whereSlice);
         }
@@ -1104,7 +1117,7 @@ class Builder
      * @param  string  $boolean
      * @return array
      */
-    protected function nestWhereSlice($whereSlice, $boolean = 'and')
+    protected function createNestedWhere($whereSlice, $boolean = 'and')
     {
         $whereGroup = $this->getQuery()->forNestedWhere();
 
