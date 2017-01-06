@@ -68,7 +68,7 @@ class Repository implements CacheContract, ArrayAccess
      * @param  array  $payload
      * @return void
      */
-    protected function fireCacheEvent($event, $payload)
+    protected function fireCacheEvent($event, array $payload)
     {
         if (! isset($this->events)) {
             return;
@@ -500,7 +500,7 @@ class Repository implements CacheContract, ArrayAccess
      * @param  array   $parameters
      * @return mixed
      */
-    public function __call($method, $parameters)
+    public function __call($method, array $parameters)
     {
         if (static::hasMacro($method)) {
             return $this->macroCall($method, $parameters);

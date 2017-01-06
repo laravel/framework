@@ -43,7 +43,7 @@ class PostgresGrammar extends Grammar
      * @param  array  $where
      * @return string
      */
-    protected function whereDate(Builder $query, $where)
+    protected function whereDate(Builder $query, array $where)
     {
         $value = $this->parameter($where['value']);
 
@@ -58,7 +58,7 @@ class PostgresGrammar extends Grammar
      * @param  array  $where
      * @return string
      */
-    protected function dateBasedWhere($type, Builder $query, $where)
+    protected function dateBasedWhere($type, Builder $query, array $where)
     {
         $value = $this->parameter($where['value']);
 
@@ -72,7 +72,7 @@ class PostgresGrammar extends Grammar
      * @param  array  $values
      * @return string
      */
-    public function compileUpdate(Builder $query, $values)
+    public function compileUpdate(Builder $query, array $values)
     {
         $table = $this->wrapTable($query->from);
 
@@ -110,7 +110,7 @@ class PostgresGrammar extends Grammar
      * @param  array   $values
      * @return string
      */
-    protected function compileUpdateColumns($values)
+    protected function compileUpdateColumns(array $values)
     {
         $columns = [];
 
@@ -208,7 +208,7 @@ class PostgresGrammar extends Grammar
      * @param  string  $sequence
      * @return string
      */
-    public function compileInsertGetId(Builder $query, $values, $sequence)
+    public function compileInsertGetId(Builder $query, array $values, $sequence)
     {
         if (is_null($sequence)) {
             $sequence = 'id';
@@ -276,7 +276,7 @@ class PostgresGrammar extends Grammar
      * @param  array  $path
      * @return array
      */
-    protected function wrapJsonPathAttributes($path)
+    protected function wrapJsonPathAttributes(array $path)
     {
         return array_map(function ($attribute) {
             return "'$attribute'";

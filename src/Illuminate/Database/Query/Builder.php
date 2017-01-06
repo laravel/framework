@@ -555,7 +555,7 @@ class Builder
      * @param  string  $method
      * @return $this
      */
-    protected function addArrayOfWheres($column, $boolean, $method = 'where')
+    protected function addArrayOfWheres(array $column, $boolean, $method = 'where')
     {
         return $this->whereNested(function ($query) use ($column, $method) {
             foreach ($column as $key => $value) {
@@ -1256,7 +1256,7 @@ class Builder
      * @param  int     $index
      * @return void
      */
-    protected function addDynamic($segment, $connector, $parameters, $index)
+    protected function addDynamic($segment, $connector, array $parameters, $index)
     {
         // Once we have parsed out the columns and formatted the boolean operators we
         // are ready to add it to this query as a where clause just like any other
@@ -1588,7 +1588,7 @@ class Builder
      * @param  array  $columns
      * @return mixed|static
      */
-    public function find($id, $columns = ['*'])
+    public function find($id, array $columns = ['*'])
     {
         return $this->where('id', '=', $id)->first($columns);
     }
@@ -1612,7 +1612,7 @@ class Builder
      * @param  array   $columns
      * @return \stdClass|array|null
      */
-    public function first($columns = ['*'])
+    public function first(array $columns = ['*'])
     {
         return $this->take(1)->get($columns)->first();
     }
@@ -1623,7 +1623,7 @@ class Builder
      * @param  array  $columns
      * @return \Illuminate\Support\Collection
      */
-    public function get($columns = ['*'])
+    public function get(array $columns = ['*'])
     {
         $original = $this->columns;
 
@@ -1657,7 +1657,7 @@ class Builder
      * @param  int|null  $page
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function paginate($perPage = 15, $columns = ['*'], $pageName = 'page', $page = null)
+    public function paginate($perPage = 15, array $columns = ['*'], $pageName = 'page', $page = null)
     {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
@@ -1682,7 +1682,7 @@ class Builder
      * @param  int|null  $page
      * @return \Illuminate\Contracts\Pagination\Paginator
      */
-    public function simplePaginate($perPage = 15, $columns = ['*'], $pageName = 'page', $page = null)
+    public function simplePaginate($perPage = 15, array $columns = ['*'], $pageName = 'page', $page = null)
     {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
@@ -1700,7 +1700,7 @@ class Builder
      * @param  array  $columns
      * @return int
      */
-    public function getCountForPagination($columns = ['*'])
+    public function getCountForPagination(array $columns = ['*'])
     {
         $this->backupFieldsForCount();
 
@@ -2033,7 +2033,7 @@ class Builder
      * @param  array   $columns
      * @return mixed
      */
-    public function aggregate($function, $columns = ['*'])
+    public function aggregate($function, array $columns = ['*'])
     {
         $this->aggregate = compact('function', 'columns');
 
@@ -2069,7 +2069,7 @@ class Builder
      * @param  array   $columns
      * @return float|int
      */
-    public function numericAggregate($function, $columns = ['*'])
+    public function numericAggregate($function, array $columns = ['*'])
     {
         $result = $this->aggregate($function, $columns);
 
@@ -2435,7 +2435,7 @@ class Builder
      *
      * @throws \BadMethodCallException
      */
-    public function __call($method, $parameters)
+    public function __call($method, array $parameters)
     {
         if (static::hasMacro($method)) {
             return $this->macroCall($method, $parameters);

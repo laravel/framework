@@ -47,7 +47,7 @@ class QueryExecuted
      * @param  float  $time
      * @param
      */
-    public function __construct($sql, $bindings, $time, $connection)
+    public function __construct($sql, array $bindings, $time, $connection)
     {
         $this->sql = $sql;
         $this->time = $time;

@@ -483,7 +483,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  bool  $exists
      * @return static
      */
-    public function newInstance($attributes = [], $exists = false)
+    public function newInstance(array $attributes = [], $exists = false)
     {
         // This method just provides a convenient way for us to generate fresh model
         // instances of this current model. It is particularly useful during the
@@ -502,7 +502,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string|null  $connection
      * @return static
      */
-    public function newFromBuilder($attributes = [], $connection = null)
+    public function newFromBuilder(array $attributes = [], $connection = null)
     {
         $model = $this->newInstance([], true);
 
@@ -539,7 +539,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string|null  $connection
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public static function hydrateRaw($query, $bindings = [], $connection = null)
+    public static function hydrateRaw($query, array $bindings = [], $connection = null)
     {
         $instance = (new static)->setConnection($connection);
 
@@ -1367,7 +1367,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string  $method
      * @return int
      */
-    protected function incrementOrDecrement($column, $amount, $extra, $method)
+    protected function incrementOrDecrement($column, $amount, array $extra, $method)
     {
         $query = $this->newQuery();
 
@@ -1604,7 +1604,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  array  $attributes
      * @return void
      */
-    protected function insertAndSetId(Builder $query, $attributes)
+    protected function insertAndSetId(Builder $query, array $attributes)
     {
         $id = $query->insertGetId($attributes, $keyName = $this->getKeyName());
 
@@ -3552,7 +3552,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  array  $parameters
      * @return mixed
      */
-    public function __call($method, $parameters)
+    public function __call($method, array $parameters)
     {
         if (in_array($method, ['increment', 'decrement'])) {
             return $this->$method(...$parameters);
@@ -3568,7 +3568,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  array  $parameters
      * @return mixed
      */
-    public static function __callStatic($method, $parameters)
+    public static function __callStatic($method, array $parameters)
     {
         return (new static)->$method(...$parameters);
     }

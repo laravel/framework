@@ -55,7 +55,7 @@ class SqlServerGrammar extends Grammar
      * @param  array  $columns
      * @return string|null
      */
-    protected function compileColumns(Builder $query, $columns)
+    protected function compileColumns(Builder $query, array $columns)
     {
         if (! is_null($query->aggregate)) {
             return;
@@ -102,7 +102,7 @@ class SqlServerGrammar extends Grammar
      * @param  array  $components
      * @return string
      */
-    protected function compileAnsiOffset(Builder $query, $components)
+    protected function compileAnsiOffset(Builder $query, array $components)
     {
         // An ORDER BY clause is required to make this offset query work, so if one does
         // not exist we'll just create a dummy clause to trick the database and so it
@@ -243,7 +243,7 @@ class SqlServerGrammar extends Grammar
      * @param  array  $where
      * @return string
      */
-    protected function whereDate(Builder $query, $where)
+    protected function whereDate(Builder $query, array $where)
     {
         $value = $this->parameter($where['value']);
 
@@ -292,7 +292,7 @@ class SqlServerGrammar extends Grammar
      * @param  array  $values
      * @return string
      */
-    public function compileUpdate(Builder $query, $values)
+    public function compileUpdate(Builder $query, array $values)
     {
         $table = $alias = $this->wrapTable($query->from);
 

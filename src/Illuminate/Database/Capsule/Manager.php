@@ -194,7 +194,7 @@ class Manager
      * @param  array   $parameters
      * @return mixed
      */
-    public static function __callStatic($method, $parameters)
+    public static function __callStatic($method, array $parameters)
     {
         return static::connection()->$method(...$parameters);
     }

@@ -32,7 +32,7 @@ class Attempting
      * @param  bool  $remember
      * @param  bool  $login
      */
-    public function __construct($credentials, $remember, $login)
+    public function __construct(array $credentials, $remember, $login)
     {
         $this->login = $login;
         $this->remember = $remember;

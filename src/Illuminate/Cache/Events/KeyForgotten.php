@@ -25,7 +25,7 @@ class KeyForgotten
      * @param  array  $tags
      * @return void
      */
-    public function __construct($key, $tags = [])
+    public function __construct($key, array $tags = [])
     {
         $this->key = $key;
         $this->tags = $tags;

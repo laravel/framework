@@ -102,7 +102,7 @@ abstract class MorphOneOrMany extends HasOneOrMany
      * @param  array  $columns
      * @return \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model
      */
-    public function findOrNew($id, $columns = ['*'])
+    public function findOrNew($id, array $columns = ['*'])
     {
         if (is_null($instance = $this->find($id, $columns))) {
             $instance = $this->related->newInstance();

@@ -17,7 +17,7 @@ class SqlServerProcessor extends Processor
      * @param  string  $sequence
      * @return int
      */
-    public function processInsertGetId(Builder $query, $sql, $values, $sequence = null)
+    public function processInsertGetId(Builder $query, $sql, array $values, $sequence = null)
     {
         $connection = $query->getConnection();
 
@@ -58,7 +58,7 @@ class SqlServerProcessor extends Processor
      * @param  array  $results
      * @return array
      */
-    public function processColumnListing($results)
+    public function processColumnListing(array $results)
     {
         $mapping = function ($r) {
             $r = (object) $r;

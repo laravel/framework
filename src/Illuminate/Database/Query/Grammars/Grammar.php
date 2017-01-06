@@ -88,7 +88,7 @@ class Grammar extends BaseGrammar
      * @param  array  $aggregate
      * @return string
      */
-    protected function compileAggregate(Builder $query, $aggregate)
+    protected function compileAggregate(Builder $query, array $aggregate)
     {
         $column = $this->columnize($aggregate['columns']);
 
@@ -109,7 +109,7 @@ class Grammar extends BaseGrammar
      * @param  array  $columns
      * @return string|null
      */
-    protected function compileColumns(Builder $query, $columns)
+    protected function compileColumns(Builder $query, array $columns)
     {
         // If the query is actually performing an aggregating select, we will let that
         // compiler handle the building of the select clauses, as it will need some
@@ -142,7 +142,7 @@ class Grammar extends BaseGrammar
      * @param  array  $joins
      * @return string
      */
-    protected function compileJoins(Builder $query, $joins)
+    protected function compileJoins(Builder $query, array $joins)
     {
         $sql = [];
 
@@ -201,7 +201,7 @@ class Grammar extends BaseGrammar
      * @param  array  $where
      * @return string
      */
-    protected function whereNested(Builder $query, $where)
+    protected function whereNested(Builder $query, array $where)
     {
         $nested = $where['query'];
 
@@ -217,7 +217,7 @@ class Grammar extends BaseGrammar
      * @param  array   $where
      * @return string
      */
-    protected function whereSub(Builder $query, $where)
+    protected function whereSub(Builder $query, array $where)
     {
         $select = $this->compileSelect($where['query']);
 
@@ -231,7 +231,7 @@ class Grammar extends BaseGrammar
      * @param  array  $where
      * @return string
      */
-    protected function whereBasic(Builder $query, $where)
+    protected function whereBasic(Builder $query, array $where)
     {
         $value = $this->parameter($where['value']);
 
@@ -259,7 +259,7 @@ class Grammar extends BaseGrammar
      * @param  array  $where
      * @return string
      */
-    protected function whereBetween(Builder $query, $where)
+    protected function whereBetween(Builder $query, array $where)
     {
         $between = $where['not'] ? 'not between' : 'between';
 
@@ -273,7 +273,7 @@ class Grammar extends BaseGrammar
      * @param  array  $where
      * @return string
      */
-    protected function whereExists(Builder $query, $where)
+    protected function whereExists(Builder $query, array $where)
     {
         return 'exists ('.$this->compileSelect($where['query']).')';
     }
@@ -285,7 +285,7 @@ class Grammar extends BaseGrammar
      * @param  array  $where
      * @return string
      */
-    protected function whereNotExists(Builder $query, $where)
+    protected function whereNotExists(Builder $query, array $where)
     {
         return 'not exists ('.$this->compileSelect($where['query']).')';
     }
@@ -297,7 +297,7 @@ class Grammar extends BaseGrammar
      * @param  array  $where
      * @return string
      */
-    protected function whereIn(Builder $query, $where)
+    protected function whereIn(Builder $query, array $where)
     {
         if (empty($where['values'])) {
             return '0 = 1';
@@ -315,7 +315,7 @@ class Grammar extends BaseGrammar
      * @param  array  $where
      * @return string
      */
-    protected function whereNotIn(Builder $query, $where)
+    protected function whereNotIn(Builder $query, array $where)
     {
         if (empty($where['values'])) {
             return '1 = 1';
@@ -333,7 +333,7 @@ class Grammar extends BaseGrammar
      * @param  array  $where
      * @return string
      */
-    protected function whereInSub(Builder $query, $where)
+    protected function whereInSub(Builder $query, array $where)
     {
         $select = $this->compileSelect($where['query']);
 
@@ -347,7 +347,7 @@ class Grammar extends BaseGrammar
      * @param  array  $where
      * @return string
      */
-    protected function whereNotInSub(Builder $query, $where)
+    protected function whereNotInSub(Builder $query, array $where)
     {
         $select = $this->compileSelect($where['query']);
 
@@ -361,7 +361,7 @@ class Grammar extends BaseGrammar
      * @param  array  $where
      * @return string
      */
-    protected function whereNull(Builder $query, $where)
+    protected function whereNull(Builder $query, array $where)
     {
         return $this->wrap($where['column']).' is null';
     }
@@ -373,7 +373,7 @@ class Grammar extends BaseGrammar
      * @param  array  $where
      * @return string
      */
-    protected function whereNotNull(Builder $query, $where)
+    protected function whereNotNull(Builder $query, array $where)
     {
         return $this->wrap($where['column']).' is not null';
     }
@@ -385,7 +385,7 @@ class Grammar extends BaseGrammar
      * @param  array  $where
      * @return string
      */
-    protected function whereDate(Builder $query, $where)
+    protected function whereDate(Builder $query, array $where)
     {
         return $this->dateBasedWhere('date', $query, $where);
     }
@@ -397,7 +397,7 @@ class Grammar extends BaseGrammar
      * @param  array  $where
      * @return string
      */
-    protected function whereTime(Builder $query, $where)
+    protected function whereTime(Builder $query, array $where)
     {
         return $this->dateBasedWhere('time', $query, $where);
     }
@@ -409,7 +409,7 @@ class Grammar extends BaseGrammar
      * @param  array  $where
      * @return string
      */
-    protected function whereDay(Builder $query, $where)
+    protected function whereDay(Builder $query, array $where)
     {
         return $this->dateBasedWhere('day', $query, $where);
     }
@@ -421,7 +421,7 @@ class Grammar extends BaseGrammar
      * @param  array  $where
      * @return string
      */
-    protected function whereMonth(Builder $query, $where)
+    protected function whereMonth(Builder $query, array $where)
     {
         return $this->dateBasedWhere('month', $query, $where);
     }
@@ -433,7 +433,7 @@ class Grammar extends BaseGrammar
      * @param  array  $where
      * @return string
      */
-    protected function whereYear(Builder $query, $where)
+    protected function whereYear(Builder $query, array $where)
     {
         return $this->dateBasedWhere('year', $query, $where);
     }
@@ -446,7 +446,7 @@ class Grammar extends BaseGrammar
      * @param  array  $where
      * @return string
      */
-    protected function dateBasedWhere($type, Builder $query, $where)
+    protected function dateBasedWhere($type, Builder $query, array $where)
     {
         $value = $this->parameter($where['value']);
 
@@ -460,7 +460,7 @@ class Grammar extends BaseGrammar
      * @param  array  $where
      * @return string
      */
-    protected function whereRaw(Builder $query, $where)
+    protected function whereRaw(Builder $query, array $where)
     {
         return $where['sql'];
     }
@@ -472,7 +472,7 @@ class Grammar extends BaseGrammar
      * @param  array  $groups
      * @return string
      */
-    protected function compileGroups(Builder $query, $groups)
+    protected function compileGroups(Builder $query, array $groups)
     {
         return 'group by '.$this->columnize($groups);
     }
@@ -484,7 +484,7 @@ class Grammar extends BaseGrammar
      * @param  array  $havings
      * @return string
      */
-    protected function compileHavings(Builder $query, $havings)
+    protected function compileHavings(Builder $query, array $havings)
     {
         $sql = implode(' ', array_map([$this, 'compileHaving'], $havings));
 
@@ -515,7 +515,7 @@ class Grammar extends BaseGrammar
      * @param  array   $having
      * @return string
      */
-    protected function compileBasicHaving($having)
+    protected function compileBasicHaving(array $having)
     {
         $column = $this->wrap($having['column']);
 
@@ -531,7 +531,7 @@ class Grammar extends BaseGrammar
      * @param  array  $orders
      * @return string
      */
-    protected function compileOrders(Builder $query, $orders)
+    protected function compileOrders(Builder $query, array $orders)
     {
         if (empty($orders)) {
             return '';
@@ -678,7 +678,7 @@ class Grammar extends BaseGrammar
      * @param  string  $sequence
      * @return string
      */
-    public function compileInsertGetId(Builder $query, $values, $sequence)
+    public function compileInsertGetId(Builder $query, array $values, $sequence)
     {
         return $this->compileInsert($query, $values);
     }
@@ -690,7 +690,7 @@ class Grammar extends BaseGrammar
      * @param  array  $values
      * @return string
      */
-    public function compileUpdate(Builder $query, $values)
+    public function compileUpdate(Builder $query, array $values)
     {
         $table = $this->wrapTable($query->from);
 
@@ -814,7 +814,7 @@ class Grammar extends BaseGrammar
      * @param  array   $segments
      * @return string
      */
-    protected function concatenate($segments)
+    protected function concatenate(array $segments)
     {
         return implode(' ', array_filter($segments, function ($value) {
             return (string) $value !== '';

@@ -47,7 +47,7 @@ trait CreatesUserProviders
      * @param  array  $config
      * @return \Illuminate\Auth\DatabaseUserProvider
      */
-    protected function createDatabaseProvider($config)
+    protected function createDatabaseProvider(array $config)
     {
         $connection = $this->app['db']->connection();
 
@@ -60,7 +60,7 @@ trait CreatesUserProviders
      * @param  array  $config
      * @return \Illuminate\Auth\EloquentUserProvider
      */
-    protected function createEloquentProvider($config)
+    protected function createEloquentProvider(array $config)
     {
         return new EloquentUserProvider($this->app['hash'], $config['model']);
     }

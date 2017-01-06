@@ -24,7 +24,7 @@ class Failed
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
      * @param  array  $credentials
      */
-    public function __construct($user, $credentials)
+    public function __construct($user, array $credentials)
     {
         $this->user = $user;
         $this->credentials = $credentials;

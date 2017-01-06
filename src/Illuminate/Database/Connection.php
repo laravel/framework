@@ -307,7 +307,7 @@ class Connection implements ConnectionInterface
      * @param  array   $bindings
      * @return array
      */
-    public function selectFromWriteConnection($query, $bindings = [])
+    public function selectFromWriteConnection($query, array $bindings = [])
     {
         return $this->select($query, $bindings, false);
     }
@@ -359,7 +359,7 @@ class Connection implements ConnectionInterface
      * @param  bool  $useReadPdo
      * @return \Generator
      */
-    public function cursor($query, $bindings = [], $useReadPdo = true)
+    public function cursor($query, array $bindings = [], $useReadPdo = true)
     {
         $statement = $this->run($query, $bindings, function ($me, $query, $bindings) use ($useReadPdo) {
             if ($me->pretending()) {
@@ -402,7 +402,7 @@ class Connection implements ConnectionInterface
      * @param  array  $bindings
      * @return void
      */
-    public function bindValues($statement, $bindings)
+    public function bindValues($statement, array $bindings)
     {
         foreach ($bindings as $key => $value) {
             $statement->bindValue(
@@ -713,7 +713,7 @@ class Connection implements ConnectionInterface
      *
      * @throws \Illuminate\Database\QueryException
      */
-    protected function run($query, $bindings, Closure $callback)
+    protected function run($query, array $bindings, Closure $callback)
     {
         $this->reconnectIfMissingConnection();
 
@@ -754,7 +754,7 @@ class Connection implements ConnectionInterface
      *
      * @throws \Illuminate\Database\QueryException
      */
-    protected function runQueryCallback($query, $bindings, Closure $callback)
+    protected function runQueryCallback($query, array $bindings, Closure $callback)
     {
         // To execute the statement, we'll simply call the callback, which will actually
         // run the SQL against the PDO connection. Then we can calculate the time it
@@ -786,7 +786,7 @@ class Connection implements ConnectionInterface
      *
      * @throws \Illuminate\Database\QueryException
      */
-    protected function tryAgainIfCausedByLostConnection(QueryException $e, $query, $bindings, Closure $callback)
+    protected function tryAgainIfCausedByLostConnection(QueryException $e, $query, array $bindings, Closure $callback)
     {
         if ($this->causedByLostConnection($e->getPrevious())) {
             $this->reconnect();
@@ -843,7 +843,7 @@ class Connection implements ConnectionInterface
      * @param  float|null  $time
      * @return void
      */
-    public function logQuery($query, $bindings, $time = null)
+    public function logQuery($query, array $bindings, $time = null)
     {
         if (isset($this->events)) {
             $this->events->fire(new Events\QueryExecuted(

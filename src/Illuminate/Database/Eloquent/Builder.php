@@ -160,7 +160,7 @@ class Builder
      * @param  array  $columns
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static[]|static|null
      */
-    public function find($id, $columns = ['*'])
+    public function find($id, array $columns = ['*'])
     {
         if (is_array($id)) {
             return $this->findMany($id, $columns);
@@ -178,7 +178,7 @@ class Builder
      * @param  array  $columns
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function findMany($ids, $columns = ['*'])
+    public function findMany(array $ids, array $columns = ['*'])
     {
         if (empty($ids)) {
             return $this->model->newCollection();
@@ -198,7 +198,7 @@ class Builder
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function findOrFail($id, $columns = ['*'])
+    public function findOrFail($id, array $columns = ['*'])
     {
         $result = $this->find($id, $columns);
 
@@ -292,7 +292,7 @@ class Builder
      * @param  array  $columns
      * @return \Illuminate\Database\Eloquent\Model|static|null
      */
-    public function first($columns = ['*'])
+    public function first(array $columns = ['*'])
     {
         return $this->take(1)->get($columns)->first();
     }
@@ -305,7 +305,7 @@ class Builder
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function firstOrFail($columns = ['*'])
+    public function firstOrFail(array $columns = ['*'])
     {
         if (! is_null($model = $this->first($columns))) {
             return $model;
@@ -320,7 +320,7 @@ class Builder
      * @param  array  $columns
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    public function get($columns = ['*'])
+    public function get(array $columns = ['*'])
     {
         $builder = $this->applyScopes();
 
@@ -489,7 +489,7 @@ class Builder
      *
      * @throws \InvalidArgumentException
      */
-    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
+    public function paginate($perPage = null, array $columns = ['*'], $pageName = 'page', $page = null)
     {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
@@ -518,7 +518,7 @@ class Builder
      * @param  int|null  $page
      * @return \Illuminate\Contracts\Pagination\Paginator
      */
-    public function simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
+    public function simplePaginate($perPage = null, array $columns = ['*'], $pageName = 'page', $page = null)
     {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
@@ -633,7 +633,7 @@ class Builder
      * @param  array  $columns
      * @return \Illuminate\Database\Eloquent\Model[]
      */
-    public function getModels($columns = ['*'])
+    public function getModels(array $columns = ['*'])
     {
         $results = $this->query->get($columns)->all();
 
@@ -1169,7 +1169,7 @@ class Builder
      * @param  array   $results
      * @return array
      */
-    protected function parseNestedWith($name, $results)
+    protected function parseNestedWith($name, array $results)
     {
         $progress = [];
 
@@ -1219,7 +1219,7 @@ class Builder
      * @param  array $parameters
      * @return mixed
      */
-    protected function callScope(callable $scope, $parameters = [])
+    protected function callScope(callable $scope, array $parameters = [])
     {
         array_unshift($parameters, $this);
 
@@ -1311,7 +1311,7 @@ class Builder
      * @param  int  $length
      * @return void
      */
-    protected function addNestedWhereSlice(QueryBuilder $query, $wheres, $offset, $length = null)
+    protected function addNestedWhereSlice(QueryBuilder $query, array $wheres, $offset, $length = null)
     {
         $whereSlice = array_slice($wheres, $offset, $length);
 
@@ -1334,7 +1334,7 @@ class Builder
      * @param  string  $boolean
      * @return array
      */
-    protected function nestWhereSlice($whereSlice, $boolean = 'and')
+    protected function nestWhereSlice(array $whereSlice, $boolean = 'and')
     {
         $whereGroup = $this->getQuery()->forNestedWhere();
 
@@ -1454,7 +1454,7 @@ class Builder
      * @param  array   $parameters
      * @return mixed
      */
-    public function __call($method, $parameters)
+    public function __call($method, array $parameters)
     {
         if (isset($this->macros[$method])) {
             array_unshift($parameters, $this);

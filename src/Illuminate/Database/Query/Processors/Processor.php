@@ -27,7 +27,7 @@ class Processor
      * @param  string  $sequence
      * @return int
      */
-    public function processInsertGetId(Builder $query, $sql, $values, $sequence = null)
+    public function processInsertGetId(Builder $query, $sql, array $values, $sequence = null)
     {
         $query->getConnection()->insert($sql, $values);
 
@@ -42,7 +42,7 @@ class Processor
      * @param  array  $results
      * @return array
      */
-    public function processColumnListing($results)
+    public function processColumnListing(array $results)
     {
         return $results;
     }
