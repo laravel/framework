@@ -17,6 +17,8 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
  */
 class Builder
 {
+    use Concerns\QueriesRelationships;
+
     /**
      * The base query builder instance.
      *
@@ -334,6 +336,19 @@ class Builder
     }
 
     /**
+     * Get a single column's value from the first result of a query.
+     *
+     * @param  string  $column
+     * @return mixed
+     */
+    public function value($column)
+    {
+        if ($result = $this->first([$column])) {
+            return $result->{$column};
+        }
+    }
+
+    /**
      * Execute the query as a "select" statement.
      *
      * @param  array  $columns
@@ -343,31 +358,14 @@ class Builder
     {
         $builder = $this->applyScopes();
 
-        $models = $builder->getModels($columns);
-
         // If we actually found models we will also eager load any relationships that
         // have been specified as needing to be eager loaded, which will solve the
         // n+1 query issue for the developers to avoid running a lot of queries.
-        if (count($models) > 0) {
+        if (count($models = $builder->getModels($columns)) > 0) {
             $models = $builder->eagerLoadRelations($models);
         }
 
         return $builder->getModel()->newCollection($models);
-    }
-
-    /**
-     * Get a single column's value from the first result of a query.
-     *
-     * @param  string  $column
-     * @return mixed
-     */
-    public function value($column)
-    {
-        $result = $this->first([$column]);
-
-        if ($result) {
-            return $result->{$column};
-        }
     }
 
     /**
@@ -377,9 +375,7 @@ class Builder
      */
     public function cursor()
     {
-        $builder = $this->applyScopes();
-
-        foreach ($builder->query->cursor() as $record) {
+        foreach ($this->applyScopes()->query->cursor() as $record) {
             yield $this->model->newFromBuilder($record);
         }
     }
@@ -398,6 +394,9 @@ class Builder
         $page = 1;
 
         do {
+            // We'll execute the query for the given page and get the results. If there are
+            // no results we can just break and return from here. When there are results
+            // we will call the callback with the current chunk of these results here.
             $results = $this->forPage($page, $count)->get();
 
             $countResults = $results->count();
@@ -434,6 +433,9 @@ class Builder
         do {
             $clone = clone $this;
 
+            // We'll execute the query for the given page and get the results. If there are
+            // no results we can just break and return from here. When there are results
+            // we will call the callback with the current chunk of these results here.
             $results = $clone->forPageAfterId($count, $lastId, $column)->get();
 
             $countResults = $results->count();
@@ -442,6 +444,9 @@ class Builder
                 break;
             }
 
+            // On each chunk result set, we will pass them to the callback and then let the
+            // developer take care of everything within the callback, which allows us to
+            // keep the memory low for spinning through large result sets for working.
             if ($callback($results) === false) {
                 return false;
             }
@@ -450,6 +455,18 @@ class Builder
         } while ($countResults == $count);
 
         return true;
+    }
+
+    /**
+     * Add a generic "order by" clause if the query doesn't already have one.
+     *
+     * @return void
+     */
+    protected function enforceOrderBy()
+    {
+        if (empty($this->query->orders) && empty($this->query->unionOrders)) {
+            $this->orderBy($this->model->getQualifiedKeyName(), 'asc');
+        }
     }
 
     /**
@@ -468,18 +485,6 @@ class Builder
                 }
             }
         });
-    }
-
-    /**
-     * Add a generic "order by" clause if the query doesn't already have one.
-     *
-     * @return void
-     */
-    protected function enforceOrderBy()
-    {
-        if (empty($this->query->orders) && empty($this->query->unionOrders)) {
-            $this->orderBy($this->model->getQualifiedKeyName(), 'asc');
-        }
     }
 
     /**
@@ -503,7 +508,7 @@ class Builder
         }
 
         return $results->map(function ($value) use ($column) {
-            return $this->model->newFromBuilder([$column => $value])->$column;
+            return $this->model->newFromBuilder([$column => $value])->{$column};
         });
     }
 
@@ -524,13 +529,9 @@ class Builder
 
         $perPage = $perPage ?: $this->model->getPerPage();
 
-        $query = $this->toBase();
-
-        $total = $query->getCountForPagination();
-
-        $results = $total
-            ? $this->forPage($page, $perPage)->get($columns)
-            : $this->model->newCollection();
+        $results = ($total = $this->toBase()->getCountForPagination())
+                                    ? $this->forPage($page, $perPage)->get($columns)
+                                    : $this->model->newCollection();
 
         return new LengthAwarePaginator($results, $total, $perPage, $page, [
             'path' => Paginator::resolveCurrentPath(),
@@ -553,6 +554,9 @@ class Builder
 
         $perPage = $perPage ?: $this->model->getPerPage();
 
+        // Next we will set the limit and offset for this query so that when we get the
+        // results we get the proper section of results. Then, we'll create the full
+        // paginator instances for these results with the given page and per page.
         $this->skip(($page - 1) * $perPage)->take($perPage + 1);
 
         return new Paginator($this->get($columns), $perPage, $page, [
@@ -582,9 +586,9 @@ class Builder
      */
     public function increment($column, $amount = 1, array $extra = [])
     {
-        $extra = $this->addUpdatedAtColumn($extra);
-
-        return $this->toBase()->increment($column, $amount, $extra);
+        return $this->toBase()->increment(
+            $column, $amount, $this->addUpdatedAtColumn($extra)
+        );
     }
 
     /**
@@ -597,9 +601,9 @@ class Builder
      */
     public function decrement($column, $amount = 1, array $extra = [])
     {
-        $extra = $this->addUpdatedAtColumn($extra);
-
-        return $this->toBase()->decrement($column, $amount, $extra);
+        return $this->toBase()->decrement(
+            $column, $amount, $this->addUpdatedAtColumn($extra)
+        );
     }
 
     /**
@@ -614,9 +618,10 @@ class Builder
             return $values;
         }
 
-        $column = $this->model->getUpdatedAtColumn();
-
-        return Arr::add($values, $column, $this->model->freshTimestampString());
+        return Arr::add(
+            $values, $this->model->getUpdatedAtColumn(),
+            $this->model->freshTimestampString()
+        );
     }
 
     /**
@@ -627,9 +632,7 @@ class Builder
     public function delete()
     {
         if (isset($this->onDelete)) {
-            $closure = $this->onDelete;
-
-            return $closure($this);
+            return call_user_func($this->onDelete, $this);
         }
 
         return $this->toBase()->delete();
@@ -637,6 +640,8 @@ class Builder
 
     /**
      * Run the default delete function on the builder.
+     *
+     * Since we do not apply scopes here, the row will actually be deleted.
      *
      * @return mixed
      */
@@ -863,225 +868,6 @@ class Builder
     }
 
     /**
-     * Add a relationship count / exists condition to the query.
-     *
-     * @param  string  $relation
-     * @param  string  $operator
-     * @param  int     $count
-     * @param  string  $boolean
-     * @param  \Closure|null  $callback
-     * @return \Illuminate\Database\Eloquent\Builder|static
-     */
-    public function has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null)
-    {
-        if (strpos($relation, '.') !== false) {
-            return $this->hasNested($relation, $operator, $count, $boolean, $callback);
-        }
-
-        $relation = $this->getHasRelationQuery($relation);
-
-        // If we only need to check for the existence of the relation, then we can
-        // optimize the subquery to only run a "where exists" clause instead of
-        // the full "count" clause. This will make the query run much faster.
-        $queryType = $this->shouldRunExistsQuery($operator, $count)
-                ? 'getRelationQuery' : 'getRelationCountQuery';
-
-        $query = $relation->{$queryType}($relation->getRelated()->newQuery(), $this);
-
-        if ($callback) {
-            $query->callScope($callback);
-        }
-
-        return $this->addHasWhere(
-            $query, $relation, $operator, $count, $boolean
-        );
-    }
-
-    /**
-     * Add nested relationship count / exists conditions to the query.
-     *
-     * @param  string  $relations
-     * @param  string  $operator
-     * @param  int     $count
-     * @param  string  $boolean
-     * @param  \Closure|null  $callback
-     * @return \Illuminate\Database\Eloquent\Builder|static
-     */
-    protected function hasNested($relations, $operator = '>=', $count = 1, $boolean = 'and', $callback = null)
-    {
-        $relations = explode('.', $relations);
-
-        // In order to nest "has", we need to add count relation constraints on the
-        // callback Closure. We'll do this by simply passing the Closure its own
-        // reference to itself so it calls itself recursively on each segment.
-        $closure = function ($q) use (&$closure, &$relations, $operator, $count, $boolean, $callback) {
-            if (count($relations) > 1) {
-                $q->whereHas(array_shift($relations), $closure);
-            } else {
-                $q->has(array_shift($relations), $operator, $count, 'and', $callback);
-            }
-        };
-
-        return $this->has(array_shift($relations), '>=', 1, $boolean, $closure);
-    }
-
-    /**
-     * Add a relationship count / exists condition to the query.
-     *
-     * @param  string  $relation
-     * @param  string  $boolean
-     * @param  \Closure|null  $callback
-     * @return \Illuminate\Database\Eloquent\Builder|static
-     */
-    public function doesntHave($relation, $boolean = 'and', Closure $callback = null)
-    {
-        return $this->has($relation, '<', 1, $boolean, $callback);
-    }
-
-    /**
-     * Add a relationship count / exists condition to the query with where clauses.
-     *
-     * @param  string  $relation
-     * @param  \Closure|null  $callback
-     * @param  string  $operator
-     * @param  int     $count
-     * @return \Illuminate\Database\Eloquent\Builder|static
-     */
-    public function whereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)
-    {
-        return $this->has($relation, $operator, $count, 'and', $callback);
-    }
-
-    /**
-     * Add a relationship count / exists condition to the query with where clauses.
-     *
-     * @param  string  $relation
-     * @param  \Closure|null  $callback
-     * @return \Illuminate\Database\Eloquent\Builder|static
-     */
-    public function whereDoesntHave($relation, Closure $callback = null)
-    {
-        return $this->doesntHave($relation, 'and', $callback);
-    }
-
-    /**
-     * Add a relationship count / exists condition to the query with an "or".
-     *
-     * @param  string  $relation
-     * @param  string  $operator
-     * @param  int     $count
-     * @return \Illuminate\Database\Eloquent\Builder|static
-     */
-    public function orHas($relation, $operator = '>=', $count = 1)
-    {
-        return $this->has($relation, $operator, $count, 'or');
-    }
-
-    /**
-     * Add a relationship count / exists condition to the query with where clauses and an "or".
-     *
-     * @param  string    $relation
-     * @param  \Closure  $callback
-     * @param  string    $operator
-     * @param  int       $count
-     * @return \Illuminate\Database\Eloquent\Builder|static
-     */
-    public function orWhereHas($relation, Closure $callback, $operator = '>=', $count = 1)
-    {
-        return $this->has($relation, $operator, $count, 'or', $callback);
-    }
-
-    /**
-     * Add the "has" condition where clause to the query.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $hasQuery
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation  $relation
-     * @param  string  $operator
-     * @param  int  $count
-     * @param  string  $boolean
-     * @return \Illuminate\Database\Eloquent\Builder|static
-     */
-    protected function addHasWhere(Builder $hasQuery, Relation $relation, $operator, $count, $boolean)
-    {
-        $hasQuery->mergeModelDefinedRelationConstraints($relation->getQuery());
-
-        if ($this->shouldRunExistsQuery($operator, $count)) {
-            $not = ($operator === '<' && $count === 1);
-
-            return $this->addWhereExistsQuery($hasQuery->toBase(), $boolean, $not);
-        }
-
-        return $this->whereCountQuery($hasQuery->toBase(), $operator, $count, $boolean);
-    }
-
-    /**
-     * Check if we can run an "exists" query to optimize performance.
-     *
-     * @param  string  $operator
-     * @param  int  $count
-     * @return bool
-     */
-    protected function shouldRunExistsQuery($operator, $count)
-    {
-        return ($operator === '>=' || $operator === '<') && $count === 1;
-    }
-
-    /**
-     * Add a sub query count clause to the query.
-     *
-     * @param  \Illuminate\Database\Query\Builder $query
-     * @param  string  $operator
-     * @param  int  $count
-     * @param  string  $boolean
-     * @return $this
-     */
-    protected function whereCountQuery(QueryBuilder $query, $operator = '>=', $count = 1, $boolean = 'and')
-    {
-        if (is_numeric($count)) {
-            $count = new Expression($count);
-        }
-
-        $this->query->addBinding($query->getBindings(), 'where');
-
-        return $this->where(new Expression('('.$query->toSql().')'), $operator, $count, $boolean);
-    }
-
-    /**
-     * Merge the constraints from a relation query to the current query.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $relation
-     * @return \Illuminate\Database\Eloquent\Builder|static
-     */
-    public function mergeModelDefinedRelationConstraints(Builder $relation)
-    {
-        $removedScopes = $relation->removedScopes();
-
-        $relationQuery = $relation->getQuery();
-
-        $whereBindings = Arr::get($relationQuery->getRawBindings(), 'where', []);
-
-        // Here we have some relation query and the original relation. We need to copy over any
-        // where clauses that the developer may have put in the relation definition function.
-        // We need to remove any global scopes that the developer already removed as well.
-        return $this->withoutGlobalScopes($removedScopes)->mergeWheres(
-            $relationQuery->wheres, $whereBindings
-        );
-    }
-
-    /**
-     * Get the "has relation" base query instance.
-     *
-     * @param  string  $relation
-     * @return \Illuminate\Database\Eloquent\Relations\Relation
-     */
-    protected function getHasRelationQuery($relation)
-    {
-        return Relation::noConstraints(function () use ($relation) {
-            return $this->getModel()->$relation();
-        });
-    }
-
-    /**
      * Set the relationships that should be eager loaded.
      *
      * @param  mixed  $relations
@@ -1113,56 +899,6 @@ class Builder
         }
 
         $this->eagerLoad = array_diff_key($this->eagerLoad, array_flip($relations));
-
-        return $this;
-    }
-
-    /**
-     * Add subselect queries to count the relations.
-     *
-     * @param  mixed  $relations
-     * @return $this
-     */
-    public function withCount($relations)
-    {
-        if (is_null($this->query->columns)) {
-            $this->query->select([$this->query->from.'.*']);
-        }
-
-        $relations = is_array($relations) ? $relations : func_get_args();
-
-        foreach ($this->parseWithRelations($relations) as $name => $constraints) {
-            // First we will determine if the name has been aliased using an "as" clause on the name
-            // and if it has we will extract the actual relationship name and the desired name of
-            // the resulting column. This allows multiple counts on the same relationship name.
-            $segments = explode(' ', $name);
-
-            unset($alias);
-
-            if (count($segments) == 3 && Str::lower($segments[1]) == 'as') {
-                list($name, $alias) = [$segments[0], $segments[2]];
-            }
-
-            $relation = $this->getHasRelationQuery($name);
-
-            // Here we will get the relationship count query and prepare to add it to the main query
-            // as a sub-select. First, we'll get the "has" query and use that to get the relation
-            // count query. We will normalize the relation name then append _count as the name.
-            $query = $relation->getRelationCountQuery(
-                $relation->getRelated()->newQuery(), $this
-            );
-
-            $query->callScope($constraints);
-
-            $query->mergeModelDefinedRelationConstraints($relation->getQuery());
-
-            // Finally we will add the proper result column alias to the query and run the subselect
-            // statement against the query builder. Then we will return the builder instance back
-            // to the developer for further constraint chaining that needs to take place on it.
-            $column = snake_case(isset($alias) ? $alias : $name).'_count';
-
-            $this->selectSub($query->toBase(), $column);
-        }
 
         return $this;
     }
@@ -1400,16 +1136,6 @@ class Builder
     }
 
     /**
-     * Get a base query builder instance.
-     *
-     * @return \Illuminate\Database\Query\Builder
-     */
-    public function toBase()
-    {
-        return $this->applyScopes()->getQuery();
-    }
-
-    /**
      * Set the underlying query builder instance.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -1420,6 +1146,16 @@ class Builder
         $this->query = $query;
 
         return $this;
+    }
+
+    /**
+     * Get a base query builder instance.
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function toBase()
+    {
+        return $this->applyScopes()->getQuery();
     }
 
     /**
@@ -1513,10 +1249,10 @@ class Builder
         }
 
         if (in_array($method, $this->passthru)) {
-            return $this->toBase()->$method(...$parameters);
+            return $this->toBase()->{$method}(...$parameters);
         }
 
-        $this->query->$method(...$parameters);
+        $this->query->{$method}(...$parameters);
 
         return $this;
     }
