@@ -1,6 +1,6 @@
 # Release Notes for 5.3.x
 
-## [Unreleased]
+## v5.3.29 (2017-01-06)
 
 ### Added
 - Added `Blueprint::nullableMorphs()` ([#16879](https://github.com/laravel/framework/pull/16879))
@@ -12,6 +12,7 @@
 - Added fallback to `SlackAttachment` notification ([#16912](https://github.com/laravel/framework/pull/16912))
 - Added `Macroable` trait to `RedirectResponse` ([#16929](https://github.com/laravel/framework/pull/16929))
 - Support namespaces when using `make:policy --model` ([#16981](https://github.com/laravel/framework/pull/16981))
+- Added `HourlyAt()` option for scheduled events ([#17168](https://github.com/laravel/framework/pull/17168))
 
 ### Changed
 - Allow SparkPost transport transmission metadata to be set at runtime ([#16838](https://github.com/laravel/framework/pull/16838))
@@ -39,6 +40,10 @@
 - Fixed logic in `ChannelManager::sendNow()` if `$channels` is `null` ([#17068](https://github.com/laravel/framework/pull/17068))
 - Fixed validating distinct for nested keys ([#17102](https://github.com/laravel/framework/pull/17102))
 - Fixed `HasManyThrough::updateOrCreate()` ([#17105](https://github.com/laravel/framework/pull/17105))
+
+### Security
+- Changed SwiftMailer version to `~5.4` ([#17131](https://github.com/laravel/framework/pull/17131))
+
 
 ## v5.3.28 (2016-12-15)
 
