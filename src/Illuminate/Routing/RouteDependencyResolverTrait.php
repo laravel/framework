@@ -109,7 +109,7 @@ trait RouteDependencyResolverTrait
      * @param  array $classNames
      * @return array
      */
-    protected function cleanDependenciesFromParameters($originalParameters, $classNames)
+    protected function cleanDependenciesFromParameters(array $originalParameters, array $classNames)
     {
         $parameters = [];
         // Remove any duplicates from class list
