@@ -868,110 +868,6 @@ class Builder
     }
 
     /**
-     * Set the relationships that should be eager loaded.
-     *
-     * @param  mixed  $relations
-     * @return $this
-     */
-    public function with($relations)
-    {
-        if (is_string($relations)) {
-            $relations = func_get_args();
-        }
-
-        $eagers = $this->parseWithRelations($relations);
-
-        $this->eagerLoad = array_merge($this->eagerLoad, $eagers);
-
-        return $this;
-    }
-
-    /**
-     * Prevent the specified relations from being eager loaded.
-     *
-     * @param  mixed  $relations
-     * @return $this
-     */
-    public function without($relations)
-    {
-        if (is_string($relations)) {
-            $relations = func_get_args();
-        }
-
-        $this->eagerLoad = array_diff_key($this->eagerLoad, array_flip($relations));
-
-        return $this;
-    }
-
-    /**
-     * Parse a list of relations into individuals.
-     *
-     * @param  array  $relations
-     * @return array
-     */
-    protected function parseWithRelations(array $relations)
-    {
-        $results = [];
-
-        foreach ($relations as $name => $constraints) {
-            // If the "relation" value is actually a numeric key, we can assume that no
-            // constraints have been specified for the eager load and we'll just put
-            // an empty Closure with the loader so that we can treat all the same.
-            if (is_numeric($name)) {
-                if (Str::contains($constraints, ':')) {
-                    list($constraints, $columns) = explode(':', $constraints);
-
-                    $f = function ($q) use ($columns) {
-                        $q->select(explode(',', $columns));
-                    };
-                } else {
-                    $f = function () {
-                        //
-                    };
-                }
-
-                list($name, $constraints) = [$constraints, $f];
-            }
-
-            // We need to separate out any nested includes. Which allows the developers
-            // to load deep relationships using "dots" without stating each level of
-            // the relationship with its own key in the array of eager load names.
-            $results = $this->parseNestedWith($name, $results);
-
-            $results[$name] = $constraints;
-        }
-
-        return $results;
-    }
-
-    /**
-     * Parse the nested relationships in a relation.
-     *
-     * @param  string  $name
-     * @param  array   $results
-     * @return array
-     */
-    protected function parseNestedWith($name, $results)
-    {
-        $progress = [];
-
-        // If the relation has already been set on the result array, we will not set it
-        // again, since that would override any constraints that were already placed
-        // on the relationships. We will only set the ones that are not specified.
-        foreach (explode('.', $name) as $segment) {
-            $progress[] = $segment;
-
-            if (! isset($results[$last = implode('.', $progress)])) {
-                $results[$last] = function () {
-                    //
-                };
-            }
-        }
-
-        return $results;
-    }
-
-    /**
      * Call the given local model scopes.
      *
      * @param  array  $scopes
@@ -1124,6 +1020,111 @@ class Builder
         $whereGroup->wheres = $whereSlice;
 
         return ['type' => 'Nested', 'query' => $whereGroup, 'boolean' => $boolean];
+    }
+
+    /**
+     * Set the relationships that should be eager loaded.
+     *
+     * @param  mixed  $relations
+     * @return $this
+     */
+    public function with($relations)
+    {
+        $eagerLoad = $this->parseWithRelations(is_string($relations) ? func_get_args() : $relations);
+
+        $this->eagerLoad = array_merge($this->eagerLoad, $eagerLoad);
+
+        return $this;
+    }
+
+    /**
+     * Prevent the specified relations from being eager loaded.
+     *
+     * @param  mixed  $relations
+     * @return $this
+     */
+    public function without($relations)
+    {
+        $this->eagerLoad = array_diff_key($this->eagerLoad, array_flip(
+            is_string($relations) ? func_get_args() : $relations
+        ));
+
+        return $this;
+    }
+
+    /**
+     * Parse a list of relations into individuals.
+     *
+     * @param  array  $relations
+     * @return array
+     */
+    protected function parseWithRelations(array $relations)
+    {
+        $results = [];
+
+        foreach ($relations as $name => $constraints) {
+            // If the "relation" value is actually a numeric key, we can assume that no
+            // constraints have been specified for the eager load and we'll just put
+            // an empty Closure with the loader so that we can treat all the same.
+            if (is_numeric($name)) {
+                $name = $constraints;
+
+                list($name, $constraints) = Str::contains($name, ':')
+                            ? $this->createSelectWithConstraint($name)
+                            : [$name, function () {
+                                //
+                            }];
+            }
+
+            // We need to separate out any nested includes. Which allows the developers
+            // to load deep relationships using "dots" without stating each level of
+            // the relationship with its own key in the array of eager load names.
+            $results = $this->addNestedWiths($name, $results);
+
+            $results[$name] = $constraints;
+        }
+
+        return $results;
+    }
+
+    /**
+     * Create a constraint to select the given columns for the relation.
+     *
+     * @param  string  $name
+     * @return array
+     */
+    protected function createSelectWithConstraint($name)
+    {
+        return [explode(':', $name)[0], function ($query) use ($name) {
+            $query->select(explode(',', explode(':', $name)[1]));
+        }];
+    }
+
+    /**
+     * Parse the nested relationships in a relation.
+     *
+     * @param  string  $name
+     * @param  array   $results
+     * @return array
+     */
+    protected function addNestedWiths($name, $results)
+    {
+        $progress = [];
+
+        // If the relation has already been set on the result array, we will not set it
+        // again, since that would override any constraints that were already placed
+        // on the relationships. We will only set the ones that are not specified.
+        foreach (explode('.', $name) as $segment) {
+            $progress[] = $segment;
+
+            if (! isset($results[$last = implode('.', $progress)])) {
+                $results[$last] = function () {
+                    //
+                };
+            }
+        }
+
+        return $results;
     }
 
     /**
