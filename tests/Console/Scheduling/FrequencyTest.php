@@ -43,6 +43,7 @@ class FrequencyTest extends TestCase
     public function testOverrideWithHourly()
     {
         $this->assertEquals('0 * * * * *', $this->event->everyFiveMinutes()->hourly()->getExpression());
+        $this->assertEquals('37 * * * * *', $this->event->hourlyAt(37)->getExpression());
     }
 
     public function testMonthlyOn()
