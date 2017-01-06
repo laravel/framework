@@ -48,6 +48,19 @@ trait QueriesRelationships
     }
 
     /**
+     * Get the "has relation" base query instance.
+     *
+     * @param  string  $relation
+     * @return \Illuminate\Database\Eloquent\Relations\Relation
+     */
+    protected function getHasRelationQuery($relation)
+    {
+        return Relation::noConstraints(function () use ($relation) {
+            return $this->getModel()->{$relation}();
+        });
+    }
+
+    /**
      * Add nested relationship count / exists conditions to the query.
      *
      * @param  string  $relations
@@ -266,18 +279,5 @@ trait QueriesRelationships
         return $this->withoutGlobalScopes($removedScopes)->mergeWheres(
             $relationQuery->wheres, $whereBindings
         );
-    }
-
-    /**
-     * Get the "has relation" base query instance.
-     *
-     * @param  string  $relation
-     * @return \Illuminate\Database\Eloquent\Relations\Relation
-     */
-    protected function getHasRelationQuery($relation)
-    {
-        return Relation::noConstraints(function () use ($relation) {
-            return $this->getModel()->$relation();
-        });
     }
 }
