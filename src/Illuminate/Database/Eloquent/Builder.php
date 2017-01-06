@@ -156,6 +156,81 @@ class Builder
     }
 
     /**
+     * Apply the callback's query changes if the given "value" is true.
+     *
+     * @param  bool  $value
+     * @param  \Closure  $callback
+     * @param  \Closure  $default
+     * @return $this
+     */
+    public function when($value, $callback, $default = null)
+    {
+        $builder = $this;
+
+        if ($value) {
+            $builder = $callback($builder);
+        } elseif ($default) {
+            $builder = $default($builder);
+        }
+
+        return $builder;
+    }
+
+    /**
+     * Add a where clause on the primary key to the query.
+     *
+     * @param  mixed  $id
+     * @return $this
+     */
+    public function whereKey($id)
+    {
+        if (is_array($id)) {
+            $this->query->whereIn($this->model->getQualifiedKeyName(), $id);
+
+            return $this;
+        }
+
+        return $this->where($this->model->getQualifiedKeyName(), '=', $id);
+    }
+
+    /**
+     * Add a basic where clause to the query.
+     *
+     * @param  string|\Closure  $column
+     * @param  string  $operator
+     * @param  mixed   $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function where($column, $operator = null, $value = null, $boolean = 'and')
+    {
+        if ($column instanceof Closure) {
+            $query = $this->model->newQueryWithoutScopes();
+
+            $column($query);
+
+            $this->query->addNestedWhereQuery($query->getQuery(), $boolean);
+        } else {
+            $this->query->where(...func_get_args());
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add an "or where" clause to the query.
+     *
+     * @param  string|\Closure  $column
+     * @param  string  $operator
+     * @param  mixed   $value
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    public function orWhere($column, $operator = null, $value = null)
+    {
+        return $this->where($column, $operator, $value, 'or');
+    }
+
+    /**
      * Find a model by its primary key.
      *
      * @param  mixed  $id
@@ -790,81 +865,6 @@ class Builder
         $dots = Str::contains($name, '.');
 
         return $dots && Str::startsWith($name, $relation.'.');
-    }
-
-    /**
-     * Apply the callback's query changes if the given "value" is true.
-     *
-     * @param  bool  $value
-     * @param  \Closure  $callback
-     * @param  \Closure  $default
-     * @return $this
-     */
-    public function when($value, $callback, $default = null)
-    {
-        $builder = $this;
-
-        if ($value) {
-            $builder = $callback($builder);
-        } elseif ($default) {
-            $builder = $default($builder);
-        }
-
-        return $builder;
-    }
-
-    /**
-     * Add a where clause on the primary key to the query.
-     *
-     * @param  mixed  $id
-     * @return $this
-     */
-    public function whereKey($id)
-    {
-        if (is_array($id)) {
-            $this->query->whereIn($this->model->getQualifiedKeyName(), $id);
-
-            return $this;
-        }
-
-        return $this->where($this->model->getQualifiedKeyName(), '=', $id);
-    }
-
-    /**
-     * Add a basic where clause to the query.
-     *
-     * @param  string|\Closure  $column
-     * @param  string  $operator
-     * @param  mixed   $value
-     * @param  string  $boolean
-     * @return $this
-     */
-    public function where($column, $operator = null, $value = null, $boolean = 'and')
-    {
-        if ($column instanceof Closure) {
-            $query = $this->model->newQueryWithoutScopes();
-
-            $column($query);
-
-            $this->query->addNestedWhereQuery($query->getQuery(), $boolean);
-        } else {
-            $this->query->where(...func_get_args());
-        }
-
-        return $this;
-    }
-
-    /**
-     * Add an "or where" clause to the query.
-     *
-     * @param  string|\Closure  $column
-     * @param  string  $operator
-     * @param  mixed   $value
-     * @return \Illuminate\Database\Eloquent\Builder|static
-     */
-    public function orWhere($column, $operator = null, $value = null)
-    {
-        return $this->where($column, $operator, $value, 'or');
     }
 
     /**
