@@ -8,7 +8,6 @@ use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\TableDiff;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Schema\Grammars\Grammar;
 use Doctrine\DBAL\Schema\AbstractSchemaManager as SchemaManager;
 
 class RenameColumn
