@@ -327,7 +327,6 @@ class HasManyThrough extends Relation
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @param  array  $joining
      * @param  bool   $touch
      * @return \Illuminate\Database\Eloquent\Model
      */
