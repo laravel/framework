@@ -8,6 +8,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use UnexpectedValueException;
 use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 
@@ -44,11 +45,11 @@ class PasswordBroker implements PasswordBrokerContract
     /**
      * Create a new password broker instance.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @param  \Illuminate\Contracts\Auth\UserProvider  $users
      * @return void
      */
-    public function __construct($app, UserProvider $users, $expiration)
+    public function __construct(Application $app, UserProvider $users, $expiration)
     {
         $this->app = $app;
         $this->users = $users;
