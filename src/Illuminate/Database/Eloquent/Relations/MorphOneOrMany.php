@@ -197,7 +197,7 @@ abstract class MorphOneOrMany extends HasOneOrMany
      */
     protected function setForeignAttributesForCreate(Model $model)
     {
-        $model->{$this->getPlainForeignKey()} = $this->getParentKey();
+        $model->{$this->getForeignKeyName()} = $this->getParentKey();
 
         $model->{last(explode('.', $this->morphType))} = $this->morphClass;
     }

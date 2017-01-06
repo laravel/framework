@@ -158,11 +158,10 @@ abstract class Relation
      */
     public function getRelationQuery(Builder $query, Builder $parent, $columns = ['*'])
     {
-        $query->select($columns);
-
-        $key = $this->wrap($this->getQualifiedParentKeyName());
-
-        return $query->where($this->getHasCompareKey(), '=', new Expression($key));
+        return $query->select($columns)->where(
+            $this->getHasCompareKey(), '=',
+            new Expression($this->wrap($this->getQualifiedParentKeyName()))
+        );
     }
 
     /**
@@ -181,12 +180,10 @@ abstract class Relation
         // off of the bindings, leaving only the constraints that the developers put
         // as "extra" on the relationships, and not original relation constraints.
         try {
-            $results = call_user_func($callback);
+            return call_user_func($callback);
         } finally {
             static::$constraints = $previous;
         }
-
-        return $results;
     }
 
     /**
@@ -198,9 +195,9 @@ abstract class Relation
      */
     protected function getKeys(array $models, $key = null)
     {
-        return array_unique(array_values(array_map(function ($value) use ($key) {
+        return collect($models)->map(function ($value) use ($key) {
             return $key ? $value->getAttribute($key) : $value->getKey();
-        }, $models)));
+        })->values()->unique()->all();
     }
 
     /**
@@ -291,7 +288,8 @@ abstract class Relation
      */
     public function wrap($value)
     {
-        return $this->parent->newQueryWithoutScopes()->getQuery()->getGrammar()->wrap($value);
+        return $this->parent->newQueryWithoutScopes()
+                    ->getQuery()->getGrammar()->wrap($value);
     }
 
     /**
@@ -325,11 +323,9 @@ abstract class Relation
             return $models;
         }
 
-        $tables = array_map(function ($model) {
+        return array_combine(array_map(function ($model) {
             return (new $model)->getTable();
-        }, $models);
-
-        return array_combine($tables, $models);
+        }, $models), $models);
     }
 
     /**
