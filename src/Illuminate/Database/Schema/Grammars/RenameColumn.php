@@ -21,7 +21,7 @@ class RenameColumn
      * @param  \Illuminate\Database\Connection  $connection
      * @return array
      */
-    public static function compile($grammar, Blueprint $blueprint, Fluent $command, Connection $connection)
+    public static function compile(Grammar $grammar, Blueprint $blueprint, Fluent $command, Connection $connection)
     {
         $column = $connection->getDoctrineColumn(
             $grammar->getTablePrefix().$blueprint->getTable(), $command->from
@@ -44,7 +44,7 @@ class RenameColumn
      * @param  \Doctrine\DBAL\Schema\AbstractSchemaManager  $schema
      * @return \Doctrine\DBAL\Schema\TableDiff
      */
-    protected static function getRenamedDiff($grammar, Blueprint $blueprint, Fluent $command, Column $column, SchemaManager $schema)
+    protected static function getRenamedDiff(Grammar $grammar, Blueprint $blueprint, Fluent $command, Column $column, SchemaManager $schema)
     {
         return static::setRenamedColumns(
             $grammar->getDoctrineTableDiff($blueprint, $schema), $command, $column
