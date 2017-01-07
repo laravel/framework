@@ -56,6 +56,8 @@ trait QueriesRelationships
     /**
      * Add nested relationship count / exists conditions to the query.
      *
+     * Sets up recursive call to whereHas until we finish the nested relation.
+     *
      * @param  string  $relations
      * @param  string  $operator
      * @param  int     $count
