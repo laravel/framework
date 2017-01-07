@@ -127,7 +127,7 @@ trait AuthenticatesUsers
         return redirect()->back()
             ->withInput($request->only($this->username(), 'remember'))
             ->withErrors([
-                $this->username() => Lang::get('auth.failed'),
+                $this->username() => trans('auth.failed'),
             ]);
     }
 
