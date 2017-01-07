@@ -140,29 +140,31 @@ abstract class Relation
      * Add the constraints for a relationship count query.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Builder  $parent
+     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function getRelationCountQuery(Builder $query, Builder $parent)
+    public function getRelationExistenceCountQuery(Builder $query, Builder $parentQuery)
     {
-        return $this->getRelationQuery($query, $parent, new Expression('count(*)'));
+        return $this->getRelationExistenceQuery(
+            $query, $parentQuery, new Expression('count(*)')
+        );
     }
 
     /**
-     * Add the constraints for a relationship query.
+     * Add the constraints for an internal relationship existence query.
+     *
+     * Essentially, these queries compare on column names like whereColumn.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Builder  $parent
+     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
      * @param  array|mixed $columns
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function getRelationQuery(Builder $query, Builder $parent, $columns = ['*'])
+    public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
     {
-        $query->select($columns);
-
-        $key = $this->wrap($this->getQualifiedParentKeyName());
-
-        return $query->where($this->getHasCompareKey(), '=', new Expression($key));
+        return $query->select($columns)->whereColumn(
+            $this->getQualifiedParentKeyName(), '=', $this->getExistenceCompareKey()
+        );
     }
 
     /**
@@ -181,12 +183,10 @@ abstract class Relation
         // off of the bindings, leaving only the constraints that the developers put
         // as "extra" on the relationships, and not original relation constraints.
         try {
-            $results = call_user_func($callback);
+            return call_user_func($callback);
         } finally {
             static::$constraints = $previous;
         }
-
-        return $results;
     }
 
     /**
@@ -198,9 +198,9 @@ abstract class Relation
      */
     protected function getKeys(array $models, $key = null)
     {
-        return array_unique(array_values(array_map(function ($value) use ($key) {
+        return collect($models)->map(function ($value) use ($key) {
             return $key ? $value->getAttribute($key) : $value->getKey();
-        }, $models)));
+        })->values()->unique()->all();
     }
 
     /**
@@ -284,17 +284,6 @@ abstract class Relation
     }
 
     /**
-     * Wrap the given value with the parent query's grammar.
-     *
-     * @param  string  $value
-     * @return string
-     */
-    public function wrap($value)
-    {
-        return $this->parent->newQueryWithoutScopes()->getQuery()->getGrammar()->wrap($value);
-    }
-
-    /**
      * Set or get the morph map for polymorphic relations.
      *
      * @param  array|null  $map
@@ -325,11 +314,9 @@ abstract class Relation
             return $models;
         }
 
-        $tables = array_map(function ($model) {
+        return array_combine(array_map(function ($model) {
             return (new $model)->getTable();
-        }, $models);
-
-        return array_combine($tables, $models);
+        }, $models), $models);
     }
 
     /**

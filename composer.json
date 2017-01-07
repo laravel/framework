@@ -25,7 +25,7 @@
         "mtdowling/cron-expression": "~1.0",
         "nesbot/carbon": "~1.20",
         "ramsey/uuid": "~3.0",
-        "swiftmailer/swiftmailer": "~5.1",
+        "swiftmailer/swiftmailer": "~5.4",
         "symfony/console": "~3.2",
         "symfony/debug": "~3.2",
         "symfony/finder": "~3.2",
@@ -75,6 +75,7 @@
         "pda/pheanstalk": "~3.0",
         "phpunit/phpunit": "~5.7",
         "predis/predis": "~1.0",
+        "doctrine/dbal": "~2.5",
         "symfony/css-selector": "~3.2",
         "symfony/dom-crawler": "~3.2"
     },

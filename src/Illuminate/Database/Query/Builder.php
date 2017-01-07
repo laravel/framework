@@ -1340,6 +1340,20 @@ class Builder
     {
         $type = 'Basic';
 
+        // Here we will make some assumptions about the operator. If only 2 values are
+        // passed to the method, we will assume that the operator is an equals sign
+        // and keep going. Otherwise, we'll require the operator to be passed in.
+        list($value, $operator) = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() == 2
+        );
+
+        // If the given operator is not found in the list of valid operators we will
+        // assume that the developer is just short-cutting the '=' operators and
+        // we will set the operators to '=' and set the values appropriately.
+        if ($this->invalidOperator($operator)) {
+            list($value, $operator) = [$operator, '='];
+        }
+
         $this->havings[] = compact('type', 'column', 'operator', 'value', 'boolean');
 
         if (! $value instanceof Expression) {
@@ -1847,7 +1861,7 @@ class Builder
             // On each chunk result set, we will pass them to the callback and then let the
             // developer take care of everything within the callback, which allows us to
             // keep the memory low for spinning through large result sets for working.
-            if (call_user_func($callback, $results) === false) {
+            if ($callback($results) === false) {
                 return false;
             }
 
@@ -1889,7 +1903,7 @@ class Builder
             // On each chunk result set, we will pass them to the callback and then let the
             // developer take care of everything within the callback, which allows us to
             // keep the memory low for spinning through large result sets for working.
-            if (call_user_func($callback, $results) === false) {
+            if ($callback($results) === false) {
                 return false;
             }
 

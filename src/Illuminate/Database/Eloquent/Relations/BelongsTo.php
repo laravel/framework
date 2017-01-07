@@ -4,7 +4,6 @@ namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Collection;
 
 class BelongsTo extends Relation
@@ -87,32 +86,32 @@ class BelongsTo extends Relation
      * Add the constraints for a relationship query.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Builder  $parent
+     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
      * @param  array|mixed  $columns
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function getRelationQuery(Builder $query, Builder $parent, $columns = ['*'])
+    public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
     {
-        if ($parent->getQuery()->from == $query->getQuery()->from) {
-            return $this->getRelationQueryForSelfRelation($query, $parent, $columns);
+        if ($parentQuery->getQuery()->from == $query->getQuery()->from) {
+            return $this->getRelationExistenceQueryForSelfRelation($query, $parentQuery, $columns);
         }
 
         $query->select($columns);
 
-        $otherKey = $this->wrap($query->getModel()->getTable().'.'.$this->otherKey);
+        $otherKey = $query->getModel()->getTable().'.'.$this->otherKey;
 
-        return $query->where($this->getQualifiedForeignKey(), '=', new Expression($otherKey));
+        return $query->whereColumn($this->getQualifiedForeignKey(), '=', $otherKey);
     }
 
     /**
      * Add the constraints for a relationship query on the same table.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Builder  $parent
+     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
      * @param  array|mixed  $columns
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function getRelationQueryForSelfRelation(Builder $query, Builder $parent, $columns = ['*'])
+    public function getRelationExistenceQueryForSelfRelation(Builder $query, Builder $parentQuery, $columns = ['*'])
     {
         $query->select($columns);
 
@@ -120,9 +119,9 @@ class BelongsTo extends Relation
 
         $query->getModel()->setTable($hash);
 
-        $key = $this->wrap($this->getQualifiedForeignKey());
-
-        return $query->where($hash.'.'.$query->getModel()->getKeyName(), '=', new Expression($key));
+        return $query->whereColumn(
+            $hash.'.'.$query->getModel()->getKeyName(), '=', $this->getQualifiedForeignKey()
+        );
     }
 
     /**

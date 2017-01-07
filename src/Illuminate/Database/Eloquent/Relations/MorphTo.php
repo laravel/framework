@@ -184,7 +184,7 @@ class MorphTo extends BelongsTo
         $key = $instance->getTable().'.'.$instance->getKeyName();
 
         $query = $this->replayMacros($instance->newQuery())
-            ->mergeModelDefinedRelationConstraints($this->getQuery())
+            ->mergeConstraintsFrom($this->getQuery())
             ->with($this->getQuery()->getEagerLoads());
 
         return $query->whereIn($key, $this->gatherKeysByType($type)->all())->get();

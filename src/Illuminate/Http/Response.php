@@ -13,13 +13,6 @@ class Response extends BaseResponse
     use ResponseTrait;
 
     /**
-     * The original content of the response.
-     *
-     * @var mixed
-     */
-    public $original;
-
-    /**
      * Set the content on the response.
      *
      * @param  mixed  $content
@@ -75,15 +68,5 @@ class Response extends BaseResponse
         }
 
         return json_encode($content);
-    }
-
-    /**
-     * Get the original response content.
-     *
-     * @return mixed
-     */
-    public function getOriginalContent()
-    {
-        return $this->original;
     }
 }

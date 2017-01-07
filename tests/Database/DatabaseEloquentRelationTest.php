@@ -2,12 +2,10 @@
 
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Grammar;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Query\Builder as QueryBuilder;
 
 class DatabaseEloquentRelationTest extends TestCase
 {
@@ -63,30 +61,6 @@ class DatabaseEloquentRelationTest extends TestCase
         ], Relation::morphMap());
 
         Relation::morphMap([], false);
-    }
-
-    /**
-     * Testing to ensure loop does not occur during relational queries in global scopes.
-     *
-     * Executing parent model's global scopes could result in an infinite loop when the
-     * parent model's global scope utilizes a relation in a query like has or whereHas
-     */
-    public function testDonNotRunParentModelGlobalScopes()
-    {
-        /* @var Mockery\MockInterface $parent */
-        $eloquentBuilder = m::mock(Builder::class);
-        $queryBuilder = m::mock(QueryBuilder::class);
-        $parent = m::mock(EloquentRelationResetModelStub::class)->makePartial();
-        $grammar = m::mock(Grammar::class);
-
-        $eloquentBuilder->shouldReceive('getModel')->andReturn($related = m::mock(StdClass::class));
-        $eloquentBuilder->shouldReceive('getQuery')->andReturn($queryBuilder);
-        $queryBuilder->shouldReceive('getGrammar')->andReturn($grammar);
-        $grammar->shouldReceive('wrap');
-        $parent->shouldReceive('newQueryWithoutScopes')->andReturn($eloquentBuilder);
-
-        $relation = new EloquentRelationStub($eloquentBuilder, $parent);
-        $relation->wrap('test');
     }
 }
 

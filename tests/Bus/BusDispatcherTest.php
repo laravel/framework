@@ -4,6 +4,7 @@ use Mockery as m;
 use Illuminate\Bus\Dispatcher;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
+use Illuminate\Config\Repository as Config;
 
 class BusDispatcherTest extends TestCase
 {
@@ -77,6 +78,32 @@ class BusDispatcherTest extends TestCase
 
         $this->assertInstanceOf(StandAloneCommand::class, $response);
     }
+
+    public function testOnConnectionOnJobWhenDispatching()
+    {
+        $container = new Container;
+        $container->singleton('config', function () {
+            return new Config([
+                'queue' => [
+                    'default' => 'null',
+                    'connections' => [
+                        'null' => ['driver' => 'null'],
+                    ],
+                ],
+            ]);
+        });
+
+        $dispatcher = new Dispatcher($container, function () {
+            $mock = m::mock('Illuminate\Contracts\Queue\Queue');
+            $mock->shouldReceive('push')->once();
+
+            return $mock;
+        });
+
+        $job = (new ShouldNotBeDispatched)->onConnection('null');
+
+        $dispatcher->dispatch($job);
+    }
 }
 
 class BusInjectionStub
@@ -121,5 +148,16 @@ class StandAloneHandler
     public function handle(StandAloneCommand $command)
     {
         return $command;
+    }
+}
+
+class ShouldNotBeDispatched implements Illuminate\Contracts\Queue\ShouldQueue
+{
+    use Illuminate\Bus\Queueable,
+        Illuminate\Queue\InteractsWithQueue;
+
+    public function handle()
+    {
+        throw new RuntimeException('This should not be run');
     }
 }

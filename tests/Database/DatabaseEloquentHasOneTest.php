@@ -161,14 +161,11 @@ class DatabaseEloquentHasOneTest extends TestCase
         $builder->shouldReceive('getQuery')->once()->andReturn($baseQuery);
         $builder->shouldReceive('getQuery')->once()->andReturn($parentQuery);
 
-        $builder->shouldReceive('select')->once()->with(m::type('Illuminate\Database\Query\Expression'));
+        $builder->shouldReceive('select')->once()->with(m::type('Illuminate\Database\Query\Expression'))->andReturnSelf();
         $relation->getParent()->shouldReceive('getTable')->andReturn('table');
-        $builder->shouldReceive('where')->once()->with('table.foreign_key', '=', m::type('Illuminate\Database\Query\Expression'));
-        $relation->getQuery()->shouldReceive('getQuery')->andReturn($parentQuery = m::mock('StdClass'));
-        $parentQuery->shouldReceive('getGrammar')->once()->andReturn($grammar = m::mock('StdClass'));
-        $grammar->shouldReceive('wrap')->once()->with('table.id');
+        $builder->shouldReceive('whereColumn')->once()->with('table.id', '=', 'table.foreign_key');
 
-        $relation->getRelationCountQuery($builder, $builder);
+        $relation->getRelationExistenceCountQuery($builder, $builder);
     }
 
     protected function getRelation()

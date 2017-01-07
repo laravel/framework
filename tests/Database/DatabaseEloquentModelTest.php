@@ -105,7 +105,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testHydrateRawMakesRawQuery()
     {
-        $collection = EloquentModelHydrateRawStub::hydrateRaw('SELECT ?', ['foo']);
+        $collection = EloquentModelHydrateRawStub::fromQuery('SELECT ?', ['foo']);
         $this->assertEquals('hydrated', $collection);
     }
 
@@ -907,12 +907,12 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelStub;
         $this->addMockConnection($model);
         $relation = $model->hasOne('EloquentModelSaveStub');
-        $this->assertEquals('save_stub.eloquent_model_stub_id', $relation->getForeignKey());
+        $this->assertEquals('save_stub.eloquent_model_stub_id', $relation->getQualifiedForeignKeyName());
 
         $model = new EloquentModelStub;
         $this->addMockConnection($model);
         $relation = $model->hasOne('EloquentModelSaveStub', 'foo');
-        $this->assertEquals('save_stub.foo', $relation->getForeignKey());
+        $this->assertEquals('save_stub.foo', $relation->getQualifiedForeignKeyName());
         $this->assertSame($model, $relation->getParent());
         $this->assertInstanceOf('EloquentModelSaveStub', $relation->getQuery()->getModel());
     }
@@ -922,7 +922,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelStub;
         $this->addMockConnection($model);
         $relation = $model->morphOne('EloquentModelSaveStub', 'morph');
-        $this->assertEquals('save_stub.morph_id', $relation->getForeignKey());
+        $this->assertEquals('save_stub.morph_id', $relation->getQualifiedForeignKeyName());
         $this->assertEquals('save_stub.morph_type', $relation->getMorphType());
         $this->assertEquals('EloquentModelStub', $relation->getMorphClass());
     }
@@ -944,12 +944,12 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelStub;
         $this->addMockConnection($model);
         $relation = $model->hasMany('EloquentModelSaveStub');
-        $this->assertEquals('save_stub.eloquent_model_stub_id', $relation->getForeignKey());
+        $this->assertEquals('save_stub.eloquent_model_stub_id', $relation->getQualifiedForeignKeyName());
 
         $model = new EloquentModelStub;
         $this->addMockConnection($model);
         $relation = $model->hasMany('EloquentModelSaveStub', 'foo');
-        $this->assertEquals('save_stub.foo', $relation->getForeignKey());
+        $this->assertEquals('save_stub.foo', $relation->getQualifiedForeignKeyName());
         $this->assertSame($model, $relation->getParent());
         $this->assertInstanceOf('EloquentModelSaveStub', $relation->getQuery()->getModel());
     }
@@ -959,7 +959,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelStub;
         $this->addMockConnection($model);
         $relation = $model->morphMany('EloquentModelSaveStub', 'morph');
-        $this->assertEquals('save_stub.morph_id', $relation->getForeignKey());
+        $this->assertEquals('save_stub.morph_id', $relation->getQualifiedForeignKeyName());
         $this->assertEquals('save_stub.morph_type', $relation->getMorphType());
         $this->assertEquals('EloquentModelStub', $relation->getMorphClass());
     }

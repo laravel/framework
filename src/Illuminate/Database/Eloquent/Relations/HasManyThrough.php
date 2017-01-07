@@ -4,7 +4,6 @@ namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -82,11 +81,11 @@ class HasManyThrough extends Relation
      * Add the constraints for a relationship query.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Builder  $parent
+     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
      * @param  array|mixed  $columns
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function getRelationQuery(Builder $query, Builder $parent, $columns = ['*'])
+    public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
     {
         $parentTable = $this->parent->getTable();
 
@@ -94,9 +93,9 @@ class HasManyThrough extends Relation
 
         $query->select($columns);
 
-        $key = $this->wrap($parentTable.'.'.$this->firstKey);
-
-        return $query->where($this->getHasCompareKey(), '=', new Expression($key));
+        return $query->whereColumn(
+            $this->getExistenceCompareKey(), '=', $parentTable.'.'.$this->firstKey
+        );
     }
 
     /**
@@ -308,6 +307,38 @@ class HasManyThrough extends Relation
     }
 
     /**
+     * Get the first related model record matching the attributes or instantiate it.
+     *
+     * @param  array  $attributes
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function firstOrNew(array $attributes)
+    {
+        if (is_null($instance = $this->where($attributes)->first())) {
+            $instance = $this->related->newInstance($attributes);
+        }
+
+        return $instance;
+    }
+
+    /**
+     * Create or update a related record matching the attributes, and fill it with values.
+     *
+     * @param  array  $attributes
+     * @param  array  $values
+     * @param  bool   $touch
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function updateOrCreate(array $attributes, array $values = [])
+    {
+        $instance = $this->firstOrNew($attributes);
+
+        $instance->fill($values)->save();
+
+        return $instance;
+    }
+
+    /**
      * Execute the query as a "select" statement.
      *
      * @param  array  $columns
@@ -388,7 +419,7 @@ class HasManyThrough extends Relation
      *
      * @return string
      */
-    public function getHasCompareKey()
+    public function getExistenceCompareKey()
     {
         return $this->farParent->getQualifiedKeyName();
     }

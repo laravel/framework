@@ -38,6 +38,16 @@ class HttpJsonResponseTest extends TestCase
         $this->assertEquals('bar', $data->foo);
     }
 
+    public function testGetOriginalContent()
+    {
+        $response = new Illuminate\Http\JsonResponse(new JsonResponseTestArrayableObject);
+        $this->assertInstanceOf(JsonResponseTestArrayableObject::class, $response->getOriginalContent());
+
+        $response = new Illuminate\Http\JsonResponse;
+        $response->setData(new JsonResponseTestArrayableObject);
+        $this->assertInstanceOf(JsonResponseTestArrayableObject::class, $response->getOriginalContent());
+    }
+
     public function testSetAndRetrieveOptions()
     {
         $response = new Illuminate\Http\JsonResponse(['foo' => 'bar']);

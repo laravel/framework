@@ -386,13 +386,13 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testEagerLoadRelationsLoadTopLevelRelationships()
     {
-        $builder = m::mock('Illuminate\Database\Eloquent\Builder[loadRelation]', [$this->getMockQueryBuilder()]);
+        $builder = m::mock('Illuminate\Database\Eloquent\Builder[eagerLoadRelation]', [$this->getMockQueryBuilder()]);
         $nop1 = function () {
         };
         $nop2 = function () {
         };
         $builder->setEagerLoads(['foo' => $nop1, 'foo.bar' => $nop2]);
-        $builder->shouldAllowMockingProtectedMethods()->shouldReceive('loadRelation')->with(['models'], 'foo', $nop1)->andReturn(['foo']);
+        $builder->shouldAllowMockingProtectedMethods()->shouldReceive('eagerLoadRelation')->with(['models'], 'foo', $nop1)->andReturn(['foo']);
 
         $results = $builder->eagerLoadRelations(['models']);
         $this->assertEquals(['foo'], $results);
@@ -790,7 +790,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $sql = preg_replace($aliasRegex, $alias, $sql);
 
-        $this->assertContains('"self_related_stubs"."parent_id" = "self_alias_hash"."id"', $sql);
+        $this->assertContains('"self_alias_hash"."id" = "self_related_stubs"."parent_id"', $sql);
     }
 
     protected function mockConnectionForModel($model, $database)
