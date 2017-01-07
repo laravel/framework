@@ -457,6 +457,7 @@ class Blueprint
     public function char($column, $length = null)
     {
         $length = $length ?: $this->defaultLength;
+
         return $this->addColumn('char', $column, compact('length'));
     }
 
