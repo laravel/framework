@@ -1515,13 +1515,34 @@ class Builder
         if ($query instanceof Closure) {
             call_user_func($query, $query = $this->newQuery());
         }
-
+        
+        if ($query instanceof Model) {
+            return $this->merge($query);
+        }
+        
         $this->unions[] = compact('query', 'all');
 
         $this->addBinding($query->getBindings(), 'union');
 
         return $this;
     }
+    
+    /**
+     * Merge model record into simple query
+     *
+     * @param Model $model
+     * @return Builder|static
+     * @throws InvalidArgumentException
+     */
+    protected function merge(Model $model)
+    {
+        if ($model->getTable() === $this->from ) {
+            return $this->union(
+                \DB::table($this->from)->where($model->getKeyName(), $model->getKey())
+            );
+        }
+        throw new InvalidArgumentException();
+    }    
 
     /**
      * Add a union all statement to the query.
