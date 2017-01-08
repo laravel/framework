@@ -1532,7 +1532,8 @@ class Builder
      *
      * @param Model $model
      * @return Builder|static
-     * @throws InvalidArgumentException
+     *
+     * @throws \InvalidArgumentException
      */
     protected function merge(Model $model)
     {
