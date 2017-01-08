@@ -1526,7 +1526,7 @@ class Builder
 
         return $this;
     }
-    
+
     /**
      * Merge model record into simple query.
      *
