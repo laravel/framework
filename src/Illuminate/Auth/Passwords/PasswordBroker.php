@@ -278,7 +278,6 @@ class PasswordBroker implements PasswordBrokerContract
             $email,
             $expiration,
             $user->getKey(),
-            $user->updated_at->timestamp,
             $user->password,
         ]);
     }
