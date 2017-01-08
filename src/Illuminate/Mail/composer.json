@@ -19,7 +19,7 @@
         "illuminate/contracts": "5.3.*",
         "illuminate/support": "5.3.*",
         "psr/log": "~1.0",
-        "swiftmailer/swiftmailer": "~5.1"
+        "swiftmailer/swiftmailer": "~5.4"
     },
     "autoload": {
         "psr-4": {
