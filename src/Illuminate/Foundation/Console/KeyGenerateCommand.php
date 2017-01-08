@@ -52,7 +52,7 @@ class KeyGenerateCommand extends Command
     protected function setKeyInEnvironmentFile($key)
     {
         file_put_contents($this->laravel->environmentFilePath(), preg_replace(
-            $this->getAppKeyPattern(),
+            $this->keyReplacementPattern(),
             'APP_KEY='.$key,
             file_get_contents($this->laravel->environmentFilePath())
         ));
@@ -75,10 +75,10 @@ class KeyGenerateCommand extends Command
      *
      * @return string
      */
-    protected function getAppKeyPattern()
+    protected function keyReplacementPattern()
     {
-        $escapedKey = preg_quote('='.$this->laravel['config']['app.key'], '/');
+        $escaped = preg_quote('='.$this->laravel['config']['app.key'], '/');
 
-        return "/^APP_KEY$escapedKey/m";
+        return "/^APP_KEY{$escaped}/m";
     }
 }
