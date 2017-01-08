@@ -221,7 +221,7 @@ abstract class ServiceProvider
      */
     public function isDeferred()
     {
-        return isset($this->defer) ? $this->defer : flase;
+        return isset($this->defer) ? $this->defer : false;
     }
 
     /**
