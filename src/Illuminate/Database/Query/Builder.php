@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\ConnectionInterface;
@@ -1530,8 +1531,8 @@ class Builder
     /**
      * Merge model record into simple query.
      *
-     * @param Model $model
-     * @return Builder|static
+     * @param \Illuminate\Database\Eloquent\Model $model
+     * @return \Illuminate\Database\Query\Builder|static
      *
      * @throws \InvalidArgumentException
      */
