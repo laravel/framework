@@ -21,7 +21,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
     /**
      * The container instance.
      *
-     * @var \Illuminate\Container\Container
+     * @var \Illuminate\Contracts\Container\Container
      */
     protected $container;
 
