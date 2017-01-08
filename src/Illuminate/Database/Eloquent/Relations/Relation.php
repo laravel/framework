@@ -63,6 +63,28 @@ abstract class Relation
     }
 
     /**
+     * Run a callback with constraints disabled on the relation.
+     *
+     * @param  \Closure  $callback
+     * @return mixed
+     */
+    public static function noConstraints(Closure $callback)
+    {
+        $previous = static::$constraints;
+
+        static::$constraints = false;
+
+        // When resetting the relation where clause, we want to shift the first element
+        // off of the bindings, leaving only the constraints that the developers put
+        // as "extra" on the relationships, and not original relation constraints.
+        try {
+            return call_user_func($callback);
+        } finally {
+            static::$constraints = $previous;
+        }
+    }
+
+    /**
      * Set the base constraints on the relation query.
      *
      * @return void
@@ -165,28 +187,6 @@ abstract class Relation
         return $query->select($columns)->whereColumn(
             $this->getQualifiedParentKeyName(), '=', $this->getExistenceCompareKey()
         );
-    }
-
-    /**
-     * Run a callback with constraints disabled on the relation.
-     *
-     * @param  \Closure  $callback
-     * @return mixed
-     */
-    public static function noConstraints(Closure $callback)
-    {
-        $previous = static::$constraints;
-
-        static::$constraints = false;
-
-        // When resetting the relation where clause, we want to shift the first element
-        // off of the bindings, leaving only the constraints that the developers put
-        // as "extra" on the relationships, and not original relation constraints.
-        try {
-            return call_user_func($callback);
-        } finally {
-            static::$constraints = $previous;
-        }
     }
 
     /**

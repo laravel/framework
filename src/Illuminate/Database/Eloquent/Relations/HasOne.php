@@ -17,19 +17,6 @@ class HasOne extends HasOneOrMany
     protected $withDefault;
 
     /**
-     * Return a new model instance in case the relationship does not exist.
-     *
-     * @param  \Closure|bool  $callback
-     * @return $this
-     */
-    public function withDefault($callback = true)
-    {
-        $this->withDefault = $callback;
-
-        return $this;
-    }
-
-    /**
      * Get the results of the relationship.
      *
      * @return mixed
@@ -53,19 +40,6 @@ class HasOne extends HasOneOrMany
         }
 
         return $models;
-    }
-
-    /**
-     * Match the eagerly loaded results to their parents.
-     *
-     * @param  array  $models
-     * @param  \Illuminate\Database\Eloquent\Collection  $results
-     * @param  string  $relation
-     * @return array
-     */
-    public function match(array $models, Collection $results, $relation)
-    {
-        return $this->matchOne($models, $results, $relation);
     }
 
     /**
@@ -93,5 +67,31 @@ class HasOne extends HasOneOrMany
         }
 
         return $instance;
+    }
+
+    /**
+     * Match the eagerly loaded results to their parents.
+     *
+     * @param  array  $models
+     * @param  \Illuminate\Database\Eloquent\Collection  $results
+     * @param  string  $relation
+     * @return array
+     */
+    public function match(array $models, Collection $results, $relation)
+    {
+        return $this->matchOne($models, $results, $relation);
+    }
+
+    /**
+     * Return a new model instance in case the relationship does not exist.
+     *
+     * @param  \Closure|bool  $callback
+     * @return $this
+     */
+    public function withDefault($callback = true)
+    {
+        $this->withDefault = $callback;
+
+        return $this;
     }
 }
