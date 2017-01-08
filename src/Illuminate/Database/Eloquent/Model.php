@@ -824,6 +824,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Determine if the model uses soft deletes.
+     *
+     * @return bool
+     */
+    public function isSoftDeleting()
+    {
+        return false;
+    }
+
+    /**
      * Begin querying the model.
      *
      * @return \Illuminate\Database\Eloquent\Builder
