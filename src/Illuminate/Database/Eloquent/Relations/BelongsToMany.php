@@ -32,7 +32,7 @@ class BelongsToMany extends Relation
      *
      * @var string
      */
-    protected $otherKey;
+    protected $relatedKey;
 
     /**
      * The "name" of the relationship.
@@ -97,14 +97,14 @@ class BelongsToMany extends Relation
      * @param  \Illuminate\Database\Eloquent\Model  $parent
      * @param  string  $table
      * @param  string  $foreignKey
-     * @param  string  $otherKey
+     * @param  string  $relatedKey
      * @param  string  $relationName
      * @return void
      */
-    public function __construct(Builder $query, Model $parent, $table, $foreignKey, $otherKey, $relationName = null)
+    public function __construct(Builder $query, Model $parent, $table, $foreignKey, $relatedKey, $relationName = null)
     {
         $this->table = $table;
-        $this->otherKey = $otherKey;
+        $this->relatedKey = $relatedKey;
         $this->foreignKey = $foreignKey;
         $this->relationName = $relationName;
 
@@ -142,7 +142,7 @@ class BelongsToMany extends Relation
 
         $key = $baseTable.'.'.$this->related->getKeyName();
 
-        $query->join($this->table, $key, '=', $this->getQualifiedOtherKeyName());
+        $query->join($this->table, $key, '=', $this->getQualifiedRelatedKeyName());
 
         return $this;
     }
@@ -521,7 +521,7 @@ class BelongsToMany extends Relation
      */
     protected function aliasedPivotColumns()
     {
-        $defaults = [$this->foreignKey, $this->otherKey];
+        $defaults = [$this->foreignKey, $this->relatedKey];
 
         return collect(array_merge($defaults, $this->pivotColumns))->map(function ($column) {
             return $this->table.'.'.$column.' as pivot_'.$column;
@@ -880,13 +880,13 @@ class BelongsToMany extends Relation
     }
 
     /**
-     * Get the fully qualified "other key" for the relation.
+     * Get the fully qualified "related key" for the relation.
      *
      * @return string
      */
-    public function getQualifiedOtherKeyName()
+    public function getQualifiedRelatedKeyName()
     {
-        return $this->table.'.'.$this->otherKey;
+        return $this->table.'.'.$this->relatedKey;
     }
 
     /**
