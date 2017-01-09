@@ -24,6 +24,32 @@ class PostgresConnection extends Connection
         return new PostgresBuilder($this);
     }
 
+    public function prepareBindings(array $bindings)
+    {
+        $grammar = $this->getQueryGrammar();
+
+        foreach ($bindings as $key => $value) {
+            // We need to transform all instances of DateTimeInterface into the actual
+            // date string. Each query grammar maintains its own date string format
+            // so we'll just ask the grammar for the format to get from the date.
+            if ($value instanceof DateTimeInterface) {
+                $bindings[$key] = $value->format($grammar->getDateFormat());
+            } 
+            elseif ($value === false) {
+                $bindings[$key] = 0;
+            }
+            elseif (empty($value) && ! is_numeric($value)) {
+                // Some types, such as date, do not involve the use of an empty string as a null.
+                // Therefore use more enhanced version of a null value/
+                $bindings[$key] = null;
+            }
+        }
+
+        return $bindings;
+    }
+
+
+
     /**
      * Get the default query grammar instance.
      *
