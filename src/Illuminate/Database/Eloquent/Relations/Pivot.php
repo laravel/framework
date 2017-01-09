@@ -51,13 +51,10 @@ class Pivot extends Model
         // The pivot model is a "dynamic" model since we will set the tables dynamically
         // for the instance. This allows it work for any intermediate tables for the
         // many to many relationship that are defined by this developer's classes.
-        $this->setTable($table);
-
-        $this->setConnection($parent->getConnectionName());
-
-        $this->forceFill($attributes);
-
-        $this->syncOriginal();
+        $this->setConnection($parent->getConnectionName())
+             ->setTable($table)
+             ->forceFill($attributes)
+             ->syncOriginal();
 
         // We store off the parent instance so we will access the timestamp column names
         // for the model, since the pivot model timestamps aren't easily configurable
@@ -117,9 +114,9 @@ class Pivot extends Model
      */
     protected function getDeleteQuery()
     {
-        $foreign = $this->getAttribute($this->foreignKey);
-
-        $query = $this->newQuery()->where($this->foreignKey, $foreign);
+        $query = $this->newQuery()->where(
+            $this->foreignKey, $this->getAttribute($this->foreignKey)
+        );
 
         return $query->where($this->otherKey, $this->getAttribute($this->otherKey));
     }
