@@ -68,21 +68,6 @@ class MorphToMany extends BelongsToMany
     }
 
     /**
-     * Add the constraints for a relationship count query.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
-     * @param  array|mixed  $columns
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
-    {
-        $query = parent::getRelationExistenceQuery($query, $parentQuery, $columns);
-
-        return $query->where($this->table.'.'.$this->morphType, $this->morphClass);
-    }
-
-    /**
      * Set the constraints for an eager load of the relation.
      *
      * @param  array  $models
@@ -104,9 +89,24 @@ class MorphToMany extends BelongsToMany
      */
     protected function baseAttachRecord($id, $timed)
     {
-        $record = parent::baseAttachRecord($id, $timed);
+        return Arr::add(
+            parent::baseAttachRecord($id, $timed), $this->morphType, $this->morphClass
+        );
+    }
 
-        return Arr::add($record, $this->morphType, $this->morphClass);
+    /**
+     * Add the constraints for a relationship count query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
+     * @param  array|mixed  $columns
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
+    {
+        return parent::getRelationExistenceQuery($query, $parentQuery, $columns)->where(
+            $this->table.'.'.$this->morphType, $this->morphClass
+        );
     }
 
     /**
@@ -116,9 +116,7 @@ class MorphToMany extends BelongsToMany
      */
     protected function newPivotQuery()
     {
-        $query = parent::newPivotQuery();
-
-        return $query->where($this->morphType, $this->morphClass);
+        return parent::newPivotQuery()->where($this->morphType, $this->morphClass);
     }
 
     /**
