@@ -43,16 +43,16 @@ class MorphTo extends BelongsTo
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @param  \Illuminate\Database\Eloquent\Model  $parent
      * @param  string  $foreignKey
-     * @param  string  $otherKey
+     * @param  string  $ownerKey
      * @param  string  $type
      * @param  string  $relation
      * @return void
      */
-    public function __construct(Builder $query, Model $parent, $foreignKey, $otherKey, $type, $relation)
+    public function __construct(Builder $query, Model $parent, $foreignKey, $ownerKey, $type, $relation)
     {
         $this->morphType = $type;
 
-        parent::__construct($query, $parent, $foreignKey, $otherKey, $relation);
+        parent::__construct($query, $parent, $foreignKey, $ownerKey, $relation);
     }
 
     /**
@@ -62,7 +62,7 @@ class MorphTo extends BelongsTo
      */
     public function getResults()
     {
-        if (! $this->otherKey) {
+        if (! $this->ownerKey) {
             return;
         }
 
