@@ -158,9 +158,9 @@ trait HasRelationships
      */
     protected function morphEagerTo($name, $type, $id)
     {
-        $query = $this->newQuery()->setEagerLoads([]);
-
-        return new MorphTo($query, $this, $id, null, $type, $name);
+        return new MorphTo(
+            $this->newQuery()->setEagerLoads([]), $this, $id, null, $type, $name
+        );
     }
 
     /**
@@ -175,7 +175,7 @@ trait HasRelationships
     protected function morphInstanceTo($target, $name, $type, $id)
     {
         $instance = $this->newRelatedInstance(
-            $this->getActualClassNameForMorph($target)
+            Model::getActualClassNameForMorph($target)
         );
 
         return new MorphTo(
@@ -189,7 +189,7 @@ trait HasRelationships
      * @param  string  $class
      * @return string
      */
-    public function getActualClassNameForMorph($class)
+    public static function getActualClassNameForMorph($class)
     {
         return Arr::get(Relation::morphMap(), $class, $class);
     }
