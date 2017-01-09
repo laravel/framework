@@ -268,7 +268,7 @@ abstract class HasOneOrMany extends Relation
         // Here we will set the raw attributes to avoid hitting the "fill" method so
         // that we do not have to worry about a mass accessor rules blocking sets
         // on the models. Otherwise, some of these attributes will not get set.
-        return tap($this->related->newInstance($attributes), function ($instance) use ($attributes) {
+        return tap($this->related->newInstance($attributes), function ($instance) {
             $instance->setAttribute($this->getForeignKeyName(), $this->getParentKey());
 
             $instance->save();
