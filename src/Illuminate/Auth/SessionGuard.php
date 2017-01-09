@@ -212,7 +212,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     public function once(array $credentials = [])
     {
-        $this->fireAttemptEvent($credentials, false);
+        $this->fireAttemptEvent($credentials);
 
         if ($this->validate($credentials)) {
             $this->setUser($this->lastAttempted);
@@ -550,7 +550,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  bool  $remember
      * @return void
      */
-    protected function fireAttemptEvent(array $credentials, $remember)
+    protected function fireAttemptEvent(array $credentials, $remember = false)
     {
         if (isset($this->events)) {
             $this->events->fire(new Events\Attempting(
