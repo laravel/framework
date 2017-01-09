@@ -121,8 +121,7 @@ class BelongsTo extends Relation
         // null or 0 in (depending on if incrementing keys are in use) so the query wont
         // fail plus returns zero results, which should be what the developer expects.
         if (count($keys) === 0) {
-            return [$this->related->getIncrementing() &&
-                    $this->related->getKeyType() === 'int' ? 0 : null];
+            return [$this->relationHasIncrementingId() ? 0 : null];
         }
 
         return array_values(array_unique($keys));
@@ -171,8 +170,8 @@ class BelongsTo extends Relation
         // and match back onto their children using these keys of the dictionary and
         // the primary key of the children to map them onto the correct instances.
         foreach ($models as $model) {
-            if (isset($dictionary[$model->$foreign])) {
-                $model->setRelation($relation, $dictionary[$model->$foreign]);
+            if (isset($dictionary[$model->{$foreign}])) {
+                $model->setRelation($relation, $dictionary[$model->{$foreign}]);
             }
         }
 
@@ -271,6 +270,17 @@ class BelongsTo extends Relation
     public function getRelationCountHash()
     {
         return 'laravel_reserved_'.static::$selfJoinCount++;
+    }
+
+    /**
+     * Determine if the related model has an auto-incrementing ID.
+     *
+     * @return bool
+     */
+    protected function relationHasIncrementingId()
+    {
+            return $this->related->getIncrementing() &&
+                                $this->related->getKeyType() === 'int';
     }
 
     /**
