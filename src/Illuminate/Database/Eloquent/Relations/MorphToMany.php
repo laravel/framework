@@ -58,9 +58,9 @@ class MorphToMany extends BelongsToMany
      *
      * @return $this
      */
-    protected function setWhere()
+    protected function addWhereConstraints()
     {
-        parent::setWhere();
+        parent::addWhereConstraints();
 
         $this->query->where($this->table.'.'.$this->morphType, $this->morphClass);
 
@@ -102,9 +102,9 @@ class MorphToMany extends BelongsToMany
      * @param  bool  $timed
      * @return array
      */
-    protected function createAttachRecord($id, $timed)
+    protected function baseAttachRecord($id, $timed)
     {
-        $record = parent::createAttachRecord($id, $timed);
+        $record = parent::baseAttachRecord($id, $timed);
 
         return Arr::add($record, $this->morphType, $this->morphClass);
     }

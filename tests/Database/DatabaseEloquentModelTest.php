@@ -1016,8 +1016,8 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelStub;
         $this->addMockConnection($model);
         $relation = $model->belongsToMany('EloquentModelSaveStub');
-        $this->assertEquals('eloquent_model_save_stub_eloquent_model_stub.eloquent_model_stub_id', $relation->getForeignKey());
-        $this->assertEquals('eloquent_model_save_stub_eloquent_model_stub.eloquent_model_save_stub_id', $relation->getOtherKey());
+        $this->assertEquals('eloquent_model_save_stub_eloquent_model_stub.eloquent_model_stub_id', $relation->getQualifiedForeignKeyName());
+        $this->assertEquals('eloquent_model_save_stub_eloquent_model_stub.eloquent_model_save_stub_id', $relation->getQualifiedOtherKeyName());
         $this->assertSame($model, $relation->getParent());
         $this->assertInstanceOf('EloquentModelSaveStub', $relation->getQuery()->getModel());
         $this->assertEquals(__FUNCTION__, $relation->getRelationName());
@@ -1025,8 +1025,8 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelStub;
         $this->addMockConnection($model);
         $relation = $model->belongsToMany('EloquentModelSaveStub', 'table', 'foreign', 'other');
-        $this->assertEquals('table.foreign', $relation->getForeignKey());
-        $this->assertEquals('table.other', $relation->getOtherKey());
+        $this->assertEquals('table.foreign', $relation->getQualifiedForeignKeyName());
+        $this->assertEquals('table.other', $relation->getQualifiedOtherKeyName());
         $this->assertSame($model, $relation->getParent());
         $this->assertInstanceOf('EloquentModelSaveStub', $relation->getQuery()->getModel());
     }
