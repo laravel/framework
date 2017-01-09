@@ -89,11 +89,11 @@ trait HasRelationships
      *
      * @param  string  $related
      * @param  string  $foreignKey
-     * @param  string  $otherKey
+     * @param  string  $ownerKey
      * @param  string  $relation
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function belongsTo($related, $foreignKey = null, $otherKey = null, $relation = null)
+    public function belongsTo($related, $foreignKey = null, $ownerKey = null, $relation = null)
     {
         // If no relation name was given, we will use this debug backtrace to extract
         // the calling method's name and use that as the relationship name as most
@@ -114,10 +114,10 @@ trait HasRelationships
         // Once we have the foreign key names, we'll just create a new Eloquent query
         // for the related models and returns the relationship instance which will
         // actually be responsible for retrieving and hydrating every relations.
-        $otherKey = $otherKey ?: $instance->getKeyName();
+        $ownerKey = $ownerKey ?: $instance->getKeyName();
 
         return new BelongsTo(
-            $instance->newQuery(), $this, $foreignKey, $otherKey, $relation
+            $instance->newQuery(), $this, $foreignKey, $ownerKey, $relation
         );
     }
 
