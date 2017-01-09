@@ -21,20 +21,22 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $conn->shouldReceive('statement')->once()->with('foo');
         $conn->shouldReceive('statement')->once()->with('bar');
         $grammar = m::mock('Illuminate\Database\Schema\Grammars\MySqlGrammar');
-        $blueprint = $this->getMockBuilder('Illuminate\Database\Schema\Blueprint')->setMethods(['toSql'])->setConstructorArgs(['users'])->getMock();
-        $blueprint->expects($this->once())->method('toSql')->with($this->equalTo($conn), $this->equalTo($grammar))->will($this->returnValue(['foo', 'bar']));
+        $blueprint = $this->getMockBuilder('Illuminate\Database\Schema\Blueprint')->setMethods(['toSql'])->setConstructorArgs([$conn, 'users'])->getMock();
+        $blueprint->expects($this->once())->method('toSql')->with($this->equalTo($grammar))->will($this->returnValue(['foo', 'bar']));
 
-        $blueprint->build($conn, $grammar);
+        $blueprint->build($grammar);
     }
 
     public function testIndexDefaultNames()
     {
-        $blueprint = new Blueprint('users');
+        $connection = m::mock('Illuminate\Database\Connection');
+
+        $blueprint = new Blueprint($connection, 'users');
         $blueprint->unique(['foo', 'bar']);
         $commands = $blueprint->getCommands();
         $this->assertEquals('users_foo_bar_unique', $commands[0]->index);
 
-        $blueprint = new Blueprint('users');
+        $blueprint = new Blueprint($connection, 'users');
         $blueprint->index('foo');
         $commands = $blueprint->getCommands();
         $this->assertEquals('users_foo_index', $commands[0]->index);
@@ -42,12 +44,14 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
     public function testDropIndexDefaultNames()
     {
-        $blueprint = new Blueprint('users');
+        $connection = m::mock('Illuminate\Database\Connection');
+
+        $blueprint = new Blueprint($connection, 'users');
         $blueprint->dropUnique(['foo', 'bar']);
         $commands = $blueprint->getCommands();
         $this->assertEquals('users_foo_bar_unique', $commands[0]->index);
 
-        $blueprint = new Blueprint('users');
+        $blueprint = new Blueprint($connection, 'users');
         $blueprint->dropIndex(['foo']);
         $commands = $blueprint->getCommands();
         $this->assertEquals('users_foo_index', $commands[0]->index);
@@ -55,22 +59,22 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
     public function testDefaultCurrentTimestamp()
     {
-        $base = new Blueprint('users', function ($table) {
+        $connection = m::mock('Illuminate\Database\Connection');
+
+        $base = new Blueprint($connection, 'users', function ($table) {
             $table->timestamp('created')->useCurrent();
         });
 
-        $connection = m::mock('Illuminate\Database\Connection');
+        $blueprint = clone $base;
+        $this->assertEquals(['alter table `users` add `created` timestamp default CURRENT_TIMESTAMP not null'], $blueprint->toSql(new MySqlGrammar));
 
         $blueprint = clone $base;
-        $this->assertEquals(['alter table `users` add `created` timestamp default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new MySqlGrammar));
+        $this->assertEquals(['alter table "users" add column "created" timestamp(0) without time zone default CURRENT_TIMESTAMP(0) not null'], $blueprint->toSql(new PostgresGrammar));
 
         $blueprint = clone $base;
-        $this->assertEquals(['alter table "users" add column "created" timestamp(0) without time zone default CURRENT_TIMESTAMP(0) not null'], $blueprint->toSql($connection, new PostgresGrammar));
+        $this->assertEquals(['alter table "users" add column "created" datetime default CURRENT_TIMESTAMP not null'], $blueprint->toSql(new SQLiteGrammar));
 
         $blueprint = clone $base;
-        $this->assertEquals(['alter table "users" add column "created" datetime default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new SQLiteGrammar));
-
-        $blueprint = clone $base;
-        $this->assertEquals(['alter table "users" add "created" datetime default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new SqlServerGrammar));
+        $this->assertEquals(['alter table "users" add "created" datetime default CURRENT_TIMESTAMP not null'], $blueprint->toSql(new SqlServerGrammar));
     }
 }

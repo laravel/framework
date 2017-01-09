@@ -31,6 +31,13 @@ class Blueprint
     protected $commands = [];
 
     /**
+     * The database connection instance.
+     *
+     * @var \Illuminate\Database\Connection
+     */
+    protected $connection;
+
+    /**
      * The storage engine that should be used for the table.
      *
      * @var string
@@ -57,13 +64,15 @@ class Blueprint
     /**
      * Create a new schema blueprint.
      *
+     * @param  \Illuminate\Database\Connection  $connection
      * @param  string  $table
      * @param  \Closure|null  $callback
      * @return void
      */
-    public function __construct($table, Closure $callback = null)
+    public function __construct(Connection $connection, $table, Closure $callback = null)
     {
         $this->table = $table;
+        $this->connection = $connection;
 
         if (! is_null($callback)) {
             $callback($this);
@@ -73,25 +82,23 @@ class Blueprint
     /**
      * Execute the blueprint against the database.
      *
-     * @param  \Illuminate\Database\Connection  $connection
      * @param  \Illuminate\Database\Schema\Grammars\Grammar $grammar
      * @return void
      */
-    public function build(Connection $connection, Grammar $grammar)
+    public function build(Grammar $grammar)
     {
-        foreach ($this->toSql($connection, $grammar) as $statement) {
-            $connection->statement($statement);
+        foreach ($this->toSql($grammar) as $statement) {
+            $this->connection->statement($statement);
         }
     }
 
     /**
      * Get the raw SQL statements for the blueprint.
      *
-     * @param  \Illuminate\Database\Connection  $connection
      * @param  \Illuminate\Database\Schema\Grammars\Grammar  $grammar
      * @return array
      */
-    public function toSql(Connection $connection, Grammar $grammar)
+    public function toSql(Grammar $grammar)
     {
         $this->addImpliedCommands();
 
@@ -104,7 +111,7 @@ class Blueprint
             $method = 'compile'.ucfirst($command->name);
 
             if (method_exists($grammar, $method)) {
-                if (! is_null($sql = $grammar->$method($this, $command, $connection))) {
+                if (! is_null($sql = $grammar->$method($this, $command, $this->connection))) {
                     $statements = array_merge($statements, (array) $sql);
                 }
             }
@@ -442,11 +449,15 @@ class Blueprint
      * Create a new char column on the table.
      *
      * @param  string  $column
-     * @param  int  $length
+     * @param  int|null  $length
      * @return \Illuminate\Support\Fluent
      */
-    public function char($column, $length = 255)
+    public function char($column, $length = null)
     {
+        if (is_null($length)) {
+            $length = $this->connection->getConfig('char_default_length', 255);
+        }
+
         return $this->addColumn('char', $column, compact('length'));
     }
 
@@ -454,11 +465,15 @@ class Blueprint
      * Create a new string column on the table.
      *
      * @param  string  $column
-     * @param  int  $length
+     * @param  int|null  $length
      * @return \Illuminate\Support\Fluent
      */
-    public function string($column, $length = 255)
+    public function string($column, $length = null)
     {
+        if (is_null($length)) {
+            $length = $this->connection->getConfig('char_default_length', 255);
+        }
+
         return $this->addColumn('string', $column, compact('length'));
     }
 
