@@ -672,8 +672,7 @@ class BelongsToMany extends Relation
         $key = $this->getRelated()->getKeyName();
 
         $columns = [
-            $this->related->getUpdatedAtColumn() =>
-            $this->related->freshTimestampString()
+            $this->related->getUpdatedAtColumn() => $this->related->freshTimestampString(),
         ];
 
         // If we actually have IDs for the relation, we will run the query to update all
