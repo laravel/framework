@@ -83,58 +83,6 @@ class BelongsTo extends Relation
     }
 
     /**
-     * Add the constraints for a relationship query.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
-     * @param  array|mixed  $columns
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
-    {
-        if ($parentQuery->getQuery()->from == $query->getQuery()->from) {
-            return $this->getRelationExistenceQueryForSelfRelation($query, $parentQuery, $columns);
-        }
-
-        $query->select($columns);
-
-        $otherKey = $query->getModel()->getTable().'.'.$this->otherKey;
-
-        return $query->whereColumn($this->getQualifiedForeignKey(), '=', $otherKey);
-    }
-
-    /**
-     * Add the constraints for a relationship query on the same table.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
-     * @param  array|mixed  $columns
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function getRelationExistenceQueryForSelfRelation(Builder $query, Builder $parentQuery, $columns = ['*'])
-    {
-        $query->select($columns);
-
-        $query->from($query->getModel()->getTable().' as '.$hash = $this->getRelationCountHash());
-
-        $query->getModel()->setTable($hash);
-
-        return $query->whereColumn(
-            $hash.'.'.$query->getModel()->getKeyName(), '=', $this->getQualifiedForeignKey()
-        );
-    }
-
-    /**
-     * Get a relationship join table hash.
-     *
-     * @return string
-     */
-    public function getRelationCountHash()
-    {
-        return 'laravel_reserved_'.static::$selfJoinCount++;
-    }
-
-    /**
      * Set the constraints for an eager load of the relation.
      *
      * @param  array  $models
@@ -174,7 +122,7 @@ class BelongsTo extends Relation
         // fail plus returns zero results, which should be what the developer expects.
         if (count($keys) === 0) {
             return [$this->related->getIncrementing() &&
-                    $this->related->getKeyType() === 'int' ? 0 : null, ];
+                    $this->related->getKeyType() === 'int' ? 0 : null];
         }
 
         return array_values(array_unique($keys));
@@ -232,6 +180,17 @@ class BelongsTo extends Relation
     }
 
     /**
+     * Update the parent model on the relationship.
+     *
+     * @param  array  $attributes
+     * @return mixed
+     */
+    public function update(array $attributes)
+    {
+        return $this->getResults()->fill($attributes)->save();
+    }
+
+    /**
      * Associate the model instance to the given parent.
      *
      * @param  \Illuminate\Database\Eloquent\Model|int  $model
@@ -239,7 +198,7 @@ class BelongsTo extends Relation
      */
     public function associate($model)
     {
-        $otherKey = ($model instanceof Model ? $model->getAttribute($this->otherKey) : $model);
+        $otherKey = $model instanceof Model ? $model->getAttribute($this->otherKey) : $model;
 
         $this->parent->setAttribute($this->foreignKey, $otherKey);
 
@@ -263,16 +222,55 @@ class BelongsTo extends Relation
     }
 
     /**
-     * Update the parent model on the relationship.
+     * Add the constraints for a relationship query.
      *
-     * @param  array  $attributes
-     * @return mixed
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
+     * @param  array|mixed  $columns
+     * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function update(array $attributes)
+    public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
     {
-        $instance = $this->getResults();
+        if ($parentQuery->getQuery()->from == $query->getQuery()->from) {
+            return $this->getRelationExistenceQueryForSelfRelation($query, $parentQuery, $columns);
+        }
 
-        return $instance->fill($attributes)->save();
+        $otherKey = $query->getModel()->getTable().'.'.$this->otherKey;
+
+        return $query->select($columns)->whereColumn(
+            $this->getQualifiedForeignKey(), '=', $otherKey
+        );
+    }
+
+    /**
+     * Add the constraints for a relationship query on the same table.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
+     * @param  array|mixed  $columns
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function getRelationExistenceQueryForSelfRelation(Builder $query, Builder $parentQuery, $columns = ['*'])
+    {
+        $query->select($columns)->from(
+            $query->getModel()->getTable().' as '.$hash = $this->getRelationCountHash()
+        );
+
+        $query->getModel()->setTable($hash);
+
+        return $query->whereColumn(
+            $hash.'.'.$query->getModel()->getKeyName(), '=', $this->getQualifiedForeignKey()
+        );
+    }
+
+    /**
+     * Get a relationship join table hash.
+     *
+     * @return string
+     */
+    public function getRelationCountHash()
+    {
+        return 'laravel_reserved_'.static::$selfJoinCount++;
     }
 
     /**
@@ -306,16 +304,6 @@ class BelongsTo extends Relation
     }
 
     /**
-     * Get the name of the relationship.
-     *
-     * @return string
-     */
-    public function getRelation()
-    {
-        return $this->relation;
-    }
-
-    /**
      * Get the fully qualified associated key of the relationship.
      *
      * @return string
@@ -323,5 +311,15 @@ class BelongsTo extends Relation
     public function getQualifiedOtherKeyName()
     {
         return $this->related->getTable().'.'.$this->otherKey;
+    }
+
+    /**
+     * Get the name of the relationship.
+     *
+     * @return string
+     */
+    public function getRelation()
+    {
+        return $this->relation;
     }
 }
