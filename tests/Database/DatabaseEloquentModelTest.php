@@ -923,7 +923,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->addMockConnection($model);
         $relation = $model->morphOne('EloquentModelSaveStub', 'morph');
         $this->assertEquals('save_stub.morph_id', $relation->getQualifiedForeignKeyName());
-        $this->assertEquals('save_stub.morph_type', $relation->getMorphType());
+        $this->assertEquals('save_stub.morph_type', $relation->getQualifiedMorphType());
         $this->assertEquals('EloquentModelStub', $relation->getMorphClass());
     }
 
@@ -960,7 +960,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->addMockConnection($model);
         $relation = $model->morphMany('EloquentModelSaveStub', 'morph');
         $this->assertEquals('save_stub.morph_id', $relation->getQualifiedForeignKeyName());
-        $this->assertEquals('save_stub.morph_type', $relation->getMorphType());
+        $this->assertEquals('save_stub.morph_type', $relation->getQualifiedMorphType());
         $this->assertEquals('EloquentModelStub', $relation->getMorphClass());
     }
 
