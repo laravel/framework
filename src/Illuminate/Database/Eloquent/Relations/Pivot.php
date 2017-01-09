@@ -114,11 +114,10 @@ class Pivot extends Model
      */
     protected function getDeleteQuery()
     {
-        $query = $this->newQuery()->where(
-            $this->foreignKey, $this->getAttribute($this->foreignKey)
-        );
-
-        return $query->where($this->otherKey, $this->getAttribute($this->otherKey));
+        return $this->newQuery()->where([
+            $this->foreignKey => $this->getAttribute($this->foreignKey),
+            $this->otherKey => $this->getAttribute($this->otherKey)
+        ]);
     }
 
     /**
