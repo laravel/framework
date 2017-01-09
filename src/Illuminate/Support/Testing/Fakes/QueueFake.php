@@ -210,10 +210,7 @@ class QueueFake implements Queue
     public function bulk($jobs, $data = '', $queue = null)
     {
         foreach ($this->jobs as $job) {
-            $this->jobs[get_class($job)][] = [
-                'job' => $job,
-                'queue' => $queue,
-            ];
+            $this->push($job);
         }
     }
 
