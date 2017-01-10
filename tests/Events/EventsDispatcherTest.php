@@ -22,6 +22,20 @@ class EventsDispatcherTest extends TestCase
         $this->assertEquals('bar', $_SERVER['__event.test']);
     }
 
+    public function testHaltingEventExecution()
+    {
+        unset($_SERVER['__event.test']);
+        $d = new Dispatcher;
+        $d->listen('foo', function ($foo) {
+            $this->assertTrue(true);
+            return 'here';
+        });
+        $d->listen('foo', function ($foo) {
+            throw new Exception('should not be called');
+        });
+        $d->until('foo', ['bar']);
+    }
+
     public function testContainerResolutionOfEventHandlers()
     {
         $d = new Dispatcher($container = m::mock('Illuminate\Container\Container'));
