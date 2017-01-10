@@ -1,5 +1,11 @@
 # Release Notes for 5.3.x
 
+## [Unreleased]
+
+### Fixed
+- Use regex in `KeyGenerateCommand` to match `APP_KEY` ([#17151](https://github.com/laravel/framework/pull/17151))
+
+
 ## v5.3.29 (2017-01-06)
 
 ### Added
