@@ -36,7 +36,7 @@ class ValidationRuleParser
      * Parse the human-friendly rules into a full rules array for the validator.
      *
      * @param  array  $rules
-     * @return StdClass
+     * @return \StdClass
      */
     public function explode($rules)
     {
