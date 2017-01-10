@@ -18,19 +18,6 @@ class PhpRedisConnection extends Connection
     }
 
     /**
-     * Evaluate a Lua script and return the result.
-     *
-     * @param  string  $script
-     * @param  int  $numberOfKeys
-     * @param  dynamic  $arguments
-     * @return mixed
-     */
-    public function eval($script, $numberOfKeys, ...$arguments)
-    {
-        return $this->client->eval($script, $arguments, $numberOfKeys);
-    }
-
-    /**
      * Subscribe to a set of given channels for messages.
      *
      * @param  array|string  $channels
@@ -69,5 +56,25 @@ class PhpRedisConnection extends Connection
     public function createSubscription($channels, Closure $callback, $method = 'subscribe')
     {
         //
+    }
+
+    /**
+     * Pass other method calls down to the underlying client.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        if ($method == 'eval') {
+            $parameters = [
+                isset($parameters[0]) ? $parameters[0] : null,
+                array_slice($parameters, 2),
+                isset($parameters[1]) ? $parameters[1] : null,
+            ];
+        }
+
+        return $this->command($method, $parameters);
     }
 }
