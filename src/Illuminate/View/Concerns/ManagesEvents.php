@@ -50,15 +50,14 @@ trait ManagesEvents
      *
      * @param  array|string  $views
      * @param  \Closure|string  $callback
-     * @param  int|null  $priority
      * @return array
      */
-    public function composer($views, $callback, $priority = null)
+    public function composer($views, $callback)
     {
         $composers = [];
 
         foreach ((array) $views as $view) {
-            $composers[] = $this->addViewEvent($view, $callback, 'composing: ', $priority);
+            $composers[] = $this->addViewEvent($view, $callback, 'composing: ');
         }
 
         return $composers;
@@ -70,19 +69,18 @@ trait ManagesEvents
      * @param  string  $view
      * @param  \Closure|string  $callback
      * @param  string  $prefix
-     * @param  int|null  $priority
      * @return \Closure|null
      */
-    protected function addViewEvent($view, $callback, $prefix = 'composing: ', $priority = null)
+    protected function addViewEvent($view, $callback, $prefix = 'composing: ')
     {
         $view = $this->normalizeName($view);
 
         if ($callback instanceof Closure) {
-            $this->addEventListener($prefix.$view, $callback, $priority);
+            $this->addEventListener($prefix.$view, $callback);
 
             return $callback;
         } elseif (is_string($callback)) {
-            return $this->addClassEvent($view, $callback, $prefix, $priority);
+            return $this->addClassEvent($view, $callback, $prefix);
         }
     }
 
@@ -92,10 +90,9 @@ trait ManagesEvents
      * @param  string    $view
      * @param  string    $class
      * @param  string    $prefix
-     * @param  int|null  $priority
      * @return \Closure
      */
-    protected function addClassEvent($view, $class, $prefix, $priority = null)
+    protected function addClassEvent($view, $class, $prefix)
     {
         $name = $prefix.$view;
 
@@ -106,7 +103,7 @@ trait ManagesEvents
             $class, $prefix
         );
 
-        $this->addEventListener($name, $callback, $priority);
+        $this->addEventListener($name, $callback);
 
         return $callback;
     }
@@ -164,16 +161,11 @@ trait ManagesEvents
      *
      * @param  string    $name
      * @param  \Closure  $callback
-     * @param  int|null  $priority
      * @return void
      */
-    protected function addEventListener($name, $callback, $priority = null)
+    protected function addEventListener($name, $callback)
     {
-        if (is_null($priority)) {
-            $this->events->listen($name, $callback);
-        } else {
-            $this->events->listen($name, $callback, $priority);
-        }
+        $this->events->listen($name, $callback);
     }
 
     /**

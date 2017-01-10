@@ -126,18 +126,6 @@ class ViewFactoryTest extends TestCase
         $this->assertEquals('bar', $callback());
     }
 
-    public function testComposersAreProperlyRegisteredWithPriority()
-    {
-        $factory = $this->getFactory();
-        $factory->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type('Closure'), 1);
-        $callback = $factory->composer('foo', function () {
-            return 'bar';
-        }, 1);
-        $callback = $callback[0];
-
-        $this->assertEquals('bar', $callback());
-    }
-
     public function testComposersCanBeMassRegistered()
     {
         $factory = $this->getFactory();
