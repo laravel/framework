@@ -164,6 +164,13 @@ class Validator implements ValidatorContract
     ];
 
     /**
+     * The current rule.
+     *
+     * @var string
+     */
+    protected $currentRule;
+
+    /**
      * Create a new Validator instance.
      *
      * @param  \Illuminate\Contracts\Translation\Translator  $translator
