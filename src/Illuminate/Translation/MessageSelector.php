@@ -23,7 +23,7 @@ class MessageSelector
 
         $segments = $this->stripConditions($segments);
 
-        return count($segments) == 1 || $number == 1
+        return count($segments) === 1 || $number == 1
                         ? $segments[0] : $segments[1];
     }
 
@@ -65,9 +65,9 @@ class MessageSelector
         if (Str::contains($condition, ',')) {
             list($from, $to) = explode(',', $condition, 2);
 
-            if ($to == '*' && $number >= $from) {
+            if ($to === '*' && $number >= $from) {
                 return $value;
-            } elseif ($from == '*' && $number <= $to) {
+            } elseif ($from === '*' && $number <= $to) {
                 return $value;
             } elseif ($number >= $from && $number <= $to) {
                 return $value;

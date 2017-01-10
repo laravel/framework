@@ -163,7 +163,7 @@ trait GuardsAttributes
      */
     public function isGuarded($key)
     {
-        return in_array($key, $this->getGuarded()) || $this->getGuarded() == ['*'];
+        return in_array($key, $this->getGuarded()) || $this->getGuarded() === ['*'];
     }
 
     /**
@@ -173,7 +173,7 @@ trait GuardsAttributes
      */
     public function totallyGuarded()
     {
-        return count($this->getFillable()) == 0 && $this->getGuarded() == ['*'];
+        return count($this->getFillable()) === 0 && $this->getGuarded() === ['*'];
     }
 
     /**

@@ -169,7 +169,7 @@ class Blueprint
     protected function creating()
     {
         return collect($this->commands)->contains(function ($command) {
-            return $command->name == 'create';
+            return $command->name === 'create';
         });
     }
 

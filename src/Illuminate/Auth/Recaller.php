@@ -73,6 +73,6 @@ class Recaller
     {
         $segments = explode('|', $this->recaller);
 
-        return count($segments) == 2 && trim($segments[0]) !== '' && trim($segments[1]) !== '';
+        return count($segments) === 2 && trim($segments[0]) !== '' && trim($segments[1]) !== '';
     }
 }

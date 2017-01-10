@@ -51,7 +51,7 @@ trait ConfirmableTrait
     protected function getDefaultConfirmCallback()
     {
         return function () {
-            return $this->getLaravel()->environment() == 'production';
+            return $this->getLaravel()->environment() === 'production';
         };
     }
 }
