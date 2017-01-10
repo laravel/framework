@@ -48,7 +48,7 @@ class BroadcastChannel
                   ->onQueue($message->queue);
         }
 
-        return $this->events->fire($event);
+        return $this->events->dispatch($event);
     }
 
     /**
