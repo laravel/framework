@@ -5,6 +5,7 @@ namespace Illuminate\Database\Connectors;
 use PDOException;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
+use Illuminate\Database\Connection;
 use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Database\PostgresConnection;
@@ -267,8 +268,8 @@ class ConnectionFactory
      */
     protected function createConnection($driver, $connection, $database, $prefix = '', array $config = [])
     {
-        if ($this->container->bound($key = "db.connection.{$driver}")) {
-            return $this->container->make($key, [$connection, $database, $prefix, $config]);
+        if ($resolver = Connection::getResolver($driver)) {
+            return $resolver($connection, $database, $prefix, $config);
         }
 
         switch ($driver) {
