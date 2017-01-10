@@ -60,7 +60,7 @@ class RollbackCommand extends BaseCommand
         $this->migrator->rollback(
             $this->getMigrationPaths(), [
                 'pretend' => $this->option('pretend'),
-                'step' => (int) $this->option('step')
+                'step' => (int) $this->option('step'),
             ]
         );
 
