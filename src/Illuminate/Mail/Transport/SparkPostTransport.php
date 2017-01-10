@@ -34,7 +34,6 @@ class SparkPostTransport extends Transport
      * @param  \GuzzleHttp\ClientInterface  $client
      * @param  string  $key
      * @param  array  $options
-     * @param  array  $metadata
      * @return void
      */
     public function __construct(ClientInterface $client, $key, $options = [])

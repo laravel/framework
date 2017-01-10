@@ -47,6 +47,7 @@ class MiddlewareNameResolver
      * Parse the middleware group and format it for usage.
      *
      * @param  string  $name
+     * @param  array  $map
      * @param  array  $middlewareGroups
      * @return array
      */

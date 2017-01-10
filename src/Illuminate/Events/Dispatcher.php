@@ -65,7 +65,7 @@ class Dispatcher implements DispatcherContract
             if (Str::contains($event, '*')) {
                 $this->setupWildcardListen($event, $listener);
             } else {
-                $this->listeners[$event][] = $this->makeListener($event, $listener);
+                $this->listeners[$event][] = $this->makeListener($listener);
             }
         }
     }
@@ -79,7 +79,7 @@ class Dispatcher implements DispatcherContract
      */
     protected function setupWildcardListen($event, $listener)
     {
-        $this->wildcards[$event][] = $this->makeListener($event, $listener, true);
+        $this->wildcards[$event][] = $this->makeListener($listener, true);
     }
 
     /**
@@ -317,9 +317,10 @@ class Dispatcher implements DispatcherContract
      * Register an event listener with the dispatcher.
      *
      * @param  string|\Closure  $listener
+     * @param  bool  $wildcard
      * @return mixed
      */
-    public function makeListener($event, $listener, $wildcard = false)
+    public function makeListener($listener, $wildcard = false)
     {
         if (is_string($listener)) {
             return $this->createClassListener($listener, $wildcard);
@@ -338,6 +339,7 @@ class Dispatcher implements DispatcherContract
      * Create a class based listener using the IoC container.
      *
      * @param  string  $listener
+     * @param  bool  $wildcard
      * @return \Closure
      */
     public function createClassListener($listener, $wildcard = false)

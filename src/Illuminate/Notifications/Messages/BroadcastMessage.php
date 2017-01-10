@@ -18,7 +18,7 @@ class BroadcastMessage
     /**
      * Create a new message instance.
      *
-     * @param  string  $content
+     * @param  array  $data
      * @return void
      */
     public function __construct(array $data)
