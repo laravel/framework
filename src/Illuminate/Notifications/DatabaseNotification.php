@@ -72,7 +72,7 @@ class DatabaseNotification extends Model
      *
      * @return bool
      */
-    public function isNotRead()
+    public function notRead()
     {
         return $this->read_at === null;
     }
