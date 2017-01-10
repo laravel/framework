@@ -77,6 +77,13 @@ class Validator implements ValidatorContract
     protected $rules;
 
     /**
+     * The current rule that is validating.
+     *
+     * @var string
+     */
+    protected $currentRule;
+
+    /**
      * The array of wildcard attributes with their asterisks expanded.
      *
      * @var array
@@ -162,13 +169,6 @@ class Validator implements ValidatorContract
         'RequiredIf', 'RequiredUnless', 'Confirmed', 'Same', 'Different', 'Unique',
         'Before', 'After', 'BeforeOrEqual', 'AfterOrEqual',
     ];
-
-    /**
-     * The current rule.
-     *
-     * @var string
-     */
-    protected $currentRule;
 
     /**
      * Create a new Validator instance.
