@@ -33,8 +33,8 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
         $console->shouldReceive('find')->with('migrate:reset')->andReturn($resetCommand);
         $console->shouldReceive('find')->with('migrate')->andReturn($migrateCommand);
 
-        $resetCommand->shouldReceive('run')->with(new InputMatcher("--database --force --path 'migrate:reset'"), m::any());
-        $migrateCommand->shouldReceive('run')->with(new InputMatcher('--database --force --path migrate'), m::any());
+        $resetCommand->shouldReceive('run')->with(new InputMatcher("--database --path --force 'migrate:reset'"), m::any());
+        $migrateCommand->shouldReceive('run')->with(new InputMatcher('--database --path --force migrate'), m::any());
 
         $this->runCommand($command);
     }
@@ -55,8 +55,8 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
         $console->shouldReceive('find')->with('migrate:rollback')->andReturn($rollbackCommand);
         $console->shouldReceive('find')->with('migrate')->andReturn($migrateCommand);
 
-        $rollbackCommand->shouldReceive('run')->with(new InputMatcher("--database --force --path --step=2 'migrate:rollback'"), m::any());
-        $migrateCommand->shouldReceive('run')->with(new InputMatcher('--database --force --path migrate'), m::any());
+        $rollbackCommand->shouldReceive('run')->with(new InputMatcher("--database --path --step=2 --force 'migrate:rollback'"), m::any());
+        $migrateCommand->shouldReceive('run')->with(new InputMatcher('--database --path --force migrate'), m::any());
 
         $this->runCommand($command, ['--step' => 2]);
     }
