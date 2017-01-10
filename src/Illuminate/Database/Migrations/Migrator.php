@@ -283,7 +283,7 @@ class Migrator
      *
      * @param  array  $migrations
      * @param  array  $paths
-     * @param  array  $options
+     * @param  bool  $pretend
      * @return array
      */
     protected function resetMigrations(array $migrations, array $paths, $pretend = false)

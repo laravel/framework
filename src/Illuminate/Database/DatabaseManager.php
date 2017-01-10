@@ -142,6 +142,7 @@ class DatabaseManager implements ConnectionResolverInterface
      * Prepare the database connection instance.
      *
      * @param  \Illuminate\Database\Connection  $connection
+     * @param  string  $type
      * @return \Illuminate\Database\Connection
      */
     protected function configure(Connection $connection, $type)

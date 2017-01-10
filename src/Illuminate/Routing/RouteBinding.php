@@ -26,6 +26,7 @@ class RouteBinding
     /**
      * Create a class based binding using the IoC container.
      *
+     * @param  \Illuminate\Container\Container  $container
      * @param  string  $binding
      * @return \Closure
      */

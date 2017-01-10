@@ -14,7 +14,6 @@ class PhpRedisConnector
      * Create a new clustered Predis connection.
      *
      * @param  array  $config
-     * @param  array  $clusterOptions
      * @param  array  $options
      * @return \Illuminate\Redis\PhpRedisConnection
      */
