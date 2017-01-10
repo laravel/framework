@@ -25,7 +25,7 @@ class NotificationChannelManagerTest extends TestCase
         $manager->shouldReceive('driver')->andReturn($driver = Mockery::mock());
         $events->shouldReceive('until')->with(Mockery::type(Illuminate\Notifications\Events\NotificationSending::class))->andReturn(true);
         $driver->shouldReceive('send')->once();
-        $events->shouldReceive('fire')->with(Mockery::type(Illuminate\Notifications\Events\NotificationSent::class));
+        $events->shouldReceive('dispatch')->with(Mockery::type(Illuminate\Notifications\Events\NotificationSent::class));
 
         $manager->send(new NotificationChannelManagerTestNotifiable, new NotificationChannelManagerTestNotification);
     }
@@ -42,7 +42,7 @@ class NotificationChannelManagerTest extends TestCase
         $events->shouldReceive('until')->with(Mockery::type(Illuminate\Notifications\Events\NotificationSending::class))->andReturn(true);
         $manager->shouldReceive('driver')->once()->andReturn($driver = Mockery::mock());
         $driver->shouldReceive('send')->once();
-        $events->shouldReceive('fire')->with(Mockery::type(Illuminate\Notifications\Events\NotificationSent::class));
+        $events->shouldReceive('dispatch')->with(Mockery::type(Illuminate\Notifications\Events\NotificationSent::class));
 
         $manager->send([new NotificationChannelManagerTestNotifiable], new NotificationChannelManagerTestNotificationWithTwoChannels);
     }
