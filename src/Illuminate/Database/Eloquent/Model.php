@@ -567,7 +567,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // that is done. We will call the "saved" method here to run any actions
         // we need to happen after a model gets successfully saved right here.
         if ($saved) {
-            $this->saved($options);
+            $this->finishSave($options);
         }
 
         return $saved;
@@ -594,7 +594,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  array  $options
      * @return void
      */
-    protected function saved(array $options)
+    protected function finishSave(array $options)
     {
         $this->fireModelEvent('saved', false);
 
