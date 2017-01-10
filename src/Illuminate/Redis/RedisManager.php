@@ -23,6 +23,13 @@ class RedisManager implements Factory
     protected $config;
 
     /**
+     * The Redis connections.
+     *
+     * @var mixed
+     */
+    protected $connections;
+
+    /**
      * Create a new Redis manager instance.
      *
      * @param  string  $driver
