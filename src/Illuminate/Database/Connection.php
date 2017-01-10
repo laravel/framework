@@ -5,6 +5,7 @@ namespace Illuminate\Database;
 use PDO;
 use Closure;
 use Exception;
+use PDOStatement;
 use LogicException;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
@@ -307,13 +308,14 @@ class Connection implements ConnectionInterface
             // For select statements, we'll simply execute the query and return an array
             // of the database result set. Each element in the array will be a single
             // row from the database table, and will either be an array or objects.
-            $statement = $this->getPdoForSelect($useReadPdo)->prepare($query);
+            $statement = $this->prepared($this->getPdoForSelect($useReadPdo)
+                              ->prepare($query));
 
             $this->bindValues($statement, $this->prepareBindings($bindings));
 
             $statement->execute();
 
-            return $statement->fetchAll($this->fetchMode);
+            return $statement->fetchAll();
         });
     }
 
@@ -335,10 +337,8 @@ class Connection implements ConnectionInterface
             // First we will create a statement for the query. Then, we will set the fetch
             // mode and prepare the bindings for the query. Once that's done we will be
             // ready to execute the query against the database and return the cursor.
-            $statement = $this->getPdoForSelect($useReadPdo)
-                            ->prepare($query);
-
-            $statement->setFetchMode($this->fetchMode);
+            $statement = $this->prepared($this->getPdoForSelect($useReadPdo)
+                              ->prepare($query));
 
             $this->bindValues(
                 $statement, $this->prepareBindings($bindings)
@@ -355,6 +355,23 @@ class Connection implements ConnectionInterface
         while ($record = $statement->fetch()) {
             yield $record;
         }
+    }
+
+    /**
+     * Configure the PDO prepared statement.
+     *
+     * @param  \PDOStatement  $statement
+     * @return \PDOStatement
+     */
+    protected function prepared(PDOStatement $statement)
+    {
+        $statement->setFetchMode($this->fetchMode);
+
+        $this->event(new Events\StatementPrepared(
+            $this, $statement
+        ));
+
+        return $statement;
     }
 
     /**
