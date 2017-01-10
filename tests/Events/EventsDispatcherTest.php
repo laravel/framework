@@ -28,6 +28,7 @@ class EventsDispatcherTest extends TestCase
         $d = new Dispatcher;
         $d->listen('foo', function ($foo) {
             $this->assertTrue(true);
+
             return 'here';
         });
         $d->listen('foo', function ($foo) {
