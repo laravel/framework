@@ -103,7 +103,7 @@ class Dispatcher implements DispatcherContract
     public function push($event, $payload = [])
     {
         $this->listen($event.'_pushed', function () use ($event, $payload) {
-            $this->fire($event, $payload);
+            $this->dispatch($event, $payload);
         });
     }
 
@@ -143,7 +143,7 @@ class Dispatcher implements DispatcherContract
      */
     public function flush($event)
     {
-        $this->fire($event.'_pushed');
+        $this->dispatch($event.'_pushed');
     }
 
     /**
@@ -154,18 +154,6 @@ class Dispatcher implements DispatcherContract
      * @return array|null
      */
     public function dispatch($event, $payload = [])
-    {
-        return $this->fire($event, $payload);
-    }
-
-    /**
-     * Fire an event and call the listeners.
-     *
-     * @param  string|object  $event
-     * @param  mixed  $payload
-     * @return array|null
-     */
-    public function fire($event, $payload = [])
     {
         // When the given "event" is actually an object we will assume it is an event
         // object and use the class as the event name and this event itself as the
@@ -194,6 +182,18 @@ class Dispatcher implements DispatcherContract
         }
 
         return $responses;
+    }
+
+    /**
+     * Fire an event and call the listeners.
+     *
+     * @param  string|object  $event
+     * @param  mixed  $payload
+     * @return array|null
+     */
+    public function fire($event, $payload = [])
+    {
+        return $this->dispatch($event, $payload);
     }
 
     /**
