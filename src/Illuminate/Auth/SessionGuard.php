@@ -550,7 +550,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  bool  $remember
      * @return void
      */
-    protected function fireAttemptEvent(array $credentials, $remember)
+    protected function fireAttemptEvent(array $credentials, $remember = false)
     {
         if (isset($this->events)) {
             $this->events->fire(new Events\Attempting(

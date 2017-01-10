@@ -89,11 +89,11 @@ trait HasRelationships
      *
      * @param  string  $related
      * @param  string  $foreignKey
-     * @param  string  $otherKey
+     * @param  string  $ownerKey
      * @param  string  $relation
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function belongsTo($related, $foreignKey = null, $otherKey = null, $relation = null)
+    public function belongsTo($related, $foreignKey = null, $ownerKey = null, $relation = null)
     {
         // If no relation name was given, we will use this debug backtrace to extract
         // the calling method's name and use that as the relationship name as most
@@ -114,10 +114,10 @@ trait HasRelationships
         // Once we have the foreign key names, we'll just create a new Eloquent query
         // for the related models and returns the relationship instance which will
         // actually be responsible for retrieving and hydrating every relations.
-        $otherKey = $otherKey ?: $instance->getKeyName();
+        $ownerKey = $ownerKey ?: $instance->getKeyName();
 
         return new BelongsTo(
-            $instance->newQuery(), $this, $foreignKey, $otherKey, $relation
+            $instance->newQuery(), $this, $foreignKey, $ownerKey, $relation
         );
     }
 
@@ -158,9 +158,9 @@ trait HasRelationships
      */
     protected function morphEagerTo($name, $type, $id)
     {
-        $query = $this->newQuery()->setEagerLoads([]);
-
-        return new MorphTo($query, $this, $id, null, $type, $name);
+        return new MorphTo(
+            $this->newQuery()->setEagerLoads([]), $this, $id, null, $type, $name
+        );
     }
 
     /**
@@ -175,7 +175,7 @@ trait HasRelationships
     protected function morphInstanceTo($target, $name, $type, $id)
     {
         $instance = $this->newRelatedInstance(
-            $this->getActualClassNameForMorph($target)
+            Model::getActualClassNameForMorph($target)
         );
 
         return new MorphTo(
@@ -189,7 +189,7 @@ trait HasRelationships
      * @param  string  $class
      * @return string
      */
-    public function getActualClassNameForMorph($class)
+    public static function getActualClassNameForMorph($class)
     {
         return Arr::get(Relation::morphMap(), $class, $class);
     }
@@ -284,11 +284,11 @@ trait HasRelationships
      * @param  string  $related
      * @param  string  $table
      * @param  string  $foreignKey
-     * @param  string  $otherKey
+     * @param  string  $relatedKey
      * @param  string  $relation
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function belongsToMany($related, $table = null, $foreignKey = null, $otherKey = null, $relation = null)
+    public function belongsToMany($related, $table = null, $foreignKey = null, $relatedKey = null, $relation = null)
     {
         // If no relationship name was passed, we will pull backtraces to get the
         // name of the calling function. We will use that function name as the
@@ -304,7 +304,7 @@ trait HasRelationships
 
         $foreignKey = $foreignKey ?: $this->getForeignKey();
 
-        $otherKey = $otherKey ?: $instance->getForeignKey();
+        $relatedKey = $relatedKey ?: $instance->getForeignKey();
 
         // If no table name was provided, we can guess it by concatenating the two
         // models using underscores in alphabetical order. The two model names
@@ -314,7 +314,7 @@ trait HasRelationships
         }
 
         return new BelongsToMany(
-            $instance->newQuery(), $this, $table, $foreignKey, $otherKey, $relation
+            $instance->newQuery(), $this, $table, $foreignKey, $relatedKey, $relation
         );
     }
 
@@ -325,11 +325,11 @@ trait HasRelationships
      * @param  string  $name
      * @param  string  $table
      * @param  string  $foreignKey
-     * @param  string  $otherKey
+     * @param  string  $relatedKey
      * @param  bool  $inverse
      * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
-    public function morphToMany($related, $name, $table = null, $foreignKey = null, $otherKey = null, $inverse = false)
+    public function morphToMany($related, $name, $table = null, $foreignKey = null, $relatedKey = null, $inverse = false)
     {
         $caller = $this->guessBelongsToManyRelation();
 
@@ -340,7 +340,7 @@ trait HasRelationships
 
         $foreignKey = $foreignKey ?: $name.'_id';
 
-        $otherKey = $otherKey ?: $instance->getForeignKey();
+        $relatedKey = $relatedKey ?: $instance->getForeignKey();
 
         // Now we're ready to create a new query builder for this related model and
         // the relationship instances for this relation. This relations will set
@@ -349,7 +349,7 @@ trait HasRelationships
 
         return new MorphToMany(
             $instance->newQuery(), $this, $name, $table,
-            $foreignKey, $otherKey, $caller, $inverse
+            $foreignKey, $relatedKey, $caller, $inverse
         );
     }
 
@@ -360,19 +360,19 @@ trait HasRelationships
      * @param  string  $name
      * @param  string  $table
      * @param  string  $foreignKey
-     * @param  string  $otherKey
+     * @param  string  $relatedKey
      * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
-    public function morphedByMany($related, $name, $table = null, $foreignKey = null, $otherKey = null)
+    public function morphedByMany($related, $name, $table = null, $foreignKey = null, $relatedKey = null)
     {
         $foreignKey = $foreignKey ?: $this->getForeignKey();
 
         // For the inverse of the polymorphic many-to-many relations, we will change
         // the way we determine the foreign and other keys, as it is the opposite
         // of the morph-to-many method since we're figuring out these inverses.
-        $otherKey = $otherKey ?: $name.'_id';
+        $relatedKey = $relatedKey ?: $name.'_id';
 
-        return $this->morphToMany($related, $name, $table, $foreignKey, $otherKey, true);
+        return $this->morphToMany($related, $name, $table, $foreignKey, $relatedKey, true);
     }
 
     /**

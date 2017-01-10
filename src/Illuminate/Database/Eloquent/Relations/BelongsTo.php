@@ -9,6 +9,11 @@ use Illuminate\Database\Eloquent\Collection;
 class BelongsTo extends Relation
 {
     /**
+     * The child model instance of the relation.
+     */
+    protected $child;
+
+    /**
      * The foreign key of the parent model.
      *
      * @var string
@@ -20,7 +25,7 @@ class BelongsTo extends Relation
      *
      * @var string
      */
-    protected $otherKey;
+    protected $ownerKey;
 
     /**
      * The name of the relationship.
@@ -40,19 +45,24 @@ class BelongsTo extends Relation
      * Create a new belongs to relationship instance.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  \Illuminate\Database\Eloquent\Model  $child
      * @param  string  $foreignKey
-     * @param  string  $otherKey
+     * @param  string  $ownerKey
      * @param  string  $relation
      * @return void
      */
-    public function __construct(Builder $query, Model $parent, $foreignKey, $otherKey, $relation)
+    public function __construct(Builder $query, Model $child, $foreignKey, $ownerKey, $relation)
     {
-        $this->otherKey = $otherKey;
+        $this->ownerKey = $ownerKey;
         $this->relation = $relation;
         $this->foreignKey = $foreignKey;
 
-        parent::__construct($query, $parent);
+        // In the underlying base relationship class, this variable is referred to as
+        // the "parent" since most relationships are not inversed. But, since this
+        // one is we will create a "child" variable for much better readability.
+        $this->child = $child;
+
+        parent::__construct($query, $child);
     }
 
     /**
@@ -78,60 +88,8 @@ class BelongsTo extends Relation
             // of the related models matching on the foreign key that's on a parent.
             $table = $this->related->getTable();
 
-            $this->query->where($table.'.'.$this->otherKey, '=', $this->parent->{$this->foreignKey});
+            $this->query->where($table.'.'.$this->ownerKey, '=', $this->child->{$this->foreignKey});
         }
-    }
-
-    /**
-     * Add the constraints for a relationship query.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
-     * @param  array|mixed  $columns
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
-    {
-        if ($parentQuery->getQuery()->from == $query->getQuery()->from) {
-            return $this->getRelationExistenceQueryForSelfRelation($query, $parentQuery, $columns);
-        }
-
-        $query->select($columns);
-
-        $otherKey = $query->getModel()->getTable().'.'.$this->otherKey;
-
-        return $query->whereColumn($this->getQualifiedForeignKey(), '=', $otherKey);
-    }
-
-    /**
-     * Add the constraints for a relationship query on the same table.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
-     * @param  array|mixed  $columns
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function getRelationExistenceQueryForSelfRelation(Builder $query, Builder $parentQuery, $columns = ['*'])
-    {
-        $query->select($columns);
-
-        $query->from($query->getModel()->getTable().' as '.$hash = $this->getRelationCountHash());
-
-        $query->getModel()->setTable($hash);
-
-        return $query->whereColumn(
-            $hash.'.'.$query->getModel()->getKeyName(), '=', $this->getQualifiedForeignKey()
-        );
-    }
-
-    /**
-     * Get a relationship join table hash.
-     *
-     * @return string
-     */
-    public function getRelationCountHash()
-    {
-        return 'laravel_reserved_'.static::$selfJoinCount++;
     }
 
     /**
@@ -145,7 +103,7 @@ class BelongsTo extends Relation
         // We'll grab the primary key name of the related models since it could be set to
         // a non-standard name and not "id". We will then construct the constraint for
         // our eagerly loading query so it returns the proper models from execution.
-        $key = $this->related->getTable().'.'.$this->otherKey;
+        $key = $this->related->getTable().'.'.$this->ownerKey;
 
         $this->query->whereIn($key, $this->getEagerModelKeys($models));
     }
@@ -158,23 +116,18 @@ class BelongsTo extends Relation
      */
     protected function getEagerModelKeys(array $models)
     {
-        $keys = [];
-
         // First we need to gather all of the keys from the parent models so we know what
         // to query for via the eager loading query. We will add them to an array then
         // execute a "where in" statement to gather up all of those related records.
-        foreach ($models as $model) {
-            if (! is_null($value = $model->{$this->foreignKey})) {
-                $keys[] = $value;
-            }
-        }
+        $keys = collect($models)->map(function ($model) {
+            return $model->{$this->foreignKey};
+        })->filter()->all();
 
         // If there are no keys that were not null we will just return an array with either
         // null or 0 in (depending on if incrementing keys are in use) so the query wont
         // fail plus returns zero results, which should be what the developer expects.
         if (count($keys) === 0) {
-            return [$this->related->getIncrementing() &&
-                    $this->related->getKeyType() === 'int' ? 0 : null, ];
+            return [$this->relationHasIncrementingId() ? 0 : null];
         }
 
         return array_values(array_unique($keys));
@@ -208,7 +161,7 @@ class BelongsTo extends Relation
     {
         $foreign = $this->foreignKey;
 
-        $other = $this->otherKey;
+        $owner = $this->ownerKey;
 
         // First we will get to build a dictionary of the child models by their primary
         // key of the relationship, then we can easily match the children back onto
@@ -216,50 +169,19 @@ class BelongsTo extends Relation
         $dictionary = [];
 
         foreach ($results as $result) {
-            $dictionary[$result->getAttribute($other)] = $result;
+            $dictionary[$result->getAttribute($owner)] = $result;
         }
 
         // Once we have the dictionary constructed, we can loop through all the parents
         // and match back onto their children using these keys of the dictionary and
         // the primary key of the children to map them onto the correct instances.
         foreach ($models as $model) {
-            if (isset($dictionary[$model->$foreign])) {
-                $model->setRelation($relation, $dictionary[$model->$foreign]);
+            if (isset($dictionary[$model->{$foreign}])) {
+                $model->setRelation($relation, $dictionary[$model->{$foreign}]);
             }
         }
 
         return $models;
-    }
-
-    /**
-     * Associate the model instance to the given parent.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model|int  $model
-     * @return \Illuminate\Database\Eloquent\Model
-     */
-    public function associate($model)
-    {
-        $otherKey = ($model instanceof Model ? $model->getAttribute($this->otherKey) : $model);
-
-        $this->parent->setAttribute($this->foreignKey, $otherKey);
-
-        if ($model instanceof Model) {
-            $this->parent->setRelation($this->relation, $model);
-        }
-
-        return $this->parent;
-    }
-
-    /**
-     * Dissociate previously associated model from the given parent.
-     *
-     * @return \Illuminate\Database\Eloquent\Model
-     */
-    public function dissociate()
-    {
-        $this->parent->setAttribute($this->foreignKey, null);
-
-        return $this->parent->setRelation($this->relation, null);
     }
 
     /**
@@ -270,9 +192,99 @@ class BelongsTo extends Relation
      */
     public function update(array $attributes)
     {
-        $instance = $this->getResults();
+        return $this->getResults()->fill($attributes)->save();
+    }
 
-        return $instance->fill($attributes)->save();
+    /**
+     * Associate the model instance to the given parent.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|int  $model
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function associate($model)
+    {
+        $ownerKey = $model instanceof Model ? $model->getAttribute($this->ownerKey) : $model;
+
+        $this->child->setAttribute($this->foreignKey, $ownerKey);
+
+        if ($model instanceof Model) {
+            $this->child->setRelation($this->relation, $model);
+        }
+
+        return $this->child;
+    }
+
+    /**
+     * Dissociate previously associated model from the given parent.
+     *
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function dissociate()
+    {
+        $this->child->setAttribute($this->foreignKey, null);
+
+        return $this->child->setRelation($this->relation, null);
+    }
+
+    /**
+     * Add the constraints for a relationship query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
+     * @param  array|mixed  $columns
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
+    {
+        if ($parentQuery->getQuery()->from == $query->getQuery()->from) {
+            return $this->getRelationExistenceQueryForSelfRelation($query, $parentQuery, $columns);
+        }
+
+        return $query->select($columns)->whereColumn(
+            $this->getQualifiedForeignKey(), '=', $query->getModel()->getTable().'.'.$this->ownerKey
+        );
+    }
+
+    /**
+     * Add the constraints for a relationship query on the same table.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
+     * @param  array|mixed  $columns
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function getRelationExistenceQueryForSelfRelation(Builder $query, Builder $parentQuery, $columns = ['*'])
+    {
+        $query->select($columns)->from(
+            $query->getModel()->getTable().' as '.$hash = $this->getRelationCountHash()
+        );
+
+        $query->getModel()->setTable($hash);
+
+        return $query->whereColumn(
+            $hash.'.'.$query->getModel()->getKeyName(), '=', $this->getQualifiedForeignKey()
+        );
+    }
+
+    /**
+     * Get a relationship join table hash.
+     *
+     * @return string
+     */
+    public function getRelationCountHash()
+    {
+        return 'laravel_reserved_'.static::$selfJoinCount++;
+    }
+
+    /**
+     * Determine if the related model has an auto-incrementing ID.
+     *
+     * @return bool
+     */
+    protected function relationHasIncrementingId()
+    {
+        return $this->related->getIncrementing() &&
+                                $this->related->getKeyType() === 'int';
     }
 
     /**
@@ -292,7 +304,7 @@ class BelongsTo extends Relation
      */
     public function getQualifiedForeignKey()
     {
-        return $this->parent->getTable().'.'.$this->foreignKey;
+        return $this->child->getTable().'.'.$this->foreignKey;
     }
 
     /**
@@ -300,9 +312,19 @@ class BelongsTo extends Relation
      *
      * @return string
      */
-    public function getOtherKey()
+    public function getOwnerKey()
     {
-        return $this->otherKey;
+        return $this->ownerKey;
+    }
+
+    /**
+     * Get the fully qualified associated key of the relationship.
+     *
+     * @return string
+     */
+    public function getQualifiedOwnerKeyName()
+    {
+        return $this->related->getTable().'.'.$this->ownerKey;
     }
 
     /**
@@ -313,15 +335,5 @@ class BelongsTo extends Relation
     public function getRelation()
     {
         return $this->relation;
-    }
-
-    /**
-     * Get the fully qualified associated key of the relationship.
-     *
-     * @return string
-     */
-    public function getQualifiedOtherKeyName()
-    {
-        return $this->related->getTable().'.'.$this->otherKey;
     }
 }
