@@ -67,11 +67,12 @@ class RouteUrlGenerator
     /**
      * Generate a URL for the given route.
      *
-     * @param  \Illuminate\Routing\UrlGeneartor  $url
      * @param  \Illuminate\Routing\Route  $route
      * @param  array  $parameters
      * @param  bool  $absolute
      * @return string
+     * 
+     * @throws UrlGenerationException
      */
     public function to($route, $parameters = [], $absolute = false)
     {
