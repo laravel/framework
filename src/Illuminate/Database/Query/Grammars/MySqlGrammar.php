@@ -136,7 +136,7 @@ class MySqlGrammar extends Grammar
     /**
      * Compile all of the columns for an update statement.
      *
-     * @param  array  $value
+     * @param  array  $values
      * @return string
      */
     protected function compileUpdateColumns($values)

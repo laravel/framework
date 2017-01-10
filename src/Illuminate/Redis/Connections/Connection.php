@@ -38,7 +38,6 @@ abstract class Connection
      *
      * @param  array|string  $channels
      * @param  \Closure  $callback
-     * @param  string  $method
      * @return void
      */
     public function subscribe($channels, Closure $callback)

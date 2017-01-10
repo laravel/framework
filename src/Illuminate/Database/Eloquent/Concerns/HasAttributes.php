@@ -585,6 +585,7 @@ trait HasAttributes
     /**
      * Get an array attribute with the given key and value set.
      *
+     * @param  string  $path
      * @param  string  $key
      * @param  mixed  $value
      * @return $this
@@ -1029,6 +1030,7 @@ trait HasAttributes
     /**
      * Get all of the attribute mutator methods.
      *
+     * @param  mixed  $class
      * @return array
      */
     protected static function getMutatorMethods($class)

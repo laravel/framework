@@ -416,7 +416,7 @@ class Mailer implements MailerContract, MailQueueContract
     protected function sendSwiftMessage($message)
     {
         if ($this->events) {
-            $this->events->fire(new Events\MessageSending($message));
+            $this->events->dispatch(new Events\MessageSending($message));
         }
 
         try {
@@ -482,7 +482,7 @@ class Mailer implements MailerContract, MailQueueContract
     /**
      * Set the queue manager instance.
      *
-     * @param  \Illuminate\Contracts\Queue\Queue  $queue
+     * @param  \Illuminate\Contracts\Queue\Factory  $queue
      * @return $this
      */
     public function setQueue(QueueContract $queue)

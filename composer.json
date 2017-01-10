@@ -71,11 +71,11 @@
     },
     "require-dev": {
         "aws/aws-sdk-php": "~3.0",
+        "doctrine/dbal": "~2.5",
         "mockery/mockery": "~0.9.4",
         "pda/pheanstalk": "~3.0",
         "phpunit/phpunit": "~5.7",
         "predis/predis": "~1.0",
-        "doctrine/dbal": "~2.5",
         "symfony/css-selector": "~3.2",
         "symfony/dom-crawler": "~3.2"
     },

@@ -102,10 +102,9 @@ class EventFake implements Dispatcher
      *
      * @param  string|array  $events
      * @param  mixed  $listener
-     * @param  int  $priority
      * @return void
      */
-    public function listen($events, $listener, $priority = 0)
+    public function listen($events, $listener)
     {
         //
     }
@@ -145,18 +144,6 @@ class EventFake implements Dispatcher
     }
 
     /**
-     * Fire an event until the first non-null response is returned.
-     *
-     * @param  string  $event
-     * @param  array  $payload
-     * @return mixed
-     */
-    public function until($event, $payload = [])
-    {
-        return $this->dispatch($event, $payload, true);
-    }
-
-    /**
      * Flush a set of pushed events.
      *
      * @param  string  $event
@@ -172,24 +159,13 @@ class EventFake implements Dispatcher
      *
      * @param  string|object  $event
      * @param  mixed  $payload
-     * @param  bool  $halt
      * @return array|null
      */
-    public function dispatch($event, $payload = [], $halt = false)
+    public function dispatch($event, $payload = [])
     {
         $name = is_object($event) ? get_class($event) : (string) $event;
 
         $this->events[$name][] = func_get_args();
-    }
-
-    /**
-     * Get the event that is currently dispatching.
-     *
-     * @return string
-     */
-    public function dispatching()
-    {
-        //
     }
 
     /**

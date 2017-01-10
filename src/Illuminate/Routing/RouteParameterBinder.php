@@ -2,6 +2,8 @@
 
 namespace Illuminate\Routing;
 
+use Illuminate\Support\Arr;
+
 class RouteParameterBinder
 {
     /**
@@ -25,6 +27,7 @@ class RouteParameterBinder
     /**
      * Get the parameters for the route.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return array
      */
     public function parameters($request)

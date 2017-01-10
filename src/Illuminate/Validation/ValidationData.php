@@ -20,6 +20,7 @@ class ValidationData
      * Gather a copy of the attribute data filled with any missing attributes.
      *
      * @param  string  $attribute
+     * @param  array  $masterData
      * @return array
      */
     protected static function initializeAttributeOnData($attribute, $masterData)
@@ -38,6 +39,7 @@ class ValidationData
     /**
      * Get all of the exact attribute values for a given wildcard attribute.
      *
+     * @param  array  $masterData
      * @param  array  $data
      * @param  string  $attribute
      * @return array
@@ -71,6 +73,7 @@ class ValidationData
      * Used to extract a sub-section of the data for faster iteration.
      *
      * @param  string  $attribute
+     * @param  array  $masterData
      * @return array
      */
     public static function extractDataFromPath($attribute, $masterData)

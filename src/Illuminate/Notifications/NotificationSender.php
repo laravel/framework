@@ -69,6 +69,7 @@ class NotificationSender
      *
      * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
      * @param  mixed  $notification
+     * @param  array  $channels
      * @return void
      */
     public function sendNow($notifiables, $notification, array $channels = null)
@@ -111,7 +112,7 @@ class NotificationSender
 
         $response = $this->manager->driver($channel)->send($notifiable, $notification);
 
-        $this->events->fire(
+        $this->events->dispatch(
             new Events\NotificationSent($notifiable, $notification, $channel, $response)
         );
     }
