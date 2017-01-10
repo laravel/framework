@@ -149,7 +149,7 @@ abstract class ServiceProvider
     /**
      * Add a publish group / tag to the service provider.
      *
-     * @param  string  $path
+     * @param  string  $group
      * @param  array  $paths
      * @return void
      */

@@ -96,7 +96,7 @@ class AliasLoader
     /**
      * Ensure that the given alias has an existing real-time facade class.
      *
-     * @param  string  $class
+     * @param  string  $alias
      * @return string
      */
     protected function ensureFacadeExists($alias)

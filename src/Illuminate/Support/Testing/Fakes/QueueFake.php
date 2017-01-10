@@ -99,7 +99,7 @@ class QueueFake implements Queue
     /**
      * Resolve a queue connection instance.
      *
-     * @param  string  $name
+     * @param  mixed  $value
      * @return \Illuminate\Contracts\Queue\Queue
      */
     public function connection($value = null)

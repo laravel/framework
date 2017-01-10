@@ -49,6 +49,10 @@ class Connector
     /**
      * Create a new PDO connection instance.
      *
+     * @param  string  $dsn
+     * @param  string  $username
+     * @param  string  $password
+     * @param  array  $options
      * @return \PDO
      */
     protected function createPdoConnection($dsn, $username, $password, $options)

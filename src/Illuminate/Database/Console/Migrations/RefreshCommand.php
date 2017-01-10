@@ -93,7 +93,6 @@ class RefreshCommand extends Command
      *
      * @param  string  $database
      * @param  string  $path
-     * @param  bool  $step
      * @param  bool  $force
      * @return void
      */
