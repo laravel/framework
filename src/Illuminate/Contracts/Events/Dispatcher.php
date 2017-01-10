@@ -47,6 +47,16 @@ interface Dispatcher
     public function flush($event);
 
     /**
+     * Fire an event and call the listeners.
+     *
+     * @param  string|object  $event
+     * @param  mixed  $payload
+     * @param  bool  $halt
+     * @return array|null
+     */
+    public function fire($event, $payload = [], $halt = false);
+
+    /**
      * Dispatch an event and call the listeners.
      *
      * @param  string|object  $event
