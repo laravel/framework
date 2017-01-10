@@ -296,7 +296,7 @@ class Dispatcher implements DispatcherContract
      * Register an event listener with the dispatcher.
      *
      * @param  string|\Closure  $listener
-     * @param  boolean  $wildcard
+     * @param  bool  $wildcard
      * @return mixed
      */
     public function makeListener($listener, $wildcard = false)
@@ -318,7 +318,7 @@ class Dispatcher implements DispatcherContract
      * Create a class based listener using the IoC container.
      *
      * @param  string  $listener
-     * @param  boolean  $wildcard
+     * @param  bool  $wildcard
      * @return \Closure
      */
     public function createClassListener($listener, $wildcard = false)
