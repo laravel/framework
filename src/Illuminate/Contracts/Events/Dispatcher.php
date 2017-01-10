@@ -9,10 +9,9 @@ interface Dispatcher
      *
      * @param  string|array  $events
      * @param  mixed  $listener
-     * @param  int  $priority
      * @return void
      */
-    public function listen($events, $listener, $priority = 0);
+    public function listen($events, $listener);
 
     /**
      * Determine if a given event has listeners.
@@ -40,15 +39,6 @@ interface Dispatcher
     public function subscribe($subscriber);
 
     /**
-     * Fire an event until the first non-null response is returned.
-     *
-     * @param  string  $event
-     * @param  array  $payload
-     * @return mixed
-     */
-    public function until($event, $payload = []);
-
-    /**
      * Flush a set of pushed events.
      *
      * @param  string  $event
@@ -61,17 +51,9 @@ interface Dispatcher
      *
      * @param  string|object  $event
      * @param  mixed  $payload
-     * @param  bool  $halt
      * @return array|null
      */
-    public function dispatch($event, $payload = [], $halt = false);
-
-    /**
-     * Get the event that is currently firing.
-     *
-     * @return string
-     */
-    public function dispatching();
+    public function dispatch($event, $payload = []);
 
     /**
      * Remove a set of listeners from the dispatcher.
