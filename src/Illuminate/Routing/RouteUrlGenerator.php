@@ -71,7 +71,7 @@ class RouteUrlGenerator
      * @param  array  $parameters
      * @param  bool  $absolute
      * @return string
-     * 
+     *
      * @throws UrlGenerationException
      */
     public function to($route, $parameters = [], $absolute = false)
