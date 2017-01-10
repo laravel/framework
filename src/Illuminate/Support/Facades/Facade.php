@@ -29,7 +29,7 @@ abstract class Facade
      */
     public static function spy()
     {
-        if (static::isMock()) {
+        if (! static::isMock()) {
             $class = static::getMockableClass();
 
             static::swap($class ? Mockery::spy($class) : Mockery::spy());
