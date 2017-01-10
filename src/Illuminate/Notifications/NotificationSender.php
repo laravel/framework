@@ -111,7 +111,7 @@ class NotificationSender
 
         $response = $this->manager->driver($channel)->send($notifiable, $notification);
 
-        $this->events->fire(
+        $this->events->dispatch(
             new Events\NotificationSent($notifiable, $notification, $channel, $response)
         );
     }

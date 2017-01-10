@@ -627,6 +627,8 @@ if (! function_exists('retry')) {
      * @param  callable  $callback
      * @param  int  $sleep
      * @return mixed
+     *
+     * @throws \Exception
      */
     function retry($times, callable $callback, $sleep = 0)
     {
