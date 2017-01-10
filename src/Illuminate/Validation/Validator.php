@@ -756,7 +756,7 @@ class Validator implements ValidatorContract
     /**
      * Add conditions to a given field based on a Closure.
      *
-     * @param  string  $attribute
+     * @param  string|array  $attribute
      * @param  string|array  $rules
      * @param  callable  $callback
      * @return void
