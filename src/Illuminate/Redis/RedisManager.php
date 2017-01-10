@@ -23,7 +23,7 @@ class RedisManager implements Factory
     protected $config;
 
     /**
-     * The Redis connection.
+     * The Redis connections.
      *
      * @var mixed
      */
