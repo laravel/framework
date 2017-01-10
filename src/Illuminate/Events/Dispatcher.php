@@ -221,22 +221,15 @@ class Dispatcher implements DispatcherContract
         // When the given "event" is actually an object we will assume it is an event
         // object and use the class as the event name and this event itself as the
         // payload to the handler, which makes object based events quite simple.
-        if (is_object($event)) {
-            list($payload, $event) = [[$event], get_class($event)];
-        }
+        list($event, $payload) = $this->parseEventAndPayload(
+            $event, $payload
+        );
 
         $responses = [];
 
-        // If an array is not given to us as the payload, we will turn it into one so
-        // we can easily use call_user_func_array on the listeners, passing in the
-        // payload to each of them so that they receive each of these arguments.
-        if (! is_array($payload)) {
-            $payload = [$payload];
-        }
-
         $this->firing[] = $event;
 
-        if (isset($payload[0]) && $payload[0] instanceof ShouldBroadcast) {
+        if ($this->shouldBroadcast($payload)) {
             $this->broadcastEvent($payload[0]);
         }
 
@@ -265,6 +258,33 @@ class Dispatcher implements DispatcherContract
         array_pop($this->firing);
 
         return $halt ? null : $responses;
+    }
+
+    /**
+     * Parse the given event and payload and prepare them for dispatching.
+     *
+     * @param  mixed  $event
+     * @param  mixed  $payload
+     * @return array
+     */
+    protected function parseEventAndPayload($event, $payload)
+    {
+        if (is_object($event)) {
+            list($payload, $event) = [[$event], get_class($event)];
+        }
+
+        return [$event, array_wrap($payload)];
+    }
+
+    /**
+     * Determine if the payload has a broadcastable event.
+     *
+     * @param  array  $payload
+     * @return bool
+     */
+    protected function shouldBroadcast(array $payload)
+    {
+        return isset($payload[0]) && $payload[0] instanceof ShouldBroadcast;
     }
 
     /**
