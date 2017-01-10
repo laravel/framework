@@ -589,7 +589,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Finish processing on a successful save operation.
+     * Perform any actions that are necessary after the model is saved.
      *
      * @param  array  $options
      * @return void
