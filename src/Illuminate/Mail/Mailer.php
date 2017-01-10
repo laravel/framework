@@ -416,7 +416,7 @@ class Mailer implements MailerContract, MailQueueContract
     protected function sendSwiftMessage($message)
     {
         if ($this->events) {
-            $this->events->fire(new Events\MessageSending($message));
+            $this->events->dispatch(new Events\MessageSending($message));
         }
 
         try {
