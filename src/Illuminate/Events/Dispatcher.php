@@ -103,8 +103,19 @@ class Dispatcher implements DispatcherContract
     public function push($event, $payload = [])
     {
         $this->listen($event.'_pushed', function () use ($event, $payload) {
-            $this->fire($event, $payload);
+            $this->dispatch($event, $payload);
         });
+    }
+
+    /**
+     * Flush a set of pushed events.
+     *
+     * @param  string  $event
+     * @return void
+     */
+    public function flush($event)
+    {
+        $this->dispatch($event.'_pushed');
     }
 
     /**
@@ -136,14 +147,15 @@ class Dispatcher implements DispatcherContract
     }
 
     /**
-     * Flush a set of pushed events.
+     * Fire an event until the first non-null response is returned.
      *
-     * @param  string  $event
-     * @return void
+     * @param  string|object  $event
+     * @param  mixed  $payload
+     * @return array|null
      */
-    public function flush($event)
+    public function until($event, $payload = [])
     {
-        $this->fire($event.'_pushed');
+        return $this->dispatch($event, $payload, true);
     }
 
     /**
@@ -151,11 +163,12 @@ class Dispatcher implements DispatcherContract
      *
      * @param  string|object  $event
      * @param  mixed  $payload
+     * @param  bool  $halt
      * @return array|null
      */
-    public function dispatch($event, $payload = [])
+    public function fire($event, $payload = [], $halt = false)
     {
-        return $this->fire($event, $payload);
+        return $this->dispatch($event, $payload, $halt);
     }
 
     /**
@@ -163,9 +176,10 @@ class Dispatcher implements DispatcherContract
      *
      * @param  string|object  $event
      * @param  mixed  $payload
+     * @param  bool  $halt
      * @return array|null
      */
-    public function fire($event, $payload = [])
+    public function dispatch($event, $payload = [], $halt = false)
     {
         // When the given "event" is actually an object we will assume it is an event
         // object and use the class as the event name and this event itself as the
@@ -183,6 +197,13 @@ class Dispatcher implements DispatcherContract
         foreach ($this->getListeners($event) as $listener) {
             $response = $listener($event, $payload);
 
+            // If a response is returned from the listener and event halting is enabled
+            // we will just return this response, and not call the rest of the event
+            // listeners. Otherwise we will add the response on the response list.
+            if (! is_null($response) && $halt) {
+                return $response;
+            }
+
             // If a boolean false is returned from a listener, we will stop propagating
             // the event to any further listeners down in the chain, else we keep on
             // looping through the listeners and firing every one in our sequence.
@@ -193,7 +214,7 @@ class Dispatcher implements DispatcherContract
             $responses[] = $response;
         }
 
-        return $responses;
+        return $halt ? null : $responses;
     }
 
     /**

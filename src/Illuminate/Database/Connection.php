@@ -780,11 +780,11 @@ class Connection implements ConnectionInterface
 
         switch ($event) {
             case 'beganTransaction':
-                return $this->events->fire(new Events\TransactionBeginning($this));
+                return $this->events->dispatch(new Events\TransactionBeginning($this));
             case 'committed':
-                return $this->events->fire(new Events\TransactionCommitted($this));
+                return $this->events->dispatch(new Events\TransactionCommitted($this));
             case 'rollingBack':
-                return $this->events->fire(new Events\TransactionRolledBack($this));
+                return $this->events->dispatch(new Events\TransactionRolledBack($this));
         }
     }
 
@@ -797,7 +797,7 @@ class Connection implements ConnectionInterface
     protected function event($event)
     {
         if (isset($this->events)) {
-            $this->events->fire($event);
+            $this->events->dispatch($event);
         }
     }
 
