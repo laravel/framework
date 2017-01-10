@@ -945,7 +945,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  int  $options
      * @return string
      *
-     * @throws JsonEncodingException
+     * @throws \Illuminate\Database\Eloquent\JsonEncodingException
      */
     public function toJson($options = 0)
     {

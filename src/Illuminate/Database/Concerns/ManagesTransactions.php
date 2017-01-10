@@ -85,7 +85,7 @@ trait ManagesTransactions
      * Start a new database transaction.
      *
      * @return void
-     * @throws Exception
+     * @throws \Exception
      */
     public function beginTransaction()
     {
@@ -132,7 +132,7 @@ trait ManagesTransactions
      * @param  \Exception  $e
      * @return void
      *
-     * @throws Exception
+     * @throws \Exception
      */
     protected function handleBeginTransactionException($e)
     {
