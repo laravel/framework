@@ -53,6 +53,8 @@ trait ManagesTransactions
      * @param  int  $currentAttempt
      * @param  int  $maxAttempts
      * @return void
+     *
+     * @throws \Exception
      */
     protected function handleTransactionException($e, $currentAttempt, $maxAttempts)
     {
@@ -129,6 +131,8 @@ trait ManagesTransactions
      *
      * @param  \Exception  $e
      * @return void
+     *
+     * @throws Exception
      */
     protected function handleBeginTransactionException($e)
     {
