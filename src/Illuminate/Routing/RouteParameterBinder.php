@@ -2,6 +2,8 @@
 
 namespace Illuminate\Routing;
 
+use Illuminate\Support\Arr;
+
 class RouteParameterBinder
 {
     /**
