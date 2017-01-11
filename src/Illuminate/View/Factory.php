@@ -149,23 +149,17 @@ class Factory implements FactoryContract
      */
     public function renderEach($view, $data, $iterator, $empty = 'raw|')
     {
-        $result = '';
-
         // If is actually data in the array, we will loop through the data and append
         // an instance of the partial view to the final result HTML passing in the
         // iterated value of this data array, allowing the views to access them.
         if (count($data) > 0) {
-            $result = $this->renderEachView($view, $data, $iterator);
+            return $this->renderEachView($view, $data, $iterator);
         }
 
         // If there is no data in the array, we will render the contents of the empty
         // view. Alternatively, the "empty view" could be a raw string that begins
         // with "raw|" for convenience and to let this know that it is a string.
-        else {
-            return $this->renderEmptyEach($empty);
-        }
-
-        return $result;
+        return $this->renderEmptyEach($empty);
     }
 
     /**
