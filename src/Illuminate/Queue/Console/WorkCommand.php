@@ -80,7 +80,7 @@ class WorkCommand extends Command
         // connection being run for the queue operation currently being executed.
         $queue = $this->getQueue($connection);
 
-        $response = $this->runWorker(
+        $this->runWorker(
             $connection, $queue
         );
     }
