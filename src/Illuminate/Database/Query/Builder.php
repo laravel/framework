@@ -1320,7 +1320,7 @@ class Builder
         foreach ($groups as $group) {
             $this->groups = array_merge(
                 (array) $this->groups,
-                is_array($group) ? $group : [$group]
+                array_wrap($group)
             );
         }
 
@@ -2019,11 +2019,7 @@ class Builder
      */
     public function count($columns = '*')
     {
-        if (! is_array($columns)) {
-            $columns = [$columns];
-        }
-
-        return (int) $this->aggregate(__FUNCTION__, $columns);
+        return (int) $this->aggregate(__FUNCTION__, array_wrap($columns));
     }
 
     /**
