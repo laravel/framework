@@ -54,7 +54,9 @@ trait HasGlobalScopes
             return Arr::get(static::$globalScopes, static::class.'.'.$scope);
         }
 
-        return Arr::get(static::$globalScopes, static::class.'.'.get_class($scope));
+        return Arr::get(
+            static::$globalScopes, static::class.'.'.get_class($scope)
+        );
     }
 
     /**
