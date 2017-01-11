@@ -41,7 +41,7 @@ class Connector
             );
         } catch (Exception $e) {
             return $this->tryAgainIfCausedByLostConnection(
-                $e, $dsn, $username, $password, $options
+                $e, $dsn, Arr::get($config, 'username'), Arr::get($config, 'password'), $options
             );
         }
     }
