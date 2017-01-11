@@ -36,7 +36,7 @@ class Connector
     public function createConnection($dsn, array $config, array $options)
     {
         list($username, $password) = [
-            Arr::get($config, 'username'), Arr::get($config, 'password')
+            Arr::get($config, 'username'), Arr::get($config, 'password'),
         ];
 
         try {
