@@ -87,25 +87,27 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
      * Render the paginator using the given view.
      *
      * @param  string|null  $view
+     * @param  array  $data
      * @return string
      */
-    public function links($view = null)
+    public function links($view = null, $data = [])
     {
-        return $this->render($view);
+        return $this->render($view, $data);
     }
 
     /**
      * Render the paginator using the given view.
      *
      * @param  string|null  $view
+     * @param  array  $data
      * @return string
      */
-    public function render($view = null)
+    public function render($view = null, $data = [])
     {
         return new HtmlString(
-            static::viewFactory()->make($view ?: static::$defaultSimpleView, [
+            static::viewFactory()->make($view ?: static::$defaultSimpleView, array_merge($data, [
                 'paginator' => $this,
-            ])->render()
+            ]))->render()
         );
     }
 
