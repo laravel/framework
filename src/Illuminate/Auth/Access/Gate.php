@@ -236,7 +236,7 @@ class Gate implements GateContract
             return false;
         }
 
-        $arguments = is_array($arguments) ? $arguments : [$arguments];
+        $arguments = array_wrap($arguments);
 
         // First we will call the "before" callbacks for the Gate. If any of these give
         // back a non-null response, we will immediately return that result in order

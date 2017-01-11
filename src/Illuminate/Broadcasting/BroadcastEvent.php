@@ -42,11 +42,7 @@ class BroadcastEvent
         $name = method_exists($event, 'broadcastAs')
                 ? $event->broadcastAs() : get_class($event);
 
-        $channels = $event->broadcastOn();
-
-        if (! is_array($channels)) {
-            $channels = [$channels];
-        }
+        $channels = array_wrap($event->broadcastOn());
 
         $this->broadcaster->broadcast(
             $channels, $name, $this->getPayloadFromEvent($event)
