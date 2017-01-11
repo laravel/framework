@@ -261,7 +261,7 @@ class RedisQueue extends Queue implements QueueContract
     /**
      * Get the underlying Redis instance.
      *
-     * @return \Illuminate\Contracts\Redis\Database
+     * @return \Illuminate\Contracts\Redis\Factory
      */
     public function getRedis()
     {
