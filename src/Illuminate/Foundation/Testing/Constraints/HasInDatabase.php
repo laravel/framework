@@ -17,7 +17,7 @@ class HasInDatabase extends PHPUnit_Framework_Constraint
     /**
      * The database connection.
      *
-     * @var \Illuminate\Database\Collection
+     * @var \Illuminate\Database\Connection
      */
     protected $database;
 
@@ -31,7 +31,7 @@ class HasInDatabase extends PHPUnit_Framework_Constraint
     /**
      * Create a new constraint instance.
      *
-     * @param  \Illuminate\Database\Collection  $database
+     * @param  \Illuminate\Database\Connection  $database
      * @param  array  $data
      * @return void
      */

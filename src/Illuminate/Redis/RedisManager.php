@@ -62,7 +62,7 @@ class RedisManager implements Factory
      * Resolve the given connection by name.
      *
      * @param  string  $name
-     * @return \Illuminate\Redis\Connection
+     * @return \Illuminate\Redis\Connections\Connection
      */
     protected function resolve($name)
     {
@@ -85,7 +85,7 @@ class RedisManager implements Factory
      * Resolve the given cluster connection by name.
      *
      * @param  string  $name
-     * @return \Illuminate\Redis\Connection
+     * @return \Illuminate\Redis\Connections\Connection
      */
     protected function resolveCluster($name)
     {

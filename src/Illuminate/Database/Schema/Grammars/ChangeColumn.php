@@ -67,7 +67,7 @@ class ChangeColumn
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Doctrine\DBAL\Schema\Table  $table
-     * @return \Doctrine\DBAL\Schema\TableDiff
+     * @return \Doctrine\DBAL\Schema\Table
      */
     protected static function getTableWithColumnChanges(Blueprint $blueprint, Table $table)
     {
