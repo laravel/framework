@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Response;
 use Illuminate\Contracts\View\View;
 use PHPUnit_Framework_Assert as PHPUnit;
+use Symfony\Component\HttpFoundation\Cookie;
 
 class TestResponse extends Response
 {
@@ -108,16 +109,16 @@ class TestResponse extends Response
      * @param  string  $cookieName
      * @param  mixed  $value
      * @param  bool  $encrypted
-     * @return void
+     * @return $this
      */
     public function assertCookie($cookieName, $value = null, $encrypted = true)
     {
-        PHPUnit::assertTrue(
-            $exists = $this->hasCookie($cookieName),
+        PHPUnit::assertNotNull(
+            $cookie = $this->getCookie($cookieName),
             "Cookie [{$cookieName}] not present on response."
         );
 
-        if (! $exists || is_null($value)) {
+        if (! $cookie || is_null($value)) {
             return $this;
         }
 
@@ -130,23 +131,23 @@ class TestResponse extends Response
             $actual, $value,
             "Cookie [{$cookieName}] was found, but value [{$actual}] does not match [{$value}]."
         );
+
+        return $this;
     }
 
     /**
-     * Determine if the response has a given cookie.
+     * Get the given cookie from the response.
      *
      * @param  string  $cookieName
-     * @return bool
+     * @return Cookie|null
      */
-    protected function hasCookie($cookieName)
+    protected function getCookie($cookieName)
     {
         foreach ($this->headers->getCookies() as $cookie) {
             if ($cookie->getName() === $cookieName) {
-                return true;
+                return $cookie;
             }
         }
-
-        return false;
     }
 
     /**
