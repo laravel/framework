@@ -1281,11 +1281,14 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Count the number of items in the collection.
      *
+     * @param callable|null $callback
      * @return int
      */
-    public function count()
+    public function count(callable $callback = null)
     {
-        return count($this->items);
+        $items = $callback === null ? $this->items : $this->filter($callback)->toArray();
+
+        return count($items);
     }
 
     /**
