@@ -1194,7 +1194,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 
     public function testCount()
     {
-        $c = new Collection([1,3,5,7]);
+        $c = new Collection([1, 3, 5, 7]);
 
         $this->assertEquals(4, $c->count());
     }
@@ -1204,10 +1204,10 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
      */
     public function testCountWithFilter()
     {
-        $c = new Collection([1,3,5,7]);
+        $c = new Collection([1, 3, 5, 7]);
 
-        $this->assertEquals(3, $c->count(function($v) {
-            return $v>1;
+        $this->assertEquals(3, $c->count(function ($v) {
+            return $v > 1;
         }));
     }
 
