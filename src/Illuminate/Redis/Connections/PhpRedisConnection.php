@@ -18,6 +18,21 @@ class PhpRedisConnection extends Connection
     }
 
     /**
+     * Proxy a call to the eval function of PhpRedis.
+     *
+     * @param  array  $parameters
+     * @return mixed
+     */
+    protected function proxyToEval(array $parameters)
+    {
+        return $this->command('eval', [
+            isset($parameters[0]) ? $parameters[0] : null,
+            array_slice($parameters, 2),
+            isset($parameters[1]) ? $parameters[1] : null,
+        ]);
+    }
+
+    /**
      * Subscribe to a set of given channels for messages.
      *
      * @param  array|string  $channels
@@ -68,11 +83,7 @@ class PhpRedisConnection extends Connection
     public function __call($method, $parameters)
     {
         if ($method == 'eval') {
-            $parameters = [
-                isset($parameters[0]) ? $parameters[0] : null,
-                array_slice($parameters, 2),
-                isset($parameters[1]) ? $parameters[1] : null,
-            ];
+            return $this->proxyToEval($parameters);
         }
 
         return $this->command($method, $parameters);
