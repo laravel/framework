@@ -1031,3 +1031,36 @@ if ( ! function_exists('with'))
 		return $object;
 	}
 }
+
+if ( ! function_exists('array_reindex'))
+{
+	/**
+	* Reindex array by specific parameter of values 
+	*
+	* @param array $array
+	* @param string $key
+	* @return array
+	*/
+	function array_reindex($array, $key)
+	{
+		$result = array();
+		
+		foreach ($array as $value) 
+		{
+			if (is_array($value)) 
+			{
+				$result[$value[$key]] = $value;
+			} 
+			else if (is_object($value)) 
+			{
+				$result[$value->$key] = $value;
+			} 
+			else 
+			{
+				throw new InvalidArgumentException("Multi-dimensional array or collection of objects  allowed.");
+			}
+		}
+		
+		return $result;
+	}
+}
