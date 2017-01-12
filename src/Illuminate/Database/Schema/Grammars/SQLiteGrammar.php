@@ -40,7 +40,7 @@ class SQLiteGrammar extends Grammar
      */
     public function compileColumnExists($table)
     {
-        return 'pragma table_info('.str_replace('.', '__', $table).')';
+        return 'pragma table_info('.$this->wrapTable(str_replace('.', '__', $table)).')';
     }
 
     /**
