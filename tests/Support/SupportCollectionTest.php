@@ -1318,7 +1318,7 @@ class SupportCollectionTest extends TestCase
 
     public function testCount()
     {
-        $c = new Collection([1,3,5,7]);
+        $c = new Collection([1, 3, 5, 7]);
 
         $this->assertEquals(4, $c->count());
     }
@@ -1328,10 +1328,17 @@ class SupportCollectionTest extends TestCase
      */
     public function testCountWithFilter()
     {
-        $c = new Collection([1,3,5,7]);
+        $c = new Collection([1, 3, 5, 7]);
 
-        $this->assertEquals(3, $c->count(function($v) {
-            return $v>1;
+        $this->assertEquals(3, $c->count(function ($v) {
+            return $v > 1;
+        }));
+
+
+        $c = new Collection([ ['id'=>7, 'name'=>'foo'], ['id'=>12, 'name'=>'bar'], ['id'=>12, 'name'=>'baz']]);
+
+        $this->assertEquals(2, $c->count(function ($v) {
+            return substr($v['name'],0,1)==='b';
         }));
     }
 
