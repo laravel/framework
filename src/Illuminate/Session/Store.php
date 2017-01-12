@@ -7,7 +7,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use SessionHandlerInterface;
 use Illuminate\Contracts\Session\Session;
-use Symfony\Component\HttpFoundation\Request;
 
 class Store implements Session
 {
@@ -198,7 +197,7 @@ class Store implements Session
      *
      * @param  string  $key
      * @param  mixed  $default
-     * @return void
+     * @return mixed
      */
     public function get($key, $default = null)
     {
@@ -456,7 +455,7 @@ class Store implements Session
     /**
      * Flush the session data and regenerate the ID.
      *
-     * @return void
+     * @return bool
      */
     public function invalidate()
     {
