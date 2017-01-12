@@ -11,6 +11,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Factory as Queue;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
+use SuperClosure\SerializableClosure;
 
 class Mailable implements MailableContract
 {
@@ -502,6 +503,10 @@ class Mailable implements MailableContract
      */
     public function withSwiftMessage($callback)
     {
+        if ( !($callback instanceof SerializableClosure) ) {
+            $callback = new SerializableClosure($callback);
+        }
+
         $this->callbacks[] = $callback;
 
         return $this;
