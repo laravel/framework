@@ -161,6 +161,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected $casts = [];
 
     /**
+     * Map relationships to null objects that should be returned if the result is null.
+     *
+     * @var array
+     */
+    protected $relationship_null_objects = [];
+
+    /**
      * The relationships that should be touched on save.
      *
      * @var array
@@ -2710,7 +2717,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
                 .'Illuminate\Database\Eloquent\Relations\Relation');
         }
 
-        $this->setRelation($method, $results = $relations->getResults());
+        $results = $relations->getResults();
+
+        if ($results === null && array_key_exists($method, $this->relationship_null_objects)) {
+            $results = new $this->relationship_null_objects[$method];
+        }
+
+        $this->setRelation($method, $results);
 
         return $results;
     }
