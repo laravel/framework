@@ -68,7 +68,7 @@ interface Session
      *
      * @param  string  $key
      * @param  mixed  $default
-     * @return void
+     * @return mixed
      */
     public function get($key, $default = null);
 
