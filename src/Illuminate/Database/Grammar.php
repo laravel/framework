@@ -56,13 +56,13 @@ abstract class Grammar
         // the pieces so we can wrap each of the segments of the expression on it
         // own, and then joins them both back together with the "as" connector.
         if (strpos(strtolower($value), ' as ') !== false) {
-            $segments = explode(' ', $value);
+            $segments = preg_split( '/\s+as\s+/i', $value );
 
             if ($prefixAlias) {
-                $segments[2] = $this->tablePrefix.$segments[2];
+                $segments[1] = $this->tablePrefix.$segments[1];
             }
 
-            return $this->wrap($segments[0]).' as '.$this->wrapValue($segments[2]);
+            return $this->wrap($segments[0]).' as '.$this->wrapValue($segments[1]);
         }
 
         $wrapped = [];
