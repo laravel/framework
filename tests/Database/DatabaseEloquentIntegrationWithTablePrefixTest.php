@@ -85,7 +85,7 @@ class DatabaseEloquentIntegrationWithTablePrefixTest extends TestCase
         $models = EloquentTestUser::fromQuery('SELECT * FROM prefix_users WHERE email = ?', ['abigailotwell@gmail.com']);
 
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $models);
-        $this->assertInstanceOf('EloquentTestUser', $models[0]);
+        $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestUser', $models[0]);
         $this->assertEquals('abigailotwell@gmail.com', $models[0]->email);
         $this->assertEquals(1, $models->count());
     }

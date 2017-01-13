@@ -153,13 +153,13 @@ class StandAloneHandler
     }
 }
 
-class ShouldNotBeDispatched implements Illuminate\Contracts\Queue\ShouldQueue
+class ShouldNotBeDispatched implements \Illuminate\Contracts\Queue\ShouldQueue
 {
-    use Illuminate\Bus\Queueable,
-        Illuminate\Queue\InteractsWithQueue;
+    use \Illuminate\Bus\Queueable,
+        \Illuminate\Queue\InteractsWithQueue;
 
     public function handle()
     {
-        throw new RuntimeException('This should not be run');
+        throw new \RuntimeException('This should not be run');
     }
 }
