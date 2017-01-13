@@ -160,6 +160,7 @@ class Factory implements FactoryContract
                 $result .= $this->make($view, $data)->render();
             }
         }
+
         // If there is no data in the array, we will render the contents of the empty
         // view. Alternatively, the "empty view" could be a raw string that begins
         // with "raw|" for convenience and to let this know that it is a string.
