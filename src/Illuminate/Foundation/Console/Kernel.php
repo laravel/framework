@@ -222,14 +222,18 @@ class Kernel implements KernelContract
     /**
      * Queue the given console command.
      *
-     * @param  string  $command
-     * @param  array   $parameters
+     * @param  string $command
+     * @param  array  $parameters
+     * @param  string $queue
+     *
      * @return void
      */
-    public function queue($command, array $parameters = [])
+    public function queue($command, array $parameters = [], $queue = null)
     {
         $this->app['Illuminate\Contracts\Queue\Queue']->push(
-            'Illuminate\Foundation\Console\QueuedJob', func_get_args()
+            'Illuminate\Foundation\Console\QueuedJob',
+            [$command, $parameters],
+            $queue
         );
     }
 
