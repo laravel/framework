@@ -5,7 +5,6 @@ namespace Illuminate\View;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-use Illuminate\Support\Collection;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\View\Engines\EngineResolver;
@@ -171,6 +170,7 @@ class Factory implements FactoryContract
                 $result = $this->make($empty)->render();
             }
         }
+
         return $result;
     }
 
