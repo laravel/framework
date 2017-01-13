@@ -1788,21 +1788,27 @@ class Builder
      */
     public function chunkById($count, callable $callback, $column = 'id', $alias = null)
     {
-        $lastId = null;
-
         $alias = $alias ?: $column;
 
-        $results = $this->forPageAfterId($count, 0, $column)->get();
+        $lastId = 0;
 
-        while (! empty($results)) {
+        do {
+            $clone = clone $this;
+
+            $results = $clone->forPageAfterId($count, $lastId, $column)->get();
+
+            $countResults = $results->count();
+
+            if ($countResults == 0) {
+                break;
+            }
+
             if (call_user_func($callback, $results) === false) {
                 return false;
             }
 
-            $lastId = last($results)->{$alias};
-
-            $results = $this->forPageAfterId($count, $lastId, $column)->get();
-        }
+            $lastId = $results->last()->{$alias};
+        } while ($countResults == $count);
 
         return true;
     }
