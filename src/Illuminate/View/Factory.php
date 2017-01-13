@@ -155,44 +155,23 @@ class Factory implements FactoryContract
         // an instance of the partial view to the final result HTML passing in the
         // iterated value of this data array, allowing the views to access them.
         if (count($data) > 0) {
-            $result = $this->renderEachView($view, $data, $iterator);
+            foreach ($data as $key => $value) {
+                $result .= $this->make(
+                    $view, ['key' => $key, $iterator => $value]
+                )->render();
+            }
         }
 
         // If there is no data in the array, we will render the contents of the empty
         // view. Alternatively, the "empty view" could be a raw string that begins
         // with "raw|" for convenience and to let this know that it is a string.
         else {
-            return $this->renderEmptyEach($empty);
+            $result = Str::startsWith($empty, 'raw|')
+                        ? substr($empty, 4)
+                        : $this->make($empty)->render();
         }
 
         return $result;
-    }
-
-    /**
-     * Render the given view N number of times based on the data.
-     *
-     * @param  string  $view
-     * @param  array  $data
-     * @param  string  $iterator
-     * @return string
-     */
-    protected function renderEachView($view, $data, $iterator)
-    {
-        return collect($data)->map(function ($value, $key) use ($view, $iterator) {
-            return $this->make($view, ['key' => $key, $iterator => $value])->render();
-        })->implode('');
-    }
-
-    /**
-     * Render an empty "each" view.
-     *
-     * @param  string  $empty
-     * @return string
-     */
-    protected function renderEmptyEach($empty)
-    {
-        return Str::startsWith($empty, 'raw|')
-                        ? substr($empty, 4) : $this->make($empty)->render();
     }
 
     /**

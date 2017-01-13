@@ -124,7 +124,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Get the mode of a given key.
      *
      * @param  mixed  $key
-     * @return array
+     * @return array|null
      */
     public function mode($key = null)
     {
@@ -909,9 +909,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return $this->items[$keys];
         }
 
-        if (! is_array($keys)) {
-            $keys = [$keys];
-        }
+        $keys = array_wrap($keys);
 
         return new static(array_intersect_key($this->items, array_flip($keys)));
     }
@@ -1459,6 +1457,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      *
      * @param  string  $key
      * @return mixed
+     *
+     * @throws \Exception
      */
     public function __get($key)
     {

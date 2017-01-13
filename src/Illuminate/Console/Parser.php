@@ -31,7 +31,7 @@ class Parser
     }
 
     /**
-     * Extract the naem of the command from the expression.
+     * Extract the name of the command from the expression.
      *
      * @param  string  $expression
      * @return string

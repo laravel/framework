@@ -30,13 +30,6 @@ class FactoryBuilder
     protected $name = 'default';
 
     /**
-     * The number of models to build.
-     *
-     * @var int
-     */
-    protected $amount = 1;
-
-    /**
      * The model states.
      *
      * @var array
@@ -56,6 +49,13 @@ class FactoryBuilder
      * @var \Faker\Generator
      */
     protected $faker;
+
+    /**
+     * The number of models to build.
+     *
+     * @var int
+     */
+    protected $amount = 1;
 
     /**
      * Create an new builder instance.

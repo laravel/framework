@@ -1320,7 +1320,7 @@ class Builder
         foreach ($groups as $group) {
             $this->groups = array_merge(
                 (array) $this->groups,
-                is_array($group) ? $group : [$group]
+                array_wrap($group)
             );
         }
 
@@ -1861,7 +1861,7 @@ class Builder
             // On each chunk result set, we will pass them to the callback and then let the
             // developer take care of everything within the callback, which allows us to
             // keep the memory low for spinning through large result sets for working.
-            if (call_user_func($callback, $results) === false) {
+            if ($callback($results) === false) {
                 return false;
             }
 
@@ -1903,7 +1903,7 @@ class Builder
             // On each chunk result set, we will pass them to the callback and then let the
             // developer take care of everything within the callback, which allows us to
             // keep the memory low for spinning through large result sets for working.
-            if (call_user_func($callback, $results) === false) {
+            if ($callback($results) === false) {
                 return false;
             }
 
@@ -2019,11 +2019,7 @@ class Builder
      */
     public function count($columns = '*')
     {
-        if (! is_array($columns)) {
-            $columns = [$columns];
-        }
-
-        return (int) $this->aggregate(__FUNCTION__, $columns);
+        return (int) $this->aggregate(__FUNCTION__, array_wrap($columns));
     }
 
     /**

@@ -54,6 +54,6 @@ class PendingBroadcast
      */
     public function __destruct()
     {
-        $this->events->fire($this->event);
+        $this->events->dispatch($this->event);
     }
 }

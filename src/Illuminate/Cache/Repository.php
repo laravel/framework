@@ -418,7 +418,7 @@ class Repository implements CacheContract, ArrayAccess
     protected function event($event)
     {
         if (isset($this->events)) {
-            $this->events->fire($event);
+            $this->events->dispatch($event);
         }
     }
 

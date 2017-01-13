@@ -24,7 +24,6 @@ trait CompilesTranslations
     /**
      * Compile the endlang statements into valid PHP.
      *
-     * @param  string  $expression
      * @return string
      */
     protected function compileEndlang()

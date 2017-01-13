@@ -48,7 +48,7 @@ class Redirector
      *
      * @param  int    $status
      * @param  array  $headers
-     * @param  string  $fallback
+     * @param  mixed  $fallback
      * @return \Illuminate\Http\RedirectResponse
      */
     public function back($status = 302, $headers = [], $fallback = false)

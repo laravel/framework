@@ -21,7 +21,7 @@ class MailMessage extends SimpleMessage
     /**
      * The Markdown template to render (if applicable).
      *
-     * @var string
+     * @var string|null
      */
     public $markdown = 'notifications::email';
 

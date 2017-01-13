@@ -363,7 +363,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function formatParameters($parameters)
     {
-        $parameters = is_array($parameters) ? $parameters : [$parameters];
+        $parameters = array_wrap($parameters);
 
         foreach ($parameters as $key => $parameter) {
             if ($parameter instanceof UrlRoutable) {

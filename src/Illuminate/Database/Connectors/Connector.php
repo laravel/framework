@@ -35,9 +35,13 @@ class Connector
      */
     public function createConnection($dsn, array $config, array $options)
     {
+        list($username, $password) = [
+            Arr::get($config, 'username'), Arr::get($config, 'password'),
+        ];
+
         try {
             return $this->createPdoConnection(
-                $dsn, Arr::get($config, 'username'), Arr::get($config, 'password'), $options
+                $dsn, $username, $password, $options
             );
         } catch (Exception $e) {
             return $this->tryAgainIfCausedByLostConnection(
@@ -49,6 +53,10 @@ class Connector
     /**
      * Create a new PDO connection instance.
      *
+     * @param  string  $dsn
+     * @param  string  $username
+     * @param  string  $password
+     * @param  array  $options
      * @return \PDO
      */
     protected function createPdoConnection($dsn, $username, $password, $options)

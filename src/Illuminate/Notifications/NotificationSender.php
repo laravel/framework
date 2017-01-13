@@ -13,7 +13,7 @@ class NotificationSender
     /**
      * The notification manager instance.
      *
-     * @var \Illuminate\Notifications\Manager
+     * @var \Illuminate\Notifications\ChannelManager
      */
     protected $manager;
 
@@ -34,7 +34,7 @@ class NotificationSender
     /**
      * Create a new notification sender instance.
      *
-     * @param  \Illuminate\Notifications\Manager  $manager
+     * @param  \Illuminate\Notifications\ChannelManager  $manager
      * @param  \Illuminate\Contracts\Bus\Dispatcher  $bus
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @return void
@@ -69,6 +69,7 @@ class NotificationSender
      *
      * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
      * @param  mixed  $notification
+     * @param  array  $channels
      * @return void
      */
     public function sendNow($notifiables, $notification, array $channels = null)
@@ -111,7 +112,7 @@ class NotificationSender
 
         $response = $this->manager->driver($channel)->send($notifiable, $notification);
 
-        $this->events->fire(
+        $this->events->dispatch(
             new Events\NotificationSent($notifiable, $notification, $channel, $response)
         );
     }
@@ -147,7 +148,7 @@ class NotificationSender
         foreach ($notifiables as $notifiable) {
             $notificationId = Uuid::uuid4()->toString();
 
-            foreach ($notification->via($notifiable) as $channel) {
+            foreach ($original->via($notifiable) as $channel) {
                 $notification = clone $original;
 
                 $notification->id = $notificationId;

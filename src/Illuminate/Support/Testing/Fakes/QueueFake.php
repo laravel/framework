@@ -99,7 +99,7 @@ class QueueFake implements Queue
     /**
      * Resolve a queue connection instance.
      *
-     * @param  string  $name
+     * @param  mixed  $value
      * @return \Illuminate\Contracts\Queue\Queue
      */
     public function connection($value = null)
@@ -197,5 +197,41 @@ class QueueFake implements Queue
     public function pop($queue = null)
     {
         //
+    }
+
+    /**
+     * Push an array of jobs onto the queue.
+     *
+     * @param  array $jobs
+     * @param  mixed $data
+     * @param  string $queue
+     * @return mixed
+     */
+    public function bulk($jobs, $data = '', $queue = null)
+    {
+        foreach ($this->jobs as $job) {
+            $this->push($job);
+        }
+    }
+
+    /**
+     * Get the connection name for the queue.
+     *
+     * @return string
+     */
+    public function getConnectionName()
+    {
+        //
+    }
+
+    /**
+     * Set the connection name for the queue.
+     *
+     * @param  string $name
+     * @return $this
+     */
+    public function setConnectionName($name)
+    {
+        return $this;
     }
 }

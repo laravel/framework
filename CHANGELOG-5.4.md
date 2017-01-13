@@ -4,9 +4,8 @@
 
 ### General
 - Added real-time facades 😈 ([feb52bf](https://github.com/laravel/framework/commit/feb52bf966c0ea517ec0cf688b5a2534b50a8268))
-- Added support for PhpRedis ([#15160](https://github.com/laravel/framework/pull/15160), [01ed1c8](https://github.com/laravel/framework/commit/01ed1c8348a8e69ad213c95dd8d24e652154e6f0), [1ef8b9c](https://github.com/laravel/framework/commit/1ef8b9c3f156c7d4debc6c6f67b73b032d8337d5))
-- Added support for multiple Redis clusters ([#16696](https://github.com/laravel/framework/pull/16696), [464075d](https://github.com/laravel/framework/commit/464075d3c5f152dfc4fc9287595d62dbdc3c6347))
 - Added `retry()` helper ([e3bd359](https://github.com/laravel/framework/commit/e3bd359d52cee0ba8db9673e45a8221c1c1d95d6), [52e9381](https://github.com/laravel/framework/commit/52e9381d3d64631f2842c1d86fee2aa64a6c73ac))
+- Added `array_wrap()` helper function ([0f76617](https://github.com/laravel/framework/commit/0f766177e4ac42eceb00aa691634b00a77b18b59))
 - Added default 503 error page into framework ([855a8aa](https://github.com/laravel/framework/commit/855a8aaca2903015e3fe26f756e73af9f1b98374), [#16848](https://github.com/laravel/framework/pull/16848))
 - Added `Encrypter::encryptString()` to bypass serialization ([9725a8e](https://github.com/laravel/framework/commit/9725a8e7d0555474114f5cad9249fe8fe556836c))
 - Support wildcards in `MessageBag::first()` ([#15217](https://github.com/laravel/framework/pull/15217))
@@ -19,12 +18,13 @@
 - Refactored authentication component ([7b48bfc](https://github.com/laravel/framework/commit/7b48bfccf9ed12c71461651bbf52a3214b58d82e), [5c4541b](https://github.com/laravel/framework/commit/5c4541bc43f22b0d99c5cc6db38781060bff836f))
 - Switched to components for auth view subs ([78891d5](https://github.com/laravel/framework/commit/78891d56198081d84bb268f88ce3e03989375e1b))
 - Added names to password reset routes ([#16988](https://github.com/laravel/framework/pull/16988))
+- Stopped touching the user timestamp when updating the `remember_token` ([#17135](https://github.com/laravel/framework/pull/17135))
 
 ## Authorization
 - Consider interfaces and extended classes in `Gate::resolvePolicyCallback()` ([#15757](https://github.com/laravel/framework/pull/15757))
 
 ### Blade
-- Added Blade components and slots ([e8d2a45](https://github.com/laravel/framework/commit/e8d2a45479abd2ba6b524293ce5cfb599c8bf910))
+- Added Blade components and slots ([e8d2a45](https://github.com/laravel/framework/commit/e8d2a45479abd2ba6b524293ce5cfb599c8bf910), [a00a201](https://github.com/laravel/framework/commit/a00a2016a4ff6518b60845745fc0533058f6adc6))
 - Refactored Blade component ([7cdb6a6](https://github.com/laravel/framework/commit/7cdb6a6f6b77c91906c4ad0c6110b30042a43277), [5e394bb](https://github.com/laravel/framework/commit/5e394bb2c4b20833ea07b052823fe744491bdbd5))
 - Refactored View component ([#17018](https://github.com/laravel/framework/pull/17018), [bb998dc](https://github.com/laravel/framework/commit/bb998dc23e7f4da5820b61fb5eb606fe4a654a2a))
 - Refactored Blade `@parent` compilation ([#16033](https://github.com/laravel/framework/pull/16033), [16f72a5](https://github.com/laravel/framework/commit/16f72a5a580b593ac804bc0b2fdcc6eb278e55b2))
@@ -74,6 +74,7 @@
 - Removed `Container::normalize()` ([ff993b8](https://github.com/laravel/framework/commit/ff993b806dcb21ba8a5367594e87d113338c1670))
 
 ### DB
+- Refactored all database components (_too many commits, sorry_)
 - Allow rolling back to a given transaction save-point ([#15876](https://github.com/laravel/framework/pull/15876))
 - Added `$values` parameter to `Builder::firstOrNew()` ([#15567](https://github.com/laravel/framework/pull/15567))
 - Allow dependency injection on database seeders `run()` method ([#15959](https://github.com/laravel/framework/pull/15959))
@@ -81,9 +82,10 @@
 - Added collation support to `SQLServerGrammar` ([#16227](https://github.com/laravel/framework/pull/16227))
 - Don't rollback to save-points on deadlock (nested transaction) ([#15932](https://github.com/laravel/framework/pull/15932))
 - Improve `Connection::selectOne()` performance by switching to `array_shift()` ([#16188](https://github.com/laravel/framework/pull/16188))
-- Refactored database components ([5ba9db8](https://github.com/laravel/framework/commit/5ba9db8f120ef1c7c92f997cae15820e537de543), [2313820](https://github.com/laravel/framework/commit/2313820ccbe6b997474bae99b92f0d936df5d3f6), [ace9702](https://github.com/laravel/framework/commit/ace9702a1a7b17cb33b2f61eb46973de5e4111e6), [dd41098](https://github.com/laravel/framework/commit/dd4109815787fbd0bd802a7e301daf1f3865d956), [7ddb6fe](https://github.com/laravel/framework/commit/7ddb6fe9780459a2f02ea7e246dc7f644bf7ea58), [03f3c8c](https://github.com/laravel/framework/commit/03f3c8cbe87f6ab9c6acdde3e9463f134bf491f9), [b2a4159](https://github.com/laravel/framework/commit/b2a415971061e9d722e40aefceefa8b834fcb632), [cc7eab0](https://github.com/laravel/framework/commit/cc7eab09932143a8b75d5a71d1b23d37b2bbebdd), [bd0e895](https://github.com/laravel/framework/commit/bd0e8952dc73b11fe9a7d5b019161ac22f93cf78), [c743dae](https://github.com/laravel/framework/commit/c743dae9acc17046a54c8eaf8f8846e539f5958a))
+- Added `having()` shortcut ([#17160](https://github.com/laravel/framework/pull/17160))
 
 ### Eloquent
+- Refactored Eloquent (_too many commits, sorry_)
 - Added support for object-based events for native Eloquent events ([e7a724d](https://github.com/laravel/framework/commit/e7a724d3895f2b24b98c0cafb1650f2193351d83), [9770d1a](https://github.com/laravel/framework/commit/9770d1a64c1010daf845fcebfcc4695a30d8df2d))
 - Added custom class support for pivot models ([#14293](https://github.com/laravel/framework/pull/14293), [5459777](https://github.com/laravel/framework/commit/5459777c90ff6d0888bd821027c417d57cc89981))
 - Use the model's primary key instead of `id` in `Model::getForeignKey()` ([#16396](https://github.com/laravel/framework/pull/16396))
@@ -98,6 +100,7 @@
 - Enforce an `orderBy` clause for `chunk()` ([#16283](https://github.com/laravel/framework/pull/16283), [#16513](https://github.com/laravel/framework/pull/16513))
 
 ### Events
+- Removed event priorities/halting ([dbbfc62](https://github.com/laravel/framework/commit/dbbfc62beff1625b0d45bbf39650d047555cf4fa), [#17245](https://github.com/laravel/framework/pull/17245))
 - Allow queued handlers to specify their queue and connection ([fedd4cd](https://github.com/laravel/framework/commit/fedd4cd4d900656071d44fc1ee9c83e6de986fa8))
 - Converted `locale.changed` event into `LocaleUpdated` class ([3385fdc](https://github.com/laravel/framework/commit/3385fdc0f8e4890ab57261755bcbbf79f9ec828d))
 - Unified wording ([2dcde69](https://github.com/laravel/framework/commit/2dcde6983ffbb4faf1c238544b51831b33c3a857))
@@ -116,6 +119,7 @@
 - Converted `kernel.handled` event into `RequestHandled` class ([43a5e5f](https://github.com/laravel/framework/commit/43a5e5f341cc8affd52e77019f50e2d96feb94a5))
 - Throw `AuthorizationException` in `FormRequest` ([1a75409](https://github.com/laravel/framework/commit/1a7540967ca36f875a262a22b76c2a094b9ba3b4))
 - Use `Str::random` instead of UUID in `FileHelpers` ([#17046](https://github.com/laravel/framework/pull/17046))
+- Moved `getOriginalContent()` to `ResponseTrait` ([#17137](https://github.com/laravel/framework/pull/17137))
 
 ### Logging
 - Added `LogServiceProvider` to defer loading of logging code ([#15451](https://github.com/laravel/framework/pull/15451), [6550153](https://github.com/laravel/framework/commit/6550153162b4d54d03d37dd9adfd0c95ca0383a9), [#15794](https://github.com/laravel/framework/pull/15794))
@@ -139,6 +143,10 @@
 - Refactored Queue component ([9bc8ca5](https://github.com/laravel/framework/commit/9bc8ca502687f29761b9eb78f70db6e3c3f0a09e), [e030231](https://github.com/laravel/framework/commit/e030231604479d0326ad9bfb56a2a36229d78ff4), [a041fb5](https://github.com/laravel/framework/commit/a041fb5ec9fc775d1a3efb6b647604da2b02b866), [7bb15cf](https://github.com/laravel/framework/commit/7bb15cf40a182bed3d00bc55de55798e58bf1ed0), [5505728](https://github.com/laravel/framework/commit/55057285b321b4b668d12fade330b0d196f9514a))
 - Refactored how queue connection names are set ([4c600fb](https://github.com/laravel/framework/commit/4c600fb7af855747b6b44a194a5d0061d6294488))
 
+### Redis
+- Added support for PhpRedis ([#15160](https://github.com/laravel/framework/pull/15160), [01ed1c8](https://github.com/laravel/framework/commit/01ed1c8348a8e69ad213c95dd8d24e652154e6f0), [1ef8b9c](https://github.com/laravel/framework/commit/1ef8b9c3f156c7d4debc6c6f67b73b032d8337d5))
+- Added support for multiple Redis clusters ([#16696](https://github.com/laravel/framework/pull/16696), [464075d](https://github.com/laravel/framework/commit/464075d3c5f152dfc4fc9287595d62dbdc3c6347))
+
 ### Routing
 - Added support for fluent routes ([#16647](https://github.com/laravel/framework/pull/16647), [#16748](https://github.com/laravel/framework/pull/16748))
 - Removed `RouteServiceProvider::loadRoutesFrom()` ([0f2b3be](https://github.com/laravel/framework/commit/0f2b3be9b8753ba2813595f9191aa8d8c31886b1))
@@ -161,6 +169,7 @@
 - Added JSON loader for translations and `__()` helper ([#16424](https://github.com/laravel/framework/pull/16424), [#16470](https://github.com/laravel/framework/pull/16470), [9437244](https://github.com/laravel/framework/commit/94372447b9de48f5c174db2cf7c81dffb3c0c692))
 - Replaced Symfony's translator ([#15563](https://github.com/laravel/framework/pull/15563))
 - Added `namespaces()` method to translation loaders ([#16664](https://github.com/laravel/framework/pull/16664), [fe7bbf7](https://github.com/laravel/framework/commit/fe7bbf727834a748b04fcf5145b1137dd45ac4b7))
+- Switched to `trans()` helper in `AuthenticatesUsers` ([#17202](https://github.com/laravel/framework/pull/17202))
 
 ### Validation
 - Refactored Validation component ([#17005](https://github.com/laravel/framework/pull/17005), [9e98e7a](https://github.com/laravel/framework/commit/9e98e7a5120f14e942bd00a1439e1a049440eea8), [9b817f1](https://github.com/laravel/framework/commit/9b817f1d03b3a7b3379723a32ab818aa3860060a))
@@ -168,3 +177,4 @@
 - Added IPv4 and IPv6 validators ([#16545](https://github.com/laravel/framework/pull/16545))
 - Made `date_format` validation more precise ([#16858](https://github.com/laravel/framework/pull/16858))
 - Add place-holder replacers for `*_or_equal` rules ([#17030](https://github.com/laravel/framework/pull/17030))
+- Made `sometimes()` chainable ([#17241](https://github.com/laravel/framework/pull/17241))

@@ -23,6 +23,13 @@ class RedisManager implements Factory
     protected $config;
 
     /**
+     * The Redis connections.
+     *
+     * @var mixed
+     */
+    protected $connections;
+
+    /**
      * Create a new Redis manager instance.
      *
      * @param  string  $driver
@@ -38,7 +45,7 @@ class RedisManager implements Factory
      * Get a Redis connection by name.
      *
      * @param  string  $name
-     * @return \Illuminate\Redis\Connection
+     * @return \Illuminate\Redis\Connections\Connection
      */
     public function connection($name = null)
     {
@@ -55,7 +62,9 @@ class RedisManager implements Factory
      * Resolve the given connection by name.
      *
      * @param  string  $name
-     * @return \Illuminate\Redis\Connection
+     * @return \Illuminate\Redis\Connections\Connection
+     *
+     * @throws \InvalidArgumentException
      */
     protected function resolve($name)
     {
@@ -78,7 +87,7 @@ class RedisManager implements Factory
      * Resolve the given cluster connection by name.
      *
      * @param  string  $name
-     * @return \Illuminate\Redis\Connection
+     * @return \Illuminate\Redis\Connections\Connection
      */
     protected function resolveCluster($name)
     {
@@ -92,7 +101,7 @@ class RedisManager implements Factory
     /**
      * Get the connector instance for the current driver.
      *
-     * @return mixed
+     * @return \Illuminate\Redis\Connectors\PhpRedisConnector|\Illuminate\Redis\Connectors\PredisConnector
      */
     protected function connector()
     {

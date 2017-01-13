@@ -101,7 +101,6 @@ interface Container
      * Get a closure to resolve the given type from the container.
      *
      * @param  string  $abstract
-     * @param  array  $defaults
      * @return \Closure
      */
     public function factory($abstract);

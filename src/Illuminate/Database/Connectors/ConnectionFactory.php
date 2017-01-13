@@ -5,6 +5,7 @@ namespace Illuminate\Database\Connectors;
 use PDOException;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
+use Illuminate\Database\Connection;
 use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Database\PostgresConnection;
@@ -175,7 +176,7 @@ class ConnectionFactory
     protected function createPdoResolverWithHosts(array $config)
     {
         return function () use ($config) {
-            foreach (Arr::shuffle($this->parseHosts($config)) as $key => $host) {
+            foreach (Arr::shuffle($hosts = $this->parseHosts($config)) as $key => $host) {
                 $config['host'] = $host;
 
                 try {
@@ -199,7 +200,7 @@ class ConnectionFactory
      */
     protected function parseHosts(array $config)
     {
-        $hosts = is_array($config['host']) ? $config['host'] : [$config['host']];
+        $hosts = array_wrap($config['host']);
 
         if (empty($hosts)) {
             throw new InvalidArgumentException('Database hosts array is empty.');
@@ -267,8 +268,8 @@ class ConnectionFactory
      */
     protected function createConnection($driver, $connection, $database, $prefix = '', array $config = [])
     {
-        if ($this->container->bound($key = "db.connection.{$driver}")) {
-            return $this->container->make($key, [$connection, $database, $prefix, $config]);
+        if ($resolver = Connection::getResolver($driver)) {
+            return $resolver($connection, $database, $prefix, $config);
         }
 
         switch ($driver) {

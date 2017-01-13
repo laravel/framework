@@ -53,7 +53,7 @@ class Application extends SymfonyApplication implements ApplicationContract
         $this->setAutoExit(false);
         $this->setCatchExceptions(false);
 
-        $events->fire(new Events\ArtisanStarting($this));
+        $events->dispatch(new Events\ArtisanStarting($this));
 
         $this->bootstrap();
     }

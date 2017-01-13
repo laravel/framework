@@ -53,6 +53,7 @@ class RateLimiter
     /**
      * Add the lockout key to the cache.
      *
+     * @param  string  $key
      * @param  int  $decayMinutes
      * @return void
      */

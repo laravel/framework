@@ -293,7 +293,7 @@ class Writer implements LogContract, PsrLoggerInterface
         // log listeners. These are useful for building profilers or other tools
         // that aggregate all of the log messages for a given "request" cycle.
         if (isset($this->dispatcher)) {
-            $this->dispatcher->fire(new MessageLogged($level, $message, $context));
+            $this->dispatcher->dispatch(new MessageLogged($level, $message, $context));
         }
     }
 

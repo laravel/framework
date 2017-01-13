@@ -27,7 +27,7 @@ trait ThrottlesLogins
      * Increment the login attempts for the user.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return int
+     * @return void
      */
     protected function incrementLoginAttempts(Request $request)
     {

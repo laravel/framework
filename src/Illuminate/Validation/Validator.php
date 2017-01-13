@@ -77,6 +77,13 @@ class Validator implements ValidatorContract
     protected $rules;
 
     /**
+     * The current rule that is validating.
+     *
+     * @var string
+     */
+    protected $currentRule;
+
+    /**
      * The array of wildcard attributes with their asterisks expanded.
      *
      * @var array
@@ -756,10 +763,10 @@ class Validator implements ValidatorContract
     /**
      * Add conditions to a given field based on a Closure.
      *
-     * @param  string  $attribute
+     * @param  string|array  $attribute
      * @param  string|array  $rules
      * @param  callable  $callback
-     * @return void
+     * @return $this
      */
     public function sometimes($attribute, $rules, callable $callback)
     {
@@ -770,6 +777,8 @@ class Validator implements ValidatorContract
                 $this->addRules([$key => $rules]);
             }
         }
+
+        return $this;
     }
 
     /**
@@ -952,6 +961,7 @@ class Validator implements ValidatorContract
     /**
      * Get the Presence Verifier implementation.
      *
+     * @param  string  $connection
      * @return \Illuminate\Validation\PresenceVerifierInterface
      *
      * @throws \RuntimeException

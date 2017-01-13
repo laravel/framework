@@ -40,6 +40,13 @@ class Worker
     protected $exceptions;
 
     /**
+     * Indicates if the worker is paused.
+     *
+     * @var bool
+     */
+    protected $paused = false;
+
+    /**
      * Create a new queue worker.
      *
      * @param  \Illuminate\Queue\QueueManager  $manager
@@ -92,8 +99,9 @@ class Worker
             // Finally, we will check to see if we have exceeded our memory limits or if
             // the queue should restart based on other indications. If so, we'll stop
             // this worker and let whatever is "monitoring" it restart the process.
-            if ($this->memoryExceeded($options->memory) ||
-                $this->queueShouldRestart($lastRestart)) {
+            if ($this->memoryExceeded($options->memory)) {
+                $this->stop(12);
+            } elseif ($this->queueShouldRestart($lastRestart)) {
                 $this->stop();
             }
         }
@@ -142,6 +150,7 @@ class Worker
     protected function daemonShouldRun(WorkerOptions $options)
     {
         if (($this->manager->isDownForMaintenance() && ! $options->force) ||
+            $this->paused ||
             $this->events->until(new Events\Looping) === false) {
             // If the application is down for maintenance or doesn't want the queues to run
             // we will sleep for one second just in case the developer has it set to not
@@ -438,6 +447,14 @@ class Worker
     {
         if ($this->supportsAsyncSignals()) {
             pcntl_async_signals(true);
+
+            pcntl_signal(SIGUSR2, function () {
+                $this->paused = true;
+            });
+
+            pcntl_signal(SIGCONT, function () {
+                $this->paused = false;
+            });
         }
     }
 
@@ -466,13 +483,14 @@ class Worker
     /**
      * Stop listening and bail out of the script.
      *
+     * @param  int  $status
      * @return void
      */
-    public function stop()
+    public function stop($status = 0)
     {
         $this->events->fire(new Events\WorkerStopping);
 
-        die;
+        exit($status);
     }
 
     /**

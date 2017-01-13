@@ -58,6 +58,26 @@ class DatabaseNotification extends Model
     }
 
     /**
+     * Determine if a notification has been read.
+     *
+     * @return bool
+     */
+    public function read()
+    {
+        return $this->read_at !== null;
+    }
+
+    /**
+     * Determine if a notification has not been read.
+     *
+     * @return bool
+     */
+    public function unread()
+    {
+        return $this->read_at === null;
+    }
+
+    /**
      * Create a new database notification collection instance.
      *
      * @param  array  $models

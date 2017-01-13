@@ -516,7 +516,7 @@ class Router implements RegistrarContract, BindingRegistrar
             return $route;
         });
 
-        $this->events->fire(new Events\RouteMatched($route, $request));
+        $this->events->dispatch(new Events\RouteMatched($route, $request));
 
         $response = $this->runRouteWithinStack($route, $request);
 
