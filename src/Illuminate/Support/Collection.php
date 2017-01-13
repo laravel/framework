@@ -69,7 +69,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Get all of the items in the collection.
+     * Gets whether any item in the collection matches the callback
      *
      * @param  callable|null $callback
      * @return bool
