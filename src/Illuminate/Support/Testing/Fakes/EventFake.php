@@ -159,9 +159,10 @@ class EventFake implements Dispatcher
      *
      * @param  string|object  $event
      * @param  mixed  $payload
+     * @param  bool  $halt
      * @return array|null
      */
-    public function dispatch($event, $payload = [])
+    public function dispatch($event, $payload = [], $halt = false)
     {
         $name = is_object($event) ? get_class($event) : (string) $event;
 
@@ -185,6 +186,18 @@ class EventFake implements Dispatcher
      * @return void
      */
     public function forgetPushed()
+    {
+        //
+    }
+
+    /**
+     * Dispatch an event and call the listeners.
+     *
+     * @param  string|object $event
+     * @param  mixed $payload
+     * @return void
+     */
+    public function until($event, $payload = [])
     {
         //
     }
