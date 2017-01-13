@@ -56,12 +56,6 @@ class CookieJar implements JarContract
 
         $time = ($minutes == 0) ? 0 : Carbon::now()->getTimestamp() + ($minutes * 60);
 
-        if ($sameSite === 'Lax') {
-            $sameSite = Cookie::SAMESITE_LAX;
-        } elseif ($sameSite === 'Strict') {
-            $sameSite = Cookie::SAMESITE_STRICT;
-        }
-
         return new Cookie($name, $value, $time, $path, $domain, $secure, $httpOnly, $sameSite);
     }
 
