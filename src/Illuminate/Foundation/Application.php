@@ -539,7 +539,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     {
         $this->registerProviders(array_merge(
             $this->config['app.providers'],
-            $this->config->get('app.providers-'.$this['env'],[])
+            $this->config->get('app.providers-'.$this['env'], [])
         ));
     }
 

@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Config\Repository;
 use Mockery as m;
+use Illuminate\Config\Repository;
 
 class FoundationEnvironmentProvidersTest extends PHPUnit_Framework_TestCase
 {
@@ -13,7 +13,7 @@ class FoundationEnvironmentProvidersTest extends PHPUnit_Framework_TestCase
     public function testMergeProvidersWithEnvironmentProviders()
     {
         $app = m::mock('\Illuminate\Foundation\Application[registerProviders]');
-        $app->shouldReceive('registerProviders')->once()->with(['foobar','foobar-local']);
+        $app->shouldReceive('registerProviders')->once()->with(['foobar', 'foobar-local']);
 
         $app['config'] = $this->getConfigRepository();
         $app['env'] = 'testing';
@@ -38,14 +38,13 @@ class FoundationEnvironmentProvidersTest extends PHPUnit_Framework_TestCase
         return new Repository([
             'app' => [
                 'providers' => [
-                    'foobar'
+                    'foobar',
                 ],
                 'providers-testing' => [
-                    'foobar-local'
+                    'foobar-local',
                 ],
                 'providers-empty' => [],
-            ]
+            ],
         ]);
     }
-
 }
