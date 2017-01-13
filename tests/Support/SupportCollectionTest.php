@@ -1323,9 +1323,6 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(4, $c->count());
     }
 
-    /**
-     * @group nathan
-     */
     public function testCountWithFilter()
     {
         $c = new Collection([1, 3, 5, 7]);
