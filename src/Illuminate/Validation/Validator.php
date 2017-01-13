@@ -533,7 +533,7 @@ class Validator implements ValidatorContract
      */
     protected function addFailure($attribute, $rule, $parameters)
     {
-        $this->messages->add($attribute, $this->makeReplacements(
+        $this->messages->add($attribute, snake_case($rule), $this->makeReplacements(
             $this->getMessage($attribute, $rule), $attribute, $rule, $parameters
         ));
 
