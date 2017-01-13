@@ -5,6 +5,7 @@ namespace Illuminate\View;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use Illuminate\Support\Collection;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\View\Engines\EngineResolver;
@@ -149,44 +150,28 @@ class Factory implements FactoryContract
      */
     public function renderEach($view, $data, $iterator, $empty = 'raw|')
     {
+        $result = '';
         // If is actually data in the array, we will loop through the data and append
         // an instance of the partial view to the final result HTML passing in the
         // iterated value of this data array, allowing the views to access them.
         if (count($data) > 0) {
-            return $this->renderEachView($view, $data, $iterator);
-        }
+            foreach ($data as $key => $value) {
+                $data = ['key' => $key, $iterator => $value];
 
+                $result .= $this->make($view, $data)->render();
+            }
+        }
         // If there is no data in the array, we will render the contents of the empty
         // view. Alternatively, the "empty view" could be a raw string that begins
         // with "raw|" for convenience and to let this know that it is a string.
-        return $this->renderEmptyEach($empty);
-    }
-
-    /**
-     * Render the given view N number of times based on the data.
-     *
-     * @param  string  $view
-     * @param  array  $data
-     * @param  string  $iterator
-     * @return string
-     */
-    protected function renderEachView($view, $data, $iterator)
-    {
-        return collect($data)->map(function ($value, $key) use ($view, $iterator) {
-            return $this->make($view, ['key' => $key, $iterator => $value])->render();
-        })->implode('');
-    }
-
-    /**
-     * Render an empty "each" view.
-     *
-     * @param  string  $empty
-     * @return string
-     */
-    protected function renderEmptyEach($empty)
-    {
-        return Str::startsWith($empty, 'raw|')
-                        ? substr($empty, 4) : $this->make($empty)->render();
+        else {
+            if (Str::startsWith($empty, 'raw|')) {
+                $result = substr($empty, 4);
+            } else {
+                $result = $this->make($empty)->render();
+            }
+        }
+        return $result;
     }
 
     /**
