@@ -161,36 +161,6 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
     }
 
     /**
-     * Perform an insert operation on the session ID.
-     *
-     * @param  string  $sessionId
-     * @param  string  $payload
-     * @return void
-     */
-    protected function performInsert($sessionId, $payload)
-    {
-        try {
-            $payload['id'] = $sessionId;
-
-            return $this->getQuery()->insert($payload);
-        } catch (QueryException $e) {
-            $this->performUpdate($sessionId, $payload);
-        }
-    }
-
-    /**
-     * Perform an update operation on the session ID.
-     *
-     * @param  string  $sessionId
-     * @param  string  $payload
-     * @return int
-     */
-    protected function performUpdate($sessionId, $payload)
-    {
-        return $this->getQuery()->where('id', $sessionId)->update($payload);
-    }
-
-    /**
      * Get the default payload for the session.
      *
      * @param  string  $data
