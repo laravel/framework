@@ -1332,10 +1332,10 @@ class SupportCollectionTest extends TestCase
         }));
 
 
-        $c = new Collection([ ['id'=>7, 'name'=>'foo'], ['id'=>12, 'name'=>'bar'], ['id'=>12, 'name'=>'baz']]);
+        $c = new Collection([['id'=>7, 'name'=>'foo'], ['id'=>12, 'name'=>'bar'], ['id'=>12, 'name'=>'baz']]);
 
         $this->assertEquals(2, $c->count(function ($v) {
-            return substr($v['name'],0,1)==='b';
+            return substr($v['name'], 0, 1 )=== 'b';
         }));
     }
 
