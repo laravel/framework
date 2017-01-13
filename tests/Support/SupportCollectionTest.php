@@ -492,6 +492,77 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('name', 'framework'), $c->keys());
 	}
 
+
+	public function testGetListValueWithAccessorsAndDot()
+	{
+		$model = new TestAccessorEloquentTestStub(array(
+			'some' => (object)array(
+				'name' => 'taylor',
+				'age' => 25
+			)
+		));
+
+		$modelTwo = new TestAccessorEloquentTestStub(array(
+			'some' => (object)array(
+				'name' => 'dayle',
+				'age' => 20
+			)
+		));
+
+		$data = new Collection(array($model, $modelTwo));
+
+		$this->assertEquals(array('taylor' => 25, 'dayle' => 20), $data->lists('some.age', 'some.name'));
+	}
+
+
+	public function testArrayPluckDotWithArray()
+	{
+		$array = array(
+			array(
+				'info' => array(
+					'name' => 'taylor'
+				),
+				'contact' => array(
+					'email' => 'foo'
+				)
+			),
+			array(
+				'info' => array(
+					'name' => 'dayle'
+				),
+				'contact' => array(
+					'email' => 'bar'
+				)
+			),
+		);
+
+		$this->assertEquals(array('taylor' => 'foo', 'dayle' => 'bar'), array_pluck($array, 'contact.email', 'info.name'));
+	}
+
+
+	public function testArrayPluckDotWithObject()
+	{
+		$array = (object)array(
+			(object)array(
+				'info' => (object)array(
+					'name' => 'taylor'
+				),
+				'contact' => (object)array(
+					'email' => 'foo'
+				)
+			),
+			(object)array(
+				'info' => (object)array(
+					'name' => 'dayle'
+				),
+				'contact' => (object)array(
+					'email' => 'bar'
+				)
+			),
+		);
+
+		$this->assertEquals(array('taylor' => 'foo', 'dayle' => 'bar'), array_pluck($array, 'contact.email', 'info.name'));
+	}
 }
 
 class TestAccessorEloquentTestStub

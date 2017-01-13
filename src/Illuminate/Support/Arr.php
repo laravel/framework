@@ -279,7 +279,7 @@ class Arr {
 
 		foreach ($array as $item)
 		{
-			$itemValue = is_object($item) ? $item->{$value} : $item[$value];
+			$itemValue = is_object($item) ? object_get($item, $value) : array_get($item, $value);
 
 			// If the key is "null", we will just append the value to the array and keep
 			// looping. Otherwise we will key the array using the value of the key we
@@ -290,7 +290,7 @@ class Arr {
 			}
 			else
 			{
-				$itemKey = is_object($item) ? $item->{$key} : $item[$key];
+				$itemKey = is_object($item) ? object_get($item, $key) : array_get($item, $key);
 
 				$results[$itemKey] = $itemValue;
 			}

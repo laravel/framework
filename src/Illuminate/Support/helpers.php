@@ -655,7 +655,9 @@ if ( ! function_exists('object_get'))
 
 		foreach (explode('.', $key) as $segment)
 		{
-			if ( ! is_object($object) || ! isset($object->{$segment}))
+			$accessor = 'get'.lcfirst($segment).'Attribute';
+
+			if (( ! is_object($object) || ! isset($object->{$segment})) && ! method_exists($object, $accessor))
 			{
 				return value($default);
 			}
