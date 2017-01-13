@@ -63,6 +63,7 @@ class RedisManager implements Factory
      *
      * @param  string  $name
      * @return \Illuminate\Redis\Connections\Connection
+     *
      * @throws \InvalidArgumentException
      */
     protected function resolve($name)
