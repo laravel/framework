@@ -45,7 +45,7 @@ class RedisManager implements Factory
      * Get a Redis connection by name.
      *
      * @param  string  $name
-     * @return \Illuminate\Redis\Connection
+     * @return \Illuminate\Redis\Connections\Connection
      */
     public function connection($name = null)
     {
@@ -63,6 +63,8 @@ class RedisManager implements Factory
      *
      * @param  string  $name
      * @return \Illuminate\Redis\Connections\Connection
+     *
+     * @throws \InvalidArgumentException
      */
     protected function resolve($name)
     {
@@ -99,7 +101,7 @@ class RedisManager implements Factory
     /**
      * Get the connector instance for the current driver.
      *
-     * @return mixed
+     * @return \Illuminate\Redis\Connectors\PhpRedisConnector|\Illuminate\Redis\Connectors\PredisConnector
      */
     protected function connector()
     {
