@@ -36,21 +36,19 @@ class SupportCollectionTest extends TestCase
     {
         $c = new Collection(['foo', 'bar', 'baz']);
 
-        $result = $c->any(function($v) {
+        $result = $c->any(function ($v) {
             return $v === 'foo';
         });
 
         $this->assertEquals(true, $result);
 
-
-        $result = $c->any(function($v) {
+        $result = $c->any(function ($v) {
             return $v === 'baz';
         });
 
         $this->assertEquals(true, $result);
 
-
-        $result = $c->any(function($v) {
+        $result = $c->any(function ($v) {
             return $v === 'not_foo';
         });
 
