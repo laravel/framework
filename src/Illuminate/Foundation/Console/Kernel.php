@@ -222,9 +222,9 @@ class Kernel implements KernelContract
     /**
      * Queue the given console command.
      *
-     * @param  string $command
+     * @param  string  $command
      * @param  array  $parameters
-     * @param  string $queue
+     * @param  string|null  $queue
      *
      * @return void
      */
