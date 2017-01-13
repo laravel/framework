@@ -57,7 +57,16 @@ class StatusCommand extends BaseCommand
 
         $ran = $this->migrator->getRepository()->getRan();
 
-        $migrations = Collection::make($this->getAllMigrationFiles())
+        if( $group = $this->option('group') ) {
+            $files = $this->migrator->getMigrationFilesByGroup(
+                $this->getMigrationPaths(),
+                $group
+            );
+        } else {
+            $files = $this->getAllMigrationFiles();
+        }
+
+        $migrations = Collection::make($files)
                             ->map(function ($migration) use ($ran) {
                                 $migrationName = $this->migrator->getMigrationName($migration);
 
@@ -94,6 +103,8 @@ class StatusCommand extends BaseCommand
             ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'],
 
             ['path', null, InputOption::VALUE_OPTIONAL, 'The path of migrations files to use.'],
+
+            ['group', null, InputOption::VALUE_OPTIONAL, 'The group of migrations to use.'],
         ];
     }
 }

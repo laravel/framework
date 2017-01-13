@@ -12,6 +12,13 @@ abstract class Migration
     protected $connection;
 
     /**
+     * The group of the migration.
+     *
+     * @var string
+     */
+    protected $group;
+
+    /**
      * Get the migration connection name.
      *
      * @return string
@@ -19,5 +26,15 @@ abstract class Migration
     public function getConnection()
     {
         return $this->connection;
+    }
+
+    /**
+     * Get the migration group.
+     *
+     * @return string
+     */
+    public function getGroup()
+    {
+        return $this->group;
     }
 }

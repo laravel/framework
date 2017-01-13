@@ -41,18 +41,26 @@ class RefreshCommand extends Command
 
         $path = $this->input->getOption('path');
 
+        $group = $this->input->getOption('group');
+
         // If the "step" option is specified it means we only want to rollback a small
         // number of migrations before migrating again. For example, the user might
         // only rollback and remigrate the latest four migrations instead of all.
         $step = $this->input->getOption('step') ?: 0;
 
-        if ($step > 0) {
+        if ($step > 0 || $group) {
             $this->call('migrate:rollback', [
-                '--database' => $database, '--force' => $force, '--path' => $path, '--step' => $step,
+                '--database' => $database,
+                '--force'    => $force,
+                '--path'     => $path,
+                '--step'     => $step,
+                '--group'    => $group,
             ]);
         } else {
             $this->call('migrate:reset', [
-                '--database' => $database, '--force' => $force, '--path' => $path,
+                '--database' => $database,
+                '--force'    => $force,
+                '--path'     => $path,
             ]);
         }
 
@@ -61,8 +69,9 @@ class RefreshCommand extends Command
         // them in succession. We'll also see if we need to re-seed the database.
         $this->call('migrate', [
             '--database' => $database,
-            '--force' => $force,
-            '--path' => $path,
+            '--force'    => $force,
+            '--path'     => $path,
+            '--group'    => $group,
         ]);
 
         if ($this->needsSeeding()) {
@@ -110,6 +119,8 @@ class RefreshCommand extends Command
             ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'],
 
             ['path', null, InputOption::VALUE_OPTIONAL, 'The path of migrations files to be executed.'],
+
+            ['group', null, InputOption::VALUE_OPTIONAL, 'The group of migrations to be executed.'],
 
             ['seed', null, InputOption::VALUE_NONE, 'Indicates if the seed task should be re-run.'],
 

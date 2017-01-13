@@ -80,7 +80,11 @@ class Migrator
     {
         $this->notes = [];
 
-        $files = $this->getMigrationFiles($paths);
+        if( $group = Arr::get($options, 'group', null) ) {
+            $files = $this->getMigrationFilesByGroup($paths, $group);
+        } else {
+            $files = $this->getMigrationFiles($paths);
+        }
 
         // Once we grab all of the migration files for the path, we will compare them
         // against the migrations that have already been run for this package then
@@ -185,7 +189,20 @@ class Migrator
         // We want to pull in the last batch of migrations that ran on the previous
         // migration operation. We'll then reverse those migrations and run each
         // of them "down" to reverse the last migration "operation" which ran.
-        if (($steps = Arr::get($options, 'step', 0)) > 0) {
+        $steps = Arr::get($options, 'step', 0);
+
+        if ( $group = Arr::get($options, 'group', null) ) {
+            $migrations = array_reverse($this->getRanByGroup($paths, $group));
+
+            if( $steps > 0 ) {
+                $migrations = array_slice($migrations, 0, $steps);
+            }
+
+            // Convert to array of objects
+            $migrations = array_map(function($migration) {
+                return (object) ['migration' => $migration];
+            }, $migrations);
+        } else if ($steps > 0) {
             $migrations = $this->repository->getMigrations($steps);
         } else {
             $migrations = $this->repository->getLast();
@@ -205,11 +222,12 @@ class Migrator
 
             foreach ($migrations as $migration) {
                 $migration = (object) $migration;
+                $file = $files[$migration->migration];
 
-                $rolledBack[] = $files[$migration->migration];
+                $rolledBack[] = $file;
 
                 $this->runDown(
-                    $files[$migration->migration],
+                    $file,
                     $migration, Arr::get($options, 'pretend', false)
                 );
             }
@@ -304,6 +322,53 @@ class Migrator
         })->values()->keyBy(function ($file) {
             return $this->getMigrationName($file);
         })->all();
+    }
+
+    /**
+     * Get the files of migrations that belong to a group.
+     *
+     * @param  array  $paths
+     * @param  string  $group
+     * @return array
+     */
+    public function getMigrationFilesByGroup($paths, $group)
+    {
+        $files = [];
+
+        foreach ($this->getMigrationFiles($paths) as $file) {
+            $migration = $this->getMigrationName($file);
+
+            if( $group == $this->getMigrationGroup($migration) ) {
+                $files[$migration] = $file;
+            }
+        }
+
+        return $files;
+    }
+
+    /**
+     * Get the ran migrations by group.
+     *
+     * @param  array  $paths
+     * @param  string  $group
+     * @return array
+     */
+    public function getRanByGroup($paths, $group) {
+        return array_intersect(
+            $this->repository->getRan(),
+            array_keys($this->getMigrationFilesByGroup($paths, $group))
+        );
+    }
+
+    /**
+     * Get a migration's group.
+     *
+     * @param  string  $migration
+     * @return string
+     */
+    public function getMigrationGroup($migration)
+    {
+        return $this->resolve($migration)->getGroup();
     }
 
     /**
