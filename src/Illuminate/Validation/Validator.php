@@ -511,7 +511,7 @@ class Validator implements ValidatorContract
 
         $message = $this->doReplacements($message, $attribute, $rule, $parameters);
 
-        $this->messages->add($attribute, $message);
+        $this->messages->add($attribute, snake_case($rule), $message);
     }
 
     /**
