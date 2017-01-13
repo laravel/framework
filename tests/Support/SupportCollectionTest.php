@@ -32,6 +32,31 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals('default', $result);
     }
 
+    public function testAny()
+    {
+        $c = new Collection(['foo', 'bar', 'baz']);
+
+        $result = $c->any(function($v) {
+            return $v === 'foo';
+        });
+
+        $this->assertEquals(true, $result);
+
+
+        $result = $c->any(function($v) {
+            return $v === 'baz';
+        });
+
+        $this->assertEquals(true, $result);
+
+
+        $result = $c->any(function($v) {
+            return $v === 'not_foo';
+        });
+
+        $this->assertEquals(false, $result);
+    }
+
     public function testFirstWithDefaultAndWithoutCallback()
     {
         $data = new Collection;
