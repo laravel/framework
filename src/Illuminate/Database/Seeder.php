@@ -30,11 +30,11 @@ abstract class Seeder
      */
     public function call($class)
     {
-        $this->resolve($class)->__invoke();
-
         if (isset($this->command)) {
-            $this->command->getOutput()->writeln("<info>Seeded:</info> $class");
+            $this->command->getOutput()->writeln("<info>Seeding:</info> $class");
         }
+
+        $this->resolve($class)->__invoke();
     }
 
     /**
