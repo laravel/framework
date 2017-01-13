@@ -137,6 +137,13 @@ class Connection implements ConnectionInterface
     protected $doctrineConnection;
 
     /**
+     * The connection resolvers.
+     *
+     * @var array
+     */
+    protected static $resolvers = [];
+
+    /**
      * Create a new database connection instance.
      *
      * @param  \PDO|\Closure     $pdo
@@ -1167,5 +1174,29 @@ class Connection implements ConnectionInterface
         $grammar->setTablePrefix($this->tablePrefix);
 
         return $grammar;
+    }
+
+    /**
+     * Register a connection resolver.
+     *
+     * @param  string  $driver
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public static function resolverFor($driver, Closure $callback)
+    {
+        static::$resolvers[$driver] = $callback;
+    }
+
+    /**
+     * Get the connection resolver for the given driver.
+     *
+     * @param  string  $driver
+     * @return mixed
+     */
+    public static function getResolver($driver)
+    {
+        return isset(static::$resolvers[$driver]) ?
+                     static::$resolvers[$driver] : null;
     }
 }

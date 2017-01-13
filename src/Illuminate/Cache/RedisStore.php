@@ -227,7 +227,7 @@ class RedisStore extends TaggableStore implements Store
     /**
      * Get the Redis database instance.
      *
-     * @return \Illuminate\Contracts\Redis\Database
+     * @return \Illuminate\Contracts\Redis\Factory
      */
     public function getRedis()
     {

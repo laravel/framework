@@ -951,7 +951,7 @@ class Builder
             $this->addNewWheresWithinGroup($query, $originalWhereCount);
         }
 
-        return $this;
+        return $result;
     }
 
     /**

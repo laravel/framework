@@ -13,7 +13,7 @@ class NotificationSender
     /**
      * The notification manager instance.
      *
-     * @var \Illuminate\Notifications\Manager
+     * @var \Illuminate\Notifications\ChannelManager
      */
     protected $manager;
 
@@ -34,7 +34,7 @@ class NotificationSender
     /**
      * Create a new notification sender instance.
      *
-     * @param  \Illuminate\Notifications\Manager  $manager
+     * @param  \Illuminate\Notifications\ChannelManager  $manager
      * @param  \Illuminate\Contracts\Bus\Dispatcher  $bus
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @return void
