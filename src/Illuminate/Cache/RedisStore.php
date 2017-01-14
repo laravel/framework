@@ -279,6 +279,7 @@ class RedisStore extends TaggableStore implements Store
         if (is_numeric($value) || is_null($value)) {
             return $value;
         }
+
         return $this->useCompression ? gzcompress(serialize($value)) : serialize($value);
     }
 
@@ -292,8 +293,10 @@ class RedisStore extends TaggableStore implements Store
     {
         if (is_string($value)) {
             $isValueCompressed = bin2hex(mb_strcut($value, 0, 1)) === self::COMPRESSION_ENABLED_FILE_HEADER;
+
             return unserialize($isValueCompressed ? gzuncompress($value) : $value);
         }
+
         return $value;
     }
 }
