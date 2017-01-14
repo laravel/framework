@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Testing\Concerns;
 
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Foundation\Testing\TestResponse;
 use Illuminate\Contracts\Http\Kernel as HttpKernel;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
@@ -235,6 +236,12 @@ trait MakesHttpRequests
         $response = $kernel->handle(
             $request = Request::createFromBase($symfonyRequest)
         );
+        
+        // if response is an instance of RedirectResponse & session is not null
+        // then reflash the session data to the next request
+        if ($response instanceof RedirectResponse && $response->getSession()) {
+            $response->getSession()->reflash();
+        }
 
         $kernel->terminate($request, $response);
 
