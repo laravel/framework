@@ -139,7 +139,7 @@ class Blueprint
     protected function addFluentIndexes()
     {
         foreach ($this->columns as $column) {
-            foreach (['primary', 'unique', 'index'] as $index) {
+            foreach (['primary', 'unique', 'index', 'fulltext'] as $index) {
                 // If the index has been specified on the given column, but is simply
                 // equal to "true" (boolean), no name has been specified for this
                 // index, so we will simply call the index methods without one.
