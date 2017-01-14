@@ -276,6 +276,17 @@ class Blueprint
     }
 
     /**
+     * Indicate that the given fulltext key should be dropped.
+     *
+     * @param  string|array  $index
+     * @return \Illuminate\Support\Fluent
+     */
+    public function dropFulltext($index)
+    {
+        return $this->dropIndexCommand('dropFulltext', 'fulltext', $index);
+    }
+
+    /**
      * Indicate that the given foreign key should be dropped.
      *
      * @param  string|array  $index
@@ -384,6 +395,18 @@ class Blueprint
     public function index($columns, $name = null, $algorithm = null)
     {
         return $this->indexCommand('index', $columns, $name, $algorithm);
+    }
+
+    /**
+     * Specify a fulltext index for the table.
+     *
+     * @param  string|array  $columns
+     * @param  string  $name
+     * @return \Illuminate\Support\Fluent
+     */
+    public function fulltext($columns, $name = null)
+    {
+        return $this->indexCommand('fulltext', $columns, $name);
     }
 
     /**
