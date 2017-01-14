@@ -51,23 +51,20 @@ class ListenerMakeCommand extends GeneratorCommand
      */
     protected function buildClass($name)
     {
-        $stub = parent::buildClass($name);
-
         $event = $this->option('event');
 
-        if (! Str::startsWith($event, $this->laravel->getNamespace()) && ! Str::startsWith($event, 'Illuminate')) {
+        if (! Str::startsWith($event, $this->laravel->getNamespace()) &&
+            ! Str::startsWith($event, 'Illuminate')) {
             $event = $this->laravel->getNamespace().'Events\\'.$event;
         }
 
         $stub = str_replace(
-            'DummyEvent', class_basename($event), $stub
+            'DummyEvent', class_basename($event), parent::buildClass($name)
         );
 
-        $stub = str_replace(
+        return str_replace(
             'DummyFullEvent', $event, $stub
         );
-
-        return $stub;
     }
 
     /**

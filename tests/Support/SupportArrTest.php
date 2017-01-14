@@ -1,9 +1,10 @@
 <?php
 
 use Illuminate\Support\Arr;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Collection;
 
-class SupportArrTest extends PHPUnit_Framework_TestCase
+class SupportArrTest extends TestCase
 {
     public function testAccessible()
     {

@@ -1,8 +1,9 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
-class BroadcastEventTest extends PHPUnit_Framework_TestCase
+class BroadcastEventTest extends TestCase
 {
     public function tearDown()
     {

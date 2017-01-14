@@ -1,8 +1,9 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
 use Illuminate\Notifications\Action;
 
-class NotificationActionTest extends PHPUnit_Framework_TestCase
+class NotificationActionTest extends TestCase
 {
     public function testActionIsCreatedProperly()
     {

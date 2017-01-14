@@ -51,46 +51,6 @@ class FileStore implements Store
     }
 
     /**
-     * Retrieve an item and expiry time from the cache by key.
-     *
-     * @param  string  $key
-     * @return array
-     */
-    protected function getPayload($key)
-    {
-        $path = $this->path($key);
-
-        // If the file doesn't exists, we obviously can't return the cache so we will
-        // just return null. Otherwise, we'll get the contents of the file and get
-        // the expiration UNIX timestamps from the start of the file's contents.
-        try {
-            $expire = substr(
-                $contents = $this->files->get($path, true), 0, 10
-            );
-        } catch (Exception $e) {
-            return ['data' => null, 'time' => null];
-        }
-
-        // If the current time is greater than expiration timestamps we will delete
-        // the file and return null. This helps clean up the old files and keeps
-        // this directory much cleaner for us as old files aren't hanging out.
-        if (Carbon::now()->getTimestamp() >= $expire) {
-            $this->forget($key);
-
-            return ['data' => null, 'time' => null];
-        }
-
-        $data = unserialize(substr($contents, 10));
-
-        // Next, we'll extract the number of minutes that are remaining for a cache
-        // so that we can properly retain the time for things like the increment
-        // operation that may be performed on the cache.
-        $time = ($expire - Carbon::now()->getTimestamp()) / 60;
-
-        return compact('data', 'time');
-    }
-
-    /**
      * Store an item in the cache for a given number of minutes.
      *
      * @param  string  $key
@@ -100,11 +60,11 @@ class FileStore implements Store
      */
     public function put($key, $value, $minutes)
     {
-        $value = $this->expiration($minutes).serialize($value);
+        $this->ensureCacheDirectoryExists($path = $this->path($key));
 
-        $this->createCacheDirectory($path = $this->path($key));
-
-        $this->files->put($path, $value, true);
+        $this->files->put(
+            $path, $this->expiration($minutes).serialize($value), true
+        );
     }
 
     /**
@@ -113,7 +73,7 @@ class FileStore implements Store
      * @param  string  $path
      * @return void
      */
-    protected function createCacheDirectory($path)
+    protected function ensureCacheDirectoryExists($path)
     {
         if (! $this->files->exists(dirname($path))) {
             $this->files->makeDirectory(dirname($path), 0777, true, true);
@@ -131,11 +91,9 @@ class FileStore implements Store
     {
         $raw = $this->getPayload($key);
 
-        $int = ((int) $raw['data']) + $value;
-
-        $this->put($key, $int, $raw['time']);
-
-        return $int;
+        return tap(((int) $raw['data']) + $value, function ($newValue) use ($key, $raw) {
+            $this->put($key, $newValue, $raw['time']);
+        });
     }
 
     /**
@@ -170,9 +128,7 @@ class FileStore implements Store
      */
     public function forget($key)
     {
-        $file = $this->path($key);
-
-        if ($this->files->exists($file)) {
+        if ($this->files->exists($file = $this->path($key))) {
             return $this->files->delete($file);
         }
 
@@ -182,15 +138,71 @@ class FileStore implements Store
     /**
      * Remove all items from the cache.
      *
-     * @return void
+     * @return bool
      */
     public function flush()
     {
-        if ($this->files->isDirectory($this->directory)) {
-            foreach ($this->files->directories($this->directory) as $directory) {
-                $this->files->deleteDirectory($directory);
+        if (! $this->files->isDirectory($this->directory)) {
+            return false;
+        }
+
+        foreach ($this->files->directories($this->directory) as $directory) {
+            if (! $this->files->deleteDirectory($directory)) {
+                return false;
             }
         }
+
+        return true;
+    }
+
+    /**
+     * Retrieve an item and expiry time from the cache by key.
+     *
+     * @param  string  $key
+     * @return array
+     */
+    protected function getPayload($key)
+    {
+        $path = $this->path($key);
+
+        // If the file doesn't exists, we obviously can't return the cache so we will
+        // just return null. Otherwise, we'll get the contents of the file and get
+        // the expiration UNIX timestamps from the start of the file's contents.
+        try {
+            $expire = substr(
+                $contents = $this->files->get($path, true), 0, 10
+            );
+        } catch (Exception $e) {
+            return $this->emptyPayload();
+        }
+
+        // If the current time is greater than expiration timestamps we will delete
+        // the file and return null. This helps clean up the old files and keeps
+        // this directory much cleaner for us as old files aren't hanging out.
+        if (Carbon::now()->getTimestamp() >= $expire) {
+            $this->forget($key);
+
+            return $this->emptyPayload();
+        }
+
+        $data = unserialize(substr($contents, 10));
+
+        // Next, we'll extract the number of minutes that are remaining for a cache
+        // so that we can properly retain the time for things like the increment
+        // operation that may be performed on this cache on a later operation.
+        $time = ($expire - Carbon::now()->getTimestamp()) / 60;
+
+        return compact('data', 'time');
+    }
+
+    /**
+     * Get a default empty payload for the cache.
+     *
+     * @return array
+     */
+    protected function emptyPayload()
+    {
+        return ['data' => null, 'time' => null];
     }
 
     /**
@@ -216,11 +228,7 @@ class FileStore implements Store
     {
         $time = Carbon::now()->getTimestamp() + (int) ($minutes * 60);
 
-        if ($minutes === 0 || $time > 9999999999) {
-            return 9999999999;
-        }
-
-        return (int) $time;
+        return $minutes === 0 || $time > 9999999999 ? 9999999999 : (int) $time;
     }
 
     /**

@@ -1,8 +1,9 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\MemcachedStore;
 
-class CacheMemcachedStoreTest extends PHPUnit_Framework_TestCase
+class CacheMemcachedStoreTest extends TestCase
 {
     public function testGetReturnsNullWhenNotFound()
     {
@@ -113,6 +114,19 @@ class CacheMemcachedStoreTest extends PHPUnit_Framework_TestCase
         $memcache->expects($this->once())->method('delete')->with($this->equalTo('foo'));
         $store = new MemcachedStore($memcache);
         $store->forget('foo');
+    }
+
+    public function testFlushesCached()
+    {
+        if (! class_exists('Memcached')) {
+            $this->markTestSkipped('Memcached module not installed');
+        }
+
+        $memcache = $this->getMockBuilder('Memcached')->setMethods(['flush'])->getMock();
+        $memcache->expects($this->once())->method('flush')->willReturn(true);
+        $store = new Illuminate\Cache\MemcachedStore($memcache);
+        $result = $store->flush();
+        $this->assertTrue($result);
     }
 
     public function testGetAndSetPrefix()

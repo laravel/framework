@@ -30,7 +30,7 @@ class ModelNotFoundException extends RuntimeException
     public function setModel($model, $ids = [])
     {
         $this->model = $model;
-        $this->ids = is_array($ids) ? $ids : [$ids];
+        $this->ids = array_wrap($ids);
 
         $this->message = "No query results for model [{$model}]";
 

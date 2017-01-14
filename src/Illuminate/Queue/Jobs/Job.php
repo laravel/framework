@@ -2,12 +2,12 @@
 
 namespace Illuminate\Queue\Jobs;
 
-use DateTime;
-use Carbon\Carbon;
-use Illuminate\Support\Arr;
+use Illuminate\Queue\InteractsWithTime;
 
 abstract class Job
 {
+    use InteractsWithTime;
+
     /**
      * The job handler instance.
      *
@@ -21,13 +21,6 @@ abstract class Job
      * @var \Illuminate\Container\Container
      */
     protected $container;
-
-    /**
-     * The name of the queue the job belongs to.
-     *
-     * @var string
-     */
-    protected $queue;
 
     /**
      * Indicates if the job has been deleted.
@@ -44,18 +37,16 @@ abstract class Job
     protected $released = false;
 
     /**
-     * Get the number of times the job has been attempted.
-     *
-     * @return int
+     * The name of the connection the job belongs to.
      */
-    abstract public function attempts();
+    protected $connectionName;
 
     /**
-     * Get the raw body string for the job.
+     * The name of the queue the job belongs to.
      *
-     * @return string
+     * @var string
      */
-    abstract public function getRawBody();
+    protected $queue;
 
     /**
      * Fire the job.
@@ -66,22 +57,9 @@ abstract class Job
     {
         $payload = $this->payload();
 
-        list($class, $method) = $this->parseJob($payload['job']);
+        list($class, $method) = JobName::parse($payload['job']);
 
-        $this->instance = $this->resolve($class);
-
-        $this->instance->{$method}($this, $payload['data']);
-    }
-
-    /**
-     * Resolve the given job handler.
-     *
-     * @param  string  $class
-     * @return mixed
-     */
-    protected function resolve($class)
-    {
-        return $this->container->make($class);
+        with($this->instance = $this->resolve($class))->{$method}($this, $payload['data']);
     }
 
     /**
@@ -136,7 +114,7 @@ abstract class Job
     }
 
     /**
-     * Call the failed method on the job instance.
+     * Process an exception that caused the job to fail.
      *
      * @param  \Exception  $e
      * @return void
@@ -145,51 +123,52 @@ abstract class Job
     {
         $payload = $this->payload();
 
-        list($class, $method) = $this->parseJob($payload['job']);
+        list($class, $method) = JobName::parse($payload['job']);
 
-        $this->instance = $this->resolve($class);
-
-        if (method_exists($this->instance, 'failed')) {
+        if (method_exists($this->instance = $this->resolve($class), 'failed')) {
             $this->instance->failed($payload['data'], $e);
         }
     }
 
     /**
-     * Parse the job declaration into class and method.
+     * Resolve the given class.
      *
-     * @param  string  $job
+     * @param  string  $class
+     * @return mixed
+     */
+    protected function resolve($class)
+    {
+        return $this->container->make($class);
+    }
+
+    /**
+     * Get the decoded body of the job.
+     *
      * @return array
      */
-    protected function parseJob($job)
+    public function payload()
     {
-        $segments = explode('@', $job);
-
-        return count($segments) > 1 ? $segments : [$segments[0], 'fire'];
+        return json_decode($this->getRawBody(), true);
     }
 
     /**
-     * Calculate the number of seconds with the given delay.
+     * The number of times to attempt a job.
      *
-     * @param  \DateTime|int  $delay
-     * @return int
+     * @return int|null
      */
-    protected function getSeconds($delay)
+    public function maxTries()
     {
-        if ($delay instanceof DateTime) {
-            return max(0, $delay->getTimestamp() - $this->getTime());
-        }
-
-        return (int) $delay;
+        return array_get($this->payload(), 'maxTries');
     }
 
     /**
-     * Get the current system time.
+     * The number of seconds the job can run.
      *
-     * @return int
+     * @return int|null
      */
-    protected function getTime()
+    public function timeout()
     {
-        return Carbon::now()->getTimestamp();
+        return array_get($this->payload(), 'timeout');
     }
 
     /**
@@ -205,33 +184,23 @@ abstract class Job
     /**
      * Get the resolved name of the queued job class.
      *
+     * Resolves the name of "wrapped" jobs such as class-based handlers.
+     *
      * @return string
      */
     public function resolveName()
     {
-        $name = $this->getName();
-
-        $payload = $this->payload();
-
-        if ($name === 'Illuminate\Queue\CallQueuedHandler@call') {
-            return Arr::get($payload, 'data.commandName', $name);
-        }
-
-        if ($name === 'Illuminate\Events\CallQueuedHandler@call') {
-            return $payload['data']['class'].'@'.$payload['data']['method'];
-        }
-
-        return $name;
+        return JobName::resolve($this->getName(), $this->payload());
     }
 
     /**
-     * Get the decoded body of the job.
+     * Get the name of the connection the job belongs to.
      *
-     * @return array
+     * @return string
      */
-    public function payload()
+    public function getConnectionName()
     {
-        return json_decode($this->getRawBody(), true);
+        return $this->connectionName;
     }
 
     /**

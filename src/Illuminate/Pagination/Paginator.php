@@ -39,9 +39,8 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
         $this->perPage = $perPage;
         $this->currentPage = $this->setCurrentPage($currentPage);
         $this->path = $this->path != '/' ? rtrim($this->path, '/') : $this->path;
-        $this->items = $items instanceof Collection ? $items : Collection::make($items);
 
-        $this->checkForMorePages();
+        $this->setItems($items);
     }
 
     /**
@@ -58,12 +57,15 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
     }
 
     /**
-     * Check for more pages. The last item will be sliced off.
+     * Set the items for the paginator.
      *
+     * @param  mixed  $items
      * @return void
      */
-    protected function checkForMorePages()
+    protected function setItems($items)
     {
+        $this->items = $items instanceof Collection ? $items : Collection::make($items);
+
         $this->hasMore = count($this->items) > ($this->perPage);
 
         $this->items = $this->items->slice(0, $this->perPage);
@@ -79,29 +81,6 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
         if ($this->hasMorePages()) {
             return $this->url($this->currentPage() + 1);
         }
-    }
-
-    /**
-     * Manually indicate that the paginator does have more pages.
-     *
-     * @param  bool  $value
-     * @return $this
-     */
-    public function hasMorePagesWhen($value = true)
-    {
-        $this->hasMore = $value;
-
-        return $this;
-    }
-
-    /**
-     * Determine if there are more items in the data source.
-     *
-     * @return bool
-     */
-    public function hasMorePages()
-    {
-        return $this->hasMore;
     }
 
     /**
@@ -128,6 +107,29 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
                 'paginator' => $this,
             ])->render()
         );
+    }
+
+    /**
+     * Manually indicate that the paginator does have more pages.
+     *
+     * @param  bool  $value
+     * @return $this
+     */
+    public function hasMorePagesWhen($value = true)
+    {
+        $this->hasMore = $value;
+
+        return $this;
+    }
+
+    /**
+     * Determine if there are more items in the data source.
+     *
+     * @return bool
+     */
+    public function hasMorePages()
+    {
+        return $this->hasMore;
     }
 
     /**

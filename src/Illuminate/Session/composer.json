@@ -15,11 +15,11 @@
     ],
     "require": {
         "php": ">=5.6.4",
-        "illuminate/contracts": "5.3.*",
-        "illuminate/support": "5.3.*",
+        "illuminate/contracts": "5.4.*",
+        "illuminate/support": "5.4.*",
         "nesbot/carbon": "~1.20",
-        "symfony/finder": "3.1.*",
-        "symfony/http-foundation": "3.1.*"
+        "symfony/finder": "~3.2",
+        "symfony/http-foundation": "~3.2"
     },
     "autoload": {
         "psr-4": {
@@ -28,11 +28,11 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.3-dev"
+            "dev-master": "5.4-dev"
         }
     },
     "suggest": {
-        "illuminate/console": "Required to use the session:table command (5.3.*)."
+        "illuminate/console": "Required to use the session:table command (5.4.*)."
     },
     "config": {
         "sort-packages": true

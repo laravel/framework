@@ -1,10 +1,11 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Channels\DatabaseChannel;
 use Illuminate\Notifications\Messages\DatabaseMessage;
 
-class NotificationDatabaseChannelTest extends PHPUnit_Framework_TestCase
+class NotificationDatabaseChannelTest extends TestCase
 {
     public function tearDown()
     {

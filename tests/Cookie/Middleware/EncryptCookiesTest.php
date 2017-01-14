@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Router;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Cookie\CookieJar;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Routing\Controller;
@@ -13,7 +14,7 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
-class EncryptCookiesTest extends PHPUnit_Framework_TestCase
+class EncryptCookiesTest extends TestCase
 {
     /**
      * @var Router

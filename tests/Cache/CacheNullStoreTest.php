@@ -1,8 +1,9 @@
 <?php
 
 use Illuminate\Cache\NullStore;
+use PHPUnit\Framework\TestCase;
 
-class CacheNullStoreTest extends PHPUnit_Framework_TestCase
+class CacheNullStoreTest extends TestCase
 {
     public function testItemsCanNotBeCached()
     {

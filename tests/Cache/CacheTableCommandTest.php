@@ -1,10 +1,11 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
 use Illuminate\Cache\Console\CacheTableCommand;
 
-class CacheTableCommandTest extends PHPUnit_Framework_TestCase
+class CacheTableCommandTest extends TestCase
 {
     public function tearDown()
     {

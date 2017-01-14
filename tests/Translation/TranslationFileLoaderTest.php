@@ -1,9 +1,10 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Translation\FileLoader;
 
-class TranslationFileLoaderTest extends PHPUnit_Framework_TestCase
+class TranslationFileLoaderTest extends TestCase
 {
     public function tearDown()
     {
@@ -57,5 +58,14 @@ class TranslationFileLoaderTest extends PHPUnit_Framework_TestCase
         $files->shouldReceive('getRequire')->never();
 
         $this->assertEquals([], $loader->load('en', 'foo', 'bar'));
+    }
+
+    public function testLoadMethodForJSONProperlyCallsLoader()
+    {
+        $loader = new FileLoader($files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__);
+        $files->shouldReceive('exists')->once()->with(__DIR__.'/en.json')->andReturn(true);
+        $files->shouldReceive('get')->once()->with(__DIR__.'/en.json')->andReturn('{"foo":"bar"}');
+
+        $this->assertEquals(['foo' => 'bar'], $loader->load('en', '*', '*'));
     }
 }

@@ -93,17 +93,16 @@ if (! function_exists('app')) {
     /**
      * Get the available container instance.
      *
-     * @param  string  $make
-     * @param  array   $parameters
+     * @param  string  $abstract
      * @return mixed|\Illuminate\Foundation\Application
      */
-    function app($make = null, $parameters = [])
+    function app($abstract = null)
     {
-        if (is_null($make)) {
+        if (is_null($abstract)) {
             return Container::getInstance();
         }
 
-        return Container::getInstance()->make($make, $parameters);
+        return Container::getInstance()->make($abstract);
     }
 }
 
@@ -157,7 +156,7 @@ if (! function_exists('back')) {
      *
      * @param  int    $status
      * @param  array  $headers
-     * @param  string  $fallback
+     * @param  mixed  $fallback
      * @return \Illuminate\Http\RedirectResponse
      */
     function back($status = 302, $headers = [], $fallback = false)
@@ -328,7 +327,7 @@ if (! function_exists('csrf_token')) {
         $session = app('session');
 
         if (isset($session)) {
-            return $session->getToken();
+            return $session->token();
         }
 
         throw new RuntimeException('Application session store not set.');
@@ -427,7 +426,7 @@ if (! function_exists('encrypt')) {
 
 if (! function_exists('env')) {
     /**
-     * Gets the value of an environment variable. Supports boolean, empty and null.
+     * Gets the value of an environment variable.
      *
      * @param  string  $key
      * @param  mixed   $default
@@ -636,12 +635,11 @@ if (! function_exists('resolve')) {
      * Resolve a service from the container.
      *
      * @param  string  $name
-     * @param  array  $parameters
      * @return mixed
      */
-    function resolve($name, $parameters = [])
+    function resolve($name)
     {
-        return app($name, $parameters);
+        return app($name);
     }
 }
 
@@ -763,18 +761,17 @@ if (! function_exists('trans')) {
      * Translate the given message.
      *
      * @param  string  $id
-     * @param  array   $parameters
-     * @param  string  $domain
+     * @param  array   $replace
      * @param  string  $locale
-     * @return \Symfony\Component\Translation\TranslatorInterface|string
+     * @return \Illuminate\Contracts\Translation\Translator|string
      */
-    function trans($id = null, $parameters = [], $domain = 'messages', $locale = null)
+    function trans($id = null, $replace = [], $locale = null)
     {
         if (is_null($id)) {
             return app('translator');
         }
 
-        return app('translator')->trans($id, $parameters, $domain, $locale);
+        return app('translator')->trans($id, $replace, $locale);
     }
 }
 
@@ -784,14 +781,28 @@ if (! function_exists('trans_choice')) {
      *
      * @param  string  $id
      * @param  int|array|\Countable  $number
-     * @param  array   $parameters
-     * @param  string  $domain
+     * @param  array   $replace
      * @param  string  $locale
      * @return string
      */
-    function trans_choice($id, $number, array $parameters = [], $domain = 'messages', $locale = null)
+    function trans_choice($id, $number, array $replace = [], $locale = null)
     {
-        return app('translator')->transChoice($id, $number, $parameters, $domain, $locale);
+        return app('translator')->transChoice($id, $number, $replace, $locale);
+    }
+}
+
+if (! function_exists('__')) {
+    /**
+     * Translate the given message.
+     *
+     * @param  string  $key
+     * @param  array  $replace
+     * @param  string  $locale
+     * @return \Illuminate\Contracts\Translation\Translator|string
+     */
+    function __($key = null, $replace = [], $locale = null)
+    {
+        return app('translator')->getFromJson($key, $replace, $locale);
     }
 }
 

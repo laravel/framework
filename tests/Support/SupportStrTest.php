@@ -1,8 +1,9 @@
 <?php
 
 use Illuminate\Support\Str;
+use PHPUnit\Framework\TestCase;
 
-class SupportStrTest extends PHPUnit_Framework_TestCase
+class SupportStrTest extends TestCase
 {
     /**
      * Test the Str::words method.

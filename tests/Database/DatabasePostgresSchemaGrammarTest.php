@@ -1,9 +1,10 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Schema\Blueprint;
 
-class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase
+class DatabasePostgresSchemaGrammarTest extends TestCase
 {
     public function tearDown()
     {

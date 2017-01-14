@@ -3,11 +3,14 @@
 namespace DummyNamespace;
 
 use DummyFullEvent;
+use Illuminate\Bus\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
 class DummyClass
 {
+    use Queueable;
+
     /**
      * Create the event listener.
      *

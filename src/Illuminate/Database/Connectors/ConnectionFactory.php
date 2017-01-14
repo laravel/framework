@@ -5,6 +5,7 @@ namespace Illuminate\Database\Connectors;
 use PDOException;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
+use Illuminate\Database\Connection;
 use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Database\PostgresConnection;
@@ -51,6 +52,18 @@ class ConnectionFactory
     }
 
     /**
+     * Parse and prepare the database configuration.
+     *
+     * @param  array   $config
+     * @param  string  $name
+     * @return array
+     */
+    protected function parseConfig(array $config, $name)
+    {
+        return Arr::add(Arr::add($config, 'prefix', ''), 'name', $name);
+    }
+
+    /**
      * Create a single database connection instance.
      *
      * @param  array  $config
@@ -90,6 +103,58 @@ class ConnectionFactory
     }
 
     /**
+     * Get the read configuration for a read / write connection.
+     *
+     * @param  array  $config
+     * @return array
+     */
+    protected function getReadConfig(array $config)
+    {
+        return $this->mergeReadWriteConfig(
+            $config, $this->getReadWriteConfig($config, 'read')
+        );
+    }
+
+    /**
+     * Get the read configuration for a read / write connection.
+     *
+     * @param  array  $config
+     * @return array
+     */
+    protected function getWriteConfig(array $config)
+    {
+        return $this->mergeReadWriteConfig(
+            $config, $this->getReadWriteConfig($config, 'write')
+        );
+    }
+
+    /**
+     * Get a read / write level configuration.
+     *
+     * @param  array   $config
+     * @param  string  $type
+     * @return array
+     */
+    protected function getReadWriteConfig(array $config, $type)
+    {
+        return isset($config[$type][0])
+                        ? $config[$type][array_rand($config[$type])]
+                        : $config[$type];
+    }
+
+    /**
+     * Merge a configuration for a read / write connection.
+     *
+     * @param  array  $config
+     * @param  array  $merge
+     * @return array
+     */
+    protected function mergeReadWriteConfig(array $config, array $merge)
+    {
+        return Arr::except(array_merge($config, $merge), ['read', 'write']);
+    }
+
+    /**
      * Create a new Closure that resolves to a PDO instance.
      *
      * @param  array  $config
@@ -97,11 +162,9 @@ class ConnectionFactory
      */
     protected function createPdoResolver(array $config)
     {
-        if (array_key_exists('host', $config)) {
-            return $this->createPdoResolverWithHosts($config);
-        }
-
-        return $this->createPdoResolverWithoutHosts($config);
+        return array_key_exists('host', $config)
+                            ? $this->createPdoResolverWithHosts($config)
+                            : $this->createPdoResolverWithoutHosts($config);
     }
 
     /**
@@ -113,13 +176,7 @@ class ConnectionFactory
     protected function createPdoResolverWithHosts(array $config)
     {
         return function () use ($config) {
-            $hosts = is_array($config['host']) ? $config['host'] : [$config['host']];
-
-            if (empty($hosts)) {
-                throw new InvalidArgumentException('Database hosts array is empty.');
-            }
-
-            foreach (Arr::shuffle($hosts) as $key => $host) {
+            foreach (Arr::shuffle($hosts = $this->parseHosts($config)) as $key => $host) {
                 $config['host'] = $host;
 
                 try {
@@ -136,6 +193,23 @@ class ConnectionFactory
     }
 
     /**
+     * Parse the hosts configuration item into an array.
+     *
+     * @param  array  $config
+     * @return array
+     */
+    protected function parseHosts(array $config)
+    {
+        $hosts = array_wrap($config['host']);
+
+        if (empty($hosts)) {
+            throw new InvalidArgumentException('Database hosts array is empty.');
+        }
+
+        return $hosts;
+    }
+
+    /**
      * Create a new Closure that resolves to a PDO instance where there is no configured host.
      *
      * @param  array  $config
@@ -146,72 +220,6 @@ class ConnectionFactory
         return function () use ($config) {
             return $this->createConnector($config)->connect($config);
         };
-    }
-
-    /**
-     * Get the read configuration for a read / write connection.
-     *
-     * @param  array  $config
-     * @return array
-     */
-    protected function getReadConfig(array $config)
-    {
-        $readConfig = $this->getReadWriteConfig($config, 'read');
-
-        return $this->mergeReadWriteConfig($config, $readConfig);
-    }
-
-    /**
-     * Get the read configuration for a read / write connection.
-     *
-     * @param  array  $config
-     * @return array
-     */
-    protected function getWriteConfig(array $config)
-    {
-        $writeConfig = $this->getReadWriteConfig($config, 'write');
-
-        return $this->mergeReadWriteConfig($config, $writeConfig);
-    }
-
-    /**
-     * Get a read / write level configuration.
-     *
-     * @param  array   $config
-     * @param  string  $type
-     * @return array
-     */
-    protected function getReadWriteConfig(array $config, $type)
-    {
-        if (isset($config[$type][0])) {
-            return $config[$type][array_rand($config[$type])];
-        }
-
-        return $config[$type];
-    }
-
-    /**
-     * Merge a configuration for a read / write connection.
-     *
-     * @param  array  $config
-     * @param  array  $merge
-     * @return array
-     */
-    protected function mergeReadWriteConfig(array $config, array $merge)
-    {
-        return Arr::except(array_merge($config, $merge), ['read', 'write']);
-    }
-
-    /**
-     * Parse and prepare the database configuration.
-     *
-     * @param  array   $config
-     * @param  string  $name
-     * @return array
-     */
-    protected function parseConfig(array $config, $name)
-    {
-        return Arr::add(Arr::add($config, 'prefix', ''), 'name', $name);
     }
 
     /**
@@ -260,8 +268,8 @@ class ConnectionFactory
      */
     protected function createConnection($driver, $connection, $database, $prefix = '', array $config = [])
     {
-        if ($this->container->bound($key = "db.connection.{$driver}")) {
-            return $this->container->make($key, [$connection, $database, $prefix, $config]);
+        if ($resolver = Connection::getResolver($driver)) {
+            return $resolver($connection, $database, $prefix, $config);
         }
 
         switch ($driver) {

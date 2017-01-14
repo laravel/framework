@@ -68,13 +68,11 @@ class Composer
      */
     protected function findComposer()
     {
-        if (! $this->files->exists($this->workingPath.'/composer.phar')) {
-            return 'composer';
+        if ($this->files->exists($this->workingPath.'/composer.phar')) {
+            return ProcessUtils::escapeArgument((new PhpExecutableFinder)->find(false)).' composer.phar';
         }
 
-        $binary = ProcessUtils::escapeArgument((new PhpExecutableFinder)->find(false));
-
-        return "{$binary} composer.phar";
+        return 'composer';
     }
 
     /**

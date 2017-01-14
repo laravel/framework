@@ -1,10 +1,11 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
 use Illuminate\Session\Console\SessionTableCommand;
 
-class SessionTableCommandTest extends PHPUnit_Framework_TestCase
+class SessionTableCommandTest extends TestCase
 {
     public function tearDown()
     {

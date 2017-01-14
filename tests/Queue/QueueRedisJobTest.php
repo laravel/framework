@@ -1,8 +1,9 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
-class QueueRedisJobTest extends PHPUnit_Framework_TestCase
+class QueueRedisJobTest extends TestCase
 {
     public function tearDown()
     {
@@ -43,6 +44,7 @@ class QueueRedisJobTest extends PHPUnit_Framework_TestCase
             m::mock(Illuminate\Queue\RedisQueue::class),
             json_encode(['job' => 'foo', 'data' => ['data'], 'attempts' => 1]),
             json_encode(['job' => 'foo', 'data' => ['data'], 'attempts' => 2]),
+            'connection-name',
             'default'
         );
     }

@@ -2,8 +2,9 @@
 
 use Mockery as m;
 use Carbon\Carbon;
+use PHPUnit\Framework\TestCase;
 
-class CacheRepositoryTest extends PHPUnit_Framework_TestCase
+class CacheRepositoryTest extends TestCase
 {
     public function tearDown()
     {
@@ -123,6 +124,14 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($result);
         $result = $repo->add('foo', 'bar', Carbon::now());
         $this->assertFalse($result);
+    }
+
+    public function testCacheAddCallsRedisStoreAdd()
+    {
+        $store = m::mock(Illuminate\Cache\RedisStore::class);
+        $store->shouldReceive('add')->once()->with('k', 'v', 60)->andReturn(true);
+        $repository = new Illuminate\Cache\Repository($store);
+        $this->assertTrue($repository->add('k', 'v', 60));
     }
 
     public function testRegisterMacroWithNonStaticCall()

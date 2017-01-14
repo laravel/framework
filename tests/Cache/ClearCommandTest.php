@@ -1,10 +1,11 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
 use Illuminate\Cache\Console\ClearCommand;
 
-class ClearCommandTest extends PHPUnit_Framework_TestCase
+class ClearCommandTest extends TestCase
 {
     public function tearDown()
     {

@@ -17,7 +17,7 @@
         "php": ">=5.6.4",
         "ext-mbstring": "*",
         "doctrine/inflector": "~1.0",
-        "illuminate/contracts": "5.3.*",
+        "illuminate/contracts": "5.4.*",
         "paragonie/random_compat": "~1.4|~2.0"
     },
     "replace": {
@@ -33,13 +33,13 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.3-dev"
+            "dev-master": "5.4-dev"
         }
     },
     "suggest": {
         "illuminate/filesystem": "Required to use the composer class (5.2.*).",
-        "symfony/process": "Required to use the composer class (3.1.*).",
-        "symfony/var-dumper": "Required to use the dd function (3.1.*)."
+        "symfony/process": "Required to use the composer class (~3.2).",
+        "symfony/var-dumper": "Required to use the dd function (~3.2)."
     },
     "config": {
         "sort-packages": true

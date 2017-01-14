@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Bootstrap;
 
 use Exception;
 use ErrorException;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Foundation\Application;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Debug\Exception\FatalErrorException;
@@ -42,7 +43,7 @@ class HandleExceptions
     }
 
     /**
-     * Convert a PHP error to an ErrorException.
+     * Convert PHP errors to ErrorException instances.
      *
      * @param  int  $level
      * @param  string  $message
@@ -141,7 +142,7 @@ class HandleExceptions
      */
     protected function isFatal($type)
     {
-        return in_array($type, [E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE]);
+        return in_array($type, [E_COMPILE_ERROR, E_CORE_ERROR, E_ERROR, E_PARSE]);
     }
 
     /**
@@ -151,6 +152,6 @@ class HandleExceptions
      */
     protected function getExceptionHandler()
     {
-        return $this->app->make('Illuminate\Contracts\Debug\ExceptionHandler');
+        return $this->app->make(ExceptionHandler::class);
     }
 }

@@ -15,11 +15,13 @@
     ],
     "require": {
         "php": ">=5.6.4",
-        "illuminate/container": "5.3.*",
-        "illuminate/contracts": "5.3.*",
-        "illuminate/support": "5.3.*",
+        "erusev/parsedown": "~1.6",
+        "illuminate/container": "5.4.*",
+        "illuminate/contracts": "5.4.*",
+        "illuminate/support": "5.4.*",
         "psr/log": "~1.0",
-        "swiftmailer/swiftmailer": "~5.4"
+        "swiftmailer/swiftmailer": "~5.4",
+        "tijsverkoyen/css-to-inline-styles": "~2.2"
     },
     "autoload": {
         "psr-4": {
@@ -28,13 +30,12 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.3-dev"
+            "dev-master": "5.4-dev"
         }
     },
     "suggest": {
         "aws/aws-sdk-php": "Required to use the SES mail driver (~3.0).",
-        "guzzlehttp/guzzle": "Required to use the Mailgun and Mandrill mail drivers (~5.3|~6.0).",
-        "jeremeamia/superclosure": "Required to be able to serialize closures (~2.0)."
+        "guzzlehttp/guzzle": "Required to use the Mailgun and Mandrill mail drivers (~6.0)."
     },
     "config": {
         "sort-packages": true

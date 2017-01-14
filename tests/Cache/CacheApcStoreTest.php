@@ -1,6 +1,8 @@
 <?php
 
-class CacheApcStoreTest extends PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class CacheApcStoreTest extends TestCase
 {
     public function testGetReturnsNullWhenNotFound()
     {
@@ -90,5 +92,14 @@ class CacheApcStoreTest extends PHPUnit_Framework_TestCase
         $apc->expects($this->once())->method('delete')->with($this->equalTo('foo'));
         $store = new Illuminate\Cache\ApcStore($apc);
         $store->forget('foo');
+    }
+
+    public function testFlushesCached()
+    {
+        $apc = $this->getMockBuilder('Illuminate\Cache\ApcWrapper')->setMethods(['flush'])->getMock();
+        $apc->expects($this->once())->method('flush')->willReturn(true);
+        $store = new Illuminate\Cache\ApcStore($apc);
+        $result = $store->flush();
+        $this->assertTrue($result);
     }
 }

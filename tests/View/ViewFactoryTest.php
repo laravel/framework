@@ -2,8 +2,9 @@
 
 use Mockery as m;
 use Illuminate\View\Factory;
+use PHPUnit\Framework\TestCase;
 
-class ViewFactoryTest extends PHPUnit_Framework_TestCase
+class ViewFactoryTest extends TestCase
 {
     public function tearDown()
     {
@@ -63,28 +64,6 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('empty', $factory->renderEach('view', [], 'iterator', 'foo'));
     }
 
-    public function testAddANamedViews()
-    {
-        $factory = $this->getFactory();
-        $factory->name('bar', 'foo');
-
-        $this->assertEquals(['foo' => 'bar'], $factory->getNames());
-    }
-
-    public function testMakeAViewFromNamedView()
-    {
-        $factory = $this->getFactory();
-        $factory->getFinder()->shouldReceive('find')->once()->with('view')->andReturn('path.php');
-        $factory->getEngineResolver()->shouldReceive('resolve')->once()->with('php')->andReturn($engine = m::mock('Illuminate\View\Engines\EngineInterface'));
-        $factory->getFinder()->shouldReceive('addExtension')->once()->with('php');
-        $factory->getDispatcher()->shouldReceive('fire');
-        $factory->addExtension('php', 'php');
-        $factory->name('view', 'foo');
-        $view = $factory->of('foo', ['data']);
-
-        $this->assertSame($engine, $view->getEngine());
-    }
-
     public function testRawStringsMayBeReturnedFromRenderEach()
     {
         $this->assertEquals('foo', $this->getFactory()->renderEach('foo', [], 'item', 'raw|foo'));
@@ -142,18 +121,6 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         $callback = $factory->composer('foo', function () {
             return 'bar';
         });
-        $callback = $callback[0];
-
-        $this->assertEquals('bar', $callback());
-    }
-
-    public function testComposersAreProperlyRegisteredWithPriority()
-    {
-        $factory = $this->getFactory();
-        $factory->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type('Closure'), 1);
-        $callback = $factory->composer('foo', function () {
-            return 'bar';
-        }, 1);
         $callback = $callback[0];
 
         $this->assertEquals('bar', $callback());
@@ -243,9 +210,10 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
 
     public function testSectionExtending()
     {
+        $placeholder = Illuminate\View\Factory::parentPlaceholder();
         $factory = $this->getFactory();
         $factory->startSection('foo');
-        echo 'hi @parent';
+        echo 'hi '.$placeholder;
         $factory->stopSection();
         $factory->startSection('foo');
         echo 'there';
@@ -255,17 +223,47 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
 
     public function testSectionMultipleExtending()
     {
+        $placeholder = Illuminate\View\Factory::parentPlaceholder();
         $factory = $this->getFactory();
         $factory->startSection('foo');
-        echo 'hello @parent nice to see you @parent';
+        echo 'hello '.$placeholder.' nice to see you '.$placeholder;
         $factory->stopSection();
         $factory->startSection('foo');
-        echo 'my @parent';
+        echo 'my '.$placeholder;
         $factory->stopSection();
         $factory->startSection('foo');
         echo 'friend';
         $factory->stopSection();
         $this->assertEquals('hello my friend nice to see you my friend', $factory->yieldContent('foo'));
+    }
+
+    public function testComponentHandling()
+    {
+        $factory = $this->getFactory();
+        $factory->getFinder()->shouldReceive('find')->andReturn(__DIR__.'/fixtures/component.php');
+        $factory->getEngineResolver()->shouldReceive('resolve')->andReturn(new Illuminate\View\Engines\PhpEngine);
+        $factory->getDispatcher()->shouldReceive('fire');
+        $factory->startComponent('component', ['name' => 'Taylor']);
+        $factory->slot('title');
+        echo 'title<hr>';
+        $factory->endSlot();
+        echo 'component';
+        $contents = $factory->renderComponent();
+        $this->assertEquals('title<hr> component Taylor', $contents);
+    }
+
+    public function testTranslation()
+    {
+        $container = new Illuminate\Container\Container;
+        $container->instance('translator', $translator = m::mock('StdClass'));
+        $translator->shouldReceive('getFromJson')->with('Foo', ['name' => 'taylor'])->andReturn('Bar');
+        $factory = $this->getFactory();
+        $factory->setContainer($container);
+        $factory->startTranslation(['name' => 'taylor']);
+        echo 'Foo';
+        $string = $factory->renderTranslation();
+
+        $this->assertEquals('Bar', $string);
     }
 
     public function testSingleStackPush()
@@ -287,18 +285,6 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         echo ', Hello!';
         $factory->stopPush();
         $this->assertEquals('hi, Hello!', $factory->yieldPushContent('foo'));
-
-        // mimic a parent view is rendering
-        $factory->incrementRender();
-        $factory->startPush('foo');
-        echo 'Dear ';
-        $factory->stopPush();
-        $factory->startPush('foo');
-        echo 'friend';
-        $factory->stopPush();
-        $factory->decrementRender();
-
-        $this->assertEquals('Dear friendhi, Hello!', $factory->yieldPushContent('foo'));
     }
 
     public function testSessionAppending()
@@ -377,19 +363,6 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         $factory->getDispatcher()->shouldReceive('fire');
         $factory->make('vendor/package::foo/bar');
         $factory->make('vendor/package::foo.bar');
-    }
-
-    public function testMakeWithAlias()
-    {
-        $factory = $this->getFactory();
-        $factory->alias('real', 'alias');
-        $factory->getFinder()->shouldReceive('find')->once()->with('real')->andReturn('path.php');
-        $factory->getEngineResolver()->shouldReceive('resolve')->once()->with('php')->andReturn(m::mock('Illuminate\View\Engines\EngineInterface'));
-        $factory->getDispatcher()->shouldReceive('fire');
-
-        $view = $factory->make('alias');
-
-        $this->assertEquals('real', $view->getName());
     }
 
     /**

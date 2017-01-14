@@ -1,8 +1,9 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
 use Illuminate\Notifications\Messages\SimpleMessage as Message;
 
-class NotificationMessageTest extends PHPUnit_Framework_TestCase
+class NotificationMessageTest extends TestCase
 {
     public function testLevelCanBeRetrieved()
     {

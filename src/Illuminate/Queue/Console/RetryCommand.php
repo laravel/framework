@@ -29,15 +29,29 @@ class RetryCommand extends Command
      */
     public function fire()
     {
+        foreach ($this->getJobIds() as $id) {
+            $this->retryJob($id);
+
+            $this->info("The failed job [{$id}] has been pushed back onto the queue!");
+
+            $this->laravel['queue.failer']->forget($id);
+        }
+    }
+
+    /**
+     * Get the job IDs to be retried.
+     *
+     * @return array
+     */
+    protected function getJobIds()
+    {
         $ids = $this->argument('id');
 
         if (count($ids) === 1 && $ids[0] === 'all') {
             $ids = Arr::pluck($this->laravel['queue.failer']->all(), 'id');
         }
 
-        foreach ($ids as $id) {
-            $this->retryJob($id);
-        }
+        return $ids;
     }
 
     /**
@@ -48,26 +62,21 @@ class RetryCommand extends Command
      */
     protected function retryJob($id)
     {
-        $failed = $this->laravel['queue.failer']->find($id);
-
-        if (! is_null($failed)) {
-            $failed = (object) $failed;
-
-            $failed->payload = $this->resetAttempts($failed->payload);
-
-            $this->laravel['queue']->connection($failed->connection)
-                                ->pushRaw($failed->payload, $failed->queue);
-
-            $this->laravel['queue.failer']->forget($failed->id);
-
-            $this->info("The failed job [{$id}] has been pushed back onto the queue!");
-        } else {
-            $this->error("No failed job matches the given ID [{$id}].");
+        if (is_null($failed = $this->laravel['queue.failer']->find($id))) {
+            return $this->error("No failed job matches the given ID [{$id}].");
         }
+
+        $failed = (object) $failed;
+
+        $this->laravel['queue']->connection($failed->connection)->pushRaw(
+            $this->resetAttempts($failed->payload), $failed->queue
+        );
     }
 
     /**
      * Reset the payload attempts.
+     *
+     * Applicable to Redis jobs which store attempts in their payload.
      *
      * @param  string  $payload
      * @return string
@@ -77,7 +86,7 @@ class RetryCommand extends Command
         $payload = json_decode($payload, true);
 
         if (isset($payload['attempts'])) {
-            $payload['attempts'] = 1;
+            $payload['attempts'] = 0;
         }
 
         return json_encode($payload);
