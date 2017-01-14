@@ -8,6 +8,13 @@ use Illuminate\Contracts\Redis\Database as Redis;
 class RedisStore extends TaggableStore implements Store
 {
     /**
+     * Default value of first byte of zlib compressed string.
+     *
+     * @var string
+     */
+    const COMPRESSION_ENABLED_FILE_HEADER = '78';
+
+    /**
      * The Redis database connection.
      *
      * @var \Illuminate\Redis\Database
@@ -29,18 +36,25 @@ class RedisStore extends TaggableStore implements Store
     protected $connection;
 
     /**
+     * @var bool
+     */
+    protected $useCompression;
+
+    /**
      * Create a new Redis store.
      *
      * @param  \Illuminate\Redis\Database  $redis
      * @param  string  $prefix
      * @param  string  $connection
+     * @param  bool    $useCompression
      * @return void
      */
-    public function __construct(Redis $redis, $prefix = '', $connection = 'default')
+    public function __construct(Redis $redis, $prefix = '', $connection = 'default', $useCompression = false)
     {
         $this->redis = $redis;
         $this->setPrefix($prefix);
         $this->setConnection($connection);
+        $this->useCompression = $useCompression;
     }
 
     /**
@@ -235,6 +249,26 @@ class RedisStore extends TaggableStore implements Store
     }
 
     /**
+     * Get whether or not compression is enabled.
+     *
+     * @return bool
+     */
+    public function getUseCompression()
+    {
+        return $this->useCompression;
+    }
+
+    /**
+     * Enable or disable compression.
+     *
+     * @param bool $useCompression
+     */
+    public function setUseCompression($useCompression)
+    {
+        $this->useCompression = $useCompression;
+    }
+
+    /**
      * Serialize the value.
      *
      * @param  mixed  $value
@@ -242,7 +276,10 @@ class RedisStore extends TaggableStore implements Store
      */
     protected function serialize($value)
     {
-        return is_numeric($value) ? $value : serialize($value);
+        if (is_numeric($value) || is_null($value)) {
+            return $value;
+        }
+        return $this->useCompression ? gzcompress(serialize($value)) : serialize($value);
     }
 
     /**
@@ -253,6 +290,10 @@ class RedisStore extends TaggableStore implements Store
      */
     protected function unserialize($value)
     {
-        return is_numeric($value) ? $value : unserialize($value);
+        if (is_string($value)) {
+            $isValueCompressed = bin2hex(mb_strcut($value, 0, 1)) === self::COMPRESSION_ENABLED_FILE_HEADER;
+            return unserialize($isValueCompressed ? gzuncompress($value) : $value);
+        }
+        return $value;
     }
 }

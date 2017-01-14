@@ -193,7 +193,9 @@ class CacheManager implements FactoryContract
 
         $connection = Arr::get($config, 'connection', 'default');
 
-        return $this->repository(new RedisStore($redis, $this->getPrefix($config), $connection));
+        return $this->repository(
+            new RedisStore($redis, $this->getPrefix($config), $connection, $this->getUseCompression($config))
+        );
     }
 
     /**
@@ -241,6 +243,17 @@ class CacheManager implements FactoryContract
     protected function getPrefix(array $config)
     {
         return Arr::get($config, 'prefix') ?: $this->app['config']['cache.prefix'];
+    }
+
+    /**
+     * Get whether or not the cache should use compression.
+     *
+     * @param  array  $config
+     * @return bool
+     */
+    protected function getUseCompression(array $config)
+    {
+        return Arr::get($config, 'use_compression') ?: false;
     }
 
     /**
