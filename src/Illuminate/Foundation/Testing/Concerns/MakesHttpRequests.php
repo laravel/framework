@@ -236,7 +236,7 @@ trait MakesHttpRequests
         $response = $kernel->handle(
             $request = Request::createFromBase($symfonyRequest)
         );
-        
+
         // if response is an instance of RedirectResponse & session is not null
         // then reflash the session data to the next request
         if ($response instanceof RedirectResponse && $response->getSession()) {
