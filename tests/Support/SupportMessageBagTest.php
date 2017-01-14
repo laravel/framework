@@ -24,12 +24,12 @@ class SupportMessageBagTest extends TestCase
     {
         $container = new MessageBag;
         $container->setFormat(':message');
-        $container->add('foo', 'bar');
-        $container->add('foo', 'baz');
-        $container->add('boom', 'bust');
+        $container->add('foo', 'required', 'bar');
+        $container->add('foo', 'required', 'baz');
+        $container->add('boom', 'required', 'bust');
         $messages = $container->getMessages();
-        $this->assertEquals(['bar', 'baz'], $messages['foo']);
-        $this->assertEquals(['bust'], $messages['boom']);
+        $this->assertEquals(['required'=>['bar', 'baz']], $messages['foo']);
+        $this->assertEquals(['required'=>['bust']], $messages['boom']);
     }
 
     public function testMessagesMayBeMerged()
