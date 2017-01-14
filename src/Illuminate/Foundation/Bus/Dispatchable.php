@@ -7,10 +7,10 @@ trait Dispatchable
     /**
      * Dispatch the job with the given arguments.
      *
-     * @return void
+     * @return \Illuminate\Foundation\Bus\PendingDispatch
      */
     public static function dispatch()
     {
-        return dispatch(new static(...func_get_args()));
+        return new PendingDispatch(new static(...func_get_args()));
     }
 }

@@ -40,6 +40,13 @@ class Worker
     protected $exceptions;
 
     /**
+     * Indicates if the worker is paused.
+     *
+     * @var bool
+     */
+    protected $paused = false;
+
+    /**
      * Create a new queue worker.
      *
      * @param  \Illuminate\Queue\QueueManager  $manager
@@ -143,6 +150,7 @@ class Worker
     protected function daemonShouldRun(WorkerOptions $options)
     {
         if (($this->manager->isDownForMaintenance() && ! $options->force) ||
+            $this->paused ||
             $this->events->until(new Events\Looping) === false) {
             // If the application is down for maintenance or doesn't want the queues to run
             // we will sleep for one second just in case the developer has it set to not
@@ -439,6 +447,14 @@ class Worker
     {
         if ($this->supportsAsyncSignals()) {
             pcntl_async_signals(true);
+
+            pcntl_signal(SIGUSR2, function () {
+                $this->paused = true;
+            });
+
+            pcntl_signal(SIGCONT, function () {
+                $this->paused = false;
+            });
         }
     }
 
