@@ -406,6 +406,9 @@ abstract class Grammar extends BaseGrammar
             case 'binary':
                 $type = 'blob';
                 break;
+            case 'json':
+                $type = 'json_array';
+                break;
         }
 
         return Type::getType($type);
