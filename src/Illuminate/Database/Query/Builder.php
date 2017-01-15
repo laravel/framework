@@ -1613,7 +1613,7 @@ class Builder
     {
         $this->lock = $value;
 
-        if ($this->lock) {
+        if (isset($this->lock)) {
             $this->useWritePdo();
         }
 
