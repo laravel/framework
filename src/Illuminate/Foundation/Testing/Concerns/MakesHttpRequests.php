@@ -48,7 +48,7 @@ trait MakesHttpRequests
      *
      * @param  string  $uri
      * @param  array  $headers
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\TestResponse
      */
     public function get($uri, array $headers = [])
     {
@@ -62,7 +62,7 @@ trait MakesHttpRequests
      *
      * @param  string  $uri
      * @param  array  $headers
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\TestResponse
      */
     public function getJson($uri, array $headers = [])
     {
@@ -75,7 +75,7 @@ trait MakesHttpRequests
      * @param  string  $uri
      * @param  array  $data
      * @param  array  $headers
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\TestResponse
      */
     public function post($uri, array $data = [], array $headers = [])
     {
@@ -90,7 +90,7 @@ trait MakesHttpRequests
      * @param  string  $uri
      * @param  array  $data
      * @param  array  $headers
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\TestResponse
      */
     public function postJson($uri, array $data = [], array $headers = [])
     {
@@ -103,7 +103,7 @@ trait MakesHttpRequests
      * @param  string  $uri
      * @param  array  $data
      * @param  array  $headers
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\TestResponse
      */
     public function put($uri, array $data = [], array $headers = [])
     {
@@ -118,7 +118,7 @@ trait MakesHttpRequests
      * @param  string  $uri
      * @param  array  $data
      * @param  array  $headers
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\TestResponse
      */
     public function putJson($uri, array $data = [], array $headers = [])
     {
@@ -131,7 +131,7 @@ trait MakesHttpRequests
      * @param  string  $uri
      * @param  array  $data
      * @param  array  $headers
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\TestResponse
      */
     public function patch($uri, array $data = [], array $headers = [])
     {
@@ -146,7 +146,7 @@ trait MakesHttpRequests
      * @param  string  $uri
      * @param  array  $data
      * @param  array  $headers
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\TestResponse
      */
     public function patchJson($uri, array $data = [], array $headers = [])
     {
@@ -159,7 +159,7 @@ trait MakesHttpRequests
      * @param  string  $uri
      * @param  array  $data
      * @param  array  $headers
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\TestResponse
      */
     public function delete($uri, array $data = [], array $headers = [])
     {
@@ -174,7 +174,7 @@ trait MakesHttpRequests
      * @param  string  $uri
      * @param  array  $data
      * @param  array  $headers
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\TestResponse
      */
     public function deleteJson($uri, array $data = [], array $headers = [])
     {
@@ -188,7 +188,7 @@ trait MakesHttpRequests
      * @param  string  $uri
      * @param  array  $data
      * @param  array  $headers
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\TestResponse
      */
     public function json($method, $uri, array $data = [], array $headers = [])
     {
@@ -202,11 +202,9 @@ trait MakesHttpRequests
             'Accept' => 'application/json',
         ], $headers);
 
-        $this->call(
+        return $this->call(
             $method, $uri, [], [], $files, $this->transformHeadersToServerVars($headers), $content
         );
-
-        return $this;
     }
 
     /**
@@ -219,7 +217,7 @@ trait MakesHttpRequests
      * @param  array  $files
      * @param  array  $server
      * @param  string  $content
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Foundation\Testing\TestResponse
      */
     public function call($method, $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null)
     {
