@@ -686,7 +686,7 @@ class Factory implements FactoryContract
     public function stopPush()
     {
         if (empty($this->pushStack)) {
-            throw new InvalidArgumentException('Cannot end a section without first starting one.');
+            throw new InvalidArgumentException('Cannot end a push without first starting one.');
         }
 
         $last = array_pop($this->pushStack);
