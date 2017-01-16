@@ -6,6 +6,7 @@ use Exception;
 use ReflectionClass;
 use Illuminate\Support\Str;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
@@ -395,7 +396,7 @@ class Dispatcher implements DispatcherContract
     {
         try {
             return (new ReflectionClass($class))->implementsInterface(
-                'Illuminate\Contracts\Queue\ShouldQueue'
+                ShouldQueue::class
             );
         } catch (Exception $e) {
             return false;

@@ -245,8 +245,8 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function resource($name, $controller, array $options = [])
     {
-        if ($this->container && $this->container->bound('Illuminate\Routing\ResourceRegistrar')) {
-            $registrar = $this->container->make('Illuminate\Routing\ResourceRegistrar');
+        if ($this->container && $this->container->bound(ResourceRegistrar::class)) {
+            $registrar = $this->container->make(ResourceRegistrar::class);
         } else {
             $registrar = new ResourceRegistrar($this);
         }
@@ -533,7 +533,7 @@ class Router implements RegistrarContract, BindingRegistrar
     {
         $this->current = $route = $this->routes->match($request);
 
-        $this->container->instance('Illuminate\Routing\Route', $route);
+        $this->container->instance(Route::class, $route);
 
         return $route;
     }

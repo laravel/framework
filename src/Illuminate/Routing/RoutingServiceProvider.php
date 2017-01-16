@@ -3,8 +3,12 @@
 namespace Illuminate\Routing;
 
 use Illuminate\Support\ServiceProvider;
+use Psr\Http\Message\ResponseInterface;
 use Zend\Diactoros\Response as PsrResponse;
+use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
+use Illuminate\Contracts\View\Factory as ViewFactoryContract;
+use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
 
 class RoutingServiceProvider extends ServiceProvider
 {
@@ -116,7 +120,7 @@ class RoutingServiceProvider extends ServiceProvider
      */
     protected function registerPsrRequest()
     {
-        $this->app->bind('Psr\Http\Message\ServerRequestInterface', function ($app) {
+        $this->app->bind(ServerRequestInterface::class, function ($app) {
             return (new DiactorosFactory)->createRequest($app->make('request'));
         });
     }
@@ -128,7 +132,7 @@ class RoutingServiceProvider extends ServiceProvider
      */
     protected function registerPsrResponse()
     {
-        $this->app->bind('Psr\Http\Message\ResponseInterface', function ($app) {
+        $this->app->bind(ResponseInterface::class, function ($app) {
             return new PsrResponse();
         });
     }
@@ -140,8 +144,8 @@ class RoutingServiceProvider extends ServiceProvider
      */
     protected function registerResponseFactory()
     {
-        $this->app->singleton('Illuminate\Contracts\Routing\ResponseFactory', function ($app) {
-            return new ResponseFactory($app['Illuminate\Contracts\View\Factory'], $app['redirect']);
+        $this->app->singleton(ResponseFactoryContract::class, function ($app) {
+            return new ResponseFactory($app[ViewFactoryContract::class], $app['redirect']);
         });
     }
 }
