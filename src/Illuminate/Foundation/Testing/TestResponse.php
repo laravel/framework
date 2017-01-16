@@ -163,7 +163,7 @@ class TestResponse extends Response
      * @param  array  $data
      * @return $this
      */
-    public function assertHasJson(array $data)
+    public function assertJson(array $data)
     {
         PHPUnit::assertArraySubset($data, $this->decodeResponseJson());
 
@@ -176,7 +176,7 @@ class TestResponse extends Response
      * @param  array  $data
      * @return $this
      */
-    public function assertHasExactJson(array $data)
+    public function assertExactJson(array $data)
     {
         $actual = json_encode(Arr::sortRecursive(
             (array) $this->decodeResponseJson()
