@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Testing;
 
 use Closure;
+use Illuminate\Support\Arr;
 use Illuminate\Http\Response;
 use Illuminate\Contracts\View\View;
 use PHPUnit_Framework_Assert as PHPUnit;
@@ -165,6 +166,23 @@ class TestResponse extends Response
     public function assertHasJson(array $data)
     {
         PHPUnit::assertArraySubset($data, $this->decodeResponseJson());
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response has the exact given JSON.
+     *
+     * @param  array  $data
+     * @return $this
+     */
+    public function assertHasExactJson(array $data)
+    {
+        $actual = json_encode(Arr::sortRecursive(
+            (array) $this->decodeResponseJson()
+        ));
+
+        PHPUnit::assertEquals(json_encode(Arr::sortRecursive($data)), $actual);
 
         return $this;
     }
