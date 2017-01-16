@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Added
+- Added `read()` and `unread()` methods to `DatabaseNotification` ([#17243](https://github.com/laravel/framework/pull/17243))
+
+### Changed
+- Show seed output prior to running, instead of after ([#17318](https://github.com/laravel/framework/pull/17318))
+
 ### Fixed
 - Use regex in `KeyGenerateCommand` to match `APP_KEY` ([#17151](https://github.com/laravel/framework/pull/17151))
 
