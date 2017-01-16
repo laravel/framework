@@ -71,17 +71,17 @@ abstract class Grammar
      */
     protected function wrapAliasedValue($value, $prefixAlias = false)
     {
-        $segments = explode(' ', $value);
+        $segments = preg_split('/\s+as\s+/i', $value);
 
         // If we are wrapping a table we need to prefix the alias with the table prefix
         // as well in order to generate proper syntax. If this is a column of course
         // no prefix is necessary. The condition will be true when from wrapTable.
         if ($prefixAlias) {
-            $segments[2] = $this->tablePrefix.$segments[2];
+            $segments[1] = $this->tablePrefix.$segments[1];
         }
 
         return $this->wrap(
-            $segments[0]).' as '.$this->wrapValue($segments[2]
+            $segments[0]).' as '.$this->wrapValue($segments[1]
         );
     }
 

@@ -12,15 +12,15 @@
 - Support implicit keys in `MessageBag::first()` and `MessageBag::first()` ([#17001](https://github.com/laravel/framework/pull/17001))
 - Removed compiled class file generation and deprecated `ServiceProvider::compiles()` ([#17003](https://github.com/laravel/framework/pull/17003), [733d829](https://github.com/laravel/framework/commit/733d829d6551dde2f290b6c26543dd08956e82e7))
 - Renamed `DetectEnvironment` to `LoadEnvironmentVariables` ([c36874d](https://github.com/laravel/framework/commit/c36874dda29d8eb9f9364c4bd308c7ee10060c25))
+- Allow view data to be passed Paginator methods ([#17331](https://github.com/laravel/framework/pull/17331))
 
 ### Authentication
 - Secured password reset tokens against timing attacks and compromised databases ([#16850](https://github.com/laravel/framework/pull/16850), [9d674b0](https://github.com/laravel/framework/commit/9d674b053145968ff9060b930a644ddd7851d66f))
 - Refactored authentication component ([7b48bfc](https://github.com/laravel/framework/commit/7b48bfccf9ed12c71461651bbf52a3214b58d82e), [5c4541b](https://github.com/laravel/framework/commit/5c4541bc43f22b0d99c5cc6db38781060bff836f))
-- Switched to components for auth view subs ([78891d5](https://github.com/laravel/framework/commit/78891d56198081d84bb268f88ce3e03989375e1b))
 - Added names to password reset routes ([#16988](https://github.com/laravel/framework/pull/16988))
 - Stopped touching the user timestamp when updating the `remember_token` ([#17135](https://github.com/laravel/framework/pull/17135))
 
-## Authorization
+### Authorization
 - Consider interfaces and extended classes in `Gate::resolvePolicyCallback()` ([#15757](https://github.com/laravel/framework/pull/15757))
 
 ### Blade
@@ -33,6 +33,7 @@
 
 ### Broadcasting
 - Added model binding in broadcasting channel definitions ([#16120](https://github.com/laravel/framework/pull/16120), [515d97c](https://github.com/laravel/framework/commit/515d97c1f3ad4797876979d450304684012142d6))
+- Added `Dispatchable::broadcast()` [0fd8f8d](https://github.com/laravel/framework/commit/0fd8f8de75545b5701e59f51c88d02c12528800a)
 
 ### Cache
 - Added `RedisStore::add()` to store an item in the cache if the key doesn't exist ([#15877](https://github.com/laravel/framework/pull/15877))
@@ -83,6 +84,8 @@
 - Don't rollback to save-points on deadlock (nested transaction) ([#15932](https://github.com/laravel/framework/pull/15932))
 - Improve `Connection::selectOne()` performance by switching to `array_shift()` ([#16188](https://github.com/laravel/framework/pull/16188))
 - Added `having()` shortcut ([#17160](https://github.com/laravel/framework/pull/17160))
+- Added customer connection resolver ([#17248](https://github.com/laravel/framework/pull/17248))
+- Support aliasing database names with spaces ([#17312](https://github.com/laravel/framework/pull/17312))
 
 ### Eloquent
 - Refactored Eloquent (_too many commits, sorry_)
@@ -100,10 +103,12 @@
 - Enforce an `orderBy` clause for `chunk()` ([#16283](https://github.com/laravel/framework/pull/16283), [#16513](https://github.com/laravel/framework/pull/16513))
 
 ### Events
-- Removed event priorities/halting ([dbbfc62](https://github.com/laravel/framework/commit/dbbfc62beff1625b0d45bbf39650d047555cf4fa), [#17245](https://github.com/laravel/framework/pull/17245))
+- Removed event priorities ([dbbfc62](https://github.com/laravel/framework/commit/dbbfc62beff1625b0d45bbf39650d047555cf4fa), [#17245](https://github.com/laravel/framework/pull/17245), [f83edc1](https://github.com/laravel/framework/commit/f83edc1cb820523fd933c3d3c0430a1f63a073ec))
 - Allow queued handlers to specify their queue and connection ([fedd4cd](https://github.com/laravel/framework/commit/fedd4cd4d900656071d44fc1ee9c83e6de986fa8))
 - Converted `locale.changed` event into `LocaleUpdated` class ([3385fdc](https://github.com/laravel/framework/commit/3385fdc0f8e4890ab57261755bcbbf79f9ec828d))
 - Unified wording ([2dcde69](https://github.com/laravel/framework/commit/2dcde6983ffbb4faf1c238544b51831b33c3a857))
+- Allow chaining queueable methods onto trait dispatch ([9fde549](https://github.com/laravel/framework/commit/9fde54954c326b9021476aa87c96bf43a7885bcc))
+- Removed `Queueable` trait from event listeners subs ([2a90ef4](https://github.com/laravel/framework/commit/2a90ef46a2121783f8c5c8f20274634cde115612))
 
 ### Filesystem
 - Use UUID instead of `md5()` for generating file names in `FileHelpers` ([#16193](https://github.com/laravel/framework/pull/16193))
@@ -142,6 +147,8 @@
 - Converted `illuminate.queue.looping` event into `Looping` class ([57c82d0](https://github.com/laravel/framework/commit/57c82d095c356a0fe0f9381536afec768cdcc072))
 - Refactored Queue component ([9bc8ca5](https://github.com/laravel/framework/commit/9bc8ca502687f29761b9eb78f70db6e3c3f0a09e), [e030231](https://github.com/laravel/framework/commit/e030231604479d0326ad9bfb56a2a36229d78ff4), [a041fb5](https://github.com/laravel/framework/commit/a041fb5ec9fc775d1a3efb6b647604da2b02b866), [7bb15cf](https://github.com/laravel/framework/commit/7bb15cf40a182bed3d00bc55de55798e58bf1ed0), [5505728](https://github.com/laravel/framework/commit/55057285b321b4b668d12fade330b0d196f9514a))
 - Refactored how queue connection names are set ([4c600fb](https://github.com/laravel/framework/commit/4c600fb7af855747b6b44a194a5d0061d6294488))
+- Let queue worker exit ungracefully on `memoryExceeded()` ([#17302](https://github.com/laravel/framework/pull/17302))
+- Support pause and continue signals in queue worker ([827d075](https://github.com/laravel/framework/commit/827d075fb06b516eea992393279fc5ec2adabcf8))
 
 ### Redis
 - Added support for PhpRedis ([#15160](https://github.com/laravel/framework/pull/15160), [01ed1c8](https://github.com/laravel/framework/commit/01ed1c8348a8e69ad213c95dd8d24e652154e6f0), [1ef8b9c](https://github.com/laravel/framework/commit/1ef8b9c3f156c7d4debc6c6f67b73b032d8337d5))
@@ -164,6 +171,8 @@
 - Improve database testing methods ([#16679](https://github.com/laravel/framework/pull/16679), [14e9dad](https://github.com/laravel/framework/commit/14e9dad05d09429fab244e2d8f6c49e679a3a975), [f23ac64](https://github.com/laravel/framework/commit/f23ac640fa403ca8d4131c36367b53e123b6b852))
 - Refactored `MailFake` ([b1d8f81](https://github.com/laravel/framework/commit/b1d8f813d13960096493f3adc3bc32ace66ba2e6))
 - Switched to namespaced PHPUnit `TestCase` ([#17058](https://github.com/laravel/framework/pull/17058))
+- Allow chaining of response assertions ([#17330](https://github.com/laravel/framework/pull/17330))
+- Return `TestResponse` from `MakesHttpRequests::json()` ([#17341](https://github.com/laravel/framework/pull/17341))
 
 ### Translations
 - Added JSON loader for translations and `__()` helper ([#16424](https://github.com/laravel/framework/pull/16424), [#16470](https://github.com/laravel/framework/pull/16470), [9437244](https://github.com/laravel/framework/commit/94372447b9de48f5c174db2cf7c81dffb3c0c692))

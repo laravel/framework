@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Testing;
 
 use Closure;
+use Illuminate\Support\Arr;
 use Illuminate\Http\Response;
 use Illuminate\Contracts\View\View;
 use PHPUnit_Framework_Assert as PHPUnit;
@@ -39,7 +40,7 @@ class TestResponse extends Response
      * Assert that the response has the given status code.
      *
      * @param  int  $status
-     * @return void
+     * @return $this
      */
     public function assertStatus($status)
     {
@@ -49,13 +50,15 @@ class TestResponse extends Response
             $actual === $status,
             "Expected status code {$status} but received {$actual}."
         );
+
+        return $this;
     }
 
     /**
      * Assert whether the response is redirecting to a given URI.
      *
      * @param  string  $uri
-     * @return void
+     * @return $this
      */
     public function assertRedirect($uri)
     {
@@ -64,6 +67,8 @@ class TestResponse extends Response
         );
 
         PHPUnit::assertEquals(app('url')->to($uri), $this->headers->get('Location'));
+
+        return $this;
     }
 
     /**
@@ -96,11 +101,13 @@ class TestResponse extends Response
      *
      * @param  string  $cookieName
      * @param  mixed  $value
-     * @return void
+     * @return $this
      */
     public function assertPlainCookie($cookieName, $value = null)
     {
         $this->assertCookie($cookieName, $value, false);
+
+        return $this;
     }
 
     /**
@@ -154,11 +161,30 @@ class TestResponse extends Response
      * Assert that the response is a superset of the given JSON.
      *
      * @param  array  $data
-     * @return void
+     * @return $this
      */
-    public function assertHasJson(array $data)
+    public function assertJson(array $data)
     {
         PHPUnit::assertArraySubset($data, $this->decodeResponseJson());
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response has the exact given JSON.
+     *
+     * @param  array  $data
+     * @return $this
+     */
+    public function assertExactJson(array $data)
+    {
+        $actual = json_encode(Arr::sortRecursive(
+            (array) $this->decodeResponseJson()
+        ));
+
+        PHPUnit::assertEquals(json_encode(Arr::sortRecursive($data)), $actual);
+
+        return $this;
     }
 
     /**
@@ -186,7 +212,7 @@ class TestResponse extends Response
      *
      * @param  string|array  $key
      * @param  mixed  $value
-     * @return void
+     * @return $this
      */
     public function assertViewHas($key, $value = null)
     {
@@ -203,13 +229,15 @@ class TestResponse extends Response
         } else {
             PHPUnit::assertEquals($value, $this->original->$key);
         }
+
+        return $this;
     }
 
     /**
      * Assert that the response view has a given list of bound data.
      *
      * @param  array  $bindings
-     * @return void
+     * @return $this
      */
     public function assertViewHasAll(array $bindings)
     {
@@ -220,31 +248,37 @@ class TestResponse extends Response
                 $this->assertViewHas($key, $value);
             }
         }
+
+        return $this;
     }
 
     /**
      * Assert that the response view is missing a piece of bound data.
      *
      * @param  string  $key
-     * @return void
+     * @return $this
      */
     public function assertViewMissing($key)
     {
         $this->ensureResponseHasView();
 
         PHPUnit::assertArrayNotHasKey($key, $this->original->getData());
+
+        return $this;
     }
 
     /**
      * Ensure that the response has a view as its original content.
      *
-     * @return void
+     * @return $this
      */
     protected function ensureResponseHasView()
     {
         if (! isset($this->original) || ! $this->original instanceof View) {
             return PHPUnit::fail('The response is not a view.');
         }
+
+        return $this;
     }
 
     /**
@@ -252,7 +286,7 @@ class TestResponse extends Response
      *
      * @param  string|array  $key
      * @param  mixed  $value
-     * @return void
+     * @return $this
      */
     public function assertSessionHas($key, $value = null)
     {
@@ -268,13 +302,15 @@ class TestResponse extends Response
         } else {
             PHPUnit::assertEquals($value, app('session.store')->get($key));
         }
+
+        return $this;
     }
 
     /**
      * Assert that the session has a given list of values.
      *
      * @param  array  $bindings
-     * @return void
+     * @return $this
      */
     public function assertSessionHasAll(array $bindings)
     {
@@ -285,13 +321,15 @@ class TestResponse extends Response
                 $this->assertSessionHas($key, $value);
             }
         }
+
+        return $this;
     }
 
     /**
      * Assert that the session does not have a given key.
      *
      * @param  string|array  $key
-     * @return void
+     * @return $this
      */
     public function assertSessionMissing($key)
     {
@@ -305,6 +343,8 @@ class TestResponse extends Response
                 "Session has unexpected key [{$key}]."
             );
         }
+
+        return $this;
     }
 
     /**
