@@ -398,6 +398,8 @@ if (! function_exists('elixir')) {
             }
         }
 
+        $file = ltrim($file, '/');
+
         if (isset($manifest[$file])) {
             return '/'.trim($buildDirectory.'/'.$manifest[$file], '/');
         }
