@@ -76,7 +76,8 @@ class MailgunTransport extends Transport
     {
         return [
             'auth' => [
-                'api' => $this->key,
+                'api',
+                $this->key,
             ],
             'multipart' => [
                 [
