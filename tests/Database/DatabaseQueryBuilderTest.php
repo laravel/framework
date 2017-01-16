@@ -68,6 +68,13 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('x.y as foo.bar')->from('baz');
         $this->assertEquals('select "x"."y" as "foo.bar" from "baz"', $builder->toSql());
     }
+    
+    public function testAliasWrappingWithSpacesInDatabaseName()
+    {
+	    $builder = $this->getBuilder();
+	    $builder->select('w x.y.z as foo.bar')->from('baz');
+    	$this->assertEquals('select "w x"."y"."z" as "foo.bar" from "baz"', $builder->toSql());
+    }
 
     public function testAddingSelects()
     {
