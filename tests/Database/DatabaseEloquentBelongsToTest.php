@@ -76,6 +76,22 @@ class DatabaseEloquentBelongsToTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testRelateMethodDefinesRelationship()
+	{
+		$relationship = 'foo';
+		$child = new EloquentBelongsToModelStub;
+
+		$relation = $this->getRelation();
+		$relation->relate($relationship);
+
+		$builder = $relation->getQuery();
+		$builder->shouldReceive('first')->andReturn($child);
+
+		$relation->getParent()->bip = 'bap';
+		$this->assertEquals('bap', $relation->getResults()->$relationship->bip);
+	}
+
+
 	protected function getRelation($parent = null)
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder');

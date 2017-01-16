@@ -110,6 +110,22 @@ class DatabaseEloquentHasOneTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testRelateMethodDefinesRelationship()
+	{
+		$relationship = 'foo';
+		$child = new EloquentHasOneModelStub;
+
+		$relation = $this->getRelation();
+		$relation->relate($relationship);
+
+		$builder = $relation->getQuery();
+		$builder->shouldReceive('first')->andReturn($child);
+
+		$relation->getParent()->shouldReceive('getAttribute')->with('bip')->andReturn('bap');
+		$this->assertEquals('bap', $relation->getResults()->$relationship->bip);
+	}
+
+
 	protected function getRelation()
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder');

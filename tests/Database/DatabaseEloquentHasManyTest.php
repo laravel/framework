@@ -90,6 +90,25 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testRelateMethodDefinesRelationship()
+	{
+		$relationship = 'foo';
+		$child = new EloquentHasManyModelStub;
+
+		$relation = $this->getRelation();
+		$relation->relate($relationship);
+
+		$builder = $relation->getQuery();
+		$builder->shouldReceive('get')->andReturn(new Collection([$child]));
+
+		$children = $relation->getResults();
+		$this->assertCount(1, $children);
+
+		$relation->getParent()->shouldReceive('getAttribute')->with('bip')->andReturn('bap');
+		$this->assertEquals('bap', $children->first()->$relationship->bip);
+	}
+
+
 	protected function getRelation()
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder');

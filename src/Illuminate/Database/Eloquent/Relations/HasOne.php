@@ -11,7 +11,23 @@ class HasOne extends HasOneOrMany {
 	 */
 	public function getResults()
 	{
-		return $this->query->first();
+		return $this->initInverseRelation($this->query->first());
+	}
+
+	/**
+	 * Initialize the parent relationship on the model.
+	 *
+	 * @param  mixed  $model
+	 * @return mixed
+	 */
+	protected function initInverseRelation($model = null)
+	{
+		if ( ! empty($this->relationToParent) && $model)
+		{
+			$model->setRelation($this->relationToParent, $this->parent);
+		}
+
+		return $model;
 	}
 
 	/**

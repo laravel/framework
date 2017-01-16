@@ -30,6 +30,11 @@ abstract class Relation {
 	protected $related;
 
 	/**
+	 * The relationship from child to parent.
+	 */
+	protected $relationToParent;
+
+	/**
 	 * Indicates if the relation is adding constraints.
 	 *
 	 * @var bool
@@ -92,6 +97,19 @@ abstract class Relation {
 	 * @return mixed
 	 */
 	abstract public function getResults();
+
+	/**
+	 * Define the relationship of child to parent.
+	 *
+	 * @param  string  $relationship
+	 * @return \Illuminate\Database\Eloquent\Relations\Relation
+	 */
+	public function relate($relationship)
+	{
+		$this->relationToParent = $relationship;
+
+		return $this;
+	}
 
 	/**
 	 * Get the relationship for eager loading.
