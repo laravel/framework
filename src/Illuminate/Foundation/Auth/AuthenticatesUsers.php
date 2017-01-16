@@ -160,10 +160,11 @@ trait AuthenticatesUsers
     /**
      * Get the guard to be used during authentication.
      *
+     * @param  string  $name
      * @return \Illuminate\Contracts\Auth\StatefulGuard
      */
-    protected function guard()
+    protected function guard($name = null)
     {
-        return Auth::guard();
+        return Auth::guard($name);
     }
 }
