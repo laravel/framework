@@ -20,7 +20,7 @@
 - Added names to password reset routes ([#16988](https://github.com/laravel/framework/pull/16988))
 - Stopped touching the user timestamp when updating the `remember_token` ([#17135](https://github.com/laravel/framework/pull/17135))
 
-## Authorization
+### Authorization
 - Consider interfaces and extended classes in `Gate::resolvePolicyCallback()` ([#15757](https://github.com/laravel/framework/pull/15757))
 
 ### Blade
