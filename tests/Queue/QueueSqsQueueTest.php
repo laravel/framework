@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Queue;
+
 use Aws\Result;
 use Mockery as m;
 use Aws\Sqs\SqsClient;
@@ -58,7 +60,7 @@ class QueueSqsQueueTest extends TestCase
 
     public function testDelayedPushWithDateTimeProperlyPushesJobOntoSqs()
     {
-        $now = Carbon\Carbon::now();
+        $now = \Carbon\Carbon::now();
         $queue = $this->getMockBuilder('Illuminate\Queue\SqsQueue')->setMethods(['createPayload', 'secondsUntil', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
         $queue->expects($this->once())->method('createPayload')->with($this->mockedJob, $this->mockedData)->will($this->returnValue($this->mockedPayload));
         $queue->expects($this->once())->method('secondsUntil')->with($now)->will($this->returnValue(5));
@@ -91,7 +93,7 @@ class QueueSqsQueueTest extends TestCase
 
     public function testGetQueueProperlyResolvesUrlWithPrefix()
     {
-        $queue = new Illuminate\Queue\SqsQueue($this->sqs, $this->queueName, $this->prefix);
+        $queue = new \Illuminate\Queue\SqsQueue($this->sqs, $this->queueName, $this->prefix);
         $this->assertEquals($this->queueUrl, $queue->getQueue(null));
         $queueUrl = $this->baseUrl.'/'.$this->account.'/test';
         $this->assertEquals($queueUrl, $queue->getQueue('test'));
@@ -99,7 +101,7 @@ class QueueSqsQueueTest extends TestCase
 
     public function testGetQueueProperlyResolvesUrlWithoutPrefix()
     {
-        $queue = new Illuminate\Queue\SqsQueue($this->sqs, $this->queueUrl);
+        $queue = new \Illuminate\Queue\SqsQueue($this->sqs, $this->queueUrl);
         $this->assertEquals($this->queueUrl, $queue->getQueue(null));
         $queueUrl = $this->baseUrl.'/'.$this->account.'/test';
         $this->assertEquals($queueUrl, $queue->getQueue($queueUrl));

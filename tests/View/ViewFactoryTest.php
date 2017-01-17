@@ -1,8 +1,11 @@
 <?php
 
+namespace Illuminate\Tests\View;
+
 use Mockery as m;
 use Illuminate\View\Factory;
 use PHPUnit\Framework\TestCase;
+use ReflectionFunction;
 
 class ViewFactoryTest extends TestCase
 {
@@ -19,7 +22,7 @@ class ViewFactoryTest extends TestCase
         $factory->getFinder()->shouldReceive('find')->once()->with('view')->andReturn('path.php');
         $factory->getEngineResolver()->shouldReceive('resolve')->once()->with('php')->andReturn($engine = m::mock('Illuminate\View\Engines\EngineInterface'));
         $factory->getFinder()->shouldReceive('addExtension')->once()->with('php');
-        $factory->setDispatcher(new Illuminate\Events\Dispatcher);
+        $factory->setDispatcher(new \Illuminate\Events\Dispatcher);
         $factory->creator('view', function ($view) {
             $_SERVER['__test.view'] = $view;
         });
@@ -210,7 +213,7 @@ class ViewFactoryTest extends TestCase
 
     public function testSectionExtending()
     {
-        $placeholder = Illuminate\View\Factory::parentPlaceholder();
+        $placeholder = \Illuminate\View\Factory::parentPlaceholder();
         $factory = $this->getFactory();
         $factory->startSection('foo');
         echo 'hi '.$placeholder;
@@ -223,7 +226,7 @@ class ViewFactoryTest extends TestCase
 
     public function testSectionMultipleExtending()
     {
-        $placeholder = Illuminate\View\Factory::parentPlaceholder();
+        $placeholder = \Illuminate\View\Factory::parentPlaceholder();
         $factory = $this->getFactory();
         $factory->startSection('foo');
         echo 'hello '.$placeholder.' nice to see you '.$placeholder;
@@ -241,7 +244,7 @@ class ViewFactoryTest extends TestCase
     {
         $factory = $this->getFactory();
         $factory->getFinder()->shouldReceive('find')->andReturn(__DIR__.'/fixtures/component.php');
-        $factory->getEngineResolver()->shouldReceive('resolve')->andReturn(new Illuminate\View\Engines\PhpEngine);
+        $factory->getEngineResolver()->shouldReceive('resolve')->andReturn(new \Illuminate\View\Engines\PhpEngine);
         $factory->getDispatcher()->shouldReceive('fire');
         $factory->startComponent('component', ['name' => 'Taylor']);
         $factory->slot('title');
@@ -254,7 +257,7 @@ class ViewFactoryTest extends TestCase
 
     public function testTranslation()
     {
-        $container = new Illuminate\Container\Container;
+        $container = new \Illuminate\Container\Container;
         $container->instance('translator', $translator = m::mock('StdClass'));
         $translator->shouldReceive('getFromJson')->with('Foo', ['name' => 'taylor'])->andReturn('Bar');
         $factory = $this->getFactory();
@@ -381,7 +384,7 @@ class ViewFactoryTest extends TestCase
      */
     public function testExceptionsInSectionsAreThrown()
     {
-        $engine = new Illuminate\View\Engines\CompilerEngine(m::mock('Illuminate\View\Compilers\CompilerInterface'));
+        $engine = new \Illuminate\View\Engines\CompilerEngine(m::mock('Illuminate\View\Compilers\CompilerInterface'));
         $engine->getCompiler()->shouldReceive('getCompiledPath')->andReturnUsing(function ($path) {
             return $path;
         });

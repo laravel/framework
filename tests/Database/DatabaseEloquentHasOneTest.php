@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Database;
+
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Collection;
@@ -185,7 +187,7 @@ class DatabaseEloquentHasOneTest extends TestCase
     }
 }
 
-class EloquentHasOneModelStub extends Illuminate\Database\Eloquent\Model
+class EloquentHasOneModelStub extends \Illuminate\Database\Eloquent\Model
 {
     public $foreign_key = 'foreign.value';
 }

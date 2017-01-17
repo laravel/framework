@@ -1,7 +1,10 @@
 <?php
 
+namespace Illuminate\Tests\Session;
+
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 class EncryptedSessionStoreTest extends TestCase
 {

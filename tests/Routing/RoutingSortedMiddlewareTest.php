@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Routing;
+
 use PHPUnit\Framework\TestCase;
 use Illuminate\Routing\SortedMiddleware;
 

@@ -1,12 +1,16 @@
 <?php
 
+namespace Illuminate\Tests\View;
+
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class ViewEngineResolverTest extends TestCase
 {
     public function testResolversMayBeResolved()
     {
-        $resolver = new Illuminate\View\Engines\EngineResolver;
+        $resolver = new \Illuminate\View\Engines\EngineResolver;
         $resolver->register('foo', function () {
             return new StdClass;
         });
@@ -20,7 +24,7 @@ class ViewEngineResolverTest extends TestCase
      */
     public function testResolverThrowsExceptionOnUnknownEngine()
     {
-        $resolver = new Illuminate\View\Engines\EngineResolver;
+        $resolver = new \Illuminate\View\Engines\EngineResolver;
         $resolver->resolve('foo');
     }
 }

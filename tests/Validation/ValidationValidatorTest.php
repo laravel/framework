@@ -1,5 +1,8 @@
 <?php
 
+namespace Illuminate\Tests\Validation;
+
+use DateTime;
 use Mockery as m;
 use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
@@ -31,7 +34,7 @@ class ValidationValidatorTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => 'bar', 'baz' => 'boom'], ['foo' => 'Same:baz']);
-        $v->setContainer(new Illuminate\Container\Container);
+        $v->setContainer(new \Illuminate\Container\Container);
         $v->after(function ($validator) {
             $_SERVER['__validator.after.test'] = true;
 
@@ -476,7 +479,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'Array']);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['foo' => new Symfony\Component\HttpFoundation\File\File('/tmp/foo', false)], ['foo' => 'Array']);
+        $v = new Validator($trans, ['foo' => new \Symfony\Component\HttpFoundation\File\File('/tmp/foo', false)], ['foo' => 'Array']);
         $this->assertFalse($v->passes());
     }
 
@@ -1956,7 +1959,7 @@ class ValidationValidatorTest extends TestCase
     public function testValidateFile()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $file = new Symfony\Component\HttpFoundation\File\UploadedFile(__FILE__, '', null, null, null, true);
+        $file = new \Symfony\Component\HttpFoundation\File\UploadedFile(__FILE__, '', null, null, null, true);
 
         $v = new Validator($trans, ['x' => '1'], ['x' => 'file']);
         $this->assertTrue($v->fails());
@@ -3117,22 +3120,22 @@ class ValidationValidatorTest extends TestCase
 
     public function testGetLeadingExplicitAttributePath()
     {
-        $this->assertEquals(null, Illuminate\Validation\ValidationData::getLeadingExplicitAttributePath('*.email'));
-        $this->assertEquals('foo', Illuminate\Validation\ValidationData::getLeadingExplicitAttributePath('foo.*'));
-        $this->assertEquals('foo.bar', Illuminate\Validation\ValidationData::getLeadingExplicitAttributePath('foo.bar.*.baz'));
-        $this->assertEquals('foo.bar.1', Illuminate\Validation\ValidationData::getLeadingExplicitAttributePath('foo.bar.1'));
+        $this->assertEquals(null, \Illuminate\Validation\ValidationData::getLeadingExplicitAttributePath('*.email'));
+        $this->assertEquals('foo', \Illuminate\Validation\ValidationData::getLeadingExplicitAttributePath('foo.*'));
+        $this->assertEquals('foo.bar', \Illuminate\Validation\ValidationData::getLeadingExplicitAttributePath('foo.bar.*.baz'));
+        $this->assertEquals('foo.bar.1', \Illuminate\Validation\ValidationData::getLeadingExplicitAttributePath('foo.bar.1'));
     }
 
     public function testExtractDataFromPath()
     {
         $data = [['email' => 'mail'], ['email' => 'mail2']];
-        $this->assertEquals([['email' => 'mail'], ['email' => 'mail2']], Illuminate\Validation\ValidationData::extractDataFromPath(null, $data));
+        $this->assertEquals([['email' => 'mail'], ['email' => 'mail2']], \Illuminate\Validation\ValidationData::extractDataFromPath(null, $data));
 
         $data = ['cat' => ['cat1' => ['name']], ['cat2' => ['name2']]];
-        $this->assertEquals(['cat' => ['cat1' => ['name']]], Illuminate\Validation\ValidationData::extractDataFromPath('cat.cat1', $data));
+        $this->assertEquals(['cat' => ['cat1' => ['name']]], \Illuminate\Validation\ValidationData::extractDataFromPath('cat.cat1', $data));
 
         $data = ['cat' => ['cat1' => ['name' => '1', 'price' => 1]], ['cat2' => ['name' => 2]]];
-        $this->assertEquals(['cat' => ['cat1' => ['name' => '1']]], Illuminate\Validation\ValidationData::extractDataFromPath('cat.cat1.name', $data));
+        $this->assertEquals(['cat' => ['cat1' => ['name' => '1']]], \Illuminate\Validation\ValidationData::extractDataFromPath('cat.cat1.name', $data));
     }
 
     public function testInlineMessagesMayUseAsteriskForEachRules()
@@ -3253,8 +3256,8 @@ class ValidationValidatorTest extends TestCase
 
     public function getIlluminateArrayTranslator()
     {
-        return new Illuminate\Translation\Translator(
-            new Illuminate\Translation\ArrayLoader, 'en'
+        return new \Illuminate\Translation\Translator(
+            new \Illuminate\Translation\ArrayLoader, 'en'
         );
     }
 }

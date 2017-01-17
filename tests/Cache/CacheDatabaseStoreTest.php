@@ -1,5 +1,8 @@
 <?php
 
+namespace Illuminate\Tests\Cache;
+
+use Exception;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\DatabaseStore;

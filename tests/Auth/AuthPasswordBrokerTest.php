@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Auth;
+
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\Auth\PasswordBroker;
@@ -134,7 +136,7 @@ class AuthPasswordBrokerTest extends TestCase
 
     protected function getBroker($mocks)
     {
-        return new Illuminate\Auth\Passwords\PasswordBroker($mocks['tokens'], $mocks['users'], $mocks['mailer'], $mocks['view']);
+        return new \Illuminate\Auth\Passwords\PasswordBroker($mocks['tokens'], $mocks['users'], $mocks['mailer'], $mocks['view']);
     }
 
     protected function getMocks()
