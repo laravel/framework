@@ -2,6 +2,8 @@
 
 namespace Illuminate\Support\Facades;
 
+use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactoryContract;
+
 /**
  * @see \Illuminate\Contracts\Broadcasting\Factory
  */
@@ -14,6 +16,6 @@ class Broadcast extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return 'Illuminate\Contracts\Broadcasting\Factory';
+        return BroadcastingFactoryContract::class;
     }
 }
