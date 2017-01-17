@@ -116,7 +116,7 @@ class MailChannel
     {
         $this->addSender($mailMessage, $message);
 
-        $mailMessage->bcc($this->getRecipients($notifiable, $message));
+        $mailMessage->to($this->getRecipients($notifiable, $message));
     }
 
     /**

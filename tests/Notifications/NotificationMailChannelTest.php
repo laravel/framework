@@ -70,7 +70,7 @@ class NotificationMailChannelTest extends TestCase
 
             $mock->shouldReceive('subject')->once()->with('test subject');
 
-            $mock->shouldReceive('bcc')->once()->with(['taylor@laravel.com']);
+            $mock->shouldReceive('to')->once()->with(['taylor@laravel.com']);
 
             $mock->shouldReceive('from')->never();
 
@@ -109,7 +109,7 @@ class NotificationMailChannelTest extends TestCase
 
             $mock->shouldReceive('subject')->once()->with('Notification Mail Channel Test Notification No Subject');
 
-            $mock->shouldReceive('bcc')->once()->with(['taylor@laravel.com']);
+            $mock->shouldReceive('to')->once()->with(['taylor@laravel.com']);
 
             $closure($mock);
 
@@ -148,7 +148,7 @@ class NotificationMailChannelTest extends TestCase
 
             $mock->shouldReceive('to')->never();
 
-            $mock->shouldReceive('bcc')->with(['taylor@laravel.com', 'jeffrey@laracasts.com']);
+            $mock->shouldReceive('to')->with(['taylor@laravel.com', 'jeffrey@laracasts.com']);
 
             $closure($mock);
 
@@ -185,7 +185,7 @@ class NotificationMailChannelTest extends TestCase
 
             $mock->shouldReceive('subject')->once();
 
-            $mock->shouldReceive('bcc')->once();
+            $mock->shouldReceive('to')->once();
 
             $mock->shouldReceive('from')->with('test@mail.com', 'Test Man');
 
@@ -224,7 +224,7 @@ class NotificationMailChannelTest extends TestCase
 
             $mock->shouldReceive('subject')->once();
 
-            $mock->shouldReceive('bcc')->once();
+            $mock->shouldReceive('to')->once();
 
             $mock->shouldReceive('from')->with('test@mail.com', null);
 
@@ -263,7 +263,7 @@ class NotificationMailChannelTest extends TestCase
 
             $mock->shouldReceive('subject')->once();
 
-            $mock->shouldReceive('bcc')->once();
+            $mock->shouldReceive('to')->once();
 
             $mock->shouldReceive('replyTo')->with('test@mail.com', 'Test Man');
 
@@ -302,7 +302,7 @@ class NotificationMailChannelTest extends TestCase
 
             $mock->shouldReceive('subject')->once();
 
-            $mock->shouldReceive('bcc')->once();
+            $mock->shouldReceive('to')->once();
 
             $mock->shouldReceive('replyTo')->with('test@mail.com', null);
 
@@ -341,7 +341,7 @@ class NotificationMailChannelTest extends TestCase
 
             $mock->shouldReceive('subject')->once();
 
-            $mock->shouldReceive('bcc')->once()->with(['taylor@laravel.com']);
+            $mock->shouldReceive('to')->once()->with(['taylor@laravel.com']);
 
             $mock->shouldReceive('setPriority')->once()->with(1);
 
