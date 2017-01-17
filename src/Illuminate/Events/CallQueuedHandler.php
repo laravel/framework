@@ -3,6 +3,7 @@
 namespace Illuminate\Events;
 
 use Illuminate\Contracts\Queue\Job;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Container\Container;
 
 class CallQueuedHandler
@@ -56,7 +57,7 @@ class CallQueuedHandler
      */
     protected function setJobInstanceIfNecessary(Job $job, $instance)
     {
-        if (in_array('Illuminate\Queue\InteractsWithQueue', class_uses_recursive(get_class($instance)))) {
+        if (in_array(InteractsWithQueue::class, class_uses_recursive(get_class($instance)))) {
             $instance->setJob($job);
         }
 

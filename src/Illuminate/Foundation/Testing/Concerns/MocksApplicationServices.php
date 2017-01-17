@@ -5,6 +5,8 @@ namespace Illuminate\Foundation\Testing\Concerns;
 use Mockery;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Bus\Dispatcher as BusDispatcherContract;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcherContract;
 use Illuminate\Contracts\Notifications\Dispatcher as NotificationDispatcher;
 
 trait MocksApplicationServices
@@ -98,7 +100,7 @@ trait MocksApplicationServices
      */
     protected function withoutEvents()
     {
-        $mock = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
+        $mock = Mockery::mock(EventsDispatcherContract::class);
 
         $mock->shouldReceive('fire')->andReturnUsing(function ($called) {
             $this->firedEvents[] = $called;
@@ -179,14 +181,14 @@ trait MocksApplicationServices
      */
     protected function withoutJobs()
     {
-        $mock = Mockery::mock('Illuminate\Contracts\Bus\Dispatcher');
+        $mock = Mockery::mock(BusDispatcherContract::class);
 
         $mock->shouldReceive('dispatch', 'dispatchNow')->andReturnUsing(function ($dispatched) {
             $this->dispatchedJobs[] = $dispatched;
         });
 
         $this->app->instance(
-            'Illuminate\Contracts\Bus\Dispatcher', $mock
+            BusDispatcherContract::class, $mock
         );
 
         return $this;
