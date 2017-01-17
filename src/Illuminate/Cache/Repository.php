@@ -281,4 +281,14 @@ class Repository implements ArrayAccess {
 		return call_user_func_array(array($this->store, $method), $parameters);
 	}
 
+    /**
+     * Clone cache repository instance.
+     *
+     * @return void
+     */
+    public function __clone()
+    {
+        $this->store = clone $this->store;
+	}
+
 }
