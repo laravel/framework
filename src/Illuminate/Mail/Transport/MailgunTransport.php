@@ -57,9 +57,11 @@ class MailgunTransport extends Transport
     {
         $this->beforeSendPerformed($message);
 
+        $to = $this->getTo($message);
+
         $message->setBcc([]);
 
-        $this->client->post($this->url, $this->payload($message));
+        $this->client->post($this->url, $this->payload($message, $to));
 
         $this->sendPerformed($message);
 
@@ -72,7 +74,7 @@ class MailgunTransport extends Transport
      * @param  \Swift_Mime_Message  $message
      * @return array
      */
-    protected function payload(Swift_Mime_Message $message)
+    protected function payload(Swift_Mime_Message $message, $to)
     {
         return [
             'auth' => [
@@ -82,7 +84,7 @@ class MailgunTransport extends Transport
             'multipart' => [
                 [
                     'name' => 'to',
-                    'contents' => $this->getTo($message),
+                    'contents' => $to,
                 ],
                 [
                     'name' => 'message',
