@@ -2,6 +2,8 @@
 
 namespace Illuminate\Support\Facades;
 
+use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
+
 /**
  * @see \Illuminate\Contracts\Routing\ResponseFactory
  */
@@ -14,6 +16,6 @@ class Response extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return 'Illuminate\Contracts\Routing\ResponseFactory';
+        return ResponseFactoryContract::class;
     }
 }

@@ -7,6 +7,7 @@ use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Cache\Factory as FactoryContract;
+use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 
 class CacheManager implements FactoryContract
 {
@@ -223,9 +224,9 @@ class CacheManager implements FactoryContract
     {
         $repository = new Repository($store);
 
-        if ($this->app->bound('Illuminate\Contracts\Events\Dispatcher')) {
+        if ($this->app->bound(DispatcherContract::class)) {
             $repository->setEventDispatcher(
-                $this->app['Illuminate\Contracts\Events\Dispatcher']
+                $this->app[DispatcherContract::class]
             );
         }
 

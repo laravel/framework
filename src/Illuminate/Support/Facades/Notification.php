@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support\Facades;
 
+use Illuminate\Notifications\ChannelManager;
 use Illuminate\Support\Testing\Fakes\NotificationFake;
 
 /**
@@ -26,6 +27,6 @@ class Notification extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return 'Illuminate\Notifications\ChannelManager';
+        return ChannelManager::class;
     }
 }

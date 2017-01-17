@@ -2,6 +2,8 @@
 
 namespace Illuminate\Support\Facades;
 
+use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
+
 /**
  * @method static int handle(\Symfony\Component\Console\Input\InputInterface $input, \Symfony\Component\Console\Output\OutputInterface $output = null)
  * @method static int call(string $command, array $parameters = [])
@@ -20,6 +22,6 @@ class Artisan extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return 'Illuminate\Contracts\Console\Kernel';
+        return ConsoleKernelContract::class;
     }
 }

@@ -25,6 +25,7 @@ use Illuminate\Session\Console\SessionTableCommand;
 use Illuminate\Foundation\Console\PolicyMakeCommand;
 use Illuminate\Foundation\Console\RouteCacheCommand;
 use Illuminate\Foundation\Console\RouteClearCommand;
+use Illuminate\Console\Scheduling\ScheduleRunCommand;
 use Illuminate\Foundation\Console\ConfigCacheCommand;
 use Illuminate\Foundation\Console\ConfigClearCommand;
 use Illuminate\Foundation\Console\ConsoleMakeCommand;
@@ -39,6 +40,7 @@ use Illuminate\Foundation\Console\ProviderMakeCommand;
 use Illuminate\Foundation\Console\ClearCompiledCommand;
 use Illuminate\Foundation\Console\EventGenerateCommand;
 use Illuminate\Foundation\Console\VendorPublishCommand;
+use Illuminate\Console\Scheduling\ScheduleFinishCommand;
 use Illuminate\Database\Console\Seeds\SeederMakeCommand;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
 use Illuminate\Foundation\Console\NotificationMakeCommand;
@@ -101,8 +103,8 @@ class ArtisanServiceProvider extends ServiceProvider
         'RouteClear' => 'command.route.clear',
         'RouteList' => 'command.route.list',
         'Seed' => 'command.seed',
-        'ScheduleFinish' => 'Illuminate\Console\Scheduling\ScheduleFinishCommand',
-        'ScheduleRun' => 'Illuminate\Console\Scheduling\ScheduleRunCommand',
+        'ScheduleFinish' => ScheduleFinishCommand::class,
+        'ScheduleRun' => ScheduleRunCommand::class,
         'StorageLink' => 'command.storage.link',
         'Up' => 'command.up',
         'ViewClear' => 'command.view.clear',
@@ -758,7 +760,7 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerScheduleFinishCommand()
     {
-        $this->app->singleton('Illuminate\Console\Scheduling\ScheduleFinishCommand');
+        $this->app->singleton(ScheduleFinishCommand::class);
     }
 
     /**
@@ -768,7 +770,7 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerScheduleRunCommand()
     {
-        $this->app->singleton('Illuminate\Console\Scheduling\ScheduleRunCommand');
+        $this->app->singleton(ScheduleRunCommand::class);
     }
 
     /**
