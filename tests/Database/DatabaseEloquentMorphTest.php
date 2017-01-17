@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Database;
+
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Model;
@@ -233,6 +235,6 @@ class DatabaseEloquentMorphTest extends TestCase
     }
 }
 
-class EloquentMorphResetModelStub extends Illuminate\Database\Eloquent\Model
+class EloquentMorphResetModelStub extends \Illuminate\Database\Eloquent\Model
 {
 }

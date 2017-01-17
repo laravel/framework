@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Routing;
+
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Routing\Redirector;

@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Database;
+
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -69,8 +71,4 @@ class DatabaseMigrationCreatorTest extends TestCase
 
         return $this->getMockBuilder('Illuminate\Database\Migrations\MigrationCreator')->setMethods(['getDatePrefix'])->setConstructorArgs([$files])->getMock();
     }
-}
-
-class MigrationCreatorFakeMigration
-{
 }

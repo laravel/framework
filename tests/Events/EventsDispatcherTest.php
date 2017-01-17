@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Events;
+
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Events\Dispatcher;
@@ -172,7 +174,7 @@ class EventsDispatcherTest extends TestCase
         $queue->shouldReceive('connection')->once()->with(null)->andReturnSelf();
 
         $queue->shouldReceive('pushOn')->once()->with(null, 'Illuminate\Events\CallQueuedHandler@call', [
-            'class' => 'TestDispatcherQueuedHandler',
+            'class' => 'Illuminate\Tests\Events\TestDispatcherQueuedHandler',
             'method' => 'someMethod',
             'data' => serialize(['foo', 'bar']),
         ]);
@@ -181,7 +183,7 @@ class EventsDispatcherTest extends TestCase
             return $queue;
         });
 
-        $d->listen('some.event', 'TestDispatcherQueuedHandler@someMethod');
+        $d->listen('some.event', 'Illuminate\Tests\Events\TestDispatcherQueuedHandler@someMethod');
         $d->fire('some.event', ['foo', 'bar']);
     }
 
@@ -190,7 +192,7 @@ class EventsDispatcherTest extends TestCase
         $d = new Dispatcher;
         $queue = m::mock('Illuminate\Contracts\Queue\Queue');
         $queue->shouldReceive('push')->once()->with('Illuminate\Events\CallQueuedHandler@call', [
-            'class' => 'TestDispatcherQueuedHandlerCustomQueue',
+            'class' => 'Illuminate\Tests\Events\TestDispatcherQueuedHandlerCustomQueue',
             'method' => 'someMethod',
             'data' => serialize(['foo', 'bar']),
         ]);
@@ -198,7 +200,7 @@ class EventsDispatcherTest extends TestCase
             return $queue;
         });
 
-        $d->listen('some.event', 'TestDispatcherQueuedHandlerCustomQueue@someMethod');
+        $d->listen('some.event', 'Illuminate\Tests\Events\TestDispatcherQueuedHandlerCustomQueue@someMethod');
         $d->fire('some.event', ['foo', 'bar']);
     }
 
@@ -206,7 +208,7 @@ class EventsDispatcherTest extends TestCase
     {
         unset($_SERVER['__event.test']);
         $d = new Dispatcher;
-        $d->listen('ExampleEvent', function () {
+        $d->listen('Illuminate\Tests\Events\ExampleEvent', function () {
             $_SERVER['__event.test'] = 'baz';
         });
         $d->fire(new ExampleEvent);
@@ -218,7 +220,7 @@ class EventsDispatcherTest extends TestCase
     {
         unset($_SERVER['__event.test']);
         $d = new Dispatcher;
-        $d->listen('SomeEventInterface', function () {
+        $d->listen('Illuminate\Tests\Events\SomeEventInterface', function () {
             $_SERVER['__event.test'] = 'bar';
         });
         $d->fire(new AnotherEvent);
@@ -230,10 +232,10 @@ class EventsDispatcherTest extends TestCase
     {
         unset($_SERVER['__event.test']);
         $d = new Dispatcher;
-        $d->listen('AnotherEvent', function () {
+        $d->listen('Illuminate\Tests\Events\AnotherEvent', function () {
             $_SERVER['__event.test1'] = 'fooo';
         });
-        $d->listen('SomeEventInterface', function () {
+        $d->listen('Illuminate\Tests\Events\SomeEventInterface', function () {
             $_SERVER['__event.test2'] = 'baar';
         });
         $d->fire(new AnotherEvent);
@@ -243,14 +245,14 @@ class EventsDispatcherTest extends TestCase
     }
 }
 
-class TestDispatcherQueuedHandler implements Illuminate\Contracts\Queue\ShouldQueue
+class TestDispatcherQueuedHandler implements \Illuminate\Contracts\Queue\ShouldQueue
 {
     public function handle()
     {
     }
 }
 
-class TestDispatcherQueuedHandlerCustomQueue implements Illuminate\Contracts\Queue\ShouldQueue
+class TestDispatcherQueuedHandlerCustomQueue implements \Illuminate\Contracts\Queue\ShouldQueue
 {
     public function handle()
     {

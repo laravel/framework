@@ -1,8 +1,12 @@
 <?php
 
+namespace Illuminate\Tests\Support;
+
+use ArrayAccess;
 use Mockery as m;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class SupportHelpersTest extends TestCase
 {
@@ -656,17 +660,17 @@ class SupportHelpersTest extends TestCase
     public function testClassUsesRecursiveShouldReturnTraitsOnParentClasses()
     {
         $this->assertEquals([
-            'SupportTestTraitOne' => 'SupportTestTraitOne',
-            'SupportTestTraitTwo' => 'SupportTestTraitTwo',
+            'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
+            'Illuminate\Tests\Support\SupportTestTraitTwo' => 'Illuminate\Tests\Support\SupportTestTraitTwo',
         ],
-        class_uses_recursive('SupportTestClassTwo'));
+        class_uses_recursive('Illuminate\Tests\Support\SupportTestClassTwo'));
     }
 
     public function testClassUsesRecursiveAcceptsObject()
     {
         $this->assertEquals([
-            'SupportTestTraitOne' => 'SupportTestTraitOne',
-            'SupportTestTraitTwo' => 'SupportTestTraitTwo',
+            'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
+            'Illuminate\Tests\Support\SupportTestTraitTwo' => 'Illuminate\Tests\Support\SupportTestTraitTwo',
         ],
         class_uses_recursive(new SupportTestClassTwo));
     }

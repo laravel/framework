@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Foundation;
+
 use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\AliasLoader;
 

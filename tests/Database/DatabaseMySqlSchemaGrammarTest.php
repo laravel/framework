@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Database;
+
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Schema\Blueprint;
@@ -385,7 +387,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table `users` add `foo` varchar(100) null default \'bar\'', $statements[0]);
 
         $blueprint = new Blueprint('users');
-        $blueprint->string('foo', 100)->nullable()->default(new Illuminate\Database\Query\Expression('CURRENT TIMESTAMP'));
+        $blueprint->string('foo', 100)->nullable()->default(new \Illuminate\Database\Query\Expression('CURRENT TIMESTAMP'));
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
@@ -734,6 +736,6 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
     public function getGrammar()
     {
-        return new Illuminate\Database\Schema\Grammars\MySqlGrammar;
+        return new \Illuminate\Database\Schema\Grammars\MySqlGrammar;
     }
 }

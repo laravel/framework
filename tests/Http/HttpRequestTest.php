@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Http;
+
 use Mockery as m;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
@@ -237,7 +239,7 @@ class HttpRequestTest extends TestCase
         $this->assertEquals('Taylor', $request['name']);
         $this->assertEquals('Bob', $request->input('foo', 'Bob'));
 
-        $request = Request::create('/', 'GET', [], [], ['file' => new Symfony\Component\HttpFoundation\File\UploadedFile(__FILE__, 'foo.php')]);
+        $request = Request::create('/', 'GET', [], [], ['file' => new \Symfony\Component\HttpFoundation\File\UploadedFile(__FILE__, 'foo.php')]);
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\File\UploadedFile', $request['file']);
     }
 

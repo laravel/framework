@@ -1,7 +1,11 @@
 <?php
 
+namespace Illuminate\Tests\Cache;
+
+use Memcached;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class CacheMemcachedConnectorTest extends TestCase
 {

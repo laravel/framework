@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Encryption;
+
 use PHPUnit\Framework\TestCase;
 use Illuminate\Encryption\Encrypter;
 

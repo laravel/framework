@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Cache;
+
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
@@ -104,7 +106,7 @@ class ClearCommandTest extends TestCase
 
     protected function runCommand($command, $input = [])
     {
-        return $command->run(new Symfony\Component\Console\Input\ArrayInput($input), new Symfony\Component\Console\Output\NullOutput);
+        return $command->run(new \Symfony\Component\Console\Input\ArrayInput($input), new \Symfony\Component\Console\Output\NullOutput);
     }
 }
 

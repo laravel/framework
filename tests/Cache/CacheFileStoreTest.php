@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Cache;
+
 use Illuminate\Cache\FileStore;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;

@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Pagination;
+
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Pagination\UrlWindow;

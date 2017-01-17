@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Console\Scheduling;
+
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Console\Scheduling\Event;

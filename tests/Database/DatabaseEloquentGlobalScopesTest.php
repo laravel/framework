@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Database;
+
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -107,7 +109,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
     }
 }
 
-class EloquentClosureGlobalScopesTestModel extends Illuminate\Database\Eloquent\Model
+class EloquentClosureGlobalScopesTestModel extends \Illuminate\Database\Eloquent\Model
 {
     protected $table = 'table';
 
@@ -161,7 +163,7 @@ class EloquentClosureGlobalScopesWithOrTestModel extends EloquentClosureGlobalSc
     }
 }
 
-class EloquentGlobalScopesTestModel extends Illuminate\Database\Eloquent\Model
+class EloquentGlobalScopesTestModel extends \Illuminate\Database\Eloquent\Model
 {
     protected $table = 'table';
 

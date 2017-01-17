@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Cookie\Middleware;
+
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Router;
@@ -39,8 +41,8 @@ class EncryptCookiesTest extends TestCase
     public function testSetCookieEncryption()
     {
         $this->router->get($this->setCookiePath, [
-            'middleware' => 'EncryptCookiesTestMiddleware',
-            'uses' => 'EncryptCookiesTestController@setCookies',
+            'middleware' => 'Illuminate\Tests\Cookie\Middleware\EncryptCookiesTestMiddleware',
+            'uses' => 'Illuminate\Tests\Cookie\Middleware\EncryptCookiesTestController@setCookies',
         ]);
 
         $response = $this->router->dispatch(Request::create($this->setCookiePath, 'GET'));
@@ -56,8 +58,8 @@ class EncryptCookiesTest extends TestCase
     public function testQueuedCookieEncryption()
     {
         $this->router->get($this->queueCookiePath, [
-            'middleware' => ['EncryptCookiesTestMiddleware', 'AddQueuedCookiesToResponseTestMiddleware'],
-            'uses' => 'EncryptCookiesTestController@queueCookies',
+            'middleware' => ['Illuminate\Tests\Cookie\Middleware\EncryptCookiesTestMiddleware', 'Illuminate\Tests\Cookie\Middleware\AddQueuedCookiesToResponseTestMiddleware'],
+            'uses' => 'Illuminate\Tests\Cookie\Middleware\EncryptCookiesTestController@queueCookies',
         ]);
 
         $response = $this->router->dispatch(Request::create($this->queueCookiePath, 'GET'));

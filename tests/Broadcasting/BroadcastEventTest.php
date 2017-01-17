@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Broadcasting;
+
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -15,7 +17,7 @@ class BroadcastEventTest extends TestCase
         $broadcaster = m::mock('Illuminate\Contracts\Broadcasting\Broadcaster');
 
         $broadcaster->shouldReceive('broadcast')->once()->with(
-            ['test-channel'], 'TestBroadcastEvent', ['firstName' => 'Taylor', 'lastName' => 'Otwell', 'collection' => ['foo' => 'bar']]
+            ['test-channel'], 'Illuminate\Tests\Broadcasting\TestBroadcastEvent', ['firstName' => 'Taylor', 'lastName' => 'Otwell', 'collection' => ['foo' => 'bar']]
         );
 
         $event = new TestBroadcastEvent;
@@ -25,7 +27,7 @@ class BroadcastEventTest extends TestCase
         $job = m::mock('Illuminate\Contracts\Queue\Job');
         $job->shouldReceive('delete')->once();
 
-        (new Illuminate\Broadcasting\BroadcastEvent($broadcaster))->fire($job, $jobData);
+        (new \Illuminate\Broadcasting\BroadcastEvent($broadcaster))->fire($job, $jobData);
     }
 
     public function testManualParameterSpecification()
@@ -33,7 +35,7 @@ class BroadcastEventTest extends TestCase
         $broadcaster = m::mock('Illuminate\Contracts\Broadcasting\Broadcaster');
 
         $broadcaster->shouldReceive('broadcast')->once()->with(
-            ['test-channel'], 'TestBroadcastEventWithManualData', ['name' => 'Taylor', 'socket' => null]
+            ['test-channel'], 'Illuminate\Tests\Broadcasting\TestBroadcastEventWithManualData', ['name' => 'Taylor', 'socket' => null]
         );
 
         $event = new TestBroadcastEventWithManualData;
@@ -43,7 +45,7 @@ class BroadcastEventTest extends TestCase
         $job = m::mock('Illuminate\Contracts\Queue\Job');
         $job->shouldReceive('delete')->once();
 
-        (new Illuminate\Broadcasting\BroadcastEvent($broadcaster))->fire($job, $jobData);
+        (new \Illuminate\Broadcasting\BroadcastEvent($broadcaster))->fire($job, $jobData);
     }
 }
 

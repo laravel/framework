@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Redis;
+
 use Illuminate\Redis\RedisManager;
 
 trait InteractsWithRedis
