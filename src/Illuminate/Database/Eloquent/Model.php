@@ -7,6 +7,7 @@ use ArrayAccess;
 use JsonSerializable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Fluent;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
@@ -937,6 +938,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function toArray()
     {
         return array_merge($this->attributesToArray(), $this->relationsToArray());
+    }
+
+    /**
+     * Transform each attribute in the model using a callback.
+     *
+     * @param  callable $callback
+     * @return \Illuminate\Support\Fluent
+     */
+    public function transform(callable $callback)
+    {
+        return new Fluent($callback($this));
     }
 
     /**
