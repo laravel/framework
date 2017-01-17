@@ -2,16 +2,16 @@
 
 namespace Illuminate\Tests\Support;
 
+use stdClass;
 use ArrayAccess;
-use JsonSerializable;
 use Mockery as m;
+use ReflectionClass;
+use JsonSerializable;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Collection;
+use PHPUnit_Framework_Error_Notice;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
-use PHPUnit_Framework_Error_Notice;
-use ReflectionClass;
-use stdClass;
 
 class SupportCollectionTest extends TestCase
 {

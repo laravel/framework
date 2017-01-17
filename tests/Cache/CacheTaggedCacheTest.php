@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Cache;
 
-use DateInterval;
 use DateTime;
+use DateInterval;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\ArrayStore;

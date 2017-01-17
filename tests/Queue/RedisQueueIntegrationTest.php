@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Queue;
 
-use Illuminate\Tests\Redis\InteractsWithRedis;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Queue\RedisQueue;
 use Illuminate\Container\Container;
 use Illuminate\Queue\Jobs\RedisJob;
+use Illuminate\Tests\Redis\InteractsWithRedis;
 
 class RedisQueueIntegrationTest extends TestCase
 {

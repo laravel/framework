@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Auth;
 
-use Illuminate\Auth\Passwords\DatabaseTokenRepository;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Auth\Passwords\DatabaseTokenRepository;
 
 class AuthDatabaseTokenRepositoryTest extends TestCase
 {
