@@ -50,6 +50,8 @@ class SparkPostTransport extends Transport
     {
         $this->beforeSendPerformed($message);
 
+        $recipients = $this->getRecipients($message);
+
         $message->setBcc([]);
 
         $this->client->post('https://api.sparkpost.com/api/v1/transmissions', [
@@ -57,7 +59,7 @@ class SparkPostTransport extends Transport
                 'Authorization' => $this->key,
             ],
             'json' => array_merge([
-                'recipients' => $this->getRecipients($message),
+                'recipients' => $recipients,
                 'content' => [
                     'email_rfc822' => $message->toString(),
                 ],
@@ -79,23 +81,19 @@ class SparkPostTransport extends Transport
      */
     protected function getRecipients(Swift_Mime_Message $message)
     {
-        $to = [];
+        $recipients = [];
 
-        if ($message->getTo()) {
-            $to = array_merge($to, array_keys($message->getTo()));
+        foreach ((array) $message->getTo() as $email => $name) {
+            $recipients[] = ['address' => compact('name', 'email')];
         }
 
-        if ($message->getCc()) {
-            $to = array_merge($to, array_keys($message->getCc()));
+        foreach ((array) $message->getCc() as $email => $name) {
+            $recipients[] = ['address' => compact('name', 'email')];
         }
 
-        if ($message->getBcc()) {
-            $to = array_merge($to, array_keys($message->getBcc()));
+        foreach ((array) $message->getBcc() as $email => $name) {
+            $recipients[] = ['address' => compact('name', 'email')];
         }
-
-        $recipients = array_map(function ($address) {
-            return compact('address');
-        }, $to);
 
         return $recipients;
     }
