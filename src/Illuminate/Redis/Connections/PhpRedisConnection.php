@@ -86,6 +86,6 @@ class PhpRedisConnection extends Connection
             return $this->proxyToEval($parameters);
         }
 
-        return $this->command($method, $parameters);
+        return parent::__call($method, $parameters);
     }
 }
