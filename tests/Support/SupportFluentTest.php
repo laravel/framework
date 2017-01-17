@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Support;
 
-use Illuminate\Support\Fluent;
-use IteratorAggregate;
-use PHPUnit\Framework\TestCase;
 use ReflectionObject;
+use IteratorAggregate;
+use Illuminate\Support\Fluent;
+use PHPUnit\Framework\TestCase;
 
 class SupportFluentTest extends TestCase
 {

@@ -3,11 +3,11 @@
 namespace Illuminate\Tests\Notifications;
 
 use Mockery;
+use stdClass;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\HtmlString;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\MailMessage;
-use stdClass;
 
 class NotificationMailChannelTest extends TestCase
 {

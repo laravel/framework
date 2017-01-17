@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Support;
 
+use stdClass;
 use ArrayAccess;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 class SupportFacadeTest extends TestCase
 {
