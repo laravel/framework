@@ -710,7 +710,7 @@ class Route
      */
     public function whereIn($name, array $array = [])
     {
-        foreach ($array as $value){
+        foreach ($array as $value) {
             $this->wheres[$name] = $value;
         }
 
