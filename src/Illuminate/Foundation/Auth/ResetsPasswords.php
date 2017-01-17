@@ -14,17 +14,26 @@ trait ResetsPasswords
     /**
      * Display the password reset view for the given token.
      *
-     * If no token is present, display the link request form.
-     *
      * @param  \Illuminate\Http\Request  $request
-     * @param  string|null  $token
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function showResetForm(Request $request, $token = null)
+    public function showResetForm(Request $request)
     {
-        return view('auth.passwords.reset')->with(
-            ['token' => $token, 'email' => $request->email]
-        );
+        $credentials = $request->only('email', 'expiration', 'token');
+
+        if (! ($user = $this->broker()->getUser($credentials))) {
+            $request->session()->flash('warning', trans(Password::INVALID_USER));
+        }
+
+        if (! $this->broker()->validateToken($user, $credentials)) {
+            $request->session()->flash('warning', trans(Password::INVALID_TOKEN));
+        }
+
+        if (! $this->broker()->validateTimestamp($credentials['expiration'])) {
+            $request->session()->flash('warning', trans(Password::EXPIRED_TOKEN));
+        }
+
+        return view('auth.passwords.reset')->with($credentials);
     }
 
     /**
@@ -64,6 +73,7 @@ trait ResetsPasswords
         return [
             'token' => 'required',
             'email' => 'required|email',
+            'expiration' => 'required|date_format:U',
             'password' => 'required|confirmed|min:6',
         ];
     }
@@ -87,7 +97,7 @@ trait ResetsPasswords
     protected function credentials(Request $request)
     {
         return $request->only(
-            'email', 'password', 'password_confirmation', 'token'
+            'email', 'expiration', 'token', 'password', 'password_confirmation'
         );
     }
 
@@ -116,8 +126,7 @@ trait ResetsPasswords
      */
     protected function sendResetResponse($response)
     {
-        return redirect($this->redirectPath())
-                            ->with('status', trans($response));
+        return redirect($this->redirectPath())->with('status', trans($response));
     }
 
     /**
@@ -129,9 +138,7 @@ trait ResetsPasswords
      */
     protected function sendResetFailedResponse(Request $request, $response)
     {
-        return redirect()->back()
-                    ->withInput($request->only('email'))
-                    ->withErrors(['email' => trans($response)]);
+        return redirect()->back()->with('warning', trans($response));
     }
 
     /**

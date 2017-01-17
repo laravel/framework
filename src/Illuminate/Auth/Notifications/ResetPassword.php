@@ -15,14 +15,23 @@ class ResetPassword extends Notification
     public $token;
 
     /**
+     * The password reset expiration date.
+     *
+     * @var int
+     */
+    public $expiration;
+
+    /**
      * Create a notification instance.
      *
      * @param  string  $token
+     * @param  int  $expiration
      * @return void
      */
-    public function __construct($token)
+    public function __construct($token, $expiration)
     {
         $this->token = $token;
+        $this->expiration = $expiration;
     }
 
     /**
@@ -44,9 +53,12 @@ class ResetPassword extends Notification
      */
     public function toMail($notifiable)
     {
+        $email = $notifiable->getEmailForPasswordReset();
+        $link = url("password/reset?email={$email}&expiration={$this->expiration}&token={$this->token}");
+
         return (new MailMessage)
             ->line('You are receiving this email because we received a password reset request for your account.')
-            ->action('Reset Password', url('password/reset', $this->token))
+            ->action('Reset Password', $link)
             ->line('If you did not request a password reset, no further action is required.');
     }
 }
