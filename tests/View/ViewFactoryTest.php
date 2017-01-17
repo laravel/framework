@@ -3,9 +3,9 @@
 namespace Illuminate\Tests\View;
 
 use Mockery as m;
+use ReflectionFunction;
 use Illuminate\View\Factory;
 use PHPUnit\Framework\TestCase;
-use ReflectionFunction;
 
 class ViewFactoryTest extends TestCase
 {

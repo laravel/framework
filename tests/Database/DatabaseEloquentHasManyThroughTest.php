@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Database;
 
+use stdClass;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-use stdClass;
 
 class DatabaseEloquentHasManyThroughTest extends TestCase
 {

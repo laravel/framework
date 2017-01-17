@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Support;
 
+use stdClass;
 use ArrayObject;
 use Illuminate\Support\Arr;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Collection;
-use stdClass;
 
 class SupportArrTest extends TestCase
 {

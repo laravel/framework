@@ -3,10 +3,10 @@
 namespace Illuminate\Tests\Notifications;
 
 use Mockery;
+use stdClass;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Notifications\Dispatcher;
-use stdClass;
 
 class NotificationRoutesNotificationsTest extends TestCase
 {
