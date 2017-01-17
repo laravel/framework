@@ -555,7 +555,7 @@ if (! function_exists('mix')) {
      * @param  string  $path
      * @return \Illuminate\Support\HtmlString
      *
-     * @throws \InvalidArgumentException
+     * @throws \Exception
      */
     function mix($path)
     {
