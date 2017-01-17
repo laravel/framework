@@ -755,6 +755,10 @@ class Validator implements ValidatorContract
             $this->rules, $response->rules
         );
 
+        $this->rules = array_combine(
+            array_keys($response->rules), $this->rules
+        );
+
         $this->implicitAttributes = array_merge(
             $this->implicitAttributes, $response->implicitAttributes
         );
