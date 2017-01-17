@@ -48,9 +48,15 @@ trait ThrottlesLogins
 
         $message = Lang::get('auth.throttle', ['seconds' => $seconds]);
 
+        $errors = [$this->username() => $message];
+
+        if ($request->expectsJson()) {
+            return response()->json($errors, 423);
+        }
+
         return redirect()->back()
             ->withInput($request->only($this->username(), 'remember'))
-            ->withErrors([$this->username() => $message]);
+            ->withErrors($errors);
     }
 
     /**
