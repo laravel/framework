@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Auth;
+
 use Mockery as m;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
@@ -12,6 +14,7 @@ use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Contracts\Auth\Factory as Auth;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
+use stdClass;
 
 class AuthorizeMiddlewareTest extends TestCase
 {
@@ -52,7 +55,7 @@ class AuthorizeMiddlewareTest extends TestCase
     }
 
     /**
-     * @expectedException Illuminate\Auth\Access\AuthorizationException
+     * @expectedException \Illuminate\Auth\Access\AuthorizationException
      */
     public function testSimpleAbilityUnauthorized()
     {
@@ -91,7 +94,7 @@ class AuthorizeMiddlewareTest extends TestCase
     }
 
     /**
-     * @expectedException Illuminate\Auth\Access\AuthorizationException
+     * @expectedException \Illuminate\Auth\Access\AuthorizationException
      */
     public function testModelTypeUnauthorized()
     {
@@ -132,7 +135,7 @@ class AuthorizeMiddlewareTest extends TestCase
     }
 
     /**
-     * @expectedException Illuminate\Auth\Access\AuthorizationException
+     * @expectedException \Illuminate\Auth\Access\AuthorizationException
      */
     public function testModelUnauthorized()
     {

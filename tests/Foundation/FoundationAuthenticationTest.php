@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Foundation;
+
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Auth\AuthManager;

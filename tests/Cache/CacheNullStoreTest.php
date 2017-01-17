@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Cache;
+
 use Illuminate\Cache\NullStore;
 use PHPUnit\Framework\TestCase;
 

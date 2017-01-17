@@ -1,18 +1,20 @@
 <?php
 
+namespace Illuminate\Tests\Mail;
+
 use PHPUnit\Framework\TestCase;
 
 class MailMarkdownTest extends TestCase
 {
     public function tearDown()
     {
-        Mockery::close();
+        \Mockery::close();
     }
 
     public function testRenderFunctionReturnsHtml()
     {
-        $viewFactory = Mockery::mock('Illuminate\View\Factory');
-        $markdown = new Illuminate\Mail\Markdown($viewFactory);
+        $viewFactory = \Mockery::mock('Illuminate\View\Factory');
+        $markdown = new \Illuminate\Mail\Markdown($viewFactory);
         $viewFactory->shouldReceive('flushFinderCache')->once();
         $viewFactory->shouldReceive('replaceNamespace')->once()->with('mail', $markdown->htmlComponentPaths())->andReturnSelf();
         $viewFactory->shouldReceive('make')->with('view', [])->andReturnSelf();
@@ -26,8 +28,8 @@ class MailMarkdownTest extends TestCase
 
     public function testRenderTextReturnsText()
     {
-        $viewFactory = Mockery::mock('Illuminate\View\Factory');
-        $markdown = new Illuminate\Mail\Markdown($viewFactory);
+        $viewFactory = \Mockery::mock('Illuminate\View\Factory');
+        $markdown = new \Illuminate\Mail\Markdown($viewFactory);
         $viewFactory->shouldReceive('flushFinderCache')->once();
         $viewFactory->shouldReceive('replaceNamespace')->once()->with('mail', $markdown->markdownComponentPaths())->andReturnSelf();
         $viewFactory->shouldReceive('make')->with('view', [])->andReturnSelf();
@@ -40,8 +42,8 @@ class MailMarkdownTest extends TestCase
 
     public function testParseReturnsParsedMarkdown()
     {
-        $viewFactory = Mockery::mock('Illuminate\View\Factory');
-        $markdown = new Illuminate\Mail\Markdown($viewFactory);
+        $viewFactory = \Mockery::mock('Illuminate\View\Factory');
+        $markdown = new \Illuminate\Mail\Markdown($viewFactory);
 
         $result = $markdown->parse('# Something');
 

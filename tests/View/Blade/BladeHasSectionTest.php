@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Blade;
+
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\View\Compilers\BladeCompiler;

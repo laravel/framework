@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Foundation;
+
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -57,7 +59,7 @@ class FoundationProviderRepositoryTest extends TestCase
 
     public function testShouldRecompileReturnsCorrectValue()
     {
-        $repo = new Illuminate\Foundation\ProviderRepository(m::mock('Illuminate\Contracts\Foundation\Application'), new Illuminate\Filesystem\Filesystem, __DIR__.'/services.php');
+        $repo = new \Illuminate\Foundation\ProviderRepository(m::mock('Illuminate\Contracts\Foundation\Application'), new \Illuminate\Filesystem\Filesystem, __DIR__.'/services.php');
         $this->assertTrue($repo->shouldRecompile(null, []));
         $this->assertTrue($repo->shouldRecompile(['providers' => ['foo']], ['foo', 'bar']));
         $this->assertFalse($repo->shouldRecompile(['providers' => ['foo']], ['foo']));
@@ -65,7 +67,7 @@ class FoundationProviderRepositoryTest extends TestCase
 
     public function testLoadManifestReturnsParsedJSON()
     {
-        $repo = new Illuminate\Foundation\ProviderRepository(m::mock('Illuminate\Contracts\Foundation\Application'), $files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__.'/services.php');
+        $repo = new \Illuminate\Foundation\ProviderRepository(m::mock('Illuminate\Contracts\Foundation\Application'), $files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__.'/services.php');
         $files->shouldReceive('exists')->once()->with(__DIR__.'/services.php')->andReturn(true);
         $files->shouldReceive('getRequire')->once()->with(__DIR__.'/services.php')->andReturn($array = ['users' => ['dayle' => true], 'when' => []]);
 
@@ -74,7 +76,7 @@ class FoundationProviderRepositoryTest extends TestCase
 
     public function testWriteManifestStoresToProperLocation()
     {
-        $repo = new Illuminate\Foundation\ProviderRepository(m::mock('Illuminate\Contracts\Foundation\Application'), $files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__.'/services.php');
+        $repo = new \Illuminate\Foundation\ProviderRepository(m::mock('Illuminate\Contracts\Foundation\Application'), $files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__.'/services.php');
         $files->shouldReceive('put')->once()->with(__DIR__.'/services.php', '<?php return '.var_export(['foo'], true).';');
 
         $result = $repo->writeManifest(['foo']);

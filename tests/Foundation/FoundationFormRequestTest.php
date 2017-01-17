@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Foundation;
+
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
@@ -30,7 +32,7 @@ class FoundationFormRequestTest extends TestCase
      */
     public function testValidateFunctionThrowsValidationExceptionIfValidationFails()
     {
-        $request = m::mock('FoundationTestFormRequestStub[response]');
+        $request = m::mock('Illuminate\Tests\Foundation\FoundationTestFormRequestStub[response]');
         $request->initialize(['name' => null]);
         $request->setContainer($container = new Container);
         $factory = m::mock('Illuminate\Validation\Factory');
@@ -41,7 +43,7 @@ class FoundationFormRequestTest extends TestCase
         $validator->shouldReceive('passes')->once()->andReturn(false);
         $validator->shouldReceive('getMessageBag')->once()->andReturn($messages = m::mock('Illuminate\Support\MessageBag'));
         $messages->shouldReceive('toArray')->once()->andReturn(['name' => ['Name required']]);
-        $request->shouldReceive('response')->once()->andReturn(new Illuminate\Http\Response);
+        $request->shouldReceive('response')->once()->andReturn(new \Illuminate\Http\Response);
 
         $request->validate($factory);
     }
@@ -51,7 +53,7 @@ class FoundationFormRequestTest extends TestCase
      */
     public function testValidateFunctionThrowsHttpResponseExceptionIfAuthorizationFails()
     {
-        $request = m::mock('FoundationTestFormRequestForbiddenStub[forbiddenResponse]');
+        $request = m::mock('Illuminate\Tests\Foundation\FoundationTestFormRequestForbiddenStub[forbiddenResponse]');
         $request->initialize(['name' => null]);
         $request->setContainer($container = new Container);
         $factory = m::mock('Illuminate\Validation\Factory');
@@ -92,7 +94,7 @@ class FoundationFormRequestTest extends TestCase
     }
 }
 
-class FoundationTestFormRequestStub extends Illuminate\Foundation\Http\FormRequest
+class FoundationTestFormRequestStub extends \Illuminate\Foundation\Http\FormRequest
 {
     public function rules()
     {
@@ -105,7 +107,7 @@ class FoundationTestFormRequestStub extends Illuminate\Foundation\Http\FormReque
     }
 }
 
-class FoundationTestFormRequestForbiddenStub extends Illuminate\Foundation\Http\FormRequest
+class FoundationTestFormRequestForbiddenStub extends \Illuminate\Foundation\Http\FormRequest
 {
     public function rules()
     {
@@ -117,7 +119,7 @@ class FoundationTestFormRequestForbiddenStub extends Illuminate\Foundation\Http\
         return false;
     }
 }
-class FoundationTestFormRequestHooks extends Illuminate\Foundation\Http\FormRequest
+class FoundationTestFormRequestHooks extends \Illuminate\Foundation\Http\FormRequest
 {
     public function rules()
     {

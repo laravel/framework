@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Support;
+
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\HtmlString;
 

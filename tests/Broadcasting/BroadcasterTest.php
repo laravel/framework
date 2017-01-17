@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Broadcasting;
+
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;

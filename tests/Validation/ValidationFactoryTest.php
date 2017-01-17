@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Validation;
+
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Validation\Factory;

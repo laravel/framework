@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Cache;
+
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\Events\CacheHit;

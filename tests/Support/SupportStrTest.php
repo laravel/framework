@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Support;
+
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 

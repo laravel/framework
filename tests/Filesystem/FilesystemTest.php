@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Filesystem;
+
 use PHPUnit\Framework\TestCase;
 use Illuminate\Filesystem\Filesystem;
 
@@ -188,7 +190,7 @@ class FilesystemTest extends TestCase
     }
 
     /**
-     * @expectedException Illuminate\Contracts\Filesystem\FileNotFoundException
+     * @expectedException \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     public function testGetThrowsExceptionNonexisitingFile()
     {
@@ -204,7 +206,7 @@ class FilesystemTest extends TestCase
     }
 
     /**
-     * @expectedException Illuminate\Contracts\Filesystem\FileNotFoundException
+     * @expectedException \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     public function testGetRequireThrowsExceptionNonexisitingFile()
     {
