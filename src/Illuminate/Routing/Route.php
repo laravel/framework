@@ -700,6 +700,22 @@ class Route
 
         return $this;
     }
+    
+    /**
+     * Search if one of route parameters value in given array.
+     * 
+     * @param $name
+     * @param array $array
+     * @return $this
+     */
+    public function whereIn($name, array $array = [])
+    {
+        foreach ($array as $value){
+            $this->wheres[$name] = $value;
+        }
+
+        return $this;
+    }
 
     /**
      * Parse arguments to the where method into an array.
