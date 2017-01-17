@@ -4,8 +4,8 @@ namespace Illuminate\Tests\Cache;
 
 use Memcached;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use PHPUnit\Framework\TestCase;
 
 class CacheMemcachedConnectorTest extends TestCase
 {

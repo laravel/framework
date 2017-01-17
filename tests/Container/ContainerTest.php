@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Container;
 
+use stdClass;
+use ReflectionException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
-use ReflectionException;
-use stdClass;
 
 class ContainerTest extends TestCase
 {

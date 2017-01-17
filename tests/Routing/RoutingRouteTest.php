@@ -2,8 +2,10 @@
 
 namespace Illuminate\Tests\Routing;
 
+use stdClass;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
+use UnexpectedValueException;
 use Illuminate\Routing\Router;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Events\Dispatcher;
@@ -15,10 +17,8 @@ use Illuminate\Auth\Middleware\Authorize;
 use Illuminate\Routing\ResourceRegistrar;
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Auth\Middleware\Authenticate;
-use stdClass;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Routing\Middleware\SubstituteBindings;
-use UnexpectedValueException;
 
 class RoutingRouteTest extends TestCase
 {

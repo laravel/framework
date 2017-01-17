@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\View;
 
+use stdClass;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 class ViewEngineResolverTest extends TestCase
 {

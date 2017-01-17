@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Database\Seeder;
 use Mockery;
+use Illuminate\Database\Seeder;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Database\Console\Seeds\SeedCommand;
