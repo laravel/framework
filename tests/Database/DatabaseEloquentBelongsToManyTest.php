@@ -2,15 +2,15 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use stdClass;
 use Mockery as m;
+use ReflectionClass;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use ReflectionClass;
-use stdClass;
 
 class DatabaseEloquentBelongsToManyTest extends TestCase
 {

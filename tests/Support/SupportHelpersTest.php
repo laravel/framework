@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Support;
 
+use stdClass;
 use ArrayAccess;
 use Mockery as m;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 class SupportHelpersTest extends TestCase
 {

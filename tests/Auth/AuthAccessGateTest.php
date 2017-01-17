@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Auth;
 
+use StdClass;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Container\Container;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Auth\Access\HandlesAuthorization;
-use StdClass;
 
 class GateTest extends TestCase
 {

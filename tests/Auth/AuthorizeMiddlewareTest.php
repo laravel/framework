@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Auth;
 
+use stdClass;
 use Mockery as m;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
@@ -14,7 +15,6 @@ use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Contracts\Auth\Factory as Auth;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
-use stdClass;
 
 class AuthorizeMiddlewareTest extends TestCase
 {
