@@ -942,8 +942,7 @@ trait HasAttributes
         foreach ($this->attributes as $key => $value) {
             if (! array_key_exists($key, $this->original)) {
                 $dirty[$key] = $value;
-            } elseif ($value !== $this->original[$key] &&
-                    ! $this->originalIsNumericallyEquivalent($key)) {
+            } elseif (! $this->originalIsEquivalent($key)) {
                 $dirty[$key] = $value;
             }
         }
@@ -952,22 +951,38 @@ trait HasAttributes
     }
 
     /**
-     * Determine if the new and old values for a given key are numerically equivalent.
+     * Determine if the new and old values for a given key are equivalent.
      *
      * @param  string  $key
      * @return bool
      */
-    protected function originalIsNumericallyEquivalent($key)
+    protected function originalIsEquivalent($key)
     {
         $current = $this->attributes[$key];
 
         $original = $this->original[$key];
 
-        // This method checks if the two values are numerically equivalent even if they
-        // are different types. This is in case the two values are not the same type
-        // we can do a fair comparison of the two values to know if this is dirty.
-        return is_numeric($current) && is_numeric($original)
-            && strcmp((string) $current, (string) $original) === 0;
+        if ($current === $original) {
+            return true;
+        }
+
+        if ($current instanceof DateTimeInterface) {
+            $current = $this->serializeDate($current);
+        } elseif ($current === false) {
+            $current = 0;
+        } elseif ($current === true) {
+            $current = 1;
+        }
+
+        if ($current === $original) {
+            return true;
+        }
+
+        if (is_numeric($current) && is_numeric($original) && strcmp((string) $current, (string) $original) === 0) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
