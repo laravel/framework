@@ -269,6 +269,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $model->exists = $exists;
 
+        $model->setConnection(
+            $this->getConnectionName()
+        );
+
         return $model;
     }
 
