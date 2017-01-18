@@ -77,9 +77,9 @@ class LoadConfiguration
         $configPath = realpath($app->configPath());
 
         foreach (Finder::create()->files()->name('*.php')->in($configPath) as $file) {
-            $nesting = $this->getConfigurationNesting($file, $configPath);
+            $directory = $this->getNestedDirectory($file, $configPath);
 
-            $files[$nesting.basename($file->getRealPath(), '.php')] = $file->getRealPath();
+            $files[$directory.basename($file->getRealPath(), '.php')] = $file->getRealPath();
         }
 
         return $files;
@@ -92,14 +92,14 @@ class LoadConfiguration
      * @param  string  $configPath
      * @return string
      */
-    protected function getConfigurationNesting(SplFileInfo $file, $configPath)
+    protected function getNestedDirectory(SplFileInfo $file, $configPath)
     {
         $directory = $file->getPath();
 
-        if ($tree = trim(str_replace($configPath, '', $directory), DIRECTORY_SEPARATOR)) {
-            $tree = str_replace(DIRECTORY_SEPARATOR, '.', $tree).'.';
+        if ($nested = trim(str_replace($configPath, '', $directory), DIRECTORY_SEPARATOR)) {
+            $nested = str_replace(DIRECTORY_SEPARATOR, '.', $nested).'.';
         }
 
-        return $tree;
+        return $nested;
     }
 }
