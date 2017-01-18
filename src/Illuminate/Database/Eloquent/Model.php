@@ -324,11 +324,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Save a new model and return the instance.
      *
      * @param  array  $attributes
+     * @param  string|null  $connection
      * @return static
      */
-    public static function create(array $attributes = [])
+    public static function create(array $attributes = [], $connection = null)
     {
-        return tap(new static($attributes), function ($model) {
+        $instance = (new static($attributes))->setConnection($connection);
+
+        return tap($instance, function ($model) {
             $model->save();
         });
     }
@@ -337,12 +340,15 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Save a new model and return the instance. Allow mass-assignment.
      *
      * @param  array  $attributes
+     * @param  string|null  $connection
      * @return static
      */
-    public static function forceCreate(array $attributes)
+    public static function forceCreate(array $attributes, $connection = null)
     {
-        return static::unguarded(function () use ($attributes) {
-            return (new static)->create($attributes);
+        $instance = (new static)->setConnection($connection);
+
+        return static::unguarded(function () use ($attributes, $instance) {
+            return $instance->create($attributes);
         });
     }
 
