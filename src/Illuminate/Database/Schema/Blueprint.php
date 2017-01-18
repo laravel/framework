@@ -55,6 +55,13 @@ class Blueprint
     public $temporary = false;
 
     /**
+     * The default char/string length.
+     *
+     * @var int
+     */
+    protected $defaultLength;
+
+    /**
      * Create a new schema blueprint.
      *
      * @param  string  $table
@@ -68,6 +75,8 @@ class Blueprint
         if (! is_null($callback)) {
             $callback($this);
         }
+
+        $this->defaultLength = config()->get('database.default_length');
     }
 
     /**
@@ -445,8 +454,10 @@ class Blueprint
      * @param  int  $length
      * @return \Illuminate\Support\Fluent
      */
-    public function char($column, $length = 255)
+    public function char($column, $length = null)
     {
+        $length = $length ?: $this->defaultLength;
+
         return $this->addColumn('char', $column, compact('length'));
     }
 
@@ -457,8 +468,10 @@ class Blueprint
      * @param  int  $length
      * @return \Illuminate\Support\Fluent
      */
-    public function string($column, $length = 255)
+    public function string($column, $length = null)
     {
+        $length = $length ?: $this->defaultLength;
+
         return $this->addColumn('string', $column, compact('length'));
     }
 
