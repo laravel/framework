@@ -81,7 +81,7 @@ class SparkPostTransport extends Transport
      */
     protected function getRecipients(Swift_Mime_Message $message)
     {
-        return collect($this->recipients($message))->map(function($name, $email) {
+        return collect($this->recipients($message))->map(function ($name, $email) {
             return ['address' => compact('name', 'email')];
         })->values()->all();
     }
