@@ -274,6 +274,15 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertContains('<option value="2013">2013</option>', $range);
 	}
 
+	public function testFormSelectRangeWithStep()
+	{
+		$range = $this->formBuilder->selectRange('step', 5, 20, 15, ['rangeStep' => 5]);
+
+		$this->assertContains('<select name="step"><option value="5">5</option>', $range);
+		$this->assertNotContains('<option value="6">6</option>', $range);
+		$this->assertContains('<option value="15" selected="selected">15</option>', $range);
+		$this->assertContains('<option value="20">20</option>', $range);
+	}
 
 	public function testFormSelectMonth()
 	{

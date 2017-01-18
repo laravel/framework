@@ -453,7 +453,14 @@ class FormBuilder {
 	 */
 	public function selectRange($name, $begin, $end, $selected = null, $options = array())
 	{
-		$range = array_combine($range = range($begin, $end), $range);
+		$step = 1;
+
+		if (array_key_exists('rangeStep', $options)) {
+			$step = $options['rangeStep'];
+			unset($options['rangeStep']);
+		}
+
+		$range = array_combine($range = range($begin, $end, $step), $range);
 
 		return $this->select($name, $range, $selected, $options);
 	}
