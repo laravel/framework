@@ -3,7 +3,7 @@
 namespace Illuminate\Http;
 
 use Exception;
-use Illuminate\Http\Exception\HttpResponseException;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 trait ResponseTrait
 {
@@ -125,7 +125,7 @@ trait ResponseTrait
     /**
      * Throws the response in a HttpResponseException instance.
      *
-     * @throws \Illuminate\Http\Exception\HttpResponseException
+     * @throws \Illuminate\Http\Exceptions\HttpResponseException
      */
     public function throwResponse()
     {
