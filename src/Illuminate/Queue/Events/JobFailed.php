@@ -2,22 +2,8 @@
 
 namespace Illuminate\Queue\Events;
 
-class JobFailed
+class JobFailed extends AbstractJobEvent
 {
-    /**
-     * The connection name.
-     *
-     * @var string
-     */
-    public $connectionName;
-
-    /**
-     * The job instance.
-     *
-     * @var \Illuminate\Contracts\Queue\Job
-     */
-    public $job;
-
     /**
      * The exception that caused the job to fail.
      *
@@ -35,8 +21,7 @@ class JobFailed
      */
     public function __construct($connectionName, $job, $exception)
     {
-        $this->job = $job;
+        parent::__construct($connectionName, $job);
         $this->exception = $exception;
-        $this->connectionName = $connectionName;
     }
 }
