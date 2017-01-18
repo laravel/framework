@@ -163,7 +163,7 @@ class Message {
 	/**
 	 * Attach a file to the message.
 	 *
-	 * @param  string  $file
+	 * @param  string  $file absolute path on the filesystem
 	 * @param  array   $options
 	 * @return $this
 	 */
@@ -215,7 +215,7 @@ class Message {
 	/**
 	 * Embed a file in the message and get the CID.
 	 *
-	 * @param  string  $file
+	 * @param  string  $file absolute path on the filesystem
 	 * @return string
 	 */
 	public function embed($file)
