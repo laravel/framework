@@ -231,6 +231,37 @@ class Builder
     }
 
     /**
+     * Create a collection of models from plain arrays.
+     *
+     * @param  array  $items
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function hydrate(array $items)
+    {
+        $instance = $this->model->newInstance();
+
+        return $instance->newCollection(array_map(function ($item) use ($instance) {
+            return $instance->newFromBuilder($item);
+        }, $items));
+    }
+
+    /**
+     * Create a collection of models from a raw query.
+     *
+     * @param  string  $query
+     * @param  array  $bindings
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function fromQuery($query, $bindings = [])
+    {
+        $instance = $this->model->newInstance();
+
+        return $this->hydrate(
+            $instance->getConnection()->select($query, $bindings)
+        );
+    }
+
+    /**
      * Find a model by its primary key.
      *
      * @param  mixed  $id

@@ -325,37 +325,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Create a collection of models from plain arrays.
-     *
-     * @param  array  $items
-     * @param  string|null  $connection
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public static function hydrate(array $items, $connection = null)
-    {
-        $instance = (new static)->setConnection($connection);
-
-        return $instance->newCollection(array_map(function ($item) use ($instance) {
-            return $instance->newFromBuilder($item);
-        }, $items));
-    }
-
-    /**
-     * Create a collection of models from a raw query.
-     *
-     * @param  string  $query
-     * @param  array  $bindings
-     * @param  string|null  $connection
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public static function fromQuery($query, $bindings = [], $connection = null)
-    {
-        $instance = (new static)->setConnection($connection);
-
-        return static::hydrate($instance->getConnection()->select($query, $bindings), $connection);
-    }
-
-    /**
      * Get all of the models from the database.
      *
      * @param  array|mixed  $columns
