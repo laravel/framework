@@ -411,40 +411,6 @@ class Builder
     }
 
     /**
-     * Save a new model and return the instance.
-     *
-     * @param  array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model
-     */
-    public function create(array $attributes = [])
-    {
-        $instance = $this->model->newInstance($attributes)->setConnection(
-            $this->query->getConnection()->getName()
-        );
-
-        $instance->save();
-
-        return $instance;
-    }
-
-    /**
-     * Save a new model and return the instance. Allow mass-assignment.
-     *
-     * @param  array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model
-     */
-    public function forceCreate(array $attributes)
-    {
-        $instance = $this->model->newInstance($attributes)->setConnection(
-            $this->query->getConnection()->getName()
-        );
-
-        return $this->model->unguarded(function () use ($attributes, $instance) {
-            return $instance->create($attributes);
-        });
-    }
-
-    /**
      * Get a single column's value from the first result of a query.
      *
      * @param  string  $column
@@ -804,6 +770,40 @@ class Builder
             'path' => Paginator::resolveCurrentPath(),
             'pageName' => $pageName,
         ]);
+    }
+
+    /**
+     * Save a new model and return the instance.
+     *
+     * @param  array  $attributes
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function create(array $attributes = [])
+    {
+        $instance = $this->model->newInstance($attributes)->setConnection(
+            $this->query->getConnection()->getName()
+        );
+
+        $instance->save();
+
+        return $instance;
+    }
+
+    /**
+     * Save a new model and return the instance. Allow mass-assignment.
+     *
+     * @param  array  $attributes
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function forceCreate(array $attributes)
+    {
+        $instance = $this->model->newInstance($attributes)->setConnection(
+            $this->query->getConnection()->getName()
+        );
+
+        return $this->model->unguarded(function () use ($attributes, $instance) {
+            return $instance->create($attributes);
+        });
     }
 
     /**
