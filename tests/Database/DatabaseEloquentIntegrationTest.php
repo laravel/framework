@@ -461,7 +461,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $user->setConnection('second_connection');
         $user->save();
 
-        $models = EloquentTestUser::fromQuery('SELECT * FROM users WHERE email = ?', ['abigailotwell@gmail.com'], 'second_connection');
+        $models = EloquentTestUser::on('second_connection')->fromQuery('SELECT * FROM users WHERE email = ?', ['abigailotwell@gmail.com']);
 
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $models);
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestUser', $models[0]);
