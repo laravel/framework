@@ -329,7 +329,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function create(array $attributes = [], $connection = null)
     {
-        $instance = (new static($attributes))->setConnection($connection);
+        $instance = new static($attributes);
+
+        if ($connection) {
+            $instance->setConnection($connection);
+        }
 
         return tap($instance, function ($model) {
             $model->save();
@@ -345,7 +349,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function forceCreate(array $attributes, $connection = null)
     {
-        $instance = (new static)->setConnection($connection);
+        $instance = (new static);
+
+        if ($connection) {
+            $instance->setConnection($connection);
+        }
 
         return static::unguarded(function () use ($attributes, $instance) {
             return $instance->create($attributes);
