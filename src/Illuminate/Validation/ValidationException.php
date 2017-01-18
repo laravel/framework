@@ -34,14 +34,4 @@ class ValidationException extends Exception
         $this->response = $response;
         $this->validator = $validator;
     }
-
-    /**
-     * Get the underlying response instance.
-     *
-     * @return \Symfony\Component\HttpFoundation\Response|null
-     */
-    public function getResponse()
-    {
-        return $this->response;
-    }
 }
