@@ -329,7 +329,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
                 case '>=':  return $retrieved >= $value;
                 case '===': return $retrieved === $value;
                 case '!==': return $retrieved !== $value;
-                case 'like': return strpos($retrieved, $value) !== false;
+                case 'contains': return strpos($retrieved, $value) !== false;
             }
         };
     }
