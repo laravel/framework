@@ -30,7 +30,7 @@ class MandrillTransport extends Transport
      */
     public function __construct(ClientInterface $client, $key)
     {
-        $this->key = $key;
+        $this->setKey($key);
         $this->client = $client;
     }
 
@@ -65,21 +65,7 @@ class MandrillTransport extends Transport
      */
     protected function getTo(Swift_Mime_Message $message)
     {
-        $to = [];
-
-        if ($message->getTo()) {
-            $to = array_merge($to, array_keys($message->getTo()));
-        }
-
-        if ($message->getCc()) {
-            $to = array_merge($to, array_keys($message->getCc()));
-        }
-
-        if ($message->getBcc()) {
-            $to = array_merge($to, array_keys($message->getBcc()));
-        }
-
-        return $to;
+        return array_keys($this->recipients($message));
     }
 
     /**
@@ -96,10 +82,10 @@ class MandrillTransport extends Transport
      * Set the API key being used by the transport.
      *
      * @param  string  $key
-     * @return string
+     * @return void
      */
     public function setKey($key)
     {
-        return $this->key = $key;
+        $this->key = $key;
     }
 }
