@@ -29,6 +29,13 @@ class Builder
     protected $resolver;
 
     /**
+     * The default string length for migrations.
+     *
+     * @var int
+     */
+    public static $defaultStringLength = 255;
+
+    /**
      * Create a new database Schema manager.
      *
      * @param  \Illuminate\Database\Connection  $connection
@@ -38,6 +45,17 @@ class Builder
     {
         $this->connection = $connection;
         $this->grammar = $connection->getSchemaGrammar();
+    }
+
+    /**
+     * Set the default string length for migrations.
+     *
+     * @param  int  $length
+     * @return void
+     */
+    public static function defaultStringLength($length)
+    {
+        static::$defaultStringLength = $length;
     }
 
     /**

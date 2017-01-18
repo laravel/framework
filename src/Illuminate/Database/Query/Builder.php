@@ -1606,14 +1606,14 @@ class Builder
     /**
      * Lock the selected rows in the table.
      *
-     * @param  bool  $value
+     * @param  string|bool  $value
      * @return $this
      */
     public function lock($value = true)
     {
         $this->lock = $value;
 
-        if ($this->lock) {
+        if (! is_null($this->lock)) {
             $this->useWritePdo();
         }
 
