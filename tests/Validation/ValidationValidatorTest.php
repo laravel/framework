@@ -2323,6 +2323,13 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals(['x' => ['Required', 'Confirmed']], $v->getRules());
 
         $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => ''], ['y' => 'Required']);
+        $v->sometimes('x', 'Required', function ($i) {
+            return true;
+        });
+        $this->assertEquals(['x' => ['Required'], 'y' => ['Required']], $v->getRules());
+
+        $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => 'foo'], ['x' => 'Required']);
         $v->sometimes('x', 'Confirmed', function ($i) {
             return $i->x == 'bar';
@@ -3240,13 +3247,6 @@ class ValidationValidatorTest extends TestCase
         $file = new File(__FILE__, false);
         $v = new Validator($trans, ['file' => $file], ['file' => 'Required|mimes:xls']);
         $this->assertFalse($v->passes());
-    }
-
-    public function testValidationCanAcceptNumericKeysForRules()
-    {
-        $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, [10 => ''], [10 => 'Required']);
-        $this->assertEquals([10], array_keys($v->getRules()));
     }
 
     protected function getTranslator()
