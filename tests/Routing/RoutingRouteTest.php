@@ -32,7 +32,7 @@ class RoutingRouteTest extends TestCase
 
         $router = $this->getRouter();
         $router->get('foo/bar', function () {
-            throw new \Illuminate\Http\Exception\HttpResponseException(new Response('hello'));
+            throw new \Illuminate\Http\Exceptions\HttpResponseException(new Response('hello'));
         });
         $this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
 

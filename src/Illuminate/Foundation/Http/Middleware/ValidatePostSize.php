@@ -3,7 +3,7 @@
 namespace Illuminate\Foundation\Http\Middleware;
 
 use Closure;
-use Illuminate\Http\Exception\PostTooLargeException;
+use Illuminate\Http\Exceptions\PostTooLargeException;
 
 class ValidatePostSize
 {
@@ -14,7 +14,7 @@ class ValidatePostSize
      * @param  \Closure  $next
      * @return mixed
      *
-     * @throws \Illuminate\Http\Exception\PostTooLargeException
+     * @throws \Illuminate\Http\Exceptions\PostTooLargeException
      */
     public function handle($request, Closure $next)
     {
