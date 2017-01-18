@@ -1729,6 +1729,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->getConnection()->shouldReceive('select')->once()
             ->with(m::any(), m::any(), false);
         $builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock()->get();
+
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->getConnection()->shouldReceive('select')->once()
+            ->with(m::any(), m::any(), false);
+        $builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock(false)->get();
     }
 
     public function testBindingOrder()
