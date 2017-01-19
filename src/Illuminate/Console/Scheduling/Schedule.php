@@ -17,6 +17,13 @@ class Schedule
     protected $cache;
 
     /**
+     * All of the events on the schedule.
+     *
+     * @var array
+     */
+    protected $events = [];
+
+    /**
      * Create a new event instance.
      *
      * @param  \Illuminate\Contracts\Cache\Repository  $cache
@@ -26,13 +33,6 @@ class Schedule
     {
         $this->cache = $cache;
     }
-
-    /**
-     * All of the events on the schedule.
-     *
-     * @var array
-     */
-    protected $events = [];
 
     /**
      * Add a new callback event to the schedule.
