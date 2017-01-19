@@ -4,8 +4,6 @@ namespace Illuminate\View\Concerns;
 
 use Closure;
 use Illuminate\Support\Str;
-use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\View\View as ViewContract;
 
 trait ManagesEvents
