@@ -4,6 +4,8 @@ namespace Illuminate\Tests\Broadcasting;
 
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Broadcasting\BroadcastEvent;
+use Illuminate\Contracts\Broadcasting\Broadcaster;
 
 class BroadcastEventTest extends TestCase
 {
@@ -14,10 +16,10 @@ class BroadcastEventTest extends TestCase
 
     public function testBasicEventBroadcastParameterFormatting()
     {
-        $broadcaster = m::mock('Illuminate\Contracts\Broadcasting\Broadcaster');
+        $broadcaster = m::mock(Broadcaster::class);
 
         $broadcaster->shouldReceive('broadcast')->once()->with(
-            ['test-channel'], 'Illuminate\Tests\Broadcasting\TestBroadcastEvent', ['firstName' => 'Taylor', 'lastName' => 'Otwell', 'collection' => ['foo' => 'bar']]
+            ['test-channel'], TestBroadcastEvent::class, ['firstName' => 'Taylor', 'lastName' => 'Otwell', 'collection' => ['foo' => 'bar']]
         );
 
         $event = new TestBroadcastEvent;
@@ -27,15 +29,15 @@ class BroadcastEventTest extends TestCase
 
     public function testManualParameterSpecification()
     {
-        $broadcaster = m::mock('Illuminate\Contracts\Broadcasting\Broadcaster');
+        $broadcaster = m::mock(Broadcaster::class);
 
         $broadcaster->shouldReceive('broadcast')->once()->with(
-            ['test-channel'], 'Illuminate\Tests\Broadcasting\TestBroadcastEventWithManualData', ['name' => 'Taylor', 'socket' => null]
+            ['test-channel'], TestBroadcastEventWithManualData::class, ['name' => 'Taylor', 'socket' => null]
         );
 
         $event = new TestBroadcastEventWithManualData;
 
-        (new \Illuminate\Broadcasting\BroadcastEvent($event))->handle($broadcaster);
+        (new BroadcastEvent($event))->handle($broadcaster);
     }
 }
 
