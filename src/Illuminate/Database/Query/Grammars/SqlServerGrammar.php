@@ -214,6 +214,18 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile the lock into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  bool|string  $value
+     * @return string
+     */
+    protected function compileLock(Builder $query, $value)
+    {
+        return '';
+    }
+
+    /**
      * Compile an exists statement into SQL.
      *
      * @param \Illuminate\Database\Query\Builder $query
