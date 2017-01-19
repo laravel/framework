@@ -18,6 +18,7 @@ class AuthenticationException extends Exception
      *
      * @param  string  $message
      * @param  array  $guards
+     * @return void
      */
     public function __construct($message = 'Unauthenticated.', array $guards = [])
     {
