@@ -28,7 +28,7 @@ class HandleExceptions
     {
         $this->app = $app;
 
-        error_reporting(-1);
+        //error_reporting(-1);
 
         set_error_handler([$this, 'handleError']);
 
@@ -43,7 +43,7 @@ class HandleExceptions
 
     /**
      * Convert a PHP error to an ErrorException.
-     *
+     * If it's production environment. Only report error to log system;
      * @param  int  $level
      * @param  string  $message
      * @param  string  $file
@@ -53,10 +53,13 @@ class HandleExceptions
      *
      * @throws \ErrorException
      */
-    public function handleError($level, $message, $file = '', $line = 0, $context = [])
+    public function handleError($level, $message, $file = '', $line = 0)
     {
+        $e = new ErrorException($message, 0, $level, $file, $line);
         if (error_reporting() & $level) {
-            throw new ErrorException($message, 0, $level, $file, $line);
+            throw $e;
+        }else{
+             $this->getExceptionHandler()->report($e);
         }
     }
 
