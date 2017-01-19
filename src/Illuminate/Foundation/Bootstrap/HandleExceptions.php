@@ -59,7 +59,7 @@ class HandleExceptions
         if (error_reporting() & $level) {
             throw $e;
         } else {
-             $this->getExceptionHandler()->report($e);
+            $this->getExceptionHandler()->report($e);
         }
     }
 
