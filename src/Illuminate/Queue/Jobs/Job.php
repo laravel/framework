@@ -72,7 +72,7 @@ abstract class Job
         $this->deleted = true;
         $payload = $this->payload();
 
-        list($class, $method) = $this->parseJob($payload['job']);
+        list($class, $method) = JobName::parse($payload['job']);
 
         $this->instance = $this->resolve($class);
 
