@@ -6,8 +6,8 @@ use ReflectionClass;
 use ReflectionProperty;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\Job;
-use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 
 class BroadcastEvent implements ShouldQueue
