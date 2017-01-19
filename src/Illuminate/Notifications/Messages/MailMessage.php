@@ -111,8 +111,8 @@ class MailMessage extends SimpleMessage
     /**
      * Set the "reply to" address of the message.
      *
-     * @param  array|string $address
-     * @param null $name
+     * @param  array|string  $address
+     * @param  string|null  $name
      * @return $this
      */
     public function replyTo($address, $name = null)
