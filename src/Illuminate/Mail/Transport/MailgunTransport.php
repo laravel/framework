@@ -72,6 +72,7 @@ class MailgunTransport extends Transport
      * Get the HTTP payload for sending the Mailgun message.
      *
      * @param  \Swift_Mime_Message  $message
+     * @param  string  $to
      * @return array
      */
     protected function payload(Swift_Mime_Message $message, $to)
