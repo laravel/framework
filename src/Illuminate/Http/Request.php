@@ -308,9 +308,10 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     {
         $value = $this->input($key);
 
-        $boolOrArray = is_bool($value) || is_array($value);
+        $boolArrayOrObject = is_bool($value) || is_array($value)
+            || is_object($value);
 
-        return ! $boolOrArray && trim((string) $value) === '';
+        return ! $boolArrayOrObject && trim((string) $value) === '';
     }
 
     /**
