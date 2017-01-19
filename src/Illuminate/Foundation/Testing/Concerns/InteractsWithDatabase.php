@@ -20,8 +20,24 @@ trait InteractsWithDatabase
 
         $count = $database->connection($connection)->table($table)->where($data)->count();
 
+        $extraInfo = '';
+        if (0 === $count) {
+            $allResults = $database->connection($connection)->table($table)->get();
+            $extraInfo = sprintf('%sAll entries in table "%s":%s%s',
+                PHP_EOL,
+                $table,
+                PHP_EOL,
+                json_encode($allResults, JSON_PRETTY_PRINT)
+            );
+        }
+
         $this->assertGreaterThan(0, $count, sprintf(
-            'Unable to find row in database table [%s] that matched attributes [%s].', $table, json_encode($data)
+            'Unable to find row in database table "%s" that matched attributes: %s%s%s%s',
+            $table,
+            PHP_EOL,
+            json_encode($data, JSON_PRETTY_PRINT),
+            PHP_EOL,
+            $extraInfo
         ));
 
         return $this;
