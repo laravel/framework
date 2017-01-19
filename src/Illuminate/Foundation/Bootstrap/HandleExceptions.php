@@ -43,7 +43,7 @@ class HandleExceptions
 
     /**
      * Convert a PHP error to an ErrorException.
-     * If it's production environment. Only report error to log system;
+     * If it's production environment. Only report error to log system.
      * @param  int  $level
      * @param  string  $message
      * @param  string  $file
@@ -58,7 +58,7 @@ class HandleExceptions
         $e = new ErrorException($message, 0, $level, $file, $line);
         if (error_reporting() & $level) {
             throw $e;
-        }else{
+        } else {
              $this->getExceptionHandler()->report($e);
         }
     }
