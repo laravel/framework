@@ -98,4 +98,22 @@ class CallQueuedHandler
             $command->failed($e);
         }
     }
+
+    /**
+     * Call the deleted method on the job instance.
+     *
+     * Run EVERY time when the job is deleted from queue
+     * not fun when the job is release in the queue.
+     *
+     * @param  array  $data
+     * @return void
+     */
+    public function deleted(array $data)
+    {
+        $command = unserialize($data['command']);
+
+        if (method_exists($command, 'deleted')) {
+            $command->deleted();
+        }
+    }
 }
