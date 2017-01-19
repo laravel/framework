@@ -45,7 +45,7 @@ class MailgunTransport extends Transport
      */
     public function __construct(ClientInterface $client, $key, $domain)
     {
-        $this->key = $key;
+        $this->setKey($key);
         $this->client = $client;
         $this->setDomain($domain);
     }
@@ -71,7 +71,8 @@ class MailgunTransport extends Transport
     /**
      * Get the HTTP payload for sending the Mailgun message.
      *
-     * @param  \Swift_Mime_Message  $message
+     * @param  Swift_Mime_Message  $message
+     * @param  array  $to
      * @return array
      */
     protected function payload(Swift_Mime_Message $message, $to)
@@ -103,22 +104,9 @@ class MailgunTransport extends Transport
      */
     protected function getTo(Swift_Mime_Message $message)
     {
-        return collect($this->allContacts($message))->map(function ($display, $address) {
+        return collect($this->recipients($message))->map(function ($display, $address) {
             return $display ? $display." <{$address}>" : $address;
         })->values()->implode(',');
-    }
-
-    /**
-     * Get all of the contacts for the message.
-     *
-     * @param  \Swift_Mime_Message  $message
-     * @return array
-     */
-    protected function allContacts(Swift_Mime_Message $message)
-    {
-        return array_merge(
-            (array) $message->getTo(), (array) $message->getCc(), (array) $message->getBcc()
-        );
     }
 
     /**
@@ -162,6 +150,6 @@ class MailgunTransport extends Transport
     {
         $this->url = 'https://api.mailgun.net/v3/'.$domain.'/messages.mime';
 
-        return $this->domain = $domain;
+        $this->domain = $domain;
     }
 }

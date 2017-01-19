@@ -38,9 +38,9 @@ class SparkPostTransport extends Transport
      */
     public function __construct(ClientInterface $client, $key, $options = [])
     {
-        $this->key = $key;
+        $this->setKey($key);
         $this->client = $client;
-        $this->options = $options;
+        $this->setOptions($options);
     }
 
     /**
@@ -81,21 +81,9 @@ class SparkPostTransport extends Transport
      */
     protected function getRecipients(Swift_Mime_Message $message)
     {
-        $recipients = [];
-
-        foreach ((array) $message->getTo() as $email => $name) {
-            $recipients[] = ['address' => compact('name', 'email')];
-        }
-
-        foreach ((array) $message->getCc() as $email => $name) {
-            $recipients[] = ['address' => compact('name', 'email')];
-        }
-
-        foreach ((array) $message->getBcc() as $email => $name) {
-            $recipients[] = ['address' => compact('name', 'email')];
-        }
-
-        return $recipients;
+        return collect($this->recipients($message))->map(function ($name, $email) {
+            return ['address' => compact('name', 'email')];
+        })->values()->all();
     }
 
     /**
@@ -112,11 +100,11 @@ class SparkPostTransport extends Transport
      * Set the API key being used by the transport.
      *
      * @param  string  $key
-     * @return string
+     * @return void
      */
     public function setKey($key)
     {
-        return $this->key = $key;
+        $this->key = $key;
     }
 
     /**
@@ -133,10 +121,10 @@ class SparkPostTransport extends Transport
      * Set the transmission options being used by the transport.
      *
      * @param  array  $options
-     * @return array
+     * @return void
      */
     public function setOptions(array $options)
     {
-        return $this->options = $options;
+        $this->options = $options;
     }
 }

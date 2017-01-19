@@ -53,6 +53,6 @@ class ArrayTransport extends Transport
      */
     public function flush()
     {
-        return $this->messages = new Collection;
+        $this->messages = new Collection;
     }
 }
