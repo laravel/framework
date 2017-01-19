@@ -7,6 +7,7 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Queue\RedisQueue;
 use Illuminate\Container\Container;
 use Illuminate\Queue\Jobs\RedisJob;
+use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Tests\Redis\InteractsWithRedis;
 
 class RedisQueueIntegrationTest extends TestCase
@@ -247,7 +248,7 @@ class RedisQueueIntegrationTest extends TestCase
 
         /** @var \Illuminate\Queue\Jobs\RedisJob $redisJob */
         $redisJob = $this->queue->pop();
-        $redisJob->getContainer()->shouldReceive('make')->once()->with('Illuminate\Queue\CallQueuedHandler')->andReturn($handler = m::mock('StdClass'));
+        $redisJob->getContainer()->shouldReceive('make')->once()->with(CallQueuedHandler::class)->andReturn($handler = m::mock('StdClass'));
 
         $redisJob->delete();
 
@@ -269,7 +270,7 @@ class RedisQueueIntegrationTest extends TestCase
         $this->assertEquals(3, $this->queue->size());
         $job = $this->queue->pop();
         $this->assertEquals(3, $this->queue->size());
-        $job->getContainer()->shouldReceive('make')->once()->with('Illuminate\Queue\CallQueuedHandler')->andReturn($handler = m::mock('StdClass'));
+        $job->getContainer()->shouldReceive('make')->once()->with(CallQueuedHandler::class)->andReturn($handler = m::mock('StdClass'));
         $job->delete();
         $this->assertEquals(2, $this->queue->size());
     }
