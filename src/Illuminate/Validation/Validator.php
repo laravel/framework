@@ -10,7 +10,6 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
 use Illuminate\Contracts\Container\Container;
-use Symfony\Component\HttpFoundation\File\File;
 use Illuminate\Contracts\Translation\Translator;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
