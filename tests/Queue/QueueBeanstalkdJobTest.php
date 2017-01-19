@@ -36,7 +36,8 @@ class QueueBeanstalkdJobTest extends TestCase
     {
         $job = $this->getJob();
         $job->getPheanstalk()->shouldReceive('delete')->once()->with($job->getPheanstalkJob());
-
+        $job->getPheanstalkJob()->shouldReceive('getData')->once();
+        $job->getContainer()->shouldReceive('make')->once()->with('')->andReturn($handler = m::mock('StdClass'));
         $job->delete();
     }
 
