@@ -24,7 +24,7 @@ class RedisQueueIntegrationTest extends TestCase
         $this->setUpRedis();
 
         $this->queue = new RedisQueue($this->redis);
-        $container   = m::mock(Container::class);
+        $container = m::mock(Container::class);
         $this->queue->setContainer($container);
     }
 
