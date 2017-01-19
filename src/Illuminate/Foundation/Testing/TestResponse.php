@@ -192,7 +192,7 @@ class TestResponse extends Response
      *
      * @return array
      */
-    protected function decodeResponseJson()
+    public function decodeResponseJson()
     {
         $decodedResponse = json_decode($this->getContent(), true);
 
