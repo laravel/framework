@@ -38,7 +38,7 @@ class RouteBinding
             // to run multiple bind methods in a single class for convenience.
             $segments = explode('@', $binding);
 
-            $method = count($segments) == 2 ? $segments[1] : 'bind';
+            $method = count($segments) === 2 ? $segments[1] : 'bind';
 
             $callable = [$container->make($segments[0]), $method];
 

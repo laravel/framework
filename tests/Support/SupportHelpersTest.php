@@ -142,7 +142,7 @@ class SupportHelpersTest extends TestCase
     {
         $array = ['name' => 'taylor', 'otherDeveloper' => 'dayle'];
         $this->assertEquals('dayle', array_first($array, function ($value) {
-            return $value == 'dayle';
+            return $value === 'dayle';
         }));
     }
 

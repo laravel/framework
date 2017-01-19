@@ -383,7 +383,7 @@ class Dispatcher implements DispatcherContract
     {
         $segments = explode('@', $listener);
 
-        return [$segments[0], count($segments) == 2 ? $segments[1] : 'handle'];
+        return [$segments[0], count($segments) === 2 ? $segments[1] : 'handle'];
     }
 
     /**

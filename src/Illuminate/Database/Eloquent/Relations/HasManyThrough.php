@@ -300,7 +300,7 @@ class HasManyThrough extends Relation
         $result = $this->find($id, $columns);
 
         if (is_array($id)) {
-            if (count($result) == count(array_unique($id))) {
+            if (count($result) === count(array_unique($id))) {
                 return $result;
             }
         } elseif (! is_null($result)) {
@@ -389,7 +389,7 @@ class HasManyThrough extends Relation
      */
     protected function shouldSelect(array $columns = ['*'])
     {
-        if ($columns == ['*']) {
+        if ($columns === ['*']) {
             $columns = [$this->related->getTable().'.*'];
         }
 

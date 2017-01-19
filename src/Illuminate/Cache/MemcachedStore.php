@@ -43,7 +43,7 @@ class MemcachedStore extends TaggableStore implements Store
         $this->memcached = $memcached;
 
         $this->onVersionThree = (new ReflectionMethod('Memcached', 'getMulti'))
-                            ->getNumberOfParameters() == 2;
+                            ->getNumberOfParameters() === 2;
     }
 
     /**

@@ -76,7 +76,7 @@ class GateTest extends TestCase
         });
 
         $gate->after(function ($user, $ability, $result) {
-            if ($ability == 'foo') {
+            if ($ability === 'foo') {
                 $this->assertTrue($result, 'After callback on `foo` should receive true as result');
             } else {
                 $this->assertFalse($result, 'After callback on `bar` or `missing` should receive false as result');
