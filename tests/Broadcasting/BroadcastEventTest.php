@@ -21,13 +21,8 @@ class BroadcastEventTest extends TestCase
         );
 
         $event = new TestBroadcastEvent;
-        $serializedEvent = serialize($event);
-        $jobData = ['event' => $serializedEvent];
 
-        $job = m::mock('Illuminate\Contracts\Queue\Job');
-        $job->shouldReceive('delete')->once();
-
-        (new \Illuminate\Broadcasting\BroadcastEvent($broadcaster))->fire($job, $jobData);
+        (new \Illuminate\Broadcasting\BroadcastEvent($event))->handle($broadcaster);
     }
 
     public function testManualParameterSpecification()
@@ -39,13 +34,8 @@ class BroadcastEventTest extends TestCase
         );
 
         $event = new TestBroadcastEventWithManualData;
-        $serializedEvent = serialize($event);
-        $jobData = ['event' => $serializedEvent];
 
-        $job = m::mock('Illuminate\Contracts\Queue\Job');
-        $job->shouldReceive('delete')->once();
-
-        (new \Illuminate\Broadcasting\BroadcastEvent($broadcaster))->fire($job, $jobData);
+        (new \Illuminate\Broadcasting\BroadcastEvent($event))->handle($broadcaster);
     }
 }
 

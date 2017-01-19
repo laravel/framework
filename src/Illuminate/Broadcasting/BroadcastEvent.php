@@ -4,51 +4,49 @@ namespace Illuminate\Broadcasting;
 
 use ReflectionClass;
 use ReflectionProperty;
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 
-class BroadcastEvent
+class BroadcastEvent implements ShouldQueue
 {
+    use Queueable;
+
     /**
-     * The broadcaster implementation.
+     * The event instance.
      *
-     * @var \Illuminate\Contracts\Broadcasting\Broadcaster
+     * @var mixed
      */
-    protected $broadcaster;
+    protected $event;
 
     /**
      * Create a new job handler instance.
      *
-     * @param  \Illuminate\Contracts\Broadcasting\Broadcaster  $broadcaster
+     * @param  mixed  $event
      * @return void
      */
-    public function __construct(Broadcaster $broadcaster)
+    public function __construct($event)
     {
-        $this->broadcaster = $broadcaster;
+        $this->event = $event;
     }
 
     /**
      * Handle the queued job.
      *
-     * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  array  $data
+     * @param  \Illuminate\Contracts\Broadcasting\Broadcaster  $broadcaster
      * @return void
      */
-    public function fire(Job $job, array $data)
+    public function handle(Broadcaster $broadcaster)
     {
-        $event = unserialize($data['event']);
+        $name = method_exists($this->event, 'broadcastAs')
+                ? $this->event->broadcastAs() : get_class($this->event);
 
-        $name = method_exists($event, 'broadcastAs')
-                ? $event->broadcastAs() : get_class($event);
-
-        $channels = array_wrap($event->broadcastOn());
-
-        $this->broadcaster->broadcast(
-            $channels, $name, $this->getPayloadFromEvent($event)
+        $broadcaster->broadcast(
+            array_wrap($this->event->broadcastOn()), $name,
+            $this->getPayloadFromEvent($this->event)
         );
-
-        $job->delete();
     }
 
     /**
