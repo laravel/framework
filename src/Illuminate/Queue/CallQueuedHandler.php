@@ -102,8 +102,10 @@ class CallQueuedHandler
     /**
      * Call the deleted method on the job instance.
      *
-     * Run EVERY time when the job is deleted from queue
-     * not fun when the job is release in the queue.
+     * Run EVERY time when the job is deleted from queue.
+     *
+     * This isn't called when the job is released in the queue, only when it's leaving it.
+     * Also called after a failure before the failed method.
      *
      * @param  array  $data
      * @return void
