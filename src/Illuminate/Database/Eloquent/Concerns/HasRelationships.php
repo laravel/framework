@@ -7,11 +7,13 @@ use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -60,6 +62,26 @@ trait HasRelationships
         $localKey = $localKey ?: $this->getKeyName();
 
         return new HasOne($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey);
+    }
+
+    /**
+     * Define a one-to-one relationship that goes through an intermediate model.
+     *
+     * @param string      $related           Class name of related Model
+     * @param string      $through           Class name of through Model
+     * @param string|null $thisForeignKey    Foreign key from Through model to $this Model
+     * @param string|null $throughForeignKey Foreign key from Related model to Through model
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOneThrough
+     */
+    public function hasOneThrough($related, $through, $thisForeignKey = null, $throughForeignKey = null)
+    {
+        $related = $this->newRelatedInstance($related);
+        $through = new $through;
+        $thisForeignKey = $thisForeignKey ?: $this->getForeignKey();
+        $throughForeignKey = $throughForeignKey ?: $through->getForeignKey();
+
+        return new HasOneThrough($related->newQuery(), $this, $through, $thisForeignKey, $throughForeignKey);
     }
 
     /**
@@ -120,6 +142,26 @@ trait HasRelationships
         return new BelongsTo(
             $instance->newQuery(), $this, $foreignKey, $ownerKey, $relation
         );
+    }
+
+    /**
+     * Define an inverse one-to-one relationship that goes through an intermediate model.
+     *
+     * @param string      $related           Class name of related Model
+     * @param string      $through           Class name of through Model
+     * @param string|null $throughForeignKey Foreign key to Through model from $this Model
+     * @param string|null $relatedForeignKey Foreign key to Related model from Through model
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToThrough
+     */
+    public function belongsToThrough($related, $through, $throughForeignKey = null, $relatedForeignKey = null)
+    {
+        $related = $this->newRelatedInstance($related);
+        $through = new $through;
+        $throughForeignKey = $throughForeignKey ?: $through->getForeignKey();
+        $relatedForeignKey = $relatedForeignKey ?: $related->getForeignKey();
+
+        return new BelongsToThrough($related->newQuery(), $this, $through, $throughForeignKey, $relatedForeignKey);
     }
 
     /**
