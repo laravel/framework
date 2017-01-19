@@ -54,7 +54,15 @@ class HigherOrderCollectionProxy
     public function __call($method, $parameters)
     {
         return $this->collection->{$this->method}(function ($value) use ($method, $parameters) {
-            return $value->{$method}(...$parameters);
+            if (is_object($value)) {
+                return $value->{$method}(...$parameters);
+            }
+
+            if ($method == 'empty') {
+                return empty($value);
+            }
+
+            return $method($value, ...$parameters);
         });
     }
 }
