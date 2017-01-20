@@ -7,17 +7,17 @@ use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\BelongsToThrough;
 
 trait HasRelationships
 {
@@ -67,10 +67,10 @@ trait HasRelationships
     /**
      * Define a one-to-one relationship that goes through an intermediate model.
      *
-     * @param string      $related           Class name of related Model
-     * @param string      $through           Class name of through Model
-     * @param string|null $thisForeignKey    Foreign key from Through model to $this Model
-     * @param string|null $throughForeignKey Foreign key from Related model to Through model
+     * @param string $related
+     * @param string $through
+     * @param string $thisForeignKey
+     * @param string $throughForeignKey
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasOneThrough
      */
@@ -147,10 +147,10 @@ trait HasRelationships
     /**
      * Define an inverse one-to-one relationship that goes through an intermediate model.
      *
-     * @param string      $related           Class name of related Model
-     * @param string      $through           Class name of through Model
-     * @param string|null $throughForeignKey Foreign key to Through model from $this Model
-     * @param string|null $relatedForeignKey Foreign key to Related model from Through model
+     * @param string $related
+     * @param string $through
+     * @param string $throughForeignKey
+     * @param string $relatedForeignKey
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToThrough
      */
