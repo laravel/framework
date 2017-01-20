@@ -60,8 +60,8 @@ class SeederMakeCommand extends GeneratorCommand
         parent::fire();
 
         $this->composer->dumpAutoloads();
-    }    
-    
+    }
+
     /**
      * Build the class with the given name.
      *
