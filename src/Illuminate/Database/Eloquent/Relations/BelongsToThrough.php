@@ -35,8 +35,8 @@ class BelongsToThrough extends Relation
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @param  \Illuminate\Database\Eloquent\Model  $farParent
      * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @param  string  $farParentKey  Foreign key to parent
-     * @param  string  $parentKey  Foreign key to related
+     * @param  string  $farParentKey
+     * @param  string  $parentKey
      * @return void
      */
     public function __construct(Builder $query, Model $farParent, Model $parent, $farParentKey, $parentKey)
