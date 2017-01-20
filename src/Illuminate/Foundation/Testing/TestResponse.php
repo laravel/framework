@@ -158,6 +158,32 @@ class TestResponse extends Response
     }
 
     /**
+     * Assert that the given string is contained within the response.
+     *
+     * @param  string  $value
+     * @return $this
+     */
+    public function assertSee($value)
+    {
+        PHPUnit::assertContains($value, $this->getContent());
+
+        return $this;
+    }
+
+    /**
+     * Assert that the given string is not contained within the response.
+     *
+     * @param  string  $value
+     * @return $this
+     */
+    public function assertDontSee($value)
+    {
+        PHPUnit::assertNotContains($value, $this->getContent());
+
+        return $this;
+    }
+
+    /**
      * Assert that the response is a superset of the given JSON.
      *
      * @param  array  $data
