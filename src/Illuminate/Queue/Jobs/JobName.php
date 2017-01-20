@@ -3,6 +3,7 @@
 namespace Illuminate\Queue\Jobs;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class JobName
 {
@@ -14,9 +15,7 @@ class JobName
      */
     public static function parse($job)
     {
-        $segments = explode('@', $job);
-
-        return count($segments) > 1 ? $segments : [$segments[0], 'fire'];
+        return Str::parseCallback($job, 'fire');
     }
 
     /**

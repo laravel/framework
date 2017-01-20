@@ -381,9 +381,7 @@ class Dispatcher implements DispatcherContract
      */
     protected function parseClassCallable($listener)
     {
-        $segments = explode('@', $listener);
-
-        return [$segments[0], count($segments) == 2 ? $segments[1] : 'handle'];
+        return Str::parseCallback($listener, 'handle');
     }
 
     /**

@@ -136,11 +136,7 @@ trait ManagesEvents
      */
     protected function parseClassEvent($class, $prefix)
     {
-        if (! Str::contains($class, '@')) {
-            return [$class, $this->classEventMethodForPrefix($prefix)];
-        }
-
-        return explode('@', $class);
+        return Str::parseCallback($class, $this->classEventMethodForPrefix($prefix));
     }
 
     /**
