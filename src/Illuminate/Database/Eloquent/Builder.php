@@ -7,7 +7,6 @@ use BadMethodCallException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Pagination\Paginator;
-use Illuminate\Database\Query\Expression;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -228,6 +227,37 @@ class Builder
     public function orWhere($column, $operator = null, $value = null)
     {
         return $this->where($column, $operator, $value, 'or');
+    }
+
+    /**
+     * Create a collection of models from plain arrays.
+     *
+     * @param  array  $items
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function hydrate(array $items)
+    {
+        $instance = $this->model->newInstance();
+
+        return $instance->newCollection(array_map(function ($item) use ($instance) {
+            return $instance->newFromBuilder($item);
+        }, $items));
+    }
+
+    /**
+     * Create a collection of models from a raw query.
+     *
+     * @param  string  $query
+     * @param  array  $bindings
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function fromQuery($query, $bindings = [])
+    {
+        $instance = $this->model->newInstance();
+
+        return $this->hydrate(
+            $instance->getConnection()->select($query, $bindings)
+        );
     }
 
     /**
@@ -770,6 +800,40 @@ class Builder
             'path' => Paginator::resolveCurrentPath(),
             'pageName' => $pageName,
         ]);
+    }
+
+    /**
+     * Save a new model and return the instance.
+     *
+     * @param  array  $attributes
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function create(array $attributes = [])
+    {
+        $instance = $this->model->newInstance($attributes)->setConnection(
+            $this->query->getConnection()->getName()
+        );
+
+        $instance->save();
+
+        return $instance;
+    }
+
+    /**
+     * Save a new model and return the instance. Allow mass-assignment.
+     *
+     * @param  array  $attributes
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function forceCreate(array $attributes)
+    {
+        $instance = $this->model->newInstance($attributes)->setConnection(
+            $this->query->getConnection()->getName()
+        );
+
+        return $this->model->unguarded(function () use ($attributes, $instance) {
+            return $instance->create($attributes);
+        });
     }
 
     /**

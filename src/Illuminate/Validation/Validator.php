@@ -10,7 +10,6 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
 use Illuminate\Contracts\Container\Container;
-use Symfony\Component\HttpFoundation\File\File;
 use Illuminate\Contracts\Translation\Translator;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
@@ -755,10 +754,6 @@ class Validator implements ValidatorContract
             $this->rules, $response->rules
         );
 
-        $this->rules = array_combine(
-            array_keys($response->rules), $this->rules
-        );
-
         $this->implicitAttributes = array_merge(
             $this->implicitAttributes, $response->implicitAttributes
         );
@@ -1047,11 +1042,7 @@ class Validator implements ValidatorContract
      */
     protected function callClassBasedExtension($callback, $parameters)
     {
-        if (Str::contains($callback, '@')) {
-            list($class, $method) = explode('@', $callback);
-        } else {
-            list($class, $method) = [$callback, 'validate'];
-        }
+        list($class, $method) = Str::parseCallback($callback, 'validate');
 
         return call_user_func_array([$this->container->make($class), $method], $parameters);
     }

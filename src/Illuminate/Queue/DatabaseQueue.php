@@ -269,7 +269,7 @@ class DatabaseQueue extends Queue implements QueueContract
     /**
      * Mark the given job ID as reserved.
      *
-     * @param \Illuminate\Queue\Jobs\DatabaseJobRecord $job
+     * @param  \Illuminate\Queue\Jobs\DatabaseJobRecord  $job
      * @return \Illuminate\Queue\Jobs\DatabaseJobRecord
      */
     protected function markJobAsReserved($job)

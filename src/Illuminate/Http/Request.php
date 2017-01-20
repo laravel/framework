@@ -416,7 +416,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * Get the route handling the request.
      *
-     * @param string|null $param
+     * @param  string|null  $param
      *
      * @return \Illuminate\Routing\Route|object|string
      */

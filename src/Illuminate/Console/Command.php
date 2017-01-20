@@ -478,7 +478,7 @@ class Command extends SymfonyCommand
     /**
      * Set the verbosity level.
      *
-     * @param string|int $level
+     * @param  string|int  $level
      * @return void
      */
     protected function setVerbosity($level)
