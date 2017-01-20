@@ -60,6 +60,19 @@ class SeederMakeCommand extends GeneratorCommand
         parent::fire();
 
         $this->composer->dumpAutoloads();
+    }    
+    
+    /**
+     * Build the class with the given name.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function buildClass($name)
+    {
+        $stub = $this->files->get($this->getStub());
+
+        return $this->replaceClass($stub, class_basename($name));
     }
 
     /**
@@ -80,7 +93,7 @@ class SeederMakeCommand extends GeneratorCommand
      */
     protected function getPath($name)
     {
-        return $this->laravel->databasePath().'/seeds/'.$name.'.php';
+        return $this->laravel->databasePath().'/seeds/'.str_replace('\\', '/', $name).'.php';
     }
 
     /**
