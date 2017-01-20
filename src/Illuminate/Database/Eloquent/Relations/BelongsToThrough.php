@@ -6,22 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
-/**
- * BelongsToThrough relation defines an inverse one-to-one relationship between two models that uses a third
- * intermediate model as the connection.
- *
- * <code>
- * select * from Related
- * inner join Parent    on Parent.ForeignKey    = Related.PrimaryKey
- * inner join FarParent on FarParent.ForeignKey = Parent.PrimaryKey
- * where
- *     FarParent.PrimaryKey = ?
- * and FarParent.PrimaryKey is not null
- * </code>
- *
- *
- * @author Peter Scopes <peter.scopes@gmail.com>
- */
 class BelongsToThrough extends Relation
 {
     /**
@@ -48,11 +32,12 @@ class BelongsToThrough extends Relation
     /**
      * Create a new belongs to through relationship instance.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param \Illuminate\Database\Eloquent\Model   $farParent
-     * @param \Illuminate\Database\Eloquent\Model   $parent
-     * @param string                                $farParentKey Foreign key to parent
-     * @param string                                $parentKey    Foreign key to related
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Model  $farParent
+     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  string  $farParentKey  Foreign key to parent
+     * @param  string  $parentKey  Foreign key to related
+     * @return void
      */
     public function __construct(Builder $query, Model $farParent, Model $parent, $farParentKey, $parentKey)
     {
@@ -111,7 +96,8 @@ class BelongsToThrough extends Relation
     }
 
     /**
-     * @param Builder|null $query
+     * @param  \Illuminate\Database\Eloquent\Builder|null  $query
+     * @return void
      */
     protected function setJoin(Builder $query = null)
     {
@@ -143,7 +129,7 @@ class BelongsToThrough extends Relation
     /**
      * Initialize the relation on a set of models.
      *
-     * @param  array   $models
+     * @param  array  $models
      * @param  string  $relation
      * @return array
      */
@@ -159,10 +145,9 @@ class BelongsToThrough extends Relation
     /**
      * Match the eagerly loaded results to their parents.
      *
-     * @param  array                                    $models   Parent models
-     * @param  \Illuminate\Database\Eloquent\Collection $results  Related models
-     * @param  string                                   $relation
-     *
+     * @param  array  $models  Parent models
+     * @param  \Illuminate\Database\Eloquent\Collection  $results  Related models
+     * @param  string  $relation
      * @return array
      */
     public function match(array $models, Collection $results, $relation)
@@ -218,8 +203,7 @@ class BelongsToThrough extends Relation
     /**
      * Execute the query as a "select" statement.
      *
-     * @param array $columns
-     *
+     * @param  array  $columns
      * @return mixed
      */
     public function get($columns = ['*'])

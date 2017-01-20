@@ -67,11 +67,10 @@ trait HasRelationships
     /**
      * Define a one-to-one relationship that goes through an intermediate model.
      *
-     * @param string $related
-     * @param string $through
-     * @param string $thisForeignKey
-     * @param string $throughForeignKey
-     *
+     * @param  string  $related
+     * @param  string  $through
+     * @param  string  $thisForeignKey
+     * @param  string  $throughForeignKey
      * @return \Illuminate\Database\Eloquent\Relations\HasOneThrough
      */
     public function hasOneThrough($related, $through, $thisForeignKey = null, $throughForeignKey = null)
@@ -147,11 +146,10 @@ trait HasRelationships
     /**
      * Define an inverse one-to-one relationship that goes through an intermediate model.
      *
-     * @param string $related
-     * @param string $through
-     * @param string $throughForeignKey
-     * @param string $relatedForeignKey
-     *
+     * @param  string  $related
+     * @param  string  $through
+     * @param  string  $throughForeignKey
+     * @param  string  $relatedForeignKey
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToThrough
      */
     public function belongsToThrough($related, $through, $throughForeignKey = null, $relatedForeignKey = null)
