@@ -91,7 +91,7 @@ class BroadcastNotificationCreated implements ShouldBroadcast
 
         return $class.'.'.$this->notifiable->getKey();
     }
-    
+
     /**
      * Returns the notification type that will be set as the "type" with the broadcasted event.
      *
@@ -102,7 +102,7 @@ class BroadcastNotificationCreated implements ShouldBroadcast
         if (method_exists($this->notification, 'notificationType')) {
             return $this->notification->notificationType();
         }
-        
+ 
         return get_class($this->notification);
     }
 }
