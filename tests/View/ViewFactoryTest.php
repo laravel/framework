@@ -248,11 +248,12 @@ class ViewFactoryTest extends TestCase
         $factory->getDispatcher()->shouldReceive('fire');
         $factory->startComponent('component', ['name' => 'Taylor']);
         $factory->slot('title');
+        $factory->slot('website', 'laravel.com');
         echo 'title<hr>';
         $factory->endSlot();
         echo 'component';
         $contents = $factory->renderComponent();
-        $this->assertEquals('title<hr> component Taylor', $contents);
+        $this->assertEquals('title<hr> component Taylor laravel.com', $contents);
     }
 
     public function testTranslation()
