@@ -21,7 +21,7 @@ class HandleExceptions
 
     /**
      * Bootstrap the given application.
-     *
+     * 
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
@@ -29,7 +29,7 @@ class HandleExceptions
     {
         $this->app = $app;
 
-        error_reporting(-1);
+        //error_reporting(-1);
 
         set_error_handler([$this, 'handleError']);
 
@@ -44,7 +44,7 @@ class HandleExceptions
 
     /**
      * Convert PHP errors to ErrorException instances.
-     *
+     * If it's production environment. Only report error to log system.
      * @param  int  $level
      * @param  string  $message
      * @param  string  $file
@@ -54,10 +54,13 @@ class HandleExceptions
      *
      * @throws \ErrorException
      */
-    public function handleError($level, $message, $file = '', $line = 0, $context = [])
+    public function handleError($level, $message, $file = '', $line = 0)
     {
+        $e = new ErrorException($message, 0, $level, $file, $line);
         if (error_reporting() & $level) {
             throw new ErrorException($message, 0, $level, $file, $line);
+        } else {
+            $this->getExceptionHandler()->report($e);
         }
     }
 
