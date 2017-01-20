@@ -18,6 +18,13 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testArrayUndot()
+	{
+		$array = array_undot(array('developer.name' => 'taylor', 'developer.age' => 25, 'developer.address.number' => 123, 'developer.address.street' => 'Fake St', 'language' => 'php', 'closure' => function() { return 'closure'; }));
+		$this->assertEquals($array, array('developer' => array('name' => 'taylor', 'age' => 25, 'address' => array('number' => 123, 'street' => 'Fake St')), 'language' => 'php', 'closure' => 'closure'));
+	}
+
+
 	public function testArrayGet()
 	{
 		$array = array('names' => array('developer' => 'taylor'));

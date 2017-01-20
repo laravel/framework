@@ -137,6 +137,27 @@ if ( ! function_exists('array_dot'))
 	}
 }
 
+if ( ! function_exists('array_undot'))
+{
+	/**
+	 * Expand an array with dotted keys into a multi-dimensional associative array.
+	 *
+	 * @param  array   $array
+	 * @return array
+	 */
+	function array_undot($array)
+	{
+		$results = array();
+
+		foreach ($array as $key => $value)
+		{
+			array_set($results, $key, value($value));
+		}
+
+		return $results;
+	}
+}
+
 if ( ! function_exists('array_except'))
 {
 	/**
