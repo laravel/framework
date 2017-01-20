@@ -452,6 +452,15 @@ empty
 	}
 
 
+	public function testNestedInlineIfStatementsAreCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$string   = '@if ($foo)<span class="@if ($bar)has-class@endif"></span>@endif';
+		$expected = '<?php if($foo): ?><span class="<?php if($bar): ?>has-class<?php endif; ?>"></span><?php endif; ?>';
+		$this->assertEquals($expected, $compiler->compileString($string));
+	}
+
+
 	protected function getFiles()
 	{
 		return m::mock('Illuminate\Filesystem\Filesystem');
