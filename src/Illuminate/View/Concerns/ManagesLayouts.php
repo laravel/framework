@@ -31,17 +31,17 @@ trait ManagesLayouts
      * Start injecting content into a section.
      *
      * @param  string  $section
-     * @param  string  $content
+     * @param  string|null  $content
      * @return void
      */
-    public function startSection($section, $content = '')
+    public function startSection($section, $content = null)
     {
-        if ($content === '') {
+        if ($content === null) {
             if (ob_start()) {
                 $this->sectionStack[] = $section;
             }
         } else {
-            $this->extendSection($section, $content);
+            $this->extendSection($section, e($content));
         }
     }
 

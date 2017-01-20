@@ -42,8 +42,11 @@
 @endforeach
 
 <!-- Salutation -->
-Regards,<br>
-{{ config('app.name') }}
+@if (! empty($salutation))
+    {{ $salutation }}
+@else
+    Regards,<br>{{ config('app.name') }}
+@endif
 
 <!-- Subcopy -->
 @if (isset($actionText))
