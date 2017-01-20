@@ -6,6 +6,7 @@ use Closure;
 use LogicException;
 use ReflectionFunction;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Container\Container;
 use Illuminate\Routing\Matching\UriValidator;
@@ -210,7 +211,7 @@ class Route
      */
     public function getController()
     {
-        list($class) = explode('@', $this->action['uses']);
+        $class = $this->parseControllerCallback()[0];
 
         if (! $this->controller) {
             $this->controller = $this->container->make($class);
@@ -226,7 +227,17 @@ class Route
      */
     protected function getControllerMethod()
     {
-        return explode('@', $this->action['uses'])[1];
+        return $this->parseControllerCallback()[1];
+    }
+
+    /**
+     * Parse the controller.
+     *
+     * @return array
+     */
+    protected function parseControllerCallback()
+    {
+        return Str::parseCallback($this->action['uses']);
     }
 
     /**
