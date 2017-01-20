@@ -34,7 +34,7 @@ class RouteSignatureParameters
      */
     protected static function fromClassMethodString($uses)
     {
-        list($class, $method) = Str::parseCallback($uses, null);
+        list($class, $method) = Str::parseCallback($uses);
 
         return (new ReflectionMethod($class, $method))->getParameters();
     }

@@ -237,7 +237,7 @@ class Route
      */
     protected function parseControllerCallback()
     {
-        return Str::parseCallback($this->action['uses'], null);
+        return Str::parseCallback($this->action['uses']);
     }
 
     /**
