@@ -72,7 +72,7 @@ class BroadcastNotificationCreated implements ShouldBroadcast
     {
         return array_merge($this->data, [
             'id' => $this->notification->id,
-            'type' => get_class($this->notification),
+            'type' => $this->notificationType(),
         ]);
     }
 
@@ -90,5 +90,19 @@ class BroadcastNotificationCreated implements ShouldBroadcast
         $class = str_replace('\\', '.', get_class($this->notifiable));
 
         return $class.'.'.$this->notifiable->getKey();
+    }
+    
+    /**
+     * Returns the notification type that will be set as the "type" with the broadcasted event.
+     *
+     * @return string
+     */
+    protected function notificationType()
+    {
+        if (method_exists($this->notification, 'notificationType')) {
+            return $this->notification->notificationType();
+        }
+        
+        return get_class($this->notification);
     }
 }
