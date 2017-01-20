@@ -118,8 +118,8 @@ class Str
      */
     public static function is($pattern, $value)
     {
-        //there should be a strict check as we are dealing with strings.
-        if ($pattern === $value) {
+        //typecast to make the check more reliable. 
+        if ((string)$pattern == (string)$value) {
             return true;
         }
 
