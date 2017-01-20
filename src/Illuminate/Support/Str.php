@@ -118,7 +118,8 @@ class Str
      */
     public static function is($pattern, $value)
     {
-        if ($pattern == $value) {
+        //there should be a strict check as we are dealing with strings.
+        if ($pattern === $value) {
             return true;
         }
 
