@@ -41,7 +41,7 @@ trait ManagesLayouts
                 $this->sectionStack[] = $section;
             }
         } else {
-            $this->extendSection($section, $content);
+            $this->extendSection($section, e($content));
         }
     }
 
