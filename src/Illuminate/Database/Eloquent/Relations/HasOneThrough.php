@@ -6,23 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
-/**
- * HasOneThrough relation defines a one-to-one relationship between two models that uses a third
- * intermediate model as the connection.
- *
- * <code>
- * select Related.*, Parent.ForeignKey
- * from Related
- * inner join Parent on Parent.PrimaryKey = Related.ForeignKey
- * where
- *     Parent.ForeignKey = FarParent.PrimaryKey
- * and Parent.ForeignKey in not null
- * </code>
- *
- *
- *
- * @author Peter Scopes <peter.scopes@gmail.com>
- */
 class HasOneThrough extends Relation
 {
     /**
@@ -49,11 +32,11 @@ class HasOneThrough extends Relation
     /**
      * Create a new has one through relationship instance.
      *
-     * @param Builder $query
-     * @param Model   $farParent
-     * @param Model   $parent
-     * @param         $parentForeignKey
-     * @param         $relatedForeignKey
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Model  $farParent
+     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  string  $parentForeignKey
+     * @param  string  $relatedForeignKey
      */
     public function __construct(Builder $query, Model $farParent, Model $parent, $parentForeignKey, $relatedForeignKey)
     {
@@ -114,7 +97,8 @@ class HasOneThrough extends Relation
     }
 
     /**
-     * @param Builder|null $query
+     * @param  \Illuminate\Database\Eloquent\Builder|null  $query
+     * @return void
      */
     protected function setJoin(Builder $query = null)
     {
@@ -142,7 +126,7 @@ class HasOneThrough extends Relation
     /**
      * Initialize the relation on a set of models.
      *
-     * @param  array   $models
+     * @param  array  $models
      * @param  string  $relation
      * @return array
      */
@@ -158,10 +142,9 @@ class HasOneThrough extends Relation
     /**
      * Match the eagerly loaded results to their parents.
      *
-     * @param  array                                    $models   Parent models
-     * @param  \Illuminate\Database\Eloquent\Collection $results  Related models
-     * @param  string                                   $relation
-     *
+     * @param  array  $models  Parent models
+     * @param  \Illuminate\Database\Eloquent\Collection  $results  Related models
+     * @param  string  $relation
      * @return array
      */
     public function match(array $models, Collection $results, $relation)
@@ -217,8 +200,7 @@ class HasOneThrough extends Relation
     /**
      * Execute the query as a "select" statement.
      *
-     * @param array $columns
-     *
+     * @param  array  $columns
      * @return mixed
      */
     public function get($columns = ['*'])
