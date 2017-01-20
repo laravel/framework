@@ -1530,13 +1530,14 @@ class Builder {
 	 */
 	public function lists($column, $key = null)
 	{
-		$columns = $this->getListSelect($column, $key);
+		$select = is_null($key) ? array($column) : array($column, $key);
 
 		// First we will just get all of the column values for the record result set
 		// then we can associate those values with the column if it was specified
 		// otherwise we can just give these values back without a specific key.
-		$results = new Collection($this->get($columns));
+		$results = new Collection($this->get($select));
 
+		$columns = $this->removeTablePrefixes($select);
 		$values = $results->fetch($columns[0])->all();
 
 		// If a key was specified and we have results, we will go ahead and combine
@@ -1544,7 +1545,7 @@ class Builder {
 		// be accessed by the key of the rows instead of simply being numeric.
 		if ( ! is_null($key) && count($results) > 0)
 		{
-			$keys = $results->fetch($key)->all();
+			$keys = $results->fetch($columns[1])->all();
 
 			return array_combine($keys, $values);
 		}
@@ -1553,22 +1554,21 @@ class Builder {
 	}
 
 	/**
-	 * Get the columns that should be used in a list array.
+	 * Get the columns that should be used in a list array without their prefixes (if any).
 	 *
-	 * @param  string  $column
-	 * @param  string  $key
+	 * @param  array  $select
 	 * @return array
 	 */
-	protected function getListSelect($column, $key)
+	protected function removeTablePrefixes($select)
 	{
-		$select = is_null($key) ? array($column) : array($column, $key);
-
-		// If the selected column contains a "dot", we will remove it so that the list
+		// If the selected fields contain a "dot", we will remove it so that the list
 		// operation can run normally. Specifying the table is not needed, since we
 		// really want the names of the columns as it is in this resulting array.
-		if (($dot = strpos($select[0], '.')) !== false)
-		{
-			$select[0] = substr($select[0], $dot + 1);
+		foreach($select as &$field) {
+			if (($dot = strpos($field, '.')) !== false)
+			{
+				$field = substr($field, $dot + 1);
+			}
 		}
 
 		return $select;
