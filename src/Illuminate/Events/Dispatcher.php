@@ -435,7 +435,7 @@ class Dispatcher implements DispatcherContract
     {
         $handler = (new ReflectionClass($class))->newInstanceWithoutConstructor();
 
-        $handler->queue($this->resolveQueue(), 'Illuminate\Events\CallQueuedHandler@call', [
+        $handler->queue($this->resolveQueue(), CallQueuedHandler::class.'@call', [
             'class' => $class, 'method' => $method, 'data' => serialize($arguments),
         ]);
     }
@@ -458,7 +458,7 @@ class Dispatcher implements DispatcherContract
 
         $this->resolveQueue()
                 ->connection($connection)
-                ->pushOn($queue, 'Illuminate\Events\CallQueuedHandler@call', [
+                ->pushOn($queue, CallQueuedHandler::class.'@call', [
                     'class' => $class,
                     'method' => $method,
                     'data' => serialize($arguments),
