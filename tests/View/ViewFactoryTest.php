@@ -440,6 +440,8 @@ class ViewFactoryTest extends TestCase
             'last' => false,
             'depth' => 1,
             'parent' => null,
+            'odd' => false,
+            'even' => true,
         ];
 
         $this->assertEquals([$expectedLoop], $factory->getLoopStack());
@@ -455,6 +457,8 @@ class ViewFactoryTest extends TestCase
             'last' => false,
             'depth' => 2,
             'parent' => (object) $expectedLoop,
+            'odd' => false,
+            'even' => true,
         ];
         $this->assertEquals([$expectedLoop, $secondExpectedLoop], $factory->getLoopStack());
 
@@ -478,6 +482,8 @@ class ViewFactoryTest extends TestCase
             'last' => null,
             'depth' => 1,
             'parent' => null,
+            'odd' => false,
+            'even' => true,
         ];
 
         $this->assertEquals([$expectedLoop], $factory->getLoopStack());
@@ -491,11 +497,25 @@ class ViewFactoryTest extends TestCase
 
         $factory->incrementLoopIndices();
 
+        $expected = [
+            'iteration' => 1,
+            'index' => 0,
+            'remaining' => 3,
+            'odd' => true,
+            'even' => false,
+        ];
+        $this->assertArraySubset($expected, $factory->getLoopStack()[0], true);
+
         $factory->incrementLoopIndices();
 
-        $this->assertEquals(2, $factory->getLoopStack()[0]['iteration']);
-        $this->assertEquals(1, $factory->getLoopStack()[0]['index']);
-        $this->assertEquals(2, $factory->getLoopStack()[0]['remaining']);
+        $expected = [
+            'iteration' => 2,
+            'index' => 1,
+            'remaining' => 2,
+            'odd' => false,
+            'even' => true,
+        ];
+        $this->assertArraySubset($expected, $factory->getLoopStack()[0], true);
     }
 
     public function testReachingEndOfLoop()
