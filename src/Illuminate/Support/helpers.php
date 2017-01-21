@@ -493,11 +493,11 @@ if (! function_exists('dd')) {
      * @param  mixed
      * @return void
      */
-    function dd()
+    function dd(...$args)
     {
         array_map(function ($x) {
             (new Dumper)->dump($x);
-        }, func_get_args());
+        }, $args);
 
         die(1);
     }
