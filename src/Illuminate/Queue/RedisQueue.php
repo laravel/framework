@@ -39,6 +39,13 @@ class RedisQueue extends Queue implements QueueContract
     protected $retryAfter = 60;
 
     /**
+     * The last delayed payload sent by the queue.
+     *
+     * @var string
+     */
+    protected $lastDelayedPayload;
+
+    /**
      * Create a new Redis queue instance.
      *
      * @param  \Illuminate\Contracts\Redis\Factory  $redis
@@ -109,7 +116,7 @@ class RedisQueue extends Queue implements QueueContract
      */
     public function later($delay, $job, $data = '', $queue = null)
     {
-        $payload = $this->createPayload($job, $data);
+        $this->lastDelayedPayload = $payload = $this->createPayload($job, $data);
 
         $this->getConnection()->zadd(
             $this->getQueue($queue).':delayed', $this->availableAt($delay), $payload
