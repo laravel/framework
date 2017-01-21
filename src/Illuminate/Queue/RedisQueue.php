@@ -174,11 +174,11 @@ class RedisQueue extends Queue implements QueueContract
      *
      * @param  string  $from
      * @param  string  $to
-     * @return void
+     * @return array
      */
     public function migrateExpiredJobs($from, $to)
     {
-        $this->getConnection()->eval(
+        return $this->getConnection()->eval(
             LuaScripts::migrateExpiredJobs(), 2, $from, $to, $this->currentTime()
         );
     }
