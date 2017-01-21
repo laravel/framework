@@ -80,4 +80,26 @@ trait CompilesConditionals
     {
         return '<?php endif; ?>';
     }
+
+    /**
+     * Compile the default statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileDefault($expression)
+    {
+        return "<?php if (isset{$expression} && (string) {$expression} != ''): echo e{$expression}; else: ?>";
+    }
+
+    /**
+     * Compile the end default statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileEnddefault($expression)
+    {
+        return '<?php endif; ?>';
+    }
 }
