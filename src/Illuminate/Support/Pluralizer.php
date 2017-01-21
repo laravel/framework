@@ -170,7 +170,7 @@ class Pluralizer {
 	 */
 	public static function plural($value, $count = 2)
 	{
-		if ($count == 1) return $value;
+		if ($count < 2) return $value;
 
 		if (in_array($value, static::$irregular)) return $value;
 
