@@ -53,9 +53,7 @@ class RedisStore extends TaggableStore implements Store
     {
         $value = $this->connection()->get($this->prefix.$key);
 
-        if (! is_null($value) && $value !== false) {
-            return $this->unserialize($value);
-        }
+        return $this->unserialize($value);
     }
 
     /**
@@ -270,6 +268,8 @@ class RedisStore extends TaggableStore implements Store
      */
     protected function unserialize($value)
     {
-        return is_numeric($value) ? $value : unserialize($value);
+        if (! is_null($value) && $value !== false) {
+            return is_numeric($value) ? $value : unserialize($value);
+        }
     }
 }
