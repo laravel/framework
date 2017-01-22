@@ -2,7 +2,9 @@
 
 namespace Illuminate\Tests\Database;
 
+use Carbon\Carbon;
 use Exception;
+use Illuminate\Support\Collection;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Relations\Pivot;
@@ -94,6 +96,22 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->schema($connection)->create('non_incrementing_users', function ($table) {
             $table->string('name')->nullable();
+        });
+
+        $this->schema('default')->create('test_dirty_casts', function ($table) {
+            $table->increments('id');
+            $table->integer('int_value');
+            $table->float('real_value');
+            $table->string('string_value');
+            $table->boolean('true_value');
+            $table->boolean('false_value');
+            $table->text('object_value');
+            $table->text('array_value');
+            $table->text('collection_value');
+            $table->timestamp('date_value');
+            $table->timestamp('datetime_value');
+            $table->integer('timestamp_value');
+            $table->timestamps();
         });
     }
 
@@ -995,6 +1013,86 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertInternalType('string', $user->id);
     }
 
+    public function testCastedFieldsAreNotDirtyWhenSetToTheSameCastedValues()
+    {
+        $now = Carbon::now();
+        $today = Carbon::today();
+        $time = time();
+        $object = new \StdClass();
+        $object->f = 'v';
+        $string = new StringCastable('string');
+
+        $model = EloquentTestDirtyCast::create([
+            'int_value'    => 1,
+            'real_value'   => 1.0000001,
+            'string_value' => $string,
+            'true_value'   => true,
+            'false_value'  => false,
+            'object_value' => $object,
+            'array_value'  => [],
+            'collection_value' => new Collection(['foo' => 'bar']),
+            'date_value'      => $today,
+            'datetime_value'  => $now,
+            'timestamp_value' => $time,
+        ]);
+
+        $model->int_value = 1;
+        $model->real_value = 1.0000001;
+        $model->string_value = $string;
+        $model->true_value = true;
+        $model->false_value = false;
+        $model->object_value = $object;
+        $model->array_value = [];
+        $model->collection_value = new Collection(['foo' => 'bar']);
+        $model->date_value = $today;
+        $model->datetime_value = $now;
+        $model->timestamp_value = $time;
+        $this->assertFalse($model->isDirty());
+
+        $model->int_value = '1';
+        $model->real_value = '1.0000001';
+        $model->string_value = 'string';
+        $model->true_value = 1;
+        $model->false_value = '0';
+        $model->object_value = $object;
+        $model->array_value = [];
+        $model->collection_value = new Collection(['foo' => 'bar']);
+        $model->date_value = (string) $today;
+        $model->datetime_value = (string) $now;
+        $model->timestamp_value = (string) $time;
+
+        $this->assertFalse($model->isDirty());
+
+        $model = $model->fresh();
+
+        $model->int_value = 1;
+        $model->real_value = 1.0000001;
+        $model->string_value = $string;
+        $model->true_value = true;
+        $model->false_value = false;
+        $model->object_value = $object;
+        $model->array_value = [];
+        $model->collection_value = new Collection(['foo' => 'bar']);
+        $model->date_value = $today;
+        $model->datetime_value = $now;
+        $model->timestamp_value = $time;
+        $this->assertFalse($model->isDirty());
+
+        $model->int_value = '1';
+        $model->real_value = '1.0000001';
+        $model->string_value = 'string';
+        $model->true_value = 1;
+        $model->false_value = '0';
+        $model->object_value = $object;
+        $model->array_value = [];
+        $model->collection_value = new Collection(['foo' => 'bar']);
+        $model->date_value = (string) $today;
+        $model->datetime_value = (string) $now;
+        $model->timestamp_value = (string) $time;
+
+        $this->assertFalse($model->isDirty());
+    }
+
     public function testRelationsArePreloadedInGlobalScope()
     {
         $user = EloquentTestUserWithGlobalScope::create(['email' => 'taylorotwell@gmail.com']);
@@ -1224,6 +1322,24 @@ class EloquentTestUserWithStringCastId extends EloquentTestUser
     ];
 }
 
+class EloquentTestDirtyCast extends Eloquent
+{
+    protected $guarded = [];
+    protected $table = 'test_dirty_casts';
+    protected $casts = [
+        'int_value'    => 'int',
+        'real_value'   => 'real',
+        'true_value'   => 'bool',
+        'false_value'  => 'bool',
+        'object_value' => 'object',
+        'array_value'  => 'array',
+        'collection_value' => 'collection',
+        'date_value'      => 'date',
+        'datetime_value'  => 'datetime',
+        'timestamp_value' => 'timestamp',
+    ];
+}
+
 class EloquentTestOrder extends Eloquent
 {
     protected $guarded = [];
@@ -1233,6 +1349,21 @@ class EloquentTestOrder extends Eloquent
     public function item()
     {
         return $this->morphTo();
+    }
+}
+
+class StringCastable
+{
+    private $str;
+
+    public function __construct($str)
+    {
+        $this->str = $str;
+    }
+
+    public function __toString()
+    {
+        return $this->str;
     }
 }
 
