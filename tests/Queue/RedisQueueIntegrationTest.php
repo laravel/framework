@@ -209,7 +209,7 @@ class RedisQueueIntegrationTest extends TestCase
         //check the content of delayed queue
         $this->assertEquals(1, $this->redis->connection()->zcard('queues:default:delayed'));
 
-        $results = $this->redis->connection()->zrangebyscore('queues:default:delayed', -INF, INF, 'withscores');
+        $results = $this->redis->connection()->zrangebyscore('queues:default:delayed', -INF, INF, ['WITHSCORES' => true]);
 
         $payload = array_keys($results)[0];
 
