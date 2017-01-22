@@ -68,7 +68,7 @@ class UploadedFile extends SymfonyUploadedFile
     public function storeAs($path, $name, $options = [])
     {
         $options = $this->parseOptions($options);
-        
+
         $disk = Arr::pull($options, 'disk');
 
         return Container::getInstance()->make(FilesystemFactory::class)->disk($disk)->putFileAs(
