@@ -1141,7 +1141,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function modelQualifiedKeyName()
     {
-        return ($model = new static)->getTable().'.'.$model->getKeyName();
+        $model = new static;
+
+        return $model->getTable().'.'.$model->getKeyName();
     }
 
     /**
