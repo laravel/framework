@@ -1105,6 +1105,46 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Get the table associated with the model with static call.
+     *
+     * @return string
+     */
+    public static function modelTableName()
+    {
+        return (new static)->getTable();
+    }
+
+    /**
+     * Get the primary key for the model with static call.
+     *
+     * @return string
+     */
+    public static function modelKeyName()
+    {
+        return (new static)->getKeyName();
+    }
+
+    /**
+     * Get the table qualified column name with static call.
+     *
+     * @return string
+     */
+    public static function modelQualifiedColumnName($column)
+    {
+        return (new static)->getTable().'.'.$column;
+    }
+
+    /**
+     * Get the table qualified key name with static call.
+     *
+     * @return string
+     */
+    public static function modelQualifiedKeyName()
+    {
+        return ($model = new static)->getTable().'.'.$model->getKeyName();
+    }
+
+    /**
      * Get the auto incrementing key type.
      *
      * @return string

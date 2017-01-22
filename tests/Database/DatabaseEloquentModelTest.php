@@ -1577,6 +1577,26 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($result);
     }
 
+    public function testModelTableName()
+    {
+        $this->assertSame('stub', EloquentModelStubWithCustomKey::modelTableName());
+    }
+
+    public function testModelKeyName()
+    {
+        $this->assertSame('custom_key', EloquentModelStubWithCustomKey::modelKeyName());
+    }
+
+    public function testModelQualifiedColumnName()
+    {
+        $this->assertSame('stub.something', EloquentModelStubWithCustomKey::modelQualifiedColumnName('something'));
+    }
+
+    public function testModelQualifiedKeyName()
+    {
+        $this->assertSame('stub.custom_key', EloquentModelStubWithCustomKey::modelQualifiedKeyName());
+    }
+
     protected function addMockConnection($model)
     {
         $model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
@@ -1694,6 +1714,11 @@ class EloquentModelStub extends Model
 class EloquentModelCamelStub extends EloquentModelStub
 {
     public static $snakeAttributes = false;
+}
+
+class EloquentModelStubWithCustomKey extends EloquentModelStub
+{
+    protected $primaryKey = 'custom_key';
 }
 
 class EloquentDateModelStub extends EloquentModelStub
