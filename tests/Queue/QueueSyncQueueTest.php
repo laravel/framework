@@ -35,7 +35,7 @@ class QueueSyncQueueTest extends TestCase
         $container = new \Illuminate\Container\Container;
         Container::setInstance($container);
         $events = m::mock('Illuminate\Contracts\Events\Dispatcher');
-        $events->shouldReceive('fire')->times(3);
+        $events->shouldReceive('dispatch')->times(3);
         $container->instance('events', $events);
         $container->instance('Illuminate\Contracts\Events\Dispatcher', $events);
         $sync->setContainer($container);
