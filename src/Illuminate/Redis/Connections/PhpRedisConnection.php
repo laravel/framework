@@ -84,9 +84,9 @@ class PhpRedisConnection extends Connection
      * Removes the first count occurences of the value element from the list.
      *
      * @param  string  $key
-     * @param  integer  $count
+     * @param  int  $count
      * @param  $value  $value
-     * @return integer|false
+     * @return int|false
      */
     public function lrem($key, $count, $value)
     {
@@ -97,7 +97,7 @@ class PhpRedisConnection extends Connection
      * Removes and returns a random element from the set value at key.
      *
      * @param  string  $key
-     * @param  integer|null  $count
+     * @param  int|null  $count
      * @return mixed|false
      */
     public function spop($key, $count = null)
@@ -110,7 +110,7 @@ class PhpRedisConnection extends Connection
      *
      * @param  string  $key
      * @param  array  $membersAndScoresDictionary
-     * @return integer
+     * @return int
      */
     public function zadd($key, array $membersAndScoresDictionary)
     {
