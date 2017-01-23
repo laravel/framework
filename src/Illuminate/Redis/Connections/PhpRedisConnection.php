@@ -125,6 +125,19 @@ class PhpRedisConnection extends Connection
     }
 
     /**
+     * Evaluate a LUA script serverside, from the SHA1 hash of the script instead of the script itself.
+     *
+     * @param  string  $script
+     * @param  int  $numkeys
+     * @param  mixed  $arguments
+     * @return mixed
+     */
+    public function evalsha($script, $numkeys, ...$arguments)
+    {
+        return $this->command('evalsha', [$this->script('load', $script), $arguments, $parameters]);
+    }
+
+    /**
      * Subscribe to a set of given channels for messages.
      *
      * @param  array|string  $channels
