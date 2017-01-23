@@ -827,7 +827,7 @@ class Builder
      */
     public function forceCreate(array $attributes)
     {
-        $instance = $this->model->newInstance($attributes)->setConnection(
+        $instance = $this->model->newInstance()->setConnection(
             $this->query->getConnection()->getName()
         );
 
