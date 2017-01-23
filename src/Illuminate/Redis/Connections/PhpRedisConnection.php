@@ -130,6 +130,16 @@ class PhpRedisConnection extends Connection
             return $this->proxyToEval($parameters);
         }
 
+        $arrayMethods = [
+            'hdel', 'hstrlen',
+            'lpush', 'rpush',
+            'sadd', 'srem', 'sdiff', 'sdiffstore', 'sinter', 'sinterstore', 'sunion', 'sunionstore',
+        ];
+
+        if (is_array($parameters) && in_array($method, $arrayMethods)) {
+            $this->command($method, ...$parameters);
+        }
+
         return parent::__call($method, $parameters);
     }
 }
