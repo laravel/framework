@@ -1,7 +1,7 @@
 <?php
 
-use Carbon\Carbon;
 use Mockery as m;
+use Carbon\Carbon;
 use Illuminate\Redis\Database;
 use Illuminate\Queue\RedisQueue;
 use Illuminate\Container\Container;
