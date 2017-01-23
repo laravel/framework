@@ -61,6 +61,50 @@ class PhpRedisConnection extends Connection
     }
 
     /**
+     * Removes the first count occurences of the value element from the list.
+     *
+     * @param  string  $key
+     * @param  integer  $count
+     * @param  $value  $value
+     * @return integer|false
+     */
+    public function lrem($key, $count, $value)
+    {
+        return $this->command('lrem', $key, $value, $count);
+    }
+
+    /**
+     * Removes and returns a random element from the set value at key.
+     *
+     * @param  string  $key
+     * @param  integer|null  $count
+     * @return mixed|false
+     */
+    public function spop($key, $count = null)
+    {
+        return $this->command('spop', $key, $count);
+    }
+
+    /**
+     * Add one or more members to a sorted set or update its score if it already exists.
+     *
+     * @param  string  $key
+     * @param  array  $membersAndScoresDictionary
+     * @return integer
+     */
+    public function zadd($key, array $membersAndScoresDictionary)
+    {
+        $arguments = [];
+
+        foreach ($membersAndScoresDictionary as $member => $score) {
+            $arguments[] = $score;
+            $arguments[] = $member;
+        }
+
+        return $this->command('zadd', ...$arguments);
+    }
+
+    /**
      * Subscribe to a set of given channels for messages.
      *
      * @param  array|string  $channels
