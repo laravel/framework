@@ -410,7 +410,7 @@ trait MakesHttpRequests
 
         return $this;
     }
-    
+
     /**
      * Assert that the response contains the given JSON.
      *
