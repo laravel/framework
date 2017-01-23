@@ -8,7 +8,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
 use Illuminate\View\Factory as ViewFactory;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
-use Illuminate\Contracts\Markdown as MarkdownContract;
+use Illuminate\Contracts\Mail\Markdown as MarkdownContract;
 
 class Markdown implements MarkdownContract
 {
