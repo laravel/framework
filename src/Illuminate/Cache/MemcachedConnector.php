@@ -5,6 +5,24 @@ use Memcached;
 class MemcachedConnector {
 
 	/**
+	 * The application instance.
+	 *
+	 * @var \Illuminate\Foundation\Application
+	 */
+	protected $app;
+
+	/**
+	 * Create a memcached connector instance.
+	 *
+	 * @param  \Illuminate\Foundation\Application  $app
+	 * @return void
+	 */
+	public function __construct($app)
+	{
+		$this->app = $app;
+	}
+
+	/**
 	 * Create a new Memcached connection.
 	 *
 	 * @param  array  $servers
@@ -15,6 +33,18 @@ class MemcachedConnector {
 	public function connect(array $servers)
 	{
 		$memcached = $this->getMemcached();
+
+		if (!empty($this->app['config']['cache.memcached_options'])) {
+			$memcached->setOptions($this->app['config']['cache.memcached_options']);
+		}
+
+		if (!empty($this->app['config']['cache.memcached_sasl.username'])
+			&& !empty($this->app['config']['cache.memcached_sasl.password'])) {
+			$memcached->setSaslAuthData(
+				$this->app['config']['cache.memcached_sasl.username'],
+				$this->app['config']['cache.memcached_sasl.password']
+			);
+		}
 
 		// For each server in the array, we'll just extract the configuration and add
 		// the server to the Memcached connection. Once we have added all of these
