@@ -13,14 +13,8 @@ class ConsoleScheduledEventTest extends PHPUnit_Framework_TestCase
      */
     protected $defaultTimezone;
 
-    /**
-     * @var Carbon
-     */
-    protected $now;
-
     public function setUp()
     {
-        $this->now = Carbon::now();
         $this->defaultTimezone = date_default_timezone_get();
         date_default_timezone_set('UTC');
     }
@@ -28,7 +22,7 @@ class ConsoleScheduledEventTest extends PHPUnit_Framework_TestCase
     public function tearDown()
     {
         date_default_timezone_set($this->defaultTimezone);
-        Carbon::setTestNow($this->now);
+        Carbon::setTestNow(null);
         m::close();
     }
 
