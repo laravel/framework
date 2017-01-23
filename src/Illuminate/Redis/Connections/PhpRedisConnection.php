@@ -61,6 +61,26 @@ class PhpRedisConnection extends Connection
     }
 
     /**
+     * Set the string value in argument as value of the key.
+     *
+     * @param string  $key
+     * @param mixed  $value
+     * @param string|null  $expireResolution
+     * @param int|null  $expireTTL
+     * @param string|null  $flag
+     * @return bool
+     */
+    public function set($key, $value, $expireResolution = null, $expireTTL = null, $flag = null)
+    {
+        return $this->command(
+            'set',
+            $key,
+            $value,
+            $expireResolution ? [$expireResolution, $flag => $expireTTL] : null
+        );
+    }
+
+    /**
      * Removes the first count occurences of the value element from the list.
      *
      * @param  string  $key
