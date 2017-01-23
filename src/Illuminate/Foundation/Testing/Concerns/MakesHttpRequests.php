@@ -402,8 +402,7 @@ trait MakesHttpRequests
                 $this->seeJsonStructureContains($structuredData[$key], $responseData[$key]);
             } else {
                 $this->assertArrayHasKey($key, $responseData);
-                if ($value === '*') {
-                }else{
+                if ($value !== '*') {
                     $this->assertEquals($value, $responseData[$key]);
                 }
             }
