@@ -3,12 +3,14 @@
 namespace Illuminate\Mail;
 
 use Parsedown;
+use RuntimeException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
 use Illuminate\View\Factory as ViewFactory;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
+use Illuminate\Contracts\Markdown as MarkdownContract;
 
-class Markdown
+class Markdown implements MarkdownContract
 {
     /**
      * The view factory implementation.
@@ -16,6 +18,13 @@ class Markdown
      * @var \Illuminate\View\Factory
      */
     protected $view;
+
+    /**
+     * The markdown parser callable.
+     *
+     * @var callable
+     */
+    protected $parser;
 
     /**
      * The current theme being used when generating emails.
@@ -36,11 +45,21 @@ class Markdown
      *
      * @param  \Illuminate\View\Factory  $view
      * @param  array  $options
+     * @param  callable|null  $parser
      * @return void
      */
-    public function __construct(ViewFactory $view, array $options = [])
+    public function __construct(ViewFactory $view, array $options = [], callable $parser = null)
     {
         $this->view = $view;
+
+        $this->parser = $parser ?: function ($text) {
+            if class_exists(Parsedown::class) {
+                throw new RuntimeException('A markdown library is required. You may wish to install erusev/parsedown.');
+            }
+
+            (new Parsedown)->text($text);
+        };
+
         $this->theme = Arr::get($options, 'theme', 'default');
         $this->loadComponentsFrom(Arr::get($options, 'paths', []));
     }
@@ -88,11 +107,11 @@ class Markdown
      * @param  string  $text
      * @return string
      */
-    public static function parse($text)
+    public function parse($text)
     {
-        $parsedown = new Parsedown;
+        $parser = $this->parser;
 
-        return new HtmlString($parsedown->text($text));
+        return new HtmlString($parser($text));
     }
 
     /**

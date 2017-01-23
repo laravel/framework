@@ -1,3 +1,3 @@
 <div class="table">
-{{ Illuminate\Mail\Markdown::parse($slot) }}
+{{ app('mail.markdown')->parse($slot) }}
 </div>
