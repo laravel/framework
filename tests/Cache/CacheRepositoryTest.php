@@ -68,6 +68,11 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase
         });
         $this->assertEquals('bar', $result);
 
+        /*
+         * Use Carbon object...
+         */
+        Carbon::setTestNow(Carbon::now());
+
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->andReturn(null);
         $repo->getStore()->shouldReceive('put')->once()->with('foo', 'bar', 602 / 60);
@@ -80,6 +85,8 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase
             return 'qux';
         });
         $this->assertEquals('qux', $result);
+
+        Carbon::setTestNow();
     }
 
     public function testRememberForeverMethodCallsForeverAndReturnsDefault()
