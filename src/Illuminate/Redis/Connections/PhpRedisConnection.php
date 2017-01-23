@@ -153,7 +153,8 @@ class PhpRedisConnection extends Connection
         $arrayMethods = [
             'hdel', 'hstrlen',
             'lpush', 'rpush',
-            'sadd', 'srem', 'sdiff', 'sdiffstore', 'sinter', 'sinterstore', 'sunion', 'sunionstore',
+            'scan', 'hscan', 'sscan', 'zscan',
+            'sadd', 'srem', 'sdiff', 'sinter', 'sunion', 'sdiffstore', 'sinterstore', 'sunionstore',
         ];
 
         if (is_array($parameters) && in_array($method, $arrayMethods)) {
