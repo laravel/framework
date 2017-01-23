@@ -37,6 +37,13 @@ abstract class Job
     protected $released = false;
 
     /**
+     * Indicates if the job has failed.
+     *
+     * @var bool
+     */
+    protected $failed = false;
+
+    /**
      * The name of the connection the job belongs to.
      */
     protected $connectionName;
@@ -114,6 +121,26 @@ abstract class Job
     }
 
     /**
+     * Determine if the job has been marked as a failure.
+     *
+     * @return bool
+     */
+    public function hasFailed()
+    {
+        return $this->failed;
+    }
+
+    /**
+     * Mark the job as "failed".
+     *
+     * @return void
+     */
+    public function markAsFailed()
+    {
+        $this->failed = true;
+    }
+
+    /**
      * Process an exception that caused the job to fail.
      *
      * @param  \Exception  $e
@@ -121,6 +148,8 @@ abstract class Job
      */
     public function failed($e)
     {
+        $this->markAsFailed();
+
         $payload = $this->payload();
 
         list($class, $method) = JobName::parse($payload['job']);
