@@ -18,6 +18,8 @@ class FailingJob
      */
     public static function handle($connectionName, $job, $e = null)
     {
+        $job->markAsFailed();
+
         if ($job->isDeleted()) {
             return;
         }

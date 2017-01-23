@@ -77,7 +77,7 @@ class BoundMethod
         // Here we need to turn the array callable into a Class@method string we can use to
         // examine the container and see if there are any method bindings for this given
         // method. If there are, we can call this method binding callback immediately.
-        $method = static::normalizeMethod($container, $callback);
+        $method = static::normalizeMethod($callback);
 
         if ($container->hasMethodBinding($method)) {
             return $container->callMethodBinding($method, $callback[0]);
@@ -89,11 +89,10 @@ class BoundMethod
     /**
      * Normalize the given callback into a Class@method string.
      *
-     * @param  \Illuminate\Container\Container  $container
      * @param  callable  $callback
      * @return string
      */
-    protected static function normalizeMethod($container, $callback)
+    protected static function normalizeMethod($callback)
     {
         $class = is_string($callback[0]) ? $callback[0] : get_class($callback[0]);
 

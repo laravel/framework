@@ -82,7 +82,7 @@ class RedisJob extends Job implements JobContract
     {
         parent::delete();
 
-        $this->redis->deleteReserved($this->queue, $this->reserved);
+        $this->redis->deleteReserved($this->queue, $this);
     }
 
     /**
@@ -95,7 +95,7 @@ class RedisJob extends Job implements JobContract
     {
         parent::release($delay);
 
-        $this->redis->deleteAndRelease($this->queue, $this->reserved, $delay);
+        $this->redis->deleteAndRelease($this->queue, $this, $delay);
     }
 
     /**
