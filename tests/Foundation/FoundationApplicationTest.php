@@ -21,7 +21,7 @@ class FoundationApplicationTest extends TestCase
         $app['translator'] = $trans = m::mock('StdClass');
         $trans->shouldReceive('setLocale')->once()->with('foo');
         $app['events'] = $events = m::mock('StdClass');
-        $events->shouldReceive('fire')->once()->with(m::type('Illuminate\Foundation\Events\LocaleUpdated'));
+        $events->shouldReceive('dispatch')->once()->with(m::type('Illuminate\Foundation\Events\LocaleUpdated'));
 
         $app->setLocale('foo');
     }
