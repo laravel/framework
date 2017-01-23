@@ -115,7 +115,7 @@ class FactoryBuilder
         if ($results instanceof Model) {
             $results->save();
         } else {
-            $result->each->save();
+            $results->each->save();
         }
 
         return $results;
