@@ -145,6 +145,9 @@ class ChangeColumn
             case 'binary':
                 $type = 'blob';
                 break;
+            case 'json':
+                $type = 'json_array';
+                break;
         }
 
         return Type::getType($type);
