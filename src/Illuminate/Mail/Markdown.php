@@ -57,7 +57,7 @@ class Markdown implements MarkdownContract
                 throw new RuntimeException('A markdown library is required. You may wish to install erusev/parsedown.');
             }
 
-            (new Parsedown)->text($text);
+            return (new Parsedown)->text($text);
         };
 
         $this->theme = Arr::get($options, 'theme', 'default');
