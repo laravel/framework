@@ -53,7 +53,7 @@ class Markdown implements MarkdownContract
         $this->view = $view;
 
         $this->parser = $parser ?: function ($text) {
-            if class_exists(Parsedown::class) {
+            if (!class_exists(Parsedown::class)) {
                 throw new RuntimeException('A markdown library is required. You may wish to install erusev/parsedown.');
             }
 
