@@ -16,7 +16,7 @@ class NotificationSendQueuedNotificationTest extends TestCase
     public function testNotificationsCanBeSent()
     {
         $job = new SendQueuedNotifications('notifiables', 'notification');
-        $manager = Mockery::mock('Illuminate\Notifications\ChannelManager');
+        $manager = Mockery::mock(\Illuminate\Notifications\ChannelManager::class);
         $manager->shouldReceive('sendNow')->once()->with('notifiables', 'notification', null);
         $job->handle($manager);
     }

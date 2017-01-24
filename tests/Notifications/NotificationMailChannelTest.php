@@ -66,7 +66,7 @@ class NotificationMailChannelTest extends TestCase
         $views = ['html' => $html, 'text' => $text];
 
         $mailer->shouldReceive('send')->with($views, $data, Mockery::on(function ($closure) {
-            $mock = Mockery::mock('Illuminate\Mailer\Message');
+            $mock = Mockery::mock(\Illuminate\Mailer\Message::class);
 
             $mock->shouldReceive('subject')->once()->with('test subject');
 
@@ -105,7 +105,7 @@ class NotificationMailChannelTest extends TestCase
         $views = ['html' => $html, 'text' => $text];
 
         $mailer->shouldReceive('send')->with($views, $data, Mockery::on(function ($closure) {
-            $mock = Mockery::mock('Illuminate\Mailer\Message');
+            $mock = Mockery::mock(\Illuminate\Mailer\Message::class);
 
             $mock->shouldReceive('subject')->once()->with('Notification Mail Channel Test Notification No Subject');
 
@@ -142,7 +142,7 @@ class NotificationMailChannelTest extends TestCase
         $views = ['html' => $html, 'text' => $text];
 
         $mailer->shouldReceive('send')->with($views, $data, Mockery::on(function ($closure) {
-            $mock = Mockery::mock('Illuminate\Mailer\Message');
+            $mock = Mockery::mock(\Illuminate\Mailer\Message::class);
 
             $mock->shouldReceive('subject')->once();
 
@@ -181,7 +181,7 @@ class NotificationMailChannelTest extends TestCase
         $views = ['html' => $html, 'text' => $text];
 
         $mailer->shouldReceive('send')->with($views, $data, Mockery::on(function ($closure) {
-            $mock = Mockery::mock('Illuminate\Mailer\Message');
+            $mock = Mockery::mock(\Illuminate\Mailer\Message::class);
 
             $mock->shouldReceive('subject')->once();
 
@@ -220,7 +220,7 @@ class NotificationMailChannelTest extends TestCase
         $views = ['html' => $html, 'text' => $text];
 
         $mailer->shouldReceive('send')->with($views, $data, Mockery::on(function ($closure) {
-            $mock = Mockery::mock('Illuminate\Mailer\Message');
+            $mock = Mockery::mock(\Illuminate\Mailer\Message::class);
 
             $mock->shouldReceive('subject')->once();
 
@@ -259,7 +259,7 @@ class NotificationMailChannelTest extends TestCase
         $views = ['html' => $html, 'text' => $text];
 
         $mailer->shouldReceive('send')->with($views, $data, Mockery::on(function ($closure) {
-            $mock = Mockery::mock('Illuminate\Mailer\Message');
+            $mock = Mockery::mock(\Illuminate\Mailer\Message::class);
 
             $mock->shouldReceive('subject')->once();
 
@@ -298,7 +298,7 @@ class NotificationMailChannelTest extends TestCase
         $views = ['html' => $html, 'text' => $text];
 
         $mailer->shouldReceive('send')->with($views, $data, Mockery::on(function ($closure) {
-            $mock = Mockery::mock('Illuminate\Mailer\Message');
+            $mock = Mockery::mock(\Illuminate\Mailer\Message::class);
 
             $mock->shouldReceive('subject')->once();
 
@@ -337,7 +337,7 @@ class NotificationMailChannelTest extends TestCase
         $views = ['html' => $html, 'text' => $text];
 
         $mailer->shouldReceive('send')->with($views, $data, Mockery::on(function ($closure) {
-            $mock = Mockery::mock('Illuminate\Mailer\Message');
+            $mock = Mockery::mock(\Illuminate\Mailer\Message::class);
 
             $mock->shouldReceive('subject')->once();
 
