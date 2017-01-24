@@ -43,7 +43,7 @@ class EncryptedSessionStoreTest extends TestCase
 
     public function getSession()
     {
-        $reflection = new ReflectionClass('Illuminate\Session\EncryptedStore');
+        $reflection = new ReflectionClass(\Illuminate\Session\EncryptedStore::class);
 
         return $reflection->newInstanceArgs($this->getMocks());
     }
@@ -53,7 +53,7 @@ class EncryptedSessionStoreTest extends TestCase
         return [
             $this->getSessionName(),
             m::mock('SessionHandlerInterface'),
-            m::mock('Illuminate\Contracts\Encryption\Encrypter'),
+            m::mock(\Illuminate\Contracts\Encryption\Encrypter::class),
             $this->getSessionId(),
         ];
     }

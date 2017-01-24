@@ -17,10 +17,10 @@ class SessionTableCommandTest extends TestCase
     public function testCreateMakesMigration()
     {
         $command = new SessionTableCommandTestStub(
-            $files = m::mock('Illuminate\Filesystem\Filesystem'),
-            $composer = m::mock('Illuminate\Support\Composer')
+            $files = m::mock(\Illuminate\Filesystem\Filesystem::class),
+            $composer = m::mock(\Illuminate\Support\Composer::class)
         );
-        $creator = m::mock('Illuminate\Database\Migrations\MigrationCreator')->shouldIgnoreMissing();
+        $creator = m::mock(\Illuminate\Database\Migrations\MigrationCreator::class)->shouldIgnoreMissing();
 
         $app = new Application();
         $app->useDatabasePath(__DIR__);
