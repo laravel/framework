@@ -14,7 +14,7 @@ class ValidationDatabasePresenceVerifierTest extends TestCase
 
     public function testBasicCount()
     {
-        $verifier = new \Illuminate\Validation\DatabasePresenceVerifier($db = m::mock('Illuminate\Database\ConnectionResolverInterface'));
+        $verifier = new \Illuminate\Validation\DatabasePresenceVerifier($db = m::mock(\Illuminate\Database\ConnectionResolverInterface::class));
         $verifier->setConnection('connection');
         $db->shouldReceive('connection')->once()->with('connection')->andReturn($conn = m::mock('StdClass'));
         $conn->shouldReceive('table')->once()->with('table')->andReturn($builder = m::mock('StdClass'));
@@ -33,7 +33,7 @@ class ValidationDatabasePresenceVerifierTest extends TestCase
 
     public function testBasicCountWithClosures()
     {
-        $verifier = new \Illuminate\Validation\DatabasePresenceVerifier($db = m::mock('Illuminate\Database\ConnectionResolverInterface'));
+        $verifier = new \Illuminate\Validation\DatabasePresenceVerifier($db = m::mock(\Illuminate\Database\ConnectionResolverInterface::class));
         $verifier->setConnection('connection');
         $db->shouldReceive('connection')->once()->with('connection')->andReturn($conn = m::mock('StdClass'));
         $conn->shouldReceive('table')->once()->with('table')->andReturn($builder = m::mock('StdClass'));
