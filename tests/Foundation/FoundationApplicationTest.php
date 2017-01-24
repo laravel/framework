@@ -21,14 +21,14 @@ class FoundationApplicationTest extends TestCase
         $app['translator'] = $trans = m::mock('StdClass');
         $trans->shouldReceive('setLocale')->once()->with('foo');
         $app['events'] = $events = m::mock('StdClass');
-        $events->shouldReceive('dispatch')->once()->with(m::type('Illuminate\Foundation\Events\LocaleUpdated'));
+        $events->shouldReceive('dispatch')->once()->with(m::type(\Illuminate\Foundation\Events\LocaleUpdated::class));
 
         $app->setLocale('foo');
     }
 
     public function testServiceProvidersAreCorrectlyRegistered()
     {
-        $provider = m::mock('Illuminate\Tests\Foundation\ApplicationBasicServiceProviderStub');
+        $provider = m::mock(\Illuminate\Tests\Foundation\ApplicationBasicServiceProviderStub::class);
         $class = get_class($provider);
         $provider->shouldReceive('register')->once();
         $app = new Application;
@@ -39,7 +39,7 @@ class FoundationApplicationTest extends TestCase
 
     public function testServiceProvidersAreCorrectlyRegisteredWhenRegisterMethodIsNotPresent()
     {
-        $provider = m::mock('Illuminate\Support\ServiceProvider');
+        $provider = m::mock(\Illuminate\Support\ServiceProvider::class);
         $class = get_class($provider);
         $provider->shouldReceive('register')->never();
         $app = new Application;
@@ -51,7 +51,7 @@ class FoundationApplicationTest extends TestCase
     public function testDeferredServicesMarkedAsBound()
     {
         $app = new Application;
-        $app->setDeferredServices(['foo' => 'Illuminate\Tests\Foundation\ApplicationDeferredServiceProviderStub']);
+        $app->setDeferredServices(['foo' => \Illuminate\Tests\Foundation\ApplicationDeferredServiceProviderStub::class]);
         $this->assertTrue($app->bound('foo'));
         $this->assertEquals('foo', $app->make('foo'));
     }
@@ -59,7 +59,7 @@ class FoundationApplicationTest extends TestCase
     public function testDeferredServicesAreSharedProperly()
     {
         $app = new Application;
-        $app->setDeferredServices(['foo' => 'Illuminate\Tests\Foundation\ApplicationDeferredSharedServiceProviderStub']);
+        $app->setDeferredServices(['foo' => \Illuminate\Tests\Foundation\ApplicationDeferredSharedServiceProviderStub::class]);
         $this->assertTrue($app->bound('foo'));
         $one = $app->make('foo');
         $two = $app->make('foo');
@@ -71,7 +71,7 @@ class FoundationApplicationTest extends TestCase
     public function testDeferredServicesCanBeExtended()
     {
         $app = new Application;
-        $app->setDeferredServices(['foo' => 'Illuminate\Tests\Foundation\ApplicationDeferredServiceProviderStub']);
+        $app->setDeferredServices(['foo' => \Illuminate\Tests\Foundation\ApplicationDeferredServiceProviderStub::class]);
         $app->extend('foo', function ($instance, $container) {
             return $instance.'bar';
         });
@@ -81,7 +81,7 @@ class FoundationApplicationTest extends TestCase
     public function testDeferredServiceProviderIsRegisteredOnlyOnce()
     {
         $app = new Application;
-        $app->setDeferredServices(['foo' => 'Illuminate\Tests\Foundation\ApplicationDeferredServiceProviderCountStub']);
+        $app->setDeferredServices(['foo' => \Illuminate\Tests\Foundation\ApplicationDeferredServiceProviderCountStub::class]);
         $obj = $app->make('foo');
         $this->assertInstanceOf('StdClass', $obj);
         $this->assertSame($obj, $app->make('foo'));
@@ -92,7 +92,7 @@ class FoundationApplicationTest extends TestCase
     {
         ApplicationDeferredServiceProviderStub::$initialized = false;
         $app = new Application;
-        $app->setDeferredServices(['foo' => 'Illuminate\Tests\Foundation\ApplicationDeferredServiceProviderStub']);
+        $app->setDeferredServices(['foo' => \Illuminate\Tests\Foundation\ApplicationDeferredServiceProviderStub::class]);
         $this->assertTrue($app->bound('foo'));
         $this->assertFalse(ApplicationDeferredServiceProviderStub::$initialized);
         $app->extend('foo', function ($instance, $container) {
@@ -106,7 +106,7 @@ class FoundationApplicationTest extends TestCase
     public function testDeferredServicesCanRegisterFactories()
     {
         $app = new Application;
-        $app->setDeferredServices(['foo' => 'Illuminate\Tests\Foundation\ApplicationFactoryProviderStub']);
+        $app->setDeferredServices(['foo' => \Illuminate\Tests\Foundation\ApplicationFactoryProviderStub::class]);
         $this->assertTrue($app->bound('foo'));
         $this->assertEquals(1, $app->make('foo'));
         $this->assertEquals(2, $app->make('foo'));
@@ -117,8 +117,8 @@ class FoundationApplicationTest extends TestCase
     {
         $app = new Application;
         $app->setDeferredServices([
-            'foo' => 'Illuminate\Tests\Foundation\ApplicationMultiProviderStub',
-            'bar' => 'Illuminate\Tests\Foundation\ApplicationMultiProviderStub',
+            'foo' => \Illuminate\Tests\Foundation\ApplicationMultiProviderStub::class,
+            'bar' => \Illuminate\Tests\Foundation\ApplicationMultiProviderStub::class,
         ]);
         $this->assertEquals('foo', $app->make('foo'));
         $this->assertEquals('foobar', $app->make('bar'));
@@ -157,7 +157,7 @@ class FoundationApplicationTest extends TestCase
         $app = new Application;
         $closure = function () {
         };
-        $app->beforeBootstrapping('Illuminate\Foundation\Bootstrap\RegisterFacades', $closure);
+        $app->beforeBootstrapping(\Illuminate\Foundation\Bootstrap\RegisterFacades::class, $closure);
         $this->assertArrayHasKey(0, $app['events']->getListeners('bootstrapping: Illuminate\Foundation\Bootstrap\RegisterFacades'));
         // $this->assertSame($closure, $app['events']->getListeners('bootstrapping: Illuminate\Foundation\Bootstrap\RegisterFacades')[0]);
     }
@@ -167,7 +167,7 @@ class FoundationApplicationTest extends TestCase
         $app = new Application;
         $closure = function () {
         };
-        $app->afterBootstrapping('Illuminate\Foundation\Bootstrap\RegisterFacades', $closure);
+        $app->afterBootstrapping(\Illuminate\Foundation\Bootstrap\RegisterFacades::class, $closure);
         $this->assertArrayHasKey(0, $app['events']->getListeners('bootstrapped: Illuminate\Foundation\Bootstrap\RegisterFacades'));
         // $this->assertSame($closure, $app['events']->getListeners('bootstrapped: Illuminate\Foundation\Bootstrap\RegisterFacades')[0]);
     }

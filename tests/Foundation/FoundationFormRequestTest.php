@@ -17,11 +17,11 @@ class FoundationFormRequestTest extends TestCase
     {
         $request = FoundationTestFormRequestStub::create('/', 'GET', ['name' => 'abigail']);
         $request->setContainer($container = new Container);
-        $factory = m::mock('Illuminate\Validation\Factory');
+        $factory = m::mock(\Illuminate\Validation\Factory::class);
         $factory->shouldReceive('make')->once()->with(['name' => 'abigail'], ['name' => 'required'], [], [])->andReturn(
-            $validator = m::mock('Illuminate\Validation\Validator')
+            $validator = m::mock(\Illuminate\Validation\Validator::class)
         );
-        $container->instance('Illuminate\Contracts\Validation\Factory', $factory);
+        $container->instance(\Illuminate\Contracts\Validation\Factory::class, $factory);
         $validator->shouldReceive('passes')->once()->andReturn(true);
 
         $request->validate($factory);
@@ -35,13 +35,13 @@ class FoundationFormRequestTest extends TestCase
         $request = m::mock('Illuminate\Tests\Foundation\FoundationTestFormRequestStub[response]');
         $request->initialize(['name' => null]);
         $request->setContainer($container = new Container);
-        $factory = m::mock('Illuminate\Validation\Factory');
+        $factory = m::mock(\Illuminate\Validation\Factory::class);
         $factory->shouldReceive('make')->once()->with(['name' => null], ['name' => 'required'], [], [])->andReturn(
-            $validator = m::mock('Illuminate\Validation\Validator')
+            $validator = m::mock(\Illuminate\Validation\Validator::class)
         );
-        $container->instance('Illuminate\Contracts\Validation\Factory', $factory);
+        $container->instance(\Illuminate\Contracts\Validation\Factory::class, $factory);
         $validator->shouldReceive('passes')->once()->andReturn(false);
-        $validator->shouldReceive('getMessageBag')->once()->andReturn($messages = m::mock('Illuminate\Support\MessageBag'));
+        $validator->shouldReceive('getMessageBag')->once()->andReturn($messages = m::mock(\Illuminate\Support\MessageBag::class));
         $messages->shouldReceive('toArray')->once()->andReturn(['name' => ['Name required']]);
         $request->shouldReceive('response')->once()->andReturn(new \Illuminate\Http\Response);
 
@@ -56,11 +56,11 @@ class FoundationFormRequestTest extends TestCase
         $request = m::mock('Illuminate\Tests\Foundation\FoundationTestFormRequestForbiddenStub[forbiddenResponse]');
         $request->initialize(['name' => null]);
         $request->setContainer($container = new Container);
-        $factory = m::mock('Illuminate\Validation\Factory');
+        $factory = m::mock(\Illuminate\Validation\Factory::class);
         $factory->shouldReceive('make')->once()->with(['name' => null], ['name' => 'required'], [], [])->andReturn(
-            $validator = m::mock('Illuminate\Validation\Validator')
+            $validator = m::mock(\Illuminate\Validation\Validator::class)
         );
-        $container->instance('Illuminate\Contracts\Validation\Factory', $factory);
+        $container->instance(\Illuminate\Contracts\Validation\Factory::class, $factory);
         $validator->shouldReceive('passes')->never();
 
         $request->validate($factory);
@@ -69,8 +69,8 @@ class FoundationFormRequestTest extends TestCase
     public function testRedirectResponseIsProperlyCreatedWithGivenErrors()
     {
         $request = FoundationTestFormRequestStub::create('/', 'GET');
-        $request->setRedirector($redirector = m::mock('Illuminate\Routing\Redirector'));
-        $redirector->shouldReceive('to')->once()->with('previous')->andReturn($response = m::mock('Illuminate\Http\RedirectResponse'));
+        $request->setRedirector($redirector = m::mock(\Illuminate\Routing\Redirector::class));
+        $redirector->shouldReceive('to')->once()->with('previous')->andReturn($response = m::mock(\Illuminate\Http\RedirectResponse::class));
         $redirector->shouldReceive('getUrlGenerator')->andReturn($url = m::mock('StdClass'));
         $url->shouldReceive('previous')->once()->andReturn('previous');
         $response->shouldReceive('withInput')->andReturn($response);
@@ -83,11 +83,11 @@ class FoundationFormRequestTest extends TestCase
     {
         $request = FoundationTestFormRequestHooks::create('/', 'GET', ['name' => 'abigail']);
         $request->setContainer($container = new Container);
-        $factory = m::mock('Illuminate\Validation\Factory');
+        $factory = m::mock(\Illuminate\Validation\Factory::class);
         $factory->shouldReceive('make')->once()->with(['name' => 'Taylor'], ['name' => 'required'], [], [])->andReturn(
-            $validator = m::mock('Illuminate\Validation\Validator')
+            $validator = m::mock(\Illuminate\Validation\Validator::class)
         );
-        $container->instance('Illuminate\Contracts\Validation\Factory', $factory);
+        $container->instance(\Illuminate\Contracts\Validation\Factory::class, $factory);
         $validator->shouldReceive('passes')->once()->andReturn(true);
 
         $request->validate($factory);
