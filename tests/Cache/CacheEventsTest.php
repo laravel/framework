@@ -177,7 +177,7 @@ class CacheEventTest extends TestCase
 
     protected function getDispatcher()
     {
-        return m::mock('Illuminate\Events\Dispatcher');
+        return m::mock(\Illuminate\Events\Dispatcher::class);
     }
 
     protected function getRepository($dispatcher)

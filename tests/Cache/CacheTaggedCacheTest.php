@@ -62,8 +62,8 @@ class CacheTaggedCacheTest extends TestCase
 
     public function testRedisCacheTagsPushForeverKeysCorrectly()
     {
-        $store = m::mock('Illuminate\Contracts\Cache\Store');
-        $tagSet = m::mock('Illuminate\Cache\TagSet', [$store, ['foo', 'bar']]);
+        $store = m::mock(\Illuminate\Contracts\Cache\Store::class);
+        $tagSet = m::mock(\Illuminate\Cache\TagSet::class, [$store, ['foo', 'bar']]);
         $tagSet->shouldReceive('getNamespace')->andReturn('foo|bar');
         $tagSet->shouldReceive('getNames')->andReturn(['foo', 'bar']);
         $redis = new \Illuminate\Cache\RedisTaggedCache($store, $tagSet);
@@ -79,8 +79,8 @@ class CacheTaggedCacheTest extends TestCase
 
     public function testRedisCacheTagsPushStandardKeysCorrectly()
     {
-        $store = m::mock('Illuminate\Contracts\Cache\Store');
-        $tagSet = m::mock('Illuminate\Cache\TagSet', [$store, ['foo', 'bar']]);
+        $store = m::mock(\Illuminate\Contracts\Cache\Store::class);
+        $tagSet = m::mock(\Illuminate\Cache\TagSet::class, [$store, ['foo', 'bar']]);
         $tagSet->shouldReceive('getNamespace')->andReturn('foo|bar');
         $tagSet->shouldReceive('getNames')->andReturn(['foo', 'bar']);
         $redis = new \Illuminate\Cache\RedisTaggedCache($store, $tagSet);
@@ -95,8 +95,8 @@ class CacheTaggedCacheTest extends TestCase
 
     public function testRedisCacheTagsCanBeFlushed()
     {
-        $store = m::mock('Illuminate\Contracts\Cache\Store');
-        $tagSet = m::mock('Illuminate\Cache\TagSet', [$store, ['foo', 'bar']]);
+        $store = m::mock(\Illuminate\Contracts\Cache\Store::class);
+        $tagSet = m::mock(\Illuminate\Cache\TagSet::class, [$store, ['foo', 'bar']]);
         $tagSet->shouldReceive('getNamespace')->andReturn('foo|bar');
         $redis = new \Illuminate\Cache\RedisTaggedCache($store, $tagSet);
         $store->shouldReceive('getPrefix')->andReturn('prefix:');

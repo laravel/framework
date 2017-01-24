@@ -17,10 +17,10 @@ class ClearCommandTest extends TestCase
     public function testClearWithNoStoreArgument()
     {
         $command = new ClearCommandTestStub(
-            $cacheManager = m::mock('Illuminate\Cache\CacheManager')
+            $cacheManager = m::mock(\Illuminate\Cache\CacheManager::class)
         );
 
-        $cacheRepository = m::mock('Illuminate\Contracts\Cache\Repository');
+        $cacheRepository = m::mock(\Illuminate\Contracts\Cache\Repository::class);
 
         $app = new Application();
         $command->setLaravel($app);
@@ -34,10 +34,10 @@ class ClearCommandTest extends TestCase
     public function testClearWithStoreArgument()
     {
         $command = new ClearCommandTestStub(
-            $cacheManager = m::mock('Illuminate\Cache\CacheManager')
+            $cacheManager = m::mock(\Illuminate\Cache\CacheManager::class)
         );
 
-        $cacheRepository = m::mock('Illuminate\Contracts\Cache\Repository');
+        $cacheRepository = m::mock(\Illuminate\Contracts\Cache\Repository::class);
 
         $app = new Application();
         $command->setLaravel($app);
@@ -54,10 +54,10 @@ class ClearCommandTest extends TestCase
     public function testClearWithInvalidStoreArgument()
     {
         $command = new ClearCommandTestStub(
-            $cacheManager = m::mock('Illuminate\Cache\CacheManager')
+            $cacheManager = m::mock(\Illuminate\Cache\CacheManager::class)
         );
 
-        $cacheRepository = m::mock('Illuminate\Contracts\Cache\Repository');
+        $cacheRepository = m::mock(\Illuminate\Contracts\Cache\Repository::class);
 
         $app = new Application();
         $command->setLaravel($app);
@@ -71,10 +71,10 @@ class ClearCommandTest extends TestCase
     public function testClearWithTagsOption()
     {
         $command = new ClearCommandTestStub(
-            $cacheManager = m::mock('Illuminate\Cache\CacheManager')
+            $cacheManager = m::mock(\Illuminate\Cache\CacheManager::class)
         );
 
-        $cacheRepository = m::mock('Illuminate\Contracts\Cache\Repository');
+        $cacheRepository = m::mock(\Illuminate\Contracts\Cache\Repository::class);
 
         $app = new Application();
         $command->setLaravel($app);
@@ -89,10 +89,10 @@ class ClearCommandTest extends TestCase
     public function testClearWithStoreArgumentAndTagsOption()
     {
         $command = new ClearCommandTestStub(
-            $cacheManager = m::mock('Illuminate\Cache\CacheManager')
+            $cacheManager = m::mock(\Illuminate\Cache\CacheManager::class)
         );
 
-        $cacheRepository = m::mock('Illuminate\Contracts\Cache\Repository');
+        $cacheRepository = m::mock(\Illuminate\Contracts\Cache\Repository::class);
 
         $app = new Application();
         $command->setLaravel($app);
