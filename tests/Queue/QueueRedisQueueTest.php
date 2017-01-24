@@ -1,8 +1,11 @@
 <?php
 
-use Mockery as m;
+namespace Illuminate\Tests\Queue;
 
-class QueueRedisQueueTest extends PHPUnit_Framework_TestCase
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+
+class QueueRedisQueueTest extends TestCase
 {
     public function tearDown()
     {
@@ -11,10 +14,10 @@ class QueueRedisQueueTest extends PHPUnit_Framework_TestCase
 
     public function testPushProperlyPushesJobOntoRedis()
     {
-        $queue = $this->getMockBuilder('Illuminate\Queue\RedisQueue')->setMethods(['getRandomId'])->setConstructorArgs([$redis = m::mock('Illuminate\Redis\Database'), 'default'])->getMock();
+        $queue = $this->getMockBuilder('Illuminate\Queue\RedisQueue')->setMethods(['getRandomId'])->setConstructorArgs([$redis = m::mock('Illuminate\Contracts\Redis\Factory'), 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->will($this->returnValue('foo'));
         $redis->shouldReceive('connection')->once()->andReturn($redis);
-        $redis->shouldReceive('rpush')->once()->with('queues:default', json_encode(['job' => 'foo', 'data' => ['data'], 'id' => 'foo', 'attempts' => 1]));
+        $redis->shouldReceive('rpush')->once()->with('queues:default', json_encode(['job' => 'foo', 'data' => ['data'], 'id' => 'foo', 'attempts' => 0]));
 
         $id = $queue->push('foo', ['data']);
         $this->assertEquals('foo', $id);
@@ -22,16 +25,15 @@ class QueueRedisQueueTest extends PHPUnit_Framework_TestCase
 
     public function testDelayedPushProperlyPushesJobOntoRedis()
     {
-        $queue = $this->getMockBuilder('Illuminate\Queue\RedisQueue')->setMethods(['getSeconds', 'getTime', 'getRandomId'])->setConstructorArgs([$redis = m::mock('Illuminate\Redis\Database'), 'default'])->getMock();
+        $queue = $this->getMockBuilder('Illuminate\Queue\RedisQueue')->setMethods(['availableAt', 'getRandomId'])->setConstructorArgs([$redis = m::mock('Illuminate\Contracts\Redis\Factory'), 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->will($this->returnValue('foo'));
-        $queue->expects($this->once())->method('getSeconds')->with(1)->will($this->returnValue(1));
-        $queue->expects($this->once())->method('getTime')->will($this->returnValue(1));
+        $queue->expects($this->once())->method('availableAt')->with(1)->will($this->returnValue(2));
 
         $redis->shouldReceive('connection')->once()->andReturn($redis);
         $redis->shouldReceive('zadd')->once()->with(
             'queues:default:delayed',
             2,
-            json_encode(['job' => 'foo', 'data' => ['data'], 'id' => 'foo', 'attempts' => 1])
+            json_encode(['job' => 'foo', 'data' => ['data'], 'id' => 'foo', 'attempts' => 0])
         );
 
         $id = $queue->later(1, 'foo', ['data']);
@@ -40,17 +42,16 @@ class QueueRedisQueueTest extends PHPUnit_Framework_TestCase
 
     public function testDelayedPushWithDateTimeProperlyPushesJobOntoRedis()
     {
-        $date = Carbon\Carbon::now();
-        $queue = $this->getMockBuilder('Illuminate\Queue\RedisQueue')->setMethods(['getSeconds', 'getTime', 'getRandomId'])->setConstructorArgs([$redis = m::mock('Illuminate\Redis\Database'), 'default'])->getMock();
+        $date = \Carbon\Carbon::now();
+        $queue = $this->getMockBuilder('Illuminate\Queue\RedisQueue')->setMethods(['availableAt', 'getRandomId'])->setConstructorArgs([$redis = m::mock('Illuminate\Contracts\Redis\Factory'), 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->will($this->returnValue('foo'));
-        $queue->expects($this->once())->method('getSeconds')->with($date)->will($this->returnValue(1));
-        $queue->expects($this->once())->method('getTime')->will($this->returnValue(1));
+        $queue->expects($this->once())->method('availableAt')->with($date)->will($this->returnValue(2));
 
         $redis->shouldReceive('connection')->once()->andReturn($redis);
         $redis->shouldReceive('zadd')->once()->with(
             'queues:default:delayed',
             2,
-            json_encode(['job' => 'foo', 'data' => ['data'], 'id' => 'foo', 'attempts' => 1])
+            json_encode(['job' => 'foo', 'data' => ['data'], 'id' => 'foo', 'attempts' => 0])
         );
 
         $queue->later($date, 'foo', ['data']);

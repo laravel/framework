@@ -1,9 +1,12 @@
 <?php
 
+namespace Illuminate\Tests\Mail;
+
 use Mockery as m;
 use Illuminate\Mail\Message;
+use PHPUnit\Framework\TestCase;
 
-class MailMessageTest extends PHPUnit_Framework_TestCase
+class MailMessageTest extends TestCase
 {
     /**
      * @var \Mockery::mock
@@ -19,7 +22,7 @@ class MailMessageTest extends PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $this->swift = m::mock(Swift_Mime_Message::class);
+        $this->swift = m::mock(\Swift_Mime_Message::class);
         $this->message = new Message($this->swift);
     }
 
@@ -90,7 +93,7 @@ class MailMessageTest extends PHPUnit_Framework_TestCase
 
     public function testGetSwiftMessageMethod()
     {
-        $this->assertInstanceOf(Swift_Mime_Message::class, $this->message->getSwiftMessage());
+        $this->assertInstanceOf(\Swift_Mime_Message::class, $this->message->getSwiftMessage());
     }
 
     public function testBasicAttachment()

@@ -1,8 +1,11 @@
 <?php
 
-use Mockery as m;
+namespace Illuminate\Tests\Database;
 
-class DatabaseSoftDeletingScopeTest extends PHPUnit_Framework_TestCase
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+
+class DatabaseSoftDeletingScopeTest extends TestCase
 {
     public function tearDown()
     {
@@ -24,7 +27,7 @@ class DatabaseSoftDeletingScopeTest extends PHPUnit_Framework_TestCase
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder');
         $builder->shouldDeferMissing();
-        $scope = new Illuminate\Database\Eloquent\SoftDeletingScope;
+        $scope = new \Illuminate\Database\Eloquent\SoftDeletingScope;
         $scope->extend($builder);
         $callback = $builder->getMacro('forceDelete');
         $givenBuilder = m::mock('Illuminate\Database\Eloquent\Builder');
@@ -38,7 +41,7 @@ class DatabaseSoftDeletingScopeTest extends PHPUnit_Framework_TestCase
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder');
         $builder->shouldDeferMissing();
-        $scope = new Illuminate\Database\Eloquent\SoftDeletingScope;
+        $scope = new \Illuminate\Database\Eloquent\SoftDeletingScope;
         $scope->extend($builder);
         $callback = $builder->getMacro('restore');
         $givenBuilder = m::mock('Illuminate\Database\Eloquent\Builder');

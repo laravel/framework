@@ -1,13 +1,17 @@
 <?php
 
+namespace Illuminate\Tests\Http;
+
+use JsonSerializable;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 
-class HttpJsonResponseTest extends PHPUnit_Framework_TestCase
+class HttpJsonResponseTest extends TestCase
 {
     public function testSeAndRetrieveJsonableData()
     {
-        $response = new Illuminate\Http\JsonResponse(new JsonResponseTestJsonableObject);
+        $response = new \Illuminate\Http\JsonResponse(new JsonResponseTestJsonableObject);
         $data = $response->getData();
         $this->assertInstanceOf('StdClass', $data);
         $this->assertEquals('bar', $data->foo);
@@ -15,7 +19,7 @@ class HttpJsonResponseTest extends PHPUnit_Framework_TestCase
 
     public function testSeAndRetrieveJsonSerializeData()
     {
-        $response = new Illuminate\Http\JsonResponse(new JsonResponseTestJsonSerializeObject);
+        $response = new \Illuminate\Http\JsonResponse(new JsonResponseTestJsonSerializeObject);
         $data = $response->getData();
         $this->assertInstanceOf('StdClass', $data);
         $this->assertEquals('bar', $data->foo);
@@ -23,7 +27,7 @@ class HttpJsonResponseTest extends PHPUnit_Framework_TestCase
 
     public function testSeAndRetrieveArrayableData()
     {
-        $response = new Illuminate\Http\JsonResponse(new JsonResponseTestArrayableObject);
+        $response = new \Illuminate\Http\JsonResponse(new JsonResponseTestArrayableObject);
         $data = $response->getData();
         $this->assertInstanceOf('StdClass', $data);
         $this->assertEquals('bar', $data->foo);
@@ -31,31 +35,41 @@ class HttpJsonResponseTest extends PHPUnit_Framework_TestCase
 
     public function testSetAndRetrieveData()
     {
-        $response = new Illuminate\Http\JsonResponse(['foo' => 'bar']);
+        $response = new \Illuminate\Http\JsonResponse(['foo' => 'bar']);
         $data = $response->getData();
         $this->assertInstanceOf('StdClass', $data);
         $this->assertEquals('bar', $data->foo);
     }
 
+    public function testGetOriginalContent()
+    {
+        $response = new \Illuminate\Http\JsonResponse(new JsonResponseTestArrayableObject);
+        $this->assertInstanceOf(JsonResponseTestArrayableObject::class, $response->getOriginalContent());
+
+        $response = new \Illuminate\Http\JsonResponse;
+        $response->setData(new JsonResponseTestArrayableObject);
+        $this->assertInstanceOf(JsonResponseTestArrayableObject::class, $response->getOriginalContent());
+    }
+
     public function testSetAndRetrieveOptions()
     {
-        $response = new Illuminate\Http\JsonResponse(['foo' => 'bar']);
-        $response->setJsonOptions(JSON_PRETTY_PRINT);
-        $this->assertSame(JSON_PRETTY_PRINT, $response->getJsonOptions());
+        $response = new \Illuminate\Http\JsonResponse(['foo' => 'bar']);
+        $response->setEncodingOptions(JSON_PRETTY_PRINT);
+        $this->assertSame(JSON_PRETTY_PRINT, $response->getEncodingOptions());
     }
 
     public function testSetAndRetrieveDefaultOptions()
     {
-        $response = new Illuminate\Http\JsonResponse(['foo' => 'bar']);
-        $this->assertSame(0, $response->getJsonOptions());
+        $response = new \Illuminate\Http\JsonResponse(['foo' => 'bar']);
+        $this->assertSame(0, $response->getEncodingOptions());
     }
 
     public function testSetAndRetrieveStatusCode()
     {
-        $response = new Illuminate\Http\JsonResponse(['foo' => 'bar'], 404);
+        $response = new \Illuminate\Http\JsonResponse(['foo' => 'bar'], 404);
         $this->assertSame(404, $response->getStatusCode());
 
-        $response = new Illuminate\Http\JsonResponse(['foo' => 'bar']);
+        $response = new \Illuminate\Http\JsonResponse(['foo' => 'bar']);
         $response->setStatusCode(404);
         $this->assertSame(404, $response->getStatusCode());
     }

@@ -44,13 +44,21 @@ class Grammar extends BaseGrammar
      */
     public function compileSelect(Builder $query)
     {
+        // If the query does not have any columns set, we'll set the columns to the
+        // * character to just get all of the columns from the database. Then we
+        // can build the query and concatenate all the pieces together as one.
         $original = $query->columns;
 
         if (is_null($query->columns)) {
             $query->columns = ['*'];
         }
 
-        $sql = trim($this->concatenate($this->compileComponents($query)));
+        // To compile the query, we'll spin through each component of the query and
+        // see if that component exists. If it does we'll just call the compiler
+        // function for the component which is responsible for making the SQL.
+        $sql = trim($this->concatenate(
+            $this->compileComponents($query))
+        );
 
         $query->columns = $original;
 
@@ -144,17 +152,11 @@ class Grammar extends BaseGrammar
      */
     protected function compileJoins(Builder $query, $joins)
     {
-        $sql = [];
-
-        foreach ($joins as $join) {
-            $conditions = $this->compileWheres($join);
-
+        return collect($joins)->map(function ($join) use ($query) {
             $table = $this->wrapTable($join->table);
 
-            $sql[] = trim("{$join->type} join {$table} {$conditions}");
-        }
-
-        return implode(' ', $sql);
+            return trim("{$join->type} join {$table} {$this->compileWheres($join)}");
+        })->implode(' ');
     }
 
     /**
@@ -165,63 +167,60 @@ class Grammar extends BaseGrammar
      */
     protected function compileWheres(Builder $query)
     {
-        $sql = [];
-
-        if (is_null($query->wheres)) {
-            return '';
-        }
-
         // Each type of where clauses has its own compiler function which is responsible
         // for actually creating the where clauses SQL. This helps keep the code nice
         // and maintainable since each clause has a very small method that it uses.
-        foreach ($query->wheres as $where) {
-            $method = "where{$where['type']}";
-
-            $sql[] = $where['boolean'].' '.$this->$method($query, $where);
+        if (is_null($query->wheres)) {
+            return '';
         }
 
         // If we actually have some where clauses, we will strip off the first boolean
         // operator, which is added by the query builders for convenience so we can
         // avoid checking for the first clauses in each of the compilers methods.
-        if (count($sql) > 0) {
-            $sql = implode(' ', $sql);
-
-            $conjunction = $query instanceof JoinClause ? 'on' : 'where';
-
-            return $conjunction.' '.$this->removeLeadingBoolean($sql);
+        if (count($sql = $this->compileWheresToArray($query)) > 0) {
+            return $this->concatenateWhereClauses($query, $sql);
         }
 
         return '';
     }
 
     /**
-     * Compile a nested where clause.
+     * Get an array of all the where clauses for the query.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return array
+     */
+    protected function compileWheresToArray($query)
+    {
+        return collect($query->wheres)->map(function ($where) use ($query) {
+            return $where['boolean'].' '.$this->{"where{$where['type']}"}($query, $where);
+        })->all();
+    }
+
+    /**
+     * Format the where clause statements into one string.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $sql
+     * @return string
+     */
+    protected function concatenateWhereClauses($query, $sql)
+    {
+        $conjunction = $query instanceof JoinClause ? 'on' : 'where';
+
+        return $conjunction.' '.$this->removeLeadingBoolean(implode(' ', $sql));
+    }
+
+    /**
+     * Compile a raw where clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $where
      * @return string
      */
-    protected function whereNested(Builder $query, $where)
+    protected function whereRaw(Builder $query, $where)
     {
-        $nested = $where['query'];
-
-        $offset = $query instanceof JoinClause ? 3 : 6;
-
-        return '('.substr($this->compileWheres($nested), $offset).')';
-    }
-
-    /**
-     * Compile a where condition with a sub-select.
-     *
-     * @param  \Illuminate\Database\Query\Builder $query
-     * @param  array   $where
-     * @return string
-     */
-    protected function whereSub(Builder $query, $where)
-    {
-        $select = $this->compileSelect($where['query']);
-
-        return $this->wrap($where['column']).' '.$where['operator']." ($select)";
+        return $where['sql'];
     }
 
     /**
@@ -239,58 +238,6 @@ class Grammar extends BaseGrammar
     }
 
     /**
-     * Compile a where clause comparing two columns..
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $where
-     * @return string
-     */
-    protected function whereColumn(Builder $query, $where)
-    {
-        $second = $this->wrap($where['second']);
-
-        return $this->wrap($where['first']).' '.$where['operator'].' '.$second;
-    }
-
-    /**
-     * Compile a "between" where clause.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $where
-     * @return string
-     */
-    protected function whereBetween(Builder $query, $where)
-    {
-        $between = $where['not'] ? 'not between' : 'between';
-
-        return $this->wrap($where['column']).' '.$between.' ? and ?';
-    }
-
-    /**
-     * Compile a where exists clause.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $where
-     * @return string
-     */
-    protected function whereExists(Builder $query, $where)
-    {
-        return 'exists ('.$this->compileSelect($where['query']).')';
-    }
-
-    /**
-     * Compile a where exists clause.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $where
-     * @return string
-     */
-    protected function whereNotExists(Builder $query, $where)
-    {
-        return 'not exists ('.$this->compileSelect($where['query']).')';
-    }
-
-    /**
      * Compile a "where in" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -299,13 +246,11 @@ class Grammar extends BaseGrammar
      */
     protected function whereIn(Builder $query, $where)
     {
-        if (empty($where['values'])) {
-            return '0 = 1';
+        if (! empty($where['values'])) {
+            return $this->wrap($where['column']).' in ('.$this->parameterize($where['values']).')';
         }
 
-        $values = $this->parameterize($where['values']);
-
-        return $this->wrap($where['column']).' in ('.$values.')';
+        return '0 = 1';
     }
 
     /**
@@ -317,13 +262,11 @@ class Grammar extends BaseGrammar
      */
     protected function whereNotIn(Builder $query, $where)
     {
-        if (empty($where['values'])) {
-            return '1 = 1';
+        if (! empty($where['values'])) {
+            return $this->wrap($where['column']).' not in ('.$this->parameterize($where['values']).')';
         }
 
-        $values = $this->parameterize($where['values']);
-
-        return $this->wrap($where['column']).' not in ('.$values.')';
+        return '1 = 1';
     }
 
     /**
@@ -335,9 +278,7 @@ class Grammar extends BaseGrammar
      */
     protected function whereInSub(Builder $query, $where)
     {
-        $select = $this->compileSelect($where['query']);
-
-        return $this->wrap($where['column']).' in ('.$select.')';
+        return $this->wrap($where['column']).' in ('.$this->compileSelect($where['query']).')';
     }
 
     /**
@@ -349,9 +290,7 @@ class Grammar extends BaseGrammar
      */
     protected function whereNotInSub(Builder $query, $where)
     {
-        $select = $this->compileSelect($where['query']);
-
-        return $this->wrap($where['column']).' not in ('.$select.')';
+        return $this->wrap($where['column']).' not in ('.$this->compileSelect($where['query']).')';
     }
 
     /**
@@ -376,6 +315,20 @@ class Grammar extends BaseGrammar
     protected function whereNotNull(Builder $query, $where)
     {
         return $this->wrap($where['column']).' is not null';
+    }
+
+    /**
+     * Compile a "between" where clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereBetween(Builder $query, $where)
+    {
+        $between = $where['not'] ? 'not between' : 'between';
+
+        return $this->wrap($where['column']).' '.$between.' ? and ?';
     }
 
     /**
@@ -454,15 +407,70 @@ class Grammar extends BaseGrammar
     }
 
     /**
-     * Compile a raw where clause.
+     * Compile a where clause comparing two columns..
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $where
      * @return string
      */
-    protected function whereRaw(Builder $query, $where)
+    protected function whereColumn(Builder $query, $where)
     {
-        return $where['sql'];
+        return $this->wrap($where['first']).' '.$where['operator'].' '.$this->wrap($where['second']);
+    }
+
+    /**
+     * Compile a nested where clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereNested(Builder $query, $where)
+    {
+        // Here we will calculate what portion of the string we need to remove. If this
+        // is a join clause query, we need to remove the "on" portion of the SQL and
+        // if it is a normal query we need to take the leading "where" of queries.
+        $offset = $query instanceof JoinClause ? 3 : 6;
+
+        return '('.substr($this->compileWheres($where['query']), $offset).')';
+    }
+
+    /**
+     * Compile a where condition with a sub-select.
+     *
+     * @param  \Illuminate\Database\Query\Builder $query
+     * @param  array   $where
+     * @return string
+     */
+    protected function whereSub(Builder $query, $where)
+    {
+        $select = $this->compileSelect($where['query']);
+
+        return $this->wrap($where['column']).' '.$where['operator']." ($select)";
+    }
+
+    /**
+     * Compile a where exists clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereExists(Builder $query, $where)
+    {
+        return 'exists ('.$this->compileSelect($where['query']).')';
+    }
+
+    /**
+     * Compile a where exists clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereNotExists(Builder $query, $where)
+    {
+        return 'not exists ('.$this->compileSelect($where['query']).')';
     }
 
     /**
@@ -502,7 +510,7 @@ class Grammar extends BaseGrammar
         // If the having clause is "raw", we can just return the clause straight away
         // without doing any more processing on it. Otherwise, we will compile the
         // clause into SQL based on the components that make it up from builder.
-        if ($having['type'] === 'raw') {
+        if ($having['type'] === 'Raw') {
             return $having['boolean'].' '.$having['sql'];
         }
 
@@ -533,17 +541,27 @@ class Grammar extends BaseGrammar
      */
     protected function compileOrders(Builder $query, $orders)
     {
-        if (empty($orders)) {
-            return '';
+        if (! empty($orders)) {
+            return 'order by '.implode(', ', $this->compileOrdersToArray($query, $orders));
         }
 
-        return 'order by '.implode(', ', array_map(function ($order) {
-            if (isset($order['sql'])) {
-                return $order['sql'];
-            }
+        return '';
+    }
 
-            return $this->wrap($order['column']).' '.$order['direction'];
-        }, $orders));
+    /**
+     * Compile the query orders to an array.
+     *
+     * @param  \Illuminate\Database\Query\Builder
+     * @param  array  $orders
+     * @return array
+     */
+    protected function compileOrdersToArray(Builder $query, $orders)
+    {
+        return array_map(function ($order) {
+            return ! isset($order['sql'])
+                        ? $this->wrap($order['column']).' '.$order['direction']
+                        : $order['sql'];
+        }, $orders);
     }
 
     /**
@@ -618,22 +636,22 @@ class Grammar extends BaseGrammar
      */
     protected function compileUnion(array $union)
     {
-        $joiner = $union['all'] ? ' union all ' : ' union ';
+        $conjuction = $union['all'] ? ' union all ' : ' union ';
 
-        return $joiner.$union['query']->toSql();
+        return $conjuction.$union['query']->toSql();
     }
 
     /**
      * Compile an exists statement into SQL.
      *
-     * @param \Illuminate\Database\Query\Builder $query
+     * @param  \Illuminate\Database\Query\Builder  $query
      * @return string
      */
     public function compileExists(Builder $query)
     {
         $select = $this->compileSelect($query);
 
-        return "select exists($select) as {$this->wrap('exists')}";
+        return "select exists({$select}) as {$this->wrap('exists')}";
     }
 
     /**
@@ -659,13 +677,9 @@ class Grammar extends BaseGrammar
         // We need to build a list of parameter place-holders of values that are bound
         // to the query. Each insert should have the exact same amount of parameter
         // bindings so we will loop through the record and parameterize them all.
-        $parameters = [];
-
-        foreach ($values as $record) {
-            $parameters[] = '('.$this->parameterize($record).')';
-        }
-
-        $parameters = implode(', ', $parameters);
+        $parameters = collect($values)->map(function ($record) {
+            return '('.$this->parameterize($record).')';
+        })->implode(', ');
 
         return "insert into $table ($columns) values $parameters";
     }
@@ -697,29 +711,25 @@ class Grammar extends BaseGrammar
         // Each one of the columns in the update statements needs to be wrapped in the
         // keyword identifiers, also a place-holder needs to be created for each of
         // the values in the list of bindings so we can make the sets statements.
-        $columns = [];
-
-        foreach ($values as $key => $value) {
-            $columns[] = $this->wrap($key).' = '.$this->parameter($value);
-        }
-
-        $columns = implode(', ', $columns);
+        $columns = collect($values)->map(function ($value, $key) {
+            return $this->wrap($key).' = '.$this->parameter($value);
+        })->implode(', ');
 
         // If the query has any "join" clauses, we will setup the joins on the builder
         // and compile them so we can attach them to this update, as update queries
         // can get join statements to attach to other tables when they're needed.
+        $joins = '';
+
         if (isset($query->joins)) {
             $joins = ' '.$this->compileJoins($query, $query->joins);
-        } else {
-            $joins = '';
         }
 
         // Of course, update queries may also be constrained by where clauses so we'll
         // need to compile the where clauses and attach it to the query so only the
         // intended records are updated by the SQL statements we generate to run.
-        $where = $this->compileWheres($query);
+        $wheres = $this->compileWheres($query);
 
-        return trim("update {$table}{$joins} set $columns $where");
+        return trim("update {$table}{$joins} set $columns $wheres");
     }
 
     /**
@@ -746,11 +756,9 @@ class Grammar extends BaseGrammar
      */
     public function compileDelete(Builder $query)
     {
-        $table = $this->wrapTable($query->from);
+        $wheres = is_array($query->wheres) ? $this->compileWheres($query) : '';
 
-        $where = is_array($query->wheres) ? $this->compileWheres($query) : '';
-
-        return trim("delete from $table ".$where);
+        return trim("delete from {$this->wrapTable($query->from)} $wheres");
     }
 
     /**

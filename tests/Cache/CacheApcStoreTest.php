@@ -1,12 +1,16 @@
 <?php
 
-class CacheApcStoreTest extends PHPUnit_Framework_TestCase
+namespace Illuminate\Tests\Cache;
+
+use PHPUnit\Framework\TestCase;
+
+class CacheApcStoreTest extends TestCase
 {
     public function testGetReturnsNullWhenNotFound()
     {
         $apc = $this->getMockBuilder('Illuminate\Cache\ApcWrapper')->setMethods(['get'])->getMock();
         $apc->expects($this->once())->method('get')->with($this->equalTo('foobar'))->will($this->returnValue(null));
-        $store = new Illuminate\Cache\ApcStore($apc, 'foo');
+        $store = new \Illuminate\Cache\ApcStore($apc, 'foo');
         $this->assertNull($store->get('bar'));
     }
 
@@ -14,7 +18,7 @@ class CacheApcStoreTest extends PHPUnit_Framework_TestCase
     {
         $apc = $this->getMockBuilder('Illuminate\Cache\ApcWrapper')->setMethods(['get'])->getMock();
         $apc->expects($this->once())->method('get')->will($this->returnValue('bar'));
-        $store = new Illuminate\Cache\ApcStore($apc);
+        $store = new \Illuminate\Cache\ApcStore($apc);
         $this->assertEquals('bar', $store->get('foo'));
     }
 
@@ -26,7 +30,7 @@ class CacheApcStoreTest extends PHPUnit_Framework_TestCase
             ['bar', null],
             ['baz', 'norf'],
         ]);
-        $store = new Illuminate\Cache\ApcStore($apc);
+        $store = new \Illuminate\Cache\ApcStore($apc);
         $this->assertEquals([
             'foo'   => 'qux',
             'bar'   => null,
@@ -38,7 +42,7 @@ class CacheApcStoreTest extends PHPUnit_Framework_TestCase
     {
         $apc = $this->getMockBuilder('Illuminate\Cache\ApcWrapper')->setMethods(['put'])->getMock();
         $apc->expects($this->once())->method('put')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(60));
-        $store = new Illuminate\Cache\ApcStore($apc);
+        $store = new \Illuminate\Cache\ApcStore($apc);
         $store->put('foo', 'bar', 1);
     }
 
@@ -52,7 +56,7 @@ class CacheApcStoreTest extends PHPUnit_Framework_TestCase
         ], [
             $this->equalTo('bar'), $this->equalTo('norf'), $this->equalTo(60),
         ]);
-        $store = new Illuminate\Cache\ApcStore($apc);
+        $store = new \Illuminate\Cache\ApcStore($apc);
         $store->putMany([
             'foo'   => 'bar',
             'baz'   => 'qux',
@@ -64,7 +68,7 @@ class CacheApcStoreTest extends PHPUnit_Framework_TestCase
     {
         $apc = $this->getMockBuilder('Illuminate\Cache\ApcWrapper')->setMethods(['increment'])->getMock();
         $apc->expects($this->once())->method('increment')->with($this->equalTo('foo'), $this->equalTo(5));
-        $store = new Illuminate\Cache\ApcStore($apc);
+        $store = new \Illuminate\Cache\ApcStore($apc);
         $store->increment('foo', 5);
     }
 
@@ -72,7 +76,7 @@ class CacheApcStoreTest extends PHPUnit_Framework_TestCase
     {
         $apc = $this->getMockBuilder('Illuminate\Cache\ApcWrapper')->setMethods(['decrement'])->getMock();
         $apc->expects($this->once())->method('decrement')->with($this->equalTo('foo'), $this->equalTo(5));
-        $store = new Illuminate\Cache\ApcStore($apc);
+        $store = new \Illuminate\Cache\ApcStore($apc);
         $store->decrement('foo', 5);
     }
 
@@ -80,7 +84,7 @@ class CacheApcStoreTest extends PHPUnit_Framework_TestCase
     {
         $apc = $this->getMockBuilder('Illuminate\Cache\ApcWrapper')->setMethods(['put'])->getMock();
         $apc->expects($this->once())->method('put')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(0));
-        $store = new Illuminate\Cache\ApcStore($apc);
+        $store = new \Illuminate\Cache\ApcStore($apc);
         $store->forever('foo', 'bar');
     }
 
@@ -88,7 +92,16 @@ class CacheApcStoreTest extends PHPUnit_Framework_TestCase
     {
         $apc = $this->getMockBuilder('Illuminate\Cache\ApcWrapper')->setMethods(['delete'])->getMock();
         $apc->expects($this->once())->method('delete')->with($this->equalTo('foo'));
-        $store = new Illuminate\Cache\ApcStore($apc);
+        $store = new \Illuminate\Cache\ApcStore($apc);
         $store->forget('foo');
+    }
+
+    public function testFlushesCached()
+    {
+        $apc = $this->getMockBuilder('Illuminate\Cache\ApcWrapper')->setMethods(['flush'])->getMock();
+        $apc->expects($this->once())->method('flush')->willReturn(true);
+        $store = new \Illuminate\Cache\ApcStore($apc);
+        $result = $store->flush();
+        $this->assertTrue($result);
     }
 }

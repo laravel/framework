@@ -1,8 +1,11 @@
 <?php
 
-use Mockery as m;
+namespace Illuminate\Tests\Queue;
 
-class QueueListenerTest extends PHPUnit_Framework_TestCase
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+
+class QueueListenerTest extends TestCase
 {
     public function tearDown()
     {
@@ -32,8 +35,12 @@ class QueueListenerTest extends PHPUnit_Framework_TestCase
 
     public function testMakeProcessCorrectlyFormatsCommandLine()
     {
-        $listener = new Illuminate\Queue\Listener(__DIR__);
-        $process = $listener->makeProcess('connection', 'queue', 1, 2, 3);
+        $listener = new \Illuminate\Queue\Listener(__DIR__);
+        $options = new \Illuminate\Queue\ListenerOptions();
+        $options->delay = 1;
+        $options->memory = 2;
+        $options->timeout = 3;
+        $process = $listener->makeProcess('connection', 'queue', $options);
         $escape = '\\' === DIRECTORY_SEPARATOR ? '"' : '\'';
 
         $this->assertInstanceOf('Symfony\Component\Process\Process', $process);

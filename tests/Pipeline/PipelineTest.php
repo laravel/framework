@@ -1,8 +1,11 @@
 <?php
 
+namespace Illuminate\Tests\Pipeline;
+
+use PHPUnit\Framework\TestCase;
 use Illuminate\Pipeline\Pipeline;
 
-class PipelineTest extends PHPUnit_Framework_TestCase
+class PipelineTest extends TestCase
 {
     public function testPipelineBasicUsage()
     {
@@ -12,9 +15,9 @@ class PipelineTest extends PHPUnit_Framework_TestCase
             return $next($piped);
         };
 
-        $result = (new Pipeline(new Illuminate\Container\Container))
+        $result = (new Pipeline(new \Illuminate\Container\Container))
                     ->send('foo')
-                    ->through(['PipelineTestPipeOne', $pipeTwo])
+                    ->through(['Illuminate\Tests\Pipeline\PipelineTestPipeOne', $pipeTwo])
                     ->then(function ($piped) {
                         return $piped;
                     });
@@ -29,7 +32,7 @@ class PipelineTest extends PHPUnit_Framework_TestCase
 
     public function testPipelineUsageWithObjects()
     {
-        $result = (new Pipeline(new Illuminate\Container\Container))
+        $result = (new Pipeline(new \Illuminate\Container\Container))
             ->send('foo')
             ->through([new PipelineTestPipeOne])
             ->then(function ($piped) {
@@ -46,9 +49,9 @@ class PipelineTest extends PHPUnit_Framework_TestCase
     {
         $parameters = ['one', 'two'];
 
-        $result = (new Pipeline(new Illuminate\Container\Container))
+        $result = (new Pipeline(new \Illuminate\Container\Container))
             ->send('foo')
-            ->through('PipelineTestParameterPipe:'.implode(',', $parameters))
+            ->through('Illuminate\Tests\Pipeline\PipelineTestParameterPipe:'.implode(',', $parameters))
             ->then(function ($piped) {
                 return $piped;
             });
@@ -61,9 +64,9 @@ class PipelineTest extends PHPUnit_Framework_TestCase
 
     public function testPipelineViaChangesTheMethodBeingCalledOnThePipes()
     {
-        $pipelineInstance = new Pipeline(new Illuminate\Container\Container);
+        $pipelineInstance = new Pipeline(new \Illuminate\Container\Container);
         $result = $pipelineInstance->send('data')
-            ->through('PipelineTestPipeOne')
+            ->through('Illuminate\Tests\Pipeline\PipelineTestPipeOne')
             ->via('differentMethod')
             ->then(function ($piped) {
                 return $piped;
@@ -77,7 +80,7 @@ class PipelineTest extends PHPUnit_Framework_TestCase
     public function testPipelineThrowsExceptionOnResolveWithoutContainer()
     {
         (new Pipeline)->send('data')
-            ->through('PipelineTestPipeOne')
+            ->through('Illuminate\Tests\Pipeline\PipelineTestPipeOne')
             ->then(function ($piped) {
                 return $piped;
             });

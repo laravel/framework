@@ -1,12 +1,15 @@
 <?php
 
+namespace Illuminate\Tests\Mail;
+
 use Aws\Ses\SesClient;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Collection;
 use Illuminate\Mail\TransportManager;
 use Illuminate\Foundation\Application;
 use Illuminate\Mail\Transport\SesTransport;
 
-class MailSesTransportTest extends PHPUnit_Framework_TestCase
+class MailSesTransportTest extends TestCase
 {
     public function testGetTransport()
     {
@@ -34,7 +37,7 @@ class MailSesTransportTest extends PHPUnit_Framework_TestCase
 
     public function testSend()
     {
-        $message = new Swift_Message('Foo subject', 'Bar body');
+        $message = new \Swift_Message('Foo subject', 'Bar body');
         $message->setSender('myself@example.com');
         $message->setTo('me@example.com');
         $message->setBcc('you@example.com');

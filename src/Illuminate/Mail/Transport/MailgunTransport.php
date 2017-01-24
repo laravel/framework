@@ -3,7 +3,6 @@
 namespace Illuminate\Mail\Transport;
 
 use Swift_Mime_Message;
-use GuzzleHttp\Post\PostFile;
 use GuzzleHttp\ClientInterface;
 
 class MailgunTransport extends Transport
@@ -58,25 +57,11 @@ class MailgunTransport extends Transport
     {
         $this->beforeSendPerformed($message);
 
-        $options = ['auth' => ['api', $this->key]];
-
         $to = $this->getTo($message);
 
         $message->setBcc([]);
 
-        if (version_compare(ClientInterface::VERSION, '6') === 1) {
-            $options['multipart'] = [
-                ['name' => 'to', 'contents' => $to],
-                ['name' => 'message', 'contents' => $message->toString(), 'filename' => 'message.mime'],
-            ];
-        } else {
-            $options['body'] = [
-                'to' => $to,
-                'message' => new PostFile('message', $message->toString()),
-            ];
-        }
-
-        $this->client->post($this->url, $options);
+        $this->client->post($this->url, $this->payload($message, $to));
 
         $this->sendPerformed($message);
 
@@ -84,24 +69,57 @@ class MailgunTransport extends Transport
     }
 
     /**
+     * Get the HTTP payload for sending the Mailgun message.
+     *
+     * @param  \Swift_Mime_Message  $message
+     * @param  string  $to
+     * @return array
+     */
+    protected function payload(Swift_Mime_Message $message, $to)
+    {
+        return [
+            'auth' => [
+                'api',
+                $this->key,
+            ],
+            'multipart' => [
+                [
+                    'name' => 'to',
+                    'contents' => $to,
+                ],
+                [
+                    'name' => 'message',
+                    'contents' => $message->toString(),
+                    'filename' => 'message.mime',
+                ],
+            ],
+        ];
+    }
+
+    /**
      * Get the "to" payload field for the API request.
+     *
+     * @param  \Swift_Mime_Message  $message
+     * @return string
+     */
+    protected function getTo(Swift_Mime_Message $message)
+    {
+        return collect($this->allContacts($message))->map(function ($display, $address) {
+            return $display ? $display." <{$address}>" : $address;
+        })->values()->implode(',');
+    }
+
+    /**
+     * Get all of the contacts for the message.
      *
      * @param  \Swift_Mime_Message  $message
      * @return array
      */
-    protected function getTo(Swift_Mime_Message $message)
+    protected function allContacts(Swift_Mime_Message $message)
     {
-        $formatted = [];
-
-        $contacts = array_merge(
+        return array_merge(
             (array) $message->getTo(), (array) $message->getCc(), (array) $message->getBcc()
         );
-
-        foreach ($contacts as $address => $display) {
-            $formatted[] = $display ? $display." <{$address}>" : $address;
-        }
-
-        return implode(',', $formatted);
     }
 
     /**

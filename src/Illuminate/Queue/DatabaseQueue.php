@@ -2,10 +2,10 @@
 
 namespace Illuminate\Queue;
 
-use DateTime;
 use Carbon\Carbon;
 use Illuminate\Database\Connection;
 use Illuminate\Queue\Jobs\DatabaseJob;
+use Illuminate\Queue\Jobs\DatabaseJobRecord;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 
 class DatabaseQueue extends Queue implements QueueContract
@@ -36,7 +36,7 @@ class DatabaseQueue extends Queue implements QueueContract
      *
      * @var int|null
      */
-    protected $expire = 60;
+    protected $retryAfter = 60;
 
     /**
      * Create a new database queue instance.
@@ -44,15 +44,15 @@ class DatabaseQueue extends Queue implements QueueContract
      * @param  \Illuminate\Database\Connection  $database
      * @param  string  $table
      * @param  string  $default
-     * @param  int  $expire
+     * @param  int  $retryAfter
      * @return void
      */
-    public function __construct(Connection $database, $table, $default = 'default', $expire = 60)
+    public function __construct(Connection $database, $table, $default = 'default', $retryAfter = 60)
     {
         $this->table = $table;
-        $this->expire = $expire;
         $this->default = $default;
         $this->database = $database;
+        $this->retryAfter = $retryAfter;
     }
 
     /**
@@ -78,7 +78,7 @@ class DatabaseQueue extends Queue implements QueueContract
      */
     public function push($job, $data = '', $queue = null)
     {
-        return $this->pushToDatabase(0, $queue, $this->createPayload($job, $data));
+        return $this->pushToDatabase($queue, $this->createPayload($job, $data));
     }
 
     /**
@@ -91,7 +91,7 @@ class DatabaseQueue extends Queue implements QueueContract
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
-        return $this->pushToDatabase(0, $queue, $payload);
+        return $this->pushToDatabase($queue, $payload);
     }
 
     /**
@@ -105,7 +105,7 @@ class DatabaseQueue extends Queue implements QueueContract
      */
     public function later($delay, $job, $data = '', $queue = null)
     {
-        return $this->pushToDatabase($delay, $queue, $this->createPayload($job, $data));
+        return $this->pushToDatabase($queue, $this->createPayload($job, $data), $delay);
     }
 
     /**
@@ -120,46 +120,63 @@ class DatabaseQueue extends Queue implements QueueContract
     {
         $queue = $this->getQueue($queue);
 
-        $availableAt = $this->getAvailableAt(0);
+        $availableAt = $this->availableAt();
 
-        $records = array_map(function ($job) use ($queue, $data, $availableAt) {
-            return $this->buildDatabaseRecord(
-                $queue, $this->createPayload($job, $data), $availableAt
-            );
-        }, (array) $jobs);
-
-        return $this->database->table($this->table)->insert($records);
+        return $this->database->table($this->table)->insert(collect((array) $jobs)->map(
+            function ($job) use ($queue, $data, $availableAt) {
+                return $this->buildDatabaseRecord($queue, $this->createPayload($job, $data), $availableAt);
+            }
+        )->all());
     }
 
     /**
      * Release a reserved job back onto the queue.
      *
      * @param  string  $queue
-     * @param  \StdClass  $job
+     * @param  \Illuminate\Queue\Jobs\DatabaseJobRecord  $job
      * @param  int  $delay
      * @return mixed
      */
     public function release($queue, $job, $delay)
     {
-        return $this->pushToDatabase($delay, $queue, $job->payload, $job->attempts);
+        return $this->pushToDatabase($queue, $job->payload, $delay, $job->attempts);
     }
 
     /**
      * Push a raw payload to the database with a given delay.
      *
-     * @param  \DateTime|int  $delay
      * @param  string|null  $queue
      * @param  string  $payload
+     * @param  \DateTime|int  $delay
      * @param  int  $attempts
      * @return mixed
      */
-    protected function pushToDatabase($delay, $queue, $payload, $attempts = 0)
+    protected function pushToDatabase($queue, $payload, $delay = 0, $attempts = 0)
     {
-        $attributes = $this->buildDatabaseRecord(
-            $this->getQueue($queue), $payload, $this->getAvailableAt($delay), $attempts
-        );
+        return $this->database->table($this->table)->insertGetId($this->buildDatabaseRecord(
+            $this->getQueue($queue), $payload, $this->availableAt($delay), $attempts
+        ));
+    }
 
-        return $this->database->table($this->table)->insertGetId($attributes);
+    /**
+     * Create an array to insert for the given job.
+     *
+     * @param  string|null  $queue
+     * @param  string  $payload
+     * @param  int  $availableAt
+     * @param  int  $attempts
+     * @return array
+     */
+    protected function buildDatabaseRecord($queue, $payload, $availableAt, $attempts = 0)
+    {
+        return [
+            'queue' => $queue,
+            'payload' => $payload,
+            'attempts' => $attempts,
+            'reserved_at' => null,
+            'available_at' => $availableAt,
+            'created_at' => $this->currentTime(),
+        ];
     }
 
     /**
@@ -175,13 +192,7 @@ class DatabaseQueue extends Queue implements QueueContract
         $this->database->beginTransaction();
 
         if ($job = $this->getNextAvailableJob($queue)) {
-            $job = $this->markJobAsReserved($job);
-
-            $this->database->commit();
-
-            return new DatabaseJob(
-                $this->container, $this, $job, $queue
-            );
+            return $this->marshalJob($queue, $job);
         }
 
         $this->database->commit();
@@ -191,7 +202,7 @@ class DatabaseQueue extends Queue implements QueueContract
      * Get the next available job for the queue.
      *
      * @param  string|null  $queue
-     * @return \StdClass|null
+     * @return \Illuminate\Queue\Jobs\DatabaseJobRecord|null
      */
     protected function getNextAvailableJob($queue)
     {
@@ -205,7 +216,7 @@ class DatabaseQueue extends Queue implements QueueContract
                     ->orderBy('id', 'asc')
                     ->first();
 
-        return $job ? (object) $job : null;
+        return $job ? new DatabaseJobRecord((object) $job) : null;
     }
 
     /**
@@ -217,8 +228,8 @@ class DatabaseQueue extends Queue implements QueueContract
     protected function isAvailable($query)
     {
         $query->where(function ($query) {
-            $query->whereNull('reserved_at');
-            $query->where('available_at', '<=', $this->getTime());
+            $query->whereNull('reserved_at')
+                  ->where('available_at', '<=', $this->currentTime());
         });
     }
 
@@ -230,7 +241,7 @@ class DatabaseQueue extends Queue implements QueueContract
      */
     protected function isReservedButExpired($query)
     {
-        $expiration = Carbon::now()->subSeconds($this->expire)->getTimestamp();
+        $expiration = Carbon::now()->subSeconds($this->retryAfter)->getTimestamp();
 
         $query->orWhere(function ($query) use ($expiration) {
             $query->where('reserved_at', '<=', $expiration);
@@ -238,19 +249,34 @@ class DatabaseQueue extends Queue implements QueueContract
     }
 
     /**
+     * Marshal the reserved job into a DatabaseJob instance.
+     *
+     * @param  string  $queue
+     * @param  \Illuminate\Queue\Jobs\DatabaseJobRecord  $job
+     * @return \Illuminate\Queue\Jobs\DatabaseJob
+     */
+    protected function marshalJob($queue, $job)
+    {
+        $job = $this->markJobAsReserved($job);
+
+        $this->database->commit();
+
+        return new DatabaseJob(
+            $this->container, $this, $job, $this->connectionName, $queue
+        );
+    }
+
+    /**
      * Mark the given job ID as reserved.
      *
-     * @param \stdClass $job
-     * @return \stdClass
+     * @param  \Illuminate\Queue\Jobs\DatabaseJobRecord  $job
+     * @return \Illuminate\Queue\Jobs\DatabaseJobRecord
      */
     protected function markJobAsReserved($job)
     {
-        $job->attempts = $job->attempts + 1;
-        $job->reserved_at = $this->getTime();
-
         $this->database->table($this->table)->where('id', $job->id)->update([
-            'reserved_at' => $job->reserved_at,
-            'attempts' => $job->attempts,
+            'reserved_at' => $job->touch(),
+            'attempts' => $job->increment(),
         ]);
 
         return $job;
@@ -272,40 +298,6 @@ class DatabaseQueue extends Queue implements QueueContract
         }
 
         $this->database->commit();
-    }
-
-    /**
-     * Get the "available at" UNIX timestamp.
-     *
-     * @param  \DateTime|int  $delay
-     * @return int
-     */
-    protected function getAvailableAt($delay)
-    {
-        $availableAt = $delay instanceof DateTime ? $delay : Carbon::now()->addSeconds($delay);
-
-        return $availableAt->getTimestamp();
-    }
-
-    /**
-     * Create an array to insert for the given job.
-     *
-     * @param  string|null  $queue
-     * @param  string  $payload
-     * @param  int  $availableAt
-     * @param  int  $attempts
-     * @return array
-     */
-    protected function buildDatabaseRecord($queue, $payload, $availableAt, $attempts = 0)
-    {
-        return [
-            'queue' => $queue,
-            'attempts' => $attempts,
-            'reserved_at' => null,
-            'available_at' => $availableAt,
-            'created_at' => $this->getTime(),
-            'payload' => $payload,
-        ];
     }
 
     /**

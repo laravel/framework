@@ -1,14 +1,19 @@
 <?php
 
+namespace Illuminate\Tests\Auth;
+
+use StdClass;
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Container\Container;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class GateTest extends PHPUnit_Framework_TestCase
+class GateTest extends TestCase
 {
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException InvalidArgumentException
      */
     public function test_gate_throws_exception_on_invalid_callback_type()
     {
@@ -132,7 +137,7 @@ class GateTest extends PHPUnit_Framework_TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', 'AccessGateTestClass@foo');
+        $gate->define('foo', '\Illuminate\Tests\Auth\AccessGateTestClass@foo');
 
         $this->assertTrue($gate->check('foo'));
     }
@@ -144,6 +149,24 @@ class GateTest extends PHPUnit_Framework_TestCase
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
 
         $this->assertTrue($gate->check('update', new AccessGateTestDummy));
+    }
+
+    public function test_policy_classes_handle_checks_for_all_subtypes()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
+
+        $this->assertTrue($gate->check('update', new AccessGateTestSubDummy));
+    }
+
+    public function test_policy_classes_handle_checks_for_interfaces()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummyInterface::class, AccessGateTestPolicy::class);
+
+        $this->assertTrue($gate->check('update', new AccessGateTestSubDummy));
     }
 
     public function test_policy_converts_dash_to_camel()
@@ -263,7 +286,17 @@ class AccessGateTestClass
     }
 }
 
-class AccessGateTestDummy
+interface AccessGateTestDummyInterface
+{
+    //
+}
+
+class AccessGateTestDummy implements AccessGateTestDummyInterface
+{
+    //
+}
+
+class AccessGateTestSubDummy extends AccessGateTestDummy
 {
     //
 }

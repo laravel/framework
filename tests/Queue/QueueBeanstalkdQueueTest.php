@@ -1,8 +1,11 @@
 <?php
 
-use Mockery as m;
+namespace Illuminate\Tests\Queue;
 
-class QueueBeanstalkdQueueTest extends PHPUnit_Framework_TestCase
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+
+class QueueBeanstalkdQueueTest extends TestCase
 {
     public function tearDown()
     {
@@ -11,7 +14,7 @@ class QueueBeanstalkdQueueTest extends PHPUnit_Framework_TestCase
 
     public function testPushProperlyPushesJobOntoBeanstalkd()
     {
-        $queue = new Illuminate\Queue\BeanstalkdQueue(m::mock('Pheanstalk\Pheanstalk'), 'default', 60);
+        $queue = new \Illuminate\Queue\BeanstalkdQueue(m::mock('Pheanstalk\Pheanstalk'), 'default', 60);
         $pheanstalk = $queue->getPheanstalk();
         $pheanstalk->shouldReceive('useTube')->once()->with('stack')->andReturn($pheanstalk);
         $pheanstalk->shouldReceive('useTube')->once()->with('default')->andReturn($pheanstalk);
@@ -23,11 +26,11 @@ class QueueBeanstalkdQueueTest extends PHPUnit_Framework_TestCase
 
     public function testDelayedPushProperlyPushesJobOntoBeanstalkd()
     {
-        $queue = new Illuminate\Queue\BeanstalkdQueue(m::mock('Pheanstalk\Pheanstalk'), 'default', 60);
+        $queue = new \Illuminate\Queue\BeanstalkdQueue(m::mock('Pheanstalk\Pheanstalk'), 'default', 60);
         $pheanstalk = $queue->getPheanstalk();
         $pheanstalk->shouldReceive('useTube')->once()->with('stack')->andReturn($pheanstalk);
         $pheanstalk->shouldReceive('useTube')->once()->with('default')->andReturn($pheanstalk);
-        $pheanstalk->shouldReceive('put')->twice()->with(json_encode(['job' => 'foo', 'data' => ['data']]), Pheanstalk\Pheanstalk::DEFAULT_PRIORITY, 5, Pheanstalk\Pheanstalk::DEFAULT_TTR);
+        $pheanstalk->shouldReceive('put')->twice()->with(json_encode(['job' => 'foo', 'data' => ['data']]), \Pheanstalk\Pheanstalk::DEFAULT_PRIORITY, 5, \Pheanstalk\Pheanstalk::DEFAULT_TTR);
 
         $queue->later(5, 'foo', ['data'], 'stack');
         $queue->later(5, 'foo', ['data']);
@@ -35,7 +38,7 @@ class QueueBeanstalkdQueueTest extends PHPUnit_Framework_TestCase
 
     public function testPopProperlyPopsJobOffOfBeanstalkd()
     {
-        $queue = new Illuminate\Queue\BeanstalkdQueue(m::mock('Pheanstalk\Pheanstalk'), 'default', 60);
+        $queue = new \Illuminate\Queue\BeanstalkdQueue(m::mock('Pheanstalk\Pheanstalk'), 'default', 60);
         $queue->setContainer(m::mock('Illuminate\Container\Container'));
         $pheanstalk = $queue->getPheanstalk();
         $pheanstalk->shouldReceive('watchOnly')->once()->with('default')->andReturn($pheanstalk);
@@ -49,7 +52,7 @@ class QueueBeanstalkdQueueTest extends PHPUnit_Framework_TestCase
 
     public function testDeleteProperlyRemoveJobsOffBeanstalkd()
     {
-        $queue = new Illuminate\Queue\BeanstalkdQueue(m::mock('Pheanstalk\Pheanstalk'), 'default', 60);
+        $queue = new \Illuminate\Queue\BeanstalkdQueue(m::mock('Pheanstalk\Pheanstalk'), 'default', 60);
         $pheanstalk = $queue->getPheanstalk();
         $pheanstalk->shouldReceive('useTube')->once()->with('default')->andReturn($pheanstalk);
         $pheanstalk->shouldReceive('delete')->once()->with(m::type('Pheanstalk\Job'));

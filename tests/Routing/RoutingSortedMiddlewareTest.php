@@ -1,8 +1,11 @@
 <?php
 
+namespace Illuminate\Tests\Routing;
+
+use PHPUnit\Framework\TestCase;
 use Illuminate\Routing\SortedMiddleware;
 
-class RoutingSortedMiddlewareTest extends PHPUnit_Framework_TestCase
+class RoutingSortedMiddlewareTest extends TestCase
 {
     public function testMiddlewareCanBeSortedByPriority()
     {

@@ -2,14 +2,9 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
-use RuntimeException;
-use Doctrine\DBAL\Types\Type;
 use Illuminate\Support\Fluent;
-use Doctrine\DBAL\Schema\Table;
-use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\TableDiff;
 use Illuminate\Database\Connection;
-use Doctrine\DBAL\Schema\Comparator;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Grammar as BaseGrammar;
@@ -34,48 +29,22 @@ abstract class Grammar extends BaseGrammar
      */
     public function compileRenameColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        $schema = $connection->getDoctrineSchemaManager();
-
-        $table = $this->getTablePrefix().$blueprint->getTable();
-
-        $column = $connection->getDoctrineColumn($table, $command->from);
-
-        $tableDiff = $this->getRenamedDiff($blueprint, $command, $column, $schema);
-
-        return (array) $schema->getDatabasePlatform()->getAlterTableSQL($tableDiff);
+        return RenameColumn::compile($this, $blueprint, $command, $connection);
     }
 
     /**
-     * Get a new column instance with the new column name.
+     * Compile a change column command into a series of SQL statements.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @param  \Doctrine\DBAL\Schema\Column  $column
-     * @param  \Doctrine\DBAL\Schema\AbstractSchemaManager  $schema
-     * @return \Doctrine\DBAL\Schema\TableDiff
-     */
-    protected function getRenamedDiff(Blueprint $blueprint, Fluent $command, Column $column, SchemaManager $schema)
-    {
-        $tableDiff = $this->getDoctrineTableDiff($blueprint, $schema);
-
-        return $this->setRenamedColumns($tableDiff, $command, $column);
-    }
-
-    /**
-     * Set the renamed columns on the table diff.
+     * @param  \Illuminate\Database\Connection $connection
+     * @return array
      *
-     * @param  \Doctrine\DBAL\Schema\TableDiff  $tableDiff
-     * @param  \Illuminate\Support\Fluent  $command
-     * @param  \Doctrine\DBAL\Schema\Column  $column
-     * @return \Doctrine\DBAL\Schema\TableDiff
+     * @throws \RuntimeException
      */
-    protected function setRenamedColumns(TableDiff $tableDiff, Fluent $command, Column $column)
+    public function compileChange(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        $newColumn = new Column($command->to, $column->getType(), $column->toArray());
-
-        $tableDiff->renamedColumns = [$command->from => $newColumn];
-
-        return $tableDiff;
+        return ChangeColumn::compile($this, $blueprint, $command, $connection);
     }
 
     /**
@@ -87,22 +56,22 @@ abstract class Grammar extends BaseGrammar
      */
     public function compileForeign(Blueprint $blueprint, Fluent $command)
     {
-        $table = $this->wrapTable($blueprint);
-
-        $index = $this->wrap($command->index);
-
-        $on = $this->wrapTable($command->on);
-
         // We need to prepare several of the elements of the foreign key definition
         // before we can create the SQL, such as wrapping the tables and convert
         // an array of columns to comma-delimited strings for the SQL queries.
-        $columns = $this->columnize($command->columns);
+        $sql = sprintf('alter table %s add constraint %s ',
+            $this->wrapTable($blueprint),
+            $this->wrap($command->index)
+        );
 
-        $onColumns = $this->columnize((array) $command->references);
-
-        $sql = "alter table {$table} add constraint {$index} ";
-
-        $sql .= "foreign key ({$columns}) references {$on} ({$onColumns})";
+        // Once we have the initial portion of the SQL statement we will add on the
+        // key name, table name, and referenced columns. These will complete the
+        // main portion of the SQL statement and this SQL will almost be done.
+        $sql .= sprintf('foreign key (%s) references %s (%s)',
+            $this->columnize($command->columns),
+            $this->wrapTable($command->on),
+            $this->columnize((array) $command->references)
+        );
 
         // Once we have the basic foreign key creation statement constructed we can
         // build out the syntax for what should happen on an update or delete of
@@ -138,6 +107,17 @@ abstract class Grammar extends BaseGrammar
         }
 
         return $columns;
+    }
+
+    /**
+     * Get the SQL for the column data type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function getType(Fluent $column)
+    {
+        return $this->{'type'.ucfirst($column->type)}($column);
     }
 
     /**
@@ -190,17 +170,6 @@ abstract class Grammar extends BaseGrammar
     }
 
     /**
-     * Get the SQL for the column data type.
-     *
-     * @param  \Illuminate\Support\Fluent  $column
-     * @return string
-     */
-    protected function getType(Fluent $column)
-    {
-        return $this->{'type'.ucfirst($column->type)}($column);
-    }
-
-    /**
      * Add a prefix to an array of values.
      *
      * @param  string  $prefix
@@ -222,23 +191,23 @@ abstract class Grammar extends BaseGrammar
      */
     public function wrapTable($table)
     {
-        if ($table instanceof Blueprint) {
-            $table = $table->getTable();
-        }
-
-        return parent::wrapTable($table);
+        return parent::wrapTable(
+            $table instanceof Blueprint ? $table->getTable() : $table
+        );
     }
 
     /**
-     * {@inheritdoc}
+     * Wrap a value in keyword identifiers.
+     *
+     * @param  \Illuminate\Database\Query\Expression|string  $value
+     * @param  bool    $prefixAlias
+     * @return string
      */
     public function wrap($value, $prefixAlias = false)
     {
-        if ($value instanceof Fluent) {
-            $value = $value->name;
-        }
-
-        return parent::wrap($value, $prefixAlias);
+        return parent::wrap(
+            $value instanceof Fluent ? $value->name : $value, $prefixAlias
+        );
     }
 
     /**
@@ -253,11 +222,9 @@ abstract class Grammar extends BaseGrammar
             return $value;
         }
 
-        if (is_bool($value)) {
-            return "'".(int) $value."'";
-        }
-
-        return "'".strval($value)."'";
+        return is_bool($value)
+                    ? "'".(int) $value."'"
+                    : "'".strval($value)."'";
     }
 
     /**
@@ -267,201 +234,13 @@ abstract class Grammar extends BaseGrammar
      * @param  \Doctrine\DBAL\Schema\AbstractSchemaManager  $schema
      * @return \Doctrine\DBAL\Schema\TableDiff
      */
-    protected function getDoctrineTableDiff(Blueprint $blueprint, SchemaManager $schema)
+    public function getDoctrineTableDiff(Blueprint $blueprint, SchemaManager $schema)
     {
         $table = $this->getTablePrefix().$blueprint->getTable();
 
-        $tableDiff = new TableDiff($table);
-
-        $tableDiff->fromTable = $schema->listTableDetails($table);
-
-        return $tableDiff;
-    }
-
-    /**
-     * Compile a change column command into a series of SQL statements.
-     *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
-     * @param  \Illuminate\Database\Connection $connection
-     * @return array
-     *
-     * @throws \RuntimeException
-     */
-    public function compileChange(Blueprint $blueprint, Fluent $command, Connection $connection)
-    {
-        if (! $connection->isDoctrineAvailable()) {
-            throw new RuntimeException(sprintf(
-                'Changing columns for table "%s" requires Doctrine DBAL; install "doctrine/dbal".',
-                $blueprint->getTable()
-            ));
-        }
-
-        $schema = $connection->getDoctrineSchemaManager();
-
-        $tableDiff = $this->getChangedDiff($blueprint, $schema);
-
-        if ($tableDiff !== false) {
-            return (array) $schema->getDatabasePlatform()->getAlterTableSQL($tableDiff);
-        }
-
-        return [];
-    }
-
-    /**
-     * Get the Doctrine table difference for the given changes.
-     *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Doctrine\DBAL\Schema\AbstractSchemaManager  $schema
-     * @return \Doctrine\DBAL\Schema\TableDiff|bool
-     */
-    protected function getChangedDiff(Blueprint $blueprint, SchemaManager $schema)
-    {
-        $table = $schema->listTableDetails($this->getTablePrefix().$blueprint->getTable());
-
-        return (new Comparator)->diffTable($table, $this->getTableWithColumnChanges($blueprint, $table));
-    }
-
-    /**
-     * Get a copy of the given Doctrine table after making the column changes.
-     *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Doctrine\DBAL\Schema\Table  $table
-     * @return \Doctrine\DBAL\Schema\TableDiff
-     */
-    protected function getTableWithColumnChanges(Blueprint $blueprint, Table $table)
-    {
-        $table = clone $table;
-
-        foreach ($blueprint->getChangedColumns() as $fluent) {
-            $column = $this->getDoctrineColumnForChange($table, $fluent);
-
-            // Here we will spin through each fluent column definition and map it to the proper
-            // Doctrine column definitions - which is necessary because Laravel and Doctrine
-            // use some different terminology for various column attributes on the tables.
-            foreach ($fluent->getAttributes() as $key => $value) {
-                if (! is_null($option = $this->mapFluentOptionToDoctrine($key))) {
-                    if (method_exists($column, $method = 'set'.ucfirst($option))) {
-                        $column->{$method}($this->mapFluentValueToDoctrine($option, $value));
-                    }
-                }
-            }
-        }
-
-        return $table;
-    }
-
-    /**
-     * Get the Doctrine column instance for a column change.
-     *
-     * @param  \Doctrine\DBAL\Schema\Table  $table
-     * @param  \Illuminate\Support\Fluent  $fluent
-     * @return \Doctrine\DBAL\Schema\Column
-     */
-    protected function getDoctrineColumnForChange(Table $table, Fluent $fluent)
-    {
-        return $table->changeColumn(
-            $fluent['name'], $this->getDoctrineColumnChangeOptions($fluent)
-        )->getColumn($fluent['name']);
-    }
-
-    /**
-     * Get the Doctrine column change options.
-     *
-     * @param  \Illuminate\Support\Fluent  $fluent
-     * @return array
-     */
-    protected function getDoctrineColumnChangeOptions(Fluent $fluent)
-    {
-        $options = ['type' => $this->getDoctrineColumnType($fluent['type'])];
-
-        if (in_array($fluent['type'], ['text', 'mediumText', 'longText'])) {
-            $options['length'] = $this->calculateDoctrineTextLength($fluent['type']);
-        }
-
-        return $options;
-    }
-
-    /**
-     * Get the doctrine column type.
-     *
-     * @param  string  $type
-     * @return \Doctrine\DBAL\Types\Type
-     */
-    protected function getDoctrineColumnType($type)
-    {
-        $type = strtolower($type);
-
-        switch ($type) {
-            case 'biginteger':
-                $type = 'bigint';
-                break;
-            case 'smallinteger':
-                $type = 'smallint';
-                break;
-            case 'mediumtext':
-            case 'longtext':
-                $type = 'text';
-                break;
-            case 'binary':
-                $type = 'blob';
-                break;
-        }
-
-        return Type::getType($type);
-    }
-
-    /**
-     * Calculate the proper column length to force the Doctrine text type.
-     *
-     * @param  string  $type
-     * @return int
-     */
-    protected function calculateDoctrineTextLength($type)
-    {
-        switch ($type) {
-            case 'mediumText':
-                return 65535 + 1;
-            case 'longText':
-                return 16777215 + 1;
-            default:
-                return 255 + 1;
-        }
-    }
-
-    /**
-     * Get the matching Doctrine option for a given Fluent attribute name.
-     *
-     * @param  string  $attribute
-     * @return string|null
-     */
-    protected function mapFluentOptionToDoctrine($attribute)
-    {
-        switch ($attribute) {
-            case 'type':
-            case 'name':
-                return;
-            case 'nullable':
-                return 'notnull';
-            case 'total':
-                return 'precision';
-            case 'places':
-                return 'scale';
-            default:
-                return $attribute;
-        }
-    }
-
-    /**
-     * Get the matching Doctrine value for a given Fluent attribute.
-     *
-     * @param  string  $option
-     * @param  mixed  $value
-     * @return mixed
-     */
-    protected function mapFluentValueToDoctrine($option, $value)
-    {
-        return $option == 'notnull' ? ! $value : $value;
+        return tap(new TableDiff($table), function ($tableDiff) use ($schema, $table) {
+            $tableDiff->fromTable = $schema->listTableDetails($table);
+        });
     }
 
     /**

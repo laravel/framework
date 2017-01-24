@@ -2,6 +2,8 @@
 
 namespace Illuminate\Support\Facades;
 
+use Psr\Log\LoggerInterface;
+
 /**
  * @see \Illuminate\Log\Writer
  */
@@ -14,6 +16,6 @@ class Log extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return 'log';
+        return LoggerInterface::class;
     }
 }

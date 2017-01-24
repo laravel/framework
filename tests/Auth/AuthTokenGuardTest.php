@@ -1,10 +1,14 @@
 <?php
 
+namespace Illuminate\Tests\Auth;
+
+use Mockery;
 use Illuminate\Http\Request;
 use Illuminate\Auth\TokenGuard;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\Auth\UserProvider;
 
-class AuthTokenGuardTest extends PHPUnit_Framework_TestCase
+class AuthTokenGuardTest extends TestCase
 {
     public function tearDown()
     {

@@ -89,15 +89,15 @@ class View implements ArrayAccess, ViewContract
             // Once we have the contents of the view, we will flush the sections if we are
             // done rendering all views so that there is nothing left hanging over when
             // another view gets rendered in the future by the application developer.
-            $this->factory->flushSectionsIfDoneRendering();
+            $this->factory->flushStateIfDoneRendering();
 
             return ! is_null($response) ? $response : $contents;
         } catch (Exception $e) {
-            $this->factory->flushSections();
+            $this->factory->flushState();
 
             throw $e;
         } catch (Throwable $e) {
-            $this->factory->flushSections();
+            $this->factory->flushState();
 
             throw $e;
         }
@@ -128,18 +128,6 @@ class View implements ArrayAccess, ViewContract
     }
 
     /**
-     * Get the sections of the rendered view.
-     *
-     * @return array
-     */
-    public function renderSections()
-    {
-        return $this->render(function () {
-            return $this->factory->getSections();
-        });
-    }
-
-    /**
      * Get the evaluated contents of the view.
      *
      * @return string
@@ -165,6 +153,18 @@ class View implements ArrayAccess, ViewContract
         }
 
         return $data;
+    }
+
+    /**
+     * Get the sections of the rendered view.
+     *
+     * @return array
+     */
+    public function renderSections()
+    {
+        return $this->render(function () {
+            return $this->factory->getSections();
+        });
     }
 
     /**
@@ -206,33 +206,21 @@ class View implements ArrayAccess, ViewContract
      */
     public function withErrors($provider)
     {
-        if ($provider instanceof MessageProvider) {
-            $this->with('errors', $provider->getMessageBag());
-        } else {
-            $this->with('errors', new MessageBag((array) $provider));
-        }
+        $this->with('errors', $this->formatErrors($provider));
 
         return $this;
     }
 
     /**
-     * Get the view factory instance.
+     * Format the given message provider into a MessageBag.
      *
-     * @return \Illuminate\View\Factory
+     * @param  \Illuminate\Contracts\Support\MessageProvider|array  $provider
+     * @return \Illuminate\Support\MessageBag
      */
-    public function getFactory()
+    protected function formatErrors($provider)
     {
-        return $this->factory;
-    }
-
-    /**
-     * Get the view's rendering engine.
-     *
-     * @return \Illuminate\View\Engines\EngineInterface
-     */
-    public function getEngine()
-    {
-        return $this->engine;
+        return $provider instanceof MessageProvider
+                        ? $provider->getMessageBag() : new MessageBag((array) $provider);
     }
 
     /**
@@ -284,6 +272,26 @@ class View implements ArrayAccess, ViewContract
     public function setPath($path)
     {
         $this->path = $path;
+    }
+
+    /**
+     * Get the view factory instance.
+     *
+     * @return \Illuminate\View\Factory
+     */
+    public function getFactory()
+    {
+        return $this->factory;
+    }
+
+    /**
+     * Get the view's rendering engine.
+     *
+     * @return \Illuminate\View\Engines\EngineInterface
+     */
+    public function getEngine()
+    {
+        return $this->engine;
     }
 
     /**
@@ -387,11 +395,11 @@ class View implements ArrayAccess, ViewContract
      */
     public function __call($method, $parameters)
     {
-        if (Str::startsWith($method, 'with')) {
-            return $this->with(Str::snake(substr($method, 4)), $parameters[0]);
+        if (! Str::startsWith($method, 'with')) {
+            throw new BadMethodCallException("Method [$method] does not exist on view.");
         }
 
-        throw new BadMethodCallException("Method [$method] does not exist on view.");
+        return $this->with(Str::snake(substr($method, 4)), $parameters[0]);
     }
 
     /**

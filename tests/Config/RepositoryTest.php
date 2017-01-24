@@ -1,8 +1,11 @@
 <?php
 
+namespace Illuminate\Tests\Config;
+
+use PHPUnit\Framework\TestCase;
 use Illuminate\Config\Repository;
 
-class RepositoryTest extends PHPUnit_Framework_TestCase
+class RepositoryTest extends TestCase
 {
     /**
      * @var \Illuminate\Config\Repository

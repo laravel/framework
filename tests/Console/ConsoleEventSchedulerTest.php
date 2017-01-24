@@ -1,10 +1,22 @@
 <?php
 
+namespace Illuminate\Tests\Console;
+
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Console\Scheduling\Schedule;
 
-class ConsoleEventSchedulerTest extends PHPUnit_Framework_TestCase
+class ConsoleEventSchedulerTest extends TestCase
 {
+    public function setUp()
+    {
+        parent::setUp();
+
+        \Illuminate\Container\Container::getInstance()->instance(
+            'Illuminate\Console\Scheduling\Schedule', $this->schedule = new Schedule(m::mock('Illuminate\Contracts\Cache\Repository'))
+        );
+    }
+
     public function tearDown()
     {
         m::close();
@@ -15,7 +27,7 @@ class ConsoleEventSchedulerTest extends PHPUnit_Framework_TestCase
         $escape = '\\' === DIRECTORY_SEPARATOR ? '"' : '\'';
         $escapeReal = '\\' === DIRECTORY_SEPARATOR ? '\\"' : '"';
 
-        $schedule = new Schedule;
+        $schedule = $this->schedule;
         $schedule->exec('path/to/command');
         $schedule->exec('path/to/command -f --foo="bar"');
         $schedule->exec('path/to/command', ['-f']);
@@ -40,7 +52,7 @@ class ConsoleEventSchedulerTest extends PHPUnit_Framework_TestCase
     {
         $escape = '\\' === DIRECTORY_SEPARATOR ? '"' : '\'';
 
-        $schedule = new Schedule;
+        $schedule = $this->schedule;
         $schedule->command('queue:listen');
         $schedule->command('queue:listen --tries=3');
         $schedule->command('queue:listen', ['--tries' => 3]);
@@ -56,7 +68,7 @@ class ConsoleEventSchedulerTest extends PHPUnit_Framework_TestCase
     {
         $escape = '\\' === DIRECTORY_SEPARATOR ? '"' : '\'';
 
-        $schedule = new Schedule;
+        $schedule = $this->schedule;
         $schedule->command(ConsoleCommandStub::class, ['--force']);
 
         $events = $schedule->events();
@@ -75,7 +87,7 @@ class FooClassStub
     }
 }
 
-class ConsoleCommandStub extends Illuminate\Console\Command
+class ConsoleCommandStub extends \Illuminate\Console\Command
 {
     protected $signature = 'foo:bar';
 

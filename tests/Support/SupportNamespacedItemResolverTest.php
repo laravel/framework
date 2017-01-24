@@ -1,8 +1,11 @@
 <?php
 
+namespace Illuminate\Tests\Support;
+
+use PHPUnit\Framework\TestCase;
 use Illuminate\Support\NamespacedItemResolver;
 
-class SupportNamespacedItemResolverTest extends PHPUnit_Framework_TestCase
+class SupportNamespacedItemResolverTest extends TestCase
 {
     public function testResolution()
     {

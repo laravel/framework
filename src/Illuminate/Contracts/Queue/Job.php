@@ -12,6 +12,14 @@ interface Job
     public function fire();
 
     /**
+     * Release the job back into the queue.
+     *
+     * @param  int   $delay
+     * @return void
+     */
+    public function release($delay = 0);
+
+    /**
      * Delete the job from the queue.
      *
      * @return void
@@ -24,14 +32,6 @@ interface Job
      * @return bool
      */
     public function isDeleted();
-
-    /**
-     * Release the job back into the queue.
-     *
-     * @param  int   $delay
-     * @return void
-     */
-    public function release($delay = 0);
 
     /**
      * Determine if the job has been deleted or released.
@@ -48,6 +48,14 @@ interface Job
     public function attempts();
 
     /**
+     * Process an exception that caused the job to fail.
+     *
+     * @param  \Throwable  $e
+     * @return void
+     */
+    public function failed($e);
+
+    /**
      * Get the name of the queued job class.
      *
      * @return string
@@ -57,17 +65,18 @@ interface Job
     /**
      * Get the resolved name of the queued job class.
      *
+     * Resolves the name of "wrapped" jobs such as class-based handlers.
+     *
      * @return string
      */
     public function resolveName();
 
     /**
-     * Call the failed method on the job instance.
+     * Get the name of the connection the job belongs to.
      *
-     * @param  \Throwable  $e
-     * @return void
+     * @return string
      */
-    public function failed($e);
+    public function getConnectionName();
 
     /**
      * Get the name of the queue the job belongs to.

@@ -1,9 +1,14 @@
 <?php
 
+namespace Illuminate\Tests\Cache;
+
+use DateTime;
+use DateInterval;
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\ArrayStore;
 
-class CacheTaggedCacheTest extends PHPUnit_Framework_TestCase
+class CacheTaggedCacheTest extends TestCase
 {
     public function tearDown()
     {
@@ -61,7 +66,7 @@ class CacheTaggedCacheTest extends PHPUnit_Framework_TestCase
         $tagSet = m::mock('Illuminate\Cache\TagSet', [$store, ['foo', 'bar']]);
         $tagSet->shouldReceive('getNamespace')->andReturn('foo|bar');
         $tagSet->shouldReceive('getNames')->andReturn(['foo', 'bar']);
-        $redis = new Illuminate\Cache\RedisTaggedCache($store, $tagSet);
+        $redis = new \Illuminate\Cache\RedisTaggedCache($store, $tagSet);
         $store->shouldReceive('getPrefix')->andReturn('prefix:');
         $store->shouldReceive('connection')->andReturn($conn = m::mock('StdClass'));
         $conn->shouldReceive('sadd')->once()->with('prefix:foo:forever_ref', 'prefix:'.sha1('foo|bar').':key1');
@@ -78,7 +83,7 @@ class CacheTaggedCacheTest extends PHPUnit_Framework_TestCase
         $tagSet = m::mock('Illuminate\Cache\TagSet', [$store, ['foo', 'bar']]);
         $tagSet->shouldReceive('getNamespace')->andReturn('foo|bar');
         $tagSet->shouldReceive('getNames')->andReturn(['foo', 'bar']);
-        $redis = new Illuminate\Cache\RedisTaggedCache($store, $tagSet);
+        $redis = new \Illuminate\Cache\RedisTaggedCache($store, $tagSet);
         $store->shouldReceive('getPrefix')->andReturn('prefix:');
         $store->shouldReceive('connection')->andReturn($conn = m::mock('StdClass'));
         $conn->shouldReceive('sadd')->once()->with('prefix:foo:standard_ref', 'prefix:'.sha1('foo|bar').':key1');
@@ -93,7 +98,7 @@ class CacheTaggedCacheTest extends PHPUnit_Framework_TestCase
         $store = m::mock('Illuminate\Contracts\Cache\Store');
         $tagSet = m::mock('Illuminate\Cache\TagSet', [$store, ['foo', 'bar']]);
         $tagSet->shouldReceive('getNamespace')->andReturn('foo|bar');
-        $redis = new Illuminate\Cache\RedisTaggedCache($store, $tagSet);
+        $redis = new \Illuminate\Cache\RedisTaggedCache($store, $tagSet);
         $store->shouldReceive('getPrefix')->andReturn('prefix:');
         $store->shouldReceive('connection')->andReturn($conn = m::mock('StdClass'));
 

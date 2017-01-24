@@ -1,9 +1,12 @@
 <?php
 
+namespace Illuminate\Tests\Database;
+
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Schema\Blueprint;
 
-class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase
+class DatabaseSqlServerSchemaGrammarTest extends TestCase
 {
     public function tearDown()
     {
@@ -573,6 +576,6 @@ class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase
 
     public function getGrammar()
     {
-        return new Illuminate\Database\Schema\Grammars\SqlServerGrammar;
+        return new \Illuminate\Database\Schema\Grammars\SqlServerGrammar;
     }
 }

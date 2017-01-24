@@ -61,7 +61,7 @@ class NamespacedItemResolver
         }
 
         // If there is more than one segment in this group, it means we are pulling
-        // a specific item out of a groups and will need to return the item name
+        // a specific item out of a group and will need to return this item name
         // as well as the group so we know which item to pull from the arrays.
         else {
             $item = implode('.', array_slice($segments, 1));
@@ -85,7 +85,9 @@ class NamespacedItemResolver
         // two pieces of data we can proceed with parsing out the item's value.
         $itemSegments = explode('.', $item);
 
-        $groupAndItem = array_slice($this->parseBasicSegments($itemSegments), 1);
+        $groupAndItem = array_slice(
+            $this->parseBasicSegments($itemSegments), 1
+        );
 
         return array_merge([$namespace], $groupAndItem);
     }

@@ -1,9 +1,12 @@
 <?php
 
+namespace Illuminate\Tests\Queue;
+
 use Mockery as m;
 use Aws\Sqs\SqsClient;
+use PHPUnit\Framework\TestCase;
 
-class QueueSqsJobTest extends PHPUnit_Framework_TestCase
+class QueueSqsJobTest extends TestCase
 {
     public function setUp()
     {
@@ -83,11 +86,12 @@ class QueueSqsJobTest extends PHPUnit_Framework_TestCase
 
     protected function getJob()
     {
-        return new Illuminate\Queue\Jobs\SqsJob(
+        return new \Illuminate\Queue\Jobs\SqsJob(
             $this->mockedContainer,
             $this->mockedSqsClient,
-            $this->queueUrl,
-            $this->mockedJobData
+            $this->mockedJobData,
+            'connection-name',
+            $this->queueUrl
         );
     }
 }

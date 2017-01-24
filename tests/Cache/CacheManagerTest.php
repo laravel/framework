@@ -1,9 +1,12 @@
 <?php
 
+namespace Illuminate\Tests\Cache;
+
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\CacheManager;
 
-class CacheManagerTest extends PHPUnit_Framework_TestCase
+class CacheManagerTest extends TestCase
 {
     public function tearDown()
     {

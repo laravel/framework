@@ -4,7 +4,7 @@ namespace Illuminate\Broadcasting\Broadcasters;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Illuminate\Contracts\Redis\Database as RedisDatabase;
+use Illuminate\Contracts\Redis\Factory as Redis;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class RedisBroadcaster extends Broadcaster
@@ -12,7 +12,7 @@ class RedisBroadcaster extends Broadcaster
     /**
      * The Redis instance.
      *
-     * @var \Illuminate\Contracts\Redis\Database
+     * @var \Illuminate\Contracts\Redis\Factory
      */
     protected $redis;
 
@@ -26,11 +26,11 @@ class RedisBroadcaster extends Broadcaster
     /**
      * Create a new broadcaster instance.
      *
-     * @param  \Illuminate\Contracts\Redis\Database  $redis
+     * @param  \Illuminate\Contracts\Redis\Factory  $redis
      * @param  string  $connection
      * @return void
      */
-    public function __construct(RedisDatabase $redis, $connection = null)
+    public function __construct(Redis $redis, $connection = null)
     {
         $this->redis = $redis;
         $this->connection = $connection;
@@ -89,10 +89,10 @@ class RedisBroadcaster extends Broadcaster
     {
         $connection = $this->redis->connection($this->connection);
 
-        $socket = Arr::pull($payload, 'socket');
-
         $payload = json_encode([
-            'event' => $event, 'data' => $payload, 'socket' => $socket,
+            'event' => $event,
+            'data' => $payload,
+            'socket' => Arr::pull($payload, 'socket'),
         ]);
 
         foreach ($this->formatChannels($channels) as $channel) {

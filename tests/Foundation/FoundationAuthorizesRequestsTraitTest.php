@@ -1,12 +1,15 @@
 <?php
 
+namespace Illuminate\Tests\Foundation;
+
+use PHPUnit\Framework\TestCase;
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Container\Container;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 
-class FoundationAuthorizesRequestsTraitTest extends PHPUnit_Framework_TestCase
+class FoundationAuthorizesRequestsTraitTest extends TestCase
 {
     public function test_basic_gate_check()
     {
@@ -27,7 +30,7 @@ class FoundationAuthorizesRequestsTraitTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Illuminate\Auth\Access\AuthorizationException
+     * @expectedException \Illuminate\Auth\Access\AuthorizationException
      */
     public function test_exception_is_thrown_if_gate_check_fails()
     {

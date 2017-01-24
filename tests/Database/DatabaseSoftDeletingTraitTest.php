@@ -1,8 +1,11 @@
 <?php
 
-use Mockery as m;
+namespace Illuminate\Tests\Database;
 
-class DatabaseSoftDeletingTraitTest extends PHPUnit_Framework_TestCase
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+
+class DatabaseSoftDeletingTraitTest extends TestCase
 {
     public function tearDown()
     {
@@ -11,7 +14,7 @@ class DatabaseSoftDeletingTraitTest extends PHPUnit_Framework_TestCase
 
     public function testDeleteSetsSoftDeletedColumn()
     {
-        $model = m::mock('DatabaseSoftDeletingTraitStub');
+        $model = m::mock('Illuminate\Tests\Database\DatabaseSoftDeletingTraitStub');
         $model->shouldDeferMissing();
         // $model->shouldReceive('newQuery')->andReturn($query = m::mock('StdClass'));
         $model->shouldReceive('newQueryWithoutScopes')->andReturn($query = m::mock('StdClass'));
@@ -24,7 +27,7 @@ class DatabaseSoftDeletingTraitTest extends PHPUnit_Framework_TestCase
 
     public function testRestore()
     {
-        $model = m::mock('DatabaseSoftDeletingTraitStub');
+        $model = m::mock('Illuminate\Tests\Database\DatabaseSoftDeletingTraitStub');
         $model->shouldDeferMissing();
         $model->shouldReceive('fireModelEvent')->with('restoring')->andReturn(true);
         $model->shouldReceive('save')->once();
@@ -37,7 +40,7 @@ class DatabaseSoftDeletingTraitTest extends PHPUnit_Framework_TestCase
 
     public function testRestoreCancel()
     {
-        $model = m::mock('DatabaseSoftDeletingTraitStub');
+        $model = m::mock('Illuminate\Tests\Database\DatabaseSoftDeletingTraitStub');
         $model->shouldDeferMissing();
         $model->shouldReceive('fireModelEvent')->with('restoring')->andReturn(false);
         $model->shouldReceive('save')->never();
@@ -48,7 +51,7 @@ class DatabaseSoftDeletingTraitTest extends PHPUnit_Framework_TestCase
 
 class DatabaseSoftDeletingTraitStub
 {
-    use Illuminate\Database\Eloquent\SoftDeletes;
+    use \Illuminate\Database\Eloquent\SoftDeletes;
     public $deleted_at;
 
     public function newQuery()
@@ -83,7 +86,7 @@ class DatabaseSoftDeletingTraitStub
 
     public function freshTimestamp()
     {
-        return Carbon\Carbon::now();
+        return \Carbon\Carbon::now();
     }
 
     public function fromDateTime()

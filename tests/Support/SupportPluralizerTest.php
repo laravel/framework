@@ -1,8 +1,11 @@
 <?php
 
-use Illuminate\Support\Str;
+namespace Illuminate\Tests\Support;
 
-class SupportPluralizerTest extends PHPUnit_Framework_TestCase
+use Illuminate\Support\Str;
+use PHPUnit\Framework\TestCase;
+
+class SupportPluralizerTest extends TestCase
 {
     public function testBasicSingular()
     {

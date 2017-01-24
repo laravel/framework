@@ -1,8 +1,13 @@
 <?php
 
-use Illuminate\Support\Fluent;
+namespace Illuminate\Tests\Support;
 
-class SupportFluentTest extends PHPUnit_Framework_TestCase
+use ReflectionObject;
+use IteratorAggregate;
+use Illuminate\Support\Fluent;
+use PHPUnit\Framework\TestCase;
+
+class SupportFluentTest extends TestCase
 {
     public function testAttributesAreSetByConstructor()
     {

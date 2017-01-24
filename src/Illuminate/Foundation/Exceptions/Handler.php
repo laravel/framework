@@ -10,7 +10,7 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Http\Exception\HttpResponseException;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -92,30 +92,9 @@ class Handler implements ExceptionHandlerContract
     {
         $dontReport = array_merge($this->dontReport, [HttpResponseException::class]);
 
-        foreach ($dontReport as $type) {
-            if ($e instanceof $type) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Prepare exception for rendering.
-     *
-     * @param  \Exception  $e
-     * @return \Exception
-     */
-    protected function prepareException(Exception $e)
-    {
-        if ($e instanceof ModelNotFoundException) {
-            $e = new NotFoundHttpException($e->getMessage(), $e);
-        } elseif ($e instanceof AuthorizationException) {
-            $e = new HttpException(403, $e->getMessage());
-        }
-
-        return $e;
+        return ! is_null(collect($dontReport)->first(function ($type) use ($e) {
+            return $e instanceof $type;
+        }));
     }
 
     /**
@@ -141,6 +120,47 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
+     * Prepare exception for rendering.
+     *
+     * @param  \Exception  $e
+     * @return \Exception
+     */
+    protected function prepareException(Exception $e)
+    {
+        if ($e instanceof ModelNotFoundException) {
+            $e = new NotFoundHttpException($e->getMessage(), $e);
+        } elseif ($e instanceof AuthorizationException) {
+            $e = new HttpException(403, $e->getMessage());
+        }
+
+        return $e;
+    }
+
+    /**
+     * Create a response object from the given validation exception.
+     *
+     * @param  \Illuminate\Validation\ValidationException  $e
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function convertValidationExceptionToResponse(ValidationException $e, $request)
+    {
+        if ($e->response) {
+            return $e->response;
+        }
+
+        $errors = $e->validator->errors()->getMessages();
+
+        if ($request->expectsJson()) {
+            return response()->json($errors, 422);
+        }
+
+        return redirect()->back()->withInput(
+            $request->input()
+        )->withErrors($errors);
+    }
+
+    /**
      * Prepare response containing exception render.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -157,7 +177,44 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
-     * Map exception into an illuminate response.
+     * Render the given HttpException.
+     *
+     * @param  \Symfony\Component\HttpKernel\Exception\HttpException  $e
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function renderHttpException(HttpException $e)
+    {
+        $status = $e->getStatusCode();
+
+        view()->replaceNamespace('errors', [
+            resource_path('views/errors'),
+            __DIR__.'/views',
+        ]);
+
+        if (view()->exists("errors::{$status}")) {
+            return response()->view("errors::{$status}", ['exception' => $e], $status, $e->getHeaders());
+        } else {
+            return $this->convertExceptionToResponse($e);
+        }
+    }
+
+    /**
+     * Create a Symfony response for the given exception.
+     *
+     * @param  \Exception  $e
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function convertExceptionToResponse(Exception $e)
+    {
+        $e = FlattenException::create($e);
+
+        $handler = new SymfonyExceptionHandler(config('app.debug'));
+
+        return SymfonyResponse::create($handler->getHtml($e), $e->getStatusCode(), $e->getHeaders());
+    }
+
+    /**
+     * Map the given exception into an Illuminate response.
      *
      * @param  \Symfony\Component\HttpFoundation\Response  $response
      * @param  \Exception  $e
@@ -184,60 +241,6 @@ class Handler implements ExceptionHandlerContract
     public function renderForConsole($output, Exception $e)
     {
         (new ConsoleApplication)->renderException($e, $output);
-    }
-
-    /**
-     * Render the given HttpException.
-     *
-     * @param  \Symfony\Component\HttpKernel\Exception\HttpException  $e
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    protected function renderHttpException(HttpException $e)
-    {
-        $status = $e->getStatusCode();
-
-        if (view()->exists("errors.{$status}")) {
-            return response()->view("errors.{$status}", ['exception' => $e], $status, $e->getHeaders());
-        } else {
-            return $this->convertExceptionToResponse($e);
-        }
-    }
-
-    /**
-     * Create a response object from the given validation exception.
-     *
-     * @param  \Illuminate\Validation\ValidationException  $e
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    protected function convertValidationExceptionToResponse(ValidationException $e, $request)
-    {
-        if ($e->response) {
-            return $e->response;
-        }
-
-        $errors = $e->validator->errors()->getMessages();
-
-        if ($request->expectsJson()) {
-            return response()->json($errors, 422);
-        }
-
-        return redirect()->back()->withInput($request->input())->withErrors($errors);
-    }
-
-    /**
-     * Create a Symfony response for the given exception.
-     *
-     * @param  \Exception  $e
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    protected function convertExceptionToResponse(Exception $e)
-    {
-        $e = FlattenException::create($e);
-
-        $handler = new SymfonyExceptionHandler(config('app.debug'));
-
-        return SymfonyResponse::create($handler->getHtml($e), $e->getStatusCode(), $e->getHeaders());
     }
 
     /**

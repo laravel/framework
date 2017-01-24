@@ -1,8 +1,11 @@
 <?php
 
-use Mockery as m;
+namespace Illuminate\Tests\Foundation;
 
-class FoundationComposerTest extends PHPUnit_Framework_TestCase
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+
+class FoundationComposerTest extends TestCase
 {
     public function tearDown()
     {

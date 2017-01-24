@@ -1,9 +1,12 @@
 <?php
 
+namespace Illuminate\Tests\Support;
+
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Support\MessageBag;
 
-class SupportMessageBagTest extends PHPUnit_Framework_TestCase
+class SupportMessageBagTest extends TestCase
 {
     public function tearDown()
     {
@@ -72,6 +75,24 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase
         $container->add('foo', 'baz');
         $messages = $container->getMessages();
         $this->assertEquals('bar', $container->first('foo'));
+    }
+
+    public function testFirstReturnsEmptyStringIfNoMessagesFound()
+    {
+        $container = new MessageBag;
+        $container->setFormat(':message');
+        $messages = $container->getMessages();
+        $this->assertEquals('', $container->first('foo'));
+    }
+
+    public function testFirstReturnsSingleMessageFromDotKeys()
+    {
+        $container = new MessageBag;
+        $container->setFormat(':message');
+        $container->add('name.first', 'jon');
+        $container->add('name.last', 'snow');
+        $messages = $container->getMessages();
+        $this->assertEquals('jon', $container->first('name.*'));
     }
 
     public function testHasIndicatesExistence()
@@ -187,5 +208,14 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase
     {
         $messageBag = new MessageBag(['country' => 'Azerbaijan', 'capital' => 'Baku']);
         $this->assertEquals(['country' => ['Azerbaijan'], 'capital' => ['Baku']], $messageBag->getMessages());
+    }
+
+    public function testFirstFindsMessageForWildcardKey()
+    {
+        $container = new MessageBag;
+        $container->setFormat(':message');
+        $container->add('foo.bar', 'baz');
+        $messages = $container->getMessages();
+        $this->assertEquals('baz', $container->first('foo.*'));
     }
 }

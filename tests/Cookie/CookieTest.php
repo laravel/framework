@@ -1,10 +1,13 @@
 <?php
 
+namespace Illuminate\Tests\Cookie;
+
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Cookie\CookieJar;
 use Symfony\Component\HttpFoundation\Request;
 
-class CookieTest extends PHPUnit_Framework_TestCase
+class CookieTest extends TestCase
 {
     public function tearDown()
     {

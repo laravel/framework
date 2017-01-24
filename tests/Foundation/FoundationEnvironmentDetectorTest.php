@@ -1,8 +1,11 @@
 <?php
 
-use Mockery as m;
+namespace Illuminate\Tests\Foundation;
 
-class FoundationEnvironmentDetectorTest extends PHPUnit_Framework_TestCase
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+
+class FoundationEnvironmentDetectorTest extends TestCase
 {
     public function tearDown()
     {
@@ -11,7 +14,7 @@ class FoundationEnvironmentDetectorTest extends PHPUnit_Framework_TestCase
 
     public function testClosureCanBeUsedForCustomEnvironmentDetection()
     {
-        $env = new Illuminate\Foundation\EnvironmentDetector;
+        $env = new \Illuminate\Foundation\EnvironmentDetector;
 
         $result = $env->detect(function () {
             return 'foobar';
@@ -21,7 +24,7 @@ class FoundationEnvironmentDetectorTest extends PHPUnit_Framework_TestCase
 
     public function testConsoleEnvironmentDetection()
     {
-        $env = new Illuminate\Foundation\EnvironmentDetector;
+        $env = new \Illuminate\Foundation\EnvironmentDetector;
 
         $result = $env->detect(function () {
             return 'foobar';

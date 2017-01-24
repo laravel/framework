@@ -1,8 +1,11 @@
 <?php
 
-use Mockery as m;
+namespace Illuminate\Tests\Validation;
 
-class ValidationDatabasePresenceVerifierTest extends PHPUnit_Framework_TestCase
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+
+class ValidationDatabasePresenceVerifierTest extends TestCase
 {
     public function tearDown()
     {
@@ -11,7 +14,7 @@ class ValidationDatabasePresenceVerifierTest extends PHPUnit_Framework_TestCase
 
     public function testBasicCount()
     {
-        $verifier = new Illuminate\Validation\DatabasePresenceVerifier($db = m::mock('Illuminate\Database\ConnectionResolverInterface'));
+        $verifier = new \Illuminate\Validation\DatabasePresenceVerifier($db = m::mock('Illuminate\Database\ConnectionResolverInterface'));
         $verifier->setConnection('connection');
         $db->shouldReceive('connection')->once()->with('connection')->andReturn($conn = m::mock('StdClass'));
         $conn->shouldReceive('table')->once()->with('table')->andReturn($builder = m::mock('StdClass'));
@@ -30,7 +33,7 @@ class ValidationDatabasePresenceVerifierTest extends PHPUnit_Framework_TestCase
 
     public function testBasicCountWithClosures()
     {
-        $verifier = new Illuminate\Validation\DatabasePresenceVerifier($db = m::mock('Illuminate\Database\ConnectionResolverInterface'));
+        $verifier = new \Illuminate\Validation\DatabasePresenceVerifier($db = m::mock('Illuminate\Database\ConnectionResolverInterface'));
         $verifier->setConnection('connection');
         $db->shouldReceive('connection')->once()->with('connection')->andReturn($conn = m::mock('StdClass'));
         $conn->shouldReceive('table')->once()->with('table')->andReturn($builder = m::mock('StdClass'));

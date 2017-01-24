@@ -1,8 +1,12 @@
 <?php
 
+namespace Illuminate\Tests\Notifications;
+
+use Mockery;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Notifications\SendQueuedNotifications;
 
-class NotificationSendQueuedNotificationTest extends PHPUnit_Framework_TestCase
+class NotificationSendQueuedNotificationTest extends TestCase
 {
     public function tearDown()
     {

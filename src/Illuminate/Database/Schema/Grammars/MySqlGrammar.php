@@ -40,7 +40,7 @@ class MySqlGrammar extends Grammar
      *
      * @return string
      */
-    public function compileColumnExists()
+    public function compileColumnListing()
     {
         return 'select column_name from information_schema.columns where table_schema = ? and table_name = ?';
     }
@@ -55,24 +55,40 @@ class MySqlGrammar extends Grammar
      */
     public function compileCreate(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        $columns = implode(', ', $this->getColumns($blueprint));
-
-        $sql = $blueprint->temporary ? 'create temporary' : 'create';
-
-        $sql .= ' table '.$this->wrapTable($blueprint)." ($columns)";
+        $sql = $this->compileCreateTable(
+            $blueprint, $command, $connection
+        );
 
         // Once we have the primary SQL, we can add the encoding option to the SQL for
         // the table.  Then, we can check if a storage engine has been supplied for
         // the table. If so, we will add the engine declaration to the SQL query.
-        $sql = $this->compileCreateEncoding($sql, $connection, $blueprint);
+        $sql = $this->compileCreateEncoding(
+            $sql, $connection, $blueprint
+        );
 
-        if (isset($blueprint->engine)) {
-            $sql .= ' engine = '.$blueprint->engine;
-        } elseif (! is_null($engine = $connection->getConfig('engine'))) {
-            $sql .= ' engine = '.$engine;
-        }
+        // Finally, we will append the engine configuration onto this SQL statement as
+        // the final thing we do before returning this finished SQL. Once this gets
+        // added the query will be ready to execute against the real connections.
+        return $this->compileCreateEngine(
+            $sql, $connection, $blueprint
+        );
+    }
 
-        return $sql;
+    /**
+     * Create the main create table clause.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return string
+     */
+    protected function compileCreateTable($blueprint, $command, $connection)
+    {
+        return sprintf('%s table %s (%s)',
+            $blueprint->temporary ? 'create temporary' : 'create',
+            $this->wrapTable($blueprint),
+            implode(', ', $this->getColumns($blueprint))
+        );
     }
 
     /**
@@ -85,16 +101,41 @@ class MySqlGrammar extends Grammar
      */
     protected function compileCreateEncoding($sql, Connection $connection, Blueprint $blueprint)
     {
+        // First we will set the character set if one has been set on either the create
+        // blueprint itself or on the root configuration for the connection that the
+        // table is being created on. We will add these to the create table query.
         if (isset($blueprint->charset)) {
             $sql .= ' default character set '.$blueprint->charset;
         } elseif (! is_null($charset = $connection->getConfig('charset'))) {
             $sql .= ' default character set '.$charset;
         }
 
+        // Next we will add the collation to the create table statement if one has been
+        // added to either this create table blueprint or the configuration for this
+        // connection that the query is targeting. We'll add it to this SQL query.
         if (isset($blueprint->collation)) {
             $sql .= ' collate '.$blueprint->collation;
         } elseif (! is_null($collation = $connection->getConfig('collation'))) {
             $sql .= ' collate '.$collation;
+        }
+
+        return $sql;
+    }
+
+    /**
+     * Append the engine specifications to a command.
+     *
+     * @param  string  $sql
+     * @param  \Illuminate\Database\Connection  $connection
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @return string
+     */
+    protected function compileCreateEngine($sql, Connection $connection, Blueprint $blueprint)
+    {
+        if (isset($blueprint->engine)) {
+            return $sql.' engine = '.$blueprint->engine;
+        } elseif (! is_null($engine = $connection->getConfig('engine'))) {
+            return $sql.' engine = '.$engine;
         }
 
         return $sql;
@@ -109,11 +150,9 @@ class MySqlGrammar extends Grammar
      */
     public function compileAdd(Blueprint $blueprint, Fluent $command)
     {
-        $table = $this->wrapTable($blueprint);
-
         $columns = $this->prefixArray('add', $this->getColumns($blueprint));
 
-        return 'alter table '.$table.' '.implode(', ', $columns);
+        return 'alter table '.$this->wrapTable($blueprint).' '.implode(', ', $columns);
     }
 
     /**
@@ -164,15 +203,13 @@ class MySqlGrammar extends Grammar
      */
     protected function compileKey(Blueprint $blueprint, Fluent $command, $type)
     {
-        $columns = $this->columnize($command->columns);
-
-        $table = $this->wrapTable($blueprint);
-
-        $index = $this->wrap($command->index);
-
-        $algorithm = $command->algorithm ? ' using '.$command->algorithm : '';
-
-        return "alter table {$table} add {$type} {$index}{$algorithm}($columns)";
+        return sprintf('alter table %s add %s %s%s(%s)',
+            $this->wrapTable($blueprint),
+            $type,
+            $this->wrap($command->index),
+            $command->algorithm ? ' using '.$command->algorithm : '',
+            $this->columnize($command->columns)
+        );
     }
 
     /**
@@ -210,9 +247,7 @@ class MySqlGrammar extends Grammar
     {
         $columns = $this->prefixArray('drop', $this->wrapArray($command->columns));
 
-        $table = $this->wrapTable($blueprint);
-
-        return 'alter table '.$table.' '.implode(', ', $columns);
+        return 'alter table '.$this->wrapTable($blueprint).' '.implode(', ', $columns);
     }
 
     /**
@@ -236,11 +271,9 @@ class MySqlGrammar extends Grammar
      */
     public function compileDropUnique(Blueprint $blueprint, Fluent $command)
     {
-        $table = $this->wrapTable($blueprint);
-
         $index = $this->wrap($command->index);
 
-        return "alter table {$table} drop index {$index}";
+        return "alter table {$this->wrapTable($blueprint)} drop index {$index}";
     }
 
     /**
@@ -252,11 +285,9 @@ class MySqlGrammar extends Grammar
      */
     public function compileDropIndex(Blueprint $blueprint, Fluent $command)
     {
-        $table = $this->wrapTable($blueprint);
-
         $index = $this->wrap($command->index);
 
-        return "alter table {$table} drop index {$index}";
+        return "alter table {$this->wrapTable($blueprint)} drop index {$index}";
     }
 
     /**
@@ -268,11 +299,9 @@ class MySqlGrammar extends Grammar
      */
     public function compileDropForeign(Blueprint $blueprint, Fluent $command)
     {
-        $table = $this->wrapTable($blueprint);
-
         $index = $this->wrap($command->index);
 
-        return "alter table {$table} drop foreign key {$index}";
+        return "alter table {$this->wrapTable($blueprint)} drop foreign key {$index}";
     }
 
     /**
@@ -791,10 +820,10 @@ class MySqlGrammar extends Grammar
      */
     protected function wrapValue($value)
     {
-        if ($value === '*') {
-            return $value;
+        if ($value !== '*') {
+            return '`'.str_replace('`', '``', $value).'`';
         }
 
-        return '`'.str_replace('`', '``', $value).'`';
+        return $value;
     }
 }

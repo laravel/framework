@@ -12,7 +12,6 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
 {
     use Concerns\InteractsWithContainer,
         Concerns\MakesHttpRequests,
-        Concerns\ImpersonatesUsers,
         Concerns\InteractsWithAuthentication,
         Concerns\InteractsWithConsole,
         Concerns\InteractsWithDatabase,
@@ -87,8 +86,6 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
      */
     protected function refreshApplication()
     {
-        putenv('APP_ENV=testing');
-
         $this->app = $this->createApplication();
     }
 

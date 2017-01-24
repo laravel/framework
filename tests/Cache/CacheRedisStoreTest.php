@@ -1,8 +1,11 @@
 <?php
 
-use Mockery as m;
+namespace Illuminate\Tests\Cache;
 
-class CacheRedisStoreTest extends PHPUnit_Framework_TestCase
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+
+class CacheRedisStoreTest extends TestCase
 {
     public function tearDown()
     {
@@ -119,6 +122,15 @@ class CacheRedisStoreTest extends PHPUnit_Framework_TestCase
         $redis->forget('foo');
     }
 
+    public function testFlushesCached()
+    {
+        $redis = $this->getRedis();
+        $redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
+        $redis->getRedis()->shouldReceive('flushdb')->once()->andReturn('ok');
+        $result = $redis->flush();
+        $this->assertTrue($result);
+    }
+
     public function testGetAndSetPrefix()
     {
         $redis = $this->getRedis();
@@ -131,6 +143,6 @@ class CacheRedisStoreTest extends PHPUnit_Framework_TestCase
 
     protected function getRedis()
     {
-        return new Illuminate\Cache\RedisStore(m::mock('Illuminate\Redis\Database'), 'prefix');
+        return new \Illuminate\Cache\RedisStore(m::mock('Illuminate\Contracts\Redis\Factory'), 'prefix');
     }
 }

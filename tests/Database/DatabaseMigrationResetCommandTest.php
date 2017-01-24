@@ -1,10 +1,13 @@
 <?php
 
+namespace Illuminate\Tests\Database;
+
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
 use Illuminate\Database\Console\Migrations\ResetCommand;
 
-class DatabaseMigrationResetCommandTest extends PHPUnit_Framework_TestCase
+class DatabaseMigrationResetCommandTest extends TestCase
 {
     public function tearDown()
     {
@@ -43,7 +46,7 @@ class DatabaseMigrationResetCommandTest extends PHPUnit_Framework_TestCase
 
     protected function runCommand($command, $input = [])
     {
-        return $command->run(new Symfony\Component\Console\Input\ArrayInput($input), new Symfony\Component\Console\Output\NullOutput);
+        return $command->run(new \Symfony\Component\Console\Input\ArrayInput($input), new \Symfony\Component\Console\Output\NullOutput);
     }
 }
 

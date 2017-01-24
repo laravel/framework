@@ -1,8 +1,11 @@
 <?php
 
-use Mockery as m;
+namespace Illuminate\Tests\Queue;
 
-class QueueRedisJobTest extends PHPUnit_Framework_TestCase
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+
+class QueueRedisJobTest extends TestCase
 {
     public function tearDown()
     {
@@ -38,11 +41,12 @@ class QueueRedisJobTest extends PHPUnit_Framework_TestCase
 
     protected function getJob()
     {
-        return new Illuminate\Queue\Jobs\RedisJob(
-            m::mock(Illuminate\Container\Container::class),
-            m::mock(Illuminate\Queue\RedisQueue::class),
+        return new \Illuminate\Queue\Jobs\RedisJob(
+            m::mock(\Illuminate\Container\Container::class),
+            m::mock(\Illuminate\Queue\RedisQueue::class),
             json_encode(['job' => 'foo', 'data' => ['data'], 'attempts' => 1]),
             json_encode(['job' => 'foo', 'data' => ['data'], 'attempts' => 2]),
+            'connection-name',
             'default'
         );
     }

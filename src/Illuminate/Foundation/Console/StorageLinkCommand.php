@@ -31,7 +31,9 @@ class StorageLinkCommand extends Command
             return $this->error('The "public/storage" directory already exists.');
         }
 
-        $this->laravel->make('files')->link(storage_path('app/public'), public_path('storage'));
+        $this->laravel->make('files')->link(
+            storage_path('app/public'), public_path('storage')
+        );
 
         $this->info('The [public/storage] directory has been linked.');
     }

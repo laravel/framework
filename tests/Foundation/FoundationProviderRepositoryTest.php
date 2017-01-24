@@ -1,8 +1,11 @@
 <?php
 
-use Mockery as m;
+namespace Illuminate\Tests\Foundation;
 
-class FoundationProviderRepositoryTest extends PHPUnit_Framework_TestCase
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+
+class FoundationProviderRepositoryTest extends TestCase
 {
     public function tearDown()
     {
@@ -17,9 +20,8 @@ class FoundationProviderRepositoryTest extends PHPUnit_Framework_TestCase
         $repo->shouldReceive('loadManifest')->once()->andReturn(['eager' => ['foo'], 'deferred' => ['deferred'], 'providers' => ['providers'], 'when' => []]);
         $repo->shouldReceive('shouldRecompile')->once()->andReturn(false);
         $provider = m::mock('Illuminate\Support\ServiceProvider');
-        $repo->shouldReceive('createProvider')->once()->with('foo')->andReturn($provider);
 
-        $app->shouldReceive('register')->once()->with($provider);
+        $app->shouldReceive('register')->once()->with('foo');
         $app->shouldReceive('runningInConsole')->andReturn(false);
         $app->shouldReceive('addDeferredServices')->once()->with(['deferred']);
 
@@ -48,10 +50,7 @@ class FoundationProviderRepositoryTest extends PHPUnit_Framework_TestCase
             return $manifest;
         });
 
-        // bar mock should be registered with the application since it's eager
-        $repo->shouldReceive('createProvider')->once()->with('bar')->andReturn($barMock);
-
-        $app->shouldReceive('register')->once()->with($barMock);
+        $app->shouldReceive('register')->once()->with('bar');
         $app->shouldReceive('runningInConsole')->andReturn(false);
         $app->shouldReceive('addDeferredServices')->once()->with(['foo.provides1' => 'foo', 'foo.provides2' => 'foo']);
 
@@ -60,7 +59,7 @@ class FoundationProviderRepositoryTest extends PHPUnit_Framework_TestCase
 
     public function testShouldRecompileReturnsCorrectValue()
     {
-        $repo = new Illuminate\Foundation\ProviderRepository(m::mock('Illuminate\Contracts\Foundation\Application'), new Illuminate\Filesystem\Filesystem, __DIR__.'/services.php');
+        $repo = new \Illuminate\Foundation\ProviderRepository(m::mock('Illuminate\Contracts\Foundation\Application'), new \Illuminate\Filesystem\Filesystem, __DIR__.'/services.php');
         $this->assertTrue($repo->shouldRecompile(null, []));
         $this->assertTrue($repo->shouldRecompile(['providers' => ['foo']], ['foo', 'bar']));
         $this->assertFalse($repo->shouldRecompile(['providers' => ['foo']], ['foo']));
@@ -68,7 +67,7 @@ class FoundationProviderRepositoryTest extends PHPUnit_Framework_TestCase
 
     public function testLoadManifestReturnsParsedJSON()
     {
-        $repo = new Illuminate\Foundation\ProviderRepository(m::mock('Illuminate\Contracts\Foundation\Application'), $files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__.'/services.php');
+        $repo = new \Illuminate\Foundation\ProviderRepository(m::mock('Illuminate\Contracts\Foundation\Application'), $files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__.'/services.php');
         $files->shouldReceive('exists')->once()->with(__DIR__.'/services.php')->andReturn(true);
         $files->shouldReceive('getRequire')->once()->with(__DIR__.'/services.php')->andReturn($array = ['users' => ['dayle' => true], 'when' => []]);
 
@@ -77,7 +76,7 @@ class FoundationProviderRepositoryTest extends PHPUnit_Framework_TestCase
 
     public function testWriteManifestStoresToProperLocation()
     {
-        $repo = new Illuminate\Foundation\ProviderRepository(m::mock('Illuminate\Contracts\Foundation\Application'), $files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__.'/services.php');
+        $repo = new \Illuminate\Foundation\ProviderRepository(m::mock('Illuminate\Contracts\Foundation\Application'), $files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__.'/services.php');
         $files->shouldReceive('put')->once()->with(__DIR__.'/services.php', '<?php return '.var_export(['foo'], true).';');
 
         $result = $repo->writeManifest(['foo']);

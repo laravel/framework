@@ -1,10 +1,13 @@
 <?php
 
+namespace Illuminate\Tests\Database;
+
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Migrations\DatabaseMigrationRepository;
 
-class DatabaseMigrationRepositoryTest extends PHPUnit_Framework_TestCase
+class DatabaseMigrationRepositoryTest extends TestCase
 {
     public function tearDown()
     {

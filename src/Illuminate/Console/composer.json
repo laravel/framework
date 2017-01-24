@@ -15,10 +15,10 @@
     ],
     "require": {
         "php": ">=5.6.4",
-        "illuminate/contracts": "5.3.*",
-        "illuminate/support": "5.3.*",
+        "illuminate/contracts": "5.4.*",
+        "illuminate/support": "5.4.*",
         "nesbot/carbon": "~1.20",
-        "symfony/console": "3.1.*"
+        "symfony/console": "~3.2"
     },
     "autoload": {
         "psr-4": {
@@ -27,13 +27,13 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.3-dev"
+            "dev-master": "5.4-dev"
         }
     },
     "suggest": {
-        "guzzlehttp/guzzle": "Required to use the ping methods on schedules (~5.3|~6.0).",
+        "guzzlehttp/guzzle": "Required to use the ping methods on schedules (~6.0).",
         "mtdowling/cron-expression": "Required to use scheduling component (~1.0).",
-        "symfony/process": "Required to use scheduling component (3.1.*)."
+        "symfony/process": "Required to use scheduling component (~3.2)."
     },
     "config": {
         "sort-packages": true

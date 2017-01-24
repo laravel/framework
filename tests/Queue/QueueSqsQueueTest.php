@@ -1,10 +1,13 @@
 <?php
 
+namespace Illuminate\Tests\Queue;
+
 use Aws\Result;
 use Mockery as m;
 use Aws\Sqs\SqsClient;
+use PHPUnit\Framework\TestCase;
 
-class QueueSqsQueueTest extends PHPUnit_Framework_TestCase
+class QueueSqsQueueTest extends TestCase
 {
     public function tearDown()
     {
@@ -57,10 +60,10 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase
 
     public function testDelayedPushWithDateTimeProperlyPushesJobOntoSqs()
     {
-        $now = Carbon\Carbon::now();
-        $queue = $this->getMockBuilder('Illuminate\Queue\SqsQueue')->setMethods(['createPayload', 'getSeconds', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
+        $now = \Carbon\Carbon::now();
+        $queue = $this->getMockBuilder('Illuminate\Queue\SqsQueue')->setMethods(['createPayload', 'secondsUntil', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
         $queue->expects($this->once())->method('createPayload')->with($this->mockedJob, $this->mockedData)->will($this->returnValue($this->mockedPayload));
-        $queue->expects($this->once())->method('getSeconds')->with($now)->will($this->returnValue(5));
+        $queue->expects($this->once())->method('secondsUntil')->with($now)->will($this->returnValue(5));
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->will($this->returnValue($this->queueUrl));
         $this->sqs->shouldReceive('sendMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload, 'DelaySeconds' => 5])->andReturn($this->mockedSendMessageResponseModel);
         $id = $queue->later($now->addSeconds(5), $this->mockedJob, $this->mockedData, $this->queueName);
@@ -69,9 +72,9 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase
 
     public function testDelayedPushProperlyPushesJobOntoSqs()
     {
-        $queue = $this->getMockBuilder('Illuminate\Queue\SqsQueue')->setMethods(['createPayload', 'getSeconds', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
+        $queue = $this->getMockBuilder('Illuminate\Queue\SqsQueue')->setMethods(['createPayload', 'secondsUntil', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
         $queue->expects($this->once())->method('createPayload')->with($this->mockedJob, $this->mockedData)->will($this->returnValue($this->mockedPayload));
-        $queue->expects($this->once())->method('getSeconds')->with($this->mockedDelay)->will($this->returnValue($this->mockedDelay));
+        $queue->expects($this->once())->method('secondsUntil')->with($this->mockedDelay)->will($this->returnValue($this->mockedDelay));
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->will($this->returnValue($this->queueUrl));
         $this->sqs->shouldReceive('sendMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload, 'DelaySeconds' => $this->mockedDelay])->andReturn($this->mockedSendMessageResponseModel);
         $id = $queue->later($this->mockedDelay, $this->mockedJob, $this->mockedData, $this->queueName);
@@ -90,7 +93,7 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase
 
     public function testGetQueueProperlyResolvesUrlWithPrefix()
     {
-        $queue = new Illuminate\Queue\SqsQueue($this->sqs, $this->queueName, $this->prefix);
+        $queue = new \Illuminate\Queue\SqsQueue($this->sqs, $this->queueName, $this->prefix);
         $this->assertEquals($this->queueUrl, $queue->getQueue(null));
         $queueUrl = $this->baseUrl.'/'.$this->account.'/test';
         $this->assertEquals($queueUrl, $queue->getQueue('test'));
@@ -98,7 +101,7 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase
 
     public function testGetQueueProperlyResolvesUrlWithoutPrefix()
     {
-        $queue = new Illuminate\Queue\SqsQueue($this->sqs, $this->queueUrl);
+        $queue = new \Illuminate\Queue\SqsQueue($this->sqs, $this->queueUrl);
         $this->assertEquals($this->queueUrl, $queue->getQueue(null));
         $queueUrl = $this->baseUrl.'/'.$this->account.'/test';
         $this->assertEquals($queueUrl, $queue->getQueue($queueUrl));

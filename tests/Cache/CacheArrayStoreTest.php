@@ -1,8 +1,11 @@
 <?php
 
+namespace Illuminate\Tests\Cache;
+
+use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\ArrayStore;
 
-class CacheArrayStoreTest extends PHPUnit_Framework_TestCase
+class CacheArrayStoreTest extends TestCase
 {
     public function testItemsCanBeSetAndRetrieved()
     {
@@ -63,7 +66,8 @@ class CacheArrayStoreTest extends PHPUnit_Framework_TestCase
         $store = new ArrayStore;
         $store->put('foo', 'bar', 10);
         $store->put('baz', 'boom', 10);
-        $store->flush();
+        $result = $store->flush();
+        $this->assertTrue($result);
         $this->assertNull($store->get('foo'));
         $this->assertNull($store->get('baz'));
     }

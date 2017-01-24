@@ -1,10 +1,13 @@
 <?php
 
+namespace Illuminate\Tests\Support;
+
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Support\Traits\CapsuleManagerTrait;
 
-class SupportCapsuleManagerTraitTest extends PHPUnit_Framework_TestCase
+class SupportCapsuleManagerTraitTest extends TestCase
 {
     use CapsuleManagerTrait;
 

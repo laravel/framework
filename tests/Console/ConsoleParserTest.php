@@ -1,8 +1,11 @@
 <?php
 
-use Illuminate\Console\Parser;
+namespace Illuminate\Tests\Console;
 
-class ConsoleParserTest extends PHPUnit_Framework_TestCase
+use Illuminate\Console\Parser;
+use PHPUnit\Framework\TestCase;
+
+class ConsoleParserTest extends TestCase
 {
     public function testBasicParameterParsing()
     {

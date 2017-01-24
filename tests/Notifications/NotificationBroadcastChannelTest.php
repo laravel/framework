@@ -1,10 +1,14 @@
 <?php
 
+namespace Illuminate\Tests\Notifications;
+
+use Mockery;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Notifications\Notification;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Notifications\Channels\BroadcastChannel;
 
-class NotificationBroadcastChannelTest extends PHPUnit_Framework_TestCase
+class NotificationBroadcastChannelTest extends TestCase
 {
     public function tearDown()
     {
@@ -18,7 +22,7 @@ class NotificationBroadcastChannelTest extends PHPUnit_Framework_TestCase
         $notifiable = Mockery::mock();
 
         $events = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
-        $events->shouldReceive('fire')->once()->with(Mockery::type('Illuminate\Notifications\Events\BroadcastNotificationCreated'));
+        $events->shouldReceive('dispatch')->once()->with(Mockery::type('Illuminate\Notifications\Events\BroadcastNotificationCreated'));
         $channel = new BroadcastChannel($events);
         $channel->send($notifiable, $notification);
     }
@@ -29,7 +33,7 @@ class NotificationBroadcastChannelTest extends PHPUnit_Framework_TestCase
         $notification->id = 1;
         $notifiable = Mockery::mock();
 
-        $event = new Illuminate\Notifications\Events\BroadcastNotificationCreated(
+        $event = new \Illuminate\Notifications\Events\BroadcastNotificationCreated(
             $notifiable, $notification, $notification->toArray($notifiable)
         );
 
@@ -45,7 +49,7 @@ class NotificationBroadcastChannelTest extends PHPUnit_Framework_TestCase
         $notifiable = Mockery::mock();
 
         $events = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
-        $events->shouldReceive('fire')->once()->with(Mockery::on(function ($event) {
+        $events->shouldReceive('dispatch')->once()->with(Mockery::on(function ($event) {
             return $event->connection == 'sync';
         }));
         $channel = new BroadcastChannel($events);

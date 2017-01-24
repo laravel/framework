@@ -3,6 +3,7 @@
 namespace Illuminate\Pipeline;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Pipeline\Hub as PipelineHubContract;
 
 class PipelineServiceProvider extends ServiceProvider
 {
@@ -21,7 +22,7 @@ class PipelineServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton(
-            'Illuminate\Contracts\Pipeline\Hub', 'Illuminate\Pipeline\Hub'
+            PipelineHubContract::class, Hub::class
         );
     }
 
@@ -33,7 +34,7 @@ class PipelineServiceProvider extends ServiceProvider
     public function provides()
     {
         return [
-            'Illuminate\Contracts\Pipeline\Hub',
+            PipelineHubContract::class,
         ];
     }
 }

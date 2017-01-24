@@ -3,7 +3,8 @@
 namespace Illuminate\Support\Facades;
 
 /**
- * @see \Illuminate\Redis\Database
+ * @see \Illuminate\Redis\RedisManager
+ * @see \Illuminate\Contracts\Redis\Factory
  */
 class Redis extends Facade
 {

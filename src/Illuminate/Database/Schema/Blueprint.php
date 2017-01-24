@@ -114,7 +114,7 @@ class Blueprint
     }
 
     /**
-     * Add the commands that are implied by the blueprint.
+     * Add the commands that are implied by the blueprint's state.
      *
      * @return void
      */
@@ -140,20 +140,20 @@ class Blueprint
     {
         foreach ($this->columns as $column) {
             foreach (['primary', 'unique', 'index'] as $index) {
-                // If the index has been specified on the given column, but is simply
-                // equal to "true" (boolean), no name has been specified for this
-                // index, so we will simply call the index methods without one.
-                if ($column->$index === true) {
-                    $this->$index($column->name);
+                // If the index has been specified on the given column, but is simply equal
+                // to "true" (boolean), no name has been specified for this index so the
+                // index method can be called without a name and it will generate one.
+                if ($column->{$index} === true) {
+                    $this->{$index}($column->name);
 
                     continue 2;
                 }
 
-                // If the index has been specified on the column and it is something
-                // other than boolean true, we will assume a name was provided on
-                // the index specification, and pass in the name to the method.
-                elseif (isset($column->$index)) {
-                    $this->$index($column->name, $column->$index);
+                // If the index has been specified on the given column, and it has a string
+                // value, we'll go ahead and call the index method and pass the name for
+                // the index since the developer specified the explicit name for this.
+                elseif (isset($column->{$index})) {
+                    $this->{$index}($column->name, $column->{$index});
 
                     continue 2;
                 }
@@ -168,13 +168,9 @@ class Blueprint
      */
     protected function creating()
     {
-        foreach ($this->commands as $command) {
-            if ($command->name == 'create') {
-                return true;
-            }
-        }
-
-        return false;
+        return collect($this->commands)->contains(function ($command) {
+            return $command->name == 'create';
+        });
     }
 
     /**
@@ -449,8 +445,10 @@ class Blueprint
      * @param  int  $length
      * @return \Illuminate\Support\Fluent
      */
-    public function char($column, $length = 255)
+    public function char($column, $length = null)
     {
+        $length = $length ?: Builder::$defaultStringLength;
+
         return $this->addColumn('char', $column, compact('length'));
     }
 
@@ -461,8 +459,10 @@ class Blueprint
      * @param  int  $length
      * @return \Illuminate\Support\Fluent
      */
-    public function string($column, $length = 255)
+    public function string($column, $length = null)
     {
+        $length = $length ?: Builder::$defaultStringLength;
+
         return $this->addColumn('string', $column, compact('length'));
     }
 
@@ -565,6 +565,18 @@ class Blueprint
     }
 
     /**
+     * Create a new unsigned integer (4-byte) column on the table.
+     *
+     * @param  string  $column
+     * @param  bool  $autoIncrement
+     * @return \Illuminate\Support\Fluent
+     */
+    public function unsignedInteger($column, $autoIncrement = false)
+    {
+        return $this->integer($column, $autoIncrement, true);
+    }
+
+    /**
      * Create a new unsigned tiny integer (1-byte) column on the table.
      *
      * @param  string  $column
@@ -598,18 +610,6 @@ class Blueprint
     public function unsignedMediumInteger($column, $autoIncrement = false)
     {
         return $this->mediumInteger($column, $autoIncrement, true);
-    }
-
-    /**
-     * Create a new unsigned integer (4-byte) column on the table.
-     *
-     * @param  string  $column
-     * @param  bool  $autoIncrement
-     * @return \Illuminate\Support\Fluent
-     */
-    public function unsignedInteger($column, $autoIncrement = false)
-    {
-        return $this->integer($column, $autoIncrement, true);
     }
 
     /**
@@ -788,18 +788,6 @@ class Blueprint
     /**
      * Add nullable creation and update timestamps to the table.
      *
-     * Alias for self::timestamps().
-     *
-     * @return void
-     */
-    public function nullableTimestamps()
-    {
-        $this->timestamps();
-    }
-
-    /**
-     * Add nullable creation and update timestamps to the table.
-     *
      * @return void
      */
     public function timestamps()
@@ -807,6 +795,18 @@ class Blueprint
         $this->timestamp('created_at')->nullable();
 
         $this->timestamp('updated_at')->nullable();
+    }
+
+    /**
+     * Add nullable creation and update timestamps to the table.
+     *
+     * Alias for self::timestamps().
+     *
+     * @return void
+     */
+    public function nullableTimestamps()
+    {
+        $this->timestamps();
     }
 
     /**
@@ -928,30 +928,6 @@ class Blueprint
     }
 
     /**
-     * Create a new drop index command on the blueprint.
-     *
-     * @param  string  $command
-     * @param  string  $type
-     * @param  string|array  $index
-     * @return \Illuminate\Support\Fluent
-     */
-    protected function dropIndexCommand($command, $type, $index)
-    {
-        $columns = [];
-
-        // If the given "index" is actually an array of columns, the developer means
-        // to drop an index merely by specifying the columns involved without the
-        // conventional name, so we will build the index name from the columns.
-        if (is_array($index)) {
-            $columns = $index;
-
-            $index = $this->createIndexName($type, $columns);
-        }
-
-        return $this->indexCommand($command, $columns, $index);
-    }
-
-    /**
      * Add a new index command to the blueprint.
      *
      * @param  string        $type
@@ -967,11 +943,33 @@ class Blueprint
         // If no name was specified for this index, we will create one using a basic
         // convention of the table name, followed by the columns, followed by an
         // index type, such as primary or index, which makes the index unique.
-        if (is_null($index)) {
-            $index = $this->createIndexName($type, $columns);
+        $index = $index ?: $this->createIndexName($type, $columns);
+
+        return $this->addCommand(
+            $type, compact('index', 'columns', 'algorithm')
+        );
+    }
+
+    /**
+     * Create a new drop index command on the blueprint.
+     *
+     * @param  string  $command
+     * @param  string  $type
+     * @param  string|array  $index
+     * @return \Illuminate\Support\Fluent
+     */
+    protected function dropIndexCommand($command, $type, $index)
+    {
+        $columns = [];
+
+        // If the given "index" is actually an array of columns, the developer means
+        // to drop an index merely by specifying the columns involved without the
+        // conventional name, so we will build the index name from the columns.
+        if (is_array($index)) {
+            $index = $this->createIndexName($type, $columns = $index);
         }
 
-        return $this->addCommand($type, compact('index', 'columns', 'algorithm'));
+        return $this->indexCommand($command, $columns, $index);
     }
 
     /**
@@ -998,9 +996,9 @@ class Blueprint
      */
     public function addColumn($type, $name, array $parameters = [])
     {
-        $attributes = array_merge(compact('type', 'name'), $parameters);
-
-        $this->columns[] = $column = new Fluent($attributes);
+        $this->columns[] = $column = new Fluent(
+            array_merge(compact('type', 'name'), $parameters)
+        );
 
         return $column;
     }

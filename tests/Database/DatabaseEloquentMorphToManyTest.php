@@ -1,9 +1,12 @@
 <?php
 
+namespace Illuminate\Tests\Database;
+
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
-class DatabaseEloquentMorphToManyTest extends PHPUnit_Framework_TestCase
+class DatabaseEloquentMorphToManyTest extends TestCase
 {
     public function tearDown()
     {
@@ -99,7 +102,7 @@ class DatabaseEloquentMorphToManyTest extends PHPUnit_Framework_TestCase
     }
 }
 
-class EloquentMorphToManyModelStub extends Illuminate\Database\Eloquent\Model
+class EloquentMorphToManyModelStub extends \Illuminate\Database\Eloquent\Model
 {
     protected $guarded = [];
 }

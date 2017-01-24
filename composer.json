@@ -18,26 +18,24 @@
         "php": ">=5.6.4",
         "ext-mbstring": "*",
         "ext-openssl": "*",
-        "classpreloader/classpreloader": "~3.0",
         "doctrine/inflector": "~1.0",
-        "jeremeamia/superclosure": "~2.2",
+        "erusev/parsedown": "~1.6",
         "league/flysystem": "~1.0",
         "monolog/monolog": "~1.11",
         "mtdowling/cron-expression": "~1.0",
         "nesbot/carbon": "~1.20",
         "paragonie/random_compat": "~1.4|~2.0",
-        "psy/psysh": "0.7.*|0.8.*",
         "ramsey/uuid": "~3.0",
         "swiftmailer/swiftmailer": "~5.4",
-        "symfony/console": "3.1.*",
-        "symfony/debug": "3.1.*",
-        "symfony/finder": "3.1.*",
-        "symfony/http-foundation": "3.1.*",
-        "symfony/http-kernel": "3.1.*",
-        "symfony/process": "3.1.*",
-        "symfony/routing": "3.1.*",
-        "symfony/translation": "3.1.*",
-        "symfony/var-dumper": "3.1.*",
+        "symfony/console": "~3.2",
+        "symfony/debug": "~3.2",
+        "symfony/finder": "~3.2",
+        "symfony/http-foundation": "~3.2",
+        "symfony/http-kernel": "~3.2",
+        "symfony/process": "~3.2",
+        "symfony/routing": "~3.2",
+        "symfony/var-dumper": "~3.2",
+        "tijsverkoyen/css-to-inline-styles": "~2.2",
         "vlucas/phpdotenv": "~2.2"
     },
     "replace": {
@@ -74,12 +72,13 @@
     },
     "require-dev": {
         "aws/aws-sdk-php": "~3.0",
+        "doctrine/dbal": "~2.5",
         "mockery/mockery": "~0.9.4",
         "pda/pheanstalk": "~3.0",
-        "phpunit/phpunit": "~5.4",
+        "phpunit/phpunit": "~5.7",
         "predis/predis": "~1.0",
-        "symfony/css-selector": "3.1.*",
-        "symfony/dom-crawler": "3.1.*"
+        "symfony/css-selector": "~3.2",
+        "symfony/dom-crawler": "~3.2"
     },
     "autoload": {
         "files": [
@@ -90,27 +89,38 @@
             "Illuminate\\": "src/Illuminate/"
         }
     },
+    "autoload-dev": {
+        "files": [
+            "tests/Database/stubs/MigrationCreatorFakeMigration.php"
+        ],
+        "psr-4": {
+            "Illuminate\\Tests\\": "tests/"
+        }
+    },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.3-dev"
+            "dev-master": "5.4-dev"
         }
     },
     "suggest": {
         "aws/aws-sdk-php": "Required to use the SQS queue driver and SES mail driver (~3.0).",
-        "doctrine/dbal": "Required to rename columns and drop SQLite columns (~2.4).",
+        "doctrine/dbal": "Required to rename columns and drop SQLite columns (~2.5).",
         "fzaninotto/faker": "Required to use the eloquent factory builder (~1.4).",
-        "guzzlehttp/guzzle": "Required to use the Mailgun and Mandrill mail drivers and the ping methods on schedules (~5.3|~6.0).",
+        "guzzlehttp/guzzle": "Required to use the Mailgun and Mandrill mail drivers and the ping methods on schedules (~6.0).",
+        "laravel/tinker": "Required to use the tinker console command (~1.0).",
         "league/flysystem-aws-s3-v3": "Required to use the Flysystem S3 driver (~1.0).",
         "league/flysystem-rackspace": "Required to use the Flysystem Rackspace driver (~1.0).",
+        "nexmo/client": "Required to use the Nexmo transport (~1.0).",
         "pda/pheanstalk": "Required to use the beanstalk queue driver (~3.0).",
         "predis/predis": "Required to use the redis cache and queue drivers (~1.0).",
         "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (~2.0).",
-        "symfony/css-selector": "Required to use some of the crawler integration testing tools (3.1.*).",
-        "symfony/dom-crawler": "Required to use most of the crawler integration testing tools (3.1.*).",
-        "symfony/psr-http-message-bridge": "Required to use psr7 bridging features (0.2.*)."
+        "symfony/css-selector": "Required to use some of the crawler integration testing tools (~3.2).",
+        "symfony/dom-crawler": "Required to use most of the crawler integration testing tools (~3.2).",
+        "symfony/psr-http-message-bridge": "Required to psr7 bridging features (0.2.*)."
     },
     "config": {
         "sort-packages": true
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }

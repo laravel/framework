@@ -1,12 +1,15 @@
 <?php
 
+namespace Illuminate\Tests\Database;
+
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
-class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase
+class DatabaseEloquentMorphTest extends TestCase
 {
     public function tearDown()
     {
@@ -232,6 +235,6 @@ class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase
     }
 }
 
-class EloquentMorphResetModelStub extends Illuminate\Database\Eloquent\Model
+class EloquentMorphResetModelStub extends \Illuminate\Database\Eloquent\Model
 {
 }

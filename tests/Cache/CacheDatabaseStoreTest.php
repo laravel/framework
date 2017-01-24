@@ -1,9 +1,13 @@
 <?php
 
+namespace Illuminate\Tests\Cache;
+
+use Exception;
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\DatabaseStore;
 
-class CacheDatabaseStoreTest extends PHPUnit_Framework_TestCase
+class CacheDatabaseStoreTest extends TestCase
 {
     public function tearDown()
     {
@@ -67,7 +71,7 @@ class CacheDatabaseStoreTest extends PHPUnit_Framework_TestCase
         $table->shouldReceive('insert')->once()->with(['key' => 'prefixfoo', 'value' => 'bar', 'expiration' => 61])->andReturnUsing(function () {
             throw new Exception;
         });
-        $table->shouldReceive('where')->once()->with('key', '=', 'prefixfoo')->andReturn($table);
+        $table->shouldReceive('where')->once()->with('key', 'prefixfoo')->andReturn($table);
         $table->shouldReceive('update')->once()->with(['value' => 'bar', 'expiration' => 61]);
 
         $store->put('foo', 'bar', 1);
@@ -96,9 +100,10 @@ class CacheDatabaseStoreTest extends PHPUnit_Framework_TestCase
         $store = $this->getStore();
         $table = m::mock('StdClass');
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
-        $table->shouldReceive('delete')->once();
+        $table->shouldReceive('delete')->once()->andReturn(2);
 
-        $store->flush();
+        $result = $store->flush();
+        $this->assertTrue($result);
     }
 
     public function testIncrementReturnsCorrectValues()

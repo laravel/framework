@@ -1,11 +1,14 @@
 <?php
 
+namespace Illuminate\Tests\Http;
+
 use Mockery as m;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
-class HttpRequestTest extends PHPUnit_Framework_TestCase
+class HttpRequestTest extends TestCase
 {
     public function tearDown()
     {
@@ -236,7 +239,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('Taylor', $request['name']);
         $this->assertEquals('Bob', $request->input('foo', 'Bob'));
 
-        $request = Request::create('/', 'GET', [], [], ['file' => new Symfony\Component\HttpFoundation\File\UploadedFile(__FILE__, 'foo.php')]);
+        $request = Request::create('/', 'GET', [], [], ['file' => new \Symfony\Component\HttpFoundation\File\UploadedFile(__FILE__, 'foo.php')]);
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\File\UploadedFile', $request['file']);
     }
 
@@ -478,7 +481,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $request = Request::create('/', 'GET');
         $session = m::mock('Illuminate\Session\Store');
         $session->shouldReceive('getOldInput')->once()->with('foo', 'bar')->andReturn('boom');
-        $request->setSession($session);
+        $request->setLaravelSession($session);
         $this->assertEquals('boom', $request->old('foo', 'bar'));
     }
 
@@ -487,7 +490,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $request = Request::create('/', 'GET');
         $session = m::mock('Illuminate\Session\Store');
         $session->shouldReceive('flashInput')->once();
-        $request->setSession($session);
+        $request->setLaravelSession($session);
         $request->flush();
     }
 
@@ -739,21 +742,25 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $session = m::mock('Illuminate\Session\Store');
         $session->shouldReceive('flashInput')->once()->with(['name' => 'Taylor', 'email' => 'foo']);
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
-        $request->setSession($session);
+        $request->setLaravelSession($session);
         $request->flash();
     }
 
     public function testHttpRequestFlashOnlyCallsFlashWithProperParameters()
     {
-        $request = m::mock('Illuminate\Http\Request[flash]');
-        $request->shouldReceive('flash')->once()->with('only', ['key1', 'key2']);
-        $request->flashOnly(['key1', 'key2']);
+        $session = m::mock('Illuminate\Session\Store');
+        $session->shouldReceive('flashInput')->once()->with(['name' => 'Taylor']);
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
+        $request->setLaravelSession($session);
+        $request->flashOnly(['name']);
     }
 
     public function testHttpRequestFlashExceptCallsFlashWithProperParameters()
     {
-        $request = m::mock('Illuminate\Http\Request[flash]');
-        $request->shouldReceive('flash')->once()->with('except', ['key1', 'key2']);
-        $request->flashExcept(['key1', 'key2']);
+        $session = m::mock('Illuminate\Session\Store');
+        $session->shouldReceive('flashInput')->once()->with(['name' => 'Taylor']);
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
+        $request->setLaravelSession($session);
+        $request->flashExcept(['email']);
     }
 }

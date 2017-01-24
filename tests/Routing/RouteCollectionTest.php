@@ -1,9 +1,13 @@
 <?php
 
+namespace Illuminate\Tests\Routing;
+
+use ArrayIterator;
 use Illuminate\Routing\Route;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Routing\RouteCollection;
 
-class RouteCollectionTest extends PHPUnit_Framework_TestCase
+class RouteCollectionTest extends TestCase
 {
     /**
      * @var \Illuminate\Routing\RouteCollection

@@ -1,10 +1,14 @@
 <?php
 
-class DatabaseSQLiteProcessorTest extends PHPUnit_Framework_TestCase
+namespace Illuminate\Tests\Database;
+
+use PHPUnit\Framework\TestCase;
+
+class DatabaseSQLiteProcessorTest extends TestCase
 {
     public function testProcessColumnListing()
     {
-        $processor = new Illuminate\Database\Query\Processors\SQLiteProcessor;
+        $processor = new \Illuminate\Database\Query\Processors\SQLiteProcessor;
 
         $listing = [['name' => 'id'], ['name' => 'name'], ['name' => 'email']];
         $expected = ['id', 'name', 'email'];

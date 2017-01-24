@@ -1,10 +1,13 @@
 <?php
 
+namespace Illuminate\Tests\Cache;
+
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Contracts\Cache\Repository as Cache;
 
-class CacheRateLimiterTest extends PHPUnit_Framework_TestCase
+class CacheRateLimiterTest extends TestCase
 {
     public function tearDown()
     {

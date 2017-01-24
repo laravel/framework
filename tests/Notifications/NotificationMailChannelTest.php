@@ -1,9 +1,15 @@
 <?php
 
+namespace Illuminate\Tests\Notifications;
+
+use Mockery;
+use stdClass;
+use PHPUnit\Framework\TestCase;
+use Illuminate\Support\HtmlString;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\MailMessage;
 
-class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
+class NotificationMailChannelTest extends TestCase
 {
     public function tearDown()
     {
@@ -18,11 +24,19 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
         $message = $notification->toMail($notifiable);
         $data = $message->toArray();
 
-        $channel = new Illuminate\Notifications\Channels\MailChannel(
-            $mailer = Mockery::mock(Illuminate\Contracts\Mail\Mailer::class)
+        $channel = new \Illuminate\Notifications\Channels\MailChannel(
+            $mailer = Mockery::mock(\Illuminate\Contracts\Mail\Mailer::class)
         );
 
-        $views = ['notifications::email', 'notifications::email-plain'];
+        $markdown = Mockery::mock(StdClass::class);
+        $markdown->shouldReceive('render')->andReturn($html = new HtmlString(''));
+        $markdown->shouldReceive('renderText')->andReturn($text = new HtmlString(''));
+
+        $channel->setMarkdownResolver(function () use ($markdown) {
+            return $markdown;
+        });
+
+        $views = ['html' => $html, 'text' => $text];
 
         $mailer->shouldReceive('send')->with($views, $data, Mockery::type('Closure'));
 
@@ -37,18 +51,26 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
         $message = $notification->toMail($notifiable);
         $data = $message->toArray();
 
-        $channel = new Illuminate\Notifications\Channels\MailChannel(
-            $mailer = Mockery::mock(Illuminate\Contracts\Mail\Mailer::class)
+        $channel = new \Illuminate\Notifications\Channels\MailChannel(
+            $mailer = Mockery::mock(\Illuminate\Contracts\Mail\Mailer::class)
         );
 
-        $views = ['notifications::email', 'notifications::email-plain'];
+        $markdown = Mockery::mock(StdClass::class);
+        $markdown->shouldReceive('render')->andReturn($html = new HtmlString(''));
+        $markdown->shouldReceive('renderText')->andReturn($text = new HtmlString(''));
+
+        $channel->setMarkdownResolver(function () use ($markdown) {
+            return $markdown;
+        });
+
+        $views = ['html' => $html, 'text' => $text];
 
         $mailer->shouldReceive('send')->with($views, $data, Mockery::on(function ($closure) {
             $mock = Mockery::mock('Illuminate\Mailer\Message');
 
             $mock->shouldReceive('subject')->once()->with('test subject');
 
-            $mock->shouldReceive('to')->once()->with('taylor@laravel.com');
+            $mock->shouldReceive('to')->once()->with(['taylor@laravel.com']);
 
             $mock->shouldReceive('from')->never();
 
@@ -68,18 +90,26 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
         $message = $notification->toMail($notifiable);
         $data = $message->toArray();
 
-        $channel = new Illuminate\Notifications\Channels\MailChannel(
-            $mailer = Mockery::mock(Illuminate\Contracts\Mail\Mailer::class)
+        $channel = new \Illuminate\Notifications\Channels\MailChannel(
+            $mailer = Mockery::mock(\Illuminate\Contracts\Mail\Mailer::class)
         );
 
-        $views = ['notifications::email', 'notifications::email-plain'];
+        $markdown = Mockery::mock(StdClass::class);
+        $markdown->shouldReceive('render')->andReturn($html = new HtmlString(''));
+        $markdown->shouldReceive('renderText')->andReturn($text = new HtmlString(''));
+
+        $channel->setMarkdownResolver(function () use ($markdown) {
+            return $markdown;
+        });
+
+        $views = ['html' => $html, 'text' => $text];
 
         $mailer->shouldReceive('send')->with($views, $data, Mockery::on(function ($closure) {
             $mock = Mockery::mock('Illuminate\Mailer\Message');
 
             $mock->shouldReceive('subject')->once()->with('Notification Mail Channel Test Notification No Subject');
 
-            $mock->shouldReceive('to')->once()->with('taylor@laravel.com');
+            $mock->shouldReceive('to')->once()->with(['taylor@laravel.com']);
 
             $closure($mock);
 
@@ -97,11 +127,19 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
         $message = $notification->toMail($notifiable);
         $data = $message->toArray();
 
-        $channel = new Illuminate\Notifications\Channels\MailChannel(
-            $mailer = Mockery::mock(Illuminate\Contracts\Mail\Mailer::class)
+        $channel = new \Illuminate\Notifications\Channels\MailChannel(
+            $mailer = Mockery::mock(\Illuminate\Contracts\Mail\Mailer::class)
         );
 
-        $views = ['notifications::email', 'notifications::email-plain'];
+        $markdown = Mockery::mock(StdClass::class);
+        $markdown->shouldReceive('render')->andReturn($html = new HtmlString(''));
+        $markdown->shouldReceive('renderText')->andReturn($text = new HtmlString(''));
+
+        $channel->setMarkdownResolver(function () use ($markdown) {
+            return $markdown;
+        });
+
+        $views = ['html' => $html, 'text' => $text];
 
         $mailer->shouldReceive('send')->with($views, $data, Mockery::on(function ($closure) {
             $mock = Mockery::mock('Illuminate\Mailer\Message');
@@ -110,7 +148,7 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
 
             $mock->shouldReceive('to')->never();
 
-            $mock->shouldReceive('bcc')->with(['taylor@laravel.com', 'jeffrey@laracasts.com']);
+            $mock->shouldReceive('to')->with(['taylor@laravel.com', 'jeffrey@laracasts.com']);
 
             $closure($mock);
 
@@ -128,11 +166,19 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
         $message = $notification->toMail($notifiable);
         $data = $message->toArray();
 
-        $channel = new Illuminate\Notifications\Channels\MailChannel(
-            $mailer = Mockery::mock(Illuminate\Contracts\Mail\Mailer::class)
+        $channel = new \Illuminate\Notifications\Channels\MailChannel(
+            $mailer = Mockery::mock(\Illuminate\Contracts\Mail\Mailer::class)
         );
 
-        $views = ['notifications::email', 'notifications::email-plain'];
+        $markdown = Mockery::mock(StdClass::class);
+        $markdown->shouldReceive('render')->andReturn($html = new HtmlString(''));
+        $markdown->shouldReceive('renderText')->andReturn($text = new HtmlString(''));
+
+        $channel->setMarkdownResolver(function () use ($markdown) {
+            return $markdown;
+        });
+
+        $views = ['html' => $html, 'text' => $text];
 
         $mailer->shouldReceive('send')->with($views, $data, Mockery::on(function ($closure) {
             $mock = Mockery::mock('Illuminate\Mailer\Message');
@@ -159,11 +205,19 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
         $message = $notification->toMail($notifiable);
         $data = $message->toArray();
 
-        $channel = new Illuminate\Notifications\Channels\MailChannel(
-            $mailer = Mockery::mock(Illuminate\Contracts\Mail\Mailer::class)
+        $channel = new \Illuminate\Notifications\Channels\MailChannel(
+            $mailer = Mockery::mock(\Illuminate\Contracts\Mail\Mailer::class)
         );
 
-        $views = ['notifications::email', 'notifications::email-plain'];
+        $markdown = Mockery::mock(StdClass::class);
+        $markdown->shouldReceive('render')->andReturn($html = new HtmlString(''));
+        $markdown->shouldReceive('renderText')->andReturn($text = new HtmlString(''));
+
+        $channel->setMarkdownResolver(function () use ($markdown) {
+            return $markdown;
+        });
+
+        $views = ['html' => $html, 'text' => $text];
 
         $mailer->shouldReceive('send')->with($views, $data, Mockery::on(function ($closure) {
             $mock = Mockery::mock('Illuminate\Mailer\Message');
@@ -182,35 +236,6 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
         $channel->send($notifiable, $notification);
     }
 
-    public function testMessageWithToAddress()
-    {
-        $notification = new NotificationMailChannelTestNotificationWithToAddress;
-        $notifiable = new NotificationMailChannelTestNotifiable;
-
-        $message = $notification->toMail($notifiable);
-        $data = $message->toArray();
-
-        $channel = new Illuminate\Notifications\Channels\MailChannel(
-            $mailer = Mockery::mock(Illuminate\Contracts\Mail\Mailer::class)
-        );
-
-        $views = ['notifications::email', 'notifications::email-plain'];
-
-        $mailer->shouldReceive('send')->with($views, $data, Mockery::on(function ($closure) {
-            $mock = Mockery::mock('Illuminate\Mailer\Message');
-
-            $mock->shouldReceive('subject')->once();
-
-            $mock->shouldReceive('to')->once()->with('jeffrey@laracasts.com');
-
-            $closure($mock);
-
-            return true;
-        }));
-
-        $channel->send($notifiable, $notification);
-    }
-
     public function testMessageWithReplyToAddress()
     {
         $notification = new NotificationMailChannelTestNotificationWithReplyToAddress;
@@ -219,11 +244,19 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
         $message = $notification->toMail($notifiable);
         $data = $message->toArray();
 
-        $channel = new Illuminate\Notifications\Channels\MailChannel(
-            $mailer = Mockery::mock(Illuminate\Contracts\Mail\Mailer::class)
+        $channel = new \Illuminate\Notifications\Channels\MailChannel(
+            $mailer = Mockery::mock(\Illuminate\Contracts\Mail\Mailer::class)
         );
 
-        $views = ['notifications::email', 'notifications::email-plain'];
+        $markdown = Mockery::mock(StdClass::class);
+        $markdown->shouldReceive('render')->andReturn($html = new HtmlString(''));
+        $markdown->shouldReceive('renderText')->andReturn($text = new HtmlString(''));
+
+        $channel->setMarkdownResolver(function () use ($markdown) {
+            return $markdown;
+        });
+
+        $views = ['html' => $html, 'text' => $text];
 
         $mailer->shouldReceive('send')->with($views, $data, Mockery::on(function ($closure) {
             $mock = Mockery::mock('Illuminate\Mailer\Message');
@@ -250,11 +283,19 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
         $message = $notification->toMail($notifiable);
         $data = $message->toArray();
 
-        $channel = new Illuminate\Notifications\Channels\MailChannel(
-            $mailer = Mockery::mock(Illuminate\Contracts\Mail\Mailer::class)
+        $channel = new \Illuminate\Notifications\Channels\MailChannel(
+            $mailer = Mockery::mock(\Illuminate\Contracts\Mail\Mailer::class)
         );
 
-        $views = ['notifications::email', 'notifications::email-plain'];
+        $markdown = Mockery::mock(StdClass::class);
+        $markdown->shouldReceive('render')->andReturn($html = new HtmlString(''));
+        $markdown->shouldReceive('renderText')->andReturn($text = new HtmlString(''));
+
+        $channel->setMarkdownResolver(function () use ($markdown) {
+            return $markdown;
+        });
+
+        $views = ['html' => $html, 'text' => $text];
 
         $mailer->shouldReceive('send')->with($views, $data, Mockery::on(function ($closure) {
             $mock = Mockery::mock('Illuminate\Mailer\Message');
@@ -273,37 +314,6 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
         $channel->send($notifiable, $notification);
     }
 
-    public function testMessageWithToCcEmails()
-    {
-        $notification = new NotificationMailChannelTestNotificationWithCcEmails;
-        $notifiable = new NotificationMailChannelTestNotifiable;
-
-        $message = $notification->toMail($notifiable);
-        $data = $message->toArray();
-
-        $channel = new Illuminate\Notifications\Channels\MailChannel(
-            $mailer = Mockery::mock(Illuminate\Contracts\Mail\Mailer::class)
-        );
-
-        $views = ['notifications::email', 'notifications::email-plain'];
-
-        $mailer->shouldReceive('send')->with($views, $data, Mockery::on(function ($closure) {
-            $mock = Mockery::mock('Illuminate\Mailer\Message');
-
-            $mock->shouldReceive('subject')->once();
-
-            $mock->shouldReceive('to')->once()->with('taylor@laravel.com');
-
-            $mock->shouldReceive('cc')->once()->with(['cc1@email.com', 'cc2@email.com']);
-
-            $closure($mock);
-
-            return true;
-        }));
-
-        $channel->send($notifiable, $notification);
-    }
-
     public function testMessageWithPriority()
     {
         $notification = new NotificationMailChannelTestNotificationWithPriority;
@@ -312,18 +322,26 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
         $message = $notification->toMail($notifiable);
         $data = $message->toArray();
 
-        $channel = new Illuminate\Notifications\Channels\MailChannel(
-            $mailer = Mockery::mock(Illuminate\Contracts\Mail\Mailer::class)
+        $channel = new \Illuminate\Notifications\Channels\MailChannel(
+            $mailer = Mockery::mock(\Illuminate\Contracts\Mail\Mailer::class)
         );
 
-        $views = ['notifications::email', 'notifications::email-plain'];
+        $markdown = Mockery::mock(StdClass::class);
+        $markdown->shouldReceive('render')->andReturn($html = new HtmlString(''));
+        $markdown->shouldReceive('renderText')->andReturn($text = new HtmlString(''));
+
+        $channel->setMarkdownResolver(function () use ($markdown) {
+            return $markdown;
+        });
+
+        $views = ['html' => $html, 'text' => $text];
 
         $mailer->shouldReceive('send')->with($views, $data, Mockery::on(function ($closure) {
             $mock = Mockery::mock('Illuminate\Mailer\Message');
 
             $mock->shouldReceive('subject')->once();
 
-            $mock->shouldReceive('to')->once()->with('taylor@laravel.com');
+            $mock->shouldReceive('to')->once()->with(['taylor@laravel.com']);
 
             $mock->shouldReceive('setPriority')->once()->with(1);
 
@@ -340,8 +358,8 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
         $notification = new NotificationMailChannelTestNotificationWithMailableContract;
         $notifiable = new NotificationMailChannelTestNotifiable;
 
-        $channel = new Illuminate\Notifications\Channels\MailChannel(
-            $mailer = Mockery::mock(Illuminate\Contracts\Mail\Mailer::class)
+        $channel = new \Illuminate\Notifications\Channels\MailChannel(
+            $mailer = Mockery::mock(\Illuminate\Contracts\Mail\Mailer::class)
         );
 
         $mailer->shouldReceive('send')->once();
@@ -352,14 +370,14 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
 
 class NotificationMailChannelTestNotifiable
 {
-    use Illuminate\Notifications\Notifiable;
+    use \Illuminate\Notifications\Notifiable;
 
     public $email = 'taylor@laravel.com';
 }
 
 class NotificationMailChannelTestNotifiableMultipleEmails
 {
-    use Illuminate\Notifications\Notifiable;
+    use \Illuminate\Notifications\Notifiable;
 
     public function routeNotificationForMail()
     {
@@ -451,10 +469,10 @@ class NotificationMailChannelTestNotificationWithMailableContract extends Notifi
 {
     public function toMail($notifiable)
     {
-        $mock = Mockery::mock(Illuminate\Contracts\Mail\Mailable::class);
+        $mock = Mockery::mock(\Illuminate\Contracts\Mail\Mailable::class);
 
         $mock->shouldReceive('send')->once()->with(Mockery::on(function ($mailer) {
-            if (! $mailer instanceof Illuminate\Contracts\Mail\Mailer) {
+            if (! $mailer instanceof \Illuminate\Contracts\Mail\Mailer) {
                 return false;
             }
 

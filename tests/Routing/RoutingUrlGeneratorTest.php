@@ -1,12 +1,15 @@
 <?php
 
+namespace Illuminate\Tests\Routing;
+
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Contracts\Routing\UrlRoutable;
 
-class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
+class RoutingUrlGeneratorTest extends TestCase
 {
     public function testBasicGeneration()
     {
@@ -40,6 +43,27 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('http://www.foo.com/foo/bar', $url->asset('foo/bar'));
         $this->assertEquals('https://www.foo.com/foo/bar', $url->asset('foo/bar', true));
+    }
+
+    public function testBasicGenerationWithFormatting()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
+        );
+
+        /*
+         * Empty Named Route
+         */
+        $route = new Route(['GET'], '/named-route', ['as' => 'plain']);
+        $routes->add($route);
+
+        $url->formatPathUsing(function ($path) {
+            return '/something'.$path;
+        });
+
+        $this->assertEquals('http://www.foo.com/something/foo/bar', $url->to('foo/bar'));
+        $this->assertEquals('/something/named-route', $url->route('plain', [], false));
     }
 
     public function testBasicRouteGeneration()
@@ -103,6 +127,14 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
         $route = new Route(['GET'], 'foo/invoke', ['controller' => 'InvokableActionStub']);
         $routes->add($route);
 
+        /*
+         * With Default Parameter
+         */
+        $url->defaults(['locale' => 'en']);
+        $route = new Route(['GET'], 'foo', ['as' => 'defaults', 'domain' => '{locale}.example.com', function () {
+        }]);
+        $routes->add($route);
+
         $this->assertEquals('/', $url->route('plain', [], false));
         $this->assertEquals('/?foo=bar', $url->route('plain', ['foo' => 'bar'], false));
         $this->assertEquals('http://www.foo.com/foo/bar', $url->route('foo'));
@@ -122,6 +154,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('/foo/bar#derp', $url->route('fragment', [], false));
         $this->assertEquals('/foo/bar?foo=bar#derp', $url->route('fragment', ['foo' => 'bar'], false));
         $this->assertEquals('/foo/bar?baz=%C3%A5%CE%B1%D1%84#derp', $url->route('fragment', ['baz' => 'åαф'], false));
+        $this->assertEquals('http://en.example.com/foo', $url->route('defaults'));
     }
 
     public function testFluentRouteNameDefinitions()
@@ -353,7 +386,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Illuminate\Routing\Exceptions\UrlGenerationException
+     * @expectedException \Illuminate\Routing\Exceptions\UrlGenerationException
      */
     public function testUrlGenerationForControllersRequiresPassingOfRequiredParameters()
     {
@@ -391,7 +424,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
             $request = Request::create('http://www.foo.com/')
         );
 
-        $url->forceSchema('https');
+        $url->forceScheme('https');
         $route = new Route(['GET'], '/foo', ['as' => 'plain']);
         $routes->add($route);
 

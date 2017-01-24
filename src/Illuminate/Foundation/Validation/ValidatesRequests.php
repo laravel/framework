@@ -76,6 +76,22 @@ trait ValidatesRequests
     }
 
     /**
+     * Execute a Closure within with a given error bag set as the default bag.
+     *
+     * @param  string  $errorBag
+     * @param  callable  $callback
+     * @return void
+     */
+    protected function withErrorBag($errorBag, callable $callback)
+    {
+        $this->validatesRequestErrorBag = $errorBag;
+
+        call_user_func($callback);
+
+        $this->validatesRequestErrorBag = null;
+    }
+
+    /**
      * Throw the failed validation exception.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -121,6 +137,16 @@ trait ValidatesRequests
     }
 
     /**
+     * Get the key to be used for the view error bag.
+     *
+     * @return string
+     */
+    protected function errorBag()
+    {
+        return $this->validatesRequestErrorBag ?: 'default';
+    }
+
+    /**
      * Get the URL we should redirect to.
      *
      * @return string
@@ -138,31 +164,5 @@ trait ValidatesRequests
     protected function getValidationFactory()
     {
         return app(Factory::class);
-    }
-
-    /**
-     * Execute a Closure within with a given error bag set as the default bag.
-     *
-     * @param  string  $errorBag
-     * @param  callable  $callback
-     * @return void
-     */
-    protected function withErrorBag($errorBag, callable $callback)
-    {
-        $this->validatesRequestErrorBag = $errorBag;
-
-        call_user_func($callback);
-
-        $this->validatesRequestErrorBag = null;
-    }
-
-    /**
-     * Get the key to be used for the view error bag.
-     *
-     * @return string
-     */
-    protected function errorBag()
-    {
-        return $this->validatesRequestErrorBag ?: 'default';
     }
 }

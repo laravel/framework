@@ -28,27 +28,17 @@ class DatabaseJob extends Job implements JobContract
      * @param  \Illuminate\Container\Container  $container
      * @param  \Illuminate\Queue\DatabaseQueue  $database
      * @param  \StdClass  $job
+     * @param  string  $connectionName
      * @param  string  $queue
      * @return void
      */
-    public function __construct(Container $container, DatabaseQueue $database, $job, $queue)
+    public function __construct(Container $container, DatabaseQueue $database, $job, $connectionName, $queue)
     {
         $this->job = $job;
         $this->queue = $queue;
         $this->database = $database;
         $this->container = $container;
-    }
-
-    /**
-     * Delete the job from the queue.
-     *
-     * @return void
-     */
-    public function delete()
-    {
-        parent::delete();
-
-        $this->database->deleteReserved($this->queue, $this->job->id);
+        $this->connectionName = $connectionName;
     }
 
     /**
@@ -64,6 +54,18 @@ class DatabaseJob extends Job implements JobContract
         $this->delete();
 
         $this->database->release($this->queue, $this->job, $delay);
+    }
+
+    /**
+     * Delete the job from the queue.
+     *
+     * @return void
+     */
+    public function delete()
+    {
+        parent::delete();
+
+        $this->database->deleteReserved($this->queue, $this->job->id);
     }
 
     /**
@@ -94,35 +96,5 @@ class DatabaseJob extends Job implements JobContract
     public function getRawBody()
     {
         return $this->job->payload;
-    }
-
-    /**
-     * Get the IoC container instance.
-     *
-     * @return \Illuminate\Container\Container
-     */
-    public function getContainer()
-    {
-        return $this->container;
-    }
-
-    /**
-     * Get the underlying queue driver instance.
-     *
-     * @return \Illuminate\Queue\DatabaseQueue
-     */
-    public function getDatabaseQueue()
-    {
-        return $this->database;
-    }
-
-    /**
-     * Get the underlying database job.
-     *
-     * @return \StdClass
-     */
-    public function getDatabaseJob()
-    {
-        return $this->job;
     }
 }

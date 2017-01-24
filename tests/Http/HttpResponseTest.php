@@ -1,11 +1,14 @@
 <?php
 
+namespace Illuminate\Tests\Http;
+
 use Mockery as m;
 use Illuminate\Http\Request;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Contracts\Support\Jsonable;
 
-class HttpResponseTest extends PHPUnit_Framework_TestCase
+class HttpResponseTest extends TestCase
 {
     public function tearDown()
     {
@@ -14,16 +17,16 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase
 
     public function testJsonResponsesAreConvertedAndHeadersAreSet()
     {
-        $response = new Illuminate\Http\Response(new JsonableStub);
+        $response = new \Illuminate\Http\Response(new JsonableStub);
         $this->assertEquals('foo', $response->getContent());
         $this->assertEquals('application/json', $response->headers->get('Content-Type'));
 
-        $response = new Illuminate\Http\Response();
+        $response = new \Illuminate\Http\Response();
         $response->setContent(['foo' => 'bar']);
         $this->assertEquals('{"foo":"bar"}', $response->getContent());
         $this->assertEquals('application/json', $response->headers->get('Content-Type'));
 
-        $response = new Illuminate\Http\Response(new JsonSerializableStub);
+        $response = new \Illuminate\Http\Response(new JsonSerializableStub);
         $this->assertEquals('{"foo":"bar"}', $response->getContent());
         $this->assertEquals('application/json', $response->headers->get('Content-Type'));
     }
@@ -32,13 +35,13 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase
     {
         $mock = m::mock('Illuminate\Contracts\Support\Renderable');
         $mock->shouldReceive('render')->once()->andReturn('foo');
-        $response = new Illuminate\Http\Response($mock);
+        $response = new \Illuminate\Http\Response($mock);
         $this->assertEquals('foo', $response->getContent());
     }
 
     public function testHeader()
     {
-        $response = new Illuminate\Http\Response();
+        $response = new \Illuminate\Http\Response();
         $this->assertNull($response->headers->get('foo'));
         $response->header('foo', 'bar');
         $this->assertEquals('bar', $response->headers->get('foo'));
@@ -50,9 +53,9 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase
 
     public function testWithCookie()
     {
-        $response = new Illuminate\Http\Response();
+        $response = new \Illuminate\Http\Response();
         $this->assertCount(0, $response->headers->getCookies());
-        $this->assertEquals($response, $response->withCookie(new Symfony\Component\HttpFoundation\Cookie('foo', 'bar')));
+        $this->assertEquals($response, $response->withCookie(new \Symfony\Component\HttpFoundation\Cookie('foo', 'bar')));
         $cookies = $response->headers->getCookies();
         $this->assertCount(1, $cookies);
         $this->assertEquals('foo', $cookies[0]->getName());
@@ -62,14 +65,14 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase
     public function testGetOriginalContent()
     {
         $arr = ['foo' => 'bar'];
-        $response = new Illuminate\Http\Response();
+        $response = new \Illuminate\Http\Response();
         $response->setContent($arr);
         $this->assertSame($arr, $response->getOriginalContent());
     }
 
     public function testSetAndRetrieveStatusCode()
     {
-        $response = new Illuminate\Http\Response('foo');
+        $response = new \Illuminate\Http\Response('foo');
         $response->setStatusCode(404);
         $this->assertSame(404, $response->getStatusCode());
     }
@@ -97,10 +100,10 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
         $response->setSession($session = m::mock('Illuminate\Session\Store'));
-        $session->shouldReceive('get')->with('errors', m::type('Illuminate\Support\ViewErrorBag'))->andReturn(new Illuminate\Support\ViewErrorBag);
+        $session->shouldReceive('get')->with('errors', m::type('Illuminate\Support\ViewErrorBag'))->andReturn(new \Illuminate\Support\ViewErrorBag);
         $session->shouldReceive('flash')->once()->with('errors', m::type('Illuminate\Support\ViewErrorBag'));
         $provider = m::mock('Illuminate\Contracts\Support\MessageProvider');
-        $provider->shouldReceive('getMessageBag')->once()->andReturn(new Illuminate\Support\MessageBag);
+        $provider->shouldReceive('getMessageBag')->once()->andReturn(new \Illuminate\Support\MessageBag);
         $response->withErrors($provider);
     }
 
@@ -123,7 +126,7 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
         $response->setSession($session = m::mock('Illuminate\Session\Store'));
-        $session->shouldReceive('get')->with('errors', m::type('Illuminate\Support\ViewErrorBag'))->andReturn(new Illuminate\Support\ViewErrorBag);
+        $session->shouldReceive('get')->with('errors', m::type('Illuminate\Support\ViewErrorBag'))->andReturn(new \Illuminate\Support\ViewErrorBag);
         $session->shouldReceive('flash')->once()->with('errors', m::type('Illuminate\Support\ViewErrorBag'));
         $provider = ['foo' => 'bar'];
         $response->withErrors($provider);
@@ -139,7 +142,7 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException BadMethodCallException
+     * @expectedException \BadMethodCallException
      */
     public function testMagicCallException()
     {
@@ -156,7 +159,7 @@ class JsonableStub implements Jsonable
     }
 }
 
-class JsonSerializableStub implements JsonSerializable
+class JsonSerializableStub implements \JsonSerializable
 {
     public function jsonSerialize()
     {

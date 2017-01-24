@@ -1,9 +1,13 @@
 <?php
 
+namespace Illuminate\Tests\Notifications;
+
+use Mockery;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\SlackMessage;
 
-class NotificationSlackChannelTest extends PHPUnit_Framework_TestCase
+class NotificationSlackChannelTest extends TestCase
 {
     public function tearDown()
     {
@@ -18,7 +22,7 @@ class NotificationSlackChannelTest extends PHPUnit_Framework_TestCase
     {
         $notifiable = new NotificationSlackChannelTestNotifiable;
 
-        $channel = new Illuminate\Notifications\Channels\SlackWebhookChannel(
+        $channel = new \Illuminate\Notifications\Channels\SlackWebhookChannel(
             $http = Mockery::mock('GuzzleHttp\Client')
         );
 
@@ -121,7 +125,7 @@ class NotificationSlackChannelTest extends PHPUnit_Framework_TestCase
 
 class NotificationSlackChannelTestNotifiable
 {
-    use Illuminate\Notifications\Notifiable;
+    use \Illuminate\Notifications\Notifiable;
 
     public function routeNotificationForSlack()
     {

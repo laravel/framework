@@ -1,10 +1,14 @@
 <?php
 
-class BcryptHasherTest extends PHPUnit_Framework_TestCase
+namespace Illuminate\Tests\Hashing;
+
+use PHPUnit\Framework\TestCase;
+
+class BcryptHasherTest extends TestCase
 {
     public function testBasicHashing()
     {
-        $hasher = new Illuminate\Hashing\BcryptHasher;
+        $hasher = new \Illuminate\Hashing\BcryptHasher;
         $value = $hasher->make('password');
         $this->assertNotSame('password', $value);
         $this->assertTrue($hasher->check('password', $value));

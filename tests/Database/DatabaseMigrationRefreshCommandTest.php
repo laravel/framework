@@ -1,6 +1,9 @@
 <?php
 
+namespace Illuminate\Tests\Database;
+
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\Console\Migrations\ResetCommand;
@@ -9,7 +12,7 @@ use Illuminate\Database\Console\Migrations\RefreshCommand;
 use Illuminate\Database\Console\Migrations\RollbackCommand;
 use Symfony\Component\Console\Application as ConsoleApplication;
 
-class DatabaseMigrationRefreshCommandTest extends PHPUnit_Framework_TestCase
+class DatabaseMigrationRefreshCommandTest extends TestCase
 {
     public function tearDown()
     {
@@ -32,8 +35,8 @@ class DatabaseMigrationRefreshCommandTest extends PHPUnit_Framework_TestCase
         $console->shouldReceive('find')->with('migrate:reset')->andReturn($resetCommand);
         $console->shouldReceive('find')->with('migrate')->andReturn($migrateCommand);
 
-        $resetCommand->shouldReceive('run')->with(new InputMatcher("--database --force --path 'migrate:reset'"), m::any());
-        $migrateCommand->shouldReceive('run')->with(new InputMatcher('--database --force --path migrate'), m::any());
+        $resetCommand->shouldReceive('run')->with(new InputMatcher("--database --path --force 'migrate:reset'"), m::any());
+        $migrateCommand->shouldReceive('run')->with(new InputMatcher('--database --path --force migrate'), m::any());
 
         $this->runCommand($command);
     }
@@ -54,15 +57,15 @@ class DatabaseMigrationRefreshCommandTest extends PHPUnit_Framework_TestCase
         $console->shouldReceive('find')->with('migrate:rollback')->andReturn($rollbackCommand);
         $console->shouldReceive('find')->with('migrate')->andReturn($migrateCommand);
 
-        $rollbackCommand->shouldReceive('run')->with(new InputMatcher("--database --force --path --step=2 'migrate:rollback'"), m::any());
-        $migrateCommand->shouldReceive('run')->with(new InputMatcher('--database --force --path migrate'), m::any());
+        $rollbackCommand->shouldReceive('run')->with(new InputMatcher("--database --path --step=2 --force 'migrate:rollback'"), m::any());
+        $migrateCommand->shouldReceive('run')->with(new InputMatcher('--database --path --force migrate'), m::any());
 
         $this->runCommand($command, ['--step' => 2]);
     }
 
     protected function runCommand($command, $input = [])
     {
-        return $command->run(new Symfony\Component\Console\Input\ArrayInput($input), new Symfony\Component\Console\Output\NullOutput);
+        return $command->run(new \Symfony\Component\Console\Input\ArrayInput($input), new \Symfony\Component\Console\Output\NullOutput);
     }
 }
 

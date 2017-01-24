@@ -65,9 +65,9 @@ class PolicyMakeCommand extends GeneratorCommand
 
         $stub = str_replace('DummyModel', $model, $stub);
 
-        $stub = str_replace('dummyModelName', Str::camel($model), $stub);
+        $stub = str_replace('dummyModel', Str::camel($model), $stub);
 
-        return str_replace('dummyPluralModelName', Str::plural(Str::camel($model)), $stub);
+        return str_replace('dummyPluralModel', Str::plural(Str::camel($model)), $stub);
     }
 
     /**
@@ -77,11 +77,9 @@ class PolicyMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        if ($this->option('model')) {
-            return __DIR__.'/stubs/policy.stub';
-        }
-
-        return __DIR__.'/stubs/policy.plain.stub';
+        return $this->option('model')
+                    ? __DIR__.'/stubs/policy.stub'
+                    : __DIR__.'/stubs/policy.plain.stub';
     }
 
     /**

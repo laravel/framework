@@ -1,9 +1,12 @@
 <?php
 
+namespace Illuminate\Tests\Queue;
+
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Queue\QueueManager;
 
-class QueueManagerTest extends PHPUnit_Framework_TestCase
+class QueueManagerTest extends TestCase
 {
     public function tearDown()
     {
@@ -23,6 +26,7 @@ class QueueManagerTest extends PHPUnit_Framework_TestCase
         $manager = new QueueManager($app);
         $connector = m::mock('StdClass');
         $queue = m::mock('StdClass');
+        $queue->shouldReceive('setConnectionName')->once()->with('sync')->andReturnSelf();
         $connector->shouldReceive('connect')->once()->with(['driver' => 'sync'])->andReturn($queue);
         $manager->addConnector('sync', function () use ($connector) {
             return $connector;
@@ -45,6 +49,7 @@ class QueueManagerTest extends PHPUnit_Framework_TestCase
         $manager = new QueueManager($app);
         $connector = m::mock('StdClass');
         $queue = m::mock('StdClass');
+        $queue->shouldReceive('setConnectionName')->once()->with('foo')->andReturnSelf();
         $connector->shouldReceive('connect')->once()->with(['driver' => 'bar'])->andReturn($queue);
         $manager->addConnector('bar', function () use ($connector) {
             return $connector;
@@ -66,6 +71,7 @@ class QueueManagerTest extends PHPUnit_Framework_TestCase
         $manager = new QueueManager($app);
         $connector = m::mock('StdClass');
         $queue = m::mock('StdClass');
+        $queue->shouldReceive('setConnectionName')->once()->with('null')->andReturnSelf();
         $connector->shouldReceive('connect')->once()->with(['driver' => 'null'])->andReturn($queue);
         $manager->addConnector('null', function () use ($connector) {
             return $connector;

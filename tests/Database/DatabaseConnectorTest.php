@@ -1,8 +1,12 @@
 <?php
 
-use Mockery as m;
+namespace Illuminate\Tests\Database;
 
-class DatabaseConnectorTest extends PHPUnit_Framework_TestCase
+use PDO;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+
+class DatabaseConnectorTest extends TestCase
 {
     public function tearDown()
     {
@@ -11,7 +15,7 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase
 
     public function testOptionResolution()
     {
-        $connector = new Illuminate\Database\Connectors\Connector;
+        $connector = new \Illuminate\Database\Connectors\Connector;
         $connector->setDefaultOptions([0 => 'foo', 1 => 'bar']);
         $this->assertEquals([0 => 'baz', 1 => 'bar', 2 => 'boom'], $connector->getOptions(['options' => [0 => 'baz', 2 => 'boom']]));
     }
@@ -146,7 +150,7 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase
 
     public function testSqlServerConnectCallsCreateConnectionWithOptionalArguments()
     {
-        $config = ['host' => 'foo', 'database' => 'bar', 'port' => 111, 'appname' => 'baz', 'readonly' => true, 'charset' => 'utf-8', 'pooling' => false];
+        $config = ['host' => 'foo', 'database' => 'bar', 'port' => 111, 'readonly' => true, 'charset' => 'utf-8', 'pooling' => false, 'appname' => 'baz'];
         $dsn = $this->getDsn($config);
         $connector = $this->getMockBuilder('Illuminate\Database\Connectors\SqlServerConnector')->setMethods(['createConnection', 'getOptions'])->getMock();
         $connection = m::mock('stdClass');
@@ -166,14 +170,14 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase
             $appname = isset($config['appname']) ? ';appname='.$config['appname'] : '';
             $charset = isset($config['charset']) ? ';charset='.$config['charset'] : '';
 
-            return "dblib:host={$host}{$port};dbname={$database}{$appname}{$charset}";
+            return "dblib:host={$host}{$port};dbname={$database}{$charset}{$appname}";
         } else {
             $port = isset($config['port']) ? ','.$port : '';
             $appname = isset($config['appname']) ? ';APP='.$config['appname'] : '';
             $readonly = isset($config['readonly']) ? ';ApplicationIntent=ReadOnly' : '';
             $pooling = (isset($config['pooling']) && $config['pooling'] == false) ? ';ConnectionPooling=0' : '';
 
-            return "sqlsrv:Server={$host}{$port};Database={$database}{$appname}{$readonly}{$pooling}";
+            return "sqlsrv:Server={$host}{$port};Database={$database}{$readonly}{$pooling}{$appname}";
         }
     }
 }

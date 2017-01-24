@@ -1,13 +1,16 @@
 <?php
 
+namespace Illuminate\Tests\Queue;
+
 use Carbon\Carbon;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
-use \Illuminate\Queue\DatabaseQueue;
+use Illuminate\Queue\DatabaseQueue;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
-class QueueDatabaseQueueIntegrationTest extends PHPUnit_Framework_TestCase
+class QueueDatabaseQueueIntegrationTest extends TestCase
 {
     /**
      * @var DatabaseQueue The queue instance.
@@ -80,7 +83,7 @@ class QueueDatabaseQueueIntegrationTest extends PHPUnit_Framework_TestCase
     /**
      * Get a schema builder instance.
      *
-     * @return Illuminate\Database\Schema\Builder
+     * @return \Illuminate\Database\Schema\Builder
      */
     protected function schema()
     {

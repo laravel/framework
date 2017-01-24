@@ -2,9 +2,9 @@
 
 namespace Illuminate\Foundation\Bootstrap;
 
+use SplFileInfo;
 use Illuminate\Config\Repository;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Config\Repository as RepositoryContract;
 
@@ -29,20 +29,23 @@ class LoadConfiguration
             $loadedFromCache = true;
         }
 
-        $app->instance('config', $config = new Repository($items));
-
         // Next we will spin through all of the configuration files in the configuration
         // directory and load each one into the repository. This will make all of the
         // options available to the developer for use in various parts of this app.
+        $app->instance('config', $config = new Repository($items));
+
         if (! isset($loadedFromCache)) {
             $this->loadConfigurationFiles($app, $config);
         }
 
+        // Finally, we will set the application's environment based on the configuration
+        // values that were loaded. We will pass a callback which will be used to get
+        // the environment in a web context where an "--env" switch is not present.
         $app->detectEnvironment(function () use ($config) {
             return $config->get('app.env', 'production');
         });
 
-        date_default_timezone_set($config['app.timezone']);
+        date_default_timezone_set($config->get('app.timezone', 'UTC'));
 
         mb_internal_encoding('UTF-8');
     }
@@ -74,9 +77,9 @@ class LoadConfiguration
         $configPath = realpath($app->configPath());
 
         foreach (Finder::create()->files()->name('*.php')->in($configPath) as $file) {
-            $nesting = $this->getConfigurationNesting($file, $configPath);
+            $directory = $this->getNestedDirectory($file, $configPath);
 
-            $files[$nesting.basename($file->getRealPath(), '.php')] = $file->getRealPath();
+            $files[$directory.basename($file->getRealPath(), '.php')] = $file->getRealPath();
         }
 
         return $files;
@@ -85,18 +88,18 @@ class LoadConfiguration
     /**
      * Get the configuration file nesting path.
      *
-     * @param  \Symfony\Component\Finder\SplFileInfo  $file
+     * @param  \SplFileInfo  $file
      * @param  string  $configPath
      * @return string
      */
-    protected function getConfigurationNesting(SplFileInfo $file, $configPath)
+    protected function getNestedDirectory(SplFileInfo $file, $configPath)
     {
         $directory = $file->getPath();
 
-        if ($tree = trim(str_replace($configPath, '', $directory), DIRECTORY_SEPARATOR)) {
-            $tree = str_replace(DIRECTORY_SEPARATOR, '.', $tree).'.';
+        if ($nested = trim(str_replace($configPath, '', $directory), DIRECTORY_SEPARATOR)) {
+            $nested = str_replace(DIRECTORY_SEPARATOR, '.', $nested).'.';
         }
 
-        return $tree;
+        return $nested;
     }
 }

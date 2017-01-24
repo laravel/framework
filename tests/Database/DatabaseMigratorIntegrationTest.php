@@ -1,11 +1,14 @@
 <?php
 
+namespace Illuminate\Tests\Database;
+
+use PHPUnit\Framework\TestCase;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Migrations\DatabaseMigrationRepository;
 
-class DatabaseMigratorIntegrationTest extends PHPUnit_Framework_TestCase
+class DatabaseMigratorIntegrationTest extends TestCase
 {
     protected $db;
 
@@ -25,9 +28,9 @@ class DatabaseMigratorIntegrationTest extends PHPUnit_Framework_TestCase
 
         $db->setAsGlobal();
 
-        $container = new Illuminate\Container\Container;
+        $container = new \Illuminate\Container\Container;
         $container->instance('db', $db->getDatabaseManager());
-        Illuminate\Support\Facades\Facade::setFacadeApplication($container);
+        \Illuminate\Support\Facades\Facade::setFacadeApplication($container);
 
         $this->migrator = new Migrator(
             $repository = new DatabaseMigrationRepository($db->getDatabaseManager(), 'migrations'),
@@ -42,8 +45,8 @@ class DatabaseMigratorIntegrationTest extends PHPUnit_Framework_TestCase
 
     public function tearDown()
     {
-        Illuminate\Support\Facades\Facade::clearResolvedInstances();
-        Illuminate\Support\Facades\Facade::setFacadeApplication(null);
+        \Illuminate\Support\Facades\Facade::clearResolvedInstances();
+        \Illuminate\Support\Facades\Facade::setFacadeApplication(null);
     }
 
     public function testBasicMigrationOfSingleFolder()
@@ -59,21 +62,6 @@ class DatabaseMigratorIntegrationTest extends PHPUnit_Framework_TestCase
 
     public function testMigrationsCanBeRolledBack()
     {
-        $this->migrator->run([__DIR__.'/migrations/one']);
-        $this->assertTrue($this->db->schema()->hasTable('users'));
-        $this->assertTrue($this->db->schema()->hasTable('password_resets'));
-        $rolledBack = $this->migrator->rollback([__DIR__.'/migrations/one']);
-        $this->assertFalse($this->db->schema()->hasTable('users'));
-        $this->assertFalse($this->db->schema()->hasTable('password_resets'));
-
-        $this->assertTrue(str_contains($rolledBack[0], 'password_resets'));
-        $this->assertTrue(str_contains($rolledBack[1], 'users'));
-    }
-
-    public function testMigrationsCanBeRolledBackWithFetchAssocEnabled()
-    {
-        $this->db->getConnection()->setFetchMode(\PDO::FETCH_ASSOC);
-
         $this->migrator->run([__DIR__.'/migrations/one']);
         $this->assertTrue($this->db->schema()->hasTable('users'));
         $this->assertTrue($this->db->schema()->hasTable('password_resets'));

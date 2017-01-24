@@ -1,8 +1,11 @@
 <?php
 
-use Mockery as m;
+namespace Illuminate\Tests\View;
 
-class ViewFinderTest extends PHPUnit_Framework_TestCase
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+
+class ViewFinderTest extends TestCase
 {
     public function tearDown()
     {
@@ -32,6 +35,7 @@ class ViewFinderTest extends PHPUnit_Framework_TestCase
         $finder->addLocation(__DIR__.'/nested');
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo.blade.php')->andReturn(false);
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo.php')->andReturn(false);
+        $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo.css')->andReturn(false);
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/nested/foo.blade.php')->andReturn(true);
 
         $this->assertEquals(__DIR__.'/nested/foo.blade.php', $finder->find('foo'));
@@ -62,6 +66,7 @@ class ViewFinderTest extends PHPUnit_Framework_TestCase
         $finder->addNamespace('foo', [__DIR__.'/foo', __DIR__.'/bar']);
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo/bar/baz.blade.php')->andReturn(false);
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo/bar/baz.php')->andReturn(false);
+        $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo/bar/baz.css')->andReturn(false);
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/bar/bar/baz.blade.php')->andReturn(true);
 
         $this->assertEquals(__DIR__.'/bar/bar/baz.blade.php', $finder->find('foo::bar.baz'));
@@ -75,6 +80,7 @@ class ViewFinderTest extends PHPUnit_Framework_TestCase
         $finder = $this->getFinder();
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo.blade.php')->andReturn(false);
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo.php')->andReturn(false);
+        $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo.css')->andReturn(false);
 
         $finder->find('foo');
     }
@@ -111,7 +117,7 @@ class ViewFinderTest extends PHPUnit_Framework_TestCase
         $finder->addExtension('baz');
         $finder->addExtension('baz');
 
-        $this->assertCount(3, $finder->getExtensions());
+        $this->assertCount(4, $finder->getExtensions());
     }
 
     public function testPassingViewWithHintReturnsTrue()
@@ -137,6 +143,6 @@ class ViewFinderTest extends PHPUnit_Framework_TestCase
 
     protected function getFinder()
     {
-        return new Illuminate\View\FileViewFinder(m::mock('Illuminate\Filesystem\Filesystem'), [__DIR__]);
+        return new \Illuminate\View\FileViewFinder(m::mock('Illuminate\Filesystem\Filesystem'), [__DIR__]);
     }
 }

@@ -1,8 +1,13 @@
 <?php
 
-use Mockery as m;
+namespace Illuminate\Tests\Cache;
 
-class CacheMemcachedConnectorTest extends PHPUnit_Framework_TestCase
+use Memcached;
+use Mockery as m;
+use RuntimeException;
+use PHPUnit\Framework\TestCase;
+
+class CacheMemcachedConnectorTest extends TestCase
 {
     public function tearDown()
     {
