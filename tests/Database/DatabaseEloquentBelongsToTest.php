@@ -46,9 +46,9 @@ class DatabaseEloquentBelongsToTest extends TestCase
     public function testModelsAreProperlyMatchedToParents()
     {
         $relation = $this->getRelation();
-        $result1 = m::mock('stdClass');
+        $result1 = m::mock(\StdClass::class);
         $result1->shouldReceive('getAttribute')->with('id')->andReturn(1);
-        $result2 = m::mock('stdClass');
+        $result2 = m::mock(\StdClass::class);
         $result2->shouldReceive('getAttribute')->with('id')->andReturn(2);
         $model1 = new EloquentBelongsToModelStub;
         $model1->foreign_key = 1;

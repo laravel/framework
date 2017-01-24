@@ -17,7 +17,7 @@ class CacheDatabaseStoreTest extends TestCase
     public function testNullIsReturnedWhenItemNotFound()
     {
         $store = $this->getStore();
-        $table = m::mock('StdClass');
+        $table = m::mock(\StdClass::class);
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
         $table->shouldReceive('where')->once()->with('key', '=', 'prefixfoo')->andReturn($table);
         $table->shouldReceive('first')->once()->andReturn(null);
@@ -28,7 +28,7 @@ class CacheDatabaseStoreTest extends TestCase
     public function testNullIsReturnedAndItemDeletedWhenItemIsExpired()
     {
         $store = $this->getMockBuilder(\Illuminate\Cache\DatabaseStore::class)->setMethods(['forget'])->setConstructorArgs($this->getMocks())->getMock();
-        $table = m::mock('StdClass');
+        $table = m::mock(\StdClass::class);
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
         $table->shouldReceive('where')->once()->with('key', '=', 'prefixfoo')->andReturn($table);
         $table->shouldReceive('first')->once()->andReturn((object) ['expiration' => 1]);
@@ -40,7 +40,7 @@ class CacheDatabaseStoreTest extends TestCase
     public function testDecryptedValueIsReturnedWhenItemIsValid()
     {
         $store = $this->getStore();
-        $table = m::mock('StdClass');
+        $table = m::mock(\StdClass::class);
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
         $table->shouldReceive('where')->once()->with('key', '=', 'prefixfoo')->andReturn($table);
         $table->shouldReceive('first')->once()->andReturn((object) ['value' => 'bar', 'expiration' => 999999999999999]);
@@ -52,7 +52,7 @@ class CacheDatabaseStoreTest extends TestCase
     public function testEncryptedValueIsInsertedWhenNoExceptionsAreThrown()
     {
         $store = $this->getMockBuilder(\Illuminate\Cache\DatabaseStore::class)->setMethods(['getTime'])->setConstructorArgs($this->getMocks())->getMock();
-        $table = m::mock('StdClass');
+        $table = m::mock(\StdClass::class);
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
         $store->getEncrypter()->shouldReceive('encrypt')->once()->with('bar')->andReturn('bar');
         $store->expects($this->once())->method('getTime')->will($this->returnValue(1));
@@ -64,7 +64,7 @@ class CacheDatabaseStoreTest extends TestCase
     public function testEncryptedValueIsUpdatedWhenInsertThrowsException()
     {
         $store = $this->getMockBuilder(\Illuminate\Cache\DatabaseStore::class)->setMethods(['getTime'])->setConstructorArgs($this->getMocks())->getMock();
-        $table = m::mock('StdClass');
+        $table = m::mock(\StdClass::class);
         $store->getConnection()->shouldReceive('table')->with('table')->andReturn($table);
         $store->getEncrypter()->shouldReceive('encrypt')->once()->with('bar')->andReturn('bar');
         $store->expects($this->once())->method('getTime')->will($this->returnValue(1));
@@ -87,7 +87,7 @@ class CacheDatabaseStoreTest extends TestCase
     public function testItemsMayBeRemovedFromCache()
     {
         $store = $this->getStore();
-        $table = m::mock('StdClass');
+        $table = m::mock(\StdClass::class);
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
         $table->shouldReceive('where')->once()->with('key', '=', 'prefixfoo')->andReturn($table);
         $table->shouldReceive('delete')->once();
@@ -98,7 +98,7 @@ class CacheDatabaseStoreTest extends TestCase
     public function testItemsMayBeFlushedFromCache()
     {
         $store = $this->getStore();
-        $table = m::mock('StdClass');
+        $table = m::mock(\StdClass::class);
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
         $table->shouldReceive('delete')->once()->andReturn(2);
 
@@ -109,8 +109,8 @@ class CacheDatabaseStoreTest extends TestCase
     public function testIncrementReturnsCorrectValues()
     {
         $store = $this->getStore();
-        $table = m::mock('StdClass');
-        $cache = m::mock('StdClass');
+        $table = m::mock(\StdClass::class);
+        $cache = m::mock(\StdClass::class);
 
         $store->getConnection()->shouldReceive('transaction')->once()->with(m::type('Closure'))->andReturnUsing(function ($closure) {
             return $closure();
@@ -151,8 +151,8 @@ class CacheDatabaseStoreTest extends TestCase
     public function testDecrementReturnsCorrectValues()
     {
         $store = $this->getStore();
-        $table = m::mock('StdClass');
-        $cache = m::mock('StdClass');
+        $table = m::mock(\StdClass::class);
+        $cache = m::mock(\StdClass::class);
 
         $store->getConnection()->shouldReceive('transaction')->once()->with(m::type('Closure'))->andReturnUsing(function ($closure) {
             return $closure();

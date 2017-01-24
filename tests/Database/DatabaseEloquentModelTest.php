@@ -307,7 +307,7 @@ class DatabaseEloquentModelTest extends TestCase
         ];
         $model = new EloquentDateModelStub;
         \Illuminate\Database\Eloquent\Model::setConnectionResolver($resolver = m::mock(\Illuminate\Database\ConnectionResolverInterface::class));
-        $resolver->shouldReceive('connection')->andReturn($mockConnection = m::mock('StdClass'));
+        $resolver->shouldReceive('connection')->andReturn($mockConnection = m::mock(\StdClass::class));
         $mockConnection->shouldReceive('getQueryGrammar')->andReturn($mockConnection);
         $mockConnection->shouldReceive('getDateFormat')->andReturn('Y-m-d H:i:s');
         $instance = $model->newInstance($timestamps);
@@ -323,7 +323,7 @@ class DatabaseEloquentModelTest extends TestCase
         ];
         $model = new EloquentDateModelStub;
         \Illuminate\Database\Eloquent\Model::setConnectionResolver($resolver = m::mock(\Illuminate\Database\ConnectionResolverInterface::class));
-        $resolver->shouldReceive('connection')->andReturn($mockConnection = m::mock('StdClass'));
+        $resolver->shouldReceive('connection')->andReturn($mockConnection = m::mock(\StdClass::class));
         $mockConnection->shouldReceive('getQueryGrammar')->andReturn($mockConnection);
         $mockConnection->shouldReceive('getDateFormat')->andReturn('Y-m-d H:i:s');
         $instance = $model->newInstance($timestamps);
@@ -1299,7 +1299,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->syncOriginalAttribute('id');
         $model->foo = 2;
 
-        $model->shouldReceive('newQuery')->andReturn($query = m::mock('StdClass'));
+        $model->shouldReceive('newQuery')->andReturn($query = m::mock(\StdClass::class));
         $query->shouldReceive('where')->andReturn($query);
         $query->shouldReceive('increment');
 
@@ -1743,7 +1743,7 @@ class EloquentModelDestroyStub extends Model
     {
         $mock = m::mock(\Illuminate\Database\Eloquent\Builder::class);
         $mock->shouldReceive('whereIn')->once()->with('id', [1, 2, 3])->andReturn($mock);
-        $mock->shouldReceive('get')->once()->andReturn([$model = m::mock('StdClass')]);
+        $mock->shouldReceive('get')->once()->andReturn([$model = m::mock(\StdClass::class)]);
         $model->shouldReceive('delete')->once();
 
         return $mock;

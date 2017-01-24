@@ -31,7 +31,7 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $scope->extend($builder);
         $callback = $builder->getMacro('forceDelete');
         $givenBuilder = m::mock(\Illuminate\Database\Eloquent\Builder::class);
-        $givenBuilder->shouldReceive('getQuery')->andReturn($query = m::mock('StdClass'));
+        $givenBuilder->shouldReceive('getQuery')->andReturn($query = m::mock(\StdClass::class));
         $query->shouldReceive('delete')->once();
 
         $callback($givenBuilder);
@@ -46,7 +46,7 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $callback = $builder->getMacro('restore');
         $givenBuilder = m::mock(\Illuminate\Database\Eloquent\Builder::class);
         $givenBuilder->shouldReceive('withTrashed')->once();
-        $givenBuilder->shouldReceive('getModel')->once()->andReturn($model = m::mock('StdClass'));
+        $givenBuilder->shouldReceive('getModel')->once()->andReturn($model = m::mock(\StdClass::class));
         $model->shouldReceive('getDeletedAtColumn')->once()->andReturn('deleted_at');
         $givenBuilder->shouldReceive('update')->once()->with(['deleted_at' => null]);
 
@@ -78,7 +78,7 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $scope->extend($builder);
         $callback = $builder->getMacro('onlyTrashed');
         $givenBuilder = m::mock(\Illuminate\Database\Eloquent\Builder::class);
-        $givenBuilder->shouldReceive('getQuery')->andReturn($query = m::mock('StdClass'));
+        $givenBuilder->shouldReceive('getQuery')->andReturn($query = m::mock(\StdClass::class));
         $givenBuilder->shouldReceive('getModel')->andReturn($model);
         $givenBuilder->shouldReceive('withoutGlobalScope')->with($scope)->andReturn($givenBuilder);
         $model->shouldReceive('getQualifiedDeletedAtColumn')->andReturn('table.deleted_at');
@@ -98,7 +98,7 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $scope->extend($builder);
         $callback = $builder->getMacro('withoutTrashed');
         $givenBuilder = m::mock(\Illuminate\Database\Eloquent\Builder::class);
-        $givenBuilder->shouldReceive('getQuery')->andReturn($query = m::mock('stdClass'));
+        $givenBuilder->shouldReceive('getQuery')->andReturn($query = m::mock(\StdClass::class));
         $givenBuilder->shouldReceive('getModel')->andReturn($model);
         $givenBuilder->shouldReceive('withoutGlobalScope')->with($scope)->andReturn($givenBuilder);
         $model->shouldReceive('getQualifiedDeletedAtColumn')->andReturn('table.deleted_at');

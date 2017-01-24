@@ -303,7 +303,7 @@ class RoutingRouteTest extends TestCase
         });
 
         $this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
-        $this->assertInstanceOf('stdClass', $_SERVER['__test.route_inject'][0]);
+        $this->assertInstanceOf(\StdClass::class, $_SERVER['__test.route_inject'][0]);
         $this->assertEquals('bar', $_SERVER['__test.route_inject'][1]);
 
         unset($_SERVER['__test.route_inject']);

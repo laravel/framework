@@ -16,8 +16,8 @@ class DatabaseSoftDeletingTraitTest extends TestCase
     {
         $model = m::mock(\Illuminate\Tests\Database\DatabaseSoftDeletingTraitStub::class);
         $model->shouldDeferMissing();
-        // $model->shouldReceive('newQuery')->andReturn($query = m::mock('StdClass'));
-        $model->shouldReceive('newQueryWithoutScopes')->andReturn($query = m::mock('StdClass'));
+        // $model->shouldReceive('newQuery')->andReturn($query = m::mock(\StdClass::class));
+        $model->shouldReceive('newQueryWithoutScopes')->andReturn($query = m::mock(\StdClass::class));
         $query->shouldReceive('where')->once()->with('id', 1)->andReturn($query);
         $query->shouldReceive('update')->once()->with(['deleted_at' => 'date-time']);
         $model->delete();

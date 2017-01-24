@@ -71,7 +71,7 @@ class FoundationFormRequestTest extends TestCase
         $request = FoundationTestFormRequestStub::create('/', 'GET');
         $request->setRedirector($redirector = m::mock(\Illuminate\Routing\Redirector::class));
         $redirector->shouldReceive('to')->once()->with('previous')->andReturn($response = m::mock(\Illuminate\Http\RedirectResponse::class));
-        $redirector->shouldReceive('getUrlGenerator')->andReturn($url = m::mock('StdClass'));
+        $redirector->shouldReceive('getUrlGenerator')->andReturn($url = m::mock(\StdClass::class));
         $url->shouldReceive('previous')->once()->andReturn('previous');
         $response->shouldReceive('withInput')->andReturn($response);
         $response->shouldReceive('withErrors')->with(['errors'], 'default')->andReturn($response);

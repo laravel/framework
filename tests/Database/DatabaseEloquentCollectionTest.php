@@ -137,7 +137,7 @@ class DatabaseEloquentCollectionTest extends TestCase
     public function testLoadMethodEagerLoadsGivenRelationships()
     {
         $c = $this->getMockBuilder(\Illuminate\Database\Eloquent\Collection::class)->setMethods(['first'])->setConstructorArgs([['foo']])->getMock();
-        $mockItem = m::mock('StdClass');
+        $mockItem = m::mock(\StdClass::class);
         $c->expects($this->once())->method('first')->will($this->returnValue($mockItem));
         $mockItem->shouldReceive('newQuery')->once()->andReturn($mockItem);
         $mockItem->shouldReceive('with')->with(['bar', 'baz'])->andReturn($mockItem);

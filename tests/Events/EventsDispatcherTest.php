@@ -42,7 +42,7 @@ class EventsDispatcherTest extends TestCase
     public function testContainerResolutionOfEventHandlers()
     {
         $d = new Dispatcher($container = m::mock(\Illuminate\Container\Container::class));
-        $container->shouldReceive('make')->once()->with('FooHandler')->andReturn($handler = m::mock('StdClass'));
+        $container->shouldReceive('make')->once()->with('FooHandler')->andReturn($handler = m::mock(\StdClass::class));
         $handler->shouldReceive('onFooEvent')->once()->with('foo', 'bar');
         $d->listen('foo', 'FooHandler@onFooEvent');
         $d->fire('foo', ['foo', 'bar']);
@@ -51,7 +51,7 @@ class EventsDispatcherTest extends TestCase
     public function testContainerResolutionOfEventHandlersWithDefaultMethods()
     {
         $d = new Dispatcher($container = m::mock(\Illuminate\Container\Container::class));
-        $container->shouldReceive('make')->once()->with('FooHandler')->andReturn($handler = m::mock('StdClass'));
+        $container->shouldReceive('make')->once()->with('FooHandler')->andReturn($handler = m::mock(\StdClass::class));
         $handler->shouldReceive('handle')->once()->with('foo', 'bar');
         $d->listen('foo', 'FooHandler');
         $d->fire('foo', ['foo', 'bar']);

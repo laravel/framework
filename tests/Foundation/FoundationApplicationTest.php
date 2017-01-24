@@ -16,11 +16,11 @@ class FoundationApplicationTest extends TestCase
     public function testSetLocaleSetsLocaleAndFiresLocaleChangedEvent()
     {
         $app = new Application;
-        $app['config'] = $config = m::mock('StdClass');
+        $app['config'] = $config = m::mock(\StdClass::class);
         $config->shouldReceive('set')->once()->with('app.locale', 'foo');
-        $app['translator'] = $trans = m::mock('StdClass');
+        $app['translator'] = $trans = m::mock(\StdClass::class);
         $trans->shouldReceive('setLocale')->once()->with('foo');
-        $app['events'] = $events = m::mock('StdClass');
+        $app['events'] = $events = m::mock(\StdClass::class);
         $events->shouldReceive('dispatch')->once()->with(m::type(\Illuminate\Foundation\Events\LocaleUpdated::class));
 
         $app->setLocale('foo');
@@ -63,8 +63,8 @@ class FoundationApplicationTest extends TestCase
         $this->assertTrue($app->bound('foo'));
         $one = $app->make('foo');
         $two = $app->make('foo');
-        $this->assertInstanceOf('StdClass', $one);
-        $this->assertInstanceOf('StdClass', $two);
+        $this->assertInstanceOf(\StdClass::class, $one);
+        $this->assertInstanceOf(\StdClass::class, $two);
         $this->assertSame($one, $two);
     }
 
@@ -83,7 +83,7 @@ class FoundationApplicationTest extends TestCase
         $app = new Application;
         $app->setDeferredServices(['foo' => \Illuminate\Tests\Foundation\ApplicationDeferredServiceProviderCountStub::class]);
         $obj = $app->make('foo');
-        $this->assertInstanceOf('StdClass', $obj);
+        $this->assertInstanceOf(\StdClass::class, $obj);
         $this->assertSame($obj, $app->make('foo'));
         $this->assertEquals(1, ApplicationDeferredServiceProviderCountStub::$count);
     }

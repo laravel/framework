@@ -265,7 +265,7 @@ class ContainerTest extends TestCase
     public function testResolvingCallbacksAreCalledForType()
     {
         $container = new Container;
-        $container->resolving('StdClass', function ($object) {
+        $container->resolving(\StdClass::class, function ($object) {
             return $object->name = 'taylor';
         });
         $container->bind('foo', function () {
@@ -364,14 +364,14 @@ class ContainerTest extends TestCase
             return func_get_args();
         });
 
-        $this->assertInstanceOf('stdClass', $result[0]);
+        $this->assertInstanceOf(\StdClass::class, $result[0]);
         $this->assertEquals([], $result[1]);
 
         $result = $container->call(function (StdClass $foo, $bar = []) {
             return func_get_args();
         }, ['bar' => 'taylor']);
 
-        $this->assertInstanceOf('stdClass', $result[0]);
+        $this->assertInstanceOf(\StdClass::class, $result[0]);
         $this->assertEquals('taylor', $result[1]);
 
         /*
@@ -384,7 +384,7 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf('Closure', $result);
         $result = $result();
 
-        $this->assertInstanceOf('stdClass', $result[0]);
+        $this->assertInstanceOf(\StdClass::class, $result[0]);
         $this->assertEquals('taylor', $result[1]);
     }
 
@@ -761,7 +761,7 @@ class ContainerTest extends TestCase
     public function testResolvingCallbacksShouldBeFiredWhenCalledWithAliases()
     {
         $container = new Container;
-        $container->alias('StdClass', 'std');
+        $container->alias(\StdClass::class, 'std');
         $container->resolving('std', function ($object) {
             return $object->name = 'taylor';
         });

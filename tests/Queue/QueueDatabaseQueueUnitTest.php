@@ -18,7 +18,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
     {
         $queue = $this->getMockBuilder(\Illuminate\Queue\DatabaseQueue::class)->setMethods(['currentTime'])->setConstructorArgs([$database = m::mock(\Illuminate\Database\Connection::class), 'table', 'default'])->getMock();
         $queue->expects($this->any())->method('currentTime')->will($this->returnValue('time'));
-        $database->shouldReceive('table')->with('table')->andReturn($query = m::mock('StdClass'));
+        $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(\StdClass::class));
         $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) {
             $this->assertEquals('default', $array['queue']);
             $this->assertEquals(json_encode(['job' => 'foo', 'data' => ['data']]), $array['payload']);
@@ -38,7 +38,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
             [$database = m::mock(\Illuminate\Database\Connection::class), 'table', 'default']
         )->getMock();
         $queue->expects($this->any())->method('currentTime')->will($this->returnValue('time'));
-        $database->shouldReceive('table')->with('table')->andReturn($query = m::mock('StdClass'));
+        $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(\StdClass::class));
         $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) {
             $this->assertEquals('default', $array['queue']);
             $this->assertEquals(json_encode(['job' => 'foo', 'data' => ['data']]), $array['payload']);
@@ -87,7 +87,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $queue = $this->getMockBuilder(\Illuminate\Queue\DatabaseQueue::class)->setMethods(['currentTime', 'availableAt'])->setConstructorArgs([$database, 'table', 'default'])->getMock();
         $queue->expects($this->any())->method('currentTime')->will($this->returnValue('created'));
         $queue->expects($this->any())->method('availableAt')->will($this->returnValue('available'));
-        $database->shouldReceive('table')->with('table')->andReturn($query = m::mock('StdClass'));
+        $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(\StdClass::class));
         $query->shouldReceive('insert')->once()->andReturnUsing(function ($records) {
             $this->assertEquals([[
                 'queue' => 'queue',

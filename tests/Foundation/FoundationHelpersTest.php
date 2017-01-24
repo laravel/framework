@@ -16,10 +16,10 @@ class FoundationHelpersTest extends TestCase
     public function testCache()
     {
         $app = new Application;
-        $app['cache'] = $cache = m::mock('StdClass');
+        $app['cache'] = $cache = m::mock(\StdClass::class);
 
         // 1. cache()
-        $this->assertInstanceOf('StdClass', cache());
+        $this->assertInstanceOf(\StdClass::class, cache());
 
         // 2. cache(['foo' => 'bar'], 1);
         $cache->shouldReceive('put')->once()->with('foo', 'bar', 1);

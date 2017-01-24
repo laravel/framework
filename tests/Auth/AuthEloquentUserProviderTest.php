@@ -16,7 +16,7 @@ class AuthEloquentUserProviderTest extends TestCase
     public function testRetrieveByIDReturnsUser()
     {
         $provider = $this->getProviderMock();
-        $mock = m::mock('stdClass');
+        $mock = m::mock(\StdClass::class);
         $mock->shouldReceive('newQuery')->once()->andReturn($mock);
         $mock->shouldReceive('find')->once()->with(1)->andReturn('bar');
         $provider->expects($this->once())->method('createModel')->will($this->returnValue($mock));
@@ -28,7 +28,7 @@ class AuthEloquentUserProviderTest extends TestCase
     public function testRetrieveByCredentialsReturnsUser()
     {
         $provider = $this->getProviderMock();
-        $mock = m::mock('stdClass');
+        $mock = m::mock(\StdClass::class);
         $mock->shouldReceive('newQuery')->once()->andReturn($mock);
         $mock->shouldReceive('where')->once()->with('username', 'dayle');
         $mock->shouldReceive('first')->once()->andReturn('bar');

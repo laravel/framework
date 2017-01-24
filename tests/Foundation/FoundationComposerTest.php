@@ -18,7 +18,7 @@ class FoundationComposerTest extends TestCase
 
         $composer = $this->getMockBuilder(\Illuminate\Support\Composer::class)->setMethods(['getProcess'])->setConstructorArgs([$files = m::mock(\Illuminate\Filesystem\Filesystem::class), __DIR__])->getMock();
         $files->shouldReceive('exists')->once()->with(__DIR__.'/composer.phar')->andReturn(true);
-        $process = m::mock('stdClass');
+        $process = m::mock(\StdClass::class);
         $composer->expects($this->once())->method('getProcess')->will($this->returnValue($process));
         $process->shouldReceive('setCommandLine')->once()->with($escape.PHP_BINARY.$escape.' composer.phar dump-autoload');
         $process->shouldReceive('run')->once();
@@ -30,7 +30,7 @@ class FoundationComposerTest extends TestCase
     {
         $composer = $this->getMockBuilder(\Illuminate\Support\Composer::class)->setMethods(['getProcess'])->setConstructorArgs([$files = m::mock(\Illuminate\Filesystem\Filesystem::class), __DIR__])->getMock();
         $files->shouldReceive('exists')->once()->with(__DIR__.'/composer.phar')->andReturn(false);
-        $process = m::mock('stdClass');
+        $process = m::mock(\StdClass::class);
         $composer->expects($this->once())->method('getProcess')->will($this->returnValue($process));
         $process->shouldReceive('setCommandLine')->once()->with('composer dump-autoload');
         $process->shouldReceive('run')->once();
