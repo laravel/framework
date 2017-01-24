@@ -1,6 +1,6 @@
 # Release Notes for 5.4.x
 
-## [Unreleased]
+## v5.4.0 (2017-01-24)
 
 ### General
 - Added real-time facades 😈 ([feb52bf](https://github.com/laravel/framework/commit/feb52bf966c0ea517ec0cf688b5a2534b50a8268))
@@ -204,3 +204,4 @@
 - Support wildcards in `MessageBag::first()` ([#15217](https://github.com/laravel/framework/pull/15217))
 - Support implicit keys in `MessageBag::first()` and `MessageBag::first()` ([#17001](https://github.com/laravel/framework/pull/17001))
 - Support arrays with empty string as key ([#17427](https://github.com/laravel/framework/pull/17427))
+- Add type check to `validateUrl()` ([#17504](https://github.com/laravel/framework/pull/17504))
