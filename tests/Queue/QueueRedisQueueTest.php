@@ -14,7 +14,7 @@ class QueueRedisQueueTest extends TestCase
 
     public function testPushProperlyPushesJobOntoRedis()
     {
-        $queue = $this->getMockBuilder('Illuminate\Queue\RedisQueue')->setMethods(['getRandomId'])->setConstructorArgs([$redis = m::mock('Illuminate\Contracts\Redis\Factory'), 'default'])->getMock();
+        $queue = $this->getMockBuilder(\Illuminate\Queue\RedisQueue::class)->setMethods(['getRandomId'])->setConstructorArgs([$redis = m::mock(\Illuminate\Contracts\Redis\Factory::class), 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->will($this->returnValue('foo'));
         $redis->shouldReceive('connection')->once()->andReturn($redis);
         $redis->shouldReceive('rpush')->once()->with('queues:default', json_encode(['job' => 'foo', 'data' => ['data'], 'id' => 'foo', 'attempts' => 0]));
@@ -25,7 +25,7 @@ class QueueRedisQueueTest extends TestCase
 
     public function testDelayedPushProperlyPushesJobOntoRedis()
     {
-        $queue = $this->getMockBuilder('Illuminate\Queue\RedisQueue')->setMethods(['availableAt', 'getRandomId'])->setConstructorArgs([$redis = m::mock('Illuminate\Contracts\Redis\Factory'), 'default'])->getMock();
+        $queue = $this->getMockBuilder(\Illuminate\Queue\RedisQueue::class)->setMethods(['availableAt', 'getRandomId'])->setConstructorArgs([$redis = m::mock(\Illuminate\Contracts\Redis\Factory::class), 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->will($this->returnValue('foo'));
         $queue->expects($this->once())->method('availableAt')->with(1)->will($this->returnValue(2));
 
@@ -43,7 +43,7 @@ class QueueRedisQueueTest extends TestCase
     public function testDelayedPushWithDateTimeProperlyPushesJobOntoRedis()
     {
         $date = \Carbon\Carbon::now();
-        $queue = $this->getMockBuilder('Illuminate\Queue\RedisQueue')->setMethods(['availableAt', 'getRandomId'])->setConstructorArgs([$redis = m::mock('Illuminate\Contracts\Redis\Factory'), 'default'])->getMock();
+        $queue = $this->getMockBuilder(\Illuminate\Queue\RedisQueue::class)->setMethods(['availableAt', 'getRandomId'])->setConstructorArgs([$redis = m::mock(\Illuminate\Contracts\Redis\Factory::class), 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->will($this->returnValue('foo'));
         $queue->expects($this->once())->method('availableAt')->with($date)->will($this->returnValue(2));
 

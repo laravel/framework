@@ -16,7 +16,7 @@ class QueueListenerTest extends TestCase
     {
         $process = m::mock('Symfony\Component\Process\Process')->makePartial();
         $process->shouldReceive('run')->once();
-        $listener = m::mock('Illuminate\Queue\Listener')->makePartial();
+        $listener = m::mock(\Illuminate\Queue\Listener::class)->makePartial();
         $listener->shouldReceive('memoryExceeded')->once()->with(1)->andReturn(false);
 
         $listener->runProcess($process, 1);
@@ -26,7 +26,7 @@ class QueueListenerTest extends TestCase
     {
         $process = m::mock('Symfony\Component\Process\Process')->makePartial();
         $process->shouldReceive('run')->once();
-        $listener = m::mock('Illuminate\Queue\Listener')->makePartial();
+        $listener = m::mock(\Illuminate\Queue\Listener::class)->makePartial();
         $listener->shouldReceive('memoryExceeded')->once()->with(1)->andReturn(true);
         $listener->shouldReceive('stop')->once();
 
