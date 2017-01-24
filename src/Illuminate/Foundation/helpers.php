@@ -567,7 +567,12 @@ if (! function_exists('mix')) {
                 throw new Exception('The Mix manifest does not exist.');
             }
 
-            $manifest = json_decode(file_get_contents($manifestPath), true);
+            $manifest = collect(json_decode(file_get_contents($manifestPath), true))
+                ->mapWithKeys(function ($path, $key) {
+                    $path = str_replace('\\', '/', $path);
+                    $key = str_replace('\\', '/', $key);
+                    return [$key => $path];
+                })->toArray();
         }
 
         if (! starts_with($path, '/')) {
