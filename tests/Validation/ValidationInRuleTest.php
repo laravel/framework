@@ -1,9 +1,10 @@
 <?php
 
 use Illuminate\Validation\Rule;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Validation\Rules\In;
 
-class ValidationInRuleTest extends PHPUnit_Framework_TestCase
+class ValidationInRuleTest extends TestCase
 {
     public function testItCorrectlyFormatsAStringVersionOfTheRule()
     {

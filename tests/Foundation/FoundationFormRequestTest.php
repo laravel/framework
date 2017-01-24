@@ -1,9 +1,10 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 
-class FoundationFormRequestTest extends PHPUnit_Framework_TestCase
+class FoundationFormRequestTest extends TestCase
 {
     public function tearDown()
     {
@@ -46,7 +47,7 @@ class FoundationFormRequestTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Illuminate\Http\Exception\HttpResponseException
+     * @expectedException \Illuminate\Auth\Access\AuthorizationException
      */
     public function testValidateFunctionThrowsHttpResponseExceptionIfAuthorizationFails()
     {
@@ -59,7 +60,6 @@ class FoundationFormRequestTest extends PHPUnit_Framework_TestCase
         );
         $container->instance('Illuminate\Contracts\Validation\Factory', $factory);
         $validator->shouldReceive('passes')->never();
-        $request->shouldReceive('forbiddenResponse')->once()->andReturn(new Illuminate\Http\Response);
 
         $request->validate($factory);
     }

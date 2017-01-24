@@ -68,8 +68,7 @@ abstract class Compiler
             return true;
         }
 
-        $lastModified = $this->files->lastModified($path);
-
-        return $lastModified >= $this->files->lastModified($compiled);
+        return $this->files->lastModified($path) >=
+               $this->files->lastModified($compiled);
     }
 }

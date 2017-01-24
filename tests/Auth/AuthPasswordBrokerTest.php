@@ -1,9 +1,10 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\Auth\PasswordBroker;
 
-class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase
+class AuthPasswordBrokerTest extends TestCase
 {
     public function tearDown()
     {

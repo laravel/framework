@@ -29,40 +29,17 @@ class BeanstalkdJob extends Job implements JobContract
      * @param  \Illuminate\Container\Container  $container
      * @param  \Pheanstalk\Pheanstalk  $pheanstalk
      * @param  \Pheanstalk\Job  $job
+     * @param  string  $connectionName
      * @param  string  $queue
      * @return void
      */
-    public function __construct(Container $container,
-                                Pheanstalk $pheanstalk,
-                                PheanstalkJob $job,
-                                $queue)
+    public function __construct(Container $container, Pheanstalk $pheanstalk, PheanstalkJob $job, $connectionName, $queue)
     {
         $this->job = $job;
         $this->queue = $queue;
         $this->container = $container;
         $this->pheanstalk = $pheanstalk;
-    }
-
-    /**
-     * Get the raw body string for the job.
-     *
-     * @return string
-     */
-    public function getRawBody()
-    {
-        return $this->job->getData();
-    }
-
-    /**
-     * Delete the job from the queue.
-     *
-     * @return void
-     */
-    public function delete()
-    {
-        parent::delete();
-
-        $this->pheanstalk->delete($this->job);
+        $this->connectionName = $connectionName;
     }
 
     /**
@@ -93,6 +70,18 @@ class BeanstalkdJob extends Job implements JobContract
     }
 
     /**
+     * Delete the job from the queue.
+     *
+     * @return void
+     */
+    public function delete()
+    {
+        parent::delete();
+
+        $this->pheanstalk->delete($this->job);
+    }
+
+    /**
      * Get the number of times the job has been attempted.
      *
      * @return int
@@ -112,6 +101,16 @@ class BeanstalkdJob extends Job implements JobContract
     public function getJobId()
     {
         return $this->job->getId();
+    }
+
+    /**
+     * Get the raw body string for the job.
+     *
+     * @return string
+     */
+    public function getRawBody()
+    {
+        return $this->job->getData();
     }
 
     /**

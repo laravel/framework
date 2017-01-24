@@ -1,8 +1,9 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
-class SupportFacadeTest extends PHPUnit_Framework_TestCase
+class SupportFacadeTest extends TestCase
 {
     public function setUp()
     {

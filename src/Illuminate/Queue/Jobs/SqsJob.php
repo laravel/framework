@@ -27,43 +27,18 @@ class SqsJob extends Job implements JobContract
      *
      * @param  \Illuminate\Container\Container  $container
      * @param  \Aws\Sqs\SqsClient  $sqs
-     * @param  string  $queue
      * @param  array   $job
+     * @param  string  $connectionName
+     * @param  string  $queue
      * @return void
      */
-    public function __construct(Container $container,
-                                SqsClient $sqs,
-                                $queue,
-                                array $job)
+    public function __construct(Container $container, SqsClient $sqs, array $job, $connectionName, $queue)
     {
         $this->sqs = $sqs;
         $this->job = $job;
         $this->queue = $queue;
         $this->container = $container;
-    }
-
-    /**
-     * Get the raw body string for the job.
-     *
-     * @return string
-     */
-    public function getRawBody()
-    {
-        return $this->job['Body'];
-    }
-
-    /**
-     * Delete the job from the queue.
-     *
-     * @return void
-     */
-    public function delete()
-    {
-        parent::delete();
-
-        $this->sqs->deleteMessage([
-            'QueueUrl' => $this->queue, 'ReceiptHandle' => $this->job['ReceiptHandle'],
-        ]);
+        $this->connectionName = $connectionName;
     }
 
     /**
@@ -80,6 +55,20 @@ class SqsJob extends Job implements JobContract
             'QueueUrl' => $this->queue,
             'ReceiptHandle' => $this->job['ReceiptHandle'],
             'VisibilityTimeout' => $delay,
+        ]);
+    }
+
+    /**
+     * Delete the job from the queue.
+     *
+     * @return void
+     */
+    public function delete()
+    {
+        parent::delete();
+
+        $this->sqs->deleteMessage([
+            'QueueUrl' => $this->queue, 'ReceiptHandle' => $this->job['ReceiptHandle'],
         ]);
     }
 
@@ -101,6 +90,16 @@ class SqsJob extends Job implements JobContract
     public function getJobId()
     {
         return $this->job['MessageId'];
+    }
+
+    /**
+     * Get the raw body string for the job.
+     *
+     * @return string
+     */
+    public function getRawBody()
+    {
+        return $this->job['Body'];
     }
 
     /**

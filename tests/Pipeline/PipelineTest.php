@@ -1,8 +1,9 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
 use Illuminate\Pipeline\Pipeline;
 
-class PipelineTest extends PHPUnit_Framework_TestCase
+class PipelineTest extends TestCase
 {
     public function testPipelineBasicUsage()
     {

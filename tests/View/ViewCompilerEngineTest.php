@@ -1,9 +1,10 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\View\Engines\CompilerEngine;
 
-class ViewCompilerEngineTest extends PHPUnit_Framework_TestCase
+class ViewCompilerEngineTest extends TestCase
 {
     public function tearDown()
     {

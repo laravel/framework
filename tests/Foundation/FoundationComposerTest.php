@@ -1,8 +1,9 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
-class FoundationComposerTest extends PHPUnit_Framework_TestCase
+class FoundationComposerTest extends TestCase
 {
     public function tearDown()
     {

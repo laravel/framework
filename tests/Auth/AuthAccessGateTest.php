@@ -1,11 +1,12 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Container\Container;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class GateTest extends PHPUnit_Framework_TestCase
+class GateTest extends TestCase
 {
     /**
      * @expectedException \InvalidArgumentException
@@ -146,6 +147,24 @@ class GateTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($gate->check('update', new AccessGateTestDummy));
     }
 
+    public function test_policy_classes_handle_checks_for_all_subtypes()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
+
+        $this->assertTrue($gate->check('update', new AccessGateTestSubDummy));
+    }
+
+    public function test_policy_classes_handle_checks_for_interfaces()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummyInterface::class, AccessGateTestPolicy::class);
+
+        $this->assertTrue($gate->check('update', new AccessGateTestSubDummy));
+    }
+
     public function test_policy_converts_dash_to_camel()
     {
         $gate = $this->getBasicGate();
@@ -263,7 +282,17 @@ class AccessGateTestClass
     }
 }
 
-class AccessGateTestDummy
+interface AccessGateTestDummyInterface
+{
+    //
+}
+
+class AccessGateTestDummy implements AccessGateTestDummyInterface
+{
+    //
+}
+
+class AccessGateTestSubDummy extends AccessGateTestDummy
 {
     //
 }

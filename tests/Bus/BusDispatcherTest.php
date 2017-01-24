@@ -2,10 +2,11 @@
 
 use Mockery as m;
 use Illuminate\Bus\Dispatcher;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Config\Repository as Config;
 
-class BusDispatcherTest extends PHPUnit_Framework_TestCase
+class BusDispatcherTest extends TestCase
 {
     public function tearDown()
     {

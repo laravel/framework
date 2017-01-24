@@ -9,6 +9,20 @@ use Symfony\Component\Finder\Finder;
 class Factory implements ArrayAccess
 {
     /**
+     * The model definitions in the container.
+     *
+     * @var array
+     */
+    protected $definitions = [];
+
+    /**
+     * The registered model states.
+     *
+     * @var array
+     */
+    protected $states = [];
+
+    /**
      * The Faker instance for the builder.
      *
      * @var \Faker\Generator
@@ -25,20 +39,6 @@ class Factory implements ArrayAccess
     {
         $this->faker = $faker;
     }
-
-    /**
-     * The model definitions in the container.
-     *
-     * @var array
-     */
-    protected $definitions = [];
-
-    /**
-     * The registered model states.
-     *
-     * @var array
-     */
-    protected $states = [];
 
     /**
      * Create a new factory container.
@@ -123,25 +123,6 @@ class Factory implements ArrayAccess
     }
 
     /**
-     * Load factories from path.
-     *
-     * @param  string  $path
-     * @return $this
-     */
-    public function load($path)
-    {
-        $factory = $this;
-
-        if (is_dir($path)) {
-            foreach (Finder::create()->files()->in($path) as $file) {
-                require $file->getRealPath();
-            }
-        }
-
-        return $factory;
-    }
-
-    /**
      * Create an instance of the given model.
      *
      * @param  string  $class
@@ -189,9 +170,9 @@ class Factory implements ArrayAccess
      */
     public function raw($class, array $attributes = [], $name = 'default')
     {
-        $raw = call_user_func($this->definitions[$class][$name], $this->faker);
-
-        return array_merge($raw, $attributes);
+        return array_merge(
+            call_user_func($this->definitions[$class][$name], $this->faker), $attributes
+        );
     }
 
     /**
@@ -204,6 +185,25 @@ class Factory implements ArrayAccess
     public function of($class, $name = 'default')
     {
         return new FactoryBuilder($class, $name, $this->definitions, $this->states, $this->faker);
+    }
+
+    /**
+     * Load factories from path.
+     *
+     * @param  string  $path
+     * @return $this
+     */
+    public function load($path)
+    {
+        $factory = $this;
+
+        if (is_dir($path)) {
+            foreach (Finder::create()->files()->in($path) as $file) {
+                require $file->getRealPath();
+            }
+        }
+
+        return $factory;
     }
 
     /**

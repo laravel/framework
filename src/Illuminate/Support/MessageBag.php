@@ -65,6 +65,20 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
     }
 
     /**
+     * Determine if a key and message combination already exists.
+     *
+     * @param  string  $key
+     * @param  string  $message
+     * @return bool
+     */
+    protected function isUnique($key, $message)
+    {
+        $messages = (array) $this->messages;
+
+        return ! isset($messages[$key]) || ! in_array($message, $messages[$key]);
+    }
+
+    /**
      * Merge a new array of messages into the bag.
      *
      * @param  \Illuminate\Contracts\Support\MessageProvider|array  $messages
@@ -79,20 +93,6 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
         $this->messages = array_merge_recursive($this->messages, $messages);
 
         return $this;
-    }
-
-    /**
-     * Determine if a key and message combination already exists.
-     *
-     * @param  string  $key
-     * @param  string  $message
-     * @return bool
-     */
-    protected function isUnique($key, $message)
-    {
-        $messages = (array) $this->messages;
-
-        return ! isset($messages[$key]) || ! in_array($message, $messages[$key]);
     }
 
     /**
@@ -146,7 +146,9 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
     {
         $messages = is_null($key) ? $this->all($format) : $this->get($key, $format);
 
-        return count($messages) > 0 ? $messages[0] : '';
+        $firstMessage = Arr::first($messages, null, '');
+
+        return is_array($firstMessage) ? Arr::first($firstMessage) : $firstMessage;
     }
 
     /**

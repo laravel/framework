@@ -1,9 +1,10 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Schema\Builder;
 
-class DatabaseSchemaBuilderTest extends PHPUnit_Framework_TestCase
+class DatabaseSchemaBuilderTest extends TestCase
 {
     public function tearDown()
     {

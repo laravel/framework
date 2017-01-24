@@ -15,9 +15,9 @@
 
     <!-- Scripts -->
     <script>
-        window.Laravel = <?php echo json_encode([
+        window.Laravel = {!! json_encode([
             'csrfToken' => csrf_token(),
-        ]); ?>
+        ]) !!};
     </script>
 </head>
 <body>
@@ -78,7 +78,7 @@
             </div>
         </nav>
 
-        @yield('content')
+        {{ $slot }}
     </div>
 
     <!-- Scripts -->

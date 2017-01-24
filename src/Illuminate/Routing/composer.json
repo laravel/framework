@@ -15,16 +15,16 @@
     ],
     "require": {
         "php": ">=5.6.4",
-        "illuminate/container": "5.3.*",
-        "illuminate/contracts": "5.3.*",
-        "illuminate/http": "5.3.*",
-        "illuminate/pipeline": "5.3.*",
-        "illuminate/session": "5.3.*",
-        "illuminate/support": "5.3.*",
-        "symfony/debug": "3.1.*",
-        "symfony/http-foundation": "3.1.*",
-        "symfony/http-kernel": "3.1.*",
-        "symfony/routing": "3.1.*"
+        "illuminate/container": "5.4.*",
+        "illuminate/contracts": "5.4.*",
+        "illuminate/http": "5.4.*",
+        "illuminate/pipeline": "5.4.*",
+        "illuminate/session": "5.4.*",
+        "illuminate/support": "5.4.*",
+        "symfony/debug": "~3.2",
+        "symfony/http-foundation": "~3.2",
+        "symfony/http-kernel": "~3.2",
+        "symfony/routing": "~3.2"
     },
     "autoload": {
         "psr-4": {
@@ -33,11 +33,11 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.3-dev"
+            "dev-master": "5.4-dev"
         }
     },
     "suggest": {
-        "illuminate/console": "Required to use the make commands (5.3.*).",
+        "illuminate/console": "Required to use the make commands (5.4.*).",
         "symfony/psr-http-message-bridge": "Required to psr7 bridging features (0.2.*)."
     },
     "config": {

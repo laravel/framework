@@ -1,9 +1,10 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\NexmoMessage;
 
-class NotificationNexmoChannelTest extends PHPUnit_Framework_TestCase
+class NotificationNexmoChannelTest extends TestCase
 {
     public function tearDown()
     {

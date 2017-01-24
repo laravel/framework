@@ -2,10 +2,11 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Routing\Controller;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
-class AuthorizesResourcesTest extends PHPUnit_Framework_TestCase
+class AuthorizesResourcesTest extends TestCase
 {
     public function testCreateMethod()
     {
@@ -61,7 +62,7 @@ class AuthorizesResourcesTest extends PHPUnit_Framework_TestCase
     {
         $router = new Router(new Illuminate\Events\Dispatcher);
 
-        $router->middleware('can', 'AuthorizesResourcesMiddleware');
+        $router->aliasMiddleware('can', 'AuthorizesResourcesMiddleware');
         $router->get($method)->uses('AuthorizesResourcesController@'.$method);
 
         $this->assertEquals(

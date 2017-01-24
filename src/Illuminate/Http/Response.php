@@ -13,13 +13,6 @@ class Response extends BaseResponse
     use ResponseTrait;
 
     /**
-     * The original content of the response.
-     *
-     * @var mixed
-     */
-    public $original;
-
-    /**
      * Set the content on the response.
      *
      * @param  mixed  $content
@@ -49,21 +42,6 @@ class Response extends BaseResponse
     }
 
     /**
-     * Morph the given content into JSON.
-     *
-     * @param  mixed   $content
-     * @return string
-     */
-    protected function morphToJson($content)
-    {
-        if ($content instanceof Jsonable) {
-            return $content->toJson();
-        }
-
-        return json_encode($content);
-    }
-
-    /**
      * Determine if the given content should be turned into JSON.
      *
      * @param  mixed  $content
@@ -78,12 +56,17 @@ class Response extends BaseResponse
     }
 
     /**
-     * Get the original response content.
+     * Morph the given content into JSON.
      *
-     * @return mixed
+     * @param  mixed   $content
+     * @return string
      */
-    public function getOriginalContent()
+    protected function morphToJson($content)
     {
-        return $this->original;
+        if ($content instanceof Jsonable) {
+            return $content->toJson();
+        }
+
+        return json_encode($content);
     }
 }

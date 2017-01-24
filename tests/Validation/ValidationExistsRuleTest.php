@@ -1,6 +1,8 @@
 <?php
 
-class ValidationExistsRuleTest extends PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class ValidationExistsRuleTest extends TestCase
 {
     public function testItCorrectlyFormatsAStringVersionOfTheRule()
     {

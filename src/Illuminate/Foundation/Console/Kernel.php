@@ -9,6 +9,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Console\Kernel as KernelContract;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 
@@ -55,9 +56,8 @@ class Kernel implements KernelContract
      * @var array
      */
     protected $bootstrappers = [
-        'Illuminate\Foundation\Bootstrap\DetectEnvironment',
+        'Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables',
         'Illuminate\Foundation\Bootstrap\LoadConfiguration',
-        'Illuminate\Foundation\Bootstrap\ConfigureLogging',
         'Illuminate\Foundation\Bootstrap\HandleExceptions',
         'Illuminate\Foundation\Bootstrap\RegisterFacades',
         'Illuminate\Foundation\Bootstrap\SetRequestForConsole',
@@ -94,7 +94,7 @@ class Kernel implements KernelContract
     protected function defineConsoleSchedule()
     {
         $this->app->instance(
-            'Illuminate\Console\Scheduling\Schedule', $schedule = new Schedule
+            'Illuminate\Console\Scheduling\Schedule', $schedule = new Schedule($this->app[Cache::class])
         );
 
         $this->schedule($schedule);
@@ -203,9 +203,10 @@ class Kernel implements KernelContract
      *
      * @param  string  $command
      * @param  array  $parameters
+     * @param  \Symfony\Component\Console\Output\OutputInterface  $outputBuffer
      * @return int
      */
-    public function call($command, array $parameters = [])
+    public function call($command, array $parameters = [], $outputBuffer = null)
     {
         $this->bootstrap();
 
@@ -215,7 +216,7 @@ class Kernel implements KernelContract
             $this->commandsLoaded = true;
         }
 
-        return $this->getArtisan()->call($command, $parameters);
+        return $this->getArtisan()->call($command, $parameters, $outputBuffer);
     }
 
     /**

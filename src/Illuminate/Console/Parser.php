@@ -19,6 +19,25 @@ class Parser
      */
     public static function parse($expression)
     {
+        $name = static::name($expression);
+
+        if (preg_match_all('/\{\s*(.*?)\s*\}/', $expression, $matches)) {
+            if (count($matches[1])) {
+                return array_merge([$name], static::parameters($matches[1]));
+            }
+        }
+
+        return [$name, [], []];
+    }
+
+    /**
+     * Extract the name of the command from the expression.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected static function name($expression)
+    {
         if (trim($expression) === '') {
             throw new InvalidArgumentException('Console command definition is empty.');
         }
@@ -27,17 +46,7 @@ class Parser
             throw new InvalidArgumentException('Unable to determine command name from signature.');
         }
 
-        $name = $matches[0];
-
-        if (preg_match_all('/\{\s*(.*?)\s*\}/', $expression, $matches)) {
-            $tokens = $matches[1];
-
-            if (count($tokens)) {
-                return array_merge([$name], static::parameters($tokens));
-            }
-        }
-
-        return [$name, [], []];
+        return $matches[0];
     }
 
     /**
@@ -71,7 +80,7 @@ class Parser
      */
     protected static function parseArgument($token)
     {
-        list($token, $description) = static::parseToken($token);
+        list($token, $description) = static::extractDescription($token);
 
         switch (true) {
             case Str::endsWith($token, '?*'):
@@ -95,7 +104,7 @@ class Parser
      */
     protected static function parseOption($token)
     {
-        list($token, $description) = static::parseToken($token);
+        list($token, $description) = static::extractDescription($token);
 
         $matches = preg_split('/\s*\|\s*/', $token, 2);
 
@@ -124,7 +133,7 @@ class Parser
      * @param  string  $token
      * @return array
      */
-    protected static function parseToken($token)
+    protected static function extractDescription($token)
     {
         $parts = preg_split('/\s+:\s+/', trim($token), 2);
 

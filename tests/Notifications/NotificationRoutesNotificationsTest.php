@@ -1,9 +1,10 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Notifications\Dispatcher;
 
-class NotificationRoutesNotificationsTest extends PHPUnit_Framework_TestCase
+class NotificationRoutesNotificationsTest extends TestCase
 {
     public function tearDown()
     {

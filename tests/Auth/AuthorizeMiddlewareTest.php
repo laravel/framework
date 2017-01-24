@@ -3,6 +3,7 @@
 use Mockery as m;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
@@ -12,7 +13,7 @@ use Illuminate\Contracts\Auth\Factory as Auth;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 
-class AuthorizeMiddlewareTest extends PHPUnit_Framework_TestCase
+class AuthorizeMiddlewareTest extends TestCase
 {
     protected $container;
     protected $user;

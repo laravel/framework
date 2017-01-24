@@ -98,13 +98,20 @@ interface Container
     public function when($concrete);
 
     /**
+     * Get a closure to resolve the given type from the container.
+     *
+     * @param  string  $abstract
+     * @return \Closure
+     */
+    public function factory($abstract);
+
+    /**
      * Resolve the given type from the container.
      *
      * @param  string  $abstract
-     * @param  array   $parameters
      * @return mixed
      */
-    public function make($abstract, array $parameters = []);
+    public function make($abstract);
 
     /**
      * Call the given Closure / class@method and inject its dependencies.

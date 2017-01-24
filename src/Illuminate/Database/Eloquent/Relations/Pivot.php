@@ -26,7 +26,7 @@ class Pivot extends Model
      *
      * @var string
      */
-    protected $otherKey;
+    protected $relatedKey;
 
     /**
      * The attributes that aren't mass assignable.
@@ -51,13 +51,10 @@ class Pivot extends Model
         // The pivot model is a "dynamic" model since we will set the tables dynamically
         // for the instance. This allows it work for any intermediate tables for the
         // many to many relationship that are defined by this developer's classes.
-        $this->setTable($table);
-
-        $this->setConnection($parent->getConnectionName());
-
-        $this->forceFill($attributes);
-
-        $this->syncOriginal();
+        $this->setConnection($parent->getConnectionName())
+             ->setTable($table)
+             ->forceFill($attributes)
+             ->syncOriginal();
 
         // We store off the parent instance so we will access the timestamp column names
         // for the model, since the pivot model timestamps aren't easily configurable
@@ -97,7 +94,7 @@ class Pivot extends Model
     {
         $query->where($this->foreignKey, $this->getAttribute($this->foreignKey));
 
-        return $query->where($this->otherKey, $this->getAttribute($this->otherKey));
+        return $query->where($this->relatedKey, $this->getAttribute($this->relatedKey));
     }
 
     /**
@@ -117,11 +114,10 @@ class Pivot extends Model
      */
     protected function getDeleteQuery()
     {
-        $foreign = $this->getAttribute($this->foreignKey);
-
-        $query = $this->newQuery()->where($this->foreignKey, $foreign);
-
-        return $query->where($this->otherKey, $this->getAttribute($this->otherKey));
+        return $this->newQuery()->where([
+            $this->foreignKey => $this->getAttribute($this->foreignKey),
+            $this->relatedKey => $this->getAttribute($this->relatedKey),
+        ]);
     }
 
     /**
@@ -135,27 +131,37 @@ class Pivot extends Model
     }
 
     /**
-     * Get the "other key" column name.
+     * Get the "related key" column name.
+     *
+     * @return string
+     */
+    public function getRelatedKey()
+    {
+        return $this->relatedKey;
+    }
+
+    /**
+     * Get the "related key" column name.
      *
      * @return string
      */
     public function getOtherKey()
     {
-        return $this->otherKey;
+        return $this->getRelatedKey();
     }
 
     /**
      * Set the key names for the pivot model instance.
      *
      * @param  string  $foreignKey
-     * @param  string  $otherKey
+     * @param  string  $relatedKey
      * @return $this
      */
-    public function setPivotKeys($foreignKey, $otherKey)
+    public function setPivotKeys($foreignKey, $relatedKey)
     {
         $this->foreignKey = $foreignKey;
 
-        $this->otherKey = $otherKey;
+        $this->relatedKey = $relatedKey;
 
         return $this;
     }

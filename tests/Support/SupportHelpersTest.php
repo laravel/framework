@@ -2,8 +2,9 @@
 
 use Mockery as m;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\TestCase;
 
-class SupportHelpersTest extends PHPUnit_Framework_TestCase
+class SupportHelpersTest extends TestCase
 {
     public function tearDown()
     {

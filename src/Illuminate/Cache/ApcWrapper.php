@@ -83,10 +83,10 @@ class ApcWrapper
     /**
      * Remove all items from the cache.
      *
-     * @return void
+     * @return bool
      */
     public function flush()
     {
-        $this->apcu ? apcu_clear_cache() : apc_clear_cache('user');
+        return $this->apcu ? apcu_clear_cache() : apc_clear_cache('user');
     }
 }

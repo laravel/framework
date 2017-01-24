@@ -1,9 +1,10 @@
 <?php
 
 use Illuminate\Validation\Rule;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Validation\Rules\Dimensions;
 
-class ValidationDimensionsRuleTest extends PHPUnit_Framework_TestCase
+class ValidationDimensionsRuleTest extends TestCase
 {
     public function testItCorrectlyFormatsAStringVersionOfTheRule()
     {

@@ -1,9 +1,10 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase
+class DatabaseEloquentPivotTest extends TestCase
 {
     public function tearDown()
     {
@@ -96,8 +97,7 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase
         $pivot->foreign = 'foreign.value';
         $pivot->other = 'other.value';
         $query = m::mock('stdClass');
-        $query->shouldReceive('where')->once()->with('foreign', 'foreign.value')->andReturn($query);
-        $query->shouldReceive('where')->once()->with('other', 'other.value')->andReturn($query);
+        $query->shouldReceive('where')->once()->with(['foreign' => 'foreign.value', 'other' => 'other.value'])->andReturn($query);
         $query->shouldReceive('delete')->once()->andReturn(true);
         $pivot->expects($this->once())->method('newQuery')->will($this->returnValue($query));
 

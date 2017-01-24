@@ -1,8 +1,9 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
 use Illuminate\Filesystem\Filesystem;
 
-class FilesystemTest extends PHPUnit_Framework_TestCase
+class FilesystemTest extends TestCase
 {
     private $tempDir;
 
@@ -52,10 +53,17 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
 
     public function testDeleteRemovesFiles()
     {
-        file_put_contents($this->tempDir.'/file.txt', 'Hello World');
+        file_put_contents($this->tempDir.'/file1.txt', 'Hello World');
+        file_put_contents($this->tempDir.'/file2.txt', 'Hello World');
+        file_put_contents($this->tempDir.'/file3.txt', 'Hello World');
+
         $files = new Filesystem();
-        $files->delete($this->tempDir.'/file.txt');
-        $this->assertFileNotExists($this->tempDir.'/file.txt');
+        $files->delete($this->tempDir.'/file1.txt');
+        $this->assertFileNotExists($this->tempDir.'/file1.txt');
+
+        $files->delete([$this->tempDir.'/file2.txt', $this->tempDir.'/file3.txt']);
+        $this->assertFileNotExists($this->tempDir.'/file2.txt');
+        $this->assertFileNotExists($this->tempDir.'/file3.txt');
     }
 
     public function testPrependExistingFiles()

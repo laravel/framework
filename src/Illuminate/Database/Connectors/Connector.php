@@ -26,19 +26,6 @@ class Connector
     ];
 
     /**
-     * Get the PDO options based on the configuration.
-     *
-     * @param  array  $config
-     * @return array
-     */
-    public function getOptions(array $config)
-    {
-        $options = Arr::get($config, 'options', []);
-
-        return array_diff_key($this->options, $options) + $options;
-    }
-
-    /**
      * Create a new PDO connection.
      *
      * @param  string  $dsn
@@ -48,40 +35,49 @@ class Connector
      */
     public function createConnection($dsn, array $config, array $options)
     {
-        $username = Arr::get($config, 'username');
-
-        $password = Arr::get($config, 'password');
+        list($username, $password) = [
+            Arr::get($config, 'username'), Arr::get($config, 'password'),
+        ];
 
         try {
-            $pdo = $this->createPdoConnection($dsn, $username, $password, $options);
+            return $this->createPdoConnection(
+                $dsn, $username, $password, $options
+            );
         } catch (Exception $e) {
-            $pdo = $this->tryAgainIfCausedByLostConnection(
+            return $this->tryAgainIfCausedByLostConnection(
                 $e, $dsn, $username, $password, $options
             );
         }
-
-        return $pdo;
     }
 
     /**
-     * Get the default PDO connection options.
+     * Create a new PDO connection instance.
      *
-     * @return array
+     * @param  string  $dsn
+     * @param  string  $username
+     * @param  string  $password
+     * @param  array  $options
+     * @return \PDO
      */
-    public function getDefaultOptions()
+    protected function createPdoConnection($dsn, $username, $password, $options)
     {
-        return $this->options;
+        if (class_exists(PDOConnection::class) && ! $this->isPersistentConnection($options)) {
+            return new PDOConnection($dsn, $username, $password, $options);
+        }
+
+        return new PDO($dsn, $username, $password, $options);
     }
 
     /**
-     * Set the default PDO connection options.
+     * Determine if the connection is persistent.
      *
      * @param  array  $options
-     * @return void
+     * @return bool
      */
-    public function setDefaultOptions(array $options)
+    protected function isPersistentConnection($options)
     {
-        $this->options = $options;
+        return isset($options[PDO::ATTR_PERSISTENT]) &&
+               $options[PDO::ATTR_PERSISTENT];
     }
 
     /**
@@ -106,31 +102,36 @@ class Connector
     }
 
     /**
-     * Create a new PDO connection instance.
+     * Get the PDO options based on the configuration.
      *
-     * @return \PDO
+     * @param  array  $config
+     * @return array
      */
-    protected function createPdoConnection($dsn, $username, $password, $options)
+    public function getOptions(array $config)
     {
-        if (class_exists(PDOConnection::class) && ! $this->isPersistentConnection($options)) {
-            return new PDOConnection($dsn, $username, $password, $options);
-        }
+        $options = Arr::get($config, 'options', []);
 
-        return new PDO($dsn, $username, $password, $options);
+        return array_diff_key($this->options, $options) + $options;
     }
 
     /**
-     * Determine if the connection is persistent.
+     * Get the default PDO connection options.
+     *
+     * @return array
+     */
+    public function getDefaultOptions()
+    {
+        return $this->options;
+    }
+
+    /**
+     * Set the default PDO connection options.
      *
      * @param  array  $options
-     * @return bool
+     * @return void
      */
-    protected function isPersistentConnection($options)
+    public function setDefaultOptions(array $options)
     {
-        if (isset($options[PDO::ATTR_PERSISTENT]) && $options[PDO::ATTR_PERSISTENT]) {
-            return true;
-        }
-
-        return false;
+        $this->options = $options;
     }
 }

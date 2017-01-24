@@ -62,9 +62,9 @@ class BcryptHasher implements HasherContract
      */
     public function needsRehash($hashedValue, array $options = [])
     {
-        $cost = isset($options['rounds']) ? $options['rounds'] : $this->rounds;
-
-        return password_needs_rehash($hashedValue, PASSWORD_BCRYPT, ['cost' => $cost]);
+        return password_needs_rehash($hashedValue, PASSWORD_BCRYPT, [
+            'cost' => isset($options['rounds']) ? $options['rounds'] : $this->rounds,
+        ]);
     }
 
     /**

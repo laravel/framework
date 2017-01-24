@@ -2,8 +2,9 @@
 
 use Mockery as m;
 use Illuminate\Log\Writer;
+use PHPUnit\Framework\TestCase;
 
-class LogWriterTest extends PHPUnit_Framework_TestCase
+class LogWriterTest extends TestCase
 {
     public function tearDown()
     {
@@ -44,10 +45,10 @@ class LogWriterTest extends PHPUnit_Framework_TestCase
         $writer = new Writer($monolog = m::mock('Monolog\Logger'), $events = new Illuminate\Events\Dispatcher);
         $monolog->shouldReceive('error')->once()->with('foo', []);
 
-        $events->listen('illuminate.log', function ($level, $message, array $context = []) {
-            $_SERVER['__log.level'] = $level;
-            $_SERVER['__log.message'] = $message;
-            $_SERVER['__log.context'] = $context;
+        $events->listen(Illuminate\Log\Events\MessageLogged::class, function ($event) {
+            $_SERVER['__log.level'] = $event->level;
+            $_SERVER['__log.message'] = $event->message;
+            $_SERVER['__log.context'] = $event->context;
         });
 
         $writer->error('foo');
@@ -79,7 +80,7 @@ class LogWriterTest extends PHPUnit_Framework_TestCase
         $callback = function () {
             return 'success';
         };
-        $events->shouldReceive('listen')->with('illuminate.log', $callback)->once();
+        $events->shouldReceive('listen')->with(Illuminate\Log\Events\MessageLogged::class, $callback)->once();
 
         $writer->listen($callback);
     }

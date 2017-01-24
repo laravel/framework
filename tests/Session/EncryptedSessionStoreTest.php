@@ -1,8 +1,9 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
-class EncryptedSessionStoreTest extends PHPUnit_Framework_TestCase
+class EncryptedSessionStoreTest extends TestCase
 {
     public function tearDown()
     {
@@ -26,7 +27,6 @@ class EncryptedSessionStoreTest extends PHPUnit_Framework_TestCase
                 'new' => [],
                 'old' => ['baz'],
             ],
-            '_sf2_meta' => $session->getBagData('_sf2_meta'),
         ]);
         $session->getEncrypter()->shouldReceive('encrypt')->once()->with($serialized)->andReturn($serialized);
         $session->getHandler()->shouldReceive('write')->once()->with(

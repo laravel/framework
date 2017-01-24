@@ -1,22 +1,14 @@
 <?php
 
 use Mockery as m;
-use Illuminate\Redis\Database;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Queue\RedisQueue;
 use Illuminate\Container\Container;
 use Illuminate\Queue\Jobs\RedisJob;
 
-class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
+class RedisQueueIntegrationTest extends TestCase
 {
-    /**
-     * @var bool
-     */
-    private static $connectionFailedOnceWithDefaultsSkip = false;
-
-    /**
-     * @var Database
-     */
-    private $redis;
+    use InteractsWithRedis;
 
     /**
      * @var RedisQueue
@@ -26,36 +18,7 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
     public function setUp()
     {
         parent::setUp();
-
-        $host = getenv('REDIS_HOST') ?: '127.0.0.1';
-        $port = getenv('REDIS_PORT') ?: 6379;
-
-        if (static::$connectionFailedOnceWithDefaultsSkip) {
-            $this->markTestSkipped('Trying default host/port failed, please set environment variable REDIS_HOST & REDIS_PORT to enable '.__CLASS__);
-
-            return;
-        }
-
-        $this->redis = new Database([
-            'cluster' => false,
-            'default' => [
-                'host' => $host,
-                'port' => $port,
-                'database' => 5,
-                'timeout' => 0.5,
-            ],
-        ]);
-
-        try {
-            $this->redis->connection()->flushdb();
-        } catch (\Exception $e) {
-            if ($host === '127.0.0.1' && $port === 6379 && getenv('REDIS_HOST') === false) {
-                $this->markTestSkipped('Trying default host/port failed, please set environment variable REDIS_HOST & REDIS_PORT to enable '.__CLASS__);
-                static::$connectionFailedOnceWithDefaultsSkip = true;
-
-                return;
-            }
-        }
+        $this->setUpRedis();
 
         $this->queue = new RedisQueue($this->redis);
         $this->queue->setContainer(m::mock(Container::class));
@@ -64,10 +27,8 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
     public function tearDown()
     {
         parent::tearDown();
+        $this->tearDownRedis();
         m::close();
-        if ($this->redis) {
-            $this->redis->connection()->flushdb();
-        }
     }
 
     public function testExpiredJobsArePopped()
@@ -108,7 +69,7 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($job, unserialize(json_decode($redisJob->getRawBody())->data->command));
         $this->assertEquals(1, $redisJob->attempts());
         $this->assertEquals($job, unserialize(json_decode($redisJob->getReservedJob())->data->command));
-        $this->assertEquals(2, json_decode($redisJob->getReservedJob())->attempts);
+        $this->assertEquals(1, json_decode($redisJob->getReservedJob())->attempts);
         $this->assertEquals($redisJob->getJobId(), json_decode($redisJob->getReservedJob())->id);
 
         // Check reserved queue
@@ -256,7 +217,7 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
 
         $decoded = json_decode($payload);
 
-        $this->assertEquals(2, $decoded->attempts);
+        $this->assertEquals(1, $decoded->attempts);
         $this->assertEquals($job, unserialize($decoded->data->command));
 
         //check if the queue has no ready item yet

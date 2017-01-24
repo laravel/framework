@@ -69,14 +69,10 @@ class AppNameCommand extends Command
     {
         $this->currentRoot = trim($this->laravel->getNamespace(), '\\');
 
-        $this->setBootstrapNamespaces();
-
         $this->setAppDirectoryNamespace();
-
+        $this->setBootstrapNamespaces();
         $this->setConfigNamespaces();
-
         $this->setComposerNamespace();
-
         $this->setDatabaseFactoryNamespaces();
 
         $this->info('Application namespace set!');
@@ -147,18 +143,6 @@ class AppNameCommand extends Command
     }
 
     /**
-     * Set the PSR-4 namespace in the Composer file.
-     *
-     * @return void
-     */
-    protected function setComposerNamespace()
-    {
-        $this->replaceIn(
-            $this->getComposerPath(), str_replace('\\', '\\\\', $this->currentRoot).'\\\\', str_replace('\\', '\\\\', $this->argument('name')).'\\\\'
-        );
-    }
-
-    /**
      * Set the namespace in the appropriate configuration files.
      *
      * @return void
@@ -166,9 +150,7 @@ class AppNameCommand extends Command
     protected function setConfigNamespaces()
     {
         $this->setAppConfigNamespaces();
-
         $this->setAuthConfigNamespace();
-
         $this->setServicesConfigNamespace();
     }
 
@@ -200,7 +182,9 @@ class AppNameCommand extends Command
     protected function setAuthConfigNamespace()
     {
         $this->replaceIn(
-            $this->getConfigPath('auth'), $this->currentRoot.'\\User', $this->argument('name').'\\User'
+            $this->getConfigPath('auth'),
+            $this->currentRoot.'\\User',
+            $this->argument('name').'\\User'
         );
     }
 
@@ -212,7 +196,23 @@ class AppNameCommand extends Command
     protected function setServicesConfigNamespace()
     {
         $this->replaceIn(
-            $this->getConfigPath('services'), $this->currentRoot.'\\User', $this->argument('name').'\\User'
+            $this->getConfigPath('services'),
+            $this->currentRoot.'\\User',
+            $this->argument('name').'\\User'
+        );
+    }
+
+    /**
+     * Set the PSR-4 namespace in the Composer file.
+     *
+     * @return void
+     */
+    protected function setComposerNamespace()
+    {
+        $this->replaceIn(
+            $this->getComposerPath(),
+            str_replace('\\', '\\\\', $this->currentRoot).'\\\\',
+            str_replace('\\', '\\\\', $this->argument('name')).'\\\\'
         );
     }
 
@@ -224,7 +224,8 @@ class AppNameCommand extends Command
     protected function setDatabaseFactoryNamespaces()
     {
         $this->replaceIn(
-            $this->laravel->databasePath().'/factories/ModelFactory.php', $this->currentRoot, $this->argument('name')
+            $this->laravel->databasePath().'/factories/ModelFactory.php',
+            $this->currentRoot, $this->argument('name')
         );
     }
 
