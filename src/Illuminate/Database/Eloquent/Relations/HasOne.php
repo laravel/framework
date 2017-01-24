@@ -10,9 +10,10 @@ class HasOne extends HasOneOrMany
     /**
      * Indicates if a default model instance should be used.
      *
-     * Alternatively, may be a Closure to execute to retrieve default value.
+     * Alternatively, may be a Closure to execute to retrieve default value
+     * or an array of attributes to set on the default model instance.
      *
-     * @var \Closure|bool
+     * @var \Closure|array|bool
      */
     protected $withDefault;
 
@@ -85,7 +86,7 @@ class HasOne extends HasOneOrMany
     /**
      * Return a new model instance in case the relationship does not exist.
      *
-     * @param  \Closure|bool  $callback
+     * @param  \Closure|array|bool  $callback
      * @return $this
      */
     public function withDefault($callback = true)
