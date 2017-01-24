@@ -13,7 +13,7 @@ class MailMarkdownTest extends TestCase
 
     public function testRenderFunctionReturnsHtml()
     {
-        $viewFactory = \Mockery::mock('Illuminate\View\Factory');
+        $viewFactory = \Mockery::mock(\Illuminate\View\Factory::class);
         $markdown = new \Illuminate\Mail\Markdown($viewFactory);
         $viewFactory->shouldReceive('flushFinderCache')->once();
         $viewFactory->shouldReceive('replaceNamespace')->once()->with('mail', $markdown->htmlComponentPaths())->andReturnSelf();
@@ -28,7 +28,7 @@ class MailMarkdownTest extends TestCase
 
     public function testRenderTextReturnsText()
     {
-        $viewFactory = \Mockery::mock('Illuminate\View\Factory');
+        $viewFactory = \Mockery::mock(\Illuminate\View\Factory::class);
         $markdown = new \Illuminate\Mail\Markdown($viewFactory);
         $viewFactory->shouldReceive('flushFinderCache')->once();
         $viewFactory->shouldReceive('replaceNamespace')->once()->with('mail', $markdown->markdownComponentPaths())->andReturnSelf();
@@ -42,7 +42,7 @@ class MailMarkdownTest extends TestCase
 
     public function testParseReturnsParsedMarkdown()
     {
-        $viewFactory = \Mockery::mock('Illuminate\View\Factory');
+        $viewFactory = \Mockery::mock(\Illuminate\View\Factory::class);
         $markdown = new \Illuminate\Mail\Markdown($viewFactory);
 
         $result = $markdown->parse('# Something');
