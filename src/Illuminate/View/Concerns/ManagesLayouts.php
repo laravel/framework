@@ -25,7 +25,7 @@ trait ManagesLayouts
      *
      * @var string
      */
-    protected static $parentPlaceholder;
+    protected static $parentPlaceholder = [];
 
     /**
      * Start injecting content into a section.
@@ -164,11 +164,11 @@ trait ManagesLayouts
      */
     public static function parentPlaceholder($section = '')
     {
-        if (! static::$parentPlaceholder) {
-            static::$parentPlaceholder = '##parent-placeholder-'.sha1($section).'##';
+        if (! isset(static::$parentPlaceholder[$section])) {
+            static::$parentPlaceholder[$section] = '##parent-placeholder-'.sha1($section).'##';
         }
 
-        return static::$parentPlaceholder;
+        return static::$parentPlaceholder[$section];
     }
 
     /**

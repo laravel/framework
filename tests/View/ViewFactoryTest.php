@@ -213,7 +213,7 @@ class ViewFactoryTest extends TestCase
 
     public function testSectionExtending()
     {
-        $placeholder = \Illuminate\View\Factory::parentPlaceholder();
+        $placeholder = \Illuminate\View\Factory::parentPlaceholder('foo');
         $factory = $this->getFactory();
         $factory->startSection('foo');
         echo 'hi '.$placeholder;
@@ -226,7 +226,7 @@ class ViewFactoryTest extends TestCase
 
     public function testSectionMultipleExtending()
     {
-        $placeholder = \Illuminate\View\Factory::parentPlaceholder();
+        $placeholder = \Illuminate\View\Factory::parentPlaceholder('foo');
         $factory = $this->getFactory();
         $factory->startSection('foo');
         echo 'hello '.$placeholder.' nice to see you '.$placeholder;
