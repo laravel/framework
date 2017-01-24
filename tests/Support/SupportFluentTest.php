@@ -84,6 +84,20 @@ class SupportFluentTest extends TestCase
         $this->assertFalse(isset($fluent->name));
     }
 
+    public function testTransformingAttributes()
+    {
+        $fluent = new Fluent([
+            'name' => 'Taylor',
+            'age' => 25,
+        ]);
+        $fluent->transform(function ($item) {
+            return [
+                'realname' => $item->name,
+            ];
+        });
+        $this->assertSame(['realname' => 'Taylor'], $fluent->toArray());
+    }
+
     public function testToArrayReturnsAttribute()
     {
         $array = ['name' => 'Taylor', 'age' => 25];
