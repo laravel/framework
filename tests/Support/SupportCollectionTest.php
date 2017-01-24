@@ -161,9 +161,9 @@ class SupportCollectionTest extends TestCase
 
     public function testToArrayCallsToArrayOnEachItemInCollection()
     {
-        $item1 = m::mock('Illuminate\Contracts\Support\Arrayable');
+        $item1 = m::mock(\Illuminate\Contracts\Support\Arrayable::class);
         $item1->shouldReceive('toArray')->once()->andReturn('foo.array');
-        $item2 = m::mock('Illuminate\Contracts\Support\Arrayable');
+        $item2 = m::mock(\Illuminate\Contracts\Support\Arrayable::class);
         $item2->shouldReceive('toArray')->once()->andReturn('bar.array');
         $c = new Collection([$item1, $item2]);
         $results = $c->toArray();
@@ -175,7 +175,7 @@ class SupportCollectionTest extends TestCase
     {
         $item1 = m::mock('JsonSerializable');
         $item1->shouldReceive('jsonSerialize')->once()->andReturn('foo.json');
-        $item2 = m::mock('Illuminate\Contracts\Support\Arrayable');
+        $item2 = m::mock(\Illuminate\Contracts\Support\Arrayable::class);
         $item2->shouldReceive('toArray')->once()->andReturn('bar.array');
         $c = new Collection([$item1, $item2]);
         $results = $c->jsonSerialize();

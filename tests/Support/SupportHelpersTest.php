@@ -239,7 +239,7 @@ class SupportHelpersTest extends TestCase
     {
         $str = 'A \'quote\' is <b>bold</b>';
         $this->assertEquals('A &#039;quote&#039; is &lt;b&gt;bold&lt;/b&gt;', e($str));
-        $html = m::mock('Illuminate\Contracts\Support\Htmlable');
+        $html = m::mock(\Illuminate\Contracts\Support\Htmlable::class);
         $html->shouldReceive('toHtml')->andReturn($str);
         $this->assertEquals($str, e($html));
     }
@@ -660,17 +660,17 @@ class SupportHelpersTest extends TestCase
     public function testClassUsesRecursiveShouldReturnTraitsOnParentClasses()
     {
         $this->assertEquals([
-            'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
-            'Illuminate\Tests\Support\SupportTestTraitTwo' => 'Illuminate\Tests\Support\SupportTestTraitTwo',
+            \Illuminate\Tests\Support\SupportTestTraitOne::class => \Illuminate\Tests\Support\SupportTestTraitOne::class,
+            \Illuminate\Tests\Support\SupportTestTraitTwo::class => \Illuminate\Tests\Support\SupportTestTraitTwo::class,
         ],
-        class_uses_recursive('Illuminate\Tests\Support\SupportTestClassTwo'));
+        class_uses_recursive(\Illuminate\Tests\Support\SupportTestClassTwo::class));
     }
 
     public function testClassUsesRecursiveAcceptsObject()
     {
         $this->assertEquals([
-            'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
-            'Illuminate\Tests\Support\SupportTestTraitTwo' => 'Illuminate\Tests\Support\SupportTestTraitTwo',
+            \Illuminate\Tests\Support\SupportTestTraitOne::class => \Illuminate\Tests\Support\SupportTestTraitOne::class,
+            \Illuminate\Tests\Support\SupportTestTraitTwo::class => \Illuminate\Tests\Support\SupportTestTraitTwo::class,
         ],
         class_uses_recursive(new SupportTestClassTwo));
     }

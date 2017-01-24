@@ -69,7 +69,7 @@ class SupportFluentTest extends TestCase
         $this->assertEquals('Taylor', $fluent->name);
         $this->assertTrue($fluent->developer);
         $this->assertEquals(25, $fluent->age);
-        $this->assertInstanceOf('Illuminate\Support\Fluent', $fluent->programmer());
+        $this->assertInstanceOf(\Illuminate\Support\Fluent::class, $fluent->programmer());
     }
 
     public function testIssetMagicMethod()
@@ -94,7 +94,7 @@ class SupportFluentTest extends TestCase
 
     public function testToJsonEncodesTheToArrayResult()
     {
-        $fluent = $this->getMockBuilder('Illuminate\Support\Fluent')->setMethods(['toArray'])->getMock();
+        $fluent = $this->getMockBuilder(\Illuminate\Support\Fluent::class)->setMethods(['toArray'])->getMock();
         $fluent->expects($this->once())->method('toArray')->will($this->returnValue('foo'));
         $results = $fluent->toJson();
 
