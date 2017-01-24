@@ -13,7 +13,7 @@ class ConsoleEventSchedulerTest extends TestCase
         parent::setUp();
 
         \Illuminate\Container\Container::getInstance()->instance(
-            'Illuminate\Console\Scheduling\Schedule', $this->schedule = new Schedule(m::mock('Illuminate\Contracts\Cache\Repository'))
+            \Illuminate\Console\Scheduling\Schedule::class, $this->schedule = new Schedule(m::mock(\Illuminate\Contracts\Cache\Repository::class))
         );
     }
 
