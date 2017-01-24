@@ -181,7 +181,7 @@ class RouteRegistrarTest extends TestCase
     public function testCanRegisterResource()
     {
         $this->router->middleware('resource-middleware')
-                     ->resource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub');
+                     ->resource('users', \Illuminate\Tests\Routing\RouteRegistrarControllerStub::class);
 
         $this->seeResponse('deleted', Request::create('users/1', 'DELETE'));
         $this->seeMiddleware('resource-middleware');

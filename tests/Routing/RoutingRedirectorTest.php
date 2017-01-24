@@ -18,10 +18,10 @@ class RoutingRedirectorTest extends TestCase
     {
         $this->headers = m::mock('Symfony\Component\HttpFoundation\HeaderBag');
 
-        $this->request = m::mock('Illuminate\Http\Request');
+        $this->request = m::mock(\Illuminate\Http\Request::class);
         $this->request->headers = $this->headers;
 
-        $this->url = m::mock('Illuminate\Routing\UrlGenerator');
+        $this->url = m::mock(\Illuminate\Routing\UrlGenerator::class);
         $this->url->shouldReceive('getRequest')->andReturn($this->request);
         $this->url->shouldReceive('to')->with('bar', [], null)->andReturn('http://foo.com/bar');
         $this->url->shouldReceive('to')->with('bar', [], true)->andReturn('https://foo.com/bar');
@@ -29,7 +29,7 @@ class RoutingRedirectorTest extends TestCase
         $this->url->shouldReceive('to')->with('http://foo.com/bar', [], null)->andReturn('http://foo.com/bar');
         $this->url->shouldReceive('to')->with('/', [], null)->andReturn('http://foo.com/');
 
-        $this->session = m::mock('Illuminate\Session\Store');
+        $this->session = m::mock(\Illuminate\Session\Store::class);
 
         $this->redirect = new Redirector($this->url);
         $this->redirect->setSession($this->session);
@@ -44,7 +44,7 @@ class RoutingRedirectorTest extends TestCase
     {
         $response = $this->redirect->to('bar');
 
-        $this->assertInstanceOf('Illuminate\Http\RedirectResponse', $response);
+        $this->assertInstanceOf(\Illuminate\Http\RedirectResponse::class, $response);
         $this->assertEquals('http://foo.com/bar', $response->getTargetUrl());
         $this->assertEquals(302, $response->getStatusCode());
         $this->assertEquals($this->session, $response->getSession());
