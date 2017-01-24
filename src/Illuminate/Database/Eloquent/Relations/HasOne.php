@@ -10,8 +10,7 @@ class HasOne extends HasOneOrMany
     /**
      * Indicates if a default model instance should be used.
      *
-     * Alternatively, may be a Closure to execute to retrieve default value
-     * or an array of attributes to set on the default model instance.
+     * Alternatively, may be a Closure or array.
      *
      * @var \Closure|array|bool
      */
