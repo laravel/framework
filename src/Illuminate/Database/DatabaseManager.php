@@ -67,6 +67,14 @@ class DatabaseManager implements ConnectionResolverInterface {
 
 			$this->connections[$name] = $this->prepare($connection);
 		}
+		else {
+			// the global fetch mode should be initalized everytime it returns?
+			// otherwise if some code outside change it on purposes:
+			// $conn = DB::connection();
+        		// $conn->setFetchMode(PDO::FETCH_ASSOC);
+        		// then any code depends on the fetch result type (which may be FETCH_OBJ) will be corupted
+			$this->connections[$name]->setFetchMode($this->app['config']['database.fetch']);
+		}
 
 		return $this->connections[$name];
 	}
