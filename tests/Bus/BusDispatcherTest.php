@@ -19,20 +19,20 @@ class BusDispatcherTest extends TestCase
     {
         $container = new Container;
         $dispatcher = new Dispatcher($container, function () {
-            $mock = m::mock('Illuminate\Contracts\Queue\Queue');
+            $mock = m::mock(\Illuminate\Contracts\Queue\Queue::class);
             $mock->shouldReceive('push')->once();
 
             return $mock;
         });
 
-        $dispatcher->dispatch(m::mock('Illuminate\Contracts\Queue\ShouldQueue'));
+        $dispatcher->dispatch(m::mock(\Illuminate\Contracts\Queue\ShouldQueue::class));
     }
 
     public function testCommandsThatShouldQueueIsQueuedUsingCustomHandler()
     {
         $container = new Container;
         $dispatcher = new Dispatcher($container, function () {
-            $mock = m::mock('Illuminate\Contracts\Queue\Queue');
+            $mock = m::mock(\Illuminate\Contracts\Queue\Queue::class);
             $mock->shouldReceive('push')->once();
 
             return $mock;
@@ -45,8 +45,8 @@ class BusDispatcherTest extends TestCase
     {
         $container = new Container;
         $dispatcher = new Dispatcher($container, function () {
-            $mock = m::mock('Illuminate\Contracts\Queue\Queue');
-            $mock->shouldReceive('laterOn')->once()->with('foo', 10, m::type('Illuminate\Tests\Bus\BusDispatcherTestSpecificQueueAndDelayCommand'));
+            $mock = m::mock(\Illuminate\Contracts\Queue\Queue::class);
+            $mock->shouldReceive('laterOn')->once()->with('foo', 10, m::type(\Illuminate\Tests\Bus\BusDispatcherTestSpecificQueueAndDelayCommand::class));
 
             return $mock;
         });
@@ -57,7 +57,7 @@ class BusDispatcherTest extends TestCase
     public function testDispatchNowShouldNeverQueue()
     {
         $container = new Container;
-        $mock = m::mock('Illuminate\Contracts\Queue\Queue');
+        $mock = m::mock(\Illuminate\Contracts\Queue\Queue::class);
         $mock->shouldReceive('push')->never();
         $dispatcher = new Dispatcher($container, function () use ($mock) {
             return $mock;
@@ -69,7 +69,7 @@ class BusDispatcherTest extends TestCase
     public function testDispatcherCanDispatchStandAloneHandler()
     {
         $container = new Container;
-        $mock = m::mock('Illuminate\Contracts\Queue\Queue');
+        $mock = m::mock(\Illuminate\Contracts\Queue\Queue::class);
         $dispatcher = new Dispatcher($container, function () use ($mock) {
             return $mock;
         });
@@ -96,7 +96,7 @@ class BusDispatcherTest extends TestCase
         });
 
         $dispatcher = new Dispatcher($container, function () {
-            $mock = m::mock('Illuminate\Contracts\Queue\Queue');
+            $mock = m::mock(\Illuminate\Contracts\Queue\Queue::class);
             $mock->shouldReceive('push')->once();
 
             return $mock;

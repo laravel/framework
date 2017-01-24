@@ -69,8 +69,8 @@ class ViewTest extends TestCase
     public function testRenderSectionsReturnsEnvironmentSections()
     {
         $view = m::mock('Illuminate\View\View[render]', [
-            m::mock('Illuminate\View\Factory'),
-            m::mock('Illuminate\View\Engines\EngineInterface'),
+            m::mock(\Illuminate\View\Factory::class),
+            m::mock(\Illuminate\View\Engines\EngineInterface::class),
             'view',
             'path',
             [],
@@ -101,12 +101,12 @@ class ViewTest extends TestCase
         $view->getFactory()->shouldReceive('make')->once()->with('foo', ['data']);
         $result = $view->nest('key', 'foo', ['data']);
 
-        $this->assertInstanceOf('Illuminate\View\View', $result);
+        $this->assertInstanceOf(\Illuminate\View\View::class, $result);
     }
 
     public function testViewAcceptsArrayableImplementations()
     {
-        $arrayable = m::mock('Illuminate\Contracts\Support\Arrayable');
+        $arrayable = m::mock(\Illuminate\Contracts\Support\Arrayable::class);
         $arrayable->shouldReceive('toArray')->once()->andReturn(['foo' => 'bar', 'baz' => ['qux', 'corge']]);
 
         $view = $this->getView($arrayable);
@@ -182,7 +182,7 @@ class ViewTest extends TestCase
         $view->getFactory()->shouldReceive('decrementRender')->once()->ordered();
         $view->getFactory()->shouldReceive('flushStateIfDoneRendering')->once();
 
-        $view->renderable = m::mock('Illuminate\Contracts\Support\Renderable');
+        $view->renderable = m::mock(\Illuminate\Contracts\Support\Renderable::class);
         $view->renderable->shouldReceive('render')->once()->andReturn('text');
         $this->assertEquals('contents', $view->render());
     }
@@ -208,7 +208,7 @@ class ViewTest extends TestCase
         $view = $this->getView();
         $errors = ['foo' => 'bar', 'qu' => 'ux'];
         $this->assertSame($view, $view->withErrors($errors));
-        $this->assertInstanceOf('Illuminate\Support\MessageBag', $view->errors);
+        $this->assertInstanceOf(\Illuminate\Support\MessageBag::class, $view->errors);
         $foo = $view->errors->get('foo');
         $this->assertEquals($foo[0], 'bar');
         $qu = $view->errors->get('qu');
@@ -222,8 +222,8 @@ class ViewTest extends TestCase
     protected function getView($data = [])
     {
         return new View(
-            m::mock('Illuminate\View\Factory'),
-            m::mock('Illuminate\View\Engines\EngineInterface'),
+            m::mock(\Illuminate\View\Factory::class),
+            m::mock(\Illuminate\View\Engines\EngineInterface::class),
             'view',
             'path',
             $data

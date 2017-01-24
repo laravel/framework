@@ -16,7 +16,7 @@ class QueueBeanstalkdJobTest extends TestCase
     {
         $job = $this->getJob();
         $job->getPheanstalkJob()->shouldReceive('getData')->once()->andReturn(json_encode(['job' => 'foo', 'data' => ['data']]));
-        $job->getContainer()->shouldReceive('make')->once()->with('foo')->andReturn($handler = m::mock('StdClass'));
+        $job->getContainer()->shouldReceive('make')->once()->with('foo')->andReturn($handler = m::mock(\StdClass::class));
         $handler->shouldReceive('fire')->once()->with($job, ['data']);
 
         $job->fire();
@@ -26,7 +26,7 @@ class QueueBeanstalkdJobTest extends TestCase
     {
         $job = $this->getJob();
         $job->getPheanstalkJob()->shouldReceive('getData')->once()->andReturn(json_encode(['job' => 'foo', 'data' => ['data']]));
-        $job->getContainer()->shouldReceive('make')->once()->with('foo')->andReturn($handler = m::mock('Illuminate\Tests\Queue\BeanstalkdJobTestFailedTest'));
+        $job->getContainer()->shouldReceive('make')->once()->with('foo')->andReturn($handler = m::mock(\Illuminate\Tests\Queue\BeanstalkdJobTestFailedTest::class));
         $handler->shouldReceive('failed')->once()->with(['data'], m::type('Exception'));
 
         $job->failed(new \Exception);
@@ -59,7 +59,7 @@ class QueueBeanstalkdJobTest extends TestCase
     protected function getJob()
     {
         return new \Illuminate\Queue\Jobs\BeanstalkdJob(
-            m::mock('Illuminate\Container\Container'),
+            m::mock(\Illuminate\Container\Container::class),
             m::mock('Pheanstalk\Pheanstalk'),
             m::mock('Pheanstalk\Job'),
             'connection-name',

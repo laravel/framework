@@ -39,6 +39,6 @@ class ViewCompilerEngineTest extends TestCase
 
     protected function getEngine()
     {
-        return new CompilerEngine(m::mock('Illuminate\View\Compilers\CompilerInterface'));
+        return new CompilerEngine(m::mock(\Illuminate\View\Compilers\CompilerInterface::class));
     }
 }

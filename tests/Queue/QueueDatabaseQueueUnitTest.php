@@ -16,9 +16,9 @@ class QueueDatabaseQueueUnitTest extends TestCase
 
     public function testPushProperlyPushesJobOntoDatabase()
     {
-        $queue = $this->getMockBuilder('Illuminate\Queue\DatabaseQueue')->setMethods(['currentTime'])->setConstructorArgs([$database = m::mock('Illuminate\Database\Connection'), 'table', 'default'])->getMock();
+        $queue = $this->getMockBuilder(\Illuminate\Queue\DatabaseQueue::class)->setMethods(['currentTime'])->setConstructorArgs([$database = m::mock(\Illuminate\Database\Connection::class), 'table', 'default'])->getMock();
         $queue->expects($this->any())->method('currentTime')->will($this->returnValue('time'));
-        $database->shouldReceive('table')->with('table')->andReturn($query = m::mock('StdClass'));
+        $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(\StdClass::class));
         $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) {
             $this->assertEquals('default', $array['queue']);
             $this->assertEquals(json_encode(['job' => 'foo', 'data' => ['data']]), $array['payload']);
@@ -33,12 +33,12 @@ class QueueDatabaseQueueUnitTest extends TestCase
     public function testDelayedPushProperlyPushesJobOntoDatabase()
     {
         $queue = $this->getMockBuilder(
-            'Illuminate\Queue\DatabaseQueue')->setMethods(
+            \Illuminate\Queue\DatabaseQueue::class)->setMethods(
             ['currentTime'])->setConstructorArgs(
-            [$database = m::mock('Illuminate\Database\Connection'), 'table', 'default']
+            [$database = m::mock(\Illuminate\Database\Connection::class), 'table', 'default']
         )->getMock();
         $queue->expects($this->any())->method('currentTime')->will($this->returnValue('time'));
-        $database->shouldReceive('table')->with('table')->andReturn($query = m::mock('StdClass'));
+        $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(\StdClass::class));
         $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) {
             $this->assertEquals('default', $array['queue']);
             $this->assertEquals(json_encode(['job' => 'foo', 'data' => ['data']]), $array['payload']);
@@ -57,8 +57,8 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $job = new stdClass();
         $job->invalid = "\xc3\x28";
 
-        $queue = $this->getMockForAbstractClass('Illuminate\Queue\Queue');
-        $class = new ReflectionClass('Illuminate\Queue\Queue');
+        $queue = $this->getMockForAbstractClass(\Illuminate\Queue\Queue::class);
+        $class = new ReflectionClass(\Illuminate\Queue\Queue::class);
 
         $createPayload = $class->getMethod('createPayload');
         $createPayload->setAccessible(true);
@@ -71,8 +71,8 @@ class QueueDatabaseQueueUnitTest extends TestCase
     {
         $this->expectException('InvalidArgumentException');
 
-        $queue = $this->getMockForAbstractClass('Illuminate\Queue\Queue');
-        $class = new ReflectionClass('Illuminate\Queue\Queue');
+        $queue = $this->getMockForAbstractClass(\Illuminate\Queue\Queue::class);
+        $class = new ReflectionClass(\Illuminate\Queue\Queue::class);
 
         $createPayload = $class->getMethod('createPayload');
         $createPayload->setAccessible(true);
@@ -83,11 +83,11 @@ class QueueDatabaseQueueUnitTest extends TestCase
 
     public function testBulkBatchPushesOntoDatabase()
     {
-        $database = m::mock('Illuminate\Database\Connection');
-        $queue = $this->getMockBuilder('Illuminate\Queue\DatabaseQueue')->setMethods(['currentTime', 'availableAt'])->setConstructorArgs([$database, 'table', 'default'])->getMock();
+        $database = m::mock(\Illuminate\Database\Connection::class);
+        $queue = $this->getMockBuilder(\Illuminate\Queue\DatabaseQueue::class)->setMethods(['currentTime', 'availableAt'])->setConstructorArgs([$database, 'table', 'default'])->getMock();
         $queue->expects($this->any())->method('currentTime')->will($this->returnValue('created'));
         $queue->expects($this->any())->method('availableAt')->will($this->returnValue('available'));
-        $database->shouldReceive('table')->with('table')->andReturn($query = m::mock('StdClass'));
+        $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(\StdClass::class));
         $query->shouldReceive('insert')->once()->andReturnUsing(function ($records) {
             $this->assertEquals([[
                 'queue' => 'queue',

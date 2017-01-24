@@ -13,7 +13,7 @@ class HttpJsonResponseTest extends TestCase
     {
         $response = new \Illuminate\Http\JsonResponse(new JsonResponseTestJsonableObject);
         $data = $response->getData();
-        $this->assertInstanceOf('StdClass', $data);
+        $this->assertInstanceOf(\StdClass::class, $data);
         $this->assertEquals('bar', $data->foo);
     }
 
@@ -21,7 +21,7 @@ class HttpJsonResponseTest extends TestCase
     {
         $response = new \Illuminate\Http\JsonResponse(new JsonResponseTestJsonSerializeObject);
         $data = $response->getData();
-        $this->assertInstanceOf('StdClass', $data);
+        $this->assertInstanceOf(\StdClass::class, $data);
         $this->assertEquals('bar', $data->foo);
     }
 
@@ -29,7 +29,7 @@ class HttpJsonResponseTest extends TestCase
     {
         $response = new \Illuminate\Http\JsonResponse(new JsonResponseTestArrayableObject);
         $data = $response->getData();
-        $this->assertInstanceOf('StdClass', $data);
+        $this->assertInstanceOf(\StdClass::class, $data);
         $this->assertEquals('bar', $data->foo);
     }
 
@@ -37,7 +37,7 @@ class HttpJsonResponseTest extends TestCase
     {
         $response = new \Illuminate\Http\JsonResponse(['foo' => 'bar']);
         $data = $response->getData();
-        $this->assertInstanceOf('StdClass', $data);
+        $this->assertInstanceOf(\StdClass::class, $data);
         $this->assertEquals('bar', $data->foo);
     }
 

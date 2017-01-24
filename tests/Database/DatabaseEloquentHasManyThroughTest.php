@@ -19,11 +19,11 @@ class DatabaseEloquentHasManyThroughTest extends TestCase
     public function testRelationIsProperlyInitialized()
     {
         $relation = $this->getRelation();
-        $model = m::mock('Illuminate\Database\Eloquent\Model');
+        $model = m::mock(\Illuminate\Database\Eloquent\Model::class);
         $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function ($array = []) {
             return new Collection($array);
         });
-        $model->shouldReceive('setRelation')->once()->with('foo', m::type('Illuminate\Database\Eloquent\Collection'));
+        $model->shouldReceive('setRelation')->once()->with('foo', m::type(\Illuminate\Database\Eloquent\Collection::class));
         $models = $relation->initRelation([$model], 'foo');
 
         $this->assertEquals([$model], $models);
@@ -42,19 +42,19 @@ class DatabaseEloquentHasManyThroughTest extends TestCase
 
     public function testEagerConstraintsAreProperlyAddedWithCustomKey()
     {
-        $builder = m::mock('Illuminate\Database\Eloquent\Builder');
+        $builder = m::mock(\Illuminate\Database\Eloquent\Builder::class);
         $builder->shouldReceive('join')->once()->with('users', 'users.id', '=', 'posts.user_id');
         $builder->shouldReceive('where')->with('users.country_id', '=', 1);
 
-        $country = m::mock('Illuminate\Database\Eloquent\Model');
+        $country = m::mock(\Illuminate\Database\Eloquent\Model::class);
         $country->shouldReceive('getKeyName')->andReturn('id');
         $country->shouldReceive('offsetGet')->andReturn(1);
         $country->shouldReceive('getForeignKey')->andReturn('country_id');
 
-        $user = m::mock('Illuminate\Database\Eloquent\Model');
+        $user = m::mock(\Illuminate\Database\Eloquent\Model::class);
         $user->shouldReceive('getTable')->andReturn('users');
         $user->shouldReceive('getQualifiedKeyName')->andReturn('users.id');
-        $post = m::mock('Illuminate\Database\Eloquent\Model');
+        $post = m::mock(\Illuminate\Database\Eloquent\Model::class);
         $post->shouldReceive('getTable')->andReturn('posts');
 
         $builder->shouldReceive('getModel')->andReturn($post);
@@ -136,7 +136,7 @@ class DatabaseEloquentHasManyThroughTest extends TestCase
     {
         $select = ['posts.*', 'users.country_id'];
 
-        $baseBuilder = m::mock('Illuminate\Database\Query\Builder');
+        $baseBuilder = m::mock(\Illuminate\Database\Query\Builder::class);
 
         $relation = $this->getRelation();
         $relation->getRelated()->shouldReceive('newCollection')->once();
@@ -154,7 +154,7 @@ class DatabaseEloquentHasManyThroughTest extends TestCase
     {
         $select = ['users.country_id'];
 
-        $baseBuilder = m::mock('Illuminate\Database\Query\Builder');
+        $baseBuilder = m::mock(\Illuminate\Database\Query\Builder::class);
         $baseBuilder->columns = ['foo', 'bar'];
 
         $relation = $this->getRelation();
@@ -183,7 +183,7 @@ class DatabaseEloquentHasManyThroughTest extends TestCase
      */
     public function testFindOrFailThrowsException()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\HasManyThrough')->setMethods(['find'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(\Illuminate\Database\Eloquent\Relations\HasManyThrough::class)->setMethods(['find'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $relation->expects($this->once())->method('find')->with('foo')->will($this->returnValue(null));
 
         try {
@@ -200,7 +200,7 @@ class DatabaseEloquentHasManyThroughTest extends TestCase
      */
     public function testFirstOrFailThrowsException()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\HasManyThrough')->setMethods(['first'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(\Illuminate\Database\Eloquent\Relations\HasManyThrough::class)->setMethods(['first'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $relation->expects($this->once())->method('first')->with(['id' => 'foo'])->will($this->returnValue(null));
 
         try {
@@ -262,18 +262,18 @@ class DatabaseEloquentHasManyThroughTest extends TestCase
 
     protected function getRelationArguments()
     {
-        $builder = m::mock('Illuminate\Database\Eloquent\Builder');
+        $builder = m::mock(\Illuminate\Database\Eloquent\Builder::class);
         $builder->shouldReceive('join')->once()->with('users', 'users.id', '=', 'posts.user_id');
         $builder->shouldReceive('where')->with('users.country_id', '=', 1);
 
-        $country = m::mock('Illuminate\Database\Eloquent\Model');
+        $country = m::mock(\Illuminate\Database\Eloquent\Model::class);
         $country->shouldReceive('getKeyName')->andReturn('id');
         $country->shouldReceive('offsetGet')->andReturn(1);
         $country->shouldReceive('getForeignKey')->andReturn('country_id');
-        $user = m::mock('Illuminate\Database\Eloquent\Model');
+        $user = m::mock(\Illuminate\Database\Eloquent\Model::class);
         $user->shouldReceive('getTable')->andReturn('users');
         $user->shouldReceive('getQualifiedKeyName')->andReturn('users.id');
-        $post = m::mock('Illuminate\Database\Eloquent\Model');
+        $post = m::mock(\Illuminate\Database\Eloquent\Model::class);
         $post->shouldReceive('getTable')->andReturn('posts');
 
         $builder->shouldReceive('getModel')->andReturn($post);
@@ -287,17 +287,17 @@ class DatabaseEloquentHasManyThroughTest extends TestCase
 
     protected function getRelationArgumentsForNonPrimaryKey()
     {
-        $builder = m::mock('Illuminate\Database\Eloquent\Builder');
+        $builder = m::mock(\Illuminate\Database\Eloquent\Builder::class);
         $builder->shouldReceive('join')->once()->with('users', 'users.id', '=', 'posts.user_id');
         $builder->shouldReceive('where')->with('users.country_id', '=', 1);
 
-        $country = m::mock('Illuminate\Database\Eloquent\Model');
+        $country = m::mock(\Illuminate\Database\Eloquent\Model::class);
         $country->shouldReceive('offsetGet')->andReturn(1);
         $country->shouldReceive('getForeignKey')->andReturn('country_id');
-        $user = m::mock('Illuminate\Database\Eloquent\Model');
+        $user = m::mock(\Illuminate\Database\Eloquent\Model::class);
         $user->shouldReceive('getTable')->andReturn('users');
         $user->shouldReceive('getQualifiedKeyName')->andReturn('users.id');
-        $post = m::mock('Illuminate\Database\Eloquent\Model');
+        $post = m::mock(\Illuminate\Database\Eloquent\Model::class);
         $post->shouldReceive('getTable')->andReturn('posts');
 
         $builder->shouldReceive('getModel')->andReturn($post);

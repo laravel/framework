@@ -16,8 +16,8 @@ class DatabaseMigrationMakeCommandTest extends TestCase
     public function testBasicCreateDumpsAutoload()
     {
         $command = new MigrateMakeCommand(
-            $creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'),
-            $composer = m::mock('Illuminate\Support\Composer'),
+            $creator = m::mock(\Illuminate\Database\Migrations\MigrationCreator::class),
+            $composer = m::mock(\Illuminate\Support\Composer::class),
             __DIR__.'/vendor'
         );
         $app = new \Illuminate\Foundation\Application;
@@ -32,8 +32,8 @@ class DatabaseMigrationMakeCommandTest extends TestCase
     public function testBasicCreateGivesCreatorProperArguments()
     {
         $command = new MigrateMakeCommand(
-            $creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'),
-            m::mock('Illuminate\Support\Composer')->shouldIgnoreMissing(),
+            $creator = m::mock(\Illuminate\Database\Migrations\MigrationCreator::class),
+            m::mock(\Illuminate\Support\Composer::class)->shouldIgnoreMissing(),
             __DIR__.'/vendor'
         );
         $app = new \Illuminate\Foundation\Application;
@@ -47,8 +47,8 @@ class DatabaseMigrationMakeCommandTest extends TestCase
     public function testBasicCreateGivesCreatorProperArgumentsWhenTableIsSet()
     {
         $command = new MigrateMakeCommand(
-            $creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'),
-            m::mock('Illuminate\Support\Composer')->shouldIgnoreMissing(),
+            $creator = m::mock(\Illuminate\Database\Migrations\MigrationCreator::class),
+            m::mock(\Illuminate\Support\Composer::class)->shouldIgnoreMissing(),
             __DIR__.'/vendor'
         );
         $app = new \Illuminate\Foundation\Application;
@@ -62,8 +62,8 @@ class DatabaseMigrationMakeCommandTest extends TestCase
     public function testCanSpecifyPathToCreateMigrationsIn()
     {
         $command = new MigrateMakeCommand(
-            $creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'),
-            m::mock('Illuminate\Support\Composer')->shouldIgnoreMissing(),
+            $creator = m::mock(\Illuminate\Database\Migrations\MigrationCreator::class),
+            m::mock(\Illuminate\Support\Composer::class)->shouldIgnoreMissing(),
             __DIR__.'/vendor'
         );
         $app = new \Illuminate\Foundation\Application;

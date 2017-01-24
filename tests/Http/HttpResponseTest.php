@@ -33,7 +33,7 @@ class HttpResponseTest extends TestCase
 
     public function testRenderablesAreRendered()
     {
-        $mock = m::mock('Illuminate\Contracts\Support\Renderable');
+        $mock = m::mock(\Illuminate\Contracts\Support\Renderable::class);
         $mock->shouldReceive('render')->once()->andReturn('foo');
         $response = new \Illuminate\Http\Response($mock);
         $this->assertEquals('foo', $response->getContent());
@@ -81,7 +81,7 @@ class HttpResponseTest extends TestCase
     {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
-        $response->setSession($session = m::mock('Illuminate\Session\Store'));
+        $response->setSession($session = m::mock(\Illuminate\Session\Store::class));
         $session->shouldReceive('flashInput')->once()->with(['name' => 'Taylor']);
         $response->onlyInput('name');
     }
@@ -90,7 +90,7 @@ class HttpResponseTest extends TestCase
     {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
-        $response->setSession($session = m::mock('Illuminate\Session\Store'));
+        $response->setSession($session = m::mock(\Illuminate\Session\Store::class));
         $session->shouldReceive('flashInput')->once()->with(['name' => 'Taylor']);
         $response->exceptInput('age');
     }
@@ -99,10 +99,10 @@ class HttpResponseTest extends TestCase
     {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
-        $response->setSession($session = m::mock('Illuminate\Session\Store'));
-        $session->shouldReceive('get')->with('errors', m::type('Illuminate\Support\ViewErrorBag'))->andReturn(new \Illuminate\Support\ViewErrorBag);
-        $session->shouldReceive('flash')->once()->with('errors', m::type('Illuminate\Support\ViewErrorBag'));
-        $provider = m::mock('Illuminate\Contracts\Support\MessageProvider');
+        $response->setSession($session = m::mock(\Illuminate\Session\Store::class));
+        $session->shouldReceive('get')->with('errors', m::type(\Illuminate\Support\ViewErrorBag::class))->andReturn(new \Illuminate\Support\ViewErrorBag);
+        $session->shouldReceive('flash')->once()->with('errors', m::type(\Illuminate\Support\ViewErrorBag::class));
+        $provider = m::mock(\Illuminate\Contracts\Support\MessageProvider::class);
         $provider->shouldReceive('getMessageBag')->once()->andReturn(new \Illuminate\Support\MessageBag);
         $response->withErrors($provider);
     }
@@ -114,7 +114,7 @@ class HttpResponseTest extends TestCase
         $this->assertNull($response->getSession());
 
         $request = Request::create('/', 'GET');
-        $session = m::mock('Illuminate\Session\Store');
+        $session = m::mock(\Illuminate\Session\Store::class);
         $response->setRequest($request);
         $response->setSession($session);
         $this->assertSame($request, $response->getRequest());
@@ -125,9 +125,9 @@ class HttpResponseTest extends TestCase
     {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
-        $response->setSession($session = m::mock('Illuminate\Session\Store'));
-        $session->shouldReceive('get')->with('errors', m::type('Illuminate\Support\ViewErrorBag'))->andReturn(new \Illuminate\Support\ViewErrorBag);
-        $session->shouldReceive('flash')->once()->with('errors', m::type('Illuminate\Support\ViewErrorBag'));
+        $response->setSession($session = m::mock(\Illuminate\Session\Store::class));
+        $session->shouldReceive('get')->with('errors', m::type(\Illuminate\Support\ViewErrorBag::class))->andReturn(new \Illuminate\Support\ViewErrorBag);
+        $session->shouldReceive('flash')->once()->with('errors', m::type(\Illuminate\Support\ViewErrorBag::class));
         $provider = ['foo' => 'bar'];
         $response->withErrors($provider);
     }
@@ -136,7 +136,7 @@ class HttpResponseTest extends TestCase
     {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
-        $response->setSession($session = m::mock('Illuminate\Session\Store'));
+        $response->setSession($session = m::mock(\Illuminate\Session\Store::class));
         $session->shouldReceive('flash')->once()->with('foo', 'bar');
         $response->withFoo('bar');
     }

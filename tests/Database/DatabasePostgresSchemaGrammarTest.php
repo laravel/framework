@@ -548,7 +548,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
     protected function getConnection()
     {
-        return m::mock('Illuminate\Database\Connection');
+        return m::mock(\Illuminate\Database\Connection::class);
     }
 
     public function getGrammar()

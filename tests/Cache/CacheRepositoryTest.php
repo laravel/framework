@@ -147,8 +147,8 @@ class CacheRepositoryTest extends TestCase
 
     protected function getRepository()
     {
-        $dispatcher = new \Illuminate\Events\Dispatcher(m::mock('Illuminate\Container\Container'));
-        $repository = new \Illuminate\Cache\Repository(m::mock('Illuminate\Contracts\Cache\Store'));
+        $dispatcher = new \Illuminate\Events\Dispatcher(m::mock(\Illuminate\Container\Container::class));
+        $repository = new \Illuminate\Cache\Repository(m::mock(\Illuminate\Contracts\Cache\Store::class));
 
         $repository->setEventDispatcher($dispatcher);
 

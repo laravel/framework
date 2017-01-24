@@ -78,7 +78,7 @@ class DatabaseConnectionFactoryTest extends TestCase
      */
     public function testIfDriverIsntSetExceptionIsThrown()
     {
-        $factory = new ConnectionFactory($container = m::mock('Illuminate\Container\Container'));
+        $factory = new ConnectionFactory($container = m::mock(\Illuminate\Container\Container::class));
         $factory->createConnector(['foo']);
     }
 
@@ -87,14 +87,14 @@ class DatabaseConnectionFactoryTest extends TestCase
      */
     public function testExceptionIsThrownOnUnsupportedDriver()
     {
-        $factory = new ConnectionFactory($container = m::mock('Illuminate\Container\Container'));
+        $factory = new ConnectionFactory($container = m::mock(\Illuminate\Container\Container::class));
         $container->shouldReceive('bound')->once()->andReturn(false);
         $factory->createConnector(['driver' => 'foo']);
     }
 
     public function testCustomConnectorsCanBeResolvedViaContainer()
     {
-        $factory = new ConnectionFactory($container = m::mock('Illuminate\Container\Container'));
+        $factory = new ConnectionFactory($container = m::mock(\Illuminate\Container\Container::class));
         $container->shouldReceive('bound')->once()->with('db.connector.foo')->andReturn(true);
         $container->shouldReceive('make')->once()->with('db.connector.foo')->andReturn('connector');
 

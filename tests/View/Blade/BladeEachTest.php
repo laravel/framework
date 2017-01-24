@@ -22,6 +22,6 @@ class BladeEachTest extends TestCase
 
     protected function getFiles()
     {
-        return m::mock('Illuminate\Filesystem\Filesystem');
+        return m::mock(\Illuminate\Filesystem\Filesystem::class);
     }
 }

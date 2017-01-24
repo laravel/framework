@@ -15,7 +15,7 @@ class QueueRedisJobTest extends TestCase
     public function testFireProperlyCallsTheJobHandler()
     {
         $job = $this->getJob();
-        $job->getContainer()->shouldReceive('make')->once()->with('foo')->andReturn($handler = m::mock('StdClass'));
+        $job->getContainer()->shouldReceive('make')->once()->with('foo')->andReturn($handler = m::mock(\StdClass::class));
         $handler->shouldReceive('fire')->once()->with($job, ['data']);
 
         $job->fire();

@@ -21,8 +21,8 @@ class NotificationBroadcastChannelTest extends TestCase
         $notification->id = 1;
         $notifiable = Mockery::mock();
 
-        $events = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
-        $events->shouldReceive('dispatch')->once()->with(Mockery::type('Illuminate\Notifications\Events\BroadcastNotificationCreated'));
+        $events = Mockery::mock(\Illuminate\Contracts\Events\Dispatcher::class);
+        $events->shouldReceive('dispatch')->once()->with(Mockery::type(\Illuminate\Notifications\Events\BroadcastNotificationCreated::class));
         $channel = new BroadcastChannel($events);
         $channel->send($notifiable, $notification);
     }
@@ -48,7 +48,7 @@ class NotificationBroadcastChannelTest extends TestCase
         $notification->id = 1;
         $notifiable = Mockery::mock();
 
-        $events = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
+        $events = Mockery::mock(\Illuminate\Contracts\Events\Dispatcher::class);
         $events->shouldReceive('dispatch')->once()->with(Mockery::on(function ($event) {
             return $event->connection == 'sync';
         }));

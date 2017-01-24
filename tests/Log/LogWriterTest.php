@@ -77,7 +77,7 @@ class LogWriterTest extends TestCase
 
     public function testListenShortcut()
     {
-        $writer = new Writer($monolog = m::mock('Monolog\Logger'), $events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
+        $writer = new Writer($monolog = m::mock('Monolog\Logger'), $events = m::mock(\Illuminate\Contracts\Events\Dispatcher::class));
 
         $callback = function () {
             return 'success';

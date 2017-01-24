@@ -48,7 +48,7 @@ class DatabaseEloquentRelationTest extends TestCase
         Relation::morphMap([EloquentRelationResetModelStub::class]);
 
         $this->assertEquals([
-            'reset' => 'Illuminate\Tests\Database\EloquentRelationResetModelStub',
+            'reset' => \Illuminate\Tests\Database\EloquentRelationResetModelStub::class,
         ], Relation::morphMap());
 
         Relation::morphMap([], false);

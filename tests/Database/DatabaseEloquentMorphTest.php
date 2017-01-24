@@ -62,7 +62,7 @@ class DatabaseEloquentMorphTest extends TestCase
     {
         // Doesn't matter which relation type we use since they share the code...
         $relation = $this->getOneRelation();
-        $created = m::mock('Illuminate\Database\Eloquent\Model');
+        $created = m::mock(\Illuminate\Database\Eloquent\Model::class);
         $created->shouldReceive('setAttribute')->once()->with('morph_id', 1);
         $created->shouldReceive('setAttribute')->once()->with('morph_type', get_class($relation->getParent()));
         $relation->getRelated()->shouldReceive('newInstance')->once()->with(['name' => 'taylor'])->andReturn($created);
@@ -74,7 +74,7 @@ class DatabaseEloquentMorphTest extends TestCase
     public function testFindOrNewMethodFindsModel()
     {
         $relation = $this->getOneRelation();
-        $relation->getQuery()->shouldReceive('find')->once()->with('foo', ['*'])->andReturn($model = m::mock('Illuminate\Database\Eloquent\Model'));
+        $relation->getQuery()->shouldReceive('find')->once()->with('foo', ['*'])->andReturn($model = m::mock(\Illuminate\Database\Eloquent\Model::class));
         $relation->getRelated()->shouldReceive('newInstance')->never();
         $model->shouldReceive('setAttribute')->never();
         $model->shouldReceive('save')->never();
@@ -86,7 +86,7 @@ class DatabaseEloquentMorphTest extends TestCase
     {
         $relation = $this->getOneRelation();
         $relation->getQuery()->shouldReceive('find')->once()->with('foo', ['*'])->andReturn(null);
-        $relation->getRelated()->shouldReceive('newInstance')->once()->with()->andReturn($model = m::mock('Illuminate\Database\Eloquent\Model'));
+        $relation->getRelated()->shouldReceive('newInstance')->once()->with()->andReturn($model = m::mock(\Illuminate\Database\Eloquent\Model::class));
         $model->shouldReceive('setAttribute')->once()->with('morph_id', 1);
         $model->shouldReceive('setAttribute')->once()->with('morph_type', get_class($relation->getParent()));
         $model->shouldReceive('save')->never();
@@ -98,7 +98,7 @@ class DatabaseEloquentMorphTest extends TestCase
     {
         $relation = $this->getOneRelation();
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo'])->andReturn($relation->getQuery());
-        $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn($model = m::mock('Illuminate\Database\Eloquent\Model'));
+        $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn($model = m::mock(\Illuminate\Database\Eloquent\Model::class));
         $relation->getRelated()->shouldReceive('newInstance')->never();
         $model->shouldReceive('setAttribute')->never();
         $model->shouldReceive('save')->never();
@@ -111,7 +111,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $relation = $this->getOneRelation();
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo'])->andReturn($relation->getQuery());
         $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn(null);
-        $relation->getRelated()->shouldReceive('newInstance')->once()->with(['foo'])->andReturn($model = m::mock('Illuminate\Database\Eloquent\Model'));
+        $relation->getRelated()->shouldReceive('newInstance')->once()->with(['foo'])->andReturn($model = m::mock(\Illuminate\Database\Eloquent\Model::class));
         $model->shouldReceive('setAttribute')->once()->with('morph_id', 1);
         $model->shouldReceive('setAttribute')->once()->with('morph_type', get_class($relation->getParent()));
         $model->shouldReceive('save')->never();
@@ -123,7 +123,7 @@ class DatabaseEloquentMorphTest extends TestCase
     {
         $relation = $this->getOneRelation();
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo'])->andReturn($relation->getQuery());
-        $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn($model = m::mock('Illuminate\Database\Eloquent\Model'));
+        $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn($model = m::mock(\Illuminate\Database\Eloquent\Model::class));
         $relation->getRelated()->shouldReceive('newInstance')->never();
         $model->shouldReceive('setAttribute')->never();
         $model->shouldReceive('save')->never();
@@ -136,7 +136,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $relation = $this->getOneRelation();
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo'])->andReturn($relation->getQuery());
         $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn(null);
-        $relation->getRelated()->shouldReceive('newInstance')->once()->with(['foo'])->andReturn($model = m::mock('Illuminate\Database\Eloquent\Model'));
+        $relation->getRelated()->shouldReceive('newInstance')->once()->with(['foo'])->andReturn($model = m::mock(\Illuminate\Database\Eloquent\Model::class));
         $model->shouldReceive('setAttribute')->once()->with('morph_id', 1);
         $model->shouldReceive('setAttribute')->once()->with('morph_type', get_class($relation->getParent()));
         $model->shouldReceive('save')->once()->andReturn(true);
@@ -148,7 +148,7 @@ class DatabaseEloquentMorphTest extends TestCase
     {
         $relation = $this->getOneRelation();
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo'])->andReturn($relation->getQuery());
-        $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn($model = m::mock('Illuminate\Database\Eloquent\Model'));
+        $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn($model = m::mock(\Illuminate\Database\Eloquent\Model::class));
         $relation->getRelated()->shouldReceive('newInstance')->never();
         $model->shouldReceive('setAttribute')->never();
         $model->shouldReceive('fill')->once()->with(['bar']);
@@ -162,7 +162,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $relation = $this->getOneRelation();
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo'])->andReturn($relation->getQuery());
         $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn(null);
-        $relation->getRelated()->shouldReceive('newInstance')->once()->with(['foo'])->andReturn($model = m::mock('Illuminate\Database\Eloquent\Model'));
+        $relation->getRelated()->shouldReceive('newInstance')->once()->with(['foo'])->andReturn($model = m::mock(\Illuminate\Database\Eloquent\Model::class));
         $model->shouldReceive('setAttribute')->once()->with('morph_id', 1);
         $model->shouldReceive('setAttribute')->once()->with('morph_type', get_class($relation->getParent()));
         $model->shouldReceive('save')->once()->andReturn(true);
@@ -174,7 +174,7 @@ class DatabaseEloquentMorphTest extends TestCase
     public function testCreateFunctionOnNamespacedMorph()
     {
         $relation = $this->getNamespacedRelation('namespace');
-        $created = m::mock('Illuminate\Database\Eloquent\Model');
+        $created = m::mock(\Illuminate\Database\Eloquent\Model::class);
         $created->shouldReceive('setAttribute')->once()->with('morph_id', 1);
         $created->shouldReceive('setAttribute')->once()->with('morph_type', 'namespace');
         $relation->getRelated()->shouldReceive('newInstance')->once()->with(['name' => 'taylor'])->andReturn($created);
@@ -185,12 +185,12 @@ class DatabaseEloquentMorphTest extends TestCase
 
     protected function getOneRelation()
     {
-        $builder = m::mock('Illuminate\Database\Eloquent\Builder');
+        $builder = m::mock(\Illuminate\Database\Eloquent\Builder::class);
         $builder->shouldReceive('whereNotNull')->once()->with('table.morph_id');
         $builder->shouldReceive('where')->once()->with('table.morph_id', '=', 1);
-        $related = m::mock('Illuminate\Database\Eloquent\Model');
+        $related = m::mock(\Illuminate\Database\Eloquent\Model::class);
         $builder->shouldReceive('getModel')->andReturn($related);
-        $parent = m::mock('Illuminate\Database\Eloquent\Model');
+        $parent = m::mock(\Illuminate\Database\Eloquent\Model::class);
         $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
         $parent->shouldReceive('getMorphClass')->andReturn(get_class($parent));
         $builder->shouldReceive('where')->once()->with('table.morph_type', get_class($parent));
@@ -200,12 +200,12 @@ class DatabaseEloquentMorphTest extends TestCase
 
     protected function getManyRelation()
     {
-        $builder = m::mock('Illuminate\Database\Eloquent\Builder');
+        $builder = m::mock(\Illuminate\Database\Eloquent\Builder::class);
         $builder->shouldReceive('whereNotNull')->once()->with('table.morph_id');
         $builder->shouldReceive('where')->once()->with('table.morph_id', '=', 1);
-        $related = m::mock('Illuminate\Database\Eloquent\Model');
+        $related = m::mock(\Illuminate\Database\Eloquent\Model::class);
         $builder->shouldReceive('getModel')->andReturn($related);
-        $parent = m::mock('Illuminate\Database\Eloquent\Model');
+        $parent = m::mock(\Illuminate\Database\Eloquent\Model::class);
         $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
         $parent->shouldReceive('getMorphClass')->andReturn(get_class($parent));
         $builder->shouldReceive('where')->once()->with('table.morph_type', get_class($parent));
@@ -221,10 +221,10 @@ class DatabaseEloquentMorphTest extends TestCase
             $alias => 'Foo\Bar\EloquentModelNamespacedStub',
         ]);
 
-        $builder = m::mock('Illuminate\Database\Eloquent\Builder');
+        $builder = m::mock(\Illuminate\Database\Eloquent\Builder::class);
         $builder->shouldReceive('whereNotNull')->once()->with('table.morph_id');
         $builder->shouldReceive('where')->once()->with('table.morph_id', '=', 1);
-        $related = m::mock('Illuminate\Database\Eloquent\Model');
+        $related = m::mock(\Illuminate\Database\Eloquent\Model::class);
         $builder->shouldReceive('getModel')->andReturn($related);
         $parent = m::mock('Foo\Bar\EloquentModelNamespacedStub');
         $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);

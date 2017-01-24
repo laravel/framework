@@ -23,7 +23,7 @@ class SupportFacadeTest extends TestCase
     public function testFacadeCallsUnderlyingApplication()
     {
         $app = new ApplicationStub;
-        $app->setAttributes(['foo' => $mock = m::mock('StdClass')]);
+        $app->setAttributes(['foo' => $mock = m::mock(\StdClass::class)]);
         $mock->shouldReceive('bar')->once()->andReturn('baz');
         FacadeStub::setFacadeApplication($app);
         $this->assertEquals('baz', FacadeStub::bar());

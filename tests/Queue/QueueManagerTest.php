@@ -20,12 +20,12 @@ class QueueManagerTest extends TestCase
                 'queue.default' => 'sync',
                 'queue.connections.sync' => ['driver' => 'sync'],
             ],
-            'encrypter' => $encrypter = m::mock('Illuminate\Contracts\Encryption\Encrypter'),
+            'encrypter' => $encrypter = m::mock(\Illuminate\Contracts\Encryption\Encrypter::class),
         ];
 
         $manager = new QueueManager($app);
-        $connector = m::mock('StdClass');
-        $queue = m::mock('StdClass');
+        $connector = m::mock(\StdClass::class);
+        $queue = m::mock(\StdClass::class);
         $queue->shouldReceive('setConnectionName')->once()->with('sync')->andReturnSelf();
         $connector->shouldReceive('connect')->once()->with(['driver' => 'sync'])->andReturn($queue);
         $manager->addConnector('sync', function () use ($connector) {
@@ -43,12 +43,12 @@ class QueueManagerTest extends TestCase
                 'queue.default' => 'sync',
                 'queue.connections.foo' => ['driver' => 'bar'],
             ],
-            'encrypter' => $encrypter = m::mock('Illuminate\Contracts\Encryption\Encrypter'),
+            'encrypter' => $encrypter = m::mock(\Illuminate\Contracts\Encryption\Encrypter::class),
         ];
 
         $manager = new QueueManager($app);
-        $connector = m::mock('StdClass');
-        $queue = m::mock('StdClass');
+        $connector = m::mock(\StdClass::class);
+        $queue = m::mock(\StdClass::class);
         $queue->shouldReceive('setConnectionName')->once()->with('foo')->andReturnSelf();
         $connector->shouldReceive('connect')->once()->with(['driver' => 'bar'])->andReturn($queue);
         $manager->addConnector('bar', function () use ($connector) {
@@ -65,12 +65,12 @@ class QueueManagerTest extends TestCase
             'config' => [
                 'queue.default' => 'null',
             ],
-            'encrypter' => $encrypter = m::mock('Illuminate\Contracts\Encryption\Encrypter'),
+            'encrypter' => $encrypter = m::mock(\Illuminate\Contracts\Encryption\Encrypter::class),
         ];
 
         $manager = new QueueManager($app);
-        $connector = m::mock('StdClass');
-        $queue = m::mock('StdClass');
+        $connector = m::mock(\StdClass::class);
+        $queue = m::mock(\StdClass::class);
         $queue->shouldReceive('setConnectionName')->once()->with('null')->andReturnSelf();
         $connector->shouldReceive('connect')->once()->with(['driver' => 'null'])->andReturn($queue);
         $manager->addConnector('null', function () use ($connector) {
