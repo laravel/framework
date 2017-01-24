@@ -21,7 +21,7 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
         $query->shouldReceive('where')->with('email', 'email')->andReturn($query);
         $query->shouldReceive('delete')->once();
         $query->shouldReceive('insert')->once();
-        $user = m::mock('Illuminate\Contracts\Auth\CanResetPassword');
+        $user = m::mock(\Illuminate\Contracts\Auth\CanResetPassword::class);
         $user->shouldReceive('getEmailForPasswordReset')->andReturn('email');
 
         $results = $repo->create($user);
@@ -36,7 +36,7 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
         $repo->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($query = m::mock('StdClass'));
         $query->shouldReceive('where')->once()->with('email', 'email')->andReturn($query);
         $query->shouldReceive('first')->andReturn(null);
-        $user = m::mock('Illuminate\Contracts\Auth\CanResetPassword');
+        $user = m::mock(\Illuminate\Contracts\Auth\CanResetPassword::class);
         $user->shouldReceive('getEmailForPasswordReset')->andReturn('email');
 
         $this->assertFalse($repo->exists($user, 'token'));
@@ -50,7 +50,7 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
         $query->shouldReceive('where')->once()->with('email', 'email')->andReturn($query);
         $date = date('Y-m-d H:i:s', time() - 300000);
         $query->shouldReceive('first')->andReturn((object) ['created_at' => $date, 'token' => 'hashed-token']);
-        $user = m::mock('Illuminate\Contracts\Auth\CanResetPassword');
+        $user = m::mock(\Illuminate\Contracts\Auth\CanResetPassword::class);
         $user->shouldReceive('getEmailForPasswordReset')->andReturn('email');
 
         $this->assertFalse($repo->exists($user, 'token'));
@@ -64,7 +64,7 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
         $query->shouldReceive('where')->once()->with('email', 'email')->andReturn($query);
         $date = date('Y-m-d H:i:s', time() - 600);
         $query->shouldReceive('first')->andReturn((object) ['created_at' => $date, 'token' => 'hashed-token']);
-        $user = m::mock('Illuminate\Contracts\Auth\CanResetPassword');
+        $user = m::mock(\Illuminate\Contracts\Auth\CanResetPassword::class);
         $user->shouldReceive('getEmailForPasswordReset')->andReturn('email');
 
         $this->assertTrue($repo->exists($user, 'token'));
@@ -78,7 +78,7 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
         $query->shouldReceive('where')->once()->with('email', 'email')->andReturn($query);
         $date = date('Y-m-d H:i:s', time() - 600);
         $query->shouldReceive('first')->andReturn((object) ['created_at' => $date, 'token' => 'hashed-token']);
-        $user = m::mock('Illuminate\Contracts\Auth\CanResetPassword');
+        $user = m::mock(\Illuminate\Contracts\Auth\CanResetPassword::class);
         $user->shouldReceive('getEmailForPasswordReset')->andReturn('email');
 
         $this->assertFalse($repo->exists($user, 'wrong-token'));
@@ -107,8 +107,8 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
     protected function getRepo()
     {
         return new DatabaseTokenRepository(
-            m::mock('Illuminate\Database\Connection'),
-            m::mock('Illuminate\Contracts\Hashing\Hasher'),
+            m::mock(\Illuminate\Database\Connection::class),
+            m::mock(\Illuminate\Contracts\Hashing\Hasher::class),
             'table', 'key');
     }
 }
