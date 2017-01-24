@@ -15,7 +15,7 @@ class DatabaseSchemaBuilderTest extends TestCase
 
     public function testHasTableCorrectlyCallsGrammar()
     {
-        $connection = m::mock('Illuminate\Database\Connection');
+        $connection = m::mock(\Illuminate\Database\Connection::class);
         $grammar = m::mock('StdClass');
         $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
         $builder = new Builder($connection);
@@ -28,7 +28,7 @@ class DatabaseSchemaBuilderTest extends TestCase
 
     public function testTableHasColumns()
     {
-        $connection = m::mock('Illuminate\Database\Connection');
+        $connection = m::mock(\Illuminate\Database\Connection::class);
         $grammar = m::mock('StdClass');
         $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
         $builder = m::mock('Illuminate\Database\Schema\Builder[getColumnListing]', [$connection]);
@@ -40,7 +40,7 @@ class DatabaseSchemaBuilderTest extends TestCase
 
     public function testGetColumnTypeAddsPrefix()
     {
-        $connection = m::mock('Illuminate\Database\Connection');
+        $connection = m::mock(\Illuminate\Database\Connection::class);
         $column = m::mock('StdClass');
         $type = m::mock('StdClass');
         $grammar = m::mock('StdClass');

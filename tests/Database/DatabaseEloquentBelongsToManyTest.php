@@ -27,7 +27,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
         $model2->fill(['name' => 'dayle', 'pivot_user_id' => 3, 'pivot_role_id' => 4]);
         $models = [$model1, $model2];
 
-        $baseBuilder = m::mock('Illuminate\Database\Query\Builder');
+        $baseBuilder = m::mock(\Illuminate\Database\Query\Builder::class);
 
         $relation = $this->getRelation();
         $relation->getParent()->shouldReceive('getConnectionName')->andReturn('foo.connection');
@@ -41,7 +41,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
         $relation->getQuery()->shouldReceive('getQuery')->once()->andReturn($baseBuilder);
         $results = $relation->get();
 
-        $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $results);
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $results);
 
         // Make sure the foreign keys were set on the pivot models...
         $this->assertEquals('user_id', $results[0]->pivot->getForeignKey());
@@ -67,7 +67,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
         $model2->fill(['name' => 'dayle', 'pivot_user_id' => 3, 'pivot_role_id' => 4]);
         $models = [$model1, $model2];
 
-        $baseBuilder = m::mock('Illuminate\Database\Query\Builder');
+        $baseBuilder = m::mock(\Illuminate\Database\Query\Builder::class);
 
         $relation = $this->getRelation()->withTimestamps();
         $relation->getParent()->shouldReceive('getConnectionName')->andReturn('foo.connection');
@@ -125,8 +125,8 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
         $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function ($array = []) {
             return new Collection($array);
         });
-        $model = m::mock('Illuminate\Database\Eloquent\Model');
-        $model->shouldReceive('setRelation')->once()->with('foo', m::type('Illuminate\Database\Eloquent\Collection'));
+        $model = m::mock(\Illuminate\Database\Eloquent\Model::class);
+        $model->shouldReceive('setRelation')->once()->with('foo', m::type(\Illuminate\Database\Eloquent\Collection::class));
         $models = $relation->initRelation([$model], 'foo');
 
         $this->assertEquals([$model], $models);
@@ -145,7 +145,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
 
     public function testAttachInsertsPivotTableRecord()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class)->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
         $query->shouldReceive('insert')->once()->with([['user_id' => 1, 'role_id' => 2, 'foo' => 'bar']])->andReturn(true);
@@ -158,7 +158,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
 
     public function testAttachMultipleInsertsPivotTableRecord()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class)->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
         $query->shouldReceive('insert')->once()->with(
@@ -176,7 +176,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
 
     public function testAttachMethodConvertsCollectionToArrayOfKeys()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class)->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
         $query->shouldReceive('insert')->once()->with(
@@ -201,7 +201,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
 
     public function testAttachInsertsPivotTableRecordWithTimestampsWhenNecessary()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class)->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $relation->withTimestamps();
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
@@ -216,7 +216,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
 
     public function testAttachInsertsPivotTableRecordWithCustomTimestampColumns()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class)->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $relation->withTimestamps('custom_created_at', 'custom_updated_at');
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
@@ -231,7 +231,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
 
     public function testAttachInsertsPivotTableRecordWithACreatedAtTimestamp()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class)->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $relation->withPivot('created_at');
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
@@ -246,7 +246,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
 
     public function testAttachInsertsPivotTableRecordWithAnUpdatedAtTimestamp()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class)->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $relation->withPivot('updated_at');
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
@@ -261,7 +261,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
 
     public function testDetachRemovesPivotTableRecord()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class)->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
         $query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
@@ -276,7 +276,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
 
     public function testDetachWithSingleIDRemovesPivotTableRecord()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class)->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
         $query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
@@ -291,7 +291,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
 
     public function testDetachMethodConvertsCollectionToArrayOfKeys()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class)->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
         $query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
@@ -312,7 +312,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
 
     public function testDetachMethodClearsAllPivotRecordsWhenNoIDsAreGiven()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class)->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
         $query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
@@ -363,7 +363,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
 
     public function testCreateMethodCreatesNewModelAndInsertsAttachmentRecord()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['attach'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class)->setMethods(['attach'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $relation->getRelated()->shouldReceive('newInstance')->once()->andReturn($model = m::mock('StdClass'))->with(['attributes']);
         $model->shouldReceive('save')->once();
         $model->shouldReceive('getKey')->andReturn('foo');
@@ -377,7 +377,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
      */
     public function testFindOrFailThrowsException()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['find'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class)->setMethods(['find'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $relation->expects($this->once())->method('find')->with('foo')->will($this->returnValue(null));
 
         try {
@@ -394,7 +394,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
      */
     public function testFirstOrFailThrowsException()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['first'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class)->setMethods(['first'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $relation->expects($this->once())->method('first')->with(['id' => 'foo'])->will($this->returnValue(null));
 
         try {
@@ -408,7 +408,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
 
     public function testFindOrNewMethodFindsModel()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['find'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class)->setMethods(['find'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $relation->expects($this->once())->method('find')->with('foo')->will($this->returnValue($model = m::mock('StdClass')));
         $relation->getRelated()->shouldReceive('newInstance')->never();
 
@@ -417,7 +417,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
 
     public function testFindOrNewMethodReturnsNewModel()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['find'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class)->setMethods(['find'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $relation->expects($this->once())->method('find')->with('foo')->will($this->returnValue(null));
         $relation->getRelated()->shouldReceive('newInstance')->once()->andReturn($model = m::mock('StdClass'));
 
@@ -426,7 +426,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
 
     public function testFirstOrNewMethodFindsFirstModel()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['where'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class)->setMethods(['where'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $relation->expects($this->once())->method('where')->with(['foo'])->will($this->returnValue($relation->getQuery()));
         $relation->getQuery()->shouldReceive('first')->once()->andReturn($model = m::mock('StdClass'));
         $relation->getRelated()->shouldReceive('newInstance')->never();
@@ -436,7 +436,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
 
     public function testFirstOrNewMethodReturnsNewModel()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['where'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class)->setMethods(['where'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $relation->expects($this->once())->method('where')->with(['foo'])->will($this->returnValue($relation->getQuery()));
         $relation->getQuery()->shouldReceive('first')->once()->andReturn(null);
         $relation->getRelated()->shouldReceive('newInstance')->once()->andReturn($model = m::mock('StdClass'));
@@ -446,7 +446,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
 
     public function testFirstOrCreateMethodFindsFirstModel()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['where', 'create'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class)->setMethods(['where', 'create'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $relation->expects($this->once())->method('where')->with(['foo'])->will($this->returnValue($relation->getQuery()));
         $relation->getQuery()->shouldReceive('first')->once()->andReturn($model = m::mock('StdClass'));
         $relation->expects($this->never())->method('create')->with(['foo'])->will($this->returnValue(null));
@@ -456,7 +456,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
 
     public function testFirstOrCreateMethodReturnsNewModel()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['where', 'create'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class)->setMethods(['where', 'create'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $relation->expects($this->once())->method('where')->with(['foo'])->will($this->returnValue($relation->getQuery()));
         $relation->getQuery()->shouldReceive('first')->once()->andReturn(null);
         $relation->expects($this->once())->method('create')->with(['foo'])->will($this->returnValue($model = m::mock('StdClass')));
@@ -466,7 +466,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
 
     public function testUpdateOrCreateMethodFindsFirstModelAndUpdates()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['where', 'create'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class)->setMethods(['where', 'create'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $relation->expects($this->once())->method('where')->with(['foo'])->will($this->returnValue($relation->getQuery()));
         $relation->getQuery()->shouldReceive('first')->once()->andReturn($model = m::mock('StdClass'));
         $model->shouldReceive('fill')->once();
@@ -478,7 +478,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
 
     public function testUpdateOrCreateMethodReturnsNewModel()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['where', 'create'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class)->setMethods(['where', 'create'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $relation->expects($this->once())->method('where')->with(['bar'])->will($this->returnValue($relation->getQuery()));
         $relation->getQuery()->shouldReceive('first')->once()->andReturn(null);
         $relation->expects($this->once())->method('create')->with(['foo'])->will($this->returnValue($model = m::mock('StdClass')));
@@ -491,7 +491,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
      */
     public function testSyncMethodSyncsIntermediateTableWithGivenArray($list)
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['attach', 'detach'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class)->setMethods(['attach', 'detach'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
         $query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
@@ -516,7 +516,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
 
     public function testSyncMethodSyncsIntermediateTableWithGivenArrayAndAttributes()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['attach', 'detach', 'touchIfTouching', 'updateExistingPivot'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class)->setMethods(['attach', 'detach', 'touchIfTouching', 'updateExistingPivot'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
         $query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
@@ -533,7 +533,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
 
     public function testSyncMethodDoesntReturnValuesThatWereNotUpdated()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['attach', 'detach', 'touchIfTouching', 'updateExistingPivot'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class)->setMethods(['attach', 'detach', 'touchIfTouching', 'updateExistingPivot'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
         $query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
@@ -568,7 +568,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
      */
     public function testToggleMethodTogglesIntermediateTableWithGivenArray($list)
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['attach', 'detach'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class)->setMethods(['attach', 'detach'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
         $query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
@@ -593,7 +593,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
 
     public function testToggleMethodCanLeaveRelatedTimestampsIntact()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['attach', 'detach'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class)->setMethods(['attach', 'detach'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
         $query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
@@ -610,7 +610,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
 
     public function testToggleMethodTogglesIntermediateTableWithGivenArrayAndAttributes()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['attach', 'detach', 'touchIfTouching', 'updateExistingPivot'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class)->setMethods(['attach', 'detach', 'touchIfTouching', 'updateExistingPivot'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
         $query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
@@ -626,7 +626,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
 
     public function testTouchIfTouching()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['touch', 'touchingParent'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class)->setMethods(['touch', 'touchingParent'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $relation->expects($this->once())->method('touchingParent')->will($this->returnValue(true));
         $relation->getParent()->shouldReceive('touch')->once();
         $relation->getParent()->shouldReceive('touches')->once()->with('relation_name')->andReturn(true);
@@ -637,7 +637,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
 
     public function testSyncMethodConvertsEloquentCollectionToArrayOfKeys()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['attach', 'detach', 'touchIfTouching', 'formatRecordsList'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class)->setMethods(['attach', 'detach', 'touchIfTouching', 'formatRecordsList'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
         $query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
@@ -656,7 +656,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
 
     public function testSyncMethodConvertsBaseCollectionToArrayOfKeys()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['attach', 'detach', 'touchIfTouching', 'formatRecordsList'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class)->setMethods(['attach', 'detach', 'touchIfTouching', 'formatRecordsList'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
         $query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
@@ -671,7 +671,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
 
     public function testWherePivotParamsUsedForNewQueries()
     {
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['attach', 'detach', 'touchIfTouching', 'formatRecordsList'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation = $this->getMockBuilder(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class)->setMethods(['attach', 'detach', 'touchIfTouching', 'formatRecordsList'])->setConstructorArgs($this->getRelationArguments())->getMock();
 
         // we expect to call $relation->wherePivot()
         $relation->getQuery()->shouldReceive('where')->once()->andReturn($relation);
@@ -708,19 +708,19 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
 
     public function getRelationArguments()
     {
-        $parent = m::mock('Illuminate\Database\Eloquent\Model');
+        $parent = m::mock(\Illuminate\Database\Eloquent\Model::class);
         $parent->shouldReceive('getKey')->andReturn(1);
         $parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
         $parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
 
-        $builder = m::mock('Illuminate\Database\Eloquent\Builder');
-        $related = m::mock('Illuminate\Database\Eloquent\Model');
+        $builder = m::mock(\Illuminate\Database\Eloquent\Builder::class);
+        $related = m::mock(\Illuminate\Database\Eloquent\Model::class);
         $builder->shouldReceive('getModel')->andReturn($related);
 
         $related->shouldReceive('getTable')->andReturn('roles');
         $related->shouldReceive('getKeyName')->andReturn('id');
         $related->shouldReceive('newPivot')->andReturnUsing(function () {
-            $reflector = new ReflectionClass('Illuminate\Database\Eloquent\Relations\Pivot');
+            $reflector = new ReflectionClass(\Illuminate\Database\Eloquent\Relations\Pivot::class);
 
             return $reflector->newInstanceArgs(func_get_args());
         });

@@ -19,11 +19,11 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
     public function testToSqlRunsCommandsFromBlueprint()
     {
-        $conn = m::mock('Illuminate\Database\Connection');
+        $conn = m::mock(\Illuminate\Database\Connection::class);
         $conn->shouldReceive('statement')->once()->with('foo');
         $conn->shouldReceive('statement')->once()->with('bar');
-        $grammar = m::mock('Illuminate\Database\Schema\Grammars\MySqlGrammar');
-        $blueprint = $this->getMockBuilder('Illuminate\Database\Schema\Blueprint')->setMethods(['toSql'])->setConstructorArgs(['users'])->getMock();
+        $grammar = m::mock(\Illuminate\Database\Schema\Grammars\MySqlGrammar::class);
+        $blueprint = $this->getMockBuilder(\Illuminate\Database\Schema\Blueprint::class)->setMethods(['toSql'])->setConstructorArgs(['users'])->getMock();
         $blueprint->expects($this->once())->method('toSql')->with($this->equalTo($conn), $this->equalTo($grammar))->will($this->returnValue(['foo', 'bar']));
 
         $blueprint->build($conn, $grammar);
@@ -61,7 +61,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             $table->timestamp('created')->useCurrent();
         });
 
-        $connection = m::mock('Illuminate\Database\Connection');
+        $connection = m::mock(\Illuminate\Database\Connection::class);
 
         $blueprint = clone $base;
         $this->assertEquals(['alter table `users` add `created` timestamp default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new MySqlGrammar));

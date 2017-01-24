@@ -14,12 +14,12 @@ class DatabaseProcessorTest extends TestCase
 
     public function testInsertGetIdProcessing()
     {
-        $pdo = $this->createMock('Illuminate\Tests\Database\ProcessorTestPDOStub');
+        $pdo = $this->createMock(\Illuminate\Tests\Database\ProcessorTestPDOStub::class);
         $pdo->expects($this->once())->method('lastInsertId')->with($this->equalTo('id'))->will($this->returnValue('1'));
-        $connection = m::mock('Illuminate\Database\Connection');
+        $connection = m::mock(\Illuminate\Database\Connection::class);
         $connection->shouldReceive('insert')->once()->with('sql', ['foo']);
         $connection->shouldReceive('getPdo')->once()->andReturn($pdo);
-        $builder = m::mock('Illuminate\Database\Query\Builder');
+        $builder = m::mock(\Illuminate\Database\Query\Builder::class);
         $builder->shouldReceive('getConnection')->andReturn($connection);
         $processor = new \Illuminate\Database\Query\Processors\Processor;
         $result = $processor->processInsertGetId($builder, 'sql', ['foo'], 'id');
