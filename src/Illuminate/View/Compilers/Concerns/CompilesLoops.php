@@ -5,6 +5,13 @@ namespace Illuminate\View\Compilers\Concerns;
 trait CompilesLoops
 {
     /**
+     * Counter to keep track of nested forelse statements.
+     *
+     * @var int
+     */
+    protected $forElseCounter = 0;
+
+    /**
      * Compile the forelse statements into valid PHP.
      *
      * @param  string  $expression
