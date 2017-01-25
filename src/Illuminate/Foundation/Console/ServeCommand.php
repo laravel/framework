@@ -28,17 +28,17 @@ class ServeCommand extends Command {
 	{
 		$this->checkPhpVersion();
 
-		chdir($this->laravel['path.base']);
+		chdir($this->laravel['path.public']);
 
 		$host = $this->input->getOption('host');
 
 		$port = $this->input->getOption('port');
 
-		$public = $this->laravel['path.public'];
+		$base = $this->laravel['path.base'];
 
 		$this->info("Laravel development server started on http://{$host}:{$port}");
 
-		passthru('"'.PHP_BINARY.'"'." -S {$host}:{$port} -t \"{$public}\" server.php");
+		passthru('"'.PHP_BINARY.'"'." -S {$host}:{$port} \"{$base}\"/server.php");
 	}
 
 	/**
