@@ -1,5 +1,29 @@
 # Release Notes for 5.4.x
 
+## v5.4.3 (2017-01-25)
+
+### Added
+- Mock `dispatch()` method in `MocksApplicationServices` ([#17543](https://github.com/laravel/framework/pull/17543), [d974a88](https://github.com/laravel/framework/commit/d974a8828221ba8673cc4f6d9124d1d33f3de447))
+
+### Changed
+- Moved `$forElseCounter` property from `BladeCompiler` to `CompilesLoops` ([#17538](https://github.com/laravel/framework/pull/17538))
+
+### Fixed
+- Fixed bug in `Router::pushMiddlewareToGroup()` ([1054fd2](https://github.com/laravel/framework/commit/1054fd2523913e59e980553b5411a22f16ecf817))
+- Fixed indentation in `Notifications/resources/views/email.blade.php` ([0435cfc](https://github.com/laravel/framework/commit/0435cfcf171908432d88e447fe4021998e515b9f))
+
+
+## v5.4.2 (2017-01-25)
+
+### Fixed
+- Fixed removal of reset tokens after password reset ([#17524](https://github.com/laravel/framework/pull/17524))
+
+
+## v5.4.1 (2017-01-24)
+
+### Fixed
+- Fixed view parent placeholding ([64f7e9c](https://github.com/laravel/framework/commit/64f7e9c4e37637df7b0820b11d5fcee1c1cca58d))
+
 ## v5.4.0 (2017-01-24)
 
 ### General

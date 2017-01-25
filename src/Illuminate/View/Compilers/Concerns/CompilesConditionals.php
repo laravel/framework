@@ -5,7 +5,7 @@ namespace Illuminate\View\Compilers\Concerns;
 trait CompilesConditionals
 {
     /**
-     * Compile the has section statements into valid PHP.
+     * Compile the has-section statements into valid PHP.
      *
      * @param  string  $expression
      * @return string
@@ -71,7 +71,7 @@ trait CompilesConditionals
     }
 
     /**
-     * Compile the end unless statements into valid PHP.
+     * Compile the end-unless statements into valid PHP.
      *
      * @param  string  $expression
      * @return string
