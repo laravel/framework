@@ -140,14 +140,14 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
     }
 
     /**
-     * Delete a token record by token.
+     * Delete a token record by user.
      *
-     * @param  string  $token
+     * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
      * @return void
      */
-    public function delete($token)
+    public function delete(CanResetPasswordContract $user)
     {
-        $this->getTable()->where('token', $token)->delete();
+        $this->deleteExisting($user);
     }
 
     /**
