@@ -724,7 +724,11 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function pushMiddlewareToGroup($group, $middleware)
     {
-        if (isset($this->middlewareGroups[$group]) && ! in_array($middleware, $this->middlewareGroups[$group])) {
+        if (! array_key_exists($group, $this->middlewareGroups)) {
+            $this->middlewareGroups[$group] = [];
+        }
+
+        if ( ! in_array($middleware, $this->middlewareGroups[$group])) {
             $this->middlewareGroups[$group][] = $middleware;
         }
 
