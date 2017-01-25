@@ -37,10 +37,9 @@ trait CompilesLoops
     /**
      * Compile the for-else-empty statements into valid PHP.
      *
-     * @param  string  $expression
      * @return string
      */
-    protected function compileEmpty($expression)
+    protected function compileEmpty()
     {
         $empty = '$__empty_'.$this->forElseCounter--;
 
@@ -50,10 +49,9 @@ trait CompilesLoops
     /**
      * Compile the end-for-else statements into valid PHP.
      *
-     * @param  string  $expression
      * @return string
      */
-    protected function compileEndforelse($expression)
+    protected function compileEndforelse()
     {
         return '<?php endif; ?>';
     }
@@ -115,10 +113,9 @@ trait CompilesLoops
     /**
      * Compile the end-for statements into valid PHP.
      *
-     * @param  string  $expression
      * @return string
      */
-    protected function compileEndfor($expression)
+    protected function compileEndfor()
     {
         return '<?php endfor; ?>';
     }
@@ -126,10 +123,9 @@ trait CompilesLoops
     /**
      * Compile the end-for-each statements into valid PHP.
      *
-     * @param  string  $expression
      * @return string
      */
-    protected function compileEndforeach($expression)
+    protected function compileEndforeach()
     {
         return '<?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>';
     }
@@ -148,10 +144,9 @@ trait CompilesLoops
     /**
      * Compile the end-while statements into valid PHP.
      *
-     * @param  string  $expression
      * @return string
      */
-    protected function compileEndwhile($expression)
+    protected function compileEndwhile()
     {
         return '<?php endwhile; ?>';
     }
