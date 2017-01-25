@@ -29,7 +29,7 @@ trait CompilesIncludes
     }
 
     /**
-     * Compile the include statements into valid PHP.
+     * Compile the include-if statements into valid PHP.
      *
      * @param  string  $expression
      * @return string

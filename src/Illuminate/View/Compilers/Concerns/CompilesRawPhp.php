@@ -16,7 +16,7 @@ trait CompilesRawPhp
     }
 
     /**
-     * Compile end-php statement into valid PHP.
+     * Compile end-php statements into valid PHP.
      *
      * @param  string  $expression
      * @return string
