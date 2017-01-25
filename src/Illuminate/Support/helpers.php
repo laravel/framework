@@ -338,8 +338,9 @@ if (! function_exists('class_basename')) {
     function class_basename($class)
     {
         $class = is_object($class) ? get_class($class) : $class;
+        $reflection = new ReflectionClass($class);
 
-        return basename(str_replace('\\', '/', $class));
+        return $reflection->getShortName();
     }
 }
 
