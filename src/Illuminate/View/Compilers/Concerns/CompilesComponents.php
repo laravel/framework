@@ -16,7 +16,7 @@ trait CompilesComponents
     }
 
     /**
-     * Compile the end component statements into valid PHP.
+     * Compile the end-component statements into valid PHP.
      *
      * @param  string  $expression
      * @return string
@@ -38,7 +38,7 @@ trait CompilesComponents
     }
 
     /**
-     * Compile the end slot statements into valid PHP.
+     * Compile the end-slot statements into valid PHP.
      *
      * @param  string  $expression
      * @return string
