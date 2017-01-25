@@ -287,4 +287,35 @@ trait MocksApplicationServices
 
         return $this;
     }
+
+    /**
+     * Specify a notification that is not expected to be dispatched.
+     *
+     * @param  string $notification
+     * @param  mixed  $notifiable
+     *
+     * @return $this
+     */
+    protected function doesntExpectNotification($notification, $notifiable = null)
+    {
+        $this->withoutNotifications();
+
+        $this->beforeApplicationDestroyed(function () use ($notifiable, $notification) {
+            foreach ($this->dispatchedNotifications as $dispatched) {
+                $notified = $dispatched['notifiable'];
+
+                if (get_class($dispatched['instance']) === $notification) {
+                    if ($notifiable === null || ($notified === $notifiable ||
+                            $notified->getKey() == $notifiable->getKey())
+                    ) {
+                        throw new Exception(
+                            'The following unexpected notification was dispatched: [' . $notification . ']'
+                        );
+                    }
+                }
+            }
+        });
+
+        return $this;
+    }
 }
