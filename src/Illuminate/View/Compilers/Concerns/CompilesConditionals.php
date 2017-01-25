@@ -51,10 +51,9 @@ trait CompilesConditionals
     /**
      * Compile the else statements into valid PHP.
      *
-     * @param  string  $expression
      * @return string
      */
-    protected function compileElse($expression)
+    protected function compileElse()
     {
         return '<?php else: ?>';
     }
@@ -62,10 +61,9 @@ trait CompilesConditionals
     /**
      * Compile the end-if statements into valid PHP.
      *
-     * @param  string  $expression
      * @return string
      */
-    protected function compileEndif($expression)
+    protected function compileEndif()
     {
         return '<?php endif; ?>';
     }
@@ -73,10 +71,9 @@ trait CompilesConditionals
     /**
      * Compile the end-unless statements into valid PHP.
      *
-     * @param  string  $expression
      * @return string
      */
-    protected function compileEndunless($expression)
+    protected function compileEndunless()
     {
         return '<?php endif; ?>';
     }
