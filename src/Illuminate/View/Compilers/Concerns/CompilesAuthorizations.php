@@ -38,7 +38,7 @@ trait CompilesAuthorizations
     }
 
     /**
-     * Compile the else-can statements into valid PHP.
+     * Compile the else-cannot statements into valid PHP.
      *
      * @param  string  $expression
      * @return string

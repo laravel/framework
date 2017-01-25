@@ -5,7 +5,14 @@ namespace Illuminate\View\Compilers\Concerns;
 trait CompilesLoops
 {
     /**
-     * Compile the forelse statements into valid PHP.
+     * Counter to keep track of nested forelse statements.
+     *
+     * @var int
+     */
+    protected $forElseCounter = 0;
+
+    /**
+     * Compile the for-else statements into valid PHP.
      *
      * @param  string  $expression
      * @return string
@@ -28,7 +35,7 @@ trait CompilesLoops
     }
 
     /**
-     * Compile the forelse statements into valid PHP.
+     * Compile the for-else-empty statements into valid PHP.
      *
      * @param  string  $expression
      * @return string
@@ -63,7 +70,7 @@ trait CompilesLoops
     }
 
     /**
-     * Compile the foreach statements into valid PHP.
+     * Compile the for-each statements into valid PHP.
      *
      * @param  string  $expression
      * @return string

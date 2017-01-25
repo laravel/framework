@@ -22,7 +22,7 @@ trait CompilesTranslations
     }
 
     /**
-     * Compile the endlang statements into valid PHP.
+     * Compile the end-lang statements into valid PHP.
      *
      * @return string
      */
