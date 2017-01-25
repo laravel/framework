@@ -23,20 +23,6 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $scope->apply($builder, $model);
     }
 
-    public function testForceDeleteExtension()
-    {
-        $builder = m::mock('Illuminate\Database\Eloquent\Builder');
-        $builder->shouldDeferMissing();
-        $scope = new \Illuminate\Database\Eloquent\SoftDeletingScope;
-        $scope->extend($builder);
-        $callback = $builder->getMacro('forceDelete');
-        $givenBuilder = m::mock('Illuminate\Database\Eloquent\Builder');
-        $givenBuilder->shouldReceive('getQuery')->andReturn($query = m::mock('StdClass'));
-        $query->shouldReceive('delete')->once();
-
-        $callback($givenBuilder);
-    }
-
     public function testRestoreExtension()
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder');
