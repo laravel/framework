@@ -1,6 +1,6 @@
 # Release Notes for 5.4.x
 
-## [Unreleased]
+## v5.4.0 (2017-01-24)
 
 ### General
 - Added real-time facades 😈 ([feb52bf](https://github.com/laravel/framework/commit/feb52bf966c0ea517ec0cf688b5a2534b50a8268))
@@ -30,6 +30,7 @@
 - Don't reverse the order of `@push`ed data ([#16325](https://github.com/laravel/framework/pull/16325))
 - Allow view data to be passed Paginator methods ([#17331](https://github.com/laravel/framework/pull/17331))
 - Add `mix()` helper method ([6ea4997](https://github.com/laravel/framework/commit/6ea4997fcf7cf0ae4c18bce9418817ff00e4727f))
+- Escape inline sections content ([#17453](https://github.com/laravel/framework/pull/17453))
 
 ### Broadcasting
 - Added model binding in broadcasting channel definitions ([#16120](https://github.com/laravel/framework/pull/16120), [515d97c](https://github.com/laravel/framework/commit/515d97c1f3ad4797876979d450304684012142d6))
@@ -148,19 +149,23 @@
 ### Notifications
 - Added `NotificationSender` class ([5f93133](https://github.com/laravel/framework/commit/5f93133170c40b203f0922fd29eb22e1ee20be21))
 - Removed `to` and `cc` from mail `MailMessage` ([ff68549](https://github.com/laravel/framework/commit/ff685491f4739b899dbe91e5fb1683c28e2dc5e1))
+- Add salutation option to `SimpleMessage` notification ([#17429](https://github.com/laravel/framework/pull/17429))
 
 ### Queue
 - Support job-based queue options ([#16257](https://github.com/laravel/framework/pull/16257), [2382dc3](https://github.com/laravel/framework/commit/2382dc3f374bee7ad966d11ecb35a1429d9a09e8), [ee385fa](https://github.com/laravel/framework/commit/ee385fa5eab0c4642f47636f0e033e982d402bb9))
 - Fixed manually failing jobs and added `FailingJob` class ([707a3bc](https://github.com/laravel/framework/commit/707a3bc84ce82bbe44e2c722ede24b5edb194b6b), [55afe12](https://github.com/laravel/framework/commit/55afe12977b55dbafda940e18102bb52276ca569))
 - Converted `illuminate.queue.looping` event into `Looping` class ([57c82d0](https://github.com/laravel/framework/commit/57c82d095c356a0fe0f9381536afec768cdcc072))
-- Refactored Queue component ([9bc8ca5](https://github.com/laravel/framework/commit/9bc8ca502687f29761b9eb78f70db6e3c3f0a09e), [e030231](https://github.com/laravel/framework/commit/e030231604479d0326ad9bfb56a2a36229d78ff4), [a041fb5](https://github.com/laravel/framework/commit/a041fb5ec9fc775d1a3efb6b647604da2b02b866), [7bb15cf](https://github.com/laravel/framework/commit/7bb15cf40a182bed3d00bc55de55798e58bf1ed0), [5505728](https://github.com/laravel/framework/commit/55057285b321b4b668d12fade330b0d196f9514a))
+- Refactored Queue component ([9bc8ca5](https://github.com/laravel/framework/commit/9bc8ca502687f29761b9eb78f70db6e3c3f0a09e), [e030231](https://github.com/laravel/framework/commit/e030231604479d0326ad9bfb56a2a36229d78ff4), [a041fb5](https://github.com/laravel/framework/commit/a041fb5ec9fc775d1a3efb6b647604da2b02b866), [7bb15cf](https://github.com/laravel/framework/commit/7bb15cf40a182bed3d00bc55de55798e58bf1ed0), [5505728](https://github.com/laravel/framework/commit/55057285b321b4b668d12fade330b0d196f9514a), [fed36bd](https://github.com/laravel/framework/commit/fed36bd7e09658009d36d9dd568f19ddcb75172e))
 - Refactored how queue connection names are set ([4c600fb](https://github.com/laravel/framework/commit/4c600fb7af855747b6b44a194a5d0061d6294488))
 - Let queue worker exit ungracefully on `memoryExceeded()` ([#17302](https://github.com/laravel/framework/pull/17302))
 - Support pause and continue signals in queue worker ([827d075](https://github.com/laravel/framework/commit/827d075fb06b516eea992393279fc5ec2adabcf8))
 
 ### Redis
-- Added support for PhpRedis ([#15160](https://github.com/laravel/framework/pull/15160), [01ed1c8](https://github.com/laravel/framework/commit/01ed1c8348a8e69ad213c95dd8d24e652154e6f0), [1ef8b9c](https://github.com/laravel/framework/commit/1ef8b9c3f156c7d4debc6c6f67b73b032d8337d5))
+- Added support for [PhpRedis](https://github.com/phpredis/phpredis) ([#15160](https://github.com/laravel/framework/pull/15160), [01ed1c8](https://github.com/laravel/framework/commit/01ed1c8348a8e69ad213c95dd8d24e652154e6f0), [1ef8b9c](https://github.com/laravel/framework/commit/1ef8b9c3f156c7d4debc6c6f67b73b032d8337d5))
 - Added support for multiple Redis clusters ([#16696](https://github.com/laravel/framework/pull/16696), [464075d](https://github.com/laravel/framework/commit/464075d3c5f152dfc4fc9287595d62dbdc3c6347))
+- Added `RedisQueue::laterRaw()` method ([7fbac1c](https://github.com/laravel/framework/commit/7fbac1c6c09080da698f4c3256356cb896465692))
+- Return migrated jobs from `RedisQueue::migrateExpiredJobs()` ([f21e942](https://github.com/laravel/framework/commit/f21e942ae8a4104ffdf42c231601efe8759c4c10))
+- Send full job back into `RedisQueue` ([16e862c](https://github.com/laravel/framework/commit/16e862c1e22795acab869fa01ec5f8bcd7d400b3))
 
 ### Routing
 - Added support for fluent routes ([#16647](https://github.com/laravel/framework/pull/16647), [#16748](https://github.com/laravel/framework/pull/16748))
@@ -181,6 +186,7 @@
 - Namespaced all tests ([#17058](https://github.com/laravel/framework/pull/17058), [#17148](https://github.com/laravel/framework/pull/17148))
 - Allow chaining of response assertions ([#17330](https://github.com/laravel/framework/pull/17330))
 - Return `TestResponse` from `MakesHttpRequests::json()` ([#17341](https://github.com/laravel/framework/pull/17341))
+- Always return collection from factory when `$amount` is set ([#17493](https://github.com/laravel/framework/pull/17493))
 
 ### Translations
 - Added JSON loader for translations and `__()` helper ([#16424](https://github.com/laravel/framework/pull/16424), [#16470](https://github.com/laravel/framework/pull/16470), [9437244](https://github.com/laravel/framework/commit/94372447b9de48f5c174db2cf7c81dffb3c0c692))
@@ -198,3 +204,4 @@
 - Support wildcards in `MessageBag::first()` ([#15217](https://github.com/laravel/framework/pull/15217))
 - Support implicit keys in `MessageBag::first()` and `MessageBag::first()` ([#17001](https://github.com/laravel/framework/pull/17001))
 - Support arrays with empty string as key ([#17427](https://github.com/laravel/framework/pull/17427))
+- Add type check to `validateUrl()` ([#17504](https://github.com/laravel/framework/pull/17504))

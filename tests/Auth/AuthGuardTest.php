@@ -359,6 +359,27 @@ class AuthGuardTest extends TestCase
         $this->assertTrue($guard->viaRemember());
     }
 
+    public function testLoginOnceSetsUser()
+    {
+        list($session, $provider, $request, $cookie) = $this->getMocks();
+        $guard = m::mock('Illuminate\Auth\SessionGuard', ['default', $provider, $session])->makePartial();
+        $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
+        $guard->getProvider()->shouldReceive('retrieveByCredentials')->once()->with(['foo'])->andReturn($user);
+        $guard->getProvider()->shouldReceive('validateCredentials')->once()->with($user, ['foo'])->andReturn(true);
+        $guard->shouldReceive('setUser')->once()->with($user);
+        $this->assertTrue($guard->once(['foo']));
+    }
+
+    public function testLoginOnceFailure()
+    {
+        list($session, $provider, $request, $cookie) = $this->getMocks();
+        $guard = m::mock('Illuminate\Auth\SessionGuard', ['default', $provider, $session])->makePartial();
+        $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
+        $guard->getProvider()->shouldReceive('retrieveByCredentials')->once()->with(['foo'])->andReturn($user);
+        $guard->getProvider()->shouldReceive('validateCredentials')->once()->with($user, ['foo'])->andReturn(false);
+        $this->assertFalse($guard->once(['foo']));
+    }
+
     protected function getGuard()
     {
         list($session, $provider, $request, $cookie) = $this->getMocks();
