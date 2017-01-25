@@ -101,7 +101,7 @@ trait MocksApplicationServices
     {
         $mock = Mockery::mock(EventsDispatcherContract::class);
 
-        $mock->shouldReceive('dispatch')->andReturnUsing(function ($called) {
+        $mock->shouldReceive('fire', 'dispatch')->andReturnUsing(function ($called) {
             $this->firedEvents[] = $called;
         });
 
