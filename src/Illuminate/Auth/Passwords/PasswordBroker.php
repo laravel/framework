@@ -98,7 +98,7 @@ class PasswordBroker implements PasswordBrokerContract
         // in their persistent storage. Then we'll delete the token and return.
         $callback($user, $password);
 
-        $this->tokens->delete($credentials['token']);
+        $this->tokens->delete($user);
 
         return static::PASSWORD_RESET;
     }
