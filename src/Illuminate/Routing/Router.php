@@ -728,7 +728,7 @@ class Router implements RegistrarContract, BindingRegistrar
             $this->middlewareGroups[$group] = [];
         }
 
-        if ( ! in_array($middleware, $this->middlewareGroups[$group])) {
+        if (! in_array($middleware, $this->middlewareGroups[$group])) {
             $this->middlewareGroups[$group][] = $middleware;
         }
 
