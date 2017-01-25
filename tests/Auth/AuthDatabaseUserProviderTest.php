@@ -42,7 +42,7 @@ class AuthDatabaseUserProviderTest extends PHPUnit_Framework_TestCase {
 	{
 		$conn = m::mock('Illuminate\Database\Connection');
 		$conn->shouldReceive('table')->once()->with('foo')->andReturn($conn);
-		$conn->shouldReceive('where')->once()->with('username', 'dayle');
+		$conn->shouldReceive('where')->once()->with(['username' => 'dayle']);
 		$conn->shouldReceive('first')->once()->andReturn(array('id' => 1, 'name' => 'taylor'));
 		$hasher = m::mock('Illuminate\Hashing\HasherInterface');
 		$provider = new Illuminate\Auth\DatabaseUserProvider($conn, $hasher, 'foo');
@@ -58,7 +58,7 @@ class AuthDatabaseUserProviderTest extends PHPUnit_Framework_TestCase {
 	{
 		$conn = m::mock('Illuminate\Database\Connection');
 		$conn->shouldReceive('table')->once()->with('foo')->andReturn($conn);
-		$conn->shouldReceive('where')->once()->with('username', 'dayle');
+		$conn->shouldReceive('where')->once()->with(['username' => 'dayle']);
 		$conn->shouldReceive('first')->once()->andReturn(null);
 		$hasher = m::mock('Illuminate\Hashing\HasherInterface');
 		$provider = new Illuminate\Auth\DatabaseUserProvider($conn, $hasher, 'foo');
