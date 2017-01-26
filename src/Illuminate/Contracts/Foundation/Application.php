@@ -89,4 +89,19 @@ interface Application extends Container
      * @return string
      */
     public function getCachedServicesPath();
+
+    /**
+     * Get the current application locale.
+     *
+     * @return string
+     */
+    public function getLocale();
+
+    /**
+     * Set the current application locale.
+     *
+     * @param  string  $locale
+     * @return void
+     */
+    public function setLocale($locale);
 }
