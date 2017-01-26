@@ -1,6 +1,6 @@
 # Release Notes for 5.3.x
 
-## [Unreleased]
+## v5.3.30 (2017-01-26)
 
 ### Added
 - Added `read()` and `unread()` methods to `DatabaseNotification` ([#17243](https://github.com/laravel/framework/pull/17243))
