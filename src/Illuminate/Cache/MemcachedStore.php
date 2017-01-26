@@ -232,4 +232,15 @@ class MemcachedStore extends TaggableStore implements Store
     {
         $this->prefix = ! empty($prefix) ? $prefix.':' : '';
     }
+
+    /**
+     * Return the result code of the last operation.
+     *
+     * @link http://php.net/manual/en/memcached.getresultcode.php
+     * @return int Result code of the last Memcached operation.
+     */
+    public function getResultCode()
+    {
+        return $this->memcached->getResultCode();
+    }
 }
