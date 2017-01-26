@@ -86,6 +86,23 @@ class UrlGenerator {
 	}
 
 	/**
+	 * Get the current URL with one or more replaced parameters
+	 *
+	 * @param  array  $routeParameters
+	 * @param  array  $getParameters
+	 * @param  bool  $absolute
+	 * @return string
+	 */
+	public function alter(array $routeParameters = array(), array $getParameters = array(), $absolute = true)
+	{
+		$replacedRouteParameters = $routeParameters + $this->request->route()->parameters();
+		$replacedGetParameters = $getParameters + $this->request->query->all();
+
+		return $this->toRoute($this->request->route(), $replacedRouteParameters, $absolute)
+			. $this->getRouteQueryString($replacedGetParameters);
+	}
+
+	/**
 	 * Get the URL for the previous request.
 	 *
 	 * @return string
