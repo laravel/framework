@@ -1,5 +1,19 @@
 # Release Notes for 5.4.x
 
+## v5.4.4 (2017-01-26)
+
+### Added
+- Add `hasMiddlewareGroup()` and `getMiddlewareGroups()` method to `Router` ([#17576](https://github.com/laravel/framework/pull/17576))
+
+### Fixed
+- Fixed `--database` option on `migrate` commands ([#17574](https://github.com/laravel/framework/pull/17574))
+- Fixed `$sequence` being always overwritten in `PostgresGrammar::compileInsertGetId()` ([#17570](https://github.com/laravel/framework/pull/17570))
+
+### Removed
+- Removed various unused parameters from view compilers ([#17554](https://github.com/laravel/framework/pull/17554))
+- Removed superfluous `ForceDelete` extension from `SoftDeletingScope` ([#17552](https://github.com/laravel/framework/pull/17552))
+
+
 ## v5.4.3 (2017-01-25)
 
 ### Added
