@@ -104,4 +104,12 @@ interface Application extends Container
      * @return void
      */
     public function setLocale($locale);
+    
+    /**
+     * Determine if application locale is the given locale.
+     *
+     * @param  string  $locale
+     * @return bool
+     */
+    public function isLocale($locale);
 }
