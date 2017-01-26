@@ -691,7 +691,7 @@ class Router implements RegistrarContract, BindingRegistrar
     {
         return array_key_exists($name, $this->middlewareGroups);
     }
-    
+
     /**
      * Get all of the defined middleware groups.
      *
@@ -701,7 +701,7 @@ class Router implements RegistrarContract, BindingRegistrar
     {
         return $this->middlewareGroups;
     }
-    
+
     /**
      * Register a group of middleware.
      *
