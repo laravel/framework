@@ -76,6 +76,20 @@ class UrlGenerator {
 	}
 
 	/**
+	 * Get the current URL with one or more replaced parameters
+	 *
+	 * @param  array   $parameters
+	 * @param  bool    $absolute
+	 * @return string
+	 */
+	public function alter(array $parameters = array(), $absolute = true)
+	{
+		$replaced_parameters = array_merge($_GET, $this->request->route()->parameters(), $parameters);
+
+		return $this->toRoute($this->request->route(), $replaced_parameters, $absolute);
+	}
+
+	/**
 	 * Get the current URL for the request.
 	 *
 	 * @return string
