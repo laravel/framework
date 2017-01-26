@@ -682,6 +682,27 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
+     * Check if a middlewareGroup with the given name exists.
+     *
+     * @param  string  $name
+     * @return bool
+     */
+    public function hasMiddlewareGroup($name)
+    {
+        return array_key_exists($name, $this->middlewareGroups);
+    }
+
+    /**
+     * Get all of the defined middleware groups.
+     *
+     * @return array
+     */
+    public function getMiddlewareGroups()
+    {
+        return $this->middlewareGroups;
+    }
+
+    /**
      * Register a group of middleware.
      *
      * @param  string  $name
