@@ -28,10 +28,6 @@ class RouteServiceProvider extends ServiceProvider
             $this->loadCachedRoutes();
         } else {
             $this->loadRoutes();
-
-            $this->app->booted(function () {
-                $this->app['router']->getRoutes()->refreshNameLookups();
-            });
         }
     }
 

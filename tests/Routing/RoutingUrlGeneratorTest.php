@@ -170,7 +170,6 @@ class RoutingUrlGeneratorTest extends TestCase
         $route = new Route(['GET'], 'foo/bar', []);
         $route->name('foo');
         $routes->add($route);
-        $routes->refreshNameLookups();
 
         $this->assertEquals('http://www.foo.com/foo/bar', $url->route('foo'));
     }
