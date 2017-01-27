@@ -44,7 +44,7 @@ class LoadEnvironmentVariables
             );
         }
 
-        if (! env('APP_ENV') || empty($file)) {
+        if (! env('APP_ENV')) {
             return;
         }
 
