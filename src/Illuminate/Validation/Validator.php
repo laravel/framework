@@ -2200,6 +2200,26 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
+	 * Get the parameters that pass validation rules.
+	 *
+	 * @return array
+	 */
+	public function getPassingParameters()
+	{
+		return array_diff(array_keys($this->getData()), $this->getFailingParameters());
+	}
+
+	/**
+	 * Get the parameters that do not pass validation rules.
+	 *
+	 * @return array
+	 */
+	public function getFailingParameters()
+	{
+		return array_keys($this->getMessageBag()->toArray());
+	}
+
+	/**
 	 * Set the validation rules.
 	 *
 	 * @param  array  $rules
