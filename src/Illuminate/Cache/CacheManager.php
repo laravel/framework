@@ -159,6 +159,17 @@ class CacheManager extends Manager {
 	}
 
 	/**
+	 * Create a new cache repository with the given implementation.
+	 *
+	 * @param  \Illuminate\Cache\StoreInterface  $store
+	 * @return \Illuminate\Cache\Repository
+	 */
+	protected function getRepository(StoreInterface $store)
+	{
+		return $this->repository($store);
+	}
+
+	/**
 	 * Get the default cache driver name.
 	 *
 	 * @return string
