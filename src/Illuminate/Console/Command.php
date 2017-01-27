@@ -121,7 +121,7 @@ class Command extends SymfonyCommand
     {
         list($name, $arguments, $options) = Parser::parse($this->signature);
 
-        parent::__construct($name);
+        parent::__construct($this->name = $name);
 
         // After parsing the signature we will spin through the arguments and options
         // and set them on this command. These will already be changed into proper
