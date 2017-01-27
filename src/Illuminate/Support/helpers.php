@@ -655,6 +655,16 @@ if ( ! function_exists('object_get'))
 
 		foreach (explode('.', $key) as $segment)
 		{
+			if ($object instanceof \Illuminate\Database\Eloquent\Collection)
+			{
+				$object = $object->find($segment);
+				if ( ! $object)
+				{
+					return value($default);
+				}
+				continue;
+			}
+
 			if ( ! is_object($object) || ! isset($object->{$segment}))
 			{
 				return value($default);
