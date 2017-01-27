@@ -18,49 +18,6 @@ class PhpRedisConnection extends Connection
     }
 
     /**
-     * Proxy a call to the eval function of PhpRedis.
-     *
-     * @param  array  $parameters
-     * @return mixed
-     */
-    protected function proxyToEval(array $parameters)
-    {
-        return $this->command('eval', [
-            isset($parameters[0]) ? $parameters[0] : null,
-            array_slice($parameters, 2),
-            isset($parameters[1]) ? $parameters[1] : null,
-        ]);
-    }
-
-    /**
-     * Subscribe to a set of given channels for messages.
-     *
-     * @param  array|string  $channels
-     * @param  \Closure  $callback
-     * @return void
-     */
-    public function subscribe($channels, Closure $callback)
-    {
-        $this->client->subscribe((array) $channels, function ($redis, $channel, $message) use ($callback) {
-            $callback($message, $channel);
-        });
-    }
-
-    /**
-     * Subscribe to a set of given channels with wildcards.
-     *
-     * @param  array|string  $channels
-     * @param  \Closure  $callback
-     * @return void
-     */
-    public function psubscribe($channels, Closure $callback)
-    {
-        $this->client->psubscribe((array) $channels, function ($redis, $pattern, $channel, $message) use ($callback) {
-            $callback($message, $channel);
-        });
-    }
-
-    /**
      * Set the string value in argument as value of the key.
      *
      * @param string  $key
@@ -135,6 +92,49 @@ class PhpRedisConnection extends Connection
     public function evalsha($script, $numkeys, ...$arguments)
     {
         return $this->command('evalsha', [$this->script('load', $script), $arguments, $parameters]);
+    }
+
+    /**
+     * Proxy a call to the eval function of PhpRedis.
+     *
+     * @param  array  $parameters
+     * @return mixed
+     */
+    protected function proxyToEval(array $parameters)
+    {
+        return $this->command('eval', [
+            isset($parameters[0]) ? $parameters[0] : null,
+            array_slice($parameters, 2),
+            isset($parameters[1]) ? $parameters[1] : null,
+        ]);
+    }
+
+    /**
+     * Subscribe to a set of given channels for messages.
+     *
+     * @param  array|string  $channels
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function subscribe($channels, Closure $callback)
+    {
+        $this->client->subscribe((array) $channels, function ($redis, $channel, $message) use ($callback) {
+            $callback($message, $channel);
+        });
+    }
+
+    /**
+     * Subscribe to a set of given channels with wildcards.
+     *
+     * @param  array|string  $channels
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function psubscribe($channels, Closure $callback)
+    {
+        $this->client->psubscribe((array) $channels, function ($redis, $pattern, $channel, $message) use ($callback) {
+            $callback($message, $channel);
+        });
     }
 
     /**
