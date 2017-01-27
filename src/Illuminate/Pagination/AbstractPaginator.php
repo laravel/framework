@@ -501,7 +501,7 @@ abstract class AbstractPaginator implements Htmlable
     /**
      * Transform each item in the collection using a callback.
      *
-     * @param  callable $callback
+     * @param  callable  $callback
      * @return $this
      */
     public function transform(callable $callback)

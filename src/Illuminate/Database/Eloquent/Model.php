@@ -888,7 +888,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Transform each attribute in the model using a callback.
      *
-     * @param  callable $callback
+     * @param  callable  $callback
      * @return \Illuminate\Support\Fluent
      */
     public function transform(callable $callback)

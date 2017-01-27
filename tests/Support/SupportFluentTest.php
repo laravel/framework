@@ -90,11 +90,13 @@ class SupportFluentTest extends TestCase
             'name' => 'Taylor',
             'age' => 25,
         ]);
+
         $fluent->transform(function ($item) {
             return [
                 'realname' => $item->name,
             ];
         });
+
         $this->assertSame(['realname' => 'Taylor'], $fluent->toArray());
     }
 
