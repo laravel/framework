@@ -1,5 +1,28 @@
 # Release Notes for 5.4.x
 
+## v5.4.6 (2017-01-27)
+
+### Added
+- Generate non-existent models with `make:controller` ([#17587](https://github.com/laravel/framework/pull/17587), [382b78c](https://github.com/laravel/framework/commit/382b78ca12282c580ff801a00b2e52faf50c6d38))
+- Added `TestResponse::dump()` method ([#17600](https://github.com/laravel/framework/pull/17600))
+
+### Changed
+- Switch to `ViewFactory` contract in `Mail/Markdown` ([#17591](https://github.com/laravel/framework/pull/17591))
+- Use implicit binding when generating controllers with `make:model` ([#17588](https://github.com/laravel/framework/pull/17588))
+- Made PhpRedis method signatures compatibility with Predis ([#17488](https://github.com/laravel/framework/pull/17488))
+- Use `config('app.name')` in `markdown/message.blade.php` ([#17604](https://github.com/laravel/framework/pull/17604))
+- Use `getStatusCode()` instead of `status()` in `TestResponse::fromBaseResponse()` ([#17590](https://github.com/laravel/framework/pull/17590))
+
+### Fixed
+- Fixed loading of `.env.testing` when running PHPUnit ([#17596](https://github.com/laravel/framework/pull/17596))
+
+
+## v5.4.5 (2017-01-26)
+
+### Fixed
+- Fixed database session data not persisting ([#17584](https://github.com/laravel/framework/pull/17584))
+
+
 ## v5.4.4 (2017-01-26)
 
 ### Added
