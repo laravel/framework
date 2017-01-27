@@ -58,12 +58,13 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
     /**
      * Transform each item in the attributes using a callback.
      *
-     * @param  callable $callback
+     * @param  callable  $callback
      * @return $this
      */
     public function transform(callable $callback)
     {
         $this->attributes = $callback($this);
+
         return $this;
     }
 
