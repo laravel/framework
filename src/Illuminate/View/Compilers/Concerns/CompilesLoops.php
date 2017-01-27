@@ -98,6 +98,7 @@ trait CompilesLoops
     {
         if ($expression) {
             preg_match('/\(\s*(\d+)\s*\)$/', $expression, $matches);
+            
             return $matches ? '<?php break '.max(1, $matches[1]).'; ?>' : "<?php if{$expression} break; ?>";
         }
 
@@ -114,6 +115,7 @@ trait CompilesLoops
     {
         if ($expression) {
             preg_match('/\(\s*(\d+)\s*\)$/', $expression, $matches);
+            
             return $matches ? '<?php continue '.max(1, $matches[1]).'; ?>' : "<?php if{$expression} continue; ?>";
         }
 
