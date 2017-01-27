@@ -40,13 +40,29 @@ class ModelMakeCommand extends GeneratorCommand
             return;
         }
 
-        if ($this->option('migration')) {
+        if ($this->option('migration') || $this->confirmNewMigration()) {
             $this->createMigration();
         }
 
         if ($this->option('controller')) {
             $this->createController();
         }
+    }
+
+    /**
+     * Ask if a new migration should be generated.
+     *
+     * @return bool
+     */
+    protected function confirmNewMigration()
+    {
+        $migrationClass = 'Create'.Str::plural((class_basename($this->argument('name')))).'Table';
+
+        if (class_exists($migrationClass)) {
+            return false;
+        }
+
+        return $this->confirm("A $migrationClass migration was not found. Do you want to generate it?", true);
     }
 
     /**
