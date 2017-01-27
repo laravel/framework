@@ -20,7 +20,7 @@ class TestResponse extends Response
     public static function fromBaseResponse($response)
     {
         $testResponse = new static(
-            $response->getContent(), $response->status()
+            $response->getContent(), $response->getStatusCode()
         );
 
         $testResponse->headers = $response->headers;
