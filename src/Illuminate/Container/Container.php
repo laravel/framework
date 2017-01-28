@@ -355,6 +355,13 @@ class Container implements ArrayAccess, ContainerContract
         // can be updated with consuming classes that have gotten resolved here.
         $this->instances[$abstract] = $instance;
 
+        // We also register the type as a singleton, except we also provide the instance
+        $shared = true;
+        $concrete = function() use ($instance) {
+        	return $instance;
+        };
+        $this->bindings[$abstract] = compact('concrete', 'shared');
+
         if ($this->bound($abstract)) {
             $this->rebound($abstract);
         }
