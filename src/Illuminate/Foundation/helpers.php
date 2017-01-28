@@ -798,7 +798,7 @@ if (! function_exists('files')) {
             return app('files');
         }
 
-        if (!is_null($content)) {
+        if (! is_null($content)) {
             return app('files')->put($path, $content);
         }
 
