@@ -175,7 +175,7 @@ class Store implements Session
     public function exists($key)
     {
         return ! collect(is_array($key) ? $key : func_get_args())->contains(function ($key) {
-            return ! Arr::exists($this->attributes, $key);
+            return ! Arr::has($this->attributes, $key);
         });
     }
 
