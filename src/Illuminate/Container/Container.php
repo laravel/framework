@@ -355,7 +355,7 @@ class Container implements ArrayAccess, ContainerContract
         // We also register the type as a singleton, except we also provide the instance
         $shared = true;
         $concrete = function () use ($instance) {
-        	return $instance;
+            return $instance;
         };
         $this->bindings[$abstract] = compact('concrete', 'shared');
 
@@ -1000,7 +1000,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function forgetInstance($abstract)
     {
-    	unset($this->bindings[$abstract]);
+        unset($this->bindings[$abstract]);
         unset($this->instances[$abstract]);
     }
 
@@ -1011,9 +1011,9 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function forgetInstances()
     {
-    	foreach ($this->instances as $abstract => $instance) {
-    		unset($this->bindings[$abstract]);
-    	}
+        foreach ($this->instances as $abstract => $instance) {
+            unset($this->bindings[$abstract]);
+        }
         $this->instances = [];
     }
 
