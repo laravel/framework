@@ -637,7 +637,7 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
-     * Find the concerete binding for the given abstract in the contextual binding array.
+     * Find the concrete binding for the given abstract in the contextual binding array.
      *
      * @param  string  $abstract
      * @return string|null
