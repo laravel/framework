@@ -350,21 +350,18 @@ class Container implements ArrayAccess, ContainerContract
 
         unset($this->aliases[$abstract]);
 
-        // We'll check to determine if this type has been bound before, and if it has
-        // we will fire the rebound callbacks registered with the container and it
-        // can be updated with consuming classes that have gotten resolved here.
         $this->instances[$abstract] = $instance;
 
         // We also register the type as a singleton, except we also provide the instance
         $shared = true;
-        $concrete = function() use ($instance) {
+        $concrete = function () use ($instance) {
         	return $instance;
         };
         $this->bindings[$abstract] = compact('concrete', 'shared');
 
-        if ($this->bound($abstract)) {
-            $this->rebound($abstract);
-        }
+        // Fire the rebound callbacks registered with the container and it
+        // can be updated with consuming classes that have gotten resolved here.
+        $this->rebound($abstract);
     }
 
     /**
@@ -1003,6 +1000,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function forgetInstance($abstract)
     {
+    	unset($this->bindings[$abstract]);
         unset($this->instances[$abstract]);
     }
 
@@ -1013,6 +1011,9 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function forgetInstances()
     {
+    	foreach ($this->instances as $abstract => $instance) {
+    		unset($this->bindings[$abstract]);
+    	}
         $this->instances = [];
     }
 
