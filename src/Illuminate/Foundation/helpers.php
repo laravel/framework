@@ -784,6 +784,28 @@ if (! function_exists('session')) {
     }
 }
 
+if (! function_exists('files')) {
+    /**
+     * Get / put the specified file content.
+     *
+     * @param  string  $path
+     * @param  mixed  $content
+     * @return mixed
+     */
+    function files($path = null, $content = null)
+    {
+        if (is_null($path)) {
+            return app('files');
+        }
+
+        if (!is_null($content)) {
+            return app('files')->put($path, $content);
+        }
+
+        return app('files')->get($path);
+    }
+}
+
 if (! function_exists('storage_path')) {
     /**
      * Get the path to the storage folder.
