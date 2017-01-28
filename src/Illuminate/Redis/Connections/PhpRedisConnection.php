@@ -32,7 +32,7 @@ class PhpRedisConnection extends Connection
         return $this->command('set', [
             $key,
             $value,
-            $expireResolution ? [$expireResolution, $flag => $expireTTL] : null
+            $expireResolution ? [$expireResolution, $flag => $expireTTL] : null,
         ]);
     }
 
@@ -91,7 +91,7 @@ class PhpRedisConnection extends Connection
     public function evalsha($script, $numkeys, ...$arguments)
     {
         return $this->command('evalsha', [
-            $this->script('load', $script), $arguments, $numkeys
+            $this->script('load', $script), $arguments, $numkeys,
         ]);
     }
 
