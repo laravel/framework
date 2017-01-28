@@ -563,7 +563,7 @@ if (! function_exists('mix')) {
         static $shouldHotReload;
 
         if (! $manifest) {
-            if (! file_exists($manifestPath = public_path('mix-manifest.json'))) {
+            if (! file_exists($manifestPath = public_path(env('MIX_MANIFEST_PATH', 'mix-manifest.json')))) {
                 throw new Exception('The Mix manifest does not exist.');
             }
 
