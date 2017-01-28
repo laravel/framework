@@ -29,12 +29,11 @@ class PhpRedisConnection extends Connection
      */
     public function set($key, $value, $expireResolution = null, $expireTTL = null, $flag = null)
     {
-        return $this->command(
-            'set',
+        return $this->command('set', [
             $key,
             $value,
             $expireResolution ? [$expireResolution, $flag => $expireTTL] : null
-        );
+        ]);
     }
 
     /**
@@ -47,7 +46,7 @@ class PhpRedisConnection extends Connection
      */
     public function lrem($key, $count, $value)
     {
-        return $this->command('lrem', $key, $value, $count);
+        return $this->command('lrem', [$key, $value, $count]);
     }
 
     /**
@@ -59,7 +58,7 @@ class PhpRedisConnection extends Connection
      */
     public function spop($key, $count = null)
     {
-        return $this->command('spop', $key, $count);
+        return $this->command('spop', [$key]);
     }
 
     /**
@@ -73,12 +72,12 @@ class PhpRedisConnection extends Connection
     {
         $arguments = [];
 
-        foreach ($membersAndScoresDictionary as $member => $score) {
+        foreach ($membersAndScoresDictionary as $score => $member) {
             $arguments[] = $score;
             $arguments[] = $member;
         }
 
-        return $this->command('zadd', ...$arguments);
+        return $this->client->zadd($key, ...$arguments);
     }
 
     /**
@@ -91,7 +90,9 @@ class PhpRedisConnection extends Connection
      */
     public function evalsha($script, $numkeys, ...$arguments)
     {
-        return $this->command('evalsha', [$this->script('load', $script), $arguments, $parameters]);
+        return $this->command('evalsha', [
+            $this->script('load', $script), $arguments, $numkeys
+        ]);
     }
 
     /**
@@ -161,17 +162,6 @@ class PhpRedisConnection extends Connection
     {
         if ($method == 'eval') {
             return $this->proxyToEval($parameters);
-        }
-
-        $arrayMethods = [
-            'hdel', 'hstrlen',
-            'lpush', 'rpush',
-            'scan', 'hscan', 'sscan', 'zscan',
-            'sadd', 'srem', 'sdiff', 'sinter', 'sunion', 'sdiffstore', 'sinterstore', 'sunionstore',
-        ];
-
-        if (is_array($parameters) && in_array($method, $arrayMethods)) {
-            $this->command($method, ...$parameters);
         }
 
         return parent::__call($method, $parameters);
