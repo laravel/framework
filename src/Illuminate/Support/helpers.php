@@ -84,6 +84,20 @@ if (! function_exists('array_dot')) {
     }
 }
 
+if (! function_exists('array_from_dot')) {
+    /**
+     * Create a new multi-dimensional associative array from a flattened
+     * array in dot notation.
+     *
+     * @param  array   $array
+     * @return array
+     */
+    function array_from_dot($array)
+    {
+        return Arr::fromDot($array);
+    }
+}
+
 if (! function_exists('array_except')) {
     /**
      * Get all of the given array except for a specified array of items.
