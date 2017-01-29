@@ -1,9 +1,9 @@
 @component('mail::layout')
     {{-- Header --}}
     @slot('header')
-        @component('mail::header', ['url' => config('app.url')])
-            {{ config('app.name') }}
-        @endcomponent
+        {{--@component('mail::header', ['url' => config('app.url')])--}}
+            {{--{{ config('app.name') }}--}}
+        {{--@endcomponent--}}
     @endslot
 
     {{-- Body --}}
@@ -20,8 +20,8 @@
 
     {{-- Footer --}}
     @slot('footer')
-        @component('mail::footer')
-            © 2016 {{ config('app.name') }}. All rights reserved.
-        @endcomponent
+        {{--@component('mail::footer')--}}
+            {{--© 2016 {{ config('app.name') }}. All rights reserved.--}}
+        {{--@endcomponent--}}
     @endslot
 @endcomponent
