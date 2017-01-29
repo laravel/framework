@@ -94,6 +94,24 @@ class Arr
     }
 
     /**
+     * Create a new multi-dimensional associative array from a flattened
+     * array in dot notation.
+     *
+     * @param  array  $array
+     * @return array
+     */
+    public static function fromDot($array)
+    {
+        $results = [];
+
+        foreach ($array as $key => $value) {
+            static::set($results, $key, $value);
+        }
+
+        return $results;
+    }
+
+    /**
      * Get all of the given array except for a specified array of items.
      *
      * @param  array  $array

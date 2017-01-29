@@ -57,6 +57,21 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['foo.bar' => []], $array);
     }
 
+    public function testFromDot()
+    {
+        $array = Arr::fromDot(['foo.bar' => 'baz']);
+        $this->assertEquals(['foo' => ['bar' => 'baz']], $array);
+
+        $array = Arr::fromDot([]);
+        $this->assertEquals([], $array);
+
+        $array = Arr::fromDot(['foo.bar' => []]);
+        $this->assertEquals(['foo' => ['bar' => []]], $array);
+
+        $array = Arr::fromDot(['foo.bar' => [], 'foo.baz' => 'bar']);
+        $this->assertEquals(['foo' => ['bar' => [], 'baz' => 'bar']], $array);
+    }
+
     public function testExcept()
     {
         $array = ['name' => 'Desk', 'price' => 100];
