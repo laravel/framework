@@ -305,7 +305,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return new static(Arr::where($this->items, $callback));
         }
 
-        return new static(array_filter($this->items));
+        return new static(array_filter($this->items, function($value) {
+            return (! is_null($value)) &&
+                (! is_bool($value) || $value !== false) &&
+                (! is_string($value) || $value !== '');
+        }));
     }
 
     /**
