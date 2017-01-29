@@ -614,7 +614,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Get the values of a given key.
      *
-     * @param  string  $value
+     * @param  string|array  $value
      * @param  string|null  $key
      * @return static
      */
