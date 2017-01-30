@@ -649,6 +649,8 @@ class FormBuilder {
 	 */
 	protected function getCheckboxCheckedState($name, $value, $checked)
 	{
+		if (is_bool($checked)) return $checked;
+		
 		if (isset($this->session) && ! $this->oldInputIsEmpty() && is_null($this->old($name))) return false;
 
 		if ($this->missingOldAndModel($name)) return $checked;
@@ -668,6 +670,8 @@ class FormBuilder {
 	 */
 	protected function getRadioCheckedState($name, $value, $checked)
 	{
+		if (is_bool($checked)) return $checked;
+		
 		if ($this->missingOldAndModel($name)) return $checked;
 
 		return $this->getValueAttribute($name) == $value;
