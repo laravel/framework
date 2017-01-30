@@ -203,7 +203,7 @@ class HasOneThrough extends Relation
      * @param  array  $columns
      * @return mixed
      */
-    public function get($columns = ['*'])
+    public function get(array $columns = ['*'])
     {
         // First we'll add the proper select columns onto the query so it is run with
         // the proper columns. Then, we will get the results and hydrate out pivot
