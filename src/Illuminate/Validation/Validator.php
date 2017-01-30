@@ -742,7 +742,7 @@ class Validator implements ValidatorContract
      * @param  array  $rules
      * @return void
      */
-    protected function addRules($rules)
+    public function addRules($rules)
     {
         // The primary purpose of this parser is to expand any "*" rules to the all
         // of the explicit rules needed for the given data. For example the rule
