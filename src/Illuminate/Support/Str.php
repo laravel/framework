@@ -60,6 +60,17 @@ class Str
     }
 
     /**
+     * Remove excess whitespaces from a given string.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function clearWhitespaces($value)
+    {
+        return preg_replace('/\s+/',' ', $value);
+    }
+
+    /**
      * Determine if a given string contains a given substring.
      *
      * @param  string  $haystack
