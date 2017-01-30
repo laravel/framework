@@ -51,10 +51,9 @@ trait CompilesAuthorizations
     /**
      * Compile the end-can statements into valid PHP.
      *
-     * @param  string  $expression
      * @return string
      */
-    protected function compileEndcan($expression)
+    protected function compileEndcan()
     {
         return '<?php endif; ?>';
     }
@@ -62,10 +61,9 @@ trait CompilesAuthorizations
     /**
      * Compile the end-cannot statements into valid PHP.
      *
-     * @param  string  $expression
      * @return string
      */
-    protected function compileEndcannot($expression)
+    protected function compileEndcannot()
     {
         return '<?php endif; ?>';
     }

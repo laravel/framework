@@ -116,12 +116,16 @@ class BelongsTo extends Relation
      */
     protected function getEagerModelKeys(array $models)
     {
+        $keys = [];
+
         // First we need to gather all of the keys from the parent models so we know what
         // to query for via the eager loading query. We will add them to an array then
         // execute a "where in" statement to gather up all of those related records.
-        $keys = collect($models)->map(function ($model) {
-            return $model->{$this->foreignKey};
-        })->filter()->all();
+        foreach ($models as $model) {
+            if (! is_null($value = $model->{$this->foreignKey})) {
+                $keys[] = $value;
+            }
+        }
 
         // If there are no keys that were not null we will just return an array with either
         // null or 0 in (depending on if incrementing keys are in use) so the query wont

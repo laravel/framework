@@ -2639,6 +2639,9 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => [1, 2, 3, 4]], ['foo' => 'size:4']);
         $this->assertTrue($v->passes());
 
+        $v = new Validator($trans, ['foo' => [1, 2, 3, 4]], ['foo.*' => 'integer', 'foo.0' => 'required']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['foo' => [['bar' => [1, 2, 3]], ['bar' => [1, 2, 3]]]], ['foo.*.bar' => 'size:4']);
         $this->assertFalse($v->passes());
 

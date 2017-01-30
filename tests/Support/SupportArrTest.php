@@ -304,6 +304,16 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['Taylor', 'Abigail'], $array);
     }
 
+    public function testPluckWithArrayValue()
+    {
+        $array = [
+            ['developer' => ['name' => 'Taylor']],
+            ['developer' => ['name' => 'Abigail']],
+        ];
+        $array = Arr::pluck($array, ['developer', 'name']);
+        $this->assertEquals(['Taylor', 'Abigail'], $array);
+    }
+
     public function testPluckWithKeys()
     {
         $array = [
