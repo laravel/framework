@@ -242,6 +242,11 @@ class SupportStrTest extends TestCase
         $this->assertEquals('Laravel Php , Framework . ', Str::clearWhitespaces('Laravel    Php   ,   Framework  . '));
         $this->assertEquals('Ларавел Php , Frăimwörk . ', Str::clearWhitespaces('Ларавел    Php   ,   Frăimwörk  . '));
     }
+
+    public function testClearPunctuation()
+    {
+        $this->assertEquals('Laravel Php Frăimwörk', Str::clearPunctuation('{Laravel/ -Php, (Frăimwörk).}'));
+    }
 }
 
 class StringableObjectStub
