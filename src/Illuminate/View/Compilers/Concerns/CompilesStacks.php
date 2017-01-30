@@ -40,10 +40,9 @@ trait CompilesStacks
     /**
      * Compile the end-push statements into valid PHP.
      *
-     * @param  string  $expression
      * @return string
      */
-    protected function compileEndpush($expression)
+    protected function compileEndpush()
     {
         return '<?php $__env->stopPush(); ?>';
     }
