@@ -15,6 +15,15 @@ class CallQueuedHandler
     protected $dispatcher;
 
     /**
+     * The command that has been unserialized
+     * This is a cache for the deleted and failed callback.
+     * Set the first time the command method is called
+     *
+     * @var mixed
+     */
+    private $jobCommand;
+
+    /**
      * Create a new handler instance.
      *
      * @param  \Illuminate\Contracts\Bus\Dispatcher  $dispatcher
@@ -23,6 +32,21 @@ class CallQueuedHandler
     public function __construct(Dispatcher $dispatcher)
     {
         $this->dispatcher = $dispatcher;
+    }
+
+    /**
+     * Unserialize the command
+     *
+     * @param $data
+     * @return Job
+     */
+    protected function command($data)
+    {
+        if ($this->jobCommand) {
+            return $this->jobCommand;
+        }
+
+        return $this->jobCommand = unserialize($data['command']);
     }
 
     /**
@@ -35,7 +59,7 @@ class CallQueuedHandler
     public function call(Job $job, array $data)
     {
         $command = $this->setJobInstanceIfNecessary(
-            $job, unserialize($data['command'])
+            $job, $this->command($data)
         );
 
         $this->dispatcher->dispatchNow(
@@ -86,16 +110,36 @@ class CallQueuedHandler
      *
      * The exception that caused the failure will be passed.
      *
-     * @param  array  $data
-     * @param  \Exception  $e
+     * @param  array      $data
+     * @param  \Exception $e
      * @return void
      */
     public function failed(array $data, $e)
     {
-        $command = unserialize($data['command']);
+        $command = $this->command($data);
 
         if (method_exists($command, 'failed')) {
             $command->failed($e);
+        }
+    }
+
+    /**
+     * Call the deleted method on the job instance.
+     *
+     * Run EVERY time when the job is deleted from queue.
+     *
+     * This isn't called when the job is released in the queue, only when it's leaving it.
+     * Also called after a failure before the failed method.
+     *
+     * @param  array $data
+     * @return void
+     */
+    public function deleted(array $data)
+    {
+        $command = $this->command($data);
+
+        if (method_exists($command, 'deleted')) {
+            $command->deleted();
         }
     }
 }
