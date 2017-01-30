@@ -121,7 +121,7 @@ class BelongsTo extends Relation
         // execute a "where in" statement to gather up all of those related records.
         $keys = collect($models)->map(function ($model) {
             return $model->{$this->foreignKey};
-        })->filter(function($value) {
+        })->filter(function ($value) {
             return (! is_null($value)) &&
                 (! is_bool($value) || $value !== false) &&
                 (! is_string($value) || $value !== '');
