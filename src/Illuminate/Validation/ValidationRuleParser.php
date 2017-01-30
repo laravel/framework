@@ -151,7 +151,7 @@ class ValidationRuleParser
         $merge = head($this->explodeRules([$rules]));
 
         $results[$attribute] = array_merge(
-            isset($results[$attribute]) ? $results[$attribute] : [], $merge
+            isset($results[$attribute]) ? $this->explodeExplicitRule($results[$attribute]) : [], $merge
         );
 
         return $results;
