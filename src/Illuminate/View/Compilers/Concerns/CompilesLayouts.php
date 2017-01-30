@@ -38,7 +38,7 @@ trait CompilesLayouts
      */
     protected function compileSection($expression)
     {
-        $this->lastSection = trim($expression, "()'");
+        $this->lastSection = trim($expression, "()'\"");
 
         return "<?php \$__env->startSection{$expression}; ?>";
     }
