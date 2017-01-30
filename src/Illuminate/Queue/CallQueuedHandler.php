@@ -110,8 +110,8 @@ class CallQueuedHandler
      *
      * The exception that caused the failure will be passed.
      *
-     * @param  array      $data
-     * @param  \Exception $e
+     * @param  array  $data
+     * @param  \Exception  $e
      * @return void
      */
     public function failed(array $data, $e)

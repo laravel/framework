@@ -28,9 +28,9 @@ class FailingJob
             // If the job has failed, we will delete it, call the "failed" method and then call
             // an event indicating the job has failed so it can be logged if needed. This is
             // to allow every developer to better keep monitor of their failed queue jobs.
-            $job->delete();
-
             $job->failed($e);
+
+            $job->delete();
         } finally {
             static::events()->fire(new JobFailed(
                 $connectionName, $job, $e ?: new ManuallyFailedException
