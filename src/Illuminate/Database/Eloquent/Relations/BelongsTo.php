@@ -121,7 +121,11 @@ class BelongsTo extends Relation
         // execute a "where in" statement to gather up all of those related records.
         $keys = collect($models)->map(function ($model) {
             return $model->{$this->foreignKey};
-        })->filter()->all();
+        })->filter(function ($value) {
+            return (! is_null($value)) &&
+                (! is_bool($value) || $value !== false) &&
+                (! is_string($value) || $value !== '');
+        })->all();
 
         // If there are no keys that were not null we will just return an array with either
         // null or 0 in (depending on if incrementing keys are in use) so the query wont
