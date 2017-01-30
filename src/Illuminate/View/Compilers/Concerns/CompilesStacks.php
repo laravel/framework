@@ -16,6 +16,17 @@ trait CompilesStacks
     }
 
     /**
+     * Compile the reverse-stack statements into the content.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileReversestack($expression)
+    {
+        return "<?php echo \$__env->yieldReversedPushContent{$expression}; ?>";
+    }
+
+    /**
      * Compile the push statements into valid PHP.
      *
      * @param  string  $expression
@@ -29,10 +40,33 @@ trait CompilesStacks
     /**
      * Compile the end-push statements into valid PHP.
      *
+     * @param  string  $expression
      * @return string
      */
-    protected function compileEndpush()
+    protected function compileEndpush($expression)
     {
         return '<?php $__env->stopPush(); ?>';
+    }
+
+    /**
+     * Compile the prepend statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compilePrepend($expression)
+    {
+        return "<?php \$__env->startPrepend{$expression}; ?>";
+    }
+
+    /**
+     * Compile the end-prepend statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileEndprepend($expression)
+    {
+        return '<?php $__env->stopPrepend(); ?>';
     }
 }

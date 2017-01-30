@@ -92,6 +92,22 @@ trait ManagesStacks
     }
 
     /**
+     * Get the string contents of a push section in reverse order.
+     *
+     * @param  string  $section
+     * @param  string  $default
+     * @return string
+     */
+    public function yieldReversedPushContent($section, $default = '')
+    {
+        if (isset($this->pushes[$section])) {
+            return implode(array_reverse($this->pushes[$section]));
+        }
+
+        return $default;
+    }
+
+    /**
      * Flush all of the stacks.
      *
      * @return void
