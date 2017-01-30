@@ -40,6 +40,13 @@ class Worker
     protected $exceptions;
 
     /**
+     * Indicates if the worker should exit.
+     *
+     * @var bool
+     */
+    protected $shouldQuit = false;
+
+    /**
      * Indicates if the worker is paused.
      *
      * @var bool
@@ -86,6 +93,10 @@ class Worker
             );
 
             $this->registerTimeoutHandler($job, $options);
+
+            if ($this->shouldQuit) {
+                $this->kill();
+            }
 
             // If the daemon should run (not in maintenance mode, etc.), then we can run
             // fire off this job for processing. Otherwise, we will need to sleep the
@@ -447,6 +458,10 @@ class Worker
     {
         if ($this->supportsAsyncSignals()) {
             pcntl_async_signals(true);
+
+            pcntl_signal(SIGQUIT, function () {
+                $this->shouldQuit = true;
+            });
 
             pcntl_signal(SIGUSR2, function () {
                 $this->paused = true;
