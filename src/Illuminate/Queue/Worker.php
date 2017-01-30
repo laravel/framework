@@ -459,7 +459,7 @@ class Worker
         if ($this->supportsAsyncSignals()) {
             pcntl_async_signals(true);
 
-            pcntl_signal(SIGQUIT, function () {
+            pcntl_signal(SIGTERM, function () {
                 $this->shouldQuit = true;
             });
 
