@@ -78,7 +78,7 @@ class Str
      */
     public static function clearWhitespaces($value)
     {
-        return preg_replace('/\s+/',' ', $value);
+        return preg_replace('/\s+/', ' ', $value);
     }
 
     /**
