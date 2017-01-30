@@ -63,8 +63,6 @@ class EventFake implements Dispatcher
 
         return collect($this->events[$event])->filter(function ($arguments) use ($callback) {
             return $callback(...$arguments);
-        })->flatMap(function ($arguments) {
-            return $this->mapEventArguments($arguments);
         });
     }
 
@@ -77,24 +75,6 @@ class EventFake implements Dispatcher
     public function hasDispatched($event)
     {
         return isset($this->events[$event]) && ! empty($this->events[$event]);
-    }
-
-    /**
-     * Map the "fire" method arguments for inspection.
-     *
-     * @param  array  $arguments
-     * @return array
-     */
-    protected function mapEventArguments($arguments)
-    {
-        // If the fired event was just a simple string event, we will return the event
-        // name as the key with the array of arguments as the value. Otherwise this
-        // event was an object event and we will return this object as the value.
-        if (is_string($arguments[0])) {
-            return [$arguments[0] => $arguments[1]];
-        } else {
-            return [get_class($arguments[0]) => $arguments[0]];
-        }
     }
 
     /**
