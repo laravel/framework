@@ -4,6 +4,7 @@
 
 ### Added
 - Added `Illuminate\Support\Facades\Schema` to `notifications.stub` ([#17664](https://github.com/laravel/framework/pull/17664))
+- Added support for numeric arguments to `@break` and `@continue` ([#17603](https://github.com/laravel/framework/pull/17603))
 
 ### Change
 - Use `usesTimestamps()` in Eloquent traits ([#17612](https://github.com/laravel/framework/pull/17612))
@@ -22,6 +23,10 @@
 - Fixed `BelongsTo` not accepting id of `0` in foreign relations ([#17668](https://github.com/laravel/framework/pull/17668))
 - Support double quotes with `@section()` ([#17677](https://github.com/laravel/framework/pull/17677))
 - Fixed parsing explicit validator rules ([#17681](https://github.com/laravel/framework/pull/17681))
+- Fixed `SessionGuard::recaller()` when request is `null` ([#17688](https://github.com/laravel/framework/pull/17688), [565456d](https://github.com/laravel/framework/commit/565456d89e8d6378c213edb7e9d0724fa8a5f473))
+- Added missing `force` and `tries` options for `queue:listen` ([#17687](https://github.com/laravel/framework/pull/17687))
+- Fixed how reservation works when queue is paused ([9d348c5](https://github.com/laravel/framework/commit/9d348c5d57873bfcca86cff1987e22472d1f0e5b))
+
 
 ## v5.4.6 (2017-01-27)
 
