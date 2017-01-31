@@ -1,6 +1,6 @@
 # Release Notes for 5.4.x
 
-## [Unreleased]
+## v5.4.7 (2017-01-31)
 
 ### Added
 - Added `Illuminate\Support\Facades\Schema` to `notifications.stub` ([#17664](https://github.com/laravel/framework/pull/17664))
