@@ -258,7 +258,10 @@ class Store implements SessionInterface {
 	 */
 	public function ageFlashData()
 	{
-		foreach ($this->get('flash.old', array()) as $old) { $this->forget($old); }
+		foreach ($this->get('flash.old', array()) as $old)
+		{
+			$this->forget($old);
+		}
 
 		$this->put('flash.old', $this->get('flash.new', array()));
 
