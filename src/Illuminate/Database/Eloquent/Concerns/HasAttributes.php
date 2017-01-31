@@ -3,11 +3,11 @@
 namespace Illuminate\Database\Eloquent\Concerns;
 
 use Carbon\Carbon;
-use Illuminate\Support\HtmlString;
 use LogicException;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\HtmlString;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection as BaseCollection;
