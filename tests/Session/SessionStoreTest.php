@@ -138,6 +138,18 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse($session->hasOldInput('boom'));
 	}
 
+	public function testOldInputWithUploadedFileFlashing()
+	{
+		$file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', null, array(__FILE__, 'photo.jpg'));
+
+		$session = $this->getSession();
+		$session->flashInput(array('bar' => array('baz' => array('name' => 'foo', 'file' => $file))));
+
+		$this->assertTrue($session->hasOldInput('bar.baz.name'));
+		$this->assertEquals('foo', $session->getOldInput('bar.baz.name'));
+		$this->assertFalse($session->hasOldInput('bar.baz.file'));
+	}
+
 
 	public function testDataFlashing()
 	{

@@ -388,7 +388,33 @@ class Store implements SessionInterface {
 	 */
 	public function flashInput(array $value)
 	{
+		$value = $this->recursiveArrayValueFilter($value, function($v)
+		{
+			return $v instanceof \Symfony\Component\HttpFoundation\File\UploadedFile === false;
+		});
 		$this->flash('_old_input', $value);
+	}
+
+	/**
+	 * Filter array recursively with callback.
+	 *
+	 * @param  array     $arrayValue
+	 * @param  callable  $callback
+	 * @return array
+	 */
+	protected function recursiveArrayValueFilter(array $arrayValue, callable $callback)
+	{
+		foreach ($arrayValue as $key => $value)
+		{
+			if (is_array($value))
+			{
+				$value = $this->recursiveArrayValueFilter($value, $callback);
+			}
+
+			$arrayValue[$key] = $value;
+		}
+
+		return array_filter($arrayValue, $callback);
 	}
 
 	/**
