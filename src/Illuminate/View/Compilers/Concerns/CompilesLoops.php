@@ -96,7 +96,13 @@ trait CompilesLoops
      */
     protected function compileBreak($expression)
     {
-        return $expression ? "<?php if{$expression} break; ?>" : '<?php break; ?>';
+        if ($expression) {
+            preg_match('/\(\s*(-?\d+)\s*\)$/', $expression, $matches);
+
+            return $matches ? '<?php break '.max(1, $matches[1]).'; ?>' : "<?php if{$expression} break; ?>";
+        }
+
+        return '<?php break; ?>';
     }
 
     /**
@@ -107,7 +113,13 @@ trait CompilesLoops
      */
     protected function compileContinue($expression)
     {
-        return $expression ? "<?php if{$expression} continue; ?>" : '<?php continue; ?>';
+        if ($expression) {
+            preg_match('/\(\s*(-?\d+)\s*\)$/', $expression, $matches);
+
+            return $matches ? '<?php continue '.max(1, $matches[1]).'; ?>' : "<?php if{$expression} continue; ?>";
+        }
+
+        return '<?php continue; ?>';
     }
 
     /**
