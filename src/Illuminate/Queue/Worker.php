@@ -85,6 +85,15 @@ class Worker
         $lastRestart = $this->getTimestampOfLastQueueRestart();
 
         while (true) {
+            // Before reserving any jobs, we will make sure this queue is not paused and
+            // if it is we will just pause this worker for a given amount of time and
+            // make sure we do not need to kill this worker process off completely.
+            if (! $this->daemonShouldRun($options)) {
+                $this->pauseWorker($options, $lastRestart);
+
+                continue;
+            }
+
             // First, we will attempt to get the next job off of the queue. We will also
             // register the timeout handler and reset the alarm for this job so it is
             // not stuck in a frozen state forever. Then, we can fire off this job.
@@ -101,7 +110,7 @@ class Worker
             // If the daemon should run (not in maintenance mode, etc.), then we can run
             // fire off this job for processing. Otherwise, we will need to sleep the
             // worker so no more jobs are processed until they should be processed.
-            if ($job && $this->daemonShouldRun($options)) {
+            if ($job) {
                 $this->runJob($job, $connectionName, $options);
             } else {
                 $this->sleep($options->sleep);
@@ -110,11 +119,7 @@ class Worker
             // Finally, we will check to see if we have exceeded our memory limits or if
             // the queue should restart based on other indications. If so, we'll stop
             // this worker and let whatever is "monitoring" it restart the process.
-            if ($this->memoryExceeded($options->memory)) {
-                $this->stop(12);
-            } elseif ($this->queueShouldRestart($lastRestart)) {
-                $this->stop();
-            }
+            $this->stopIfNecessary($options, $lastRestart);
         }
     }
 
@@ -148,8 +153,7 @@ class Worker
      */
     protected function timeoutForJob($job, WorkerOptions $options)
     {
-        return $job && ! is_null($job->timeout())
-                            ? $job->timeout() : $options->timeout;
+        return $job && ! is_null($job->timeout()) ? $job->timeout() : $options->timeout;
     }
 
     /**
@@ -160,18 +164,38 @@ class Worker
      */
     protected function daemonShouldRun(WorkerOptions $options)
     {
-        if (($this->manager->isDownForMaintenance() && ! $options->force) ||
+        return ! (($this->manager->isDownForMaintenance() && ! $options->force) ||
             $this->paused ||
-            $this->events->until(new Events\Looping) === false) {
-            // If the application is down for maintenance or doesn't want the queues to run
-            // we will sleep for one second just in case the developer has it set to not
-            // sleep at all. This just prevents CPU from maxing out in this situation.
-            $this->sleep(1);
+            $this->events->until(new Events\Looping) === false);
+    }
 
-            return false;
+    /**
+     * Pause the worker for the current loop.
+     *
+     * @param  WorkerOptions  $options
+     * @param  int  $lastRestart
+     * @return void
+     */
+    protected function pauseWorker(WorkerOptions $options, $lastRestart)
+    {
+        $this->sleep($options->sleep > 0 ? $options->sleep : 1);
+
+        $this->stopIfNecessary($options, $lastRestart);
+    }
+
+    /**
+     * Stop the process if necessary.
+     *
+     * @param  WorkerOptions  $options
+     * @param  int  $lastRestart
+     */
+    protected function stopIfNecessary(WorkerOptions $options, $lastRestart)
+    {
+        if ($this->memoryExceeded($options->memory)) {
+            $this->stop(12);
+        } elseif ($this->queueShouldRestart($lastRestart)) {
+            $this->stop();
         }
-
-        return true;
     }
 
     /**
