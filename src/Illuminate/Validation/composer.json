@@ -18,6 +18,7 @@
         "illuminate/container": "5.4.*",
         "illuminate/contracts": "5.4.*",
         "illuminate/support": "5.4.*",
+        "illuminate/translation": "5.4.*",
         "symfony/http-foundation": "~3.2"
     },
     "autoload": {
