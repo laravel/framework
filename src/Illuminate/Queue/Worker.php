@@ -103,10 +103,6 @@ class Worker
 
             $this->registerTimeoutHandler($job, $options);
 
-            if ($this->shouldQuit) {
-                $this->kill();
-            }
-
             // If the daemon should run (not in maintenance mode, etc.), then we can run
             // fire off this job for processing. Otherwise, we will need to sleep the
             // worker so no more jobs are processed until they should be processed.
@@ -191,6 +187,10 @@ class Worker
      */
     protected function stopIfNecessary(WorkerOptions $options, $lastRestart)
     {
+        if ($this->shouldQuit) {
+            $this->kill();
+        }
+
         if ($this->memoryExceeded($options->memory)) {
             $this->stop(12);
         } elseif ($this->queueShouldRestart($lastRestart)) {
