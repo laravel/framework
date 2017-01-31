@@ -1358,6 +1358,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->dateAttribute = '1969-07-20';
         $model->datetimeAttribute = '1969-07-20 22:56:00';
         $model->timestampAttribute = '1969-07-20 22:56:00';
+        $model->htmlAttribute = '<p>Foo</p>';
 
         $this->assertInternalType('int', $model->intAttribute);
         $this->assertInternalType('float', $model->floatAttribute);
@@ -1378,6 +1379,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals('1969-07-20', $model->dateAttribute->toDateString());
         $this->assertEquals('1969-07-20 22:56:00', $model->datetimeAttribute->toDateTimeString());
         $this->assertEquals(-14173440, $model->timestampAttribute);
+        $this->assertInstanceOf('Illuminate\Support\HtmlString', $model->htmlAttribute);
 
         $arr = $model->toArray();
         $this->assertInternalType('int', $arr['intAttribute']);
@@ -1396,6 +1398,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals('1969-07-20 00:00:00', $arr['dateAttribute']);
         $this->assertEquals('1969-07-20 22:56:00', $arr['datetimeAttribute']);
         $this->assertEquals(-14173440, $arr['timestampAttribute']);
+        $this->assertEquals('<p>Foo</p>', $arr['htmlAttribute']);
     }
 
     public function testModelDateAttributeCastingResetsTime()
@@ -1876,6 +1879,7 @@ class EloquentModelCastingStub extends Model
         'dateAttribute' => 'date',
         'datetimeAttribute' => 'datetime',
         'timestampAttribute' => 'timestamp',
+        'htmlAttribute' => 'html',
     ];
 
     public function jsonAttributeValue()
