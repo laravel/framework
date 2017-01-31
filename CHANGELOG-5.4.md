@@ -1,5 +1,28 @@
 # Release Notes for 5.4.x
 
+## [Unreleased]
+
+### Added
+- Added `Illuminate\Support\Facades\Schema` to `notifications.stub` ([#17664](https://github.com/laravel/framework/pull/17664))
+
+### Change
+- Use `usesTimestamps()` in Eloquent traits ([#17612](https://github.com/laravel/framework/pull/17612))
+- Default to `null` if amount isn't set in `factory()` helper ([#17614](https://github.com/laravel/framework/pull/17614))
+- Normalize PhpRedis GET/MGET results ([#17196](https://github.com/laravel/framework/pull/17196))
+- Changed visibility of `Validator::addRules()` from `protected` to `public` ([#17654](https://github.com/laravel/framework/pull/17654))
+- Gracefully handle `SIGTERM` signal in queue worker ([b38ba01](https://github.com/laravel/framework/commit/b38ba016283c6491d6e525caeb6206b2b04321fc), [819888c](https://github.com/laravel/framework/commit/819888ca1776581225d57e00fdc4ba709cbcc5d0))
+- Support inspecting multiple events of same type using `Event` fake ([55be2ea](https://github.com/laravel/framework/commit/55be2ea35ccd2e450f9ffad23fd7ac446c035013))
+- Replaced hard-coded year in plain-text markdown emails ([#17684](https://github.com/laravel/framework/pull/17684))
+- Made button component in plain-text markdown emails easier to read ([#17683](https://github.com/laravel/framework/pull/17683))
+
+### Fixed
+- Set `Command::$name` in `Command::configureUsingFluentDefinition()` ([#17610](https://github.com/laravel/framework/pull/17610))
+- Support post size `0` (unlimited) in `ValidatePostSize` ([#17607](https://github.com/laravel/framework/pull/17607))
+- Fixed method signature issues in `PhpRedisConnection` ([#17627](https://github.com/laravel/framework/pull/17627))
+- Fixed `BelongsTo` not accepting id of `0` in foreign relations ([#17668](https://github.com/laravel/framework/pull/17668))
+- Support double quotes with `@section()` ([#17677](https://github.com/laravel/framework/pull/17677))
+- Fixed parsing explicit validator rules ([#17681](https://github.com/laravel/framework/pull/17681))
+
 ## v5.4.6 (2017-01-27)
 
 ### Added

@@ -92,7 +92,8 @@ class ListenCommand extends Command
     {
         return new ListenerOptions(
             $this->option('env'), $this->option('delay'),
-            $this->option('memory'), $this->option('timeout')
+            $this->option('memory'), $this->option('timeout'),
+            $this->option('tries'), $this->option('force')
         );
     }
 
