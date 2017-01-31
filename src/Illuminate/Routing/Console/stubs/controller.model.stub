@@ -9,7 +9,7 @@ use DummyRootNamespaceHttp\Controllers\Controller;
 class DummyClass extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the DummyModelVariable.
      *
      * @return \Illuminate\Http\Response
      */
@@ -19,7 +19,7 @@ class DummyClass extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new DummyModelVariable.
      *
      * @return \Illuminate\Http\Response
      */
@@ -29,7 +29,7 @@ class DummyClass extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created DummyModelVariable in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
@@ -40,7 +40,7 @@ class DummyClass extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified DummyModelClass.
      *
      * @param  \DummyFullModelClass  $DummyModelVariable
      * @return \Illuminate\Http\Response
@@ -51,7 +51,7 @@ class DummyClass extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the form for editing the specified DummyModelVariable.
      *
      * @param  \DummyFullModelClass  $DummyModelVariable
      * @return \Illuminate\Http\Response
@@ -62,7 +62,7 @@ class DummyClass extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified DummyModelVariable in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \DummyFullModelClass  $DummyModelVariable
@@ -74,7 +74,7 @@ class DummyClass extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified DummyModelVariable from storage.
      *
      * @param  \DummyFullModelClass  $DummyModelVariable
      * @return \Illuminate\Http\Response
