@@ -15,9 +15,9 @@ class CallQueuedHandler
     protected $dispatcher;
 
     /**
-     * The command that has been unserialized
+     * The command that has been unserialized.
      * This is a cache for the deleted and failed callback.
-     * Set the first time the command method is called
+     * Set the first time the command method is called.
      *
      * @var mixed
      */
@@ -35,7 +35,7 @@ class CallQueuedHandler
     }
 
     /**
-     * Unserialize the command from the data array
+     * Unserialize the command from the data array.
      *
      * @param array $data
      * @return Job
