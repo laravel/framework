@@ -6,7 +6,7 @@
 - Added `Illuminate\Support\Facades\Schema` to `notifications.stub` ([#17664](https://github.com/laravel/framework/pull/17664))
 - Added support for numeric arguments to `@break` and `@continue` ([#17603](https://github.com/laravel/framework/pull/17603))
 
-### Change
+### Changed
 - Use `usesTimestamps()` in Eloquent traits ([#17612](https://github.com/laravel/framework/pull/17612))
 - Default to `null` if amount isn't set in `factory()` helper ([#17614](https://github.com/laravel/framework/pull/17614))
 - Normalize PhpRedis GET/MGET results ([#17196](https://github.com/laravel/framework/pull/17196))
