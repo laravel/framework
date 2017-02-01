@@ -35,12 +35,12 @@ class CallQueuedHandler
     }
 
     /**
-     * Unserialize the command
+     * Unserialize the command from the data array
      *
-     * @param $data
+     * @param array $data
      * @return Job
      */
-    protected function command($data)
+    protected function command(array $data)
     {
         if ($this->jobCommand) {
             return $this->jobCommand;
