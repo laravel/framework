@@ -1,5 +1,26 @@
 # Release Notes for 5.4.x
 
+## [Unreleased]
+
+### Changed
+- Use `route()` helper instead of `url()` in authentication component ([#17718](https://github.com/laravel/framework/pull/17718))
+
+
+## v5.4.8 (2017-02-01)
+
+### Added
+- Added `TestResponse::assertJsonStructure()` ([#17700](https://github.com/laravel/framework/pull/17700))
+- Added `Macroable` trait to Eloquent `Relation` class ([#17707](https://github.com/laravel/framework/pull/17707))
+
+### Changed
+- Move `shouldKill()` check from `daemon()` to `stopIfNecessary()` ([8403b34](https://github.com/laravel/framework/commit/8403b34a6de212e5cd98d40333fd84d112fbb9f7))
+- Removed `isset()` check from `validateSame()` ([#17708](https://github.com/laravel/framework/pull/17708))
+
+### Fixed
+- Added `force` option to `queue:listen` signature ([#17716](https://github.com/laravel/framework/pull/17716))
+- Fixed missing `return` in `HasManyThrough::find()` and `HasManyThrough::findMany()` ([#17717](https://github.com/laravel/framework/pull/17717))
+
+
 ## v5.4.7 (2017-01-31)
 
 ### Added
