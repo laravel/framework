@@ -263,7 +263,7 @@ class HasManyThrough extends Relation
             return $this->findMany($id, $columns);
         }
 
-        $this->where(
+        return $this->where(
             $this->getRelated()->getQualifiedKeyName(), '=', $id
         )->first($columns);
     }
@@ -281,7 +281,7 @@ class HasManyThrough extends Relation
             return $this->getRelated()->newCollection();
         }
 
-        $this->whereIn(
+        return $this->whereIn(
             $this->getRelated()->getQualifiedKeyName(), $ids
         )->get($columns);
     }
