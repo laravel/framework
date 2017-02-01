@@ -239,6 +239,7 @@ class TestResponse extends Response
                 }
             } elseif (is_array($value)) {
                 PHPUnit::assertArrayHasKey($key, $responseData);
+
                 $this->assertJsonStructure($structure[$key], $responseData[$key]);
             } else {
                 PHPUnit::assertArrayHasKey($value, $responseData);
