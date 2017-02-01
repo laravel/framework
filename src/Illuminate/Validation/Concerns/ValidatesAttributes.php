@@ -1219,7 +1219,7 @@ trait ValidatesAttributes
 
         $other = Arr::get($this->data, $parameters[0]);
 
-        return isset($other) && $value === $other;
+        return $value === $other;
     }
 
     /**
