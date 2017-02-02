@@ -583,7 +583,7 @@ if (! function_exists('mix')) {
 
         return $shouldHotReload = file_exists(public_path('hot'))
                     ? new HtmlString("http://localhost:8080{$manifest[$path]}")
-                    : new HtmlString(url($manifest[$path]));
+                    : new HtmlString($manifest[$path]);
     }
 }
 
