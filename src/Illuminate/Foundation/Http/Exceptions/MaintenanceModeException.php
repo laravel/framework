@@ -18,7 +18,7 @@ class MaintenanceModeException extends ServiceUnavailableHttpException
     /**
      * The number of seconds to wait before retrying.
      *
-     * @var \Carbon\Carbon
+     * @var int
      */
     public $retryAfter;
 
