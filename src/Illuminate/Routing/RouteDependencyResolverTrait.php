@@ -131,7 +131,7 @@ trait RouteDependencyResolverTrait
      * @param  array $parameters
      * @return array
      */
-    protected function mergeRemainingParameters($arguments, $parameters)
+    protected function mergeRemainingParameters(array $arguments, array $parameters)
     {
         foreach ($arguments as $key => $argument) {
             // Arguments that aren't objects will be a default value or null
