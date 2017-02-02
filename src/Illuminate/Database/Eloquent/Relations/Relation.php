@@ -205,7 +205,7 @@ abstract class Relation
     {
         return collect($models)->map(function ($value) use ($key) {
             return $key ? $value->getAttribute($key) : $value->getKey();
-        })->values()->unique()->all();
+        })->values()->unique()->sort()->all();
     }
 
     /**
