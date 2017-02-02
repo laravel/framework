@@ -10,8 +10,10 @@ use JsonSerializable;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Collection;
 use PHPUnit_Framework_Error_Notice;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class SupportCollectionTest extends TestCase
 {
@@ -1438,12 +1440,57 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['name', 'framework'], $c->keys()->all());
     }
 
-    public function testPaginate()
+    public function testForPage()
     {
         $c = new Collection(['one', 'two', 'three', 'four']);
         $this->assertEquals(['one', 'two'], $c->forPage(1, 2)->all());
         $this->assertEquals([2 => 'three', 3 => 'four'], $c->forPage(2, 2)->all());
         $this->assertEquals([], $c->forPage(3, 2)->all());
+    }
+
+    public function testPaginate()
+    {
+        $c = new Collection(['one', 'two', 'three', 'four']);
+
+        $perPage = 2;
+        $page = 2;
+        $pageName = 'page';
+        $total = $c->count();
+        $path = 'http://foo.bar?page=2';
+        $itemsOnPage = ['three', 'four'];
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $c->paginate($page, $pageName, $page);
+
+        $this->assertEquals(new LengthAwarePaginator($itemsOnPage, $total, $perPage, $page, [
+            'path' => $path,
+            'pageName' => $pageName,
+        ]), $result);
+    }
+
+    public function testSimplePaginate()
+    {
+        $c = new Collection(['one', 'two', 'three', 'four']);
+
+        $perPage = 2;
+        $page = 2;
+        $pageName = 'page';
+        $path = 'http://foo.bar?page=2';
+        $itemsOnPage = ['three', 'four'];
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $c->simplePaginate($page, $pageName, $page);
+
+        $this->assertEquals(new Paginator($itemsOnPage, $perPage, $page, [
+            'path' => $path,
+            'pageName' => $pageName,
+        ]), $result);
     }
 
     public function testPrepend()
