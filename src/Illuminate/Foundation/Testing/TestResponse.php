@@ -6,11 +6,14 @@ use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Http\Response;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
 use Symfony\Component\HttpFoundation\Cookie;
 
 class TestResponse extends Response
 {
+    use Macroable;
+
     /**
      * Convert the given response into a TestResponse.
      *
