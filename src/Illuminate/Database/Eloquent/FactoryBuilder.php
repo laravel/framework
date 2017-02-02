@@ -143,6 +143,45 @@ class FactoryBuilder
     }
 
     /**
+     * Create an array of raw attribute arrays.
+     *
+     * @param  array  $attributes
+     * @return mixed
+     */
+    public function raw(array $attributes = [])
+    {
+        if ($this->amount === null) {
+            return $this->getRawAttributes();
+        }
+
+        if ($this->amount < 1) {
+            return [];
+        }
+
+        return array_map(function () use ($attributes) {
+            return $this->getRawAttributes($attributes);
+        }, range(1, $this->amount));
+    }
+
+    /**
+     * Get a raw attributes array for the model.
+     *
+     * @param  array  $attributes
+     * @return mixed
+     */
+    protected function getRawAttributes(array $attributes = [])
+    {
+        $definition = call_user_func(
+            $this->definitions[$this->class][$this->name],
+            $this->faker, $attributes
+        );
+
+        return $this->callClosureAttributes(
+            array_merge($this->applyStates($definition, $attributes), $attributes)
+        );
+    }
+
+    /**
      * Make an instance of the model with the given attributes.
      *
      * @param  array  $attributes
@@ -157,14 +196,9 @@ class FactoryBuilder
                 throw new InvalidArgumentException("Unable to locate factory with name [{$this->name}] [{$this->class}].");
             }
 
-            $definition = call_user_func(
-                $this->definitions[$this->class][$this->name],
-                $this->faker, $attributes
+            return new $this->class(
+                $this->getRawAttributes($attributes)
             );
-
-            return new $this->class($this->callClosureAttributes(
-                array_merge($this->applyStates($definition, $attributes), $attributes)
-            ));
         });
     }
 
