@@ -273,6 +273,16 @@ class TestResponse extends Response
     }
 
     /**
+     * Alias for the "decodeResponseJson" method.
+     *
+     * @return array
+     */
+    public function json()
+    {
+        return $this->decodeResponseJson();
+    }
+
+    /**
      * Assert that the response view has a given piece of bound data.
      *
      * @param  string|array  $key
