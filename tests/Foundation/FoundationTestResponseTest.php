@@ -46,6 +46,19 @@ class FoundationTestResponseTest extends TestCase
         $response = new TestResponse(new JsonSerializableSingleResourceStub);
         $response->assertJsonStructure(['*' => ['foo', 'bar', 'foobar']]);
     }
+
+    public function testMacroable()
+    {
+        TestResponse::macro('foo', function () {
+            return 'bar';
+        });
+
+        $response = new TestResponse;
+
+        $this->assertEquals(
+            'bar', $response->foo()
+        );
+    }
 }
 
 class JsonSerializableMixedResourcesStub implements JsonSerializable
