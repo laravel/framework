@@ -273,7 +273,7 @@ class TestResponse extends Response
     }
 
     /**
-     * Alias for the "decodeResponseJson" method.
+     * Validate and return the decoded response JSON.
      *
      * @return array
      */
