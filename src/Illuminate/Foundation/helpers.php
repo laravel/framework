@@ -552,8 +552,8 @@ if (! function_exists('mix')) {
     /**
      * Get the path to a versioned Mix file.
      *
-     * @param string $path
-     * @param string $manifestDir
+     * @param  string $path
+     * @param  string $manifestDir
      * @return \Illuminate\Support\HtmlString
      *
      * @throws \Exception
@@ -586,8 +586,8 @@ if (! function_exists('mix')) {
         }
 
         return file_exists(public_path($manifestDir.'/hot'))
-            ? new HtmlString("http://localhost:8080{$manifest[$path]}")
-            : new HtmlString($manifestDir.$manifest[$path]);
+                    ? new HtmlString("http://localhost:8080{$manifest[$path]}")
+                    : new HtmlString($manifestDir.$manifest[$path]);
     }
 }
 
