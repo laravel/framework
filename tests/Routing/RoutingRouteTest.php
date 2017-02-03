@@ -1151,7 +1151,7 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('taylor', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
-    public function testImplicitBindingsWithOptionalParameter()
+    public function testImplicitBindingsWithOptionalParameterWithExistingKeyInUri()
     {
         $phpunit = $this;
         $router = $this->getRouter();
@@ -1164,13 +1164,35 @@ class RoutingRouteTest extends TestCase
             },
         ]);
         $this->assertEquals('taylor', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
 
+    public function testImplicitBindingsWithOptionalParameterWithNoKeyInUri()
+    {
+        $phpunit = $this;
         $router = $this->getRouter();
-        $router->get('bar/{foo?}', function (RoutingTestUserModel $foo = null) use ($phpunit) {
-            $phpunit->assertInstanceOf(RoutingTestUserModel::class, $foo);
-            $phpunit->assertNull($foo->value);
-        });
-        $router->dispatch(Request::create('bar', 'GET'))->getContent();
+        $router->get('foo/{bar?}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (RoutingTestUserModel $bar = null) use ($phpunit) {
+                $phpunit->assertNull($bar);
+            },
+        ]);
+        $router->dispatch(Request::create('foo', 'GET'))->getContent();
+    }
+
+    /**
+     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    public function testImplicitBindingsWithOptionalParameterWithNonExistingKeyInUri()
+    {
+        $phpunit = $this;
+        $router = $this->getRouter();
+        $router->get('foo/{bar?}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (RoutingTestNonExistingUserModel $bar = null) use ($phpunit) {
+                $phpunit->fail('ModelNotFoundException was expected.');
+            },
+        ]);
+        $router->dispatch(Request::create('foo/nonexisting', 'GET'))->getContent();
     }
 
     public function testImplicitBindingThroughIOC()
@@ -1429,6 +1451,18 @@ class RoutingTestUserModel extends Model
 
 class RoutingTestExtendedUserModel extends RoutingTestUserModel
 {
+}
+
+class RoutingTestNonExistingUserModel extends RoutingTestUserModel
+{
+    public function first()
+    {
+    }
+
+    public function firstOrFail()
+    {
+        throw new \Illuminate\Database\Eloquent\ModelNotFoundException();
+    }
 }
 
 class ActionStub
