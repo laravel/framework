@@ -337,6 +337,10 @@ trait ValidatesAttributes
             return false;
         }
 
+        if (is_string($value) && preg_match('#^(\d{5,}[^\d]\d{2}[^\d]\d{2}|\d{2}[^\d]\d{2}[^\d]\d{5,})$#', $value)) {
+            return false;
+        }
+
         $date = date_parse($value);
 
         return checkdate($date['month'], $date['day'], $date['year']);
