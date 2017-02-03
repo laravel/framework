@@ -134,6 +134,8 @@ class BelongsTo extends Relation
             return [$this->relationHasIncrementingId() ? 0 : null];
         }
 
+        sort($keys);
+
         return array_values(array_unique($keys));
     }
 
