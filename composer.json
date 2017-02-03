@@ -74,7 +74,7 @@
         "doctrine/dbal": "~2.5",
         "mockery/mockery": "~0.9.4",
         "pda/pheanstalk": "~3.0",
-        "phpunit/phpunit": "~5.7",
+        "phpunit/phpunit": "~6.0",
         "predis/predis": "~1.0",
         "symfony/css-selector": "~3.2",
         "symfony/dom-crawler": "~3.2"
