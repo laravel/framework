@@ -450,6 +450,19 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Set the JSON payload for the request.
+     *
+     * @param  array  $json
+     * @return $this
+     */
+    public function setJson($json)
+    {
+        $this->json = $json;
+
+        return $this;
+    }
+
+    /**
      * Get the user resolver callback.
      *
      * @return \Closure
