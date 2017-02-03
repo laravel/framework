@@ -835,6 +835,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function tap(callable $callback)
     {
         $callback(new static($this->items));
+
         return $this;
     }
 
