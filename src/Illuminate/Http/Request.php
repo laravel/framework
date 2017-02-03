@@ -303,6 +303,17 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Set the JSON payload for the request.
+     *
+     * @param  array  $json
+     * @return void
+     */
+    public function setJson($json)
+    {
+        $this->json = $json;
+    }
+
+    /**
      * Get the input source for the request.
      *
      * @return \Symfony\Component\HttpFoundation\ParameterBag
