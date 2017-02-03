@@ -553,6 +553,28 @@ trait HasAttributes
     }
 
     /**
+     * Determine if an attribute or relation exists on the model.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function issetAttribute($key)
+    {
+        return ! is_null($this->getAttribute($key));
+    }
+
+    /**
+     * Unset an attribute on the model.
+     *
+     * @param  string  $key
+     * @return void
+     */
+    public function unsetAttribute($key)
+    {
+        unset($this->attributes[$key], $this->relations[$key]);
+    }
+
+    /**
      * Determine if the given attribute is a date or date castable.
      *
      * @param  string  $key
