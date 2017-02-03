@@ -1882,6 +1882,24 @@ class SupportCollectionTest extends TestCase
 
         $this->assertSame(['b' => ['free' => false]], $premium->toArray());
     }
+
+    public function testHigherOrderWithFunctions()
+    {
+        $collection = new Collection(['laravel', 'framework', '']);
+
+        $result = $collection->map->strtoupper()->reject->empty();
+
+        $this->assertSame(['LARAVEL', 'FRAMEWORK'], $result->toArray());
+    }
+
+    public function testHigherOrderWithFunctionsWithExtraArguments()
+    {
+        $collection = new Collection(['===laravel===', '---framework---']);
+
+        $result = $collection->map->substr(3, -3);
+
+        $this->assertSame(['laravel', 'framework'], $result->toArray());
+    }
 }
 
 class TestSupportCollectionHigherOrderItem
