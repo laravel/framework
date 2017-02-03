@@ -1882,6 +1882,19 @@ class SupportCollectionTest extends TestCase
 
         $this->assertSame(['b' => ['free' => false]], $premium->toArray());
     }
+
+    public function testTap()
+    {
+        $collection = new Collection([1, 2, 3]);
+
+        $fromTap = [];
+        $collection = $collection->tap(function ($collection) use (&$fromTap) {
+            $fromTap = $collection->slice(0, 1)->toArray();
+        });
+
+        $this->assertSame([1], $fromTap);
+        $this->assertSame([1, 2, 3], $collection->toArray());
+    }
 }
 
 class TestSupportCollectionHigherOrderItem
