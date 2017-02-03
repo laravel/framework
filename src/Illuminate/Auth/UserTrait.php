@@ -48,7 +48,7 @@ trait UserTrait {
 	 *
 	 * @return string
 	 */
-	public function getRememberTokenName()
+	public static function getRememberTokenName()
 	{
 		return 'remember_token';
 	}
