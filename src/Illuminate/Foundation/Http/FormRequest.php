@@ -246,4 +246,16 @@ class FormRequest extends Request implements ValidatesWhenResolved
 
         return $this;
     }
+
+    /**
+     * Get all of the input and files for the request.
+     *
+     * @return array
+     */
+    public function all()
+    {
+        $this->merge($this->request->all());
+
+        return parent::all();
+    }
 }
