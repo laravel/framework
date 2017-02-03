@@ -260,7 +260,7 @@ class ConnectionFactory
      */
     protected function createConnection($driver, $connection, $database, $prefix = '', array $config = [])
     {
-        if ($this->container->bound($key = "db.connection.{$driver}")) {
+        if ($this->container->bound($key = "db.connection.{$driver}.{$config['name']}")) {
             return $this->container->make($key, [$connection, $database, $prefix, $config]);
         }
 
