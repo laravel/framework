@@ -1,9 +1,24 @@
 # Release Notes for 5.4.x
 
-## [Unreleased]
+## v5.4.9 (2017-02-03)
+
+### Added
+- Added `Macroable` trait to `TestResponse` ([#17726](https://github.com/laravel/framework/pull/17726))
+- Added container alias for the Redis connection instance ([#17722](https://github.com/laravel/framework/pull/17722))
+- Added `raw()` method to `FactoryBuilder` ([#17734](https://github.com/laravel/framework/pull/17734))
+- Added `json()` as alias for `decodeResponseJson` method on `TestResponse` ([#17735](https://github.com/laravel/framework/pull/17735))
 
 ### Changed
 - Use `route()` helper instead of `url()` in authentication component ([#17718](https://github.com/laravel/framework/pull/17718))
+- Added `Jedi` to uncountable list for pluralization ([#17729](https://github.com/laravel/framework/pull/17729))
+- Return relative URL from `mix()` helper ([#17727](https://github.com/laravel/framework/pull/17727))
+- Sort foreign keys on eloquent relations ([#17730](https://github.com/laravel/framework/pull/17730))
+- Properly set the JSON payload of `FormRequests` instead of re-building it ([#17760](https://github.com/laravel/framework/pull/17760), [2d725c2](https://github.com/laravel/framework/commit/2d725c205a7f700f0143670def471e0b5082a420))
+- Use `isset()` instead of `array_key_exists()` in `HasAttributes::getAttributeFromArray()` ([#17739](https://github.com/laravel/framework/pull/17739))
+
+### Fixed
+- Added missing `sleep` option to `queue:listen` ([59ef5bf](https://github.com/laravel/framework/commit/59ef5bff290195445925dc89a160782485bfc425))
+- Switched to strict comparison `TrimStrings` middleware ([#17741](https://github.com/laravel/framework/pull/17741))
 
 
 ## v5.4.8 (2017-02-01)

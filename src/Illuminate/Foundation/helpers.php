@@ -553,17 +553,21 @@ if (! function_exists('mix')) {
      * Get the path to a versioned Mix file.
      *
      * @param  string  $path
+     * @param  string  $manifestDirectory
      * @return \Illuminate\Support\HtmlString
      *
      * @throws \Exception
      */
-    function mix($path)
+    function mix($path, $manifestDirectory = '')
     {
         static $manifest;
-        static $shouldHotReload;
+
+        if ($manifestDirectory && ! starts_with($manifestDirectory, '/')) {
+            $manifestDirectory = "/{$manifestDirectory}";
+        }
 
         if (! $manifest) {
-            if (! file_exists($manifestPath = public_path('mix-manifest.json'))) {
+            if (! file_exists($manifestPath = public_path($manifestDirectory.'/mix-manifest.json'))) {
                 throw new Exception('The Mix manifest does not exist.');
             }
 
@@ -581,9 +585,9 @@ if (! function_exists('mix')) {
             );
         }
 
-        return $shouldHotReload = file_exists(public_path('hot'))
+        return file_exists(public_path($manifestDirectory.'/hot'))
                     ? new HtmlString("http://localhost:8080{$manifest[$path]}")
-                    : new HtmlString($manifest[$path]);
+                    : new HtmlString($manifestDirectory.$manifest[$path]);
     }
 }
 
