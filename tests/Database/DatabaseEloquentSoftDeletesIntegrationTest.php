@@ -96,7 +96,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $comment1 = TestCommentWithoutSoftDelete::create(['body' => 'foo', 'post_id' => 1]);
         $this->assertFalse($comment1->isSoftDeleting());
 
-        SoftDeletesTestComment::setEventDispatcher(new Illuminate\Events\Dispatcher);
+        SoftDeletesTestComment::setEventDispatcher(new \Illuminate\Events\Dispatcher);
         $comment2 = SoftDeletesTestComment::create(['body' => 'foo', 'post_id' => 1]);
 
         $this->assertTrue($comment2->isSoftDeleting());
