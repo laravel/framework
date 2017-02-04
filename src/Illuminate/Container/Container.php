@@ -938,10 +938,10 @@ class Container implements ArrayAccess, ContainerContract
     {
         return $this->bindings;
     }
-    
+
     /**
      * Return the types which are bound in this container, except for aliases.
-     * 
+     *
      * @return array
      */
     public function getAbstractTypes()

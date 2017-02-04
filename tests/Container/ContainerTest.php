@@ -772,7 +772,7 @@ class ContainerTest extends TestCase
 
         $this->assertEquals('taylor', $instance->name);
     }
-    
+
     public function testRetrieveAbstractTypes()
     {
         $container = new Container;
@@ -784,7 +784,7 @@ class ContainerTest extends TestCase
         $container->instance('Illuminate\Tests\Container\IContainerContractStub', $instance);
         $instance = new ContainerConcreteStub;
         $container->instance('other', $instance);
-        
+
         $types = $container->getAbstractTypes();
         $this->assertEquals(3, count($types));
         $this->assertContains('something', $types);
