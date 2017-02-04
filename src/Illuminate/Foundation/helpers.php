@@ -553,21 +553,21 @@ if (! function_exists('mix')) {
      * Get the path to a versioned Mix file.
      *
      * @param  string  $path
-     * @param  string  $manifestDir
+     * @param  string  $manifestDirectory
      * @return \Illuminate\Support\HtmlString
      *
      * @throws \Exception
      */
-    function mix($path, $manifestDir = '')
+    function mix($path, $manifestDirectory = '')
     {
         static $manifest;
 
-        if ($manifestDir && ! starts_with($manifestDir, '/')) {
-            $manifestDir = "/{$manifestDir}";
+        if ($manifestDirectory && ! starts_with($manifestDirectory, '/')) {
+            $manifestDirectory = "/{$manifestDirectory}";
         }
 
         if (! $manifest) {
-            if (! file_exists($manifestPath = public_path($manifestDir.'/mix-manifest.json'))) {
+            if (! file_exists($manifestPath = public_path($manifestDirectory.'/mix-manifest.json'))) {
                 throw new Exception('The Mix manifest does not exist.');
             }
 
@@ -585,9 +585,9 @@ if (! function_exists('mix')) {
             );
         }
 
-        return file_exists(public_path($manifestDir.'/hot'))
+        return file_exists(public_path($manifestDirectory.'/hot'))
                     ? new HtmlString("http://localhost:8080{$manifest[$path]}")
-                    : new HtmlString($manifestDir.$manifest[$path]);
+                    : new HtmlString($manifestDirectory.$manifest[$path]);
     }
 }
 
