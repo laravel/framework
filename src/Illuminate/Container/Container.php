@@ -938,6 +938,16 @@ class Container implements ArrayAccess, ContainerContract
     {
         return $this->bindings;
     }
+    
+    /**
+     * Return the types which are bound in this container, except for aliases.
+     * 
+     * @return array
+     */
+    public function getAbstractTypes()
+    {
+        return array_unique(array_merge(array_keys($this->bindings), array_keys($this->instances)));
+    }
 
     /**
      * Get the alias for an abstract if available.
