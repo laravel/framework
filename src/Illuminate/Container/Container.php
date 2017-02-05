@@ -946,7 +946,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function getAbstractTypes()
     {
-        return array_unique(array_merge(array_keys($this->bindings), array_keys($this->instances)));
+        return array_keys(array_merge($this->bindings, $this->instances));
     }
 
     /**
