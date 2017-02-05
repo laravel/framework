@@ -116,7 +116,7 @@ abstract class Queue
     protected function createObjectPayload($job)
     {
         return [
-            'job' => 'Illuminate\Queue\CallQueuedHandler@call',
+            'job' => CallQueuedHandler::class.'@call',
             'maxTries' => isset($job->tries) ? $job->tries : null,
             'timeout' => isset($job->timeout) ? $job->timeout : null,
             'data' => [

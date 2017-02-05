@@ -4,6 +4,8 @@ namespace Illuminate\Queue\Jobs;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Queue\CallQueuedHandler as QueueCallQueuedHandler;
+use Illuminate\Events\CallQueuedHandler as EventsCallQueuedHandler;
 
 class JobName
 {
@@ -27,11 +29,11 @@ class JobName
      */
     public static function resolve($name, $payload)
     {
-        if ($name === 'Illuminate\Queue\CallQueuedHandler@call') {
+        if ($name === QueueCallQueuedHandler::class.'@call') {
             return Arr::get($payload, 'data.commandName', $name);
         }
 
-        if ($name === 'Illuminate\Events\CallQueuedHandler@call') {
+        if ($name === EventsCallQueuedHandler::class.'@call') {
             return $payload['data']['class'].'@'.$payload['data']['method'];
         }
 
