@@ -1540,6 +1540,16 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateEmailWithDomainCheck()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'alice@some-gibberish-domain-that-will-never-exist-qcXKQ9734Fxkkh.com'], ['x' => 'email:checkdomain']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'foo@gmail.com'], ['x' => 'email:checkdomain']);
+        $this->assertTrue($v->passes());
+    }
+
     /**
      * @dataProvider validUrls
      */
