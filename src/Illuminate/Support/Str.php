@@ -66,7 +66,7 @@ class Str
      * @param  string|array  $needles
      * @return bool
      */
-    public static function contains(string $haystack, $needles) : bool
+    public static function contains($haystack, $needles) : bool
     {
         foreach ((array) $needles as $needle) {
             if ($needle != '' && mb_strpos($haystack, $needle) !== false) {
@@ -84,7 +84,7 @@ class Str
      * @param  string|array  $needles
      * @return bool
      */
-    public static function endsWith(string $haystack, $needles) : bool
+    public static function endsWith($haystack, $needles) : bool
     {
         foreach ((array) $needles as $needle) {
             if (substr($haystack, -strlen($needle)) === (string) $needle) {
@@ -379,7 +379,7 @@ class Str
      * @param  string|array  $needles
      * @return bool
      */
-    public static function startsWith(string $haystack, $needles) : bool
+    public static function startsWith($haystack, $needles) : bool
     {
         foreach ((array) $needles as $needle) {
             if ($needle != '' && substr($haystack, 0, strlen($needle)) === (string) $needle) {
