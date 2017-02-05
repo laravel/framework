@@ -220,18 +220,15 @@ class TestResponse extends Response
      * Assert that the response has a given JSON structure.
      *
      * @param  array|null  $structure
-     * @param  array|null  $responseData
      * @return $this
      */
-    public function assertJsonStructure(array $structure = null, $responseData = null)
+    public function assertJsonStructure(array $structure = null)
     {
         if (is_null($structure)) {
             return $this->assertJson();
         }
 
-        if (is_null($responseData)) {
-            $responseData = $this->decodeResponseJson();
-        }
+        $responseData = $this->decodeResponseJson();
 
         foreach ($structure as $key => $value) {
             if (is_array($value) && $key === '*') {
