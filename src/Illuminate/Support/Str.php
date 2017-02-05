@@ -260,7 +260,7 @@ class Str
      * @param  string  $subject
      * @return string
      */
-    public static function replaceFirst(string $search, string $replace, string $subject) : string string
+    public static function replaceFirst(string $search, string $replace, string $subject) : string
     {
         $position = strpos($subject, $search);
 
