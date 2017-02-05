@@ -1,5 +1,6 @@
 <?php
 
+use Carbon\Carbon;
 use Mockery as m;
 use Illuminate\Redis\Database;
 use Illuminate\Queue\RedisQueue;
@@ -25,6 +26,7 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
 
     public function setUp()
     {
+        Carbon::setTestNow();
         parent::setUp();
 
         $host = getenv('REDIS_HOST') ?: '127.0.0.1';
@@ -63,6 +65,7 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
 
     public function tearDown()
     {
+        Carbon::setTestNow(Carbon::now());
         parent::tearDown();
         m::close();
         if ($this->redis) {
