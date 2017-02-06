@@ -117,15 +117,30 @@ abstract class Queue
     protected function createObjectPayload($job)
     {
         return [
+            'displayName' => $this->getDisplayName($job),
             'job' => 'Illuminate\Queue\CallQueuedHandler@call',
             'maxTries' => isset($job->tries) ? $job->tries : null,
-            'name' => $job instanceof CallQueuedListener ? $job->class : '',
             'timeout' => isset($job->timeout) ? $job->timeout : null,
             'data' => [
                 'commandName' => get_class($job),
                 'command' => serialize(clone $job),
             ],
         ];
+    }
+
+    /**
+     * Get the display name for the given job.
+     *
+     * @param  mixed  $job
+     * @return string
+     */
+    protected function getDisplayName($job)
+    {
+        if ($job instanceof CallQueuedListener) {
+            return $job->class;
+        }
+
+        return get_class($job);
     }
 
     /**
