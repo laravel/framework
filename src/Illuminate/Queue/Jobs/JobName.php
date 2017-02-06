@@ -27,8 +27,8 @@ class JobName
      */
     public static function resolve($name, $payload)
     {
-        if (isset($payload['name']) && ! empty($payload['name'])) {
-            return $payload['name'];
+        if (isset($payload['displayName']) && ! empty($payload['displayName'])) {
+            return $payload['displayName'];
         }
 
         if ($name === 'Illuminate\Queue\CallQueuedHandler@call') {
