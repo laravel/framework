@@ -2,7 +2,6 @@
 
 namespace Illuminate\Queue\Jobs;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 class JobName
