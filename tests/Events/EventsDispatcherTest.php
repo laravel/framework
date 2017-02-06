@@ -183,23 +183,6 @@ class EventsDispatcherTest extends TestCase
         $d->fire('some.event', ['foo', 'bar']);
     }
 
-    public function testQueuedEventHandlersAreQueuedWithCustomHandlers()
-    {
-        $d = new Dispatcher;
-        $queue = m::mock('Illuminate\Contracts\Queue\Queue');
-        $queue->shouldReceive('push')->once()->with('Illuminate\Events\CallQueuedHandler@call', [
-            'class' => 'Illuminate\Tests\Events\TestDispatcherQueuedHandlerCustomQueue',
-            'method' => 'someMethod',
-            'data' => serialize(['foo', 'bar']),
-        ]);
-        $d->setQueueResolver(function () use ($queue) {
-            return $queue;
-        });
-
-        $d->listen('some.event', 'Illuminate\Tests\Events\TestDispatcherQueuedHandlerCustomQueue@someMethod');
-        $d->fire('some.event', ['foo', 'bar']);
-    }
-
     public function testClassesWork()
     {
         unset($_SERVER['__event.test']);
