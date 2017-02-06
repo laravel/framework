@@ -131,7 +131,7 @@ class BelongsToMany extends Relation
      * @param  \Illuminate\Database\Eloquent\Builder|null  $query
      * @return $this
      */
-    protected function performJoin($query = null)
+    protected function performJoin(Builder $query = null)
     {
         $query = $query ?: $this->query;
 
