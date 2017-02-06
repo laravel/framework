@@ -35,10 +35,6 @@ class JobName
             return Arr::get($payload, 'data.commandName', $name);
         }
 
-        if ($name === 'Illuminate\Events\CallQueuedHandler@call') {
-            return $payload['data']['class'].'@'.$payload['data']['method'];
-        }
-
         return $name;
     }
 }
