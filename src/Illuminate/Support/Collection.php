@@ -827,19 +827,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Pass the collection to the given callback and return the current instance.
-     *
-     * @param  callable $callback
-     * @return $this
-     */
-    public function tap(callable $callback)
-    {
-        $callback(new static($this->items));
-
-        return $this;
-    }
-
-    /**
      * Get and remove the last item from the collection.
      *
      * @return mixed
@@ -1185,6 +1172,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         return $this->slice(0, $limit);
+    }
+
+    /**
+     * Pass the collection to the given callback and then return it.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function tap(callable $callback)
+    {
+        $callback(new static($this->items));
+
+        return $this;
     }
 
     /**
