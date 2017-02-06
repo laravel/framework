@@ -66,7 +66,7 @@ class HasOneThrough extends Relation
     {
         $parentForeignKey = $this->parent->getTable().'.'.$this->parentForeignKey;
 
-        $this->setJoin();
+        $this->performJoin();
 
         if (static::$constraints) {
             $this->query->where($parentForeignKey, '=', $this->farParent->getKey());
@@ -85,7 +85,7 @@ class HasOneThrough extends Relation
      */
     public function getRelationQuery(Builder $query, Builder $parent, $columns = ['*'])
     {
-        $this->setJoin($query);
+        $this->performJoin($query);
 
         $query->select($columns);
 
@@ -98,15 +98,17 @@ class HasOneThrough extends Relation
 
     /**
      * @param  \Illuminate\Database\Eloquent\Builder|null  $query
-     * @return void
+     * @return $this
      */
-    protected function setJoin(Builder $query = null)
+    protected function performJoin(Builder $query = null)
     {
         $query = $query ?: $this->query;
 
         $relatedForeignKey = $this->related->getTable().'.'.$this->relatedForeignKey;
 
         $query->join($this->parent->getTable(), $this->parent->getQualifiedKeyName(), '=', $relatedForeignKey);
+
+        return $this;
     }
 
     /**

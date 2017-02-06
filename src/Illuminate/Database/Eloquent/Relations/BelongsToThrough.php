@@ -67,7 +67,7 @@ class BelongsToThrough extends Relation
     {
         $farParentLocalKey = $this->farParent->getQualifiedKeyName();
 
-        $this->setJoin();
+        $this->performJoin();
 
         if (static::$constraints) {
             $this->query->where($farParentLocalKey, '=', $this->farParent->getKey());
@@ -86,7 +86,7 @@ class BelongsToThrough extends Relation
      */
     public function getRelationQuery(Builder $query, Builder $parent, $columns = ['*'])
     {
-        $this->setJoin($query);
+        $this->performJoin($query);
 
         $query->select($columns);
 
@@ -97,9 +97,9 @@ class BelongsToThrough extends Relation
 
     /**
      * @param  \Illuminate\Database\Eloquent\Builder|null  $query
-     * @return void
+     * @return $this
      */
-    protected function setJoin(Builder $query = null)
+    protected function performJoin(Builder $query = null)
     {
         $query = $query ?: $this->query;
 
@@ -110,6 +110,8 @@ class BelongsToThrough extends Relation
 
         $query->join($this->parent->getTable(), $parentForeignKey, '=', $relatedLocalKey);
         $query->join($this->farParent->getTable(), $farParentForeignKey, '=', $parentLocalKey);
+
+        return $this;
     }
 
     /**
