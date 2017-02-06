@@ -450,19 +450,15 @@ class Dispatcher implements DispatcherContract
      */
     protected function queueHandler($class, $method, $arguments)
     {
-        $handler = (new ReflectionClass($class))->newInstanceWithoutConstructor();
+        $listener = (new ReflectionClass($class))->newInstanceWithoutConstructor();
 
-        $connection = isset($handler->connection) ? $handler->connection : null;
+        $connection = isset($listener->connection) ? $listener->connection : null;
 
-        $queue = isset($handler->queue) ? $handler->queue : null;
+        $queue = isset($listener->queue) ? $listener->queue : null;
 
         $this->resolveQueue()
                 ->connection($connection)
-                ->pushOn($queue, 'Illuminate\Events\CallQueuedHandler@call', [
-                    'class' => $class,
-                    'method' => $method,
-                    'data' => serialize($arguments),
-                ]);
+                ->pushOn($queue, new CallQueuedListener($class, $method, serialize($arguments)));
     }
 
     /**

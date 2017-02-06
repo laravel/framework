@@ -27,6 +27,10 @@ class JobName
      */
     public static function resolve($name, $payload)
     {
+        if (isset($payload['displayName']) && ! empty($payload['displayName'])) {
+            return $payload['displayName'];
+        }
+
         if ($name === 'Illuminate\Queue\CallQueuedHandler@call') {
             return Arr::get($payload, 'data.commandName', $name);
         }

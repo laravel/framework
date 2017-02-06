@@ -1175,6 +1175,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Pass the collection to the given callback and then return it.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function tap(callable $callback)
+    {
+        $callback(new static($this->items));
+
+        return $this;
+    }
+
+    /**
      * Transform each item in the collection using a callback.
      *
      * @param  callable  $callback

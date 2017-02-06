@@ -3,6 +3,7 @@
 namespace Illuminate\Queue;
 
 use Illuminate\Container\Container;
+use Illuminate\Events\CallQueuedListener;
 
 abstract class Queue
 {
@@ -116,6 +117,7 @@ abstract class Queue
     protected function createObjectPayload($job)
     {
         return [
+            'displayName' => $this->getDisplayName($job),
             'job' => 'Illuminate\Queue\CallQueuedHandler@call',
             'maxTries' => isset($job->tries) ? $job->tries : null,
             'timeout' => isset($job->timeout) ? $job->timeout : null,
@@ -124,6 +126,21 @@ abstract class Queue
                 'command' => serialize(clone $job),
             ],
         ];
+    }
+
+    /**
+     * Get the display name for the given job.
+     *
+     * @param  mixed  $job
+     * @return string
+     */
+    protected function getDisplayName($job)
+    {
+        if ($job instanceof CallQueuedListener) {
+            return $job->class;
+        }
+
+        return get_class($job);
     }
 
     /**

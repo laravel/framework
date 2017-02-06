@@ -173,11 +173,7 @@ class EventsDispatcherTest extends TestCase
 
         $queue->shouldReceive('connection')->once()->with(null)->andReturnSelf();
 
-        $queue->shouldReceive('pushOn')->once()->with(null, 'Illuminate\Events\CallQueuedHandler@call', [
-            'class' => 'Illuminate\Tests\Events\TestDispatcherQueuedHandler',
-            'method' => 'someMethod',
-            'data' => serialize(['foo', 'bar']),
-        ]);
+        $queue->shouldReceive('pushOn')->once()->with(null, m::type('Illuminate\Events\CallQueuedListener'));
 
         $d->setQueueResolver(function () use ($queue) {
             return $queue;
