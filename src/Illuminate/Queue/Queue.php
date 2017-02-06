@@ -3,6 +3,7 @@
 namespace Illuminate\Queue;
 
 use Illuminate\Container\Container;
+use Illuminate\Events\CallQueuedListener;
 
 abstract class Queue
 {
@@ -118,6 +119,7 @@ abstract class Queue
         return [
             'job' => 'Illuminate\Queue\CallQueuedHandler@call',
             'maxTries' => isset($job->tries) ? $job->tries : null,
+            'name' => $job instanceof CallQueuedListener ? $job->class : '',
             'timeout' => isset($job->timeout) ? $job->timeout : null,
             'data' => [
                 'commandName' => get_class($job),
