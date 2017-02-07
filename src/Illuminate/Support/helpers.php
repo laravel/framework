@@ -1031,3 +1031,24 @@ if ( ! function_exists('with'))
 		return $object;
 	}
 }
+
+if ( ! function_exists('now'))
+{
+	/**
+	 * Return the current datetime.
+	 *
+	 * @param  DateTimeZone|mixed  DateTimeZone
+	 * @return DateTime
+	 */
+	function now($timezone = null)
+	{
+		if (is_null($timezone)) return new DateTime;
+
+		if ( ! $timezone instanceof DateTimeZone)
+		{
+			$timezone = @timezone_open((string) $timezone);
+		}
+
+		return $timezone === false ? new DateTime : new DateTime(null, $timezone);
+	}
+}
