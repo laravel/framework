@@ -460,6 +460,18 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         return value($default);
     }
+    
+    /**
+     * Get a new collection from the collection by key.
+     *
+     * @param  mixed  $key
+     * @param  mixed  $default
+     * @return static
+     */
+    public function collect($key, $default = null)
+    {
+        return new static($this->get($key, $default));
+    }
 
     /**
      * Group an associative array by a field or using a callback.
