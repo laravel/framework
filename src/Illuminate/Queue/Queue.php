@@ -3,7 +3,6 @@
 namespace Illuminate\Queue;
 
 use Illuminate\Container\Container;
-use Illuminate\Events\CallQueuedListener;
 
 abstract class Queue
 {
@@ -136,11 +135,8 @@ abstract class Queue
      */
     protected function getDisplayName($job)
     {
-        if ($job instanceof CallQueuedListener) {
-            return $job->class;
-        }
-
-        return get_class($job);
+        return method_exists($job, 'displayName')
+                        ? $job->displayName() : get_class($job);
     }
 
     /**
