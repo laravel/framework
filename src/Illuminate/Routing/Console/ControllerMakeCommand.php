@@ -41,6 +41,8 @@ class ControllerMakeCommand extends GeneratorCommand
             return __DIR__.'/stubs/controller.model.stub';
         } elseif ($this->option('resource')) {
             return __DIR__.'/stubs/controller.stub';
+        } elseif ($this->option('single')) {
+            return __DIR__.'/stubs/controller.single.stub';
         }
 
         return __DIR__.'/stubs/controller.plain.stub';
@@ -126,6 +128,8 @@ class ControllerMakeCommand extends GeneratorCommand
             ['model', 'm', InputOption::VALUE_OPTIONAL, 'Generate a resource controller for the given model.'],
 
             ['resource', 'r', InputOption::VALUE_NONE, 'Generate a resource controller class.'],
+
+            ['single', 's', InputOption::VALUE_NONE, 'Generate a single action controller class.'],
         ];
     }
 }
