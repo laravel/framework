@@ -1473,11 +1473,11 @@ class DatabaseEloquentModelTest extends TestCase
     public function testModelAttributeCastingFailsOnUnencodableData()
     {
         $model = new EloquentModelCastingStub;
-        $model->objectAttribute = ["foo" => "b\xF8r"];
+        $model->objectAttribute = ['foo' => "b\xF8r"];
         $obj = new StdClass;
         $obj->foo = "b\xF8r";
         $model->arrayAttribute = $obj;
-        $model->jsonAttribute = ["foo" => "b\xF8r"];
+        $model->jsonAttribute = ['foo' => "b\xF8r"];
 
         $model->getAttributes();
     }
