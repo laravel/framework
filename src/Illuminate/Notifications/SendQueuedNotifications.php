@@ -56,4 +56,14 @@ class SendQueuedNotifications implements ShouldQueue
     {
         $manager->sendNow($this->notifiables, $this->notification, $this->channels);
     }
+
+    /**
+     * Get the display name for the queued job.
+     *
+     * @return string
+     */
+    public function displayName()
+    {
+        return get_class($this->notification);
+    }
 }
