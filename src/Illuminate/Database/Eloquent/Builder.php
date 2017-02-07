@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent;
 
 use Closure;
 use BadMethodCallException;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Pagination\Paginator;
@@ -190,7 +191,7 @@ class Builder
      */
     public function whereKey($id)
     {
-        if (is_array($id)) {
+        if (is_array($id) || $id instanceof Arrayable) {
             $this->query->whereIn($this->model->getQualifiedKeyName(), $id);
 
             return $this;
