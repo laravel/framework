@@ -200,6 +200,23 @@ class TestResponse extends Response
     }
 
     /**
+     * Assert that the response has the exact given JSON.
+     *
+     * @param  array  $data
+     * @return $this
+     */
+    public function assertExactJson(array $data)
+    {
+        $actual = json_encode(Arr::sortRecursive(
+            (array) $this->decodeResponseJson()
+        ));
+
+        PHPUnit::assertEquals(json_encode(Arr::sortRecursive($data)), $actual);
+
+        return $this;
+    }
+
+    /**
      * Assert that the response contains the given JSON fragment.
      *
      * @param  array  $data
@@ -222,23 +239,6 @@ class TestResponse extends Response
                 "[{$actual}]."
             );
         }
-
-        return $this;
-    }
-
-    /**
-     * Assert that the response has the exact given JSON.
-     *
-     * @param  array  $data
-     * @return $this
-     */
-    public function assertExactJson(array $data)
-    {
-        $actual = json_encode(Arr::sortRecursive(
-            (array) $this->decodeResponseJson()
-        ));
-
-        PHPUnit::assertEquals(json_encode(Arr::sortRecursive($data)), $actual);
 
         return $this;
     }
