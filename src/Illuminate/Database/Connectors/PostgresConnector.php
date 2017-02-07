@@ -36,6 +36,7 @@ class PostgresConnector extends Connector implements ConnectorInterface {
 		$charset = $config['charset'];
 
 		$connection->prepare("set names '$charset'")->execute();
+		$connection->prepare("set timezone='" . \Config::get('app.timezone') . "'")->execute();
 
 		// Unlike MySQL, Postgres allows the concept of "schema" and a default schema
 		// may have been specified on the connections. If that is the case we will
