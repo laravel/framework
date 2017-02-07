@@ -17,4 +17,17 @@ class JsonEncodingException extends RuntimeException
     {
         return new static('Error encoding model ['.get_class($model).'] with ID ['.$model->getKey().'] to JSON: '.$message);
     }
+
+    /**
+     * Create a new JSON encoding exception for an attribute.
+     *
+     * @param  mixed  $key
+     * @param  string $message
+     * @return static
+     * @internal param mixed $key
+     */
+    public static function forAttribute($key, $message)
+    {
+        return new static('Error encoding value of attribute ['.$key.'] to JSON: '.$message);
+    }
 }
