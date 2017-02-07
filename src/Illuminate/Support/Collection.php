@@ -460,7 +460,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         return value($default);
     }
-    
+
     /**
      * Get a new collection from the collection by key.
      *
