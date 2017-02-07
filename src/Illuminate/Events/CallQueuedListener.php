@@ -98,4 +98,14 @@ class CallQueuedListener implements ShouldQueue
             call_user_func_array([$handler, 'failed'], $parameters);
         }
     }
+
+    /**
+     * Get the display name for the queued job.
+     *
+     * @return string
+     */
+    public function displayName()
+    {
+        return $this->class;
+    }
 }
