@@ -146,7 +146,7 @@ class RedisTaggedCache extends TaggedCache
         $values = array_unique($this->store->connection()->smembers($referenceKey));
 
         if (count($values) > 0) {
-            call_user_func_array([$this->store->connection(), 'del'], [$value]);
+            call_user_func_array([$this->store->connection(), 'del'], $values);
         }
     }
 
