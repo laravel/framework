@@ -151,7 +151,7 @@ abstract class Queue
         return [
             'displayName' => is_string($job) ? explode('@', $job)[0] : null,
             'job' => $job, 'maxTries' => null,
-            'timeout' => null, 'data' => $data
+            'timeout' => null, 'data' => $data,
         ];
     }
 
