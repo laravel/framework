@@ -19,6 +19,7 @@
         "illuminate/bus": "5.4.*",
         "illuminate/container": "5.4.*",
         "illuminate/contracts": "5.4.*",
+        "illuminate/filesystem": "5.4.*",
         "illuminate/mail": "5.4.*",
         "illuminate/queue": "5.4.*",
         "illuminate/support": "5.4.*",
