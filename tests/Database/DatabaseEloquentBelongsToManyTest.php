@@ -325,24 +325,6 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
         $this->assertTrue($relation->detach());
     }
 
-    public function testDetachMethodFiresDeleteIndividuallyWhenUsingModel()
-    {
-        $model = m::mock();
-        $model->shouldReceive('delete')->once();
-        $collection = new BaseCollection([$model]);
-        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
-        $using = m::mock();
-        $using->shouldReceive('newQuery')->once();
-        $relation->shouldReceive('hasCustomPivotModel')->andReturn(true);
-        $relation->shouldReceive('using')->andReturn($using);
-        $using->shouldReceive('where')->once()->with('user_id', 1)->andReturnSelf();
-        $using->shouldReceive('whereIn')->once()->with('role_id', [1, 2, 3]);
-        $using->shouldReceive('get')->once()->andReturn($collection);
-        $relation->expects($this->once())->method('touchIfTouching');
-
-        $this->assertTrue($relation->detach([1, 2, 3]));
-    }
-
     public function testFirstMethod()
     {
         $relation = m::mock('Illuminate\Database\Eloquent\Relations\BelongsToMany[get]', $this->getRelationArguments());
