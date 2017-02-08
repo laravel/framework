@@ -37,9 +37,9 @@ class Pivot extends Model
 
 
     /**
-     * Whether this Pivot was instantiated directly
+     * Whether this Pivot was instantiated directly.
      *
-     * @var boolean
+     * @var bool
      */
     protected $instantiatedAsModel = false;
 
@@ -55,13 +55,10 @@ class Pivot extends Model
     public function __construct($parent = null, $attributes = [], $table = null, $exists = false)
     {
         if (! $parent instanceof Model) {
-            
             $attributes = is_array($parent) ? $parent : $attributes;
             parent::__construct($attributes);
             $this->instantiatedAsModel = true;
-
         } else {
-
             parent::__construct();
 
             // The pivot model is a "dynamic" model since we will set the tables dynamically
@@ -112,7 +109,7 @@ class Pivot extends Model
         if ($this->instantiatedAsModel) {
             return parent::setKeysForSaveQuery($query);
         }
-        
+
         $query->where($this->foreignKey, $this->getAttribute($this->foreignKey));
 
         return $query->where($this->relatedKey, $this->getAttribute($this->relatedKey));

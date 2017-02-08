@@ -108,8 +108,8 @@ class DatabaseEloquentPivotTest extends TestCase
 
     public function testPivotCanBeInstantiatedAsAModel()
     {
-        $pivot = new DatabaseEloquentPivotTestDateStub(['value' => 'test']);
-        
+        $pivot = new DatabaseEloquentPivotTest(['value' => 'test']);
+
         $this->assertInstanceOf(Pivot::class, $pivot);
         $this->assertEquals('test', $pivot->value);
     }

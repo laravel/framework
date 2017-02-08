@@ -350,7 +350,6 @@ trait InteractsWithPivotTable
         } else {
             $query = $this->newPivotQuery();
         }
-       
 
         // If associated IDs were passed to the method we will only delete those
         // associations, otherwise all of the association ties will be broken.
@@ -376,7 +375,6 @@ trait InteractsWithPivotTable
         } else {
             $results = $query->delete();
         }
-        
 
         if ($touch) {
             $this->touchIfTouching();

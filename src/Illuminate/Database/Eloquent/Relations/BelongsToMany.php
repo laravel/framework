@@ -236,7 +236,7 @@ class BelongsToMany extends Relation
 
     /**
      * Specify the custom pivot model to use for the relationship.
-     * Also, attach global scopes
+     * Also, attach global scopes.
      *
      * @param  string  $class
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
@@ -261,9 +261,9 @@ class BelongsToMany extends Relation
     }
 
     /**
-     * Whether or not this relationship is using a custom pivot model
+     * Whether or not this relationship is using a custom pivot model.
      *
-     * @return boolean
+     * @return bool
      */
     public function hasCustomPivotModel()
     {
