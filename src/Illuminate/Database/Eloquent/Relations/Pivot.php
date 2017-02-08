@@ -35,7 +35,6 @@ class Pivot extends Model
      */
     protected $guarded = [];
 
-
     /**
      * Whether this Pivot was instantiated directly.
      *
