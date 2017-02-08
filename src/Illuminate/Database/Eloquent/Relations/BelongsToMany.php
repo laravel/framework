@@ -245,10 +245,10 @@ class BelongsToMany extends Relation
     {
         $this->using = $class;
 
-        $query = (new $class())->newQuery();
-        $query = $query->applyScopes();
+        $query = (new $class())->newQuery()->applyScopes();
 
-        foreach ($query->getQuery()->wheres as $where) {
+        $wheres = $query->getQuery()->wheres ?: [];
+        foreach ($wheres as $where) {
             $this->query->where(
                 array_key_exists('column', $where) ? $where['column'] : null,
                 array_key_exists('operator', $where) ? $where['operator'] : null,

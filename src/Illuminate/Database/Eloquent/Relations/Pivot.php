@@ -109,6 +109,10 @@ class Pivot extends Model
      */
     protected function setKeysForSaveQuery(Builder $query)
     {
+        if ($this->instantiatedAsModel) {
+            return parent::setKeysForSaveQuery($query);
+        }
+        
         $query->where($this->foreignKey, $this->getAttribute($this->foreignKey));
 
         return $query->where($this->relatedKey, $this->getAttribute($this->relatedKey));
