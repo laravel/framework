@@ -97,9 +97,14 @@ class PhpRedisConnection extends Connection
     public function zadd($key, ...$dictionary)
     {
         if (count($dictionary) === 1) {
-            $dictionary = call_user_func_array('array_merge', call_user_func_array('array_map',
-                [null, array_values($dictionary[0]), array_keys($dictionary[0])]
-            ));
+            $_dictionary = [];
+
+            foreach ($dictionary[0] as $member => $score) {
+                $_dictionary[] = $score;
+                $_dictionary[] = $member;
+            }
+
+            $dictionary = $_dictionary;
         }
 
         return $this->client->zadd($key, ...$dictionary);
