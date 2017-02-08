@@ -105,7 +105,6 @@ class MessageSelector
      *
      * @param  string  $locale
      * @param  int  $number
-     *
      * @return int
      */
     public function getPluralIndex($locale, $number){
