@@ -35,6 +35,14 @@ class Pivot extends Model
      */
     protected $guarded = [];
 
+
+    /**
+     * Whether this Pivot was instantiated directly
+     *
+     * @var boolean
+     */
+    protected $instantiatedAsModel = false;
+
     /**
      * Create a new pivot model instance.
      *
@@ -44,22 +52,31 @@ class Pivot extends Model
      * @param  bool    $exists
      * @return void
      */
-    public function __construct(Model $parent, $attributes, $table, $exists = false)
+    public function __construct($parent = null, $attributes = [], $table = null, $exists = false)
     {
-        parent::__construct();
+        if (! $parent instanceof Model) {
+            
+            $attributes = is_array($parent) ? $parent : $attributes;
+            parent::__construct($attributes);
+            $this->instantiatedAsModel = true;
 
-        // The pivot model is a "dynamic" model since we will set the tables dynamically
-        // for the instance. This allows it work for any intermediate tables for the
-        // many to many relationship that are defined by this developer's classes.
-        $this->setConnection($parent->getConnectionName())
-             ->setTable($table)
-             ->forceFill($attributes)
-             ->syncOriginal();
+        } else {
 
-        // We store off the parent instance so we will access the timestamp column names
-        // for the model, since the pivot model timestamps aren't easily configurable
-        // from the developer's point of view. We can use the parents to get these.
-        $this->parent = $parent;
+            parent::__construct();
+
+            // The pivot model is a "dynamic" model since we will set the tables dynamically
+            // for the instance. This allows it work for any intermediate tables for the
+            // many to many relationship that are defined by this developer's classes.
+            $this->setConnection($parent->getConnectionName())
+                 ->setTable($table)
+                 ->forceFill($attributes)
+                 ->syncOriginal();
+
+            // We store off the parent instance so we will access the timestamp column names
+            // for the model, since the pivot model timestamps aren't easily configurable
+            // from the developer's point of view. We can use the parents to get these.
+            $this->parent = $parent;
+        }
 
         $this->exists = $exists;
 
@@ -104,7 +121,7 @@ class Pivot extends Model
      */
     public function delete()
     {
-        return $this->getDeleteQuery()->delete();
+        return $this->instantiatedAsModel ? parent::delete() : $this->getDeleteQuery()->delete();
     }
 
     /**
@@ -183,7 +200,7 @@ class Pivot extends Model
      */
     public function getCreatedAtColumn()
     {
-        return $this->parent->getCreatedAtColumn();
+        return $this->instantiatedAsModel ? parent::getCreatedAtColumn() : $this->parent->getCreatedAtColumn();
     }
 
     /**
@@ -193,6 +210,6 @@ class Pivot extends Model
      */
     public function getUpdatedAtColumn()
     {
-        return $this->parent->getUpdatedAtColumn();
+        return $this->instantiatedAsModel ? parent::getUpdatedAtColumn() : $this->parent->getUpdatedAtColumn();
     }
 }

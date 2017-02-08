@@ -236,6 +236,7 @@ class BelongsToMany extends Relation
 
     /**
      * Specify the custom pivot model to use for the relationship.
+     * Also, attach global scopes
      *
      * @param  string  $class
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
@@ -244,7 +245,29 @@ class BelongsToMany extends Relation
     {
         $this->using = $class;
 
+        $query = (new $class())->newQuery();
+        $query = $query->applyScopes();
+
+        foreach ($query->getQuery()->wheres as $where) {
+            $this->query->where(
+                array_key_exists('column', $where) ? $where['column'] : null,
+                array_key_exists('operator', $where) ? $where['operator'] : null,
+                array_key_exists('value', $where) ? $where['value'] : null,
+                array_key_exists('boolean', $where) ? $where['boolean'] : null
+            );
+        }
+
         return $this;
+    }
+
+    /**
+     * Whether or not this relationship is using a custom pivot model
+     *
+     * @return boolean
+     */
+    public function hasCustomPivotModel()
+    {
+        return (bool) $this->using;
     }
 
     /**
