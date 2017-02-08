@@ -107,7 +107,8 @@ class MessageSelector
      * @param  int  $number
      * @return int
      */
-    public function getPluralIndex($locale, $number){
+    public function getPluralIndex($locale, $number)
+    {
         switch ($locale) {
             case 'az':
             case 'bo':
