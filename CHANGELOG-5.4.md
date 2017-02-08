@@ -1,5 +1,27 @@
 # Release Notes for 5.4.x
 
+## v5.4.10 (2017-02-08)
+
+### Added
+- Added Blade `@prepend` directive ([#17696](https://github.com/laravel/framework/pull/17696))
+- Added `Collection::tap()` method ([#17756](https://github.com/laravel/framework/pull/17756))
+- Allow multiple manifest files for `mix()` helper ([#17759](https://github.com/laravel/framework/pull/17759))
+- Adding facility to `Log:useSyslog()` ([#17789](https://github.com/laravel/framework/pull/17789))
+- Added macros to Eloquent builder ([#17719](https://github.com/laravel/framework/pull/17719))
+- Added `TestResponse::assertJsonFragment()` method ([#17809](https://github.com/laravel/framework/pull/17809))
+
+### Changed
+- Use `route()` helper instead of `url()` in authentication component ([#17718](https://github.com/laravel/framework/pull/17718))
+- Ensure that the `map()` method exists before calling in `RouteServiceProvider::loadRoutes()` ([#17784](https://github.com/laravel/framework/pull/17784))
+- Clean up how events are dispatched ([8c90e7f](https://github.com/laravel/framework/commit/8c90e7fe31bee11bd496050a807c790da12cc519), [c9e8854](https://github.com/laravel/framework/commit/c9e8854f9a9954e29ee5cdb0ca757736a65cbe15))
+- Changed job `name` to `displayName` ([4e85a9a](https://github.com/laravel/framework/commit/4e85a9aaeb97a56a203a152ee7b114daaf07c6d8), [d033626](https://github.com/laravel/framework/commit/d0336261cdb63df6fff666490a6e9987cba5c0f0))
+- Made plain string job payloads more similar to object based payloads ([bd49288](https://github.com/laravel/framework/commit/bd49288c551c47f4d15cb371fabfd2b0670b903d))
+- Bring back pluralization rules for translations ([#17826](https://github.com/laravel/framework/pull/17826))
+
+### Fixed
+- Apply overrides in `factory()->raw()` method ([#17763](https://github.com/laravel/framework/pull/17763))
+
+
 ## v5.4.9 (2017-02-03)
 
 ### Added
