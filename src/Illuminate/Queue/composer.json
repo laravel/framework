@@ -18,6 +18,7 @@
         "illuminate/console": "5.5.*",
         "illuminate/container": "5.5.*",
         "illuminate/contracts": "5.5.*",
+        "illuminate/filesystem": "5.5.*",
         "illuminate/support": "5.5.*",
         "nesbot/carbon": "~1.20",
         "symfony/debug": "~3.2",

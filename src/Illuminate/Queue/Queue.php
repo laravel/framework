@@ -148,7 +148,11 @@ abstract class Queue
      */
     protected function createStringPayload($job, $data)
     {
-        return ['job' => $job, 'data' => $data];
+        return [
+            'displayName' => is_string($job) ? explode('@', $job)[0] : null,
+            'job' => $job, 'maxTries' => null,
+            'timeout' => null, 'data' => $data,
+        ];
     }
 
     /**

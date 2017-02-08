@@ -14,6 +14,13 @@ trait ManagesStacks
     protected $pushes = [];
 
     /**
+     * All of the finished, captured prepend sections.
+     *
+     * @var array
+     */
+    protected $prepends = [];
+
+    /**
      * The stack of in-progress push sections.
      *
      * @var array
@@ -76,6 +83,61 @@ trait ManagesStacks
     }
 
     /**
+     * Start prepending content into a push section.
+     *
+     * @param  string  $section
+     * @param  string  $content
+     * @return void
+     */
+    public function startPrepend($section, $content = '')
+    {
+        if ($content === '') {
+            if (ob_start()) {
+                $this->pushStack[] = $section;
+            }
+        } else {
+            $this->extendPrepend($section, $content);
+        }
+    }
+
+    /**
+     * Stop prepending content into a push section.
+     *
+     * @return string
+     * @throws \InvalidArgumentException
+     */
+    public function stopPrepend()
+    {
+        if (empty($this->pushStack)) {
+            throw new InvalidArgumentException('Cannot end a prepend operation without first starting one.');
+        }
+
+        return tap(array_pop($this->pushStack), function ($last) {
+            $this->extendPrepend($last, ob_get_clean());
+        });
+    }
+
+    /**
+     * Prepend content to a given stack.
+     *
+     * @param  string  $section
+     * @param  string  $content
+     * @return void
+     */
+    protected function extendPrepend($section, $content)
+    {
+        if (! isset($this->prepends[$section])) {
+            $this->prepends[$section] = [];
+        }
+
+        if (! isset($this->prepends[$section][$this->renderCount])) {
+            $this->prepends[$section][$this->renderCount] = $content;
+        } else {
+            $this->prepends[$section][$this->renderCount] = $content.$this->prepends[$section][$this->renderCount];
+        }
+    }
+
+    /**
      * Get the string contents of a push section.
      *
      * @param  string  $section
@@ -84,11 +146,21 @@ trait ManagesStacks
      */
     public function yieldPushContent($section, $default = '')
     {
-        if (isset($this->pushes[$section])) {
-            return implode($this->pushes[$section]);
+        if (! isset($this->pushes[$section]) && ! isset($this->prepends[$section])) {
+            return $default;
         }
 
-        return $default;
+        $output = '';
+
+        if (isset($this->prepends[$section])) {
+            $output .= implode(array_reverse($this->prepends[$section]));
+        }
+
+        if (isset($this->pushes[$section])) {
+            $output .= implode($this->pushes[$section]);
+        }
+
+        return $output;
     }
 
     /**
@@ -99,6 +171,7 @@ trait ManagesStacks
     public function flushStacks()
     {
         $this->pushes = [];
+        $this->prepends = [];
         $this->pushStack = [];
     }
 }
