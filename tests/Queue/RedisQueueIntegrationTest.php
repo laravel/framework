@@ -91,7 +91,7 @@ class RedisQueueIntegrationTest extends TestCase
 
         // Check reserved queue
         $this->assertEquals(1, $this->redis[$driver]->connection()->zcard('queues:default:reserved'));
-        $result = $this->redis[$driver]->connection()->zrangebyscore('queues:default:reserved', -INF, INF, ['WITHSCORES' => true]);
+        $result = $this->redis[$driver]->connection()->zrangebyscore('queues:default:reserved', -INF, INF, ['withscores' => true]);
         $reservedJob = array_keys($result)[0];
         $score = $result[$reservedJob];
         $this->assertLessThanOrEqual($score, $before + 60);
@@ -118,7 +118,7 @@ class RedisQueueIntegrationTest extends TestCase
 
         // Check reserved queue
         $this->assertEquals(1, $this->redis[$driver]->connection()->zcard('queues:default:reserved'));
-        $result = $this->redis[$driver]->connection()->zrangebyscore('queues:default:reserved', -INF, INF, ['WITHSCORES' => true]);
+        $result = $this->redis[$driver]->connection()->zrangebyscore('queues:default:reserved', -INF, INF, ['withscores' => true]);
         $reservedJob = array_keys($result)[0];
         $score = $result[$reservedJob];
         $this->assertLessThanOrEqual($score, $before + 60);
@@ -147,7 +147,7 @@ class RedisQueueIntegrationTest extends TestCase
 
         // Check reserved queue
         $this->assertEquals(1, $this->redis[$driver]->connection()->zcard('queues:default:reserved'));
-        $result = $this->redis[$driver]->connection()->zrangebyscore('queues:default:reserved', -INF, INF, ['WITHSCORES' => true]);
+        $result = $this->redis[$driver]->connection()->zrangebyscore('queues:default:reserved', -INF, INF, ['withscores' => true]);
         $reservedJob = array_keys($result)[0];
         $score = $result[$reservedJob];
         $this->assertLessThanOrEqual($score, $before);
@@ -183,7 +183,7 @@ class RedisQueueIntegrationTest extends TestCase
 
         // Check reserved queue
         $this->assertEquals(2, $this->redis[$driver]->connection()->zcard('queues:default:reserved'));
-        $result = $this->redis[$driver]->connection()->zrangebyscore('queues:default:reserved', -INF, INF, ['WITHSCORES' => true]);
+        $result = $this->redis[$driver]->connection()->zrangebyscore('queues:default:reserved', -INF, INF, ['withscores' => true]);
 
         foreach ($result as $payload => $score) {
             $command = unserialize(json_decode($payload)->data->command);
@@ -220,7 +220,7 @@ class RedisQueueIntegrationTest extends TestCase
 
         // Check reserved queue
         $this->assertEquals(1, $this->redis[$driver]->connection()->zcard('queues:default:reserved'));
-        $result = $this->redis[$driver]->connection()->zrangebyscore('queues:default:reserved', -INF, INF, ['WITHSCORES' => true]);
+        $result = $this->redis[$driver]->connection()->zrangebyscore('queues:default:reserved', -INF, INF, ['withscores' => true]);
         $reservedJob = array_keys($result)[0];
         $score = $result[$reservedJob];
         $this->assertLessThanOrEqual($score, $before + 30);
@@ -251,7 +251,7 @@ class RedisQueueIntegrationTest extends TestCase
         //check the content of delayed queue
         $this->assertEquals(1, $this->redis[$driver]->connection()->zcard('queues:default:delayed'));
 
-        $results = $this->redis[$driver]->connection()->zrangebyscore('queues:default:delayed', -INF, INF, ['WITHSCORES' => true]);
+        $results = $this->redis[$driver]->connection()->zrangebyscore('queues:default:delayed', -INF, INF, ['withscores' => true]);
 
         $payload = array_keys($results)[0];
 
