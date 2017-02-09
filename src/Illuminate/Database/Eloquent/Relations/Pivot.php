@@ -36,16 +36,9 @@ class Pivot extends Model
     protected $guarded = [];
 
     /**
-     * Whether this Pivot was instantiated directly.
-     *
-     * @var bool
-     */
-    protected $instantiatedAsModel = false;
-
-    /**
      * Create a new pivot model instance.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  mixed   $parent
      * @param  array   $attributes
      * @param  string  $table
      * @param  bool    $exists
@@ -56,7 +49,6 @@ class Pivot extends Model
         if (! $parent instanceof Model) {
             $attributes = is_array($parent) ? $parent : $attributes;
             parent::__construct($attributes);
-            $this->instantiatedAsModel = true;
         } else {
             parent::__construct();
 
@@ -105,7 +97,7 @@ class Pivot extends Model
      */
     protected function setKeysForSaveQuery(Builder $query)
     {
-        if ($this->instantiatedAsModel) {
+        if (! $this->hasParent()) {
             return parent::setKeysForSaveQuery($query);
         }
 
@@ -121,7 +113,7 @@ class Pivot extends Model
      */
     public function delete()
     {
-        return $this->instantiatedAsModel ? parent::delete() : $this->getDeleteQuery()->delete();
+        return $this->hasParent() ? $this->getDeleteQuery()->delete() : parent::delete();
     }
 
     /**
@@ -200,7 +192,7 @@ class Pivot extends Model
      */
     public function getCreatedAtColumn()
     {
-        return $this->instantiatedAsModel ? parent::getCreatedAtColumn() : $this->parent->getCreatedAtColumn();
+        return $this->hasParent() ? $this->parent->getCreatedAtColumn() : parent::getCreatedAtColumn();
     }
 
     /**
@@ -210,6 +202,16 @@ class Pivot extends Model
      */
     public function getUpdatedAtColumn()
     {
-        return $this->instantiatedAsModel ? parent::getUpdatedAtColumn() : $this->parent->getUpdatedAtColumn();
+        return $this->hasParent() ? $this->parent->getUpdatedAtColumn() : parent::getUpdatedAtColumn();
+    }
+
+    /**
+     * Determine if this pivot has a parent or if it's being used as a model
+     *
+     * @return bool
+     */
+    public function hasParent()
+    {
+        return (bool) $this->parent;
     }
 }

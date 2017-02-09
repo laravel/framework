@@ -434,7 +434,7 @@ trait InteractsWithPivotTable
     /**
      * Create a new query builder for the pivot table.
      *
-     * @param \Illuminate\Database\Query\Builder (optional)
+     * @param  \Illuminate\Database\Query\Builder  $query
      * @return \Illuminate\Database\Query\Builder
      */
     protected function newPivotQuery(Builder $query = null)
