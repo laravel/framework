@@ -84,7 +84,7 @@ class FactoryBuilder
      */
     public function times($amount)
     {
-        $this->amount = $amount;
+        $this->amount = $amount == 1 ? null : $amount;
 
         return $this;
     }
