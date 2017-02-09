@@ -206,7 +206,7 @@ class Pivot extends Model
     }
 
     /**
-     * Determine if this pivot has a parent or if it's being used as a model
+     * Determine if this pivot has a parent or if it's being used as a model.
      *
      * @return bool
      */
