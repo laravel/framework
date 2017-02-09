@@ -267,6 +267,12 @@ class HttpRequestTest extends TestCase
         $this->assertEquals(['name' => 'Taylor'], $request->intersect('name', 'age', 'email'));
     }
 
+    public function testPickMethod()
+    {
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => null]);
+        $this->assertEquals(['name' => 'Taylor', 'age' => null], $request->pick('name', 'age', 'email'));
+    }
+
     public function testQueryMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor']);
