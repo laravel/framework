@@ -27,7 +27,7 @@ class JobName
      */
     public static function resolve($name, $payload)
     {
-        if (isset($payload['displayName']) && ! empty($payload['displayName'])) {
+        if (! empty($payload['displayName'])) {
             return $payload['displayName'];
         }
 
