@@ -12,7 +12,7 @@ class SendQueuedMailable
      *
      * @var Mailable
      */
-    protected $mailable;
+    public $mailable;
 
     /**
      * Create a new job instance.
