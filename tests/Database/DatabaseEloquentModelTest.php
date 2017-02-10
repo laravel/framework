@@ -1468,7 +1468,6 @@ class DatabaseEloquentModelTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Database\Eloquent\JsonEncodingException
-     * @expectedExceptionMessage Error encoding value of attribute
      */
     public function testModelAttributeCastingFailsOnUnencodableData()
     {
