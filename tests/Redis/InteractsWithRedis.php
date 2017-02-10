@@ -55,6 +55,8 @@ trait InteractsWithRedis
     {
         if ($this->redis) {
             $this->redis['predis']->connection()->flushdb();
+            $this->redis['predis']->connection()->disconnect();
+            $this->redis['phpredis']->connection()->close();
         }
     }
 
