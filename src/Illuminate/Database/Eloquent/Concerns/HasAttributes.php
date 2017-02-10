@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Database\Eloquent\JsonEncodingException;
 
 trait HasAttributes
 {
@@ -527,6 +528,9 @@ trait HasAttributes
 
         if ($this->isJsonCastable($key) && ! is_null($value)) {
             $value = $this->asJson($value);
+            if (false === $value) {
+                throw JsonEncodingException::forAttribute($key, json_last_error_msg());
+            }
         }
 
         // If this attribute contains a JSON ->, we'll set the proper value in the
