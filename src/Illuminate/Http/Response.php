@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http;
 
+use Exception;
 use ArrayObject;
 use JsonSerializable;
 use Illuminate\Contracts\Support\Jsonable;
@@ -68,5 +69,24 @@ class Response extends BaseResponse
         }
 
         return json_encode($content);
+    }
+
+    /**
+     * Get a JSON response from the base response.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
+    public function toJsonResponse()
+    {
+        if (! $this->shouldBeJson($this->original)) {
+            throw new Exception('The Response cannot be converted to a JSON response.');
+        }
+
+        return new JsonResponse(
+            $this->original,
+            $this->statusCode,
+            $this->headers->all()
+        );
     }
 }
