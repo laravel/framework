@@ -66,7 +66,7 @@ abstract class Job
 
         list($class, $method) = JobName::parse($payload['job']);
 
-        with($this->instance = $this->resolve($class))->{$method}($this, $payload['data']);
+        with($this->resolve($class))->{$method}($this, $payload['data']);
     }
 
     /**
@@ -77,6 +77,13 @@ abstract class Job
     public function delete()
     {
         $this->deleted = true;
+        $payload = $this->payload();
+
+        list($class, $method) = JobName::parse($payload['job']);
+
+        if (method_exists($instance = $this->resolve($class), 'deleted')) {
+            $instance->deleted($payload['data']);
+        }
     }
 
     /**
@@ -154,8 +161,8 @@ abstract class Job
 
         list($class, $method) = JobName::parse($payload['job']);
 
-        if (method_exists($this->instance = $this->resolve($class), 'failed')) {
-            $this->instance->failed($payload['data'], $e);
+        if (method_exists($instance = $this->resolve($class), 'failed')) {
+            $instance->failed($payload['data'], $e);
         }
     }
 
@@ -167,7 +174,11 @@ abstract class Job
      */
     protected function resolve($class)
     {
-        return $this->container->make($class);
+        if ($this->instance) {
+            return $this->instance;
+        }
+
+        return $this->instance = $this->container->make($class);
     }
 
     /**

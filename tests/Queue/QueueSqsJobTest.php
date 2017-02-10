@@ -66,6 +66,7 @@ class QueueSqsJobTest extends TestCase
         $queue = $this->getMockBuilder('Illuminate\Queue\SqsQueue')->setMethods(['getQueue'])->setConstructorArgs([$this->mockedSqsClient, $this->queueName, $this->account])->getMock();
         $queue->setContainer($this->mockedContainer);
         $job = $this->getJob();
+        $job->getContainer()->shouldReceive('make')->once()->with('foo')->andReturn($handler = m::mock('StdClass'));
         $job->getSqs()->expects($this->once())->method('deleteMessage')->with(['QueueUrl' => $this->queueUrl, 'ReceiptHandle' => $this->mockedReceiptHandle]);
         $job->delete();
     }

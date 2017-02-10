@@ -24,6 +24,7 @@ class QueueRedisJobTest extends TestCase
     public function testDeleteRemovesTheJobFromRedis()
     {
         $job = $this->getJob();
+        $job->getContainer()->shouldReceive('make')->once()->with('foo')->andReturn($handler = m::mock('StdClass'));
         $job->getRedisQueue()->shouldReceive('deleteReserved')->once()
             ->with('default', $job);
 
