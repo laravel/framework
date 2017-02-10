@@ -458,7 +458,7 @@ class Dispatcher implements DispatcherContract
 
         $this->resolveQueue()
                 ->connection($connection)
-                ->pushOn($queue, new CallQueuedListener($class, $method, serialize($arguments)));
+                ->pushOn($queue, new CallQueuedListener($class, $method, $arguments));
     }
 
     /**
