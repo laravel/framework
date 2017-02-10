@@ -28,7 +28,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      *
      * @var string
      */
-    const VERSION = '5.4.0-Dev';
+    const VERSION = '5.5.0-Dev';
 
     /**
      * The base path for the Laravel installation.
@@ -1044,7 +1044,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 
         $this['translator']->setLocale($locale);
 
-        $this['events']->fire(new Events\LocaleUpdated($locale));
+        $this['events']->dispatch(new Events\LocaleUpdated($locale));
     }
 
     /**

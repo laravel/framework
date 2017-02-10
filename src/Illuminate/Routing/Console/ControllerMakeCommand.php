@@ -74,6 +74,12 @@ class ControllerMakeCommand extends GeneratorCommand
         if ($this->option('model')) {
             $modelClass = $this->parseModel($this->option('model'));
 
+            if (! class_exists($modelClass)) {
+                if ($this->confirm("A {$modelClass} model does not exist. Do you want to generate it?", true)) {
+                    $this->call('make:model', ['name' => $modelClass]);
+                }
+            }
+
             $replace = [
                 'DummyFullModelClass' => $modelClass,
                 'DummyModelClass' => class_basename($modelClass),

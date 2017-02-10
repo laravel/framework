@@ -6,7 +6,6 @@ use RuntimeException;
 use Doctrine\DBAL\Types\Type;
 use Illuminate\Support\Fluent;
 use Doctrine\DBAL\Schema\Table;
-use Doctrine\DBAL\Schema\Column;
 use Illuminate\Database\Connection;
 use Doctrine\DBAL\Schema\Comparator;
 use Illuminate\Database\Schema\Blueprint;

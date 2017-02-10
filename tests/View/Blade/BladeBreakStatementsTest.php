@@ -41,6 +41,48 @@ test
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
+    public function testBreakStatementsWithArgumentAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@for ($i = 0; $i < 10; $i++)
+test
+@break(2)
+@endfor';
+        $expected = '<?php for($i = 0; $i < 10; $i++): ?>
+test
+<?php break 2; ?>
+<?php endfor; ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
+    public function testBreakStatementsWithSpacedArgumentAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@for ($i = 0; $i < 10; $i++)
+test
+@break( 2 )
+@endfor';
+        $expected = '<?php for($i = 0; $i < 10; $i++): ?>
+test
+<?php break 2; ?>
+<?php endfor; ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
+    public function testBreakStatementsWithFaultyArgumentAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@for ($i = 0; $i < 10; $i++)
+test
+@break(-2)
+@endfor';
+        $expected = '<?php for($i = 0; $i < 10; $i++): ?>
+test
+<?php break 1; ?>
+<?php endfor; ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
     protected function getFiles()
     {
         return m::mock('Illuminate\Filesystem\Filesystem');

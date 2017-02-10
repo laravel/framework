@@ -75,7 +75,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileInsertGetId(Builder $query, $values, $sequence)
     {
-        if (! is_null($sequence)) {
+        if (is_null($sequence)) {
             $sequence = 'id';
         }
 

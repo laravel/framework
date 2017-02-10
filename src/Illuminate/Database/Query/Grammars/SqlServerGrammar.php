@@ -214,9 +214,21 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile the lock into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  bool|string  $value
+     * @return string
+     */
+    protected function compileLock(Builder $query, $value)
+    {
+        return '';
+    }
+
+    /**
      * Compile an exists statement into SQL.
      *
-     * @param \Illuminate\Database\Query\Builder $query
+     * @param  \Illuminate\Database\Query\Builder  $query
      * @return string
      */
     public function compileExists(Builder $query)
@@ -249,9 +261,11 @@ class SqlServerGrammar extends Grammar
      * Compile a delete statement with joins into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  string  $table
+     * @param  string  $where
      * @return string
      */
-    protected function compileDeleteWithJoins($query, $table, $where)
+    protected function compileDeleteWithJoins(Builder $query, $table, $where)
     {
         $joins = ' '.$this->compileJoins($query, $query->joins);
 

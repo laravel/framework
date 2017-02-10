@@ -568,7 +568,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // First we need to create a fresh query instance and touch the creation and
         // update timestamp on the model which are maintained by us for developer
         // convenience. Then we will just continue saving the model instances.
-        if ($this->timestamps) {
+        if ($this->usesTimestamps()) {
             $this->updateTimestamps();
         }
 
@@ -626,7 +626,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // First we'll need to create a fresh query instance and touch the creation and
         // update timestamps on this model, which are maintained by us for developer
         // convenience. After, we will just continue saving these model instances.
-        if ($this->timestamps) {
+        if ($this->usesTimestamps()) {
             $this->updateTimestamps();
         }
 
@@ -736,8 +736,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $this->performDeleteOnModel();
 
-        $this->exists = false;
-
         // Once the model has been deleted, we will fire off the deleted event so that
         // the developers may hook into post-delete operations. We will then return
         // a boolean true as the delete is presumably successful on the database.
@@ -766,6 +764,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected function performDeleteOnModel()
     {
         $this->setKeysForSaveQuery($this->newQueryWithoutScopes())->delete();
+
+        $this->exists = false;
     }
 
     /**

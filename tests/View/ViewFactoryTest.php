@@ -213,7 +213,7 @@ class ViewFactoryTest extends TestCase
 
     public function testSectionExtending()
     {
-        $placeholder = \Illuminate\View\Factory::parentPlaceholder();
+        $placeholder = \Illuminate\View\Factory::parentPlaceholder('foo');
         $factory = $this->getFactory();
         $factory->startSection('foo');
         echo 'hi '.$placeholder;
@@ -226,7 +226,7 @@ class ViewFactoryTest extends TestCase
 
     public function testSectionMultipleExtending()
     {
-        $placeholder = \Illuminate\View\Factory::parentPlaceholder();
+        $placeholder = \Illuminate\View\Factory::parentPlaceholder('foo');
         $factory = $this->getFactory();
         $factory->startSection('foo');
         echo 'hello '.$placeholder.' nice to see you '.$placeholder;
@@ -248,11 +248,12 @@ class ViewFactoryTest extends TestCase
         $factory->getDispatcher()->shouldReceive('fire');
         $factory->startComponent('component', ['name' => 'Taylor']);
         $factory->slot('title');
+        $factory->slot('website', 'laravel.com');
         echo 'title<hr>';
         $factory->endSlot();
         echo 'component';
         $contents = $factory->renderComponent();
-        $this->assertEquals('title<hr> component Taylor', $contents);
+        $this->assertEquals('title<hr> component Taylor laravel.com', $contents);
     }
 
     public function testTranslation()

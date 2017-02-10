@@ -17,12 +17,12 @@ trait CompilesTranslations
         } elseif ($expression[1] === '[') {
             return "<?php \$__env->startTranslation{$expression}; ?>";
         } else {
-            return "<?php echo app('translator')->get$expression; ?>";
+            return "<?php echo app('translator')->get{$expression}; ?>";
         }
     }
 
     /**
-     * Compile the endlang statements into valid PHP.
+     * Compile the end-lang statements into valid PHP.
      *
      * @return string
      */
@@ -39,6 +39,6 @@ trait CompilesTranslations
      */
     protected function compileChoice($expression)
     {
-        return "<?php echo app('translator')->choice$expression; ?>";
+        return "<?php echo app('translator')->choice{$expression}; ?>";
     }
 }

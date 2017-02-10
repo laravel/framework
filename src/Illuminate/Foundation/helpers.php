@@ -467,7 +467,7 @@ if (! function_exists('env')) {
 
 if (! function_exists('event')) {
     /**
-     * Fire an event and call the listeners.
+     * Dispatch an event and call the listeners.
      *
      * @param  string|object  $event
      * @param  mixed  $payload
@@ -476,7 +476,7 @@ if (! function_exists('event')) {
      */
     function event(...$args)
     {
-        return app('events')->fire(...$args);
+        return app('events')->dispatch(...$args);
     }
 }
 
@@ -494,7 +494,7 @@ if (! function_exists('factory')) {
         $arguments = func_get_args();
 
         if (isset($arguments[1]) && is_string($arguments[1])) {
-            return $factory->of($arguments[0], $arguments[1])->times(isset($arguments[2]) ? $arguments[2] : 1);
+            return $factory->of($arguments[0], $arguments[1])->times(isset($arguments[2]) ? $arguments[2] : null);
         } elseif (isset($arguments[1])) {
             return $factory->of($arguments[0])->times($arguments[1]);
         } else {
@@ -553,17 +553,21 @@ if (! function_exists('mix')) {
      * Get the path to a versioned Mix file.
      *
      * @param  string  $path
+     * @param  string  $manifestDirectory
      * @return \Illuminate\Support\HtmlString
      *
      * @throws \Exception
      */
-    function mix($path)
+    function mix($path, $manifestDirectory = '')
     {
         static $manifest;
-        static $shouldHotReload;
+
+        if ($manifestDirectory && ! starts_with($manifestDirectory, '/')) {
+            $manifestDirectory = "/{$manifestDirectory}";
+        }
 
         if (! $manifest) {
-            if (! file_exists($manifestPath = public_path('mix-manifest.json'))) {
+            if (! file_exists($manifestPath = public_path($manifestDirectory.'/mix-manifest.json'))) {
                 throw new Exception('The Mix manifest does not exist.');
             }
 
@@ -581,9 +585,9 @@ if (! function_exists('mix')) {
             );
         }
 
-        return $shouldHotReload = file_exists(public_path('hot'))
+        return file_exists(public_path($manifestDirectory.'/hot'))
                     ? new HtmlString("http://localhost:8080{$manifest[$path]}")
-                    : new HtmlString(url($manifest[$path]));
+                    : new HtmlString($manifestDirectory.$manifest[$path]);
     }
 }
 

@@ -62,9 +62,7 @@ class Repository implements CacheContract, ArrayAccess
      */
     public function has($key)
     {
-        $value = $this->get($key);
-
-        return ! is_null($value) && $value !== false;
+        return ! is_null($this->get($key));
     }
 
     /**
@@ -85,7 +83,7 @@ class Repository implements CacheContract, ArrayAccess
         // If we could not find the cache value, we will fire the missed event and get
         // the default value for this cache value. This default could be a callback
         // so we will execute the value function which will resolve it if needed.
-        if (is_null($value) || $value === false) {
+        if (is_null($value)) {
             $this->event(new CacheMissed($key));
 
             $value = value($default);
@@ -128,7 +126,7 @@ class Repository implements CacheContract, ArrayAccess
         // If we could not find the cache value, we will fire the missed event and get
         // the default value for this cache value. This default could be a callback
         // so we will execute the value function which will resolve it if needed.
-        if (is_null($value) || $value === false) {
+        if (is_null($value)) {
             $this->event(new CacheMissed($key));
 
             return isset($keys[$key]) ? value($keys[$key]) : null;
@@ -218,12 +216,10 @@ class Repository implements CacheContract, ArrayAccess
             );
         }
 
-        $exists = $this->get($key);
-
         // If the value did not exist in the cache, we will put the value in the cache
         // so it exists for subsequent requests. Then, we will return true so it is
         // easy to know if the value gets added. Otherwise, we will return false.
-        if (is_null($exists) || $exists === false) {
+        if (is_null($this->get($key))) {
             $this->put($key, $value, $minutes);
 
             return true;
@@ -285,7 +281,7 @@ class Repository implements CacheContract, ArrayAccess
         // If the item exists in the cache we will just return this immediately and if
         // not we will execute the given Closure and cache the result of that for a
         // given number of minutes so it's available for all subsequent requests.
-        if (! is_null($value) && $value !== false) {
+        if (! is_null($value)) {
             return $value;
         }
 
@@ -320,7 +316,7 @@ class Repository implements CacheContract, ArrayAccess
         // If the item exists in the cache we will just return this immediately and if
         // not we will execute the given Closure and cache the result of that for a
         // given number of minutes so it's available for all subsequent requests.
-        if (! is_null($value) && $value !== false) {
+        if (! is_null($value)) {
             return $value;
         }
 

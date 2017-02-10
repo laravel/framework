@@ -614,7 +614,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Get the values of a given key.
      *
-     * @param  string  $value
+     * @param  string|array  $value
      * @param  string|null  $key
      * @return static
      */
@@ -1172,6 +1172,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         return $this->slice(0, $limit);
+    }
+
+    /**
+     * Pass the collection to the given callback and then return it.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function tap(callable $callback)
+    {
+        $callback(new static($this->items));
+
+        return $this;
     }
 
     /**

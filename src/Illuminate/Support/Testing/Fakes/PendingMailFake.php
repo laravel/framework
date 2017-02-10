@@ -10,7 +10,7 @@ class PendingMailFake extends PendingMail
     /**
      * Create a new instance.
      *
-     * @param  \Illuminate\Support\Testing\Fakes\MailFake
+     * @param  \Illuminate\Support\Testing\Fakes\MailFake  $mailer
      * @return void
      */
     public function __construct($mailer)

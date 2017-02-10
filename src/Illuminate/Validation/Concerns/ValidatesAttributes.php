@@ -1219,7 +1219,7 @@ trait ValidatesAttributes
 
         $other = Arr::get($this->data, $parameters[0]);
 
-        return isset($other) && $value === $other;
+        return $value === $other;
     }
 
     /**
@@ -1290,6 +1290,10 @@ trait ValidatesAttributes
      */
     protected function validateUrl($attribute, $value)
     {
+        if (! is_string($value)) {
+            return false;
+        }
+
         /*
          * This pattern is derived from Symfony\Component\Validator\Constraints\UrlValidator (2.7.4).
          *

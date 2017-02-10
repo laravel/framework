@@ -1695,6 +1695,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock(false);
         $this->assertEquals('select * from `foo` where `bar` = ? lock in share mode', $builder->toSql());
         $this->assertEquals(['baz'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock('lock in share mode');
+        $this->assertEquals('select * from `foo` where `bar` = ? lock in share mode', $builder->toSql());
+        $this->assertEquals(['baz'], $builder->getBindings());
     }
 
     public function testPostgresLock()
@@ -1708,6 +1713,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock(false);
         $this->assertEquals('select * from "foo" where "bar" = ? for share', $builder->toSql());
         $this->assertEquals(['baz'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock('for key share');
+        $this->assertEquals('select * from "foo" where "bar" = ? for key share', $builder->toSql());
+        $this->assertEquals(['baz'], $builder->getBindings());
     }
 
     public function testSqlServerLock()
@@ -1720,6 +1730,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getSqlServerBuilder();
         $builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock(false);
         $this->assertEquals('select * from [foo] with(rowlock,holdlock) where [bar] = ?', $builder->toSql());
+        $this->assertEquals(['baz'], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock('with(holdlock)');
+        $this->assertEquals('select * from [foo] with(holdlock) where [bar] = ?', $builder->toSql());
         $this->assertEquals(['baz'], $builder->getBindings());
     }
 

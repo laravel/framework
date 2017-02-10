@@ -22,7 +22,7 @@ class TrimStrings extends TransformsRequest
      */
     protected function transform($key, $value)
     {
-        if (in_array($key, $this->except)) {
+        if (in_array($key, $this->except, true)) {
             return $value;
         }
 

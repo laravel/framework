@@ -25,7 +25,7 @@ class QueueRedisJobTest extends TestCase
     {
         $job = $this->getJob();
         $job->getRedisQueue()->shouldReceive('deleteReserved')->once()
-            ->with('default', json_encode(['job' => 'foo', 'data' => ['data'], 'attempts' => 2]));
+            ->with('default', $job);
 
         $job->delete();
     }
@@ -34,7 +34,7 @@ class QueueRedisJobTest extends TestCase
     {
         $job = $this->getJob();
         $job->getRedisQueue()->shouldReceive('deleteAndRelease')->once()
-            ->with('default', json_encode(['job' => 'foo', 'data' => ['data'], 'attempts' => 2]), 1);
+            ->with('default', $job, 1);
 
         $job->release(1);
     }

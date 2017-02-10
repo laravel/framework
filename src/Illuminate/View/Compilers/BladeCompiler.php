@@ -105,13 +105,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected $verbatimBlocks = [];
 
     /**
-     * Counter to keep track of nested forelse statements.
-     *
-     * @var int
-     */
-    protected $forElseCounter = 0;
-
-    /**
      * Compile the view at the given path.
      *
      * @param  string  $path

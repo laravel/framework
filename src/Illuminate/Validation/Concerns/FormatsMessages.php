@@ -5,9 +5,6 @@ namespace Illuminate\Validation\Concerns;
 use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Illuminate\Contracts\Container\Container;
-use Symfony\Component\HttpFoundation\File\File;
-use Illuminate\Contracts\Translation\Translator;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 trait FormatsMessages
@@ -356,11 +353,7 @@ trait FormatsMessages
      */
     protected function callClassBasedReplacer($callback, $message, $attribute, $rule, $parameters)
     {
-        if (Str::contains($callback, '@')) {
-            list($class, $method) = explode('@', $callback);
-        } else {
-            list($class, $method) = [$callback, 'replace'];
-        }
+        list($class, $method) = Str::parseCallback($callback, 'replace');
 
         return call_user_func_array([$this->container->make($class), $method], array_slice(func_get_args(), 1));
     }

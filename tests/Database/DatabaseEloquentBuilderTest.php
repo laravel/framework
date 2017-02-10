@@ -351,7 +351,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['bar', 'baz'], $builder->pluck('name')->all());
     }
 
-    public function testMacrosAreCalledOnBuilder()
+    public function testLocalMacrosAreCalledOnBuilder()
     {
         unset($_SERVER['__test.builder']);
         $builder = new \Illuminate\Database\Eloquent\Builder(new \Illuminate\Database\Query\Builder(
@@ -369,6 +369,15 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals($builder, $result);
         $this->assertEquals($builder, $_SERVER['__test.builder']);
         unset($_SERVER['__test.builder']);
+    }
+
+    public function testGlobalMacrosAreCalledOnBuilder()
+    {
+        Builder::macro('foo', function ($bar) {
+            return $bar;
+        });
+
+        $this->assertEquals($this->getBuilder()->foo('bar'), 'bar');
     }
 
     public function testGetModelsProperlyHydratesModels()

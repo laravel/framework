@@ -98,7 +98,7 @@ class ValidationRuleParser
      */
     protected function explodeWildcardRules($results, $attribute, $rules)
     {
-        $pattern = str_replace('\*', '[^\.]+', preg_quote($attribute));
+        $pattern = str_replace('\*', '[^\.]*', preg_quote($attribute));
 
         $data = ValidationData::initializeAndGatherData($attribute, $this->data);
 
@@ -151,7 +151,7 @@ class ValidationRuleParser
         $merge = head($this->explodeRules([$rules]));
 
         $results[$attribute] = array_merge(
-            isset($results[$attribute]) ? $results[$attribute] : [], $merge
+            isset($results[$attribute]) ? $this->explodeExplicitRule($results[$attribute]) : [], $merge
         );
 
         return $results;

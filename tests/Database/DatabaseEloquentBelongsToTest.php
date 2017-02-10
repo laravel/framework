@@ -33,6 +33,14 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $relation->addEagerConstraints($models);
     }
 
+    public function testIdsInEagerConstraintsCanBeZero()
+    {
+        $relation = $this->getRelation();
+        $relation->getQuery()->shouldReceive('whereIn')->once()->with('relation.id', ['foreign.value', 0]);
+        $models = [new EloquentBelongsToModelStub, new EloquentBelongsToModelStubWithZeroId];
+        $relation->addEagerConstraints($models);
+    }
+
     public function testRelationIsProperlyInitialized()
     {
         $relation = $this->getRelation();
@@ -141,6 +149,11 @@ class EloquentBelongsToModelStub extends \Illuminate\Database\Eloquent\Model
 class AnotherEloquentBelongsToModelStub extends \Illuminate\Database\Eloquent\Model
 {
     public $foreign_key = 'foreign.value.two';
+}
+
+class EloquentBelongsToModelStubWithZeroId extends \Illuminate\Database\Eloquent\Model
+{
+    public $foreign_key = 0;
 }
 
 class MissingEloquentBelongsToModelStub extends \Illuminate\Database\Eloquent\Model

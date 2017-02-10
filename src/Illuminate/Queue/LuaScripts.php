@@ -97,7 +97,7 @@ if(next(val) ~= nil) then
     end
 end
 
-return true
+return val
 LUA;
     }
 }

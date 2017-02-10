@@ -23,7 +23,7 @@ trait CompilesLayouts
     {
         $expression = $this->stripParentheses($expression);
 
-        $echo = "<?php echo \$__env->make($expression, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
+        $echo = "<?php echo \$__env->make({$expression}, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
 
         $this->footer[] = $echo;
 
@@ -38,7 +38,7 @@ trait CompilesLayouts
      */
     protected function compileSection($expression)
     {
-        $this->lastSection = trim($expression, "()'");
+        $this->lastSection = trim($expression, "()'\"");
 
         return "<?php \$__env->startSection{$expression}; ?>";
     }
@@ -67,10 +67,9 @@ trait CompilesLayouts
     /**
      * Compile the show statements into valid PHP.
      *
-     * @param  string  $expression
      * @return string
      */
-    protected function compileShow($expression)
+    protected function compileShow()
     {
         return '<?php echo $__env->yieldSection(); ?>';
     }
@@ -78,10 +77,9 @@ trait CompilesLayouts
     /**
      * Compile the append statements into valid PHP.
      *
-     * @param  string  $expression
      * @return string
      */
-    protected function compileAppend($expression)
+    protected function compileAppend()
     {
         return '<?php $__env->appendSection(); ?>';
     }
@@ -89,10 +87,9 @@ trait CompilesLayouts
     /**
      * Compile the overwrite statements into valid PHP.
      *
-     * @param  string  $expression
      * @return string
      */
-    protected function compileOverwrite($expression)
+    protected function compileOverwrite()
     {
         return '<?php $__env->stopSection(true); ?>';
     }
@@ -100,10 +97,9 @@ trait CompilesLayouts
     /**
      * Compile the stop statements into valid PHP.
      *
-     * @param  string  $expression
      * @return string
      */
-    protected function compileStop($expression)
+    protected function compileStop()
     {
         return '<?php $__env->stopSection(); ?>';
     }
@@ -111,10 +107,9 @@ trait CompilesLayouts
     /**
      * Compile the end-section statements into valid PHP.
      *
-     * @param  string  $expression
      * @return string
      */
-    protected function compileEndsection($expression)
+    protected function compileEndsection()
     {
         return '<?php $__env->stopSection(); ?>';
     }
