@@ -26,6 +26,25 @@ class FoundationTestResponseTest extends TestCase
         $response->assertJson($resource->jsonSerialize());
     }
 
+    public function testAssertJsonFragment()
+    {
+        $response = new TestResponse(new JsonSerializableSingleResourceStub);
+
+        $response->assertJsonFragment(['foo' => 'foo 0']);
+
+        $response->assertJsonFragment(['foo' => 'foo 0', 'bar' => 'bar 0', 'foobar' => 'foobar 0']);
+
+        $response = new TestResponse(new JsonSerializableMixedResourcesStub);
+
+        $response->assertJsonFragment(['foo' => 'bar']);
+
+        $response->assertJsonFragment(['foobar_foo' => 'foo']);
+
+        $response->assertJsonFragment(['foobar' => ['foobar_foo' => 'foo', 'foobar_bar' => 'bar']]);
+
+        $response->assertJsonFragment(['foo' => 'bar 0', 'bar' => ['foo' => 'bar 0', 'bar' => 'foo 0']]);
+    }
+
     public function testAssertJsonStructure()
     {
         $response = new TestResponse(new JsonSerializableMixedResourcesStub);
@@ -44,6 +63,7 @@ class FoundationTestResponseTest extends TestCase
 
         // Wildcard (repeating structure) at root
         $response = new TestResponse(new JsonSerializableSingleResourceStub);
+
         $response->assertJsonStructure(['*' => ['foo', 'bar', 'foobar']]);
     }
 
