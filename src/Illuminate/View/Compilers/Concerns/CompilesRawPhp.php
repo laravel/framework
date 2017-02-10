@@ -45,6 +45,7 @@ trait CompilesRawPhp
     protected function compileSet($expression)
     {
         list($variable, $value) = explode(',', $expression, 2);
+
         return "<?php $variable = $value; ?>";
     }
 }
