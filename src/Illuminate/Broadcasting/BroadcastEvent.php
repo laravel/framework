@@ -19,7 +19,7 @@ class BroadcastEvent implements ShouldQueue
      *
      * @var mixed
      */
-    protected $event;
+    public $event;
 
     /**
      * Create a new job handler instance.
