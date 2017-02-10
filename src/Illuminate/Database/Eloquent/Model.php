@@ -244,8 +244,6 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		$this->bootIfNotBooted();
 
-		$this->syncOriginal();
-
 		$this->fill($attributes);
 	}
 
