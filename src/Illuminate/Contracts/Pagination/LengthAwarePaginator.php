@@ -9,7 +9,7 @@ interface LengthAwarePaginator extends Paginator
      *
      * @param  int  $start
      * @param  int  $end
-     * @return string
+     * @return array
      */
     public function getUrlRange($start, $end);
 
