@@ -116,6 +116,16 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	}
 
 	/**
+	 * Get the version number of the application.
+	 *
+	 * @return string
+	 */
+	public function version()
+	{
+		return static::VERSION;
+	}
+
+	/**
 	 * Create a new request instance from the request class.
 	 *
 	 * @return \Illuminate\Http\Request
