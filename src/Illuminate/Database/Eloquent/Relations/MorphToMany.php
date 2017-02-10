@@ -128,7 +128,10 @@ class MorphToMany extends BelongsToMany
      */
     public function newPivot(array $attributes = [], $exists = false)
     {
-        $pivot = new MorphPivot($this->parent, $attributes, $this->table, $exists);
+        $using = $this->using;
+
+        $pivot = $using ? new $using($this->parent, $attributes, $this->table, $exists)
+                        : new MorphPivot($this->parent, $attributes, $this->table, $exists);
 
         $pivot->setPivotKeys($this->foreignKey, $this->relatedKey)
               ->setMorphType($this->morphType)
