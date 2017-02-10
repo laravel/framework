@@ -527,10 +527,7 @@ trait HasAttributes
         }
 
         if ($this->isJsonCastable($key) && ! is_null($value)) {
-            $value = $this->asJson($value);
-            if (false === $value) {
-                throw JsonEncodingException::forAttribute($key, json_last_error_msg());
-            }
+            $value = $this->castAttributeAsJson($key, $value);
         }
 
         // If this attribute contains a JSON ->, we'll set the proper value in the
@@ -611,6 +608,26 @@ trait HasAttributes
     {
         return isset($this->attributes[$key]) ?
                     $this->fromJson($this->attributes[$key]) : [];
+    }
+
+    /**
+     * Cast the given attribute to JSON.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return string
+     */
+    protected function castAttributeAsJson($key, $value)
+    {
+        $value = $this->asJson($value);
+
+        if ($value === false) {
+            throw JsonEncodingException::forAttribute(
+                $this, $key, json_last_error_msg()
+            );
+        }
+
+        return $value;
     }
 
     /**
