@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Testing;
 
 use Closure;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Http\Response;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Traits\Macroable;
