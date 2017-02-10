@@ -35,4 +35,16 @@ trait CompilesRawPhp
     {
         return "<?php unset{$expression}; ?>";
     }
+
+    /**
+     * Compile the set statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileSet($expression)
+    {
+        list($variable, $value) = explode(',', $expression, 2);
+        return "<?php $variable = $value; ?>";
+    }
 }
