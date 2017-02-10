@@ -7,6 +7,7 @@ use BadMethodCallException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -190,7 +191,7 @@ class Builder
      */
     public function whereKey($id)
     {
-        if (is_array($id)) {
+        if (is_array($id) || $id instanceof Arrayable) {
             $this->query->whereIn($this->model->getQualifiedKeyName(), $id);
 
             return $this;
