@@ -1235,8 +1235,9 @@ class RoutingRouteTest extends TestCase
             return 'hello';
         });
 
-        $this->assertInstanceOf(\Illuminate\Http\Response::class, $router->dispatch(Request::create('foo/bar', 'GET')));
-        $this->assertNotInstanceOf(\Illuminate\Http\JsonResponse::class, $router->dispatch(Request::create('foo/bar', 'GET')));
+        $response = $router->dispatch(Request::create('foo/bar', 'GET'));
+        $this->assertInstanceOf(\Illuminate\Http\Response::class, $response);
+        $this->assertNotInstanceOf(\Illuminate\Http\JsonResponse::class, $response);
     }
 
     public function testJsonResponseIsReturned()
@@ -1246,8 +1247,9 @@ class RoutingRouteTest extends TestCase
             return ['foo', 'bar'];
         });
 
-        $this->assertNotInstanceOf(\Illuminate\Http\Response::class, $router->dispatch(Request::create('foo/bar', 'GET')));
-        $this->assertInstanceOf(\Illuminate\Http\JsonResponse::class, $router->dispatch(Request::create('foo/bar', 'GET')));
+        $response = $router->dispatch(Request::create('foo/bar', 'GET'));
+        $this->assertNotInstanceOf(\Illuminate\Http\Response::class, $response);
+        $this->assertInstanceOf(\Illuminate\Http\JsonResponse::class, $response);
     }
 
     protected function getRouter()
