@@ -7,11 +7,11 @@ use Illuminate\Support\Str;
 trait FileHelpers
 {
     /**
-     * The file hash name.
+     * The cache copy of the file's hash name.
      *
      * @var string
      */
-    private $hashNameCache = null;
+    protected $hashName = null;
 
     /**
      * Get the fully qualified path to the file.
@@ -55,7 +55,7 @@ trait FileHelpers
             $path = rtrim($path, '/').'/';
         }
 
-        $hash = $this->hashNameCache ?: $this->hashNameCache = Str::random(40);
+        $hash = $this->hashName ?: $this->hashName = Str::random(40);
 
         return $path.$hash.'.'.$this->guessExtension();
     }
