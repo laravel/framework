@@ -13,7 +13,7 @@ class Message
      * @var \Swift_Message
      */
     protected $swift;
-    
+
     /**
      * CIDs of files embedded in the message.
      *
@@ -247,15 +247,13 @@ class Message
      */
     public function embed($file)
     {
-        if(isset($this->embeddedFiles[$file])) {
+        if (isset($this->embeddedFiles[$file])) {
             return $this->embeddedFiles[$file];
         }
 
-        $cid = $this->swift->embed(Swift_Image::fromPath($file));
-
-        $this->embeddedFiles[$file] = $cid;
-
-        return $cid;
+        return $this->embeddedFiles[$file] = $this->swift->embed(
+            Swift_Image::fromPath($file)
+        );
     }
 
     /**
