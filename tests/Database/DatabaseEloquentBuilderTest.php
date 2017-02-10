@@ -805,6 +805,45 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertContains('"self_alias_hash"."id" = "self_related_stubs"."parent_id"', $sql);
     }
 
+    public function testWhereKeyMethodWithInt()
+    {
+        $model = $this->getMockModel();
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $int = 1;
+
+        $builder->getQuery()->shouldReceive('where')->once()->with($keyName, '=', $int);
+
+        $builder->whereKey($int);
+    }
+
+    public function testWhereKeyMethodWithArray()
+    {
+        $model = $this->getMockModel();
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $array = [1, 2, 3];
+
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with($keyName, $array);
+
+        $builder->whereKey($array);
+    }
+
+    public function testWhereKeyMethodWithCollection()
+    {
+        $model = $this->getMockModel();
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $collection = new Collection([1, 2, 3]);
+
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with($keyName, $collection);
+
+        $builder->whereKey($collection);
+    }
+
     protected function mockConnectionForModel($model, $database)
     {
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';

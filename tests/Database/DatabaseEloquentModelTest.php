@@ -1466,6 +1466,21 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNull($array['timestampAttribute']);
     }
 
+    /**
+     * @expectedException \Illuminate\Database\Eloquent\JsonEncodingException
+     */
+    public function testModelAttributeCastingFailsOnUnencodableData()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->objectAttribute = ['foo' => "b\xF8r"];
+        $obj = new StdClass;
+        $obj->foo = "b\xF8r";
+        $model->arrayAttribute = $obj;
+        $model->jsonAttribute = ['foo' => "b\xF8r"];
+
+        $model->getAttributes();
+    }
+
     public function testUpdatingNonExistentModelFails()
     {
         $model = new EloquentModelStub;
