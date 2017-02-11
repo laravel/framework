@@ -459,6 +459,14 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('a')->from('t1')->where('a', 10)->where('b', 1)->union($union)->orderBy('a')->limit(10);
         $this->assertEquals($expectedSql, $builder->toSql());
         $this->assertEquals([0 => 10, 1 => 1, 2 => 11, 3 => 2], $builder->getBindings());
+
+        $builder = $this->getSQLiteBuilder();
+        $expectedSql = 'select * from (select "name" from "users" where "id" = ?) union select * from (select "name" from "users" where "id" = ?)';
+        $builder->select('name')->from("users")->where('id', '=', 1);
+        $builder->union($this->getSQLiteBuilder()->select('name')->from("users")->where('id', '=', 2));
+        $this->assertEquals($expectedSql, $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+
     }
 
     public function testUnionAlls()
