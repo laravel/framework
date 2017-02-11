@@ -28,12 +28,4 @@ interface Dispatcher
      * @return $this
      */
     public function pipeThrough(array $pipes);
-
-    /**
-     * Retrieve the handler for a command.
-     *
-     * @param  mixed  $command
-     * @return bool|mixed
-     */
-    public function getCommandHandler($command);
 }
