@@ -1,5 +1,28 @@
 # Release Notes for 5.4.x
 
+## [Unreleased]
+
+### Changed
+- Prevent duplication of embedded files in `Mail\Message` ([#17877](https://github.com/laravel/framework/pull/17877))
+
+
+## v5.4.11 (2017-02-10)
+
+### Added
+- Support `Encrypt` and `TrustServerCertificate` options on SqlServer connections ([#17841](https://github.com/laravel/framework/pull/17841))
+- Support custom pivot models in `MorphToMany::newPivot()` ([#17862](https://github.com/laravel/framework/pull/17862))
+- Support `Arrayable` objects in Eloquent's `whereKey()` method ([#17812](https://github.com/laravel/framework/pull/17812))
+
+### Changed
+- Use `app.locale` lang attribute in `app.stub` ([#17827](https://github.com/laravel/framework/pull/17827))
+- Throw `JsonEncodingException` when JSON encoder fails to encode eloquent attribute ([#17804](https://github.com/laravel/framework/pull/17804), [11e89f3](https://github.com/laravel/framework/commit/11e89f35b0f1fc1654d51bc31c865ab796da9f46))
+- Ensure file `hashName()` is unique ([#17879](https://github.com/laravel/framework/pull/17879), [830f194](https://github.com/laravel/framework/commit/830f194f9f72cd3de31151990c7aad6db52f1e86))
+
+### Fixed
+- Added missing `Str` class import to `TestResponse` ([#17835](https://github.com/laravel/framework/pull/17835))
+- Fixed PhpRedis’ `zadd()` method signature ([#17832](https://github.com/laravel/framework/pull/17832))
+
+
 ## v5.4.10 (2017-02-08)
 
 ### Added
