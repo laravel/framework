@@ -462,8 +462,8 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getSQLiteBuilder();
         $expectedSql = 'select * from (select "name" from "users" where "id" = ?) union select * from (select "name" from "users" where "id" = ?)';
-        $builder->select('name')->from("users")->where('id', '=', 1);
-        $builder->union($this->getSQLiteBuilder()->select('name')->from("users")->where('id', '=', 2));
+        $builder->select('name')->from('users')->where('id', '=', 1);
+        $builder->union($this->getSQLiteBuilder()->select('name')->from('users')->where('id', '=', 2));
         $this->assertEquals($expectedSql, $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
     }
