@@ -75,7 +75,7 @@ class DatabaseServiceProvider extends ServiceProvider
     protected function registerEloquentFactory()
     {
         $this->app->singleton(FakerGenerator::class, function () {
-            return FakerFactory::create();
+            return FakerFactory::create(env('FAKER_LOCALE'));
         });
 
         $this->app->singleton(EloquentFactory::class, function ($app) {
