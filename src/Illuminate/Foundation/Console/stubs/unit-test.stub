@@ -15,6 +15,7 @@ class DummyClass extends TestCase
      */
     public function testExample()
     {
+        $this->markTestIncomplete('Incomplete unit test at '.self::class);
         $this->assertTrue(true);
     }
 }
