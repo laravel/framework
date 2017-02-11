@@ -466,7 +466,6 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->union($this->getSQLiteBuilder()->select('name')->from("users")->where('id', '=', 2));
         $this->assertEquals($expectedSql, $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
-
     }
 
     public function testUnionAlls()
