@@ -4,7 +4,6 @@ namespace Illuminate\Filesystem;
 
 use RuntimeException;
 use Illuminate\Http\File;
-use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
@@ -327,16 +326,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
             return trim($config->get('url'), '/').'/'.ltrim($path, '/');
         }
 
-        $path = '/storage/'.$path;
-
-        // If the path contains "storage/public", it probably means the developer is using
-        // the default disk to generate the path instead of the "public" disk like they
-        // are really supposed to use. We will remove the public from this path here.
-        if (Str::contains($path, '/storage/public/')) {
-            return Str::replaceFirst('/public/', '/', $path);
-        } else {
-            return $path;
-        }
+        return rtrim($config->get('root'), '/').'/'.ltrim($path, '/');
     }
 
     /**
