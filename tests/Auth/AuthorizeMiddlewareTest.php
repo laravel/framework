@@ -187,6 +187,28 @@ class AuthorizeMiddlewareTest extends TestCase
         $this->assertEquals($response->content(), 'success');
     }
 
+    public function testModelInstanceAsParameter()
+    {
+        $instance = m::mock(\Illuminate\Database\Eloquent\Model::class);
+
+        $this->gate()->define('success', function ($user, $model) use ($instance) {
+            $this->assertSame($model, $instance);
+
+            return true;
+        });
+
+        $request = m::mock(Request::class);
+
+        $nextParam = null;
+
+        $next = function ($param) use (&$nextParam) {
+            $nextParam = $param;
+        };
+
+        (new Authorize($this->container->make(Auth::class), $this->gate()))
+            ->handle($request, $next, 'success', $instance);
+    }
+
     /**
      * Get the Gate instance from the container.
      *
