@@ -101,12 +101,13 @@ class BelongsToMany extends Relation
      * @param  string  $relationName
      * @return void
      */
-    public function __construct(Builder $query, Model $parent, $table, $foreignKey, $relatedKey, $relationName = null)
+    public function __construct(Builder $query, Model $parent, $table, $foreignKey, $relatedKey, $localKey, $relationName = null)
     {
         $this->table = $table;
         $this->relatedKey = $relatedKey;
         $this->foreignKey = $foreignKey;
         $this->relationName = $relationName;
+		$this->localKey = $localKey;
 
         parent::__construct($query, $parent);
     }
@@ -140,7 +141,7 @@ class BelongsToMany extends Relation
         // model instance. Then we can set the "where" for the parent models.
         $baseTable = $this->related->getTable();
 
-        $key = $baseTable.'.'.$this->related->getKeyName();
+        $key = $baseTable.'.'.$this->localKey;
 
         $query->join($this->table, $key, '=', $this->getQualifiedRelatedKeyName());
 
