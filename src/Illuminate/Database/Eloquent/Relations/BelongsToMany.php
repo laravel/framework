@@ -107,7 +107,7 @@ class BelongsToMany extends Relation
         $this->relatedKey = $relatedKey;
         $this->foreignKey = $foreignKey;
         $this->relationName = $relationName;
-		$this->localKey = $localKey;
+        $this->localKey = $localKey;
 
         parent::__construct($query, $parent);
     }

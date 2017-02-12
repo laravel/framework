@@ -307,7 +307,7 @@ trait HasRelationships
 
         $relatedKey = $relatedKey ?: $instance->getForeignKey();
 
-		$localKey = $localKey ?: $this->getKeyName();
+        $localKey = $localKey ?: $this->getKeyName();
 
         // If no table name was provided, we can guess it by concatenating the two
         // models using underscores in alphabetical order. The two model names
