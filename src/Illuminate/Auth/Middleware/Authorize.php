@@ -4,6 +4,7 @@ namespace Illuminate\Auth\Middleware;
 
 use Closure;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Auth\Factory as Auth;
 
 class Authorize
@@ -70,7 +71,9 @@ class Authorize
         }
 
         return collect($models)->map(function ($model) use ($request) {
-            return $this->getModel($request, $model);
+            return $model instanceof Model
+                ?$model
+                :$this->getModel($request, $model);
         })->all();
     }
 
