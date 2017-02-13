@@ -212,7 +212,7 @@ class RedisQueue extends Queue implements QueueContract
      * Delete a reserved job from the queue.
      *
      * @param  string  $queue
-     * @param  \Illuminate\Queues\Jobs\RedisJob  $job
+     * @param  \Illuminate\Queue\Jobs\RedisJob  $job
      * @return void
      */
     public function deleteReserved($queue, $job)
@@ -224,7 +224,7 @@ class RedisQueue extends Queue implements QueueContract
      * Delete a reserved job from the reserved queue and release it.
      *
      * @param  string  $queue
-     * @param  \Illuminate\Queues\Jobs\RedisJob  $job
+     * @param  \Illuminate\Queue\Jobs\RedisJob  $job
      * @param  int  $delay
      * @return void
      */

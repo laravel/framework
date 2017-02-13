@@ -30,6 +30,7 @@ services:
 before_install:
   - if [[ $TRAVIS_PHP_VERSION != 7.1 ]] ; then phpenv config-rm xdebug.ini; fi
   - echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - echo "extension = redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - travis_retry composer self-update
 
 install:
