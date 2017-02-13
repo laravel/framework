@@ -32,8 +32,9 @@ class QueueRedisQueueTest extends TestCase
         $redis->shouldReceive('connection')->once()->andReturn($redis);
         $redis->shouldReceive('zadd')->once()->with(
             'queues:default:delayed',
-            2,
-            json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'timeout' => null, 'data' => ['data'], 'id' => 'foo', 'attempts' => 0])
+            [
+                json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'timeout' => null, 'data' => ['data'], 'id' => 'foo', 'attempts' => 0]) => 2,
+            ]
         );
 
         $id = $queue->later(1, 'foo', ['data']);
@@ -50,8 +51,9 @@ class QueueRedisQueueTest extends TestCase
         $redis->shouldReceive('connection')->once()->andReturn($redis);
         $redis->shouldReceive('zadd')->once()->with(
             'queues:default:delayed',
-            2,
-            json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'timeout' => null, 'data' => ['data'], 'id' => 'foo', 'attempts' => 0])
+            [
+                json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'timeout' => null, 'data' => ['data'], 'id' => 'foo', 'attempts' => 0]) => 2,
+            ]
         );
 
         $queue->later($date, 'foo', ['data']);
