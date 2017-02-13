@@ -182,6 +182,16 @@ class PhpRedisConnection extends Connection
     }
 
     /**
+     * Disconnects from the Redis instance.
+     *
+     * @return void
+     */
+    public function disconnect()
+    {
+        $this->client->close();
+    }
+
+    /**
      * Pass other method calls down to the underlying client.
      *
      * @param  string  $method
