@@ -27,8 +27,8 @@ trait InteractsWithRedis
             return;
         }
 
-        foreach (['predis', 'phpredis'] as $driver) {
-            $this->redis[$driver] = new RedisManager($driver, [
+        foreach ($this->redisDriverProvider() as $driver) {
+            $this->redis[$driver[0]] = new RedisManager($driver[0], [
                 'cluster' => false,
                 'default' => [
                     'host' => $host,
@@ -53,18 +53,23 @@ trait InteractsWithRedis
 
     public function tearDownRedis()
     {
-        if ($this->redis) {
-            $this->redis['predis']->connection()->flushdb();
-            $this->redis['predis']->connection()->disconnect();
-            $this->redis['phpredis']->connection()->close();
+        $this->redis['predis']->connection()->flushdb();
+
+        foreach ($this->redisDriverProvider() as $driver) {
+            $this->redis[$driver[0]]->connection()->disconnect();
         }
     }
 
     public function redisDriverProvider()
     {
-        return [
+        $providers = [
             ['predis'],
-            ['phpredis'],
         ];
+
+        if (extension_loaded('redis')) {
+            $providers[] = ['phpredis'];
+        }
+
+        return $providers;
     }
 }
