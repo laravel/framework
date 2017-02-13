@@ -1092,7 +1092,7 @@ class SupportCollectionTest extends TestCase
     {
         $data = new Collection([2, 3, 5, 6]);
         $data = $data->pairMap();
-        $this->assertSame([[2,3], [3,5], [5,6]], $data->toArray());
+        $this->assertSame([[2, 3], [3, 5], [5, 6]], $data->toArray());
     }
 
     public function testPairMapInsufficientElements()
