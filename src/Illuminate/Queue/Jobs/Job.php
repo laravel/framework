@@ -77,6 +77,15 @@ abstract class Job
     public function delete()
     {
         $this->deleted = true;
+        $payload = $this->payload();
+
+        list($class, $method) = JobName::parse($payload['job']);
+
+        $this->instance = $this->resolve($class);
+
+        if (method_exists($this->instance, 'deleted')) {
+            $this->instance->deleted($payload['data']);
+        }
     }
 
     /**
