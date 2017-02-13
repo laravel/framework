@@ -35,6 +35,13 @@ class BelongsToMany extends Relation
     protected $relatedKey;
 
     /**
+     * The local key of the parent model.
+     *
+     * @var string
+     */
+    protected $localKey;
+
+    /**
      * The "name" of the relationship.
      *
      * @var string
