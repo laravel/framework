@@ -112,8 +112,8 @@ class BelongsToMany extends Relation
      * @param  string  $table
      * @param  string  $foreignKey
      * @param  string  $relatedKey
-     * @param  string  $localKey
      * @param  string  $parentKey
+     * @param  string  $localKey
      * @param  string  $relationName
      * @return void
      */

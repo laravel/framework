@@ -41,6 +41,7 @@ class MorphToMany extends BelongsToMany
      * @param  string  $foreignKey
      * @param  string  $relatedKey
      * @param  string  $localKey
+     * @param  string  $parentKey
      * @param  string  $relationName
      * @param  bool  $inverse
      * @return void
