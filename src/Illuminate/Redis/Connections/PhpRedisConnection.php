@@ -200,8 +200,16 @@ class PhpRedisConnection extends Connection
      */
     public function __call($method, $parameters)
     {
+        $method = strtolower($method);
+
         if ($method == 'eval') {
             return $this->proxyToEval($parameters);
+        }
+
+        if ($method == 'zrangebyscore' || $method == 'zrevrangebyscore') {
+            $parameters = array_map(function ($parameter) {
+                return is_array($parameter) ? array_change_key_case($parameter) : $parameter;
+            }, $parameters);
         }
 
         return parent::__call($method, $parameters);
