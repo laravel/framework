@@ -158,7 +158,7 @@ trait AuthenticatesUsers
 
         $request->session()->regenerate();
 
-        return redirect('/');
+        return redirect(property_exists($this, 'redirectAfterLogout') ? $this->redirectAfterLogout : '/');
     }
 
     /**
