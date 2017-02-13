@@ -24,9 +24,6 @@ class RedisQueueIntegrationTest extends TestCase
         Carbon::setTestNow();
         parent::setUp();
         $this->setUpRedis();
-
-        $this->queue = new RedisQueue($this->redis);
-        $this->queue->setContainer(m::mock(Container::class));
     }
 
     public function tearDown()
@@ -37,8 +34,15 @@ class RedisQueueIntegrationTest extends TestCase
         m::close();
     }
 
-    public function testExpiredJobsArePopped()
+    /**
+     * @dataProvider redisDriverProvider
+     *
+     * @param string $driver
+     */
+    public function testExpiredJobsArePopped($driver)
     {
+        $this->setQueue($driver);
+
         $jobs = [
             new RedisQueueIntegrationTestJob(0),
             new RedisQueueIntegrationTestJob(1),
@@ -56,12 +60,19 @@ class RedisQueueIntegrationTest extends TestCase
         $this->assertEquals($jobs[3], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
         $this->assertNull($this->queue->pop());
 
-        $this->assertEquals(1, $this->redis->connection()->zcard('queues:default:delayed'));
-        $this->assertEquals(3, $this->redis->connection()->zcard('queues:default:reserved'));
+        $this->assertEquals(1, $this->redis[$driver]->connection()->zcard('queues:default:delayed'));
+        $this->assertEquals(3, $this->redis[$driver]->connection()->zcard('queues:default:reserved'));
     }
 
-    public function testPopProperlyPopsJobOffOfRedis()
+    /**
+     * @dataProvider redisDriverProvider
+     *
+     * @param string $driver
+     */
+    public function testPopProperlyPopsJobOffOfRedis($driver)
     {
+        $this->setQueue($driver);
+
         // Push an item into queue
         $job = new RedisQueueIntegrationTestJob(10);
         $this->queue->push($job);
@@ -79,8 +90,8 @@ class RedisQueueIntegrationTest extends TestCase
         $this->assertEquals($redisJob->getJobId(), json_decode($redisJob->getReservedJob())->id);
 
         // Check reserved queue
-        $this->assertEquals(1, $this->redis->connection()->zcard('queues:default:reserved'));
-        $result = $this->redis->connection()->zrangebyscore('queues:default:reserved', -INF, INF, ['WITHSCORES' => true]);
+        $this->assertEquals(1, $this->redis[$driver]->connection()->zcard('queues:default:reserved'));
+        $result = $this->redis[$driver]->connection()->zrangebyscore('queues:default:reserved', -INF, INF, ['withscores' => true]);
         $reservedJob = array_keys($result)[0];
         $score = $result[$reservedJob];
         $this->assertLessThanOrEqual($score, $before + 60);
@@ -88,8 +99,14 @@ class RedisQueueIntegrationTest extends TestCase
         $this->assertEquals($job, unserialize(json_decode($reservedJob)->data->command));
     }
 
-    public function testPopProperlyPopsDelayedJobOffOfRedis()
+    /**
+     * @dataProvider redisDriverProvider
+     *
+     * @param string $driver
+     */
+    public function testPopProperlyPopsDelayedJobOffOfRedis($driver)
     {
+        $this->setQueue($driver);
         // Push an item into queue
         $job = new RedisQueueIntegrationTestJob(10);
         $this->queue->later(-10, $job);
@@ -100,8 +117,8 @@ class RedisQueueIntegrationTest extends TestCase
         $after = time();
 
         // Check reserved queue
-        $this->assertEquals(1, $this->redis->connection()->zcard('queues:default:reserved'));
-        $result = $this->redis->connection()->zrangebyscore('queues:default:reserved', -INF, INF, ['WITHSCORES' => true]);
+        $this->assertEquals(1, $this->redis[$driver]->connection()->zcard('queues:default:reserved'));
+        $result = $this->redis[$driver]->connection()->zrangebyscore('queues:default:reserved', -INF, INF, ['withscores' => true]);
         $reservedJob = array_keys($result)[0];
         $score = $result[$reservedJob];
         $this->assertLessThanOrEqual($score, $before + 60);
@@ -109,9 +126,14 @@ class RedisQueueIntegrationTest extends TestCase
         $this->assertEquals($job, unserialize(json_decode($reservedJob)->data->command));
     }
 
-    public function testPopPopsDelayedJobOffOfRedisWhenExpireNull()
+    /**
+     * @dataProvider redisDriverProvider
+     *
+     * @param string $driver
+     */
+    public function testPopPopsDelayedJobOffOfRedisWhenExpireNull($driver)
     {
-        $this->queue = new RedisQueue($this->redis, 'default', null, null);
+        $this->queue = new RedisQueue($this->redis[$driver], 'default', null, null);
         $this->queue->setContainer(m::mock(Container::class));
 
         // Push an item into queue
@@ -124,8 +146,8 @@ class RedisQueueIntegrationTest extends TestCase
         $after = time();
 
         // Check reserved queue
-        $this->assertEquals(1, $this->redis->connection()->zcard('queues:default:reserved'));
-        $result = $this->redis->connection()->zrangebyscore('queues:default:reserved', -INF, INF, ['WITHSCORES' => true]);
+        $this->assertEquals(1, $this->redis[$driver]->connection()->zcard('queues:default:reserved'));
+        $result = $this->redis[$driver]->connection()->zrangebyscore('queues:default:reserved', -INF, INF, ['withscores' => true]);
         $reservedJob = array_keys($result)[0];
         $score = $result[$reservedJob];
         $this->assertLessThanOrEqual($score, $before);
@@ -133,9 +155,14 @@ class RedisQueueIntegrationTest extends TestCase
         $this->assertEquals($job, unserialize(json_decode($reservedJob)->data->command));
     }
 
-    public function testNotExpireJobsWhenExpireNull()
+    /**
+     * @dataProvider redisDriverProvider
+     *
+     * @param string $driver
+     */
+    public function testNotExpireJobsWhenExpireNull($driver)
     {
-        $this->queue = new RedisQueue($this->redis, 'default', null, null);
+        $this->queue = new RedisQueue($this->redis[$driver], 'default', null, null);
         $this->queue->setContainer(m::mock(Container::class));
 
         // Make an expired reserved job
@@ -155,8 +182,8 @@ class RedisQueueIntegrationTest extends TestCase
         $after = time();
 
         // Check reserved queue
-        $this->assertEquals(2, $this->redis->connection()->zcard('queues:default:reserved'));
-        $result = $this->redis->connection()->zrangebyscore('queues:default:reserved', -INF, INF, ['WITHSCORES' => true]);
+        $this->assertEquals(2, $this->redis[$driver]->connection()->zcard('queues:default:reserved'));
+        $result = $this->redis[$driver]->connection()->zrangebyscore('queues:default:reserved', -INF, INF, ['withscores' => true]);
 
         foreach ($result as $payload => $score) {
             $command = unserialize(json_decode($payload)->data->command);
@@ -172,9 +199,14 @@ class RedisQueueIntegrationTest extends TestCase
         }
     }
 
-    public function testExpireJobsWhenExpireSet()
+    /**
+     * @dataProvider redisDriverProvider
+     *
+     * @param string $driver
+     */
+    public function testExpireJobsWhenExpireSet($driver)
     {
-        $this->queue = new RedisQueue($this->redis, 'default', null, 30);
+        $this->queue = new RedisQueue($this->redis[$driver], 'default', null, 30);
         $this->queue->setContainer(m::mock(Container::class));
 
         // Push an item into queue
@@ -187,8 +219,8 @@ class RedisQueueIntegrationTest extends TestCase
         $after = time();
 
         // Check reserved queue
-        $this->assertEquals(1, $this->redis->connection()->zcard('queues:default:reserved'));
-        $result = $this->redis->connection()->zrangebyscore('queues:default:reserved', -INF, INF, ['WITHSCORES' => true]);
+        $this->assertEquals(1, $this->redis[$driver]->connection()->zcard('queues:default:reserved'));
+        $result = $this->redis[$driver]->connection()->zrangebyscore('queues:default:reserved', -INF, INF, ['withscores' => true]);
         $reservedJob = array_keys($result)[0];
         $score = $result[$reservedJob];
         $this->assertLessThanOrEqual($score, $before + 30);
@@ -196,8 +228,15 @@ class RedisQueueIntegrationTest extends TestCase
         $this->assertEquals($job, unserialize(json_decode($reservedJob)->data->command));
     }
 
-    public function testRelease()
+    /**
+     * @dataProvider redisDriverProvider
+     *
+     * @param string $driver
+     */
+    public function testRelease($driver)
     {
+        $this->setQueue($driver);
+
         //push a job into queue
         $job = new RedisQueueIntegrationTestJob(30);
         $this->queue->push($job);
@@ -210,9 +249,9 @@ class RedisQueueIntegrationTest extends TestCase
         $after = time();
 
         //check the content of delayed queue
-        $this->assertEquals(1, $this->redis->connection()->zcard('queues:default:delayed'));
+        $this->assertEquals(1, $this->redis[$driver]->connection()->zcard('queues:default:delayed'));
 
-        $results = $this->redis->connection()->zrangebyscore('queues:default:delayed', -INF, INF, ['WITHSCORES' => true]);
+        $results = $this->redis[$driver]->connection()->zrangebyscore('queues:default:delayed', -INF, INF, ['withscores' => true]);
 
         $payload = array_keys($results)[0];
 
@@ -230,8 +269,14 @@ class RedisQueueIntegrationTest extends TestCase
         $this->assertNull($this->queue->pop());
     }
 
-    public function testReleaseInThePast()
+    /**
+     * @dataProvider redisDriverProvider
+     *
+     * @param string $driver
+     */
+    public function testReleaseInThePast($driver)
     {
+        $this->setQueue($driver);
         $job = new RedisQueueIntegrationTestJob(30);
         $this->queue->push($job);
 
@@ -242,8 +287,15 @@ class RedisQueueIntegrationTest extends TestCase
         $this->assertInstanceOf(RedisJob::class, $this->queue->pop());
     }
 
-    public function testDelete()
+    /**
+     * @dataProvider redisDriverProvider
+     *
+     * @param string $driver
+     */
+    public function testDelete($driver)
     {
+        $this->setQueue($driver);
+
         $job = new RedisQueueIntegrationTestJob(30);
         $this->queue->push($job);
 
@@ -252,15 +304,21 @@ class RedisQueueIntegrationTest extends TestCase
 
         $redisJob->delete();
 
-        $this->assertEquals(0, $this->redis->connection()->zcard('queues:default:delayed'));
-        $this->assertEquals(0, $this->redis->connection()->zcard('queues:default:reserved'));
-        $this->assertEquals(0, $this->redis->connection()->llen('queues:default'));
+        $this->assertEquals(0, $this->redis[$driver]->connection()->zcard('queues:default:delayed'));
+        $this->assertEquals(0, $this->redis[$driver]->connection()->zcard('queues:default:reserved'));
+        $this->assertEquals(0, $this->redis[$driver]->connection()->llen('queues:default'));
 
         $this->assertNull($this->queue->pop());
     }
 
-    public function testSize()
+    /**
+     * @dataProvider redisDriverProvider
+     *
+     * @param string $driver
+     */
+    public function testSize($driver)
     {
+        $this->setQueue($driver);
         $this->assertEquals(0, $this->queue->size());
         $this->queue->push(new RedisQueueIntegrationTestJob(1));
         $this->assertEquals(1, $this->queue->size());
@@ -272,6 +330,15 @@ class RedisQueueIntegrationTest extends TestCase
         $this->assertEquals(3, $this->queue->size());
         $job->delete();
         $this->assertEquals(2, $this->queue->size());
+    }
+
+    /**
+     * @param string $driver
+     */
+    private function setQueue($driver)
+    {
+        $this->queue = new RedisQueue($this->redis[$driver]);
+        $this->queue->setContainer(m::mock(Container::class));
     }
 }
 

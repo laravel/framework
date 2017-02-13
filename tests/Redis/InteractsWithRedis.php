@@ -12,7 +12,7 @@ trait InteractsWithRedis
     private static $connectionFailedOnceWithDefaultsSkip = false;
 
     /**
-     * @var RedisManager
+     * @var RedisManager[]
      */
     private $redis;
 
@@ -27,18 +27,20 @@ trait InteractsWithRedis
             return;
         }
 
-        $this->redis = new RedisManager('predis', [
-            'cluster' => false,
-            'default' => [
-                'host' => $host,
-                'port' => $port,
-                'database' => 5,
-                'timeout' => 0.5,
-            ],
-        ]);
+        foreach (['predis', 'phpredis'] as $driver) {
+            $this->redis[$driver] = new RedisManager($driver, [
+                'cluster' => false,
+                'default' => [
+                    'host' => $host,
+                    'port' => $port,
+                    'database' => 5,
+                    'timeout' => 0.5,
+                ],
+            ]);
+        }
 
         try {
-            $this->redis->connection()->flushdb();
+            $this->redis['predis']->connection()->flushdb();
         } catch (\Exception $e) {
             if ($host === '127.0.0.1' && $port === 6379 && getenv('REDIS_HOST') === false) {
                 $this->markTestSkipped('Trying default host/port failed, please set environment variable REDIS_HOST & REDIS_PORT to enable '.__CLASS__);
@@ -52,7 +54,17 @@ trait InteractsWithRedis
     public function tearDownRedis()
     {
         if ($this->redis) {
-            $this->redis->connection()->flushdb();
+            $this->redis['predis']->connection()->flushdb();
+            $this->redis['predis']->connection()->disconnect();
+            $this->redis['phpredis']->connection()->close();
         }
+    }
+
+    public function redisDriverProvider()
+    {
+        return [
+            ['predis'],
+            ['phpredis'],
+        ];
     }
 }
