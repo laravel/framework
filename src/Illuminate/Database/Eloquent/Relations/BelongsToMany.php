@@ -98,16 +98,17 @@ class BelongsToMany extends Relation
      * @param  string  $table
      * @param  string  $foreignKey
      * @param  string  $relatedKey
+     * @param  string  $localKey
      * @param  string  $relationName
      * @return void
      */
     public function __construct(Builder $query, Model $parent, $table, $foreignKey, $relatedKey, $localKey, $relationName = null)
     {
         $this->table = $table;
+        $this->localKey = $localKey;
         $this->relatedKey = $relatedKey;
         $this->foreignKey = $foreignKey;
         $this->relationName = $relationName;
-        $this->localKey = $localKey;
 
         parent::__construct($query, $parent);
     }

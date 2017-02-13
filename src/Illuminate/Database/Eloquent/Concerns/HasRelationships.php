@@ -286,6 +286,7 @@ trait HasRelationships
      * @param  string  $table
      * @param  string  $foreignKey
      * @param  string  $relatedKey
+     * @param  string  $localKey
      * @param  string  $relation
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
@@ -307,8 +308,6 @@ trait HasRelationships
 
         $relatedKey = $relatedKey ?: $instance->getForeignKey();
 
-        $localKey = $localKey ?: $this->getKeyName();
-
         // If no table name was provided, we can guess it by concatenating the two
         // models using underscores in alphabetical order. The two model names
         // are transformed to snake case from their default CamelCase also.
@@ -317,7 +316,8 @@ trait HasRelationships
         }
 
         return new BelongsToMany(
-            $instance->newQuery(), $this, $table, $foreignKey, $relatedKey, $localKey, $relation
+            $instance->newQuery(), $this, $table, $foreignKey,
+            $relatedKey, $localKey ?: $this->getKeyName(), $relation
         );
     }
 
