@@ -39,6 +39,13 @@ class BelongsToMany extends Relation
      *
      * @var string
      */
+    protected $parentKey;
+
+    /**
+     * The local key of the related model.
+     *
+     * @var string
+     */
     protected $localKey;
 
     /**
@@ -106,12 +113,14 @@ class BelongsToMany extends Relation
      * @param  string  $foreignKey
      * @param  string  $relatedKey
      * @param  string  $localKey
+     * @param  string  $parentKey
      * @param  string  $relationName
      * @return void
      */
-    public function __construct(Builder $query, Model $parent, $table, $foreignKey, $relatedKey, $localKey, $relationName = null)
+    public function __construct(Builder $query, Model $parent, $table, $foreignKey, $relatedKey, $parentKey, $localKey, $relationName = null)
     {
         $this->table = $table;
+        $this->parentKey = $parentKey;
         $this->localKey = $localKey;
         $this->relatedKey = $relatedKey;
         $this->foreignKey = $foreignKey;
@@ -163,8 +172,10 @@ class BelongsToMany extends Relation
      */
     protected function addWhereConstraints()
     {
+        $parentKey = $this->parentKey;
+
         $this->query->where(
-            $this->getQualifiedForeignKeyName(), '=', $this->parent->getKey()
+            $this->getQualifiedForeignKeyName(), '=', $this->parent->$parentKey
         );
 
         return $this;
