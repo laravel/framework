@@ -1895,6 +1895,25 @@ class SupportCollectionTest extends TestCase
         $this->assertSame([1], $fromTap);
         $this->assertSame([1, 2, 3], $collection->toArray());
     }
+
+    public function testWhen()
+    {
+        $collection = new Collection(['michael', 'tom']);
+
+        $collection->when(true, function ($collection) {
+            return $collection->push('adam');
+        });
+
+        $this->assertSame(['michael', 'tom', 'adam'], $collection->toArray());
+
+        $collection = new Collection(['michael', 'tom']);
+
+        $collection->when(false, function ($collection) {
+            return $collection->push('adam');
+        });
+
+        $this->assertSame(['michael', 'tom'], $collection->toArray());
+    }
 }
 
 class TestSupportCollectionHigherOrderItem
