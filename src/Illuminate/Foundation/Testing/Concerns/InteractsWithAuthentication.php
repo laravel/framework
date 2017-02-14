@@ -13,7 +13,7 @@ trait InteractsWithAuthentication
      * @param  string|null  $driver
      * @return $this
      */
-    public function actingAs(UserContract $user, $driver = null)
+    public function loginAs(UserContract $user, $driver = null)
     {
         $this->be($user, $driver);
 
@@ -40,7 +40,7 @@ trait InteractsWithAuthentication
      * @param  string|null  $guard
      * @return $this
      */
-    public function seeIsAuthenticated($guard = null)
+    public function assertAuthentication($guard = null)
     {
         $this->assertTrue($this->isAuthenticated($guard), 'The user is not authenticated');
 
@@ -53,7 +53,7 @@ trait InteractsWithAuthentication
      * @param  string|null  $guard
      * @return $this
      */
-    public function dontSeeIsAuthenticated($guard = null)
+    public function assertGuest($guard = null)
     {
         $this->assertFalse($this->isAuthenticated($guard), 'The user is authenticated');
 
@@ -78,7 +78,7 @@ trait InteractsWithAuthentication
      * @param  string|null  $guard
      * @return $this
      */
-    public function seeIsAuthenticatedAs($user, $guard = null)
+    public function assertAuthenticatedAs($user, $guard = null)
     {
         $expected = $this->app->make('auth')->guard($guard)->user();
 
@@ -102,7 +102,7 @@ trait InteractsWithAuthentication
      * @param  string|null  $guard
      * @return $this
      */
-    public function seeCredentials(array $credentials, $guard = null)
+    public function assertCredentials(array $credentials, $guard = null)
     {
         $this->assertTrue(
             $this->hasCredentials($credentials, $guard), 'The given credentials are invalid.'
@@ -118,7 +118,7 @@ trait InteractsWithAuthentication
      * @param  string|null  $guard
      * @return $this
      */
-    public function dontSeeCredentials(array $credentials, $guard = null)
+    public function assertCredentialsMissing(array $credentials, $guard = null)
     {
         $this->assertFalse(
             $this->hasCredentials($credentials, $guard), 'The given credentials are valid.'
@@ -141,5 +141,53 @@ trait InteractsWithAuthentication
         $user = $provider->retrieveByCredentials($credentials);
 
         return $user && $provider->validateCredentials($user, $credentials);
+    }
+
+    /**
+     * @see loginAs
+     */
+    public function actingAs(UserContract $user, $driver = null)
+    {
+        return $this->loginAs($user, $driver);
+    }
+
+    /**
+     * @see assertAuthentication
+     */
+    public function seeIsAuthenticated($guard = null)
+    {
+        return $this->assertAuthentication($guard);
+    }
+
+    /**
+     * @see assertGuest
+     */
+    public function dontSeeIsAuthenticated($guard = null)
+    {
+        return $this->assertGuest($guard);
+    }
+
+    /**
+     * @see assertAuthenticatedAs
+     */
+    public function seeIsAuthenticatedAs($user, $guard = null)
+    {
+        return $this->assertAuthenticatedAs($user, $guard);
+    }
+
+    /**
+     * @see assertCredentials
+     */
+    public function seeCredentials(array $credentials, $guard = null)
+    {
+        return $this->assertCredentials($credentials, $guard);
+    }
+
+    /**
+     * @see assertCredentialsMissing
+     */
+    public function dontSeeCredentials(array $credentials, $guard = null)
+    {
+        return $this->assertCredentialsMissing($credentials, $guard);
     }
 }
