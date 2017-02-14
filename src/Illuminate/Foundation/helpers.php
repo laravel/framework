@@ -671,11 +671,7 @@ if (! function_exists('request')) {
             return app('request')->only($key);
         }
 
-        if (app('request')->hasFile($key)) {
-            return app('request')->file($key);
-        }
-
-        return app('request')->input($key, $default);
+        return data_get(app('request')->all(), $key, $default);
     }
 }
 
