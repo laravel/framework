@@ -113,11 +113,12 @@ class MorphToMany extends BelongsToMany
     /**
      * Create a new query builder for the pivot table.
      *
+     * @param  \Illuminate\Database\Query\Builder  $query
      * @return \Illuminate\Database\Query\Builder
      */
-    protected function newPivotQuery()
+    protected function newPivotQuery(Builder $query = null)
     {
-        return parent::newPivotQuery()->where($this->morphType, $this->morphClass);
+        return parent::newPivotQuery($query)->where($this->morphType, $this->morphClass);
     }
 
     /**

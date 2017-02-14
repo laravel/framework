@@ -38,28 +38,33 @@ class Pivot extends Model
     /**
      * Create a new pivot model instance.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  mixed   $parent
      * @param  array   $attributes
      * @param  string  $table
      * @param  bool    $exists
      * @return void
      */
-    public function __construct(Model $parent, $attributes, $table, $exists = false)
+    public function __construct($parent = null, $attributes = [], $table = null, $exists = false)
     {
-        parent::__construct();
+        if (! $parent instanceof Model) {
+            $attributes = is_array($parent) ? $parent : $attributes;
+            parent::__construct($attributes);
+        } else {
+            parent::__construct();
 
-        // The pivot model is a "dynamic" model since we will set the tables dynamically
-        // for the instance. This allows it work for any intermediate tables for the
-        // many to many relationship that are defined by this developer's classes.
-        $this->setConnection($parent->getConnectionName())
-             ->setTable($table)
-             ->forceFill($attributes)
-             ->syncOriginal();
+            // The pivot model is a "dynamic" model since we will set the tables dynamically
+            // for the instance. This allows it work for any intermediate tables for the
+            // many to many relationship that are defined by this developer's classes.
+            $this->setConnection($parent->getConnectionName())
+                 ->setTable($table)
+                 ->forceFill($attributes)
+                 ->syncOriginal();
 
-        // We store off the parent instance so we will access the timestamp column names
-        // for the model, since the pivot model timestamps aren't easily configurable
-        // from the developer's point of view. We can use the parents to get these.
-        $this->parent = $parent;
+            // We store off the parent instance so we will access the timestamp column names
+            // for the model, since the pivot model timestamps aren't easily configurable
+            // from the developer's point of view. We can use the parents to get these.
+            $this->parent = $parent;
+        }
 
         $this->exists = $exists;
 
@@ -92,6 +97,10 @@ class Pivot extends Model
      */
     protected function setKeysForSaveQuery(Builder $query)
     {
+        if (! $this->hasParent()) {
+            return parent::setKeysForSaveQuery($query);
+        }
+
         $query->where($this->foreignKey, $this->getAttribute($this->foreignKey));
 
         return $query->where($this->relatedKey, $this->getAttribute($this->relatedKey));
@@ -104,7 +113,7 @@ class Pivot extends Model
      */
     public function delete()
     {
-        return $this->getDeleteQuery()->delete();
+        return $this->hasParent() ? $this->getDeleteQuery()->delete() : parent::delete();
     }
 
     /**
@@ -183,7 +192,7 @@ class Pivot extends Model
      */
     public function getCreatedAtColumn()
     {
-        return $this->parent->getCreatedAtColumn();
+        return $this->hasParent() ? $this->parent->getCreatedAtColumn() : parent::getCreatedAtColumn();
     }
 
     /**
@@ -193,6 +202,16 @@ class Pivot extends Model
      */
     public function getUpdatedAtColumn()
     {
-        return $this->parent->getUpdatedAtColumn();
+        return $this->hasParent() ? $this->parent->getUpdatedAtColumn() : parent::getUpdatedAtColumn();
+    }
+
+    /**
+     * Determine if this pivot has a parent or if it's being used as a model.
+     *
+     * @return bool
+     */
+    public function hasParent()
+    {
+        return (bool) $this->parent;
     }
 }

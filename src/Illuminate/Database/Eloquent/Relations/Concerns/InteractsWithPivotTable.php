@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as BaseCollection;
 
@@ -343,7 +344,12 @@ trait InteractsWithPivotTable
      */
     public function detach($ids = null, $touch = true)
     {
-        $query = $this->newPivotQuery();
+        if ($this->hasCustomPivotModel()) {
+            $using = new $this->using();
+            $query = $this->newPivotQuery($using->newQuery());
+        } else {
+            $query = $this->newPivotQuery();
+        }
 
         // If associated IDs were passed to the method we will only delete those
         // associations, otherwise all of the association ties will be broken.
@@ -359,7 +365,16 @@ trait InteractsWithPivotTable
         // Once we have all of the conditions set on the statement, we are ready
         // to run the delete on the pivot table. Then, if the touch parameter
         // is true, we will go ahead and touch all related models to sync.
-        $results = $query->delete();
+
+        if ($this->hasCustomPivotModel()) {
+            $models = $query->get();
+            $models->each(function ($model) {
+                $model->delete();
+            });
+            $results = $models->isNotEmpty();
+        } else {
+            $results = $query->delete();
+        }
 
         if ($touch) {
             $this->touchIfTouching();
@@ -419,11 +434,12 @@ trait InteractsWithPivotTable
     /**
      * Create a new query builder for the pivot table.
      *
+     * @param  \Illuminate\Database\Query\Builder  $query
      * @return \Illuminate\Database\Query\Builder
      */
-    protected function newPivotQuery()
+    protected function newPivotQuery(Builder $query = null)
     {
-        $query = $this->newPivotStatement();
+        $query = $query ?: $this->newPivotStatement();
 
         foreach ($this->pivotWheres as $arguments) {
             call_user_func_array([$query, 'where'], $arguments);
