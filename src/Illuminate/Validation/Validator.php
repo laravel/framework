@@ -1661,6 +1661,10 @@ class Validator implements ValidatorContract
      */
     protected function validateDimensions($attribute, $value, $parameters)
     {
+        if (is_array($value)) {
+            return $this->validateDimensionsArray($attribute, $value, $parameters);
+        }
+
         if (! $this->isAValidFileInstance($value) || ! $sizeDetails = getimagesize($value->getRealPath())) {
             return false;
         }
@@ -1688,6 +1692,25 @@ class Validator implements ValidatorContract
             );
 
             return $numerator / $denominator == $width / $height;
+        }
+
+        return true;
+    }
+
+    /**
+     * Validate the dimensions of an array of images matches the given values.
+     *
+     * @param  string $attribute
+     * @param  array  $value
+     * @param  array $parameters
+     * @return bool
+     */
+    protected function validateDimensionsArray($attribute, $value, $parameters)
+    {
+        foreach ($value as $image) {
+            if (! $this->validateDimensions($attribute, $image, $parameters)) {
+                return false;
+            }
         }
 
         return true;

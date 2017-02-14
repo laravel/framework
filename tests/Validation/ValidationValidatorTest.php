@@ -1905,6 +1905,20 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($v->fails());
     }
 
+    public function testValidateImageDimensionsArray()
+    {
+        // Knowing that demo image.gif has width = 3 and height = 2
+        $uploadedFiles = [
+            new \Symfony\Component\HttpFoundation\File\UploadedFile(__DIR__.'/fixtures/image.gif', '', null, null, null, true),
+            new \Symfony\Component\HttpFoundation\File\UploadedFile(__DIR__.'/fixtures/image.gif', '', null, null, null, true)
+        ];
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, [], ['x' => 'dimensions:min_width=5']);
+        $v->setFiles(['x' => $uploadedFiles]);
+        $this->assertTrue($v->fails());
+    }
+
     /**
      * @requires extension fileinfo
      */
