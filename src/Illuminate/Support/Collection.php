@@ -315,10 +315,12 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  callable  $callback
      * @return mixed
      */
-    public function when($value, callable $callback)
+    public function when($value, callable $callback, callable $default = null)
     {
         if ($value) {
             return $callback($this);
+        } elseif ($default) {
+            return $default($this);
         }
 
         return $this;
