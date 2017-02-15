@@ -2,12 +2,27 @@
 
 namespace Illuminate\Tests\Cache;
 
+use Carbon\Carbon;
 use Illuminate\Cache\FileStore;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
 class CacheFileStoreTest extends TestCase
 {
+    public function setup()
+    {
+        parent::setup();
+
+        Carbon::setTestNow(Carbon::now());
+    }
+
+    public function tearDown()
+    {
+        parent::tearDown();
+
+        Carbon::setTestNow(null);
+    }
+
     public function testNullIsReturnedIfFileDoesntExist()
     {
         $files = $this->mockFilesystem();
@@ -85,7 +100,7 @@ class CacheFileStoreTest extends TestCase
     public function testIncrementDoesNotExtendCacheLife()
     {
         $files = $this->mockFilesystem();
-        $expiration = time() + 59;
+        $expiration = Carbon::now()->addSeconds(50)->getTimestamp();
         $initialValue = $expiration.serialize(1);
         $valueAfterIncrement = $expiration.serialize(2);
         $store = new FileStore($files, __DIR__);
