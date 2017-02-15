@@ -309,6 +309,25 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Apply the callback if the value is truthy.
+     *
+     * @param  bool  $value
+     * @param  callable  $callback
+     * @param  callable  $default
+     * @return mixed
+     */
+    public function when($value, callable $callback, callable $default = null)
+    {
+        if ($value) {
+            return $callback($this);
+        } elseif ($default) {
+            return $default($this);
+        }
+
+        return $this;
+    }
+
+    /**
      * Filter items by the given key value pair.
      *
      * @param  string  $key

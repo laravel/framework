@@ -1,5 +1,44 @@
 # Release Notes for 5.4.x
 
+## v5.4.12 (2017-02-15)
+
+### Added
+- Allow configuration of Faker locale through `app.faker_locale` config ([#17895](https://github.com/laravel/framework/pull/17895))
+- Added `when()` method to `Collection` class ([#17917](https://github.com/laravel/framework/pull/17917))
+- Check for files in `request()` helper ([e08714d](https://github.com/laravel/framework/commit/e08714d65a2f3ab503fd59061aa8ab2fc37e19a4), [18d1648](https://github.com/laravel/framework/commit/18d16486103292c681c29f503b27bf3affb5a2d3))
+- Added `TestResponse::assertSessionHasErrors()` method ([dbaf3b1](https://github.com/laravel/framework/commit/dbaf3b10f1daa483a1db840c60ec95337c9a1f6e))
+
+### Changed
+- Prevent duplication of embedded files in `Mail\Message` ([#17877](https://github.com/laravel/framework/pull/17877))
+- Only unserialize data if needed in `CallQueuedListener` ([964fb7f](https://github.com/laravel/framework/commit/964fb7fc1c80948beb521f1672d0b250eedea94d))
+- Made a couple of properties public ([614b94a](https://github.com/laravel/framework/commit/614b94a15564352f3775d3bc81097f89ba79e586))
+- Handle `Model` instances in `Authorize` middleware ([#17898](https://github.com/laravel/framework/pull/17898))
+- Use `asset()` helper in `app.stub` ([#17896](https://github.com/laravel/framework/pull/17896))
+- Test PhpRedis connection if extension is loaded ([#17882](https://github.com/laravel/framework/pull/17882), [#17910](https://github.com/laravel/framework/pull/17910))
+- Use `Carbon::setTestNow()` in all tests ([#17937](https://github.com/laravel/framework/pull/17937))
+
+### Fixed
+- Make sub select union queries work with SQLite ([#17890](https://github.com/laravel/framework/pull/17890))
+- Fix `zRangeByScore()` options syntax for PhpRedis ([#17912](https://github.com/laravel/framework/pull/17912))
+
+
+## v5.4.11 (2017-02-10)
+
+### Added
+- Support `Encrypt` and `TrustServerCertificate` options on SqlServer connections ([#17841](https://github.com/laravel/framework/pull/17841))
+- Support custom pivot models in `MorphToMany::newPivot()` ([#17862](https://github.com/laravel/framework/pull/17862))
+- Support `Arrayable` objects in Eloquent's `whereKey()` method ([#17812](https://github.com/laravel/framework/pull/17812))
+
+### Changed
+- Use `app.locale` lang attribute in `app.stub` ([#17827](https://github.com/laravel/framework/pull/17827))
+- Throw `JsonEncodingException` when JSON encoder fails to encode eloquent attribute ([#17804](https://github.com/laravel/framework/pull/17804), [11e89f3](https://github.com/laravel/framework/commit/11e89f35b0f1fc1654d51bc31c865ab796da9f46))
+- Ensure file `hashName()` is unique ([#17879](https://github.com/laravel/framework/pull/17879), [830f194](https://github.com/laravel/framework/commit/830f194f9f72cd3de31151990c7aad6db52f1e86))
+
+### Fixed
+- Added missing `Str` class import to `TestResponse` ([#17835](https://github.com/laravel/framework/pull/17835))
+- Fixed PhpRedis’ `zadd()` method signature ([#17832](https://github.com/laravel/framework/pull/17832))
+
+
 ## v5.4.10 (2017-02-08)
 
 ### Added

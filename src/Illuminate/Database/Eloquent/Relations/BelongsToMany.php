@@ -594,7 +594,7 @@ class BelongsToMany extends Relation
     {
         // To hydrate the pivot relationship, we will just gather the pivot attributes
         // and create a new Pivot model, which is basically a dynamic model that we
-        // will set the attributes, table, and connections on so it they be used.
+        // will set the attributes, table, and connections on it so it will work.
         foreach ($models as $model) {
             $model->setRelation('pivot', $this->newExistingPivot(
                 $this->migratePivotAttributes($model)

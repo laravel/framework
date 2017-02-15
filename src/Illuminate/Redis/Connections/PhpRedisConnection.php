@@ -178,4 +178,38 @@ class PhpRedisConnection extends Connection
     {
         //
     }
+
+    /**
+     * Disconnects from the Redis instance.
+     *
+     * @return void
+     */
+    public function disconnect()
+    {
+        $this->client->close();
+    }
+
+    /**
+     * Pass other method calls down to the underlying client.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        $method = strtolower($method);
+
+        if ($method == 'eval') {
+            return $this->proxyToEval($parameters);
+        }
+
+        if ($method == 'zrangebyscore' || $method == 'zrevrangebyscore') {
+            $parameters = array_map(function ($parameter) {
+                return is_array($parameter) ? array_change_key_case($parameter) : $parameter;
+            }, $parameters);
+        }
+
+        return parent::__call($method, $parameters);
+    }
 }
