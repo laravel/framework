@@ -313,6 +313,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      *
      * @param  bool  $value
      * @param  callable  $callback
+     * @param  callable  $default
      * @return mixed
      */
     public function when($value, callable $callback, callable $default = null)
