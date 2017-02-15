@@ -1914,6 +1914,19 @@ class SupportCollectionTest extends TestCase
 
         $this->assertSame(['michael', 'tom'], $collection->toArray());
     }
+
+    public function testWhenDefault()
+    {
+        $collection = new Collection(['michael', 'tom']);
+
+        $collection->when(false, function ($collection) {
+            return $collection->push('adam');
+        }, function ($collection) {
+            return $collection->push('taylor');
+        });
+
+        $this->assertSame(['michael', 'tom', 'taylor'], $collection->toArray());
+    }
 }
 
 class TestSupportCollectionHigherOrderItem
