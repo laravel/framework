@@ -299,6 +299,7 @@ class Blueprint {
 	 */
 	public function primary($columns, $name = null)
 	{
+		$name = ! empty($name) ? $name : '';
 		return $this->indexCommand('primary', $columns, $name);
 	}
 
