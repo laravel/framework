@@ -1914,7 +1914,7 @@ class SupportCollectionTest extends TestCase
 
         $this->assertSame(['michael', 'tom'], $collection->toArray());
     }
-    
+
     public function testWhenDefault()
     {
         $collection = new Collection(['michael', 'tom']);
@@ -1927,7 +1927,6 @@ class SupportCollectionTest extends TestCase
 
         $this->assertSame(['michael', 'tom', 'taylor'], $collection->toArray());
     }
-   
 }
 
 class TestSupportCollectionHigherOrderItem
