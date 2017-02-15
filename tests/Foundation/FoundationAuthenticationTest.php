@@ -54,14 +54,14 @@ class FoundationAuthenticationTest extends TestCase
         m::close();
     }
 
-    public function testAssertAuthentication()
+    public function testAssertAuthenticated()
     {
         $this->mockGuard()
             ->shouldReceive('check')
             ->once()
             ->andReturn(true);
 
-        $this->assertAuthentication();
+        $this->assertAuthenticated();
     }
 
     public function testAssertGuest()
@@ -128,6 +128,6 @@ class FoundationAuthenticationTest extends TestCase
 
         $this->setupProvider($credentials);
 
-        $this->assertCredentialsMissing($credentials);
+        $this->assertInvalidCredentials($credentials);
     }
 }

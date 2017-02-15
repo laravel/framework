@@ -13,7 +13,7 @@ trait InteractsWithAuthentication
      * @param  string|null  $driver
      * @return $this
      */
-    public function loginAs(UserContract $user, $driver = null)
+    public function actingAs(UserContract $user, $driver = null)
     {
         $this->be($user, $driver);
 
@@ -40,7 +40,7 @@ trait InteractsWithAuthentication
      * @param  string|null  $guard
      * @return $this
      */
-    public function assertAuthentication($guard = null)
+    public function assertAuthenticated($guard = null)
     {
         $this->assertTrue($this->isAuthenticated($guard), 'The user is not authenticated');
 
@@ -118,7 +118,7 @@ trait InteractsWithAuthentication
      * @param  string|null  $guard
      * @return $this
      */
-    public function assertCredentialsMissing(array $credentials, $guard = null)
+    public function assertInvalidCredentials(array $credentials, $guard = null)
     {
         $this->assertFalse(
             $this->hasCredentials($credentials, $guard), 'The given credentials are valid.'
