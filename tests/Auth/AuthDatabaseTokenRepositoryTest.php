@@ -3,14 +3,25 @@
 namespace Illuminate\Tests\Auth;
 
 use Mockery as m;
+use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Auth\Passwords\DatabaseTokenRepository;
 
 class AuthDatabaseTokenRepositoryTest extends TestCase
 {
+    public function setup()
+    {
+        parent::setup();
+
+        Carbon::setTestNow(Carbon::now());
+    }
+
     public function tearDown()
     {
+        parent::tearDown();
+
         m::close();
+        Carbon::setTestNow(null);
     }
 
     public function testCreateInsertsNewRecordIntoTable()
@@ -48,7 +59,7 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
         $repo->getHasher()->shouldReceive('check')->with('token', 'hashed-token')->andReturn(true);
         $repo->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($query = m::mock('StdClass'));
         $query->shouldReceive('where')->once()->with('email', 'email')->andReturn($query);
-        $date = date('Y-m-d H:i:s', time() - 300000);
+        $date = Carbon::now()->subSeconds(300000)->toDateTimeString();
         $query->shouldReceive('first')->andReturn((object) ['created_at' => $date, 'token' => 'hashed-token']);
         $user = m::mock('Illuminate\Contracts\Auth\CanResetPassword');
         $user->shouldReceive('getEmailForPasswordReset')->andReturn('email');
@@ -62,7 +73,7 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
         $repo->getHasher()->shouldReceive('check')->with('token', 'hashed-token')->andReturn(true);
         $repo->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($query = m::mock('StdClass'));
         $query->shouldReceive('where')->once()->with('email', 'email')->andReturn($query);
-        $date = date('Y-m-d H:i:s', time() - 600);
+        $date = Carbon::now()->subMinutes(10)->toDateTimeString();
         $query->shouldReceive('first')->andReturn((object) ['created_at' => $date, 'token' => 'hashed-token']);
         $user = m::mock('Illuminate\Contracts\Auth\CanResetPassword');
         $user->shouldReceive('getEmailForPasswordReset')->andReturn('email');
@@ -76,7 +87,7 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
         $repo->getHasher()->shouldReceive('check')->with('wrong-token', 'hashed-token')->andReturn(false);
         $repo->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($query = m::mock('StdClass'));
         $query->shouldReceive('where')->once()->with('email', 'email')->andReturn($query);
-        $date = date('Y-m-d H:i:s', time() - 600);
+        $date = Carbon::now()->subMinutes(10)->toDateTimeString();
         $query->shouldReceive('first')->andReturn((object) ['created_at' => $date, 'token' => 'hashed-token']);
         $user = m::mock('Illuminate\Contracts\Auth\CanResetPassword');
         $user->shouldReceive('getEmailForPasswordReset')->andReturn('email');
