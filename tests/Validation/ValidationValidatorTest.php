@@ -1923,6 +1923,13 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:ratio=1']);
         $this->assertTrue($v->fails());
+
+        // This test fails without suppressing warnings on getimagesize() due to a read error.
+        $emptyUploadedFile = new \Symfony\Component\HttpFoundation\File\UploadedFile(__DIR__.'/fixtures/empty.gif', '', null, null, null, true);
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['x' => $emptyUploadedFile], ['x' => 'dimensions:min_width=1']);
+        $this->assertTrue($v->fails());
     }
 
     /**
