@@ -243,9 +243,39 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($model->save());
     }
 
+    public function testEventsCanBeFiredWithCustomEventObjectsWithOldModel()
+    {
+        $model = $this->getMockBuilder('Illuminate\Tests\Database\OldEloquentModelEventObjectStub')->setMethods(['newQueryWithoutScopes'])->getMock();
+        $query = m::mock('Illuminate\Database\Eloquent\Builder');
+        $model->expects($this->once())->method('newQueryWithoutScopes')->will($this->returnValue($query));
+        $model->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
+        $events->shouldReceive('until')->once()->with(m::type(EloquentModelSavingEventStub::class))->andReturn(false);
+        $model->exists = true;
+
+        $this->assertFalse($model->save());
+    }
+
     public function testUpdateProcessWithoutTimestamps()
     {
         $model = $this->getMockBuilder('Illuminate\Tests\Database\EloquentModelEventObjectStub')->setMethods(['newQueryWithoutScopes', 'updateTimestamps', 'fireModelEvent'])->getMock();
+        $model->timestamps = false;
+        $query = m::mock('Illuminate\Database\Eloquent\Builder');
+        $query->shouldReceive('where')->once()->with('id', '=', 1);
+        $query->shouldReceive('update')->once()->with(['name' => 'taylor'])->andReturn(1);
+        $model->expects($this->once())->method('newQueryWithoutScopes')->will($this->returnValue($query));
+        $model->expects($this->never())->method('updateTimestamps');
+        $model->expects($this->any())->method('fireModelEvent')->will($this->returnValue(true));
+
+        $model->id = 1;
+        $model->syncOriginal();
+        $model->name = 'taylor';
+        $model->exists = true;
+        $this->assertTrue($model->save());
+    }
+
+    public function testUpdateProcessWithoutTimestampsWithOldModel()
+    {
+        $model = $this->getMockBuilder('Illuminate\Tests\Database\OldEloquentModelEventObjectStub')->setMethods(['newQueryWithoutScopes', 'updateTimestamps', 'fireModelEvent'])->getMock();
         $model->timestamps = false;
         $query = m::mock('Illuminate\Database\Eloquent\Builder');
         $query->shouldReceive('where')->once()->with('id', '=', 1);
@@ -1955,6 +1985,13 @@ class EloquentModelSavingEventStub
 class EloquentModelEventObjectStub extends \Illuminate\Database\Eloquent\Model
 {
     protected $observableEvents = [
+        'saving' => EloquentModelSavingEventStub::class,
+    ];
+}
+
+class OldEloquentModelEventObjectStub extends \Illuminate\Database\Eloquent\Model
+{
+    protected $events = [
         'saving' => EloquentModelSavingEventStub::class,
     ];
 }

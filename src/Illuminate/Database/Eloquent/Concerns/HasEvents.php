@@ -152,6 +152,10 @@ trait HasEvents
      */
     protected function fireCustomModelEvent($event, $method)
     {
+        if (property_exists($this, 'events') && is_array($this->events)) {
+            $this->observableEvents = $this->events;
+        }
+
         if (! isset($this->observableEvents[$event])) {
             return;
         }
