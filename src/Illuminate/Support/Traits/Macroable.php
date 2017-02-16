@@ -65,7 +65,6 @@ trait Macroable
         return static::resolveMacroCall($method, $parameters, static::$macros[$method]->bindTo($this, static::class));
     }
 
-
     /**
      * Dynamically handle calls to the class.
      *
