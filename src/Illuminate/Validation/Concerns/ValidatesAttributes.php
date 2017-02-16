@@ -424,7 +424,7 @@ trait ValidatesAttributes
      */
     protected function validateDimensions($attribute, $value, $parameters)
     {
-        if (! $this->isValidFileInstance($value) || ! $sizeDetails = getimagesize($value->getRealPath())) {
+        if (! $this->isValidFileInstance($value) || ! $sizeDetails = @getimagesize($value->getRealPath())) {
             return false;
         }
 
