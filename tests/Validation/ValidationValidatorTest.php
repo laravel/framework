@@ -215,6 +215,26 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals('replaced!', $v->messages()->first('name'));
     }
 
+    public function testNestedAttributesAreReplacedInDimensions()
+    {
+        // Knowing that demo image.gif has width = 3 and height = 2
+        $uploadedFile = new \Symfony\Component\HttpFoundation\File\UploadedFile(__DIR__.'/fixtures/image.gif', '', null, null, null, true);
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.dimensions' => ':min_width :max_height :ratio'], 'en');
+        $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:min_width=10,max_height=20,ratio=1']);
+        $v->messages()->setFormat(':message');
+        $this->assertTrue($v->fails());
+        $this->assertEquals('10 20 1', $v->messages()->first('x'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.dimensions' => ':width :height :ratio'], 'en');
+        $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:min_width=10,max_height=20,ratio=1']);
+        $v->messages()->setFormat(':message');
+        $this->assertTrue($v->fails());
+        $this->assertEquals(':width :height 1', $v->messages()->first('x'));
+    }
+
     public function testAttributeNamesAreReplaced()
     {
         $trans = $this->getIlluminateArrayTranslator();
