@@ -1515,6 +1515,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 				$this->setKeysForSaveQuery($query)->update($dirty);
 
 				$this->fireModelEvent('updated', false);
+
+				return true;
 			}
 		}
 
