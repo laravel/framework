@@ -75,7 +75,7 @@ trait Macroable
      *
      * @throws \BadMethodCallException
      */
-    protected function resolveMacroCall($method, $parameters, $bind)
+    protected static function resolveMacroCall($method, $parameters, $bind)
     {
         if (! static::hasMacro($method)) {
             throw new BadMethodCallException("Method {$method} does not exist.");
