@@ -1790,7 +1790,7 @@ class Builder
     }
 
     /**
-     * Run a pagiantion count query.
+     * Run a pagination count query.
      *
      * @param  array  $columns
      * @return array
