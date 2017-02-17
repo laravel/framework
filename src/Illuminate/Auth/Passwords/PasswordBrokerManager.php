@@ -64,8 +64,8 @@ class PasswordBrokerManager implements FactoryContract
         }
 
         return new PasswordBroker(
-            $this->app,
             $this->app['auth']->createUserProvider($config['provider']),
+            $this->app['config']['app.key'],
             $config['expire']
         );
     }

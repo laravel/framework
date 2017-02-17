@@ -15,11 +15,11 @@ use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 class PasswordBroker implements PasswordBrokerContract
 {
     /**
-     * The application instance.
+     * The application key.
      *
-     * @var \Illuminate\Foundation\Application
+     * @var string
      */
-    protected $app;
+    protected $key;
 
     /**
      * The user provider implementation.
@@ -45,13 +45,14 @@ class PasswordBroker implements PasswordBrokerContract
     /**
      * Create a new password broker instance.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @param  \Illuminate\Contracts\Auth\UserProvider  $users
+     * @param  string  $key
+     * @param  int  $expiration
      * @return void
      */
-    public function __construct(Application $app, UserProvider $users, $expiration)
+    public function __construct(UserProvider $users, $key, $expiration)
     {
-        $this->app = $app;
+        $this->key = $key;
         $this->users = $users;
         $this->expiration = $expiration;
     }
@@ -255,13 +256,11 @@ class PasswordBroker implements PasswordBrokerContract
      */
     public function getKey()
     {
-        $key = $this->app['config']['app.key'];
-
-        if (Str::startsWith($key, 'base64:')) {
-            $key = base64_decode(substr($key, 7));
+        if (Str::startsWith($this->key, 'base64:')) {
+            return base64_decode(substr($this->key, 7));
         }
 
-        return $key;
+        return $this->key;
     }
 
     /**

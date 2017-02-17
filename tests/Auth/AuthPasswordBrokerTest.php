@@ -126,14 +126,14 @@ class AuthPasswordBrokerTest extends TestCase
 
     protected function getBroker($mocks)
     {
-        return new \Illuminate\Auth\Passwords\PasswordBroker($mocks['app'], $mocks['users'], $mocks['expiration']);
+        return new \Illuminate\Auth\Passwords\PasswordBroker($mocks['users'], $mocks['key'], $mocks['expiration']);
     }
 
     protected function getMocks()
     {
         $mocks = [
-            'app' => m::mock('Illuminate\Contracts\Foundation\Application'),
             'users' => m::mock('Illuminate\Contracts\Auth\UserProvider'),
+            'key' => 'secret',
             'expiration' => time(),
         ];
 
