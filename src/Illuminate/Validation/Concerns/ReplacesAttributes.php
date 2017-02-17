@@ -367,9 +367,10 @@ trait ReplacesAttributes
      */
     protected function replaceDimensions($message, $attribute, $rule, $parameters)
     {
-        $nesteds = $this->parseNamedParameters($parameters);
-        if (is_array($nesteds)) {
-            foreach ($nesteds as $key => $value) {
+        $parameters = $this->parseNamedParameters($parameters);
+
+        if (is_array($parameters)) {
+            foreach ($parameters as $key => $value) {
                 $message = str_replace(':'.$key, $value, $message);
             }
         }
