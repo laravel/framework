@@ -17,7 +17,7 @@ trait RegistersUsers
      */
     public function showRegistrationForm()
     {
-        return view('auth.register');
+        return isset($this->view) ? view($this->view) : view('auth.register');
     }
 
     /**
