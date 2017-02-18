@@ -21,11 +21,18 @@ class SlackMessage
     public $username;
 
     /**
-     * The user icon for the message.
+     * The user emoji icon for the message.
      *
      * @var string|null
      */
     public $icon;
+
+    /**
+     * The user url logo for the message.
+     *
+     * @var string|null
+     */
+    public $logo;
 
     /**
      * The channel to send the message on.
