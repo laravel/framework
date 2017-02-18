@@ -1687,7 +1687,7 @@ class Validator implements ValidatorContract
                 [1, 1], array_filter(sscanf($parameters['ratio'], '%f/%d'))
             );
 
-            return $numerator / $denominator == $width / $height;
+            return abs($numerator / $denominator - $width / $height) < 0.000001;
         }
 
         return true;
