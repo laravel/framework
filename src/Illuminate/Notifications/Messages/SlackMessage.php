@@ -99,7 +99,7 @@ class SlackMessage
     }
 
     /**
-     * Set a custom username for the Slack message.
+     * Set a custom username and optional emoji icon for the Slack message.
      *
      * @param  string  $username
      * @param  string|null  $icon
@@ -115,7 +115,7 @@ class SlackMessage
 
         return $this;
     }
-    
+
     /**
      * Set a custom logo image for the Slack message.
      *
