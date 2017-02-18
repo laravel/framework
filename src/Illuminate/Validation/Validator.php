@@ -1661,7 +1661,7 @@ class Validator implements ValidatorContract
      */
     protected function validateDimensions($attribute, $value, $parameters)
     {
-        if (! $this->isAValidFileInstance($value) || ! $sizeDetails = getimagesize($value->getRealPath())) {
+        if (! $this->isAValidFileInstance($value) || ! $sizeDetails = @getimagesize($value->getRealPath())) {
             return false;
         }
 
