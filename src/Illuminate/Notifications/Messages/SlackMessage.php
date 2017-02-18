@@ -99,7 +99,7 @@ class SlackMessage
     }
 
     /**
-     * Set a custom user icon for the Slack message.
+     * Set a custom username for the Slack message.
      *
      * @param  string  $username
      * @param  string|null  $icon
@@ -112,6 +112,19 @@ class SlackMessage
         if (! is_null($icon)) {
             $this->icon = $icon;
         }
+
+        return $this;
+    }
+    
+    /**
+     * Set a custom logo image for the Slack message.
+     *
+     * @param  string  $logo
+     * @return $this
+     */
+    public function logo($logo)
+    {
+        $this->logo = $logo;
 
         return $this;
     }
