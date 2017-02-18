@@ -1034,6 +1034,32 @@ class SupportCollectionTest extends TestCase
         );
     }
 
+    public function testMapWithKeysResult()
+    {
+        $data = new Collection([
+            ['name' => 'itemA', 'value' => 1],
+            ['name' => 'itemB', 'value' => 0],
+            ['name' => 'itemC', 'value' => 'D'],
+            ['name' => 'itemC', 'value' => 'E'],
+            ['name' => 'itemC', 'value' => 'F'],
+        ]);
+        $data = $data->mapWithKeys(function ($value, $key, $result) {
+            if ($current = data_get($result, $value['name'])) {
+                if (! is_array($current)) {
+                    $current = [$current];
+                }
+
+                $current[] = $value['value'];
+            }
+
+            return [$value['name'] => $current ?: $value['value']];
+        });
+        $this->assertEquals(
+            ['itemA' => 1, 'itemB' => 0, 'itemC' => ['D', 'E', 'F']],
+            $data->all()
+        );
+    }
+
     public function testMapWithKeysIntegerKeys()
     {
         $data = new Collection([
