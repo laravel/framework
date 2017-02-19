@@ -486,6 +486,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $query = $this->newQueryWithoutScopes();
 
+        // If new save is required without instantizing the new class.
+        // $options = "create" || "update"
+        if (isset($options['create']))
+            if ($options['create'] && $this -> exists ) {
+                $this->attributes[(string)$this->primaryKey]++;
+                $this->exists = false;
+            }
+
         // If the "saving" event returns false we'll bail out of the save and return
         // false, indicating that the save failed. This provides a chance for any
         // listeners to cancel save operations if validations fail or whatever.
