@@ -489,11 +489,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // If new save is required without instantizing the new class.
         // $options["create"] is boolean; true means create a new record without updating previous.
         // false or not set means update the same record without creating a new one.
-        if (isset($options['create']))
-            if ($options['create'] && $this -> exists ) {
-                $this->attributes[(string)$this->primaryKey]++;
+        if (isset($options['create'])) {
+            if ($options['create'] && $this->exists) {
+                $this->attributes[(string) $this->primaryKey]++;
                 $this->exists = false;
             }
+        }
 
         // If the "saving" event returns false we'll bail out of the save and return
         // false, indicating that the save failed. This provides a chance for any
