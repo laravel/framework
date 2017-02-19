@@ -403,9 +403,7 @@ class Blueprint
      */
     public function tableForeign($table, $name = null)
     {
-
         $column_name = substr($table, 0, -1).'_id';
-
         $column = $this->integer($column_name)->unsigned();
         $this->foreign($column_name, $name)->references('id')->on($table);
 
