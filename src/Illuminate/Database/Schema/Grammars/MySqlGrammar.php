@@ -65,7 +65,12 @@ class MySqlGrammar extends Grammar
         $sql = $this->compileCreateEncoding(
             $sql, $connection, $blueprint
         );
-
+        
+        // Then, we can add the row format option to the SQL for the table.
+        $sql = $this->compileCreateRowFormat(
+            $sql, $connection, $blueprint
+        );
+        
         // Finally, we will append the engine configuration onto this SQL statement as
         // the final thing we do before returning this finished SQL. Once this gets
         // added the query will be ready to execute against the real connections.
@@ -123,6 +128,25 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Append the row format specifications to a command.
+     *
+     * @param  string  $sql
+     * @param  \Illuminate\Database\Connection  $connection
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @return string
+     */
+    protected function compileCreateRowFormat($sql, Connection $connection, Blueprint $blueprint)
+    {
+        if (isset($blueprint->rowFormat)) {
+            return $sql.' row_format = '.$blueprint->rowFormat;
+        } elseif (! is_null($rowFormat = $connection->getConfig('row_format'))) {
+            return $sql.' row_format = '.$rowFormat;
+        }
+
+        return $sql;
+    }
+    
+    /**
      * Append the engine specifications to a command.
      *
      * @param  string  $sql
@@ -140,7 +164,7 @@ class MySqlGrammar extends Grammar
 
         return $sql;
     }
-
+    
     /**
      * Compile an add column command.
      *
