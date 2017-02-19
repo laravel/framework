@@ -97,10 +97,29 @@ class RouteRegistrarTest extends TestCase
         $this->seeMiddleware('controller-middleware');
     }
 
+    public function testCanRegisterRouteWithCallableControllerAction()
+    {
+        $this->router->middleware('controller-middleware')
+                     ->get('users', [RouteRegistrarControllerStub::class, 'index']);
+
+        $this->seeResponse('controller', Request::create('users', 'GET'));
+        $this->seeMiddleware('controller-middleware');
+    }
+
     public function testCanRegisterRouteWithArrayAndControllerAction()
     {
         $this->router->middleware('controller-middleware')->put('users', [
             'uses' => 'Illuminate\Tests\Routing\RouteRegistrarControllerStub@index',
+        ]);
+
+        $this->seeResponse('controller', Request::create('users', 'PUT'));
+        $this->seeMiddleware('controller-middleware');
+    }
+
+    public function testCanRegisterRouteWithArrayAndCallableControllerAction()
+    {
+        $this->router->middleware('controller-middleware')->put('users', [
+            'uses' => [RouteRegistrarControllerStub::class, 'index'],
         ]);
 
         $this->seeResponse('controller', Request::create('users', 'PUT'));

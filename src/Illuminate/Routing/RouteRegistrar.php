@@ -2,7 +2,6 @@
 
 namespace Illuminate\Routing;
 
-use Closure;
 use BadMethodCallException;
 use InvalidArgumentException;
 
@@ -146,7 +145,7 @@ class RouteRegistrar
             return $this->attributes;
         }
 
-        if (is_string($action) || $action instanceof Closure) {
+        if (is_string($action) || is_callable($action)) {
             $action = ['uses' => $action];
         }
 
