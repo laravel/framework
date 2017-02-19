@@ -393,7 +393,7 @@ class Blueprint
     {
         return $this->indexCommand('foreign', $columns, $name);
     }
-    
+
     /**
      * Specify a table to create a standard foreign key for the table.
      *
@@ -401,9 +401,10 @@ class Blueprint
      * @param  string  $name
      * @return \Illuminate\Support\Fluent
      */
-    public function tableForeign($table, $name = null){
+    public function tableForeign($table, $name = null)
+    {
 
-        $column_name = substr($table, 0, -1) . "_id";
+        $column_name = substr($table, 0, -1).'_id';
 
         $column = $this->integer($column_name)->unsigned();
         $this->foreign($column_name, $name)->references('id')->on($table);
