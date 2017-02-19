@@ -554,6 +554,7 @@ class Container implements ArrayAccess, ContainerContract
         // so the developer can keep using the same objects instance every time.
         if (isset($this->instances[$abstract]) && ! $needsContextualBuild) {
             $this->fireResolvingCallbacks($abstract, $this->instances[$abstract]);
+
             return $this->instances[$abstract];
         }
 
