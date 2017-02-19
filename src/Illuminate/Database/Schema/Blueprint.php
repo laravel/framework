@@ -401,7 +401,7 @@ class Blueprint
      * @param  string  $name
      * @return \Illuminate\Support\Fluent
      */
-    public function fastForeign($table, $name = null){
+    public function tableForeign($table, $name = null){
 
         $column_name = substr($table, 0, -1) . "_id";
 
