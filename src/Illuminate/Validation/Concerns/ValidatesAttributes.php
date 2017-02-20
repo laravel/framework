@@ -7,6 +7,7 @@ use Countable;
 use Exception;
 use Throwable;
 use DateTimeZone;
+use Ramsey\Uuid\Uuid;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -14,7 +15,6 @@ use InvalidArgumentException;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
 use Illuminate\Validation\ValidationData;
-use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -1322,7 +1322,7 @@ trait ValidatesAttributes
     /**
      * Validate that an attribute is a valid UUID.
      *
-     * @param string  $attibute
+     * @param string  $attribute
      * @param mixed   $value
      * @return bool
      */
