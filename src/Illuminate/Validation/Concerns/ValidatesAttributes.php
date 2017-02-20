@@ -14,6 +14,7 @@ use InvalidArgumentException;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
 use Illuminate\Validation\ValidationData;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -1316,6 +1317,18 @@ trait ValidatesAttributes
         $~ixu';
 
         return preg_match($pattern, $value) > 0;
+    }
+
+    /**
+     * Validate that an attribute is a valid UUID.
+     *
+     * @param string  $attibute
+     * @param mixed   $value
+     * @return bool
+     */
+    protected function validateUuid($attribute, $value)
+    {
+        return Uuid::isValid($value);
     }
 
     /**

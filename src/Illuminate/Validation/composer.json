@@ -19,6 +19,7 @@
         "illuminate/contracts": "5.5.*",
         "illuminate/support": "5.5.*",
         "illuminate/translation": "5.5.*",
+        "ramsey/uuid": "~3.0",
         "symfony/http-foundation": "~3.2"
     },
     "autoload": {

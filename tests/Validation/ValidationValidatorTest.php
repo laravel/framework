@@ -1837,6 +1837,16 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateUuid()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'aslsdlks'], ['x' => 'Uuid']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'fa47c0e9-2fc8-4c58-a8c5-bd53684706e1'], ['x' => 'Uuid']);
+        $this->assertTrue($v->passes());
+    }
+
     public function testValidateImage()
     {
         $trans = $this->getIlluminateArrayTranslator();
