@@ -3,6 +3,7 @@
 namespace Illuminate\Routing;
 
 use Closure;
+use Exception;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -489,7 +490,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * Dispatch the request to the application.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      */
     public function dispatch(Request $request)
     {
@@ -592,7 +593,7 @@ class Router implements RegistrarContract, BindingRegistrar
      *
      * @param  \Symfony\Component\HttpFoundation\Request  $request
      * @param  mixed  $response
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      */
     public function prepareResponse($request, $response)
     {
@@ -600,6 +601,14 @@ class Router implements RegistrarContract, BindingRegistrar
             $response = (new HttpFoundationFactory)->createResponse($response);
         } elseif (! $response instanceof SymfonyResponse) {
             $response = new Response($response);
+        }
+
+        if ($response instanceof Response) {
+            try {
+                $response = $response->toJsonResponse();
+            } catch (Exception $e) {
+                //
+            }
         }
 
         return $response->prepare($request);

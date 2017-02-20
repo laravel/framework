@@ -6,6 +6,7 @@ use Mockery as m;
 use JsonSerializable;
 use Illuminate\Http\Request;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
@@ -85,6 +86,26 @@ class HttpResponseTest extends TestCase
         $response = new \Illuminate\Http\Response('foo');
         $response->setStatusCode(404);
         $this->assertSame(404, $response->getStatusCode());
+    }
+
+    public function testToJsonResponse()
+    {
+        $response = new \Illuminate\Http\Response(['foo' => 'bar']);
+        $jsonResponse = $response->toJsonResponse();
+
+        $this->assertInstanceOf(JsonResponse::class, $jsonResponse);
+        $this->assertSame('{"foo":"bar"}', $jsonResponse->getContent());
+        $this->assertSame($response->getStatusCode(), $jsonResponse->getStatusCode());
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage The Response cannot be converted to a JSON response.
+     */
+    public function testTextResponseCannotBeConvertedToJsonResponse()
+    {
+        $response = new \Illuminate\Http\Response('foo');
+        $response->toJsonResponse();
     }
 
     public function testOnlyInputOnRedirect()
