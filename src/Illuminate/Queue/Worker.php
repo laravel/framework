@@ -264,7 +264,7 @@ class Worker
     }
 
     /**
-     * Process a given job from the queue.
+     * Process the given job from the queue.
      *
      * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
