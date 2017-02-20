@@ -1,0 +1,21 @@
+<?php
+
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Application Language Lines
+    |--------------------------------------------------------------------------
+    |
+    | The following language lines are used by the application. You are free
+    | to modify these language lines according to your application's
+    | requirements.
+    |
+    */
+
+    'toggle.navigation' => 'Toggle Navigation',
+
+    'dashboard' => 'Dashboard',
+    'you-are-logged-in' => 'You are logged in!'
+
+];
