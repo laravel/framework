@@ -1891,6 +1891,11 @@ class ValidationValidatorTest extends TestCase
         $file6->expects($this->any())->method('guessExtension')->will($this->returnValue('svg'));
         $v = new Validator($trans, ['x' => $file6], ['x' => 'Image']);
         $this->assertTrue($v->passes());
+        
+        $file7 = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension'])->setConstructorArgs($uploadedFile)->getMock();
+        $file7->expects($this->any())->method('guessExtension')->will($this->returnValue('tiff'));
+        $v = new Validator($trans, ['x' => $file7], ['x' => 'Image']);
+        $this->assertTrue($v->passes());
     }
 
     public function testValidateImageDimensions()
