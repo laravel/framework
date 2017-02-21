@@ -51,6 +51,12 @@ class QueueSqsQueueTest extends TestCase
                 ],
             ],
         ]);
+
+        $this->mockedQueueAttributesResponseModel = new Result([
+            'Attributes' => [
+                'ApproximateNumberOfMessages' => 1,
+            ],
+        ]);
     }
 
     public function testPopProperlyPopsJobOffOfSqs()
@@ -94,6 +100,15 @@ class QueueSqsQueueTest extends TestCase
         $this->sqs->shouldReceive('sendMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload])->andReturn($this->mockedSendMessageResponseModel);
         $id = $queue->push($this->mockedJob, $this->mockedData, $this->queueName);
         $this->assertEquals($this->mockedMessageId, $id);
+    }
+
+    public function testSizeProperlyReadsSqsQueueSize()
+    {
+        $queue = $this->getMockBuilder('Illuminate\Queue\SqsQueue')->setMethods(['getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
+        $queue->expects($this->once())->method('getQueue')->with($this->queueName)->will($this->returnValue($this->queueUrl));
+        $this->sqs->shouldReceive('getQueueAttributes')->once()->with(['QueueUrl' => $this->queueUrl, 'AttributeNames' => ['ApproximateNumberOfMessages']])->andReturn($this->mockedQueueAttributesResponseModel);
+        $size = $queue->size($this->queueName);
+        $this->assertEquals($size, 1);
     }
 
     public function testGetQueueProperlyResolvesUrlWithPrefix()
