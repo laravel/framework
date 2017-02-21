@@ -4,7 +4,6 @@ namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
-use Symfony\Component\Console\Input\InputOption;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 class EmptyCommand extends Command
@@ -73,7 +72,7 @@ class EmptyCommand extends Command
         // Now drop all the tables from the selected database
         $this->info('Dropping all tables...');
         $tableDropper->dropAllTables($this->resolver->connection());
-        
+
         // Run any additional commands the developer has asked for
         if ($this->needsMigrations()) {
             $this->runMigrations();
@@ -115,7 +114,7 @@ class EmptyCommand extends Command
     }
 
     /**
-     * Get the table dropper class for this driver
+     * Get the table dropper class for this driver.
      *
      * @return void
      */
@@ -124,7 +123,7 @@ class EmptyCommand extends Command
         $driver = $this->resolver->connection()->getDriverName();
 
         $dropperClass = '\\Illuminate\\Database\\Console\\Migrations\\TableDroppers\\'.ucfirst($driver);
-        
+
         if (! class_exists($dropperClass)) {
             return false;
         }
@@ -163,5 +162,4 @@ class EmptyCommand extends Command
             '--force' => true,
         ]);
     }
-
 }
