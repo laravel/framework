@@ -68,7 +68,7 @@ interface Job
      * @return int|null
      */
     public function timeout();
-    
+
     /**
      * Get the name of the queued job class.
      *
