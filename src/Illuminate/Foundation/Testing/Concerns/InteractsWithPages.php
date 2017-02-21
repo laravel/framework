@@ -702,9 +702,7 @@ trait InteractsWithPages
         $names = array_keys($files);
 
         $files = array_map(function (array $file, $name) use ($uploads) {
-            return isset($uploads[$name])
-                        ? $this->getUploadedFileForTesting($file, $uploads, $name)
-                        : $file;
+            return $this->getUploadedFileForTesting($file, $uploads, $name);
         }, $files, $names);
 
         $uploads = array_combine($names, $files);
@@ -752,8 +750,10 @@ trait InteractsWithPages
      */
     protected function getUploadedFileForTesting($file, $uploads, $name)
     {
+        $originalName = isset( $uploads[$name] ) ? basename($uploads[$name]) :  $file['name'];
+
         return new UploadedFile(
-            $file['tmp_name'], basename($uploads[$name]), $file['type'], $file['size'], $file['error'], true
+            $file['tmp_name'], $originalName, $file['type'], $file['size'], $file['error'], true
         );
     }
 }
