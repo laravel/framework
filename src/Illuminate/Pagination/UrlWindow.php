@@ -29,26 +29,28 @@ class UrlWindow
      *
      * @param  \Illuminate\Contracts\Pagination\LengthAwarePaginator  $paginator
      * @param  int  $onEachSide
+     * @param  int  $onEachEdge
      * @return array
      */
-    public static function make(PaginatorContract $paginator, $onEachSide = 3)
+    public static function make(PaginatorContract $paginator, $onEachSide = 3, $onEachEdge = 2)
     {
-        return (new static($paginator))->get($onEachSide);
+        return (new static($paginator))->get($onEachSide, $onEachEdge);
     }
 
     /**
      * Get the window of URLs to be shown.
      *
      * @param  int  $onEachSide
+     * @param  int  $onEachEdge
      * @return array
      */
-    public function get($onEachSide = 3)
+    public function get($onEachSide = 3, $onEachEdge = 2)
     {
-        if ($this->paginator->lastPage() < ($onEachSide * 2) + 6) {
+        if ($this->paginator->lastPage() < ($onEachSide * 2) + ($onEachEdge * 2) + 2) {
             return $this->getSmallSlider();
         }
 
-        return $this->getUrlSlider($onEachSide);
+        return $this->getUrlSlider($onEachSide, $onEachEdge);
     }
 
     /**
@@ -69,9 +71,10 @@ class UrlWindow
      * Create a URL slider links.
      *
      * @param  int  $onEachSide
+     * @param  int  $onEachEdge
      * @return array
      */
-    protected function getUrlSlider($onEachSide)
+    protected function getUrlSlider($onEachSide, $onEachEdge)
     {
         $window = $onEachSide * 2;
 
@@ -84,37 +87,38 @@ class UrlWindow
         }
 
         // If the current page is very close to the beginning of the page range, we will
-        // just render the beginning of the page range, followed by the last 2 of the
-        // links in this list, since we will not have room to create a full slider.
-        if ($this->currentPage() <= $window) {
-            return $this->getSliderTooCloseToBeginning($window);
+        // just render the beginning of the page range, followed by the last links in
+        // this list, since we will not have room to create a full slider.
+        if ($this->currentPage() <= $onEachSide + $onEachEdge + 1) {
+            return $this->getSliderTooCloseToBeginning($window, $onEachEdge);
         }
 
         // If the current page is close to the ending of the page range we will just get
         // this first couple pages, followed by a larger window of these ending pages
         // since we're too close to the end of the list to create a full on slider.
-        elseif ($this->currentPage() > ($this->lastPage() - $window)) {
-            return $this->getSliderTooCloseToEnding($window);
+        elseif ($this->currentPage() >= ($this->lastPage() - $onEachSide - $onEachEdge)) {
+            return $this->getSliderTooCloseToEnding($window, $onEachEdge);
         }
 
         // If we have enough room on both sides of the current page to build a slider we
         // will surround it with both the beginning and ending caps, with this window
         // of pages in the middle providing a Google style sliding paginator setup.
-        return $this->getFullSlider($onEachSide);
+        return $this->getFullSlider($onEachSide, $onEachEdge);
     }
 
     /**
      * Get the slider of URLs when too close to beginning of window.
      *
      * @param  int  $window
+     * @param  int  $onEachEdge
      * @return array
      */
-    protected function getSliderTooCloseToBeginning($window)
+    protected function getSliderTooCloseToBeginning($window, $onEachEdge)
     {
         return [
-            'first'  => $this->paginator->getUrlRange(1, $window + 2),
+            'first'  => $this->paginator->getUrlRange(1, $window + $onEachEdge),
             'slider' => null,
-            'last'   => $this->getFinish(),
+            'last'   => $this->getFinish($onEachEdge),
         ];
     }
 
@@ -122,17 +126,18 @@ class UrlWindow
      * Get the slider of URLs when too close to ending of window.
      *
      * @param  int  $window
+     * @param  int  $onEachEdge
      * @return array
      */
-    protected function getSliderTooCloseToEnding($window)
+    protected function getSliderTooCloseToEnding($window, $onEachEdge)
     {
         $last = $this->paginator->getUrlRange(
-            $this->lastPage() - ($window + 2),
+            $this->lastPage() + 1 - $window - $onEachEdge,
             $this->lastPage()
         );
 
         return [
-            'first'  => $this->getStart(),
+            'first'  => $this->getStart($onEachEdge),
             'slider' => null,
             'last'   => $last,
         ];
@@ -142,14 +147,15 @@ class UrlWindow
      * Get the slider of URLs when a full slider can be made.
      *
      * @param  int  $onEachSide
+     * @param  int  $onEachEdge
      * @return array
      */
-    protected function getFullSlider($onEachSide)
+    protected function getFullSlider($onEachSide, $onEachEdge)
     {
         return [
-            'first'  => $this->getStart(),
+            'first'  => $this->getStart($onEachEdge),
             'slider' => $this->getAdjacentUrlRange($onEachSide),
-            'last'   => $this->getFinish(),
+            'last'   => $this->getFinish($onEachEdge),
         ];
     }
 
@@ -170,22 +176,24 @@ class UrlWindow
     /**
      * Get the starting URLs of a pagination slider.
      *
+     * @param  int  $onEachEdge
      * @return array
      */
-    public function getStart()
+    public function getStart($onEachEdge)
     {
-        return $this->paginator->getUrlRange(1, 2);
+        return $this->paginator->getUrlRange(1, $onEachEdge);
     }
 
     /**
      * Get the ending URLs of a pagination slider.
      *
+     * @param  int  $onEachEdge
      * @return array
      */
-    public function getFinish()
+    public function getFinish($onEachEdge)
     {
         return $this->paginator->getUrlRange(
-            $this->lastPage() - 1,
+            $this->lastPage() + 1 - $onEachEdge,
             $this->lastPage()
         );
     }
