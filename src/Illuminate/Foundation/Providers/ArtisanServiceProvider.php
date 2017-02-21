@@ -42,6 +42,7 @@ use Illuminate\Foundation\Console\EventGenerateCommand;
 use Illuminate\Foundation\Console\VendorPublishCommand;
 use Illuminate\Console\Scheduling\ScheduleFinishCommand;
 use Illuminate\Database\Console\Seeds\SeederMakeCommand;
+use Illuminate\Database\Console\Migrations\EmptyCommand;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
 use Illuminate\Foundation\Console\NotificationMakeCommand;
 use Illuminate\Queue\Console\WorkCommand as QueueWorkCommand;
@@ -84,6 +85,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'ConfigClear' => 'command.config.clear',
         'Down' => 'command.down',
         'Environment' => 'command.environment',
+        'Empty' => 'command.empty',
         'KeyGenerate' => 'command.key.generate',
         'Migrate' => 'command.migrate',
         'MigrateInstall' => 'command.migrate.install',
@@ -299,6 +301,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.controller.make', function ($app) {
             return new ControllerMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerEmptyCommand()
+    {
+        $this->app->singleton('command.empty', function ($app) {
+            return new EmptyCommand($app['db']);
         });
     }
 
