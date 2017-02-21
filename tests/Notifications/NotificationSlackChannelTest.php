@@ -65,6 +65,40 @@ class NotificationSlackChannelTest extends TestCase
         );
     }
 
+    public function testCorrectPayloadIsSentToSlackWithImageIcon()
+    {
+        $this->validatePayload(
+            new NotificationSlackChannelTestNotificationWithImageIcon,
+            [
+                'json' => [
+                    'username' => 'Ghostbot',
+                    'icon_url' => 'http://example.com/image.png',
+                    'channel' => '#ghost-talk',
+                    'text' => 'Content',
+                    'attachments' => [
+                        [
+                            'title' => 'Laravel',
+                            'title_link' => 'https://laravel.com',
+                            'text' => 'Attachment Content',
+                            'fallback' => 'Attachment Fallback',
+                            'fields' => [
+                                [
+                                    'title' => 'Project',
+                                    'value' => 'Laravel',
+                                    'short' => true,
+                                ],
+                            ],
+                            'mrkdwn_in' => ['text'],
+                            'footer' => 'Laravel',
+                            'footer_icon' => 'https://laravel.com/fake.png',
+                            'ts' => 1234567890,
+                        ],
+                    ],
+                ],
+            ]
+        );
+    }
+
     public function testCorrectPayloadWithoutOptionalFieldsIsSentToSlack()
     {
         $this->validatePayload(
@@ -139,6 +173,32 @@ class NotificationSlackChannelTestNotification extends Notification
     {
         return (new SlackMessage)
                     ->from('Ghostbot', ':ghost:')
+                    ->to('#ghost-talk')
+                    ->content('Content')
+                    ->attachment(function ($attachment) {
+                        $timestamp = Mockery::mock('Carbon\Carbon');
+                        $timestamp->shouldReceive('getTimestamp')->andReturn(1234567890);
+                        $attachment->title('Laravel', 'https://laravel.com')
+                                   ->content('Attachment Content')
+                                   ->fallback('Attachment Fallback')
+                                   ->fields([
+                                        'Project' => 'Laravel',
+                                    ])
+                                    ->footer('Laravel')
+                                    ->footerIcon('https://laravel.com/fake.png')
+                                    ->markdown(['text'])
+                                    ->timestamp($timestamp);
+                    });
+    }
+}
+
+class NotificationSlackChannelTestNotificationWithImageIcon extends Notification
+{
+    public function toSlack($notifiable)
+    {
+        return (new SlackMessage)
+                    ->from('Ghostbot')
+                    ->image('http://example.com/image.png')
                     ->to('#ghost-talk')
                     ->content('Content')
                     ->attachment(function ($attachment) {
