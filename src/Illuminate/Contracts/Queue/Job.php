@@ -20,6 +20,20 @@ interface Job
     public function release($delay = 0);
 
     /**
+     * The number of times to attempt a job.
+     *
+     * @return int|null
+     */
+    public function maxTries();
+
+    /**
+     * The number of seconds the job can run.
+     *
+     * @return int|null
+     */
+    public function timeout();
+
+    /**
      * Delete the job from the queue.
      *
      * @return void
