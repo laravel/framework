@@ -40,4 +40,23 @@ trait CompilesIncludes
 
         return "<?php if (\$__env->exists({$expression})) echo \$__env->make({$expression}, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
     }
+
+    /**
+     * Compile the include-when statements into valid PHP.
+     *
+     * @param string $expression
+     * @return string
+     */
+    protected function compileIncludeWhen($expression)
+    {
+        $expression = $this->stripParentheses($expression);
+
+        preg_match('/ *(.*), *(.*)$/is', $expression, $matches);
+
+        $when = trim($matches[1]);
+
+        $arguments = trim($matches[2]);
+
+        return "<?php if ({$when}) echo \$__env->make({$arguments}, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
+    }
 }
