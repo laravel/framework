@@ -24,7 +24,7 @@ class CookieTest extends TestCase
         $this->assertTrue($c->isSecure());
         $this->assertEquals('/domain', $c->getDomain());
         $this->assertEquals('/path', $c->getPath());
-        $this->assertEquals('lax', $c2->getSameSite());
+        $this->assertEquals('lax', $c->getSameSite());
 
         $c2 = $cookie->forever('color', 'blue', '/path', '/domain', true, false, false, 'strict');
         $this->assertEquals('blue', $c2->getValue());
