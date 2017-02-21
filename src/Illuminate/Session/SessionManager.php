@@ -23,7 +23,7 @@ class SessionManager extends Manager {
 	 */
 	protected function createArrayDriver()
 	{
-		return new Store($this->app['config']['session.cookie'], new NullSessionHandler);
+		return $this->buildSession(new NullSessionHandler);
 	}
 
 	/**
@@ -33,9 +33,7 @@ class SessionManager extends Manager {
 	 */
 	protected function createCookieDriver()
 	{
-		$lifetime = $this->app['config']['session.lifetime'];
-
-		return $this->buildSession(new CookieSessionHandler($this->app['cookie'], $lifetime));
+		return $this->buildSession(new CookieSessionHandler($this->app['cookie']));
 	}
 
 	/**
@@ -149,9 +147,7 @@ class SessionManager extends Manager {
 	 */
 	protected function createCacheHandler($driver)
 	{
-		$minutes = $this->app['config']['session.lifetime'];
-
-		return new CacheBasedSessionHandler($this->app['cache']->driver($driver), $minutes);
+		return new CacheBasedSessionHandler($this->app['cache']->driver($driver));
 	}
 
 	/**
@@ -162,6 +158,10 @@ class SessionManager extends Manager {
 	 */
 	protected function buildSession($handler)
 	{
+		if ($handler instanceof ExpirationAwareInterface) {
+			$handler->setLifetime($this->app['config']['session.lifetime']);
+		}
+
 		return new Store($this->app['config']['session.cookie'], $handler);
 	}
 
