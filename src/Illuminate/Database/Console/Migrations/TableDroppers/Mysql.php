@@ -2,13 +2,13 @@
 
 namespace Illuminate\Database\Console\Migrations\TableDroppers;
 
-use Illuminate\Database\ConnectionInterface;
 use stdClass;
+use Illuminate\Database\ConnectionInterface;
 
 class Mysql implements TableDropper
 {
     /**
-     * Drop all tables on the database connection
+     * Drop all tables on the database connection.
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
      * @return void

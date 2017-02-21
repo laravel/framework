@@ -4,8 +4,8 @@ namespace Illuminate\Tests\Database;
 
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Connection;
 use Illuminate\Container\Container;
+use Illuminate\Database\Connection;
 use Symfony\Component\Console\Input\ArrayInput;
 use Illuminate\Database\Console\Seeds\SeedCommand;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -13,9 +13,9 @@ use Illuminate\Database\Console\Migrations\EmptyCommand;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
 use Illuminate\Database\Console\Migrations\TableDroppers\Mysql;
 use Illuminate\Database\Console\Migrations\TableDroppers\Pgsql;
+use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Console\Migrations\TableDroppers\Sqlite;
 use Symfony\Component\Console\Application as ConsoleApplication;
-use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Console\Migrations\TableDroppers\Sqlserver;
 
 class DatabaseMigrationEmptyTest extends TestCase
@@ -47,18 +47,18 @@ class DatabaseMigrationEmptyTest extends TestCase
     public function testEmptyCommandShowsErrorWhenDatabaseDriverNotSupported()
     {
         $this->connection->shouldReceive('getDriverName')->twice()->andReturn('other');
-        
+
         $this->resolver->shouldReceive('setDefaultConnection')->once()->with('other');
         $this->resolver->shouldReceive('connection')->twice()->andReturn($this->connection);
-        
+
         $this->container->shouldReceive('call');
         $this->container->shouldReceive('environment')->once()->andReturn('testing');
         $this->container->shouldReceive('make')->never();
-       
+
         $this->command->setLaravel($this->container);
 
         $this->runCommand(['--database' => 'other']);
-       
+
         $this->assertStringStartsWith('Sorry - the "db:empty" command does not support "other" database drivers at this stage', $this->output->fetch());
     }
 

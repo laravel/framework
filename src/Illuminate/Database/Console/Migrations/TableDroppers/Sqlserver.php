@@ -7,7 +7,7 @@ use Illuminate\Database\ConnectionInterface;
 class Sqlserver implements TableDropper
 {
     /**
-     * Drop all tables on the database connection
+     * Drop all tables on the database connection.
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
      * @return void
