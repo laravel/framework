@@ -23,8 +23,8 @@ class QueueSqsQueueTest extends TestCase
         $this->baseUrl = 'https://sqs.someregion.amazonaws.com';
 
         // This is how the modified getQueue builds the queueUrl
-        $this->prefix = $this->baseUrl . '/' . $this->account . '/';
-        $this->queueUrl = $this->prefix . $this->queueName;
+        $this->prefix = $this->baseUrl.'/'.$this->account.'/';
+        $this->queueUrl = $this->prefix.$this->queueName;
 
         $this->mockedJob = 'foo';
         $this->mockedData = ['data'];
@@ -115,7 +115,7 @@ class QueueSqsQueueTest extends TestCase
     {
         $queue = new \Illuminate\Queue\SqsQueue($this->sqs, $this->queueName, $this->prefix);
         $this->assertEquals($this->queueUrl, $queue->getQueue(null));
-        $queueUrl = $this->baseUrl . '/' . $this->account . '/test';
+        $queueUrl = $this->baseUrl.'/'.$this->account.'/test';
         $this->assertEquals($queueUrl, $queue->getQueue('test'));
     }
 
@@ -123,7 +123,7 @@ class QueueSqsQueueTest extends TestCase
     {
         $queue = new \Illuminate\Queue\SqsQueue($this->sqs, $this->queueUrl);
         $this->assertEquals($this->queueUrl, $queue->getQueue(null));
-        $queueUrl = $this->baseUrl . '/' . $this->account . '/test';
+        $queueUrl = $this->baseUrl.'/'.$this->account.'/test';
         $this->assertEquals($queueUrl, $queue->getQueue($queueUrl));
     }
 }

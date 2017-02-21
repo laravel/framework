@@ -19,7 +19,7 @@ class QueueSqsJobTest extends TestCase
         $this->releaseDelay = 0;
 
         // This is how the modified getQueue builds the queueUrl
-        $this->queueUrl = $this->baseUrl . '/' . $this->account . '/' . $this->queueName;
+        $this->queueUrl = $this->baseUrl.'/'.$this->account.'/'.$this->queueName;
 
         // Get a mock of the SqsClient
         $this->mockedSqsClient = $this->getMockBuilder('Aws\Sqs\SqsClient')
