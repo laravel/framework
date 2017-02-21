@@ -43,6 +43,16 @@ abstract class Queue
     }
 
     /**
+     * Push a new job onto the queue.
+     *
+     * @param  string  $job
+     * @param  mixed  $data
+     * @param  string  $queue
+     * @return mixed
+     */
+    abstract public function push($job, $data, $queue);
+
+    /**
      * Push a new job onto the queue after a delay.
      *
      * @param  string  $queue
@@ -55,6 +65,17 @@ abstract class Queue
     {
         return $this->later($delay, $job, $data, $queue);
     }
+
+    /**
+     * Push a new job onto the queue after a delay.
+     *
+     * @param  \DateTime|int  $delay
+     * @param  string  $job
+     * @param  mixed  $data
+     * @param  string  $queue
+     * @return mixed
+     */
+    abstract public function later($delay, $job, $data, $queue);
 
     /**
      * Push an array of jobs onto the queue.
