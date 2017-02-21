@@ -154,9 +154,9 @@ class SqlServerConnector extends Connector implements ConnectorInterface
     {
         if (isset($config['port']) && ! empty($config['port'])) {
             return $config['host'].$separator.$config['port'];
-        } else {
-            return $config['host'];
         }
+
+        return $config['host'];
     }
 
     /**

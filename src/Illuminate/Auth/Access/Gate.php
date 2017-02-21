@@ -329,11 +329,12 @@ class Gate implements GateContract
 
         if (isset($this->abilities[$ability])) {
             return $this->abilities[$ability];
-        } else {
-            return function () {
-                return false;
-            };
         }
+
+        return function () {
+            return false;
+        };
+
     }
 
     /**

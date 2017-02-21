@@ -17,9 +17,9 @@ class CommandBuilder
     {
         if ($event->runInBackground) {
             return $this->buildBackgroundCommand($event);
-        } else {
-            return $this->buildForegroundCommand($event);
         }
+
+        return $this->buildForegroundCommand($event);
     }
 
     /**
