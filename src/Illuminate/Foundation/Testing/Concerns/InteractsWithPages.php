@@ -750,6 +750,9 @@ trait InteractsWithPages
      */
     protected function getUploadedFileForTesting($file, $uploads, $name)
     {
+        // if file is empty return $file
+        if( $file['error'] == UPLOAD_ERR_NO_FILE ) { return; }
+
         $originalName = isset( $uploads[$name] ) ? basename($uploads[$name]) :  $file['name'];
 
         return new UploadedFile(
