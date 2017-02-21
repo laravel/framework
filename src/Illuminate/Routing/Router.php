@@ -603,16 +603,15 @@ class Router implements RegistrarContract, BindingRegistrar
     {
         if ($response instanceof PsrResponseInterface) {
             $response = (new HttpFoundationFactory)->createResponse($response);
+        } elseif (! $response instanceof SymfonyResponse &&
+                   ($response instanceof Arrayable ||
+                    $response instanceof Jsonable ||
+                    $response instanceof ArrayObject ||
+                    $response instanceof JsonSerializable ||
+                    is_array($response))) {
+            $response = new JsonResponse($response);
         } elseif (! $response instanceof SymfonyResponse) {
-            if ($response instanceof Arrayable ||
-                $response instanceof Jsonable ||
-                $response instanceof ArrayObject ||
-                $response instanceof JsonSerializable ||
-                is_array($response)) {
-                $response = new JsonResponse($response);
-            } else {
-                $response = new Response($response);
-            }
+            $response = new Response($response);
         }
 
         return $response->prepare($request);
