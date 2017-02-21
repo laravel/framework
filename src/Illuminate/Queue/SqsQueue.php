@@ -52,9 +52,14 @@ class SqsQueue extends Queue implements QueueContract
      */
     public function size($queue = null)
     {
-        return (int) $this->sqs->getQueueAttributes([
+        $response = $this->sqs->getQueueAttributes([
             'QueueUrl' => $this->getQueue($queue),
-        ])->get('ApproximateNumberOfMessages');
+            'AttributeNames' => ['ApproximateNumberOfMessages'],
+        ]);
+
+        $attributes = $response->get('Attributes');
+
+        return (int) $attributes['ApproximateNumberOfMessages'];
     }
 
     /**
