@@ -44,7 +44,7 @@ class CookieTest extends TestCase
         $cookie = $this->getCreator();
         $cookie->setDefaultPathAndDomain('/path', '/domain', true, 'lax');
         $c = $cookie->make('color', 'blue');
-        $this->assertEquals('blue', $c->getValue());        
+        $this->assertEquals('blue', $c->getValue());
         $this->assertTrue($c->isSecure());
         $this->assertEquals('/domain', $c->getDomain());
         $this->assertEquals('/path', $c->getPath());

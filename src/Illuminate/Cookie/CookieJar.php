@@ -158,7 +158,7 @@ class CookieJar implements JarContract
      * @param  string  $sameSite
      * @return array
      */
-    protected function getPathAndDomain($path, $domain, $secure = false, $sameSite)
+    protected function getPathAndDomain($path, $domain, $secure = false, $sameSite = null)
     {
         return [$path ?: $this->path, $domain ?: $this->domain, $secure ?: $this->secure, $sameSite ?: $this->sameSite];
     }
@@ -172,7 +172,7 @@ class CookieJar implements JarContract
      * @param  string  $sameSite
      * @return $this
      */
-    public function setDefaultPathAndDomain($path, $domain, $secure = false, $sameSite)
+    public function setDefaultPathAndDomain($path, $domain, $secure = false, $sameSite = null)
     {
         list($this->path, $this->domain, $this->secure, $this->sameSite) = [$path, $domain, $secure, $sameSite];
 
