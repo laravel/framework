@@ -1,6 +1,6 @@
 # Release Notes for 5.4.x
 
-## [Unreleased]
+## v5.4.13 (2017-02-22)
 
 ### Added
 - Add `$default` parameter to `Collection::when()` method ([#17941](https://github.com/laravel/framework/pull/17941))
@@ -13,6 +13,7 @@
 - Use the pagination translation strings in paginator templates ([#18009](https://github.com/laravel/framework/pull/18009))
 - Use `getAuthPassword()` method in `AuthenticateSession` middleware ([#17965](https://github.com/laravel/framework/pull/17965))
 - Return `null` from `Gate::getPolicyFor()` if given class is not a string ([#17972](https://github.com/laravel/framework/pull/17972))
+- Add image url options to Slack Notifications ([#18011](https://github.com/laravel/framework/pull/18011))
 
 ### Fixed
 - Fixed `@lang` directive when used with JSON file ([#17919](https://github.com/laravel/framework/pull/17919), [2bd35c1](https://github.com/laravel/framework/commit/2bd35c13678faae68ee0bbe95d46b12f77357c98))
