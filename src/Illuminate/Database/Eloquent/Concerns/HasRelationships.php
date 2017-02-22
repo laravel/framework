@@ -176,7 +176,7 @@ trait HasRelationships
     protected function morphInstanceTo($target, $name, $type, $id)
     {
         $instance = $this->newRelatedInstance(
-            Model::getActualClassNameForMorph($target)
+            static::getActualClassNameForMorph($target)
         );
 
         return new MorphTo(
