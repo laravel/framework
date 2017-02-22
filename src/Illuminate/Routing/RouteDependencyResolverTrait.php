@@ -31,34 +31,34 @@ trait RouteDependencyResolverTrait
     /**
      * Resolve the given method's type-hinted dependencies.
      *
-     * @param  array  $originalParameters
+     * @param  array  $parameters
      * @param  \ReflectionFunctionAbstract  $reflector
      * @return array
      */
-    public function resolveMethodDependencies(array $originalParameters, ReflectionFunctionAbstract $reflector)
+    public function resolveMethodDependencies(array $parameters, ReflectionFunctionAbstract $reflector)
     {
-        $parameters = [];
+        $results = [];
 
-        $values = array_values($originalParameters);
+        $instanceCount = 0;
 
-        $instancesCount = 0;
+        $values = array_values($parameters);
 
         foreach ($reflector->getParameters() as $key => $parameter) {
             $instance = $this->transformDependency(
-                $parameter, $originalParameters
+                $parameter, $parameters
             );
 
             if (! is_null($instance)) {
-                $instancesCount++;
+                $instanceCount++;
 
-                $parameters[] = $instance;
+                $results[] = $instance;
             } else {
-                $parameters[] = isset($values[$key - $instancesCount])
-                    ? $values[$key - $instancesCount] : $parameter->getDefaultValue();
+                $results[] = isset($values[$key - $instanceCount])
+                    ? $values[$key - $instanceCount] : $parameter->getDefaultValue();
             }
         }
 
-        return $parameters;
+        return $results;
     }
 
     /**
