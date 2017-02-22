@@ -28,6 +28,14 @@ this is a comment
         $this->assertEmpty($compiler->compileString($string));
     }
 
+    public function testBladeCodeInsideCommentsIsNotCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '{{-- @foreach() --}}';
+
+        $this->assertEmpty($compiler->compileString($string));
+    }
+
     protected function getFiles()
     {
         return m::mock('Illuminate\Filesystem\Filesystem');

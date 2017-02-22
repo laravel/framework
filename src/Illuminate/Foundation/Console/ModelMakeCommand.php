@@ -44,7 +44,7 @@ class ModelMakeCommand extends GeneratorCommand
             $this->createMigration();
         }
 
-        if ($this->option('controller')) {
+        if ($this->option('controller') || $this->option('resource')) {
             $this->createController();
         }
     }

@@ -56,6 +56,20 @@ interface Job
     public function failed($e);
 
     /**
+     * The number of times to attempt a job.
+     *
+     * @return int|null
+     */
+    public function maxTries();
+
+    /**
+     * The number of seconds the job can run.
+     *
+     * @return int|null
+     */
+    public function timeout();
+
+    /**
      * Get the name of the queued job class.
      *
      * @return string
