@@ -194,9 +194,7 @@ trait InteractsWithInput
     {
         $keys = is_array($keys) ? $keys : func_get_args();
 
-        return collect($this->all())->filter(function ($value, $key) use ($keys) {
-            return in_array($key, $keys);
-        })->toArray();
+        return array_intersect_key($this->all(), array_flip($keys));
     }
 
     /**
