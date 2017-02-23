@@ -90,7 +90,6 @@ class FoundationTestResponseTest extends TestCase
         $files->makeDirectory($tempDir, 0755, false, true);
         $files->put($tempDir.'/file.txt', 'Hello World');
 
-
         $response = TestResponse::fromBaseResponse(new BinaryFileResponse($tempDir.'/file.txt'));
 
         $this->assertEquals($tempDir.'/file.txt', $response->getFile()->getPathname());
