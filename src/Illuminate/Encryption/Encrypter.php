@@ -100,6 +100,25 @@ class Encrypter implements EncrypterContract
     }
 
     /**
+     * Encrypt the given value using a custom key.
+     *
+     * @param  mixed  $value
+     * @param  bool  $serialize
+     * @param  string  $key
+     * @return string
+     *
+     * @throws \Illuminate\Contracts\Encryption\EncryptException
+     */
+    public function encryptWithPassword($value, $serialize = true, $password)
+	{
+		$iterations = 1000;
+		$salt = $this->key;
+		$key = hash_pbkdf2("sha256", $password, $salt, $iterations, 32);
+
+		return $this->encrypt($value, $serialize, $key);
+	}
+
+    /**
      * Encrypt a string without serialization.
      *
      * @param  string  $value
@@ -109,6 +128,18 @@ class Encrypter implements EncrypterContract
     public function encryptString($value, $key = null)
     {
         return $this->encrypt($value, false, $key);
+    }
+
+    /**
+     * Encrypt a string without serialization, using a custom key.
+     *
+     * @param  string  $value
+     * @param  string  $key
+     * @return string
+     */
+    public function encryptStringWithPassword($value, $key)
+    {
+        return $this->encryptWithPassword($value, false, $key);
     }
 
     /**
