@@ -909,6 +909,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Put a collection of items into the collection.
+     *
+     * @param $collection
+     * @return static
+     */
+    public function putAll($collection)
+    {
+        $source = $this->items;
+        $destination = (array) $collection->getIterator();
+        return new static(array_merge(array_values($source), array_values($destination)));
+    }
+
+    /**
      * Get one or more items randomly from the collection.
      *
      * @param  int|null  $amount

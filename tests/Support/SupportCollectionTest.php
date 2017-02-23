@@ -483,6 +483,12 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['name' => 'World', 'id' => 1], $c->merge(new Collection(['name' => 'World', 'id' => 1]))->all());
     }
 
+    public function testPutAllCollection()
+    {
+        $c = new Collection([0 => 'foo', 1 => 'bar']);
+        $this->assertEquals([0 => 'foo', 1 => 'bar', 2 => 'foo', 3 => 'bar'], $c->putAll(new Collection([0 => 'foo', 1 => 'bar']))->all());
+    }
+
     public function testUnionNull()
     {
         $c = new Collection(['name' => 'Hello']);
