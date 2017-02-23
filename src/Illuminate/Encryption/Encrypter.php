@@ -113,7 +113,7 @@ class Encrypter implements EncrypterContract
 	{
 		$iterations = 1000;
 		$salt = $this->key;
-		$key = hash_pbkdf2("sha256", $password, $salt, $iterations, 32);
+		$key = hash_pbkdf2('sha256', $password, $salt, $iterations, 32);
 
 		return $this->encrypt($value, $serialize, $key);
 	}
