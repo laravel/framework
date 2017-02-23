@@ -918,6 +918,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         $source = $this->items;
         $destination = (array) $collection->getIterator();
+
         return new static(array_merge(array_values($source), array_values($destination)));
     }
 
