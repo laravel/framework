@@ -11,7 +11,7 @@ interface Encrypter
      * @param  bool  $serialize
      * @return string
      */
-    public function encrypt($value, $serialize = true);
+    public function encrypt($value, $serialize = true, $password = null);
 
     /**
      * Decrypt the given value.
@@ -20,5 +20,5 @@ interface Encrypter
      * @param  bool  $unserialize
      * @return string
      */
-    public function decrypt($payload, $unserialize = true);
+    public function decrypt($payload, $unserialize = true, $password = null);
 }

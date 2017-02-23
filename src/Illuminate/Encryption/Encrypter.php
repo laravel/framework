@@ -64,11 +64,12 @@ class Encrypter implements EncrypterContract
      *
      * @param  mixed  $value
      * @param  bool  $serialize
+     * @param  string  $key
      * @return string
      *
      * @throws \Illuminate\Contracts\Encryption\EncryptException
      */
-    public function encrypt($value, $serialize = true)
+    public function encrypt($value, $serialize = true, $key = null)
     {
         $iv = random_bytes(16);
 
@@ -77,7 +78,7 @@ class Encrypter implements EncrypterContract
         // value can be verified later as not having been changed by the users.
         $value = \openssl_encrypt(
             $serialize ? serialize($value) : $value,
-            $this->cipher, $this->key, 0, $iv
+            $this->cipher, ! is_null($key) ? $key : $this->key, 0, $iv
         );
 
         if ($value === false) {
@@ -99,14 +100,45 @@ class Encrypter implements EncrypterContract
     }
 
     /**
+     * Encrypt the given value using a custom key.
+     *
+     * @param  mixed  $value
+     * @param  bool  $serialize
+     * @param  string  $key
+     * @return string
+     *
+     * @throws \Illuminate\Contracts\Encryption\EncryptException
+     */
+    public function encryptWithPassword($value, $serialize, $password)
+    {
+        $iterations = 1000;
+        $salt = $this->key;
+      	$key = hash_pbkdf2('sha256', $password, $salt, $iterations, 32);
+        return $this->encrypt($value, $serialize, $key);
+    }
+
+    /**
      * Encrypt a string without serialization.
      *
      * @param  string  $value
+     * @param  string  $key
      * @return string
      */
-    public function encryptString($value)
+    public function encryptString($value, $password = null)
     {
-        return $this->encrypt($value, false);
+        return $this->encrypt($value, false, $password);
+    }
+
+    /**
+     * Encrypt a string without serialization, using a custom key.
+     *
+     * @param  string  $value
+     * @param  string  $key
+     * @return string
+     */
+    public function encryptStringWithPassword($value, $password)
+    {
+        return $this->encryptWithPassword($value, false, $password);
     }
 
     /**
@@ -114,21 +146,28 @@ class Encrypter implements EncrypterContract
      *
      * @param  mixed  $payload
      * @param  bool  $unserialize
+     * @param  string  $password
      * @return string
      *
      * @throws \Illuminate\Contracts\Encryption\DecryptException
      */
-    public function decrypt($payload, $unserialize = true)
+    public function decrypt($payload, $unserialize = true, $key = null)
     {
-        $payload = $this->getJsonPayload($payload);
 
+		if (! is_null($key)) {
+			$iterations = 1000;
+			$salt = $this->key;
+			$key = hash_pbkdf2('sha256', $key, $salt, $iterations, 32);
+		}
+
+		$payload = $this->getJsonPayload($payload);
         $iv = base64_decode($payload['iv']);
 
         // Here we will decrypt the value. If we are able to successfully decrypt it
         // we will then unserialize it and return it out to the caller. If we are
         // unable to decrypt this value we will throw out an exception message.
         $decrypted = \openssl_decrypt(
-            $payload['value'], $this->cipher, $this->key, 0, $iv
+            $payload['value'], $this->cipher, ! is_null($key) ? $key : $this->key, 0, $iv
         );
 
         if ($decrypted === false) {
@@ -142,11 +181,12 @@ class Encrypter implements EncrypterContract
      * Decrypt the given string without unserialization.
      *
      * @param  string  $payload
+     * @param  string  $key
      * @return string
      */
-    public function decryptString($payload)
+    public function decryptString($payload, $key = null)
     {
-        return $this->decrypt($payload, false);
+        return $this->decrypt($payload, false, $key);
     }
 
     /**
