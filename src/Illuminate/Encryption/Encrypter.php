@@ -112,9 +112,8 @@ class Encrypter implements EncrypterContract
     public function encryptWithPassword($value, $serialize, $password)
     {
         $iterations = 1000;
-        $salt = 1;//$this->key;
-        $key = hash_pbkdf2('sha256', $password, $salt, $iterations, 32);
-
+        $salt = $this->key;
+      	$key = hash_pbkdf2('sha256', $password, $salt, $iterations, 32);
         return $this->encrypt($value, $serialize, $key);
     }
 
@@ -125,9 +124,9 @@ class Encrypter implements EncrypterContract
      * @param  string  $key
      * @return string
      */
-    public function encryptString($value, $key = null)
+    public function encryptString($value, $password = null)
     {
-        return $this->encrypt($value, false, $key);
+        return $this->encrypt($value, false, $password);
     }
 
     /**
@@ -137,9 +136,9 @@ class Encrypter implements EncrypterContract
      * @param  string  $key
      * @return string
      */
-    public function encryptStringWithPassword($value, $key)
+    public function encryptStringWithPassword($value, $password)
     {
-        return $this->encryptWithPassword($value, false, $key);
+        return $this->encryptWithPassword($value, false, $password);
     }
 
     /**
@@ -154,8 +153,14 @@ class Encrypter implements EncrypterContract
      */
     public function decrypt($payload, $unserialize = true, $key = null)
     {
-        $payload = $this->getJsonPayload($payload);
 
+		if (! is_null($key)) {
+			$iterations = 1000;
+			$salt = $this->key;
+			$key = hash_pbkdf2('sha256', $key, $salt, $iterations, 32);
+		}
+
+		$payload = $this->getJsonPayload($payload);
         $iv = base64_decode($payload['iv']);
 
         // Here we will decrypt the value. If we are able to successfully decrypt it

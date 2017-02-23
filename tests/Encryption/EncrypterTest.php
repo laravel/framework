@@ -7,62 +7,58 @@ use Illuminate\Encryption\Encrypter;
 
 class EncrypterTest extends TestCase
 {
-	/*
-     *public function testEncryption()
-     *{
-     *    $e = new Encrypter(str_repeat('a', 16));
-     *    $encrypted = $e->encrypt('foo');
-     *    $this->assertNotEquals('foo', $encrypted);
-     *    $this->assertEquals('foo', $e->decrypt($encrypted));
-     *}
-	 */
+	public function testEncryption()
+	{
+		$e = new Encrypter(str_repeat('a', 16));
+		$encrypted = $e->encrypt('foo');
+		$this->assertNotEquals('foo', $encrypted);
+		$this->assertEquals('foo', $e->decrypt($encrypted));
+	}
 
-/*
- *    public function testEncryptionWithPassword()
- *    {
- *        $e = new Encrypter(str_repeat('a', 16));
- *        $encrypted = $e->encryptWithPassword('foo', true, 'bar');
- *        $this->assertNotEquals('foo', $encrypted);
- *        $this->assertSame('foo', $e->decrypt($encrypted, 'bar'));
- *    }
- *
- *    public function testRawStringEncryption()
- *    {
- *        $e = new Encrypter(str_repeat('a', 16));
- *        $encrypted = $e->encryptString('foo');
- *        $this->assertNotEquals('foo', $encrypted);
- *        $this->assertEquals('foo', $e->decryptString($encrypted));
- *    }
- */
+	public function testEncryptionWithPassword()
+	{
+		$e = new Encrypter(str_repeat('a', 16));
+		$encrypted = $e->encryptWithPassword('foo', true, 'bar');
+		$this->assertNotEquals('foo', $encrypted);
+		$this->assertSame('foo', $e->decrypt($encrypted, true, 'bar'));
+	}
+
+	public function testRawStringEncryption()
+	{
+		$e = new Encrypter(str_repeat('a', 16));
+		$encrypted = $e->encryptString('foo');
+		$this->assertNotEquals('foo', $encrypted);
+		$this->assertEquals('foo', $e->decryptString($encrypted));
+	}
 
     public function testRawStringEncryptionWithPassword()
     {
         $e = new Encrypter(str_repeat('a', 16));
-        $encrypted = $e->encryptStringWithPassword('foo', false, 'bar');
+        $encrypted = $e->encryptStringWithPassword('foo', 'bar');
         $this->assertNotEquals('foo', $encrypted);
-        $this->assertSame('foo', $e->decryptString($encrypted, 'bar'));
+        $this->assertEquals('foo', $e->decryptString($encrypted, 'bar'));
     }
 
-    public function testEncryptionUsingBase64EncodedKey()
-    {
-        $e = new Encrypter(random_bytes(16));
-        $encrypted = $e->encrypt('foo');
-        $this->assertNotEquals('foo', $encrypted);
-        $this->assertEquals('foo', $e->decrypt($encrypted));
-    }
+	public function testEncryptionUsingBase64EncodedKey()
+	{
+		$e = new Encrypter(random_bytes(16));
+		$encrypted = $e->encrypt('foo');
+		$this->assertNotEquals('foo', $encrypted);
+		$this->assertEquals('foo', $e->decrypt($encrypted));
+	}
 
-    public function testWithCustomCipher()
-    {
-        $e = new Encrypter(str_repeat('b', 32), 'AES-256-CBC');
-        $encrypted = $e->encrypt('bar');
-        $this->assertNotEquals('bar', $encrypted);
-        $this->assertEquals('bar', $e->decrypt($encrypted));
+	public function testWithCustomCipher()
+	{
+		$e = new Encrypter(str_repeat('b', 32), 'AES-256-CBC');
+		$encrypted = $e->encrypt('bar');
+		$this->assertNotEquals('bar', $encrypted);
+		$this->assertEquals('bar', $e->decrypt($encrypted));
 
-        $e = new Encrypter(random_bytes(32), 'AES-256-CBC');
-        $encrypted = $e->encrypt('foo');
-        $this->assertNotEquals('foo', $encrypted);
-        $this->assertEquals('foo', $e->decrypt($encrypted));
-    }
+		$e = new Encrypter(random_bytes(32), 'AES-256-CBC');
+		$encrypted = $e->encrypt('foo');
+		$this->assertNotEquals('foo', $encrypted);
+		$this->assertEquals('foo', $e->decrypt($encrypted));
+	}
 
     /**
      * @expectedException RuntimeException
