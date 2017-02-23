@@ -110,12 +110,12 @@ class Encrypter implements EncrypterContract
      * @throws \Illuminate\Contracts\Encryption\EncryptException
      */
     public function encryptWithPassword($value, $serialize, $password)
-	{
-		$iterations = 1000;
-		$salt = $this->key;
-		$key = hash_pbkdf2('sha256', $password, $salt, $iterations, 32);
+    {
+        $iterations = 1000;
+        $salt = $this->key;
+        $key = hash_pbkdf2('sha256', $password, $salt, $iterations, 32);
 
-		return $this->encrypt($value, $serialize, $key);
+        return $this->encrypt($value, $serialize, $key);
 	}
 
     /**
