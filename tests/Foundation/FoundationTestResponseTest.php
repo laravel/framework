@@ -5,7 +5,9 @@ namespace Illuminate\Tests\Foundation;
 use JsonSerializable;
 use Illuminate\Http\Response;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\TestResponse;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class FoundationTestResponseTest extends TestCase
 {
@@ -79,6 +81,21 @@ class FoundationTestResponseTest extends TestCase
         $this->assertEquals(
             'bar', $response->foo()
         );
+    }
+
+    public function testCanBeCreatedFromBinaryFileResponses()
+    {
+        $files = new Filesystem();
+        $tempDir = __DIR__.'/tmp';
+        $files->makeDirectory($tempDir, 0755, false, true);
+        $files->put($tempDir.'/file.txt', 'Hello World');
+
+
+        $response = TestResponse::fromBaseResponse(new BinaryFileResponse($tempDir.'/file.txt'));
+
+        $this->assertEquals($tempDir.'/file.txt', $response->getFile()->getPathname());
+
+        $files->deleteDirectory($tempDir);
     }
 }
 
