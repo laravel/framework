@@ -195,4 +195,14 @@ class Pivot extends Model
     {
         return $this->parent->getUpdatedAtColumn();
     }
+
+    /**
+     * Get the parent model class.
+     *
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function getParentClass()
+    {
+        return $this->parent;
+    }
 }
