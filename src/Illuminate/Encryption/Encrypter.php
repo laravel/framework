@@ -68,7 +68,7 @@ class Encrypter implements EncrypterContract
      *
      * @throws \Illuminate\Contracts\Encryption\EncryptException
      */
-    public function encrypt($value, $serialize = true)
+    public function encrypt($value, $serialize = true, $password = null)
     {
         $iv = random_bytes(16);
 
@@ -77,7 +77,7 @@ class Encrypter implements EncrypterContract
         // value can be verified later as not having been changed by the users.
         $value = \openssl_encrypt(
             $serialize ? serialize($value) : $value,
-            $this->cipher, $this->key, 0, $iv
+            $this->cipher, ($password) ? $password : $this->key, 0, $iv
         );
 
         if ($value === false) {
@@ -104,9 +104,9 @@ class Encrypter implements EncrypterContract
      * @param  string  $value
      * @return string
      */
-    public function encryptString($value)
+    public function encryptString($value, $password = null)
     {
-        return $this->encrypt($value, false);
+        return $this->encrypt($value, false, $password);
     }
 
     /**
@@ -118,7 +118,7 @@ class Encrypter implements EncrypterContract
      *
      * @throws \Illuminate\Contracts\Encryption\DecryptException
      */
-    public function decrypt($payload, $unserialize = true)
+    public function decrypt($payload, $unserialize = true, $password = null)
     {
         $payload = $this->getJsonPayload($payload);
 
@@ -128,7 +128,7 @@ class Encrypter implements EncrypterContract
         // we will then unserialize it and return it out to the caller. If we are
         // unable to decrypt this value we will throw out an exception message.
         $decrypted = \openssl_decrypt(
-            $payload['value'], $this->cipher, $this->key, 0, $iv
+            $payload['value'], $this->cipher, ($password) ? $password : $this->key, 0, $iv
         );
 
         if ($decrypted === false) {
@@ -144,9 +144,9 @@ class Encrypter implements EncrypterContract
      * @param  string  $payload
      * @return string
      */
-    public function decryptString($payload)
+    public function decryptString($payload, $password = null)
     {
-        return $this->decrypt($payload, false);
+        return $this->decrypt($payload, false, $password);
     }
 
     /**
