@@ -114,6 +114,7 @@ class Encrypter implements EncrypterContract
         $iterations = 1000;
         $salt = $this->key;
         $key = hash_pbkdf2('sha256', $password, $salt, $iterations, 32);
+
         return $this->encrypt($value, $serialize, $key);
     }
 
@@ -154,13 +155,13 @@ class Encrypter implements EncrypterContract
     public function decrypt($payload, $unserialize = true, $key = null)
     {
 
-		if (! is_null($key)) {
-			$iterations = 1000;
-			$salt = $this->key;
+        if (! is_null($key)) {
+            $iterations = 1000;
+            $salt = $this->key;
             $key = hash_pbkdf2('sha256', $key, $salt, $iterations, 32);
-		}
+        }
 
-		$payload = $this->getJsonPayload($payload);
+        $payload = $this->getJsonPayload($payload);
         $iv = base64_decode($payload['iv']);
 
         // Here we will decrypt the value. If we are able to successfully decrypt it
