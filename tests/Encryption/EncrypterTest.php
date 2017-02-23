@@ -20,7 +20,7 @@ class EncrypterTest extends TestCase
         $e = new Encrypter(str_repeat('a', 16));
         $encrypted = $e->encrypt('foo','bar');
         $this->assertNotEquals('foo', $encrypted);
-        $this->assertEquals('foo', $e->decrypt($encrypted,'bar'));
+        $this->assertSame('foo', $e->decrypt($encrypted,'bar'));
     }
 
     public function testRawStringEncryption()
@@ -36,7 +36,7 @@ class EncrypterTest extends TestCase
         $e = new Encrypter(str_repeat('a', 16));
         $encrypted = $e->encryptString('foo','bar');
         $this->assertNotEquals('foo', $encrypted);
-        $this->assertEquals('foo', $e->decryptString($encrypted,'bar'));
+        $this->assertSame('foo', $e->decryptString($encrypted,'bar'));
     }
 
     public function testEncryptionUsingBase64EncodedKey()

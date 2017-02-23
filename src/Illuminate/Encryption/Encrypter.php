@@ -64,11 +64,12 @@ class Encrypter implements EncrypterContract
      *
      * @param  mixed  $value
      * @param  bool  $serialize
+     * @param  string  $key
      * @return string
      *
      * @throws \Illuminate\Contracts\Encryption\EncryptException
      */
-    public function encrypt($value, $serialize = true, $password = null)
+    public function encrypt($value, $serialize = true, $key = null)
     {
         $iv = random_bytes(16);
 
@@ -77,7 +78,7 @@ class Encrypter implements EncrypterContract
         // value can be verified later as not having been changed by the users.
         $value = \openssl_encrypt(
             $serialize ? serialize($value) : $value,
-            $this->cipher, ($password) ? $password : $this->key, 0, $iv
+            $this->cipher, !is_null($key) ? $key : $this->key, 0, $iv
         );
 
         if ($value === false) {
@@ -102,11 +103,12 @@ class Encrypter implements EncrypterContract
      * Encrypt a string without serialization.
      *
      * @param  string  $value
+     * @param  string  $key
      * @return string
      */
-    public function encryptString($value, $password = null)
+    public function encryptString($value, $key = null)
     {
-        return $this->encrypt($value, false, $password);
+        return $this->encrypt($value, false, $key);
     }
 
     /**
@@ -114,11 +116,12 @@ class Encrypter implements EncrypterContract
      *
      * @param  mixed  $payload
      * @param  bool  $unserialize
+     * @param  string  $password
      * @return string
      *
      * @throws \Illuminate\Contracts\Encryption\DecryptException
      */
-    public function decrypt($payload, $unserialize = true, $password = null)
+    public function decrypt($payload, $unserialize = true, $key = null)
     {
         $payload = $this->getJsonPayload($payload);
 
@@ -128,7 +131,7 @@ class Encrypter implements EncrypterContract
         // we will then unserialize it and return it out to the caller. If we are
         // unable to decrypt this value we will throw out an exception message.
         $decrypted = \openssl_decrypt(
-            $payload['value'], $this->cipher, ($password) ? $password : $this->key, 0, $iv
+            $payload['value'], $this->cipher, !is_null($key) ? $key : $this->key, 0, $iv
         );
 
         if ($decrypted === false) {
@@ -142,11 +145,12 @@ class Encrypter implements EncrypterContract
      * Decrypt the given string without unserialization.
      *
      * @param  string  $payload
+     * @param  string  $key
      * @return string
      */
-    public function decryptString($payload, $password = null)
+    public function decryptString($payload, $key = null)
     {
-        return $this->decrypt($payload, false, $password);
+        return $this->decrypt($payload, false, $key);
     }
 
     /**
