@@ -560,6 +560,19 @@ if (! function_exists('head')) {
     }
 }
 
+if (! function_exists('kebab_case')) {
+    /**
+     * Convert a string to kebab case.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    function kebab_case($value)
+    {
+        return Str::kebab($value);
+    }
+}
+
 if (! function_exists('last')) {
     /**
      * Get the last element from an array.
