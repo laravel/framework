@@ -116,7 +116,7 @@ class Encrypter implements EncrypterContract
         $key = hash_pbkdf2('sha256', $password, $salt, $iterations, 32);
 
         return $this->encrypt($value, $serialize, $key);
-	}
+    }
 
     /**
      * Encrypt a string without serialization.
