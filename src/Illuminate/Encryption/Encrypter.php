@@ -109,7 +109,7 @@ class Encrypter implements EncrypterContract
      *
      * @throws \Illuminate\Contracts\Encryption\EncryptException
      */
-    public function encryptWithPassword($value, $serialize = true, $password)
+    public function encryptWithPassword($value, $serialize, $password)
 	{
 		$iterations = 1000;
 		$salt = $this->key;
