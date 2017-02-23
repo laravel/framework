@@ -154,7 +154,6 @@ class Encrypter implements EncrypterContract
      */
     public function decrypt($payload, $unserialize = true, $key = null)
     {
-
         if (! is_null($key)) {
             $iterations = 1000;
             $salt = $this->key;

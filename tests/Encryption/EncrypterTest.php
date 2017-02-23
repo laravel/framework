@@ -15,13 +15,13 @@ class EncrypterTest extends TestCase
         $this->assertEquals('foo', $e->decrypt($encrypted));
     }
 
-	public function testEncryptionWithPassword()
-	{
-		$e = new Encrypter(str_repeat('a', 16));
-		$encrypted = $e->encryptWithPassword('foo', true, 'bar');
-		$this->assertNotEquals('foo', $encrypted);
-		$this->assertSame('foo', $e->decrypt($encrypted, true, 'bar'));
-	}
+    public function testEncryptionWithPassword()
+    {
+        $e = new Encrypter(str_repeat('a', 16));
+        $encrypted = $e->encryptWithPassword('foo', true, 'bar');
+        $this->assertNotEquals('foo', $encrypted);
+        $this->assertSame('foo', $e->decrypt($encrypted, true, 'bar'));
+    }
 
     public function testRawStringEncryption()
     {
