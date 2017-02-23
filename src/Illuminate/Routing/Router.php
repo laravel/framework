@@ -245,7 +245,6 @@ class Router implements RegistrarContract, BindingRegistrar
     public function resource($name, $controller, array $options = [])
     {
         $controller = str_replace('App\Http\Controllers\\', '', $controller);
-        
         if ($this->container && $this->container->bound(ResourceRegistrar::class)) {
             $registrar = $this->container->make(ResourceRegistrar::class);
         } else {
