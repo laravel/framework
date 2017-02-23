@@ -43,6 +43,7 @@ class RouteGroup
             if (substr($new['namespace'], 0, 1) == '\\') {
                 return trim($new['namespace'], '\\');
             }
+            
             return isset($old['namespace'])
                     ? trim($old['namespace'], '\\').'\\'.trim($new['namespace'], '\\')
                     : trim($new['namespace'], '\\');
