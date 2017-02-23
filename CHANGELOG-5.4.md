@@ -1,11 +1,13 @@
 # Release Notes for 5.4.x
 
-## [Unreleased]
+## v5.4.13 (2017-02-22)
 
 ### Added
 - Add `$default` parameter to `Collection::when()` method ([#17941](https://github.com/laravel/framework/pull/17941))
 - Support `--resource` argument on `make:model` command ([#17955](https://github.com/laravel/framework/pull/17955))
 - Added `replaceDimensions()` for validator messages ([#17946](https://github.com/laravel/framework/pull/17946), [b219058](https://github.com/laravel/framework/commit/b219058063336dd9cc851349e287052d76bcc18e))
+- Allow Slack notifications to use image urls ([#18011](https://github.com/laravel/framework/pull/18011))
+- Added `@includeWhen($condition, $view, $data)` directive ([#18047](https://github.com/laravel/framework/pull/18047))
 
 ### Changed
 - Prevent Blade from compiling statements inside comments ([#17952](https://github.com/laravel/framework/pull/17952))
@@ -13,12 +15,18 @@
 - Use the pagination translation strings in paginator templates ([#18009](https://github.com/laravel/framework/pull/18009))
 - Use `getAuthPassword()` method in `AuthenticateSession` middleware ([#17965](https://github.com/laravel/framework/pull/17965))
 - Return `null` from `Gate::getPolicyFor()` if given class is not a string ([#17972](https://github.com/laravel/framework/pull/17972))
+- Add missing methods to the `Job` interface ([#18034](https://github.com/laravel/framework/pull/18034))
+- Improved PostgreSQL table existence check ([#18041](https://github.com/laravel/framework/pull/18041))
+- Allow `getActualClassNameForMorph()` used by `morphInstanceTo()` to be overridden ([#18058](https://github.com/laravel/framework/pull/18058))
 
 ### Fixed
 - Fixed `@lang` directive when used with JSON file ([#17919](https://github.com/laravel/framework/pull/17919), [2bd35c1](https://github.com/laravel/framework/commit/2bd35c13678faae68ee0bbe95d46b12f77357c98))
 - Improved image `dimensions` validation rule ([#17943](https://github.com/laravel/framework/pull/17943), [#17944](https://github.com/laravel/framework/pull/17944), [#17963](https://github.com/laravel/framework/pull/17963), [#17980](https://github.com/laravel/framework/pull/17980))
 - Fixed `$willBeAvailableAt` having the wrong time if using `$retryAfter` in `MaintenanceModeException` ([#17991](https://github.com/laravel/framework/pull/17991))
 - Trim spaces while collecting section name ([#18012](https://github.com/laravel/framework/pull/18012))
+- Fixed implementation of `SqsQueue::size()` ([#18037](https://github.com/laravel/framework/pull/18037))
+- Fixed bug in `PasswordBroker::deleteToken()` ([#18045](https://github.com/laravel/framework/pull/18045))
+- Fixed route parameters binding ([#17973](https://github.com/laravel/framework/pull/17973))
 
 
 ## v5.4.12 (2017-02-15)
