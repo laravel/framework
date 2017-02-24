@@ -226,6 +226,10 @@ class Arr
 
                 if (isset($array[$part]) && is_array($array[$part])) {
                     $array = &$array[$part];
+                } elseif ($part === '*') {
+                    foreach ($array as &$arr) {
+                        static::forget($arr, implode('.', $parts));
+                    }
                 } else {
                     continue 2;
                 }

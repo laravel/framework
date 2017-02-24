@@ -792,6 +792,32 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'], $data->except('last')->all());
     }
 
+    public function testMultidimensionalExcept()
+    {
+        $data = new Collection([
+            ['first' => 'Taylor', 'last' => 'Otwell', 'email' => 'taylorotwell@gmail.com'],
+            ['first' => 'Nielsen', 'last' => 'Martins', 'email' => 'nielsenfake@gmail.com'],
+        ]);
+
+        $this->assertEquals([
+            ['first' => 'Taylor'],
+            ['first' => 'Nielsen'],
+        ], $data->except(['*.last', '*.email', '*.missing'])->all());
+        $this->assertEquals([
+            ['first' => 'Taylor'],
+            ['first' => 'Nielsen'],
+        ], $data->except('*.last', '*.email', '*.missing')->all());
+
+        $this->assertEquals([
+            ['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'],
+            ['first' => 'Nielsen', 'email' => 'nielsenfake@gmail.com'],
+        ], $data->except(['*.last'])->all());
+        $this->assertEquals([
+            ['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'],
+            ['first' => 'Nielsen', 'email' => 'nielsenfake@gmail.com'],
+        ], $data->except('*.last')->all());
+    }
+
     public function testPluckWithArrayAndObjectValues()
     {
         $data = new Collection([(object) ['name' => 'taylor', 'email' => 'foo'], ['name' => 'dayle', 'email' => 'bar']]);

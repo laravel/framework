@@ -521,5 +521,73 @@ class SupportArrTest extends TestCase
         $array = ['emails' => ['joe@example.com' => ['name' => 'Joe'], 'jane@localhost' => ['name' => 'Jane']]];
         Arr::forget($array, ['emails.joe@example.com', 'emails.jane@localhost']);
         $this->assertEquals(['emails' => ['joe@example.com' => ['name' => 'Joe']]], $array);
+
+        // Works with one level array using '*' dot syntax
+        $array = [
+            ['name' => 'John Doe', 'age' => 18, 'password' => '12345'],
+            ['name' => 'Jane Doe', 'age' => 22, 'password' => '54321'],
+            ['name' => 'Merry Doe', 'age' => 25],
+            ['age' => 22, 'password' => '54321'],
+            [],
+        ];
+        Arr::forget($array, ['*.password', '*.age']);
+        $this->assertEquals([
+            ['name' => 'John Doe'],
+            ['name' => 'Jane Doe'],
+            ['name' => 'Merry Doe'],
+            [],
+            [],
+        ], $array);
+
+        // Works in case of '*' as array key (Original behavior)
+        $array = ['name' => 'John Doe', '*' => 33];
+        Arr::forget($array, ['*']);
+        $this->assertEquals(['name' => 'John Doe'], $array);
+
+        // Works wit multi-dimensional array using '*' dot syntax
+        $array = [
+            [
+                ['name' => 'John Doe', 'age' => 18, 'password' => '12345'],
+                ['name' => 'Jane Doe', 'age' => 22, 'password' => '54321'],
+            ],
+        ];
+        Arr::forget($array, ['*.*.password']);
+        $this->assertEquals([
+            [
+                ['name' => 'John Doe', 'age' => 18],
+                ['name' => 'Jane Doe', 'age' => 22],
+            ],
+        ], $array);
+
+        // Works with nested multi-dimensional array using '*' dot syntax
+        $array = [
+            [
+                'users' => [
+                    ['name' => 'John Vieira', 'age' => 18, 'password' => '12345'],
+                    ['name' => 'Jane Vieira', 'age' => 22, 'password' => '54321'],
+                ],
+            ],
+            [
+                'users' => [
+                    ['name' => 'John Silva', 'age' => 18, 'password' => '12345'],
+                    ['name' => 'Okano William', 'age' => 22, 'password' => '54321'],
+                ],
+            ],
+        ];
+        Arr::forget($array, ['*.users.*.password']);
+        $this->assertEquals([
+            [
+                'users' => [
+                    ['name' => 'John Vieira', 'age' => 18],
+                    ['name' => 'Jane Vieira', 'age' => 22],
+                ],
+            ],
+            [
+                'users' => [
+                    ['name' => 'John Silva', 'age' => 18],
+                    ['name' => 'Okano William', 'age' => 22],
+                ],
+            ],
+        ], $array);
     }
 }
