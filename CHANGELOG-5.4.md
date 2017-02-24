@@ -1,5 +1,19 @@
 # Release Notes for 5.4.x
 
+## [Unreleased]
+
+### Added
+- Added `Str::kebab()` and `kebab_case()` helper ([#18084](https://github.com/laravel/framework/pull/18084))
+
+### Changed
+- Create `TestResponse` using composition instead of inheritance ([#18089](https://github.com/laravel/framework/pull/18089))
+- Changed visibility of `Pivot::$parent` from `protected` to `public` ([#18096](https://github.com/laravel/framework/pull/18096))
+
+### Fixed
+- Don't use `value()` helper in `BoundMethod` class ([#18075](https://github.com/laravel/framework/pull/18075))
+- Don't require manifest file when running `npm run hot` ([#18088](https://github.com/laravel/framework/pull/18088))
+
+
 ## v5.4.13 (2017-02-22)
 
 ### Added
