@@ -646,6 +646,16 @@ class Route
     {
         return isset($this->action['controller']) ? $this->action['controller'] : 'Closure';
     }
+    
+    /**
+     * Get only the method name of the route action.
+     *
+     * @return string
+     */
+    public function getActionMethod()
+    {
+        return array_last(explode('@', $this->getActionName()));
+    }
 
     /**
      * Get the action array for the route.
