@@ -3,14 +3,17 @@
 namespace Illuminate\Tests\Foundation;
 
 use JsonSerializable;
+use Illuminate\Http\Response;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\TestResponse;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class FoundationTestResponseTest extends TestCase
 {
     public function testAssertJsonWithArray()
     {
-        $response = new TestResponse(new JsonSerializableSingleResourceStub);
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
 
         $resource = new JsonSerializableSingleResourceStub;
 
@@ -19,7 +22,7 @@ class FoundationTestResponseTest extends TestCase
 
     public function testAssertJsonWithMixed()
     {
-        $response = new TestResponse(new JsonSerializableMixedResourcesStub);
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
 
         $resource = new JsonSerializableMixedResourcesStub;
 
@@ -28,13 +31,13 @@ class FoundationTestResponseTest extends TestCase
 
     public function testAssertJsonFragment()
     {
-        $response = new TestResponse(new JsonSerializableSingleResourceStub);
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
 
         $response->assertJsonFragment(['foo' => 'foo 0']);
 
         $response->assertJsonFragment(['foo' => 'foo 0', 'bar' => 'bar 0', 'foobar' => 'foobar 0']);
 
-        $response = new TestResponse(new JsonSerializableMixedResourcesStub);
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
 
         $response->assertJsonFragment(['foo' => 'bar']);
 
@@ -47,7 +50,7 @@ class FoundationTestResponseTest extends TestCase
 
     public function testAssertJsonStructure()
     {
-        $response = new TestResponse(new JsonSerializableMixedResourcesStub);
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
 
         // At root
         $response->assertJsonStructure(['foo']);
@@ -62,7 +65,7 @@ class FoundationTestResponseTest extends TestCase
         $response->assertJsonStructure(['baz' => ['*' => ['foo', 'bar' => ['foo', 'bar']]]]);
 
         // Wildcard (repeating structure) at root
-        $response = new TestResponse(new JsonSerializableSingleResourceStub);
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
 
         $response->assertJsonStructure(['*' => ['foo', 'bar', 'foobar']]);
     }
@@ -73,11 +76,25 @@ class FoundationTestResponseTest extends TestCase
             return 'bar';
         });
 
-        $response = new TestResponse;
+        $response = TestResponse::fromBaseResponse(new Response);
 
         $this->assertEquals(
             'bar', $response->foo()
         );
+    }
+
+    public function testCanBeCreatedFromBinaryFileResponses()
+    {
+        $files = new Filesystem();
+        $tempDir = __DIR__.'/tmp';
+        $files->makeDirectory($tempDir, 0755, false, true);
+        $files->put($tempDir.'/file.txt', 'Hello World');
+
+        $response = TestResponse::fromBaseResponse(new BinaryFileResponse($tempDir.'/file.txt'));
+
+        $this->assertEquals($tempDir.'/file.txt', $response->getFile()->getPathname());
+
+        $files->deleteDirectory($tempDir);
     }
 }
 
