@@ -14,9 +14,9 @@ class FileLoader implements LoaderInterface
     protected $files;
 
     /**
-     * The default path for the loader.
+     * The default path or paths for the loader.
      *
-     * @var string
+     * @var string|array
      */
     protected $path;
 
@@ -31,7 +31,7 @@ class FileLoader implements LoaderInterface
      * Create a new file loader instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @param  string  $path
+     * @param  string|array  $path
      * @return void
      */
     public function __construct(Filesystem $files, $path)
@@ -103,15 +103,17 @@ class FileLoader implements LoaderInterface
     /**
      * Load a locale from a given path.
      *
-     * @param  string  $path
+     * @param  string|array  $paths
      * @param  string  $locale
      * @param  string  $group
      * @return array
      */
-    protected function loadPath($path, $locale, $group)
+    protected function loadPath($paths, $locale, $group)
     {
-        if ($this->files->exists($full = "{$path}/{$locale}/{$group}.php")) {
-            return $this->files->getRequire($full);
+        foreach ($this->pathToArray($paths) as $path) {
+            if ($this->files->exists($full = "{$path}/{$locale}/{$group}.php")) {
+                return $this->files->getRequire($full);
+            }
         }
 
         return [];
@@ -120,17 +122,33 @@ class FileLoader implements LoaderInterface
     /**
      * Load a locale from the given JSON file path.
      *
-     * @param  string  $path
+     * @param  string|array  $paths
      * @param  string  $locale
      * @return array
      */
-    protected function loadJsonPath($path, $locale)
+    protected function loadJsonPath($paths, $locale)
     {
-        if ($this->files->exists($full = "{$path}/{$locale}.json")) {
-            return json_decode($this->files->get($full), true);
+        foreach ($this->pathToArray($paths) as $path) {
+            if ($this->files->exists($full = "{$path}/{$locale}.json")) {
+                return json_decode($this->files->get($full), true);
+            }
         }
 
         return [];
+    }
+
+    /**
+     * Convert string path to array.
+     *
+     * @void
+     */
+    private function pathToArray($path)
+    {
+        if (! is_array($path)) {
+            $path = [$path];
+        }
+
+        return $path;
     }
 
     /**
