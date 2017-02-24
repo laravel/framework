@@ -1319,7 +1319,7 @@ class EloquentTestAddressValueObject implements Arrayable
         $this->lineTwo = $lineTwo;
     }
 
-    public static function fromModelAttributes($model, $attributes)
+    public static function fromModelAttributes($attributes)
     {
         return new static($attributes['line_one'], $attributes['line_two']);
     }
