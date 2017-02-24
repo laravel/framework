@@ -36,33 +36,6 @@ class TestResponse
     }
 
     /**
-     * Dynamically access base response parameters.
-     *
-     * @param  string  $key
-     * @return mixed
-     */
-    public function __get($key)
-    {
-        return $this->baseResponse->{$key};
-    }
-
-    /**
-     * Handle dynamic calls into macros or pass missing methods to the base response.
-     *
-     * @param  string  $method
-     * @param  array   $parameters
-     * @return mixed
-     */
-    public function __call($method, $args)
-    {
-        if (static::hasMacro($method)) {
-            return $this->macroCall($method, $args);
-        }
-
-        return $this->baseResponse->{$method}(...$args);
-    }
-
-    /**
      * Create a new TestResponse from another response.
      *
      * @param  \Illuminate\Http\Response  $response
@@ -535,5 +508,32 @@ class TestResponse
         }
 
         dd($content);
+    }
+
+    /**
+     * Dynamically access base response parameters.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    public function __get($key)
+    {
+        return $this->baseResponse->{$key};
+    }
+
+    /**
+     * Handle dynamic calls into macros or pass missing methods to the base response.
+     *
+     * @param  string  $method
+     * @param  array   $parameters
+     * @return mixed
+     */
+    public function __call($method, $args)
+    {
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $args);
+        }
+
+        return $this->baseResponse->{$method}(...$args);
     }
 }
