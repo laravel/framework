@@ -540,7 +540,7 @@ trait HasAttributes
             return $this->classCastCache[$key];
         } else {
             return $this->classCastCache[$key] = forward_static_call(
-                [$this->getCasts()[$key], 'fromModelAttributes'], $this, $this->attributes
+                [$this->getCasts()[$key], 'fromModelAttributes'], $this->attributes, $key, $this
             );
         }
     }
@@ -571,7 +571,8 @@ trait HasAttributes
     {
         foreach ($this->classCastCache as $key => $value) {
             $this->attributes = array_merge(
-                $this->attributes, $value->toModelAttributes($this, $this->attributes)
+                $this->attributes,
+                $value->toModelAttributes($this->attributes, $key, $this)
             );
         }
     }
@@ -646,7 +647,7 @@ trait HasAttributes
                 function () {
                     return null;
                 },
-                $this->castToClass($key)->toModelAttributes($this)
+                $this->castToClass($key)->toModelAttributes($this->attributes, $key, $this)
             ));
 
             unset($this->classCastCache[$key]);
