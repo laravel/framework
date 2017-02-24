@@ -646,7 +646,7 @@ class Route
     {
         return isset($this->action['controller']) ? $this->action['controller'] : 'Closure';
     }
-    
+
     /**
      * Get only the method name of the route action.
      *
