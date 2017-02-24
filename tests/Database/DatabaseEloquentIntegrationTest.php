@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Exception;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Model as Eloquent;
@@ -1061,6 +1062,39 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals('Jule Doe', $johnWithFriends->friends->find(4)->pivot->friend->name);
     }
 
+    public function testAttributesMayBeCastToValueObjects()
+    {
+        $model = new EloquentTestValueObjectCast;
+        $model->line_one = 'Address Line 1';
+        $model->line_two = 'Address Line 2';
+
+        $this->assertInstanceOf(EloquentTestAddressValueObject::class, $model->address);
+        $this->assertEquals('Address Line 1', $model->address->lineOne);
+        $this->assertEquals('Address Line 2', $model->address->lineTwo);
+
+        $model->address->lineOne = 'Modified Line 1';
+        $this->assertEquals('Modified Line 1', $model->line_one);
+        $this->assertEquals('Modified Line 1', $model->toArray()['line_one']);
+
+        $model->address = new EloquentTestAddressValueObject('Fresh Line 1', 'Fresh Line 2');
+        $this->assertEquals('Fresh Line 1', $model->line_one);
+        $this->assertEquals('Fresh Line 2', $model->line_two);
+
+        $model->address = null;
+        $this->assertNull($model->line_one);
+        $this->assertNull($model->line_two);
+
+        $model->address = new EloquentTestAddressValueObject('Fresh Line 1', 'Fresh Line 2');
+        $model->forceFill(['address' => null]);
+        $this->assertNull($model->line_one);
+        $this->assertNull($model->line_two);
+
+        $model->address = new EloquentTestAddressValueObject('Fresh Line 1', 'Fresh Line 2');
+        $model->address->lineOne = 'Mutated Line 1';
+        $model = unserialize(serialize($model));
+        $this->assertEquals('Mutated Line 1', $model->line_one);
+    }
+
     /**
      * Helpers...
      */
@@ -1272,4 +1306,41 @@ class EloquentTestFriendPivot extends Pivot
     {
         return $this->belongsTo(EloquentTestFriendLevel::class, 'friend_level_id');
     }
+}
+
+class EloquentTestAddressValueObject implements Arrayable
+{
+    public $lineOne;
+    public $lineTwo;
+
+    public function __construct($lineOne, $lineTwo)
+    {
+        $this->lineOne = $lineOne;
+        $this->lineTwo = $lineTwo;
+    }
+
+    public static function fromModelAttributes($model, $attributes)
+    {
+        return new static($attributes['line_one'], $attributes['line_two']);
+    }
+
+    public function toModelAttributes()
+    {
+        return [
+            'line_one' => $this->lineOne,
+            'line_two' => $this->lineTwo,
+        ];
+    }
+
+    public function toArray()
+    {
+        return $this->toModelAttributes();
+    }
+}
+
+class EloquentTestValueObjectCast extends Eloquent
+{
+    protected $casts = [
+        'address' => EloquentTestAddressValueObject::class,
+    ];
 }
