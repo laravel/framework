@@ -16,9 +16,8 @@ use Doctrine\DBAL\Connection as DoctrineConnection;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
-use Illuminate\Database\Query\Grammars\Grammar as QueryGrammar;
 
-class Connection implements ConnectionInterface
+abstract class Connection implements ConnectionInterface
 {
     use DetectsDeadlocks,
         DetectsLostConnections,
@@ -188,10 +187,7 @@ class Connection implements ConnectionInterface
      *
      * @return \Illuminate\Database\Query\Grammars\Grammar
      */
-    protected function getDefaultQueryGrammar()
-    {
-        return new QueryGrammar;
-    }
+    abstract protected function getDefaultQueryGrammar();
 
     /**
      * Set the schema grammar to the default implementation.
@@ -208,10 +204,7 @@ class Connection implements ConnectionInterface
      *
      * @return \Illuminate\Database\Schema\Grammars\Grammar
      */
-    protected function getDefaultSchemaGrammar()
-    {
-        //
-    }
+    abstract protected function getDefaultSchemaGrammar();
 
     /**
      * Set the query post processor to the default implementation.
@@ -228,10 +221,7 @@ class Connection implements ConnectionInterface
      *
      * @return \Illuminate\Database\Query\Processors\Processor
      */
-    protected function getDefaultPostProcessor()
-    {
-        return new Processor;
-    }
+    abstract protected function getDefaultPostProcessor();
 
     /**
      * Get a schema builder instance for the connection.
@@ -842,6 +832,13 @@ class Connection implements ConnectionInterface
 
         return $schema->listTableDetails($table)->getColumn($column);
     }
+
+    /**
+     * Get the Doctrine DBAL driver.
+     *
+     * @return \Doctrine\DBAL\Driver\Driver
+     */
+    abstract protected function getDoctrineDriver();
 
     /**
      * Get the Doctrine DBAL schema manager for the connection.
