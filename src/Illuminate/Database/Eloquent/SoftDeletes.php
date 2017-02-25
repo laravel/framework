@@ -11,7 +11,6 @@ trait SoftDeletes
      */
     protected $forceDeleting = false;
 
-
     /**
      * Indicates if the model should also update dirty attributes in addition to soft deleting.
      *
