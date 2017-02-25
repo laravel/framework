@@ -1333,11 +1333,11 @@ trait ValidatesAttributes
         // return the proper size accordingly. If it is a number, then number itself
         // is the size. If it is a file, we take kilobytes, and for a string the
         // entire length of the string will be considered the attribute size.
-        if (is_string($value) && !$hasNumeric) {
-		    return mb_strlen($value);
-	    } elseif (is_numeric($value) || $hasNumeric) {
-		    return $value;
-	    } elseif (is_array($value)) {
+        if (is_string($value) && ! $hasNumeric) {
+            return mb_strlen($value);
+        } elseif (is_numeric($value) || $hasNumeric) {
+            return $value;
+        } elseif (is_array($value)) {
             return count($value);
         } elseif ($value instanceof File) {
             return $value->getSize() / 1024;
