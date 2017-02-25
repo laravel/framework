@@ -3293,4 +3293,23 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
             new Illuminate\Translation\ArrayLoader, 'en'
         );
     }
+
+    public function testNumberOrStringNumber()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans,
+            [
+                'testNumber' => -100,
+                'testString' => '-100',
+                'testNumberString' => ' -100 ',
+            ],
+            [
+                'testNumber' => 'required|min:1',
+                'testString' => 'required|min:1',
+                'testNumberString' => 'required|integer|min:1',
+            ]);
+        $this->assertEquals($v->valid(), [
+            'testString' => '-100',
+        ]);
+    }
 }
