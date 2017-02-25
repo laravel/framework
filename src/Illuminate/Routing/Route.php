@@ -648,6 +648,16 @@ class Route
     }
 
     /**
+     * Get the method name of the route action.
+     *
+     * @return string
+     */
+    public function getActionMethod()
+    {
+        return array_last(explode('@', $this->getActionName()));
+    }
+
+    /**
      * Get the action array for the route.
      *
      * @return array
