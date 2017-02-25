@@ -158,6 +158,17 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertNull(SoftDeletesTestUser::find(2)->deleted_at);
     }
 
+    public function testDeleteWithUpdateSetsDirtyAttributes()
+    {
+        $this->createUsers();
+
+        $abigail = SoftDeletesTestUser::find(2);
+        $abigail->email = 'test@gmail.com';
+        $abigail->deleteWithUpdate();
+
+        $this->assertEquals('test@gmail.com', SoftDeletesTestUser::withTrashed()->find(2)->email);
+    }
+
     public function testForceDeleteActuallyDeletesRecords()
     {
         $this->createUsers();

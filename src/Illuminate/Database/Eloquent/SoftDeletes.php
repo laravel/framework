@@ -11,6 +11,14 @@ trait SoftDeletes
      */
     protected $forceDeleting = false;
 
+
+    /**
+     * Indicates if the model should also update dirty attributes in addition to soft deleting.
+     *
+     * @var bool
+     */
+    protected $updateDirtyOnDelete = false;
+
     /**
      * Boot the soft deleting trait for a model.
      *
@@ -33,6 +41,22 @@ trait SoftDeletes
         $deleted = $this->delete();
 
         $this->forceDeleting = false;
+
+        return $deleted;
+    }
+
+    /**
+     * Update any dirty attributes in addition to soft deleting.
+     *
+     * @return bool|null
+     **/
+    public function deleteWithUpdate()
+    {
+        $this->updateDirtyOnDelete = true;
+
+        $deleted = $this->delete();
+
+        $this->updateDirtyOnDelete = false;
 
         return $deleted;
     }
@@ -62,7 +86,13 @@ trait SoftDeletes
 
         $this->{$this->getDeletedAtColumn()} = $time = $this->freshTimestamp();
 
-        $query->update([$this->getDeletedAtColumn() => $this->fromDateTime($time)]);
+        $updateFields = [$this->getDeletedAtColumn() => $this->fromDateTime($time)];
+
+        if ($this->updateDirtyOnDelete) {
+            $updateFields = array_merge($updateFields, $this->getDirty());
+        }
+
+        $query->update($updateFields);
     }
 
     /**
