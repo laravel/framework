@@ -648,7 +648,7 @@ class Route
     }
 
     /**
-     * Get only the method name of the route action.
+     * Get the method name of the route action.
      *
      * @return string
      */
