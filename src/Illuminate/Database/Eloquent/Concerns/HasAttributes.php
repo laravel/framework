@@ -489,7 +489,7 @@ trait HasAttributes
     {
         $castType = $this->getCastType($key);
 
-        if (is_null($value) && in_array($castType, static::$primitiveCastTypes)) {
+        if (is_null($value)) {
             return $value;
         }
 
@@ -569,11 +569,14 @@ trait HasAttributes
      */
     protected function mergeAttributesFromClassCasts()
     {
-        foreach ($this->classCastCache as $key => $value) {
-            $this->attributes = array_merge(
-                $this->attributes,
-                $value->toModelAttributes($this->attributes, $key, $this)
-            );
+        foreach ($this->getCasts() as $attribute => $cast) {
+            if ($this->isClassCastable($attribute)) {
+                $this->attributes = array_merge(
+                    $this->attributes,
+                    $this->castToClass($attribute)
+                         ->toModelAttributes($this->attributes, $attribute, $this)
+                );
+            }
         }
     }
 
