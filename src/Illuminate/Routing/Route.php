@@ -545,7 +545,7 @@ class Route
             return null;
         }
 
-        return is_array($this->action['subdomain']) ? $this->action['subdomain'] : [$this->action['subdomain']];
+        return (array) $this->action['subdomain'];
     }
 
     /**
