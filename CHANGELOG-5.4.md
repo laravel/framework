@@ -4,6 +4,7 @@
 
 ### Added
 - Added `Str::kebab()` and `kebab_case()` helper ([#18084](https://github.com/laravel/framework/pull/18084))
+- Routes can now be restricted to a subdomain ([#18126](https://github.com/laravel/framework/pull/18126))
 
 ### Changed
 - Create `TestResponse` using composition instead of inheritance ([#18089](https://github.com/laravel/framework/pull/18089))
