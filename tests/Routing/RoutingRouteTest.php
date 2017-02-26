@@ -526,25 +526,21 @@ class RoutingRouteTest extends TestCase
          */
         $request = Request::create('http://api.foo.com/bar', 'GET');
         $route = new Route('GET', 'bar', ['subdomain' => 'api', function () {
-
         }]);
         $this->assertTrue($route->matches($request));
 
         $request = Request::create('http://api.foo.com/bar', 'GET');
         $route = new Route('GET', 'bar', ['subdomain' => ['api', 'backend'], function () {
-
         }]);
         $this->assertTrue($route->matches($request));
 
         $request = Request::create('http://api.foo.com/bar', 'GET');
         $route = new Route('GET', 'bar', ['subdomain' => 'backend', function () {
-
         }]);
         $this->assertFalse($route->matches($request));
 
         $request = Request::create('http://www.foo.com/bar', 'GET');
         $route = new Route('GET', 'bar', ['subdomain' => ['api', 'backend'], function () {
-
         }]);
         $this->assertFalse($route->matches($request));
     }

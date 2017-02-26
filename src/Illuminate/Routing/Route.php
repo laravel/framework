@@ -3,7 +3,6 @@
 namespace Illuminate\Routing;
 
 use Closure;
-use Illuminate\Routing\Matching\SubdomainValidator;
 use LogicException;
 use ReflectionFunction;
 use Illuminate\Support\Arr;
@@ -14,6 +13,7 @@ use Illuminate\Routing\Matching\UriValidator;
 use Illuminate\Routing\Matching\HostValidator;
 use Illuminate\Routing\Matching\MethodValidator;
 use Illuminate\Routing\Matching\SchemeValidator;
+use Illuminate\Routing\Matching\SubdomainValidator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 class Route
@@ -541,7 +541,7 @@ class Route
      */
     public function subdomain()
     {
-        if (!isset($this->action['subdomain'])) {
+        if (! isset($this->action['subdomain'])) {
             return null;
         }
 
