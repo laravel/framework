@@ -3,6 +3,7 @@
 namespace Illuminate\Routing;
 
 use Closure;
+use Illuminate\Routing\Matching\SubdomainValidator;
 use LogicException;
 use ReflectionFunction;
 use Illuminate\Support\Arr;
@@ -534,6 +535,20 @@ class Route
     }
 
     /**
+     * Get the domain defined for the route.
+     *
+     * @return array|null
+     */
+    public function subdomain()
+    {
+        if (!isset($this->action['subdomain'])) {
+            return null;
+        }
+
+        return is_array($this->action['subdomain']) ? $this->action['subdomain'] : [$this->action['subdomain']];
+    }
+
+    /**
      * Get the prefix of the route instance.
      *
      * @return string
@@ -752,8 +767,11 @@ class Route
         // validator implementations. We will spin through each one making sure it
         // passes and then we will know if the route as a whole matches request.
         return static::$validators = [
-            new UriValidator, new MethodValidator,
-            new SchemeValidator, new HostValidator,
+            new SubdomainValidator,
+            new UriValidator,
+            new MethodValidator,
+            new SchemeValidator,
+            new HostValidator,
         ];
     }
 
