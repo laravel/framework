@@ -138,7 +138,11 @@ trait HasEvents
 
         $result = $this->fireCustomModelEvent($event, $method);
 
-        return ! is_null($result) ? $result : static::$dispatcher->{$method}(
+        if ($result === false) {
+            return false;
+        }
+
+        return ! empty($result) ? $result : static::$dispatcher->{$method}(
             "eloquent.{$event}: ".static::class, $this
         );
     }
