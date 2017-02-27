@@ -8,8 +8,8 @@ use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Illuminate\Support\HtmlString;
 use Illuminate\Contracts\View\Factory;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Contracts\Queue\Factory as QueueContract;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
@@ -182,7 +182,7 @@ class Mailer implements MailerContract, MailQueueContract
     public function send($view, array $data = [], $callback = null)
     {
         if ($view instanceof MailableContract) {
-            if($view instanceof ShouldQueue) {
+            if ($view instanceof ShouldQueue) {
                 return $view->queue($this->queue);
             }
 
