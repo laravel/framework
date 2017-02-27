@@ -541,11 +541,7 @@ class Route
      */
     public function subdomain()
     {
-        if (! isset($this->action['subdomain'])) {
-            return null;
-        }
-
-        return (array) $this->action['subdomain'];
+        return isset($this->action['subdomain']) ? (array) $this->action['subdomain'] : null;
     }
 
     /**
