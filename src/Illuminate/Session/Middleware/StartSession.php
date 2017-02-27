@@ -69,7 +69,7 @@ class StartSession
         if ($this->sessionConfigured()) {
             $this->storeCurrentUrl($request, $session);
 
-            $this->addCookieToResponse($request,$response, $session);
+            $this->addCookieToResponse($request, $response, $session);
         }
 
         return $response;
