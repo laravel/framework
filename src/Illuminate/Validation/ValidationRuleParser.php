@@ -82,9 +82,9 @@ class ValidationRuleParser
         if (is_string($rule)) {
             return explode('|', $rule);
         } elseif (is_object($rule)) {
-            return [$rule];
+            return [strval($rule)];
         } else {
-            return $rule;
+            return array_map('strval', $rule);
         }
     }
 
