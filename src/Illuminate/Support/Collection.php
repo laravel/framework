@@ -269,6 +269,41 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Determine if all items exist in the collection their keys.
+	 *
+	 * @param  array  $keys
+	 * @return bool
+	 */
+	public function hasAll($keys)
+	{
+		$keys = array_flip((array) $keys);
+
+		return count(array_intersect_key($this->items, $keys)) == count($keys);
+	}
+
+	/**
+	 * Determine if any of the items exist in the collection their keys.
+	 *
+	 * @param  array  $keys
+	 * @return bool
+	 */
+	public function hasAny($keys)
+	{
+		return count(array_intersect_key($this->items, array_flip((array) $keys))) > 0;
+	}
+
+	/**
+	 * Determine if none of the items exist in the collection their keys.
+	 *
+	 * @param  array  $keys
+	 * @return bool
+	 */
+	public function hasNone($keys)
+	{
+		return ! $this->hasAny($keys);
+	}
+
+	/**
 	 * Concatenate values of a given key as a string.
 	 *
 	 * @param  string  $value

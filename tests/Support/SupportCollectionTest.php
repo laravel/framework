@@ -284,6 +284,38 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testHas()
+	{
+		$data = new Collection(array('firstname' => 'taylor', 'lastname' => 'otwell', 'framework' => 'laravel'));
+		$this->assertTrue($data->has('firstname'));
+		$this->assertFalse($data->has('foo'));
+	}
+
+
+	public function testHasAll()
+	{
+		$data = new Collection(array('firstname' => 'taylor', 'lastname' => 'otwell', 'framework' => 'laravel'));
+		$this->assertTrue($data->hasAll(['firstname', 'lastname', 'framework']));
+		$this->assertFalse($data->hasAll(['foo', 'lastname', 'framework']));
+	}
+
+
+	public function testHasAny()
+	{
+		$data = new Collection(array('firstname' => 'taylor', 'lastname' => 'otwell', 'framework' => 'laravel'));
+		$this->assertTrue($data->hasAny(['foo', 'lastname', 'framework']));
+		$this->assertFalse($data->hasAny(['foo', 'bar']));
+	}
+
+
+	public function testHasNone()
+	{
+		$data = new Collection(array('firstname' => 'taylor', 'lastname' => 'otwell', 'framework' => 'laravel'));
+		$this->assertTrue($data->hasNone(['foo', 'bar']));
+		$this->assertFalse($data->hasNone(['foo', 'bar', 'framework']));
+	}
+
+
 	public function testRandom()
 	{
 		$data = new Collection(array(1, 2, 3, 4, 5, 6));
