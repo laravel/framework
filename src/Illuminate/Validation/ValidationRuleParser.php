@@ -98,11 +98,9 @@ class ValidationRuleParser
      */
     protected function prepareRule($rule)
     {
-        if (
-            ! is_object($rule) ||
+        if (! is_object($rule) ||
             ($rule instanceof Exists && $rule->queryCallbacks()) ||
-            ($rule instanceof Unique && $rule->queryCallbacks())
-        ) {
+            ($rule instanceof Unique && $rule->queryCallbacks())) {
             return $rule;
         }
 
