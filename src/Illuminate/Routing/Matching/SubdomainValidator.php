@@ -20,8 +20,8 @@ class SubdomainValidator implements ValidatorInterface
             return true;
         }
 
-        $subdomains = implode('|', $route->subdomain());
-        $regex = "/^$subdomains\..*/i";
+        $subdomains = implode('\.|', $route->subdomain());
+        $regex = "/^($subdomains).*/i";
 
         return preg_match($regex, $request->getHost());
     }
