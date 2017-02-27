@@ -73,7 +73,7 @@ class RateLimiter
      */
     public function hit($key, $decayMinutes = 1)
     {
-        $this->cache->add($key, 1, $decayMinutes);
+        $this->cache->add($key, 0, $decayMinutes);
 
         return (int) $this->cache->increment($key);
     }
