@@ -13,7 +13,7 @@ class SupportFluentTest extends PHPUnit_Framework_TestCase {
 		$attributes = $refl->getProperty('attributes');
 		$attributes->setAccessible(true);
 
-		$this->assertEquals($array, $attributes->getValue($fluent));
+		$this->assertEquals($array, $attributes->getValue($fluent)->toArray());
 		$this->assertEquals($array, $fluent->getAttributes());
 	}
 
