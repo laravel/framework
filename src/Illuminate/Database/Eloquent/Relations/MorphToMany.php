@@ -130,7 +130,7 @@ class MorphToMany extends BelongsToMany
     {
         $using = $this->using;
 
-        $pivot = $using ? new $using($this->parent, $attributes, $this->table, $exists)
+        $pivot = $using ? $using::fromRawAttributes($this->parent, $attributes, $this->table, $exists)
                         : new MorphPivot($this->parent, $attributes, $this->table, $exists);
 
         $pivot->setPivotKeys($this->foreignKey, $this->relatedKey)
