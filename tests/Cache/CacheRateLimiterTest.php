@@ -44,7 +44,6 @@ class CacheRateLimiterTest extends TestCase
         $rateLimiter = new RateLimiter($cache);
 
         $rateLimiter->hit('key', 1);
-        $this->assertEquals(1, $rateLimiter->attempts('key'));
     }
 
     public function testClearClearsTheCacheKeys()
