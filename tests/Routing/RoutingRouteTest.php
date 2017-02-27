@@ -529,8 +529,8 @@ class RoutingRouteTest extends TestCase
         }]);
         $this->assertTrue($route->matches($request));
 
-        $request = Request::create('http://api.foo.com/bar', 'GET');
-        $route = new Route('GET', 'bar', ['subdomain' => ['api', 'backend'], function () {
+        $request = Request::create('http://api.v2.foo.co.uk/bar', 'GET');
+        $route = new Route('GET', 'bar', ['subdomain' => ['api.v2', 'backend'], function () {
         }]);
         $this->assertTrue($route->matches($request));
 
@@ -539,8 +539,8 @@ class RoutingRouteTest extends TestCase
         }]);
         $this->assertFalse($route->matches($request));
 
-        $request = Request::create('http://www.foo.com/bar', 'GET');
-        $route = new Route('GET', 'bar', ['subdomain' => ['api', 'backend'], function () {
+        $request = Request::create('http://api.v1.foo.co.uk/bar', 'GET');
+        $route = new Route('GET', 'bar', ['subdomain' => ['api.v2', 'api.latest'], function () {
         }]);
         $this->assertFalse($route->matches($request));
     }
