@@ -516,4 +516,26 @@ class Arr
     {
         return array_filter($array, $callback, ARRAY_FILTER_USE_BOTH);
     }
+
+    /**
+     * Rebuild a multi-dimensional array to be associative with the key from it's values.
+     *
+     * @param  array  $array
+     * @param  callable|string  $key
+     * @return array
+     */
+    public static function reKey($array, $key)
+    {
+        $callable = is_callable($key) ? $key : function ($item) use ($key) {
+            return $item[$key];
+        };
+
+        $iterator = function () use ($array, $callable) {
+            foreach ($array as $item) {
+                yield $callable($item) => $item;
+            }
+        };
+
+        return iterator_to_array($iterator());
+    }
 }
