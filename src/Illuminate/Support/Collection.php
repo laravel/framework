@@ -1306,6 +1306,32 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Split the collection into columns of equal length.
+     *
+     * e.g. new Collection([1, 2, 3, 4, 5, 6)->columnize(4);
+     *      => [[1, 2], [3, 4], [5], [6]]
+     *
+     * @param  mixed ...$items
+     * @return static
+     */
+    public function columnize($columns)
+    {
+        $listLength = $this->count();
+        $columnLength = floor($listLength / $columns);
+        $columnRemainder = $listLength % $columns;
+        $partitions = [];
+        $mark = 0;
+
+        for ($partition = 0; $partition < $columns; $partition++) {
+            $increment = ($partition < $columnRemainder) ? $columnLength + 1 : $columnLength;
+            $partitions[$partition] = $this->slice($mark, $increment);
+            $mark += $increment;
+        }
+
+        return new static($partitions);
+    }
+
+    /**
      * Get the collection of items as a plain array.
      *
      * @return array
