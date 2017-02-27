@@ -258,6 +258,52 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Determine if an item exists in the collection by value.
+	 *
+	 * @param  mixed $value
+	 * @return bool
+	 */
+	public function contains($value)
+	{
+		return in_array($value, $this->items);
+	}
+
+	/**
+	 * Determine if all items exist in the collection their values.
+	 *
+	 * @param  array $values
+	 * @return bool
+	 */
+	public function containsAll($values)
+	{
+		$values = array_unique((array) $values);
+
+		return count(array_intersect($this->items, $values)) == count($values);
+	}
+
+	/**
+	 * Determine if any of the items exist in the collection their values.
+	 *
+	 * @param  array $values
+	 * @return bool
+	 */
+	public function containsAny($values)
+	{
+		return count(array_intersect($this->items, array_unique((array) $values))) > 0;
+	}
+
+	/**
+	 * Determine if none of the items exist in the collection their values.
+	 *
+	 * @param  array $values
+	 * @return bool
+	 */
+	public function containsNone($values)
+	{
+		return ! $this->containsAny($values);
+	}
+
+	/**
 	 * Determine if an item exists in the collection by key.
 	 *
 	 * @param  mixed  $key

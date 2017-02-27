@@ -283,6 +283,37 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('taylor', 'dayle'), $data->all());
 	}
 
+	public function testContains()
+	{
+		$data = new Collection(array('firstname' => 'taylor', 'lastname' => 'otwell', 'framework' => 'laravel'));
+		$this->assertTrue($data->contains('taylor'));
+		$this->assertFalse($data->contains('foo'));
+	}
+
+
+	public function testContainsAll()
+	{
+		$data = new Collection(array('firstname' => 'taylor', 'lastname' => 'otwell', 'framework' => 'laravel'));
+		$this->assertTrue($data->containsAll(['taylor', 'otwell', 'laravel']));
+		$this->assertFalse($data->containsAll(['taylor', 'otwell', 'foo']));
+	}
+
+
+	public function testContainsAny()
+	{
+		$data = new Collection(array('firstname' => 'taylor', 'lastname' => 'otwell', 'framework' => 'laravel'));
+		$this->assertTrue($data->containsAny(['taylor', 'foo']));
+		$this->assertFalse($data->containsAny(['foo', 'bar']));
+	}
+
+
+	public function testContainsNone()
+	{
+		$data = new Collection(array('firstname' => 'taylor', 'lastname' => 'otwell', 'framework' => 'laravel'));
+		$this->assertTrue($data->containsNone(['foo', 'bar']));
+		$this->assertFalse($data->containsNone(['taylor', 'foo']));
+	}
+
 
 	public function testRandom()
 	{
