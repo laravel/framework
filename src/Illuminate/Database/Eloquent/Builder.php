@@ -168,7 +168,7 @@ class Builder
      * @param  bool  $value
      * @param  \Closure  $callback
      * @param  \Closure  $default
-     * @return $this
+     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function when($value, $callback, $default = null)
     {
@@ -187,7 +187,7 @@ class Builder
      * Add a where clause on the primary key to the query.
      *
      * @param  mixed  $id
-     * @return $this
+     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function whereKey($id)
     {
@@ -207,7 +207,7 @@ class Builder
      * @param  string  $operator
      * @param  mixed   $value
      * @param  string  $boolean
-     * @return $this
+     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
