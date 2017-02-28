@@ -142,6 +142,26 @@ class HttpResponseTest extends TestCase
         $response->withErrors($provider);
     }
 
+    public function testWithHeaders()
+    {
+        $response = new \Illuminate\Http\Response(null, 200, ['foo' => 'bar']);
+        $this->assertSame('bar', $response->headers->get('foo'));
+
+        $response->withHeaders(['foo' => 'BAR', 'bar' => 'baz']);
+        $this->assertSame('BAR', $response->headers->get('foo'));
+        $this->assertSame('baz', $response->headers->get('bar'));
+
+        $responseMessageBag = new \Symfony\Component\HttpFoundation\ResponseHeaderBag(['bar' => 'BAZ', 'titi' => 'toto']);
+        $response->withHeaders($responseMessageBag);
+        $this->assertSame('BAZ', $response->headers->get('bar'));
+        $this->assertSame('toto', $response->headers->get('titi'));
+
+        $headerBag = new \Symfony\Component\HttpFoundation\HeaderBag(['bar' => 'BAAA', 'titi' => 'TATA']);
+        $response->withHeaders($headerBag);
+        $this->assertSame('BAAA', $response->headers->get('bar'));
+        $this->assertSame('TATA', $response->headers->get('titi'));
+    }
+
     public function testMagicCall()
     {
         $response = new RedirectResponse('foo.bar');
