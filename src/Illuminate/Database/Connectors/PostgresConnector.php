@@ -82,7 +82,18 @@ class PostgresConnector extends Connector implements ConnectorInterface
         // need to establish the PDO connections and return them back for use.
         extract($config, EXTR_SKIP);
 
-        $host = isset($host) ? "host={$host};" : '';
+        $IP_PATTERN =
+            "/^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.".
+            "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.".
+            "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.".
+            "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$/";
+
+        if (isset($host)) {
+            $prefix = preg_match($IP_PATTERN, $host) ? "hostaddr" : "host";
+            $host = "{$prefix}={$host};";
+        } else {
+            $host = '';
+        }
 
         $dsn = "pgsql:{$host}dbname={$database}";
 
