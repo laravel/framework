@@ -49,7 +49,7 @@ class SendQueuedMailable
      */
     public function handle(MailerContract $mailer)
     {
-        $mailer->send($this->mailable);
+        $this->mailable->send($mailer);
     }
 
     /**

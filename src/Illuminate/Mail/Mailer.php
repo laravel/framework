@@ -213,9 +213,9 @@ class Mailer implements MailerContract, MailQueueContract
      * Send the given mailable.
      *
      * @param  MailableContract  $mailable
-     * @return void
+     * @return mixed
      */
-    protected function sendMailable($mailable)
+    protected function sendMailable(MailableContract $mailable)
     {
         return $mailable instanceof ShouldQueue
                 ? $mailable->queue($this->queue) : $mailable->send($this);
