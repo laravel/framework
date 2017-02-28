@@ -393,13 +393,16 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  string  $key
      * @param  mixed  $values
      * @param  bool  $strict
+     * @param  bool  $not
      * @return static
      */
-    public function whereIn($key, $values, $strict = false)
+    public function whereIn($key, $values, $strict = false, $not = false)
     {
+        $method = $not ? 'reject' : 'filter';
+
         $values = $this->getArrayableItems($values);
 
-        return $this->filter(function ($item) use ($key, $values, $strict) {
+        return $this->$method(function ($item) use ($key, $values, $strict) {
             return in_array(data_get($item, $key), $values, $strict);
         });
     }
@@ -414,6 +417,30 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function whereInStrict($key, $values)
     {
         return $this->whereIn($key, $values, true);
+    }
+
+    /**
+     * Filter items by the given key value pair.
+     *
+     * @param  string  $key
+     * @param  mixed  $values
+     * @return static
+     */
+    public function whereNotIn($key, $values)
+    {
+        return $this->whereIn($key, $values, false, true);
+    }
+
+    /**
+     * Filter items by the given key value pair using strict comparison.
+     *
+     * @param  string  $key
+     * @param  mixed  $values
+     * @return static
+     */
+    public function whereNotInStrict($key, $values)
+    {
+        return $this->whereIn($key, $values, true, true);
     }
 
     /**
