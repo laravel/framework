@@ -182,11 +182,7 @@ class Mailer implements MailerContract, MailQueueContract
     public function send($view, array $data = [], $callback = null)
     {
         if ($view instanceof MailableContract) {
-            if ($view instanceof ShouldQueue) {
-                return $view->queue($this->queue);
-            }
-
-            return $view->send($this);
+            return $this->sendMailable($view);
         }
 
         // First we need to parse the view, which could either be a string or an array
@@ -211,6 +207,18 @@ class Mailer implements MailerContract, MailQueueContract
         }
 
         $this->sendSwiftMessage($message->getSwiftMessage());
+    }
+
+    /**
+     * Send the given mailable.
+     *
+     * @param  MailableContract  $mailable
+     * @return void
+     */
+    protected function sendMailable($mailable)
+    {
+        return $mailable instanceof ShouldQueue
+                ? $mailable->queue($this->queue) : $mailable->send($this);
     }
 
     /**
