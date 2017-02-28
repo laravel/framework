@@ -1311,7 +1311,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * e.g. new Collection([1, 2, 3, 4, 5, 6)->columnize(4);
      *      => [[1, 2], [3, 4], [5], [6]]
      *
-     * @param  mixed ...$items
+     * @param  int ...$columns
      * @return static
      */
     public function columnize($columns)
