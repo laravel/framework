@@ -470,10 +470,7 @@ class Builder {
 
 		$models = $relation->initRelation($models, $name);
 
-		// Once we have the results, we just match those back up to their parent models
-		// using the relationship instance. Then we just return the finished arrays
-		// of models which have been eagerly hydrated and are readied for return.
-		$results = $relation->getEager();
+		$results = $this->prepareRelationResults($relation, $models);
 
 		return $relation->match($models, $results, $name);
 	}
@@ -816,6 +813,41 @@ class Builder {
 		}
 
 		return $results;
+	}
+
+	/**
+	 * Prepare results for relation loading
+	 *
+	 * @param \Illuminate\Database\Eloquent\Relations\Relation $relation
+	 * @param array                                            $models
+	 *
+	 * @return \Illuminate\Database\Eloquent\Collection
+	 */
+	protected function prepareRelationResults($relation, $models)
+	{
+		// Check for foreign key with a null value for belongsTo relations to avoid the creation of
+		// unnecessary query that obviously returns an empty result
+		if (is_a($relation, 'Illuminate\Database\Eloquent\Relations\BelongsTo'))
+		{
+			$keys = array();
+			foreach ($models as $model)
+			{
+				if ( ! is_null($value = $model->{$relation->getForeignKey()}))
+				{
+					$keys[] = $value;
+				}
+			}
+
+			if (count($keys) == 0)
+			{
+				return new Collection;
+			}
+		}
+
+		// Once we have the results, we just match those back up to their parent models
+		// using the relationship instance. Then we just return the finished arrays
+		// of models which have been eagerly hydrated and are readied for return.
+		return $relation->getEager();
 	}
 
 	/**
