@@ -61,7 +61,7 @@ class File extends UploadedFile
      * Create a new fake image.
      *
      * @param  string  $name
-     * @param  int  $height
+     * @param  int  $width
      * @param  int  $height
      * @return \Illuminate\Http\Testing\File
      */
