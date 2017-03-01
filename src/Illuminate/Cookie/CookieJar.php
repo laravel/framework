@@ -31,6 +31,13 @@ class CookieJar implements JarContract
     protected $secure = false;
 
     /**
+     * The default SameSite option (if specified).
+     *
+     * @var string
+     */
+    protected $sameSite;
+
+    /**
      * All of the cookies queued for sending.
      *
      * @var array
@@ -53,7 +60,7 @@ class CookieJar implements JarContract
      */
     public function make($name, $value, $minutes = 0, $path = null, $domain = null, $secure = false, $httpOnly = true, $raw = false, $sameSite = null)
     {
-        list($path, $domain, $secure) = $this->getPathAndDomain($path, $domain, $secure);
+        list($path, $domain, $secure, $sameSite) = $this->getPathAndDomain($path, $domain, $secure, $sameSite);
 
         $time = ($minutes == 0) ? 0 : Carbon::now()->getTimestamp() + ($minutes * 60);
 
@@ -148,11 +155,12 @@ class CookieJar implements JarContract
      * @param  string  $path
      * @param  string  $domain
      * @param  bool    $secure
+     * @param  string  $sameSite
      * @return array
      */
-    protected function getPathAndDomain($path, $domain, $secure = false)
+    protected function getPathAndDomain($path, $domain, $secure = false, $sameSite = null)
     {
-        return [$path ?: $this->path, $domain ?: $this->domain, $secure ?: $this->secure];
+        return [$path ?: $this->path, $domain ?: $this->domain, $secure ?: $this->secure, $sameSite ?: $this->sameSite];
     }
 
     /**
@@ -161,11 +169,12 @@ class CookieJar implements JarContract
      * @param  string  $path
      * @param  string  $domain
      * @param  bool    $secure
+     * @param  string  $sameSite
      * @return $this
      */
-    public function setDefaultPathAndDomain($path, $domain, $secure = false)
+    public function setDefaultPathAndDomain($path, $domain, $secure = false, $sameSite = null)
     {
-        list($this->path, $this->domain, $this->secure) = [$path, $domain, $secure];
+        list($this->path, $this->domain, $this->secure, $this->sameSite) = [$path, $domain, $secure, $sameSite];
 
         return $this;
     }

@@ -42,13 +42,13 @@ class CookieTest extends TestCase
     public function testCookiesAreCreatedWithProperOptionsUsingDefaultPathAndDomain()
     {
         $cookie = $this->getCreator();
-        $cookie->setDefaultPathAndDomain('/path', '/domain');
-        $c = $cookie->make('color', 'blue', 10, null, null, true, false);
+        $cookie->setDefaultPathAndDomain('/path', '/domain', true, 'lax');
+        $c = $cookie->make('color', 'blue');
         $this->assertEquals('blue', $c->getValue());
-        $this->assertFalse($c->isHttpOnly());
         $this->assertTrue($c->isSecure());
         $this->assertEquals('/domain', $c->getDomain());
         $this->assertEquals('/path', $c->getPath());
+        $this->assertEquals('lax', $c->getSameSite());
     }
 
     public function testQueuedCookies()
