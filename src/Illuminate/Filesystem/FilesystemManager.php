@@ -272,6 +272,18 @@ class FilesystemManager implements FactoryContract
     }
 
     /**
+     * Set the given disk instance.
+     *
+     * @param  string  $name
+     * @param  mixed  $disk
+     * @return void
+     */
+    public function set($name, $disk)
+    {
+        $this->disks[$name] = $disk;
+    }
+
+    /**
      * Get the filesystem connection configuration.
      *
      * @param  string  $name
