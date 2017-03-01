@@ -1,17 +1,32 @@
 # Release Notes for 5.4.x
 
-## [Unreleased]
+## v5.4.14 (2017-03-01)
 
 ### Added
 - Added `Str::kebab()` and `kebab_case()` helper ([#18084](https://github.com/laravel/framework/pull/18084))
+- Added `Route::getActionMethod()` ([#18105](https://github.com/laravel/framework/pull/18105))
+- Support granular `$tries` and `$timeout` on `Mailable` ([#18103](https://github.com/laravel/framework/pull/18103))
+- Added context to the `assertJson()` response ([#18166](https://github.com/laravel/framework/pull/18166), [da2c892](https://github.com/laravel/framework/commit/da2c8923328a3f852331fca5778214e05d8e6fde))
+- Add `whereNotIn()` and `whereNotInStrict()` to `Collection` ([#18157](https://github.com/laravel/framework/pull/18157))
 
 ### Changed
 - Create `TestResponse` using composition instead of inheritance ([#18089](https://github.com/laravel/framework/pull/18089))
 - Changed visibility of `Pivot::$parent` from `protected` to `public` ([#18096](https://github.com/laravel/framework/pull/18096))
+- Catch Sqlite3 deadlocks in `DetectsDeadlocks` ([#18107](https://github.com/laravel/framework/pull/18107))
+- Use `fromRawAttributes()` when in `Model::newPivot()` ([#18127](https://github.com/laravel/framework/pull/18127), [063e5ae](https://github.com/laravel/framework/commit/063e5ae341c32220d4679d0215ab9b263d0c8a33))
+- Use default connection in `DatabaseManager::purge()` when no connection name is provided ([#18128](https://github.com/laravel/framework/pull/18128))
+- Convert rule objects only once to string ([#18141](https://github.com/laravel/framework/pull/18141))
+- Respect `ShouldQueue` contract in `Mailer::send()` ([#18144](https://github.com/laravel/framework/pull/18144), [717f1f6](https://github.com/laravel/framework/commit/717f1f67eb7bb2fac7c57311f0afaa637375407d), [#18160](https://github.com/laravel/framework/pull/18160))
 
 ### Fixed
 - Don't use `value()` helper in `BoundMethod` class ([#18075](https://github.com/laravel/framework/pull/18075))
 - Don't require manifest file when running `npm run hot` ([#18088](https://github.com/laravel/framework/pull/18088))
+- Fixed injection placement of dependencies for routing method parameters ([#17973](https://github.com/laravel/framework/pull/17973))
+- Return `false` from `Model::fireModelEvent()` if custom model event returns `false` ([c5a6290](https://github.com/laravel/framework/commit/c5a62901589e313474376e241549ac31d9d3c695))
+- Fixed `firstOrFail()` on relation setting the wrong model on `ModelNotFoundException` ([#18138](https://github.com/laravel/framework/pull/18138))
+- Fixed `RateLimiter` setting initial attempts count to `2` ([#18139](https://github.com/laravel/framework/pull/18139))
+- Fixed compiled `DELETE` query when using `JOIN` with aliases ([#18156](https://github.com/laravel/framework/pull/18156), [e09b9eb](https://github.com/laravel/framework/commit/e09b9eb62715706a0368acf0af7911340e0a3298))
+- Fixed validating `present` in combination with `nullable` ([#18173](https://github.com/laravel/framework/pull/18173))
 
 
 ## v5.4.13 (2017-02-22)
