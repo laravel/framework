@@ -5,12 +5,27 @@ namespace Illuminate\Tests\Foundation;
 use JsonSerializable;
 use Illuminate\Http\Response;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Contracts\View\View;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\TestResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class FoundationTestResponseTest extends TestCase
 {
+    public function testAssertViewHas()
+    {
+        $baseResponse = tap(new Response, function ($response) {
+            $response->setContent(\Mockery::mock(View::class, [
+                'render' => 'hello world',
+                'getData' => ['foo' => 'bar'],
+            ]));
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        $response->assertViewHas('foo');
+    }
+
     public function testAssertJsonWithArray()
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
