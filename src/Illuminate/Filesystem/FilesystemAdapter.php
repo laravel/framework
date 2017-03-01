@@ -9,6 +9,7 @@ use InvalidArgumentException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use League\Flysystem\AdapterInterface;
+use PHPUnit\Framework\Assert as PHPUnit;
 use League\Flysystem\FilesystemInterface;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\FileNotFoundException;
@@ -35,6 +36,32 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     public function __construct(FilesystemInterface $driver)
     {
         $this->driver = $driver;
+    }
+
+    /**
+     * Assert that the given file exists.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    public function assertExists($path)
+    {
+        PHPUnit::assertTrue(
+            $this->exists($path), "Unable to find a file at path [{$path}]."
+        );
+    }
+
+    /**
+     * Assert that the given file does not exist.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    public function assertMissing($path)
+    {
+        PHPUnit::assertFalse(
+            $this->exists($path), "Found unexpected file at path [{$path}]."
+        );
     }
 
     /**
