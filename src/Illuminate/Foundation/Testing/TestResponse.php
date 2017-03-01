@@ -201,18 +201,29 @@ class TestResponse
      */
     public function assertJson(array $data)
     {
-        $options = JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES;
-        $expected = json_encode($data, $options);
-        $actual = json_encode($this->decodeResponseJson(), $options);
-
-        $message = 'Unable to find JSON subset: '.PHP_EOL.PHP_EOL.
-            "[{$expected}]".PHP_EOL.PHP_EOL.
-            'within'.PHP_EOL.PHP_EOL.
-            "[{$actual}].".PHP_EOL.PHP_EOL;
-
-        PHPUnit::assertArraySubset($data, $this->decodeResponseJson(), $strict = false, $message);
+        PHPUnit::assertArraySubset(
+            $data, $this->decodeResponseJson(), false, $this->assertJsonMessage($data)
+        );
 
         return $this;
+    }
+
+    /**
+     * Get the assertion message for assertJson.
+     *
+     * @param  array  $data
+     * @return string
+     */
+    protected function assertJsonMessage(array $data)
+    {
+        $expected = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+
+        $actual = json_encode($this->decodeResponseJson(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+
+        return 'Unable to find JSON: '.PHP_EOL.PHP_EOL.
+            "[{$expected}]".PHP_EOL.PHP_EOL.
+            'within response JSON:'.PHP_EOL.PHP_EOL.
+            "[{$actual}].".PHP_EOL.PHP_EOL;
     }
 
     /**
