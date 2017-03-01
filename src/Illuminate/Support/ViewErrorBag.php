@@ -61,16 +61,6 @@ class ViewErrorBag implements Countable
     }
 
     /**
-     * Get the number of messages in the default bag.
-     *
-     * @return int
-     */
-    public function count()
-    {
-        return $this->getBag('default')->count();
-    }
-
-    /**
      * Determine if the default message bag has any messages.
      *
      * @return bool
@@ -78,6 +68,16 @@ class ViewErrorBag implements Countable
     public function any()
     {
         return $this->count() > 0;
+    }
+
+    /**
+     * Get the number of messages in the default bag.
+     *
+     * @return int
+     */
+    public function count()
+    {
+        return $this->getBag('default')->count();
     }
 
     /**
