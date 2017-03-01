@@ -6,7 +6,6 @@ use Exception;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-
 trait ResponseTrait
 {
     /**
