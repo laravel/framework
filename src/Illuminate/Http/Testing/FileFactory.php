@@ -11,7 +11,7 @@ class FileFactory
      * @param  int  $kilobytes
      * @return \Illuminate\Http\Testing\File
      */
-    public function create($name, $kilobytes = null)
+    public function create($name, $kilobytes)
     {
         return tap(new File($name, tmpfile()), function ($file) use ($kilobytes) {
             $file->sizeToReport = $kilobytes * 1024;
