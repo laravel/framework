@@ -21,9 +21,7 @@ class Storage extends Facade
             $root = storage_path('framework/testing/disks/'.$disk)
         );
 
-        static::set($disk, self::createLocalDriver([
-            'root' => storage_path('framework/testing/disks/'.$disk)
-        ]));
+        static::set($disk, self::createLocalDriver(['root' => $root]));
     }
 
     /**
