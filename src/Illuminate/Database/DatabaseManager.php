@@ -194,6 +194,8 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     public function purge($name = null)
     {
+        $name = $name ?: $this->getDefaultConnection();
+
         $this->disconnect($name);
 
         unset($this->connections[$name]);

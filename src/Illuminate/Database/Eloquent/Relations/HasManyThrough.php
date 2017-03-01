@@ -247,7 +247,7 @@ class HasManyThrough extends Relation
             return $model;
         }
 
-        throw (new ModelNotFoundException)->setModel(get_class($this->parent));
+        throw (new ModelNotFoundException)->setModel(get_class($this->related));
     }
 
     /**

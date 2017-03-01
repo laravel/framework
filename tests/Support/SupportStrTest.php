@@ -123,6 +123,11 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::is($patternObject, $valueObject));
     }
 
+    public function testKebab()
+    {
+        $this->assertEquals('laravel-php-framework', Str::kebab('LaravelPhpFramework'));
+    }
+
     public function testLower()
     {
         $this->assertEquals('foo bar baz', Str::lower('FOO BAR BAZ'));

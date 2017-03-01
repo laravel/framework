@@ -251,7 +251,7 @@ class Builder
     public function selectSub($query, $as)
     {
         // If the given query is a Closure, we will execute it while passing in a new
-        // query instance ot the Closure. This will give the developer a chance to
+        // query instance to the Closure. This will give the developer a chance to
         // format and work with the query before we cast it to a raw SQL string.
         if ($query instanceof Closure) {
             $callback = $query;

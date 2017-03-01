@@ -480,7 +480,7 @@ class Validator implements ValidatorContract
             return true;
         }
 
-        return ! is_null($value);
+        return ! is_null(Arr::get($this->data, $attribute, 0));
     }
 
     /**

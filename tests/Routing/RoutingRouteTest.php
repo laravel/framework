@@ -313,7 +313,7 @@ class RoutingRouteTest extends TestCase
     {
         unset($_SERVER['__test.route_inject']);
         $router = $this->getRouter();
-        $router->get('foo/{var}/{bar?}/{baz?}', function (stdClass $foo, $var, $bar = null, stdClass $baz = null) {
+        $router->get('foo/{var}/{bar?}/{baz?}', function (stdClass $foo, $var, $bar = 'test', stdClass $baz = null) {
             $_SERVER['__test.route_inject'] = func_get_args();
 
             return 'hello';
@@ -321,8 +321,8 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
         $this->assertInstanceOf('stdClass', $_SERVER['__test.route_inject'][0]);
         $this->assertEquals('bar', $_SERVER['__test.route_inject'][1]);
-        $this->assertEquals(null, $_SERVER['__test.route_inject'][2]);
-        $this->assertEquals(null, $_SERVER['__test.route_inject'][3]);
+        $this->assertEquals('test', $_SERVER['__test.route_inject'][2]);
+        $this->assertNull($_SERVER['__test.route_inject'][3]);
         $this->assertArrayHasKey(3, $_SERVER['__test.route_inject']);
         unset($_SERVER['__test.route_inject']);
     }
