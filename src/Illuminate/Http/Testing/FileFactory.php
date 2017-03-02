@@ -11,7 +11,7 @@ class FileFactory
      * @param  int  $kilobytes
      * @return \Illuminate\Http\Testing\File
      */
-    public function create($name, $kilobytes)
+    public function create($name, $kilobytes = 0)
     {
         return tap(new File($name, tmpfile()), function ($file) use ($kilobytes) {
             $file->sizeToReport = $kilobytes * 1024;
@@ -22,7 +22,7 @@ class FileFactory
      * Create a new fake image.
      *
      * @param  string  $name
-     * @param  int  $height
+     * @param  int  $width
      * @param  int  $height
      * @return \Illuminate\Http\Testing\File
      */

@@ -46,6 +46,31 @@ class File extends UploadedFile
     }
 
     /**
+     * Create a new fake file.
+     *
+     * @param  string  $name
+     * @param  int  $kilobytes
+     * @return \Illuminate\Http\Testing\File
+     */
+    public static function create($name, $kilobytes = 0)
+    {
+        return (new FileFactory)->create($name, $kilobytes);
+    }
+
+    /**
+     * Create a new fake image.
+     *
+     * @param  string  $name
+     * @param  int  $width
+     * @param  int  $height
+     * @return \Illuminate\Http\Testing\File
+     */
+    public static function image($name, $width = 10, $height = 10)
+    {
+        return (new FileFactory)->image($name, $width, $height);
+    }
+
+    /**
      * Set the "size" of the file in kilobytes.
      *
      * @param  int  $kilobytes
