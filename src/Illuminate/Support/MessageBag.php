@@ -236,7 +236,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
      */
     protected function transform($messages, $format, $messageKey)
     {
-        return collect($messages)
+        return collect((array) $messages)
             ->map(function ($message) use ($messageKey, $format) {
                 // We will simply spin through the given messages and transform each one
                 // replacing the :message place holder with the real message allowing
