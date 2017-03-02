@@ -1954,7 +1954,7 @@ class EloquentModelSavingEventStub
 
 class EloquentModelEventObjectStub extends \Illuminate\Database\Eloquent\Model
 {
-    protected $observableEvents = [
+    protected $shouldFire = [
         'saving' => EloquentModelSavingEventStub::class,
     ];
 }
