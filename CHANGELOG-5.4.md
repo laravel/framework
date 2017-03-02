@@ -1,5 +1,18 @@
 # Release Notes for 5.4.x
 
+## v5.4.15 (2017-03-02)
+
+### Added
+- Added `any()` method to `ViewErrorBag` ([#18176](https://github.com/laravel/framework/pull/18176))
+- Added `Storage` and `File` fakes ([#18178](https://github.com/laravel/framework/pull/18178), [#18180](https://github.com/laravel/framework/pull/18180))
+
+### Changed
+- Made queue worker properties `$shouldQuit` and `$paused` public ([e40c0e7](https://github.com/laravel/framework/commit/e40c0e7cd885156caa402d6d016cc686479736f4))
+
+### Fixed
+- Proxy `isset()` checks on `TestResponse` ([#18182](https://github.com/laravel/framework/pull/18182))
+
+
 ## v5.4.14 (2017-03-01)
 
 ### Added
