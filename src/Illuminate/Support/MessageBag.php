@@ -242,8 +242,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
                 // replacing the :message place holder with the real message allowing
                 // the messages to be easily formatted to each developer's desires.
                 return str_replace([':message', ':key'], [$message, $messageKey], $format);
-            })
-            ->toArray();
+            })->all();
     }
 
     /**
