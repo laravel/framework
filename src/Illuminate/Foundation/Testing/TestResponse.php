@@ -542,6 +542,17 @@ class TestResponse
     }
 
     /**
+     * Proxy isset() checks to the underlying base response.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    public function __isset($key)
+    {
+        return isset($this->baseResponse->{$key});
+    }
+
+    /**
      * Handle dynamic calls into macros or pass missing methods to the base response.
      *
      * @param  string  $method

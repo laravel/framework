@@ -44,14 +44,14 @@ class Worker
      *
      * @var bool
      */
-    protected $shouldQuit = false;
+    public $shouldQuit = false;
 
     /**
      * Indicates if the worker is paused.
      *
      * @var bool
      */
-    protected $paused = false;
+    public $paused = false;
 
     /**
      * Create a new queue worker.
