@@ -1038,6 +1038,44 @@ class Builder
     }
 
     /**
+     * Handles dynamic "orderBy" clauses to the query.
+     *
+     * @param  string  $method
+     * @param  array   $parameters
+     * @return $this
+     */
+    public function dynamicOrderBy($method, $parameters)
+    {
+        // $parameters, if any, will contain the ORDER BY direction. There are several cases:
+        // - Empty array: Default to 'asc'
+        // - Array of one direction string (asc|desc): Apply the same direction to all fields
+        // - Array of multiple direction strings: We match each field to the corresponding
+        // direction. If the number of fields and directions mismatch, throw an exception.
+
+        $fields = explode('And', substr($method, 7));
+
+        if (($directionCount = count($parameters)) > 1 && $directionCount !== count($fields)) {
+            throw new InvalidArgumentException('Number of fields and directions mismatch.');
+        }
+
+        for ($i = 0, $j = count($fields); $i < $j; ++$i) { 
+            if (!$fields[$i]) {
+                continue;
+            }
+
+            if (!$directionCount) {
+                $this->orderBy(Str::snake($fields[$i]), 'asc');
+            } elseif ($directionCount === 1) {
+                $this->orderBy(Str::snake($fields[$i]), $parameters[0]);
+            } else {
+                $this->orderBy(Str::snake($fields[$i]), $parameters[$i]);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Add a single dynamic where clause statement to the query.
      *
      * @param  string  $segment
@@ -1363,21 +1401,6 @@ class Builder
         $result = (array) $this->first([$column]);
 
         return count($result) > 0 ? reset($result) : null;
-    }
-
-    /**
-     * Get a single column's value from the first result of a query.
-     *
-     * This is an alias for the "value" method.
-     *
-     * @param  string  $column
-     * @return mixed
-     *
-     * @deprecated since version 5.1.
-     */
-    public function pluck($column)
-    {
-        return $this->value($column);
     }
 
     /**
@@ -2116,6 +2139,10 @@ class Builder
 
         if (Str::startsWith($method, 'where')) {
             return $this->dynamicWhere($method, $parameters);
+        }
+
+        if (Str::startsWith($method, 'orderBy')) {
+            return $this->dynamicOrderBy($method, $parameters);
         }
 
         $className = get_class($this);

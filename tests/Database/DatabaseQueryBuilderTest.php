@@ -1220,6 +1220,33 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertCount(2, $builder->wheres);
     }
 
+    public function testDynamicOrderBy()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orderByEmail();
+        $this->assertEquals('select * from "users" order by "email" asc', $builder->toSql());
+        
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orderByEmail('desc');
+        $this->assertEquals('select * from "users" order by "email" desc', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orderByEmailAndName();
+        $this->assertEquals('select * from "users" order by "email" asc, "name" asc', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orderByEmailAndName('desc');
+        $this->assertEquals('select * from "users" order by "email" desc, "name" desc', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orderByEmailAndName('asc', 'desc');
+        $this->assertEquals('select * from "users" order by "email" asc, "name" desc', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orderByEmailAndNameAndHomeAddress('desc', 'desc', 'asc');
+        $this->assertEquals('select * from "users" order by "email" desc, "name" desc, "home_address" asc', $builder->toSql());
+    }
+
     /**
      * @expectedException BadMethodCallException
      */
