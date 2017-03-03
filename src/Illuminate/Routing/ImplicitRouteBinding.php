@@ -30,7 +30,7 @@ class ImplicitRouteBinding
             if (array_key_exists($parameter->name, $parameters) &&
                 ! $route->parameter($parameter->name) instanceof Model) {
                 $model = $container->make($class->name);
-                
+
                 $route->setParameter(
                     $parameters[$parameter->name]['name'], $model->where(
                     $parameters[$parameter->name]['key'] ?: $model->getRouteKeyName(),
