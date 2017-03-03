@@ -467,13 +467,22 @@ class HttpRequestTest extends TestCase
                 'error' => [4],
                 'size' => [0],
             ],
+            'file2' => [
+                'name' => [null],
+                'type' => [''],
+                'tmp_name' => [''],
+                'error' => [4],
+                'size' => [0],
+            ],
         ];
 
         $baseRequest = SymfonyRequest::create('/?boom=breeze', 'GET', ['foo' => ['bar' => 'baz']], [], $invalidFiles);
 
         $request = Request::createFromBase($baseRequest);
 
-        $this->assertEmpty($request->files->all());
+         array_map(function ($file) {
+            $this->assertEmpty($file[0]);
+        }, $request->files->all());
     }
 
     public function testOldMethodCallsSession()
