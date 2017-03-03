@@ -35,7 +35,7 @@ class ImplicitRouteBinding
                     $parameters[$parameter->name]['name'], $model->where(
                     $parameters[$parameter->name]['key'] ?: $model->getRouteKeyName(),
                     $parameters[$parameter->name]['value']
-                )->firstOrFail();
+                )->firstOrFail());
             }
         }
     }
