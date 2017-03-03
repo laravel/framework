@@ -34,6 +34,7 @@ class RouteCompiler
         $optionals = $this->getOptionalParameters();
 
         $uri = preg_replace('/\{(\w+?)\?\}/', '{$1}', $this->route->uri());
+        $uri = preg_replace('/(\{\w+?)(\:\w+?)(\})/', '$1$3', $uri);
 
         return (
             new SymfonyRoute($uri, $optionals, $this->route->wheres, [], $this->route->domain() ?: '')

@@ -316,8 +316,15 @@ class UrlGenerator implements UrlGeneratorContract
      */
     protected function toRoute($route, $parameters, $absolute)
     {
+        $new_parameters = [];
+        $parameters = array_wrap($parameters);
+        $route_parameters = $route->parameterNames();
+        foreach ($parameters as $key => $value) {
+            $new_parameters[$route_parameters[$key]] = $value;
+        }
+
         return $this->routeUrl()->to(
-            $route, $this->formatParameters($parameters), $absolute
+            $route, $this->formatParameters($new_parameters), $absolute
         );
     }
 
@@ -358,7 +365,8 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Format the array of URL parameters.
      *
-     * @param  mixed|array  $parameters
+     * @param  mixed|array $parameters
+     *
      * @return array
      */
     public function formatParameters($parameters)
@@ -366,8 +374,11 @@ class UrlGenerator implements UrlGeneratorContract
         $parameters = array_wrap($parameters);
 
         foreach ($parameters as $key => $parameter) {
+            $parts = explode(':', $key);
+            $name = $parts[0];
+            $key = $parts[1] ?? null;
             if ($parameter instanceof UrlRoutable) {
-                $parameters[$key] = $parameter->getRouteKey();
+                $parameters[$name] = $parameter->getAttribute($key ?? $parameter->getRouteKeyName());
             }
         }
 
