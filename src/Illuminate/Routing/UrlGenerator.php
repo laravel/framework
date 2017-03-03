@@ -316,15 +316,15 @@ class UrlGenerator implements UrlGeneratorContract
      */
     protected function toRoute($route, $parameters, $absolute)
     {
-        $new_parameters = [];
+        $newParameters = [];
         $parameters = array_wrap($parameters);
-        $route_parameters = $route->parameterNames();
+        $routeParameters = $route->parameterNames();
         foreach ($parameters as $key => $value) {
-            $new_parameters[$route_parameters[$key]] = $value;
+            $newParameters[$routeParameters[$key]] = $value;
         }
 
         return $this->routeUrl()->to(
-            $route, $this->formatParameters($new_parameters), $absolute
+            $route, $this->formatParameters($newParameters), $absolute
         );
     }
 

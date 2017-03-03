@@ -28,7 +28,7 @@ class ImplicitRouteBinding
             $class = $parameter->getClass();
 
             if (array_key_exists($parameter->name, $parameters) &&
-                !$route->parameter($parameter->name) instanceof Model
+                ! $route->parameter($parameter->name) instanceof Model
             ) {
                 $method = $parameter->isDefaultValueAvailable() ? 'first' : 'firstOrFail';
 
