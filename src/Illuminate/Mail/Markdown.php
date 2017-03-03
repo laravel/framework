@@ -61,7 +61,7 @@ class Markdown
             'mail', $this->htmlComponentPaths()
         )->make($view, $data)->render();
 
-        return new HtmlString(with($inliner ?: new CssToInlineStyles)->convert(
+        return new HtmlString(($inliner ?: new CssToInlineStyles)->convert(
             $contents, $this->view->make('mail::themes.'.$this->theme)->render()
         ));
     }

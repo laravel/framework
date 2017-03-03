@@ -28,18 +28,14 @@ class ImplicitRouteBinding
             $class = $parameter->getClass();
 
             if (array_key_exists($parameter->name, $parameters) &&
-                ! $route->parameter($parameter->name) instanceof Model
-            ) {
-                $method = $parameter->isDefaultValueAvailable() ? 'first' : 'firstOrFail';
-
+                ! $route->parameter($parameter->name) instanceof Model) {
                 $model = $container->make($class->name);
-
+                
                 $route->setParameter(
                     $parameters[$parameter->name]['name'], $model->where(
                     $parameters[$parameter->name]['key'] ?: $model->getRouteKeyName(),
                     $parameters[$parameter->name]['value']
-                )->{$method}()
-                );
+                )->firstOrFail()
             }
         }
     }

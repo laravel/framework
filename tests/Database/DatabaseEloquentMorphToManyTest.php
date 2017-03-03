@@ -74,7 +74,7 @@ class DatabaseEloquentMorphToManyTest extends TestCase
     {
         list($builder, $parent) = $this->getRelationArguments();
 
-        return new MorphToMany($builder, $parent, 'taggable', 'taggables', 'taggable_id', 'tag_id');
+        return new MorphToMany($builder, $parent, 'taggable', 'taggables', 'taggable_id', 'tag_id', 'id');
     }
 
     public function getRelationArguments()
@@ -98,7 +98,7 @@ class DatabaseEloquentMorphToManyTest extends TestCase
         $builder->shouldReceive('where')->once()->with('taggables.taggable_id', '=', 1);
         $builder->shouldReceive('where')->once()->with('taggables.taggable_type', get_class($parent));
 
-        return [$builder, $parent, 'taggable', 'taggables', 'taggable_id', 'tag_id', 'relation_name', false];
+        return [$builder, $parent, 'taggable', 'taggables', 'taggable_id', 'tag_id', 'id', 'relation_name', false];
     }
 }
 
