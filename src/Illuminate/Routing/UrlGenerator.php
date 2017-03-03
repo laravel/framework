@@ -377,10 +377,10 @@ class UrlGenerator implements UrlGeneratorContract
             }
             $parts = explode(':', $key);
             $name = $parts[0];
-            $key = $parts[1] ?? null;
+            $key = isset($parts[1]) ? $parts[1] : null;
             if ($parameter instanceof UrlRoutable) {
                 if ($parameter instanceof Model) {
-                    $parameters[$name] = $parameter->getAttribute($key ?? $parameter->getRouteKeyName());
+                    $parameters[$name] = $parameter->getAttribute($key ?: $parameter->getRouteKeyName());
                 } else {
                     $parameters[$name] = $parameter->getRouteKey();
                 }
