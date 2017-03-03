@@ -15,7 +15,14 @@ class ImplicitRouteBinding
      */
     public static function resolveForRoute($container, $route)
     {
-        $parameters = $route->parameters();
+        $parameters = [];
+
+        foreach ($route->parameters() as $parameter => $value) {
+            $parts = explode(':', $parameter);
+            $name = $parts[0];
+            $key = isset($parts[1]) ? $parts[1] : null;
+            $parameters[$name] = ['name' => $parameter] + compact('key', 'value');
+        }
 
         foreach ($route->signatureParameters(Model::class) as $parameter) {
             $class = $parameter->getClass();
@@ -25,10 +32,10 @@ class ImplicitRouteBinding
                 $model = $container->make($class->name);
 
                 $route->setParameter(
-                    $parameter->name, $model->where(
-                        $model->getRouteKeyName(), $parameters[$parameter->name]
-                    )->firstOrFail()
-                );
+                    $parameters[$parameter->name]['name'], $model->where(
+                    $parameters[$parameter->name]['key'] ?: $model->getRouteKeyName(),
+                    $parameters[$parameter->name]['value']
+                )->firstOrFail());
             }
         }
     }

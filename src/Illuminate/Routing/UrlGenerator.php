@@ -3,6 +3,7 @@
 namespace Illuminate\Routing;
 
 use Closure;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
@@ -317,7 +318,7 @@ class UrlGenerator implements UrlGeneratorContract
     protected function toRoute($route, $parameters, $absolute)
     {
         return $this->routeUrl()->to(
-            $route, $this->formatParameters($parameters), $absolute
+            $route, $this->formatParameters($parameters, $route), $absolute
         );
     }
 
@@ -359,15 +360,28 @@ class UrlGenerator implements UrlGeneratorContract
      * Format the array of URL parameters.
      *
      * @param  mixed|array  $parameters
+     * @param  Route        $route
      * @return array
      */
-    public function formatParameters($parameters)
+    public function formatParameters($parameters, Route $route = null)
     {
         $parameters = array_wrap($parameters);
+        $routeParameters = ($route and $route->compiled) ? $route->parameters() : [];
 
         foreach ($parameters as $key => $parameter) {
+            if (isset(array_keys($routeParameters)[$key])) {
+                unset($parameters[$key]);
+                $key = array_keys($routeParameters)[$key];
+            }
+            $parts = explode(':', $key);
+            $name = $parts[0];
+            $key = isset($parts[1]) ? $parts[1] : null;
             if ($parameter instanceof UrlRoutable) {
-                $parameters[$key] = $parameter->getRouteKey();
+                if ($parameter instanceof Model) {
+                    $parameters[$name] = $parameter->getAttribute($key ?: $parameter->getRouteKeyName());
+                } else {
+                    $parameters[$name] = $parameter->getRouteKey();
+                }
             }
         }
 
