@@ -3,12 +3,12 @@
 namespace Illuminate\Database\Migrations;
 
 use Carbon\Carbon;
-use Illuminate\Console\OutputStyle;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class Migrator
 {
@@ -76,10 +76,10 @@ class Migrator
      *
      * @param  array|string $paths
      * @param  array $options
-     * @param  OutputStyle $outputStyle
+     * @param  OutputInterface $output
      * @return array
      */
-    public function run($paths = [], array $options = [], OutputStyle $outputStyle = NULL)
+    public function run($paths = [], array $options = [], OutputInterface $output = NULL)
     {
         $this->notes = [];
 
@@ -95,7 +95,7 @@ class Migrator
         // Once we have all these migrations that are outstanding we are ready to run
         // we will go ahead and run them "up". This will execute each migration as
         // an operation against a database. Then we'll return this list of them.
-        $this->runPending($migrations, $options, $outputStyle);
+        $this->runPending($migrations, $options, $output);
 
         return $migrations;
     }
@@ -120,10 +120,10 @@ class Migrator
      *
      * @param  array $migrations
      * @param  array $options
-     * @param  OutputStyle $outputStyle
+     * @param  OutputInterface $output
      * @return void
      */
-    public function runPending(array $migrations, array $options = [], OutputStyle $outputStyle = NULL)
+    public function runPending(array $migrations, array $options = [], OutputInterface $output = NULL)
     {
         // First we will just make sure that there are any migrations to run. If there
         // aren't, we will just make a note of it to the developer so they're aware
@@ -147,16 +147,16 @@ class Migrator
         // migrations "up" so the changes are made to the databases. We'll then log
         // that the migration was run so we don't repeat it next time we execute.
         foreach ($migrations as $file) {
-            if (!is_null($outputStyle)){
-                $outputStyle->write('<info>Running:</info> ' . $this->getMigrationName($file) . '...');
+            if (!is_null($output)){
+                $output->write('<info>Running:</info> ' . $this->getMigrationName($file) . '...');
             }
 
             $now = Carbon::now();
             $this->runUp($file, $batch, $pretend);
             $difference = Carbon::now()->diffInSeconds($now);
 
-            if (!is_null($outputStyle)){
-                $outputStyle->writeln("Done! <comment>({$difference}s)</comment>");
+            if (!is_null($output)){
+                $output->writeln("Done! <comment>({$difference}s)</comment>");
             }
 
             if ($step) {

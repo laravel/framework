@@ -68,7 +68,7 @@ class MigrateCommand extends BaseCommand
         $this->migrator->run($this->getMigrationPaths(), [
             'pretend' => $this->option('pretend'),
             'step'    => $this->option('step'),
-        ], $this->output);
+        ], $this->getOutput());
 
 
         // Finally, if the "seed" option has been given, we will re-run the database
