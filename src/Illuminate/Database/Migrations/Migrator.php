@@ -2,11 +2,13 @@
 
 namespace Illuminate\Database\Migrations;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use Illuminate\Support\Collection;
-use Illuminate\Filesystem\Filesystem;
+use Carbon\Carbon;
+use Illuminate\Console\OutputStyle;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class Migrator
 {
@@ -72,11 +74,12 @@ class Migrator
     /**
      * Run the pending migrations at a given path.
      *
-     * @param  array|string  $paths
-     * @param  array  $options
+     * @param  array|string $paths
+     * @param  array $options
+     * @param  OutputStyle $outputStyle
      * @return array
      */
-    public function run($paths = [], array $options = [])
+    public function run($paths = [], array $options = [], OutputStyle $outputStyle = NULL)
     {
         $this->notes = [];
 
@@ -92,7 +95,7 @@ class Migrator
         // Once we have all these migrations that are outstanding we are ready to run
         // we will go ahead and run them "up". This will execute each migration as
         // an operation against a database. Then we'll return this list of them.
-        $this->runPending($migrations, $options);
+        $this->runPending($migrations, $options, $outputStyle);
 
         return $migrations;
     }
@@ -115,11 +118,12 @@ class Migrator
     /**
      * Run an array of migrations.
      *
-     * @param  array  $migrations
-     * @param  array  $options
+     * @param  array $migrations
+     * @param  array $options
+     * @param  OutputStyle $outputStyle
      * @return void
      */
-    public function runPending(array $migrations, array $options = [])
+    public function runPending(array $migrations, array $options = [], OutputStyle $outputStyle = NULL)
     {
         // First we will just make sure that there are any migrations to run. If there
         // aren't, we will just make a note of it to the developer so they're aware
@@ -143,7 +147,17 @@ class Migrator
         // migrations "up" so the changes are made to the databases. We'll then log
         // that the migration was run so we don't repeat it next time we execute.
         foreach ($migrations as $file) {
+            if (!is_null($outputStyle)){
+                $outputStyle->write('<info>Running:</info> ' . $this->getMigrationName($file) . '...');
+            }
+
+            $now = Carbon::now();
             $this->runUp($file, $batch, $pretend);
+            $difference = Carbon::now()->diffInSeconds($now);
+
+            if (!is_null($outputStyle)){
+                $outputStyle->writeln("Done! <comment>({$difference}s)</comment>");
+            }
 
             if ($step) {
                 $batch++;
