@@ -20,7 +20,7 @@ class ImplicitRouteBinding
         foreach ($route->parameters() as $parameter => $value) {
             $parts = explode(':', $parameter);
             $name = $parts[0];
-            $key = $parts[1] ?? null;
+            $key = isset($parts[1]) ? $parts[1] : null;
             $parameters[$name] = ['name' => $parameter] + compact('key', 'value');
         }
 
@@ -36,7 +36,7 @@ class ImplicitRouteBinding
 
                 $route->setParameter(
                     $parameters[$parameter->name]['name'], $model->where(
-                    $parameters[$parameter->name]['key'] ?? $model->getRouteKeyName(),
+                    $parameters[$parameter->name]['key'] ?: $model->getRouteKeyName(),
                     $parameters[$parameter->name]['value']
                 )->{$method}()
                 );
