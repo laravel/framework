@@ -480,7 +480,7 @@ class HttpRequestTest extends TestCase
 
         $request = Request::createFromBase($baseRequest);
 
-         array_map(function ($file) {
+        array_map(function ($file) {
             $this->assertEmpty($file[0]);
         }, $request->files->all());
     }
