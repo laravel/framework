@@ -372,7 +372,7 @@ class UrlGenerator implements UrlGeneratorContract
             if (isset($routeParameters[$index])) {
                 $key = $routeParameters[$index];
             }
-            $parts = explode(':', isset ($key) ? $key : $index);
+            $parts = explode(':', isset($key) ? $key : $index);
             $key = isset($parts[1]) ? $parts[1] : null;
             if ($parameter instanceof UrlRoutable) {
                 if ($parameter instanceof Model) {

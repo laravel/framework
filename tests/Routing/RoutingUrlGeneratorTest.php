@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Routing;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Routing\UrlGenerator;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Contracts\Routing\UrlRoutable;
 
