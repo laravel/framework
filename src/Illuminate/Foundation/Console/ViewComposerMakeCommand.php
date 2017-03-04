@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
+use Symfony\Component\Console\Input\InputOption;
 
 class ViewComposerMakeCommand extends GeneratorCommand
 {
@@ -11,7 +12,7 @@ class ViewComposerMakeCommand extends GeneratorCommand
      *
      * @var string
      */
-    protected $signature = 'make:composer {name : The name of the class} {--provider : Create the service provider if not already done}';
+    protected $signature = 'make:composer {name : The name of the class} {--p|provider : Generate a provider where you will register your view composers.}';
 
     /**
      * The console command description.
@@ -63,5 +64,17 @@ class ViewComposerMakeCommand extends GeneratorCommand
         }
 
         return parent::buildClass($name);
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['provider', 'p', InputOption::VALUE_NONE, 'Generate a provider where you will register your view composers.'],
+        ];
     }
 }
