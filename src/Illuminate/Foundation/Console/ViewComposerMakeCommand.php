@@ -47,4 +47,21 @@ class ViewComposerMakeCommand extends GeneratorCommand
     {
         return $rootNamespace.'\Http\ViewComposers';
     }
+
+    /**
+     * Build the class with the given name.
+     *
+     * Remove the base controller import if we are already in base namespace.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function buildClass($name)
+    {
+        if ($this->option('provider')) {
+            $this->call('make:provider', ['name' => 'ViewComposerServiceProvider', '--template' => 'composer']);
+        }
+
+        return parent::buildClass($name);
+    }
 }

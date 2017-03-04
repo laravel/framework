@@ -1,0 +1,49 @@
+<?php
+
+namespace DummyNamespace;
+
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\ServiceProvider;
+
+class DummyClass extends ServiceProvider
+{
+    protected $composers = [
+        // App\Http\ViewComposers\MyGlobalComposer::class => '*',
+        // App\Http\ViewComposers\ProfileComposer::class => ['profile.show', 'profile.index'],
+    ];
+
+    protected $creators = [
+        // App\Http\ViewComposers\ProfileCreator::class => ['profile'],
+    ];
+
+    /**
+     * Bootstrap the application services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        // Register class based composers and creators
+
+        foreach ($this->composers as $composerClass => $targetViews) {
+            View::composer($targetViews, $composerClass);
+        }
+
+        foreach ($this->creators as $creatorClass => $targetViews) {
+            View::creator($targetViews, $creatorClass);
+        }
+
+        // Register closure based composers and creators
+        //...
+    }
+
+    /**
+     * Register the application services.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        //
+    }
+}
