@@ -153,6 +153,13 @@ class Guard {
 		{
 			$user = $this->getUserByRecaller($recaller);
 		}
+		
+		// If at this point the user is null, we need to clear any data leftover
+		// in order to assure consistency.
+		if (is_null($user))
+		{
+			$this->clearUserDataFromStorage();
+		}
 
 		return $this->user = $user;
 	}
