@@ -102,7 +102,7 @@ abstract class GeneratorCommand extends Command
     protected function getFinalNamespace($rootNamespace)
     {
         $userNamespace = config('generators.namespaces.'.str_slug($this->type), null);
-        if ( !is_null($userNamespace)) {
+        if (! is_null($userNamespace)) {
             return $rootNamespace.$userNamespace;
         }
 
