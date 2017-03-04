@@ -366,21 +366,19 @@ class UrlGenerator implements UrlGeneratorContract
     public function formatParameters($parameters, Route $route = null)
     {
         $parameters = array_wrap($parameters);
-        $routeParameters = ($route and $route->compiled) ? $route->parameters() : [];
+        $routeParameters = $route ? $route->parameterNames() : [];
 
-        foreach ($parameters as $key => $parameter) {
-            if (isset(array_keys($routeParameters)[$key])) {
-                unset($parameters[$key]);
-                $key = array_keys($routeParameters)[$key];
+        foreach ($parameters as $index => $parameter) {
+            if (isset($routeParameters[$index])) {
+                $key = $routeParameters[$index];
             }
-            $parts = explode(':', $key);
-            $name = $parts[0];
+            $parts = explode(':', isset ($key) ? $key : $index);
             $key = isset($parts[1]) ? $parts[1] : null;
             if ($parameter instanceof UrlRoutable) {
                 if ($parameter instanceof Model) {
-                    $parameters[$name] = $parameter->getAttribute($key ?: $parameter->getRouteKeyName());
+                    $parameters[$index] = $parameter->getAttribute($key ?: $parameter->getRouteKeyName());
                 } else {
-                    $parameters[$name] = $parameter->getRouteKey();
+                    $parameters[$index] = $parameter->getRouteKey();
                 }
             }
         }

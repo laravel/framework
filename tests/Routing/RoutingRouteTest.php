@@ -1163,10 +1163,10 @@ class RoutingRouteTest extends TestCase
             'uses' => function (RoutingTestUserModel $bar) use ($phpunit) {
                 $phpunit->assertInstanceOf(RoutingTestUserModel::class, $bar);
 
-                return $bar->value;
+                return $bar->id;
             },
         ]);
-        $this->assertEquals('taylor', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+        $this->assertEquals('22', $router->dispatch(Request::create('foo/22', 'GET'))->getContent());
     }
 
     public function testImplicitBindingsWithOptionalParameterWithExistingKeyInUri()
@@ -1178,10 +1178,10 @@ class RoutingRouteTest extends TestCase
             'uses' => function (RoutingTestUserModel $bar = null) use ($phpunit) {
                 $phpunit->assertInstanceOf(RoutingTestUserModel::class, $bar);
 
-                return $bar->value;
+                return $bar->id;
             },
         ]);
-        $this->assertEquals('taylor', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+        $this->assertEquals('8321', $router->dispatch(Request::create('foo/8321', 'GET'))->getContent());
     }
 
     public function testImplicitBindingsWithOptionalParameterWithNoKeyInUri()
@@ -1230,6 +1230,27 @@ class RoutingRouteTest extends TestCase
             },
         ]);
         $router->dispatch(Request::create('foo/baz', 'GET'))->getContent();
+    }
+
+    public function testImplicitBindingsWithKey()
+    {
+        $phpunit = $this;
+        $container = new Container;
+        $router = new Router(new Dispatcher, $container);
+        $container->singleton(Registrar::class, function () use ($router) {
+            return $router;
+        });
+
+        $container->bind('Illuminate\Tests\Routing\RoutingTestUserModel', 'Illuminate\Tests\Routing\RoutingTestWithRouteKey');
+        $router->get('foo/{bar:slug}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (RoutingTestUserModel $bar) use ($phpunit) {
+                $phpunit->assertInstanceOf(RoutingTestWithRouteKey::class, $bar);
+
+                return $bar->slug;
+            },
+        ]);
+        $this->assertEquals('taylor-otwell', $router->dispatch(Request::create('foo/taylor-otwell', 'GET'))->getContent());
     }
 
     public function testDispatchingCallableActionClasses()
@@ -1475,7 +1496,7 @@ class RoutingTestUserModel extends Model
 
     public function where($key, $value)
     {
-        $this->value = $value;
+        $this->$key = $value;
 
         return $this;
     }
@@ -1492,6 +1513,10 @@ class RoutingTestUserModel extends Model
 }
 
 class RoutingTestExtendedUserModel extends RoutingTestUserModel
+{
+}
+
+class RoutingTestWithRouteKey extends RoutingTestUserModel
 {
 }
 

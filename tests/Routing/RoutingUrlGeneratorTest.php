@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Routing;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use PHPUnit\Framework\TestCase;
@@ -252,6 +253,27 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertEquals('/foo/routable', $url->route('routable', $model, false));
     }
 
+    public function testModelRoutingWithKey()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
+        );
+
+        $route = new Route(['GET'], 'foo/{bar}', ['as' => 'routable_id']);
+        $routes->add($route);
+
+        $route = new Route(['GET'], 'foo/{bar:slug}', ['as' => 'routable_slug']);
+        $routes->add($route);
+
+        $model = new RoutableModelStub;
+        $model->id = 20;
+        $model->slug = 'routable-model';
+
+        $this->assertEquals('/foo/20', $url->route('routable_id', $model, false));
+        $this->assertEquals('/foo/routable-model', $url->route('routable_slug', $model, false));
+    }
+
     public function testRoutesMaintainRequestScheme()
     {
         $url = new UrlGenerator(
@@ -449,6 +471,11 @@ class RoutingUrlGeneratorTest extends TestCase
 
         $this->assertEquals($url->to('/foo'), $url->previous('/foo'));
     }
+}
+
+class RoutableModelStub extends Model
+{
+    //
 }
 
 class RoutableInterfaceStub implements UrlRoutable
