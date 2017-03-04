@@ -89,8 +89,24 @@ abstract class GeneratorCommand extends Command
         $name = str_replace('/', '\\', $name);
 
         return $this->qualifyClass(
-            $this->getDefaultNamespace(trim($rootNamespace, '\\')).'\\'.$name
+            $this->getFinalNamespace(trim($rootNamespace, '\\')).'\\'.$name
         );
+    }
+
+    /**
+     * Get the final namespace for the class.
+     *
+     * @param  string  $rootNamespace
+     * @return string
+     */
+    protected function getFinalNamespace($rootNamespace)
+    {
+        $userNamespace = config('generators.namespaces.'.str_slug($this->type), null);
+        if ( !is_null($userNamespace)) {
+            return $rootNamespace . $userNamespace;
+        }
+
+        return $this->getDefaultNamespace($rootNamespace);
     }
 
     /**
