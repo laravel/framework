@@ -311,7 +311,7 @@ if (! function_exists('array_wrap')) {
      */
     function array_wrap($value)
     {
-        return ! is_array($value) ? [$value] : $value;
+        return Arr::wrap($value);
     }
 }
 
