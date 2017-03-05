@@ -2,11 +2,19 @@
 
 namespace Illuminate\Hashing;
 
+use LengthException;
 use RuntimeException;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 
 class BcryptHasher implements HasherContract
 {
+    /**
+     * Bcrypt truncates strings at 72 characters when computing hashes.
+     *
+     * @var int
+     */
+    const BCRYPT_MAX_LENGTH = 72;
+
     /**
      * Default crypt cost factor.
      *
@@ -21,10 +29,15 @@ class BcryptHasher implements HasherContract
      * @param  array   $options
      * @return string
      *
+     * @throws \LengthException
      * @throws \RuntimeException
      */
     public function make($value, array $options = [])
     {
+        if (strlen($value) > static::BCRYPT_MAX_LENGTH && ! isset($options['ignore_password_length'])) {
+            throw new LengthException(sprintf('Passwords longer than %d characters are truncated when using Bcrypt.', static::BCRYPT_MAX_LENGTH));
+        }
+
         $cost = isset($options['rounds']) ? $options['rounds'] : $this->rounds;
 
         $hash = password_hash($value, PASSWORD_BCRYPT, ['cost' => $cost]);
