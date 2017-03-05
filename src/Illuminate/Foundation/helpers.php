@@ -853,6 +853,21 @@ if (! function_exists('__')) {
     }
 }
 
+if (! function_exists('___')) {
+    /**
+     * Translate the given message and transforms the first letter to uppercase.
+     *
+     * @param  string  $key
+     * @param  array  $replace
+     * @param  string  $locale
+     * @return \Illuminate\Contracts\Translation\Translator|string
+     */
+    function ___($key = null, $replace = [], $locale = null)
+    {
+        return ucfirst(app('translator')->getFromJson($key, $replace, $locale));
+    }
+}
+
 if (! function_exists('url')) {
     /**
      * Generate a url for the application.
