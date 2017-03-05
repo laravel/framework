@@ -315,6 +315,19 @@ if (! function_exists('array_wrap')) {
     }
 }
 
+if (! function_exists('array_wrap_args')) {
+    /**
+     * If the given value is not an array, wrap all arguments in one.
+     *
+     * @param  mixed  $value
+     * @return array
+     */
+    function array_wrap_args($value)
+    {
+        return Arr::wrapArgs($value);
+    }
+}
+
 if (! function_exists('camel_case')) {
     /**
      * Convert a value to camel case.

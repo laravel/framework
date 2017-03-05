@@ -527,4 +527,15 @@ class Arr
     {
         return ! is_array($value) ? [$value] : $value;
     }
+
+    /**
+     * If the given value is not an array, wrap all arguments in one.
+     *
+     * @param  mixed  $value
+     * @return array
+     */
+    public static function wrapArgs($value)
+    {
+        return ! is_array($value) ? func_get_args() : $value;
+    }
 }
