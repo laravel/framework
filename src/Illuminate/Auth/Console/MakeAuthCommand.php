@@ -71,12 +71,12 @@ class MakeAuthCommand extends Command
      */
     protected function createDirectories()
     {
-        if (! is_dir(base_path('resources/views/layouts'))) {
-            mkdir(base_path('resources/views/layouts'), 0755, true);
+        if (! is_dir(resource_path('views/layouts'))) {
+            mkdir(resource_path('views/layouts'), 0755, true);
         }
 
-        if (! is_dir(base_path('resources/views/auth/passwords'))) {
-            mkdir(base_path('resources/views/auth/passwords'), 0755, true);
+        if (! is_dir(resource_path('views/auth/passwords'))) {
+            mkdir(resource_path('views/auth/passwords'), 0755, true);
         }
     }
 
@@ -90,7 +90,7 @@ class MakeAuthCommand extends Command
         foreach ($this->views as $key => $value) {
             copy(
                 __DIR__.'/stubs/make/views/'.$key,
-                base_path('resources/views/'.$value)
+                resource_path('views/'.$value)
             );
         }
     }
