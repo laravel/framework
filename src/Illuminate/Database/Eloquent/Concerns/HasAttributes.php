@@ -923,7 +923,10 @@ trait HasAttributes
     public function hasCast($key, $types = null)
     {
         if (array_key_exists($key, $this->getCasts())) {
-            return $types ? in_array($this->getCastType($key), (array) $types, true) : true;
+            $cast = $this->getCastType($key);
+            $cast = strstr($cast, ':', true) ?: $cast;
+
+            return $types ? in_array($cast, (array) $types, true) : true;
         }
 
         return false;
