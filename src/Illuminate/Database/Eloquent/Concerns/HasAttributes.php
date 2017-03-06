@@ -655,7 +655,7 @@ trait HasAttributes
 
             $this->attributes = array_merge(
                 $this->attributes,
-                array_fill_keys(array_keys(array_flip((array) $attributes)), null)
+                array_fill_keys((array) $attributes, null)
             );
 
             unset($this->classCastCache[$key]);
