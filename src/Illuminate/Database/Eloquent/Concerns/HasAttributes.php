@@ -528,7 +528,7 @@ trait HasAttributes
             return $this->classCastCache[$key];
         }
 
-        [$type, $attributes] = $this->getClassCast($key);
+        list($type, $attributes) = $this->getClassCast($key);
 
         if ($attributes) {
             $parameters = array_map(function ($key) {
@@ -569,7 +569,7 @@ trait HasAttributes
     {
         foreach ($this->getCasts() as $attribute => $cast) {
             if ($this->isClassCastable($attribute)) {
-                [$type, $attributes] = $this->getClassCast($attribute);
+                list($type, $attributes) = $this->getClassCast($attribute);
 
                 $attributeCount = count($attributes);
                 $object = $this->castToClass($attribute);
@@ -655,7 +655,7 @@ trait HasAttributes
     protected function setClassCastableAttribute($key, $value)
     {
         if (is_null($value)) {
-            [$cast, $attributes] = $this->getClassCast($key);
+            list($cast, $attributes) = $this->getClassCast($key);
 
             $this->attributes = array_merge(
                 $this->attributes,
