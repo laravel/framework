@@ -557,9 +557,7 @@ trait HasAttributes
             return false;
         }
 
-        $cast = Str::studly($casts[$key]);
-
-        return method_exists($this, "castTo{$cast}") && method_exists($this, "castFrom{$cast}");
+        return method_exists($this, 'castTo'.Str::studly($casts[$key]));
     }
 
     /**
@@ -573,14 +571,20 @@ trait HasAttributes
             if ($this->isClassCastable($attribute)) {
                 [$type, $attributes] = $this->getClassCast($attribute);
 
-                $casted = array_filter((array) call_user_func(
-                    [$this, 'castFrom'. Str::studly($type)],
-                    $this->castToClass($attribute)
-                ));
+                $attributeCount = count($attributes);
+                $object = $this->castToClass($attribute);
 
-                if (count($casted) === count($attributes)) {
-                    $this->attributes = array_merge($this->attributes, array_combine($attributes, $casted));
+                $castedAttributes = method_exists($object, '__toString')
+                    ? (string) $object
+                    : $this->{'castFrom'.Str::studly($type)}($object);
+
+                if ($attributeCount !== count($castedAttributes)) {
+                    throw new LogicException("Class cast {$attribute} must return {$attributeCount} attributes");
                 }
+
+                $this->attributes = array_merge(
+                    $this->attributes, array_combine($attributes, (array) $castedAttributes)
+                );
             }
         }
     }
