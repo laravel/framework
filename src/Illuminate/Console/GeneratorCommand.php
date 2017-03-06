@@ -101,7 +101,7 @@ abstract class GeneratorCommand extends Command
      */
     protected function getFinalNamespace($rootNamespace)
     {
-        $userNamespace = config('generators.namespaces.'.str_slug($this->type), null);
+        $userNamespace = $this->laravel['config']->get('generators.namespaces.'.Str::slug($this->type), null);
         if (! is_null($userNamespace)) {
             return $rootNamespace.$userNamespace;
         }
