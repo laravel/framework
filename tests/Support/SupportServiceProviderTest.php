@@ -22,6 +22,16 @@ class SupportServiceProviderTest extends TestCase
         m::close();
     }
 
+    public function testGetAvailableServiceProvidersToPublish()
+    {
+        $availableToPublish = ServiceProvider::providersAvailableToPublish();
+        $expected = [
+            'Illuminate\Tests\Support\ServiceProviderForTestingOne',
+            'Illuminate\Tests\Support\ServiceProviderForTestingTwo',
+        ];
+        $this->assertEquals($expected, $availableToPublish, 'Publishable service providers do not return expected set of providers.');
+    }
+
     public function testSimpleAssetsArePublishedCorrectly()
     {
         $toPublish = ServiceProvider::pathsToPublish('Illuminate\Tests\Support\ServiceProviderForTestingOne');

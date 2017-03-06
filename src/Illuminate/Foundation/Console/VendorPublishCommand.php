@@ -24,6 +24,7 @@ class VendorPublishCommand extends Command
      * @var string
      */
     protected $signature = 'vendor:publish {--force : Overwrite any existing files.}
+                    {--all : Publish assets for all service providers without prompt.}
                     {--provider= : The service provider that has assets you want to publish.}
                     {--tag=* : One or many tags that have assets you want to publish.}';
 
@@ -77,6 +78,27 @@ class VendorPublishCommand extends Command
     }
 
     /**
+     * Determine the provider to publish.
+     *
+     * @return mixed
+     */
+    protected function providerToPublish()
+    {
+        if ($this->option('all')) {
+            return null;
+        }
+
+        if ($this->option('provider')) {
+            return $this->option('provider');
+        }
+
+        return $this->choice(
+            "Which package's files would you like to publish?",
+            ServiceProvider::providersAvailableToPublish()
+        );
+    }
+
+    /**
      * Get all of the paths to publish.
      *
      * @param  string  $tag
@@ -85,7 +107,7 @@ class VendorPublishCommand extends Command
     protected function pathsToPublish($tag)
     {
         return ServiceProvider::pathsToPublish(
-            $this->option('provider'), $tag
+            $this->providerToPublish(), $tag
         );
     }
 

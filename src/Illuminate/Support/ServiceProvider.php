@@ -165,6 +165,16 @@ abstract class ServiceProvider
     }
 
     /**
+     * Get the service providers available for publishing.
+     *
+     * @return array
+     */
+    public static function providersAvailableToPublish()
+    {
+        return array_keys(static::$publishes);
+    }
+
+    /**
      * Get the paths to publish.
      *
      * @param  string  $provider
