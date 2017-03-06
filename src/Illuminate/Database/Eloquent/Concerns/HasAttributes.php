@@ -528,7 +528,7 @@ trait HasAttributes
             return $this->classCastCache[$key];
         }
 
-        [$cast, $attributes] = $this->getClassCast($key);
+        [$type, $attributes] = $this->getClassCast($key);
 
         if ($attributes) {
             $parameters = array_map(function ($key) {
@@ -573,10 +573,10 @@ trait HasAttributes
     {
         foreach ($this->getCasts() as $attribute => $cast) {
             if ($this->isClassCastable($attribute)) {
-                [$cast, $attributes] = $this->getClassCast($attribute);
+                [$type, $attributes] = $this->getClassCast($attribute);
 
                 $casted = array_filter((array) call_user_func(
-                    [$this, 'castFrom'. Str::studly($cast)],
+                    [$this, 'castFrom'. Str::studly($type)],
                     $this->castToClass($attribute)
                 ));
 
