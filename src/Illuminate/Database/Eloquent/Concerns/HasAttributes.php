@@ -966,7 +966,7 @@ trait HasAttributes
 
         return [
             strstr($cast, ':', true),
-            explode(',', ltrim(strstr($cast, ':'), ':'))
+            explode(',', ltrim(strstr($cast, ':'), ':')),
         ];
     }
 
