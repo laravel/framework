@@ -538,9 +538,7 @@ trait HasAttributes
             $parameters = [$this->attributes[$key] ?? null];
         }
 
-        return $this->classCastCache[$key] = forward_static_call(
-            [$this, 'castTo'.Str::studly($cast)], ...$parameters
-        );
+        return $this->classCastCache[$key] = $this->{'castTo'.Str::studly($type)}(...$parameters);
     }
 
     /**
