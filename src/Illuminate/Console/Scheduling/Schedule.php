@@ -4,7 +4,6 @@ namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Console\Application;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Symfony\Component\Process\ProcessUtils;
 use Illuminate\Contracts\Cache\Repository as Cache;
 
@@ -50,19 +49,6 @@ class Schedule
     }
 
     /**
-     * Add a new queued job callback event to the schedule.
-     *
-     * @param  \Illuminate\Contracts\Queue\ShouldQueue  $job
-     * @return \Illuminate\Console\Scheduling\Event
-     */
-    public function job(ShouldQueue $job)
-    {
-        return $this->call(function () use ($job) {
-            dispatch($job);
-        })->name(get_class($job));
-    }
-
-    /**
      * Add a new Artisan command event to the schedule.
      *
      * @param  string  $command
@@ -78,6 +64,19 @@ class Schedule
         return $this->exec(
             Application::formatCommandString($command), $parameters
         );
+    }
+
+    /**
+     * Add a new job callback event to the schedule.
+     *
+     * @param  object|string  $job
+     * @return \Illuminate\Console\Scheduling\Event
+     */
+    public function job($job)
+    {
+        return $this->call(function () use ($job) {
+            dispatch(is_string($job) ? resolve($job) : $job);
+        })->name(is_string($job) ? $job : get_class($job));
     }
 
     /**
