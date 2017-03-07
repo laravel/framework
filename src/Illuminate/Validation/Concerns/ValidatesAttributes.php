@@ -927,7 +927,8 @@ trait ValidatesAttributes
         }
 
         return $value->getPath() != ''
-            && (in_array($value->getMimeType(), $parameters) || in_array(explode("/", $value->getMimeType())[0] + '/*', $parameters));
+            && (in_array($value->getMimeType(), $parameters) 
+                || in_array(explode("/", $value->getMimeType())[0] + '/*', $parameters));
     }
 
     /**
