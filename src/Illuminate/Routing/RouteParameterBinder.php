@@ -90,10 +90,11 @@ class RouteParameterBinder
 
         $parameters = [];
 
-        foreach ($parameterNames as $value => $name) {
-            $name_without_key = preg_replace('/:\w+/', null, $name);
-            if (array_key_exists($name_without_key, $matches)) {
-                $parameters[$name] = $matches[$name_without_key];
+        foreach ($parameterNames as $parameter) {
+            $parameter = new RouteParameter($parameter);
+
+            if (array_key_exists($parameter->name(), $matches)) {
+                $parameters[$parameter->parameter()] = $matches[$parameter->name()];
             }
         }
 
