@@ -181,7 +181,8 @@ class ProviderRepository
      *
      * @param  array  $manifest
      * @return array
-     * @throws Exception
+     *
+     * @throws \Exception
      */
     public function writeManifest($manifest)
     {
