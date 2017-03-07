@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Routing;
 
-use Illuminate\Routing\RouteParameter;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Routing\RouteParameter;
 
 class RouteParameterTest extends TestCase
 {

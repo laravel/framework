@@ -22,7 +22,7 @@ class ImplicitRouteBinding
 
             foreach ($routeParameters as $routeParameter) {
                 if ($routeParameter->name() == $parameter->name &&
-                    !$route->parameter($parameter->name) instanceof Model
+                    ! $route->parameter($parameter->name) instanceof Model
                 ) {
                     $model = $container->make($class->name);
 
