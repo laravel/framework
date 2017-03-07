@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Routing\UrlGenerator as UrlGeneratorContract;
@@ -372,7 +373,7 @@ class UrlGenerator implements UrlGeneratorContract
                 isset($routeParameters[$index]) ? $routeParameters[$index] : $index
             );
             if ($value instanceof UrlRoutable) {
-                $parameters[$index] = method_exists($value, 'getAttribute')
+                $parameters[$index] = $value instanceof Model
                     ? $value->getAttribute($parameter->key() ?: $value->getRouteKeyName())
                     : $value->getRouteKey();
             }

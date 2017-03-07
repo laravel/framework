@@ -17,6 +17,7 @@
         "php": ">=7.0",
         "illuminate/container": "5.5.*",
         "illuminate/contracts": "5.5.*",
+        "illuminate/database": "5.5.*",
         "illuminate/http": "5.5.*",
         "illuminate/pipeline": "5.5.*",
         "illuminate/session": "5.5.*",
