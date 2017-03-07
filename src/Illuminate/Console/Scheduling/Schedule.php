@@ -57,7 +57,7 @@ class Schedule
      */
     public function job(ShouldQueue $job)
     {
-        return $this->call(function() use($job) {
+        return $this->call(function () use($job) {
             dispatch($job);
         })->name(get_class($job));
     }
