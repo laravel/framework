@@ -92,10 +92,15 @@ class VendorPublishCommand extends Command
             return $this->option('provider');
         }
 
-        return $this->choice(
+        $choice = $this->choice(
             "Which package's files would you like to publish?",
-            ServiceProvider::providersAvailableToPublish()
+            array_merge(
+                [$all = '<comment>Publish files from all packages listed below</comment>'],
+                ServiceProvider::providersAvailableToPublish()
+            )
         );
+
+        return $choice == $all ? null : $choice;
     }
 
     /**
