@@ -118,6 +118,11 @@ trait HasAttributes
                 continue;
             }
 
+            if (empty($attributes[$key])) {
+                $attributes[$key] = null;
+                continue;
+            }
+
             $attributes[$key] = $this->serializeDate(
                 $this->asDateTime($attributes[$key])
             );
