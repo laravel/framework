@@ -405,15 +405,15 @@ class Event
      */
     protected function emailOutput(Mailer $mailer, $addresses, $onlyIfOutputExists = false)
     {
-         try {
+        try {
             $text = file_get_contents($this->output);
-         } catch (Exception $e) {
+        } catch (Exception $e) {
             // "Only If Output Exists" should not care that a file might not exist
             // Keep existing behavior and rethrow exception for regular cases
             if (! $onlyIfOutputExists) {
-                 throw $e;  // rethrow it
+                throw $e;  // rethrow it
             }
-         }
+        }
 
         if ($onlyIfOutputExists && empty($text)) {
             return;
