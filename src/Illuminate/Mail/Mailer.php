@@ -428,8 +428,8 @@ class Mailer implements MailerContract, MailQueueContract
      */
     protected function sendSwiftMessage($message)
     {
-        if ($this->events) {
-            $this->events->dispatch(new Events\MessageSending($message));
+        if (! $this->shouldSendMessage($message)) {
+            return;
         }
 
         try {
@@ -437,6 +437,23 @@ class Mailer implements MailerContract, MailQueueContract
         } finally {
             $this->forceReconnection();
         }
+    }
+
+    /**
+     * Determines if the message can be sent.
+     *
+     * @param  \Swift_Message  $message
+     * @return bool
+     */
+    protected function shouldSendMessage($message)
+    {
+        if (! $this->events) {
+            return true;
+        }
+
+        return $this->events->until(
+            new Events\MessageSending($message)
+        ) !== false;
     }
 
     /**
