@@ -4,6 +4,7 @@ namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Console\Application;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Symfony\Component\Process\ProcessUtils;
 use Illuminate\Contracts\Cache\Repository as Cache;
 
@@ -46,6 +47,19 @@ class Schedule
         $this->events[] = $event = new CallbackEvent($this->cache, $callback, $parameters);
 
         return $event;
+    }
+
+    /**
+     * Add a new queued job callback event to the schedule.
+     *
+     * @param  \Illuminate\Contracts\Queue\ShouldQueue  $job
+     * @return \Illuminate\Console\Scheduling\Event
+     */
+    public function job(ShouldQueue $job)
+    {
+        return $this->call(function() use($job) {
+            dispatch($job);
+        })->name(get_class($job));
     }
 
     /**
