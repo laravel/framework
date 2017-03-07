@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation;
 
+use Exception;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 
 class ProviderRepository
@@ -181,12 +181,12 @@ class ProviderRepository
      *
      * @param  array  $manifest
      * @return array
-     * @throws FileNotFoundException
+     * @throws Exception
      */
     public function writeManifest($manifest)
     {
         if (! is_writable(dirname($this->manifestPath))) {
-            throw new FileNotFoundException('The bootstrap/cache directory must be present and writable.');
+            throw new Exception('The bootstrap/cache directory must be present and writable.');
         }
 
         $this->files->put(
