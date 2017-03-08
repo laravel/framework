@@ -108,10 +108,13 @@ class FileLoader implements LoaderInterface
      * @param  string  $group
      * @return array
      */
-    protected function loadPath($path, $locale, $group)
+    protected function loadPath($paths, $locale, $group)
     {
-        if ($this->files->exists($full = "{$path}/{$locale}/{$group}.php")) {
-            return $this->files->getRequire($full);
+        $paths = array_wrap($paths);
+        foreach ($paths as $path) {
+            if ($this->files->exists($full = "{$path}/{$locale}/{$group}.php")) {
+                return $this->files->getRequire($full);
+            }
         }
 
         return [];
@@ -124,10 +127,13 @@ class FileLoader implements LoaderInterface
      * @param  string  $locale
      * @return array
      */
-    protected function loadJsonPath($path, $locale)
+    protected function loadJsonPath($paths, $locale)
     {
-        if ($this->files->exists($full = "{$path}/{$locale}.json")) {
-            return json_decode($this->files->get($full), true);
+        $paths = array_wrap($paths);
+        foreach ($paths as $path) {
+            if ($this->files->exists($full = "{$path}/{$locale}.json")) {
+                return json_decode($this->files->get($full), true);
+            }
         }
 
         return [];
