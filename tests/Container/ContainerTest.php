@@ -773,7 +773,6 @@ class ContainerTest extends TestCase
         $this->assertEquals('taylor', $instance->name);
     }
 
-
     public function testResolvingWithArrayOfParameters()
     {
         $container = new Container;
@@ -790,7 +789,6 @@ class ContainerTest extends TestCase
         $this->assertEquals([1, 2, 3], $container->makeWith('foo', [1, 2, 3]));
     }
 
-
     public function testNestedParameterOverride()
     {
         $container = new Container;
@@ -803,7 +801,6 @@ class ContainerTest extends TestCase
 
         $this->assertEquals(['name' => 'Taylor'], $container->make('foo', ['something']));
     }
-
 
     public function testNestedParametersAreResetForFreshMake()
     {
