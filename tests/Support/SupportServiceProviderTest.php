@@ -22,14 +22,20 @@ class SupportServiceProviderTest extends TestCase
         m::close();
     }
 
-    public function testGetAvailableServiceProvidersToPublish()
+    public function testPublishableServiceProviders()
     {
-        $availableToPublish = ServiceProvider::providersAvailableToPublish();
+        $toPublish = ServiceProvider::publishableProviders();
         $expected = [
             'Illuminate\Tests\Support\ServiceProviderForTestingOne',
             'Illuminate\Tests\Support\ServiceProviderForTestingTwo',
         ];
-        $this->assertEquals($expected, $availableToPublish, 'Publishable service providers do not return expected set of providers.');
+        $this->assertEquals($expected, $toPublish, 'Publishable service providers do not return expected set of providers.');
+    }
+
+    public function testPublishableGroups()
+    {
+        $toPublish = ServiceProvider::publishableGroups();
+        $this->assertEquals(['some_tag'], $toPublish, 'Publishable groups do not return expected set of groups.');
     }
 
     public function testSimpleAssetsArePublishedCorrectly()

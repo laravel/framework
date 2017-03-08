@@ -169,9 +169,19 @@ abstract class ServiceProvider
      *
      * @return array
      */
-    public static function providersAvailableToPublish()
+    public static function publishableProviders()
     {
         return array_keys(static::$publishes);
+    }
+
+    /**
+     * Get the groups available for publishing.
+     *
+     * @return array
+     */
+    public static function publishableGroups()
+    {
+        return array_keys(static::$publishGroups);
     }
 
     /**
