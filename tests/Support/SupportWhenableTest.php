@@ -37,11 +37,11 @@ class SupportWhenableTest extends TestCase
             return $self->callDefault($method);
         });
 
-        $this->assertEquals($result, $method . '!');
+        $this->assertEquals($result, $method.'!');
     }
 
     public function callDefault($message)
     {
-        return $message . '!';
+        return $message.'!';
     }
 }
