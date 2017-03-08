@@ -313,11 +313,14 @@ trait ValidatesAttributes
      *
      * @param  string  $attribute
      * @param  mixed   $value
+     * @param  array   $parameters
      * @return bool
      */
-    protected function validateConfirmed($attribute, $value)
+    protected function validateConfirmed($attribute, $value, $parameters)
     {
-        return $this->validateSame($attribute, $value, [$attribute.'_confirmation']);
+        $confirmedField = (isset($parameters[0])) ? $parameters[0] : $attribute.'_confirmation';
+
+        return $this->validateSame($attribute, $value, [$confirmedField]);
     }
 
     /**
