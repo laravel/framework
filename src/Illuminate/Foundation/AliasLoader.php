@@ -88,9 +88,7 @@ class AliasLoader
      */
     protected function loadFacade($alias)
     {
-        tap($this->ensureFacadeExists($alias), function ($path) {
-            require $path;
-        });
+        require $this->ensureFacadeExists($alias);
     }
 
     /**
