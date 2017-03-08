@@ -773,7 +773,6 @@ class ContainerTest extends TestCase
         $this->assertEquals('taylor', $instance->name);
     }
 
-
     /**
      * @group shit
      */
@@ -792,7 +791,6 @@ class ContainerTest extends TestCase
 
         $this->assertEquals([1, 2, 3], $container->makeWith('foo', [1, 2, 3]));
     }
-
 
     public function testNestedParameterOverride()
     {
