@@ -11,13 +11,14 @@ use CachingIterator;
 use JsonSerializable;
 use IteratorAggregate;
 use InvalidArgumentException;
+use Illuminate\Support\Traits\Whenable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 
 class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate, Jsonable, JsonSerializable
 {
-    use Macroable;
+    use Macroable, Whenable;
 
     /**
      * The items contained in the collection.
@@ -306,25 +307,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         return new static(array_filter($this->items));
-    }
-
-    /**
-     * Apply the callback if the value is truthy.
-     *
-     * @param  bool  $value
-     * @param  callable  $callback
-     * @param  callable  $default
-     * @return mixed
-     */
-    public function when($value, callable $callback, callable $default = null)
-    {
-        if ($value) {
-            return $callback($this);
-        } elseif ($default) {
-            return $default($this);
-        }
-
-        return $this;
     }
 
     /**

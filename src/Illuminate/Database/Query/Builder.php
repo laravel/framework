@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Traits\Whenable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\ConnectionInterface;
@@ -22,6 +23,8 @@ class Builder
     use Macroable {
         __call as macroCall;
     }
+
+    use Whenable;
 
     /**
      * The database connection instance.
@@ -455,27 +458,6 @@ class Builder
         $this->joins[] = new JoinClause($this, 'cross', $table);
 
         return $this;
-    }
-
-    /**
-     * Apply the callback's query changes if the given "value" is true.
-     *
-     * @param  bool  $value
-     * @param  \Closure  $callback
-     * @param  \Closure  $default
-     * @return \Illuminate\Database\Query\Builder
-     */
-    public function when($value, $callback, $default = null)
-    {
-        $builder = $this;
-
-        if ($value) {
-            $builder = call_user_func($callback, $builder);
-        } elseif ($default) {
-            $builder = call_user_func($default, $builder);
-        }
-
-        return $builder;
     }
 
     /**
