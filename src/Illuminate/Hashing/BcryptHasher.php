@@ -84,7 +84,6 @@ class BcryptHasher implements HasherContract
      * Extract the cost value from the options array.
      *
      * @param  array  $options
-     *
      * @return int
      */
     protected function cost(array $options = [])
