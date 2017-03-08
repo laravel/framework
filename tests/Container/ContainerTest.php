@@ -774,9 +774,6 @@ class ContainerTest extends TestCase
     }
 
 
-    /**
-     * @group shit
-     */
     public function testResolvingWithArrayOfParameters()
     {
         $container = new Container;
@@ -805,6 +802,20 @@ class ContainerTest extends TestCase
         });
 
         $this->assertEquals(['name' => 'Taylor'], $container->make('foo', ['something']));
+    }
+
+
+    public function testNestedParametersAreResetForFreshMake()
+    {
+        $container = new Container;
+        $container->bind('foo', function ($app, $config) {
+            return $app->make('bar');
+        });
+        $container->bind('bar', function ($app, $config) {
+            return $config;
+        });
+
+        $this->assertEquals([], $container->makeWith('foo', ['something']));
     }
 }
 
