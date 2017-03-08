@@ -772,6 +772,40 @@ class ContainerTest extends TestCase
 
         $this->assertEquals('taylor', $instance->name);
     }
+
+
+    /**
+     * @group shit
+     */
+    public function testResolvingWithArrayOfParameters()
+    {
+        $container = new Container;
+        $instance = $container->makeWith(ContainerDefaultValueStub::class, ['default' => 'adam']);
+        $this->assertEquals('adam', $instance->default);
+
+        $instance = $container->make(ContainerDefaultValueStub::class);
+        $this->assertEquals('taylor', $instance->default);
+
+        $container->bind('foo', function ($app, $config) {
+            return $config;
+        });
+
+        $this->assertEquals([1, 2, 3], $container->makeWith('foo', [1, 2, 3]));
+    }
+
+
+    public function testNestedParameterOverride()
+    {
+        $container = new Container;
+        $container->bind('foo', function ($app, $config) {
+            return $app->makeWith('bar', ['name' => 'Taylor']);
+        });
+        $container->bind('bar', function ($app, $config) {
+            return $config;
+        });
+
+        $this->assertEquals(['name' => 'Taylor'], $container->make('foo', ['something']));
+    }
 }
 
 class ContainerConcreteStub

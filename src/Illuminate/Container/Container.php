@@ -83,6 +83,13 @@ class Container implements ArrayAccess, ContainerContract
     protected $buildStack = [];
 
     /**
+     * The parameter override stack.
+     *
+     * @var array
+     */
+    protected $with = [];
+
+    /**
      * The contextual binding map.
      *
      * @var array
@@ -538,6 +545,22 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
+     * Resolve the given type with the given parameter overrides.
+     *
+     * @param  string  $abstract
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function makeWith($abstract, array $parameters)
+    {
+        $this->with[] = $parameters;
+
+        return tap($this->make($abstract), function () {
+            array_pop($this->with);
+        });
+    }
+
+    /**
      * Resolve the given type from the container.
      *
      * @param  string  $abstract
@@ -675,7 +698,7 @@ class Container implements ArrayAccess, ContainerContract
         // hand back the results of the functions, which allows functions to be
         // used as resolvers for more fine-tuned resolution of these objects.
         if ($concrete instanceof Closure) {
-            return $concrete($this);
+            return $concrete($this, last($this->with) ?: []);
         }
 
         $reflector = new ReflectionClass($concrete);
@@ -725,6 +748,15 @@ class Container implements ArrayAccess, ContainerContract
         $results = [];
 
         foreach ($dependencies as $dependency) {
+            // If this dependency has a override for this particular build we will use
+            // that instead as the value. Otherwise, we will continue with this run
+            // of resolutions and let reflection attempt to determine the result.
+            if ($this->hasParameterOverride($dependency)) {
+                $results[] = $this->getParameterOverride($dependency);
+
+                continue;
+            }
+
             // If the class is null, it means the dependency is a string or some other
             // primitive type which we can not resolve since it is not a class and
             // we will just bomb out with an error since we have no-where to go.
@@ -734,6 +766,28 @@ class Container implements ArrayAccess, ContainerContract
         }
 
         return $results;
+    }
+
+    /**
+     * Determine if the given dependency has a parameter override from makeWith.
+     *
+     * @param  \ReflectionParameter  $dependency
+     * @return bool
+     */
+    protected function hasParameterOverride($dependency)
+    {
+        return array_key_exists($dependency->name, last($this->with) ?: []);
+    }
+
+    /**
+     * Get a parameter override for a dependency.
+     *
+     * @param  \ReflectionParameter  $dependency
+     * @return mixed
+     */
+    protected function getParameterOverride($dependency)
+    {
+        return last($this->with)[$dependency->name];
     }
 
     /**
