@@ -101,9 +101,9 @@ class FileLoader implements LoaderInterface
     }
 
     /**
-     * Load a locale from a given path.
+     * Load a locale from a given paths.
      *
-     * @param  string  $path
+     * @param  array  $paths
      * @param  string  $locale
      * @param  string  $group
      * @return array
@@ -121,9 +121,9 @@ class FileLoader implements LoaderInterface
     }
 
     /**
-     * Load a locale from the given JSON file path.
+     * Load a locale from the given JSON file paths.
      *
-     * @param  string  $path
+     * @param  array  $paths
      * @param  string  $locale
      * @return array
      */
