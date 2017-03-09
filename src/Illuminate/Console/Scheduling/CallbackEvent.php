@@ -26,14 +26,14 @@ class CallbackEvent extends Event
     /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Contracts\Cache\Repository  $cache
+     * @param  OverlappingStrategy $overlappingStrategy
      * @param  string  $callback
      * @param  array  $parameters
      * @return void
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(Cache $cache, $callback, array $parameters = [])
+    public function __construct(OverlappingStrategy $overlappingStrategy, $callback, array $parameters = [])
     {
         if (! is_string($callback) && ! is_callable($callback)) {
             throw new InvalidArgumentException(
@@ -41,7 +41,7 @@ class CallbackEvent extends Event
             );
         }
 
-        $this->cache = $cache;
+        $this->overlappingStrategy = $overlappingStrategy;
         $this->callback = $callback;
         $this->parameters = $parameters;
     }
@@ -57,7 +57,7 @@ class CallbackEvent extends Event
     public function run(Container $container)
     {
         if ($this->description) {
-            $this->cache->put($this->mutexName(), true, 1440);
+            $this->overlappingStrategy->prevent($this);
         }
 
         try {
@@ -79,7 +79,7 @@ class CallbackEvent extends Event
     protected function removeMutex()
     {
         if ($this->description) {
-            $this->cache->forget($this->mutexName());
+            $this->overlappingStrategy->reset($this);
         }
     }
 
@@ -99,7 +99,7 @@ class CallbackEvent extends Event
         }
 
         return $this->skip(function () {
-            return $this->cache->has($this->mutexName());
+            return $this->overlappingStrategy->overlaps($this);
         });
     }
 

@@ -10,18 +10,17 @@ use Illuminate\Contracts\Mail\Mailer;
 use Symfony\Component\Process\Process;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Container\Container;
-use Illuminate\Contracts\Cache\Repository as Cache;
 
 class Event
 {
     use Macroable, ManagesFrequencies;
 
     /**
-     * The cache store implementation.
+     * The overlapping strategy implementation.
      *
-     * @var \Illuminate\Contracts\Cache\Repository
+     * @var OverlappingStrategy
      */
-    protected $cache;
+    protected $overlappingStrategy;
 
     /**
      * The command string.
@@ -131,13 +130,13 @@ class Event
     /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Contracts\Cache\Repository  $cache
+     * @param  OverlappingStrategy $overlappingStrategy
      * @param  string  $command
      * @return void
      */
-    public function __construct(Cache $cache, $command)
+    public function __construct(OverlappingStrategy $overlappingStrategy, $command)
     {
-        $this->cache = $cache;
+        $this->overlappingStrategy = $overlappingStrategy;
         $this->command = $command;
         $this->output = $this->getDefaultOutput();
     }
@@ -161,7 +160,7 @@ class Event
     public function run(Container $container)
     {
         if ($this->withoutOverlapping) {
-            $this->cache->put($this->mutexName(), true, 1440);
+            $this->overlappingStrategy->prevent($this);
         }
 
         $this->runInBackground
@@ -516,9 +515,9 @@ class Event
         $this->withoutOverlapping = true;
 
         return $this->then(function () {
-            $this->cache->forget($this->mutexName());
+            $this->overlappingStrategy->reset($this);
         })->skip(function () {
-            return $this->cache->has($this->mutexName());
+            return $this->overlappingStrategy->overlaps($this);
         });
     }
 
