@@ -145,7 +145,9 @@ class Pipeline implements PipelineContract
                     $parameters = [$passable, $stack];
                 }
 
-                return method_exists($pipe, $this->method) ? $pipe->{$this->method}(...$parameters) : $pipe(...$parameters);
+                return method_exists($pipe, $this->method)
+                                ? $pipe->{$this->method}(...$parameters)
+                                : $pipe(...$parameters);
             };
         };
     }
