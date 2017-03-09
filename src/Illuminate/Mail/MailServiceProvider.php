@@ -121,10 +121,10 @@ class MailServiceProvider extends ServiceProvider
             ], 'laravel-mail');
         }
 
-        $this->app->singleton(Markdown::class, function () {
-            $config = $this->app->make('config');
+        $this->app->singleton(Markdown::class, function ($app) {
+            $config = $app->make('config');
 
-            return new Markdown($this->app->make('view'), [
+            return new Markdown($app->make('view'), [
                 'theme' => $config->get('mail.markdown.theme', 'default'),
                 'paths' => $config->get('mail.markdown.paths', []),
             ]);
