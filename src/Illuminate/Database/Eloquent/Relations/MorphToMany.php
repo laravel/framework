@@ -46,7 +46,8 @@ class MorphToMany extends BelongsToMany
      * @param  bool  $inverse
      * @return void
      */
-    public function __construct(Builder $query, Model $parent, $name, $table, $foreignKey, $relatedKey, $parentKey, $localKey, $relationName = null, $inverse = false)
+    public function __construct(Builder $query, Model $parent, $name, $table, $foreignKey,
+                                $relatedKey, $parentKey, $localKey, $relationName = null, $inverse = false)
     {
         $this->inverse = $inverse;
         $this->morphType = $name.'_type';
