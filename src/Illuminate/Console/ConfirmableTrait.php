@@ -27,7 +27,6 @@ trait ConfirmableTrait
             }
 
             $this->alert($warning);
-            $this->output->writeln('');
 
             $confirmed = $this->confirm('Do you really wish to run this command?');
 
