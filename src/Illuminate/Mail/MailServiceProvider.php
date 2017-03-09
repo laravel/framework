@@ -122,9 +122,11 @@ class MailServiceProvider extends ServiceProvider
         }
 
         $this->app->singleton(Markdown::class, function () {
+            $config = $this->app->make('config');
+
             return new Markdown($this->app->make('view'), [
-                'theme' => config('mail.markdown.theme', 'default'),
-                'paths' => config('mail.markdown.paths', []),
+                'theme' => $config->get('mail.markdown.theme', 'default'),
+                'paths' => $config->get('mail.markdown.paths', []),
             ]);
         });
     }
