@@ -90,7 +90,7 @@ class VendorPublishCommand extends Command
         }
 
         [$this->provider, $this->tags] = [
-            $this->option('provider'), (array) $this->option('tag')
+            $this->option('provider'), (array) $this->option('tag'),
         ];
 
         if (! $this->provider && ! $this->tags) {
