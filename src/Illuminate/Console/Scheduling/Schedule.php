@@ -67,6 +67,19 @@ class Schedule
     }
 
     /**
+     * Add a new job callback event to the schedule.
+     *
+     * @param  object|string  $job
+     * @return \Illuminate\Console\Scheduling\Event
+     */
+    public function job($job)
+    {
+        return $this->call(function () use ($job) {
+            dispatch(is_string($job) ? resolve($job) : $job);
+        })->name(is_string($job) ? $job : get_class($job));
+    }
+
+    /**
      * Add a new command event to the schedule.
      *
      * @param  string  $command

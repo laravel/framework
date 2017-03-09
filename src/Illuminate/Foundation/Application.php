@@ -519,7 +519,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function runningInConsole()
     {
-        return php_sapi_name() == 'cli';
+        return php_sapi_name() == 'cli' || php_sapi_name() == 'phpdbg';
     }
 
     /**
