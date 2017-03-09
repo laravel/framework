@@ -578,7 +578,7 @@ class Container implements ArrayAccess, ContainerContract
     {
         $this->with[] = $parameters;
 
-        $needsContextualBuild = ! is_null(
+        $needsContextualBuild = ! empty($parameters) || ! is_null(
             $this->getContextualConcrete($abstract = $this->getAlias($abstract))
         );
 
