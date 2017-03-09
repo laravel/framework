@@ -816,6 +816,19 @@ class ContainerTest extends TestCase
 
         $this->assertEquals([], $container->makeWith('foo', ['something']));
     }
+
+
+    public function testSingletonBindingsNotRespectedWithMakeParameters()
+    {
+        $container = new Container;
+
+        $container->singleton('foo', function ($app, $config) {
+            return $config;
+        });
+
+        $this->assertEquals(['name' => 'taylor'], $container->makeWith('foo', ['name' => 'taylor']));
+        $this->assertEquals(['name' => 'abigail'], $container->makeWith('foo', ['name' => 'abigail']));
+    }
 }
 
 class ContainerConcreteStub

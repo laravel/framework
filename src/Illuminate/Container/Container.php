@@ -713,7 +713,7 @@ class Container implements ArrayAccess, ContainerContract
         // hand back the results of the functions, which allows functions to be
         // used as resolvers for more fine-tuned resolution of these objects.
         if ($concrete instanceof Closure) {
-            return $concrete($this, last($this->with));
+            return $concrete($this, end($this->with));
         }
 
         $reflector = new ReflectionClass($concrete);
@@ -791,7 +791,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function hasParameterOverride($dependency)
     {
-        return array_key_exists($dependency->name, last($this->with));
+        return array_key_exists($dependency->name, end($this->with));
     }
 
     /**
@@ -802,7 +802,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function getParameterOverride($dependency)
     {
-        return last($this->with)[$dependency->name];
+        return end($this->with)[$dependency->name];
     }
 
     /**
