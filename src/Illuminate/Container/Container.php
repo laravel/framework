@@ -553,11 +553,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function makeWith($abstract, array $parameters)
     {
-        $this->with[] = $parameters;
-
-        return tap($this->make($abstract), function () {
-            array_pop($this->with);
-        });
+        return $this->resolve($abstract, $parameters);
     }
 
     /**
@@ -568,6 +564,20 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function make($abstract)
     {
+        return $this->resolve($abstract);
+    }
+
+    /**
+     * Resolve the given type from the container.
+     *
+     * @param  string  $abstract
+     * @param  array  $parameters
+     * @return mixed
+     */
+    protected function resolve($abstract, $parameters = [])
+    {
+        $this->with[] = $parameters;
+
         $needsContextualBuild = ! is_null(
             $this->getContextualConcrete($abstract = $this->getAlias($abstract))
         );
@@ -607,6 +617,8 @@ class Container implements ArrayAccess, ContainerContract
         $this->fireResolvingCallbacks($abstract, $object);
 
         $this->resolved[$abstract] = true;
+
+        array_pop($this->with);
 
         return $object;
     }

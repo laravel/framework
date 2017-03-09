@@ -805,9 +805,11 @@ class ContainerTest extends TestCase
     public function testNestedParametersAreResetForFreshMake()
     {
         $container = new Container;
+
         $container->bind('foo', function ($app, $config) {
             return $app->make('bar');
         });
+
         $container->bind('bar', function ($app, $config) {
             return $config;
         });
