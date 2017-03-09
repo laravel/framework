@@ -82,7 +82,7 @@ class NotificationSender
             if (empty($viaChannels = $channels ?: $notification->via($notifiable))) {
                 continue;
             }
-            
+
             $notificationId = Uuid::uuid4()->toString();
 
             foreach ($viaChannels as $channel) {
