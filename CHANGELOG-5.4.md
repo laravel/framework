@@ -1,5 +1,23 @@
 # Release Notes for 5.4.x
 
+## [Unreleased]
+
+### Added
+- Added PHPDBG detection to `runningInConsole()` ([#18198](https://github.com/laravel/framework/pull/18198))
+- Added `Arr:wrap()` method ([#18216](https://github.com/laravel/framework/pull/18216))
+- Allow scheduling of queued jobs ([#18235](https://github.com/laravel/framework/pull/18235), [7bb67e2](https://github.com/laravel/framework/commit/7bb67e225646fb578c039cc0af130f7aa6858120))
+- Allow skipping mail sending if a listener to `MessageSending` returns `false` ([#18245](https://github.com/laravel/framework/pull/18245))
+- Added `BcryptHasher::cost()` method ([#18266](https://github.com/laravel/framework/pull/18266))
+
+### Changed
+- Throw exception when `bootstrap/cache` directory is not writable ([#18188](https://github.com/laravel/framework/pull/18188), [b4f0005](https://github.com/laravel/framework/commit/b4f000516166b0694e842d64f5b2fde1167d4690))
+- Use `resource_path()` helper in `MakeAuthCommand` ([#18215](https://github.com/laravel/framework/pull/18215))
+- Added `file_exists()` check to `Event::emailOutput()` ([c8eafa8](https://github.com/laravel/framework/commit/c8eafa8e6741dc5add4c5030aa7362744dcdab29))
+
+### Fixed
+- Fixed an issue with slots when passed content equals `null` ([#18246](https://github.com/laravel/framework/pull/18246))
+
+
 ## v5.4.15 (2017-03-02)
 
 ### Added
