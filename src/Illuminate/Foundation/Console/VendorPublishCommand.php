@@ -69,11 +69,9 @@ class VendorPublishCommand extends Command
      */
     public function fire()
     {
-        $this->setProviderOrTagsToPublish();
+        $this->determineWhatShouldBePublished();
 
-        $tags = $this->tags ?: [null];
-
-        foreach ($tags as $tag) {
+        foreach ($this->tags ?: [null] as $tag) {
             $this->publishTag($tag);
         }
 
@@ -85,21 +83,19 @@ class VendorPublishCommand extends Command
      *
      * @return void
      */
-    protected function setProviderOrTagsToPublish()
+    protected function determineWhatShouldBePublished()
     {
         if ($this->option('all')) {
             return;
         }
 
-        $this->provider = $this->option('provider');
+        [$this->provider, $this->tags] = [
+            $this->option('provider'), (array) $this->option('tag')
+        ];
 
-        $this->tags = (array) $this->option('tag');
-
-        if ($this->provider || $this->tags) {
-            return;
+        if (! $this->provider && ! $this->tags) {
+            $this->promptForProviderOrTag();
         }
-
-        $this->promptForProviderOrTag();
     }
 
     /**
