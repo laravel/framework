@@ -479,12 +479,13 @@ class Builder
     }
 
     /**
-     * Pass the query to a given callback
+     * Pass the query to a given callback.
      * 
      * @param  \Closure  $callback
      * @return \Illuminate\Database\Query\Builder
      */
-    public function tap($callback) {
+    public function tap($callback)
+    {
         return $this->when(true, $callback);
     }
 
