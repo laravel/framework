@@ -574,9 +574,9 @@ trait HasAttributes
                 $attributeCount = count($attributes);
                 $object = $this->castToClass($attribute);
 
-                $castedAttributes = method_exists($object, '__toString')
-                    ? (string) $object
-                    : $this->{'castFrom'.Str::studly($type)}($object);
+                $castedAttributes = method_exists($this, 'castFrom'.Str::studly($type))
+                    ? $this->{'castFrom'.Str::studly($type)}($object)
+                    : $object->__toString();
 
                 if ($attributeCount !== count($castedAttributes)) {
                     throw new LogicException("Class cast {$attribute} must return {$attributeCount} attributes");
