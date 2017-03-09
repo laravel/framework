@@ -1976,10 +1976,10 @@ class ValidationValidatorTest extends TestCase
 
         $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension'])->setConstructorArgs($uploadedFile)->getMock();
         $file->expects($this->any())->method('guessExtension')->will($this->returnValue('php'));
-        
+
         $v = new Validator($trans, ['x' => $file], ['x' => 'mimetypes:text/x-php']);
         $this->assertTrue($v->passes());
-        
+
         $v = new Validator($trans, ['x' => $file], ['x' => 'mimetypes:text/*']);
         $this->assertTrue($v->passes());
     }
