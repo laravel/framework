@@ -5,7 +5,6 @@ namespace Illuminate\Console\Scheduling;
 use LogicException;
 use InvalidArgumentException;
 use Illuminate\Contracts\Container\Container;
-use Illuminate\Contracts\Cache\Repository as Cache;
 
 class CallbackEvent extends Event
 {

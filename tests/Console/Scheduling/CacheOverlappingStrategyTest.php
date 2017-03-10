@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Console\Scheduling;
 
-use Illuminate\Console\Scheduling\CacheOverlappingStrategy;
-use Illuminate\Console\Scheduling\Event;
-use PHPUnit\Framework\TestCase;
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use Illuminate\Console\Scheduling\Event;
+use Illuminate\Console\Scheduling\CacheOverlappingStrategy;
 
 class CacheOverlappingStrategyTest extends TestCase
 {

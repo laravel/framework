@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Console;
 
-use Illuminate\Container\Container;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Console\Scheduling\Schedule;

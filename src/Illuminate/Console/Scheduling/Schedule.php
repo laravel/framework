@@ -32,7 +32,7 @@ class Schedule
     {
         $container = Container::getInstance();
 
-        if (!$container->bound(OverlappingStrategy::class)) {
+        if (! $container->bound(OverlappingStrategy::class)) {
             $this->overlappingStrategy = $container->make(CacheOverlappingStrategy::class);
         } else {
             $this->overlappingStrategy = $container->make(OverlappingStrategy::class);
