@@ -40,8 +40,9 @@ class FileFactory
      */
     protected function generateImage($width, $height)
     {
-        return tap(tmpfile(), function ($temp) use ($width, $height) {
-            imagepng(imagecreatetruecolor($width, $height), $temp);
-        });
+        $path = tempnam(sys_get_temp_dir(), 'kys');
+        imagepng(imagecreatetruecolor($width, $height), $path);
+
+        return fopen($path, 'r+');
     }
 }
