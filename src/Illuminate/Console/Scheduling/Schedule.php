@@ -5,7 +5,6 @@ namespace Illuminate\Console\Scheduling;
 use Illuminate\Console\Application;
 use Illuminate\Container\Container;
 use Symfony\Component\Process\ProcessUtils;
-use Illuminate\Contracts\Cache\Repository as Cache;
 
 class Schedule
 {
