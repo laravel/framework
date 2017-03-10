@@ -1436,6 +1436,19 @@ class Builder
     }
 
     /**
+     * Add a descending "order by" clause to the query.
+     *
+     * @param  string  $column
+     * @return $this
+     */
+    public function orderByDesc($column)
+    {
+        $this->orderBy($column, 'desc');
+
+        return $this;
+    }
+
+    /**
      * Add an "order by" clause for a timestamp to the query.
      *
      * @param  string  $column
