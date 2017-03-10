@@ -320,7 +320,7 @@ class Arr
      */
     public static function isAssoc(array $array)
     {
-		return (array_values($array) !== $array);
+        return array_values($array) !== $array;
     }
 
     /**
