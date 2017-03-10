@@ -16,7 +16,7 @@ class FrequencyTest extends TestCase
     public function setUp()
     {
         $this->event = new Event(
-            m::mock('Illuminate\Contracts\Cache\Repository'),
+            m::mock('Illuminate\Console\Scheduling\OverlappingStrategy'),
             'php foo'
         );
     }
