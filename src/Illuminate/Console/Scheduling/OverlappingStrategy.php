@@ -7,7 +7,7 @@ interface OverlappingStrategy
     /**
      * prevents overlapping for the given event
      *
-     * @param Event $event
+     * @param  Event $event
      * @return void
      */
     public function prevent(Event $event);
@@ -15,7 +15,7 @@ interface OverlappingStrategy
     /**
      * checks if the given event's command is already running
      *
-     * @param Event $event
+     * @param  Event $event
      * @return bool
      */
     public function overlaps(Event $event);
@@ -23,7 +23,7 @@ interface OverlappingStrategy
     /**
      * resets the overlapping strategy for the given event
      *
-     * @param Event $event
+     * @param  Event $event
      * @return void
      */
     public function reset(Event $event);
