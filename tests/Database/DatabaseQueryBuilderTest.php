@@ -636,6 +636,10 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->orderBy('email')->orderByRaw('"age" ? desc', ['foo']);
         $this->assertEquals('select * from "users" order by "email" asc, "age" ? desc', $builder->toSql());
         $this->assertEquals(['foo'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orderByDesc('name');
+        $this->assertEquals('select * from "users" order by "name" desc', $builder->toSql());
     }
 
     public function testHavings()
