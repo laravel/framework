@@ -178,6 +178,22 @@ abstract class Relation
     }
 
     /**
+     * Add the constraints for a relationship aggregate query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
+     * @param  string  $type
+     * @param  string  $column
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function getRelationExistenceAggregateQuery(Builder $query, Builder $parentQuery, $type, $column)
+    {
+        return $this->getRelationExistenceQuery(
+            $query, $parentQuery, new Expression("$type(`$column`)")
+        );
+    }
+
+    /**
      * Add the constraints for an internal relationship existence query.
      *
      * Essentially, these queries compare on column names like whereColumn.
