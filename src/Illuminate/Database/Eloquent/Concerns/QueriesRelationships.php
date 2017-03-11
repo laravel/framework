@@ -156,6 +156,7 @@ trait QueriesRelationships
     public function withCount($relations)
     {
         $relations = is_array($relations) ? $relations : func_get_args();
+
         return $this->withAggregate($relations);
     }
 
@@ -168,6 +169,7 @@ trait QueriesRelationships
     public function withSum($relations)
     {
         $relations = is_array($relations) ? $relations : func_get_args();
+
         return $this->withAggregate($relations, 'SUM');
     }
 
@@ -180,6 +182,7 @@ trait QueriesRelationships
     public function withMax($relations)
     {
         $relations = is_array($relations) ? $relations : func_get_args();
+
         return $this->withAggregate($relations, 'MAX');
     }
 
@@ -192,6 +195,7 @@ trait QueriesRelationships
     public function withMin($relations)
     {
         $relations = is_array($relations) ? $relations : func_get_args();
+
         return $this->withAggregate($relations, 'MIN');
     }
 
@@ -204,6 +208,7 @@ trait QueriesRelationships
     public function withAvg($relations)
     {
         $relations = is_array($relations) ? $relations : func_get_args();
+
         return $this->withAggregate($relations, 'AVG');
     }
 
@@ -234,7 +239,7 @@ trait QueriesRelationships
 
             $column = 'id';
 
-            if(strpos($name, '|') !== false) {
+            if (strpos($name, '|') !== false) {
                 list($name, $column) = explode('|', $name);
             }
 
