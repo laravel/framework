@@ -26,7 +26,7 @@ class ImplicitRouteBinding
                 $parameterName = array_key_exists($parameter->name, $parameters) ? $parameter->name : null;
 
                 // check if parameter name used was camelized in routed callback method
-                if (!$parameterName) {
+                if (! $parameterName) {
                     $snakeParamName = snake_case($parameter->name);
                     $parameterName = array_key_exists($snakeParamName, $parameters) ? $snakeParamName : null;
                 }
