@@ -20,17 +20,21 @@ class ImplicitRouteBinding
         foreach ($route->signatureParameters(Model::class) as $parameter) {
             $class = $parameter->getClass();
 
-            if (array_key_exists($parameter->name, $parameters) &&
-                ! $route->parameter($parameter->name) instanceof Model) {
-                $method = $parameter->isDefaultValueAvailable() ? 'first' : 'firstOrFail';
-
+            if (! $route->parameter($parameter->name) instanceof Model) {
                 $model = $container->make($class->name);
 
-                $route->setParameter(
-                    $parameter->name, $model->where(
-                        $model->getRouteKeyName(), $parameters[$parameter->name]
-                    )->{$method}()
-                );
+                $parameterName = array_key_exists($parameter->name, $parameters) ? $parameter->name : null;
+
+                // check if parameter name used was camelized in routed callback method
+                if (!$parameterName) {
+                    $snakeParamName = snake_case($parameter->name);
+                    $parameterName = array_key_exists($snakeParamName, $parameters) ? $snakeParamName : null;
+                }
+
+                if ($parameterName) {
+                    $value = $model->where($model->getRouteKeyName(), $parameters[$parameterName])->firstOrFail();
+                    $route->setParameter($parameterName, $value);
+                }
             }
         }
     }
