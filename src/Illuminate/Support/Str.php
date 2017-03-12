@@ -277,8 +277,26 @@ class Str
      */
     public static function replaceArray($search, array $replace, $subject)
     {
-        foreach ($replace as $value) {
-            $subject = static::replaceFirst($search, $value, $subject);
+        if ($search === '') {
+            return $subject;
+        }
+        $positions = [];
+        $offset = 0;
+        do {
+            $position = strpos($subject, $search, $offset);
+            if ($position === false) {
+                break;
+            }
+            $positions[] = $position;
+            $offset = $position + strlen($search);
+        } while (true);
+
+        array_splice($positions, count($replace));
+        array_splice($replace, count($positions));
+        $positions = array_reverse($positions);
+        $replace = array_reverse($replace);
+        foreach ($positions as $index => $position) {
+            $subject = substr_replace($subject, $replace[$index], $position, strlen($search));
         }
 
         return $subject;
