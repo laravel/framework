@@ -225,6 +225,9 @@ trait QueriesRelationships
             $this->query->select([$this->query->from.'.*']);
         }
 
+        // set to lower
+        $function = Str::lower($function);
+
         foreach ($this->parseWithRelations($relations) as $name => $constraints) {
             // First we will determine if the name has been aliased using an "as" clause on the name
             // and if it has we will extract the actual relationship name and the desired name of
@@ -250,7 +253,7 @@ trait QueriesRelationships
             // as a sub-select. First, we'll get the "has" query and use that to get the relation
             // count query. We will normalize the relation name then append _count as the name.
             $query = $relation->getRelationExistenceAggregateQuery(
-                $relation->getRelated()->newQuery(), $this, Str::upper($function), $column
+                $relation->getRelated()->newQuery(), $this, $function, $column
             );
 
             $query->callScope($constraints);
@@ -260,7 +263,7 @@ trait QueriesRelationships
             // Finally we will add the proper result column alias to the query and run the subselect
             // statement against the query builder. Then we will return the builder instance back
             // to the developer for further constraint chaining that needs to take place on it.
-            $column = snake_case(isset($alias) ? $alias : $name).'_'.Str::lower($function);
+            $column = snake_case(isset($alias) ? $alias : $name).'_'.$function;
 
             $this->selectSub($query->toBase(), $column);
         }
