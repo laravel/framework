@@ -298,6 +298,20 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
+	 * If the data does not pass the validation rules, throw an exception.
+	 *
+	 * @param  string  $message
+	 * @return void
+	 * @throws \Illuminate\Validation\ValidationException
+	 */
+	public function passOrFail($message = null)
+	{
+		if ($this->passes()) return;
+
+		throw new ValidationException($this, $message);
+	}
+
+	/**
 	 * Validate a given attribute against a rule.
 	 *
 	 * @param  string  $attribute

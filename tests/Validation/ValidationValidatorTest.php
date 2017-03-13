@@ -1387,6 +1387,26 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testPassOrFailThrowsException()
+	{
+		try
+		{
+			$trans = $this->getRealTranslator();
+			$v = new Validator($trans, ['bar' => 'baz'], ['foo' => ['required']]);
+			$v->passOrFail();
+		}
+		catch (\Illuminate\Validation\ValidationException $e)
+		{
+			$this->assertEquals($v->getData(), $e->getData());
+			$this->assertEquals($v->getRules(), $e->getRules());
+			$this->assertEquals($v->getMessageBag(), $e->getMessageBag());
+			return;
+		}
+
+		$this->fail('ValidationException was not thrown');
+	}
+
+
 	protected function getTranslator()
 	{
 		return m::mock('Symfony\Component\Translation\TranslatorInterface');
