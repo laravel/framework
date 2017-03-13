@@ -772,6 +772,62 @@ class ContainerTest extends TestCase
 
         $this->assertEquals('taylor', $instance->name);
     }
+
+    public function testResolvingWithArrayOfParameters()
+    {
+        $container = new Container;
+        $instance = $container->makeWith(ContainerDefaultValueStub::class, ['default' => 'adam']);
+        $this->assertEquals('adam', $instance->default);
+
+        $instance = $container->make(ContainerDefaultValueStub::class);
+        $this->assertEquals('taylor', $instance->default);
+
+        $container->bind('foo', function ($app, $config) {
+            return $config;
+        });
+
+        $this->assertEquals([1, 2, 3], $container->makeWith('foo', [1, 2, 3]));
+    }
+
+    public function testNestedParameterOverride()
+    {
+        $container = new Container;
+        $container->bind('foo', function ($app, $config) {
+            return $app->makeWith('bar', ['name' => 'Taylor']);
+        });
+        $container->bind('bar', function ($app, $config) {
+            return $config;
+        });
+
+        $this->assertEquals(['name' => 'Taylor'], $container->make('foo', ['something']));
+    }
+
+    public function testNestedParametersAreResetForFreshMake()
+    {
+        $container = new Container;
+
+        $container->bind('foo', function ($app, $config) {
+            return $app->make('bar');
+        });
+
+        $container->bind('bar', function ($app, $config) {
+            return $config;
+        });
+
+        $this->assertEquals([], $container->makeWith('foo', ['something']));
+    }
+
+    public function testSingletonBindingsNotRespectedWithMakeParameters()
+    {
+        $container = new Container;
+
+        $container->singleton('foo', function ($app, $config) {
+            return $config;
+        });
+
+        $this->assertEquals(['name' => 'taylor'], $container->makeWith('foo', ['name' => 'taylor']));
+        $this->assertEquals(['name' => 'abigail'], $container->makeWith('foo', ['name' => 'abigail']));
+    }
 }
 
 class ContainerConcreteStub
