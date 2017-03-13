@@ -132,8 +132,8 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $builder->shouldReceive('count')->andReturn($countResult);
 
         $this->connection->shouldReceive('table')
-           ->with($this->table)
-           ->andReturn($builder);
+            ->with($this->table)
+            ->andReturn($builder);
 
         return $builder;
     }
