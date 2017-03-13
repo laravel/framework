@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
+use Illuminate\Foundation\Testing\Constraints\HasSoftDeletedInDatabase;
 use PHPUnit_Framework_Constraint_Not as ReverseConstraint;
 use Illuminate\Foundation\Testing\Constraints\HasInDatabase;
 
@@ -39,6 +40,23 @@ trait InteractsWithDatabase
         );
 
         $this->assertThat($table, $constraint);
+
+        return $this;
+    }
+
+    /**
+     * Assert that a given where condition exists in the database.
+     *
+     * @param  string  $table
+     * @param  array  $data
+     * @param  string  $connection
+     * @return $this
+     */
+    protected function assertDatabaseHasSoftDelete($table, array $data, $connection = null)
+    {
+        $this->assertThat(
+            $table, new HasSoftDeletedInDatabase($this->getConnection($connection), $data)
+        );
 
         return $this;
     }
