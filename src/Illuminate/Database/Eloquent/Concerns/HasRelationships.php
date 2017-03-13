@@ -2,8 +2,10 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Setter;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -47,12 +49,22 @@ trait HasRelationships
      * Define a one-to-one relationship.
      *
      * @param  string  $related
-     * @param  string  $foreignKey
+     * @param  string|Closure  $foreignKey
      * @param  string  $localKey
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function hasOne($related, $foreignKey = null, $localKey = null)
     {
+        // If the second argument is a Closure, we will ignore other arguments
+        // and set up the relationship with values provided in the Closure.
+        if ($foreignKey instanceof Closure) {
+            $setter = new Setter(['foreignKey', 'localKey']);
+
+            call_user_func($foreignKey, $setter);
+
+            extract($setter->retrieve());
+        }
+
         $instance = $this->newRelatedInstance($related);
 
         $foreignKey = $foreignKey ?: $this->getForeignKey();
@@ -67,13 +79,23 @@ trait HasRelationships
      *
      * @param  string  $related
      * @param  string  $name
-     * @param  string  $type
+     * @param  string|Closure  $type
      * @param  string  $id
      * @param  string  $localKey
      * @return \Illuminate\Database\Eloquent\Relations\MorphOne
      */
     public function morphOne($related, $name, $type = null, $id = null, $localKey = null)
     {
+        // If the second argument is a Closure, we will ignore other arguments
+        // and set up the relationship with values provided in the Closure.
+        if ($type instanceof Closure) {
+            $setter = new Setter(['type', 'id', 'localKey']);
+
+            call_user_func($type, $setter);
+
+            extract($setter->retrieve());
+        }
+
         $instance = $this->newRelatedInstance($related);
 
         list($type, $id) = $this->getMorphs($name, $type, $id);
@@ -89,13 +111,23 @@ trait HasRelationships
      * Define an inverse one-to-one or many relationship.
      *
      * @param  string  $related
-     * @param  string  $foreignKey
+     * @param  string|Closure  $foreignKey
      * @param  string  $ownerKey
      * @param  string  $relation
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function belongsTo($related, $foreignKey = null, $ownerKey = null, $relation = null)
     {
+        // If the second argument is a Closure, we will ignore other arguments
+        // and set up the relationship with values provided in the Closure.
+        if ($foreignKey instanceof Closure) {
+            $setter = new Setter(['foreignKey', 'ownerKey', 'relation']);
+
+            call_user_func($foreignKey, $setter);
+
+            extract($setter->retrieve());
+        }
+
         // If no relation name was given, we will use this debug backtrace to extract
         // the calling method's name and use that as the relationship name as most
         // of the time this will be what we desire to use for the relationships.
@@ -125,13 +157,23 @@ trait HasRelationships
     /**
      * Define a polymorphic, inverse one-to-one or many relationship.
      *
-     * @param  string  $name
+     * @param  string|Closure  $name
      * @param  string  $type
      * @param  string  $id
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
     public function morphTo($name = null, $type = null, $id = null)
     {
+        // If the second argument is a Closure, we will ignore other arguments
+        // and set up the relationship with values provided in the Closure.
+        if ($name instanceof Closure) {
+            $setter = new Setter(['name', 'type', 'id']);
+
+            call_user_func($name, $setter);
+
+            extract($setter->retrieve());
+        }
+
         // If no name is provided, we will use the backtrace to get the function name
         // since that is most likely the name of the polymorphic interface. We can
         // use that to get both the class and foreign key that will be utilized.
@@ -211,12 +253,22 @@ trait HasRelationships
      * Define a one-to-many relationship.
      *
      * @param  string  $related
-     * @param  string  $foreignKey
+     * @param  string|Closure  $foreignKey
      * @param  string  $localKey
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function hasMany($related, $foreignKey = null, $localKey = null)
     {
+        // If the second argument is a Closure, we will ignore other arguments
+        // and set up the relationship with values provided in the Closure.
+        if ($foreignKey instanceof Closure) {
+            $setter = new Setter(['foreignKey', 'localKey']);
+
+            call_user_func($foreignKey, $setter);
+
+            extract($setter->retrieve());
+        }
+
         $instance = $this->newRelatedInstance($related);
 
         $foreignKey = $foreignKey ?: $this->getForeignKey();
@@ -233,13 +285,23 @@ trait HasRelationships
      *
      * @param  string  $related
      * @param  string  $through
-     * @param  string|null  $firstKey
+     * @param  string|Closure|null  $firstKey
      * @param  string|null  $secondKey
      * @param  string|null  $localKey
      * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
      */
     public function hasManyThrough($related, $through, $firstKey = null, $secondKey = null, $localKey = null)
     {
+        // If the second argument is a Closure, we will ignore other arguments
+        // and set up the relationship with values provided in the Closure.
+        if ($firstKey instanceof Closure) {
+            $setter = new Setter(['firstKey', 'secondKey', 'localKey']);
+
+            call_user_func($firstKey, $setter);
+
+            extract($setter->retrieve());
+        }
+
         $through = new $through;
 
         $firstKey = $firstKey ?: $this->getForeignKey();
@@ -258,13 +320,23 @@ trait HasRelationships
      *
      * @param  string  $related
      * @param  string  $name
-     * @param  string  $type
+     * @param  string|Closure  $type
      * @param  string  $id
      * @param  string  $localKey
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
     public function morphMany($related, $name, $type = null, $id = null, $localKey = null)
     {
+        // If the second argument is a Closure, we will ignore other arguments
+        // and set up the relationship with values provided in the Closure.
+        if ($type instanceof Closure) {
+            $setter = new Setter(['type', 'id', 'localKey']);
+
+            call_user_func($type, $setter);
+
+            extract($setter->retrieve());
+        }
+
         $instance = $this->newRelatedInstance($related);
 
         // Here we will gather up the morph type and ID for the relationship so that we
@@ -283,7 +355,7 @@ trait HasRelationships
      * Define a many-to-many relationship.
      *
      * @param  string  $related
-     * @param  string  $table
+     * @param  string|Closure  $table
      * @param  string  $foreignKey
      * @param  string  $relatedKey
      * @param  string  $parentKey
@@ -294,6 +366,16 @@ trait HasRelationships
     public function belongsToMany($related, $table = null, $foreignKey = null, $relatedKey = null,
                                   $parentKey = null, $localKey = null, $relation = null)
     {
+        // If the second argument is a Closure, we will ignore other arguments
+        // and set up the relationship with values provided in the Closure.
+        if ($table instanceof Closure) {
+            $setter = new Setter(['table', 'foreignKey', 'relatedKey', 'parentKey', 'localKey', 'relation']);
+
+            call_user_func($table, $setter);
+
+            extract($setter->retrieve());
+        }
+
         // If no relationship name was passed, we will pull backtraces to get the
         // name of the calling function. We will use that function name as the
         // title of this relation since that is a great convention to apply.
@@ -329,7 +411,7 @@ trait HasRelationships
      *
      * @param  string  $related
      * @param  string  $name
-     * @param  string  $table
+     * @param  string|Closure  $table
      * @param  string  $foreignKey
      * @param  string  $relatedKey
      * @param  bool  $inverse
@@ -337,6 +419,16 @@ trait HasRelationships
      */
     public function morphToMany($related, $name, $table = null, $foreignKey = null, $relatedKey = null, $inverse = false)
     {
+        // If the second argument is a Closure, we will ignore other arguments
+        // and set up the relationship with values provided in the Closure.
+        if ($table instanceof Closure) {
+            $setter = new Setter(['table', 'foreignKey', 'relatedKey', 'inverse']);
+
+            call_user_func($table, $setter);
+
+            extract($setter->retrieve());
+        }
+
         $caller = $this->guessBelongsToManyRelation();
 
         // First, we will need to determine the foreign key and "other key" for the
@@ -364,13 +456,23 @@ trait HasRelationships
      *
      * @param  string  $related
      * @param  string  $name
-     * @param  string  $table
+     * @param  string|Closure  $table
      * @param  string  $foreignKey
      * @param  string  $relatedKey
      * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
     public function morphedByMany($related, $name, $table = null, $foreignKey = null, $relatedKey = null)
     {
+        // If the second argument is a Closure, we will ignore other arguments
+        // and set up the relationship with values provided in the Closure.
+        if ($table instanceof Closure) {
+            $setter = new Setter(['table', 'foreignKey', 'relatedKey']);
+
+            call_user_func($table, $setter);
+
+            extract($setter->retrieve());
+        }
+
         $foreignKey = $foreignKey ?: $this->getForeignKey();
 
         // For the inverse of the polymorphic many-to-many relations, we will change
