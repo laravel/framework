@@ -89,7 +89,7 @@ class VendorPublishCommand extends Command
             return;
         }
 
-        [$this->provider, $this->tags] = [
+        list($this->provider, $this->tags) = [
             $this->option('provider'), (array) $this->option('tag'),
         ];
 
