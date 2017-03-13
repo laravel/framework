@@ -89,6 +89,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public $wasRecentlyCreated = false;
 
     /**
+     * The interactions for this model.
+     *
+     * @var array
+     */
+    protected $interactions = [];
+
+    /**
      * The connection resolver instance.
      *
      * @var \Illuminate\Database\ConnectionResolverInterface
@@ -1211,6 +1218,24 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Handle an interaction.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function interact($method, array $parameters = [])
+    {
+        $interaction = app($this->interactions[$method]);
+
+        if (! method_exists($interaction, $method)) {
+            $method = 'handle';
+        }
+
+        return $interaction->$method($this, ...$parameters);
+    }
+
+    /**
      * Dynamically retrieve attributes on the model.
      *
      * @param  string  $key
@@ -1311,6 +1336,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         if (in_array($method, ['increment', 'decrement'])) {
             return $this->$method(...$parameters);
+        }
+
+        if (isset($this->interactions[$method])) {
+            return $this->interact($method, $parameters);
         }
 
         return $this->newQuery()->$method(...$parameters);
