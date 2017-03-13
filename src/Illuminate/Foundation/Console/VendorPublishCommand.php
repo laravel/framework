@@ -89,9 +89,8 @@ class VendorPublishCommand extends Command
             return;
         }
 
-        [$this->provider, $this->tags] = [
-            $this->option('provider'), (array) $this->option('tag'),
-        ];
+        $this->provider = $this->option('provider');
+        $this->tags = (array) $this->option('tag');
 
         if (! $this->provider && ! $this->tags) {
             $this->promptForProviderOrTag();
