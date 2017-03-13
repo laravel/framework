@@ -241,7 +241,7 @@ trait QueriesRelationships
             }
 
             // set the default column as * or primary key
-            $column = ($function == 'COUNT') ? '*' : $this->model->getKeyName();
+            $column = ($function == 'count') ? '*' : $this->model->getKeyName();
 
             if (strpos($name, '|') !== false) {
                 list($name, $column) = explode('|', $name);
