@@ -51,12 +51,6 @@ trait CompilesIncludes
     {
         $expression = $this->stripParentheses($expression);
 
-        preg_match('/ *(.*), *(.*)$/is', $expression, $matches);
-
-        $when = trim($matches[1]);
-
-        $arguments = trim($matches[2]);
-
-        return "<?php if ({$when}) echo \$__env->make({$arguments}, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
+        return "<?php echo \$__env->renderWhen($expression, array_except(get_defined_vars(), array('__data', '__path'))); ?>";
     }
 }
