@@ -189,7 +189,7 @@ trait QueriesRelationships
             // Finally we will add the proper result column alias to the query and run the subselect
             // statement against the query builder. Then we will return the builder instance back
             // to the developer for further constraint chaining that needs to take place on it.
-            $column = isset($alias) ? $alias : snake_case($name.'_count');
+            $column = isset($alias) ? $alias : Str::snake($name.'_count');
 
             $this->selectSub($query->toBase(), $column);
         }
