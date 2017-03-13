@@ -216,10 +216,10 @@ trait QueriesRelationships
      * use the MySQL aggregate functions including AVG COUNT, SUM, MAX and MIN.
      *
      * @param array $relations
-     * @param string $type
+     * @param string $function
      * @return $this
      */
-    public function withAggregate($relations, $type = 'COUNT')
+    public function withAggregate($relations, $function = 'COUNT')
     {
         if (is_null($this->query->columns)) {
             $this->query->select([$this->query->from.'.*']);
@@ -237,7 +237,8 @@ trait QueriesRelationships
                 list($name, $alias) = [$segments[0], $segments[2]];
             }
 
-            $column = 'id';
+            // set the default column as * or primary key
+            $column = ($function == 'COUNT') ? '*' : $this->model->getKeyName();
 
             if (strpos($name, '|') !== false) {
                 list($name, $column) = explode('|', $name);
@@ -249,7 +250,7 @@ trait QueriesRelationships
             // as a sub-select. First, we'll get the "has" query and use that to get the relation
             // count query. We will normalize the relation name then append _count as the name.
             $query = $relation->getRelationExistenceAggregateQuery(
-                $relation->getRelated()->newQuery(), $this, Str::upper($type), $column
+                $relation->getRelated()->newQuery(), $this, Str::upper($function), $column
             );
 
             $query->callScope($constraints);
@@ -259,7 +260,7 @@ trait QueriesRelationships
             // Finally we will add the proper result column alias to the query and run the subselect
             // statement against the query builder. Then we will return the builder instance back
             // to the developer for further constraint chaining that needs to take place on it.
-            $column = snake_case(isset($alias) ? $alias : $name).'_'.Str::lower($type);
+            $column = snake_case(isset($alias) ? $alias : $name).'_'.Str::lower($function);
 
             $this->selectSub($query->toBase(), $column);
         }
