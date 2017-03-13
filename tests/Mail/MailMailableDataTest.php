@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Mail;
 use Illuminate\Mail\Mailable;
 use PHPUnit\Framework\TestCase;
 
-class MailMailableTest extends TestCase
+class MailMailableDataTest extends TestCase
 {
     public function testMailableDataIsNotLost()
     {
