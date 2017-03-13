@@ -43,12 +43,12 @@ class Setter
      */
     public function __call($field, $arguments)
     {
-        if (!array_key_exists($field, $this->fields)) {
+        if (! array_key_exists($field, $this->fields)) {
             throw new Error("Call to undefined method ".__CLASS__."::$field()");
         }
 
         if (empty($arguments)) {
-            throw new TypeError("Too few arguments to function ".__CLASS__."::$field(), 0 passed");
+            throw new TypeError('Too few arguments to function '.__CLASS__."::$field(), 0 passed");
         }
 
         $this->fields[$field] = $arguments[0];
