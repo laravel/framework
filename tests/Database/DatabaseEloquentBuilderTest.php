@@ -675,7 +675,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder = $model->withSum('foo');
 
-        $this->assertEquals('select "eloquent_builder_test_model_parent_stubs".*, (select sum(`id`) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_sum" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $this->assertEquals('select "eloquent_builder_test_model_parent_stubs".*, (select sum(id) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_sum" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
     public function testWithSumAndSelect()
@@ -684,7 +684,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder = $model->select('id')->withSum('foo');
 
-        $this->assertEquals('select "id", (select sum(`id`) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_sum" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $this->assertEquals('select "id", (select sum(id) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_sum" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
     public function testWithSumAndMergedWheres()
@@ -695,7 +695,7 @@ class DatabaseEloquentBuilderTest extends TestCase
             $q->where('bam', '>', 'qux');
         }]);
 
-        $this->assertEquals('select "id", (select sum(`id`) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "bam" > ? and "active" = ?) as "active_foo_sum" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $this->assertEquals('select "id", (select sum(id) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "bam" > ? and "active" = ?) as "active_foo_sum" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
         $this->assertEquals(['qux', true], $builder->getBindings());
     }
 
@@ -705,7 +705,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder = $model->withSum('foo as foo_bar');
 
-        $this->assertEquals('select "eloquent_builder_test_model_parent_stubs".*, (select sum(`id`) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_bar_sum" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $this->assertEquals('select "eloquent_builder_test_model_parent_stubs".*, (select sum(id) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_bar_sum" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
     public function testWithSumMultipleAndPartialRename()
@@ -714,7 +714,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder = $model->withSum(['foo as foo_bar', 'foo']);
 
-        $this->assertEquals('select "eloquent_builder_test_model_parent_stubs".*, (select sum(`id`) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_bar_sum", (select sum(`id`) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_sum" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $this->assertEquals('select "eloquent_builder_test_model_parent_stubs".*, (select sum(id) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_bar_sum", (select sum(id) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_sum" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
     public function testWithMax()
@@ -723,7 +723,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder = $model->withMax('foo');
 
-        $this->assertEquals('select "eloquent_builder_test_model_parent_stubs".*, (select max(`id`) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_max" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $this->assertEquals('select "eloquent_builder_test_model_parent_stubs".*, (select max(id) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_max" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
     public function testWithMaxAndSelect()
@@ -732,7 +732,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder = $model->select('id')->withMax('foo');
 
-        $this->assertEquals('select "id", (select max(`id`) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_max" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $this->assertEquals('select "id", (select max(id) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_max" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
     public function testWithMaxAndMergedWheres()
@@ -743,7 +743,7 @@ class DatabaseEloquentBuilderTest extends TestCase
             $q->where('bam', '>', 'qux');
         }]);
 
-        $this->assertEquals('select "id", (select max(`id`) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "bam" > ? and "active" = ?) as "active_foo_max" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $this->assertEquals('select "id", (select max(id) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "bam" > ? and "active" = ?) as "active_foo_max" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
         $this->assertEquals(['qux', true], $builder->getBindings());
     }
 
@@ -753,7 +753,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder = $model->withMax('foo as foo_bar');
 
-        $this->assertEquals('select "eloquent_builder_test_model_parent_stubs".*, (select max(`id`) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_bar_max" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $this->assertEquals('select "eloquent_builder_test_model_parent_stubs".*, (select max(id) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_bar_max" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
     public function testWithMaxMultipleAndPartialRename()
@@ -762,7 +762,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder = $model->withMax(['foo as foo_bar', 'foo']);
 
-        $this->assertEquals('select "eloquent_builder_test_model_parent_stubs".*, (select max(`id`) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_bar_max", (select max(`id`) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_max" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $this->assertEquals('select "eloquent_builder_test_model_parent_stubs".*, (select max(id) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_bar_max", (select max(id) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_max" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
     public function testWithMin()
@@ -771,7 +771,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder = $model->withMin('foo');
 
-        $this->assertEquals('select "eloquent_builder_test_model_parent_stubs".*, (select min(`id`) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_min" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $this->assertEquals('select "eloquent_builder_test_model_parent_stubs".*, (select min(id) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_min" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
     public function testWithMinAndSelect()
@@ -780,7 +780,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder = $model->select('id')->withMin('foo');
 
-        $this->assertEquals('select "id", (select min(`id`) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_min" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $this->assertEquals('select "id", (select min(id) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_min" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
     public function testWithMinAndMergedWheres()
@@ -791,7 +791,7 @@ class DatabaseEloquentBuilderTest extends TestCase
             $q->where('bam', '>', 'qux');
         }]);
 
-        $this->assertEquals('select "id", (select min(`id`) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "bam" > ? and "active" = ?) as "active_foo_min" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $this->assertEquals('select "id", (select min(id) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "bam" > ? and "active" = ?) as "active_foo_min" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
         $this->assertEquals(['qux', true], $builder->getBindings());
     }
 
@@ -801,7 +801,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder = $model->withMin('foo as foo_bar');
 
-        $this->assertEquals('select "eloquent_builder_test_model_parent_stubs".*, (select min(`id`) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_bar_min" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $this->assertEquals('select "eloquent_builder_test_model_parent_stubs".*, (select min(id) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_bar_min" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
     public function testWithMinMultipleAndPartialRename()
@@ -810,7 +810,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder = $model->withMin(['foo as foo_bar', 'foo']);
 
-        $this->assertEquals('select "eloquent_builder_test_model_parent_stubs".*, (select min(`id`) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_bar_min", (select min(`id`) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_min" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $this->assertEquals('select "eloquent_builder_test_model_parent_stubs".*, (select min(id) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_bar_min", (select min(id) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_min" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
     public function testWithAvg()
@@ -819,7 +819,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder = $model->withAvg('foo');
 
-        $this->assertEquals('select "eloquent_builder_test_model_parent_stubs".*, (select avg(`id`) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_avg" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $this->assertEquals('select "eloquent_builder_test_model_parent_stubs".*, (select avg(id) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_avg" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
     public function testWithAvgAndSelect()
@@ -828,7 +828,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder = $model->select('id')->withAvg('foo');
 
-        $this->assertEquals('select "id", (select avg(`id`) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_avg" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $this->assertEquals('select "id", (select avg(id) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_avg" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
     public function testWithAvgAndMergedWheres()
@@ -839,7 +839,7 @@ class DatabaseEloquentBuilderTest extends TestCase
             $q->where('bam', '>', 'qux');
         }]);
 
-        $this->assertEquals('select "id", (select avg(`id`) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "bam" > ? and "active" = ?) as "active_foo_avg" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $this->assertEquals('select "id", (select avg(id) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "bam" > ? and "active" = ?) as "active_foo_avg" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
         $this->assertEquals(['qux', true], $builder->getBindings());
     }
 
@@ -849,7 +849,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder = $model->withAvg('foo as foo_bar');
 
-        $this->assertEquals('select "eloquent_builder_test_model_parent_stubs".*, (select avg(`id`) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_bar_avg" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $this->assertEquals('select "eloquent_builder_test_model_parent_stubs".*, (select avg(id) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_bar_avg" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
     public function testWithAvgMultipleAndPartialRename()
@@ -858,7 +858,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder = $model->withAvg(['foo as foo_bar', 'foo']);
 
-        $this->assertEquals('select "eloquent_builder_test_model_parent_stubs".*, (select avg(`id`) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_bar_avg", (select avg(`id`) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_avg" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $this->assertEquals('select "eloquent_builder_test_model_parent_stubs".*, (select avg(id) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_bar_avg", (select avg(id) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_avg" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
     public function testHasWithContraintsAndHavingInSubquery()
