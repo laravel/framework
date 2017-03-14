@@ -135,8 +135,7 @@ if (! function_exists('asset')) {
      */
     function asset($path, $secure = null)
     {
-        if(php_sapi_name() == 'cli')
-        {
+        if(php_sapi_name() == 'cli'){
             return $path;
         }
         return app('url')->asset($path, $secure);
