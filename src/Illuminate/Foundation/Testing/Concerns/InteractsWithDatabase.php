@@ -2,9 +2,9 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
-use Illuminate\Foundation\Testing\Constraints\HasSoftDeletedInDatabase;
 use PHPUnit_Framework_Constraint_Not as ReverseConstraint;
 use Illuminate\Foundation\Testing\Constraints\HasInDatabase;
+use Illuminate\Foundation\Testing\Constraints\HasSoftDeletedInDatabase;
 
 trait InteractsWithDatabase
 {
