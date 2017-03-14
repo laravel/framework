@@ -13,7 +13,7 @@ class FileFactory
      */
     public function create($name, $kilobytes = 0)
     {
-        return tap(new File($name, tmpfile()), function ($file) use ($kilobytes) {
+        return tap(new File($name, $this->tmpFile()), function ($file) use ($kilobytes) {
             $file->sizeToReport = $kilobytes * 1024;
         });
     }
@@ -36,12 +36,25 @@ class FileFactory
      *
      * @param  int  $width
      * @param  int  $height
-     * @return resource
+     * @return string
      */
     protected function generateImage($width, $height)
     {
-        return tap(tmpfile(), function ($temp) use ($width, $height) {
-            imagepng(imagecreatetruecolor($width, $height), $temp);
-        });
+        imagepng(
+            imagecreatetruecolor($width, $height),
+            $path = $this->tmpFile()
+        );
+
+        return $path;
+    }
+
+    /**
+     * Create a temporary file.
+     *
+     * @return string
+     */
+    protected function tmpFile()
+    {
+        return tempnam(sys_get_temp_dir(), 'tmp');
     }
 }
