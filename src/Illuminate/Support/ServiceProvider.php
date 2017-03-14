@@ -63,12 +63,17 @@ abstract class ServiceProvider
      * Load the given routes file if routes are not already cached.
      *
      * @param  string  $path
+     * @param  string|null  $package
      * @return void
      */
-    protected function loadRoutesFrom($path)
+    protected function loadRoutesFrom($path, $package = null)
     {
         if (! $this->app->routesAreCached()) {
-            require $path;
+            if ($package && is_file($routePath = $this->app->basePath().'/routes/vendor/'.$package.'.php')) {
+                require $routePath;
+            } else {
+                require $path;
+            }
         }
     }
 
