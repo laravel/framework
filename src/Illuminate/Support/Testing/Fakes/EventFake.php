@@ -2,7 +2,7 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
-use PHPUnit_Framework_Assert as PHPUnit;
+use PHPUnit\Framework\Assert as PHPUnit;
 use Illuminate\Contracts\Events\Dispatcher;
 
 class EventFake implements Dispatcher
