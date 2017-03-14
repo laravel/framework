@@ -90,9 +90,8 @@ class MakeAuthCommand extends Command
     protected function exportViews()
     {
         foreach ($this->views as $key => $value) {
-
-            if (!$this->option('force') && file_exists(resource_path('views/'.$value))) {
-                if (!$this->confirm('The view '.$value.' already exists, Do you wish overwrite it?')) {
+            if (! $this->option('force') && file_exists(resource_path('views/'.$value))) {
+                if (! $this->confirm('The view '.$value.' already exists, Do you wish overwrite it?')) {
                     continue;
                 }
             }
