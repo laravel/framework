@@ -55,6 +55,6 @@ class FileFactory
      */
     protected function tmpFile()
     {
-        return tempnam(sys_get_temp_dir(), 'foo');
+        return tempnam(sys_get_temp_dir(), 'tmp');
     }
 }
