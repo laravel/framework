@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Support\StrictFluent;
 
 trait HasRelationships
 {
@@ -58,11 +59,11 @@ trait HasRelationships
         // If the second argument is a Closure, we will ignore other arguments
         // and set up the relationship with values provided in the Closure.
         if ($foreignKey instanceof Closure) {
-            $setter = new Setter(['foreignKey', 'localKey']);
-
-            call_user_func($foreignKey, $setter);
-
-            extract($setter->retrieve());
+            extract(
+                StrictFluent::withNullArray(['foreignKey', 'localKey'])
+                            ->applyClosure($foreignKey)
+                            ->getAttributes()
+            );
         }
 
         $instance = $this->newRelatedInstance($related);
@@ -89,11 +90,11 @@ trait HasRelationships
         // If the second argument is a Closure, we will ignore other arguments
         // and set up the relationship with values provided in the Closure.
         if ($type instanceof Closure) {
-            $setter = new Setter(['type', 'id', 'localKey']);
-
-            call_user_func($type, $setter);
-
-            extract($setter->retrieve());
+            extract(
+                StrictFluent::withNullArray(['type', 'id', 'localKey'])
+                            ->applyClosure($type)
+                            ->getAttributes()
+            );
         }
 
         $instance = $this->newRelatedInstance($related);
@@ -121,11 +122,11 @@ trait HasRelationships
         // If the second argument is a Closure, we will ignore other arguments
         // and set up the relationship with values provided in the Closure.
         if ($foreignKey instanceof Closure) {
-            $setter = new Setter(['foreignKey', 'ownerKey', 'relation']);
-
-            call_user_func($foreignKey, $setter);
-
-            extract($setter->retrieve());
+            extract(
+                StrictFluent::withNullArray(['foreignKey', 'ownerKey', 'relation'])
+                            ->applyClosure($foreignKey)
+                            ->getAttributes()
+            );
         }
 
         // If no relation name was given, we will use this debug backtrace to extract
@@ -167,11 +168,11 @@ trait HasRelationships
         // If the second argument is a Closure, we will ignore other arguments
         // and set up the relationship with values provided in the Closure.
         if ($name instanceof Closure) {
-            $setter = new Setter(['name', 'type', 'id']);
-
-            call_user_func($name, $setter);
-
-            extract($setter->retrieve());
+            extract(
+                StrictFluent::withNullArray(['name', 'type', 'id'])
+                            ->applyClosure($name)
+                            ->getAttributes()
+            );
         }
 
         // If no name is provided, we will use the backtrace to get the function name
@@ -262,11 +263,11 @@ trait HasRelationships
         // If the second argument is a Closure, we will ignore other arguments
         // and set up the relationship with values provided in the Closure.
         if ($foreignKey instanceof Closure) {
-            $setter = new Setter(['foreignKey', 'localKey']);
-
-            call_user_func($foreignKey, $setter);
-
-            extract($setter->retrieve());
+            extract(
+                StrictFluent::withNullArray(['foreignKey', 'localKey'])
+                            ->applyClosure($foreignKey)
+                            ->getAttributes()
+            );
         }
 
         $instance = $this->newRelatedInstance($related);
@@ -295,11 +296,11 @@ trait HasRelationships
         // If the second argument is a Closure, we will ignore other arguments
         // and set up the relationship with values provided in the Closure.
         if ($firstKey instanceof Closure) {
-            $setter = new Setter(['firstKey', 'secondKey', 'localKey']);
-
-            call_user_func($firstKey, $setter);
-
-            extract($setter->retrieve());
+            extract(
+                StrictFluent::withNullArray(['firstKey', 'secondKey', 'localKey'])
+                            ->applyClosure($firstKey)
+                            ->getAttributes()
+            );
         }
 
         $through = new $through;
@@ -330,11 +331,11 @@ trait HasRelationships
         // If the second argument is a Closure, we will ignore other arguments
         // and set up the relationship with values provided in the Closure.
         if ($type instanceof Closure) {
-            $setter = new Setter(['type', 'id', 'localKey']);
-
-            call_user_func($type, $setter);
-
-            extract($setter->retrieve());
+            extract(
+                StrictFluent::withNullArray(['type', 'id', 'localKey'])
+                            ->applyClosure($type)
+                            ->getAttributes()
+            );
         }
 
         $instance = $this->newRelatedInstance($related);
@@ -369,11 +370,11 @@ trait HasRelationships
         // If the second argument is a Closure, we will ignore other arguments
         // and set up the relationship with values provided in the Closure.
         if ($table instanceof Closure) {
-            $setter = new Setter(['table', 'foreignKey', 'relatedKey', 'parentKey', 'localKey', 'relation']);
-
-            call_user_func($table, $setter);
-
-            extract($setter->retrieve());
+            extract(
+                StrictFluent::withNullArray(['table', 'foreignKey', 'relatedKey', 'parentKey', 'localKey', 'relation'])
+                            ->applyClosure($table)
+                            ->getAttributes()
+            );
         }
 
         // If no relationship name was passed, we will pull backtraces to get the
@@ -422,11 +423,11 @@ trait HasRelationships
         // If the second argument is a Closure, we will ignore other arguments
         // and set up the relationship with values provided in the Closure.
         if ($table instanceof Closure) {
-            $setter = new Setter(['table', 'foreignKey', 'relatedKey', 'inverse']);
-
-            call_user_func($table, $setter);
-
-            extract($setter->retrieve());
+            extract(
+                StrictFluent::withNullArray(['table', 'foreignKey', 'relatedKey', 'inverse'])
+                            ->applyClosure($table)
+                            ->getAttributes()
+            );
         }
 
         $caller = $this->guessBelongsToManyRelation();
@@ -466,11 +467,11 @@ trait HasRelationships
         // If the second argument is a Closure, we will ignore other arguments
         // and set up the relationship with values provided in the Closure.
         if ($table instanceof Closure) {
-            $setter = new Setter(['table', 'foreignKey', 'relatedKey']);
-
-            call_user_func($table, $setter);
-
-            extract($setter->retrieve());
+            extract(
+                StrictFluent::withNullArray(['table', 'foreignKey', 'relatedKey'])
+                            ->applyClosure($table)
+                            ->getAttributes()
+            );
         }
 
         $foreignKey = $foreignKey ?: $this->getForeignKey();
