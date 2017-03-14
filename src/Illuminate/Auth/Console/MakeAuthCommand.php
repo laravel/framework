@@ -15,8 +15,8 @@ class MakeAuthCommand extends Command
      * @var string
      */
     protected $signature = 'make:auth
-    {--views : Only scaffold the authentication views}
-    {--force : Overwrite existing views by default}';
+                    {--views : Only scaffold the authentication views}
+                    {--force : Overwrite existing views by default}';
 
     /**
      * The console command description.
@@ -90,8 +90,8 @@ class MakeAuthCommand extends Command
     protected function exportViews()
     {
         foreach ($this->views as $key => $value) {
-            if (! $this->option('force') && file_exists(resource_path('views/'.$value))) {
-                if (! $this->confirm('The view '.$value.' already exists, Do you wish overwrite it?')) {
+            if (file_exists(resource_path('views/'.$value)) && ! $this->option('force')) {
+                if (! $this->confirm("The [{$value}] view already exists. Do you want to replace it?")) {
                     continue;
                 }
             }
