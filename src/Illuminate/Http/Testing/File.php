@@ -14,13 +14,6 @@ class File extends UploadedFile
     public $name;
 
     /**
-     * The temporary file resource.
-     *
-     * @var resource
-     */
-    public $tempFile;
-
-    /**
      * The "size" to report.
      *
      * @var int
@@ -31,17 +24,16 @@ class File extends UploadedFile
      * Create a new file instance.
      *
      * @param  string  $name
-     * @param  resource  $tempFile
+     * @param  string  $path
      * @return void
      */
-    public function __construct($name, $tempFile)
+    public function __construct($name, $path)
     {
         $this->name = $name;
-        $this->tempFile = $tempFile;
 
         parent::__construct(
-            $this->tempFilePath(), $name, $this->getMimeType(),
-            filesize($this->tempFilePath()), $error = null, $test = true
+            $path, $name, $this->getMimeType(),
+            filesize($path), $error = null, $test = true
         );
     }
 
@@ -101,15 +93,5 @@ class File extends UploadedFile
     public function getMimeType()
     {
         return MimeType::from($this->name);
-    }
-
-    /**
-     * Get the path to the temporary file.
-     *
-     * @return string
-     */
-    protected function tempFilePath()
-    {
-        return stream_get_meta_data($this->tempFile)['uri'];
     }
 }
