@@ -36,6 +36,47 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Determine if the given relation is loaded on collection models.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function relationLoaded($key)
+    {
+        // If collection is empty relations are still loaded, but nothing was found
+        if ($this->isEmpty()) {
+            return true;
+        }
+
+        // Get first model
+        $first = $this->first();
+
+        // Check if this is a nested relationship
+        if (strpos($key, '.') === false) {
+            return $first->relationLoaded($key);
+        } else {
+            // Split first key from nested relations
+            $name = strstr($key, '.', true);
+            $nested = substr(strstr($key, '.'), 1);
+
+            // Check if relations are loaded
+            if (! $first->relationLoaded($name)) {
+                return false;
+            }
+
+            // Get all relationship models as new collection
+            $models = $this->pluck($name)->flatten()->unique();
+
+            // Pluck and flatten will return a base collection
+            // Cast collection back to Eloquent collection
+            $models = new static($models->items);
+
+            // Continue down nested relations
+            return $models->relationLoaded($nested);
+        }
+    }
+
+    /**
      * Load a set of relationships onto the collection.
      *
      * @param  mixed  $relations
