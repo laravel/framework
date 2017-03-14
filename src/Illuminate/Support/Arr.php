@@ -527,4 +527,22 @@ class Arr
     {
         return ! is_array($value) ? [$value] : $value;
     }
+
+    /**
+     * Convert a nested array (array of arrays) to a nested collection (collection of collections).
+     *
+     * @param  array  $array
+     * @return Collection
+     */
+    public static function toNestedCollection(&$array)
+    {
+        if (is_array($array)) {
+            foreach ($array as &$subArray) {
+                $subArray = static::toNestedCollection($subArray);
+            }
+            return new Collection($array);
+        } else {
+            return $array;
+        }
+    }
 }

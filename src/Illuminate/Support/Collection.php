@@ -510,35 +510,42 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Group an associative array by a field or using a callback.
+     * Group an associative array by a field, multiple fields, or using a callback.
      *
-     * @param  callable|string  $groupBy
+     * @param  callable|string|array  $groupBy
      * @param  bool  $preserveKeys
      * @return static
      */
     public function groupBy($groupBy, $preserveKeys = false)
     {
-        $groupBy = $this->valueRetriever($groupBy);
+        if (!is_array($groupBy)) {
+            $groupBy = [$groupBy];
+        }
+
+        $groupKeyRetrievers = [];
+        foreach ($groupBy as $currentGroupBy) {
+            $groupKeyRetrievers[] = $this->valueRetriever($currentGroupBy);
+        }
 
         $results = [];
 
         foreach ($this->items as $key => $value) {
-            $groupKeys = $groupBy($value, $key);
-
-            if (! is_array($groupKeys)) {
-                $groupKeys = [$groupKeys];
-            }
-
-            foreach ($groupKeys as $groupKey) {
-                if (! array_key_exists($groupKey, $results)) {
-                    $results[$groupKey] = new static;
+            $resultLevel = &$results;
+            foreach ($groupKeyRetrievers as $currentGroupBy) {
+                $groupKey = $currentGroupBy($value);
+                if (!array_key_exists($groupKey, $resultLevel)) {
+                    $resultLevel[$groupKey] = [];
                 }
-
-                $results[$groupKey]->offsetSet($preserveKeys ? $key : null, $value);
+                $resultLevel = &$resultLevel[$groupKey];
+            }
+            if ($preserveKeys && !is_null($key)) {
+                $resultLevel[$key] = $value;
+            } else {
+                $resultLevel[] = $value;
             }
         }
 
-        return new static($results);
+        return Arr::toNestedCollection($results);
     }
 
     /**
