@@ -962,10 +962,6 @@ class Connection implements ConnectionInterface
      */
     public function getConfig($option = null)
     {
-        if (empty($option)) {
-            return $this->config;
-        }
-
         return Arr::get($this->config, $option);
     }
 
