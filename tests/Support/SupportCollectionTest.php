@@ -1264,6 +1264,62 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals($expected_result, $resultM->toArray());
     }
 
+    public function testGroupByMultipleAttributes()
+    {
+        $data = new Collection([
+          [ "A" => "foo", "B" => "bar",    "C" => "baz",    "D" => "thud" ],
+          [ "A" => "foo", "B" => "garply", "C" => "corge",  "D" => "plugh" ],
+          [ "A" => "foo", "B" => "bar",    "C" => "corge",  "D" => "thud" ],
+          [ "A" => "foo", "B" => "bar",    "C" => "corge",  "D" => "waldo" ],
+          [ "A" => "qux", "B" => "garply", "C" => "xyzzy",  "D" => "fred" ],
+          [ "A" => "qux", "B" => "grault", "C" => "garply", "D" => "quuz" ]
+        ]);
+        $result = $data->groupByMultiple(["A", "B", "C", "D"]);
+        $expected = [
+          "foo" => [
+            "bar" => [
+              "baz" => [
+                "thud" => [
+                  [ "A" => "foo", "B" => "bar",    "C" => "baz",    "D" => "thud" ]
+                ]
+              ],
+              "corge" => [
+                "thud" => [
+                  [ "A" => "foo", "B" => "bar",    "C" => "corge",  "D" => "thud" ]
+                ],
+                "waldo" => [
+                  [ "A" => "foo", "B" => "bar",    "C" => "corge",  "D" => "waldo" ]
+                ]
+              ]
+            ],
+            "garply" => [
+              "corge" => [
+                "plugh" => [
+                  [ "A" => "foo", "B" => "garply", "C" => "corge",  "D" => "plugh" ]
+                ]
+              ]
+            ]
+          ],
+          "qux" => [
+            "garply" => [
+              "xyzzy" => [
+                "fred" => [
+                  [ "A" => "qux", "B" => "garply", "C" => "xyzzy",  "D" => "fred" ]
+                ]
+              ]
+            ],
+            "grault" => [
+              "garply" => [
+                "quuz" => [
+                  [ "A" => "qux", "B" => "grault", "C" => "garply", "D" => "quuz" ]
+                ]
+              ]
+            ]
+          ]
+        ];
+        $this->assertEquals($expected, $result->toArray());
+    }
+
     public function testKeyByAttribute()
     {
         $data = new Collection([['rating' => 1, 'name' => '1'], ['rating' => 2, 'name' => '2'], ['rating' => 3, 'name' => '3']]);
