@@ -24,6 +24,7 @@ class RouteParameter
      *
      * @param  string $parameter
      * @param  mixed  $value
+     * @return void
      */
     public function __construct($parameter, $value = null)
     {
@@ -83,6 +84,6 @@ class RouteParameter
      */
     protected function parts()
     {
-        return explode(':', $this->parameter);
+        return explode(':', $this->parameter, 2);
     }
 }

@@ -1514,10 +1514,12 @@ class RoutingTestUserModel extends Model
 
 class RoutingTestExtendedUserModel extends RoutingTestUserModel
 {
+    //
 }
 
 class RoutingTestWithRouteKey extends RoutingTestUserModel
 {
+    //
 }
 
 class RoutingTestNonExistingUserModel extends RoutingTestUserModel

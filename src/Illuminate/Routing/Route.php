@@ -428,13 +428,13 @@ class Route
     /**
      * Get the parameters as instances of RouteParameter.
      *
-     * @return RouteParameter[]
+     * @return array
      */
     public function generatedParameters()
     {
         return collect($this->parameters())->flatMap(function ($value, $key) {
             return [$key => new RouteParameter($key, $value)];
-        })->toArray();
+        })->all();
     }
 
     /**
