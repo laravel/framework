@@ -1130,19 +1130,28 @@ class SupportCollectionTest extends TestCase
     public function testGroupByAttribute()
     {
         $data = new Collection([['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1'], ['rating' => 2, 'url' => '2']]);
+        $dataM = clone $data;
 
+        $expected = [1 => [['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1']], 2 => [['rating' => 2, 'url' => '2']]];
         $result = $data->groupBy('rating');
-        $this->assertEquals([1 => [['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1']], 2 => [['rating' => 2, 'url' => '2']]], $result->toArray());
+        $this->assertEquals($expected, $result->toArray());
+        $resultM = $dataM->groupByMultiple('rating');
+        $this->assertEquals($expected, $resultM->toArray());
 
+        $expected = [1 => [['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1']], 2 => [['rating' => 2, 'url' => '2']]];
         $result = $data->groupBy('url');
-        $this->assertEquals([1 => [['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1']], 2 => [['rating' => 2, 'url' => '2']]], $result->toArray());
+        $this->assertEquals($expected, $result->toArray());
+        $resultM = $dataM->groupByMultiple('url');
+        $this->assertEquals($expected, $resultM->toArray());
     }
 
     public function testGroupByAttributePreservingKeys()
     {
         $data = new Collection([10 => ['rating' => 1, 'url' => '1'],  20 => ['rating' => 1, 'url' => '1'],  30 => ['rating' => 2, 'url' => '2']]);
+        $dataM = clone $data;
 
         $result = $data->groupBy('rating', true);
+        $resultM = $dataM->groupByMultiple('rating', true);
 
         $expected_result = [
             1 => [10 => ['rating' => 1, 'url' => '1'], 20 => ['rating' => 1, 'url' => '1']],
@@ -1150,26 +1159,35 @@ class SupportCollectionTest extends TestCase
         ];
 
         $this->assertEquals($expected_result, $result->toArray());
+        $this->assertEquals($expected_result, $resultM->toArray());
     }
 
     public function testGroupByClosureWhereItemsHaveSingleGroup()
     {
         $data = new Collection([['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1'], ['rating' => 2, 'url' => '2']]);
+        $dataM = clone $data;
 
-        $result = $data->groupBy(function ($item) {
+        $callback = function ($item) {
             return $item['rating'];
-        });
+        };
+        $result = $data->groupBy($callback);
+        $resultM = $dataM->groupByMultiple($callback);
 
-        $this->assertEquals([1 => [['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1']], 2 => [['rating' => 2, 'url' => '2']]], $result->toArray());
+        $expected = [1 => [['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1']], 2 => [['rating' => 2, 'url' => '2']]];
+        $this->assertEquals($expected, $result->toArray());
+        $this->assertEquals($expected, $resultM->toArray());
     }
 
     public function testGroupByClosureWhereItemsHaveSingleGroupPreservingKeys()
     {
         $data = new Collection([10 => ['rating' => 1, 'url' => '1'], 20 => ['rating' => 1, 'url' => '1'], 30 => ['rating' => 2, 'url' => '2']]);
+        $dataM = clone $data;
 
-        $result = $data->groupBy(function ($item) {
+        $callback = function ($item) {
             return $item['rating'];
-        }, true);
+        };
+        $result = $data->groupBy($callback, true);
+        $resultM = $dataM->groupByMultiple($callback, true);
 
         $expected_result = [
             1 => [10 => ['rating' => 1, 'url' => '1'], 20 => ['rating' => 1, 'url' => '1']],
@@ -1177,6 +1195,7 @@ class SupportCollectionTest extends TestCase
         ];
 
         $this->assertEquals($expected_result, $result->toArray());
+        $this->assertEquals($expected_result, $resultM->toArray());
     }
 
     public function testGroupByClosureWhereItemsHaveMultipleGroups()
@@ -1186,10 +1205,13 @@ class SupportCollectionTest extends TestCase
             ['user' => 2, 'roles' => ['Role_1', 'Role_2']],
             ['user' => 3, 'roles' => ['Role_1']],
         ]);
+        $dataM = clone $data;
 
-        $result = $data->groupBy(function ($item) {
+        $callback = function ($item) {
             return $item['roles'];
-        });
+        };
+        $result = $data->groupBy($callback);
+        $resultM = $dataM->groupByMultiple($callback);
 
         $expected_result = [
             'Role_1' => [
@@ -1206,6 +1228,7 @@ class SupportCollectionTest extends TestCase
         ];
 
         $this->assertEquals($expected_result, $result->toArray());
+        $this->assertEquals($expected_result, $resultM->toArray());
     }
 
     public function testGroupByClosureWhereItemsHaveMultipleGroupsPreservingKeys()
@@ -1215,10 +1238,13 @@ class SupportCollectionTest extends TestCase
             20 => ['user' => 2, 'roles' => ['Role_1', 'Role_2']],
             30 => ['user' => 3, 'roles' => ['Role_1']],
         ]);
+        $dataM = clone $data;
 
-        $result = $data->groupBy(function ($item) {
+        $callback = function ($item) {
             return $item['roles'];
-        }, true);
+        };
+        $result = $data->groupBy($callback, true);
+        $resultM = $dataM->groupByMultiple($callback, true);
 
         $expected_result = [
             'Role_1' => [
@@ -1235,6 +1261,7 @@ class SupportCollectionTest extends TestCase
         ];
 
         $this->assertEquals($expected_result, $result->toArray());
+        $this->assertEquals($expected_result, $resultM->toArray());
     }
 
     public function testKeyByAttribute()

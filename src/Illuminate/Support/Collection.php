@@ -510,13 +510,39 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Group an associative array by a field, multiple fields, or using a callback.
+     * Group an associative array by a field or using a callback.
      *
-     * @param  callable|string|array  $groupBy
+     * @param  callable|string  $groupBy
      * @param  bool  $preserveKeys
      * @return static
      */
     public function groupBy($groupBy, $preserveKeys = false)
+    {
+        $groupBy = $this->valueRetriever($groupBy);
+        $results = [];
+        foreach ($this->items as $key => $value) {
+            $groupKeys = $groupBy($value, $key);
+            if (! is_array($groupKeys)) {
+                $groupKeys = [$groupKeys];
+            }
+            foreach ($groupKeys as $groupKey) {
+                if (! array_key_exists($groupKey, $results)) {
+                    $results[$groupKey] = new static;
+                }
+                $results[$groupKey]->offsetSet($preserveKeys ? $key : null, $value);
+            }
+        }
+        return new static($results);
+    }
+
+    /**
+     * Group an associative array by multiple fields or callbacks.
+     *
+     * @param  string|array  $groupBy
+     * @param  bool  $preserveKeys
+     * @return static
+     */
+    public function groupByMultiple($groupBy, $preserveKeys = false)
     {
         if (!is_array($groupBy)) {
             $groupBy = [$groupBy];
@@ -530,18 +556,32 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $results = [];
 
         foreach ($this->items as $key => $value) {
-            $resultLevel = &$results;
+            $currentLevel = [&$results];
+            $nextLevel = [];
             foreach ($groupKeyRetrievers as $currentGroupBy) {
-                $groupKey = $currentGroupBy($value);
-                if (!array_key_exists($groupKey, $resultLevel)) {
-                    $resultLevel[$groupKey] = [];
+                $groupKeys = $currentGroupBy($value);
+                if (! is_array($groupKeys)) {
+                    $groupKeys = [$groupKeys];
                 }
-                $resultLevel = &$resultLevel[$groupKey];
+                foreach ($groupKeys as $groupKey) {
+                    foreach ($currentLevel as &$subGroup) {
+                        if (! array_key_exists($groupKey, $subGroup)) {
+                            $subGroup[$groupKey] = [];
+                        }
+                        $nextLevel[] = &$subGroup[$groupKey];
+                    }
+                }
+                $currentLevel = $nextLevel;
+                $nextLevel = [];
             }
             if ($preserveKeys && !is_null($key)) {
-                $resultLevel[$key] = $value;
+                foreach ($currentLevel as &$lastLevel) {
+                    $lastLevel[$key] = $value;
+                }
             } else {
-                $resultLevel[] = $value;
+                foreach ($currentLevel as &$lastLevel) {
+                    $lastLevel[] = $value;
+                }
             }
         }
 
@@ -1280,6 +1320,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             $exists[] = $id;
         });
     }
+
 
     /**
      * Return only unique items from the collection array using strict comparison.
