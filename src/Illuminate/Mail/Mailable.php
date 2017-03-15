@@ -188,6 +188,10 @@ class Mailable implements MailableContract
     {
         $markdown = Container::getInstance()->make(Markdown::class);
 
+        if (isset($this->theme)) {
+            $markdown->theme($this->theme);
+        }
+
         $data = $this->buildViewData();
 
         return [

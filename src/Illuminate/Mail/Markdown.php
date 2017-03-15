@@ -141,4 +141,17 @@ class Markdown
     {
         $this->componentPaths = $paths;
     }
+
+    /**
+     * Set the default theme to be used.
+     *
+     * @param  string  $theme
+     * @return $this
+     */
+    public function theme($theme)
+    {
+        $this->theme = $theme;
+
+        return $this;
+    }
 }
