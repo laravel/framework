@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Routing\UrlGenerator as UrlGeneratorContract;
@@ -317,7 +318,7 @@ class UrlGenerator implements UrlGeneratorContract
     protected function toRoute($route, $parameters, $absolute)
     {
         return $this->routeUrl()->to(
-            $route, $this->formatParameters($parameters), $absolute
+            $route, $this->formatParameters($parameters, $route), $absolute
         );
     }
 
@@ -358,16 +359,24 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Format the array of URL parameters.
      *
-     * @param  mixed|array  $parameters
+     * @param  mixed|array                $parameters
+     * @param  \Illuminate\Routing\Route  $route
+     *
      * @return array
      */
-    public function formatParameters($parameters)
+    public function formatParameters($parameters, Route $route = null)
     {
         $parameters = array_wrap($parameters);
+        $routeParameters = $route ? $route->parameterNames() : [];
 
-        foreach ($parameters as $key => $parameter) {
-            if ($parameter instanceof UrlRoutable) {
-                $parameters[$key] = $parameter->getRouteKey();
+        foreach ($parameters as $index => $value) {
+            $parameter = new RouteParameter(
+                isset($routeParameters[$index]) ? $routeParameters[$index] : $index
+            );
+            if ($value instanceof UrlRoutable) {
+                $parameters[$index] = $value instanceof Model
+                    ? $value->getAttribute($parameter->key() ?: $value->getRouteKeyName())
+                    : $value->getRouteKey();
             }
         }
 

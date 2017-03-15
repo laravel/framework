@@ -426,6 +426,18 @@ class Route
     }
 
     /**
+     * Get the parameters as instances of RouteParameter.
+     *
+     * @return array
+     */
+    public function generatedParameters()
+    {
+        return collect($this->parameters())->flatMap(function ($value, $key) {
+            return [$key => new RouteParameter($key, $value)];
+        })->all();
+    }
+
+    /**
      * Set a default value for the route.
      *
      * @param  string  $key
