@@ -84,7 +84,7 @@ class WelcomeMailableStub extends Mailable
     public function build()
     {
         $this->with('first_name', 'Taylor')
-            ->withLastName('Otwell');
+             ->withLastName('Otwell');
     }
 }
 

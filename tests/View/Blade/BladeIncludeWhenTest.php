@@ -16,10 +16,8 @@ class BladeIncludeWhenTest extends TestCase
     public function testIncludeWhensAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $this->assertEquals('<?php if (true) echo $__env->make(\'foo\', array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>', $compiler->compileString('@includeWhen(true, \'foo\')'));
-        $this->assertEquals('<?php if (true) echo $__env->make(name(foo), array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>', $compiler->compileString('@includeWhen(true, name(foo))'));
-        $this->assertEquals('<?php if (foo((\'foo\'))) echo $__env->make(name(foo), array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>', $compiler->compileString('@includeWhen(foo((\'foo\')), name(foo))'));
-        $this->assertEquals('<?php if (\'true, false\') echo $__env->make(name(foo), array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>', $compiler->compileString('@includeWhen(\'true, false\', name(foo))'));
+        $this->assertEquals('<?php echo $__env->renderWhen(true, \'foo\', ["foo" => "bar"], array_except(get_defined_vars(), array(\'__data\', \'__path\'))); ?>', $compiler->compileString('@includeWhen(true, \'foo\', ["foo" => "bar"])'));
+        $this->assertEquals('<?php echo $__env->renderWhen(true, \'foo\', array_except(get_defined_vars(), array(\'__data\', \'__path\'))); ?>', $compiler->compileString('@includeWhen(true, \'foo\')'));
     }
 
     protected function getFiles()
