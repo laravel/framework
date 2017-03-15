@@ -36,7 +36,7 @@ class RouteParameter
      * Get the name from the parameter definition
      * by finding what's before the semicolon.
      *
-     * @return string|null
+     * @return string
      */
     public function name()
     {
@@ -71,7 +71,7 @@ class RouteParameter
      *
      * @return string
      */
-    public function parameter(): string
+    public function parameter()
     {
         return $this->parameter;
     }
