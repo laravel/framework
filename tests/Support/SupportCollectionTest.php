@@ -712,6 +712,17 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([1 => 'dayle', 0 => 'taylor'], $data->all());
     }
 
+    public function testSortNaturally()
+    {
+        $data = (new Collection(['img12.png', 'img10.png', 'img2.png', 'img1.png']))->sortNaturally();
+        $this->assertEquals(['img1.png', 'img2.png', 'img10.png', 'img12.png'], $data->values()->all());
+
+        $data = (new Collection(['IMG0.png', 'img12.png', 'img10.png', 'img2.png', 'img1.png', 'IMG3.png']))->sortNaturally(true);
+        $this->assertEquals(['IMG0.png', 'img1.png', 'img2.png', 'IMG3.png', 'img10.png', 'img12.png'], $data->values()->all());
+
+
+    }
+
     public function testReverse()
     {
         $data = new Collection(['zaeed', 'alan']);

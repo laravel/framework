@@ -1172,6 +1172,21 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Sort through each item naturally.
+     *
+     * @param  bool $sensitive
+     * @return static
+     */
+    public function sortNaturally($sensitive = false)
+    {
+        $items = $this->items;
+
+        $sensitive ? natcasesort($items) : natsort($items);
+
+        return new static($items);
+    }
+
+    /**
      * Splice a portion of the underlying collection array.
      *
      * @param  int  $offset
