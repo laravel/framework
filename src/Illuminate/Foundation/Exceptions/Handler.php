@@ -171,9 +171,9 @@ class Handler implements ExceptionHandlerContract
     {
         if ($this->isHttpException($e)) {
             return $this->toIlluminateResponse($this->renderHttpException($e), $e);
-        } else {
-            return $this->toIlluminateResponse($this->convertExceptionToResponse($e), $e);
         }
+
+        return $this->toIlluminateResponse($this->convertExceptionToResponse($e), $e);
     }
 
     /**
@@ -193,9 +193,9 @@ class Handler implements ExceptionHandlerContract
 
         if (view()->exists("errors::{$status}")) {
             return response()->view("errors::{$status}", ['exception' => $e], $status, $e->getHeaders());
-        } else {
-            return $this->convertExceptionToResponse($e);
         }
+
+        return $this->convertExceptionToResponse($e);
     }
 
     /**

@@ -202,9 +202,9 @@ class Migrator
             $this->note('<info>Nothing to rollback.</info>');
 
             return [];
-        } else {
-            return $this->rollbackMigrations($migrations, $paths, $options);
         }
+
+        return $this->rollbackMigrations($migrations, $paths, $options);
     }
 
     /**
@@ -217,9 +217,9 @@ class Migrator
     {
         if (($steps = Arr::get($options, 'step', 0)) > 0) {
             return $this->repository->getMigrations($steps);
-        } else {
-            return $this->repository->getLast();
         }
+
+        return $this->repository->getLast();
     }
 
     /**
@@ -273,9 +273,9 @@ class Migrator
             $this->note('<info>Nothing to rollback.</info>');
 
             return [];
-        } else {
-            return $this->resetMigrations($migrations, $paths, $pretend);
         }
+
+        return $this->resetMigrations($migrations, $paths, $pretend);
     }
 
     /**

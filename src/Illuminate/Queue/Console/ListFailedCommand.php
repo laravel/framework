@@ -100,9 +100,9 @@ class ListFailedCommand extends Command
 
         if (isset($matches[1])) {
             return $matches[1];
-        } else {
-            return Arr::get($payload, 'job');
         }
+
+        return Arr::get($payload, 'job');
     }
 
     /**

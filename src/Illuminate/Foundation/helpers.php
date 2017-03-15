@@ -147,9 +147,9 @@ if (! function_exists('auth')) {
     {
         if (is_null($guard)) {
             return app(AuthFactory::class);
-        } else {
-            return app(AuthFactory::class)->guard($guard);
         }
+
+        return app(AuthFactory::class)->guard($guard);
     }
 }
 
