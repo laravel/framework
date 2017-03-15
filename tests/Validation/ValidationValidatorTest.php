@@ -2077,6 +2077,9 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => 'abc123'], ['x' => 'Alpha']);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => "abc\n"], ['x' => 'Alpha']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateAlphaNum()
@@ -2096,6 +2099,9 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => 'नमस्कार'], ['x' => 'AlphaNum']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => "abc\n"], ['x' => 'Alpha']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateAlphaDash()
@@ -2112,6 +2118,9 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => '٧٨٩'], ['x' => 'AlphaDash']); // eastern arabic numerals
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => "abc\n"], ['x' => 'Alpha']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateTimezone()
