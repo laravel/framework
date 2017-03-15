@@ -519,19 +519,25 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function groupBy($groupBy, $preserveKeys = false)
     {
         $groupBy = $this->valueRetriever($groupBy);
+
         $results = [];
+
         foreach ($this->items as $key => $value) {
             $groupKeys = $groupBy($value, $key);
+
             if (! is_array($groupKeys)) {
                 $groupKeys = [$groupKeys];
             }
+
             foreach ($groupKeys as $groupKey) {
                 if (! array_key_exists($groupKey, $results)) {
                     $results[$groupKey] = new static;
                 }
+
                 $results[$groupKey]->offsetSet($preserveKeys ? $key : null, $value);
             }
         }
+
         return new static($results);
     }
 
