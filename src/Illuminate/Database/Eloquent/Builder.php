@@ -197,9 +197,9 @@ class Builder
             return $this;
         }
 
-	if ($this->model->getIncrementing()) {
-	    $id = (int) $id;
-	}
+        if ($this->model->getIncrementing()) {
+            $id = (int) $id;
+        }
 
         return $this->where($this->model->getQualifiedKeyName(), '=', $id);
     }
