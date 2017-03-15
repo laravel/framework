@@ -1115,6 +1115,19 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Sets the data type for the primary key.
+     *
+     * @param string $type
+     * @return $this
+     */
+    public function setKeyType($type)
+    {
+        $this->keyType = $type;
+
+        return $this;
+    }
+
+    /**
      * Get the value indicating whether the IDs are incrementing.
      *
      * @return bool
