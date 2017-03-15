@@ -10,6 +10,8 @@
 - Added `BcryptHasher::cost()` method ([#18266](https://github.com/laravel/framework/pull/18266))
 - Added `Command::alert()` method ([#18272](https://github.com/laravel/framework/pull/18272))
 - Added `tap()` method to query builder ([#18284](https://github.com/laravel/framework/pull/18284))
+- Added `orderByDesc()` methods to query builder ([#18292](https://github.com/laravel/framework/pull/18292))
+- Added `Container::makeWith()` method ([#18271](https://github.com/laravel/framework/pull/18271), [#18320](https://github.com/laravel/framework/pull/18320))
 
 ### Changed
 - Throw exception when `bootstrap/cache` directory is not writable ([#18188](https://github.com/laravel/framework/pull/18188), [b4f0005](https://github.com/laravel/framework/commit/b4f000516166b0694e842d64f5b2fde1167d4690))
@@ -20,10 +22,17 @@
 - Support file uploads in nested array ([#18276](https://github.com/laravel/framework/pull/18276))
 - Don't use `config()` helper in Mail component ([#18290](https://github.com/laravel/framework/pull/18290))
 - Return the insert ID from `DatabaseJob::release()` ([#18288](https://github.com/laravel/framework/pull/18288), [#18291](https://github.com/laravel/framework/pull/18291))
+- Changed `id` in failed jobs migration stub to `bigIncrements()` ([#18300](https://github.com/laravel/framework/pull/18300))
+- Prevent `make:auth` from overwriting existing views ([#18319](https://github.com/laravel/framework/pull/18319), [bef8f35](https://github.com/laravel/framework/commit/bef8f35694b7c22516a27929dbfc4c49032f78c6))
+- Ensure Mailable view data is not overridden by order of operations ([#18322](https://github.com/laravel/framework/pull/18322))
+- Use `getAuthIdentifier()` method in broadcasters ([#18351](https://github.com/laravel/framework/pull/18351))
 
 ### Fixed
 - Fixed an issue with slots when passed content equals `null` ([#18246](https://github.com/laravel/framework/pull/18246))
 - Do require `Closure` in `orWhereHas()` ([#18277](https://github.com/laravel/framework/pull/18277))
+- Let PHP parse `@includeWhen` directive ([#18285](https://github.com/laravel/framework/pull/18285))
+- Only include `.php` files when loading database factories ([#18336](https://github.com/laravel/framework/pull/18336))
+- Fixed PHP 5.6 issue in `FileFactory::generateImage()` ([#18345](https://github.com/laravel/framework/pull/18345))
 
 
 ## v5.4.15 (2017-03-02)
