@@ -462,9 +462,13 @@ class Dispatcher implements DispatcherContract
 
         $job->timeout = isset($listener->timeout) ? $listener->timeout : null;
 
-        $this->resolveQueue()
-                ->connection($connection)
-                ->pushOn($queue, $job);
+        $resolvedQueue = $this->resolveQueue()->connection($connection);
+
+        if (isset($listener->delay)) {
+            $resolvedQueue->laterOn($queue, $listener->delay, $job);
+        } else {
+            $resolvedQueue->pushOn($queue, $job);
+        }
     }
 
     /**
