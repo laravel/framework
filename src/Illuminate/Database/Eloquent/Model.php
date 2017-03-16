@@ -1105,7 +1105,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Get the auto incrementing key type.
+     * Get the auto-incrementing key type.
      *
      * @return string
      */
@@ -1115,9 +1115,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Sets the data type for the primary key.
+     * Set the data type for the primary key.
      *
-     * @param string $type
+     * @param  string  $type
      * @return $this
      */
     public function setKeyType($type)
