@@ -565,6 +565,21 @@ class MySqlGrammar extends Grammar {
 	}
 
 	/**
+	 * Get the SQL for an "first" column modifier.
+	 *
+	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string|null
+	 */
+	protected function modifyFirst(Blueprint $blueprint, Fluent $column)
+	{
+		if ( ! is_null($column->first))
+		{
+			return ' first '.$this->wrap($column->first);
+		}
+	}
+
+	/**
 	 * Get the SQL for an "comment" column modifier.
 	 *
 	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
