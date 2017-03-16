@@ -1397,6 +1397,54 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
+    public function testGroupByMultipleClosureWhereItemsHaveMultipleGroups()
+    {
+        $data = new Collection([
+          ['user' => 1, 'roles' => ['Role_1', 'Role_3'], 'teams' => ['red', 'blue']],
+          ['user' => 2, 'roles' => ['Role_1', 'Role_2'], 'teams' => ['red']],
+          ['user' => 3, 'roles' => ['Role_1'], 'teams' => ['yellow', 'blue']],
+        ]);
+
+        $callback1 = function ($item) {
+            return $item['roles'];
+        };
+        $callback2 = function ($item) {
+            return $item['teams'];
+        };
+        $result = $data->groupByMultiple([$callback1, $callback2]);
+
+        $expected = [
+          'Role_1' => [
+            'red' => [
+              ['user' => 1, 'roles' => ['Role_1', 'Role_3'], 'teams' => ['red', 'blue']],
+              ['user' => 2, 'roles' => ['Role_1', 'Role_2'], 'teams' => ['red']]
+            ],
+            'blue' => [
+              ['user' => 1, 'roles' => ['Role_1', 'Role_3'], 'teams' => ['red', 'blue']],
+              ['user' => 3, 'roles' => ['Role_1'],           'teams' => ['yellow', 'blue']]
+            ],
+            'yellow' => [
+              ['user' => 3, 'roles' => ['Role_1'],           'teams' => ['yellow', 'blue']]
+            ]
+          ],
+          'Role_2' => [
+            'red' => [
+              ['user' => 2, 'roles' => ['Role_1', 'Role_2'], 'teams' => ['red']]
+            ]
+          ],
+          'Role_3' => [
+            'red' => [
+              ['user' => 1, 'roles' => ['Role_1', 'Role_3'], 'teams' => ['red', 'blue']]
+            ],
+            'blue' => [
+              ['user' => 1, 'roles' => ['Role_1', 'Role_3'], 'teams' => ['red', 'blue']]
+            ]
+          ]
+        ];
+
+        $this->assertEquals($expected, $result->toArray());
+    }
+
     public function testKeyByAttribute()
     {
         $data = new Collection([['rating' => 1, 'name' => '1'], ['rating' => 2, 'name' => '2'], ['rating' => 3, 'name' => '3']]);
