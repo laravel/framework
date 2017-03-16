@@ -76,7 +76,9 @@ trait RouteDependencyResolverTrait
         // the list of parameters. If it is we will just skip it as it is probably a model
         // binding and we do not want to mess with those; otherwise, we resolve it here.
         if ($class && ! $this->alreadyInParameters($class->name, $parameters)) {
-            return $this->container->make($class->name);
+            return $parameter->isDefaultValueAvailable()
+                ? $parameter->getDefaultValue()
+                : $this->container->make($class->name);
         }
     }
 

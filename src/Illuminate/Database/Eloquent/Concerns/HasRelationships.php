@@ -286,10 +286,13 @@ trait HasRelationships
      * @param  string  $table
      * @param  string  $foreignKey
      * @param  string  $relatedKey
+     * @param  string  $parentKey
+     * @param  string  $localKey
      * @param  string  $relation
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function belongsToMany($related, $table = null, $foreignKey = null, $relatedKey = null, $relation = null)
+    public function belongsToMany($related, $table = null, $foreignKey = null, $relatedKey = null,
+                                  $parentKey = null, $localKey = null, $relation = null)
     {
         // If no relationship name was passed, we will pull backtraces to get the
         // name of the calling function. We will use that function name as the
@@ -315,7 +318,9 @@ trait HasRelationships
         }
 
         return new BelongsToMany(
-            $instance->newQuery(), $this, $table, $foreignKey, $relatedKey, $relation
+            $instance->newQuery(), $this, $table, $foreignKey,
+            $relatedKey, $parentKey ?: $this->getKeyName(),
+            $localKey ?: $instance->getKeyName(), $relation
         );
     }
 

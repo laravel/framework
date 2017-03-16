@@ -35,6 +35,20 @@ class BelongsToMany extends Relation
     protected $relatedKey;
 
     /**
+     * The key name of the parent model.
+     *
+     * @var string
+     */
+    protected $parentKey;
+
+    /**
+     * The key name of the related model.
+     *
+     * @var string
+     */
+    protected $localKey;
+
+    /**
      * The "name" of the relationship.
      *
      * @var string
@@ -98,12 +112,17 @@ class BelongsToMany extends Relation
      * @param  string  $table
      * @param  string  $foreignKey
      * @param  string  $relatedKey
+     * @param  string  $parentKey
+     * @param  string  $localKey
      * @param  string  $relationName
      * @return void
      */
-    public function __construct(Builder $query, Model $parent, $table, $foreignKey, $relatedKey, $relationName = null)
+    public function __construct(Builder $query, Model $parent, $table, $foreignKey,
+                                $relatedKey, $parentKey, $localKey, $relationName = null)
     {
         $this->table = $table;
+        $this->localKey = $localKey;
+        $this->parentKey = $parentKey;
         $this->relatedKey = $relatedKey;
         $this->foreignKey = $foreignKey;
         $this->relationName = $relationName;
@@ -140,7 +159,7 @@ class BelongsToMany extends Relation
         // model instance. Then we can set the "where" for the parent models.
         $baseTable = $this->related->getTable();
 
-        $key = $baseTable.'.'.$this->related->getKeyName();
+        $key = $baseTable.'.'.$this->localKey;
 
         $query->join($this->table, $key, '=', $this->getQualifiedRelatedKeyName());
 
@@ -155,7 +174,7 @@ class BelongsToMany extends Relation
     protected function addWhereConstraints()
     {
         $this->query->where(
-            $this->getQualifiedForeignKeyName(), '=', $this->parent->getKey()
+            $this->getQualifiedForeignKeyName(), '=', $this->parent->{$this->parentKey}
         );
 
         return $this;

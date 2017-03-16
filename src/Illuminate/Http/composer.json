@@ -14,9 +14,9 @@
         }
     ],
     "require": {
-        "php": ">=5.6.4",
-        "illuminate/session": "5.4.*",
-        "illuminate/support": "5.4.*",
+        "php": ">=7.0",
+        "illuminate/session": "5.5.*",
+        "illuminate/support": "5.5.*",
         "symfony/http-foundation": "~3.2",
         "symfony/http-kernel": "~3.2"
     },
@@ -27,7 +27,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.4-dev"
+            "dev-master": "5.5-dev"
         }
     },
     "config": {

@@ -151,14 +151,6 @@ class SupportStrTest extends TestCase
         $this->assertEquals(11, Str::length('foo bar baz'));
     }
 
-    public function testQuickRandom()
-    {
-        $randomInteger = random_int(1, 100);
-        $this->assertEquals($randomInteger, strlen(Str::quickRandom($randomInteger)));
-        $this->assertInternalType('string', Str::quickRandom());
-        $this->assertEquals(16, strlen(Str::quickRandom()));
-    }
-
     public function testRandom()
     {
         $this->assertEquals(16, strlen(Str::random()));

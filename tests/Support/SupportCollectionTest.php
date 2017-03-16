@@ -9,7 +9,6 @@ use ReflectionClass;
 use JsonSerializable;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Collection;
-use PHPUnit_Framework_Error_Notice;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 
@@ -229,7 +228,7 @@ class SupportCollectionTest extends TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Notice
+     * @expectedException \PHPUnit\Framework\Error\Notice
      */
     public function testArrayAccessOffsetGetOnNonExist()
     {
@@ -249,7 +248,7 @@ class SupportCollectionTest extends TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Notice
+     * @expectedException \PHPUnit\Framework\Error\Notice
      */
     public function testArrayAccessOffsetUnset()
     {

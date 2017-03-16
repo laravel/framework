@@ -38,7 +38,7 @@ class LoadEnvironmentVariables
      */
     protected function checkForSpecificEnvironmentFile($app)
     {
-        if (php_sapi_name() == 'cli' && with($input = new ArgvInput)->hasParameterOption('--env')) {
+        if (php_sapi_name() == 'cli' && ($input = new ArgvInput)->hasParameterOption('--env')) {
             $this->setEnvironmentFilePath(
                 $app, $app->environmentFile().'.'.$input->getParameterOption('--env')
             );

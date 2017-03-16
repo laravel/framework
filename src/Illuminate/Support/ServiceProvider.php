@@ -219,6 +219,26 @@ abstract class ServiceProvider
     }
 
     /**
+     * Get the service providers available for publishing.
+     *
+     * @return array
+     */
+    public static function publishableProviders()
+    {
+        return array_keys(static::$publishes);
+    }
+
+    /**
+     * Get the groups available for publishing.
+     *
+     * @return array
+     */
+    public static function publishableGroups()
+    {
+        return array_keys(static::$publishGroups);
+    }
+
+    /**
      * Register the package's custom Artisan commands.
      *
      * @param  array|mixed  $commands
@@ -261,17 +281,5 @@ abstract class ServiceProvider
     public function isDeferred()
     {
         return $this->defer;
-    }
-
-    /**
-     * Get a list of files that should be compiled for the package.
-     *
-     * @deprecated
-     *
-     * @return array
-     */
-    public static function compiles()
-    {
-        return [];
     }
 }
