@@ -171,8 +171,8 @@ class Migrator
         if ($pretend) {
             return $this->pretendToRun($migration, 'up');
         }
-        
-        $this->note("<info>Migrating:</info> {$name}");
+
+        $this->note("<comment>Migrating:</comment> {$name}");
 
         $this->runMigration($migration, 'up');
 
@@ -318,8 +318,8 @@ class Migrator
         $instance = $this->resolve(
             $name = $this->getMigrationName($file)
         );
-        
-        $this->note("<info>Rolling back:</info> {$name}");
+
+        $this->note("<comment>Rolling back:</comment> {$name}");
 
         if ($pretend) {
             return $this->pretendToRun($instance, 'down');
