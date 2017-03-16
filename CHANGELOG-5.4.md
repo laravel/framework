@@ -12,6 +12,11 @@
 - Added `tap()` method to query builder ([#18284](https://github.com/laravel/framework/pull/18284))
 - Added `orderByDesc()` methods to query builder ([#18292](https://github.com/laravel/framework/pull/18292))
 - Added `Container::makeWith()` method ([#18271](https://github.com/laravel/framework/pull/18271), [#18320](https://github.com/laravel/framework/pull/18320))
+- Added `InteractsWithDatabase::assertSoftDeleted()` ([#18328](https://github.com/laravel/framework/pull/18328), [2d4e1f0](https://github.com/laravel/framework/commit/2d4e1f0fe0bae3c7e3304317a69d619e71e476cc), [f89f917](https://github.com/laravel/framework/commit/f89f917b256ad79df786c688b11247ce1e48299a))
+- Added ability to set queue parameters inside queued listeners ([#18375](https://github.com/laravel/framework/pull/18375), [cf461e2](https://github.com/laravel/framework/commit/cf461e23b6123ba6ed084d2fb8e8306482973b88))
+- Added `-q` shorthand for `make:listener --queued` ([#18362](https://github.com/laravel/framework/pull/18362))
+- Added `Model::setKeyType()` ([#18354](https://github.com/laravel/framework/pull/18354))
+- Output migration name before starting a migration or rollback ([#18379](https://github.com/laravel/framework/pull/18379), [e47e8b1](https://github.com/laravel/framework/commit/e47e8b16c1e65d752943faaa65db14ca323f5feb))
 
 ### Changed
 - Throw exception when `bootstrap/cache` directory is not writable ([#18188](https://github.com/laravel/framework/pull/18188), [b4f0005](https://github.com/laravel/framework/commit/b4f000516166b0694e842d64f5b2fde1167d4690))
@@ -26,6 +31,8 @@
 - Prevent `make:auth` from overwriting existing views ([#18319](https://github.com/laravel/framework/pull/18319), [bef8f35](https://github.com/laravel/framework/commit/bef8f35694b7c22516a27929dbfc4c49032f78c6))
 - Ensure Mailable view data is not overridden by order of operations ([#18322](https://github.com/laravel/framework/pull/18322))
 - Use `getAuthIdentifier()` method in broadcasters ([#18351](https://github.com/laravel/framework/pull/18351))
+- Use atomic cache operation when checking for event overlaps ([8ebb5b8](https://github.com/laravel/framework/commit/8ebb5b859ae8f2382a1836a83a47542de234d63a))
+- Return pretty JSON response from `HasInDatabase::failureDescription()` ([#18377](https://github.com/laravel/framework/pull/18377))
 
 ### Fixed
 - Fixed an issue with slots when passed content equals `null` ([#18246](https://github.com/laravel/framework/pull/18246))
@@ -33,6 +40,9 @@
 - Let PHP parse `@includeWhen` directive ([#18285](https://github.com/laravel/framework/pull/18285))
 - Only include `.php` files when loading database factories ([#18336](https://github.com/laravel/framework/pull/18336))
 - Fixed PHP 5.6 issue in `FileFactory::generateImage()` ([#18345](https://github.com/laravel/framework/pull/18345))
+- Allow `ImplicitRouteBinding` to match camelcase method parameter names ([#18307](https://github.com/laravel/framework/pull/18307), [4ae31a1](https://github.com/laravel/framework/commit/4ae31a154f81c2d76c7397dbdebfcac0e74e4ccd))
+- Fixing weird behaviour of `Connection::getConfig()` when `null` was passed ([#18356](https://github.com/laravel/framework/pull/18356))
+- Attempt to solve an issue with using `required_*` rules while the `ConvertEmptyStringToNull` middleware is applied ([#18376](https://github.com/laravel/framework/pull/18376))
 
 
 ## v5.4.15 (2017-03-02)
