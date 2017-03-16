@@ -1397,6 +1397,43 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
+    public function testGroupByMultipleClosureWhereItemsHaveSingleGroupPreservingKeys()
+    {
+        $data = new Collection([
+          10 => ['rating' => 1, 'url' => '1'],
+          20 => ['rating' => 1, 'url' => '1'],
+          30 => ['rating' => 2, 'url' => '2'],
+          40 => ['rating' => 1, 'url' => '3']
+        ]);
+
+        $callback1 = function ($item) {
+            return $item['rating'];
+        };
+        $callback2 = function ($item) {
+            return $item['url'];
+        };
+        $result = $data->groupByMultiple([$callback1, $callback2], true);
+
+        $expected = [
+          1 => [
+            1 => [
+              10 => ['rating' => 1, 'url' => '1'],
+              20 => ['rating' => 1, 'url' => '1']
+            ],
+            3 => [
+              40 => ['rating' => 1, 'url' => '3']
+            ]
+          ],
+          2 => [
+            2 => [
+              30 => ['rating' => 2, 'url' => '2']
+            ]
+          ]
+        ];
+
+        $this->assertEquals($expected, $result->toArray());
+    }
+
     public function testGroupByMultipleClosureWhereItemsHaveMultipleGroups()
     {
         $data = new Collection([
@@ -1438,6 +1475,54 @@ class SupportCollectionTest extends TestCase
             ],
             'blue' => [
               ['user' => 1, 'roles' => ['Role_1', 'Role_3'], 'teams' => ['red', 'blue']]
+            ]
+          ]
+        ];
+
+        $this->assertEquals($expected, $result->toArray());
+    }
+
+    public function testGroupByMultipleClosureWhereItemsHaveMultipleGroupsPreservingKeys()
+    {
+        $data = new Collection([
+          10 => ['user' => 1, 'roles' => ['Role_1', 'Role_3'], 'teams' => ['red', 'blue']],
+          20 => ['user' => 2, 'roles' => ['Role_1', 'Role_2'], 'teams' => ['red']],
+          30 => ['user' => 3, 'roles' => ['Role_1'], 'teams' => ['yellow', 'blue']],
+        ]);
+
+        $callback1 = function ($item) {
+            return $item['roles'];
+        };
+        $callback2 = function ($item) {
+            return $item['teams'];
+        };
+        $result = $data->groupByMultiple([$callback1, $callback2], true);
+
+        $expected = [
+          'Role_1' => [
+            'red' => [
+              10 => ['user' => 1, 'roles' => ['Role_1', 'Role_3'], 'teams' => ['red', 'blue']],
+              20 => ['user' => 2, 'roles' => ['Role_1', 'Role_2'], 'teams' => ['red']]
+            ],
+            'blue' => [
+              10 => ['user' => 1, 'roles' => ['Role_1', 'Role_3'], 'teams' => ['red', 'blue']],
+              30 => ['user' => 3, 'roles' => ['Role_1'],           'teams' => ['yellow', 'blue']]
+            ],
+            'yellow' => [
+              30 => ['user' => 3, 'roles' => ['Role_1'],           'teams' => ['yellow', 'blue']]
+            ]
+          ],
+          'Role_2' => [
+            'red' => [
+              20 => ['user' => 2, 'roles' => ['Role_1', 'Role_2'], 'teams' => ['red']]
+            ]
+          ],
+          'Role_3' => [
+            'red' => [
+              10 => ['user' => 1, 'roles' => ['Role_1', 'Role_3'], 'teams' => ['red', 'blue']]
+            ],
+            'blue' => [
+              10 => ['user' => 1, 'roles' => ['Role_1', 'Role_3'], 'teams' => ['red', 'blue']]
             ]
           ]
         ];
