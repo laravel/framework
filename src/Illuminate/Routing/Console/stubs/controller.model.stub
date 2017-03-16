@@ -42,10 +42,10 @@ class DummyClass extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \DummyFullModelClass  $DummyModelVariable
+     * @param  int  $DummyModelVariable
      * @return \Illuminate\Http\Response
      */
-    public function show(DummyModelClass $DummyModelVariable)
+    public function show($DummyModelVariable)
     {
         //
     }
@@ -53,10 +53,10 @@ class DummyClass extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \DummyFullModelClass  $DummyModelVariable
+     * @param  int  $DummyModelVariable
      * @return \Illuminate\Http\Response
      */
-    public function edit(DummyModelClass $DummyModelVariable)
+    public function edit($DummyModelVariable)
     {
         //
     }
@@ -65,10 +65,10 @@ class DummyClass extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \DummyFullModelClass  $DummyModelVariable
+     * @param  int  $DummyModelVariable
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, DummyModelClass $DummyModelVariable)
+    public function update(Request $request, $DummyModelVariable)
     {
         //
     }
@@ -76,10 +76,10 @@ class DummyClass extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \DummyFullModelClass  $DummyModelVariable
+     * @param  int $DummyModelVariable
      * @return \Illuminate\Http\Response
      */
-    public function destroy(DummyModelClass $DummyModelVariable)
+    public function destroy($DummyModelVariable)
     {
         //
     }
