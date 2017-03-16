@@ -160,8 +160,9 @@ class Event
      */
     public function run(Container $container)
     {
-        if ($this->withoutOverlapping) {
-            $this->cache->put($this->mutexName(), true, 1440);
+        if ($this->withoutOverlapping &&
+            ! $this->cache->add($this->mutexName(), true, 1440)) {
+            return;
         }
 
         $this->runInBackground

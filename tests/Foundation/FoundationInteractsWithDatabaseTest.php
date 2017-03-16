@@ -101,11 +101,33 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertDatabaseMissing($this->table, $this->data);
     }
 
+    public function testSeeSoftDeletedInDatabaseFindsResults()
+    {
+        $this->mockCountBuilder(1);
+
+        $this->assertSoftDeleted($this->table, $this->data);
+    }
+
+    /**
+     * @expectedException \PHPUnit\Framework\ExpectationFailedException
+     * @expectedExceptionMessage The table is empty.
+     */
+    public function testSeeSoftDeletedInDatabaseDoesNotFindResults()
+    {
+        $builder = $this->mockCountBuilder(0);
+
+        $builder->shouldReceive('get')->andReturn(collect());
+
+        $this->assertSoftDeleted($this->table, $this->data);
+    }
+
     protected function mockCountBuilder($countResult)
     {
         $builder = m::mock(Builder::class);
 
         $builder->shouldReceive('where')->with($this->data)->andReturnSelf();
+
+        $builder->shouldReceive('whereNotNull')->with('deleted_at')->andReturnSelf();
 
         $builder->shouldReceive('count')->andReturn($countResult);
 
