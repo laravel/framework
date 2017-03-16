@@ -1361,6 +1361,42 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
+    public function testGroupByMultipleClosureWhereItemsHaveSingleGroup()
+    {
+        $data = new Collection([
+          ['rating' => 1, 'url' => '1'],
+          ['rating' => 1, 'url' => '1'],
+          ['rating' => 2, 'url' => '2'],
+          ['rating' => 1, 'url' => '3']
+        ]);
+
+        $callback1 = function ($item) {
+            return $item['rating'];
+        };
+        $callback2 = function ($item) {
+            return $item['url'];
+        };
+        $result = $data->groupByMultiple([$callback1, $callback2]);
+
+        $expected = [
+          1 => [
+            1 => [
+              ['rating' => 1, 'url' => '1'],
+              ['rating' => 1, 'url' => '1']
+            ],
+            3 => [
+              ['rating' => 1, 'url' => '3']
+            ]
+          ],
+          2 => [
+            2 => [
+              ['rating' => 2, 'url' => '2']
+            ]
+          ]
+        ];
+        $this->assertEquals($expected, $result->toArray());
+    }
+
     public function testKeyByAttribute()
     {
         $data = new Collection([['rating' => 1, 'name' => '1'], ['rating' => 2, 'name' => '2'], ['rating' => 3, 'name' => '3']]);
