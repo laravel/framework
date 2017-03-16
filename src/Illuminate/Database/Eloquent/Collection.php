@@ -48,19 +48,22 @@ class Collection extends BaseCollection implements QueueableCollection
             return true;
         }
 
-        // Get first model
-        $first = $this->first();
-
         // Check if this is a nested relationship
         if (strpos($key, '.') === false) {
-            return $first->relationLoaded($key);
+            return $this->every(function ($item) use ($key) {
+                return $item->relationLoaded($key);
+            });
         } else {
             // Split first key from nested relations
             $name = strstr($key, '.', true);
             $nested = substr(strstr($key, '.'), 1);
 
+            $relationLoaded = $this->every(function ($item) use ($name) {
+                return $item->relationLoaded($name);
+            });
+
             // Check if relations are loaded
-            if (! $first->relationLoaded($name)) {
+            if (! $relationLoaded) {
                 return false;
             }
 
