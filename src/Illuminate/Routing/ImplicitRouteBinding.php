@@ -18,24 +18,33 @@ class ImplicitRouteBinding
         $parameters = $route->parameters();
 
         foreach ($route->signatureParameters(Model::class) as $parameter) {
-            $class = $parameter->getClass();
+            if ($route->parameter($parameter->name) instanceof Model) {
+                continue;
+            }
 
-            if (! $route->parameter($parameter->name) instanceof Model) {
-                $model = $container->make($class->name);
+            $model = $container->make($parameter->getClass()->name);
 
-                $parameterName = array_key_exists($parameter->name, $parameters) ? $parameter->name : null;
+            $parameterName = static::checkForParameter($parameter->name, $parameters) ?:
+                             static::checkForParameter(snake_case($parameter->name), $parameters);
 
-                // check if parameter name used was camelized in routed callback method
-                if (! $parameterName) {
-                    $snakeParamName = snake_case($parameter->name);
-                    $parameterName = array_key_exists($snakeParamName, $parameters) ? $snakeParamName : null;
-                }
-
-                if ($parameterName) {
-                    $value = $model->where($model->getRouteKeyName(), $parameters[$parameterName])->firstOrFail();
-                    $route->setParameter($parameterName, $value);
-                }
+            if ($parameterName) {
+                $route->setParameter($parameterName, $model->where(
+                    $model->getRouteKeyName(), $parameters[$parameterName]
+                )->firstOrFail());
             }
         }
+    }
+
+    /**
+     * Return the parameter name if it exists in the given parameters.
+     *
+     * @param  string  $name
+     * @param  array  $parameters
+     * @return string|null
+     */
+    protected static function checkForParameter($name, $parameters)
+    {
+        return array_key_exists($name, $parameters)
+                        ? $name : null;
     }
 }
