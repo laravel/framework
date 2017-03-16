@@ -89,7 +89,6 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
     /**
      * @expectedException \PHPUnit_Framework_ExpectationFailedException
-     * @expectedExceptionMessage a row in the table [products] does not match the attributes {"title":"Spark"}
      */
     public function testDontSeeInDatabaseFindsResults()
     {
