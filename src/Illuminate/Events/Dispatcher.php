@@ -452,13 +452,19 @@ class Dispatcher implements DispatcherContract
     {
         $listener = (new ReflectionClass($class))->newInstanceWithoutConstructor();
 
+        $job = new CallQueuedListener($class, $method, $arguments);
+
         $connection = isset($listener->connection) ? $listener->connection : null;
 
         $queue = isset($listener->queue) ? $listener->queue : null;
 
+        $job->tries = isset($listener->tries) ? $listener->tries : null;
+
+        $job->timeout = isset($listener->timeout) ? $listener->timeout : null;
+
         $this->resolveQueue()
                 ->connection($connection)
-                ->pushOn($queue, new CallQueuedListener($class, $method, $arguments));
+                ->pushOn($queue, $job);
     }
 
     /**
