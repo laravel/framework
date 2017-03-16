@@ -417,7 +417,7 @@ class Validator implements ValidatorContract
     {
         return $this->presentOrRuleIsImplicit($rule, $attribute, $value) &&
                $this->passesOptionalCheck($attribute) &&
-               $this->isNotNullIfMarkedAsNullable($attribute, $value) &&
+               $this->isNotNullIfMarkedAsNullable($rule, $attribute) &&
                $this->hasNotFailedPreviousRuleIfPresenceRule($rule, $attribute);
     }
 
@@ -470,13 +470,13 @@ class Validator implements ValidatorContract
     /**
      * Determine if the attribute fails the nullable check.
      *
+     * @param  string  $rule
      * @param  string  $attribute
-     * @param  mixed  $value
      * @return bool
      */
-    protected function isNotNullIfMarkedAsNullable($attribute, $value)
+    protected function isNotNullIfMarkedAsNullable($rule, $attribute)
     {
-        if (! $this->hasRule($attribute, ['Nullable'])) {
+        if (in_array($rule, $this->implicitRules) || ! $this->hasRule($attribute, ['Nullable'])) {
             return true;
         }
 
