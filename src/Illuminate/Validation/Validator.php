@@ -477,8 +477,7 @@ class Validator implements ValidatorContract
      */
     protected function isNotNullIfMarkedAsNullable($rule, $attribute, $value)
     {
-        if (in_array($rule, $this->implicitRules) ||
-            ! $this->hasRule($attribute, ['Nullable']))
+        if (in_array($rule, $this->implicitRules) || ! $this->hasRule($attribute, ['Nullable']))
         {
             return true;
         }
