@@ -1320,6 +1320,47 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
+    public function testGroupByMultipleAttributePreservingKeys()
+    {
+        $data = new Collection([
+          10 => ['rating' => 1, 'url' => 'a'],
+          20 => ['rating' => 1, 'url' => 'a'],
+          30 => ['rating' => 2, 'url' => 'b'],
+          40 => ['rating' => 2, 'url' => 'a'],
+          50 => ['rating' => 1, 'url' => 'b'],
+          60 => ['rating' => 3, 'url' => 'c']
+        ]);
+
+        $result = $data->groupByMultiple(['rating', 'url'], true);
+
+        $expected = [
+          1 => [
+            'a' => [
+              10 => ['rating' => 1, 'url' => 'a'],
+              20 => ['rating' => 1, 'url' => 'a']
+            ],
+            'b' => [
+              50 => ['rating' => 1, 'url' => 'b']
+            ]
+          ],
+          2 => [
+            'a' => [
+              40 => ['rating' => 2, 'url' => 'a']
+            ],
+            'b' => [
+              30 => ['rating' => 2, 'url' => 'b']
+            ]
+          ],
+          3 => [
+            'c' => [
+              60 => ['rating' => 3, 'url' => 'c']
+            ]
+          ]
+        ];
+
+        $this->assertEquals($expected, $result->toArray());
+    }
+
     public function testKeyByAttribute()
     {
         $data = new Collection([['rating' => 1, 'name' => '1'], ['rating' => 2, 'name' => '2'], ['rating' => 3, 'name' => '3']]);
