@@ -105,7 +105,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     {
         $this->mockCountBuilder(1);
 
-        $this->assertDatabaseHasSoftDelete($this->table, $this->data);
+        $this->assertSoftDeleted($this->table, $this->data);
     }
 
     /**
@@ -118,7 +118,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $builder->shouldReceive('get')->andReturn(collect());
 
-        $this->assertDatabaseHasSoftDelete($this->table, $this->data);
+        $this->assertSoftDeleted($this->table, $this->data);
     }
 
     protected function mockCountBuilder($countResult)
