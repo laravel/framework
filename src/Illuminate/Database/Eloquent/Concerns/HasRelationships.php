@@ -357,21 +357,21 @@ trait HasRelationships
      *
      * @param  string  $related
      * @param  string|Closure  $table
-     * @param  string  $foreignKey
-     * @param  string  $relatedKey
+     * @param  string  $foreignPivotKey
+     * @param  string  $relatedPivotKey
      * @param  string  $parentKey
-     * @param  string  $localKey
+     * @param  string  $relatedKey
      * @param  string  $relation
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function belongsToMany($related, $table = null, $foreignKey = null, $relatedKey = null,
-                                  $parentKey = null, $localKey = null, $relation = null)
+    public function belongsToMany($related, $table = null, $foreignPivotKey = null, $relatedPivotKey = null,
+                                  $parentKey = null, $relatedKey = null, $relation = null)
     {
         // If the second argument is a Closure, we will ignore other arguments
         // and set up the relationship with values provided in the Closure.
         if ($table instanceof Closure) {
             extract(
-                StrictFluent::withNullArray(['table', 'foreignKey', 'relatedKey', 'parentKey', 'localKey', 'relation'])
+                StrictFluent::withNullArray(['table', 'foreignPivotKey', 'relatedPivotKey', 'parentKey', 'relatedKey', 'relation'])
                             ->applyClosure($table)
                             ->getAttributes()
             );
@@ -389,9 +389,9 @@ trait HasRelationships
         // instances as well as the relationship instances we need for this.
         $instance = $this->newRelatedInstance($related);
 
-        $foreignKey = $foreignKey ?: $this->getForeignKey();
+        $foreignPivotKey = $foreignPivotKey ?: $this->getForeignKey();
 
-        $relatedKey = $relatedKey ?: $instance->getForeignKey();
+        $relatedPivotKey = $relatedPivotKey ?: $instance->getForeignKey();
 
         // If no table name was provided, we can guess it by concatenating the two
         // models using underscores in alphabetical order. The two model names
@@ -401,9 +401,9 @@ trait HasRelationships
         }
 
         return new BelongsToMany(
-            $instance->newQuery(), $this, $table, $foreignKey,
-            $relatedKey, $parentKey ?: $this->getKeyName(),
-            $localKey ?: $instance->getKeyName(), $relation
+            $instance->newQuery(), $this, $table, $foreignPivotKey,
+            $relatedPivotKey, $parentKey ?: $this->getKeyName(),
+            $relatedKey ?: $instance->getKeyName(), $relation
         );
     }
 
@@ -413,18 +413,22 @@ trait HasRelationships
      * @param  string  $related
      * @param  string  $name
      * @param  string|Closure  $table
-     * @param  string  $foreignKey
+     * @param  string  $foreignPivotKey
+     * @param  string  $relatedPivotKey
+     * @param  string  $parentKey
      * @param  string  $relatedKey
      * @param  bool  $inverse
      * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
-    public function morphToMany($related, $name, $table = null, $foreignKey = null, $relatedKey = null, $inverse = false)
+    public function morphToMany($related, $name, $table = null, $foreignPivotKey = null,
+                                $relatedPivotKey = null, $parentKey = null,
+                                $relatedKey = null, $inverse = false)
     {
         // If the second argument is a Closure, we will ignore other arguments
         // and set up the relationship with values provided in the Closure.
         if ($table instanceof Closure) {
             extract(
-                StrictFluent::withNullArray(['table', 'foreignKey', 'relatedKey', 'inverse'])
+                StrictFluent::withNullArray(['table', 'foreignPivotKey', 'relatedPivotKey', 'parentKey', 'relatedKey', 'inverse'])
                             ->applyClosure($table)
                             ->getAttributes()
             );
@@ -437,9 +441,9 @@ trait HasRelationships
         // instances, as well as the relationship instances we need for these.
         $instance = $this->newRelatedInstance($related);
 
-        $foreignKey = $foreignKey ?: $name.'_id';
+        $foreignPivotKey = $foreignPivotKey ?: $name.'_id';
 
-        $relatedKey = $relatedKey ?: $instance->getForeignKey();
+        $relatedPivotKey = $relatedPivotKey ?: $instance->getForeignKey();
 
         // Now we're ready to create a new query builder for this related model and
         // the relationship instances for this relation. This relations will set
@@ -448,7 +452,8 @@ trait HasRelationships
 
         return new MorphToMany(
             $instance->newQuery(), $this, $name, $table,
-            $foreignKey, $relatedKey, $caller, $inverse
+            $foreignPivotKey, $relatedPivotKey, $parentKey ?: $this->getKeyName(),
+            $relatedKey ?: $instance->getKeyName(), $caller, $inverse
         );
     }
 
@@ -458,30 +463,36 @@ trait HasRelationships
      * @param  string  $related
      * @param  string  $name
      * @param  string|Closure  $table
-     * @param  string  $foreignKey
+     * @param  string  $foreignPivotKey
+     * @param  string  $relatedPivotKey
+     * @param  string  $parentKey
      * @param  string  $relatedKey
      * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
-    public function morphedByMany($related, $name, $table = null, $foreignKey = null, $relatedKey = null)
+    public function morphedByMany($related, $name, $table = null, $foreignPivotKey = null,
+                                  $relatedPivotKey = null, $parentKey = null, $relatedKey = null)
     {
         // If the second argument is a Closure, we will ignore other arguments
         // and set up the relationship with values provided in the Closure.
         if ($table instanceof Closure) {
             extract(
-                StrictFluent::withNullArray(['table', 'foreignKey', 'relatedKey'])
+                StrictFluent::withNullArray(['table', 'foreignPivotKey', 'relatedPivotKey', 'parentKey', 'relatedKey'])
                             ->applyClosure($table)
                             ->getAttributes()
             );
         }
 
-        $foreignKey = $foreignKey ?: $this->getForeignKey();
+        $foreignPivotKey = $foreignPivotKey ?: $this->getForeignKey();
 
         // For the inverse of the polymorphic many-to-many relations, we will change
         // the way we determine the foreign and other keys, as it is the opposite
         // of the morph-to-many method since we're figuring out these inverses.
-        $relatedKey = $relatedKey ?: $name.'_id';
+        $relatedPivotKey = $relatedPivotKey ?: $name.'_id';
 
-        return $this->morphToMany($related, $name, $table, $foreignKey, $relatedKey, true);
+        return $this->morphToMany(
+            $related, $name, $table, $foreignPivotKey,
+            $relatedPivotKey, $parentKey, $relatedKey, true
+        );
     }
 
     /**

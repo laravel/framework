@@ -166,6 +166,17 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 2, 1 => 'foo'], $builder->getBindings());
     }
 
+    public function testTapCallback()
+    {
+        $callback = function ($query) {
+            return $query->where('id', '=', 1);
+        };
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->tap($callback)->where('email', 'foo');
+        $this->assertEquals('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
+    }
+
     public function testBasicWheres()
     {
         $builder = $this->getBuilder();
@@ -625,6 +636,10 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->orderBy('email')->orderByRaw('"age" ? desc', ['foo']);
         $this->assertEquals('select * from "users" order by "email" asc, "age" ? desc', $builder->toSql());
         $this->assertEquals(['foo'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orderByDesc('name');
+        $this->assertEquals('select * from "users" order by "name" desc', $builder->toSql());
     }
 
     public function testHavings()

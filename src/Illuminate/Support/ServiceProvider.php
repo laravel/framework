@@ -25,14 +25,14 @@ abstract class ServiceProvider
      *
      * @var array
      */
-    protected static $publishes = [];
+    public static $publishes = [];
 
     /**
      * The paths that should be published by group.
      *
      * @var array
      */
-    protected static $publishGroups = [];
+    public static $publishGroups = [];
 
     /**
      * Create a new service provider instance.

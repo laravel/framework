@@ -10,6 +10,9 @@ class SupportServiceProviderTest extends TestCase
 {
     public function setUp()
     {
+        ServiceProvider::$publishes = [];
+        ServiceProvider::$publishGroups = [];
+
         $app = m::mock('Illuminate\\Foundation\\Application')->makePartial();
         $one = new ServiceProviderForTestingOne($app);
         $one->boot();
