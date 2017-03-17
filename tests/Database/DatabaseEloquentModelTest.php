@@ -1002,6 +1002,60 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals('stub.baz', $relation->getQualifiedParentKeyName());
     }
 
+    public function testMorphToManyCreatesProperRelation()
+    {
+        $model = new EloquentModelStub;
+        $this->addMockConnection($model);
+        $relation = $model->morphToMany('Illuminate\Tests\Database\EloquentModelSaveStub', 'morph', function ($r) {
+            $r->table('table')
+              ->foreignPivotKey('foreignPivotKey')
+              ->relatedPivotKey('relatedPivotKey')
+              ->parentKey('parentKey')
+              ->relatedKey('relatedKey')
+              ->inverse();
+        });
+        $this->assertEquals('table', $relation->getTable());
+        $this->assertEquals('table.foreignPivotKey', $relation->getQualifiedForeignPivotKeyName());
+        $this->assertEquals('table.relatedPivotKey', $relation->getQualifiedRelatedPivotKeyName());
+        $this->assertEquals('stub.parentKey', $relation->getQualifiedParentKeyName());
+        $this->assertEquals('table.relatedKey', $relation->getQualifiedRelatedKeyName());
+        $this->assertEquals('Illuminate\Tests\Database\EloquentModelSaveStub', $relation->getMorphClass());
+
+        $model = new EloquentModelStub;
+        $this->addMockConnection($model);
+        $relation = $model->morphToMany('Illuminate\Tests\Database\EloquentModelSaveStub', 'morph', function ($r) {
+            $r->table('table')
+              ->foreignPivotKey('foreignPivotKey')
+              ->relatedPivotKey('relatedPivotKey')
+              ->parentKey('parentKey')
+              ->relatedKey('relatedKey');
+        });
+        $this->assertEquals('table', $relation->getTable());
+        $this->assertEquals('table.foreignPivotKey', $relation->getQualifiedForeignPivotKeyName());
+        $this->assertEquals('table.relatedPivotKey', $relation->getQualifiedRelatedPivotKeyName());
+        $this->assertEquals('stub.parentKey', $relation->getQualifiedParentKeyName());
+        $this->assertEquals('table.relatedKey', $relation->getQualifiedRelatedKeyName());
+        $this->assertEquals('Illuminate\Tests\Database\EloquentModelStub', $relation->getMorphClass());
+    }
+
+    public function testMorphedByManyCreatesProperRelation()
+    {
+        $model = new EloquentModelStub;
+        $this->addMockConnection($model);
+        $relation = $model->morphedByMany('Illuminate\Tests\Database\EloquentModelSaveStub', 'morph', function ($r) {
+            $r->table('table')
+              ->foreignPivotKey('foreignPivotKey')
+              ->relatedPivotKey('relatedPivotKey')
+              ->parentKey('parentKey')
+              ->relatedKey('relatedKey');
+        });
+        $this->assertEquals('table', $relation->getTable());
+        $this->assertEquals('table.foreignPivotKey', $relation->getQualifiedForeignPivotKeyName());
+        $this->assertEquals('table.relatedPivotKey', $relation->getQualifiedRelatedPivotKeyName());
+        $this->assertEquals('stub.parentKey', $relation->getQualifiedParentKeyName());
+        $this->assertEquals('table.relatedKey', $relation->getQualifiedRelatedKeyName());
+    }
+
     public function testBelongsToCreatesProperRelation()
     {
         $model = new EloquentModelStub;
@@ -1095,18 +1149,18 @@ class DatabaseEloquentModelTest extends TestCase
         $this->addMockConnection($model);
         $relation = $model->belongsToMany('Illuminate\Tests\Database\EloquentModelSaveStub', function ($r) {
             $r->table('table')
-              ->foreignKey('foreignKey')
-              ->relatedKey('relatedKey')
+              ->foreignPivotKey('foreignPivotKey')
+              ->relatedPivotKey('relatedPivotKey')
               ->parentKey('parentKey')
-              ->localKey('localKey')
+              ->relatedKey('relatedKey')
               ->relation('relation');
         });
         $relation->getQualifiedParentKeyName();
         $this->assertEquals('table', $relation->getTable());
-        $this->assertEquals('table.foreignKey', $relation->getQualifiedForeignKeyName());
-        $this->assertEquals('table.relatedKey', $relation->getQualifiedRelatedKeyName());
+        $this->assertEquals('table.foreignPivotKey', $relation->getQualifiedForeignPivotKeyName());
+        $this->assertEquals('table.relatedPivotKey', $relation->getQualifiedRelatedPivotKeyName());
         $this->assertEquals('stub.parentKey', $relation->getQualifiedParentKeyName());
-        $this->assertEquals('table.localKey', $relation->getQualifiedLocalKeyName());
+        $this->assertEquals('table.relatedKey', $relation->getQualifiedRelatedKeyName());
         $this->assertEquals('relation', $relation->getRelationName());
     }
 

@@ -923,9 +923,9 @@ class BelongsToMany extends Relation
      *
      * @return string
      */
-    public function getQualifiedLocalKeyName()
+    public function getQualifiedRelatedKeyName()
     {
-        return $this->table.'.'.$this->localKey;
+        return $this->table.'.'.$this->relatedKey;
     }
 
     /**
