@@ -46,6 +46,40 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
     }
 
     /**
+     * Set the value of an attribute.
+     *
+     * @param  string  $key
+     * @param  mixed   $value
+     * @return void
+     */
+    public function set($key, $value)
+    {
+        $this->attributes[$key] = $value;
+    }
+
+    /**
+     * Determine if an attribute exists.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function has($key)
+    {
+        return isset($this->attributes[$key]);
+    }
+
+    /**
+     * Unset an attribute.
+     *
+     * @param  string  $key
+     * @return void
+     */
+    public function unset($key)
+    {
+        unset($this->attributes[$key]);
+    }
+
+    /**
      * Get the attributes from the container.
      *
      * @return array
@@ -94,7 +128,7 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
      */
     public function offsetExists($offset)
     {
-        return isset($this->{$offset});
+        return $this->has($offset);
     }
 
     /**
@@ -105,7 +139,7 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
      */
     public function offsetGet($offset)
     {
-        return $this->{$offset};
+        return $this->get($offset);
     }
 
     /**
@@ -117,7 +151,7 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
      */
     public function offsetSet($offset, $value)
     {
-        $this->{$offset} = $value;
+        $this->set($offset, $value);
     }
 
     /**
@@ -128,7 +162,7 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
      */
     public function offsetUnset($offset)
     {
-        unset($this->{$offset});
+        $this->unset($offset);
     }
 
     /**
@@ -140,7 +174,7 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
      */
     public function __call($method, $parameters)
     {
-        $this->attributes[$method] = count($parameters) > 0 ? $parameters[0] : true;
+        $this->set($method, count($parameters) > 0 ? $parameters[0] : true);
 
         return $this;
     }
@@ -165,7 +199,7 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
      */
     public function __set($key, $value)
     {
-        $this->attributes[$key] = $value;
+        $this->set($key, $value);
     }
 
     /**
@@ -176,7 +210,7 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
      */
     public function __isset($key)
     {
-        return isset($this->attributes[$key]);
+        return $this->has($key);
     }
 
     /**
@@ -187,6 +221,6 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
      */
     public function __unset($key)
     {
-        unset($this->attributes[$key]);
+        $this->unset($key);
     }
 }
