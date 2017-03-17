@@ -960,11 +960,8 @@ trait HasAttributes
     {
         $dirty = [];
 
-        foreach ($this->attributes as $key => $value) {
-            if (! array_key_exists($key, $this->original)) {
-                $dirty[$key] = $value;
-            } elseif ($value !== $this->original[$key] &&
-                    ! $this->originalIsNumericallyEquivalent($key)) {
+        foreach ($this->getAttributes() as $key => $value) {
+            if (! $this->originalIsEquivalent($key, $value)) {
                 $dirty[$key] = $value;
             }
         }
@@ -973,16 +970,27 @@ trait HasAttributes
     }
 
     /**
-     * Determine if the new and old values for a given key are numerically equivalent.
+     * Determine if the new and old values for a given key are equivalent.
      *
-     * @param  string  $key
+     * @param  string $key
+     * @param  mixed  $current
      * @return bool
      */
-    protected function originalIsNumericallyEquivalent($key)
+    protected function originalIsEquivalent($key, $current)
     {
-        $current = $this->attributes[$key];
+        if (! array_key_exists($key, $this->original)) {
+            return false;
+        }
 
-        $original = $this->original[$key];
+        $original = $this->getOriginal($key);
+
+        if ($this->isDateAttribute($key)) {
+            return $this->fromDateTime($current) === $this->fromDateTime($original);
+        }
+
+        if ($this->hasCast($key)) {
+            return $this->castAttribute($key, $current) === $this->castAttribute($key, $original);
+        }
 
         // This method checks if the two values are numerically equivalent even if they
         // are different types. This is in case the two values are not the same type
