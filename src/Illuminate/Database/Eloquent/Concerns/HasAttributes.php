@@ -982,7 +982,9 @@ trait HasAttributes
             return false;
         }
 
-        $original = $this->getOriginal($key);
+        if ($current === $original = $this->getOriginal($key)) {
+            return true;
+        }
 
         if ($this->isDateAttribute($key)) {
             return $this->fromDateTime($current) === $this->fromDateTime($original);
