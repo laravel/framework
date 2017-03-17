@@ -33,7 +33,7 @@ class StrictFluent extends Fluent
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function __set($key, $value)
     {
@@ -43,7 +43,7 @@ class StrictFluent extends Fluent
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function __call($method, $parameters)
     {

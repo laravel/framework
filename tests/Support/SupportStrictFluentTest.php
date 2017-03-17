@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Support;
 
 use Exception;
-use Illuminate\Support\StrictFluent;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Support\StrictFluent;
 
 class SupportStrictFluentTest extends TestCase
 {
