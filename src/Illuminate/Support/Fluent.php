@@ -69,17 +69,6 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Unset an attribute.
-     *
-     * @param  string  $key
-     * @return void
-     */
-    public function unset($key)
-    {
-        unset($this->attributes[$key]);
-    }
-
-    /**
      * Get the attributes from the container.
      *
      * @return array
@@ -162,7 +151,7 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
      */
     public function offsetUnset($offset)
     {
-        $this->unset($offset);
+        unset($this->attributes[$offset]);
     }
 
     /**
@@ -221,6 +210,6 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
      */
     public function __unset($key)
     {
-        $this->unset($key);
+        $this->offsetUnset($key);
     }
 }

@@ -1288,7 +1288,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function offsetUnset($offset)
     {
-        $this->unsetAttribute($offset);
+        unset($this->attributes[$offset], $this->relations[$offset]);
     }
 
     /**
@@ -1310,7 +1310,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function __unset($key)
     {
-        $this->unsetAttribute($key);
+        $this->offsetUnset($key);
     }
 
     /**

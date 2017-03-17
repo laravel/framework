@@ -298,17 +298,6 @@ trait HasAttributes
     }
 
     /**
-     * Unset an attribute on the model.
-     *
-     * @param  string  $key
-     * @return void
-     */
-    public function unsetAttribute($key)
-    {
-        unset($this->attributes[$key], $this->relations[$key]);
-    }
-
-    /**
      * Get an attribute from the model.
      *
      * @param  string  $key
