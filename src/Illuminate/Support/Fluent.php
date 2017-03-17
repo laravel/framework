@@ -46,29 +46,6 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Set the value of an attribute.
-     *
-     * @param  string  $key
-     * @param  mixed   $value
-     * @return void
-     */
-    public function set($key, $value)
-    {
-        $this->attributes[$key] = $value;
-    }
-
-    /**
-     * Determine if an attribute exists.
-     *
-     * @param  string  $key
-     * @return bool
-     */
-    public function has($key)
-    {
-        return isset($this->attributes[$key]);
-    }
-
-    /**
      * Get the attributes from the container.
      *
      * @return array
@@ -117,7 +94,7 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
      */
     public function offsetExists($offset)
     {
-        return $this->has($offset);
+        return isset($this->attributes[$offset]);
     }
 
     /**
@@ -140,7 +117,7 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
      */
     public function offsetSet($offset, $value)
     {
-        $this->set($offset, $value);
+        $this->attributes[$offset] = $value;
     }
 
     /**
@@ -163,7 +140,7 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
      */
     public function __call($method, $parameters)
     {
-        $this->set($method, count($parameters) > 0 ? $parameters[0] : true);
+        $this->offsetSet($method, count($parameters) > 0 ? $parameters[0] : true);
 
         return $this;
     }
@@ -188,7 +165,7 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
      */
     public function __set($key, $value)
     {
-        $this->set($key, $value);
+        $this->offsetSet($key, $value);
     }
 
     /**
@@ -199,7 +176,7 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
      */
     public function __isset($key)
     {
-        return $this->has($key);
+        return $this->offsetExists($key);
     }
 
     /**
