@@ -7,7 +7,6 @@ use InvalidArgumentException;
 
 class StrictFluent extends Fluent
 {
-
     /**
      * Instantiate StrictFluent with an array full of nulls.
      *
