@@ -287,6 +287,28 @@ trait HasAttributes
     }
 
     /**
+     * Determine if an attribute exists.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function hasAttribute($key)
+    {
+        return ! is_null($this->getAttribute($key));
+    }
+
+    /**
+     * Unset an attribute on the model.
+     *
+     * @param  string  $key
+     * @return void
+     */
+    public function unsetAttribute($key)
+    {
+        unset($this->attributes[$key], $this->relations[$key]);
+    }
+
+    /**
      * Get an attribute from the model.
      *
      * @param  string  $key
