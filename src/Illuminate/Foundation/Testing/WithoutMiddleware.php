@@ -11,7 +11,7 @@ trait WithoutMiddleware
      *
      * @throws \Exception
      */
-    public function disableMiddlewareForAllTests()
+    public function setUpDisableMiddlewareForAllTests()
     {
         if (method_exists($this, 'withoutMiddleware')) {
             $this->withoutMiddleware();

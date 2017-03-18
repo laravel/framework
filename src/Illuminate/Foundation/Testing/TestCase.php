@@ -66,7 +66,7 @@ abstract class TestCase extends BaseTestCase
             $this->refreshApplication();
         }
 
-        $this->setUpTraits();
+        $this->runTraitHooks('setUp');
 
         foreach ($this->afterApplicationCreatedCallbacks as $callback) {
             call_user_func($callback);
@@ -90,28 +90,18 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
-     * Boot the testing helper traits.
+     * Run testing helper trait hooks by method prefix.
      *
      * @return void
      */
-    protected function setUpTraits()
+    protected function runTraitHooks(string $prefix)
     {
-        $uses = array_flip(class_uses_recursive(static::class));
+        $class = static::class;
 
-        if (isset($uses[DatabaseMigrations::class])) {
-            $this->runDatabaseMigrations();
-        }
-
-        if (isset($uses[DatabaseTransactions::class])) {
-            $this->beginDatabaseTransaction();
-        }
-
-        if (isset($uses[WithoutMiddleware::class])) {
-            $this->disableMiddlewareForAllTests();
-        }
-
-        if (isset($uses[WithoutEvents::class])) {
-            $this->disableEventsForAllTests();
+        foreach (class_uses_recursive($class) as $trait) {
+            if (method_exists($class, $method = $prefix.class_basename($trait))) {
+                call_user_func([$this, $method]);
+            }
         }
     }
 
@@ -122,6 +112,8 @@ abstract class TestCase extends BaseTestCase
      */
     protected function tearDown()
     {
+        $this->runTraitHooks('tearDown');
+
         if ($this->app) {
             foreach ($this->beforeApplicationDestroyedCallbacks as $callback) {
                 call_user_func($callback);
