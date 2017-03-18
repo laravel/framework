@@ -70,7 +70,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testDirtyOnCastOrDateAttributes(){
         $model = new EloquentModelCastingStub;
         $model->setDateFormat('Y-m-d H:i:s');
-        $model->boolAttribute = true;
+        $model->boolAttribute = 1;
         $model->foo = 1;
         $model->bar = '2017-03-18';
         $model->dateAttribute = '2017-03-18';
@@ -78,7 +78,7 @@ class DatabaseEloquentModelTest extends TestCase
 
         $model->foo = true;
         $model->bar = '2017-03-18 00:00:00';
-        $model->boolAttribute = 1;
+        $model->boolAttribute = true;
         $model->dateAttribute = '2017-03-18 00:00:00';
 
         $this->assertTrue($model->isDirty());
