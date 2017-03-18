@@ -96,6 +96,8 @@ abstract class TestCase extends BaseTestCase
      */
     protected function setUpTraits()
     {
+        $this->runTraitHooks('setUp');
+
         $uses = array_flip(class_uses_recursive(static::class));
 
         if (isset($uses[DatabaseMigrations::class])) {
@@ -116,12 +118,30 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
+     * Run testing helper trait hooks by method prefix.
+     *
+     * @return void
+     */
+    protected function runTraitHooks(string $prefix)
+    {
+        $class = static::class;
+
+        foreach (class_uses_recursive($class) as $trait) {
+            if (method_exists($class, $method = $prefix.class_basename($trait))) {
+                call_user_func([$this, $method]);
+            }
+        }
+    }
+
+    /**
      * Clean up the testing environment before the next test.
      *
      * @return void
      */
     protected function tearDown()
     {
+        $this->runTraitHooks('tearDown');
+
         if ($this->app) {
             foreach ($this->beforeApplicationDestroyedCallbacks as $callback) {
                 call_user_func($callback);
