@@ -142,6 +142,12 @@ trait HasEvents
             return false;
         }
 
+        if (is_array($result)) {
+            $result = array_filter($result, function($response) {
+                return ! is_null($response);
+            });
+        }
+
         return ! empty($result) ? $result : static::$dispatcher->{$method}(
             "eloquent.{$event}: ".static::class, $this
         );
