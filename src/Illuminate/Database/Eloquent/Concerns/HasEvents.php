@@ -143,7 +143,7 @@ trait HasEvents
         }
 
         if (is_array($result)) {
-            $result = array_filter($result, function($response) {
+            $result = array_filter($result, function ($response) {
                 return ! is_null($response);
             });
         }
