@@ -522,4 +522,15 @@ class SupportArrTest extends TestCase
         Arr::forget($array, ['emails.joe@example.com', 'emails.jane@localhost']);
         $this->assertEquals(['emails' => ['joe@example.com' => ['name' => 'Joe']]], $array);
     }
+
+    public function testWrap()
+    {
+        $string = 'a';
+        $array = ['a'];
+        $object = new stdClass;
+        $object->value = 'a';
+        $this->assertEquals(['a'], array_wrap($string));
+        $this->assertEquals($array, array_wrap($array));
+        $this->assertEquals([$object], array_wrap($object));
+    }
 }
