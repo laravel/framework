@@ -141,17 +141,6 @@ class PhpRedisConnection extends Connection
     }
 
     /**
-     * Execute a raw command.
-     *
-     * @param  array  $parameters
-     * @return mixed
-     */
-    public function executeRaw(array $parameters)
-    {
-        return $this->command('rawCommand', $parameters);
-    }
-
-    /**
      * Evaluate a LUA script serverside, from the SHA1 hash of the script instead of the script itself.
      *
      * @param  string  $script
@@ -220,6 +209,17 @@ class PhpRedisConnection extends Connection
     public function createSubscription($channels, Closure $callback, $method = 'subscribe')
     {
         //
+    }
+
+    /**
+     * Execute a raw command.
+     *
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function executeRaw(array $parameters)
+    {
+        return $this->command('rawCommand', $parameters);
     }
 
     /**
