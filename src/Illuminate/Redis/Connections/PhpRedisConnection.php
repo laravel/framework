@@ -111,7 +111,7 @@ class PhpRedisConnection extends Connection
     }
 
     /**
-     * Execute commands in a pipeline
+     * Execute commands in a pipeline.
      *
      * @param  callable  $callback
      * @return array|\Redis
@@ -126,7 +126,7 @@ class PhpRedisConnection extends Connection
     }
 
     /**
-     * Execute commands in a transaction
+     * Execute commands in a transaction.
      *
      * @param  callable  $callback
      * @return array|\Redis
@@ -141,14 +141,14 @@ class PhpRedisConnection extends Connection
     }
 
     /**
-     * Execute a raw command
+     * Execute a raw command.
      *
      * @param  array  $parameters
      * @return mixed
      */
     public function executeRaw(array $parameters)
     {
-        return $this->command("rawCommand", $parameters);
+        return $this->command('rawCommand', $parameters);
     }
 
     /**
