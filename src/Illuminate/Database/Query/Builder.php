@@ -13,13 +13,14 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Query\Processors\Processor;
 
 class Builder
 {
-    use Macroable {
+    use BuildsQueries, Macroable {
         __call as macroCall;
     }
 
@@ -458,24 +459,14 @@ class Builder
     }
 
     /**
-     * Apply the callback's query changes if the given "value" is true.
+     * Pass the query to a given callback.
      *
-     * @param  bool  $value
      * @param  \Closure  $callback
-     * @param  \Closure  $default
      * @return \Illuminate\Database\Query\Builder
      */
-    public function when($value, $callback, $default = null)
+    public function tap($callback)
     {
-        $builder = $this;
-
-        if ($value) {
-            $builder = call_user_func($callback, $builder);
-        } elseif ($default) {
-            $builder = call_user_func($default, $builder);
-        }
-
-        return $builder;
+        return $this->when(true, $callback);
     }
 
     /**
@@ -1425,6 +1416,19 @@ class Builder
     }
 
     /**
+     * Add a descending "order by" clause to the query.
+     *
+     * @param  string  $column
+     * @return $this
+     */
+    public function orderByDesc($column)
+    {
+        $this->orderBy($column, 'desc');
+
+        return $this;
+    }
+
+    /**
      * Add an "order by" clause for a timestamp to the query.
      *
      * @param  string  $column
@@ -1676,17 +1680,6 @@ class Builder
     }
 
     /**
-     * Execute the query and get the first result.
-     *
-     * @param  array   $columns
-     * @return \stdClass|array|null
-     */
-    public function first($columns = ['*'])
-    {
-        return $this->take(1)->get($columns)->first();
-    }
-
-    /**
      * Execute the query as a "select" statement.
      *
      * @param  array  $columns
@@ -1834,44 +1827,6 @@ class Builder
     }
 
     /**
-     * Chunk the results of the query.
-     *
-     * @param  int  $count
-     * @param  callable  $callback
-     * @return bool
-     */
-    public function chunk($count, callable $callback)
-    {
-        $this->enforceOrderBy();
-
-        $page = 1;
-
-        do {
-            // We'll execute the query for the given page and get the results. If there are
-            // no results we can just break and return from here. When there are results
-            // we will call the callback with the current chunk of these results here.
-            $results = $this->forPage($page, $count)->get();
-
-            $countResults = $results->count();
-
-            if ($countResults == 0) {
-                break;
-            }
-
-            // On each chunk result set, we will pass them to the callback and then let the
-            // developer take care of everything within the callback, which allows us to
-            // keep the memory low for spinning through large result sets for working.
-            if ($callback($results) === false) {
-                return false;
-            }
-
-            $page++;
-        } while ($countResults == $count);
-
-        return true;
-    }
-
-    /**
      * Chunk the results of a query by comparing numeric IDs.
      *
      * @param  int  $count
@@ -1925,24 +1880,6 @@ class Builder
         if (empty($this->orders) && empty($this->unionOrders)) {
             throw new RuntimeException('You must specify an orderBy clause when using this function.');
         }
-    }
-
-    /**
-     * Execute a callback over each item while chunking.
-     *
-     * @param  callable  $callback
-     * @param  int  $count
-     * @return bool
-     */
-    public function each(callable $callback, $count = 1000)
-    {
-        return $this->chunk($count, function ($results) use ($callback) {
-            foreach ($results as $key => $value) {
-                if ($callback($value, $key) === false) {
-                    return false;
-                }
-            }
-        });
     }
 
     /**

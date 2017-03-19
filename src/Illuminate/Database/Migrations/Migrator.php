@@ -172,6 +172,8 @@ class Migrator
             return $this->pretendToRun($migration, 'up');
         }
 
+        $this->note("<comment>Migrating:</comment> {$name}");
+
         $this->runMigration($migration, 'up');
 
         // Once we have run a migrations class, we will log that it was run in this
@@ -316,6 +318,8 @@ class Migrator
         $instance = $this->resolve(
             $name = $this->getMigrationName($file)
         );
+
+        $this->note("<comment>Rolling back:</comment> {$name}");
 
         if ($pretend) {
             return $this->pretendToRun($instance, 'down');

@@ -139,6 +139,24 @@ class Factory implements FactoryContract
     }
 
     /**
+     * Get the rendered content of the view based on a given condition.
+     *
+     * @param  bool  $condition
+     * @param  string  $view
+     * @param  array   $data
+     * @param  array   $mergeData
+     * @return string
+     */
+    public function renderWhen($condition, $view, $data = [], $mergeData = [])
+    {
+        if (! $condition) {
+            return '';
+        }
+
+        return $this->make($view, $this->parseData($data), $mergeData)->render();
+    }
+
+    /**
      * Get the rendered contents of a partial from a loop.
      *
      * @param  string  $view

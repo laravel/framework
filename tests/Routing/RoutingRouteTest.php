@@ -700,6 +700,16 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('tayloralt', $router->dispatch(Request::create('foo/TAYLOR', 'GET'))->getContent());
     }
 
+    /**
+     * @group shit
+     */
+    public function testModelBindingWithCompoundParameterName()
+    {
+        $router = $this->getRouter();
+        $router->resource('foo-bar', 'Illuminate\Tests\Routing\RouteTestResourceControllerWithModelParameter', ['middleware' => SubstituteBindings::class]);
+        $this->assertEquals('12345', $router->dispatch(Request::create('foo-bar/12345', 'GET'))->getContent());
+    }
+
     public function testModelBindingThroughIOC()
     {
         $container = new Container;
@@ -1272,6 +1282,14 @@ class RouteTestControllerWithParameterStub extends Controller
     public function returnParameter($bar = '')
     {
         return $bar;
+    }
+}
+
+class RouteTestResourceControllerWithModelParameter extends Controller
+{
+    public function show(RoutingTestUserModel $fooBar)
+    {
+        return $fooBar->value;
     }
 }
 

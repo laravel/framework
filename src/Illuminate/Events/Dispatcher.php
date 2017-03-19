@@ -450,15 +450,49 @@ class Dispatcher implements DispatcherContract
      */
     protected function queueHandler($class, $method, $arguments)
     {
-        $listener = (new ReflectionClass($class))->newInstanceWithoutConstructor();
+        list($listener, $job) = $this->createListenerAndJob($class, $method, $arguments);
 
-        $connection = isset($listener->connection) ? $listener->connection : null;
+        $connection = $this->resolveQueue()->connection(
+            isset($listener->connection) ? $listener->connection : null
+        );
 
         $queue = isset($listener->queue) ? $listener->queue : null;
 
-        $this->resolveQueue()
-                ->connection($connection)
-                ->pushOn($queue, new CallQueuedListener($class, $method, $arguments));
+        isset($listener->delay)
+                    ? $connection->laterOn($queue, $listener->delay, $job)
+                    : $connection->pushOn($queue, $job);
+    }
+
+    /**
+     * Create the listener and job for a queued listener.
+     *
+     * @param  string  $class
+     * @param  string  $method
+     * @param  array  $arguments
+     * @return array
+     */
+    protected function createListenerAndJob($class, $method, $arguments)
+    {
+        $listener = (new ReflectionClass($class))->newInstanceWithoutConstructor();
+
+        return [$listener, $this->propogateListenerOptions(
+            $listener, new CallQueuedListener($class, $method, $arguments)
+        )];
+    }
+
+    /**
+     * Propogate listener options to the job.
+     *
+     * @param  mixed  $listener
+     * @param  mixed  $job
+     * @return mixed
+     */
+    protected function propogateListenerOptions($listener, $job)
+    {
+        return tap($job, function ($job) use ($listener) {
+            $job->tries = isset($listener->tries) ? $listener->tries : null;
+            $job->timeout = isset($listener->timeout) ? $listener->timeout : null;
+        });
     }
 
     /**

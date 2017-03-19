@@ -645,6 +645,17 @@ class SupportHelpersTest extends TestCase
         ));
     }
 
+    public function testArrayWrap()
+    {
+        $string = 'a';
+        $array = ['a'];
+        $object = new stdClass;
+        $object->value = 'a';
+        $this->assertEquals(['a'], array_wrap($string));
+        $this->assertEquals($array, array_wrap($array));
+        $this->assertEquals([$object], array_wrap($object));
+    }
+
     public function testHead()
     {
         $array = ['a', 'b', 'c'];
