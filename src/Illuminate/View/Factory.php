@@ -570,6 +570,27 @@ class Factory {
 	}
 
 	/**
+	 * Stop injecting content into a section and prepend it.
+	 *
+	 * @return string
+	 */
+	public function prependSection()
+	{
+		$last = array_pop($this->sectionStack);
+
+		if (isset($this->sections[$last]))
+		{
+			$this->sections[$last] = ob_get_clean().$this->sections[$last];
+		}
+		else
+		{
+			$this->sections[$last] = ob_get_clean();
+		}
+
+		return $last;
+	}
+
+	/**
 	 * Append content to a given section.
 	 *
 	 * @param  string  $section

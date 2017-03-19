@@ -399,6 +399,12 @@ empty
 		$this->assertEquals('<?php $__env->appendSection(); ?>', $compiler->compileString('@append'));
 	}
 
+	public function testPrependSectionsAreCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$this->assertEquals('<?php $__env->prependSection(); ?>', $compiler->compileString('@prepend'));
+	}
+
 
 	public function testCustomPhpCodeIsCorrectlyHandled()
 	{

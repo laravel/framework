@@ -294,6 +294,19 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testSectionPrepending()
+	{
+		$factory = $this->getFactory();
+		$factory->startSection('foo');
+		echo 'there';
+		$factory->prependSection();
+		$factory->startSection('foo');
+		echo 'hi';
+		$factory->prependSection();
+		$this->assertEquals('hithere', $factory->yieldContent('foo'));
+	}
+
+
 	public function testYieldSectionStopsAndYields()
 	{
 		$factory = $this->getFactory();

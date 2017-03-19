@@ -328,6 +328,17 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	}
 
 	/**
+	 * Compile the prepend statement into valid PHP.
+	 *
+	 * @param  string  $expression
+	 * @return string
+	 */
+	protected function compilePrepend($expression)
+	{
+		return "<?php \$__env->prependSection(); ?>";
+	}
+
+	/**
 	 * Compile the end-section statements into valid PHP.
 	 *
 	 * @param  string  $expression
