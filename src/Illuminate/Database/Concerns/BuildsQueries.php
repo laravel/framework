@@ -84,9 +84,9 @@ trait BuildsQueries
         $builder = $this;
 
         if ($value) {
-            $builder = $callback($builder);
+            $builder = $callback($builder, $value);
         } elseif ($default) {
-            $builder = $default($builder);
+            $builder = $default($builder, $value);
         }
 
         return $builder;
