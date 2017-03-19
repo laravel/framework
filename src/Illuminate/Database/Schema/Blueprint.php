@@ -890,15 +890,72 @@ class Blueprint
      *
      * @param  string  $name
      * @param  string|null  $indexName
+     * @param  string  $size
      * @return void
      */
-    public function morphs($name, $indexName = null)
+    public function morphs($name, $indexName = null, $size = 'integer')
     {
-        $this->unsignedInteger("{$name}_id");
+        $morphId = "{$name}_id";
+        $morphType = "{$name}_type";
+        
+        $this->morphSize(false, $size, $morphId);
 
-        $this->string("{$name}_type");
+        $this->string($morphType);
 
-        $this->index(["{$name}_id", "{$name}_type"], $indexName);
+        $this->index([$morphId, $morphType], $indexName);
+    }
+    
+ /**
+     * Set different morph ID type for a polymorphic table.
+     *
+     * @param boolean $nullable
+     * @param string  $size
+     * @param string  $morphId
+     */
+    protected function morphSize($nullable, $size, $morphId) {
+
+        switch ($size) {
+            case 'big':
+                if ($nullable) {
+                    $this->unsignedBigInteger($morphId)
+                         ->nullable();
+                } else {
+                    $this->unsignedBigInteger($morphId);
+                }
+
+                break;
+            case 'medium':
+                if ($nullable) {
+                    $this->unsignedMediumInteger($morphId)
+                         ->nullable();
+                } else {
+                    $this->unsignedMediumInteger($morphId);
+                }
+                break;
+            case 'small':
+                if ($nullable) {
+                    $this->unsignedSmallInteger($morphId)
+                         ->nullable();
+                } else {
+                    $this->unsignedSmallInteger($morphId);
+                }
+                break;
+            case 'tiny':
+                if ($nullable) {
+                    $this->unsignedTinyInteger($morphId)
+                         ->nullable();
+                } else {
+                    $this->unsignedTinyInteger($morphId);
+                }
+                break;
+            default:
+                if ($nullable) {
+                    $this->unsignedInteger($morphId)
+                         ->nullable();
+                } else {
+                    $this->unsignedInteger($morphId);
+                }
+        }
     }
 
     /**
@@ -906,15 +963,19 @@ class Blueprint
      *
      * @param  string  $name
      * @param  string|null  $indexName
+     * @param  string  $size
      * @return void
      */
-    public function nullableMorphs($name, $indexName = null)
+    public function nullableMorphs($name, $indexName = null, $size = 'integer')
     {
-        $this->unsignedInteger("{$name}_id")->nullable();
+        $morphId = "{$name}_id";
+        $morphType = "{$name}_type";
+        
+        $this->morphSize(false, $size, $morphId);
 
-        $this->string("{$name}_type")->nullable();
+        $this->string($morphType)->nullable();
 
-        $this->index(["{$name}_id", "{$name}_type"], $indexName);
+        $this->index([$morphId, $morphType], $indexName);
     }
 
     /**
