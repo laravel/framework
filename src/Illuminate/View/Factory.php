@@ -583,6 +583,7 @@ class Factory {
 			$content = str_replace('@parent', $content, $this->sections[$section]);
 		}
 
+		$content = str_replace('@parent', '', $content);
 		$this->sections[$section] = $content;
 	}
 
