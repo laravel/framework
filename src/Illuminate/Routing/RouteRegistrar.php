@@ -86,7 +86,7 @@ class RouteRegistrar
      * @param  string  $name
      * @param  string  $controller
      * @param  array  $options
-     * @return \Illuminate\Routing\PendingResourceRegistration
+     * @return \Illuminate\Routing\ResourceRegistration
      */
     public function resource($name, $controller, array $options = [])
     {

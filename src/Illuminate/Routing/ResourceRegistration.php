@@ -2,7 +2,7 @@
 
 namespace Illuminate\Routing;
 
-class PendingResourceRegistration
+class ResourceRegistration
 {
     /**
      * The resource name.
@@ -26,31 +26,30 @@ class PendingResourceRegistration
     protected $options = [];
 
     /**
-     * The resource registrar.
+     * The default actions for a resourceful controller.
      *
-     * @var \Illuminate\Routing\ResourceRegistrar
+     * @var array
      */
-    protected $registrar;
+    protected $resourceDefaults;
+
+    /**
+     * The route collection instance.
+     *
+     * @var \Illuminate\Routing\RouteCollection
+     */
+    protected $routes;
 
     /**
      * Create a new pending resource registration instance.
      *
-     * @param  \Illuminate\Routing\ResourceRegistrar  $registrar
+     * @param  array  $resourceDefaults
+     * @param  \Illuminate\Routing\RouteCollection  $router
      * @return void
      */
-    public function __construct(ResourceRegistrar $registrar)
+    public function __construct(array $resourceDefaults, RouteCollection $routes)
     {
-        $this->registrar = $registrar;
-    }
-
-    /**
-     * Handle the object's destruction.
-     *
-     * @return void
-     */
-    public function __destruct()
-    {
-        $this->registrar->register($this->name, $this->controller, $this->options);
+        $this->resourceDefaults = $resourceDefaults;
+        $this->routes = $routes;
     }
 
     /**
@@ -76,6 +75,10 @@ class PendingResourceRegistration
     public function only($methods)
     {
         $this->options['only'] = is_array($methods) ? $methods : func_get_args();
+
+        $this->removeRoutes(
+            array_diff($this->resourceDefaults, $this->options['only'])
+        );
     }
 
     /**
@@ -86,5 +89,26 @@ class PendingResourceRegistration
     public function except($methods)
     {
         $this->options['except'] = is_array($methods) ? $methods : func_get_args();
+
+        $this->removeRoutes(
+            array_intersect($this->resourceDefaults, $this->options['except'])
+        );
+    }
+
+    /**
+     * Remove methods from the routes.
+     *
+     * @param  array  $methods
+     * @return void
+     */
+    protected function removeRoutes(array $methods)
+    {
+        foreach ($methods as $method) {
+            $name = $this->name.'.'.$method;
+
+            if ($route = $this->routes->getByName($name)) {
+                $this->routes->remove($route);
+            }
+        }
     }
 }

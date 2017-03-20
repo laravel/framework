@@ -240,7 +240,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  string  $name
      * @param  string  $controller
      * @param  array  $options
-     * @return \Illuminate\Routing\PendingResourceRegistration
+     * @return \Illuminate\Routing\ResourceRegistration
      */
     public function resource($name, $controller, array $options = [])
     {
@@ -250,7 +250,7 @@ class Router implements RegistrarContract, BindingRegistrar
             $registrar = new ResourceRegistrar($this);
         }
 
-        return $registrar->lazy($name, $controller, $options);
+        return $registrar->register($name, $controller, $options);
     }
 
     /**
