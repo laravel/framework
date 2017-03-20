@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\JsonEncodingException;
 
 trait HasAttributes
 {
+
     /**
      * The model's attributes.
      *
@@ -69,6 +70,13 @@ trait HasAttributes
      * @var array
      */
     protected static $mutatorCache = [];
+
+    /**
+     * The date attributes that should be auto formatted.
+     *
+     * @var null|array
+     */
+    protected $fixedFormattedFields;
 
     /**
      * Convert the model's attributes to an array.
@@ -326,6 +334,13 @@ trait HasAttributes
     {
         $value = $this->getAttributeFromArray($key);
 
+        // If the attribute exists within the formattedDated array, we will convert it to
+        // we will format it before outputting it.
+        if( ($field = $this->getFieldToFormat($key)) != null)
+        {
+            return date($field['out_format'], strtotime($this->getAttributeFromArray($key)));
+        }
+
         // If the attribute has a get mutator, we will call that then return what
         // it returns as the value, which is useful for transforming values on
         // retrieval from the model to a form that is more useful for usage.
@@ -510,10 +525,18 @@ trait HasAttributes
      */
     public function setAttribute($key, $value)
     {
+
         // First we will check for the presence of a mutator for the set operation
+        // which simply lets the developers assign some datetime properties and
+        // we'll auto convert a string to a proper formatted datetime string.
+        if( ($field = $this->getFieldToFormat($key)) != null)
+        {
+            $value = date($field['in_format'], strtotime($value));
+        }
+        // Second we will check for the presence of a mutator for the set operation
         // which simply lets the developers tweak the attribute as it is set on
         // the model, such as "json_encoding" an listing of data for storage.
-        if ($this->hasSetMutator($key)) {
+        elseif ($this->hasSetMutator($key)) {
             $method = 'set'.Str::studly($key).'Attribute';
 
             return $this->{$method}($value);
@@ -1059,5 +1082,77 @@ trait HasAttributes
         preg_match_all('/(?<=^|;)get([^;]+?)Attribute(;|$)/', implode(';', get_class_methods($class)), $matches);
 
         return $matches[1];
+    }
+
+    /**
+     * Get the formatted property for a given attribute on the model.
+     *
+     * @param  string  $key
+     * @return mix (null|array)
+     */
+    protected function getFieldToFormat($key)
+    {
+        foreach($this->getFixedFormattedFields() as $field)
+        {
+            if($field['key'] == $key)
+            {
+                return $field;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the fields to auto format.
+     *
+     * @return array
+     */
+    protected function getFixedFormattedFields()
+    {
+        if( is_null($this->fixedFormattedFields))
+        {
+            $this->fixedFormattedFields = [];
+
+            if( property_exists($this, 'formattedDates') && is_array($this->formattedDates))
+            {
+                foreach($this->formattedDates as $field)
+                {
+                    if(!is_array($field))
+                    {
+                        $this->fixedFormattedFields[] = $this->getFixedFormattedField($field);
+                        continue;
+                    }
+
+                    if(isset($field['key']))
+                    {
+                        $inFormat = isset($field['in_format']) ? $field['in_format'] : null;
+                        $outFormat = isset($field['out_format']) ? $field['out_format'] : null;
+
+                        $this->fixedFormattedFields[] = $this->getFixedFormattedField($field['key'], $inFormat, $outFormat);
+                    }
+                }
+            }
+        }
+
+        return $this->fixedFormattedFields;
+    }
+
+    /**
+     * Get get a standard format for the fields to auto format.
+     *
+     * @param  string  $key
+     * @param  string $inFormat
+     * @param  string $outFormat
+     * @return array
+     */
+    protected function getFixedFormattedField($key, $inFormat = null, $outFormat = null)
+    {
+        return 
+        [   
+            'key' => $key,
+            'in_format' => is_null($inFormat) ? config('app.fallback_in_format') : $inFormat,
+            'out_format' => is_null($outFormat) ? config('app.fallback_out_format') : $outFormat
+        ];
     }
 }
