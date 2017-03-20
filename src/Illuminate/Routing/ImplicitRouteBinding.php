@@ -18,20 +18,33 @@ class ImplicitRouteBinding
         $parameters = $route->parameters();
 
         foreach ($route->signatureParameters(Model::class) as $parameter) {
-            $class = $parameter->getClass();
+            if ($route->parameter($parameter->name) instanceof Model) {
+                continue;
+            }
 
-            if (array_key_exists($parameter->name, $parameters) &&
-                ! $route->parameter($parameter->name) instanceof Model) {
-                $method = $parameter->isDefaultValueAvailable() ? 'first' : 'firstOrFail';
+            $model = $container->make($parameter->getClass()->name);
 
-                $model = $container->make($class->name);
+            $parameterName = static::checkForParameter($parameter->name, $parameters) ?:
+                             static::checkForParameter(snake_case($parameter->name), $parameters);
 
-                $route->setParameter(
-                    $parameter->name, $model->where(
-                        $model->getRouteKeyName(), $parameters[$parameter->name]
-                    )->{$method}()
-                );
+            if ($parameterName) {
+                $route->setParameter($parameterName, $model->where(
+                    $model->getRouteKeyName(), $parameters[$parameterName]
+                )->firstOrFail());
             }
         }
+    }
+
+    /**
+     * Return the parameter name if it exists in the given parameters.
+     *
+     * @param  string  $name
+     * @param  array  $parameters
+     * @return string|null
+     */
+    protected static function checkForParameter($name, $parameters)
+    {
+        return array_key_exists($name, $parameters)
+                        ? $name : null;
     }
 }

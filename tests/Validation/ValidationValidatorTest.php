@@ -177,6 +177,37 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals('validation.boolean', $v->messages()->get('b')[0]);
     }
 
+    public function testNullableMakesNoDifferenceIfImplicitRuleExists()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, [
+            'x' => null, 'y' => null,
+        ], [
+            'x' => 'nullable|required_with:y|integer',
+            'y' => 'nullable|required_with:x|integer',
+        ]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, [
+            'x' => 'value', 'y' => null,
+        ], [
+            'x' => 'nullable|required_with:y|integer',
+            'y' => 'nullable|required_with:x|integer',
+        ]);
+        $this->assertTrue($v->fails());
+        $this->assertEquals('validation.integer', $v->messages()->get('x')[0]);
+
+        $v = new Validator($trans, [
+            'x' => 123, 'y' => null,
+        ], [
+            'x' => 'nullable|required_with:y|integer',
+            'y' => 'nullable|required_with:x|integer',
+        ]);
+        $this->assertTrue($v->fails());
+        $this->assertEquals('validation.required_with', $v->messages()->get('y')[0]);
+    }
+
     public function testProperLanguageLineIsSet()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -1976,7 +2007,11 @@ class ValidationValidatorTest extends TestCase
 
         $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension'])->setConstructorArgs($uploadedFile)->getMock();
         $file->expects($this->any())->method('guessExtension')->will($this->returnValue('php'));
+
         $v = new Validator($trans, ['x' => $file], ['x' => 'mimetypes:text/x-php']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => $file], ['x' => 'mimetypes:text/*']);
         $this->assertTrue($v->passes());
     }
 

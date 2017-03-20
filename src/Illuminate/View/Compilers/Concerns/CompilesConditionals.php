@@ -77,4 +77,25 @@ trait CompilesConditionals
     {
         return '<?php endif; ?>';
     }
+
+    /**
+     * Compile the if-isset statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileIsset($expression)
+    {
+        return "<?php if(isset{$expression}): ?>";
+    }
+
+    /**
+     * Compile the end-isset statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileEndIsset()
+    {
+        return '<?php endif; ?>';
+    }
 }
