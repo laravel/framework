@@ -10,7 +10,6 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
 use Illuminate\Contracts\Container\Container;
-use Symfony\Component\HttpFoundation\File\File;
 use Illuminate\Contracts\Translation\Translator;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
@@ -418,7 +417,7 @@ class Validator implements ValidatorContract
     {
         return $this->presentOrRuleIsImplicit($rule, $attribute, $value) &&
                $this->passesOptionalCheck($attribute) &&
-               $this->isNotNullIfMarkedAsNullable($attribute, $value) &&
+               $this->isNotNullIfMarkedAsNullable($rule, $attribute) &&
                $this->hasNotFailedPreviousRuleIfPresenceRule($rule, $attribute);
     }
 
@@ -471,17 +470,17 @@ class Validator implements ValidatorContract
     /**
      * Determine if the attribute fails the nullable check.
      *
+     * @param  string  $rule
      * @param  string  $attribute
-     * @param  mixed  $value
      * @return bool
      */
-    protected function isNotNullIfMarkedAsNullable($attribute, $value)
+    protected function isNotNullIfMarkedAsNullable($rule, $attribute)
     {
-        if (! $this->hasRule($attribute, ['Nullable'])) {
+        if (in_array($rule, $this->implicitRules) || ! $this->hasRule($attribute, ['Nullable'])) {
             return true;
         }
 
-        return ! is_null($value);
+        return ! is_null(Arr::get($this->data, $attribute, 0));
     }
 
     /**
@@ -743,7 +742,7 @@ class Validator implements ValidatorContract
      * @param  array  $rules
      * @return void
      */
-    protected function addRules($rules)
+    public function addRules($rules)
     {
         // The primary purpose of this parser is to expand any "*" rules to the all
         // of the explicit rules needed for the given data. For example the rule
@@ -1043,11 +1042,7 @@ class Validator implements ValidatorContract
      */
     protected function callClassBasedExtension($callback, $parameters)
     {
-        if (Str::contains($callback, '@')) {
-            list($class, $method) = explode('@', $callback);
-        } else {
-            list($class, $method) = [$callback, 'validate'];
-        }
+        list($class, $method) = Str::parseCallback($callback, 'validate');
 
         return call_user_func_array([$this->container->make($class), $method], $parameters);
     }

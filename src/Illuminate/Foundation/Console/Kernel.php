@@ -231,7 +231,7 @@ class Kernel implements KernelContract
     public function queue($command, array $parameters = [])
     {
         $this->app[QueueContract::class]->push(
-            QueuedJob::class, func_get_args()
+            new QueuedCommand(func_get_args())
         );
     }
 

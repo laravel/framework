@@ -123,6 +123,11 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::is($patternObject, $valueObject));
     }
 
+    public function testKebab()
+    {
+        $this->assertEquals('laravel-php-framework', Str::kebab('LaravelPhpFramework'));
+    }
+
     public function testLower()
     {
         $this->assertEquals('foo bar baz', Str::lower('FOO BAR BAZ'));
@@ -144,14 +149,6 @@ class SupportStrTest extends TestCase
     public function testLength()
     {
         $this->assertEquals(11, Str::length('foo bar baz'));
-    }
-
-    public function testQuickRandom()
-    {
-        $randomInteger = random_int(1, 100);
-        $this->assertEquals($randomInteger, strlen(Str::quickRandom($randomInteger)));
-        $this->assertInternalType('string', Str::quickRandom());
-        $this->assertEquals(16, strlen(Str::quickRandom()));
     }
 
     public function testRandom()

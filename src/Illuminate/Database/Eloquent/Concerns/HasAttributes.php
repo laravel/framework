@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Database\Eloquent\JsonEncodingException;
 
 trait HasAttributes
 {
@@ -358,7 +359,7 @@ trait HasAttributes
      */
     protected function getAttributeFromArray($key)
     {
-        if (array_key_exists($key, $this->attributes)) {
+        if (isset($this->attributes[$key])) {
             return $this->attributes[$key];
         }
     }
@@ -526,7 +527,7 @@ trait HasAttributes
         }
 
         if ($this->isJsonCastable($key) && ! is_null($value)) {
-            $value = $this->asJson($value);
+            $value = $this->castAttributeAsJson($key, $value);
         }
 
         // If this attribute contains a JSON ->, we'll set the proper value in the
@@ -607,6 +608,26 @@ trait HasAttributes
     {
         return isset($this->attributes[$key]) ?
                     $this->fromJson($this->attributes[$key]) : [];
+    }
+
+    /**
+     * Cast the given attribute to JSON.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return string
+     */
+    protected function castAttributeAsJson($key, $value)
+    {
+        $value = $this->asJson($value);
+
+        if ($value === false) {
+            throw JsonEncodingException::forAttribute(
+                $this, $key, json_last_error_msg()
+            );
+        }
+
+        return $value;
     }
 
     /**
@@ -744,7 +765,7 @@ trait HasAttributes
     {
         $defaults = [static::CREATED_AT, static::UPDATED_AT];
 
-        return $this->timestamps ? array_merge($this->dates, $defaults) : $this->dates;
+        return $this->usesTimestamps() ? array_merge($this->dates, $defaults) : $this->dates;
     }
 
     /**

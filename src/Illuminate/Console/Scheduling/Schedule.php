@@ -17,6 +17,13 @@ class Schedule
     protected $cache;
 
     /**
+     * All of the events on the schedule.
+     *
+     * @var array
+     */
+    protected $events = [];
+
+    /**
      * Create a new event instance.
      *
      * @param  \Illuminate\Contracts\Cache\Repository  $cache
@@ -26,13 +33,6 @@ class Schedule
     {
         $this->cache = $cache;
     }
-
-    /**
-     * All of the events on the schedule.
-     *
-     * @var array
-     */
-    protected $events = [];
 
     /**
      * Add a new callback event to the schedule.
@@ -64,6 +64,19 @@ class Schedule
         return $this->exec(
             Application::formatCommandString($command), $parameters
         );
+    }
+
+    /**
+     * Add a new job callback event to the schedule.
+     *
+     * @param  object|string  $job
+     * @return \Illuminate\Console\Scheduling\Event
+     */
+    public function job($job)
+    {
+        return $this->call(function () use ($job) {
+            dispatch(is_string($job) ? resolve($job) : $job);
+        })->name(is_string($job) ? $job : get_class($job));
     }
 
     /**

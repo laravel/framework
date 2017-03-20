@@ -133,6 +133,17 @@ class Str
     }
 
     /**
+     * Convert a string to kebab case.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function kebab($value)
+    {
+        return static::snake($value, '-');
+    }
+
+    /**
      * Return the length of the given string.
      *
      * @param  string  $value
@@ -194,10 +205,10 @@ class Str
      * Parse a Class@method style callback into class and method.
      *
      * @param  string  $callback
-     * @param  string  $default
+     * @param  string|null  $default
      * @return array
      */
-    public static function parseCallback($callback, $default)
+    public static function parseCallback($callback, $default = null)
     {
         return static::contains($callback, '@') ? explode('@', $callback, 2) : [$callback, $default];
     }
@@ -233,27 +244,6 @@ class Str
         }
 
         return $string;
-    }
-
-    /**
-     * Generate a "random" alpha-numeric string.
-     *
-     * Should not be considered sufficient for cryptography, etc.
-     *
-     * @deprecated since version 5.3. Use the "random" method directly.
-     *
-     * @param  int  $length
-     * @return string
-     */
-    public static function quickRandom($length = 16)
-    {
-        if (PHP_MAJOR_VERSION > 5) {
-            return static::random($length);
-        }
-
-        $pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
-        return substr(str_shuffle(str_repeat($pool, $length)), 0, $length);
     }
 
     /**

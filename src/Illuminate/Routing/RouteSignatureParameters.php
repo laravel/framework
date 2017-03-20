@@ -4,6 +4,7 @@ namespace Illuminate\Routing;
 
 use ReflectionMethod;
 use ReflectionFunction;
+use Illuminate\Support\Str;
 
 class RouteSignatureParameters
 {
@@ -33,7 +34,7 @@ class RouteSignatureParameters
      */
     protected static function fromClassMethodString($uses)
     {
-        list($class, $method) = explode('@', $uses);
+        list($class, $method) = Str::parseCallback($uses);
 
         return (new ReflectionMethod($class, $method))->getParameters();
     }

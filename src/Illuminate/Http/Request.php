@@ -416,7 +416,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * Get the route handling the request.
      *
-     * @param string|null $param
+     * @param  string|null  $param
      *
      * @return \Illuminate\Routing\Route|object|string
      */
@@ -447,6 +447,19 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         return sha1(implode('|', array_merge(
             $route->methods(), [$route->domain(), $route->uri(), $this->ip()]
         )));
+    }
+
+    /**
+     * Set the JSON payload for the request.
+     *
+     * @param  array  $json
+     * @return $this
+     */
+    public function setJson($json)
+    {
+        $this->json = $json;
+
+        return $this;
     }
 
     /**

@@ -124,7 +124,7 @@ class Pipeline implements PipelineContract
     {
         return function ($stack, $pipe) {
             return function ($passable) use ($stack, $pipe) {
-                if ($pipe instanceof Closure) {
+                if (is_callable($pipe)) {
                     // If the pipe is an instance of a Closure, we will just call it directly but
                     // otherwise we'll resolve the pipes out of the container and call it with
                     // the appropriate method and arguments, returning the results back out.
@@ -145,7 +145,9 @@ class Pipeline implements PipelineContract
                     $parameters = [$passable, $stack];
                 }
 
-                return $pipe->{$this->method}(...$parameters);
+                return method_exists($pipe, $this->method)
+                                ? $pipe->{$this->method}(...$parameters)
+                                : $pipe(...$parameters);
             };
         };
     }

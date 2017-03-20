@@ -1,15 +1,17 @@
 # Release Notes for 5.3.x
 
-## [Unreleased]
+## v5.3.30 (2017-01-26)
 
 ### Added
 - Added `read()` and `unread()` methods to `DatabaseNotification` ([#17243](https://github.com/laravel/framework/pull/17243))
 
 ### Changed
 - Show seed output prior to running, instead of after ([#17318](https://github.com/laravel/framework/pull/17318))
+- Support starting slash in `elixir()` helper ([#17359](https://github.com/laravel/framework/pull/17359))
 
 ### Fixed
 - Use regex in `KeyGenerateCommand` to match `APP_KEY` ([#17151](https://github.com/laravel/framework/pull/17151))
+- Fixed integrity constraints for database session driver ([#17301](https://github.com/laravel/framework/pull/17301))
 
 
 ## v5.3.29 (2017-01-06)

@@ -88,7 +88,7 @@ class LoadConfiguration
     /**
      * Get the configuration file nesting path.
      *
-     * @param  \Symfony\Component\Finder\SplFileInfo  $file
+     * @param  \SplFileInfo  $file
      * @param  string  $configPath
      * @return string
      */

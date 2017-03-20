@@ -83,14 +83,19 @@ trait ManagesComponents
      * Start the slot rendering process.
      *
      * @param  string  $name
+     * @param  string|null  $content
      * @return void
      */
-    public function slot($name)
+    public function slot($name, $content = null)
     {
-        if (ob_start()) {
-            $this->slots[$this->currentComponent()][$name] = '';
+        if (count(func_get_args()) == 2) {
+            $this->slots[$this->currentComponent()][$name] = $content;
+        } else {
+            if (ob_start()) {
+                $this->slots[$this->currentComponent()][$name] = '';
 
-            $this->slotStack[$this->currentComponent()][] = $name;
+                $this->slotStack[$this->currentComponent()][] = $name;
+            }
         }
     }
 

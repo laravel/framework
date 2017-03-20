@@ -137,10 +137,12 @@ class SessionStoreTest extends TestCase
         $session = $this->getSession();
         $session->flash('foo', 'bar');
         $session->flash('bar', 0);
+        $session->flash('baz');
 
         $this->assertTrue($session->has('foo'));
         $this->assertEquals('bar', $session->get('foo'));
         $this->assertEquals(0, $session->get('bar'));
+        $this->assertTrue($session->get('baz'));
 
         $session->ageFlashData();
 

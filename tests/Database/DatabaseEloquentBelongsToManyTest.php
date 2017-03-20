@@ -703,7 +703,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
     {
         list($builder, $parent) = $this->getRelationArguments();
 
-        return new BelongsToMany($builder, $parent, 'user_role', 'user_id', 'role_id', 'relation_name');
+        return new BelongsToMany($builder, $parent, 'user_role', 'user_id', 'role_id', 'id', 'id', 'relation_name');
     }
 
     public function getRelationArguments()
@@ -712,6 +712,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
         $parent->shouldReceive('getKey')->andReturn(1);
         $parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
         $parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
+        $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
 
         $builder = m::mock('Illuminate\Database\Eloquent\Builder');
         $related = m::mock('Illuminate\Database\Eloquent\Model');
@@ -728,7 +729,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
         $builder->shouldReceive('join')->once()->with('user_role', 'roles.id', '=', 'user_role.role_id');
         $builder->shouldReceive('where')->once()->with('user_role.user_id', '=', 1);
 
-        return [$builder, $parent, 'user_role', 'user_id', 'role_id', 'relation_name'];
+        return [$builder, $parent, 'user_role', 'user_id', 'role_id', 'id', 'id', 'relation_name'];
     }
 }
 

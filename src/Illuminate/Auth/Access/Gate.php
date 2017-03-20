@@ -117,7 +117,7 @@ class Gate implements GateContract
     protected function buildAbilityCallback($callback)
     {
         return function () use ($callback) {
-            list($class, $method) = explode('@', $callback);
+            list($class, $method) = Str::parseCallback($callback);
 
             return $this->resolvePolicy($class)->{$method}(...func_get_args());
         };
@@ -346,6 +346,10 @@ class Gate implements GateContract
     {
         if (is_object($class)) {
             $class = get_class($class);
+        }
+
+        if (! is_string($class)) {
+            return null;
         }
 
         if (isset($this->policies[$class])) {

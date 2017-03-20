@@ -7,7 +7,7 @@ use BadMethodCallException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Pagination\Paginator;
-use Illuminate\Database\Query\Expression;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -41,11 +41,18 @@ class Builder
     protected $eagerLoad = [];
 
     /**
-     * All of the registered builder macros.
+     * All of the globally registered builder macros.
      *
      * @var array
      */
-    protected $macros = [];
+    protected static $macros = [];
+
+    /**
+     * All of the locally registered builder macros.
+     *
+     * @var array
+     */
+    protected $localMacros = [];
 
     /**
      * A replacement for the typical delete function.
@@ -184,7 +191,7 @@ class Builder
      */
     public function whereKey($id)
     {
-        if (is_array($id)) {
+        if (is_array($id) || $id instanceof Arrayable) {
             $this->query->whereIn($this->model->getQualifiedKeyName(), $id);
 
             return $this;
@@ -828,7 +835,7 @@ class Builder
      */
     public function forceCreate(array $attributes)
     {
-        $instance = $this->model->newInstance($attributes)->setConnection(
+        $instance = $this->model->newInstance()->setConnection(
             $this->query->getConnection()->getName()
         );
 
@@ -1275,18 +1282,6 @@ class Builder
     }
 
     /**
-     * Extend the builder with a given callback.
-     *
-     * @param  string    $name
-     * @param  \Closure  $callback
-     * @return void
-     */
-    public function macro($name, Closure $callback)
-    {
-        $this->macros[$name] = $callback;
-    }
-
-    /**
      * Get the given macro by name.
      *
      * @param  string  $name
@@ -1294,7 +1289,7 @@ class Builder
      */
     public function getMacro($name)
     {
-        return Arr::get($this->macros, $name);
+        return Arr::get($this->localMacros, $name);
     }
 
     /**
@@ -1306,10 +1301,24 @@ class Builder
      */
     public function __call($method, $parameters)
     {
-        if (isset($this->macros[$method])) {
+        if ($method === 'macro') {
+            $this->localMacros[$parameters[0]] = $parameters[1];
+
+            return;
+        }
+
+        if (isset($this->localMacros[$method])) {
             array_unshift($parameters, $this);
 
-            return $this->macros[$method](...$parameters);
+            return $this->localMacros[$method](...$parameters);
+        }
+
+        if (isset(static::$macros[$method]) and static::$macros[$method] instanceof Closure) {
+            return call_user_func_array(static::$macros[$method]->bindTo($this, static::class), $parameters);
+        }
+
+        if (isset(static::$macros[$method])) {
+            return call_user_func_array(static::$macros[$method]->bindTo($this, static::class), $parameters);
         }
 
         if (method_exists($this->model, $scope = 'scope'.ucfirst($method))) {
@@ -1323,6 +1332,34 @@ class Builder
         $this->query->{$method}(...$parameters);
 
         return $this;
+    }
+
+    /**
+     * Dynamically handle calls into the query instance.
+     *
+     * @param  string  $method
+     * @param  array   $parameters
+     * @return mixed
+     *
+     * @throws \BadMethodCallException
+     */
+    public static function __callStatic($method, $parameters)
+    {
+        if ($method === 'macro') {
+            static::$macros[$parameters[0]] = $parameters[1];
+
+            return;
+        }
+
+        if (! isset(static::$macros[$method])) {
+            throw new BadMethodCallException("Method {$method} does not exist.");
+        }
+
+        if (static::$macros[$method] instanceof Closure) {
+            return call_user_func_array(Closure::bind(static::$macros[$method], null, static::class), $parameters);
+        }
+
+        return call_user_func_array(static::$macros[$method], $parameters);
     }
 
     /**

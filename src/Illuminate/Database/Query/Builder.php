@@ -251,7 +251,7 @@ class Builder
     public function selectSub($query, $as)
     {
         // If the given query is a Closure, we will execute it while passing in a new
-        // query instance ot the Closure. This will give the developer a chance to
+        // query instance to the Closure. This will give the developer a chance to
         // format and work with the query before we cast it to a raw SQL string.
         if ($query instanceof Closure) {
             $callback = $query;
@@ -476,6 +476,17 @@ class Builder
         }
 
         return $builder;
+    }
+
+    /**
+     * Pass the query to a given callback.
+     *
+     * @param  \Closure  $callback
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function tap($callback)
+    {
+        return $this->when(true, $callback);
     }
 
     /**
@@ -1425,6 +1436,19 @@ class Builder
     }
 
     /**
+     * Add a descending "order by" clause to the query.
+     *
+     * @param  string  $column
+     * @return $this
+     */
+    public function orderByDesc($column)
+    {
+        $this->orderBy($column, 'desc');
+
+        return $this;
+    }
+
+    /**
      * Add an "order by" clause for a timestamp to the query.
      *
      * @param  string  $column
@@ -1790,7 +1814,7 @@ class Builder
     }
 
     /**
-     * Run a pagiantion count query.
+     * Run a pagination count query.
      *
      * @param  array  $columns
      * @return array

@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Queue;
 
 use Aws\Result;
 use Mockery as m;
-use Aws\Sqs\SqsClient;
 use PHPUnit\Framework\TestCase;
 
 class QueueSqsQueueTest extends TestCase
@@ -16,7 +15,6 @@ class QueueSqsQueueTest extends TestCase
 
     public function setUp()
     {
-
         // Use Mockery to mock the SqsClient
         $this->sqs = m::mock('Aws\Sqs\SqsClient');
 
@@ -35,17 +33,30 @@ class QueueSqsQueueTest extends TestCase
         $this->mockedMessageId = 'e3cd03ee-59a3-4ad8-b0aa-ee2e3808ac81';
         $this->mockedReceiptHandle = '0NNAq8PwvXuWv5gMtS9DJ8qEdyiUwbAjpp45w2m6M4SJ1Y+PxCh7R930NRB8ylSacEmoSnW18bgd4nK\/O6ctE+VFVul4eD23mA07vVoSnPI4F\/voI1eNCp6Iax0ktGmhlNVzBwaZHEr91BRtqTRM3QKd2ASF8u+IQaSwyl\/DGK+P1+dqUOodvOVtExJwdyDLy1glZVgm85Yw9Jf5yZEEErqRwzYz\/qSigdvW4sm2l7e4phRol\/+IjMtovOyH\/ukueYdlVbQ4OshQLENhUKe7RNN5i6bE\/e5x9bnPhfj2gbM';
 
-        $this->mockedSendMessageResponseModel = new Result(['Body' => $this->mockedPayload,
-                                          'MD5OfBody' => md5($this->mockedPayload),
-                                          'ReceiptHandle' => $this->mockedReceiptHandle,
-                                          'MessageId' => $this->mockedMessageId,
-                                          'Attributes' => ['ApproximateReceiveCount' => 1], ]);
+        $this->mockedSendMessageResponseModel = new Result([
+            'Body' => $this->mockedPayload,
+            'MD5OfBody' => md5($this->mockedPayload),
+            'ReceiptHandle' => $this->mockedReceiptHandle,
+            'MessageId' => $this->mockedMessageId,
+            'Attributes' => ['ApproximateReceiveCount' => 1],
+        ]);
 
-        $this->mockedReceiveMessageResponseModel = new Result(['Messages' => [0 => [
-                                                'Body' => $this->mockedPayload,
-                                                     'MD5OfBody' => md5($this->mockedPayload),
-                                                      'ReceiptHandle' => $this->mockedReceiptHandle,
-                                                     'MessageId' => $this->mockedMessageId, ]]]);
+        $this->mockedReceiveMessageResponseModel = new Result([
+            'Messages' => [
+                0 => [
+                    'Body' => $this->mockedPayload,
+                    'MD5OfBody' => md5($this->mockedPayload),
+                    'ReceiptHandle' => $this->mockedReceiptHandle,
+                    'MessageId' => $this->mockedMessageId,
+                ],
+            ],
+        ]);
+
+        $this->mockedQueueAttributesResponseModel = new Result([
+            'Attributes' => [
+                'ApproximateNumberOfMessages' => 1,
+            ],
+        ]);
     }
 
     public function testPopProperlyPopsJobOffOfSqs()
@@ -89,6 +100,15 @@ class QueueSqsQueueTest extends TestCase
         $this->sqs->shouldReceive('sendMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload])->andReturn($this->mockedSendMessageResponseModel);
         $id = $queue->push($this->mockedJob, $this->mockedData, $this->queueName);
         $this->assertEquals($this->mockedMessageId, $id);
+    }
+
+    public function testSizeProperlyReadsSqsQueueSize()
+    {
+        $queue = $this->getMockBuilder('Illuminate\Queue\SqsQueue')->setMethods(['getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
+        $queue->expects($this->once())->method('getQueue')->with($this->queueName)->will($this->returnValue($this->queueUrl));
+        $this->sqs->shouldReceive('getQueueAttributes')->once()->with(['QueueUrl' => $this->queueUrl, 'AttributeNames' => ['ApproximateNumberOfMessages']])->andReturn($this->mockedQueueAttributesResponseModel);
+        $size = $queue->size($this->queueName);
+        $this->assertEquals($size, 1);
     }
 
     public function testGetQueueProperlyResolvesUrlWithPrefix()

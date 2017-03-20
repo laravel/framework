@@ -25,23 +25,23 @@ trait ManagesLayouts
      *
      * @var string
      */
-    protected static $parentPlaceholder;
+    protected static $parentPlaceholder = [];
 
     /**
      * Start injecting content into a section.
      *
      * @param  string  $section
-     * @param  string  $content
+     * @param  string|null  $content
      * @return void
      */
-    public function startSection($section, $content = '')
+    public function startSection($section, $content = null)
     {
-        if ($content === '') {
+        if ($content === null) {
             if (ob_start()) {
                 $this->sectionStack[] = $section;
             }
         } else {
-            $this->extendSection($section, $content);
+            $this->extendSection($section, e($content));
         }
     }
 
@@ -164,11 +164,11 @@ trait ManagesLayouts
      */
     public static function parentPlaceholder($section = '')
     {
-        if (! static::$parentPlaceholder) {
-            static::$parentPlaceholder = '##parent-placeholder-'.sha1($section).'##';
+        if (! isset(static::$parentPlaceholder[$section])) {
+            static::$parentPlaceholder[$section] = '##parent-placeholder-'.sha1($section).'##';
         }
 
-        return static::$parentPlaceholder;
+        return static::$parentPlaceholder[$section];
     }
 
     /**

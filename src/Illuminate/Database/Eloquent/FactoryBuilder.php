@@ -53,9 +53,9 @@ class FactoryBuilder
     /**
      * The number of models to build.
      *
-     * @var int
+     * @var int|null
      */
-    protected $amount = 1;
+    protected $amount = null;
 
     /**
      * Create an new builder instance.
@@ -112,12 +112,10 @@ class FactoryBuilder
     {
         $results = $this->make($attributes);
 
-        if ($this->amount === 1) {
+        if ($results instanceof Model) {
             $results->save();
         } else {
-            foreach ($results as $result) {
-                $result->save();
-            }
+            $results->each->save();
         }
 
         return $results;
@@ -131,17 +129,56 @@ class FactoryBuilder
      */
     public function make(array $attributes = [])
     {
-        if ($this->amount < 1) {
-            return (new $this->class)->newCollection();
+        if ($this->amount === null) {
+            return $this->makeInstance($attributes);
         }
 
-        if ($this->amount === 1) {
-            return $this->makeInstance($attributes);
+        if ($this->amount < 1) {
+            return (new $this->class)->newCollection();
         }
 
         return (new $this->class)->newCollection(array_map(function () use ($attributes) {
             return $this->makeInstance($attributes);
         }, range(1, $this->amount)));
+    }
+
+    /**
+     * Create an array of raw attribute arrays.
+     *
+     * @param  array  $attributes
+     * @return mixed
+     */
+    public function raw(array $attributes = [])
+    {
+        if ($this->amount === null) {
+            return $this->getRawAttributes($attributes);
+        }
+
+        if ($this->amount < 1) {
+            return [];
+        }
+
+        return array_map(function () use ($attributes) {
+            return $this->getRawAttributes($attributes);
+        }, range(1, $this->amount));
+    }
+
+    /**
+     * Get a raw attributes array for the model.
+     *
+     * @param  array  $attributes
+     * @return mixed
+     */
+    protected function getRawAttributes(array $attributes = [])
+    {
+        $definition = call_user_func(
+            $this->definitions[$this->class][$this->name],
+            $this->faker, $attributes
+        );
+
+        return $this->callClosureAttributes(
+            array_merge($this->applyStates($definition, $attributes), $attributes)
+        );
     }
 
     /**
@@ -159,14 +196,9 @@ class FactoryBuilder
                 throw new InvalidArgumentException("Unable to locate factory with name [{$this->name}] [{$this->class}].");
             }
 
-            $definition = call_user_func(
-                $this->definitions[$this->class][$this->name],
-                $this->faker, $attributes
+            return new $this->class(
+                $this->getRawAttributes($attributes)
             );
-
-            return new $this->class($this->callClosureAttributes(
-                array_merge($this->applyStates($definition, $attributes), $attributes)
-            ));
         });
     }
 

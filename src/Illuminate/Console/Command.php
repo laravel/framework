@@ -121,7 +121,7 @@ class Command extends SymfonyCommand
     {
         list($name, $arguments, $options) = Parser::parse($this->signature);
 
-        parent::__construct($name);
+        parent::__construct($this->name = $name);
 
         // After parsing the signature we will spin through the arguments and options
         // and set them on this command. These will already be changed into proper
@@ -476,9 +476,24 @@ class Command extends SymfonyCommand
     }
 
     /**
+     * Write a string in an alert box.
+     *
+     * @param  string  $string
+     * @return void
+     */
+    public function alert($string)
+    {
+        $this->comment(str_repeat('*', strlen($string) + 12));
+        $this->comment('*     '.$string.'     *');
+        $this->comment(str_repeat('*', strlen($string) + 12));
+
+        $this->output->writeln('');
+    }
+
+    /**
      * Set the verbosity level.
      *
-     * @param string|int $level
+     * @param  string|int  $level
      * @return void
      */
     protected function setVerbosity($level)

@@ -4,8 +4,6 @@ namespace Illuminate\View\Concerns;
 
 use Closure;
 use Illuminate\Support\Str;
-use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\View\View as ViewContract;
 
 trait ManagesEvents
@@ -138,11 +136,7 @@ trait ManagesEvents
      */
     protected function parseClassEvent($class, $prefix)
     {
-        if (! Str::contains($class, '@')) {
-            return [$class, $this->classEventMethodForPrefix($prefix)];
-        }
-
-        return explode('@', $class);
+        return Str::parseCallback($class, $this->classEventMethodForPrefix($prefix));
     }
 
     /**

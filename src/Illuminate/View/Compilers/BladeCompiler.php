@@ -49,9 +49,9 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * @var array
      */
     protected $compilers = [
+        'Comments',
         'Extensions',
         'Statements',
-        'Comments',
         'Echos',
     ];
 
@@ -103,13 +103,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * @var array
      */
     protected $verbatimBlocks = [];
-
-    /**
-     * Counter to keep track of nested forelse statements.
-     *
-     * @var int
-     */
-    protected $forElseCounter = 0;
 
     /**
      * Compile the view at the given path.

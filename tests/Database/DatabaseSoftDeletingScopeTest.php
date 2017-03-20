@@ -23,24 +23,13 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $scope->apply($builder, $model);
     }
 
-    public function testForceDeleteExtension()
-    {
-        $builder = m::mock('Illuminate\Database\Eloquent\Builder');
-        $builder->shouldDeferMissing();
-        $scope = new \Illuminate\Database\Eloquent\SoftDeletingScope;
-        $scope->extend($builder);
-        $callback = $builder->getMacro('forceDelete');
-        $givenBuilder = m::mock('Illuminate\Database\Eloquent\Builder');
-        $givenBuilder->shouldReceive('getQuery')->andReturn($query = m::mock('StdClass'));
-        $query->shouldReceive('delete')->once();
-
-        $callback($givenBuilder);
-    }
-
     public function testRestoreExtension()
     {
-        $builder = m::mock('Illuminate\Database\Eloquent\Builder');
-        $builder->shouldDeferMissing();
+        $builder = new \Illuminate\Database\Eloquent\Builder(new \Illuminate\Database\Query\Builder(
+            m::mock('Illuminate\Database\ConnectionInterface'),
+            m::mock('Illuminate\Database\Query\Grammars\Grammar'),
+            m::mock('Illuminate\Database\Query\Processors\Processor')
+        ));
         $scope = new \Illuminate\Database\Eloquent\SoftDeletingScope;
         $scope->extend($builder);
         $callback = $builder->getMacro('restore');
@@ -55,8 +44,11 @@ class DatabaseSoftDeletingScopeTest extends TestCase
 
     public function testWithTrashedExtension()
     {
-        $builder = m::mock('Illuminate\Database\Eloquent\Builder');
-        $builder->shouldDeferMissing();
+        $builder = new \Illuminate\Database\Eloquent\Builder(new \Illuminate\Database\Query\Builder(
+            m::mock('Illuminate\Database\ConnectionInterface'),
+            m::mock('Illuminate\Database\Query\Grammars\Grammar'),
+            m::mock('Illuminate\Database\Query\Processors\Processor')
+        ));
         $scope = m::mock('Illuminate\Database\Eloquent\SoftDeletingScope[remove]');
         $scope->extend($builder);
         $callback = $builder->getMacro('withTrashed');
@@ -70,8 +62,11 @@ class DatabaseSoftDeletingScopeTest extends TestCase
 
     public function testOnlyTrashedExtension()
     {
-        $builder = m::mock('Illuminate\Database\Eloquent\Builder');
-        $builder->shouldDeferMissing();
+        $builder = new \Illuminate\Database\Eloquent\Builder(new \Illuminate\Database\Query\Builder(
+            m::mock('Illuminate\Database\ConnectionInterface'),
+            m::mock('Illuminate\Database\Query\Grammars\Grammar'),
+            m::mock('Illuminate\Database\Query\Processors\Processor')
+        ));
         $model = m::mock('Illuminate\Database\Eloquent\Model');
         $model->shouldDeferMissing();
         $scope = m::mock('Illuminate\Database\Eloquent\SoftDeletingScope[remove]');
@@ -90,8 +85,11 @@ class DatabaseSoftDeletingScopeTest extends TestCase
 
     public function testWithoutTrashedExtension()
     {
-        $builder = m::mock('Illuminate\Database\Eloquent\Builder');
-        $builder->shouldDeferMissing();
+        $builder = new \Illuminate\Database\Eloquent\Builder(new \Illuminate\Database\Query\Builder(
+            m::mock('Illuminate\Database\ConnectionInterface'),
+            m::mock('Illuminate\Database\Query\Grammars\Grammar'),
+            m::mock('Illuminate\Database\Query\Processors\Processor')
+        ));
         $model = m::mock('Illuminate\Database\Eloquent\Model');
         $model->shouldDeferMissing();
         $scope = m::mock('Illuminate\Database\Eloquent\SoftDeletingScope[remove]');
