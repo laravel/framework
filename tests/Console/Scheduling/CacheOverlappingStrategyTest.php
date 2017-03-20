@@ -31,11 +31,22 @@ class CacheOverlappingStrategyTest extends TestCase
     {
         $cacheOverlappingStrategy = $this->cacheOverlappingStrategy;
 
-        $this->cacheRepository->shouldReceive('put');
+        $this->cacheRepository->shouldReceive('add');
 
         $event = new Event($this->cacheOverlappingStrategy, 'command');
 
         $cacheOverlappingStrategy->prevent($event);
+    }
+
+    public function testPreventOverlapFails()
+    {
+        $cacheOverlappingStrategy = $this->cacheOverlappingStrategy;
+
+        $this->cacheRepository->shouldReceive('add')->andReturn(false);
+
+        $event = new Event($this->cacheOverlappingStrategy, 'command');
+
+        $this->assertFalse($cacheOverlappingStrategy->prevent($event));
     }
 
     public function testOverlapsForNonRunningTask()

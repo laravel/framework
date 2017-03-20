@@ -8,7 +8,7 @@ interface OverlappingStrategy
      * prevents overlapping for the given event.
      *
      * @param  Event $event
-     * @return void
+     * @return bool true if the prevent operation was successful
      */
     public function prevent(Event $event);
 

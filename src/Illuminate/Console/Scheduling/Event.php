@@ -159,8 +159,9 @@ class Event
      */
     public function run(Container $container)
     {
-        if ($this->withoutOverlapping) {
-            $this->overlappingStrategy->prevent($this);
+        if ($this->withoutOverlapping &&
+            ! $this->overlappingStrategy->prevent($this)) {
+            return;
         }
 
         $this->runInBackground

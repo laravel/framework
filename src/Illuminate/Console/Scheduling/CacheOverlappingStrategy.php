@@ -18,7 +18,7 @@ class CacheOverlappingStrategy implements OverlappingStrategy
 
     public function prevent(Event $event)
     {
-        $this->cache->put($event->mutexName(), true, 1440);
+        return $this->cache->add($event->mutexName(), true, 1440);
     }
 
     public function overlaps(Event $event)
