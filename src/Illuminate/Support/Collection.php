@@ -550,7 +550,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function groupByMultiple($groupBy, $preserveKeys = false)
     {
-        if (!is_array($groupBy)) {
+        if (! is_array($groupBy)) {
             $groupBy = [$groupBy];
         }
 
@@ -580,7 +580,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
                 $currentLevel = $nextLevel;
                 $nextLevel = [];
             }
-            if ($preserveKeys && !is_null($key)) {
+            if ($preserveKeys && ! is_null($key)) {
                 foreach ($currentLevel as &$lastLevel) {
                     $lastLevel[$key] = $value;
                 }
@@ -1326,7 +1326,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             $exists[] = $id;
         });
     }
-
 
     /**
      * Return only unique items from the collection array using strict comparison.

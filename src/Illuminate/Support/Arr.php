@@ -540,6 +540,7 @@ class Arr
             foreach ($array as &$subArray) {
                 $subArray = static::toNestedCollection($subArray);
             }
+
             return new Collection($array);
         } else {
             return $array;
