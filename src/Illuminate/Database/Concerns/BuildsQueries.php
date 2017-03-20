@@ -74,21 +74,19 @@ trait BuildsQueries
     /**
      * Apply the callback's query changes if the given "value" is true.
      *
-     * @param  bool  $value
+     * @param  mixed  $value
      * @param  \Closure  $callback
      * @param  \Closure  $default
      * @return mixed
      */
     public function when($value, $callback, $default = null)
     {
-        $builder = $this;
-
         if ($value) {
-            $builder = $callback($builder, $value);
+            return $callback($this, $value) ?: $this;
         } elseif ($default) {
-            $builder = $default($builder, $value);
+            return $default($this, $value) ?: $this;
         }
 
-        return $builder;
+        return $this;
     }
 }

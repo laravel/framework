@@ -135,7 +135,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $callback = function ($query, $condition) {
             $this->assertTrue($condition);
 
-            return $query->where('id', '=', 1);
+            $query->where('id', '=', 1);
         };
 
         $builder = $this->getBuilder();
@@ -152,13 +152,13 @@ class DatabaseQueryBuilderTest extends TestCase
         $callback = function ($query, $condition) {
             $this->assertEquals($condition, 'truthy');
 
-            return $query->where('id', '=', 1);
+            $query->where('id', '=', 1);
         };
 
         $default = function ($query, $condition) {
             $this->assertEquals($condition, 0);
 
-            return $query->where('id', '=', 2);
+            $query->where('id', '=', 2);
         };
 
         $builder = $this->getBuilder();
