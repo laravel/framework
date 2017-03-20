@@ -5,25 +5,11 @@ namespace Illuminate\Routing;
 class ResourceRegistration
 {
     /**
-     * The resource name.
+     * The resource.
      *
-     * @var string
+     * @var array
      */
-    protected $name;
-
-    /**
-     * The resource controller.
-     *
-     * @var string
-     */
-    protected $controller;
-
-    /**
-     * The resource options.
-     *
-     * @var string
-     */
-    protected $options = [];
+    protected $resource;
 
     /**
      * The default actions for a resourceful controller.
@@ -42,29 +28,16 @@ class ResourceRegistration
     /**
      * Create a new pending resource registration instance.
      *
+     * @param  array  $resource
      * @param  array  $resourceDefaults
      * @param  \Illuminate\Routing\RouteCollection  $router
      * @return void
      */
-    public function __construct(array $resourceDefaults, RouteCollection $routes)
+    public function __construct(array $resource, array $resourceDefaults, RouteCollection $routes)
     {
+        $this->resource = $resource;
         $this->resourceDefaults = $resourceDefaults;
         $this->routes = $routes;
-    }
-
-    /**
-     * The name, controller and options to use when ready to register.
-     *
-     * @param  string  $name
-     * @param  string  $controller
-     * @param  array   $options
-     * @return void
-     */
-    public function remember($name, $controller, array $options)
-    {
-        $this->name = $name;
-        $this->controller = $controller;
-        $this->options = $options;
     }
 
     /**
@@ -74,11 +47,9 @@ class ResourceRegistration
      */
     public function only($methods)
     {
-        $this->options['only'] = is_array($methods) ? $methods : func_get_args();
+        $this->resource['options']['only'] = is_array($methods) ? $methods : func_get_args();
 
-        $this->removeRoutes(
-            array_diff($this->resourceDefaults, $this->options['only'])
-        );
+        $this->removeRoutes($this->limitedMethods());
     }
 
     /**
@@ -88,10 +59,34 @@ class ResourceRegistration
      */
     public function except($methods)
     {
-        $this->options['except'] = is_array($methods) ? $methods : func_get_args();
+        $this->resource['options']['except'] = is_array($methods) ? $methods : func_get_args();
 
-        $this->removeRoutes(
-            array_intersect($this->resourceDefaults, $this->options['except'])
+        $this->removeRoutes($this->excludedMethods());
+    }
+
+    /**
+     * Get the excluded route methods.
+     *
+     * @return array
+     */
+    protected function excludedMethods()
+    {
+        return array_intersect(
+            $this->resourceDefaults,
+            $this->resource['options']['except']
+        );
+    }
+
+    /**
+     * Get the route methods the controller shouldn't apply to.
+     *
+     * @return array
+     */
+    protected function limitedMethods()
+    {
+        return array_diff(
+            $this->resourceDefaults,
+            $this->resource['options']['only']
         );
     }
 
@@ -104,7 +99,7 @@ class ResourceRegistration
     protected function removeRoutes(array $methods)
     {
         foreach ($methods as $method) {
-            $name = $this->name.'.'.$method;
+            $name = $this->resource['name'].'.'.$method;
 
             if ($route = $this->routes->getByName($name)) {
                 $this->routes->remove($route);

@@ -109,10 +109,11 @@ class ResourceRegistrar
      */
     protected function registration($name, $controller, array $options = [])
     {
-        $registration = new ResourceRegistration($this->resourceDefaults, $this->router->getRoutes());
-        $registration->remember($name, $controller, $options);
-
-        return $registration;
+        return new ResourceRegistration(
+            compact('name', 'controller', 'options'),
+            $this->resourceDefaults,
+            $this->router->getRoutes()
+        );
     }
 
     /**
