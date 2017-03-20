@@ -81,7 +81,7 @@ trait AuthorizesRequests
      */
     public function authorizeResource($model, $parameter = null, array $options = [], $request = null)
     {
-        $parameter = $parameter ?: strtolower(class_basename($model));
+        $parameter = $parameter ?: lcfirst(class_basename($model));
 
         $middleware = [];
 
