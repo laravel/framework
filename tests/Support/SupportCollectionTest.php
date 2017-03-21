@@ -870,6 +870,15 @@ class SupportCollectionTest extends TestCase
         (new Collection)->random();
     }
 
+    public function testRandomWithoutStrictReturnTotalIfLessThanAmout()
+    {
+        $data = new Collection([1, 2, 3]);
+
+        $random = $data->random(4, false);
+        $this->assertInstanceOf(Collection::class, $random);
+        $this->assertCount(3, $random);
+    }
+
     public function testTakeLast()
     {
         $data = new Collection(['taylor', 'dayle', 'shawn']);
