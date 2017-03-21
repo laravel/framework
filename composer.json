@@ -38,7 +38,6 @@
         "vlucas/phpdotenv": "~2.2"
     },
     "replace": {
-        "laravel/framework": "5.5.*",
         "illuminate/auth": "self.version",
         "illuminate/broadcasting": "self.version",
         "illuminate/bus": "self.version",
@@ -74,7 +73,7 @@
         "aws/aws-sdk-php": "~3.0",
         "doctrine/dbal": "~2.5",
         "mockery/mockery": "~0.9.4",
-        "orchestra/testbench": "3.5.*",
+        "orchestra/testbench-core": "3.5.*",
         "pda/pheanstalk": "~3.0",
         "phpunit/phpunit": "~6.0",
         "predis/predis": "~1.0",
