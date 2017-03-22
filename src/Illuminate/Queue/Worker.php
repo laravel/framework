@@ -578,6 +578,7 @@ class Worker
     {
         return $this->manager;
     }
+
     /**
      * Set the queue manager instance.
      *
