@@ -31,6 +31,10 @@ class ArrayTransport extends Transport
     {
         $this->beforeSendPerformed($message);
 
+        if($this->beforeSendEvent->bubbleCancelled()) {
+            return 0;
+        }
+
         $this->messages[] = $message;
 
         return $this->numberOfRecipients($message);

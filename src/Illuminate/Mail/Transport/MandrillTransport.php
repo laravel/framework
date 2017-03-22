@@ -41,6 +41,10 @@ class MandrillTransport extends Transport
     {
         $this->beforeSendPerformed($message);
 
+        if($this->beforeSendEvent->bubbleCancelled()) {
+            return 0;
+        }
+
         $this->client->post('https://mandrillapp.com/api/1.0/messages/send-raw.json', [
             'form_params' => [
                 'key' => $this->key,

@@ -17,6 +17,11 @@ abstract class Transport implements Swift_Transport
     public $plugins = [];
 
     /**
+     * @var Swift_Events_SendEvent
+     */
+    protected $beforeSendEvent;
+
+    /**
      * {@inheritdoc}
      */
     public function isStarted()
@@ -59,11 +64,11 @@ abstract class Transport implements Swift_Transport
      */
     protected function beforeSendPerformed(Swift_Mime_Message $message)
     {
-        $event = new Swift_Events_SendEvent($this, $message);
+        $this->beforeSendEvent = new Swift_Events_SendEvent($this, $message);
 
         foreach ($this->plugins as $plugin) {
             if (method_exists($plugin, 'beforeSendPerformed')) {
-                $plugin->beforeSendPerformed($event);
+                $plugin->beforeSendPerformed($this->beforeSendEvent);
             }
         }
     }

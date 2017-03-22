@@ -57,6 +57,10 @@ class MailgunTransport extends Transport
     {
         $this->beforeSendPerformed($message);
 
+        if($this->beforeSendEvent->bubbleCancelled()) {
+            return 0;
+        }
+
         $to = $this->getTo($message);
 
         $message->setBcc([]);

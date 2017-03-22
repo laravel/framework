@@ -32,6 +32,10 @@ class SesTransport extends Transport
     {
         $this->beforeSendPerformed($message);
 
+        if($this->beforeSendEvent->bubbleCancelled()) {
+            return 0;
+        }
+
         $headers = $message->getHeaders();
 
         $headers->addTextHeader('X-SES-Message-ID', $this->ses->sendRawEmail([
