@@ -3,6 +3,11 @@
 ## [Unreleased]
 
 ### Added
+- Added `getManager()` and `setManager()` to queue worker ([#18452](https://github.com/laravel/framework/pull/18452))
+
+## v5.4.16 (2017-03-21)
+
+### Added
 - Added PHPDBG detection to `runningInConsole()` ([#18198](https://github.com/laravel/framework/pull/18198))
 - Added `Arr:wrap()` method ([#18216](https://github.com/laravel/framework/pull/18216))
 - Allow scheduling of queued jobs ([#18235](https://github.com/laravel/framework/pull/18235), [7bb67e2](https://github.com/laravel/framework/commit/7bb67e225646fb578c039cc0af130f7aa6858120))
