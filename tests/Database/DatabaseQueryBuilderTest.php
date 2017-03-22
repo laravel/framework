@@ -147,6 +147,23 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals('select * from "users" where "email" = ?', $builder->toSql());
     }
 
+    public function testWhenCallbackWithReturn()
+    {
+        $callback = function ($query, $condition) {
+            $this->assertTrue($condition);
+
+            return $query->where('id', '=', 1);
+        };
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->when(true, $callback)->where('email', 'foo');
+        $this->assertEquals('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->when(false, $callback)->where('email', 'foo');
+        $this->assertEquals('select * from "users" where "email" = ?', $builder->toSql());
+    }
+
     public function testWhenCallbackWithDefault()
     {
         $callback = function ($query, $condition) {
