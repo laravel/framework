@@ -31,10 +31,11 @@ class BeanstalkdConnector implements ConnectorInterface
      */
     protected function pheanstalk(array $config)
     {
-        $port = Arr::get($config, 'port', PheanstalkInterface::DEFAULT_PORT);
-        $timeout = Arr::get($config, 'timeout', Connection::DEFAULT_CONNECT_TIMEOUT);
-        $persistent = Arr::get($config, 'persistent', false);
-
-        return new Pheanstalk($config['host'], $port, $timeout, $persistent);
+        return new Pheanstalk(
+            $config['host'],
+            Arr::get($config, 'port', PheanstalkInterface::DEFAULT_PORT),
+            Arr::get($config, 'timeout', Connection::DEFAULT_CONNECT_TIMEOUT),
+            Arr::get($config, 'persistent', false)
+        );
     }
 }
