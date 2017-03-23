@@ -132,7 +132,26 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testWhenCallback()
     {
-        $callback = function ($query) {
+        $callback = function ($query, $condition) {
+            $this->assertTrue($condition);
+
+            $query->where('id', '=', 1);
+        };
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->when(true, $callback)->where('email', 'foo');
+        $this->assertEquals('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->when(false, $callback)->where('email', 'foo');
+        $this->assertEquals('select * from "users" where "email" = ?', $builder->toSql());
+    }
+
+    public function testWhenCallbackWithReturn()
+    {
+        $callback = function ($query, $condition) {
+            $this->assertTrue($condition);
+
             return $query->where('id', '=', 1);
         };
 
@@ -147,21 +166,25 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testWhenCallbackWithDefault()
     {
-        $callback = function ($query) {
-            return $query->where('id', '=', 1);
+        $callback = function ($query, $condition) {
+            $this->assertEquals($condition, 'truthy');
+
+            $query->where('id', '=', 1);
         };
 
-        $default = function ($query) {
-            return $query->where('id', '=', 2);
+        $default = function ($query, $condition) {
+            $this->assertEquals($condition, 0);
+
+            $query->where('id', '=', 2);
         };
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->when(true, $callback, $default)->where('email', 'foo');
+        $builder->select('*')->from('users')->when('truthy', $callback, $default)->where('email', 'foo');
         $this->assertEquals('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 'foo'], $builder->getBindings());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->when(false, $callback, $default)->where('email', 'foo');
+        $builder->select('*')->from('users')->when(0, $callback, $default)->where('email', 'foo');
         $this->assertEquals('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
         $this->assertEquals([0 => 2, 1 => 'foo'], $builder->getBindings());
     }

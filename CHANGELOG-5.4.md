@@ -3,6 +3,11 @@
 ## [Unreleased]
 
 ### Added
+- Added `getManager()` and `setManager()` to queue worker ([#18452](https://github.com/laravel/framework/pull/18452))
+
+## v5.4.16 (2017-03-21)
+
+### Added
 - Added PHPDBG detection to `runningInConsole()` ([#18198](https://github.com/laravel/framework/pull/18198))
 - Added `Arr:wrap()` method ([#18216](https://github.com/laravel/framework/pull/18216))
 - Allow scheduling of queued jobs ([#18235](https://github.com/laravel/framework/pull/18235), [7bb67e2](https://github.com/laravel/framework/commit/7bb67e225646fb578c039cc0af130f7aa6858120))
@@ -14,9 +19,11 @@
 - Added `Container::makeWith()` method ([#18271](https://github.com/laravel/framework/pull/18271), [#18320](https://github.com/laravel/framework/pull/18320))
 - Added `InteractsWithDatabase::assertSoftDeleted()` ([#18328](https://github.com/laravel/framework/pull/18328), [2d4e1f0](https://github.com/laravel/framework/commit/2d4e1f0fe0bae3c7e3304317a69d619e71e476cc), [f89f917](https://github.com/laravel/framework/commit/f89f917b256ad79df786c688b11247ce1e48299a))
 - Added ability to set queue parameters inside queued listeners ([#18375](https://github.com/laravel/framework/pull/18375), [cf461e2](https://github.com/laravel/framework/commit/cf461e23b6123ba6ed084d2fb8e8306482973b88))
-- Added `-q` shorthand for `make:listener --queued` ([#18362](https://github.com/laravel/framework/pull/18362))
 - Added `Model::setKeyType()` ([#18354](https://github.com/laravel/framework/pull/18354))
 - Output migration name before starting a migration or rollback ([#18379](https://github.com/laravel/framework/pull/18379), [e47e8b1](https://github.com/laravel/framework/commit/e47e8b16c1e65d752943faaa65db14ca323f5feb))
+- Added `pipeline()`, `transaction()`, and `executeRaw()` to `PhpRedisConnection` ([#18421](https://github.com/laravel/framework/pull/18421))
+- Added `@isset()` directive ([#18425](https://github.com/laravel/framework/pull/18425))
+- Added `tinyIncrements()` database schema method ([#18424](https://github.com/laravel/framework/pull/18424))
 
 ### Changed
 - Throw exception when `bootstrap/cache` directory is not writable ([#18188](https://github.com/laravel/framework/pull/18188), [b4f0005](https://github.com/laravel/framework/commit/b4f000516166b0694e842d64f5b2fde1167d4690))
@@ -33,6 +40,9 @@
 - Use `getAuthIdentifier()` method in broadcasters ([#18351](https://github.com/laravel/framework/pull/18351))
 - Use atomic cache operation when checking for event overlaps ([8ebb5b8](https://github.com/laravel/framework/commit/8ebb5b859ae8f2382a1836a83a47542de234d63a))
 - Return pretty JSON response from `HasInDatabase::failureDescription()` ([#18377](https://github.com/laravel/framework/pull/18377))
+- Allow Validator extension to use array-style callable ([#18399](https://github.com/laravel/framework/pull/18399))
+- Pass the condition value to query builder's `when()` method ([#18419](https://github.com/laravel/framework/pull/18419))
+- Don't require returning the query from `when()` method ([#18422](https://github.com/laravel/framework/pull/18422))
 
 ### Fixed
 - Fixed an issue with slots when passed content equals `null` ([#18246](https://github.com/laravel/framework/pull/18246))
@@ -43,6 +53,9 @@
 - Allow `ImplicitRouteBinding` to match camelcase method parameter names ([#18307](https://github.com/laravel/framework/pull/18307), [4ae31a1](https://github.com/laravel/framework/commit/4ae31a154f81c2d76c7397dbdebfcac0e74e4ccd))
 - Fixing weird behaviour of `Connection::getConfig()` when `null` was passed ([#18356](https://github.com/laravel/framework/pull/18356))
 - Attempt to solve an issue with using `required_*` rules while the `ConvertEmptyStringToNull` middleware is applied ([#18376](https://github.com/laravel/framework/pull/18376))
+- Fixed faking of model events ([d6cb75c](https://github.com/laravel/framework/commit/d6cb75c057009c6316d4efd865dccb3c4a5c7b36))
+- Prevent model event result from firing observable events ([#18401](https://github.com/laravel/framework/pull/18401), [0607db0](https://github.com/laravel/framework/commit/0607db02ba9eeab0a22abe1dabb19536f4aa1ff2))
+- Fix issue in `authorizeResource()` with compound names ([#18435](https://github.com/laravel/framework/pull/18435))
 
 
 ## v5.4.15 (2017-03-02)
