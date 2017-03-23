@@ -6,7 +6,6 @@ use Swift_Mailer;
 use Swift_Message;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
-use Illuminate\Support\HtmlString;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -14,6 +13,7 @@ use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Contracts\Queue\Factory as QueueContract;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Contracts\Mail\MailQueue as MailQueueContract;
+use Illuminate\Contracts\Support\Htmlable;
 
 class Mailer implements MailerContract, MailQueueContract
 {
@@ -294,7 +294,7 @@ class Mailer implements MailerContract, MailQueueContract
      */
     protected function renderView($view, $data)
     {
-        return $view instanceof HtmlString
+        return $view instanceof Htmlable
                         ? $view->toHtml()
                         : $this->views->make($view, $data)->render();
     }
