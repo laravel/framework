@@ -5,16 +5,15 @@ namespace Illuminate\Console\Scheduling;
 use Illuminate\Console\Application;
 use Illuminate\Container\Container;
 use Symfony\Component\Process\ProcessUtils;
-use Illuminate\Contracts\Cache\Repository as Cache;
 
 class Schedule
 {
     /**
-     * The cache store implementation.
+     * The overlapping strategy implementation.
      *
-     * @var \Illuminate\Contracts\Cache\Repository
+     * @var OverlappingStrategy
      */
-    protected $cache;
+    protected $overlappingStrategy;
 
     /**
      * All of the events on the schedule.
@@ -26,12 +25,17 @@ class Schedule
     /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Contracts\Cache\Repository  $cache
      * @return void
      */
-    public function __construct(Cache $cache)
+    public function __construct()
     {
-        $this->cache = $cache;
+        $container = Container::getInstance();
+
+        if (! $container->bound(OverlappingStrategy::class)) {
+            $this->overlappingStrategy = $container->make(CacheOverlappingStrategy::class);
+        } else {
+            $this->overlappingStrategy = $container->make(OverlappingStrategy::class);
+        }
     }
 
     /**
@@ -43,7 +47,7 @@ class Schedule
      */
     public function call($callback, array $parameters = [])
     {
-        $this->events[] = $event = new CallbackEvent($this->cache, $callback, $parameters);
+        $this->events[] = $event = new CallbackEvent($this->overlappingStrategy, $callback, $parameters);
 
         return $event;
     }
@@ -92,7 +96,7 @@ class Schedule
             $command .= ' '.$this->compileParameters($parameters);
         }
 
-        $this->events[] = $event = new Event($this->cache, $command);
+        $this->events[] = $event = new Event($this->overlappingStrategy, $command);
 
         return $event;
     }

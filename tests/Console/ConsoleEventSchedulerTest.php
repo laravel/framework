@@ -12,8 +12,12 @@ class ConsoleEventSchedulerTest extends TestCase
     {
         parent::setUp();
 
-        \Illuminate\Container\Container::getInstance()->instance(
-            'Illuminate\Console\Scheduling\Schedule', $this->schedule = new Schedule(m::mock('Illuminate\Contracts\Cache\Repository'))
+        $container = \Illuminate\Container\Container::getInstance();
+
+        $container->instance('Illuminate\Console\Scheduling\OverlappingStrategy', m::mock('Illuminate\Console\Scheduling\CacheOverlappingStrategy'));
+
+        $container->instance(
+            'Illuminate\Console\Scheduling\Schedule', $this->schedule = new Schedule(m::mock('Illuminate\Console\Scheduling\OverlappingStrategy'))
         );
     }
 
