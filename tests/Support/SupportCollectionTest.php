@@ -936,6 +936,25 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $collection->all());
     }
 
+    public function testTimesMethod()
+    {
+        $two = Collection::times(2, function ($number) {
+            return 'slug-'.$number;
+        });
+
+        $zero = Collection::times(0, function ($number) {
+            return 'slug-'.$number;
+        });
+
+        $negative = Collection::times(-4, function ($number) {
+            return 'slug-'.$number;
+        });
+
+        $this->assertEquals(['slug-1', 'slug-2'], $two->all());
+        $this->assertTrue($zero->isEmpty());
+        $this->assertTrue($negative->isEmpty());
+    }
+
     public function testConstructMakeFromObject()
     {
         $object = new stdClass();
