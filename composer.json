@@ -36,7 +36,8 @@
         "symfony/routing": "~3.2",
         "symfony/var-dumper": "~3.2",
         "tijsverkoyen/css-to-inline-styles": "~2.2",
-        "vlucas/phpdotenv": "~2.2"
+        "vlucas/phpdotenv": "~2.2",
+        "oohology/dotenvwriter": "^1.2"
     },
     "replace": {
         "illuminate/auth": "self.version",
