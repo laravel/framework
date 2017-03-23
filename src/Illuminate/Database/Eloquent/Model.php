@@ -1254,7 +1254,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function offsetExists($offset)
     {
-        return isset($this->$offset);
+        return ! is_null($this->getAttribute($offset));
     }
 
     /**
@@ -1265,7 +1265,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function offsetGet($offset)
     {
-        return $this->$offset;
+        return $this->getAttribute($offset);
     }
 
     /**
@@ -1277,7 +1277,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function offsetSet($offset, $value)
     {
-        $this->$offset = $value;
+        $this->setAttribute($offset, $value);
     }
 
     /**
@@ -1288,7 +1288,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function offsetUnset($offset)
     {
-        unset($this->$offset);
+        unset($this->attributes[$offset], $this->relations[$offset]);
     }
 
     /**
@@ -1299,7 +1299,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function __isset($key)
     {
-        return ! is_null($this->getAttribute($key));
+        return $this->offsetExists($key);
     }
 
     /**
@@ -1310,7 +1310,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function __unset($key)
     {
-        unset($this->attributes[$key], $this->relations[$key]);
+        $this->offsetUnset($key);
     }
 
     /**
