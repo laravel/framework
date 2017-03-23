@@ -9,18 +9,18 @@ use Symfony\Component\Process\ProcessUtils;
 class Schedule
 {
     /**
-     * The overlapping strategy implementation.
-     *
-     * @var OverlappingStrategy
-     */
-    protected $overlappingStrategy;
-
-    /**
      * All of the events on the schedule.
      *
      * @var array
      */
     protected $events = [];
+
+    /**
+     * The mutex implementation.
+     *
+     * @var \Illuminate\Console\Scheduling\Mutex
+     */
+    protected $mutex;
 
     /**
      * Create a new event instance.
@@ -31,11 +31,9 @@ class Schedule
     {
         $container = Container::getInstance();
 
-        if (! $container->bound(OverlappingStrategy::class)) {
-            $this->overlappingStrategy = $container->make(CacheOverlappingStrategy::class);
-        } else {
-            $this->overlappingStrategy = $container->make(OverlappingStrategy::class);
-        }
+        $this->mutex = $container->bound(Mutex::class)
+                                ? $container->make(Mutex::class)
+                                : $container->make(CacheMutex::class);
     }
 
     /**
@@ -47,7 +45,9 @@ class Schedule
      */
     public function call($callback, array $parameters = [])
     {
-        $this->events[] = $event = new CallbackEvent($this->overlappingStrategy, $callback, $parameters);
+        $this->events[] = $event = new CallbackEvent(
+            $this->mutex, $callback, $parameters
+        );
 
         return $event;
     }
@@ -96,7 +96,7 @@ class Schedule
             $command .= ' '.$this->compileParameters($parameters);
         }
 
-        $this->events[] = $event = new Event($this->overlappingStrategy, $command);
+        $this->events[] = $event = new Event($this->mutex, $command);
 
         return $event;
     }

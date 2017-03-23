@@ -16,13 +16,6 @@ class Event
     use Macroable, ManagesFrequencies;
 
     /**
-     * The overlapping strategy implementation.
-     *
-     * @var OverlappingStrategy
-     */
-    protected $overlappingStrategy;
-
-    /**
      * The command string.
      *
      * @var string
@@ -128,15 +121,22 @@ class Event
     public $description;
 
     /**
+     * The mutex implementation.
+     *
+     * @var \Illuminate\Console\Scheduling\Mutex
+     */
+    public $mutex;
+
+    /**
      * Create a new event instance.
      *
-     * @param  OverlappingStrategy $overlappingStrategy
+     * @param  \Illuminate\Console\Scheduling\Mutex  $mutex
      * @param  string  $command
      * @return void
      */
-    public function __construct(OverlappingStrategy $overlappingStrategy, $command)
+    public function __construct(Mutex $mutex, $command)
     {
-        $this->overlappingStrategy = $overlappingStrategy;
+        $this->mutex = $mutex;
         $this->command = $command;
         $this->output = $this->getDefaultOutput();
     }
@@ -160,7 +160,7 @@ class Event
     public function run(Container $container)
     {
         if ($this->withoutOverlapping &&
-            ! $this->overlappingStrategy->prevent($this)) {
+            ! $this->mutex->create($this)) {
             return;
         }
 
@@ -516,9 +516,9 @@ class Event
         $this->withoutOverlapping = true;
 
         return $this->then(function () {
-            $this->overlappingStrategy->reset($this);
+            $this->mutex->forget($this);
         })->skip(function () {
-            return $this->overlappingStrategy->overlaps($this);
+            return $this->mutex->exists($this);
         });
     }
 
@@ -631,5 +631,18 @@ class Event
     public function getExpression()
     {
         return $this->expression;
+    }
+
+    /**
+     * Set the mutex implementation to be used.
+     *
+     * @param  \Illuminate\Console\Scheduling\Mutex  $mutex
+     * @return $this
+     */
+    public function preventOverlapsUsing(Mutex $mutex)
+    {
+        $this->mutex = $mutex;
+
+        return $this;
     }
 }

@@ -25,14 +25,14 @@ class CallbackEvent extends Event
     /**
      * Create a new event instance.
      *
-     * @param  OverlappingStrategy $overlappingStrategy
+     * @param  \Illuminate\Console\Scheduling\Mutex  $mutex
      * @param  string  $callback
      * @param  array  $parameters
      * @return void
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(OverlappingStrategy $overlappingStrategy, $callback, array $parameters = [])
+    public function __construct(Mutex $mutex, $callback, array $parameters = [])
     {
         if (! is_string($callback) && ! is_callable($callback)) {
             throw new InvalidArgumentException(
@@ -40,7 +40,7 @@ class CallbackEvent extends Event
             );
         }
 
-        $this->overlappingStrategy = $overlappingStrategy;
+        $this->mutex = $mutex;
         $this->callback = $callback;
         $this->parameters = $parameters;
     }
@@ -56,7 +56,7 @@ class CallbackEvent extends Event
     public function run(Container $container)
     {
         if ($this->description) {
-            $this->overlappingStrategy->prevent($this);
+            $this->mutex->create($this);
         }
 
         try {
@@ -78,7 +78,7 @@ class CallbackEvent extends Event
     protected function removeMutex()
     {
         if ($this->description) {
-            $this->overlappingStrategy->reset($this);
+            $this->mutex->forget($this);
         }
     }
 
@@ -98,7 +98,7 @@ class CallbackEvent extends Event
         }
 
         return $this->skip(function () {
-            return $this->overlappingStrategy->overlaps($this);
+            return $this->mutex->exists($this);
         });
     }
 
