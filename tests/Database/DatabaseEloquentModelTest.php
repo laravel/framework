@@ -74,18 +74,21 @@ class DatabaseEloquentModelTest extends TestCase
         $model->foo = 1;
         $model->bar = '2017-03-18';
         $model->dateAttribute = '2017-03-18';
+        $model->datetimeAttribute = '2017-03-23 22:17:00';
         $model->syncOriginal();
 
+        $model->boolAttribute = true;
         $model->foo = true;
         $model->bar = '2017-03-18 00:00:00';
-        $model->boolAttribute = true;
         $model->dateAttribute = '2017-03-18 00:00:00';
+        $model->datetimeAttribute = null;
 
         $this->assertTrue($model->isDirty());
         $this->assertTrue($model->isDirty('foo'));
         $this->assertTrue($model->isDirty('bar'));
         $this->assertFalse($model->isDirty('boolAttribute'));
         $this->assertFalse($model->isDirty('dateAttribute'));
+        $this->assertTrue($model->isDirty('datetimeAttribute'));
     }
 
     public function testCleanAttributes()

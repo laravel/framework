@@ -986,6 +986,12 @@ trait HasAttributes
             return true;
         }
 
+        // When check rich this check and current attribute value not equals with original, we should skip next steps
+        // if current is null
+        if (is_null($current)) {
+            return false;
+        }
+
         if ($this->isDateAttribute($key)) {
             return $this->fromDateTime($current) === $this->fromDateTime($original);
         }
