@@ -58,6 +58,9 @@ class RouteCacheCommand extends Command
             return $this->error("Your application doesn't have any routes.");
         }
 
+        $routes->refreshNameLookups();
+        $routes->refreshActionLookups();
+
         foreach ($routes as $route) {
             $route->prepareForSerialization();
         }
