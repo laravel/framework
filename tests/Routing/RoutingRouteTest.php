@@ -700,9 +700,6 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('tayloralt', $router->dispatch(Request::create('foo/TAYLOR', 'GET'))->getContent());
     }
 
-    /**
-     * @group shit
-     */
     public function testModelBindingWithCompoundParameterName()
     {
         $router = $this->getRouter();
