@@ -62,7 +62,7 @@ class LoadConfiguration
         $files = $this->getConfigurationFiles($app);
 
         if (! isset($files['app'])) {
-            throw new \Exception('Unable not load the config/app.php file.');
+            throw new \Exception('Unable to load the config/app.php file.');
         }
 
         foreach ($this->getConfigurationFiles($app) as $key => $path) {
