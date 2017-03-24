@@ -1423,9 +1423,7 @@ class Builder
      */
     public function orderByDesc($column)
     {
-        $this->orderBy($column, 'desc');
-
-        return $this;
+        return $this->orderBy($column, 'desc');
     }
 
     /**
