@@ -166,7 +166,6 @@ class RouteCollectionTest extends TestCase
         $this->assertEquals($allRoutes, $this->routeCollection->getRoutes());
     }
 
-
     public function testRouteCollectionCleansUpOverwrittenRoutes()
     {
         // Create two routes with the same path and method.
@@ -192,8 +191,5 @@ class RouteCollectionTest extends TestCase
         // The lookups of $routeB are still there.
         $this->assertEquals($routeB, $this->routeCollection->getByName('overwrittenRouteA'));
         $this->assertEquals($routeB, $this->routeCollection->getByAction('OverwrittenView@view'));
-
     }
-
-
 }
