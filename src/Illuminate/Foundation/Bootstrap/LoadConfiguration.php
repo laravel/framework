@@ -59,6 +59,12 @@ class LoadConfiguration
      */
     protected function loadConfigurationFiles(Application $app, RepositoryContract $repository)
     {
+        $files = $this->getConfigurationFiles($app);
+
+        if (! isset($files['app'])) {
+            throw new \Exception('Unable to load the config/app.php file.');
+        }
+
         foreach ($this->getConfigurationFiles($app) as $key => $path) {
             $repository->set($key, require $path);
         }
