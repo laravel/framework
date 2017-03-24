@@ -3,43 +3,32 @@
 namespace Illuminate\Routing;
 
 use Countable;
-use ArrayIterator;
 use IteratorAggregate;
 use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Collection;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class RouteCollection implements Countable, IteratorAggregate
 {
     /**
-     * An array of the routes keyed by method.
+     * The Route collection.
      *
-     * @var array
+     * @var \Illuminate\Support\Collection
      */
-    protected $routes = [];
+    protected $collection;
 
     /**
-     * An flattened array of all of the routes.
+     * Create a new RouteCollection instance.
      *
-     * @var array
+     * @return void
      */
-    protected $allRoutes = [];
-
-    /**
-     * A look-up table of routes by their names.
-     *
-     * @var array
-     */
-    protected $nameList = [];
-
-    /**
-     * A look-up table of routes by controller action.
-     *
-     * @var array
-     */
-    protected $actionList = [];
+    public function __construct()
+    {
+        $this->collection = new Collection;
+    }
 
     /**
      * Add a Route instance to the collection.
@@ -49,65 +38,11 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     public function add(Route $route)
     {
-        $this->addToCollections($route);
-
-        $this->addLookups($route);
+        foreach ($route->methods() as $method) {
+            $this->collection->put($method.$route->domain().$route->uri(), $route);
+        }
 
         return $route;
-    }
-
-    /**
-     * Add the given route to the arrays of routes.
-     *
-     * @param  \Illuminate\Routing\Route  $route
-     * @return void
-     */
-    protected function addToCollections($route)
-    {
-        $domainAndUri = $route->domain().$route->uri();
-
-        foreach ($route->methods() as $method) {
-            $this->routes[$method][$domainAndUri] = $route;
-        }
-
-        $this->allRoutes[$method.$domainAndUri] = $route;
-    }
-
-    /**
-     * Add the route to any look-up tables if necessary.
-     *
-     * @param  \Illuminate\Routing\Route  $route
-     * @return void
-     */
-    protected function addLookups($route)
-    {
-        // If the route has a name, we will add it to the name look-up table so that we
-        // will quickly be able to find any route associate with a name and not have
-        // to iterate through every route every time we need to perform a look-up.
-        $action = $route->getAction();
-
-        if (isset($action['as'])) {
-            $this->nameList[$action['as']] = $route;
-        }
-
-        // When the route is routing to a controller we will also store the action that
-        // is used by the route. This will let us reverse route to controllers while
-        // processing a request and easily generate URLs to the given controllers.
-        if (isset($action['controller'])) {
-            $this->addToActionList($action, $route);
-        }
-    }
-
-    /**
-     * Add a route to the controller action dictionary.
-     *
-     * @param  array  $action
-     * @param  \Illuminate\Routing\Route  $route
-     * @return void
-     */
-    protected function addToActionList($action, $route)
-    {
-        $this->actionList[trim($action['controller'], '\\')] = $route;
     }
 
     /**
@@ -115,17 +50,13 @@ class RouteCollection implements Countable, IteratorAggregate
      *
      * This is done in case any names are fluently defined.
      *
+     * @deprecated since version 5.5.
+     *
      * @return void
      */
     public function refreshNameLookups()
     {
-        $this->nameList = [];
-
-        foreach ($this->allRoutes as $route) {
-            if ($route->getName()) {
-                $this->nameList[$route->getName()] = $route;
-            }
-        }
+        //
     }
 
     /**
@@ -241,7 +172,9 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     public function get($method = null)
     {
-        return is_null($method) ? $this->getRoutes() : Arr::get($this->routes, $method, []);
+        return is_null($method) ? $this->getRoutes() : $this->collection->filter(function (Route $route) use ($method) {
+            return in_array($method, $route->methods());
+        })->toArray();
     }
 
     /**
@@ -263,7 +196,9 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     public function getByName($name)
     {
-        return isset($this->nameList[$name]) ? $this->nameList[$name] : null;
+        return $this->collection->first(function (Route $route) use ($name) {
+            return Arr::get($route->getAction(), 'as') === $name;
+        });
     }
 
     /**
@@ -274,7 +209,9 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     public function getByAction($action)
     {
-        return isset($this->actionList[$action]) ? $this->actionList[$action] : null;
+        return $this->collection->first(function (Route $route) use ($action) {
+            return trim(Arr::get($route->getAction(), 'controller'), '\\') === $action;
+        });
     }
 
     /**
@@ -284,7 +221,7 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     public function getRoutes()
     {
-        return array_values($this->allRoutes);
+        return $this->getUniqueRoutes()->values()->toArray();
     }
 
     /**
@@ -294,7 +231,23 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     public function getRoutesByMethod()
     {
-        return $this->routes;
+        return $this->collection->mapWithKeys(function (Route $route) {
+            foreach ($route->methods() as $method) {
+                return [$method => [$route->domain().$route->uri() => $route]];
+            }
+        })->toArray();
+    }
+
+    /**
+     * Get the unique routes.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getUniqueRoutes()
+    {
+        return $this->collection->unique(function (Route $route) {
+            return Arr::last($route->methods()).$route->domain().$route->uri();
+        });
     }
 
     /**
@@ -304,7 +257,7 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     public function getIterator()
     {
-        return new ArrayIterator($this->getRoutes());
+        return $this->getUniqueRoutes()->getIterator();
     }
 
     /**
@@ -314,6 +267,6 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     public function count()
     {
-        return count($this->getRoutes());
+        return $this->getUniqueRoutes()->count();
     }
 }

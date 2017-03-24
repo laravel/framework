@@ -121,7 +121,7 @@ class RouteCollectionTest extends TestCase
         $this->assertCount(2, $this->routeCollection);
     }
 
-    public function testRouteCollectionCanRefreshNameLookups()
+    public function testRouteCollectionDoesNotNeedToRefreshNameLookups()
     {
         $routeIndex = new Route('GET', 'foo/index', [
             'uses' => 'FooController@index',
@@ -132,12 +132,6 @@ class RouteCollectionTest extends TestCase
 
         // The route name is set by calling \Illuminate\Routing\Route::name()
         $this->routeCollection->add($routeIndex)->name('route_name');
-
-        // No route is found. This is normal, as no refresh as been done.
-        $this->assertNull($this->routeCollection->getByName('route_name'));
-
-        // After the refresh, the name will be properly set to the route.
-        $this->routeCollection->refreshNameLookups();
         $this->assertEquals($routeIndex, $this->routeCollection->getByName('route_name'));
     }
 
