@@ -1494,7 +1494,12 @@ class Validator implements ValidatorContract
         }
 
         if (is_array($value)) {
-            return $verifier->getMultiCount($table, $column, $value, $extra);
+            // If a two-dimensional array is passed, extract the keys as values
+            if (count($value) === count($value, COUNT_RECURSIVE)) {
+                return $verifier->getMultiCount($table, $column, $value, $extra);
+            }
+
+            return $verifier->getMultiCount($table, $column, array_keys($value), $extra);
         }
 
         return $verifier->getCount($table, $column, $value, null, null, $extra);
