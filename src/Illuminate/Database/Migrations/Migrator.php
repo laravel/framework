@@ -410,7 +410,7 @@ class Migrator
         $class = Str::studly(implode('_', array_slice(explode('_', $file), 4)));
 
         if (preg_match('#^namespace\s+(.+?);$#sm', $this->files->sharedGet($path), $m)) {
-            $class = $m[1] . '\\' . $class;
+            $class = $m[1].'\\'.$class;
         }
 
         return new $class;
