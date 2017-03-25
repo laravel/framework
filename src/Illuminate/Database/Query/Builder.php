@@ -903,7 +903,7 @@ class Builder
      * @param  bool  $not
      * @return $this
      */
-    public function whereBetween($column, array $values, $boolean = 'and', $not = false)
+    public function whereBetweenDate($column, array $values, $boolean = 'and', $not = false)
     {
         $type = 'between';
 
