@@ -536,6 +536,18 @@ if (! function_exists('logger')) {
     }
 }
 
+if (! function_exists('mailer')) {
+    /**
+     * Get the Mailer instance.
+     *
+     * @return \Illuminate\Contracts\Mail\Mailer|null
+     */
+    function mailer()
+    {
+        return app('mailer');
+    }
+}
+
 if (! function_exists('method_field')) {
     /**
      * Generate a form field to spoof the HTTP verb used by forms.
