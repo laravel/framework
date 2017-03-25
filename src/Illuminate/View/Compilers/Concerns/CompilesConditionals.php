@@ -98,4 +98,22 @@ trait CompilesConditionals
     {
         return '<?php endif; ?>';
     }
+
+    /**
+     * Compile the if-user-is-logged statements into valid PHP.
+     * @return string
+     */
+    protected function compileLogged()
+    {
+        return "<?php if(\Illuminate\Contracts\Auth\Authenticatable::user()): ?>";
+    }
+    /**
+     * Compile the end-if-user-is-logged statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileEndLogged()
+    {
+        return '<?php endif; ?>';
+    }
 }
