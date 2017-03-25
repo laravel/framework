@@ -700,12 +700,20 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('tayloralt', $router->dispatch(Request::create('foo/TAYLOR', 'GET'))->getContent());
     }
 
-    /**
-     * @group shit
-     */
     public function testModelBindingWithCompoundParameterName()
     {
         $router = $this->getRouter();
+        $router->resource('foo-bar', 'Illuminate\Tests\Routing\RouteTestResourceControllerWithModelParameter', ['middleware' => SubstituteBindings::class]);
+        $this->assertEquals('12345', $router->dispatch(Request::create('foo-bar/12345', 'GET'))->getContent());
+    }
+
+    /**
+     * @group shit
+     */
+    public function testModelBindingWithCompoundParameterNameAndRouteBinding()
+    {
+        $router = $this->getRouter();
+        $router->model('foo_bar', 'Illuminate\Tests\Routing\RoutingTestUserModel');
         $router->resource('foo-bar', 'Illuminate\Tests\Routing\RouteTestResourceControllerWithModelParameter', ['middleware' => SubstituteBindings::class]);
         $this->assertEquals('12345', $router->dispatch(Request::create('foo-bar/12345', 'GET'))->getContent());
     }
