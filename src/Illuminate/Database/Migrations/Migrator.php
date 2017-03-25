@@ -407,14 +407,11 @@ class Migrator
      */
     public function resolve($file, $path)
     {
-        $namespace = '';
+        $class = Str::studly(implode('_', array_slice(explode('_', $file), 4)));
 
         if (preg_match('#^namespace\s+(.+?);$#sm', $this->files->sharedGet($path), $m)) {
-            $namespace = $m[1];
+            $class = $m[1] . '\\' . $class;
         }
-
-        $class = ($namespace ? $namespace . '\\' : '')
-            . Str::studly(implode('_', array_slice(explode('_', $file), 4)));
 
         return new $class;
     }
