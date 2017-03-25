@@ -29,7 +29,9 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\BelongsToThrough;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
@@ -727,6 +729,26 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Define a one-to-one relationship that goes through an intermediate model.
+     *
+     * @param string      $related           Class name of related Model
+     * @param string      $through           Class name of through Model
+     * @param string|null $thisForeignKey    Foreign key from Through model to $this Model
+     * @param string|null $throughForeignKey Foreign key from Related model to Through model
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOneThrough
+     */
+    public function hasOneThrough($related, $through, $thisForeignKey = null, $throughForeignKey = null)
+    {
+        $related = new $related;
+        $through = new $through;
+        $thisForeignKey = $thisForeignKey ?: $this->getForeignKey();
+        $throughForeignKey = $throughForeignKey ?: $through->getForeignKey();
+
+        return new HasOneThrough($related->newQuery(), $this, $through, $thisForeignKey, $throughForeignKey);
+    }
+
+    /**
      * Define a polymorphic one-to-one relationship.
      *
      * @param  string  $related
@@ -786,6 +808,26 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $otherKey = $otherKey ?: $instance->getKeyName();
 
         return new BelongsTo($query, $this, $foreignKey, $otherKey, $relation);
+    }
+
+    /**
+     * Define an inverse one-to-one relationship that goes through an intermediate model.
+     *
+     * @param string      $related           Class name of related Model
+     * @param string      $through           Class name of through Model
+     * @param string|null $throughForeignKey Foreign key to Through model from $this Model
+     * @param string|null $relatedForeignKey Foreign key to Related model from Through model
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToThrough
+     */
+    public function belongsToThrough($related, $through, $throughForeignKey = null, $relatedForeignKey = null)
+    {
+        $related = new $related;
+        $through = new $through;
+        $throughForeignKey = $throughForeignKey ?: $through->getForeignKey();
+        $relatedForeignKey = $relatedForeignKey ?: $related->getForeignKey();
+
+        return new BelongsToThrough($related->newQuery(), $this, $through, $throughForeignKey, $relatedForeignKey);
     }
 
     /**
