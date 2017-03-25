@@ -1092,10 +1092,9 @@ trait HasAttributes
      */
     protected function getFieldToFormat($key)
     {
-        foreach($this->getFixedFormattedFields() as $field)
-        {
-            if($field['key'] == $key)
-            {
+        foreach($this->getFixedFormattedFields() as $field) {
+            
+            if($field['key'] == $key) {
                 return $field;
             }
         }
@@ -1104,7 +1103,7 @@ trait HasAttributes
     }
 
     /**
-     * Get the fields to auto format.
+     * Get the fields that should be auto formatted.
      *
      * @return array
      */
@@ -1114,22 +1113,17 @@ trait HasAttributes
         {
             $this->fixedFormattedFields = [];
 
-            if( property_exists($this, 'formattedDates') && is_array($this->formattedDates))
-            {
+            if( property_exists($this, 'formattedDates') && is_array($this->formattedDates)) {
+                
                 foreach($this->formattedDates as $field)
                 {
-                    if(!is_array($field))
-                    {
+                    if(!is_array($field)) {
                         $this->fixedFormattedFields[] = $this->getFixedFormattedField($field);
                         continue;
                     }
 
-                    if(isset($field['key']))
-                    {
-                        $inFormat = isset($field['in_format']) ? $field['in_format'] : null;
-                        $outFormat = isset($field['out_format']) ? $field['out_format'] : null;
-
-                        $this->fixedFormattedFields[] = $this->getFixedFormattedField($field['key'], $inFormat, $outFormat);
+                    if( !is_null($fixed = $this->getFixedFormattedFieldFromArray($field))  ) {
+                        $this->fixedFormattedFields[] = $fixed;
                     }
                 }
             }
@@ -1139,7 +1133,26 @@ trait HasAttributes
     }
 
     /**
-     * Get get a standard format for the fields to auto format.
+     * Get a standard format field from a giving array.
+     *
+     * @param  array  $field
+     * @return array|null
+     */
+    protected function getFixedFormattedFieldFromArray(array $field)
+    {
+        if(isset($field['key']))
+        {
+            $inFormat = isset($field['in_format']) ? $field['in_format'] : null;
+            $outFormat = isset($field['out_format']) ? $field['out_format'] : null;
+
+            return $this->getFixedFormattedField($field['key'], $inFormat, $outFormat);
+        }
+
+        return null;
+    }
+
+    /**
+     * Get a standard format for an auto formatted field.
      *
      * @param  string  $key
      * @param  string $inFormat
@@ -1151,8 +1164,28 @@ trait HasAttributes
         return 
         [   
             'key' => $key,
-            'in_format' => is_null($inFormat) ? config('app.fallback_in_format') : $inFormat,
-            'out_format' => is_null($outFormat) ? config('app.fallback_out_format') : $outFormat
+            'in_format' => is_null($inFormat) ? $this->getFallBackInFormat() : $inFormat,
+            'out_format' => is_null($outFormat) ? $this->getFallBackOutFormat() : $outFormat
         ];
+    }
+
+    /**
+     * Get a standard datetime format for input.
+     *
+     * @return string
+     */
+    protected function getFallBackInFormat()
+    {
+        return config('app.fallback_in_format') ?: 'Y-m-d H:i:s';
+    }
+
+    /**
+     * Get a standard datetime format for output.
+     *
+     * @return string
+     */
+    protected function getFallBackOutFormat()
+    {
+        return config('app.fallback_out_format') ?: 'd/m/Y H:i A';
     }
 }
