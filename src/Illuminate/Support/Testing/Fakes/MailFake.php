@@ -54,7 +54,7 @@ class MailFake implements Mailer
     {
         PHPUnit::assertEmpty(
             $this->mailables,
-            "Some mailables (".count($this->mailables).") were sent."
+            'Some mailables ('.count($this->mailables).') were sent.'
         );
     }
 
