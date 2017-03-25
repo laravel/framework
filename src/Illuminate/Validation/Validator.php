@@ -3036,7 +3036,7 @@ class Validator implements ValidatorContract
 
         $rules = $this->explodeRules($this->initialRules);
 
-        $this->rules = array_merge($this->rules, $rules);
+        $this->rules = $rules + $this->rules;
 
         return $this;
     }

@@ -3282,6 +3282,13 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidationCanAcceptNumericKeysForRules()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [10 => ''], [10 => 'Required']);
+        $this->assertEquals([10], array_keys($v->getRules()));
+    }
+
     protected function getTranslator()
     {
         return m::mock('Symfony\Component\Translation\TranslatorInterface');
