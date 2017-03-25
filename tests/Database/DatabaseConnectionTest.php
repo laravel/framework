@@ -376,6 +376,16 @@ class DatabaseConnectionTest extends TestCase
         $this->assertSame($connection, $schema->getConnection());
     }
 
+    /**
+     * @expectedException \LogicException
+     */
+    public function testGenericConnectionThrowsLogicExceptionWhenDroppingAllTables()
+    {
+        $pdo = m::mock(\PDO::class);
+        $connection = new \Illuminate\Database\Connection($pdo);
+        $connection->dropAllTables();
+    }
+
     protected function getMockConnection($methods = [], $pdo = null)
     {
         $pdo = $pdo ?: new DatabaseConnectionTestMockPDO;

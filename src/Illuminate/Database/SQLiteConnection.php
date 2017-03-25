@@ -48,4 +48,22 @@ class SQLiteConnection extends Connection
     {
         return new DoctrineDriver;
     }
+
+    /**
+     * Drop all tables on the current database connection.
+     *
+     * @return void
+     *
+     * @throws \LogicException
+     */
+    public function dropAllTables()
+    {
+        $dbPath = $this->getConfig('database');
+
+        if (file_exists($dbPath)) {
+            unlink($dbPath);
+        }
+
+        touch($dbPath);
+    }
 }

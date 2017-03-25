@@ -152,6 +152,28 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile a drop all tables command.
+     *
+     * @param  string  $tables
+     * @return string
+     */
+    public function compileDropAllTables($tables)
+    {
+        return 'drop table '.implode(',', $tables).' cascade';
+    }
+
+    /**
+     * Compile a get all tables command.
+     *
+     * @param  string  $schema
+     * @return string
+     */
+    public function compileGetAllTables($schema)
+    {
+        return "select tablename from pg_catalog.pg_tables where schemaname = '$schema'";
+    }
+
+    /**
      * Compile a drop column command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint

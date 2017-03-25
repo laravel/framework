@@ -95,4 +95,20 @@ class SqlServerConnection extends Connection
     {
         return new DoctrineDriver;
     }
+
+    /**
+     * Drop all tables on the current database connection.
+     *
+     * @return void
+     *
+     * @throws \LogicException
+     */
+    public function dropAllTables()
+    {
+        $this->getSchemaBuilder()->disableForeignKeyConstraints();
+
+        $this->statement($this->getSchemaBuilder()->compileDropAllTables());
+
+        $this->getSchemaBuilder()->enableForeignKeyConstraints();
+    }
 }

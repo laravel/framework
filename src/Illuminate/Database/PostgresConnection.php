@@ -63,4 +63,26 @@ class PostgresConnection extends Connection
     {
         return new DoctrineDriver;
     }
+
+    /**
+     * Drop all tables on the current database connection.
+     *
+     * @return void
+     *
+     * @throws \LogicException
+     */
+    public function dropAllTables()
+    {
+        $tables = [];
+
+        foreach($this->select($this->getDefaultSchemaGrammar()->compileGetAllTables($this->getConfig('schema'))) as $table) {
+            $tables[] = get_object_vars($table)[key($table)];
+        }
+
+        if (empty($tables)) {
+            return;
+        }
+
+        $this->statement($this->getDefaultSchemaGrammar()->compileDropAllTables($tables));
+    }
 }
