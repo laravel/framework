@@ -173,11 +173,12 @@ class Handler implements ExceptionHandlerContract
             return $this->toIlluminateResponse($this->convertExceptionToResponse($e), $e);
         }
 
-        if (! $this->isHttpException($e)) {
-            $e = new HttpException(500, $e->getMessage());
-        }
+        $e = $this->isHttpException($e)
+                ? $e : new HttpException(500, $e->getMessage());
 
-        return $this->toIlluminateResponse($this->renderHttpException($e), $e);
+        return $this->toIlluminateResponse(
+            $this->renderHttpException($e), $e
+        );
     }
 
     /**
