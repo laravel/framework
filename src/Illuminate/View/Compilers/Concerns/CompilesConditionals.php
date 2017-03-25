@@ -103,16 +103,17 @@ trait CompilesConditionals
      * Compile the if-user-is-logged statements into valid PHP.
      * @return string
      */
-    protected function compileLogged()
+    protected function compileLoggedIn()
     {
         return "<?php if(\Illuminate\Contracts\Auth\Authenticatable::user()): ?>";
     }
+
     /**
      * Compile the end-if-user-is-logged statements into valid PHP.
      *
      * @return string
      */
-    protected function compileEndLogged()
+    protected function compileEndLoggedIn()
     {
         return '<?php endif; ?>';
     }

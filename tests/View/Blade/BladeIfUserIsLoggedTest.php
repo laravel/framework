@@ -16,9 +16,9 @@ class BladeIfUserIsLoggedTest extends TestCase
     public function testIfUserIsLoggedAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $string = '@logged
+        $string = '@loggedin
 breeze
-@endlogged';
+@endloggedin';
         $expected = '<?php if(\Illuminate\Contracts\Auth\Authenticatable::user()): ?>
 breeze
 <?php endif; ?>';
