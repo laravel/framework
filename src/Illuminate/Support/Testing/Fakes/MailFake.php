@@ -31,7 +31,7 @@ class MailFake implements Mailer
     }
 
     /**
-     * Determine if a mailable was sent based on a truth-test callback.
+     * Determine if a mailable was not sent based on a truth-test callback.
      *
      * @param  string  $mailable
      * @param  callable|null  $callback
