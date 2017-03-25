@@ -336,8 +336,7 @@ trait HasAttributes
 
         // If the attribute exists within the formattedDated array, we will convert it to
         // we will format it before outputting it.
-        if( ($field = $this->getFieldToFormat($key)) != null)
-        {
+        if (($field = $this->getFieldToFormat($key)) != null) {
             return date($field['out_format'], strtotime($this->getAttributeFromArray($key)));
         }
 
@@ -529,8 +528,7 @@ trait HasAttributes
         // First we will check for the presence of a mutator for the set operation
         // which simply lets the developers assign some datetime properties and
         // we'll auto convert a string to a proper formatted datetime string.
-        if( ($field = $this->getFieldToFormat($key)) != null)
-        {
+        if (($field = $this->getFieldToFormat($key)) != null) {
             $value = date($field['in_format'], strtotime($value));
         }
         // Second we will check for the presence of a mutator for the set operation
@@ -1092,9 +1090,9 @@ trait HasAttributes
      */
     protected function getFieldToFormat($key)
     {
-        foreach($this->getFixedFormattedFields() as $field) {
+        foreach ($this->getFixedFormattedFields() as $field) {
             
-            if($field['key'] == $key) {
+            if ($field['key'] == $key) {
                 return $field;
             }
         }
@@ -1109,20 +1107,19 @@ trait HasAttributes
      */
     protected function getFixedFormattedFields()
     {
-        if( is_null($this->fixedFormattedFields))
-        {
+        if (is_null($this->fixedFormattedFields)) {
             $this->fixedFormattedFields = [];
 
-            if( property_exists($this, 'formattedDates') && is_array($this->formattedDates)) {
+            if (property_exists($this, 'formattedDates') && is_array($this->formattedDates)) {
                 
-                foreach($this->formattedDates as $field)
-                {
-                    if(!is_array($field)) {
+                foreach ($this->formattedDates as $field) {
+
+                    if (! is_array($field)) {
                         $this->fixedFormattedFields[] = $this->getFixedFormattedField($field);
                         continue;
                     }
 
-                    if( !is_null($fixed = $this->getFixedFormattedFieldFromArray($field))  ) {
+                    if (! is_null($fixed = $this->getFixedFormattedFieldFromArray($field))) {
                         $this->fixedFormattedFields[] = $fixed;
                     }
                 }
@@ -1140,8 +1137,8 @@ trait HasAttributes
      */
     protected function getFixedFormattedFieldFromArray(array $field)
     {
-        if(isset($field['key']))
-        {
+        if (isset($field['key'])) {
+
             $inFormat = isset($field['in_format']) ? $field['in_format'] : null;
             $outFormat = isset($field['out_format']) ? $field['out_format'] : null;
 
@@ -1165,7 +1162,7 @@ trait HasAttributes
         [   
             'key' => $key,
             'in_format' => is_null($inFormat) ? $this->getFallBackInFormat() : $inFormat,
-            'out_format' => is_null($outFormat) ? $this->getFallBackOutFormat() : $outFormat
+            'out_format' => is_null($outFormat) ? $this->getFallBackOutFormat() : $outFormat,
         ];
     }
 
