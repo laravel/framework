@@ -903,7 +903,7 @@ class Builder
      * @param  bool  $not
      * @return $this
      */
-    public function whereBetween($column, array $values, $boolean = 'and', $not = false)
+    public function whereBetweenDate($column, array $values, $boolean = 'and', $not = false)
     {
         $type = 'between';
 
@@ -921,9 +921,9 @@ class Builder
      * @param  array   $values
      * @return \Illuminate\Database\Query\Builder|static
      */
-    public function orWhereBetween($column, array $values)
+    public function orWhereBetweenDate($column, array $values)
     {
-        return $this->whereBetween($column, $values, 'or');
+        return $this->whereBetweenDate($column, $values, 'or');
     }
 
     /**
@@ -934,9 +934,9 @@ class Builder
      * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder|static
      */
-    public function whereNotBetween($column, array $values, $boolean = 'and')
+    public function whereNotBetweenDate($column, array $values, $boolean = 'and')
     {
-        return $this->whereBetween($column, $values, $boolean, true);
+        return $this->whereBetweenDate($column, $values, $boolean, true);
     }
 
     /**
@@ -946,9 +946,9 @@ class Builder
      * @param  array   $values
      * @return \Illuminate\Database\Query\Builder|static
      */
-    public function orWhereNotBetween($column, array $values)
+    public function orWhereNotBetweenDate($column, array $values)
     {
-        return $this->whereNotBetween($column, $values, 'or');
+        return $this->whereNotBetweenDate($column, $values, 'or');
     }
 
     /**

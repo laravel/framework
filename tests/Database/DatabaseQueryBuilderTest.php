@@ -349,12 +349,12 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testWhereBetweens()
     {
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->whereBetween('id', [1, 2]);
+        $builder->select('*')->from('users')->whereBetweenDate('id', [1, 2]);
         $this->assertEquals('select * from "users" where "id" between ? and ?', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->whereNotBetween('id', [1, 2]);
+        $builder->select('*')->from('users')->whereNotBetweenDate('id', [1, 2]);
         $this->assertEquals('select * from "users" where "id" not between ? and ?', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
     }
