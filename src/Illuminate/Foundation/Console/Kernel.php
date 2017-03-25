@@ -3,7 +3,9 @@
 namespace Illuminate\Foundation\Console;
 
 use Closure;
+use Dotenv\Dotenv;
 use Exception;
+use Symfony\Component\Console\Input\ArgvInput;
 use Throwable;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -110,6 +112,8 @@ class Kernel implements KernelContract
     public function handle($input, $output = null)
     {
         try {
+            $this->setEnvironment($input);
+
             $this->bootstrap();
 
             if (! $this->commandsLoaded) {
@@ -307,6 +311,36 @@ class Kernel implements KernelContract
     protected function bootstrappers()
     {
         return $this->bootstrappers;
+    }
+
+    /**
+     * Set environment if 'env' option if provided.
+     *
+     * @param  \Symfony\Component\Console\Input\InputInterface  $input
+     * @return void
+     */
+    protected function setEnvironment($input)
+    {
+        if (! (php_sapi_name() == 'cli')) {
+            return;
+        }
+
+        if (null === $input) {
+            $input = new ArgvInput;
+        }
+
+        if ($input->hasParameterOption('--env')) {
+            $file = $this->app->call('Illuminate\Foundation\Application@environmentFile').'.'.$input->getParameterOption('--env');
+
+            if (file_exists($this->app->call('Illuminate\Foundation\Application@environmentPath').'/'.$file)) {
+                $this->app->call('Illuminate\Foundation\Application@loadEnvironmentFrom', [$file]);
+
+                (new Dotenv(
+                    $this->app->call('Illuminate\Foundation\Application@environmentPath'),
+                    $this->app->call('Illuminate\Foundation\Application@environmentFile')
+                ))->load();
+            }
+        }
     }
 
     /**
