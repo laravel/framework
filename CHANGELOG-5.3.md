@@ -1,5 +1,11 @@
 # Release Notes for 5.3.x
 
+## v5.3.31 (2017-03-24)
+
+### Fixed
+- Fixed several image validation issues ([#17983](https://github.com/laravel/framework/pull/17983))
+
+
 ## v5.3.30 (2017-01-26)
 
 ### Added
