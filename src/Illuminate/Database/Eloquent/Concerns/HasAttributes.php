@@ -1186,6 +1186,6 @@ trait HasAttributes
      */
     protected function getFallBackOutFormat()
     {
-        return config('app.fallback_out_format') ?: 'd/m/Y H:i A';
+        return config('app.fallback_out_format') ?: 'm/d/Y H:i A';
     }
 }
