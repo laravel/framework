@@ -75,7 +75,7 @@ class PostgresConnection extends Connection
     {
         $tables = [];
 
-        foreach($this->select($this->getDefaultSchemaGrammar()->compileGetAllTables($this->getConfig('schema'))) as $table) {
+        foreach ($this->select($this->getDefaultSchemaGrammar()->compileGetAllTables($this->getConfig('schema'))) as $table) {
             $tables[] = get_object_vars($table)[key($table)];
         }
 

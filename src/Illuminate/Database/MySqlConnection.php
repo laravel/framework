@@ -93,7 +93,7 @@ class MySqlConnection extends Connection
     {
         $this->getSchemaBuilder()->disableForeignKeyConstraints();
 
-        foreach($this->select('SHOW TABLES') as $table) {
+        foreach ($this->select('SHOW TABLES') as $table) {
             $this->getSchemaBuilder()->drop(get_object_vars($table)[key($table)]);
         }
 
