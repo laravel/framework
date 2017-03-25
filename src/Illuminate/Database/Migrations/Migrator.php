@@ -405,7 +405,7 @@ class Migrator
      * @param  string  $file
      * @return object
      */
-    public function resolve($file, $path)
+    public function resolve($file, $path = "")
     {
         $class = Str::studly(implode('_', array_slice(explode('_', $file), 4)));
 
