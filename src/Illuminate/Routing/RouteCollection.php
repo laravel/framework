@@ -131,7 +131,7 @@ class RouteCollection implements Countable, IteratorAggregate
     /**
      * Refresh the action look-up table.
      *
-     * This is done in case any actions are fluently defined or if routes are overwritten.
+     * This is done in case any actions are overwritten with new controllers.
      *
      * @return void
      */
@@ -140,9 +140,8 @@ class RouteCollection implements Countable, IteratorAggregate
         $this->actionList = [];
 
         foreach ($this->allRoutes as $route) {
-            $action = $route->getAction();
-            if (isset($action['controller'])) {
-                $this->addToActionList($action, $route);
+            if (isset($route->getAction()['controller'])) {
+                $this->addToActionList($route->getAction(), $route);
             }
         }
     }
