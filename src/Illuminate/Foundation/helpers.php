@@ -13,6 +13,7 @@ use Illuminate\Contracts\Cookie\Factory as CookieFactory;
 use Illuminate\Database\Eloquent\Factory as EloquentFactory;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
+use Illuminate\Contracts\Notifications\Dispatcher as Notification;
 
 if (! function_exists('abort')) {
     /**
@@ -546,6 +547,20 @@ if (! function_exists('method_field')) {
     function method_field($method)
     {
         return new HtmlString('<input type="hidden" name="_method" value="'.$method.'">');
+    }
+}
+
+if (! function_exists('notify')) {
+    /**
+     * Send to users a notification instance.
+     *
+     * @param \Illuminate\Database\Eloquent\Collection $users
+     * @param \Illuminate\Notifications\Notification $notification
+     * @return void
+     */
+    function notify($users, $notification)
+    {
+        app(Notification::class)->send($users, $notification);
     }
 }
 
