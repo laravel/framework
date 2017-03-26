@@ -2,7 +2,9 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use DB;
 use Closure;
+use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Pagination\Paginator;
@@ -467,6 +469,29 @@ class Builder
     public function lists($column, $key = null)
     {
         return $this->pluck($column, $key);
+    }
+
+    /**
+     * Get the last total row count calculated by MySQL.
+     *
+     * This only works when the `SQL_CALC_FOUND_ROWS` option is enabled on the
+     * underlying base query builder.
+     *
+     * @return int
+     */
+    public function foundRows()
+    {
+        $results = DB::select(
+            'SELECT FOUND_ROWS() AS `total`;'
+        );
+
+        if (count($results) !== 1) {
+            throw new Exception('foundRows() got an unexpected result from the database');
+        }
+
+        $result = reset($results);
+
+        return (int) $result->total;
     }
 
     /**

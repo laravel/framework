@@ -90,6 +90,13 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('select distinct "foo", "bar" from "users"', $builder->toSql());
     }
 
+    public function testBasicSelectSqlCalcFoundRows()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->sqlCalcFoundRows()->select('foo', 'bar')->from('users');
+        $this->assertEquals('select SQL_CALC_FOUND_ROWS `foo`, `bar` from `users`', $builder->toSql());
+    }
+
     public function testBasicAlias()
     {
         $builder = $this->getBuilder();
