@@ -11,17 +11,17 @@ class PostgresBuilder extends Builder
      */
     public function dropAllTables()
     {
-         $tables = [];
+        $tables = [];
 
-         foreach ($this->connection->select($this->grammar->compileGetAllTables($this->connection->getConfig('schema'))) as $table) {
+        foreach ($this->connection->select($this->grammar->compileGetAllTables($this->connection->getConfig('schema'))) as $table) {
             $tables[] = get_object_vars($table)[key($table)];
-         }
+        }
 
-         if (empty($tables)) {
+        if (empty($tables)) {
             return;
-         }
+        }
 
-         $this->connection->statement($this->grammar->compileDropAllTables($tables));
+        $this->connection->statement($this->grammar->compileDropAllTables($tables));
     }
 
     /**
