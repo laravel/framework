@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\Bootstrap\DetectEnvironment;
 
 class ConfigCacheCommand extends Command
 {
@@ -42,6 +43,38 @@ class ConfigCacheCommand extends Command
     }
 
     /**
+     * Clear the environment.
+     *
+     * @return void
+     */
+    private function clearEnvironment()
+    {
+        foreach ($_ENV as $key => $value) {
+            putenv("$key");
+            unset($_SERVER[$key]);
+        }
+
+        $_ENV = [];
+    }
+
+    /**
+     * Export environment to php code.
+     *
+     * @param $env
+     * @return string
+     */
+    private function exportEnvironment($env)
+    {
+        $code = '';
+
+        foreach ($env as $key => $value) {
+            $code .= sprintf('putenv("%s=%s"); $_ENV["%s"] = "%s"; $_SERVER["%s"] = "%s";%s', $key, $value, $key, $value, $key, $value, PHP_EOL);
+        }
+
+        return $code;
+    }
+
+    /**
      * Execute the console command.
      *
      * @return void
@@ -50,13 +83,29 @@ class ConfigCacheCommand extends Command
     {
         $this->call('config:clear');
 
-        $config = $this->getFreshConfiguration();
+        $config = var_export($this->getFreshConfiguration(), true);
 
-        $this->files->put(
-            $this->laravel->getCachedConfigPath(), '<?php return '.var_export($config, true).';'.PHP_EOL
-        );
+        $env = $this->exportEnvironment($this->getFreshEnvironment());
+
+        $code = sprintf('<?php %s%s%sreturn %s;%s', PHP_EOL, $env, PHP_EOL, $config, PHP_EOL);
+
+        $this->files->put($this->laravel->getCachedConfigPath(), $code);
 
         $this->info('Configuration cached successfully!');
+    }
+
+    /**
+     * Boot a fresh copy of the application environment.
+     *
+     * @return string
+     */
+    private function getFreshEnvironment()
+    {
+        $this->clearEnvironment();
+
+        $detector = $this->laravel->make(DetectEnvironment::class);
+
+        return $detector->loadEnvironment($this->laravel);
     }
 
     /**
