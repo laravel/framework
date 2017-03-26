@@ -81,22 +81,4 @@ class MySqlConnection extends Connection
             );
         }
     }
-
-    /**
-     * Drop all tables on the current database connection.
-     *
-     * @return void
-     *
-     * @throws \LogicException
-     */
-    public function dropAllTables()
-    {
-        $this->getSchemaBuilder()->disableForeignKeyConstraints();
-
-        foreach ($this->select('SHOW TABLES') as $table) {
-            $this->getSchemaBuilder()->drop(get_object_vars($table)[key($table)]);
-        }
-
-        $this->getSchemaBuilder()->enableForeignKeyConstraints();
-    }
 }

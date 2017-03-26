@@ -670,18 +670,6 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Drop all tables on the current database connection.
-     *
-     * @return void
-     *
-     * @throws \LogicException
-     */
-    public function dropAllTables()
-    {
-        throw new LogicException('This database connection type does not support dropAllTables()');
-    }
-
-    /**
      * Get the elapsed time since a given starting point.
      *
      * @param  int    $start

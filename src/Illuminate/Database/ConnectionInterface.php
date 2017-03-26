@@ -147,13 +147,4 @@ interface ConnectionInterface
      * @return array
      */
     public function pretend(Closure $callback);
-
-    /**
-     * Drop all tables on the current database connection.
-     *
-     * @return void
-     *
-     * @throws \LogicException
-     */
-    public function dropAllTables();
 }

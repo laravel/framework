@@ -5,6 +5,7 @@ namespace Illuminate\Database;
 use Closure;
 use Exception;
 use Throwable;
+use Illuminate\Database\Schema\SqlServerBuilder;
 use Doctrine\DBAL\Driver\PDOSqlsrv\Driver as DoctrineDriver;
 use Illuminate\Database\Query\Processors\SqlServerProcessor;
 use Illuminate\Database\Query\Grammars\SqlServerGrammar as QueryGrammar;
@@ -67,6 +68,20 @@ class SqlServerConnection extends Connection
     }
 
     /**
+     * Get a schema builder instance for the connection.
+     *
+     * @return \Illuminate\Database\Schema\SqlServerBuilder
+     */
+    public function getSchemaBuilder()
+    {
+        if (is_null($this->schemaGrammar)) {
+            $this->useDefaultSchemaGrammar();
+        }
+
+        return new SqlServerBuilder($this);
+    }
+
+    /**
      * Get the default schema grammar instance.
      *
      * @return \Illuminate\Database\Schema\Grammars\SqlServerGrammar
@@ -94,21 +109,5 @@ class SqlServerConnection extends Connection
     protected function getDoctrineDriver()
     {
         return new DoctrineDriver;
-    }
-
-    /**
-     * Drop all tables on the current database connection.
-     *
-     * @return void
-     *
-     * @throws \LogicException
-     */
-    public function dropAllTables()
-    {
-        $this->getSchemaBuilder()->disableForeignKeyConstraints();
-
-        $this->statement($this->getSchemaBuilder()->compileDropAllTables());
-
-        $this->getSchemaBuilder()->enableForeignKeyConstraints();
     }
 }
