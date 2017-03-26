@@ -26,6 +26,7 @@ use Illuminate\Foundation\Console\RouteCacheCommand;
 use Illuminate\Foundation\Console\RouteClearCommand;
 use Illuminate\Foundation\Console\ConfigCacheCommand;
 use Illuminate\Foundation\Console\ConfigClearCommand;
+use Illuminate\Foundation\Console\ConfigViewCommand;
 use Illuminate\Foundation\Console\ConsoleMakeCommand;
 use Illuminate\Foundation\Console\EnvironmentCommand;
 use Illuminate\Foundation\Console\KeyGenerateCommand;
@@ -58,6 +59,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'ClearResets' => 'command.auth.resets.clear',
         'ConfigCache' => 'command.config.cache',
         'ConfigClear' => 'command.config.clear',
+        'ConfigView' => 'command.config.view',
         'Down' => 'command.down',
         'Environment' => 'command.environment',
         'KeyGenerate' => 'command.key.generate',
@@ -209,6 +211,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.config.clear', function ($app) {
             return new ConfigClearCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerConfigViewCommand()
+    {
+        $this->app->singleton('command.config.view', function ($app) {
+            return new ConfigViewCommand;
         });
     }
 
