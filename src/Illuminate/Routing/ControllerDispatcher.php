@@ -40,6 +40,10 @@ class ControllerDispatcher
             $route->parametersWithoutNulls(), $controller, $method
         );
 
+        if (method_exists($controller, 'boot')) {
+            $controller->boot();
+        }
+
         if (method_exists($controller, 'callAction')) {
             return $controller->callAction($method, $parameters);
         }
