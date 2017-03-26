@@ -858,3 +858,15 @@ if (! function_exists('view')) {
         return $factory->make($view, $data, $mergeData);
     }
 }
+
+if (! function_exists('csrf_json_token')) {
+    /**
+     * CSRF Token to json.
+     *
+     * @return \Illuminate\Support\HtmlString
+     */
+    function csrf_json_token()
+    {
+        return json_encode(['csrfToken' => csrf_token()]);
+    }
+}
