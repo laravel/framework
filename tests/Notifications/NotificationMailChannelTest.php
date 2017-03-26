@@ -341,10 +341,50 @@ class NotificationMailChannelTest extends PHPUnit_Framework_TestCase
         $notifiable = new NotificationMailChannelTestNotifiable;
 
         $channel = new Illuminate\Notifications\Channels\MailChannel(
-            $mailer = Mockery::mock(Illuminate\Contracts\Mail\Mailer::class)
+            $mailer = Mockery::mock(Illuminate\Mail\Mailer::class)
         );
 
-        $mailer->shouldReceive('send')->once();
+        $mailer->shouldReceive('send')->twice()->with(Mockery::on(function ($mailable) use ($mailer) {
+            if ($mailable instanceof \Illuminate\Contracts\Mail\Mailable) {
+                $mailable->send($mailer);
+
+                return true;
+            }
+
+            if ($mailable == 'test:view') {
+                return true;
+            }
+
+            return false;
+        }));
+
+        $channel->send($notifiable, $notification);
+    }
+
+    public function testMessageWithMailableShouldQueueContract()
+    {
+        $notification = new NotificationMailChannelTestNotificationWithMailableShouldQueueContract;
+        $notifiable = new NotificationMailChannelTestNotifiable;
+
+        $channel = new Illuminate\Notifications\Channels\MailChannel(
+            $mailer = Mockery::mock(Illuminate\Mail\Mailer::class)
+        );
+
+        $queue = Mockery::mock(Illuminate\Contracts\Queue\Factory::class);
+
+        $queue->shouldReceive('connection')->once()->with(Mockery::on(function ($connection) {
+            return $connection == 'test';
+        }));
+
+        $mailer->shouldReceive('queue')->once()->with(Mockery::on(function ($mailable) use ($queue) {
+            if (! $mailable instanceof \Illuminate\Contracts\Mail\Mailable) {
+                return false;
+            }
+
+            $mailable->queue($queue);
+
+            return true;
+        }));
 
         $channel->send($notifiable, $notification);
     }
@@ -447,22 +487,42 @@ class NotificationMailChannelTestNotificationWithPriority extends Notification
     }
 }
 
+class NotificationMailChannelTestMail implements \Illuminate\Contracts\Mail\Mailable  {
+
+    public function send(\Illuminate\Contracts\Mail\Mailer $mailer)
+    {
+        $mailer->send('test:view');
+    }
+
+    public function queue(\Illuminate\Contracts\Queue\Factory $queue){}
+
+    public function later($delay, \Illuminate\Contracts\Queue\Factory $queue) {}
+}
+
 class NotificationMailChannelTestNotificationWithMailableContract extends Notification
 {
     public function toMail($notifiable)
     {
-        $mock = Mockery::mock(Illuminate\Contracts\Mail\Mailable::class);
+        return new NotificationMailChannelTestMail();
+    }
+}
 
-        $mock->shouldReceive('send')->once()->with(Mockery::on(function ($mailer) {
-            if (! $mailer instanceof Illuminate\Contracts\Mail\Mailer) {
-                return false;
-            }
+class NotificationMailChannelTestShouldQueueMail implements \Illuminate\Contracts\Mail\Mailable , \Illuminate\Contracts\Queue\ShouldQueue  {
 
-            $mailer->send('notifications::email-plain');
+    public function send(Illuminate\Contracts\Mail\Mailer $mailer) {}
 
-            return true;
-        }));
+    public function queue(Illuminate\Contracts\Queue\Factory $queue)
+    {
+        $queue->connection('test');
+    }
 
-        return $mock;
+    public function later($delay, Illuminate\Contracts\Queue\Factory $queue) {}
+}
+
+class NotificationMailChannelTestNotificationWithMailableShouldQueueContract extends Notification
+{
+    public function toMail($notifiable)
+    {
+        return new NotificationMailChannelTestShouldQueueMail();
     }
 }
