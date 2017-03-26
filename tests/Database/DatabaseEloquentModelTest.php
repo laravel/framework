@@ -158,7 +158,9 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $model->syncOriginal();
         $model->name = 'taylor';
         $model->exists = true;
+        $this->assertEquals(['name' => 'taylor'], $model->getPending());
         $this->assertTrue($model->save());
+        $this->assertEquals([], $model->getPending());
     }
 
     public function testUpdateProcessDoesntOverrideTimestamps()
@@ -177,7 +179,9 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $model->created_at = 'foo';
         $model->updated_at = 'bar';
         $model->exists = true;
+        $this->assertEquals(['created_at' => 'foo', 'updated_at' => 'bar'], $model->getPending());
         $this->assertTrue($model->save());
+        $this->assertEquals([], $model->getPending());
     }
 
     public function testSaveIsCancelledIfSavingEventReturnsFalse()
@@ -188,8 +192,10 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $model->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
         $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(false);
         $model->exists = true;
-
+        $model->foo = 'bar';
+        $this->assertEquals(['foo' => 'bar'], $model->getPending());
         $this->assertFalse($model->save());
+        $this->assertEquals(['foo' => 'bar'], $model->getPending());
     }
 
     public function testUpdateIsCancelledIfUpdatingEventReturnsFalse()
@@ -202,8 +208,9 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturn(false);
         $model->exists = true;
         $model->foo = 'bar';
-
+        $this->assertEquals(['foo' => 'bar'], $model->getPending());
         $this->assertFalse($model->save());
+        $this->assertEquals(['foo' => 'bar'], $model->getPending());
     }
 
     public function testUpdateProcessWithoutTimestamps()
@@ -371,9 +378,11 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
 
         $model->name = 'taylor';
         $model->exists = false;
+        $this->assertEquals(['name' => 'taylor'], $model->getPending());
         $this->assertTrue($model->save());
         $this->assertEquals(1, $model->id);
         $this->assertTrue($model->exists);
+        $this->assertEquals([], $model->getPending());
 
         $model = $this->getMock('EloquentModelStub', ['newQueryWithoutScopes', 'updateTimestamps', 'refresh']);
         $query = m::mock('Illuminate\Database\Eloquent\Builder');
@@ -390,9 +399,11 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
 
         $model->name = 'taylor';
         $model->exists = false;
+        $this->assertEquals(['name' => 'taylor'], $model->getPending());
         $this->assertTrue($model->save());
         $this->assertNull($model->id);
         $this->assertTrue($model->exists);
+        $this->assertEquals([], $model->getPending());
     }
 
     public function testInsertIsCancelledIfCreatingEventReturnsFalse()
@@ -419,6 +430,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $model->exists = true;
         $model->id = 1;
         $model->delete();
+        $this->assertEquals(['id' => 1], $model->getPending());
     }
 
     public function testPushNoRelations()

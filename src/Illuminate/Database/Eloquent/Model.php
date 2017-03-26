@@ -99,6 +99,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected $original = [];
 
     /**
+     * The model attribute's state upon saving.
+     *
+     * @var array
+     */
+    protected $written = [];
+
+    /**
      * The loaded relationships for the model.
      *
      * @var array
@@ -1161,6 +1168,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected function performDeleteOnModel()
     {
         $this->setKeysForSaveQuery($this->newQueryWithoutScopes())->delete();
+
+        $this->written = [];
     }
 
     /**
@@ -1528,6 +1537,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Records data written to the database.
+     *
+     * @param  array  $data
+     * @return void
+     */
+    protected function registerWritten(array $data)
+    {
+        $this->written = array_merge($this->written, $data);
+    }
+
+    /**
      * Perform a model update operation.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
@@ -1536,7 +1556,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function performUpdate(Builder $query, array $options = [])
     {
-        $dirty = $this->getDirty();
+        $dirty = $this->getPending();
 
         if (count($dirty) > 0) {
             // If the updating event returns false, we will cancel the update operation so
@@ -1556,10 +1576,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             // Once we have run the update operation, we will fire the "updated" event for
             // this model instance. This will allow developers to hook into these after
             // models are updated, giving them a chance to do any special processing.
-            $dirty = $this->getDirty();
+            $dirty = $this->getPending();
 
             if (count($dirty) > 0) {
                 $numRows = $this->setKeysForSaveQuery($query)->update($dirty);
+
+                $this->registerWritten($dirty);
 
                 $this->fireModelEvent('updated', false);
             }
@@ -1602,6 +1624,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // there by the developer as the manually determined key for these models.
         else {
             $query->insert($attributes);
+
+            $this->registerWritten($attributes);
         }
 
         // We will go ahead and set the exists property to true, so that it is set when
@@ -1628,6 +1652,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $id = $query->insertGetId($attributes, $keyName = $this->getKeyName());
 
         $this->setAttribute($keyName, $id);
+
+        $this->registerWritten(array_merge($attributes, [$keyName => $id]));
     }
 
     /**
@@ -3182,13 +3208,35 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function getDirty()
     {
+        return $this->getDifferences($this->attributes, $this->original);
+    }
+
+    /**
+     * Get the attributes that have changed since the last database write.
+     *
+     * @return array
+     */
+    public function getPending()
+    {
+        return $this->getDifferences($this->getDirty(), $this->written);
+    }
+
+    /**
+     * Returns all $current properties that don't match $original.
+     *
+     * @param  array  $current
+     * @param  array  $original
+     * @return array
+     */
+    protected function getDifferences(array $current, array $original)
+    {
         $dirty = [];
 
-        foreach ($this->attributes as $key => $value) {
-            if (! array_key_exists($key, $this->original)) {
+        foreach ($current as $key => $value) {
+            if (! array_key_exists($key, $original)) {
                 $dirty[$key] = $value;
-            } elseif ($value !== $this->original[$key] &&
-                                 ! $this->originalIsNumericallyEquivalent($key)) {
+            } elseif ($value !== $original[$key] &&
+                                ! $this->originalIsNumericallyEquivalent($value, $original[$key])) {
                 $dirty[$key] = $value;
             }
         }
@@ -3197,17 +3245,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Determine if the new and old values for a given key are numerically equivalent.
+     * Determine if two values are numerically equivalent.
      *
-     * @param  string  $key
+     * @param  string|int  $current
+     * @param  string|int  $original
      * @return bool
      */
-    protected function originalIsNumericallyEquivalent($key)
+    protected function originalIsNumericallyEquivalent($current, $original)
     {
-        $current = $this->attributes[$key];
-
-        $original = $this->original[$key];
-
         return is_numeric($current) && is_numeric($original) && strcmp((string) $current, (string) $original) === 0;
     }
 
