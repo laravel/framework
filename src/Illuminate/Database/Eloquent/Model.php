@@ -1146,6 +1146,18 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Determine if the model is currently soft deleting.
+     *
+     * This method protects developers from running isSoftDeleting when trait is missing.
+     *
+     * @return bool
+     */
+    public function isSoftDeleting()
+    {
+        return false;
+    }
+
+    /**
      * Register a saving model event with the dispatcher.
      *
      * @param  \Closure|string  $callback

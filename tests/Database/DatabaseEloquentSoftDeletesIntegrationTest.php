@@ -182,6 +182,24 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
         $this->assertNull($users->find(2)->deleted_at);
     }
 
+    public function testIsSoftDeleting()
+    {
+        $comment1 = TestCommentWithoutSoftDelete::create(['body' => 'foo', 'post_id' => 1]);
+        $this->assertFalse($comment1->isSoftDeleting());
+
+        SoftDeletesTestComment::setEventDispatcher(new Illuminate\Events\Dispatcher);
+        $comment2 = SoftDeletesTestComment::create(['body' => 'foo', 'post_id' => 1]);
+
+        $this->assertTrue($comment2->isSoftDeleting());
+
+        $comment2->deleting(function ($c) {
+            $this->assertFalse($c->isSoftDeleting());
+        });
+
+        $comment2->forceDelete();
+        SoftDeletesTestComment::unsetEventDispatcher();
+    }
+
     public function testOnlyTrashedOnlyReturnsTrashedRecords()
     {
         $this->createUsers();
