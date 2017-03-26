@@ -62,17 +62,6 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
-     * Compile a get all tables command.
-     *
-     * @param  string  $schema
-     * @return string
-     */
-    public function compileGetAllTables()
-    {
-        return "select name from sqlite_master where type='table'";
-    }
-
-    /**
      * Get the foreign key syntax for a table creation statement.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
