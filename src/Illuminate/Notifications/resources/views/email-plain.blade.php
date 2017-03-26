@@ -18,5 +18,9 @@ if (! empty($outroLines)) {
     echo implode("\n", $outroLines), "\n\n";
 }
 
-echo 'Regards,', "\n";
-echo config('app.name'), "\n";
+if (! empty($salutation)) {
+    echo $salutation, "\n";
+} else {
+    echo 'Regards,', "\n";
+    echo config('app.name'), "\n";
+}

@@ -28,6 +28,13 @@ class SimpleMessage
     public $greeting;
 
     /**
+     * The notification's salutation.
+     *
+     * @var string
+     */
+    public $salutation;
+
+    /**
      * The "intro" lines of the notification.
      *
      * @var array
@@ -119,6 +126,19 @@ class SimpleMessage
     }
 
     /**
+     * Set the salutation of the notification.
+     *
+     * @param  string  $salutation
+     * @return $this
+     */
+    public function salutation($salutation)
+    {
+        $this->salutation = $salutation;
+
+        return $this;
+    }
+
+    /**
      * Add a line of text to the notification.
      *
      * @param  \Illuminate\Notifications\Action|string  $line
@@ -189,6 +209,7 @@ class SimpleMessage
             'level' => $this->level,
             'subject' => $this->subject,
             'greeting' => $this->greeting,
+            'salutation' => $this->salutation,
             'introLines' => $this->introLines,
             'outroLines' => $this->outroLines,
             'actionText' => $this->actionText,

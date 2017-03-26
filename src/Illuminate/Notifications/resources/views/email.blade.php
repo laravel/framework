@@ -140,7 +140,11 @@ $style = [
 
                                         <!-- Salutation -->
                                         <p style="{{ $style['paragraph'] }}">
-                                            Regards,<br>{{ config('app.name') }}
+                                            @if (! empty($salutation))
+                                                {{ $salutation }}
+                                            @else
+                                                Regards,<br>{{ config('app.name') }}
+                                            @endif
                                         </p>
 
                                         <!-- Sub Copy -->
