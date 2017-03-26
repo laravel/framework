@@ -43,7 +43,11 @@ class ThrottleRequests
             return $this->buildResponse($key, $maxAttempts);
         }
 
-        $this->limiter->hit($key, $decayMinutes);
+        static $hit = false;
+
+        if ($hit === false) {
+            $hit = $this->limiter->hit($key, $decayMinutes);
+        }
 
         $response = $next($request);
 
