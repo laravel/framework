@@ -104,6 +104,8 @@ trait MocksApplicationServices
             $this->firedEvents[] = $called;
         });
 
+        $mock->shouldReceive('until');
+
         $this->app->instance('events', $mock);
 
         return $this;
