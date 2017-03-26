@@ -41,12 +41,21 @@ class RefreshCommand extends Command
 
         $path = $this->input->getOption('path');
 
+        // If the "batch" flag is specified it means we only want to rollback and re-run
+        // the last batch of migrations. This allows the developer to easily rollback
+        // a number of migrations without counting steps or rolling back them all.
+        $batch = $this->input->getOption('batch');
+
         // If the "step" option is specified it means we only want to rollback a small
         // number of migrations before migrating again. For example, the user might
         // only rollback and remigrate the latest four migrations instead of all.
         $step = $this->input->getOption('step') ?: 0;
 
-        if ($step > 0) {
+        if ($batch) {
+            $this->call('migrate:rollback', [
+                '--database' => $database, '--force' => $force, '--path' => $path,
+            ]);
+        } elseif ($step > 0) {
             $this->call('migrate:rollback', [
                 '--database' => $database, '--force' => $force, '--path' => $path, '--step' => $step,
             ]);
@@ -105,6 +114,8 @@ class RefreshCommand extends Command
     protected function getOptions()
     {
         return [
+            ['batch', null, InputOption::VALUE_NONE, 'Indicates if the last batch of migrations should be reverted & re-run.'],
+
             ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'],
 
             ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'],
