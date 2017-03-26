@@ -191,7 +191,12 @@ class MySqlGrammar extends Grammar
         if (isset($query->joins)) {
             $joins = ' '.$this->compileJoins($query, $query->joins);
 
-            $sql = trim("delete $table from {$table}{$joins} $where");
+            $from = explode(' as ', $table, 2);
+            if (count($from) == 1) {
+                $sql = trim("delete {$table} from {$table}{$joins} {$where}");
+            } else {
+                $sql = trim("delete {$from[1]} from {$table}{$joins} {$where}");
+            }
         } else {
             $sql = trim("delete from $table $where");
 
