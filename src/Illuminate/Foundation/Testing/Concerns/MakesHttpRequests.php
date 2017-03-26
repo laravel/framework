@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Testing\Concerns;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Debug\Dumper;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\View\View;
@@ -759,7 +760,7 @@ trait MakesHttpRequests
     /**
      * Dump the content from the last response.
      *
-     * @return void
+     * @return $this
      */
     public function dump()
     {
@@ -771,6 +772,8 @@ trait MakesHttpRequests
             $content = $json;
         }
 
-        dd($content);
+        (new Dumper)->dump($content);
+
+        return $this;
     }
 }
