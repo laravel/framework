@@ -779,3 +779,32 @@ if (! function_exists('view')) {
         return $factory->make($view, $data, $mergeData);
     }
 }
+
+
+
+if (! function_exists('viewOrFail')) {
+    /**
+     * Get the evaluated view contents for the given view or throw an exception.
+     *
+     * @param  string  $view
+     * @param  array   $data
+     * @param  array   $mergeData
+     * @return \Illuminate\View\View|\Illuminate\Contracts\View\Factory
+     * 
+	 * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    function viewOrFail($view = null, $data = [], $mergeData = [])
+    {
+        $factory = app(ViewFactory::class);
+
+        if (func_num_args() === 0) {
+            return $factory;
+        }
+        
+        if (! $factory->exists($view)) {
+            return app()->abort(404);
+        }
+
+        return $factory->make($view, $data, $mergeData);
+    }
+}
