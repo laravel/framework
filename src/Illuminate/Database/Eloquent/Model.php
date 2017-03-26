@@ -1418,18 +1418,53 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function push()
     {
-        if (! $this->save()) {
-            return false;
-        }
-
         // To sync all of the relationships to the database, we will simply spin through
         // the relationships and save each model via this "push" method, which allows
         // us to recurse into all of these nested relations for the model instance.
-        foreach ($this->relations as $models) {
-            $models = $models instanceof Collection
-                        ? $models->all() : [$models];
+        return $this->pushInverseRelations() && $this->save() && $this->pushRelations();
+    }
 
-            foreach (array_filter($models) as $model) {
+    /**
+     * Push all the inversed related models.
+     *
+     * @return bool
+     */
+    protected function pushInverseRelations()
+    {
+        foreach ($this->relations as $name => $model) {
+            $relation = $this->$name();
+
+            if (! $relation instanceof BelongsTo) {
+                continue;
+            }
+
+            if (! $model->push()) {
+                return false;
+            }
+
+            $relation->associate($model);
+        }
+
+        return true;
+    }
+
+    /**
+     * Push the related models excluding the inverse relations.
+     *
+     * @return bool
+     */
+    protected function pushRelations()
+    {
+        foreach ($this->relations as $name => $models) {
+            $relation = $this->$name();
+
+            if ($relation instanceof BelongsTo || $relation instanceof BelongsToMany) {
+                continue;
+            }
+
+            foreach (collect($models)->filter() as $model) {
+                $model->setAttribute($relation->getPlainForeignKey(), $this->getKey());
+
                 if (! $model->push()) {
                     return false;
                 }
