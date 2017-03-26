@@ -3188,7 +3188,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             if (! array_key_exists($key, $this->original)) {
                 $dirty[$key] = $value;
             } elseif ($value !== $this->original[$key] &&
-                                 ! $this->originalIsNumericallyEquivalent($key)) {
+                                 ! $this->originalIsEquivalent($key)) {
                 $dirty[$key] = $value;
             }
         }
@@ -3197,18 +3197,54 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Determine if the new and old values for a given key are numerically equivalent.
+     * Determine if the new and old values for a given key are equivalent, though not necessarily identical.
      *
      * @param  string  $key
      * @return bool
      */
-    protected function originalIsNumericallyEquivalent($key)
+    protected function originalIsEquivalent($key)
     {
         $current = $this->attributes[$key];
 
         $original = $this->original[$key];
 
+        // if they're not the same state (set/unset), they're not equivalent
+        if (empty($current) != empty($original)) {
+            return false;
+        }
+
+        return $this->isNumericallyEquivalent($current, $original)
+            || $this->isDateEquivalent($key, $current, $original);
+    }
+
+    /**
+     * Determine if the new and old values for a given key are numerically equivalent.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function isNumericallyEquivalent($current, $original)
+    {
         return is_numeric($current) && is_numeric($original) && strcmp((string) $current, (string) $original) === 0;
+    }
+
+    /**
+     * Determine if the new and old values for a given key have the same date.
+     *
+     * The $dates property converts all incoming data into datetime, whereas we may only be storing the date.
+     * Thus, any update for the same time would always show as dirty because 2016-01-01 != 2016-01 01 00:00:00
+     *
+     * Note: This means Eloquent can never add the time, if the time was missing, but we assume the database adds
+     * 00:00:00 if there was no time supplied anyway. Eloquent can overwrite the wrong time, so no problem here.
+     *
+     * @param  string  $key
+     * @param  string|int  $current
+     * @param  string  $original
+     * @return bool
+     */
+    protected function isDateEquivalent($key, $current, $original)
+    {
+        return in_array($key, $this->getDates()) && starts_with($this->fromDateTime($current), $original);
     }
 
     /**

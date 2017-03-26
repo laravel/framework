@@ -34,16 +34,23 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
     public function testDirtyAttributes()
     {
         $model = new EloquentModelStub(['foo' => '1', 'bar' => 2, 'baz' => 3]);
+        // bypass mutators
+        $model->setAttributeDirectly('date', date('Y-m-d'));
+        $model->setAttributeDirectly('datetime', date('Y-m-d H:i:s'));
         $model->syncOriginal();
         $model->foo = 1;
         $model->bar = 20;
         $model->baz = 30;
+        $model->date = date('Y-m-d H:i:s');
+        $model->datetime = date('Y-m-d H:i:s', time() + 10);
 
         $this->assertTrue($model->isDirty());
         $this->assertFalse($model->isDirty('foo'));
         $this->assertTrue($model->isDirty('bar'));
         $this->assertTrue($model->isDirty('foo', 'bar'));
         $this->assertTrue($model->isDirty(['foo', 'bar']));
+        $this->assertFalse($model->isDirty('date')); // date is still the same
+        $this->assertTrue($model->isDirty('datetime'));
     }
 
     public function testCalculatedAttributes()
@@ -1451,7 +1458,17 @@ class EloquentModelStub extends Model
 
     public function getDates()
     {
-        return [];
+        return ['date', 'datetime'];
+    }
+
+    public function setAttributeDirectly($key, $value)
+    {
+        $this->attributes[$key] = $value;
+    }
+
+    protected function getDateFormat()
+    {
+        return 'Y-m-d H:i:s';
     }
 
     public function getAppendableAttribute()
