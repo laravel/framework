@@ -76,12 +76,40 @@ class Kernel implements KernelContract
         $this->app = $app;
         $this->router = $router;
 
+        $this->boot();
+    }
+
+    /**
+     * Boot the http kernel.
+     *
+     * @return void
+     */
+    protected function boot()
+    {
+        $this->bootTraits();
+
         foreach ($this->middlewareGroups as $key => $middleware) {
-            $router->middlewareGroup($key, $middleware);
+            $this->router->middlewareGroup($key, $middleware);
         }
 
         foreach ($this->routeMiddleware as $key => $middleware) {
-            $router->middleware($key, $middleware);
+            $this->router->middleware($key, $middleware);
+        }
+    }
+
+    /**
+     * Boot the traits.
+     *
+     * @return void
+     */
+    protected function bootTraits()
+    {
+        // Loops through all the class traits.
+        foreach (class_uses_recursive(get_class($this)) as $trait) {
+            // Calls the method if it exists.
+            if (method_exists(get_called_class(), $method = 'boot'.class_basename($trait))) {
+                $this->{$method}();
+            }
         }
     }
 

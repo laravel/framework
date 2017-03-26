@@ -73,9 +73,37 @@ class Kernel implements KernelContract
         $this->app = $app;
         $this->events = $events;
 
+        $this->boot();
+    }
+
+    /**
+     * Boot the console kernel.
+     *
+     * @return void
+     */
+    protected function boot()
+    {
+        $this->bootTraits();
+
         $this->app->booted(function () {
             $this->defineConsoleSchedule();
         });
+    }
+
+    /**
+     * Boot the traits.
+     *
+     * @return void
+     */
+    protected function bootTraits()
+    {
+        // Loops through all the class traits.
+        foreach (class_uses_recursive(get_class($this)) as $trait) {
+            // Calls the method if it exists.
+            if (method_exists(get_called_class(), $method = 'boot'.class_basename($trait))) {
+                $this->{$method}();
+            }
+        }
     }
 
     /**
