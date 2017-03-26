@@ -4,10 +4,18 @@ namespace Illuminate\Routing\Middleware;
 
 use Closure;
 use Illuminate\Cache\RateLimiter;
+use Illuminate\Foundation\Application;
 use Symfony\Component\HttpFoundation\Response;
 
 class ThrottleRequests
 {
+    /**
+     * The application instance.
+     *
+     * @var \Illuminate\Foundation\Application
+     */
+    protected $app;
+
     /**
      * The rate limiter instance.
      *
@@ -18,11 +26,13 @@ class ThrottleRequests
     /**
      * Create a new request throttler.
      *
+     * @param  \Illuminate\Foundation\Application  $app
      * @param  \Illuminate\Cache\RateLimiter  $limiter
      * @return void
      */
-    public function __construct(RateLimiter $limiter)
+    public function __construct(Application $app, RateLimiter $limiter)
     {
+        $this->app = $app;
         $this->limiter = $limiter;
     }
 
@@ -37,6 +47,10 @@ class ThrottleRequests
      */
     public function handle($request, Closure $next, $maxAttempts = 60, $decayMinutes = 1)
     {
+        if ($this->runningUnitTests()) {
+            return $next($request);
+        }
+
         $key = $this->resolveRequestSignature($request);
 
         if ($this->limiter->tooManyAttempts($key, $maxAttempts, $decayMinutes)) {
@@ -124,5 +138,15 @@ class ThrottleRequests
         }
 
         return $this->limiter->retriesLeft($key, $maxAttempts);
+    }
+
+    /**
+     * Determine if the application is running unit tests.
+     *
+     * @return bool
+     */
+    protected function runningUnitTests()
+    {
+        return $this->app->runningInConsole() && $this->app->runningUnitTests();
     }
 }
