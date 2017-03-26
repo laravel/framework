@@ -114,6 +114,10 @@ class VerifyCsrfToken
             $token = $this->encrypter->decrypt($header);
         }
 
+        if (! $token) {
+            $token = $request->cookie('XSRF-TOKEN');
+        }
+
         if (! is_string($sessionToken) || ! is_string($token)) {
             return false;
         }
