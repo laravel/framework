@@ -248,7 +248,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
 
         $request = Request::create('/', 'GET', ['developer' => ['name' => 'Taylor', 'age' => 25]]);
         $this->assertEquals(['developer' => ['age' => 25]], $request->only('developer.age'));
-        $this->assertEquals(['developer' => ['name' => 'Taylor'], 'test' => null], $request->only('developer.name', 'test'));
+        $this->assertEquals(['developer' => ['name' => 'Taylor']], $request->only('developer.name', 'test'));
     }
 
     public function testExceptMethod()
