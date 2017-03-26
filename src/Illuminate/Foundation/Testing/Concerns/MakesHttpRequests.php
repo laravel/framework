@@ -135,11 +135,11 @@ trait MakesHttpRequests
      * @param  array  $headers
      * @return $this
      */
-    public function post($uri, array $data = [], array $headers = [])
+    public function post($uri, array $data = [], array $headers = [], array $files = [])
     {
         $server = $this->transformHeadersToServerVars($headers);
 
-        $this->call('POST', $uri, $data, [], [], $server);
+        $this->call('POST', $uri, $data, [], $files, $server);
 
         return $this;
     }
@@ -165,11 +165,11 @@ trait MakesHttpRequests
      * @param  array  $headers
      * @return $this
      */
-    public function put($uri, array $data = [], array $headers = [])
+    public function put($uri, array $data = [], array $headers = [], array $files = [])
     {
         $server = $this->transformHeadersToServerVars($headers);
 
-        $this->call('PUT', $uri, $data, [], [], $server);
+        $this->call('PUT', $uri, $data, [], $files, $server);
 
         return $this;
     }
@@ -195,11 +195,11 @@ trait MakesHttpRequests
      * @param  array  $headers
      * @return $this
      */
-    public function patch($uri, array $data = [], array $headers = [])
+    public function patch($uri, array $data = [], array $headers = [], array $files = [])
     {
         $server = $this->transformHeadersToServerVars($headers);
 
-        $this->call('PATCH', $uri, $data, [], [], $server);
+        $this->call('PATCH', $uri, $data, [], $files, $server);
 
         return $this;
     }
