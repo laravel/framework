@@ -30,6 +30,7 @@ use Illuminate\Foundation\Console\ConfigClearCommand;
 use Illuminate\Foundation\Console\ConsoleMakeCommand;
 use Illuminate\Foundation\Console\EnvironmentCommand;
 use Illuminate\Foundation\Console\KeyGenerateCommand;
+use Illuminate\Foundation\Console\ObserveMakeCommand;
 use Illuminate\Foundation\Console\RequestMakeCommand;
 use Illuminate\Foundation\Console\StorageLinkCommand;
 use Illuminate\Routing\Console\ControllerMakeCommand;
@@ -105,6 +106,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'Serve' => 'command.serve',
         'TestMake' => 'command.test.make',
         'VendorPublish' => 'command.vendor.publish',
+        'ObserveMake' => 'command.observe.make',
     ];
 
     /**
@@ -601,6 +603,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.notification.table', function ($app) {
             return new NotificationTableCommand($app['files'], $app['composer']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerObserveMakeCommand()
+    {
+        $this->app->singleton('command.observe.make', function ($app) {
+            return new ObserveMakeCommand($app['files']);
         });
     }
 
