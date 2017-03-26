@@ -11,12 +11,10 @@ class SQLiteBuilder extends Builder
      */
     public function dropAllTables()
     {
-        $dbPath = $this->connection->getConfig('database');
+        $this->connection->select($this->grammar->compileEnableWriteableSchema());
 
-        if (file_exists($dbPath)) {
-            unlink($dbPath);
-        }
+        $this->connection->select($this->grammar->compileDropAllTables());
 
-        touch($dbPath);
+        $this->connection->select($this->grammar->compileDisableWriteableSchema());
     }
 }
