@@ -46,16 +46,13 @@ class MailFake implements Mailer
     }
 
     /**
-     * Determine if no mailable was sent.
+     * Assert that no mailables were sent.
      *
      * @return void
      */
-    public function assertNilSent()
+    public function assertNothingSent()
     {
-        PHPUnit::assertEmpty(
-            $this->mailables,
-            'Some mailables ('.count($this->mailables).') were sent.'
-        );
+        PHPUnit::assertEmpty($this->mailables, 'Mailables were sent unexpectedly.');
     }
 
     /**
