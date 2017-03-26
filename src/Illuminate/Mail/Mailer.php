@@ -3,7 +3,6 @@
 namespace Illuminate\Mail;
 
 use Swift_Mailer;
-use Swift_Message;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Illuminate\Contracts\View\Factory;
@@ -401,7 +400,7 @@ class Mailer implements MailerContract, MailQueueContract
      */
     protected function createMessage()
     {
-        $message = new Message(new Swift_Message);
+        $message = new Message($this->swift->createMessage('message'));
 
         // If a global from address has been specified we will set it on every message
         // instances so the developer does not have to repeat themselves every time
