@@ -3,7 +3,6 @@
 namespace Illuminate\Mail;
 
 use Swift_Mailer;
-use Swift_Message;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Illuminate\Contracts\View\Factory;
