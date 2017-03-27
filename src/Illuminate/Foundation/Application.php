@@ -294,7 +294,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     /**
      * Get the path to the application "app" directory.
      *
-     * @param string $path
+     * @param string $path Optionally, a path to append to the app path
      * @return string
      */
     public function path($path = '')
@@ -305,7 +305,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     /**
      * Get the base path of the Laravel installation.
      *
-     * @param string $path
+     * @param string $path Optionally, a path to append to the base path
      * @return string
      */
     public function basePath($path = '')
@@ -316,7 +316,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     /**
      * Get the path to the bootstrap directory.
      *
-     * @param string $path
+     * @param string $path Optionally, a path to append to the bootstrap path
      * @return string
      */
     public function bootstrapPath($path = '')
@@ -327,7 +327,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     /**
      * Get the path to the application configuration files.
      *
-     * @param string $path
+     * @param string $path Optionally, a path to append to the config path
      * @return string
      */
     public function configPath($path = '')
@@ -338,7 +338,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     /**
      * Get the path to the database directory.
      *
-     * @param string $path
+     * @param string $path Optionally, a path to append to the database path
      * @return string
      */
     public function databasePath($path = '')
