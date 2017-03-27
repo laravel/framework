@@ -168,6 +168,14 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase
         $this->assertArrayHasKey(0, $app['events']->getListeners('bootstrapped: Illuminate\Foundation\Bootstrap\RegisterFacades'));
         $this->assertSame($closure, $app['events']->getListeners('bootstrapped: Illuminate\Foundation\Bootstrap\RegisterFacades')[0]);
     }
+
+    public function testSetNamespaceManually()
+    {
+        $app = new Application;
+        $namespace = 'Acme\\';
+        $app->setNamespace($namespace);
+        $this->assertSame($namespace, $app->getNamespace());
+    }
 }
 
 class ApplicationBasicServiceProviderStub extends Illuminate\Support\ServiceProvider
