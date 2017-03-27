@@ -20,4 +20,10 @@ class FoundationAliasLoaderTest extends PHPUnit_Framework_TestCase
         $loader = AliasLoader::getInstance(['foo' => 'bar']);
         $this->assertSame($loader, AliasLoader::getInstance());
     }
+
+    // unregister dummy not existing classes
+    public static function tearDownAfterClass()
+    {
+        AliasLoader::getInstance()->unregister();
+    }
 }

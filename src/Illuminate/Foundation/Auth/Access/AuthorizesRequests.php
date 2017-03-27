@@ -48,7 +48,7 @@ trait AuthorizesRequests
      */
     protected function parseAbilityAndArguments($ability, $arguments)
     {
-        if (is_string($ability)) {
+        if (is_string($ability) && ! is_subclass_of($ability, 'Illuminate\Database\Eloquent\Model')) {
             return [$ability, $arguments];
         }
 

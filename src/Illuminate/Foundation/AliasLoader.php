@@ -104,6 +104,30 @@ class AliasLoader
     }
 
     /**
+     * Unregister the loader from the auto-loader stack.
+     *
+     * @return void
+     */
+    public function unregister()
+    {
+        if ($this->registered) {
+            $this->removeFromLoaderStack();
+
+            $this->registered = false;
+        }
+    }
+
+    /**
+     * Remove the load method to the auto-loader stack.
+     *
+     * @return void
+     */
+    protected function removeFromLoaderStack()
+    {
+        spl_autoload_unregister([$this, 'load']);
+    }
+
+    /**
      * Get the registered aliases.
      *
      * @return array
