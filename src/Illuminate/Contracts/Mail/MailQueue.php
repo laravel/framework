@@ -11,7 +11,7 @@ interface MailQueue
      * @param  string  $queue
      * @return mixed
      */
-    public function queue($view, array $data, $callback, $queue = null);
+    public function queue($view, $queue = null);
 
     /**
      * Queue a new e-mail message for sending after (n) seconds.
@@ -21,5 +21,5 @@ interface MailQueue
      * @param  string  $queue
      * @return mixed
      */
-    public function later($delay, $view, array $data, $callback, $queue = null);
+    public function later($delay, $view, $queue = null);
 }
