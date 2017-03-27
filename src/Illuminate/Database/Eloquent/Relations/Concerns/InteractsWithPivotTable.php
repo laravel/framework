@@ -84,17 +84,21 @@ trait InteractsWithPivotTable
         $changes = [
             'attached' => [], 'detached' => [], 'updated' => [],
         ];
-
+        
+        $records = $this->formatRecordsList($this->parseIds($ids));
+        $recordsIds = array_keys($records);
+            
         // First we need to attach any of the associated models that are not currently
         // in this joining table. We'll spin through the given IDs, checking to see
         // if they exist in the array of current ones, and if not we will insert.
-        $current = $this->newPivotQuery()->pluck(
-            $this->relatedKey
-        )->all();
+        $current = $this->newPivotQuery()
+            ->when(!$detaching, function ($query) use ($recordsIds) {
+                return $query->whereIn($this->relatedKey, $recordsIds);
+            })
+            ->pluck($this->relatedKey)
+            ->all();
 
-        $detach = array_diff($current, array_keys(
-            $records = $this->formatRecordsList($this->parseIds($ids))
-        ));
+        $detach = array_diff($current, $recordsIds);
 
         // Next, we will take the differences of the currents and given IDs and detach
         // all of the entities that exist in the "current" array but are not in the
