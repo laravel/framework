@@ -375,7 +375,7 @@
 - Added higher-order messages for the collections ([#16267](https://github.com/laravel/framework/pull/16267), [e276b3d](https://github.com/laravel/framework/commit/e276b3d4bf2a124c4eb5975a8a2724b8c806139a), [2b7ab30](https://github.com/laravel/framework/commit/2b7ab30e0ec56ac4e4093d7f2775da98086c8000), [#16274](https://github.com/laravel/framework/pull/16274), [724950a](https://github.com/laravel/framework/commit/724950a42c225c7b53c56283c01576b050fea37a), [#17000](https://github.com/laravel/framework/pull/17000))
 - Allow collection macros to be proxied ([#16749](https://github.com/laravel/framework/pull/16749))
 - Added operator support to `Collection::contains()` method ([#16791](https://github.com/laravel/framework/pull/16791))
-- Added `Collection::every()` method ([#16777](https://github.com/laravel/framework/pull/16777))
+- Added a new `Collection::every()` method, renamed the existing to `Collection::nth()` ([#16777](https://github.com/laravel/framework/pull/16777))
 - Allow passing an array to `Collection::find()` ([#16849](https://github.com/laravel/framework/pull/16849))
 - Always return a collection when calling `Collection::random()` with a parameter ([#16865](https://github.com/laravel/framework/pull/16865))
 - Don't renumber the keys and keep the input array order in `mapWithKeys()` ([#16564](https://github.com/laravel/framework/pull/16564))
