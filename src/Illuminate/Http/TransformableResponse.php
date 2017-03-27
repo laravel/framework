@@ -13,9 +13,10 @@ abstract class TransformableResponse extends JsonResponse
      * Constructor.
      *
      * @param  mixed  $data
-     * @param  int    $status
+     * @param  int  $status
      * @param  array  $headers
-     * @param  int    $options
+     * @param  int  $options
+     * @return void
      */
     public function __construct($data = null, $status = 200, $headers = [], $options = 0)
     {
@@ -27,11 +28,11 @@ abstract class TransformableResponse extends JsonResponse
 
         parent::__construct($data, $status, $headers, $options);
     }
-    
+
     /**
      * Transforms the response data.
      *
-     * @param  array $data
+     * @param  array  $data
      * @return array
      */
     public function transform(array $data)
@@ -42,67 +43,68 @@ abstract class TransformableResponse extends JsonResponse
 
         return $data;
     }
-    
+
     /**
-     * Resolve array rules generating a new rule for every item in the array
-     * spcified with the '*' symbol.
+     * Resolve array rules generating a new rule for every '*' symbol.
      *
-     * Example: posts.*.comments.*.title => posts.0.comments.0.title
-     *
-     * @param  array $data
-     * @param  array $rules
+     * @param  array  $data
+     * @param  array  $rules
      * @return array
      */
     protected function resolveArrayVisibilityRules(array $data, array $rules)
     {
-        return array_reduce(array_keys($rules), function ($parsedRules, $rule) use ($data, $rules) {
-            if (Str::contains($rule, '*')) {
-                $gatheredRules = array_keys(
-                    ValidationData::initializeAndGatherData($rule, $data)
-                );
-                
-                return array_merge(
-                    $parsedRules,
-                    $this->sanitizeArrayGatheredRules($rule, $gatheredRules, $rules[$rule])
-                );
-            }
-            
-            $parsedRules[$rule] = $rules[$rule];
-            
-            return $parsedRules;
-        }, []);
+        return array_reduce(array_keys($rules),
+            function ($parsedRules, $rule) use ($data, $rules) {
+                if (Str::contains($rule, '*')) {
+                    $gatheredRules = array_keys(
+                        ValidationData::initializeAndGatherData($rule, $data)
+                    );
+
+                    return array_merge(
+                        $parsedRules,
+                        $this->sanitizeArrayGatheredRules(
+                            $rule,
+                            $gatheredRules,
+                            $rules[$rule]
+                        )
+                    );
+                }
+
+                $parsedRules[$rule] = $rules[$rule];
+
+                return $parsedRules;
+            }, []);
     }
-    
+
     /**
-     * Sanitize gathered array rules removing those that don't appear into
-     * orginal rules.
+     * Sanitize rules removing those that don't appear into orginal rules.
      *
-     * @param  string $rule
-     * @param  array $gatheredRules
-     * @param  boolean $valueForValidOnes
+     * @param  string  $rule
+     * @param  array  $gatheredRules
+     * @param  bool  $valueForValidOnes
      * @return array
      */
     protected function sanitizeArrayGatheredRules($rule, array $gatheredRules, $valueForValidOnes)
     {
-        $pattern = '/' . str_replace('.*.', '\.([0-9])+\.', $rule) . '/';
-        
+        $pattern = '/'.str_replace('.*.', '\.([0-9])+\.', $rule).'/';
+
         return array_reduce($gatheredRules,
             function ($validRules, $rule) use ($pattern, $valueForValidOnes) {
                 preg_match($pattern, $rule, $matches);
-                
+
                 if ($matches) {
                     $validRules[$matches[0]] = $valueForValidOnes;
                 }
-                
+
                 return $validRules;
             },
         []);
     }
-    
+
     /**
      * Apply visbility rules to given data.
      *
-     * @param  array $rules
+     * @param  array  $rules
      * @return array
      */
     protected function applyVisibilityRules(array $data, array $rules)
@@ -116,12 +118,12 @@ abstract class TransformableResponse extends JsonResponse
 
         return $data;
     }
-    
+
     /**
      * Apply rules over the fields that must be displayed.
      *
-     * @param  array $data
-     * @param  array $rules
+     * @param  array  $data
+     * @param  array  $rules
      * @return array
      */
     protected function showFields(array $data, array $rules)
@@ -144,45 +146,45 @@ abstract class TransformableResponse extends JsonResponse
                         )
                     );
                 }
-                
+
                 return $transformedData;
             },
         []);
     }
-    
+
     /**
      * Apply rules over the fields that must be hidden.
      *
-     * @param  array $data
-     * @param  array $rules
+     * @param  array  $data
+     * @param  array  $rules
      * @return array
      */
     protected function hideFields(array $data, array $rules)
     {
         $applicableRules = array_filter($rules, function ($rule) {
-            return !$rule;
+            return ! $rule;
         });
 
         if (empty($applicableRules)) {
             return $data;
         }
-        
+
         return array_reduce(array_keys($applicableRules),
             function ($transformedData, $rule) {
                 if (Arr::has($transformedData, $rule)) {
                     Arr::forget($transformedData, $rule);
                 }
-                
+
                 return $transformedData;
             },
         $data);
     }
-    
+
     /**
      * Apply casting rules to given value.
      *
-     * @param  string $attribute
-     * @param  mixed $value
+     * @param  string  $attribute
+     * @param  mixed  $value
      * @return mixed
      */
     protected function applyCastingRules($attribute, $value)
@@ -204,32 +206,32 @@ abstract class TransformableResponse extends JsonResponse
                 return $value;
         }
     }
-    
+
     /**
      * Get casting rule for given attribute.
      *
      * @param  string  $attribute
-     * @return boolean
+     * @return bool|null
      */
     protected function getCastType($attribute)
     {
-        if (!$castings = $this->castingRules()) {
-            return null;
+        if (! $castings = $this->castingRules()) {
+            return;
         }
-        
+
         if (array_key_exists($attribute, $castings)) {
             return $castings[$attribute];
         }
-        
+
         $pattern = preg_replace('/\.([0-9])+\./', '.*.', $attribute);
-        
+
         if (array_key_exists($pattern, $castings)) {
             return $castings[$pattern];
         }
-        
+
         return null;
     }
-    
+
     /**
      * Apply renaming rules for given attribute.
      *
@@ -238,23 +240,23 @@ abstract class TransformableResponse extends JsonResponse
      */
     protected function applyRenamingRules($attribute)
     {
-        if (!$renamings = $this->renamingRules()) {
+        if (! $renamings = $this->renamingRules()) {
             return $attribute;
         }
 
         if (array_key_exists($attribute, $renamings)) {
             return $renamings[$attribute];
         }
-        
+
         $pattern = preg_replace('/\.([0-9])+\./', '.*.', $attribute);
 
         if (array_key_exists($pattern, $renamings)) {
             return preg_replace('/(\w|\s|\-)+$/', $renamings[$pattern], $attribute);
         }
-        
+
         return $attribute;
     }
-    
+
     /**
      * Apply mutation rules to given value.
      *
@@ -265,20 +267,20 @@ abstract class TransformableResponse extends JsonResponse
     public function applyMutationRules($attribute, $value)
     {
         $mutations = $this->mutationRules();
-        
+
         if (array_key_exists($attribute, $mutations)) {
             return $this->executeMutators($value, $mutations[$attribute]);
         }
-        
+
         $pattern = preg_replace('/\.([0-9])+\./', '.*.', $attribute);
 
         if (array_key_exists($pattern, $mutations)) {
             return $this->executeMutators($value, $mutations[$pattern]);
         }
-        
+
         return $value;
     }
-    
+
     /**
      * Execute mutators in given value.
      *
@@ -289,41 +291,41 @@ abstract class TransformableResponse extends JsonResponse
     public function executeMutators($value, $mutators)
     {
         $mutators = explode('|', $mutators);
-        
+
         return array_reduce($mutators, function ($value, $mutator) {
             $method = 'mutator'.Str::studly($mutator);
-            
-            if (!method_exists($this, $method)) {
+
+            if (! method_exists($this, $method)) {
                 $classname = static::class;
-                
+
                 throw new \Exception("There is no mutator [$method] declared in [$classname].");
             }
-            
+
             return $this->$method($value);
         }, $value);
     }
-    
+
     /**
      * Set visibility rules to apply to current response.
      *
      * @return array
      */
     abstract public function visibilityRules();
-    
+
     /**
      * Set casting rules to apply to current response.
      *
      * @return array
      */
     abstract public function castingRules();
-    
+
     /**
      * Set renaming rules to apply to current response.
      *
      * @return array
      */
     abstract public function renamingRules();
-    
+
     /**
      * Set mutation rules to apply to current response.
      *
