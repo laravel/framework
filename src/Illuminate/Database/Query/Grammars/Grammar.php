@@ -766,7 +766,7 @@ class Grammar extends BaseGrammar
         $columns = [];
 
         foreach ($values as $key => $value) {
-            $columns[] = $this->wrap($key).' = '.$this->parameter($value);
+            $columns[] = $table.' . '.$this->wrap($key).' = '.$this->parameter($value);
         }
 
         $columns = implode(', ', $columns);
