@@ -393,7 +393,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeReal(Fluent $column)
     {
-        return 'real precision';
+        return 'real';
     }
     
     /**
