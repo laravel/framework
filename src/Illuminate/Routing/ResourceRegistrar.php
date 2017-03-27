@@ -84,6 +84,11 @@ class ResourceRegistrar
 
             return;
         }
+        
+        // Validate controller name doesn't have any @ for methods
+        if(Str::contains($controller,'@')) {
+            throw new \InvalidArgumentException("doesn't expect @ in resource [ $controller ]");
+        } 
 
         // We need to extract the base resource from the resource name. Nested resources
         // are supported in the framework, but we need to know what name to use for a
