@@ -1806,6 +1806,20 @@ class SupportCollectionTest extends TestCase
         );
     }
 
+    public function testSplitBy()
+    {
+        $collection = (new Collection([
+                ['name' => 'User 1', 'email' => 'user1@gmail.com'],
+                ['name' => 'Taylor Otwell', 'email' => 'taylor@laravel.com'],
+            ]))->splitBy(function ($row) {
+                return strpos($row['email'], '@gmail') !== false ? true : false;
+            });
+
+        $this->assertEquals([
+            ['name' => 'User 1', 'email' => 'user1@gmail.com'],
+        ], $collection[0]);
+    }
+
     public function testHigherOrderCollectionMap()
     {
         $person1 = (object) ['name' => 'Taylor'];

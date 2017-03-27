@@ -1088,6 +1088,25 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Split a collection based on condition into groups.
+     *
+     * @param \Closure $callback
+     *
+     * @return static
+     */
+    public function splitBy($callback)
+    {
+        $results = $this->reduce(function ($results, $row) use ($callback) {
+            $index = $callback($row) ? 0 : 1;
+            $results[$index][] = $row;
+
+            return $results;
+        }, []);
+
+        return new static($results);
+    }
+
+    /**
      * Chunk the underlying collection array.
      *
      * @param  int  $size
