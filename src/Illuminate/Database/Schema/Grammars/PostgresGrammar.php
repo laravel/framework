@@ -395,7 +395,7 @@ class PostgresGrammar extends Grammar
     {
         return 'real';
     }
-    
+
     /**
      * Create the column definition for a decimal type.
      *
