@@ -1834,12 +1834,17 @@ class Builder
     /**
      * Get an array with the values of a given column.
      *
-     * @param  string  $column
+     * @param  string|array  $column
      * @param  string|null  $key
      * @return array
      */
     public function pluck($column, $key = null)
     {
+        if (is_array($column)) {
+            $column = array_values($column)[0];
+            $key = array_keys($column)[0];
+        }
+
         $results = $this->get(is_null($key) ? [$column] : [$column, $key]);
 
         // If the columns are qualified with a table or have an alias, we cannot use
