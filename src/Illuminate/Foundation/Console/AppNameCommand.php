@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Composer;
 use Symfony\Component\Finder\Finder;
@@ -67,6 +68,10 @@ class AppNameCommand extends Command
      */
     public function fire()
     {
+        if (! preg_match('/^[A-Za-z][A-Za-z0-9]*(?:_[A-Za-z0-9]+)*$/', $this->argument('name'))) {
+            throw new Exception('Invalid app name.');
+        }
+
         $this->currentRoot = trim($this->laravel->getNamespace(), '\\');
 
         $this->setBootstrapNamespaces();
