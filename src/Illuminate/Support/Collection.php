@@ -60,20 +60,27 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Get the average value of a given key.
      *
-     * @param  string|null  $key
+     * @param  string|callable|null  $key
      * @return mixed
      */
     public function avg($key = null)
     {
         if ($count = $this->count()) {
-            return $this->sum($key) / $count;
+            $callback = $this->valueRetriever($key);
+            $sum = $this->reduce(function ($result, $item) use ($callback) {
+                $value = $callback($item);
+
+                return is_null($result) ? $value : $result + $value;
+            });
+
+            return $sum / $count;
         }
     }
 
     /**
      * Alias for the "avg" method.
      *
-     * @param  string|null  $key
+     * @param  string|callable|null  $key
      * @return mixed
      */
     public function average($key = null)
@@ -579,13 +586,15 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Get the max value of a given key.
      *
-     * @param  string|null  $key
+     * @param  string|callable|null  $key
      * @return mixed
      */
     public function max($key = null)
     {
-        return $this->reduce(function ($result, $item) use ($key) {
-            $value = data_get($item, $key);
+        $callback = $this->valueRetriever($key);
+
+        return $this->reduce(function ($result, $item) use ($callback) {
+            $value = $callback($item);
 
             return is_null($result) || $value > $result ? $value : $result;
         });
@@ -627,13 +636,15 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Get the min value of a given key.
      *
-     * @param  string|null  $key
+     * @param  string|callable|null  $key
      * @return mixed
      */
     public function min($key = null)
     {
-        return $this->reduce(function ($result, $item) use ($key) {
-            $value = data_get($item, $key);
+        $callback = $this->valueRetriever($key);
+
+        return $this->reduce(function ($result, $item) use ($callback) {
+            $value = $callback($item);
 
             return is_null($result) || $value < $result ? $value : $result;
         });
