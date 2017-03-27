@@ -171,20 +171,6 @@ class Builder
     public $lock;
 
     /**
-     * The field backups currently in use.
-     *
-     * @var array
-     */
-    protected $backups = [];
-
-    /**
-     * The binding backups currently in use.
-     *
-     * @var array
-     */
-    protected $bindingBackups = [];
-
-    /**
      * All of the available clause operators.
      *
      * @var array
@@ -1623,7 +1609,7 @@ class Builder
     {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
-        $total = $this->getCountForPagination($columns);
+        $total = $this->count($columns);
 
         $results = $total ? $this->forPage($page, $perPage)->get($columns) : [];
 
@@ -1664,74 +1650,7 @@ class Builder
      */
     public function getCountForPagination($columns = ['*'])
     {
-        $this->backupFieldsForCount();
-
-        $this->aggregate = ['function' => 'count', 'columns' => $this->clearSelectAliases($columns)];
-
-        $results = $this->get();
-
-        $this->aggregate = null;
-
-        $this->restoreFieldsForCount();
-
-        if (isset($this->groups)) {
-            return count($results);
-        }
-
-        return isset($results[0]) ? (int) array_change_key_case((array) $results[0])['aggregate'] : 0;
-    }
-
-    /**
-     * Backup some fields for the pagination count.
-     *
-     * @return void
-     */
-    protected function backupFieldsForCount()
-    {
-        foreach (['orders', 'limit', 'offset', 'columns'] as $field) {
-            $this->backups[$field] = $this->{$field};
-
-            $this->{$field} = null;
-        }
-
-        foreach (['order', 'select'] as $key) {
-            $this->bindingBackups[$key] = $this->bindings[$key];
-
-            $this->bindings[$key] = [];
-        }
-    }
-
-    /**
-     * Remove the column aliases since they will break count queries.
-     *
-     * @param  array  $columns
-     * @return array
-     */
-    protected function clearSelectAliases(array $columns)
-    {
-        return array_map(function ($column) {
-            return is_string($column) && ($aliasPosition = strpos(strtolower($column), ' as ')) !== false
-                    ? substr($column, 0, $aliasPosition) : $column;
-        }, $columns);
-    }
-
-    /**
-     * Restore some fields after the pagination count.
-     *
-     * @return void
-     */
-    protected function restoreFieldsForCount()
-    {
-        foreach (['orders', 'limit', 'offset', 'columns'] as $field) {
-            $this->{$field} = $this->backups[$field];
-        }
-
-        foreach (['order', 'select'] as $key) {
-            $this->bindings[$key] = $this->bindingBackups[$key];
-        }
-
-        $this->backups = [];
-        $this->bindingBackups = [];
+        return $this->count($columns);
     }
 
     /**
@@ -1988,27 +1907,13 @@ class Builder
      */
     public function aggregate($function, $columns = ['*'])
     {
-        $this->aggregate = compact('function', 'columns');
+        $aggregateQuery = $this->newQuery();
+        $aggregateQuery->aggregate = compact('function', 'columns');
 
-        $previousColumns = $this->columns;
-
-        // We will also back up the select bindings since the select clause will be
-        // removed when performing the aggregate function. Once the query is run
-        // we will add the bindings back onto this query so they can get used.
-        $previousSelectBindings = $this->bindings['select'];
-
-        $this->bindings['select'] = [];
-
-        $results = $this->get($columns);
-
-        // Once we have executed the query, we will reset the aggregate property so
-        // that more select queries can be executed against the database without
-        // the aggregate value getting in the way when the grammar builds it.
-        $this->aggregate = null;
-
-        $this->columns = $previousColumns;
-
-        $this->bindings['select'] = $previousSelectBindings;
+        $results = $aggregateQuery
+            ->setBindings($this->getBindings())
+            ->from(new Expression('('.$this->toSql().') as t'))
+            ->get();
 
         if (isset($results[0])) {
             return array_change_key_case((array) $results[0])['aggregate'];

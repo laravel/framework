@@ -488,7 +488,7 @@ class Builder
 
         $query = $this->toBase();
 
-        $total = $query->getCountForPagination();
+        $total = $query->count();
 
         $results = $total ? $this->forPage($page, $perPage)->get($columns) : new Collection;
 
