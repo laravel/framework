@@ -404,11 +404,12 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     /**
      * Get the path to the resources directory.
      *
+     * @param  string  $path
      * @return string
      */
-    public function resourcePath()
+    public function resourcePath($path = '')
     {
-        return $this->basePath.DIRECTORY_SEPARATOR.'resources';
+        return $this->basePath.DIRECTORY_SEPARATOR.'resources'.($path ? DIRECTORY_SEPARATOR.$path : $path);
     }
 
     /**
