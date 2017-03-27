@@ -2426,6 +2426,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Get the value indicating the auto incrementing key type.
+     *
+     * @return string
+     */
+    public function getKeyType()
+    {
+        return $this->keyType;
+    }
+
+    /**
      * Convert the model instance to JSON.
      *
      * @param  int  $options
