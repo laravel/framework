@@ -116,7 +116,7 @@ class BelongsTo extends Relation
     {
         $query->select($columns);
 
-        $query->from($query->getModel()->getTable().' as '.$hash = $this->getRelationCountHash());
+        $query->from($query->getModel()->getTable().' '.$hash = $this->getRelationCountHash());
 
         $query->getModel()->setTable($hash);
 
