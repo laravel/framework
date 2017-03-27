@@ -31,6 +31,13 @@ class Blueprint
     protected $commands = [];
 
     /**
+     * The comment that should be added to the table.
+     *
+     * @var string
+     */
+    public $comment;
+
+    /**
      * The storage engine that should be used for the table.
      *
      * @var string

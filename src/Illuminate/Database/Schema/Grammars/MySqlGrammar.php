@@ -61,6 +61,11 @@ class MySqlGrammar extends Grammar
 
         $sql .= ' table '.$this->wrapTable($blueprint)." ($columns)";
 
+        // We check if a table comment has been set for the table. If so, we will add the comment to the SQL query.
+        if (isset($blueprint->comment)) {
+            $sql .= " comment '".$blueprint->comment."'";
+        }
+
         // Once we have the primary SQL, we can add the encoding option to the SQL for
         // the table.  Then, we can check if a storage engine has been supplied for
         // the table. If so, we will add the engine declaration to the SQL query.
