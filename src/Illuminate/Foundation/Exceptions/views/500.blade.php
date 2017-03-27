@@ -1,4 +1,4 @@
-@extends('errors::frameworkerror')
+@extends('errors::layout')
 
 @section('title', 'Error')
 
