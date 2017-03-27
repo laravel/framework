@@ -21,6 +21,13 @@ class DummyClass extends Command
     protected $description = 'Command description';
 
     /**
+     * The console command alias.
+     *
+     * @var string
+     */
+    protected $alias = '';
+
+    /**
      * Create a new command instance.
      *
      * @return void

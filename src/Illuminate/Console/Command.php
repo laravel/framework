@@ -95,6 +95,10 @@ class Command extends SymfonyCommand
 
         $this->setDescription($this->description);
 
+        if(! empty($this->alias)) {
+            $this->setAliases([ $this->alias ]);
+        }
+
         if (! isset($this->signature)) {
             $this->specifyParameters();
         }
