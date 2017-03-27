@@ -575,9 +575,14 @@ class Connection implements ConnectionInterface
             try {
                 $this->getPdo()->beginTransaction();
             } catch (Exception $e) {
-                --$this->transactions;
-
-                throw $e;
+                if ($this->causedByLostConnection($e)) {
+                    --$this->transactions;
+                    $this->reconnect();
+                    $this->getPdo()->beginTransaction();
+                }
+                if ($this->transactions >= 1) {
+                    throw $e;
+                }
             }
         } elseif ($this->transactions > 1 && $this->queryGrammar->supportsSavepoints()) {
             $this->getPdo()->exec(
