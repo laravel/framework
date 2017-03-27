@@ -3,7 +3,6 @@
 namespace Illuminate\Redis;
 
 use Closure;
-use Predis\Client;
 use Illuminate\Support\Arr;
 use Illuminate\Contracts\Redis\Database as DatabaseContract;
 
@@ -17,7 +16,7 @@ class Database implements DatabaseContract
     protected $clients;
 
     /**
-     * Create a new Redis connection instance.
+     * Create a new Redis database instance.
      *
      * @param  array  $servers
      * @return void
