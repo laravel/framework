@@ -19,7 +19,7 @@ class NotificationServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__.'/resources/views' => resource_path('views/vendor/notifications'),
+                __DIR__.'/resources/views' => $this->app->resourcePath('views/vendor/notifications'),
             ], 'laravel-notifications');
         }
     }
