@@ -639,6 +639,16 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
+    public function testModelBindingWithNullReturnDefaultValue()
+        {
+        $router = $this->getRouter();
+        $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name = null) {
+            return 'hello world';
+        }]);
+        $router->model('bar', 'RouteModelBindingNullStub');
+        $this->assertEquals('hello world', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
+
     /**
      * @expectedException Illuminate\Database\Eloquent\ModelNotFoundException
      */
