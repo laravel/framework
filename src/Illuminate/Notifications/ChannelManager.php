@@ -215,6 +215,18 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     {
         return new Channels\SlackWebhookChannel(new HttpClient);
     }
+    
+    /**
+	 * Create an instance of the SMS driver.
+	 *
+	 * @return \Illuminate\Notifications\Channels\SMSChannel
+	 */
+	protected function createSMSDriver()
+	{
+		return new Channels\SMSChannel(new HttpClient, 
+		    $this->app['config']['services.sms.key'], 
+		    $this->app['config']['services.sms.url']);
+	}
 
     /**
      * Create a new driver instance.
