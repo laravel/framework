@@ -6,6 +6,7 @@ use Closure;
 use LogicException;
 use ReflectionMethod;
 use ReflectionFunction;
+use ReflectionException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -308,13 +309,29 @@ class Route
      */
     public function controllerMiddleware()
     {
-        if (! $this->isControllerAction()) {
+        if (! $this->isControllerAction() || ! $this->hasValidController()) {
             return [];
         }
 
         return ControllerDispatcher::getMiddleware(
             $this->getController(), $this->getControllerMethod()
         );
+    }
+
+    /**
+     * Checks if the controller class associated with this route is instantiable.
+     *
+     * @return bool
+     */
+    public function hasValidController()
+    {
+        try {
+            $this->container->make(explode('@', $this->action['uses'])[0]);
+        } catch (ReflectionException $e) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

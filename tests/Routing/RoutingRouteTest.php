@@ -1188,6 +1188,23 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('hello', $router->dispatch(Request::create('foo/bar2', 'GET'))->getContent());
     }
 
+    public function testRouteHasValidControllerWorksProperly()
+    {
+        $router = $this->getRouter();
+
+        $route = $router->get('foo/bar', ['uses' => 'NonExistantController@method']);
+        $this->assertEquals(false, $route->hasValidController());
+
+        $route2 = $router->get('foo/bar2', ['uses' => 'RouteTestControllerStub@index']);
+        $this->assertEquals(true, $route2->hasValidController());
+
+        $route3 = $router->get('foo/bar3', 'NonExistantController@method');
+        $this->assertEquals(false, $route3->hasValidController());
+
+        $route4 = $router->get('foo/bar4', 'RouteTestControllerStub@index');
+        $this->assertEquals(true, $route4->hasValidController());
+    }
+
     protected function getRouter()
     {
         $container = new Container;
