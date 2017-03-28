@@ -22,6 +22,13 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
     protected $hasMore;
 
     /**
+     * The default presenter resolver.
+     *
+     * @var \Closure
+     */
+    protected static $presenterResolver;
+
+    /**
      * Create a new paginator instance.
      *
      * @param  mixed  $items
@@ -110,13 +117,28 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
      */
     public function render(Presenter $presenter = null)
     {
-        if (is_null($presenter) && static::$presenterResolver) {
-            $presenter = call_user_func(static::$presenterResolver, $this);
-        }
-
-        $presenter = $presenter ?: new SimpleBootstrapThreePresenter($this);
+        $presenter = $presenter ?: $this->getDefaultPresenter();
 
         return $presenter->render();
+    }
+
+    /**
+     * Get default pagination presenter.
+     *
+     * @return \Illuminate\Contracts\Pagination\Presenter|SimpleBootstrapThreePresenter
+     */
+    protected function getDefaultPresenter()
+    {
+        $presenter = null;
+
+        if (static::$presenterResolver) {
+            $presenter = call_user_func(static::$presenterResolver, $this);
+        }
+        if (is_null($presenter) && AbstractPaginator::$presenterResolver) {
+            $presenter = call_user_func(AbstractPaginator::$presenterResolver, $this);
+        }
+
+        return $presenter ?: new SimpleBootstrapThreePresenter($this);
     }
 
     /**
