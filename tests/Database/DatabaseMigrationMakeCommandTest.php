@@ -20,7 +20,7 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase
         $app = new Illuminate\Foundation\Application;
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
-        $creator->shouldReceive('create')->once()->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', null, false);
+        $creator->shouldReceive('create')->once()->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', null, false, false, false);
         $composer->shouldReceive('dumpAutoloads')->once();
 
         $this->runCommand($command, ['name' => 'create_foo']);
@@ -36,7 +36,7 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase
         $app = new Illuminate\Foundation\Application;
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
-        $creator->shouldReceive('create')->once()->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', null, false);
+        $creator->shouldReceive('create')->once()->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', null, false, false, false);
 
         $this->runCommand($command, ['name' => 'create_foo']);
     }
@@ -51,9 +51,9 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase
         $app = new Illuminate\Foundation\Application;
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
-        $creator->shouldReceive('create')->once()->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'users', true);
+        $creator->shouldReceive('create')->once()->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'users', true, true, true);
 
-        $this->runCommand($command, ['name' => 'create_foo', '--create' => 'users']);
+        $this->runCommand($command, ['name' => 'create_foo', '--create' => 'users', '--no-timestamps' => true, '--soft-deletes' => true]);
     }
 
     public function testCanSpecifyPathToCreateMigrationsIn()
@@ -66,7 +66,7 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase
         $app = new Illuminate\Foundation\Application;
         $command->setLaravel($app);
         $app->setBasePath('/home/laravel');
-        $creator->shouldReceive('create')->once()->with('create_foo', '/home/laravel/vendor/laravel-package/migrations', 'users', true);
+        $creator->shouldReceive('create')->once()->with('create_foo', '/home/laravel/vendor/laravel-package/migrations', 'users', true, false, false);
         $this->runCommand($command, ['name' => 'create_foo', '--path' => 'vendor/laravel-package/migrations', '--create' => 'users']);
     }
 

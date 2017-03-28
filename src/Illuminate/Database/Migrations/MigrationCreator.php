@@ -44,7 +44,7 @@ class MigrationCreator
      * @return string
      * @throws \Exception
      */
-    public function create($name, $path, $table = null, $create = false)
+    public function create($name, $path, $table = null, $create = false, $timestamps = true, $softDeletes = false)
     {
         $this->ensureMigrationDoesntAlreadyExist($name);
 
@@ -55,7 +55,7 @@ class MigrationCreator
         // various place-holders, save the file, and run the post create event.
         $stub = $this->getStub($table, $create);
 
-        $this->files->put($path, $this->populateStub($name, $stub, $table));
+        $this->files->put($path, $this->populateStub($name, $stub, $table, $timestamps, $softDeletes));
 
         $this->firePostCreateHooks();
 
@@ -106,11 +106,21 @@ class MigrationCreator
      * @param  string  $name
      * @param  string  $stub
      * @param  string  $table
+     * @param  bool    $noTimestamps
+     * @param  bool    $softDeletes
      * @return string
      */
-    protected function populateStub($name, $stub, $table)
+    protected function populateStub($name, $stub, $table, $noTimestamps, $softDeletes)
     {
         $stub = str_replace('DummyClass', $this->getClassName($name), $stub);
+
+        if ($noTimestamps) {
+            $stub = str_replace('$table->timestamps();', '', $stub);
+        }
+
+        if (! $softDeletes) {
+            $stub = str_replace('$table->softDeletes();', '', $stub);
+        }
 
         // Here we will replace the table place-holders with the table specified by
         // the developer, which is useful for quickly creating a tables creation

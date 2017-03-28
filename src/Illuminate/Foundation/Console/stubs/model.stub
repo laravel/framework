@@ -6,5 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class DummyClass extends Model
 {
-    //
+    use Illuminate\Database\Eloquent\SoftDeletes;
+
+    protected $dates = ['created_at', 'updated_at', 'deleted_at'];
+
+    public $timestamps = false;
+    
+    // 
 }

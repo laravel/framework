@@ -15,6 +15,7 @@ class DummyClass extends Migration
         Schema::create('DummyTable', function (Blueprint $table) {
             $table->increments('id');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
