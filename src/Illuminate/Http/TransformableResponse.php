@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http;
 
+use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationData;
@@ -77,7 +78,7 @@ abstract class TransformableResponse extends JsonResponse
     }
 
     /**
-     * Sanitize rules removing those that don't appear into orginal rules.
+     * Sanitize rules removing those that don't appear into original rules.
      *
      * @param  string  $rule
      * @param  array  $gatheredRules
@@ -90,10 +91,8 @@ abstract class TransformableResponse extends JsonResponse
 
         return array_reduce($gatheredRules,
             function ($validRules, $rule) use ($pattern, $valueForValidOnes) {
-                preg_match($pattern, $rule, $matches);
-
-                if ($matches) {
-                    $validRules[$matches[0]] = $valueForValidOnes;
+                if (preg_match($pattern, $rule)) {
+                    $validRules[$rule] = $valueForValidOnes;
                 }
 
                 return $validRules;
@@ -102,7 +101,7 @@ abstract class TransformableResponse extends JsonResponse
     }
 
     /**
-     * Apply visbility rules to given data.
+     * Apply visibility rules to given data.
      *
      * @param  array  $rules
      * @return array
@@ -171,9 +170,7 @@ abstract class TransformableResponse extends JsonResponse
 
         return array_reduce(array_keys($applicableRules),
             function ($transformedData, $rule) {
-                if (Arr::has($transformedData, $rule)) {
-                    Arr::forget($transformedData, $rule);
-                }
+                Arr::forget($transformedData, $rule);
 
                 return $transformedData;
             },
@@ -286,6 +283,7 @@ abstract class TransformableResponse extends JsonResponse
      *
      * @param  mixed  $value
      * @param  string  $mutators
+     * @throws Exception
      * @return mixed
      */
     public function executeMutators($value, $mutators)
@@ -298,7 +296,7 @@ abstract class TransformableResponse extends JsonResponse
             if (! method_exists($this, $method)) {
                 $classname = static::class;
 
-                throw new \Exception("There is no mutator [$method] declared in [$classname].");
+                throw new Exception("There is no mutator [$method] declared in [$classname].");
             }
 
             return $this->$method($value);
