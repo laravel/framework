@@ -42,8 +42,12 @@ class MemcachedStore extends TaggableStore implements Store
         $this->setPrefix($prefix);
         $this->memcached = $memcached;
 
-        $this->onVersionThree = (new ReflectionMethod('Memcached', 'getMulti'))
-                            ->getNumberOfParameters() == 2;
+        try {
+            $this->onVersionThree = (new ReflectionMethod('Memcached', 'getMulti'))
+                                ->getNumberOfParameters() == 2;
+        } catch (\Exception $e) {
+            $this->onVersionThree = false; // Pre-Laravel 5.3 behaviour
+        }
     }
 
     /**
