@@ -77,7 +77,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
     {
         list($view, $swift) = $this->getMocks();
         $mailer = new Illuminate\Mail\Mailer($view, $swift);
-        $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Factory'));
+        $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Queue'));
         $queue->shouldReceive('pushOn')->once()->with(null, m::type('Illuminate\Mail\Jobs\HandleQueuedMessage'));
 
         $mailer->queue('foo', [1], 'callable');
@@ -87,7 +87,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
     {
         list($view, $swift) = $this->getMocks();
         $mailer = new Illuminate\Mail\Mailer($view, $swift);
-        $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Factory'));
+        $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Queue'));
         $queue->shouldReceive('pushOn')->once()->with('queue', m::type('Illuminate\Mail\Jobs\HandleQueuedMessage'));
 
         $mailer->queueOn('queue', 'foo', [1], 'callable');
@@ -97,7 +97,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
     {
         list($view, $swift) = $this->getMocks();
         $mailer = new Illuminate\Mail\Mailer($view, $swift);
-        $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Factory'));
+        $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Queue'));
         $queue->shouldReceive('laterOn')->once()->with(null, 10, m::type('Illuminate\Mail\Jobs\HandleQueuedMessage'));
 
         $mailer->later(10, 'foo', [1], 'callable');
@@ -107,7 +107,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
     {
         list($view, $swift) = $this->getMocks();
         $mailer = new Illuminate\Mail\Mailer($view, $swift);
-        $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Factory'));
+        $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Queue'));
         $queue->shouldReceive('laterOn')->once()->with('queue', 10, m::type('Illuminate\Mail\Jobs\HandleQueuedMessage'));
 
         $mailer->laterOn('queue', 10, 'foo', [1], 'callable');
