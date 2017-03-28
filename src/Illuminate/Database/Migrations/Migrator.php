@@ -228,11 +228,11 @@ class Migrator
      * Rollback the given migrations.
      *
      * @param  array  $migrations
-     * @param  array  $paths
+     * @param  array|string  $paths
      * @param  array  $options
      * @return array
      */
-    protected function rollbackMigrations(array $migrations, array $paths, array $options)
+    protected function rollbackMigrations(array $migrations, $paths, array $options)
     {
         $rolledBack = [];
 
