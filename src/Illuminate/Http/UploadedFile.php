@@ -16,11 +16,12 @@ class UploadedFile extends SymfonyUploadedFile
      *
      * @param  string  $path
      * @param  string|null  $disk
+     * @param  string|bool|null  $mimeType
      * @return string|false
      */
-    public function store($path, $disk = null)
+    public function store($path, $disk = null, $mimeType = null)
     {
-        return $this->storeAs($path, $this->hashName(), $disk);
+        return $this->storeAs($path, $this->hashName(), $disk, $mimeType);
     }
 
     /**
@@ -28,11 +29,12 @@ class UploadedFile extends SymfonyUploadedFile
      *
      * @param  string  $path
      * @param  string|null  $disk
+     * @param  string|bool|null  $mimeType
      * @return string|false
      */
-    public function storePublicly($path, $disk = null)
+    public function storePublicly($path, $disk = null, $mimeType = null)
     {
-        return $this->storeAs($path, $this->hashName(), $disk, 'public');
+        return $this->storeAs($path, $this->hashName(), $disk, 'public', $mimeType);
     }
 
     /**
@@ -41,11 +43,12 @@ class UploadedFile extends SymfonyUploadedFile
      * @param  string  $path
      * @param  string  $name
      * @param  string|null  $disk
+     * @param  string|bool|null  $mimeType
      * @return string|false
      */
-    public function storePubliclyAs($path, $name, $disk = null)
+    public function storePubliclyAs($path, $name, $disk = null, $mimeType = null)
     {
-        return $this->storeAs($path, $name, $disk, 'public');
+        return $this->storeAs($path, $name, $disk, 'public', $mimeType);
     }
 
     /**
@@ -55,13 +58,18 @@ class UploadedFile extends SymfonyUploadedFile
      * @param  string  $name
      * @param  string|null  $disk
      * @param  string|null  $visibility
+     * @param  string|bool|null  $mimeType
      * @return string|false
      */
-    public function storeAs($path, $name, $disk = null, $visibility = null)
+    public function storeAs($path, $name, $disk = null, $visibility = null, $mimeType = null)
     {
         $factory = Container::getInstance()->make(FilesystemFactory::class);
 
-        return $factory->disk($disk)->putFileAs($path, $this, $name, $visibility);
+        if ($mimeType === true) {
+            $mimeType = $this->getMimeType();
+        }
+
+        return $factory->disk($disk)->putFileAs($path, $this, $name, $visibility, $mimeType);
     }
 
     /**
