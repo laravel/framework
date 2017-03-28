@@ -6,6 +6,8 @@ use Illuminate\Console\GeneratorCommand;
 
 class PolicyMakeCommand extends GeneratorCommand
 {
+    use StubWriterTrait;
+
     /**
      * The console command name.
      *
@@ -34,7 +36,7 @@ class PolicyMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return __DIR__.'/stubs/policy.stub';
+        return $this->stub('foundation/policy.stub', __DIR__.'/stubs/policy.stub');
     }
 
     /**

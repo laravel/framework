@@ -7,6 +7,8 @@ use Symfony\Component\Console\Input\InputOption;
 
 class JobMakeCommand extends GeneratorCommand
 {
+    use StubWriterTrait;
+
     /**
      * The console command name.
      *
@@ -36,9 +38,9 @@ class JobMakeCommand extends GeneratorCommand
     protected function getStub()
     {
         if ($this->option('sync')) {
-            return __DIR__.'/stubs/job.stub';
+            return $this->stub('foundation/job.stub', __DIR__.'/stubs/job.stub');
         } else {
-            return __DIR__.'/stubs/job-queued.stub';
+            return $this->stub('foundation/job-queued.stub', __DIR__.'/stubs/job-queued.stub');
         }
     }
 

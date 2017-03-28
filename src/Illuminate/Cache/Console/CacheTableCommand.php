@@ -5,9 +5,12 @@ namespace Illuminate\Cache\Console;
 use Illuminate\Console\Command;
 use Illuminate\Support\Composer;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\Console\StubWriterTrait;
 
 class CacheTableCommand extends Command
 {
+    use StubWriterTrait;
+
     /**
      * The console command name.
      *
@@ -58,7 +61,7 @@ class CacheTableCommand extends Command
     {
         $fullPath = $this->createBaseMigration();
 
-        $this->files->put($fullPath, $this->files->get(__DIR__.'/stubs/cache.stub'));
+        $this->files->put($fullPath, $this->files->get($this->stub('cache/cache.stub', __DIR__.'/stubs/cache.stub')));
 
         $this->info('Migration created successfully!');
 

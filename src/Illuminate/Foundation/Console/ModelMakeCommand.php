@@ -8,6 +8,8 @@ use Symfony\Component\Console\Input\InputOption;
 
 class ModelMakeCommand extends GeneratorCommand
 {
+    use StubWriterTrait;
+
     /**
      * The console command name.
      *
@@ -52,7 +54,7 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return __DIR__.'/stubs/model.stub';
+        return $this->stub('foundation/model.stub', __DIR__.'/stubs/model.stub');
     }
 
     /**

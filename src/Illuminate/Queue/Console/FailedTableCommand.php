@@ -6,9 +6,12 @@ use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Illuminate\Support\Composer;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\Console\StubWriterTrait;
 
 class FailedTableCommand extends Command
 {
+    use StubWriterTrait;
+
     /**
      * The console command name.
      *
@@ -64,7 +67,7 @@ class FailedTableCommand extends Command
         $fullPath = $this->createBaseMigration($table);
 
         $stub = str_replace(
-            ['{{table}}', '{{tableClassName}}'], [$table, $tableClassName], $this->files->get(__DIR__.'/stubs/failed_jobs.stub')
+            ['{{table}}', '{{tableClassName}}'], [$table, $tableClassName], $this->files->get($this->stub('queue/failed_jobs.stub', __DIR__.'/stubs/failed_jobs.stub'))
         );
 
         $this->files->put($fullPath, $stub);

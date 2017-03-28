@@ -5,9 +5,12 @@ namespace Illuminate\Database\Console\Seeds;
 use Illuminate\Support\Composer;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Foundation\Console\StubWriterTrait;
 
 class SeederMakeCommand extends GeneratorCommand
 {
+    use StubWriterTrait;
+
     /**
      * The console command name.
      *
@@ -69,7 +72,7 @@ class SeederMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return __DIR__.'/stubs/seeder.stub';
+        return $this->stub('database/seeds_seeder.stub', __DIR__.'/stubs/seeder.stub');
     }
 
     /**
