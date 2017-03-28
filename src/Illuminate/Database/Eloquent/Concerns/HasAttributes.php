@@ -579,7 +579,7 @@ trait HasAttributes
                     : $object->__toString();
 
                 if ($attributeCount !== count($castedAttributes)) {
-                    throw new LogicException("Class cast {$attribute} must return {$attributeCount} attributes");
+                    throw new LogicException("Class cast {$attribute} must return {$attributeCount} attribute(s)");
                 }
 
                 $this->attributes = array_merge(
