@@ -217,4 +217,59 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(new Collection(array($one)), $c->except(array(2, 3)));
 	}
 
+	public function testMagicListsAttributesMethod()
+	{
+		$one = m::mock('Illuminate\Database\Eloquent\Model');
+		$one->shouldReceive('getAttribute')->with('name')->once()->andReturn('taylor');
+
+		$two = m::mock('Illuminate\Database\Eloquent\Model');
+		$two->shouldReceive('getAttribute')->with('name')->once()->andReturn('dayle');
+
+		$c = new Collection(array($one, $two));
+
+		$this->assertEquals(array('taylor', 'dayle'), $c->name->all());
+	}
+
+	public function testMagicEagerLoadsRelationshipListsAttributesMethod()
+	{
+		$mockItem = m::mock('EloquentModelCollectionMagicLoadStub');
+		$mockItem->shouldReceive('getAttribute')->with('workerType')->once()->andReturn('results');
+		$mockItem->shouldReceive('newQuery')->once()->andReturn($mockItem);
+		$mockItem->shouldReceive('with')->andReturn($mockItem);
+		$mockItem->shouldReceive('eagerLoadRelations')->once()->andReturn(array($mockItem));
+		$mockItem->shouldReceive('offsetExists')->andReturn(false);
+		$c = $this->getMock('Illuminate\Database\Eloquent\Collection', array('first'), array(array($mockItem)));
+		$c->expects($this->any())->method('first')->will($this->returnValue($mockItem));
+
+		$this->assertEquals(array('results'), $c->workerType->all());
+	}
+
+	public function testMagicRelationshipListsAttributesMethod()
+	{
+		$mockItem = m::mock('EloquentModelCollectionMagicLoadStub');
+		$mockItem->relations = ['workerType'=>'results'];
+		$mockItem->shouldReceive('getAttribute')->with('workerType')->once()->andReturn('results');
+		$mockItem->shouldReceive('newQuery')->never()->andReturn($mockItem);
+		$mockItem->shouldReceive('with')->never()->andReturn($mockItem);
+		$mockItem->shouldReceive('eagerLoadRelations')->never()->andReturn(array($mockItem));
+		$mockItem->shouldReceive('offsetExists')->andReturn(true);
+		$c = $this->getMock('Illuminate\Database\Eloquent\Collection', array('first'), array(array($mockItem)));
+		$c->expects($this->any())->method('first')->will($this->returnValue($mockItem));
+
+		$this->assertEquals(array('results'), $c->workerType->all());
+	}
+}
+
+class EloquentModelCollectionMagicLoadStub extends Illuminate\Database\Eloquent\Model {
+
+	protected $table = 'stub';
+
+	protected $guarded = array();
+
+	public $relations = array();
+
+	public function workerType()
+	{
+		return $this->belongsTo('EloquentModelSaveStub');
+	}
 }

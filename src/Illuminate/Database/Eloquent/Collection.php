@@ -162,7 +162,7 @@ class Collection extends BaseCollection {
 	/**
 	 * Intersect the collection with the given items.
 	 *
- 	 * @param  \ArrayAccess|array  $items
+	 * @param  \ArrayAccess|array  $items
 	 * @return static
 	 */
 	public function intersect($items)
@@ -249,5 +249,117 @@ class Collection extends BaseCollection {
 	{
 		return new BaseCollection($this->items);
 	}
+	/**
+	 * Get an array with the attribute values of given key.
+	 *
+	 * @param  string $key
+	 * @return array
+	 */
+	public function listsAttributeArray($key)
+	{
+		$items = array();
 
+		$first = $this->first();
+
+		// We want to avoid the model loading
+		// unloaded relationships separately.
+		// Therefore we check if we're trying to list
+		// a relationship and if it's already loaded.
+		// If it is not the case, we'll load the relationship.
+		if ($first instanceof Model)
+		{
+			if (method_exists($first, $key))
+			{
+				if ( ! array_key_exists($key, $first->relations))
+				{
+					$this->load($key);
+				}
+			}
+		}
+
+		// list the attribute.
+		foreach ($this->items as $item)
+		{
+			$items[] = $item->getAttribute($key);
+		}
+
+		return $items;
+	}
+
+	/**
+	 * Get a collection with the values of a given key.
+	 *
+	 * @param  string $key
+	 * @return mixed
+	 */
+	public function listsAttribute($key)
+	{
+		$items = $this->listsAttributeArray($key);
+
+		$result = $this->newCollection($items);
+
+		return $result;
+	}
+
+	/**
+	 * Collapse the collection items into a single array collection,
+	 * making use of the newCollection type defined by the first model.
+	 *
+	 * @return mixed
+	 */
+	public function collapse()
+	{
+		$results = array();
+
+		foreach ($this->items as $values)
+		{
+			if ($values instanceof Collection)
+			{
+				$values = $values->all();
+			}
+
+			$results = array_merge($results, $values);
+		}
+
+		$result = $this->newCollection($results);
+
+		return $result;
+	}
+
+	/**
+	 * Return a collection of the type specified
+	 * by the type of attribute we're collecting.
+	 *
+	 * @param  array $items
+	 * @return mixed
+	 */
+	public function newCollection(array $items = null)
+	{
+		if (is_null($items))
+		{
+			$items = $this->items;
+		}
+
+		if (($first = reset($items)) instanceof Model)
+		{
+			$result = $first->newCollection($items);
+		}
+		else
+		{
+			$result = new Collection($items);
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Dynamically retrieve attributes on the models.
+	 *
+	 * @param  string $key
+	 * @return mixed
+	 */
+	public function __get($key)
+	{
+		return $this->listsAttribute($key);
+	}
 }
