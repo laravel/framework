@@ -1052,6 +1052,116 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $router->dispatch(Request::create('bar', 'GET'))->getContent();
     }
 
+    public function testImplicitBindingsMultipleModelsAndParameters()
+    {
+        $phpunit = $this;
+        $router = $this->getRouter();
+        $router->get('hello/{foo}/{bar}', function (RoutingTestUserModel $foo, RoutingTestUserModel $bar) use ($phpunit) {
+            $phpunit->assertInstanceOf(RoutingTestUserModel::class, $foo);
+            $phpunit->assertInstanceOf(RoutingTestUserModel::class, $bar);
+
+            $phpunit->assertEquals('taylor', $foo->value);
+            $phpunit->assertEquals('otwell', $bar->value);
+
+            return 'hello';
+        });
+
+        // this makes sure the callback is called
+        $this->assertEquals('hello', $router->dispatch(Request::create('hello/taylor/otwell', 'GET'))->getContent());
+
+        $router = $this->getRouter();
+        $router->get('hello/{foo}/{bar}', function (RoutingTestTeamModel $foo, RoutingTestUserModel $bar) use ($phpunit) {
+            $phpunit->assertInstanceOf(RoutingTestTeamModel::class, $foo);
+            $phpunit->assertInstanceOf(RoutingTestUserModel::class, $bar);
+
+            $phpunit->assertEquals('laravel', $foo->value);
+            $phpunit->assertEquals('taylor', $bar->value);
+
+            return 'hello';
+        });
+
+        // this makes sure the callback is called
+        $this->assertEquals('hello', $router->dispatch(Request::create('hello/laravel/taylor', 'GET'))->getContent());
+
+        $router = $this->getRouter();
+        $router->get('hello/{foo}/{year}/{bar}', function (RoutingTestUserModel $foo, $year, RoutingTestUserModel $bar) use ($phpunit) {
+            $phpunit->assertInstanceOf(RoutingTestUserModel::class, $foo);
+            $phpunit->assertInstanceOf(RoutingTestUserModel::class, $bar);
+
+            $phpunit->assertEquals('taylor', $foo->value);
+            $phpunit->assertEquals(2015, $year);
+            $phpunit->assertEquals('otwell', $bar->value);
+
+            return 'hello';
+        });
+
+        // this makes sure the callback is called
+        $this->assertEquals('hello', $router->dispatch(Request::create('hello/taylor/2015/otwell', 'GET'))->getContent());
+    }
+
+    public function testImplicitBindingsMultipleModelsAndParametersWithOptinal()
+    {
+        $phpunit = $this;
+        $router = $this->getRouter();
+        $router->get('hello/{foo}/{year?}/{bar?}', function (RoutingTestUserModel $foo, $year = null, RoutingTestUserModel $bar = null) use ($phpunit) {
+            $phpunit->assertInstanceOf(RoutingTestUserModel::class, $foo);
+            $phpunit->assertEquals('taylor', $foo->value);
+            $phpunit->assertNull($year);
+            $phpunit->assertInstanceOf(RoutingTestUserModel::class, $bar);
+            $phpunit->assertNull($bar->value);
+
+            return 'hello';
+        });
+
+        // this makes sure the callback is called
+        $this->assertEquals('hello', $router->dispatch(Request::create('hello/taylor', 'GET'))->getContent());
+
+        $router = $this->getRouter();
+        $router->get('hello/{foo}/{year?}/{bar?}', function (RoutingTestUserModel $foo, $year = null, RoutingTestTeamModel $bar = null) use ($phpunit) {
+            $phpunit->assertInstanceOf(RoutingTestUserModel::class, $foo);
+            $phpunit->assertEquals('taylor', $foo->value);
+            $phpunit->assertNull($year);
+            $phpunit->assertInstanceOf(RoutingTestTeamModel::class, $bar);
+
+            return 'hello';
+        });
+
+        // this makes sure the callback is called
+        $this->assertEquals('hello', $router->dispatch(Request::create('hello/taylor', 'GET'))->getContent());
+
+        $router = $this->getRouter();
+        $router->get('hello/{foo}/{year?}/{bar?}', function (RoutingTestUserModel $foo, $year = 2015, RoutingTestTeamModel $bar = null) use ($phpunit) {
+            $phpunit->assertInstanceOf(RoutingTestUserModel::class, $foo);
+            $phpunit->assertEquals('taylor', $foo->value);
+            $phpunit->assertEquals(2015, $year);
+            $phpunit->assertInstanceOf(RoutingTestTeamModel::class, $bar);
+
+            return 'hello';
+        });
+
+        // this makes sure the callback is called
+        $this->assertEquals('hello', $router->dispatch(Request::create('hello/taylor', 'GET'))->getContent());
+    }
+
+    public function testImplicitBindingsMixAll()
+    {
+        $phpunit = $this;
+        $router = $this->getRouter();
+        $router->get('hello/{foo}/{year?}/{bar?}', function (Request $request, RoutingTestUserModel $foo, $year = null, RoutingTestUserModel $bar = null) use ($phpunit) {
+
+            $phpunit->assertInstanceOf(Request::class, $request);
+            $phpunit->assertInstanceOf(RoutingTestUserModel::class, $foo);
+            $phpunit->assertEquals('taylor', $foo->value);
+            $phpunit->assertNull($year);
+            $phpunit->assertInstanceOf(RoutingTestUserModel::class, $bar);
+
+            return 'hello';
+        });
+
+        // this makes sure the callback is called
+        $this->assertEquals('hello', $router->dispatch(Request::create('hello/taylor', 'GET'))->getContent());
+    }
+
     protected function getRouter()
     {
         return new Router(new Illuminate\Events\Dispatcher);
@@ -1230,6 +1340,31 @@ class RoutingTestMiddlewareGroupTwo
 }
 
 class RoutingTestUserModel extends Model
+{
+    public function getRouteKeyName()
+    {
+        return 'id';
+    }
+
+    public function where($key, $value)
+    {
+        $this->value = $value;
+
+        return $this;
+    }
+
+    public function first()
+    {
+        return $this;
+    }
+
+    public function firstOrFail()
+    {
+        return $this;
+    }
+}
+
+class RoutingTestTeamModel extends Model
 {
     public function getRouteKeyName()
     {

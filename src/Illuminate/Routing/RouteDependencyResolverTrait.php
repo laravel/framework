@@ -3,8 +3,6 @@
 namespace Illuminate\Routing;
 
 use ReflectionMethod;
-use ReflectionParameter;
-use Illuminate\Support\Arr;
 use ReflectionFunctionAbstract;
 
 trait RouteDependencyResolverTrait
@@ -52,52 +50,29 @@ trait RouteDependencyResolverTrait
     public function resolveMethodDependencies(array $parameters, ReflectionFunctionAbstract $reflector)
     {
         $originalParameters = $parameters;
+        $parameters = array_values($parameters);
 
         foreach ($reflector->getParameters() as $key => $parameter) {
-            $instance = $this->transformDependency(
-                $parameter, $parameters, $originalParameters
-            );
-
-            if (! is_null($instance)) {
-                $this->spliceIntoParameters($parameters, $key, $instance);
+            $class = $parameter->getClass();
+            if ($class) {
+                if (array_key_exists($key, $parameters) && $parameters[$key] instanceof $class->name) {
+                    continue;
+                } else {
+                    $instance = $this->container->make($class->name);
+                    if (array_key_exists($key, $parameters)) {
+                        $this->spliceIntoParameters($parameters, $key, $instance);
+                    } else {
+                        $parameters[$key] = $instance;
+                    }
+                }
+            } else {
+                if (! array_key_exists($key, $parameters)) {
+                    $parameters[$key] = $parameter->getDefaultValue();
+                }
             }
         }
 
         return $parameters;
-    }
-
-    /**
-     * Attempt to transform the given parameter into a class instance.
-     *
-     * @param  \ReflectionParameter  $parameter
-     * @param  array  $parameters
-     * @param  array  $originalParameters
-     * @return mixed
-     */
-    protected function transformDependency(ReflectionParameter $parameter, $parameters, $originalParameters)
-    {
-        $class = $parameter->getClass();
-
-        // If the parameter has a type-hinted class, we will check to see if it is already in
-        // the list of parameters. If it is we will just skip it as it is probably a model
-        // binding and we do not want to mess with those; otherwise, we resolve it here.
-        if ($class && ! $this->alreadyInParameters($class->name, $parameters)) {
-            return $this->container->make($class->name);
-        }
-    }
-
-    /**
-     * Determine if an object of the given class is in a list of parameters.
-     *
-     * @param  string  $class
-     * @param  array  $parameters
-     * @return bool
-     */
-    protected function alreadyInParameters($class, array $parameters)
-    {
-        return ! is_null(Arr::first($parameters, function ($key, $value) use ($class) {
-            return $value instanceof $class;
-        }));
     }
 
     /**
