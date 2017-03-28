@@ -879,6 +879,19 @@ class Route
 
         return $this;
     }
+    
+    /**
+     * Returns a view when route matched.
+     *
+     * @param  string  $view
+     * @return $this
+     */
+    public function view($view){
+        $this->action = $this->parseAction(function() use($view){
+            return app('view')->render($view);
+        });
+        return $this;
+    }
 
     /**
      * Set the handler for the route.
