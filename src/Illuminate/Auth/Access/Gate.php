@@ -90,19 +90,22 @@ class Gate implements GateContract
      *
      * @param  string  $ability
      * @param  callable|string  $callback
+     * @param  bool  $includeGuest
      * @return $this
      *
      * @throws \InvalidArgumentException
      */
-    public function define($ability, $callback)
+    public function define($ability, $callback, $includeGuest = false)
     {
         if (is_callable($callback)) {
-            $this->abilities[$ability] = $callback;
+            // Already a callable
         } elseif (is_string($callback) && Str::contains($callback, '@')) {
-            $this->abilities[$ability] = $this->buildAbilityCallback($callback);
+            $callback = $this->buildAbilityCallback($callback);
         } else {
             throw new InvalidArgumentException("Callback must be a callable or a 'Class@method' string.");
         }
+
+        $this->abilities[$ability] = compact('callback', 'includeGuest');
 
         return $this;
     }
@@ -140,11 +143,12 @@ class Gate implements GateContract
      * Register a callback to run before all Gate checks.
      *
      * @param  callable  $callback
+     * @param  bool  $includeGuest
      * @return $this
      */
-    public function before(callable $callback)
+    public function before(callable $callback, $includeGuest = false)
     {
-        $this->beforeCallbacks[] = $callback;
+        $this->beforeCallbacks[] = compact('callback', 'includeGuest');
 
         return $this;
     }
@@ -153,11 +157,12 @@ class Gate implements GateContract
      * Register a callback to run after all Gate checks.
      *
      * @param  callable  $callback
+     * @param  bool  $includeGuest
      * @return $this
      */
-    public function after(callable $callback)
+    public function after(callable $callback, $includeGuest = false)
     {
-        $this->afterCallbacks[] = $callback;
+        $this->afterCallbacks[] = compact('callback', 'includeGuest');
 
         return $this;
     }
@@ -233,9 +238,7 @@ class Gate implements GateContract
      */
     protected function raw($ability, $arguments = [])
     {
-        if (! $user = $this->resolveUser()) {
-            return false;
-        }
+        $user = $this->resolveUser();
 
         $arguments = is_array($arguments) ? $arguments : [$arguments];
 
@@ -278,8 +281,10 @@ class Gate implements GateContract
         $arguments = array_merge([$user, $ability], [$arguments]);
 
         foreach ($this->beforeCallbacks as $before) {
-            if (! is_null($result = $before(...$arguments))) {
-                return $result;
+            if ($user || $before['includeGuest']) {
+                if (! is_null($result = $before['callback'](...$arguments))) {
+                    return $result;
+                }
             }
         }
     }
@@ -298,7 +303,9 @@ class Gate implements GateContract
         $arguments = array_merge([$user, $ability, $result], [$arguments]);
 
         foreach ($this->afterCallbacks as $after) {
-            $after(...$arguments);
+            if ($user || $after['includeGuest']) {
+                $after['callback'](...$arguments);
+            }
         }
     }
 
@@ -314,8 +321,8 @@ class Gate implements GateContract
     {
         if ($this->firstArgumentCorrespondsToPolicy($arguments)) {
             return $this->resolvePolicyCallback($user, $ability, $arguments);
-        } elseif (isset($this->abilities[$ability])) {
-            return $this->abilities[$ability];
+        } elseif (isset($this->abilities[$ability]) && ($user || $this->abilities[$ability]['includeGuest'])) {
+            return $this->abilities[$ability]['callback'];
         } else {
             return function () {
                 return false;
@@ -355,10 +362,12 @@ class Gate implements GateContract
         return function () use ($user, $ability, $arguments) {
             $instance = $this->getPolicyFor($arguments[0]);
 
+            $includeGuest = isset($instance->includeGuest) ? (array) $instance->includeGuest : [];
+
             // If we receive a non-null result from the before method, we will return it
             // as the final result. This will allow developers to override the checks
             // in the policy to return a result for all rules defined in the class.
-            if (method_exists($instance, 'before')) {
+            if (method_exists($instance, 'before') && ($user || in_array('before', $includeGuest))) {
                 if (! is_null($result = $instance->before($user, $ability, ...$arguments))) {
                     return $result;
                 }
@@ -379,7 +388,12 @@ class Gate implements GateContract
                 return false;
             }
 
-            return $instance->{$ability}($user, ...$arguments);
+            // If we have a user or the ability is allowed to be checked for guests
+            if ($user || in_array($ability, $includeGuest)) {
+                return $instance->{$ability}($user, ...$arguments);
+            } else {
+                return false;
+            }
         };
     }
 

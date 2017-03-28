@@ -30,6 +30,30 @@ class GateTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($gate->check('bar'));
     }
 
+    public function test_basic_closures_denies_guests_if_not_specified()
+    {
+        $gate = $this->getGateForGuest();
+
+        $gate->define('foo', function ($user) {
+            return true;
+        });
+
+        $this->assertFalse($gate->check('foo'));
+    }
+
+    public function test_basic_closures_allows_guests_if_specified()
+    {
+        $gate = $this->getGateForGuest();
+
+        $gate->define('foo', function ($user) {
+            $this->assertNull($user);
+
+            return true;
+        }, true);
+
+        $this->assertTrue($gate->check('foo'));
+    }
+
     public function test_before_callbacks_can_override_result_if_necessary()
     {
         $gate = $this->getBasicGate();
@@ -59,6 +83,38 @@ class GateTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($gate->check('foo'));
     }
 
+    public function test_before_callbacks_are_not_called_for_guests_if_not_specified()
+    {
+        $gate = $this->getGateForGuest();
+
+        $gate->define('foo', function ($user) {
+            return true;
+        }, true);
+
+        $gate->before(function ($user, $ability) {
+            $this->fail();
+        });
+
+        $this->assertTrue($gate->check('foo'));
+    }
+
+    public function test_before_callbacks_are_called_for_guests_if_specified()
+    {
+        $gate = $this->getGateForGuest();
+
+        $gate->define('foo', function ($user) {
+            return true;
+        }, true);
+
+        $gate->before(function ($user, $ability) {
+            $this->assertNull($user);
+
+            return false;
+        }, true);
+
+        $this->assertFalse($gate->check('foo'));
+    }
+
     public function test_after_callbacks_are_called_with_result()
     {
         $gate = $this->getBasicGate();
@@ -81,6 +137,40 @@ class GateTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($gate->check('foo'));
         $this->assertFalse($gate->check('bar'));
         $this->assertFalse($gate->check('missing'));
+    }
+
+    public function test_after_callbacks_are_not_called_for_guests_if_not_specified()
+    {
+        $gate = $this->getGateForGuest();
+
+        $gate->define('foo', function ($user) {
+            return true;
+        }, true);
+
+        $gate->after(function ($user, $ability) {
+            $this->fail();
+        });
+
+        $this->assertTrue($gate->check('foo'));
+    }
+
+    public function test_after_callbacks_are_called_for_guests_if_specified()
+    {
+        $gate = $this->getGateForGuest();
+
+        $gate->define('foo', function ($user) {
+            return true;
+        }, true);
+
+        $afterCalled = false;
+
+        $gate->after(function ($user, $ability) use (&$afterCalled) {
+            $this->assertNull($user);
+            $afterCalled = true;
+        }, true);
+
+        $this->assertTrue($gate->check('foo'));
+        $this->assertTrue($afterCalled, 'after method should be called for guests because we marked it for guests');
     }
 
     public function test_current_user_that_is_on_gate_always_injected_into_closure_callbacks()
@@ -209,6 +299,42 @@ class GateTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($gate->forUser((object) ['id' => 2])->check('foo'));
     }
 
+    public function test_policy_denies_guests_if_not_specified()
+    {
+        $gate = $this->getGateForGuest();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
+
+        $this->assertFalse($gate->check('update', new AccessGateTestDummy));
+    }
+
+    public function test_policy_allows_guests_if_specified()
+    {
+        $gate = $this->getGateForGuest();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithIncludeGuest::class);
+
+        $this->assertTrue($gate->check('view', new AccessGateTestDummy));
+    }
+
+    public function test_policy_before_is_not_called_for_guests_if_not_specified()
+    {
+        $gate = $this->getGateForGuest();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithBefore::class);
+
+        $this->assertFalse($gate->check('update', new AccessGateTestDummy));
+    }
+
+    public function test_policy_before_is_called_for_guests_if_specified()
+    {
+        $gate = $this->getGateForGuest();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithIncludeGuest::class);
+
+        $this->assertTrue($gate->check('update', new AccessGateTestDummy));
+    }
+
     /**
      * @expectedException \Illuminate\Auth\Access\AuthorizationException
      */
@@ -251,6 +377,13 @@ class GateTest extends PHPUnit_Framework_TestCase
     {
         return new Gate(new Container, function () use ($isAdmin) {
             return (object) ['id' => 1, 'isAdmin' => $isAdmin];
+        });
+    }
+
+    protected function getGateForGuest()
+    {
+        return new Gate(new Container, function () {
+            // null (no user)
         });
     }
 }
@@ -301,6 +434,28 @@ class AccessGateTestPolicy
 class AccessGateTestPolicyWithBefore
 {
     public function before($user, $ability)
+    {
+        return true;
+    }
+
+    public function update($user, AccessGateTestDummy $dummy)
+    {
+        return false;
+    }
+}
+
+class AccessGateTestPolicyWithIncludeGuest
+{
+    public $includeGuest = ['before', 'view'];
+
+    public function before($user, $ability)
+    {
+        if ($ability == 'update') {
+            return true;
+        }
+    }
+
+    public function view($user, AccessGateTestDummy $dummy)
     {
         return true;
     }
