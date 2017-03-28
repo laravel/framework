@@ -682,7 +682,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $relations = func_get_args();
         }
 
-        $query = $this->newQuery()->with($relations);
+        $query = $this->newQueryWithoutScopes()->with($relations);
 
         $query->eagerLoadRelations([$this]);
 
