@@ -8,6 +8,7 @@ use BadMethodCallException;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
+use SuperClosure\SerializableClosure;
 use Illuminate\Contracts\Queue\Factory as Queue;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
@@ -125,6 +126,8 @@ class Mailable implements MailableContract
      */
     public function queue(Queue $queue)
     {
+        $this->makeCallbacksSerializable();
+
         $connection = property_exists($this, 'connection') ? $this->connection : null;
 
         $queueName = property_exists($this, 'queue') ? $this->queue : null;
@@ -149,6 +152,8 @@ class Mailable implements MailableContract
      */
     public function later($delay, Queue $queue)
     {
+        $this->makeCallbacksSerializable();
+
         $connection = property_exists($this, 'connection') ? $this->connection : null;
 
         $queueName = property_exists($this, 'queue') ? $this->queue : null;
@@ -502,7 +507,33 @@ class Mailable implements MailableContract
      */
     public function withSwiftMessage($callback)
     {
+        if (! ($callback instanceof SerializableClosure)) {
+            $callback = new SerializableClosure($callback);
+        }
+
         $this->callbacks[] = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Makes all the callbacks serializable.
+     *
+     * @return $this
+     */
+    public function makeCallbacksSerializable()
+    {
+        $callbacks = [];
+
+        foreach ($this->callbacks as $callback) {
+            if (! ($callback instanceof SerializableClosure)) {
+                $callback = new SerializableClosure($callback);
+            }
+
+            $callbacks[] = $callback;
+        }
+
+        $this->callbacks = $callbacks;
 
         return $this;
     }
