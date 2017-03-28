@@ -79,6 +79,13 @@ class LoadConfiguration
             $files[$nesting.basename($file->getRealPath(), '.php')] = $file->getRealPath();
         }
 
+        uksort($files, function ($prev, $next) {
+            $prev = preg_replace('/\.php$/', '', $prev);
+            $next = preg_replace('/\.php$/', '', $next);
+
+            return strcmp($prev, $next);
+        });
+
         return $files;
     }
 
