@@ -1723,7 +1723,9 @@ class Builder
         $item = $results[0];
 
         if (is_object($item)) {
-            return (int) $item->aggregate;
+            $pdo = $this->connection->getPdo();
+            $field = $pdo && $pdo->getAttribute(\PDO::ATTR_CASE) == \PDO::CASE_UPPER ? 'AGGREGATE' : 'aggregate';
+            return (int) $item->$field;
         }
 
         return (int) array_change_key_case((array) $item)['aggregate'];
