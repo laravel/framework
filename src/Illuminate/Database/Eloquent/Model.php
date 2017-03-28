@@ -2902,6 +2902,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         if ($this->isJsonCastable($key) && ! is_null($value)) {
             $value = $this->asJson($value);
         }
+        
+        // If $value is empty string, set $value as null
+        if ($value === '') {
+            $value = null;
+        }
 
         $this->attributes[$key] = $value;
 
