@@ -181,7 +181,7 @@ class Migrator
         // in the application. A migration repository keeps the migrate order.
         $this->repository->log($name, $batch);
 
-        $this->note("<info>Migrated:</info> {$name}");
+        $this->note("<info>Migrated:</info>  {$name}");
     }
 
     /**
