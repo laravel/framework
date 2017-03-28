@@ -263,12 +263,6 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('test/string/', Str::finish('test/string//', '/'));
     }
 
-    public function testSnakeCase()
-    {
-        $this->assertEquals('foo_bar', Str::snake('fooBar'));
-        $this->assertEquals('foo_bar', Str::snake('fooBar')); // test cache
-    }
-
     public function testStrLimit()
     {
         $string = 'The PHP framework for web artisans.';
@@ -281,20 +275,65 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('这是一', Str::limit($nonAsciiString, 6, ''));
     }
 
+    public function testSnakeCase()
+    {
+        $this->assertEquals('foo_bar', Str::snake('Foo Bar'));
+        $this->assertEquals('foo_bar', Str::snake('foo bar'));
+        $this->assertEquals('foo_bar', Str::snake('FooBar'));
+        $this->assertEquals('foo_bar', Str::snake('fooBar'));
+        $this->assertEquals('foo_bar', Str::snake('foo-bar'));
+        $this->assertEquals('foo_bar', Str::snake('foo_bar'));
+        $this->assertEquals('foo_bar', Str::snake('FOO_BAR'));
+
+        $this->assertEquals('foo_bar', Str::snake('fooBar'));
+        $this->assertEquals('foo_bar', Str::snake('fooBar')); // test cache
+    }
+
+    public function testKebabCase()
+    {
+        $this->assertEquals('foo-bar', Str::snake('Foo Bar', '-'));
+        $this->assertEquals('foo-bar', Str::snake('foo bar', '-'));
+        $this->assertEquals('foo-bar', Str::snake('FooBar', '-'));
+        $this->assertEquals('foo-bar', Str::snake('fooBar', '-'));
+        $this->assertEquals('foo-bar', Str::snake('foo-bar', '-'));
+        $this->assertEquals('foo-bar', Str::snake('foo_bar', '-'));
+        $this->assertEquals('foo-bar', Str::snake('FOO_BAR', '-'));
+
+        $this->assertEquals('foo-bar', Str::snake('fooBar', '-'));
+        $this->assertEquals('foo-bar', Str::snake('fooBar', '-')); // test cache
+    }
+
     public function testCamelCase()
     {
+        $this->assertEquals('fooBar', camel_case('Foo Bar'));
+        $this->assertEquals('fooBar', camel_case('foo bar'));
         $this->assertEquals('fooBar', camel_case('FooBar'));
+        $this->assertEquals('fooBar', camel_case('fooBar'));
+        $this->assertEquals('fooBar', camel_case('foo-bar'));
+        $this->assertEquals('fooBar', camel_case('foo_bar'));
+        $this->assertEquals('fooBar', camel_case('FOO_BAR'));
+
         $this->assertEquals('fooBar', camel_case('foo_bar'));
         $this->assertEquals('fooBar', camel_case('foo_bar')); // test cache
+
         $this->assertEquals('fooBarBaz', camel_case('Foo-barBaz'));
         $this->assertEquals('fooBarBaz', camel_case('foo-bar_baz'));
     }
 
     public function testStudlyCase()
     {
+        //StudlyCase <=> PascalCase
+        $this->assertEquals('FooBar', Str::studly('Foo Bar'));
+        $this->assertEquals('FooBar', Str::studly('foo bar'));
+        $this->assertEquals('FooBar', Str::studly('FooBar'));
         $this->assertEquals('FooBar', Str::studly('fooBar'));
+        $this->assertEquals('FooBar', Str::studly('foo-bar'));
+        $this->assertEquals('FooBar', Str::studly('foo_bar'));
+        $this->assertEquals('FooBar', Str::studly('FOO_BAR'));
+
         $this->assertEquals('FooBar', Str::studly('foo_bar'));
         $this->assertEquals('FooBar', Str::studly('foo_bar')); // test cache
+
         $this->assertEquals('FooBarBaz', Str::studly('foo-barBaz'));
         $this->assertEquals('FooBarBaz', Str::studly('foo-bar_baz'));
     }
