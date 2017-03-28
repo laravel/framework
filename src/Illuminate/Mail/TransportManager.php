@@ -141,6 +141,21 @@ class TransportManager extends Manager
     }
 
     /**
+     * Create an instance of the Mailjet Swift Transport driver.
+     *
+     * @return \Illuminate\Mail\Transport\MailjetTransport
+     */
+    protected function createMailjetDriver()
+    {
+        $config = $this->app['config']->get('services.mailjet', []);
+
+        return new MailjetTransport(
+            new HttpClient(Arr::get($config, 'guzzle', [])),
+            $config['public'], $config['private']
+        );
+    }
+
+    /**
      * Create an instance of the Log Swift Transport driver.
      *
      * @return \Illuminate\Mail\Transport\LogTransport
