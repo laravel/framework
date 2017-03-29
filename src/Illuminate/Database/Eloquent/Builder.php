@@ -248,11 +248,7 @@ class Builder
      */
     public function firstOrCreate(array $attributes)
     {
-        if (! is_null($instance = $this->where($attributes)->first())) {
-            return $instance;
-        }
-
-        $instance = $this->model->newInstance($attributes);
+        $instance = $this->firstOrNew($attributes);
 
         $instance->save();
 
