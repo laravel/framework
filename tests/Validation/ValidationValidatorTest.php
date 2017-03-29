@@ -1142,6 +1142,12 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => '1'], ['foo' => 'Integer']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '020'], ['foo' => 'Integer']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '0x25'], ['foo' => 'Integer']);
+        $this->assertTrue($v->passes());
     }
 
     public function testValidateInt()
@@ -1157,6 +1163,12 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => '1'], ['foo' => 'Int']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '020'], ['foo' => 'Int']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '0x25'], ['foo' => 'Int']);
         $this->assertTrue($v->passes());
     }
 
