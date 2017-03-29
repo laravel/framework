@@ -1225,6 +1225,32 @@ class BelongsToMany extends Relation
     }
 
     /**
+     * Return an array of casts for the pivot table.
+     *
+     * @return array
+     */
+    public function getPivotCasts()
+    {
+        if (empty($this->parent->getCasts())) {
+            return [];
+        }
+
+        $prefix = Str::snake($this->relationName).'.pivot.';
+        $prefixLength = strlen($prefix);
+
+        $casts = [];
+
+        foreach ($this->parent->getCasts() as $key => $type) {
+            if (substr($key, 0, $prefixLength) === $prefix) {
+                $key = substr($key, $prefixLength);
+                $casts[$key] = $type;
+            }
+        }
+
+        return $casts;
+    }
+
+    /**
      * Create a new query builder for the pivot table.
      *
      * @return \Illuminate\Database\Query\Builder
@@ -1276,7 +1302,10 @@ class BelongsToMany extends Relation
     {
         $pivot = $this->related->newPivot($this->parent, $attributes, $this->table, $exists);
 
-        return $pivot->setPivotKeys($this->foreignKey, $this->otherKey);
+        $pivot->setPivotKeys($this->foreignKey, $this->otherKey)
+              ->setCasts($this->getPivotCasts());
+
+        return $pivot;
     }
 
     /**

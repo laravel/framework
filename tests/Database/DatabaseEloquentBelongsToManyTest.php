@@ -15,9 +15,9 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
     public function testModelsAreProperlyHydrated()
     {
         $model1 = new EloquentBelongsToManyModelStub;
-        $model1->fill(['name' => 'taylor', 'pivot_user_id' => 1, 'pivot_role_id' => 2]);
+        $model1->fill(['name' => 'taylor', 'pivot_user_id' => 1, 'pivot_role_id' => 2, 'pivot_active' => 1]);
         $model2 = new EloquentBelongsToManyModelStub;
-        $model2->fill(['name' => 'dayle', 'pivot_user_id' => 3, 'pivot_role_id' => 4]);
+        $model2->fill(['name' => 'dayle', 'pivot_user_id' => 3, 'pivot_role_id' => 4, 'pivot_active' => 0]);
         $models = [$model1, $model2];
 
         $baseBuilder = m::mock('Illuminate\Database\Query\Builder');
@@ -49,6 +49,8 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(4, $results[1]->pivot->role_id);
         $this->assertEquals('foo.connection', $results[1]->pivot->getConnectionName());
         $this->assertEquals('user_role', $results[0]->pivot->getTable());
+        $this->assertTrue($results[0]->pivot->active);
+        $this->assertFalse($results[1]->pivot->active);
         $this->assertTrue($results[0]->pivot->exists);
     }
 
@@ -712,6 +714,9 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
 
         $related->shouldReceive('getTable')->andReturn('roles');
         $related->shouldReceive('getKeyName')->andReturn('id');
+        $parent->shouldReceive('getCasts')->andReturn([
+            'relation_name.pivot.active' => 'boolean',
+        ]);
         $related->shouldReceive('newPivot')->andReturnUsing(function () {
             $reflector = new ReflectionClass('Illuminate\Database\Eloquent\Relations\Pivot');
 

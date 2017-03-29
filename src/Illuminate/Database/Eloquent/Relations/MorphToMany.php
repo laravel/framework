@@ -134,7 +134,8 @@ class MorphToMany extends BelongsToMany
 
         $pivot->setPivotKeys($this->foreignKey, $this->otherKey)
               ->setMorphType($this->morphType)
-              ->setMorphClass($this->morphClass);
+              ->setMorphClass($this->morphClass)
+              ->setCasts($this->getPivotCasts());
 
         return $pivot;
     }
