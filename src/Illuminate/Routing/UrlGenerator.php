@@ -72,6 +72,13 @@ class UrlGenerator implements UrlGeneratorContract
     protected $sessionResolver;
 
     /**
+     * Default parameters.
+     *
+     * @var array
+     */
+    protected $defaultParameters = [];
+
+    /**
      * Characters that should not be URL encoded.
      *
      * @var array
@@ -105,6 +112,26 @@ class UrlGenerator implements UrlGeneratorContract
         $this->routes = $routes;
 
         $this->setRequest($request);
+    }
+
+    /**
+     * Get the default parameters.
+     *
+     * @return array
+     */
+    public function getDefaultParameters()
+    {
+        return $this->defaultParameters;
+    }
+
+    /**
+     * Set the default parameters.
+     *
+     * @return void
+     */
+    public function setDefaultParameters($key, $value)
+    {
+        $this->defaultParameters[$key] = $value;
     }
 
     /**
@@ -433,7 +460,9 @@ class UrlGenerator implements UrlGeneratorContract
      */
     protected function replaceRoutableParameters($parameters = [])
     {
-        $parameters = is_array($parameters) ? $parameters : [$parameters];
+        $parameters = array_merge(
+            $this->getDefaultParameters(),
+            is_array($parameters) ? $parameters : [$parameters]);
 
         foreach ($parameters as $key => $parameter) {
             if ($parameter instanceof UrlRoutable) {
