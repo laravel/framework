@@ -73,7 +73,7 @@ class TestResponse
     public function assertRedirect($uri)
     {
         PHPUnit::assertTrue(
-            $this->isRedirect(), 'Response status code ['.$this->status().'] is not a redirect status code.'
+            $this->isRedirect(), 'Response status code ['.$this->getStatusCode().'] is not a redirect status code.'
         );
 
         PHPUnit::assertEquals(app('url')->to($uri), $this->headers->get('Location'));
