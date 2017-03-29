@@ -48,6 +48,11 @@ class Pivot extends Model
     {
         parent::__construct();
 
+        // We store off the parent instance so we will access the timestamp column names
+        // for the model, since the pivot model timestamps aren't easily configurable
+        // from the developer's point of view. We can use the parents to get these.
+        $this->parent = $parent;
+
         // The pivot model is a "dynamic" model since we will set the tables dynamically
         // for the instance. This allows it work for any intermediate tables for the
         // many to many relationship that are defined by this developer's classes.
@@ -58,11 +63,6 @@ class Pivot extends Model
         $this->forceFill($attributes);
 
         $this->syncOriginal();
-
-        // We store off the parent instance so we will access the timestamp column names
-        // for the model, since the pivot model timestamps aren't easily configurable
-        // from the developer's point of view. We can use the parents to get these.
-        $this->parent = $parent;
 
         $this->exists = $exists;
 

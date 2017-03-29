@@ -1719,11 +1719,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $time = $this->freshTimestamp();
 
-        if (! $this->isDirty(static::UPDATED_AT)) {
+        if (! $this->isDirty($this->getUpdatedAtColumn())) {
             $this->setUpdatedAt($time);
         }
 
-        if (! $this->exists && ! $this->isDirty(static::CREATED_AT)) {
+        if (! $this->exists && ! $this->isDirty($this->getCreatedAtColumn())) {
             $this->setCreatedAt($time);
         }
     }
@@ -1736,7 +1736,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function setCreatedAt($value)
     {
-        $this->{static::CREATED_AT} = $value;
+        $column = $this->getCreatedAtColumn();
+        $this->{$column} = $value;
 
         return $this;
     }
@@ -1749,7 +1750,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function setUpdatedAt($value)
     {
-        $this->{static::UPDATED_AT} = $value;
+        $column = $this->getUpdatedAtColumn();
+        $this->{$column} = $value;
 
         return $this;
     }
@@ -2939,7 +2941,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function getDates()
     {
-        $defaults = [static::CREATED_AT, static::UPDATED_AT];
+        $defaults = [$this->getCreatedAtColumn(), $this->getUpdatedAtColumn()];
 
         return $this->timestamps ? array_merge($this->dates, $defaults) : $this->dates;
     }
