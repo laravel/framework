@@ -454,6 +454,18 @@ class Blueprint
     }
 
     /**
+     * Create a new utf8mb4 string column on the table.
+     *
+     * @param  string  $column
+     * @param  int $length
+     * @return \Illuminate\Support\Fluent
+     */
+    public function mb4String($column, $length = 191)
+    {
+        return $this->addColumn('string', $column, compact('length'));
+    }
+
+    /**
      * Create a new text column on the table.
      *
      * @param  string  $column
