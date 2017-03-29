@@ -160,6 +160,25 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['#foo', '#bar', ['#baz'], '#zap'], Arr::flatten($array, 2));
     }
 
+    public function testMerge()
+    {
+        $one = ['a' => 'foo', 'b' => 'bar'];
+        $two = ['b' => 'BAR', 'c' => ['c1' => 'baz1', 'c2' => 'baz2']];
+        $three = ['a' => 'FOO', 'c' => ['c1' => 'BAZ1']];
+
+        // Replace or insert
+        $expected = ['a' => 'foo', 'b' => 'BAR', 'c' => ['c1' => 'baz1', 'c2' => 'baz2']];
+        $this->assertEquals($expected, Arr::merge($one, $two));
+
+        // Replace root level as well as nested
+        $expected = ['a' => 'FOO', 'b' => 'BAR', 'c' => ['c1' => 'BAZ1', 'c2' => 'baz2']];
+        $this->assertEquals($expected, Arr::merge($one, $two, $three));
+
+        // Accept Collections
+        $expected = ['a' => 'FOO', 'b' => 'BAR', 'c' => ['c1' => 'BAZ1', 'c2' => 'baz2']];
+        $this->assertEquals($expected, Arr::merge(new Collection($one), $two, new Collection($three)));
+    }
+
     public function testGet()
     {
         $array = ['products.desk' => ['price' => 100]];

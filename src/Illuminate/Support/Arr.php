@@ -192,6 +192,31 @@ class Arr
     }
 
     /**
+     * @param  \ArrayAccess|array  $first
+     * @param  \ArrayAccess|array  ...$rest
+     * @return array
+     */
+    public static function merge($first, ...$rest)
+    {
+        return array_reduce($rest, function ($result, $item) {
+            $item = $item instanceof Collection ? $item->all() : $item;
+
+            foreach ($item as $key => $value) {
+                if (static::exists($result, $key) &&
+                    static::accessible($result[$key]) &&
+                    static::accessible($value)
+                ) {
+                    $result[$key] = static::merge($result[$key], $value);
+                } else {
+                    $result[$key] = $value;
+                }
+            }
+
+            return $result;
+        }, $first instanceof Collection ? $first->all() : $first);
+    }
+
+    /**
      * Remove one or many array items from a given array using "dot" notation.
      *
      * @param  array  $array
