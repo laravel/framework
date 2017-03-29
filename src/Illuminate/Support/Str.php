@@ -430,15 +430,13 @@ class Str
      */
     public static function studly($value)
     {
-        $key = $value;
-
-        if (isset(static::$studlyCache[$key])) {
-            return static::$studlyCache[$key];
+        if (isset(static::$studlyCache[$value])) {
+            return static::$studlyCache[$value];
         }
 
         $value = ucwords(str_replace(['-', '_'], ' ', $value));
 
-        return static::$studlyCache[$key] = str_replace(' ', '', $value);
+        return static::$studlyCache[$value] = str_replace(' ', '', $value);
     }
 
     /**

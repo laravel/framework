@@ -529,8 +529,8 @@ class SupportArrTest extends TestCase
         $array = ['a'];
         $object = new stdClass;
         $object->value = 'a';
-        $this->assertEquals(['a'], array_wrap($string));
-        $this->assertEquals($array, array_wrap($array));
-        $this->assertEquals([$object], array_wrap($object));
+        $this->assertEquals(['a'], Arr::wrap($string));
+        $this->assertEquals($array, Arr::wrap($array));
+        $this->assertEquals([$object], Arr::wrap($object));
     }
 }
