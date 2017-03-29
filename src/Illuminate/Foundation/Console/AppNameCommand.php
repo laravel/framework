@@ -260,7 +260,9 @@ class AppNameCommand extends Command
      */
     protected function getComposerPath()
     {
-        return $this->laravel->basePath().'/composer.json';
+        $composer_filename = env('COMPOSER', 'composer.json');
+
+        return $this->laravel->basePath().'/'.$composer_filename;
     }
 
     /**
