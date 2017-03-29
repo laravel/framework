@@ -15,4 +15,11 @@ class ValidationInRuleTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('in:1,2,3,4', (string) $rule);
     }
+
+    public function testInRuleWorksWithArrayKeys()
+    {
+        $rule = Rule::inKeys(['zero' => 0, 'one' => 1, 'two' => 2]);
+
+        $this->assertEquals('in:zero,one,two', (string) $rule);
+    }
 }

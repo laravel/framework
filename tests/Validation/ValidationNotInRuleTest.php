@@ -15,4 +15,11 @@ class ValidationNotInRuleTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('not_in:1,2,3,4', (string) $rule);
     }
+
+    public function testNotInRuleWorksWithArrayKeys()
+    {
+        $rule = Rule::notInKeys(['zero' => 0, 'one' => 1, 'two' => 2]);
+
+        $this->assertEquals('not_in:zero,one,two', (string) $rule);
+    }
 }
