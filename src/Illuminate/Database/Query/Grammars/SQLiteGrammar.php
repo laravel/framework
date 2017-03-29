@@ -80,7 +80,7 @@ class SQLiteGrammar extends Grammar
      * @param  array  $where
      * @return string
      */
-    protected function whereDate(Builder $query, $where)
+    protected function whereDate(Builder $query, array $where)
     {
         return $this->dateBasedWhere('%Y-%m-%d', $query, $where);
     }
@@ -92,7 +92,7 @@ class SQLiteGrammar extends Grammar
      * @param  array  $where
      * @return string
      */
-    protected function whereDay(Builder $query, $where)
+    protected function whereDay(Builder $query, array $where)
     {
         return $this->dateBasedWhere('%d', $query, $where);
     }
@@ -104,7 +104,7 @@ class SQLiteGrammar extends Grammar
      * @param  array  $where
      * @return string
      */
-    protected function whereMonth(Builder $query, $where)
+    protected function whereMonth(Builder $query, array $where)
     {
         return $this->dateBasedWhere('%m', $query, $where);
     }
@@ -116,7 +116,7 @@ class SQLiteGrammar extends Grammar
      * @param  array  $where
      * @return string
      */
-    protected function whereYear(Builder $query, $where)
+    protected function whereYear(Builder $query, array $where)
     {
         return $this->dateBasedWhere('%Y', $query, $where);
     }
@@ -129,7 +129,7 @@ class SQLiteGrammar extends Grammar
      * @param  array  $where
      * @return string
      */
-    protected function dateBasedWhere($type, Builder $query, $where)
+    protected function dateBasedWhere($type, Builder $query, array $where)
     {
         $value = str_pad($where['value'], 2, '0', STR_PAD_LEFT);
 

@@ -106,7 +106,7 @@ class Migrator
      * @param  array  $options
      * @return void
      */
-    public function runMigrationList($migrations, array $options = [])
+    public function runMigrationList(array $migrations, array $options = [])
     {
         // First we will just make sure that there are any migrations to run. If there
         // aren't, we will just make a note of it to the developer so they're aware

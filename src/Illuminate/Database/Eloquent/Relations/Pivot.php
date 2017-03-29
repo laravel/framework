@@ -44,7 +44,7 @@ class Pivot extends Model
      * @param  bool    $exists
      * @return void
      */
-    public function __construct(Model $parent, $attributes, $table, $exists = false)
+    public function __construct(Model $parent, array $attributes, $table, $exists = false)
     {
         parent::__construct();
 
@@ -78,7 +78,7 @@ class Pivot extends Model
      * @param  bool    $exists
      * @return static
      */
-    public static function fromRawAttributes(Model $parent, $attributes, $table, $exists = false)
+    public static function fromRawAttributes(Model $parent, array $attributes, $table, $exists = false)
     {
         $instance = new static($parent, $attributes, $table, $exists);
 

@@ -223,7 +223,7 @@ class HasManyThrough extends Relation
      * @param  array   $columns
      * @return mixed
      */
-    public function first($columns = ['*'])
+    public function first(array $columns = ['*'])
     {
         $results = $this->take(1)->get($columns);
 
@@ -238,7 +238,7 @@ class HasManyThrough extends Relation
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function firstOrFail($columns = ['*'])
+    public function firstOrFail(array $columns = ['*'])
     {
         if (! is_null($model = $this->first($columns))) {
             return $model;
@@ -254,7 +254,7 @@ class HasManyThrough extends Relation
      * @param  array  $columns
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|null
      */
-    public function find($id, $columns = ['*'])
+    public function find($id, array $columns = ['*'])
     {
         if (is_array($id)) {
             return $this->findMany($id, $columns);
@@ -272,7 +272,7 @@ class HasManyThrough extends Relation
      * @param  array  $columns
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function findMany($ids, $columns = ['*'])
+    public function findMany($ids, array $columns = ['*'])
     {
         if (empty($ids)) {
             return $this->getRelated()->newCollection();
@@ -292,7 +292,7 @@ class HasManyThrough extends Relation
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function findOrFail($id, $columns = ['*'])
+    public function findOrFail($id, array $columns = ['*'])
     {
         $result = $this->find($id, $columns);
 
@@ -345,7 +345,7 @@ class HasManyThrough extends Relation
      * @param  array  $columns
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function get($columns = ['*'])
+    public function get(array $columns = ['*'])
     {
         // First we'll add the proper select columns onto the query so it is run with
         // the proper columns. Then, we will get the results and hydrate out pivot
@@ -392,7 +392,7 @@ class HasManyThrough extends Relation
      * @param  int  $page
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
+    public function paginate($perPage = null, array $columns = ['*'], $pageName = 'page', $page = null)
     {
         $this->query->addSelect($this->getSelectColumns($columns));
 
@@ -408,7 +408,7 @@ class HasManyThrough extends Relation
      * @param  int|null  $page
      * @return \Illuminate\Contracts\Pagination\Paginator
      */
-    public function simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
+    public function simplePaginate($perPage = null, array $columns = ['*'], $pageName = 'page', $page = null)
     {
         $this->query->addSelect($this->getSelectColumns($columns));
 

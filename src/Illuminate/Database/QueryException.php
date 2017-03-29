@@ -52,7 +52,7 @@ class QueryException extends PDOException
      * @param  \Exception $previous
      * @return string
      */
-    protected function formatMessage($sql, $bindings, $previous)
+    protected function formatMessage($sql, array $bindings, $previous)
     {
         return $previous->getMessage().' (SQL: '.Str::replaceArray('?', $bindings, $sql).')';
     }

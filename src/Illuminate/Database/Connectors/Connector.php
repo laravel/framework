@@ -96,7 +96,7 @@ class Connector
      *
      * @throws \Exception
      */
-    protected function tryAgainIfCausedByLostConnection(Exception $e, $dsn, $username, $password, $options)
+    protected function tryAgainIfCausedByLostConnection(Exception $e, $dsn, $username, $password, array $options)
     {
         if ($this->causedByLostConnection($e)) {
             return $this->createPdoConnection($dsn, $username, $password, $options);
@@ -125,7 +125,7 @@ class Connector
      * @param  array  $options
      * @return bool
      */
-    protected function isPersistentConnection($options)
+    protected function isPersistentConnection(array $options)
     {
         if (isset($options[PDO::ATTR_PERSISTENT]) && $options[PDO::ATTR_PERSISTENT]) {
             return true;

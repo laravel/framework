@@ -41,7 +41,7 @@ class KeyWritten
      * @param  array  $tags
      * @return void
      */
-    public function __construct($key, $value, $minutes, $tags = [])
+    public function __construct($key, $value, $minutes, array $tags = [])
     {
         $this->key = $key;
         $this->tags = $tags;

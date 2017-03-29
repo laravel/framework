@@ -121,7 +121,7 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
      * @param  array  $token
      * @return bool
      */
-    protected function tokenExpired($token)
+    protected function tokenExpired(array $token)
     {
         $expiresAt = Carbon::parse($token['created_at'])->addSeconds($this->expires);
 
