@@ -227,6 +227,12 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
 
         $request = Request::create('/', 'GET', ['foo' => ['bar' => 'baz']]);
         $this->assertTrue($request->has('foo.bar'));
+
+        //tests objects from JSON post requests
+        $object = new stdClass();
+        $object->bar = 'baz';
+        $request = Request::create('/', 'POST', ['foo' => $object]);
+        $this->assertTrue($request->has('foo'));
     }
 
     public function testInputMethod()
