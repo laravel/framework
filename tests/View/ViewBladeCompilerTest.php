@@ -117,6 +117,7 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase
             $age or 90
         }}'));
 
+        $this->assertEquals('<?php echo e("{{js_stuff}}"); ?>', $compiler->compileString('{{ "{{js_stuff\}}" }}'));
         $this->assertEquals('<?php echo e("Hello world or foo"); ?>', $compiler->compileString('{{ "Hello world or foo" }}'));
         $this->assertEquals('<?php echo e("Hello world or foo"); ?>', $compiler->compileString('{{"Hello world or foo"}}'));
         $this->assertEquals('<?php echo e($foo + $or + $baz); ?>', $compiler->compileString('{{$foo + $or + $baz}}'));

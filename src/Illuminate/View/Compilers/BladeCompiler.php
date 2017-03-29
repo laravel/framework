@@ -361,7 +361,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileRegularEchos($value)
     {
-        $pattern = sprintf('/(@)?%s\s*(.+?)\s*%s(\r?\n)?/s', $this->contentTags[0], $this->contentTags[1]);
+        $pattern = sprintf('/(@)?%s\s*(.+?)\s*(?<!\\\)%s(\r?\n)?/s', $this->contentTags[0], $this->contentTags[1]);
 
         $callback = function ($matches) {
             $whitespace = empty($matches[3]) ? '' : $matches[3].$matches[3];
@@ -401,6 +401,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     public function compileEchoDefaults($value)
     {
+        $value = str_replace('\\'.$this->contentTags[1], $this->contentTags[1], $value);
+
         return preg_replace('/^(?=\$)(.+?)(?:\s+or\s+)(.+?)$/s', 'isset($1) ? $1 : $2', $value);
     }
 
