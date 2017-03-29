@@ -750,6 +750,22 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     }
 
     /**
+     * Unset the current user.
+     *
+     * @return $this
+     */
+    public function unsetUser()
+    {
+        $this->user = null;
+
+        $this->loggedOut = true;
+
+        $this->fireAuthenticatedEvent(null);
+
+        return $this;
+    }
+
+    /**
      * Get the current request instance.
      *
      * @return \Symfony\Component\HttpFoundation\Request

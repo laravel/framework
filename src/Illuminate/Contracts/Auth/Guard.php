@@ -47,4 +47,11 @@ interface Guard
      * @return void
      */
     public function setUser(Authenticatable $user);
+
+    /**
+     * Unset the current user.
+     *
+     * @return void
+     */
+    public function unsetUser();
 }

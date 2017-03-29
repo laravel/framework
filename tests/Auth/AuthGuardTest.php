@@ -182,6 +182,18 @@ class AuthGuardTest extends TestCase
         $this->assertTrue($mock->guest());
     }
 
+    public function testIsAuthedReturnsFalseWhenUserIsUnset()
+    {
+        $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
+        $mock = $this->getGuard();
+        $mock->setUser($user);
+        $this->assertTrue($mock->check());
+        $this->assertFalse($mock->guest());
+        $mock->unsetUser();
+        $this->assertFalse($mock->check());
+        $this->assertTrue($mock->guest());
+    }
+
     public function testUserMethodReturnsCachedUser()
     {
         $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
