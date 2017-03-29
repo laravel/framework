@@ -830,7 +830,7 @@ class Event
      * @param  bool  $onlyIfOutputExists
      * @return void
      */
-    protected function emailOutput(Mailer $mailer, $addresses, $onlyIfOutputExists = false)
+    protected function emailOutput(Mailer $mailer, array $addresses, $onlyIfOutputExists = false)
     {
         $text = file_get_contents($this->output);
 

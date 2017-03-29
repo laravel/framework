@@ -118,7 +118,7 @@ class AuthManager implements FactoryContract
      * @param  array  $config
      * @return \Illuminate\Auth\SessionGuard
      */
-    public function createSessionDriver($name, $config)
+    public function createSessionDriver($name, array $config)
     {
         $provider = $this->createUserProvider($config['provider']);
 
@@ -149,7 +149,7 @@ class AuthManager implements FactoryContract
      * @param  array  $config
      * @return \Illuminate\Auth\TokenGuard
      */
-    public function createTokenDriver($name, $config)
+    public function createTokenDriver($name, array $config)
     {
         // The token guard implements a basic API token based guard implementation
         // that takes an API token field from the request and matches it to the
@@ -289,7 +289,7 @@ class AuthManager implements FactoryContract
      * @param  array  $parameters
      * @return mixed
      */
-    public function __call($method, $parameters)
+    public function __call($method, array $parameters)
     {
         return $this->guard()->{$method}(...$parameters);
     }

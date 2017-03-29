@@ -72,7 +72,7 @@ class MySqlConnection extends Connection
      * @param  array  $bindings
      * @return void
      */
-    public function bindValues($statement, $bindings)
+    public function bindValues($statement, array $bindings)
     {
         foreach ($bindings as $key => $value) {
             $statement->bindValue(

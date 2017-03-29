@@ -81,7 +81,7 @@ class MemcachedConnector
      * @param  array  $credentials
      * @return void
      */
-    protected function setCredentials($memcached, $credentials)
+    protected function setCredentials($memcached, array $credentials)
     {
         list($username, $password) = $credentials;
 

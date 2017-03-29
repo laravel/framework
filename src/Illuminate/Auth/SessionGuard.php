@@ -303,7 +303,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  array  $extraConditions
      * @return bool
      */
-    protected function attemptBasic(Request $request, $field, $extraConditions = [])
+    protected function attemptBasic(Request $request, $field, array $extraConditions = [])
     {
         if (! $request->getUser()) {
             return false;
@@ -380,7 +380,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  array  $credentials
      * @return bool
      */
-    protected function hasValidCredentials($user, $credentials)
+    protected function hasValidCredentials($user, array $credentials)
     {
         return ! is_null($user) && $this->provider->validateCredentials($user, $credentials);
     }
