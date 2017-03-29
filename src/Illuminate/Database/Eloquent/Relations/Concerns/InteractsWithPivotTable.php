@@ -93,7 +93,7 @@ trait InteractsWithPivotTable
         )->all();
 
         $detach = array_diff($current, array_keys(
-            $records = $this->formatRecordsList($this->parseIds($ids))
+            $records = $this->formatRecordsList((array) $this->parseIds($ids))
         ));
 
         // Next, we will take the differences of the currents and given IDs and detach
