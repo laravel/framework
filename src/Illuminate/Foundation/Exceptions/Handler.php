@@ -127,6 +127,10 @@ class Handler implements ExceptionHandlerContract
      */
     public function render($request, Exception $e)
     {
+        if ($this->container['env'] === 'testing') {
+            throw $e;
+        }
+
         $e = $this->prepareException($e);
 
         if ($e instanceof HttpResponseException) {
