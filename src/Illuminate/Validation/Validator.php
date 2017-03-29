@@ -1033,7 +1033,7 @@ class Validator implements ValidatorContract
             return true;
         }
 
-        $acceptable = [true, false, 0, 1, '0', '1'];
+        $acceptable = [true, false, 0, 1, '0', '1', 'off', 'on'];
 
         return is_null($value) || in_array($value, $acceptable, true);
     }
