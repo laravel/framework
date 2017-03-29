@@ -506,7 +506,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $model = $this->newInstance([], true);
 
-        $model->setRawAttributes((array) $attributes, true);
+        $model->setRawAttributes(
+            array_combine(array_keys($attributes), $attributes),
+            true
+        );
 
         $model->setConnection($connection ?: $this->getConnectionName());
 
@@ -525,7 +528,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $instance = (new static)->setConnection($connection);
 
         $items = array_map(function ($item) use ($instance) {
-            return $instance->newFromBuilder($item);
+            return $instance->newFromBuilder((array) $item);
         }, $items);
 
         return $instance->newCollection($items);

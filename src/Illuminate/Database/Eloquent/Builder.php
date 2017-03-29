@@ -361,7 +361,7 @@ class Builder
         $builder = $this->applyScopes();
 
         foreach ($builder->query->cursor() as $record) {
-            yield $this->model->newFromBuilder($record);
+            yield $this->model->newFromBuilder((array) $record);
         }
     }
 

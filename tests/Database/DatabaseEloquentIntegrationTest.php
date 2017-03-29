@@ -56,6 +56,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
                 $table->increments('id');
                 $table->string('name')->nullable();
                 $table->string('email');
+                $table->integer('200');
                 $table->timestamps();
             });
 
@@ -150,6 +151,15 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         foreach ($records as $record) {
             $this->assertEquals(1, $record->id);
         }
+    }
+
+    public function testModelWithNumericKey()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'test@mail.com', 200 => 1]);
+
+        $model = EloquentTestUser::find(1);
+        $this->assertInstanceOf('EloquentTestUser', $model);
+        $this->assertEquals(1, $model->{200});
     }
 
     public function testBasicModelCollectionRetrieval()
