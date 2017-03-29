@@ -72,6 +72,12 @@ class MySqlGrammar extends Grammar
             $sql .= ' engine = '.$engine;
         }
 
+        if (isset($blueprint->rowFormat)) {
+            $sql .= ' ROW_FORMAT = '.$blueprint->rowFormat;
+        } elseif (! is_null($rowFormat = $connection->getConfig('RowFormat'))) {
+            $sql .= ' ROW_FORMAT = '.$rowFormat;
+        }
+
         return $sql;
     }
 
