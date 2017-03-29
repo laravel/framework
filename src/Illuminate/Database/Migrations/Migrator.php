@@ -332,7 +332,7 @@ class Migrator
         // by the application then will be able to fire by any later operation.
         $this->repository->delete($migration);
 
-        $this->note("<info>Rolled back:</info> {$name}");
+        $this->note("<info>Rolled back:</info>  {$name}");
     }
 
     /**
