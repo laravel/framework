@@ -738,6 +738,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $foreignKey = $foreignKey ?: $this->getForeignKey();
 
         $instance = new $related;
+        $instance->setConnection($this->connection);
 
         $localKey = $localKey ?: $this->getKeyName();
 
@@ -757,6 +758,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function morphOne($related, $name, $type = null, $id = null, $localKey = null)
     {
         $instance = new $related;
+        $instance->setConnection($this->connection);
 
         list($type, $id) = $this->getMorphs($name, $type, $id);
 
@@ -795,6 +797,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         }
 
         $instance = new $related;
+        $instance->setConnection($this->connection);
 
         // Once we have the foreign key names, we'll just create a new Eloquent query
         // for the related models and returns the relationship instance which will
@@ -843,6 +846,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $class = $this->getActualClassNameForMorph($class);
 
             $instance = new $class;
+            $instance->setConnection($this->connection);
 
             return new MorphTo(
                 $instance->newQuery(), $this, $id, $instance->getKeyName(), $type, $name
@@ -874,6 +878,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $foreignKey = $foreignKey ?: $this->getForeignKey();
 
         $instance = new $related;
+        $instance->setConnection($this->connection);
 
         $localKey = $localKey ?: $this->getKeyName();
 
@@ -900,7 +905,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $localKey = $localKey ?: $this->getKeyName();
 
-        return new HasManyThrough((new $related)->newQuery(), $this, $through, $firstKey, $secondKey, $localKey);
+        $instance = (new $related)->setConnection($this->connection);
+
+        return new HasManyThrough($instance->newQuery(), $this, $through, $firstKey, $secondKey, $localKey);
     }
 
     /**
@@ -916,6 +923,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function morphMany($related, $name, $type = null, $id = null, $localKey = null)
     {
         $instance = new $related;
+        $instance->setConnection($this->connection);
 
         // Here we will gather up the morph type and ID for the relationship so that we
         // can properly query the intermediate table of a relation. Finally, we will
@@ -954,6 +962,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $foreignKey = $foreignKey ?: $this->getForeignKey();
 
         $instance = new $related;
+        $instance->setConnection($this->connection);
 
         $otherKey = $otherKey ?: $instance->getForeignKey();
 
@@ -993,6 +1002,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $foreignKey = $foreignKey ?: $name.'_id';
 
         $instance = new $related;
+        $instance->setConnection($this->connection);
 
         $otherKey = $otherKey ?: $instance->getForeignKey();
 
