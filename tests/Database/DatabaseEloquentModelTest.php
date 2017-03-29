@@ -1608,6 +1608,14 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame($scopes, $model->scopesCalled);
     }
 
+    public function testIsWithNull()
+    {
+        $firstInstance = new EloquentModelStub(['id' => 1]);
+        $secondInstance = null;
+
+        $this->assertFalse($firstInstance->is($secondInstance));
+    }
+
     public function testIsWithTheSameModelInstance()
     {
         $firstInstance = new EloquentModelStub(['id' => 1]);

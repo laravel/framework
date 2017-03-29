@@ -349,7 +349,9 @@ class Migrator
         );
 
         $callback = function () use ($migration, $method) {
-            $migration->{$method}();
+            if (method_exists($migration, $method)) {
+                $migration->{$method}();
+            }
         };
 
         $this->getSchemaGrammar($connection)->supportsSchemaTransactions()
@@ -390,7 +392,9 @@ class Migrator
         );
 
         return $db->pretend(function () use ($migration, $method) {
-            $migration->$method();
+            if (method_exists($migration, $method)) {
+                $migration->{$method}();
+            }
         });
     }
 

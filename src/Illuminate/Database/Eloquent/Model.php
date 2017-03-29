@@ -959,12 +959,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Determine if two models have the same ID and belong to the same table.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Illuminate\Database\Eloquent\Model|null  $model
      * @return bool
      */
-    public function is(Model $model)
+    public function is($model)
     {
-        return $this->getKey() === $model->getKey() &&
+        return ! is_null($model) &&
+               $this->getKey() === $model->getKey() &&
                $this->getTable() === $model->getTable() &&
                $this->getConnectionName() === $model->getConnectionName();
     }

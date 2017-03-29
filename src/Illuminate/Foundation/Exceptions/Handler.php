@@ -169,11 +169,16 @@ class Handler implements ExceptionHandlerContract
      */
     protected function prepareResponse($request, Exception $e)
     {
-        if ($this->isHttpException($e)) {
-            return $this->toIlluminateResponse($this->renderHttpException($e), $e);
-        } else {
+        if (! $this->isHttpException($e) && config('app.debug')) {
             return $this->toIlluminateResponse($this->convertExceptionToResponse($e), $e);
         }
+
+        $e = $this->isHttpException($e)
+                ? $e : new HttpException(500, $e->getMessage());
+
+        return $this->toIlluminateResponse(
+            $this->renderHttpException($e), $e
+        );
     }
 
     /**
@@ -208,7 +213,7 @@ class Handler implements ExceptionHandlerContract
     {
         $e = FlattenException::create($e);
 
-        $handler = new SymfonyExceptionHandler(config('app.debug'));
+        $handler = new SymfonyExceptionHandler(config('app.debug', false));
 
         return SymfonyResponse::create($handler->getHtml($e), $e->getStatusCode(), $e->getHeaders());
     }
