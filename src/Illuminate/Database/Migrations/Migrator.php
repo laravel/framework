@@ -181,7 +181,7 @@ class Migrator
         // in the application. A migration repository keeps the migrate order.
         $this->repository->log($name, $batch);
 
-        $this->note("<info>Migrated:</info> {$name}");
+        $this->note("<info>Migrated:</info>  {$name}");
     }
 
     /**
@@ -332,7 +332,7 @@ class Migrator
         // by the application then will be able to fire by any later operation.
         $this->repository->delete($migration);
 
-        $this->note("<info>Rolled back:</info> {$name}");
+        $this->note("<info>Rolled back:</info>  {$name}");
     }
 
     /**
