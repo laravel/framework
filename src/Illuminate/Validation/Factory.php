@@ -46,6 +46,13 @@ class Factory implements FactoryContract
     protected $implicitExtensions = [];
 
     /**
+     * All of the custom validator rules to be depedent.
+     *
+     * @var array
+     */
+    protected $dependentRules = [];
+
+    /**
      * All of the custom validator message replacers.
      *
      * @var array
@@ -128,6 +135,8 @@ class Factory implements FactoryContract
 
         $validator->addImplicitExtensions($implicit);
 
+        $validator->addDependentRules($this->dependentRules);
+
         $validator->addReplacers($this->replacers);
 
         $validator->setFallbackMessages($this->fallbackMessages);
@@ -157,11 +166,16 @@ class Factory implements FactoryContract
      * @param  string  $rule
      * @param  \Closure|string  $extension
      * @param  string  $message
+     * @param bool $isDependentRule
      * @return void
      */
-    public function extend($rule, $extension, $message = null)
+    public function extend($rule, $extension, $message = null, $isDependentRule = false)
     {
         $this->extensions[$rule] = $extension;
+
+        if ($isDependentRule) {
+            $this->addDependentRule($rule);
+        }
 
         if ($message) {
             $this->fallbackMessages[Str::snake($rule)] = $message;
@@ -174,15 +188,30 @@ class Factory implements FactoryContract
      * @param  string   $rule
      * @param  \Closure|string  $extension
      * @param  string  $message
+     * @param bool $isDependentRule
      * @return void
      */
-    public function extendImplicit($rule, $extension, $message = null)
+    public function extendImplicit($rule, $extension, $message = null, $isDependentRule = false)
     {
         $this->implicitExtensions[$rule] = $extension;
+
+        if ($isDependentRule) {
+            $this->addDependentRule($rule);
+        }
 
         if ($message) {
             $this->fallbackMessages[Str::snake($rule)] = $message;
         }
+    }
+
+    /**
+     * Add a custom rule as dependent rule.
+     *
+     * @param string $rule
+     */
+    protected function addDependentRule($rule)
+    {
+        $this->dependentRules[] = $rule;
     }
 
     /**

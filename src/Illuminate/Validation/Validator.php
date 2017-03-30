@@ -2853,6 +2853,18 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Set a custom validator extension as a dependent rule.
+     *
+     * @param array $rules
+     */
+    public function addDependentRules(array $rules)
+    {
+        foreach ($rules as $rule) {
+            $this->dependentRules[] = Str::studly($rule);
+        }
+    }
+
+    /**
      * Get the array of custom validator message replacers.
      *
      * @return array
