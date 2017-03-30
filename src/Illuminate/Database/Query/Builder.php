@@ -1699,6 +1699,17 @@ class Builder
     }
 
     /**
+     * Get a random row
+     *
+     * @param array $columns
+     * @return mixed|static
+     */
+    public function getRandomRow($columns = ['*'])
+    {
+        return $this->inRandomOrder()->limit(1)->first($columns);
+    }
+
+    /**
      * Run the query as a "select" statement against the connection.
      *
      * @return array

@@ -1071,6 +1071,17 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $results);
     }
 
+    public function testGetRandomRow()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select * from "users" order by RANDOM() limit 1',[], true)->andReturn([['foo' => 'bar']]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar']])->andReturnUsing(function ($query, $results) {
+            return $results;
+        });
+        $results = $builder->from('users')->getRandomRow();
+        $this->assertEquals(['foo' => 'bar'], $results);
+    }
+
     public function testListMethodsGetsArrayOfColumnValues()
     {
         $builder = $this->getBuilder();
