@@ -10,3 +10,4 @@
 phpunit.xml export-ignore
 CHANGELOG-5.2.md export-ignore
 CONTRIBUTING.md export-ignore
+README.md export-ignore
