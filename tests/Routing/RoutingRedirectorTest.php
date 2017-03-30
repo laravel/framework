@@ -25,6 +25,7 @@ class RoutingRedirectorTest extends PHPUnit_Framework_TestCase
         $this->url->shouldReceive('to')->with('login', [], null)->andReturn('http://foo.com/login');
         $this->url->shouldReceive('to')->with('http://foo.com/bar', [], null)->andReturn('http://foo.com/bar');
         $this->url->shouldReceive('to')->with('/', [], null)->andReturn('http://foo.com/');
+        $this->url->shouldReceive('setSessionResolver')->with(m::type('callable'));
 
         $this->session = m::mock('Illuminate\Session\Store');
 

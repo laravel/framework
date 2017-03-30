@@ -216,5 +216,9 @@ class Redirector
     public function setSession(SessionStore $session)
     {
         $this->session = $session;
+
+        $this->generator->setSessionResolver(function () {
+            return $this->session;
+        });
     }
 }
