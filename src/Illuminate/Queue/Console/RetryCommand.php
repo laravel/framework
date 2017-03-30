@@ -63,7 +63,7 @@ class RetryCommand extends Command
     /**
      * Retry the queue job.
      *
-     * @param  stdClass  $job
+     * @param  \stdClass  $job
      * @return void
      */
     protected function retryJob($job)
