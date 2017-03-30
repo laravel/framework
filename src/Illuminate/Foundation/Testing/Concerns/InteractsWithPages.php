@@ -51,6 +51,13 @@ trait InteractsWithPages
     protected $uploads = [];
 
     /**
+     * Stores the flag stating we should not test for redirections or page loads.
+     *
+     * @var bool
+     */
+    protected $suspendFollowingRedirectionsFlag;
+
+    /**
      * Visit the given URI with a GET request.
      *
      * @param  string  $uri
@@ -77,7 +84,11 @@ trait InteractsWithPages
 
         $this->call($method, $uri, $parameters, $cookies, $files);
 
-        $this->clearInputs()->followRedirects()->assertPageLoaded($uri);
+        if ($this->suspendFollowingRedirectionsFlag) {
+            $this->clearInputs();
+        } else {
+            $this->clearInputs()->followRedirects()->assertPageLoaded($uri);
+        }
 
         $this->currentUri = $this->app->make('request')->fullUrl();
 
@@ -136,6 +147,91 @@ trait InteractsWithPages
     {
         while ($this->response->isRedirect()) {
             $this->makeRequest('GET', $this->response->getTargetUrl());
+        }
+
+        return $this;
+    }
+
+    /**
+     * Allows expectation of redirections for assertions of redirect to other sites or pages.
+     *
+     * @return $this
+     */
+    public function suspendFollowingRedirections()
+    {
+        $this->suspendFollowingRedirectionsFlag = true;
+
+        return $this;
+    }
+
+    /**
+     * Disables the expected redirection previously activated by expectRedirection.
+     *
+     * @return $this
+     */
+    public function restoreFollowingRedirections()
+    {
+        $this->suspendFollowingRedirectionsFlag = false;
+
+        return $this;
+    }
+
+    /**
+     * Runs the included closures page interactions inside of a suspended redirection following state
+     * and checks if the response of these operations is a redirection. Perfect for scenarios like:.
+     *
+     *      $this->visit('/login')->click('Sign in with Github')
+     *
+     * @param  \closure  $on  The closure that will run and intercept the HttpRedirection response
+     * @param  string  $target  Target scheme://hostname/path that is expected in the redirection
+     * @param  array  $params  Parameters that must be found in the redirection target
+     *
+     * @return bool
+     */
+    public function expectRedirectionTo(\Closure $on, $target = null, $params = [])
+    {
+        try {
+            $this->suspendFollowingRedirections();
+
+            $on($this);
+
+            $this->assertInstanceOf(
+                RedirectResponse::class,
+                $this->response,
+                sprintf(
+                    'Expected [%s] but got [%s]',
+                    RedirectResponse::class,
+                    get_class($this->response)
+                )
+            );
+
+            if ($target !== null || count($params) > 0) {
+                $parsedUrl = parse_url($this->response->getTargetUrl());
+            }
+
+            if ($target !== null) {
+                $targetCompareAgainst = $parsedUrl['scheme'].'://'.$parsedUrl['host'].$parsedUrl['path'];
+                $this->assertEquals(
+                    $target,
+                    $targetCompareAgainst,
+                    sprintf(
+                        'The targetUrl [%s] doesn\'t match the expected targetUrl [%s]',
+                        $target,
+                        $targetCompareAgainst
+                    )
+                );
+            }
+
+            if (count($params) > 0) {
+                parse_str($parsedUrl['query'], $parsedQuery);
+
+                $this->assertArraySubset(
+                    $params,
+                    $parsedQuery
+                );
+            }
+        } finally {
+            $this->restoreFollowingRedirections();
         }
 
         return $this;
