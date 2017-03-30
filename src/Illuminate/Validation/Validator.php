@@ -1974,6 +1974,14 @@ class Validator implements ValidatorContract
         } catch (Exception $e) {
             //
         }
+		
+		try{
+			$dt = new DateTime();
+			$dt->setTimestamp($value);
+			return $dt;
+		} catch(Exception $e){
+			//
+		}
     }
 
     /**
