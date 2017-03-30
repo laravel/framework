@@ -165,17 +165,4 @@ class RouteCollectionTest extends TestCase
         ];
         $this->assertEquals($allRoutes, $this->routeCollection->getRoutes());
     }
-
-    public function testRouteCollectionCanRemoveRoute()
-    {
-        $route = new Route('GET', 'foo', [
-            'uses' => 'FooController@index',
-            'as' => 'foo_index',
-        ]);
-
-        $this->routeCollection->add($route);
-        $this->routeCollection->remove($route);
-
-        $this->assertCount(0, $this->routeCollection);
-    }
 }
