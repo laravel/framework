@@ -561,10 +561,14 @@ class Validator implements ValidatorContract
         $results = [];
 
         foreach ($this->messages()->toArray() as $key => $message) {
-            $results[] = explode('.', $key)[0];
+            $key = explode('.', $key)[0];
+
+            if (! isset($results[$key])) {
+                $results[$key] = $key;
+            }
         }
 
-        return array_flip(array_unique($results));
+        return array_flip($results);
     }
 
     /**
