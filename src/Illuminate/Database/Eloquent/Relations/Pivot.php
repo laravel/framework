@@ -15,6 +15,10 @@ class Pivot extends Model
     protected $parent;
 
     /**
+    * Whether to use timestamps
+    */
+    public $timestamps;
+    /**
      * The name of the foreign key column.
      *
      * @var string
