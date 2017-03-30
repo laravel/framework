@@ -3,7 +3,6 @@
 namespace Illuminate\Cache;
 
 use Memcached;
-use Carbon\Carbon;
 use ReflectionMethod;
 use Illuminate\Contracts\Cache\Store;
 
@@ -100,7 +99,7 @@ class MemcachedStore extends TaggableStore implements Store
      */
     public function put($key, $value, $minutes)
     {
-        $this->memcached->set($this->prefix.$key, $value, $this->toTimestamp($minutes));
+        $this->memcached->set($this->prefix.$key, $value, (int) ($minutes * 60));
     }
 
     /**
@@ -118,7 +117,7 @@ class MemcachedStore extends TaggableStore implements Store
             $prefixedValues[$this->prefix.$key] = $value;
         }
 
-        $this->memcached->setMulti($prefixedValues, $this->toTimestamp($minutes));
+        $this->memcached->setMulti($prefixedValues, (int) ($minutes * 60));
     }
 
     /**
@@ -131,7 +130,7 @@ class MemcachedStore extends TaggableStore implements Store
      */
     public function add($key, $value, $minutes)
     {
-        return $this->memcached->add($this->prefix.$key, $value, $this->toTimestamp($minutes));
+        return $this->memcached->add($this->prefix.$key, $value, (int) ($minutes * 60));
     }
 
     /**
@@ -189,17 +188,6 @@ class MemcachedStore extends TaggableStore implements Store
     public function flush()
     {
         $this->memcached->flush();
-    }
-
-    /**
-     * Get the UNIX timestamp for the given number of minutes.
-     *
-     * @param  int  $minutes
-     * @return int
-     */
-    protected function toTimestamp($minutes)
-    {
-        return $minutes > 0 ? Carbon::now()->addSeconds($minutes * 60)->getTimestamp() : 0;
     }
 
     /**
