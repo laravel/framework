@@ -1051,7 +1051,7 @@ class Validator implements ValidatorContract
             return true;
         }
 
-        return is_null($value) || filter_var($value, FILTER_VALIDATE_INT) !== false;
+        return is_null($value) || is_numeric($value) && filter_var($value, FILTER_VALIDATE_INT) !== false;
     }
 
     /**
