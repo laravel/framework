@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use PHPUnit_Framework_Assert as PHPUnit;
 use PHPUnit_Framework_ExpectationFailedException;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
@@ -580,6 +581,12 @@ trait MakesHttpRequests
         $request = Request::createFromBase($symfonyRequest);
 
         $response = $kernel->handle($request);
+
+        // if response is an instance of RedirectResponse & session is not null
+        // then reflash the session data to the next request
+        if ($response instanceof RedirectResponse && $response->getSession()) {
+            $response->getSession()->reflash();
+        }
 
         $kernel->terminate($request, $response);
 
