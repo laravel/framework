@@ -429,11 +429,13 @@ class Validator implements ValidatorContract
 
             foreach ($rules as $rule) {
                 $this->validateAttribute($attribute, $rule);
-
                 if ($this->shouldStopValidating($attribute)) {
                     break;
                 }
             }
+             if ($this->shouldStopValidation($attribute)) {
+                 break;
+             }
         }
 
         // Here we will spin through all of the "after" hooks on this validator and
@@ -743,30 +745,66 @@ class Validator implements ValidatorContract
         return true;
     }
 
-    /**
-     * Check if we should stop further validations on a given attribute.
-     *
-     * @param  string  $attribute
-     * @return bool
-     */
-    protected function shouldStopValidating($attribute)
-    {
-        if ($this->hasRule($attribute, ['Bail'])) {
-            return $this->messages->has($attribute);
-        }
+     /**
+      * Check if we should stop further validations on a given attribute.
+      *
+      * @param  string  $attribute
+      * @return bool
+      */
+     protected function shouldStopValidating($attribute)
+     {
+         return $this->shouldStop($attribute, 'Bail');
+     }
 
-        if (isset($this->failedRules[$attribute]) &&
-            in_array('uploaded', array_keys($this->failedRules[$attribute]))) {
-            return true;
-        }
+     /**
+      * "Break" on first rule fail.
+      *
+      * Always returns true, just lets us put "stop" in rules.
+      *
+      * @return bool
+      */
+     protected function validateStop()
+     {
+         return true;
+     }
 
-        // In case the attribute has any rule that indicates that the field is required
-        // and that rule already failed then we should stop validation at this point
-        // as now there is no point in calling other rules with this field empty.
-        return $this->hasRule($attribute, $this->implicitRules) &&
-               isset($this->failedRules[$attribute]) &&
-               array_intersect(array_keys($this->failedRules[$attribute]), $this->implicitRules);
-    }
+     /**
+      * Check if we should stop further validations after attribute rule fails
+      *
+      * @param  string  $attribute
+      * @return bool
+      */
+     protected function shouldStopValidation($attribute)
+     {
+         return $this->shouldStop($attribute, 'Stop');
+     }
+
+     /**
+      * Stop on error if the specified rule is assigned and attribute has a message.
+      *
+      * @param $attribute
+      * @param $rule
+      * @return bool
+      */
+     protected function shouldStop($attribute, $rule)
+     {
+         if ($this->hasRule($attribute, $rule)) {
+             return $this->messages->has($attribute);
+         }
+
+         if (isset($this->failedRules[$attribute]) &&
+             in_array('uploaded', array_keys($this->failedRules[$attribute]))) {
+             return true;
+         }
+
+         // In case the attribute has any rule that indicates that the field is required
+         // and that rule already failed then we should stop validation at this point
+         // as now there is no point in calling other rules with this field empty.
+         return $this->hasRule($attribute, $this->implicitRules) &&
+         isset($this->failedRules[$attribute]) &&
+         array_intersect(array_keys($this->failedRules[$attribute]), $this->implicitRules);
+     }
+
 
     /**
      * Validate that a required attribute exists.
