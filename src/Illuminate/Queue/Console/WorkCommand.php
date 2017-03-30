@@ -83,6 +83,13 @@ class WorkCommand extends Command
         $response = $this->runWorker(
             $connection, $queue
         );
+
+        //When using the command as daemon, you use the restart command to stop the queue
+        //The command set the following cache value to tell the queue to stop
+        //Since the TTL of that value is forever, it can leads to problems with memcache not updating correctly
+        //which could make the queue not reusable without restarting memcache (or removing the value manually)
+        //See https://github.com/laravel/framework/issues/15155
+        $this->laravel['cache']->forget('illuminate:queue:restart');
     }
 
     /**
