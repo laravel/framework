@@ -96,7 +96,9 @@ trait AuthenticatesUsers
      */
     protected function sendLoginResponse(Request $request)
     {
-        $request->session()->regenerate();
+        if ($request->hasSession()) {
+            $request->session()->regenerate();
+        }
 
         $this->clearLoginAttempts($request);
 
@@ -151,9 +153,11 @@ trait AuthenticatesUsers
     {
         $this->guard()->logout();
 
-        $request->session()->flush();
+        if ($request->hasSession()) {
+            $request->session()->flush();
 
-        $request->session()->regenerate();
+            $request->session()->regenerate();
+        }
 
         return redirect('/');
     }
