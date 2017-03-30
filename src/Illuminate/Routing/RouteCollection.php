@@ -65,17 +65,13 @@ class RouteCollection implements Countable, IteratorAggregate
     public function remove(Route $route)
     {
         $domainAndUri = $route->domain().$route->uri();
-        $controller = trim($route->getAction()['uses'], '\\');
 
         foreach ($route->methods() as $method) {
             unset($this->routes[$method][$domainAndUri]);
         }
 
         unset($this->allRoutes[$method.$domainAndUri]);
-
-        if ($controller && isset($this->actionList[$controller])) {
-            unset($this->actionList[$controller]);
-        }
+        unset($this->actionList[trim($route->getAction()['controller'], '\\')]);
 
         $this->refreshNameLookups();
     }
