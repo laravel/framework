@@ -253,8 +253,9 @@ class TransformableResponse extends JsonResponse
      *
      * @param  string  $mutators
      * @param  mixed  $value
-     * @throws Exception
      * @return mixed
+     *
+     * @throws \Exception
      */
     public function performMutations($mutators, $value)
     {
