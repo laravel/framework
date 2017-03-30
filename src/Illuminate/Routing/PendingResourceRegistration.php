@@ -5,27 +5,6 @@ namespace Illuminate\Routing;
 class PendingResourceRegistration
 {
     /**
-     * The resource name.
-     *
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * The resource controller.
-     *
-     * @var string
-     */
-    protected $controller;
-
-    /**
-     * The resource options.
-     *
-     * @var string
-     */
-    protected $options = [];
-
-    /**
      * The resource registrar.
      *
      * @var \Illuminate\Routing\ResourceRegistrar
@@ -33,39 +12,37 @@ class PendingResourceRegistration
     protected $registrar;
 
     /**
+     * The resource information.
+     *
+     * @var array
+     */
+    protected $resource;
+
+    /**
      * Create a new pending resource registration instance.
      *
      * @param  \Illuminate\Routing\ResourceRegistrar  $registrar
+     * @param  array  $resource
      * @return void
      */
-    public function __construct(ResourceRegistrar $registrar)
+    public function __construct(ResourceRegistrar $registrar, array $resource)
     {
         $this->registrar = $registrar;
+        $this->resource = $resource;
     }
 
     /**
-     * Handle the object's destruction.
+     * Route a resource to a controller.
      *
      * @return void
      */
-    public function __destruct()
+    public function register()
     {
-        $this->registrar->register($this->name, $this->controller, $this->options);
-    }
-
-    /**
-     * The name, controller and options to use when ready to register.
-     *
-     * @param  string  $name
-     * @param  string  $controller
-     * @param  array   $options
-     * @return void
-     */
-    public function remember($name, $controller, array $options)
-    {
-        $this->name = $name;
-        $this->controller = $controller;
-        $this->options = $options;
+        $this->registrar->register(
+            $this->resource['name'],
+            $this->resource['controller'],
+            $this->resource['options']
+        );
     }
 
     /**
@@ -75,7 +52,7 @@ class PendingResourceRegistration
      */
     public function only($methods)
     {
-        $this->options['only'] = is_array($methods) ? $methods : func_get_args();
+        $this->resource['options']['only'] = is_array($methods) ? $methods : func_get_args();
     }
 
     /**
@@ -85,6 +62,6 @@ class PendingResourceRegistration
      */
     public function except($methods)
     {
-        $this->options['except'] = is_array($methods) ? $methods : func_get_args();
+        $this->resource['options']['except'] = is_array($methods) ? $methods : func_get_args();
     }
 }
