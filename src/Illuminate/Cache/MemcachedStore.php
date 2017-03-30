@@ -82,6 +82,7 @@ class MemcachedStore extends TaggableStore implements Store
      */
     public function put($key, $value, $minutes)
     {
+        $minutes = max(1, $minutes);
         $this->memcached->set($this->prefix.$key, $value, $minutes * 60);
     }
 
@@ -99,6 +100,8 @@ class MemcachedStore extends TaggableStore implements Store
         foreach ($values as $key => $value) {
             $prefixedValues[$this->prefix.$key] = $value;
         }
+
+        $minutes = max(1, $minutes);
 
         $this->memcached->setMulti($prefixedValues, $minutes * 60);
     }
@@ -149,7 +152,7 @@ class MemcachedStore extends TaggableStore implements Store
      */
     public function forever($key, $value)
     {
-        $this->put($key, $value, 0);
+        $this->memcached->set($this->prefix.$key, $value);
     }
 
     /**
