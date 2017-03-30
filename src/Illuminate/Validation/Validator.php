@@ -1019,6 +1019,31 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Validate that the current logged in user's password matches the given value.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @param  array   $parameters
+     * @return bool
+     */
+    protected function validatePassword($attribute, $value, $parameters)
+    {
+        $hasher = $this->container->make('hash');
+
+        if ($givenPasswordHash = Arr::first($parameters)) {
+            return $hasher->check($value, $givenPasswordHash);
+        }
+
+        $auth = $this->container->make('auth');
+
+        if ($auth->guest()) {
+            return false;
+        }
+
+        return $hasher->check($value, $auth->user()->getAuthPassword());
+    }
+
+    /**
      * Validate that an attribute has a matching confirmation.
      *
      * @param  string  $attribute

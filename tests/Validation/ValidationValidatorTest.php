@@ -859,6 +859,88 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('The value of foo.2 does not exist in bar.*.', $v->messages()->first('foo.2'));
     }
 
+    public function testValidatePassword()
+    {
+        // Fails when user is not logged in.
+        $auth = m::mock(Illuminate\Contracts\Auth\Guard::class);
+        $auth->shouldReceive('guest')->andReturn(true);
+
+        $hasher = m::mock(Illuminate\Contracts\Hashing\Hasher::class);
+
+        $container = m::mock(Illuminate\Container\Container::class);
+        $container->shouldReceive('make')->with('auth')->andReturn($auth);
+        $container->shouldReceive('make')->with('hash')->andReturn($hasher);
+
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['password' => 'foo'], ['password' => 'password']);
+        $v->setContainer($container);
+        $this->assertFalse($v->passes());
+
+        // Fails when password is incorrect.
+        $user = m::mock(Illuminate\Contracts\Auth\Authenticatable::class);
+        $user->shouldReceive('getAuthPassword');
+
+        $auth = m::mock(Illuminate\Contracts\Auth\Guard::class);
+        $auth->shouldReceive('guest')->andReturn(false);
+        $auth->shouldReceive('user')->andReturn($user);
+
+        $hasher = m::mock(Illuminate\Contracts\Hashing\Hasher::class);
+        $hasher->shouldReceive('check')->andReturn(false);
+
+        $container = m::mock(Illuminate\Container\Container::class);
+        $container->shouldReceive('make')->with('auth')->andReturn($auth);
+        $container->shouldReceive('make')->with('hash')->andReturn($hasher);
+
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['password' => 'foo'], ['password' => 'password']);
+        $v->setContainer($container);
+        $this->assertFalse($v->passes());
+
+        // Succeeds when password is correct.
+        $user = m::mock(Illuminate\Contracts\Auth\Authenticatable::class);
+        $user->shouldReceive('getAuthPassword');
+
+        $auth = m::mock(Illuminate\Contracts\Auth\Guard::class);
+        $auth->shouldReceive('guest')->andReturn(false);
+        $auth->shouldReceive('user')->andReturn($user);
+
+        $hasher = m::mock(Illuminate\Contracts\Hashing\Hasher::class);
+        $hasher->shouldReceive('check')->andReturn(true);
+
+        $container = m::mock(Illuminate\Container\Container::class);
+        $container->shouldReceive('make')->with('auth')->andReturn($auth);
+        $container->shouldReceive('make')->with('hash')->andReturn($hasher);
+
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['password' => 'foo'], ['password' => 'password']);
+        $v->setContainer($container);
+        $this->assertTrue($v->passes());
+
+        // Fails for an incorrect given hash.
+        $hasher = m::mock(Illuminate\Contracts\Hashing\Hasher::class);
+        $hasher->shouldReceive('check')->andReturn(false);
+
+        $container = m::mock(Illuminate\Container\Container::class);
+        $container->shouldReceive('make')->with('hash')->andReturn($hasher);
+
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['password' => 'foo'], ['password' => 'password:incorrecthash']);
+        $v->setContainer($container);
+        $this->assertFalse($v->passes());
+
+        // Succeeds for a correct hash.
+        $hasher = m::mock(Illuminate\Contracts\Hashing\Hasher::class);
+        $hasher->shouldReceive('check')->andReturn(true);
+
+        $container = m::mock(Illuminate\Container\Container::class);
+        $container->shouldReceive('make')->with('hash')->andReturn($hasher);
+
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['password' => 'foo'], ['password' => 'password:correcthash']);
+        $v->setContainer($container);
+        $this->assertTrue($v->passes());
+    }
+
     public function testValidateConfirmed()
     {
         $trans = $this->getIlluminateArrayTranslator();
