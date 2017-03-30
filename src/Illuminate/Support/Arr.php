@@ -516,4 +516,18 @@ class Arr
     {
         return array_filter($array, $callback, ARRAY_FILTER_USE_BOTH);
     }
+    
+    /**
+     * MagdSoft addition
+     * 
+     * Checks if the value is already an array, if not, creates an array with
+     *   only the value  i.e. [$value]
+     * 
+     * @param  mixed $value
+     * @return array the result
+     */
+    public static function make($value)
+    {
+        return is_array($value) ? $value : [$value];
+    }
 }

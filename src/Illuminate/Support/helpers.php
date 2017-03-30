@@ -302,6 +302,23 @@ if (! function_exists('array_where')) {
     }
 }
 
+
+if (! function_exists('array_make')) {
+    /**
+     * MagdSoft addition
+     * 
+     * Checks if the value is already an array, if not, creates an array with
+     *   only the value  i.e. [$value]
+     * 
+     * @param  mixed $value
+     * @return array the result
+     */
+    function array_make($value)
+    {
+        return Arr::make($value);
+    }
+}
+
 if (! function_exists('camel_case')) {
     /**
      * Convert a value to camel case.
@@ -888,5 +905,29 @@ if (! function_exists('with')) {
     function with($object)
     {
         return $object;
+    }
+}
+
+if (! function_exists('compare_multiple')) {
+    /**
+     * MagdSoft addition
+     * 
+     * Compares multiple values, returns true if all are equal
+     * 
+     * @param array $values (must be indexed array)
+     * @return boolean Whether each of the the $values are equal
+     */
+    function compare_multiple($values) {
+        if (!isset($values[0])) { throw new \Exception('{$values} must be an indexed array has at least one element'); }
+        // Cache the first value
+        $val = $values[0];
+        // Iterate through values
+        foreach($values as $value) {
+            // If found a different value, exit
+            if ($value != $val) {
+                return false;
+            }
+        }
+        return true;
     }
 }

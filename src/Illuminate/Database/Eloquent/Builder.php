@@ -1122,6 +1122,85 @@ class Builder
     }
 
     /**
+     * MagdSoft addition
+     * 
+     * Add subselect queries to operate aggregate operation on relations.
+     *
+     * @param  mixed  $relations   One or array of relation name (maybe
+     *                               [name => constraint] where constraint is a
+     *                               Closure
+     * @param  mixed  $aggregates  One or array of the aggregates wanted to be
+     *                              invoked (respective to relation order)
+     * @param  mixed  $params      One or array of the parameters to aggregates
+     *                              (optional, put null if you want to put 
+     *                               relation table name)
+     * @param  mixed  $aliases     One or array of the aliases (optional, put
+     *                              null if you want to put default alias)
+     * @return $this
+     */
+    public function withAggregate($relations, $aggregates, $params = [null], $aliases = [null])
+    {
+        if (is_null($this->query->columns)) {
+            $this->query->select(['*']);
+        }
+
+        $relations = array_make($relations);
+        $aggregates = array_make($aggregates);
+        $aliases = array_make($aliases);
+        $params = array_make($params);
+
+        // For performance, make the check only in debug env
+        if (env("APP_DEBUG") == "true") {
+            // Assert that the arrays are equal in count
+            if (!compare_multiple([count($relations), count($aggregates)])) {
+                throw new \Exception("Parameters to withAggregate are not equal in counts");
+            }
+            
+        }
+
+        $i = 0;
+        
+        foreach ($this->parseWithRelations($relations) as $name => $constraints) {
+            $agg =  $aggregates[$i];
+            $param = isset($params[$i]) ? $params[$i] : null;
+            
+            // First we will determine if the name has been aliased using an "as" clause on the name
+            // and if it has we will extract the actual relationship name and the desired name of
+            // the resulting column. This allows multiple counts on the same relationship name.
+            $segments = explode(' ', $name);
+
+            if (count($segments) == 3 && Str::lower($segments[1]) == 'as') {
+                list($name, $alias) = [$segments[0], $segments[2]];
+            }
+
+            $relation = $this->getHasRelationQuery($name);
+
+            // Here we will get the relationship aggregate query and prepare to add it to the main query
+            // as a sub-select. First, we'll get the "has" query and use that to get the relation
+            // aggregate query. We will normalize the relation name then append _$aggregate as the name,
+            // or put names from name
+            $query = $relation->getRelationAggregateQuery(
+                $relation->getRelated()->newQuery(), $this, $agg, $param
+            );
+
+            $query->callScope($constraints);
+
+            $query->mergeModelDefinedRelationConstraints($relation->getQuery());
+
+            // Finally we will add the proper result column alias to the query and run the subselect
+            // statement against the query builder. Then we will return the builder instance back
+            // to the developer for further constraint chaining that needs to take place on it.
+            $column = isset($aliases[$i]) ? $aliases[$i] : snake_case(isset($alias) ? $alias : $name).'_' . $agg;
+
+            $this->selectSub($query->toBase(), $column);
+            
+            $i++;
+        }
+
+        return $this;
+    }
+
+    /**
      * Parse a list of relations into individuals.
      *
      * @param  array  $relations
