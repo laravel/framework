@@ -171,6 +171,20 @@ class Pivot extends Model
     }
 
     /**
+     * Get the casts array.
+     *
+     * @return array
+     */
+    public function getCasts()
+    {
+        if ($this->parent && method_exists($this->parent, 'getCasts')) {
+            return $this->parent->getCasts();
+        }
+
+        return parent::getCasts();
+    }
+
+    /**
      * Get the name of the "created at" column.
      *
      * @return string
