@@ -81,6 +81,13 @@ abstract class AbstractPaginator implements Htmlable
     protected static $viewFactoryResolver;
 
     /**
+     * The toArray resolver callback.
+     *
+     * @var \Closure
+     */
+    protected static $toArrayResolver;
+
+    /**
      * The default pagination view.
      *
      * @var string
@@ -386,6 +393,17 @@ abstract class AbstractPaginator implements Htmlable
     public static function viewFactoryResolver(Closure $resolver)
     {
         static::$viewFactoryResolver = $resolver;
+    }
+
+    /**
+     * Set the toArray resolver callback.
+     *
+     * @param  \Closure $callback
+     * @return void
+     */
+    public static function toArrayResolver(Closure $callback)
+    {
+        static::$toArrayResolver = $callback;
     }
 
     /**

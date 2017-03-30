@@ -150,6 +150,10 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
      */
     public function toArray()
     {
+        if (isset(static::$toArrayResolver)) {
+            return call_user_func(static::$toArrayResolver, $this);
+        }
+
         return [
             'total' => $this->total(),
             'per_page' => $this->perPage(),
