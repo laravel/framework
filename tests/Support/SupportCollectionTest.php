@@ -819,6 +819,11 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $random = $data->random(3);
         $this->assertInstanceOf(Collection::class, $random);
         $this->assertCount(3, $random);
+
+        $random = $data->random(2, 5);
+        $count = $random->count();
+        $this->assertGreaterThanOrEqual(2, $count);
+        $this->assertLessThanOrEqual(5, $count);
     }
 
     /**
