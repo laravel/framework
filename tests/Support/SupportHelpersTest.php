@@ -149,6 +149,36 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         }));
     }
 
+    public function testArrayMapWithKeys()
+    {
+        $array = [
+            [
+                'id' => 5,
+                'name' => 'John',
+                'department' => 'Sales',
+                'email' => 'john@example.com',
+            ],
+            [
+                'id' => 7,
+                'name' => 'Jane',
+                'department' => 'Marketing',
+                'email' => 'jane@example.com',
+            ],
+        ];
+
+        $mapped = array_map_with_keys(
+            function ($item) {
+                return [$item['id'] => $item['name']];
+            }, $array);
+
+        $expected = [
+            5 => 'John',
+            7 => 'Jane',
+        ];
+
+        $this->assertEquals($mapped, $expected);
+    }
+
     public function testArrayPluck()
     {
         $data = [

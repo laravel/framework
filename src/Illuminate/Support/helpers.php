@@ -57,6 +57,29 @@ if (! function_exists('array_collapse')) {
     }
 }
 
+if (! function_exists('array_collapse_with_keys')) {
+    /**
+     * Collapse an array of arrays into a single array, avoids using array_merge to preserve the keys.
+     *
+     * @param $parent
+     * @return array
+     */
+    function array_collapse_with_keys($parent)
+    {
+        $result = [];
+
+        foreach ($parent as $child) {
+            if (is_array($child)) {
+                foreach ($child as $key => $value) {
+                    $result[$key] = $value;
+                }
+            }
+        }
+
+        return $result;
+    }
+}
+
 if (! function_exists('array_divide')) {
     /**
      * Divide an array into two arrays. One with keys and the other with values.
@@ -182,6 +205,24 @@ if (! function_exists('array_last')) {
     function array_last($array, callable $callback = null, $default = null)
     {
         return Arr::last($array, $callback, $default);
+    }
+}
+
+if (! function_exists('array_map_with_keys')) {
+    /**
+     * Run an associative map over each of the items, preserving keys.
+     *
+     * The callback should return an associative array with a single key/value pair.
+     *
+     * @param $callback
+     * @param $array
+     * @return array
+     */
+    function array_map_with_keys($callback, $array)
+    {
+        $mapped = array_map($callback, $array);
+
+        return array_collapse_with_keys($mapped);
     }
 }
 
