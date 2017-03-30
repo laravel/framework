@@ -957,7 +957,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return $this->items[$keys];
         }
 
-        $keys = array_wrap($keys);
+        $keys = Arr::wrap($keys);
 
         return new static(array_intersect_key($this->items, array_flip($keys)));
     }

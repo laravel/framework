@@ -4,6 +4,7 @@ namespace Illuminate\Broadcasting;
 
 use ReflectionClass;
 use ReflectionProperty;
+use Illuminate\Support\Arr;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -44,7 +45,7 @@ class BroadcastEvent implements ShouldQueue
                 ? $this->event->broadcastAs() : get_class($this->event);
 
         $broadcaster->broadcast(
-            array_wrap($this->event->broadcastOn()), $name,
+            Arr::wrap($this->event->broadcastOn()), $name,
             $this->getPayloadFromEvent($this->event)
         );
     }

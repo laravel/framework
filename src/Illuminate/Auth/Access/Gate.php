@@ -2,6 +2,7 @@
 
 namespace Illuminate\Auth\Access;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Contracts\Container\Container;
@@ -236,7 +237,7 @@ class Gate implements GateContract
             return false;
         }
 
-        $arguments = array_wrap($arguments);
+        $arguments = Arr::wrap($arguments);
 
         // First we will call the "before" callbacks for the Gate. If any of these give
         // back a non-null response, we will immediately return that result in order
