@@ -1011,6 +1011,24 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($results));
     }
 
+    public function testForPageAfterIdDoesntProduceRedundantClauses()
+    {
+        $query = EloquentTestUser::query();
+
+        $this->assertNull($query->toBase()->wheres);
+        $this->assertNull($query->toBase()->orders);
+
+        $query->forPageAfterId(15, 1);
+
+        $this->assertCount(1, $query->toBase()->wheres);
+        $this->assertCount(1, $query->toBase()->orders);
+
+        $query->forPageAfterId(15, 1);
+
+        $this->assertCount(1, $query->toBase()->wheres);
+        $this->assertCount(1, $query->toBase()->orders);
+    }
+
     public function testMorphToRelationsAcrossDatabaseConnections()
     {
         $item = null;

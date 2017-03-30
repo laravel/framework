@@ -8,7 +8,6 @@ use BadMethodCallException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Arrayable;
@@ -1493,14 +1492,32 @@ class Builder
      */
     public function forPageAfterId($perPage = 15, $lastId = 0, $column = 'id')
     {
-        $this->orders = Collection::make($this->orders)
-                ->reject(function ($order) use ($column) {
-                    return $order['column'] === $column;
-                })->values()->all();
+        $this->wheres = $this->filterOutClauses($this->wheres, $column);
+        $this->orders = $this->filterOutClauses($this->orders, $column);
 
         return $this->where($column, '>', $lastId)
                     ->orderBy($column, 'asc')
                     ->take($perPage);
+    }
+
+    /**
+     * Filter out clauses on a given column from an array of clauses.
+     *
+     * @param  array  $clauses
+     * @param  string  $column
+     * @return array
+     */
+    protected function filterOutClauses($clauses, $column)
+    {
+        if (is_null($clauses)) {
+            return;
+        }
+
+        $clauses = array_filter($clauses, function ($clause) use ($column) {
+            return $clause['column'] !== $column;
+        });
+
+        return array_values($clauses);
     }
 
     /**
