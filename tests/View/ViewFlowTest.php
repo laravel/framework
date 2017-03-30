@@ -31,7 +31,7 @@ class ViewFlowTest extends PHPUnit_Framework_TestCase
     public function testPushWithExtend()
     {
         $files = new Filesystem;
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__, $this->getViewFinder());
 
         $files->put($this->tempDir.'/child.php', $compiler->compileString('
 @extends("layout")
@@ -52,7 +52,7 @@ Hello
     public function testPushWithMultipleExtends()
     {
         $files = new Filesystem;
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__, $this->getViewFinder());
 
         $files->put($this->tempDir.'/a.php', $compiler->compileString('
 a
@@ -77,7 +77,7 @@ c
     public function testPushWithInputAndExtend()
     {
         $files = new Filesystem;
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__, $this->getViewFinder());
 
         $files->put($this->tempDir.'/aa.php', $compiler->compileString('
 a
@@ -102,7 +102,7 @@ c
     public function testExtends()
     {
         $files = new Filesystem;
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__, $this->getViewFinder());
 
         $files->put($this->tempDir.'/extends-a.php', $compiler->compileString('
 yield:
@@ -128,7 +128,7 @@ c
     public function testExtendsWithParent()
     {
         $files = new Filesystem;
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__, $this->getViewFinder());
 
         $files->put($this->tempDir.'/extends-layout.php', $compiler->compileString('
 yield:
@@ -154,7 +154,7 @@ child
     public function testExtendsWithVariable()
     {
         $files = new Filesystem;
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__, $this->getViewFinder());
 
         $files->put($this->tempDir.'/extends-variable-layout.php', $compiler->compileString('
 yield:
@@ -214,5 +214,10 @@ dad
     protected function getFiles()
     {
         return m::mock('Illuminate\Filesystem\Filesystem');
+    }
+
+    protected function getViewFinder()
+    {
+        return m::mock(\Illuminate\View\ViewFinderInterface::class);
     }
 }
