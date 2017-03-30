@@ -371,6 +371,8 @@ class Router implements RegistrarContract
 
         $new['prefix'] = static::formatGroupPrefix($new, $old);
 
+        $new['suffix'] = static::formatGroupSuffix($new, $old);
+
         if (isset($new['domain'])) {
             unset($old['domain']);
         }
@@ -384,7 +386,7 @@ class Router implements RegistrarContract
             $new['as'] = $old['as'].(isset($new['as']) ? $new['as'] : '');
         }
 
-        return array_merge_recursive(Arr::except($old, ['namespace', 'prefix', 'where', 'as']), $new);
+        return array_merge_recursive(Arr::except($old, ['namespace', 'prefix', 'suffix', 'where', 'as']), $new);
     }
 
     /**
@@ -424,6 +426,24 @@ class Router implements RegistrarContract
     }
 
     /**
+     * Format the suffix for the new group attributes.
+     *
+     * @param  array  $new
+     * @param  array  $old
+     * @return string|null
+     */
+    protected static function formatGroupSuffix($new, $old)
+    {
+        $oldSuffix = isset($old['suffix']) ? $old['suffix'] : null;
+
+        if (isset($new['suffix'])) {
+            return trim($new['suffix']).trim($oldSuffix);
+        }
+
+        return $oldSuffix;
+    }
+
+    /**
      * Get the prefix from the last group on the stack.
      *
      * @return string
@@ -434,6 +454,22 @@ class Router implements RegistrarContract
             $last = end($this->groupStack);
 
             return isset($last['prefix']) ? $last['prefix'] : '';
+        }
+
+        return '';
+    }
+
+    /**
+     * Get the suffix from the last group on the stack.
+     *
+     * @return string
+     */
+    public function getLastGroupSuffix()
+    {
+        if (! empty($this->groupStack)) {
+            $last = end($this->groupStack);
+
+            return isset($last['suffix']) ? $last['suffix'] : '';
         }
 
         return '';
@@ -470,7 +506,7 @@ class Router implements RegistrarContract
         }
 
         $route = $this->newRoute(
-            $methods, $this->prefix($uri), $action
+            $methods, $this->prefix($this->suffix($uri)), $action
         );
 
         // If we have groups that need to be merged, we will merge them now after this
@@ -509,6 +545,17 @@ class Router implements RegistrarContract
     protected function prefix($uri)
     {
         return trim(trim($this->getLastGroupPrefix(), '/').'/'.trim($uri, '/'), '/') ?: '/';
+    }
+
+    /**
+     * Suffix the given URI with the last suffix.
+     *
+     * @param  string  $uri
+     * @return string
+     */
+    protected function suffix($uri)
+    {
+        return trim($uri).trim($this->getLastGroupSuffix());
     }
 
     /**

@@ -694,26 +694,29 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
     public function testGroupMerging()
     {
         $old = ['prefix' => 'foo/bar/'];
-        $this->assertEquals(['prefix' => 'foo/bar/baz', 'namespace' => null, 'where' => []], Router::mergeGroup(['prefix' => 'baz'], $old));
+        $this->assertEquals(['prefix' => 'foo/bar/baz', 'suffix' => null, 'namespace' => null, 'where' => []], Router::mergeGroup(['prefix' => 'baz'], $old));
+
+        $old = ['suffix' => '.bar'];
+        $this->assertEquals(['prefix' => null, 'suffix' => '.foo.bar', 'namespace' => null, 'where' => []], Router::mergeGroup(['suffix' => '.foo'], $old));
 
         $old = ['domain' => 'foo'];
-        $this->assertEquals(['domain' => 'baz', 'prefix' => null, 'namespace' => null, 'where' => []], Router::mergeGroup(['domain' => 'baz'], $old));
+        $this->assertEquals(['domain' => 'baz', 'prefix' => null, 'suffix' => null, 'namespace' => null, 'where' => []], Router::mergeGroup(['domain' => 'baz'], $old));
 
         $old = ['as' => 'foo.'];
-        $this->assertEquals(['as' => 'foo.bar', 'prefix' => null, 'namespace' => null, 'where' => []], Router::mergeGroup(['as' => 'bar'], $old));
+        $this->assertEquals(['as' => 'foo.bar', 'prefix' => null, 'suffix' => null, 'namespace' => null, 'where' => []], Router::mergeGroup(['as' => 'bar'], $old));
 
         $old = ['where' => ['var1' => 'foo', 'var2' => 'bar']];
-        $this->assertEquals(['prefix' => null, 'namespace' => null, 'where' => [
+        $this->assertEquals(['prefix' => null, 'suffix' => null, 'namespace' => null, 'where' => [
             'var1' => 'foo', 'var2' => 'baz', 'var3' => 'qux',
         ]], Router::mergeGroup(['where' => ['var2' => 'baz', 'var3' => 'qux']], $old));
 
         $old = [];
-        $this->assertEquals(['prefix' => null, 'namespace' => null, 'where' => [
+        $this->assertEquals(['prefix' => null, 'suffix' => null, 'namespace' => null, 'where' => [
             'var1' => 'foo', 'var2' => 'bar',
         ]], Router::mergeGroup(['where' => ['var1' => 'foo', 'var2' => 'bar']], $old));
     }
 
-    public function testRouteGrouping()
+    public function testRouteGroupingPrefix()
     {
         /*
          * getPrefix() method
@@ -729,7 +732,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $routes[0]->getPrefix());
     }
 
-    public function testRouteGroupingWithAs()
+    public function testRouteGroupingPrefixWithAs()
     {
         $router = $this->getRouter();
         $router->group(['prefix' => 'foo', 'as' => 'Foo::'], function () use ($router) {
@@ -742,7 +745,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('foo/bar', $route->getPath());
     }
 
-    public function testNestedRouteGroupingWithAs()
+    public function testNestedRouteGroupingPrefixWithAs()
     {
         /*
          * nested with all layers present
@@ -775,7 +778,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('foo/bar/baz', $route->getPath());
     }
 
-    public function testRouteMiddlewareMergeWithMiddlewareAttributesAsStrings()
+    public function testRouteMiddlewareMergeWithMiddlewareAttributesAsStringsPrefix()
     {
         $router = $this->getRouter();
         $router->group(['prefix' => 'foo', 'middleware' => 'boo:foo'], function () use ($router) {
@@ -828,6 +831,123 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $routes = $routes->getRoutes();
         $routes[0]->prefix('prefix');
         $this->assertEquals('prefix', $routes[0]->uri());
+    }
+
+    public function testRouteGroupingSuffix()
+    {
+        /*
+         * getSuffix() method
+         */
+        $router = $this->getRouter();
+        $router->group(['suffix' => '.foo'], function () use ($router) {
+            $router->get('bar', function () {
+                return 'hello';
+            });
+        });
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+        $this->assertEquals('.foo', $routes[0]->getSuffix());
+    }
+
+    public function testRouteGroupingSuffixWithAs()
+    {
+        $router = $this->getRouter();
+        $router->group(['suffix' => '.foo', 'as' => 'Foo::'], function () use ($router) {
+            $router->get('bar', ['as' => 'bar', function () {
+                return 'hello';
+            }]);
+        });
+        $routes = $router->getRoutes();
+        $route = $routes->getByName('Foo::bar');
+        $this->assertEquals('bar.foo', $route->getPath());
+    }
+
+    public function testNestedRouteGroupingSuffixWithAs()
+    {
+        /*
+         * nested with all layers present
+         */
+        $router = $this->getRouter();
+        $router->group(['suffix' => '.foo', 'as' => 'Foo::'], function () use ($router) {
+            $router->group(['suffix' => '.bar', 'as' => 'Bar::'], function () use ($router) {
+                $router->get('baz', ['as' => 'baz', function () {
+                    return 'hello';
+                }]);
+            });
+        });
+        $routes = $router->getRoutes();
+        $route = $routes->getByName('Foo::Bar::baz');
+        $this->assertEquals('baz.bar.foo', $route->getPath());
+
+        /*
+         * nested with layer skipped
+         */
+        $router = $this->getRouter();
+        $router->group(['suffix' => '.foo', 'as' => 'Foo::'], function () use ($router) {
+            $router->group(['suffix' => '.bar'], function () use ($router) {
+                $router->get('baz', ['as' => 'baz', function () {
+                    return 'hello';
+                }]);
+            });
+        });
+        $routes = $router->getRoutes();
+        $route = $routes->getByName('Foo::baz');
+        $this->assertEquals('baz.bar.foo', $route->getPath());
+    }
+
+    public function testRouteMiddlewareMergeWithMiddlewareAttributesAsStringsSuffix()
+    {
+        $router = $this->getRouter();
+        $router->group(['suffix' => '.foo', 'middleware' => 'boo:foo'], function () use ($router) {
+            $router->get('bar', function () {
+                return 'hello';
+            })->middleware('baz:gaz');
+        });
+        $routes = $router->getRoutes()->getRoutes();
+        $route = $routes[0];
+        $this->assertEquals(
+            ['boo:foo', 'baz:gaz'],
+            $route->middleware()
+        );
+    }
+
+    public function testRouteSuffixing()
+    {
+        /*
+         * Suffix route
+         */
+        $router = $this->getRouter();
+        $router->get('foo.bar', function () {
+            return 'hello';
+        });
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+        $routes[0]->suffix('.baz');
+        $this->assertEquals('foo.bar.baz', $routes[0]->uri());
+
+        /*
+         * Use empty suffix
+         */
+        $router = $this->getRouter();
+        $router->get('foo.bar', function () {
+            return 'hello';
+        });
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+        $routes[0]->suffix('');
+        $this->assertEquals('foo.bar', $routes[0]->uri());
+
+        /*
+         * suffix homepage
+         */
+        $router = $this->getRouter();
+        $router->get('/', function () {
+            return 'hello';
+        });
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+        $routes[0]->suffix('bar');
+        $this->assertEquals('/bar', $routes[0]->uri());
     }
 
     public function testMergingControllerUses()
