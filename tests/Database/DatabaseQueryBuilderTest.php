@@ -1202,6 +1202,22 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($result);
     }
 
+    public function testSQLiteMultipleInsertsWithSomeRecordKeysMissing()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->shouldReceive('insert')->once()->with('insert into "users" ("email", "name") select ? as "email", ? as "name" union all select ? as "email", ? as "name"', ['foo', 'taylor', null, 'dayle'])->andReturn(true);
+        $result = $builder->from('users')->insert([['email' => 'foo', 'name' => 'taylor'], ['name' => 'dayle']]);
+        $this->assertTrue($result);
+    }
+
+    public function testMultipleInsertsWithSomeRecordKeysMissing()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('insert')->once()->with('insert into "users" ("email", "name") values (?, ?), (?, ?)', ['foo', 'taylor', null, 'dayle'])->andReturn(true);
+        $result = $builder->from('users')->insert([['email' => 'foo', 'name' => 'taylor'], ['name' => 'dayle']]);
+        $this->assertTrue($result);
+    }
+
     public function testInsertGetIdMethod()
     {
         $builder = $this->getBuilder();

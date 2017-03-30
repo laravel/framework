@@ -2100,10 +2100,16 @@ class Builder
             return true;
         }
 
+        $allKeys = [];
+
         // Since every insert gets treated like a batch insert, we will make sure the
         // bindings are structured in a way that is convenient for building these
         // inserts statements by verifying the elements are actually an array.
+        //
+        // We do this by finding all keys that are used in all records present in the input array
+        // and then iterating through each key when creating bindings
         if (! is_array(reset($values))) {
+            $allKeys = array_keys($values);
             $values = [$values];
         }
 
@@ -2111,20 +2117,32 @@ class Builder
         // bindings are structured in a way that is convenient for building these
         // inserts statements by verifying the elements are actually an array.
         else {
-            foreach ($values as $key => $value) {
-                ksort($value);
-                $values[$key] = $value;
-            }
+            $allKeys = array_unique(
+                array_reduce(
+                    array_map('array_keys', $values),
+                    'array_merge', []
+                )
+            );
         }
+
+        ksort($allKeys);
 
         // We'll treat every insert like a batch insert so we can easily insert each
         // of the records into the database consistently. This will make it much
         // easier on the grammars to just handle one type of record insertion.
         $bindings = [];
 
-        foreach ($values as $record) {
-            foreach ($record as $value) {
-                $bindings[] = $value;
+        foreach ($values as $index => $record) {
+            foreach ($allKeys as $key) {
+                if (isset($record[$key])) {
+                    $bindings[] = $record[$key];
+                } else {
+                    $bindings[] = null;
+
+                    // add null to existing values array to ensure placeholders are entered correctly
+                    $record[$key] = null;
+                    $values[$index] = $record;
+                }
             }
         }
 
