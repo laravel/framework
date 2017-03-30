@@ -97,24 +97,24 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
         $route = new Route(['GET'], 'foo/bar#derp', ['as' => 'fragment']);
         $routes->add($route);
 
-        $this->assertEquals('/', $url->route('plain', [], false));
-        $this->assertEquals('/?foo=bar', $url->route('plain', ['foo' => 'bar'], false));
-        $this->assertEquals('http://www.foo.com/foo/bar', $url->route('foo'));
-        $this->assertEquals('/foo/bar', $url->route('foo', [], false));
-        $this->assertEquals('/foo/bar?foo=bar', $url->route('foo', ['foo' => 'bar'], false));
-        $this->assertEquals('http://www.foo.com/foo/bar/taylor/breeze/otwell?fly=wall', $url->route('bar', ['taylor', 'otwell', 'fly' => 'wall']));
-        $this->assertEquals('http://www.foo.com/foo/bar/otwell/breeze/taylor?fly=wall', $url->route('bar', ['boom' => 'taylor', 'baz' => 'otwell', 'fly' => 'wall']));
-        $this->assertEquals('http://www.foo.com/foo/bar/2', $url->route('foobar', 2));
-        $this->assertEquals('http://www.foo.com/foo/bar/taylor', $url->route('foobar', 'taylor'));
-        $this->assertEquals('/foo/bar/taylor/breeze/otwell?fly=wall', $url->route('bar', ['taylor', 'otwell', 'fly' => 'wall'], false));
-        $this->assertEquals('https://www.foo.com/foo/baz', $url->route('baz'));
-        $this->assertEquals('http://www.foo.com/foo/bam', $url->action('foo@bar'));
-        $this->assertEquals('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', ['wall', 'woz', 'boom' => 'otwell', 'baz' => 'taylor']));
-        $this->assertEquals('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', ['taylor', 'otwell', 'wall', 'woz']));
-        $this->assertEquals('http://www.foo.com/foo/bar/%C3%A5%CE%B1%D1%84/%C3%A5%CE%B1%D1%84', $url->route('foobarbaz', ['baz' => 'åαф']));
-        $this->assertEquals('/foo/bar#derp', $url->route('fragment', [], false));
-        $this->assertEquals('/foo/bar?foo=bar#derp', $url->route('fragment', ['foo' => 'bar'], false));
-        $this->assertEquals('/foo/bar?baz=%C3%A5%CE%B1%D1%84#derp', $url->route('fragment', ['baz' => 'åαф'], false));
+        $this->assertEquals('/', $url->route('plain'));
+        $this->assertEquals('/?foo=bar', $url->route('plain', ['foo' => 'bar']));
+        $this->assertEquals('http://www.foo.com/foo/bar', $url->route('foo', [], true));
+        $this->assertEquals('/foo/bar', $url->route('foo'));
+        $this->assertEquals('/foo/bar?foo=bar', $url->route('foo', ['foo' => 'bar']));
+        $this->assertEquals('http://www.foo.com/foo/bar/taylor/breeze/otwell?fly=wall', $url->route('bar', ['taylor', 'otwell', 'fly' => 'wall'], true));
+        $this->assertEquals('http://www.foo.com/foo/bar/otwell/breeze/taylor?fly=wall', $url->route('bar', ['boom' => 'taylor', 'baz' => 'otwell', 'fly' => 'wall'], true));
+        $this->assertEquals('http://www.foo.com/foo/bar/2', $url->route('foobar', 2, true));
+        $this->assertEquals('http://www.foo.com/foo/bar/taylor', $url->route('foobar', 'taylor', true));
+        $this->assertEquals('/foo/bar/taylor/breeze/otwell?fly=wall', $url->route('bar', ['taylor', 'otwell', 'fly' => 'wall']));
+        $this->assertEquals('https://www.foo.com/foo/baz', $url->route('baz', [], true));
+        $this->assertEquals('http://www.foo.com/foo/bam', $url->action('foo@bar', [], true));
+        $this->assertEquals('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', ['wall', 'woz', 'boom' => 'otwell', 'baz' => 'taylor'], true));
+        $this->assertEquals('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', ['taylor', 'otwell', 'wall', 'woz'], true));
+        $this->assertEquals('http://www.foo.com/foo/bar/%C3%A5%CE%B1%D1%84/%C3%A5%CE%B1%D1%84', $url->route('foobarbaz', ['baz' => 'åαф'], true));
+        $this->assertEquals('/foo/bar#derp', $url->route('fragment'));
+        $this->assertEquals('/foo/bar?foo=bar#derp', $url->route('fragment', ['foo' => 'bar']));
+        $this->assertEquals('/foo/bar?baz=%C3%A5%CE%B1%D1%84#derp', $url->route('fragment', ['baz' => 'åαф']));
     }
 
     public function testFluentRouteNameDefinitions()
@@ -132,7 +132,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
         $routes->add($route);
         $routes->refreshNameLookups();
 
-        $this->assertEquals('http://www.foo.com/foo/bar', $url->route('foo'));
+        $this->assertEquals('http://www.foo.com/foo/bar', $url->route('foo', [], true));
     }
 
     public function testControllerRoutesWithADefaultNamespace()
@@ -185,7 +185,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
         $model = new RoutableInterfaceStub;
         $model->key = 'routable';
 
-        $this->assertEquals('/foo/routable', $url->route('routable', [$model], false));
+        $this->assertEquals('/foo/routable', $url->route('routable', [$model]));
     }
 
     public function testRoutableInterfaceRoutingWithSingleParameter()
@@ -201,7 +201,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
         $model = new RoutableInterfaceStub;
         $model->key = 'routable';
 
-        $this->assertEquals('/foo/routable', $url->route('routable', $model, false));
+        $this->assertEquals('/foo/routable', $url->route('routable', $model));
     }
 
     public function testRoutesMaintainRequestScheme()
@@ -217,7 +217,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
         $route = new Route(['GET'], 'foo/bar', ['as' => 'foo']);
         $routes->add($route);
 
-        $this->assertEquals('https://www.foo.com/foo/bar', $url->route('foo'));
+        $this->assertEquals('https://www.foo.com/foo/bar', $url->route('foo', [], true));
     }
 
     public function testHttpOnlyRoutes()
@@ -233,7 +233,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
         $route = new Route(['GET'], 'foo/bar', ['as' => 'foo', 'http']);
         $routes->add($route);
 
-        $this->assertEquals('http://www.foo.com/foo/bar', $url->route('foo'));
+        $this->assertEquals('http://www.foo.com/foo/bar', $url->route('foo', [], true));
     }
 
     public function testRoutesWithDomains()
@@ -252,9 +252,9 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
         $route = new Route(['GET'], 'foo/bar/{baz}', ['as' => 'bar', 'domain' => 'sub.{foo}.com']);
         $routes->add($route);
 
-        $this->assertEquals('http://sub.foo.com/foo/bar', $url->route('foo'));
-        $this->assertEquals('http://sub.taylor.com/foo/bar/otwell', $url->route('bar', ['taylor', 'otwell']));
-        $this->assertEquals('/foo/bar/otwell', $url->route('bar', ['taylor', 'otwell'], false));
+        $this->assertEquals('http://sub.foo.com/foo/bar', $url->route('foo', [], true));
+        $this->assertEquals('http://sub.taylor.com/foo/bar/otwell', $url->route('bar', ['taylor', 'otwell'], true));
+        $this->assertEquals('/foo/bar/otwell', $url->route('bar', ['taylor', 'otwell']));
     }
 
     public function testRoutesWithDomainsAndPorts()
@@ -273,8 +273,8 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
         $route = new Route(['GET'], 'foo/bar/{baz}', ['as' => 'bar', 'domain' => 'sub.{foo}.com']);
         $routes->add($route);
 
-        $this->assertEquals('http://sub.foo.com:8080/foo/bar', $url->route('foo'));
-        $this->assertEquals('http://sub.taylor.com:8080/foo/bar/otwell', $url->route('bar', ['taylor', 'otwell']));
+        $this->assertEquals('http://sub.foo.com:8080/foo/bar', $url->route('foo', [], true));
+        $this->assertEquals('http://sub.taylor.com:8080/foo/bar/otwell', $url->route('bar', ['taylor', 'otwell'], true));
     }
 
     public function testHttpsRoutesWithDomains()
@@ -290,7 +290,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
         $route = new Route(['GET'], 'foo/bar', ['as' => 'baz', 'domain' => 'sub.foo.com']);
         $routes->add($route);
 
-        $this->assertEquals('https://sub.foo.com/foo/bar', $url->route('baz'));
+        $this->assertEquals('https://sub.foo.com/foo/bar', $url->route('baz', [], true));
     }
 
     public function testRoutesWithDomainsThroughProxy()
@@ -305,7 +305,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
         $route = new Route(['GET'], 'foo/bar', ['as' => 'foo', 'domain' => 'sub.foo.com']);
         $routes->add($route);
 
-        $this->assertEquals('http://sub.foo.com/foo/bar', $url->route('foo'));
+        $this->assertEquals('http://sub.foo.com/foo/bar', $url->route('foo', [], true));
     }
 
     /**
@@ -351,10 +351,10 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
         $route = new Route(['GET'], '/foo', ['as' => 'plain']);
         $routes->add($route);
 
-        $this->assertEquals('https://www.foo.com/foo', $url->route('plain'));
+        $this->assertEquals('https://www.foo.com/foo', $url->route('plain', [], true));
 
         $url->forceRootUrl('https://www.bar.com');
-        $this->assertEquals('https://www.bar.com/foo', $url->route('plain'));
+        $this->assertEquals('https://www.bar.com/foo', $url->route('plain', [], true));
     }
 
     public function testPrevious()

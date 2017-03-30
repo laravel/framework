@@ -305,7 +305,7 @@ class UrlGenerator implements UrlGeneratorContract
      *
      * @throws \InvalidArgumentException
      */
-    public function route($name, $parameters = [], $absolute = true)
+    public function route($name, $parameters = [], $absolute = false)
     {
         if (! is_null($route = $this->routes->getByName($name))) {
             return $this->toRoute($route, $parameters, $absolute);
