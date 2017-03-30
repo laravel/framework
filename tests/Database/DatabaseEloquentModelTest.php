@@ -11,6 +11,7 @@ use LogicException;
 use ReflectionClass;
 use DateTimeImmutable;
 use DateTimeInterface;
+use Mockery\Matcher\Type;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -405,6 +406,7 @@ class DatabaseEloquentModelTest extends TestCase
         $events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(true);
         $events->shouldReceive('fire')->once()->with('eloquent.created: '.get_class($model), $model);
         $events->shouldReceive('fire')->once()->with('eloquent.saved: '.get_class($model), $model);
+        $events->shouldReceive('fire')->once()->with('eloquent.constructed: '.get_class($model), new Type(get_class($model)));
 
         $model->name = 'taylor';
         $model->exists = false;
@@ -1173,6 +1175,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testModelObserversCanBeAttachedToModels()
     {
         EloquentModelStub::setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
+        $events->shouldReceive('fire')->times(2)->with('eloquent.constructed: Illuminate\Tests\Database\EloquentModelStub', new Type(EloquentModelStub::class));
         $events->shouldReceive('listen')->once()->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelStub', 'Illuminate\Tests\Database\EloquentTestObserverStub@creating');
         $events->shouldReceive('listen')->once()->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelStub', 'Illuminate\Tests\Database\EloquentTestObserverStub@saved');
         $events->shouldReceive('forget');
@@ -1183,6 +1186,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testModelObserversCanBeAttachedToModelsWithString()
     {
         EloquentModelStub::setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
+        $events->shouldReceive('fire')->times(2)->with('eloquent.constructed: Illuminate\Tests\Database\EloquentModelStub', new Type(EloquentModelStub::class));
         $events->shouldReceive('listen')->once()->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelStub', 'Illuminate\Tests\Database\EloquentTestObserverStub@creating');
         $events->shouldReceive('listen')->once()->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelStub', 'Illuminate\Tests\Database\EloquentTestObserverStub@saved');
         $events->shouldReceive('forget');
