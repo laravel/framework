@@ -63,6 +63,22 @@ class ResourceRegistrar
     }
 
     /**
+     * Route a resource to a controller lazy.
+     *
+     * @param  string  $name
+     * @param  string  $controller
+     * @param  array   $options
+     * @return \Illuminate\Routing\PendingResourceRegistration
+     */
+    public function lazy($name, $controller, array $options = [])
+    {
+        $registrar = new PendingResourceRegistration($this);
+        $registrar->remember($name, $controller, $options);
+
+        return $registrar;
+    }
+
+    /**
      * Route a resource to a controller.
      *
      * @param  string  $name
@@ -95,24 +111,6 @@ class ResourceRegistrar
         foreach ($this->getResourceMethods($defaults, $options) as $m) {
             $this->{'addResource'.ucfirst($m)}($name, $base, $controller, $options);
         }
-
-        return $this->registration($name, $controller, $options);
-    }
-
-    /**
-     * Create a route resource registration.
-     *
-     * @param  string  $name
-     * @param  string  $controller
-     * @param  array   $options
-     * @return \Illuminate\Routing\ResourceRegistration
-     */
-    protected function registration($name, $controller, array $options = [])
-    {
-        $registration = new ResourceRegistration($this->resourceDefaults, $this->router->getRoutes());
-        $registration->remember($name, $controller, $options);
-
-        return $registration;
     }
 
     /**
