@@ -1699,7 +1699,7 @@ class Builder
     }
 
     /**
-     * Get a random row
+     * Get a random row.
      *
      * @param array $columns
      * @return mixed|static
