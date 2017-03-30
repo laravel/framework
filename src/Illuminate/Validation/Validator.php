@@ -2611,6 +2611,20 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Replace all place-holders for the before_or_equal rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
+     */
+    protected function replaceBeforeOrEqual($message, $attribute, $rule, $parameters)
+    {
+        return $this->replaceBefore($message, $attribute, $rule, $parameters);
+    }
+
+    /**
      * Replace all place-holders for the after rule.
      *
      * @param  string  $message
@@ -2620,6 +2634,20 @@ class Validator implements ValidatorContract
      * @return string
      */
     protected function replaceAfter($message, $attribute, $rule, $parameters)
+    {
+        return $this->replaceBefore($message, $attribute, $rule, $parameters);
+    }
+
+    /**
+     * Replace all place-holders for the after_or_equal rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
+     */
+    protected function replaceAfterOrEqual($message, $attribute, $rule, $parameters)
     {
         return $this->replaceBefore($message, $attribute, $rule, $parameters);
     }
