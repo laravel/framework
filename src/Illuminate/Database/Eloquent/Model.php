@@ -469,11 +469,19 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function fillableFromArray(array $attributes)
     {
+        $fillables = $attributes;
+
         if (count($this->getFillable()) > 0 && ! static::$unguarded) {
-            return array_intersect_key($attributes, array_flip($this->getFillable()));
+            $fillables = array_intersect_key($attributes, array_flip($this->getFillable()));
         }
 
-        return $attributes;
+        foreach ($attributes as $attribute => $value) {
+            if (in_array($this->getAttributeFromJSONPath($attribute), $this->getFillable())) {
+                $fillables[$attribute] = $value;
+            }
+        }
+
+        return $fillables;
     }
 
     /**
@@ -2314,6 +2322,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return true;
         }
 
+        if (in_array($this->getAttributeFromJSONPath($key), $this->getFillable())) {
+            return true;
+        }
+
         if ($this->isGuarded($key)) {
             return false;
         }
@@ -3246,6 +3258,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $original = $this->original[$key];
 
         return is_numeric($current) && is_numeric($original) && strcmp((string) $current, (string) $original) === 0;
+    }
+
+    /**
+     * Extract model attribute from a JSON path.
+     *
+     * @param  string  $path
+     * @return mixed
+     */
+    public function getAttributeFromJSONPath($path)
+    {
+        return Str::contains($path, '->') ? explode('->', $path)[0] : null;
     }
 
     /**

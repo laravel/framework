@@ -783,6 +783,21 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $model->age);
     }
 
+    public function testFillableJSONColumns()
+    {
+        $model = new EloquentModelStub;
+        $model->fillable(['options', 'meta-data']);
+        $model->fill(['options->name' => 'foo']);
+        $model->fill(['meta-data->name' => 'foo']);
+        $this->assertEquals(
+            [
+                'options->name' => 'foo',
+                'meta-data->name' => 'foo',
+            ],
+            $model->getAttributes()
+        );
+    }
+
     public function testForceFillMethodFillsGuardedAttributes()
     {
         $model = (new EloquentModelSaveStub)->forceFill(['id' => 21]);
