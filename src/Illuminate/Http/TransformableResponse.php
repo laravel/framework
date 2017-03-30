@@ -40,7 +40,7 @@ class TransformableResponse extends JsonResponse
     /**
      * Handle how a collection will be transformed.
      *
-     * @param  Collection  $data
+     * @param  \Illuminate\Support\Collection  $data
      * @return mixed
      */
     protected function handleCollectionTransformation(Collection $data)
