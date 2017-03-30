@@ -4,6 +4,7 @@ namespace Illuminate\Events;
 
 use Exception;
 use ReflectionClass;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -231,7 +232,7 @@ class Dispatcher implements DispatcherContract
             list($payload, $event) = [[$event], get_class($event)];
         }
 
-        return [$event, array_wrap($payload)];
+        return [$event, Arr::wrap($payload)];
     }
 
     /**
