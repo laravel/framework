@@ -9,6 +9,9 @@ env:
   global:
     - setup=basic
 
+git:
+  depth: 1
+
 matrix:
   fast_finish: true
   include:
