@@ -103,6 +103,21 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue($pivot->delete());
     }
+
+    public function testJsonIsCastCorrectly()
+    {
+        $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
+        $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
+
+        $pivot = new DatabaseEloquentPivotTestJsonCastStub($parent, ['data' => '{"foo":"bar"}'], 'table', true);
+
+        $this->assertEquals($pivot->data, ['foo' => 'bar']);
+    }
+}
+
+class DatabaseEloquentPivotTestJsonCastStub extends Illuminate\Database\Eloquent\Relations\Pivot
+{
+    protected $casts = ['data' => 'array'];
 }
 
 class DatabaseEloquentPivotTestDateStub extends Illuminate\Database\Eloquent\Relations\Pivot
