@@ -699,6 +699,17 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([0 => 'foo', 1 => 'bar', 2 => 25], $builder->getBindings());
     }
 
+    public function testNestedWheresWithJoins()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('email', '=', 'foo')->orWhere(function ($q) {
+            $q->join('contacts', 'users.id', '=', 'contacts.user_id')
+                ->where('contacts.email', '=', 'bar');
+        });
+        $this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = "contacts"."user_id" where "email" = ? or ("contacts"."email" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 'foo', 1 => 'bar'], $builder->getBindings());
+    }
+
     public function testFullSubSelects()
     {
         $builder = $this->getBuilder();

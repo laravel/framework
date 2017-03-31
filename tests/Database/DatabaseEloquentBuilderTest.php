@@ -404,6 +404,24 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($builder, $result);
     }
 
+    public function testQueryScopeWithJoin()
+    {
+        $model = new EloquentBuilderTestScopeJoinStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+        $query = $model->newQuery()->where('foo', '=', 'bar')->popular();
+        $this->assertEquals('select * from "users" inner join "popular_users" on "popular_users"."user_id" = "users"."id" where "foo" = ? and "popular_users"."popularity" > ?', $query->toSql());
+        $this->assertEquals(['bar', 100], $query->getBindings());
+    }
+
+    public function testNestedQueryScopeWithJoin()
+    {
+        $model = new EloquentBuilderTestScopeJoinStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+        $query = $model->newQuery()->where('foo', '=', 'bar')->where(function ($query) { $query->popular(); });
+        $this->assertEquals('select * from "users" inner join "popular_users" on "popular_users"."user_id" = "users"."id" where "foo" = ? and ("popular_users"."popularity" > ?)', $query->toSql());
+        $this->assertEquals(['bar', 100], $query->getBindings());
+    }
+
     public function testNestedWhere()
     {
         $nestedQuery = m::mock('Illuminate\Database\Eloquent\Builder');
@@ -682,6 +700,17 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $query->shouldReceive('from')->with('foo_table');
 
         return $query;
+    }
+}
+
+class EloquentBuilderTestScopeJoinStub extends Illuminate\Database\Eloquent\Model
+{
+    protected $table = 'users';
+
+    public function scopePopular($query)
+    {
+        $query->join('popular_users', 'popular_users.user_id', '=', 'users.id')
+            ->where('popular_users.popularity', '>', 100);
     }
 }
 
