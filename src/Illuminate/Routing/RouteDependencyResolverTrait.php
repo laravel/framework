@@ -51,9 +51,9 @@ trait RouteDependencyResolverTrait
             if (! is_null($instance)) {
                 $instanceCount++;
 
-                $results[] = $instance;
+                $results[$parameter->getName()] = $instance;
             } else {
-                $results[] = isset($values[$key - $instanceCount])
+                $results[$parameter->getName()] = isset($values[$key - $instanceCount])
                     ? $values[$key - $instanceCount] : $parameter->getDefaultValue();
             }
         }
