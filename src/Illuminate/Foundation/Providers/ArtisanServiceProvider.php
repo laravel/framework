@@ -40,6 +40,7 @@ use Illuminate\Foundation\Console\ClearCompiledCommand;
 use Illuminate\Foundation\Console\EventGenerateCommand;
 use Illuminate\Foundation\Console\VendorPublishCommand;
 use Illuminate\Database\Console\Seeds\SeederMakeCommand;
+use Illuminate\Foundation\Console\CollectionMakeCommand;
 use Illuminate\Foundation\Console\NotificationMakeCommand;
 use Illuminate\Notifications\Console\NotificationTableCommand;
 
@@ -93,6 +94,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'MailMake' => 'command.mail.make',
         'MiddlewareMake' => 'command.middleware.make',
         'ModelMake' => 'command.model.make',
+        'CollectionMake' => 'command.collection.make',
         'NotificationMake' => 'command.notification.make',
         'NotificationTable' => 'command.notification.table',
         'PolicyMake' => 'command.policy.make',
@@ -193,6 +195,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.auth.resets.clear', function () {
             return new ClearResetsCommand;
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerCollectionMakeCommand()
+    {
+        $this->app->singleton('command.collection.make', function ($app) {
+            return new CollectionMakeCommand($app['files']);
         });
     }
 
