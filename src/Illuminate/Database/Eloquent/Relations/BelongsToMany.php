@@ -93,7 +93,7 @@ class BelongsToMany extends Relation
      * @param  string  $relationName
      * @return void
      */
-    public function __construct(Builder $query, Model $parent, $table, $foreignKey, $otherKey, $relationName = null)
+    public function __construct(Builder $query, Model $parent, $table, $foreignKey, $otherKey, $relationName = 'pivot')
     {
         $this->table = $table;
         $this->otherKey = $otherKey;
@@ -303,7 +303,7 @@ class BelongsToMany extends Relation
         foreach ($models as $model) {
             $pivot = $this->newExistingPivot($this->cleanPivotAttributes($model));
 
-            $model->setRelation('pivot', $pivot);
+            $model->setRelation($this->getRelationName(), $pivot);
         }
     }
 
