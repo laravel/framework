@@ -97,7 +97,9 @@ class Handler implements ExceptionHandlerContract
      */
     public function render($request, Exception $e)
     {
-        if ($e instanceof HttpResponseException) {
+        if (app('env') == 'testing') {
+            return $e;
+        } elseif ($e instanceof HttpResponseException) {
             return $e->getResponse();
         } elseif ($e instanceof ModelNotFoundException) {
             $e = new NotFoundHttpException($e->getMessage(), $e);
