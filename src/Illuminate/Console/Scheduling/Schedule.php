@@ -78,9 +78,19 @@ class Schedule
      */
     protected function compileParameters(array $parameters)
     {
-        return collect($parameters)->map(function ($value, $key) {
-            return is_numeric($key) ? $value : $key.'='.(is_numeric($value) ? $value : ProcessUtils::escapeArgument($value));
-        })->implode(' ');
+        $compiled = [];
+        foreach ($parameters as $key => $value) {
+            if (! is_bool($value)) {
+                $compiled[] = is_numeric($key) ? $value : $key.'='.(is_numeric($value) ? $value : ProcessUtils::escapeArgument($value));
+                continue;
+            }
+
+            if ($value) {
+                $compiled[] = $key;
+            }
+        }
+
+        return implode(' ', $compiled);
     }
 
     /**
