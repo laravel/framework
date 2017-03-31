@@ -77,7 +77,7 @@ class QueueWorkerTest extends TestCase
         $this->exceptionHandler->shouldHaveReceived('report')->with($e);
     }
 
-    public function test_worker_does_sleep_when_queue_is_empty()
+    public function test_worker_sleeps_when_queue_is_empty()
     {
         $worker = $this->getWorker('default', ['queue' => []]);
         $worker->runNextJob('default', 'queue', $this->workerOptions(['sleep' => 5]));
