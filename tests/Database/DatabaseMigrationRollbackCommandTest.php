@@ -16,7 +16,18 @@ class DatabaseMigrationRollbackCommandTest extends PHPUnit_Framework_TestCase
         $command = new RollbackCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
         $command->setLaravel(new AppDatabaseMigrationRollbackStub());
         $migrator->shouldReceive('setConnection')->once()->with(null);
-        $migrator->shouldReceive('rollback')->once()->with(false);
+        $migrator->shouldReceive('rollback')->once()->with(0,false);
+        $migrator->shouldReceive('getNotes')->andReturn([]);
+
+        $this->runCommand($command);
+    }
+
+    public function testRollbackCommandCallsMigratorWithCountArguments()
+    {
+        $command = new RollbackCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
+        $command->setLaravel(new AppDatabaseMigrationRollbackStub());
+        $migrator->shouldReceive('setConnection')->once()->with(null);
+        $migrator->shouldReceive('rollback')->once()->with(2,false);
         $migrator->shouldReceive('getNotes')->andReturn([]);
 
         $this->runCommand($command);
@@ -27,7 +38,18 @@ class DatabaseMigrationRollbackCommandTest extends PHPUnit_Framework_TestCase
         $command = new RollbackCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
         $command->setLaravel(new AppDatabaseMigrationRollbackStub());
         $migrator->shouldReceive('setConnection')->once()->with('foo');
-        $migrator->shouldReceive('rollback')->once()->with(true);
+        $migrator->shouldReceive('rollback')->once()->with(0, true);
+        $migrator->shouldReceive('getNotes')->andReturn([]);
+
+        $this->runCommand($command, ['--pretend' => true, '--database' => 'foo']);
+    }
+
+    public function testRollbackCommandCanBePretendedWithCountArguments()
+    {
+        $command = new RollbackCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
+        $command->setLaravel(new AppDatabaseMigrationRollbackStub());
+        $migrator->shouldReceive('setConnection')->once()->with('foo');
+        $migrator->shouldReceive('rollback')->once()->with(2, true);
         $migrator->shouldReceive('getNotes')->andReturn([]);
 
         $this->runCommand($command, ['--pretend' => true, '--database' => 'foo']);

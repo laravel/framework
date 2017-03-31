@@ -12,6 +12,14 @@ interface MigrationRepositoryInterface
     public function getRan();
 
     /**
+     * Get list of migrations.
+     *
+     * @param $count
+     * @return array
+     */
+    public function getMigrations($count);
+
+    /**
      * Get the last migration batch.
      *
      * @return array
