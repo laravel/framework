@@ -136,12 +136,25 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      */
     protected function getLine($namespace, $group, $locale, $item, array $replace)
     {
-        $line = Arr::get($this->loaded[$namespace][$group][$locale], $item);
+        return $this->determineReplacements(
+            Arr::get($this->loaded[$namespace][$group][$locale], $item),
+            $this->sortReplacements($replace)->toArray()
+        );
+    }
 
+    /**
+     * Determines whether to make Array or String place-holder replacements.
+     *
+     * @param  string  $line
+     * @param  array   $replace
+     * @return string|array
+     */
+    protected function determineReplacements($line, array $replace)
+    {
         if (is_string($line)) {
             return $this->makeReplacements($line, $replace);
         } elseif (is_array($line) && count($line) > 0) {
-            return $line;
+            return $this->makeArrayReplacements($line, $replace);
         }
     }
 
@@ -165,6 +178,23 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
         }
 
         return $line;
+    }
+
+    /**
+     * Make the place-holder replacements to all lines provided by the array.
+     *
+     * @param  array   $lines
+     * @param  array   $replace
+     * @return string
+     */
+    protected function makeArrayReplacements(array $lines, array $replace)
+    {
+        $replaced = [];
+        foreach ($lines as $string => $line) {
+            $replaced[$string] = $this->determineReplacements($line, $replace);
+        }
+
+        return $replaced;
     }
 
     /**
