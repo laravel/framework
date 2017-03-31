@@ -130,7 +130,7 @@ class MigrationCreator
      */
     protected function getClassName($name)
     {
-        return Str::studly($name);
+        return Str::studly($name).'_'.$this->getDatePrefix();
     }
 
     /**
