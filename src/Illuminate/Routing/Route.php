@@ -72,6 +72,13 @@ class Route
     protected $parameterNames;
 
     /**
+     * Additional data to set on the route.
+     *
+     * @var array
+     */
+    protected $data = [];
+
+    /**
      * The compiled version of the route.
      *
      * @var \Symfony\Component\Routing\CompiledRoute
@@ -417,6 +424,46 @@ class Route
         return array_map(function ($m) {
             return trim($m, '?');
         }, $matches[1]);
+    }
+
+    /**
+     * Get a given key from the data.
+     *
+     * @param  string  $key
+     * @param  mixed|null  $default
+     * @return mixed
+     */
+    public function getData($key, $default = null)
+    {
+        return Arr::get($this->data(), $key, $default);
+    }
+
+    /**
+     * Pass data to the route.
+     *
+     * @param  string|array  $key
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function setData($key, $value = null)
+    {
+        $key = is_array($key) ? $key : [$key => $value];
+
+        foreach ($key as $k => $v) {
+            $this->data[$k] = $v;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get the additional data for the route.
+     *
+     * @return array
+     */
+    public function data()
+    {
+        return $this->data;
     }
 
     /**

@@ -360,6 +360,22 @@ class Router implements RegistrarContract
     }
 
     /**
+     * Register a new redirect route with the router.
+     *
+     * @param  string  $url
+     * @param  string  $destination
+     * @param  int  $status
+     * @return \Illuminate\Routing\Route
+     */
+    public function redirect($url, $destination, $status = 301)
+    {
+        return $this->any($url, '\Illuminate\Foundation\Http\RedirectController@handle')->setData([
+            'destination' => $destination,
+            'status' => $status,
+        ]);
+    }
+
+    /**
      * Register the typical authentication routes for an application.
      *
      * @return void
