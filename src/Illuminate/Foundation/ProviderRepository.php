@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 
 class ProviderRepository
@@ -51,6 +52,7 @@ class ProviderRepository
      */
     public function load(array $providers)
     {
+        $eagerProviderInstances = [];
         $manifest = $this->loadManifest();
 
         // First we will load the service manifest, which contains information on all
@@ -71,7 +73,13 @@ class ProviderRepository
         // application so their services can be registered with the application as
         // a provided service. Then we will set the deferred service list on it.
         foreach ($manifest['eager'] as $provider) {
-            $this->app->register($this->createProvider($provider));
+            $providerInstance = $this->createProvider($provider);
+            $eagerProviderInstances[get_class($providerInstance)] = $providerInstance;
+            $this->postContructProvider($providerInstance);
+        }
+
+        foreach ($eagerProviderInstances as $providerInstance) {
+            $this->app->register($providerInstance);
         }
 
         $this->app->addDeferredServices($manifest['deferred']);
@@ -144,6 +152,19 @@ class ProviderRepository
     public function createProvider($provider)
     {
         return new $provider($this->app);
+    }
+
+    /**
+     * Call method right after the given service provider created.
+     *
+     * @param  \Illuminate\Support\ServiceProvider  $provider
+     * @return mixed
+     */
+    protected function postContructProvider(ServiceProvider $provider)
+    {
+        if (method_exists($provider, 'postContruct')) {
+            return $this->call([$provider, 'postContruct']);
+        }
     }
 
     /**
