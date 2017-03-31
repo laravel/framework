@@ -210,6 +210,10 @@ abstract class Facade
             throw new RuntimeException('A facade root has not been set.');
         }
 
+        if (PHP_VERSION_ID >= 50600) {
+            return $instance->$method(...$args);
+        }
+
         switch (count($args)) {
             case 0:
                 return $instance->$method();
