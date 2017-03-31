@@ -917,3 +917,33 @@ if (! function_exists('view')) {
         return $factory->make($view, $data, $mergeData);
     }
 }
+
+if (! function_exists('dbd')) {
+    /**
+     * Showing all database queries.
+     *
+     * @param null|\Illuminate\Console\Command|\Psr\Log\LoggerInterface $channel
+     */
+    function dbd($channel = null)
+    {
+        static $initialized;
+        if ($initialized) {
+            return;
+        }
+        app('db')->listen(function ($sql) use ($channel) {
+            foreach ($sql->bindings as $i => $binding) {
+                $sql->bindings[$i] = is_string($binding) ? "'$binding'" : (string) $binding;
+            }
+            $query = str_replace(['%', '?'], ['%%', '%s'], $sql->sql);
+            $query = vsprintf($query, $sql->bindings);
+            if (null === $channel) {
+                dump($query);
+            } elseif ($channel instanceof \Illuminate\Console\Command) {
+                $channel->info($query);
+            } elseif ($channel instanceof \Psr\Log\LoggerInterface) {
+                $channel->info($query);
+            }
+        });
+        $initialized = true;
+    }
+}
