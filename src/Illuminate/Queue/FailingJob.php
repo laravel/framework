@@ -31,6 +31,8 @@ class FailingJob
             $job->delete();
 
             $job->failed($e);
+
+            $job->finished();
         } finally {
             static::events()->fire(new JobFailed(
                 $connectionName, $job, $e ?: new ManuallyFailedException
