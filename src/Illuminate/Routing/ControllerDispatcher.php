@@ -81,15 +81,30 @@ class ControllerDispatcher
         $shouldSkipMiddleware = $this->container->bound('middleware.disable') &&
                                 $this->container->make('middleware.disable') === true;
 
-        $middleware = $shouldSkipMiddleware ? [] : $this->getMiddleware($instance, $method);
-
+       
+        //@author Aurelien Lheureux
+        //Controller middleware was not take into account for terminate() method before this change
+        //$middleware change into $controller_middleware for more lisibility
+        $controller_middleware = $shouldSkipMiddleware ? [] : $this->getMiddleware($instance, $method);
+        $route_middleware = $route->middleware();
+        $route->middleware(array_merge($route_middleware,$controller_middleware));
+       
+       
         // Here we will make a stack onion instance to execute this request in, which gives
         // us the ability to define middlewares on controllers. We will return the given
         // response back out so that "after" filters can be run after the middlewares.
         return (new Pipeline($this->container))
                     ->send($request)
-                    ->through($middleware)
+                    ->through($controller_middleware)
                     ->then(function ($request) use ($instance, $route, $method) {
+                       
+                        //@author Aurelien Lheureux
+                        // Give possibility to call a main init() function
+                        // common from all controller to initialize  
+                        // some data after middlewares have run
+                        if(method_exists($instance, 'init'))
+                            $this->call($instance, $route, 'init');
+                        
                         return $this->router->prepareResponse(
                             $request, $this->call($instance, $route, $method)
                         );
