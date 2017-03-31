@@ -21,6 +21,13 @@ abstract class ServiceProvider
     protected $defer = false;
 
     /**
+     * Indicates if migration should be executed (default as `true`) or published.
+     *
+     * @var bool
+     */
+    protected $migrate = true;
+
+    /**
      * The paths that should be published.
      *
      * @var array
@@ -108,11 +115,32 @@ abstract class ServiceProvider
      */
     protected function loadMigrationsFrom($paths)
     {
+        if ($this->migrate !== true) {
+            return $this->publishMigrationsFrom($paths);
+        }
+
         $this->app->afterResolving('migrator', function ($migrator) use ($paths) {
             foreach ((array) $paths as $path) {
                 $migrator->path($path);
             }
         });
+    }
+
+    /**
+     * Publish a database migration path.
+     *
+     * @param  array|string  $paths
+     * @return void
+     */
+    protected function publishMigrationsFrom($paths)
+    {
+        $migrations = [];
+
+        foreach ((array) $paths as $path) {
+            $migrations[$path] = database_path('migrations');
+        }
+
+        $this->publishes($migrations, 'migrations');
     }
 
     /**
