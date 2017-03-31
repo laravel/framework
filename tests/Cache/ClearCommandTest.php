@@ -36,7 +36,7 @@ class ClearCommandTest extends PHPUnit_Framework_TestCase
 
         $cacheRepository = m::mock('Illuminate\Contracts\Cache\Repository');
 
-        $app = new Application();
+        $app = new Application;
         $command->setLaravel($app);
 
         $cacheManager->shouldReceive('store')->once()->with('foo')->andReturn($cacheRepository);

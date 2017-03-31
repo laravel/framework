@@ -3,6 +3,7 @@
 namespace Illuminate\Cache;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Cache\Console\ShowCommand;
 use Illuminate\Cache\Console\ClearCommand;
 
 class CacheServiceProvider extends ServiceProvider
@@ -47,7 +48,14 @@ class CacheServiceProvider extends ServiceProvider
             return new ClearCommand($app['cache']);
         });
 
-        $this->commands('command.cache.clear');
+        $this->app->singleton('command.cache.show', function ($app) {
+            return new ShowCommand($app['cache']);
+        });
+
+        $this->commands([
+            'command.cache.clear',
+            'command.cache.show',
+        ]);
     }
 
     /**
