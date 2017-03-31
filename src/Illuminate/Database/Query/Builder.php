@@ -324,6 +324,45 @@ class Builder
     }
 
     /**
+     * Creates a join clause with given table. Checks if the table is a closure
+     * to enable custom query instead of the table name.
+     *
+     * @param  string                                                   $type
+     * @param  string|\Closure|\Illuminate\Database\Query\Expression    $table
+     * @return JoinClause
+     */
+    protected function createJoinClause($type, $table)
+    {
+        $joinClause = new JoinClause($type, $table);
+
+        // enable the sub query for the join instead of the table
+        // we need to prepare the statement before compiling the query
+        if ($joinClause->table instanceof \Closure) {
+
+            /* @var Builder $query */
+            $joinQuery = $this->newQuery();
+
+            // Similar to the sub-select clause, we will create a new query instance so
+            // the developer may cleanly specify the entire exists query and we will
+            // compile the whole thing in the grammar and insert it into the SQL.
+            call_user_func($joinClause->table, $joinQuery);
+
+            // merge the bindings for the statements to pass values
+            // used in the query
+            $this->addBinding($joinQuery->getBindings(), 'join');
+
+            // compile the query and wrap it in brackets
+            $table = '('.$joinQuery->getGrammar()->compileSelect($joinQuery).')';
+
+            // build the sql statement with a raw expression to enable compile
+            // also add a alias for sql query. Uses the table
+            $joinClause->table = $this->raw($table.' AS '.$joinQuery->from);
+        }
+
+        return $joinClause;
+    }
+
+    /**
      * Add a join clause to the query.
      *
      * @param  string  $table
@@ -336,12 +375,13 @@ class Builder
      */
     public function join($table, $one, $operator = null, $two = null, $type = 'inner', $where = false)
     {
+        // create the join closure instance
+        $join = $this->createJoinClause($type, $table);
+
         // If the first "column" of the join is really a Closure instance the developer
         // is trying to build a join with a complex "on" clause containing more than
         // one condition, so we'll add the join and call a Closure with the query.
         if ($one instanceof Closure) {
-            $join = new JoinClause($type, $table);
-
             call_user_func($one, $join);
 
             $this->joins[] = $join;
@@ -353,8 +393,6 @@ class Builder
         // "on" clause with a single condition. So we will just build the join with
         // this simple join clauses attached to it. There is not a join callback.
         else {
-            $join = new JoinClause($type, $table);
-
             $this->joins[] = $join->on(
                 $one, $operator, $two, 'and', $where
             );
