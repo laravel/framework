@@ -760,6 +760,20 @@ if (! function_exists('storage_path')) {
     }
 }
 
+if (! function_exists('t')) {
+    /**
+     * Short function trans() .
+     *
+     * @return \Symfony\Component\Translation\TranslatorInterface|string
+     *
+     * @see trans
+     */
+    function t()
+    {
+        return call_user_func_array('trans', func_get_args());
+    }
+}
+
 if (! function_exists('trans')) {
     /**
      * Translate the given message.
