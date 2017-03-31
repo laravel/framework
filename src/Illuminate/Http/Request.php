@@ -897,9 +897,9 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 
         if (is_null($route) || is_null($param)) {
             return $route;
-        } else {
-            return $route->parameter($param);
         }
+
+        return $route->parameter($param);
     }
 
     /**
@@ -1051,8 +1051,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 
         if (array_key_exists($key, $all)) {
             return $all[$key];
-        } else {
-            return $this->route($key);
         }
+
+        return $this->route($key);
     }
 }
