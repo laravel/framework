@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Console\Migrations;
 
+use Illuminate\Support\Str;
 use Illuminate\Support\Composer;
 use Illuminate\Database\Migrations\MigrationCreator;
 
@@ -15,7 +16,8 @@ class MigrateMakeCommand extends BaseCommand
     protected $signature = 'make:migration {name : The name of the migration.}
         {--create= : The table to be created.}
         {--table= : The table to migrate.}
-        {--path= : The location where the migration file should be created.}';
+        {--path= : The location where the migration file should be created.}
+        {--s|seeder : Create a Seeder class for the table}';
 
     /**
      * The console command description.
@@ -69,6 +71,8 @@ class MigrateMakeCommand extends BaseCommand
 
         $create = $this->input->getOption('create') ?: false;
 
+        $seeder = $this->input->getOption('seeder') ?: false;
+
         if (! $table && is_string($create)) {
             $table = $create;
 
@@ -76,9 +80,14 @@ class MigrateMakeCommand extends BaseCommand
         }
 
         // Now we are ready to write the migration out to disk. Once we've written
-        // the migration out, we will dump-autoload for the entire framework to
-        // make sure that the migrations are registered by the class loaders.
+        // the migration out, we will make a Seeder (if requested) and then
+        // dump-autoload for the entire framework to make sure that the
+        // migrations are registered by the class loaders.
         $this->writeMigration($name, $table, $create);
+
+        if ($seeder && $table) {
+            $this->makeSeeder($table);
+        }
 
         $this->composer->dumpAutoloads();
     }
@@ -112,5 +121,16 @@ class MigrateMakeCommand extends BaseCommand
         }
 
         return parent::getMigrationPath();
+    }
+
+    /**
+     * Create Seeder using the table name for the Seeder name.
+     *
+     * @param $table
+     */
+    protected function makeSeeder($table)
+    {
+        $seeder = Str::plural(Str::studly(class_basename($table)));
+        $this->call('make:seeder', ['name' => "{$seeder}Seeder"]);
     }
 }
