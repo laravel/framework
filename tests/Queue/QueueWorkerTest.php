@@ -256,6 +256,7 @@ class WorkerFakeJob
     public $fired = false;
     public $callback;
     public $deleted = false;
+    public $finished = false;
     public $releaseAfter;
     public $maxTries;
     public $attempts = 0;
@@ -312,6 +313,11 @@ class WorkerFakeJob
     public function failed($e)
     {
         $this->failedWith = $e;
+    }
+
+    public function finished()
+    {
+        $this->finished = true;
     }
 
     public function setConnectionName($name)
