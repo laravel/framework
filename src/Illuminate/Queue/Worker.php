@@ -6,9 +6,9 @@ use Exception;
 use Throwable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Debug\ExceptionHandler;
-use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 
 class Worker
@@ -260,7 +260,8 @@ class Worker
             foreach (explode(',', $queue) as $queue) {
                 if (! is_null($job = $connection->pop($queue))) {
                     $preview = str_limit(json_encode($job->payload(), 256));
-                    $this->output->writeln("Successfully fetched a job:\n{$preview}\n", OutputInterface::VERBOSITY_VERY_VERBOSE);
+                    $this->output->writeln('Successfully fetched a job:' . PHP_EOL . $preview . PHP_EOL, OutputInterface::VERBOSITY_VERY_VERBOSE);
+
                     return $job;
                 }
 
@@ -269,7 +270,7 @@ class Worker
         } catch (Exception $e) {
             $this->exceptions->report($e);
             $message = str_limit($e->getMessage(), 256);
-            $this->output->writeln("Error fetching a job:\n{$message}\n", OutputInterface::VERBOSITY_VERBOSE);
+            $this->output->writeln('Error fetching a job:' . PHP_EOL . $message . PHP_EOL, OutputInterface::VERBOSITY_VERBOSE);
         } catch (Throwable $e) {
             $this->exceptions->report(new FatalThrowableError($e));
         }
