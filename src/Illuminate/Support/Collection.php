@@ -992,7 +992,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             $start = 1;
         }
 
-        return new static(range($start, $end));
+        return static::make(range($start, $end));
     }
 
     /**
