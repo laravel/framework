@@ -66,7 +66,9 @@ class SparkPostTransport extends Transport
             ], $this->options),
         ]);
 
-        $message->getHeaders()->addTextHeader('X-SparkPost-Transmission-ID', $this->getTransmissionId($response));
+        $message->getHeaders()->addTextHeader(
+            'X-SparkPost-Transmission-ID', $this->getTransmissionId($response)
+        );
 
         $this->sendPerformed($message);
 
@@ -108,9 +110,9 @@ class SparkPostTransport extends Transport
      */
     protected function getTransmissionId($response)
     {
-        $result = json_decode($response->getBody()->getContents());
-
-        return object_get($result, 'results.id');
+        return object_get(
+            json_decode($response->getBody()->getContents()), 'results.id'
+        );
     }
 
     /**
