@@ -97,6 +97,9 @@
             "dev-master": "5.2-dev"
         }
     },
+    "config": {
+        "preferred-install": "dist"
+    },
     "suggest": {
         "aws/aws-sdk-php": "Required to use the SQS queue driver and SES mail driver (~3.0).",
         "doctrine/dbal": "Required to rename columns and drop SQLite columns (~2.4).",
