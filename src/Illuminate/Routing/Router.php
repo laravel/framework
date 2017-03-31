@@ -865,7 +865,7 @@ class Router implements RegistrarContract
 
                 $route->setParameter(
                     $parameter->name, $model->where(
-                        $model->getRouteKeyName(), $parameters[$parameter->name]
+                        $model->getRouteQualifiedKeyName(), $parameters[$parameter->name]
                     )->{$method}()
                 );
             }
@@ -992,7 +992,7 @@ class Router implements RegistrarContract
             // throw a not found exception otherwise we will return the instance.
             $instance = $this->container->make($class);
 
-            if ($model = $instance->where($instance->getRouteKeyName(), $value)->first()) {
+            if ($model = $instance->where($instance->getRouteQualifiedKeyName(), $value)->first()) {
                 return $model;
             }
 

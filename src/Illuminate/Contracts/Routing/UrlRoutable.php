@@ -17,4 +17,11 @@ interface UrlRoutable
      * @return string
      */
     public function getRouteKeyName();
+
+    /**
+     * Get the qualified route key for the model.
+     *
+     * @return string
+     */
+    public function getRouteQualifiedKeyName();
 }

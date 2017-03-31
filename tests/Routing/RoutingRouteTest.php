@@ -1173,6 +1173,11 @@ class RouteModelBindingStub
         return 'id';
     }
 
+    public function getRouteQualifiedKeyName()
+    {
+        return 'table.'.$this->getRouteKeyName();
+    }
+
     public function where($key, $value)
     {
         $this->value = $value;
@@ -1191,6 +1196,11 @@ class RouteModelBindingNullStub
     public function getRouteKeyName()
     {
         return 'id';
+    }
+
+    public function getRouteQualifiedKeyName()
+    {
+        return 'table.'.$this->getRouteKeyName();
     }
 
     public function where($key, $value)

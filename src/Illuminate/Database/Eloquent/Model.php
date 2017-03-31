@@ -2010,6 +2010,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Get the qualified route key for the model.
+     *
+     * @return string
+     */
+    public function getRouteQualifiedKeyName()
+    {
+        return $this->getTable().'.'.$this->getRouteKeyName();
+    }
+
+    /**
      * Determine if the model uses timestamps.
      *
      * @return bool

@@ -387,4 +387,9 @@ class RoutableInterfaceStub implements UrlRoutable
     {
         return 'key';
     }
+
+    public function getRouteQualifiedKeyName()
+    {
+        return 'table.'.$this->getRouteKeyName();
+    }
 }
