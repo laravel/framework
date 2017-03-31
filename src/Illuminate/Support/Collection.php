@@ -1075,6 +1075,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Generate a collection instance with n number of null values.
+     *
+     * @param  int  $size
+     * @return mixed
+     */
+    public static function size($size)
+    {
+        return static::make(range(1, $size))->map(function () {});
+    }
+
+    /**
      * Slice the underlying collection array.
      *
      * @param  int  $offset
