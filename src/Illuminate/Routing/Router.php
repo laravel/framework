@@ -591,7 +591,7 @@ class Router implements RegistrarContract
     {
         $group = end($this->groupStack);
 
-        return isset($group['namespace']) && strpos($uses, '\\') !== 0 ? $group['namespace'].'\\'.$uses : $uses;
+        return isset($group['namespace']) && strpos($uses, '\\') !== 0 && strpos($uses, $group['namespace'].'\\') !== 0 ? $group['namespace'].'\\'.$uses : $uses;
     }
 
     /**
