@@ -979,6 +979,23 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Create a new collection instance containing an incrementing range of values.
+     *
+     * @param  int  $start
+     * @param  int|null  $end
+     * @return mixed
+     */
+    public static function range($start, $end = null)
+    {
+        if ($end === null) {
+            $end = $start;
+            $start = 1;
+        }
+
+        return new static(range($start, $end));
+    }
+
+    /**
      * Reduce the collection to a single value.
      *
      * @param  callable  $callback

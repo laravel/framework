@@ -1958,6 +1958,16 @@ class SupportCollectionTest extends TestCase
 
         $this->assertSame(['michael', 'tom', 'taylor'], $collection->toArray());
     }
+
+    public function testRange()
+    {
+        $fullRange = Collection::range(1, 3);
+
+        $endRange = Collection::range(3);
+
+        $this->assertSame([1, 2, 3], $fullRange->all());
+        $this->assertSame([1, 2, 3], $endRange->all());
+    }
 }
 
 class TestSupportCollectionHigherOrderItem
