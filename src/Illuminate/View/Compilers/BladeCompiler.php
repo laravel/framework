@@ -888,6 +888,16 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         $expression = $this->stripParentheses($expression);
 
+        if (preg_match('/(.+),\s*(.+)/', $expression, $matches)) {
+            return "<?php
+                if (\$__env->exists({$matches[1]})) {
+                    echo \$__env->make({$matches[1]}, array_except(get_defined_vars(), array('__data', '__path')))->render();
+                } { else {
+                    echo \$__env->make({$matches[2]}, array_except(get_defined_vars(), array('__data', '__path')))->render();
+                }
+            ?>";
+        }
+
         return "<?php if (\$__env->exists($expression)) echo \$__env->make($expression, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
     }
 
