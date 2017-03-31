@@ -204,6 +204,10 @@ class Migrator
             $this->requireFiles($files);
 
             foreach ($migrations as $migration) {
+                if (! isset($files[$migration->migration])) {
+                    continue;
+                }
+
                 $migration = (object) $migration;
 
                 $rolledBack[] = $files[$migration->migration];
