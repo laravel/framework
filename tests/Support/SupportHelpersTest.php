@@ -274,6 +274,8 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $string = 'The PHP framework for web artisans.';
         $this->assertEquals('The PHP...', Str::limit($string, 7));
         $this->assertEquals('The PHP', Str::limit($string, 7, ''));
+        $this->assertEquals('The PHP f', Str::limit($string, 9, ''));
+        $this->assertEquals('The PHP', Str::limit($string, 9, '', true));
         $this->assertEquals('The PHP framework for web artisans.', Str::limit($string, 100));
 
         $nonAsciiString = '这是一段中文';

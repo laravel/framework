@@ -149,15 +149,30 @@ class Str
      * @param  string  $value
      * @param  int     $limit
      * @param  string  $end
+     * @param  bool    $fullWord
      * @return string
      */
-    public static function limit($value, $limit = 100, $end = '...')
+    public static function limit($value, $limit = 100, $end = '...', $fullWord = false)
     {
         if (mb_strwidth($value, 'UTF-8') <= $limit) {
             return $value;
         }
 
-        return rtrim(mb_strimwidth($value, 0, $limit, '', 'UTF-8')).$end;
+        $sentence = rtrim(mb_strimwidth($value, 0, $limit, '', 'UTF-8'));
+
+        if (! $fullWord) {
+            return $sentence.$end;
+        }
+        $newLimit = mb_strpos($value, ' ', $limit + 1);
+        if ($newLimit !== false) {
+            $sentence = rtrim(mb_strimwidth($value, 0, $newLimit, '', 'UTF-8'));
+        }
+        $limit = mb_strrpos($sentence, ' ');
+        if ($limit !== false && $newLimit !== false) {
+            $sentence = rtrim(mb_strimwidth($sentence, 0, $limit, '', 'UTF-8'));
+        }
+
+        return $sentence.$end;
     }
 
     /**
