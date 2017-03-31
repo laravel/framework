@@ -214,6 +214,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	protected static $mutatorCache = array();
 
 	/**
+	 * Mutator closures.
+	 *
+	 * @var array
+	 */
+	protected static $mutators = [];
+
+	/**
 	 * The many to many relationship methods.
 	 *
 	 * @var array
@@ -280,6 +287,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		$class = get_called_class();
 
 		static::$mutatorCache[$class] = array();
+		static::$mutators[$class] = [];
 
 		// Here we will extract all of the mutated attributes so that we can quickly
 		// spin through them after we export models to their array form, which we
@@ -2505,6 +2513,29 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	 * Dynamically add mutator closure for an attribute.
+	 *
+	 * @param  string    $key
+	 * @param  \Closure  $callback
+	 * @return void
+	 */
+	public static function addMutator($key, \Closure $callback)
+	{
+		static::$mutators[get_called_class()][$key] = $callback;
+	}
+
+	/**
+	 * Remove mutator closure.
+	 *
+	 * @param  string  $key
+	 * @return void
+	 */
+	public static function removeMutator($key)
+	{
+		unset(static::$mutators[get_called_class()][$key]);
+	}
+
+	/**
 	 * Determine if a get mutator exists for an attribute.
 	 *
 	 * @param  string  $key
@@ -2512,7 +2543,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function hasGetMutator($key)
 	{
-		return method_exists($this, 'get'.studly_case($key).'Attribute');
+		return array_key_exists($key, static::$mutators[get_called_class()]) || method_exists($this, 'get'.studly_case($key).'Attribute');
 	}
 
 	/**
@@ -2524,6 +2555,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	protected function mutateAttribute($key, $value)
 	{
+		if (array_key_exists($key, static::$mutators[get_called_class()]))
+		{
+			return call_user_func(static::$mutators[get_called_class()][$key], $value);
+		}
+
 		return $this->{'get'.studly_case($key).'Attribute'}($value);
 	}
 
