@@ -18,7 +18,7 @@ abstract class ServiceProvider
      *
      * @var bool
      */
-    protected $defer = false;
+    //protected $defer = false;
 
     /**
      * The paths that should be published.
@@ -221,7 +221,7 @@ abstract class ServiceProvider
      */
     public function isDeferred()
     {
-        return $this->defer;
+        return isset($this->defer) ? $this->defer : false;
     }
 
     /**
