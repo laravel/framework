@@ -260,7 +260,7 @@ class Worker
             foreach (explode(',', $queue) as $queue) {
                 if (! is_null($job = $connection->pop($queue))) {
                     $preview = str_limit(json_encode($job->payload(), 256));
-                    $this->output->writeln('Successfully fetched a job:' . PHP_EOL . $preview . PHP_EOL, OutputInterface::VERBOSITY_VERY_VERBOSE);
+                    $this->output->writeln('Successfully fetched a job:'.PHP_EOL.$preview.PHP_EOL, OutputInterface::VERBOSITY_VERY_VERBOSE);
 
                     return $job;
                 }
@@ -270,7 +270,7 @@ class Worker
         } catch (Exception $e) {
             $this->exceptions->report($e);
             $message = str_limit($e->getMessage(), 256);
-            $this->output->writeln('Error fetching a job:' . PHP_EOL . $message . PHP_EOL, OutputInterface::VERBOSITY_VERBOSE);
+            $this->output->writeln('Error fetching a job:'.PHP_EOL.$message.PHP_EOL, OutputInterface::VERBOSITY_VERBOSE);
         } catch (Throwable $e) {
             $this->exceptions->report(new FatalThrowableError($e));
         }
