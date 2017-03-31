@@ -3,6 +3,8 @@
 namespace Illuminate\Queue;
 
 use Exception;
+use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Debug\ExceptionHandler;
@@ -40,6 +42,11 @@ class Worker
     protected $exceptions;
 
     /**
+     * @var OutputInterface
+     */
+    protected $output;
+
+    /**
      * Indicates if the worker should exit.
      *
      * @var bool
@@ -68,6 +75,18 @@ class Worker
         $this->events = $events;
         $this->manager = $manager;
         $this->exceptions = $exceptions;
+        $this->output = new NullOutput;
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @return $this
+     */
+    public function setOutput(OutputInterface $output)
+    {
+        $this->output = $output;
+
+        return $this;
     }
 
     /**
@@ -81,6 +100,7 @@ class Worker
     public function daemon($connectionName, $queue, WorkerOptions $options)
     {
         $this->listenForSignals();
+        $this->output->writeln('Running worker in daemon mode', OutputInterface::VERBOSITY_VERY_VERBOSE);
 
         $lastRestart = $this->getTimestampOfLastQueueRestart();
 
@@ -109,6 +129,7 @@ class Worker
             if ($job) {
                 $this->runJob($job, $connectionName, $options);
             } else {
+                $this->output->writeln("Sleeping for {$options->sleep} seconds", OutputInterface::VERBOSITY_VERY_VERBOSE);
                 $this->sleep($options->sleep);
             }
 
@@ -208,6 +229,8 @@ class Worker
      */
     public function runNextJob($connectionName, $queue, WorkerOptions $options)
     {
+        $this->output->writeln('Running in single job mode', OutputInterface::VERBOSITY_VERY_VERBOSE);
+
         $job = $this->getNextJob(
             $this->manager->connection($connectionName), $queue
         );
@@ -218,8 +241,6 @@ class Worker
         if ($job) {
             return $this->runJob($job, $connectionName, $options);
         }
-
-        $this->sleep($options->sleep);
     }
 
     /**
@@ -231,14 +252,22 @@ class Worker
      */
     protected function getNextJob($connection, $queue)
     {
+        $this->output->writeln('Trying to fetch a job...', OutputInterface::VERBOSITY_VERBOSE);
+
         try {
             foreach (explode(',', $queue) as $queue) {
                 if (! is_null($job = $connection->pop($queue))) {
+                    $preview = str_limit(json_encode($job->payload(), 256));
+                    $this->output->writeln("Successfully fetched a job:\n{$preview}\n", OutputInterface::VERBOSITY_VERY_VERBOSE);
                     return $job;
                 }
+
+                $this->output->writeln('The queue is empty', OutputInterface::VERBOSITY_VERY_VERBOSE);
             }
         } catch (Exception $e) {
             $this->exceptions->report($e);
+            $message = str_limit($e->getMessage(), 256);
+            $this->output->writeln("Error fetching a job:\n{$message}\n", OutputInterface::VERBOSITY_VERBOSE);
         } catch (Throwable $e) {
             $this->exceptions->report(new FatalThrowableError($e));
         }
