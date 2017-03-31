@@ -111,6 +111,8 @@ class MigrateCommand extends BaseCommand
             ['path', null, InputOption::VALUE_OPTIONAL, 'The path of migrations files to be executed.'],
 
             ['pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'],
+            
+            ['refresh', null, InputOption::VALUE_NONE, 'Rollsback and then replays all the migrations.'],
 
             ['seed', null, InputOption::VALUE_NONE, 'Indicates if the seed task should be re-run.'],
 
