@@ -159,7 +159,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileDropAllTables($tables)
     {
-        return 'drop table '.implode(',', $tables).' cascade';
+        return 'drop table "'.implode('","', $tables).'" cascade';
     }
 
     /**
