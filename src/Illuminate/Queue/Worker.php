@@ -3,12 +3,12 @@
 namespace Illuminate\Queue;
 
 use Exception;
-use Symfony\Component\Console\Output\NullOutput;
-use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
+use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 
 class Worker
@@ -241,6 +241,8 @@ class Worker
         if ($job) {
             return $this->runJob($job, $connectionName, $options);
         }
+
+        $this->sleep($options->sleep);
     }
 
     /**
