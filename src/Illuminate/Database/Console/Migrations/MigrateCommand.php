@@ -62,7 +62,8 @@ class MigrateCommand extends BaseCommand
         // so that migrations may be run for any path within the applications.
         $this->migrator->run($this->getMigrationPaths(), [
             'pretend' => $this->option('pretend'),
-            'step' => $this->option('step'),
+            'step'    => $this->option('step'),
+            'group'   => $this->option('group'),
         ]);
 
         // Once the migrator has run we will grab the note output and send it out to
@@ -109,6 +110,8 @@ class MigrateCommand extends BaseCommand
             ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'],
 
             ['path', null, InputOption::VALUE_OPTIONAL, 'The path of migrations files to be executed.'],
+
+            ['group', null, InputOption::VALUE_OPTIONAL, 'The group of migrations to be executed.'],
 
             ['pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'],
 
