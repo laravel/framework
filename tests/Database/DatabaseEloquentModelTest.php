@@ -1276,6 +1276,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $model->dateAttribute = '1969-07-20';
         $model->datetimeAttribute = '1969-07-20 22:56:00';
         $model->timestampAttribute = '1969-07-20 22:56:00';
+        $model->customAttribute = 'value';
 
         $this->assertInternalType('int', $model->intAttribute);
         $this->assertInternalType('float', $model->floatAttribute);
@@ -1296,6 +1297,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('1969-07-20', $model->dateAttribute->toDateString());
         $this->assertEquals('1969-07-20 22:56:00', $model->datetimeAttribute->toDateTimeString());
         $this->assertEquals(-14173440, $model->timestampAttribute);
+        $this->assertInstanceOf('CustomCastingStub', $model->customAttribute);
+        $this->assertEquals('value', $model->customAttribute->key);
 
         $arr = $model->toArray();
         $this->assertInternalType('int', $arr['intAttribute']);
@@ -1330,6 +1333,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $model->dateAttribute = null;
         $model->datetimeAttribute = null;
         $model->timestampAttribute = null;
+        $model->customAttribute = null;
 
         $attributes = $model->getAttributes();
 
@@ -1344,6 +1348,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertNull($attributes['dateAttribute']);
         $this->assertNull($attributes['datetimeAttribute']);
         $this->assertNull($attributes['timestampAttribute']);
+        $this->assertNull($attributes['customAttribute']);
 
         $this->assertNull($model->intAttribute);
         $this->assertNull($model->floatAttribute);
@@ -1356,6 +1361,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertNull($model->dateAttribute);
         $this->assertNull($model->datetimeAttribute);
         $this->assertNull($model->timestampAttribute);
+        $this->assertNull($model->customAttribute);
 
         $array = $model->toArray();
 
@@ -1370,6 +1376,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertNull($array['dateAttribute']);
         $this->assertNull($array['datetimeAttribute']);
         $this->assertNull($array['timestampAttribute']);
+        $this->assertNull($array['customAttribute']);
     }
 
     public function testUpdatingNonExistentModelFails()
@@ -1782,11 +1789,26 @@ class EloquentModelCastingStub extends Model
         'dateAttribute' => 'date',
         'datetimeAttribute' => 'datetime',
         'timestampAttribute' => 'timestamp',
+        'customAttribute' => 'custom'
     ];
 
     public function jsonAttributeValue()
     {
         return $this->attributes['jsonAttribute'];
+    }
+
+    public function castToCustom($value){
+        return new CustomCastingStub($value);
+    }
+}
+
+class CustomCastingStub
+{
+    public $key;
+
+    public function __construct($value)
+    {
+        $this->key = $value;
     }
 }
 

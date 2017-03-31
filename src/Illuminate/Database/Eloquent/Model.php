@@ -2830,7 +2830,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return $value;
         }
 
-        switch ($this->getCastType($key)) {
+        $castType = $this->getCastType($key);
+
+        if (method_exists($this, 'castTo' . strtoupper($castType))) {
+            return $this->{'castTo' . $castType}($value);
+        }
+
+        switch ($castType) {
             case 'int':
             case 'integer':
                 return (int) $value;
