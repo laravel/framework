@@ -1430,6 +1430,21 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Returns a bool based on if the values for "created at"
+     * and "updated at" are different or not.
+     *
+     * @return bool
+     */
+    public function hasEverBeenUpdated()
+    {
+        if ($this->timestamps) {
+            return $this->{static::UPDATED_AT} != $this->{static::CREATED_AT};
+        }
+
+        return false;
+    }
+
+    /**
      * Save the model and all of its relationships.
      *
      * @return bool
