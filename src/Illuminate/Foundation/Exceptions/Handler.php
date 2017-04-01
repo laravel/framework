@@ -38,6 +38,13 @@ class Handler implements ExceptionHandlerContract
     protected $dontReport = [];
 
     /**
+     * The prefix for views of error-pages.
+     *
+     * @var string
+     */
+    protected $prefixViewError = 'errors';
+
+    /**
      * Create a new exception handler instance.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
@@ -196,8 +203,8 @@ class Handler implements ExceptionHandlerContract
     {
         $status = $e->getStatusCode();
 
-        if (view()->exists("errors.{$status}")) {
-            return response()->view("errors.{$status}", ['exception' => $e], $status, $e->getHeaders());
+        if (view()->exists("{$this->prefixViewError}.{$status}")) {
+            return response()->view("{$this->prefixViewError}.{$status}", ['exception' => $e], $status, $e->getHeaders());
         } else {
             return $this->convertExceptionToResponse($e);
         }
