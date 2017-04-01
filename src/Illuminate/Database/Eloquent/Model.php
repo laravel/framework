@@ -2688,7 +2688,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function getAttributeFromArray($key)
     {
-        if (array_key_exists($key, $this->attributes)) {
+        if (isset($this->attributes[$key])) {
             return $this->attributes[$key];
         }
     }
@@ -2761,7 +2761,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function hasCast($key, $types = null)
     {
-        if (array_key_exists($key, $this->getCasts())) {
+        if (isset($this->getCasts()[$key])) {
             return $types ? in_array($this->getCastType($key), (array) $types, true) : true;
         }
 
