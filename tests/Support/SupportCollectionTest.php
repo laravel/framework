@@ -1710,6 +1710,41 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
             return true;
         }));
     }
+
+    public function testDropSingleItemFromCollection()
+    {
+        $expected = [
+            1 => 'bar',
+            2 => 'baz',
+            3 => 'qux',
+        ];
+        $collection = new Collection(['foo', 'bar', 'baz', 'qux']);
+
+        $this->assertEquals($expected, $collection->drop(1)->toArray());
+    }
+
+    public function testDropMultipleItemsFromCollection()
+    {
+        $expected = [3 => 'qux'];
+        $collection = new Collection(['foo', 'bar', 'baz', 'qux']);
+
+        $this->assertEquals($expected, $collection->drop(3)->toArray());
+    }
+
+    public function testDropEmptyCollection()
+    {
+        $collection = new Collection();
+
+        $this->assertEquals([], $collection->drop(2)->toArray());
+    }
+
+    public function testDropNegativeLimit()
+    {
+        $expected = [0 => 'foo'];
+        $collection = new Collection(['foo', 'bar', 'baz']);
+
+        $this->assertEquals($expected, $collection->drop(-2)->toArray());
+    }
 }
 
 class TestAccessorEloquentTestStub

@@ -1116,6 +1116,21 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Drop the first {$limit} items from the collection.
+     *
+     * @param  int  $limit
+     * @return static
+     */
+    public function drop($limit)
+    {
+        if ($limit < 0) {
+            return $this->slice(0, $limit);
+        }
+
+        return $this->slice($limit);
+    }
+
+    /**
      * Transform each item in the collection using a callback.
      *
      * @param  callable  $callback
