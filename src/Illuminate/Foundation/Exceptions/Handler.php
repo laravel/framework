@@ -106,6 +106,10 @@ class Handler implements ExceptionHandlerContract
      */
     public function render($request, Exception $e)
     {
+        if (method_exists($e, 'render')) {
+            return $e->render($request);
+        }
+
         $e = $this->prepareException($e);
 
         if ($e instanceof HttpResponseException) {
