@@ -1702,15 +1702,18 @@ class Builder
      */
     public function getCountForPagination($columns = ['*'])
     {
-        $this->backupFieldsForCount();
-
-        $this->aggregate = ['function' => 'count', 'columns' => $this->clearSelectAliases($columns)];
-
-        $results = $this->get()->all();
-
-        $this->aggregate = null;
-
-        $this->restoreFieldsForCount();
+        if(count($this->unions) < 1){
+            $this->backupFieldsForCount();
+            $this->aggregate = ['function' => 'count', 'columns' => $this->clearSelectAliases($columns)];
+            $results = $this->get()->all();
+            $this->aggregate = null;
+            $this->restoreFieldsForCount();
+        }else{
+            $results = $this->newQuery()
+                    ->selectRaw("COUNT(*) as aggregate FROM (".$this->toSql().") as aggregate_query")
+                    ->mergeBindings($this)
+                    ->get()->all();
+        }
 
         if (isset($this->groups)) {
             return count($results);
