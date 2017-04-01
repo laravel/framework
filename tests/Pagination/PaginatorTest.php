@@ -39,7 +39,7 @@ class PaginatorTest extends TestCase
     public function testPaginatorGeneratesUrlsWithoutTrailingSlash()
     {
         $p = new Paginator($array = ['item1', 'item2', 'item3'], 2, 2, ['path' => 'http://website.com/test']);
-        
+
         $this->assertEquals('http://website.com/test?page=1', $p->previousPageUrl());
     }
 }
