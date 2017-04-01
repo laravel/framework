@@ -525,11 +525,12 @@ class Builder
      * Update a record in the database.
      *
      * @param  array  $values
+     * @param  array  $options
      * @return int
      */
-    public function update(array $values)
+    public function update(array $values, array $options = [])
     {
-        return $this->toBase()->update($this->addUpdatedAtColumn($values));
+        return $this->toBase()->update($this->addUpdatedAtColumn($values, $options));
     }
 
     /**
@@ -538,11 +539,12 @@ class Builder
      * @param  string  $column
      * @param  int  $amount
      * @param  array  $extra
+     * @param  array  $options
      * @return int
      */
-    public function increment($column, $amount = 1, array $extra = [])
+    public function increment($column, $amount = 1, array $extra = [], array $options = [])
     {
-        $extra = $this->addUpdatedAtColumn($extra);
+        $extra = $this->addUpdatedAtColumn($extra, $options);
 
         return $this->toBase()->increment($column, $amount, $extra);
     }
@@ -553,11 +555,12 @@ class Builder
      * @param  string  $column
      * @param  int  $amount
      * @param  array  $extra
+     * @param  array  $options
      * @return int
      */
-    public function decrement($column, $amount = 1, array $extra = [])
+    public function decrement($column, $amount = 1, array $extra = [], array $options = [])
     {
-        $extra = $this->addUpdatedAtColumn($extra);
+        $extra = $this->addUpdatedAtColumn($extra, $options);
 
         return $this->toBase()->decrement($column, $amount, $extra);
     }
@@ -566,17 +569,18 @@ class Builder
      * Add the "updated at" column to an array of values.
      *
      * @param  array  $values
+     * @param  array  $options
      * @return array
      */
-    protected function addUpdatedAtColumn(array $values)
+    protected function addUpdatedAtColumn(array $values, array $options = [])
     {
-        if (! $this->model->usesTimestamps()) {
-            return $values;
+        if ($this->model->usesTimestamps() && Arr::get($options, 'timestamps', true)) {
+            $column = $this->model->getUpdatedAtColumn();
+
+            return Arr::add($values, $column, $this->model->freshTimestampString());
         }
 
-        $column = $this->model->getUpdatedAtColumn();
-
-        return Arr::add($values, $column, $this->model->freshTimestampString());
+        return $values;
     }
 
     /**
