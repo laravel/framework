@@ -77,7 +77,7 @@ trait Queueable
      * @param  array  $chain
      * @return $this
      */
-    public function then($chain)
+    public function chain($chain)
     {
         $this->chained = collect($chain)->map(function ($job) {
             return serialize($job);
@@ -94,7 +94,7 @@ trait Queueable
     public function dispatchNextJobInChain()
     {
         if (! empty($this->chained)) {
-            dispatch(unserialize(array_shift($this->chained))->then($this->chained));
+            dispatch(unserialize(array_shift($this->chained))->chain($this->chained));
         }
     }
 }

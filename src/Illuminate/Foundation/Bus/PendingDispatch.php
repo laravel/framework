@@ -60,9 +60,9 @@ class PendingDispatch
      * @param  array  $chain
      * @return $this
      */
-    public function then($chain)
+    public function chain($chain)
     {
-        $this->job->then($chain);
+        $this->job->chain($chain);
 
         return $this;
     }

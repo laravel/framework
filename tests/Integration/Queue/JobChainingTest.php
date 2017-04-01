@@ -21,7 +21,7 @@ class JobChainingTest extends TestCase
 
     public function test_jobs_can_be_chained_on_success()
     {
-        JobChainingTestFirstJob::dispatch()->then([
+        JobChainingTestFirstJob::dispatch()->chain([
             new JobChainingTestSecondJob
         ]);
 
@@ -32,7 +32,7 @@ class JobChainingTest extends TestCase
 
     public function test_jobs_can_be_chained_via_queue()
     {
-        Queue::connection('sync')->push((new JobChainingTestFirstJob)->then([
+        Queue::connection('sync')->push((new JobChainingTestFirstJob)->chain([
             new JobChainingTestSecondJob
         ]));
 
@@ -43,7 +43,7 @@ class JobChainingTest extends TestCase
 
     public function test_second_job_is_not_fired_if_first_was_already_deleted()
     {
-        Queue::connection('sync')->push((new JobChainingTestFailingJob)->then([
+        Queue::connection('sync')->push((new JobChainingTestFailingJob)->chain([
             new JobChainingTestSecondJob
         ]));
 
