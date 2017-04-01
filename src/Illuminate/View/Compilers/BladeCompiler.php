@@ -99,6 +99,13 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected $forelseCounter = 0;
 
     /**
+     * Helper to set the switch first case.
+     *
+     * @var bool
+     */
+    protected $firstCase;
+
+    /**
      * Compile the view at the given path.
      *
      * @param  string  $path
@@ -1089,5 +1096,65 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function setEchoFormat($format)
     {
         $this->echoFormat = $format;
+    }
+
+    /**
+     * Compile the switch statements into valid PHP.
+     * @param  string  $variable
+     *
+     * @return string
+     */
+    public function compileSwitch($variable)
+    {
+        $this->firstCase = true;
+
+        return "<?php switch({$variable}){ ";
+    }
+
+    /**
+     * Compile the case statement into valid PHP.
+     * @param  string  $value
+     *
+     * @return string
+     */
+    public function compileCase($value)
+    {
+        if ($this->firstCase) {
+            $this->firstCase = false;
+
+            return "case {$value}:  ?>";
+        }
+
+        return "<?php  case {$value}:  ?>";
+    }
+
+    /**
+     * Compile the break statement into valid PHP.
+     *
+     * @return string
+     */
+    public function compileBreakcase()
+    {
+        return '<?php break; ?>';
+    }
+
+    /**
+     * Compile the default case statement into valid PHP.
+     *
+     * @return string
+     */
+    public function compileDefault()
+    {
+        return '<?php default: ?>';
+    }
+
+    /**
+     * Compile the end of switch statement into valid PHP.
+     *
+     * @return string
+     */
+    public function compileEndSwitch()
+    {
+        return '<?php }  ?>';
     }
 }
