@@ -146,7 +146,7 @@ class LogServiceProvider extends ServiceProvider
     protected function maxFiles()
     {
         if ($this->app->bound('config')) {
-            return $this->app->make('config')->get('app.log_max_files', 5);
+            return $this->app->make('config')->get('app.log_max_files', 30);
         }
 
         return 0;
