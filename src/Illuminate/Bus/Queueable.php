@@ -26,6 +26,13 @@ trait Queueable
     public $delay;
 
     /**
+     * The jobs that should run if this job is successful.
+     *
+     * @var array
+     */
+    public $chained = [];
+
+    /**
      * Set the desired connection for the job.
      *
      * @param  string|null  $connection
@@ -62,5 +69,32 @@ trait Queueable
         $this->delay = $delay;
 
         return $this;
+    }
+
+    /**
+     * Set the jobs that should run if this job is successful.
+     *
+     * @param  array  $chain
+     * @return $this
+     */
+    public function then($chain)
+    {
+        $this->chained = collect($chain)->map(function ($job) {
+            return serialize($job);
+        })->all();
+
+        return $this;
+    }
+
+    /**
+     * Dispatch the next job on the chain.
+     *
+     * @return void
+     */
+    public function dispatchNextJobInChain()
+    {
+        if (! empty($this->chained)) {
+            dispatch(unserialize(array_shift($this->chained))->then($this->chained));
+        }
     }
 }

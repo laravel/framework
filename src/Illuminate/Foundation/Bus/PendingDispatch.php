@@ -55,6 +55,19 @@ class PendingDispatch
     }
 
     /**
+     * Set the jobs that should run if this job is successful.
+     *
+     * @param  array  $chain
+     * @return $this
+     */
+    public function then($chain)
+    {
+        $this->job->then($chain);
+
+        return $this;
+    }
+
+    /**
      * Handle the object's destruction.
      *
      * @return void
