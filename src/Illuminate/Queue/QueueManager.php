@@ -82,7 +82,7 @@ class QueueManager implements FactoryContract, MonitorContract
      */
     public function looping($callback)
     {
-        $this->app['events']->listen(Events\Looping::class, $callback);
+        $this->app['events']->listen(Supervisor\Events\LoopBeginning::class, $callback);
     }
 
     /**
@@ -104,7 +104,7 @@ class QueueManager implements FactoryContract, MonitorContract
      */
     public function stopping($callback)
     {
-        $this->app['events']->listen(Events\WorkerStopping::class, $callback);
+        $this->app['events']->listen(Supervisor\Events\SupervisorStopping::class, $callback);
     }
 
     /**
