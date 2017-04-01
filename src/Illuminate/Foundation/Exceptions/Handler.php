@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Exceptions;
 use Exception;
 use Psr\Log\LoggerInterface;
 use Illuminate\Http\Response;
+use Illuminate\Routing\Router;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Container\Container;
@@ -106,8 +107,8 @@ class Handler implements ExceptionHandlerContract
      */
     public function render($request, Exception $e)
     {
-        if (method_exists($e, 'render')) {
-            return $e->render($request);
+        if (method_exists($e, 'render') && $response = $e->render($request)) {
+            return Router::prepareResponse($request, $response);
         }
 
         $e = $this->prepareException($e);

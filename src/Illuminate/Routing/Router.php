@@ -599,7 +599,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  mixed  $response
      * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      */
-    public function prepareResponse($request, $response)
+    public static function prepareResponse($request, $response)
     {
         if ($response instanceof PsrResponseInterface) {
             $response = (new HttpFoundationFactory)->createResponse($response);
