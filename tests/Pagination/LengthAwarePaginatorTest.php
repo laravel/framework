@@ -36,13 +36,13 @@ class LengthAwarePaginatorTest extends TestCase
 
     public function testLengthAwarePaginatorCanGenerateUrls()
     {
-        $this->p->setPath('http://website.com'); 
-        $this->p->setPageName('foo'); 
+        $this->p->setPath('http://website.com');
+        $this->p->setPageName('foo');
 
         $this->assertEquals('http://website.com?foo=2',
                             $this->p->url($this->p->currentPage()));
 
-        $this->assertEquals('http://website.com?foo=1', 
+        $this->assertEquals('http://website.com?foo=1',
                             $this->p->url($this->p->currentPage() - 1));
 
         $this->assertEquals('http://website.com?foo=1',
@@ -53,8 +53,8 @@ class LengthAwarePaginatorTest extends TestCase
     {
         $this->p->setPath('http://website.com?sort_by=date');
         $this->p->setPageName('foo');
-        
-        $this->assertEquals('http://website.com?sort_by=date&foo=2', 
+
+        $this->assertEquals('http://website.com?sort_by=date&foo=2',
                             $this->p->url($this->p->currentPage()));
     }
 
@@ -62,14 +62,14 @@ class LengthAwarePaginatorTest extends TestCase
     {
         $this->p->setPath('http://website.com/test');
         $this->p->setPageName('foo');
-        
-        $this->assertEquals('http://website.com/test?foo=2', 
+
+        $this->assertEquals('http://website.com/test?foo=2',
                             $this->p->url($this->p->currentPage()));
 
-        $this->assertEquals('http://website.com/test?foo=1', 
+        $this->assertEquals('http://website.com/test?foo=1',
                             $this->p->url($this->p->currentPage() - 1));
 
-        $this->assertEquals('http://website.com/test?foo=1', 
+        $this->assertEquals('http://website.com/test?foo=1',
                             $this->p->url($this->p->currentPage() - 2));
     }
 }
