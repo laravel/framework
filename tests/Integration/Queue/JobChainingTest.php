@@ -4,8 +4,8 @@ use Illuminate\Bus\Queueable;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
 
 /**
  * @group integration
@@ -18,39 +18,35 @@ class JobChainingTest extends TestCase
         JobChainingTestSecondJob::$ran = false;
     }
 
-
     public function test_jobs_can_be_chained_on_success()
     {
         JobChainingTestFirstJob::dispatch()->then([
-            new JobChainingTestSecondJob
+            new JobChainingTestSecondJob,
         ]);
 
         $this->assertTrue(JobChainingTestFirstJob::$ran);
         $this->assertTrue(JobChainingTestSecondJob::$ran);
     }
 
-
     public function test_jobs_can_be_chained_via_queue()
     {
         Queue::connection('sync')->push((new JobChainingTestFirstJob)->then([
-            new JobChainingTestSecondJob
+            new JobChainingTestSecondJob,
         ]));
 
         $this->assertTrue(JobChainingTestFirstJob::$ran);
         $this->assertTrue(JobChainingTestSecondJob::$ran);
     }
 
-
     public function test_second_job_is_not_fired_if_first_was_already_deleted()
     {
         Queue::connection('sync')->push((new JobChainingTestFailingJob)->then([
-            new JobChainingTestSecondJob
+            new JobChainingTestSecondJob,
         ]));
 
         $this->assertFalse(JobChainingTestSecondJob::$ran);
     }
 }
-
 
 class JobChainingTestFirstJob implements ShouldQueue
 {
@@ -64,7 +60,6 @@ class JobChainingTestFirstJob implements ShouldQueue
     }
 }
 
-
 class JobChainingTestSecondJob implements ShouldQueue
 {
     use Dispatchable, Queueable;
@@ -76,7 +71,6 @@ class JobChainingTestSecondJob implements ShouldQueue
         static::$ran = true;
     }
 }
-
 
 class JobChainingTestFailingJob implements ShouldQueue
 {
