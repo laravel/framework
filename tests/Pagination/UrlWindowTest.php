@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Pagination;
 
 use PHPUnit\Framework\TestCase;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\UrlWindow;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class UrlWindowTest extends TestCase
 {
@@ -36,7 +36,7 @@ class UrlWindowTest extends TestCase
         }
 
         $this->assertEquals(['first' => [1 => '/?page=1', 2 => '/?page=2'], 'slider' => $slider, 'last' => [12 => '/?page=12', 13 => '/?page=13']], $window->get());
-        
+
         /*
          * Test Being Near The End Of The List
          */
@@ -46,7 +46,7 @@ class UrlWindowTest extends TestCase
         for ($i = 5; $i <= 13; $i++) {
             $last[$i] = '/?page='.$i;
         }
-        
+
         $this->assertEquals(['first' => [1 => '/?page=1', 2 => '/?page=2'], 'slider' => null, 'last' => $last], $window->get());
     }
 }
