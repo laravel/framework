@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\Auth;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Lang;
 
 trait AuthenticatesUsers
 {
@@ -127,7 +126,7 @@ trait AuthenticatesUsers
         return redirect()->back()
             ->withInput($request->only($this->username(), 'remember'))
             ->withErrors([
-                $this->username() => Lang::get('auth.failed'),
+                $this->username() => trans('auth.failed'),
             ]);
     }
 
