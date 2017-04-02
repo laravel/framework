@@ -174,7 +174,7 @@ class Worker
      */
     protected function pauseWorker(WorkerOptions $options, $lastRestart)
     {
-        $this->sleep($options->sleep > 0 ? $options->sleep : 1);
+        $this->sleep($options->sleep);
 
         $this->stopIfNecessary($options, $lastRestart);
     }
@@ -555,7 +555,7 @@ class Worker
      */
     public function sleep($seconds)
     {
-        sleep($seconds);
+        sleep($seconds > 0 ? $seconds : 1);
     }
 
     /**
