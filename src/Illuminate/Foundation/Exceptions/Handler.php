@@ -121,6 +121,10 @@ class Handler implements ExceptionHandlerContract
             return $this->convertValidationExceptionToResponse($e, $request);
         }
 
+        if ($request->expectsJson() && config('app.debug')) {
+            return $this->prepareJsonResponse($request, $e);
+        }
+
         return $this->prepareResponse($request, $e);
     }
 
@@ -166,7 +170,7 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
-     * Prepare response containing exception render.
+     * Prepare a response for the given exception.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Exception $e
@@ -178,12 +182,36 @@ class Handler implements ExceptionHandlerContract
             return $this->toIlluminateResponse($this->convertExceptionToResponse($e), $e);
         }
 
-        $e = $this->isHttpException($e)
-                ? $e : new HttpException(500, $e->getMessage());
+        if (! $this->isHttpException($e)) {
+            $e = new HttpException(500, $e->getMessage());
+        }
 
         return $this->toIlluminateResponse(
             $this->renderHttpException($e), $e
         );
+    }
+
+    /**
+     * Prepare a JSON response for the given exception.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Exception $e
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function prepareJsonResponse($request, Exception $e)
+    {
+        $status = $this->isHttpException($e) ? $e->getStatusCode() : 500;
+
+        $headers = $this->isHttpException($e) ? $e->getHeaders() : [];
+
+        return response(json_encode([
+            'message' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'trace' => $e->getTrace(),
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), $status, array_merge($headers, [
+            'Content-Type' => 'application/json'
+        ]));
     }
 
     /**
