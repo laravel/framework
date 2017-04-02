@@ -17,13 +17,6 @@ class Listener
     protected $commandPath;
 
     /**
-     * The environment the workers should run under.
-     *
-     * @var string
-     */
-    protected $environment;
-
-    /**
      * The amount of seconds to wait before polling the queue.
      *
      * @var int
@@ -70,7 +63,7 @@ class Listener
      */
     protected function buildCommandTemplate()
     {
-        $command = 'queue:work %s --once --queue=%s --delay=%s --memory=%s --sleep=%s --tries=%s';
+        $command = 'queue:work %s --once --queue=%s --delay=%s --memory=%s --sleep=%s --tries=%s%s';
 
         return "{$this->phpBinary()} {$this->artisanBinary()} {$command}";
     }
@@ -128,13 +121,6 @@ class Listener
     {
         $command = $this->workerCommand;
 
-        // If the environment is set, we will append it to the command string so the
-        // workers will run under the specified environment. Otherwise, they will
-        // just run under the production environment which is not always right.
-        if (isset($options->environment)) {
-            $command = $this->addEnvironment($command, $options);
-        }
-
         // Next, we will just format out the worker commands with all of the various
         // options available for the command. This will produce the final command
         // line that we will pass into a Symfony process object for processing.
@@ -145,18 +131,6 @@ class Listener
         return new Process(
             $command, $this->commandPath, null, null, $options->timeout
         );
-    }
-
-    /**
-     * Add the environment option to the given command.
-     *
-     * @param  string  $command
-     * @param  \Illuminate\Queue\ListenerOptions  $options
-     * @return string
-     */
-    protected function addEnvironment($command, ListenerOptions $options)
-    {
-        return $command.' --env='.ProcessUtils::escapeArgument($options->environment);
     }
 
     /**
@@ -175,7 +149,8 @@ class Listener
             ProcessUtils::escapeArgument($connection),
             ProcessUtils::escapeArgument($queue),
             $options->delay, $options->memory,
-            $options->sleep, $options->maxTries
+            $options->sleep, $options->maxTries,
+            $options->parameters
         );
     }
 

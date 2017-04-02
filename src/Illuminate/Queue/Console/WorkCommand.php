@@ -3,9 +3,12 @@
 namespace Illuminate\Queue\Console;
 
 use Carbon\Carbon;
+use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Queue\Events\NoJobsLeft;
+use Illuminate\Queue\Events\QueueExceptionOccurred;
+use Illuminate\Queue\Events\Sleeping;
 use Illuminate\Queue\Worker;
 use Illuminate\Console\Command;
-use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\WorkerOptions;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
@@ -76,13 +79,12 @@ class WorkCommand extends Command
         $connection = $this->argument('connection')
                         ?: $this->laravel['config']['queue.default'];
 
-        $this->output->writeln("Using connection: {$connection}", OutputInterface::VERBOSITY_VERBOSE);
-
         // We need to get the right queue for the connection which is set in the queue
         // configuration file for the application. We will pull it based on the set
         // connection being run for the queue operation currently being executed.
         $queue = $this->getQueue($connection);
 
+        $this->output->writeln("Using connection: {$connection}", OutputInterface::VERBOSITY_VERBOSE);
         $this->output->writeln("Using queue: {$queue}", OutputInterface::VERBOSITY_VERBOSE);
 
         $this->runWorker(
@@ -100,7 +102,6 @@ class WorkCommand extends Command
     protected function runWorker($connection, $queue)
     {
         $this->worker->setCache($this->laravel['cache']->driver());
-        $this->worker->setOutput($this->output);
 
         return $this->worker->{$this->option('once') ? 'runNextJob' : 'daemon'}(
             $connection, $queue, $this->gatherWorkerOptions()
@@ -129,30 +130,31 @@ class WorkCommand extends Command
     protected function listenForEvents()
     {
         $this->laravel['events']->listen(JobProcessed::class, function ($event) {
+            $this->output->writeln('<info>['.Carbon::now()->format('Y-m-d H:i:s').'] Processed:</info> '.$event->job->resolveName());
+        });
+
+        $this->laravel['events']->listen(JobProcessing::class, function ($event) {
             $this->writeOutput($event->job, false);
         });
 
+        $this->laravel['events']->listen(NoJobsLeft::class, function () {
+            $this->output->writeln('The queue seems to be empty.', OutputInterface::VERBOSITY_VERBOSE);
+        });
+
+        $this->laravel['events']->listen(Sleeping::class, function ($event) {
+            $this->output->writeln("Sleeping for {$event->seconds} seconds.", OutputInterface::VERBOSITY_VERY_VERBOSE);
+        });
+
+        $this->laravel['events']->listen(QueueExceptionOccurred::class, function ($event) {
+            $this->output->writeln($event->getMessage(), OutputInterface::VERBOSITY_VERY_VERBOSE);
+            $this->output->writeln("Couldn't fetch a job from the queue. See the log file for more information.", OutputInterface::VERBOSITY_VERBOSE);
+        });
+
         $this->laravel['events']->listen(JobFailed::class, function ($event) {
-            $this->writeOutput($event->job, true);
+            $this->output->writeln('<error>['.Carbon::now()->format('Y-m-d H:i:s').'] Failed:</error> '.$event->job->resolveName());
 
             $this->logFailedJob($event);
         });
-    }
-
-    /**
-     * Write the status output for the queue worker.
-     *
-     * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  bool  $failed
-     * @return void
-     */
-    protected function writeOutput(Job $job, $failed)
-    {
-        if ($failed) {
-            $this->output->writeln('<error>['.Carbon::now()->format('Y-m-d H:i:s').'] Failed:</error> '.$job->resolveName());
-        } else {
-            $this->output->writeln('<info>['.Carbon::now()->format('Y-m-d H:i:s').'] Processed:</info> '.$job->resolveName());
-        }
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Illuminate\Queue\Console;
 use Illuminate\Queue\Listener;
 use Illuminate\Console\Command;
 use Illuminate\Queue\ListenerOptions;
+use Symfony\Component\Process\ProcessUtils;
 
 class ListenCommand extends Command
 {
@@ -92,10 +93,9 @@ class ListenCommand extends Command
     protected function gatherOptions()
     {
         return new ListenerOptions(
-            $this->option('env'), $this->option('delay'),
-            $this->option('memory'), $this->option('timeout'),
-            $this->option('sleep'), $this->option('tries'),
-            $this->option('force')
+            $this->option('delay'), $this->option('memory'),
+            $this->option('timeout'), $this->option('sleep'), $this->option('tries'),
+            $this->option('force'), $this->resolveExtraParameters()
         );
     }
 
@@ -110,5 +110,40 @@ class ListenCommand extends Command
         $listener->setOutputHandler(function ($type, $line) {
             $this->output->write($line);
         });
+    }
+
+    /**
+     * @return string
+     */
+    protected function resolveExtraParameters()
+    {
+        return ' '.implode(' ', array_filter([
+            $this->resolveEnvironmentParameter(),
+            $this->resolveVerbosityParameter()
+        ]));
+    }
+
+    /**
+     * Resolve a Symfony verbosity level back to its CLI parameter
+     *
+     * @return string
+     */
+    protected function resolveVerbosityParameter()
+    {
+        $map = array_flip($this->verbosityMap);
+
+        if (isset($map[$this->output->getVerbosity()])) {
+            return '-'.$map[$this->output->getVerbosity()];
+        }
+    }
+
+    /**
+     * @return string
+     */
+    protected function resolveEnvironmentParameter()
+    {
+        if ($this->option('env')) {
+            return '--env='.ProcessUtils::escapeArgument($this->option('env'));
+        }
     }
 }
