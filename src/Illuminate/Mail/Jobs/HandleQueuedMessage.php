@@ -4,8 +4,8 @@ namespace Illuminate\Mail\Jobs;
 
 use Closure;
 use Illuminate\Support\Str;
-use SuperClosure\Serializer;
 use Illuminate\Contracts\Mail\Mailer;
+use Opis\Closure\SerializableClosure;
 use Illuminate\Queue\SerializesAndRestoresModelIdentifiers;
 
 class HandleQueuedMessage
@@ -71,7 +71,7 @@ class HandleQueuedMessage
         }
 
         if ($this->callback instanceof Closure) {
-            $this->callback = (new Serializer)->serialize($this->callback);
+            $this->callback = serialize(new SerializableClosure($this->callback));
         }
 
         return array_keys(get_object_vars($this));
@@ -89,7 +89,7 @@ class HandleQueuedMessage
         }
 
         if (Str::contains($this->callback, 'SerializableClosure')) {
-            $this->callback = (new Serializer)->unserialize($this->callback);
+            $this->callback = unserialize($this->callback)->getClosure();
         }
     }
 }
