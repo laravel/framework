@@ -2155,6 +2155,17 @@ class Builder
     }
 
     /**
+     * Get the ID of the last inserted row.
+     *
+     * @param  string  $sequence
+     * @return int
+     */
+    public function lastInsertId($sequence = null)
+    {
+        return $this->processor->processLastInsertId($this, $sequence);
+    }
+
+    /**
      * Update a record in the database.
      *
      * @param  array  $values

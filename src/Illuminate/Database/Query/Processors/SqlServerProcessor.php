@@ -9,19 +9,15 @@ use Illuminate\Database\Query\Builder;
 class SqlServerProcessor extends Processor
 {
     /**
-     * Process an "insert get ID" query.
+     * Process a "last insert ID" query.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  string  $sql
-     * @param  array   $values
      * @param  string  $sequence
      * @return int
      */
-    public function processInsertGetId(Builder $query, $sql, $values, $sequence = null)
+    public function processLastInsertId(Builder $query, $sequence = null)
     {
         $connection = $query->getConnection();
-
-        $connection->insert($sql, $values);
 
         if ($connection->getConfig('odbc') === true) {
             $id = $this->processInsertGetIdForOdbc($connection);
@@ -33,7 +29,7 @@ class SqlServerProcessor extends Processor
     }
 
     /**
-     * Process an "insert get ID" query for ODBC.
+     * Process a "last insert ID" query for ODBC.
      *
      * @param  \Illuminate\Database\Connection  $connection
      * @return int

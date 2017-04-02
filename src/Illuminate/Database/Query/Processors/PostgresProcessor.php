@@ -27,6 +27,25 @@ class PostgresProcessor extends Processor
     }
 
     /**
+     * Process a "last insert ID" query.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  string  $sequence
+     * @return int
+     */
+    public function processLastInsertId(Builder $query, $sequence = null)
+    {
+        $table = $query->from;
+        $sequence = $sequence ?: 'id';
+
+        $sequenceName = "{$table}_{$sequence}_seq";
+
+        $id = $query->getConnection()->getPdo()->lastInsertId($sequenceName);
+
+        return is_numeric($id) ? (int) $id : $id;
+    }
+
+    /**
      * Process the results of a column listing query.
      *
      * @param  array  $results

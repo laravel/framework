@@ -1205,6 +1205,11 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testInsertGetIdMethod()
     {
         $builder = $this->getBuilder();
+        $builder->getProcessor()->shouldReceive('processInsertGetId')->once()->with($builder, 'insert into "users" ("email") values (?)', ['foo'], null)->andReturn(1);
+        $result = $builder->from('users')->insertGetId(['email' => 'foo']);
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getBuilder();
         $builder->getProcessor()->shouldReceive('processInsertGetId')->once()->with($builder, 'insert into "users" ("email") values (?)', ['foo'], 'id')->andReturn(1);
         $result = $builder->from('users')->insertGetId(['email' => 'foo'], 'id');
         $this->assertEquals(1, $result);
@@ -1215,6 +1220,19 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $builder = $this->getBuilder();
         $builder->getProcessor()->shouldReceive('processInsertGetId')->once()->with($builder, 'insert into "users" ("email", "bar") values (?, bar)', ['foo'], 'id')->andReturn(1);
         $result = $builder->from('users')->insertGetId(['email' => 'foo', 'bar' => new Illuminate\Database\Query\Expression('bar')], 'id');
+        $this->assertEquals(1, $result);
+    }
+
+    public function testLastInsertIdMethod()
+    {
+        $builder = $this->getBuilder();
+        $builder->getProcessor()->shouldReceive('processLastInsertId')->once()->with($builder, null)->andReturn(1);
+        $result = $builder->lastInsertId();
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getBuilder();
+        $builder->getProcessor()->shouldReceive('processLastInsertId')->once()->with($builder, 'id')->andReturn(1);
+        $result = $builder->lastInsertId('id');
         $this->assertEquals(1, $result);
     }
 
