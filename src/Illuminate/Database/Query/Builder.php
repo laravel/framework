@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\ConnectionInterface;
@@ -1516,11 +1517,33 @@ class Builder
             call_user_func($query, $query = $this->newQuery());
         }
 
+        if ($query instanceof Model) {
+            return $this->merge($query);
+        }
+
         $this->unions[] = compact('query', 'all');
 
         $this->addBinding($query->getBindings(), 'union');
 
         return $this;
+    }
+
+    /**
+     * Merge model record into simple query.
+     *
+     * @param \Illuminate\Database\Eloquent\Model $model
+     * @return \Illuminate\Database\Query\Builder|static
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function merge(Model $model)
+    {
+        if ($model->getTable() === $this->from) {
+            return $this->union(
+                \DB::table($this->from)->where($model->getKeyName(), $model->getKey())
+            );
+        }
+        throw new InvalidArgumentException();
     }
 
     /**
