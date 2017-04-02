@@ -10,10 +10,11 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
+use Illuminate\Contracts\Console\Command as CommandInterface;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 
-class Command extends SymfonyCommand
+class Command extends SymfonyCommand implements CommandInterface
 {
     /**
      * The Laravel application instance.
