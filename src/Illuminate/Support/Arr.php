@@ -456,6 +456,58 @@ class Arr
 
         return $array;
     }
+    
+    /**
+     * Set new array element after one of it's key.
+     *
+     * @param $key
+     * @param array $array
+     * @param $new_key
+     * @param $new_value
+     * @return array|bool
+     */
+    public function after($key, array &$array, $new_key, $new_value)
+    {
+        if (array_key_exists($key, $array)) {
+            $new = [];
+            foreach ($array as $k => $value) {
+                $new[$k] = $value;
+                if ($k === $key) {
+                    $new[$new_key] = $new_value;
+                }
+            }
+            
+            return $new;
+        }
+        
+        return false;
+    }
+
+    /**
+     * Set new array element before one of it's key.
+     *
+     * @param $key
+     * @param array $array
+     * @param $new_key
+     * @param $new_value
+     * @return array|bool
+     */
+    public function before($key, array &$array, $new_key, $new_value)
+    {
+        if (array_key_exists($key, $array)) {
+            $new = [];
+            foreach ($array as $k => $value) {
+                if ($k === $key) {
+                    $new[$new_key] = $new_value;
+                }
+                $new[$k] = $value;
+            }
+            
+            return $new;
+        }
+        
+        return false;
+    }
 
     /**
      * Shuffle the given array and return the result.
