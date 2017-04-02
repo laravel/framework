@@ -44,6 +44,38 @@ abstract class Controller
     }
 
     /**
+     * Remove middleware.
+     *
+     * @param  string|array  $middleware
+     * @return $this
+     */
+    protected function removeMiddleware($middleware)
+    {
+        foreach ((array) $middleware as $m) {
+            if ($this->hasMiddleware($m)) {
+                $names = array_column($this->middleware, 'middleware');
+                $index = array_search($m, $names);
+                unset($this->middleware[$index]);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Determine if middleware exists.
+     *
+     * @param  string  $middleware
+     * @return bool
+     */
+    protected function hasMiddleware($middleware)
+    {
+        $names = array_column($this->middleware, 'middleware');
+
+        return ! (false === array_search($middleware, $names));
+    }
+
+    /**
      * Execute an action on the controller.
      *
      * @param  string  $method
