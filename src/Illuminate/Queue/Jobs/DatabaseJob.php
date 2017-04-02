@@ -65,7 +65,7 @@ class DatabaseJob extends Job implements JobContract
      * Release the job back into the queue.
      *
      * @param  int  $delay
-     * @return void
+     * @return int
      */
     public function release($delay = 0)
     {
@@ -73,7 +73,7 @@ class DatabaseJob extends Job implements JobContract
 
         $this->delete();
 
-        $this->database->release($this->queue, $this->job, $delay);
+         return $this->database->release($this->queue, $this->job, $delay);
     }
 
     /**
