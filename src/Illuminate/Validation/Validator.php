@@ -194,7 +194,6 @@ class Validator implements ValidatorContract
     public function __construct(TranslatorInterface $translator, array $data, array $rules,
                                 array $messages = [], array $customAttributes = [])
     {
-        $this->initialRules = $rules;
         $this->translator = $translator;
         $this->customMessages = $messages;
         $this->customAttributes = $customAttributes;
@@ -1494,7 +1493,12 @@ class Validator implements ValidatorContract
         }
 
         if (is_array($value)) {
-            return $verifier->getMultiCount($table, $column, $value, $extra);
+            // If count is equal to recursive count it means the array is not 2 dimensional.
+            // When the array is 2 dimensional we only send the keys as array, as these are the id's
+            if (count($value) === count($value, COUNT_RECURSIVE)) {
+                return $verifier->getMultiCount($table, $column, $value, $extra);
+            }
+            return $verifier->getMultiCount($table, $column, array_keys($value), $extra);
         }
 
         return $verifier->getCount($table, $column, $value, null, null, $extra);
