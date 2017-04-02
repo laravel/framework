@@ -1192,6 +1192,25 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($c->containsStrict(''));
     }
 
+    public function testCount()
+    {
+        $c = new Collection([1, 3, 5, 7]);
+
+        $this->assertEquals(4, $c->count());
+    }
+
+    /**
+     * @group nathan
+     */
+    public function testCountWithFilter()
+    {
+        $c = new Collection([1, 3, 5, 7]);
+
+        $this->assertEquals(3, $c->count(function ($v) {
+            return $v > 1;
+        }));
+    }
+
     public function testGettingSumFromCollection()
     {
         $c = new Collection([(object) ['foo' => 50], (object) ['foo' => 50]]);
