@@ -77,8 +77,11 @@ class Worker
                 $this->sleep($options->sleep);
             }
 
-            if ($this->memoryExceeded($options->memory) ||
-                $this->queueShouldRestart($lastRestart)) {
+            if ($this->memoryExceeded($options->memory)) {
+                $this->stop(12);
+            }
+
+            if ($this->queueShouldRestart($lastRestart)) {
                 $this->stop();
             }
         }
@@ -387,13 +390,14 @@ class Worker
     /**
      * Stop listening and bail out of the script.
      *
+     * @param  int  $status
      * @return void
      */
-    public function stop()
+    public function stop($status = 0)
     {
         $this->events->fire(new Events\WorkerStopping);
 
-        die;
+        exit($status);
     }
 
     /**
