@@ -115,7 +115,7 @@ class ListenCommand extends Command
     /**
      * @return string
      */
-    protected function resolveExtraParameters()
+    private function resolveExtraParameters()
     {
         return ' '.implode(' ', array_filter([
             $this->resolveEnvironmentParameter(),
@@ -128,7 +128,7 @@ class ListenCommand extends Command
      *
      * @return string
      */
-    protected function resolveVerbosityParameter()
+    private function resolveVerbosityParameter()
     {
         $map = array_flip($this->verbosityMap);
 
@@ -140,7 +140,7 @@ class ListenCommand extends Command
     /**
      * @return string
      */
-    protected function resolveEnvironmentParameter()
+    private function resolveEnvironmentParameter()
     {
         if ($this->option('env')) {
             return '--env='.ProcessUtils::escapeArgument($this->option('env'));

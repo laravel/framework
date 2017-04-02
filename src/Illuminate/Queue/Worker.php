@@ -240,7 +240,7 @@ class Worker
 
             $this->raiseEmptyQueueEvent($connection);
         } catch (Exception $e) {
-            $this->raiseQueueExceptionOccurred($connection, $e);
+            $this->raiseQueueExceptionOccurredEvent($connection, $e);
             $this->exceptions->report($e);
         } catch (Throwable $e) {
             $this->exceptions->report(new FatalThrowableError($e));
@@ -415,7 +415,7 @@ class Worker
      * @param  \Exception  $e
      * @return void
      */
-    protected function raiseQueueExceptionOccurred($connectionName, $e)
+    protected function raiseQueueExceptionOccurredEvent($connectionName, $e)
     {
         $this->events->fire(new Events\QueueExceptionOccurred(
             $connectionName, $e
