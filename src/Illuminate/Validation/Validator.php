@@ -306,7 +306,7 @@ class Validator implements ValidatorContract
     {
         $data = Arr::dot($this->initializeAttributeOnData($attribute));
 
-        $pattern = str_replace('\*', '[^\.]+', preg_quote($attribute));
+        $pattern = str_replace('\*', '[^\.]*', preg_quote($attribute));
 
         $data = array_merge($data, $this->extractValuesForWildcards(
             $data, $attribute
@@ -355,7 +355,7 @@ class Validator implements ValidatorContract
     {
         $keys = [];
 
-        $pattern = str_replace('\*', '[^\.]+', preg_quote($attribute));
+        $pattern = str_replace('\*', '[^\.]*', preg_quote($attribute));
 
         foreach ($data as $key => $value) {
             if ((bool) preg_match('/^'.$pattern.'/', $key, $matches)) {

@@ -2610,6 +2610,14 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($v->fails());
     }
 
+    public function testCoveringEmptyKeys()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['foo' => ['' => ['bar' => '']]], ['foo.*.bar' => 'required']);
+        $this->assertTrue($v->fails());
+    }
+
     public function testImplicitEachWithAsterisksWithArrayValues()
     {
         $trans = $this->getIlluminateArrayTranslator();
