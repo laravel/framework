@@ -2,21 +2,21 @@
 
 namespace Illuminate\Tests\Queue;
 
-use Illuminate\Queue\Events\NoJobsLeft;
-use Illuminate\Queue\Events\QueueExceptionOccurred;
-use Illuminate\Queue\Events\Sleeping;
 use Mockery;
 use RuntimeException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Queue\WorkerOptions;
+use Illuminate\Queue\Events\Sleeping;
 use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Queue\Events\NoJobsLeft;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\MaxAttemptsExceededException;
+use Illuminate\Queue\Events\QueueExceptionOccurred;
 
 class QueueWorkerTest extends TestCase
 {

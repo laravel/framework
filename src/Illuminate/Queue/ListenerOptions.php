@@ -5,7 +5,7 @@ namespace Illuminate\Queue;
 class ListenerOptions extends WorkerOptions
 {
     /**
-     * Any extra parameters to pass through to the worker command
+     * Any extra parameters to pass through to the worker command.
      *
      * @var string
      */

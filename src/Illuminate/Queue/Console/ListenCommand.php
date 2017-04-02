@@ -119,12 +119,12 @@ class ListenCommand extends Command
     {
         return ' '.implode(' ', array_filter([
             $this->resolveEnvironmentParameter(),
-            $this->resolveVerbosityParameter()
+            $this->resolveVerbosityParameter(),
         ]));
     }
 
     /**
-     * Resolve a Symfony verbosity level back to its CLI parameter
+     * Resolve a Symfony verbosity level back to its CLI parameter.
      *
      * @return string
      */
