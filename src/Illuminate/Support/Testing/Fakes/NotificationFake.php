@@ -35,7 +35,11 @@ class NotificationFake implements NotificationFactory
         }
 
         PHPUnit::assertTrue(
-            $this->sent($notifiable, $notification, $callback)->count() > 0,
+            $this->sent($notifiable, $notification, $callback)->filter(
+                function ($notifications) {
+                    return $notifications->isEmpty();
+                }
+            )->count() === 0,
             "The expected [{$notification}] notification was not sent."
         );
     }
@@ -59,7 +63,11 @@ class NotificationFake implements NotificationFactory
         }
 
         PHPUnit::assertTrue(
-            $this->sent($notifiable, $notification, $callback)->count() === 0,
+            $this->sent($notifiable, $notification, $callback)->filter(
+                function ($notifications) {
+                    return ! $notifications->isEmpty();
+                }
+            )->count() === 0,
             "The unexpected [{$notification}] notification was sent."
         );
     }
@@ -74,23 +82,29 @@ class NotificationFake implements NotificationFactory
      */
     public function sent($notifiable, $notification, $callback = null)
     {
-        if (! $this->hasSent($notifiable, $notification)) {
-            return collect();
+        if (! is_array($notifiable) && ! ($notifiable instanceof \IteratorAggregate)) {
+            $notifiable = [$notifiable];
         }
 
-        $callback = $callback ?: function () {
-            return true;
-        };
+        return collect($notifiable)->map(function ($notifiableItem) use ($notification, $callback) {
+            if (! $this->hasSent($notifiableItem, $notification)) {
+                return collect();
+            }
 
-        $notifications = collect($this->notificationsFor($notifiable, $notification));
+            $callback = $callback ?: function () {
+                return true;
+            };
 
-        return $notifications->filter(function ($arguments) use ($callback) {
-            return $callback(...array_values($arguments));
-        })->pluck('notification');
+            $notifications = collect($this->notificationsFor($notifiableItem, $notification));
+
+            return $notifications->filter(function ($arguments) use ($callback) {
+                return $callback(...array_values($arguments));
+            })->pluck('notification');
+        });
     }
 
     /**
-     * Determine if there are more notifications left to inspect.
+     * Determine if there are morae notifications left to inspect.
      *
      * @param  mixed  $notifiable
      * @param  string  $notification
