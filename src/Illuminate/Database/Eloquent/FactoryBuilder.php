@@ -110,17 +110,15 @@ class FactoryBuilder
      */
     public function create(array $attributes = [])
     {
-        $results = $this->make($attributes);
+        $collection = (new $this->class)->newCollection();
 
-        if ($this->amount === 1) {
-            $results->save();
-        } else {
-            foreach ($results as $result) {
-                $result->save();
-            }
+        while ($collection->count() < $this->amount) {
+            $model = $this->makeInstance($attributes);
+            $model->save();
+            $collection->push($model);
         }
 
-        return $results;
+        return $collection;
     }
 
     /**
