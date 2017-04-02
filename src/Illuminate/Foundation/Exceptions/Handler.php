@@ -210,7 +210,7 @@ class Handler implements ExceptionHandlerContract
             'line' => $e->getLine(),
             'trace' => $e->getTrace(),
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), $status, array_merge($headers, [
-            'Content-Type' => 'application/json'
+            'Content-Type' => 'application/json',
         ]));
     }
 
