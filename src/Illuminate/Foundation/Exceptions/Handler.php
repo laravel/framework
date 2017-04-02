@@ -6,6 +6,7 @@ use Exception;
 use Psr\Log\LoggerInterface;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Container\Container;
@@ -69,7 +70,7 @@ class Handler implements ExceptionHandlerContract
             throw $e; // throw the original exception
         }
 
-        $logger->error($e);
+        $logger->error($e, $this->context());
     }
 
     /**
@@ -96,6 +97,20 @@ class Handler implements ExceptionHandlerContract
         return ! is_null(collect($dontReport)->first(function ($type) use ($e) {
             return $e instanceof $type;
         }));
+    }
+
+    /**
+     * Get the default context variables for logging.
+     *
+     * @return array
+     */
+    protected function context()
+    {
+        return array_filter([
+            'userId' => Auth::id(),
+            'email' => Auth::check() && isset(Auth::user()->email)
+                        ? Auth::user()->email : null,
+        ]);
     }
 
     /**
