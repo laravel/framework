@@ -44,7 +44,7 @@ class AbstractPaginatorTest extends TestCase
     public function testGetUrlRange()
     {
     	$pagesRange = [1 => '/?page=1', 2 => '/?page=2', 3 => '/?page=3'];
-    	
+
     	$this->assertEquals($pagesRange,  $this->concrete->getUrlRange(1,3));
     	$this->assertNotEquals(array_reverse($pagesRange),  $this->concrete->getUrlRange(1,3));
     }
