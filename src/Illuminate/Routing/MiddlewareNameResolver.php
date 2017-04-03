@@ -31,7 +31,7 @@ class MiddlewareNameResolver
         // set of middleware under single keys that can be conveniently referenced.
         } elseif (isset($middlewareGroups[$name])) {
             return static::parseMiddlewareGroup(
-                $name, $map, $middlewareGroups
+                $name, $map, $middlewareGroups, $disabledMiddlewares
             );
 
         // Finally, when the middleware is simply a string mapped to a class name the
@@ -53,11 +53,14 @@ class MiddlewareNameResolver
      * @param  array  $middlewareGroups
      * @return array
      */
-    protected static function parseMiddlewareGroup($name, $map, $middlewareGroups)
+    protected static function parseMiddlewareGroup($name, $map, $middlewareGroups, $disabledMiddlewares)
     {
         $results = [];
 
         foreach ($middlewareGroups[$name] as $middleware) {
+            if (in_array($middleware, $disabledMiddlewares)) {
+                continue;
+            }
             // If the middleware is another middleware group we will pull in the group and
             // merge its middleware into the results. This allows groups to conveniently
             // reference other groups without needing to repeat all their middlewares.

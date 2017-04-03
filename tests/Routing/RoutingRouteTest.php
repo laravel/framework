@@ -261,6 +261,23 @@ class RoutingRouteTest extends TestCase
         unset($_SERVER['__middleware.group']);
     }
 
+    public function testWithoutMiddlewareGroups()
+    {
+        unset($_SERVER['__middleware.group']);
+        $router = $this->getRouter();
+        $router->get('foo/bar', ['middleware' => 'web', function () {
+            return 'hello';
+        }])->withoutMiddleware('two:taylor');
+
+        $router->aliasMiddleware('two', 'Illuminate\Tests\Routing\RoutingTestMiddlewareGroupTwo');
+        $router->middlewareGroup('web', ['Illuminate\Tests\Routing\RoutingTestMiddlewareGroupOne', 'two:taylor']);
+
+        $this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+        $this->assertTrue($_SERVER['__middleware.group']);
+
+        unset($_SERVER['__middleware.group']);
+    }
+
     public function testMiddlewareGroupsCanReferenceOtherGroups()
     {
         unset($_SERVER['__middleware.group']);
