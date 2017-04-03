@@ -59,6 +59,22 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Create a new collection by invoking the callback a given amount of times.
+     *
+     * @param  int  $amount
+     * @param  callable  $callback
+     * @return static
+     */
+    public static function times($amount, callable $callback)
+    {
+        if ($amount < 1) {
+            return new static;
+        }
+
+        return (new static(range(1, $amount)))->map($callback);
+    }
+
+    /**
      * Get all of the items in the collection.
      *
      * @return array
