@@ -352,7 +352,9 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         $input = $this->all();
 
         foreach ($keys as $key) {
-            Arr::set($results, $key, data_get($input, $key));
+            if (Arr::has($input, $key)) {
+                Arr::set($results, $key, data_get($input, $key));
+            }
         }
 
         return $results;
