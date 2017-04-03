@@ -14,13 +14,15 @@ class MiddlewareNameResolver
      * @param  array  $middlewareGroups
      * @return string|array
      */
-    public static function resolve($name, $map, $middlewareGroups)
+    public static function resolve($name, $map, $middlewareGroups, $disabledMiddlewares)
     {
         // When the middleware is simply a Closure, we will return this Closure instance
         // directly so that Closures can be registered as middleware inline, which is
         // convenient on occasions when the developers are experimenting with them.
         if ($name instanceof Closure) {
             return $name;
+        } elseif (in_array($name, $disabledMiddlewares)) {
+            return [];
         } elseif (isset($map[$name]) && $map[$name] instanceof Closure) {
             return $map[$name];
 

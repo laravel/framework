@@ -175,6 +175,18 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('caught', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
     }
 
+    public function testDisableMiddleware()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/bar', ['middleware' => 'foo', function () {
+            return 'hello';
+        }])->withoutMiddleware('foo');
+        $router->aliasMiddleware('foo', function ($request, $next) {
+            return 'caught';
+        });
+        $this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+    }
+
     public function testControllerClosureMiddleware()
     {
         $router = $this->getRouter();
