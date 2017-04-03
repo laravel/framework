@@ -53,6 +53,11 @@ class ValidationServiceProvider extends ServiceProvider
      */
     protected function registerPresenceVerifier()
     {
+        // since 'validation.presence' is optional, make the 'db' binding optional as well
+        if (! isset($this->app['db'])) {
+            return;
+        }
+
         $this->app->singleton('validation.presence', function ($app) {
             return new DatabasePresenceVerifier($app['db']);
         });
