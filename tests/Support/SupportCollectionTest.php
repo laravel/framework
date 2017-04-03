@@ -1150,6 +1150,11 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
             return $value > 5;
         }));
 
+        $c = new Collection(['v' => 1, 'a' => 3, 'l' => 5]);
+
+        $this->assertTrue($c->contains('v', 1));
+        $this->assertFalse($c->contains('a', 7));
+
         $c = new Collection([['v' => 1], ['v' => 3], ['v' => 5]]);
 
         $this->assertTrue($c->contains('v', 1));
@@ -1175,6 +1180,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($c->containsStrict(function ($value) {
             return $value > 5;
         }));
+
+        $c = new Collection(['v' => 1, 'a' => 3, 'l' => '05']);
+
+        $this->assertTrue($c->containsStrict('v', 1));
+        $this->assertFalse($c->containsStrict('a', 7));
+        $this->assertFalse($c->containsStrict('l', 5));
+        $this->assertTrue($c->containsStrict('l', '05'));
 
         $c = new Collection([['v' => 1], ['v' => 3], ['v' => '04'], ['v' => 5]]);
 

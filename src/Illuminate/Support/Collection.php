@@ -161,7 +161,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         if (func_num_args() == 2) {
             return $this->contains(function ($item) use ($key, $value) {
-                return data_get($item, $key) == $value;
+                if (is_array($item)) {
+                    return data_get($item, $key) == $value;
+                }
+
+                return data_get($this->items, $key) == $value;
             });
         }
 
@@ -183,7 +187,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         if (func_num_args() == 2) {
             return $this->contains(function ($item) use ($key, $value) {
-                return data_get($item, $key) === $value;
+                if (is_array($item)) {
+                    return data_get($item, $key) === $value;
+                }
+
+                return data_get($this->items, $key) === $value;
             });
         }
 
