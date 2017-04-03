@@ -1399,6 +1399,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $data = new Collection(['first' => 'Taylor', 'last' => 'Otwell', 'email' => 'taylorotwell@gmail.com']);
 
         $this->assertEquals($data->all(), $data->only(null)->all());
+        $this->assertEquals($data->all(), $data->only(new Collection(['first', 'missing']))->all());
         $this->assertEquals(['first' => 'Taylor'], $data->only(['first', 'missing'])->all());
         $this->assertEquals(['first' => 'Taylor'], $data->only('first', 'missing')->all());
 
