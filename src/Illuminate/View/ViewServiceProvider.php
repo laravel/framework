@@ -73,13 +73,36 @@ class ViewServiceProvider extends ServiceProvider
         // instance to pass into the engine so it can compile the views properly.
         $app->singleton('blade.compiler', function ($app) {
             $cache = $app['config']['view.compiled'];
+            $base = $this->getCommonRootPath($app['config']['view.paths']);
 
-            return new BladeCompiler($app['files'], $cache);
+            return new BladeCompiler($app['files'], $cache, $base);
         });
 
         $resolver->register('blade', function () use ($app) {
             return new CompilerEngine($app['blade.compiler']);
         });
+    }
+
+    /**
+     * Get the common root from an array of paths.
+     *
+     * @param  array  $paths
+     * @return string
+     */
+    protected function getCommonRootPath(array $paths)
+    {
+        array_walk($paths, function (&$path) {
+            $path = explode('/', trim($path, '/'));
+        });
+
+        $matches = call_user_func_array('array_intersect_assoc', $paths);
+
+        $root = '/';
+        for ($i = 0; isset($matches[$i]); $i += 1) {
+            $root .= $matches[$i].'/';
+        }
+
+        return $root;
     }
 
     /**

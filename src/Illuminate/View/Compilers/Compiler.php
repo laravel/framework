@@ -22,15 +22,23 @@ abstract class Compiler
     protected $cachePath;
 
     /**
+     * Get the base path of the views directory.
+     *
+     * @var string
+     */
+    protected $basePath;
+
+    /**
      * Create a new compiler instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  string  $cachePath
+     * @param  string  $basePath
      * @return void
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(Filesystem $files, $cachePath)
+    public function __construct(Filesystem $files, $cachePath, $basePath = null)
     {
         if (! $cachePath) {
             throw new InvalidArgumentException('Please provide a valid cache path.');
@@ -38,6 +46,7 @@ abstract class Compiler
 
         $this->files = $files;
         $this->cachePath = $cachePath;
+        $this->basePath = $basePath;
     }
 
     /**
@@ -48,6 +57,10 @@ abstract class Compiler
      */
     public function getCompiledPath($path)
     {
+        // The sha1 should not care about where the project is stored.
+        // We just get the relative path from the base path.
+        $path = str_replace_first($this->basePath, '', $path);
+
         return $this->cachePath.'/'.sha1($path).'.php';
     }
 

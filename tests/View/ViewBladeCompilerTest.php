@@ -36,8 +36,12 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase
 
     public function testCompilePathIsProperlyCreated()
     {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__, 'base_path');
         $this->assertEquals(__DIR__.'/'.sha1('foo').'.php', $compiler->getCompiledPath('foo'));
+        $this->assertEquals(
+            __DIR__.'/'.sha1('/resources/views/foo').'.php',
+            $compiler->getCompiledPath('base_path/resources/views/foo')
+        );
     }
 
     public function testCompileCompilesFileAndReturnsContents()
