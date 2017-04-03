@@ -703,7 +703,8 @@ class Route
      *
      * @return array
      */
-    public function gatherDisabledMiddlewares() {
+    public function gatherDisabledMiddlewares()
+    {
         return (array) Arr::get($this->action, 'bypass', []);
     }
 
@@ -736,7 +737,7 @@ class Route
      * @param null $middleware
      * @return $this
      */
-    public function withoutMiddleware($middleware = null) 
+    public function withoutMiddleware($middleware = null)
     {
         if (is_null($middleware)) {
             $this->action['middleware'] = [];
@@ -744,12 +745,12 @@ class Route
             if (is_string($middleware)) {
                 $middleware = func_get_args();
             }
-        
+
             $this->action['bypass'] = array_merge(
                 (array) Arr::get($this->action, 'bypass', []), $middleware
             );
         }
-        
+
         return $this;
     }
 
