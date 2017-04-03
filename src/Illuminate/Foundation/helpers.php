@@ -346,7 +346,7 @@ if (! function_exists('elixir')) {
         }
 
         if (isset($manifest[$file])) {
-            return '/'.trim($buildDirectory.'/'.$manifest[$file], '/');
+            return  app(UrlGenerator::class)->to(trim($buildDirectory.'/'.$manifest[$file], '/'));
         }
 
         throw new InvalidArgumentException("File {$file} not defined in asset manifest.");
