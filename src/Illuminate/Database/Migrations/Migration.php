@@ -20,4 +20,14 @@ abstract class Migration
     {
         return $this->connection;
     }
+
+    /**
+     * Modify the table.
+     */
+    abstract public function up();
+
+    /**
+     * Rollback changes.
+     */
+    abstract public function down();
 }
