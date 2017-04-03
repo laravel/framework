@@ -63,7 +63,7 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase
             return $callback;
         });
         $user->shouldReceive('getEmailForPasswordReset')->once()->andReturn('email');
-        $message = m::mock('StdClass');
+        $message = m::mock('\Illuminate\Mail\Message');
         $message->shouldReceive('to')->once()->with('email');
         $result = $broker->emailResetLink($user, 'token', $callback);
         call_user_func($result, $message);

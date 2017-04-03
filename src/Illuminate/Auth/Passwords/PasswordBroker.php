@@ -9,6 +9,7 @@ use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use Illuminate\Mail\Message;
 
 class PasswordBroker implements PasswordBrokerContract
 {
@@ -110,11 +111,11 @@ class PasswordBroker implements PasswordBrokerContract
         // so that it may be displayed for an user to click for password reset.
         $view = $this->emailView;
 
-        return $this->mailer->send($view, compact('token', 'user'), function ($m) use ($user, $token, $callback) {
-            $m->to($user->getEmailForPasswordReset());
+        return $this->mailer->send($view, compact('token', 'user'), function (Message $message) use ($user, $token, $callback) {
+            $message->to($user->getEmailForPasswordReset());
 
             if (! is_null($callback)) {
-                call_user_func($callback, $m, $user, $token);
+                call_user_func($callback, $message, $user, $token);
             }
         });
     }
