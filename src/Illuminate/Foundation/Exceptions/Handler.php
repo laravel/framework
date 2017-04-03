@@ -112,8 +112,7 @@ class Handler implements ExceptionHandlerContract
     {
         return array_filter([
             'userId' => Auth::id(),
-            'email' => Auth::check() && isset(Auth::user()->email)
-                        ? Auth::user()->email : null,
+            'email' => Auth::user()->email ?? null,
         ]);
     }
 
