@@ -83,7 +83,10 @@ class AuthManager implements FactoryContract
         $config = $this->getConfig($name);
 
         if (is_null($config)) {
-            throw new InvalidArgumentException("Auth guard [{$name}] is not defined.");
+            /** @var Closure $message */
+            $message = require __DIR__.'/Templates/AuthGuardNotDefined.php';
+
+            throw new InvalidArgumentException($message($name));
         }
 
         if (isset($this->customCreators[$config['driver']])) {
