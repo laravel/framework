@@ -386,6 +386,17 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Create the column definition for a real type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeReal(Fluent $column)
+    {
+        return 'real';
+    }
+
+    /**
      * Create the column definition for a decimal type.
      *
      * @param  \Illuminate\Support\Fluent  $column

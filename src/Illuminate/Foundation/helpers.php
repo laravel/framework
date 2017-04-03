@@ -346,7 +346,7 @@ if (! function_exists('database_path')) {
      */
     function database_path($path = '')
     {
-        return app()->databasePath().($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return app()->databasePath($path);
     }
 }
 
@@ -702,7 +702,7 @@ if (! function_exists('resource_path')) {
      */
     function resource_path($path = '')
     {
-        return app()->resourcePath().($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return app()->resourcePath($path);
     }
 }
 

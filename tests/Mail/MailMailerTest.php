@@ -140,6 +140,7 @@ class MailMailerTest extends TestCase
     public function setSwiftMailer($mailer)
     {
         $swift = m::mock('Swift_Mailer');
+        $swift->shouldReceive('createMessage')->andReturn(new \Swift_Message);
         $swift->shouldReceive('getTransport')->andReturn($transport = m::mock('Swift_Transport'));
         $transport->shouldReceive('stop');
         $mailer->setSwiftMailer($swift);
@@ -166,5 +167,10 @@ class FailingSwiftMailerStub
         $transport->shouldReceive('stop');
 
         return $transport;
+    }
+
+    public function createMessage()
+    {
+        return new \Swift_Message();
     }
 }

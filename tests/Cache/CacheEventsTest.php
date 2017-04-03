@@ -9,7 +9,7 @@ use Illuminate\Cache\Events\KeyWritten;
 use Illuminate\Cache\Events\CacheMissed;
 use Illuminate\Cache\Events\KeyForgotten;
 
-class CacheEventTest extends TestCase
+class CacheEventsTest extends TestCase
 {
     public function tearDown()
     {
