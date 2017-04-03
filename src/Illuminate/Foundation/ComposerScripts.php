@@ -41,6 +41,17 @@ class ComposerScripts
     {
         $laravel = new Application(getcwd());
 
+        // Create environment file if it doesn't exists.
+        if (! file_exists($laravel->environmentFilePath())) {
+            exec("php -r \"copy('".$laravel->environmentFilePath().".example',
+             '".$laravel->environmentFilePath().');"');
+        }
+
+        // Create app key.
+        if (empty(env('APP_KEY'))) {
+            exec('php artisan key:generate');
+        }
+
         if (file_exists($compiledPath = $laravel->getCachedCompilePath())) {
             @unlink($compiledPath);
         }
