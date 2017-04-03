@@ -270,7 +270,7 @@ class Dispatcher {
 		// If listeners exist for the given event, we will sort them by the priority
 		// so that we can call them in the correct order. We will cache off these
 		// sorted event listeners so we do not have to re-sort on every events.
-		if (isset($this->listeners[$eventName]))
+		if (is_array($this->listeners[$eventName]))
 		{
 			krsort($this->listeners[$eventName]);
 
