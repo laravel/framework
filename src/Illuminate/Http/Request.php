@@ -350,8 +350,12 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         $results = [];
 
         $input = $this->all();
+        
+        $inputKeys = array_keys($this->all());
+        
+        $matchingKeys = array_intersect($inputKeys, $keys);
 
-        foreach ($keys as $key) {
+        foreach ($matchingKeys as $key) {
             Arr::set($results, $key, data_get($input, $key));
         }
 
