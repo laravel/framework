@@ -23,18 +23,22 @@ class AbstractPaginatorTest extends TestCase
 
     public function testPreviousPageUrl()
     {
+        $setCurrentPage = $this->methodSetPublic('setCurrentPage');
+
         $this->assertEquals('/?page=2', $this->concrete->previousPageUrl());
 
-        $this->concrete->setCurrentPage(1);
-        $this->assertEquals(null, $this->concrete->previousPageUrl());
+        $setCurrentPage->invoke($this->concrete, 1);
+        $this->assertEquals('/?page=2', $this->concrete->previousPageUrl());
     }
 
     public function testNextPageUrl()
     {
+        $setCurrentPage = $this->methodSetPublic('setCurrentPage');
+
         $this->assertEquals('/?page=4', $this->concrete->nextPageUrl());
 
-    	$this->concrete->setCurrentPage(1);
-        $this->assertEquals('/?page=2', $this->concrete->nextPageUrl());
+        $setCurrentPage->invoke($this->concrete, 1);
+        $this->assertEquals('/?page=4', $this->concrete->nextPageUrl());
     }
 
     public function testGetUrlRange()
@@ -207,7 +211,7 @@ class AbstractPaginatorTest extends TestCase
 
     protected function methodSetPublic($method)
     {
-        $method = new \ReflectionMethod(AbstractPaginator::class, $method);
+        $method = new \ReflectionMethod($this->concrete, $method);
         $method->setAccessible(true);
 
         return $method;
