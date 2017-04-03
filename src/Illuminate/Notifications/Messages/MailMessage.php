@@ -7,7 +7,7 @@ class MailMessage extends SimpleMessage
     /**
      * The view for the message.
      *
-     * @var string
+     * @var array
      */
     public $view = [
         'notifications::email',
@@ -73,11 +73,11 @@ class MailMessage extends SimpleMessage
     /**
      * Set the view for the mail message.
      *
-     * @param  string  $view
+     * @param  array  $view
      * @param  array  $data
      * @return $this
      */
-    public function view($view, array $data = [])
+    public function view(array $view, array $data = [])
     {
         $this->view = $view;
         $this->viewData = $data;
