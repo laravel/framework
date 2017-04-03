@@ -27,4 +27,15 @@ class NullBroadcaster extends Broadcaster
     {
         //
     }
+    
+       public function check($request)
+    {
+        // 
+    }
+
+    public function validAuthenticationResponse($request, $result)
+    {
+        // 
+    }
+    
 }
