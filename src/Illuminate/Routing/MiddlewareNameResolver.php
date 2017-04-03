@@ -66,7 +66,7 @@ class MiddlewareNameResolver
             // reference other groups without needing to repeat all their middlewares.
             if (isset($middlewareGroups[$middleware])) {
                 $results = array_merge($results, static::parseMiddlewareGroup(
-                    $middleware, $map, $middlewareGroups
+                    $middleware, $map, $middlewareGroups, $disabledMiddlewares
                 ));
 
                 continue;
