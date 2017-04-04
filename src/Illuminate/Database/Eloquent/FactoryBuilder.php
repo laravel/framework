@@ -85,6 +85,8 @@ class FactoryBuilder
 
         if ($this->amount === 1) {
             $results->save();
+
+            return new Collection([$results]);
         } else {
             foreach ($results as $result) {
                 $result->save();
