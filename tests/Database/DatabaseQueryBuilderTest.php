@@ -610,6 +610,17 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['foo'], $builder->getBindings());
     }
 
+    public function testOrderByWhenArgumentsProvidedInArray()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orderBy(['age' => 'desc']);
+        $this->assertEquals('select * from "users" order by "age" desc', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orderBy(['email' => 'asc', 'age' => 'desc']);
+        $this->assertEquals('select * from "users" order by "email" asc, "age" desc', $builder->toSql());
+    }
+
     public function testHavings()
     {
         $builder = $this->getBuilder();

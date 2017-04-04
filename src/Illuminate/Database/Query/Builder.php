@@ -1350,12 +1350,20 @@ class Builder
     /**
      * Add an "order by" clause to the query.
      *
-     * @param  string  $column
+     * @param  string|array  $column
      * @param  string  $direction
      * @return $this
      */
     public function orderBy($column, $direction = 'asc')
     {
+        if (is_array($column)) {
+            array_walk($column, function ($direction, $column) {
+                $this->orderBy($column, $direction);
+            });
+
+            return $this;
+        }
+
         $this->{$this->unions ? 'unionOrders' : 'orders'}[] = [
             'column' => $column,
             'direction' => strtolower($direction) == 'asc' ? 'asc' : 'desc',
