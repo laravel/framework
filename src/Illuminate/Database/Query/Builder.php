@@ -1690,7 +1690,7 @@ class Builder
      */
     public function sum($column)
     {
-        return $this->aggregate(__FUNCTION__, [$column]);
+        return $this->numericAggregate(__FUNCTION__, [$column]);
     }
 
     /**
