@@ -64,4 +64,16 @@ class Rule
     {
         return new Rules\Unique($table, $column);
     }
+
+    /**
+     * Get a sometimes rule builder instance.
+     *
+     * @param  callable  $callback
+     * @param  string|array  $rules
+     * @return void
+     */
+    public static function sometimes($rules, callable $callback)
+    {
+        return new Rules\Sometimes($rules, $callback);
+    }
 }

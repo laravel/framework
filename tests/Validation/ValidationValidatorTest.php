@@ -3195,6 +3195,15 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testUsingRuleContract()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $rule = m::mock(Illuminate\Contracts\Validation\Rule::class.'[apply]');
+        $v = new Validator($trans, ['foo' => 'a'], []);
+        $rule->shouldReceive('apply')->once()->with($v, 'foo');
+        $v->setRules(['foo' => $rule]);
+    }
+
     public function testInvalidMethod()
     {
         $trans = $this->getIlluminateArrayTranslator();
