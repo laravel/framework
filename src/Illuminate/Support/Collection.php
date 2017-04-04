@@ -589,6 +589,55 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Get the previous item from the collection.
+     *
+     * @param  mixed  $currentItem
+     * @param  bool|false  $loop
+     * @return mixed
+     */
+    public function previous($currentItem, $loop = false)
+    {
+        $reversedCollection = $this->reverse();
+        $current = $reversedCollection->search($currentItem, true);
+        $current = $reversedCollection->keys()->search($current, true);
+
+        $previous = $reversedCollection->slice($current, 2);
+
+        if ($previous->count() === 2) {
+            return $previous->last();
+        }
+        if ($loop) {
+            return $this->last();
+        }
+
+        return false;
+    }
+
+    /**
+     * Get the next item from the collection.
+     *
+     * @param  mixed  $currentItem
+     * @param  bool|false  $loop
+     * @return mixed
+     */
+    public function next($currentItem, $loop = false)
+    {
+        $current = $this->search($currentItem, true);
+        $current = $this->keys()->search($current, true);
+
+        $next = $this->slice($current, 2);
+
+        if ($next->count() === 2) {
+            return $next->last();
+        }
+        if ($loop) {
+            return $this->first();
+        }
+
+        return false;
+    }
+
+    /**
      * Get the values of a given key.
      *
      * @param  string  $value

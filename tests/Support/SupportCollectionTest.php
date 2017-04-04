@@ -73,6 +73,34 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('default', $result);
     }
 
+    public function testPrevious()
+    {
+        $data = new Collection(['a' => 2, 3, 4, 5]);
+
+        $result = $data->previous(2);
+        $this->assertEquals(false, $result);
+
+        $result = $data->previous(2, true);
+        $this->assertEquals(5, $result);
+
+        $result = $data->previous(5);
+        $this->assertEquals(4, $result);
+    }
+
+    public function testNext()
+    {
+        $data = new Collection(['a' => 2, 3, 4, 5]);
+
+        $result = $data->next(5);
+        $this->assertEquals(false, $result);
+
+        $result = $data->next(5, true);
+        $this->assertEquals(2, $result);
+
+        $result = $data->next(2);
+        $this->assertEquals(3, $result);
+    }
+
     public function testPopReturnsAndRemovesLastItemInCollection()
     {
         $c = new Collection(['foo', 'bar']);
