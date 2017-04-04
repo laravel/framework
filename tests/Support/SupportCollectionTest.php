@@ -786,6 +786,12 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['first' => 'first-rolyat', 'last' => 'last-llewto'], $data->all());
     }
 
+    public function testMapProc(){
+      $data = new Collection(['first' => 'taylor', 'last' => 'otwell']);
+      $data = $data->mapProc('strtoupper');
+      $this->assertEquals(['first' => 'TAYLOR', 'last' => 'OTWELL'], $data->all());
+    }
+
     public function testFlatMap()
     {
         $data = new Collection([
@@ -805,6 +811,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
             return $key.'-'.strrev($item);
         });
         $this->assertEquals(['first' => 'first-rolyat', 'last' => 'last-llewto'], $data->all());
+    }
+
+    public function testTransformProc()
+    {
+    $data = new Collection(['first' => 'taylor', 'last' => 'otwell']);
+    $data->transformProc('strtoupper');
+    $this->assertEquals(['first' => 'TAYLOR', 'last' => 'OTWELL'], $data->all());
     }
 
     public function testFirstWithCallback()
