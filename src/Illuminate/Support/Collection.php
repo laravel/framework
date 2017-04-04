@@ -59,7 +59,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Create a new collection from a multi-level array
+     * Create a new collection from a multi-level array.
      *
      * @param  mixed  $items
      * @return static
@@ -67,11 +67,12 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public static function makeDepth($items = [])
     {
         $collections = self::makeDepthRecursive($items);
+
         return new static($collections);
     }
 
     /**
-     * Recursive iteration over arrayable mapping arrays to collections
+     * Recursive iteration over arrayable mapping arrays to collections.
      *
      * @param mixed $item
      * @return static
@@ -79,11 +80,13 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     private static function makeDepthRecursive($items)
     {
         $items = collect()->getArrayableItems($items);
+
         return array_map(function ($item) {
-            if (!is_array($item)) {
+            if (! is_array($item)) {
                 return $item;
             }
             $item = self::makeDepthRecursive($item);
+
             return new static($item);
         }, $items);
     }

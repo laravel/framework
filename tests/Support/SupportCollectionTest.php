@@ -1791,8 +1791,8 @@ class SupportCollectionTest extends TestCase
             collect(['foo']),
             collect([
                 'bar',
-                collect(['baz'])
-            ])
+                collect(['baz']),
+            ]),
         ], $collection->all());
     }
 
