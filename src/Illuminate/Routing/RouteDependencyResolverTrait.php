@@ -47,7 +47,7 @@ trait RouteDependencyResolverTrait
             );
 
             if (! is_null($instance)) {
-                $instanceCount ++;
+                $instanceCount++;
 
                 $this->spliceIntoParameters($parameters, $key, $instance);
             } elseif (! isset($values[$key - $instanceCount])) {
