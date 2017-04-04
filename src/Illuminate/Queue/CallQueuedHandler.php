@@ -35,7 +35,7 @@ class CallQueuedHandler
     public function call(Job $job, array $data)
     {
         $command = $this->setJobInstanceIfNecessary(
-            $job, unserialize($data['command'])
+            $job, array_key_exists('command64', $data) ? unserialize($data['command64']) : unserialize($data['command'])
         );
 
         $handler = $this->dispatcher->getCommandHandler($command) ?: null;
@@ -78,7 +78,7 @@ class CallQueuedHandler
      */
     public function failed(array $data, $e)
     {
-        $command = unserialize($data['command']);
+        $command = array_key_exists('command64', $data) ? unserialize($data['command64']) : unserialize($data['command']);
 
         if (method_exists($command, 'failed')) {
             $command->failed($e);
