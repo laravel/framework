@@ -559,6 +559,24 @@ if (! function_exists('head')) {
     }
 }
 
+if (! function_exists('image_data_uri')) {
+    /**
+     * Convert an image to data URI.
+     * 
+     * @param  string $image
+     * @return string
+     */
+    function image_data_uri($image)
+    {
+        if (file_exists($image) && ($image_type = exif_imagetype($image))) {
+            $mime_type = image_type_to_mime_type($image_type);
+            $data = base64_encode(file_get_contents($image));
+            
+            return "data:$mime_type;base64,$data";
+        }
+    }
+}
+
 if (! function_exists('last')) {
     /**
      * Get the last element from an array.
