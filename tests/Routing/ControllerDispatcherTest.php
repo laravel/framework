@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Routing;
 
-use Illuminate\Container\Container;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Routing\ControllerDispatcher;
 use ReflectionMethod;
+use PHPUnit\Framework\TestCase;
+use Illuminate\Container\Container;
+use Illuminate\Routing\ControllerDispatcher;
 
 class ControllerDispatcherTest extends TestCase
 {
@@ -22,32 +22,34 @@ class ControllerDispatcherTest extends TestCase
         $this->controllerDispatcher = new ControllerDispatcher($container);
     }
 
-    public function targetResolveMethodDependenciesKeepKeys($first) {
+    public function targetResolveMethodDependenciesKeepKeys($first)
+    {
     }
 
     public function testResolveMethodDependenciesKeepKeys()
     {
         $parameters = [
-            'first' => 'first-value'
+            'first' => 'first-value',
         ];
         $target = new ReflectionMethod(self::class, 'targetResolveMethodDependenciesKeepKeys');
 
         $actual = $this->controllerDispatcher->resolveMethodDependencies($parameters, $target);
 
         $expected = [
-            'first' => 'first-value'
+            'first' => 'first-value',
         ];
         $this->assertEquals($expected, $actual);
     }
 
-    public function targetResolveMethodDependenciesKeepsOrderOfKeysAndValues($first, $second) {
+    public function targetResolveMethodDependenciesKeepsOrderOfKeysAndValues($first, $second)
+    {
     }
 
     public function testResolveMethodDependenciesKeepsOrderOfKeysAndValues()
     {
         $parameters = [
             'second' => 'second-value',
-            'first' => 'first-value'
+            'first' => 'first-value',
         ];
         $target = new ReflectionMethod(self::class, 'targetResolveMethodDependenciesKeepsOrderOfKeysAndValues');
 
@@ -55,19 +57,20 @@ class ControllerDispatcherTest extends TestCase
 
         $expected = [
             'second' => 'second-value',
-            'first' => 'first-value'
+            'first' => 'first-value',
         ];
         $this->assertEquals($expected, $actual);
     }
 
-    public function targetResolveMethodDependenciesKeepsUnknownKeys($first) {
+    public function targetResolveMethodDependenciesKeepsUnknownKeys($first)
+    {
     }
 
     public function testResolveMethodDependenciesKeepsUnknownKeys()
     {
         $parameters = [
             'first' => 'first-value',
-            'unknown' => 'unknown'
+            'unknown' => 'unknown',
         ];
         $target = new ReflectionMethod(self::class, 'targetResolveMethodDependenciesKeepsUnknownKeys');
 
@@ -75,12 +78,13 @@ class ControllerDispatcherTest extends TestCase
 
         $expected = [
             'first' => 'first-value',
-            'unknown' => 'unknown'
+            'unknown' => 'unknown',
         ];
         $this->assertEquals($expected, $actual);
     }
 
-    public function targetResolveMethodDependenciesDoesNotCrashOnMissingKeys($first) {
+    public function targetResolveMethodDependenciesDoesNotCrashOnMissingKeys($first)
+    {
     }
 
     public function testResolveMethodDependenciesDoesNotCrashOnMissingKeys()
