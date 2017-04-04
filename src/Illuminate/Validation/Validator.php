@@ -219,10 +219,10 @@ class Validator implements ValidatorContract
             }
 
             if (Str::contains($key, '.')) {
-                $newData[str_replace('.', '->', $key)] = $value;
-            } else {
-                $newData[$key] = $value;
+                $key = str_replace('.', '->', $key);
             }
+
+            $newData[$key] = $value;
         }
 
         return $newData;
@@ -359,11 +359,11 @@ class Validator implements ValidatorContract
 
         foreach ($data as $key => $value) {
             if ((bool) preg_match('/^'.$pattern.'/', $key, $matches)) {
-                $keys[] = $matches[0];
+                if (! isset($keys[$matches[0]])) {
+                    $keys[$matches[0]] = $matches[0];
+                }
             }
         }
-
-        $keys = array_unique($keys);
 
         $data = [];
 
@@ -561,10 +561,14 @@ class Validator implements ValidatorContract
         $results = [];
 
         foreach ($this->messages()->toArray() as $key => $message) {
-            $results[] = explode('.', $key)[0];
+            $key = explode('.', $key)[0];
+
+            if (! isset($results[$key])) {
+                $results[$key] = $key;
+            }
         }
 
-        return array_flip(array_unique($results));
+        return array_flip($results);
     }
 
     /**
