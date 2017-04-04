@@ -3456,6 +3456,24 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Handles dynamic "AndReturn" method access which allows the chaining of methods which
+     * otherwise wouldn't return the existing instance of your Model. An example of this
+     * is when you call the save() method you would receive a boolean response. Using
+     * the saveAndReturn() dynamic method would return your Model instance instead.
+     *
+     * @param  string  $method
+     * @param  string  $parameters
+     *
+     * @return $this
+     */
+    public function dynamicReturn($method, $parameters)
+    {
+        call_user_func_array([$this, str_replace('AndReturn', '', $method)], $parameters);
+
+        return $this;
+    }
+
+    /**
      * Dynamically retrieve attributes on the model.
      *
      * @param  string  $key
@@ -3554,6 +3572,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function __call($method, $parameters)
     {
+        if (Str::endsWith($method, 'AndReturn')) {
+            return $this->dynamicReturn($method, $parameters);
+        }
+
         if (in_array($method, ['increment', 'decrement'])) {
             return $this->$method(...$parameters);
         }
