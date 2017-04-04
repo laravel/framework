@@ -47,6 +47,21 @@ class TestResponse
     }
 
     /**
+     * Assert that the response has a successful status code.
+     *
+     * @return $this
+     */
+    public function assertSuccessful()
+    {
+        PHPUnit::assertTrue(
+            $this->isSuccessful(),
+            'Response status code ['.$this->getStatusCode().'] is not a successful status code.'
+        );
+
+        return $this;
+    }
+
+    /**
      * Assert that the response has the given status code.
      *
      * @param  int  $status
@@ -70,13 +85,15 @@ class TestResponse
      * @param  string  $uri
      * @return $this
      */
-    public function assertRedirect($uri)
+    public function assertRedirect($uri = null)
     {
         PHPUnit::assertTrue(
             $this->isRedirect(), 'Response status code ['.$this->getStatusCode().'] is not a redirect status code.'
         );
 
-        PHPUnit::assertEquals(app('url')->to($uri), $this->headers->get('Location'));
+        if (! is_null($uri)) {
+            PHPUnit::assertEquals(app('url')->to($uri), $this->headers->get('Location'));
+        }
 
         return $this;
     }
