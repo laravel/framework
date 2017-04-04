@@ -1686,7 +1686,7 @@ class Builder
      * Retrieve the sum of the values of a given column.
      *
      * @param  string  $column
-     * @return mixed
+     * @return float|int
      */
     public function sum($column)
     {
