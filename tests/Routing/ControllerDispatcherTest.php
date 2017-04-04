@@ -97,5 +97,4 @@ class ControllerDispatcherTest extends TestCase
         $expected = [];
         $this->assertEquals($expected, $actual);
     }
-
 }
