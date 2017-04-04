@@ -440,7 +440,7 @@ class RoutingRouteTest extends TestCase
         unset($_SERVER['__test.controller_callAction_parameters']);
         $router->get(($str = str_random()).'/{user}/{defaultNull?}/{team?}', [
             'middleware' => SubstituteBindings::class,
-            'uses' => 'Illuminate\Tests\Routing\RouteTestAnotherControllerWithParameterStub@withModels'
+            'uses' => 'Illuminate\Tests\Routing\RouteTestAnotherControllerWithParameterStub@withModels',
         ]);
         $router->model('bar', 'Illuminate\Tests\Routing\RoutingTestUserModel');
         $router->model('baz', 'Illuminate\Tests\Routing\RoutingTestTeamModel');
