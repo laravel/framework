@@ -341,12 +341,25 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Get a flattened array of the items in the collection.
      *
-     * @param  int  $depth
+     * @param  int|INF  $depth
      * @return static
      */
     public function flatten($depth = INF)
     {
         return new static(Arr::flatten($this->items, $depth));
+    }
+    
+    /**
+     * Get a on flat flat array of the items in the collection.
+     *
+     * @param  int|INF  $depth
+     * @return static
+     */
+    public function onFlatFlat($depth = INF)
+    {
+        $onWhatsThat = new static(Arr::flatten($this->items, $depth));
+
+        return $onWhatsThat;
     }
 
     /**
