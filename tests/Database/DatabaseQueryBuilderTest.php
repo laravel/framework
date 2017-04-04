@@ -902,6 +902,28 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['foo' => 'bar'], $results);
     }
 
+    public function testLastMethodReturnsLastResult()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select * from "users" where "id" = ? order by "id" desc limit 1', [1], true)->andReturn([['foo' => 'bar']]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar']])->andReturnUsing(function ($query, $results) {
+            return $results;
+        });
+        $results = $builder->from('users')->where('id', '=', 1)->last();
+        $this->assertEquals(['foo' => 'bar'], $results);
+    }
+
+    public function testLastMethodReturnsLastResultWhenUsingAnOrderByClause()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select * from "users" order by "foo" asc limit 1', [], true)->andReturn([['foo' => 'bar']]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar']])->andReturnUsing(function ($query, $results) {
+            return $results;
+        });
+        $results = $builder->from('users')->orderBy('foo', 'desc')->last();
+        $this->assertEquals(['foo' => 'bar'], $results);
+    }
+
     public function testListMethodsGetsArrayOfColumnValues()
     {
         $builder = $this->getBuilder();

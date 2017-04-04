@@ -138,6 +138,9 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         foreach ($records as $record) {
             $this->assertEquals(1, $record->id);
         }
+
+        $this->assertEquals(1, EloquentTestUser::first()->id);
+        $this->assertEquals(2, EloquentTestUser::last()->id);
     }
 
     public function testBasicModelCollectionRetrieval()
