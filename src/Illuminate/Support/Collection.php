@@ -1063,6 +1063,42 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         return $this->sortBy($callback, $options, true);
     }
+    
+    /**
+     * Alias for sort function.
+     *
+     * @param  callable|null  $callback
+     * @return static
+     */
+    public function order(callable $callback = null)
+    {
+        return $this->sort($callback);
+    }
+
+    /**
+     * Alias for sortBy function.
+     *
+     * @param  callable|string  $callback
+     * @param  int   $options
+     * @param  bool  $descending
+     * @return static
+     */
+    public function orderBy($callback, $options = SORT_REGULAR, $descending = false)
+    {
+        return $this->sortBy($callback, $options, $descending);
+    }
+
+    /**
+     * Alias for sortByDesc function.
+     *
+     * @param  callable|string  $callback
+     * @param  int  $options
+     * @return static
+     */
+    public function orderByDesc($callback, $options = SORT_REGULAR)
+    {
+        return $this->sortByDesc($callback, $options);
+    }
 
     /**
      * Splice a portion of the underlying collection array.
