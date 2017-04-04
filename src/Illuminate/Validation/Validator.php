@@ -219,10 +219,10 @@ class Validator implements ValidatorContract
             }
 
             if (Str::contains($key, '.')) {
-                $newData[str_replace('.', '->', $key)] = $value;
-            } else {
-                $newData[$key] = $value;
+                $key = str_replace('.', '->', $key);
             }
+
+            $newData[$key] = $value;
         }
 
         return $newData;
@@ -777,17 +777,16 @@ class Validator implements ValidatorContract
      */
     protected function validateRequired($attribute, $value)
     {
-        if (is_null($value)) {
-            return false;
-        } elseif (is_string($value) && trim($value) === '') {
-            return false;
-        } elseif ((is_array($value) || $value instanceof Countable) && count($value) < 1) {
-            return false;
-        } elseif ($value instanceof File) {
-            return (string) $value->getPath() != '';
+        switch ($value) {
+            case is_null($value):
+            case is_string($value) && trim($value) === '':
+            case (is_array($value) || $value instanceof Countable) && count($value) < 1:
+                return false;
+            case $value instanceof File:
+                return (string) $value->getPath() != '';
+            default:
+                return true;
         }
-
-        return true;
     }
 
     /**
