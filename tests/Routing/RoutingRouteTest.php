@@ -418,7 +418,8 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('foo', $router->dispatch(Request::create('foo', 'GET'))->getContent());
     }
 
-    public function testControllerCallActionMethodParameters(){
+    public function testControllerCallActionMethodParameters()
+    {
         $router = $this->getRouter();
 
         // Has one argument but receives two
