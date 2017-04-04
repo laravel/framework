@@ -2,9 +2,9 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
-use Illuminate\Http\Testing\NullMiddleware;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Http\Testing\NullMiddleware;
 use Illuminate\Foundation\Testing\TestResponse;
 use Illuminate\Contracts\Http\Kernel as HttpKernel;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
