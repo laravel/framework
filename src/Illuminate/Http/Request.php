@@ -359,6 +359,29 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Get a subset of the items from the input data, if present.
+     *
+     * @param  array|mixed  $keys
+     * @return array
+     */
+    public function onlyIfPresent($keys)
+    {
+        $keys = is_array($keys) ? $keys : func_get_args();
+
+        $results = [];
+
+        $input = $this->all();
+
+        foreach ($keys as $key) {
+            if ($this->has($key)) {
+                Arr::set($results, $key, data_get($input, $key));
+            }
+        }
+
+        return $results;
+    }
+
+    /**
      * Get all of the input except for a specified array of items.
      *
      * @param  array|mixed  $keys

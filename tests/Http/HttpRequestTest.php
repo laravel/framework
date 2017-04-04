@@ -245,6 +245,13 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['developer' => ['name' => 'Taylor'], 'test' => null], $request->only('developer.name', 'test'));
     }
 
+    public function testOnlyIfPresentMethod()
+    {
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 25]);
+        $this->assertEquals(['age' => 25], $request->onlyIfPresent('age', 'gender'));
+        $this->assertEquals(['name' => 'Taylor', 'age' => 25], $request->onlyIfPresent('name', 'age', 'gender'));
+    }
+
     public function testExceptMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 25]);
