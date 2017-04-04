@@ -190,6 +190,21 @@ class Builder
     }
 
     /**
+     * Find a model by a single column.
+     *
+     * @param  string $column
+     * @param  mixed  $value
+     * @param  array  $columns
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static[]|static|null
+     */
+    public function findBy($column, $value, $columns = ['*'])
+    {
+        $this->query->where($column, '=', $value);
+
+        return $this->first($columns);
+    }
+
+    /**
      * Find a model by its primary key or throw an exception.
      *
      * @param  mixed  $id
@@ -211,6 +226,26 @@ class Builder
         }
 
         throw (new ModelNotFoundException)->setModel(get_class($this->model), $id);
+    }
+
+    /**
+     * Find a model by a single column.
+     *
+     * @param  string $column
+     * @param  mixed  $value
+     * @param  array  $columns
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static[]|static|null
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    public function findByOrFail($column, $value, $columns = ['*'])
+    {
+        $result = $this->findBy($column, $value, $columns);
+        if (! is_null($result)) {
+            return $result;
+        }
+
+        throw (new ModelNotFoundException)->setModel(get_class($this->model));
     }
 
     /**
