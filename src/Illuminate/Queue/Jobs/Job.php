@@ -74,7 +74,7 @@ abstract class Job
      * Release the job back into the queue.
      *
      * @param  int   $delay
-     * @return void
+     * @return int
      */
     public function release($delay = 0)
     {
