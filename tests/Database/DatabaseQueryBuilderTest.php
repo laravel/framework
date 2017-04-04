@@ -883,7 +883,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
             return $results;
         });
         $results = $builder->from('users')->sum('id');
-        $this->assertEquals(1, $results);
+        $this->assertSame(1, $results);
     }
 
     public function testSqlServerExists()
