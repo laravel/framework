@@ -50,7 +50,8 @@ trait RouteDependencyResolverTrait
                 $instanceCount++;
 
                 $this->spliceIntoParameters($parameters, $key, $instance);
-            } elseif (! isset($values[$key - $instanceCount])) {
+            } elseif (! isset($values[$key - $instanceCount]) &&
+                      $parameter->isDefaultValueAvailable()) {
                 $this->spliceIntoParameters($parameters, $key, $parameter->getDefaultValue());
             }
         }
