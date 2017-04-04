@@ -14,7 +14,7 @@ class MakeAuthCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'make:auth {--views : Only scaffold the authentication views}';
+    protected $signature = 'make:auth {--views : Only scaffold the authentication views} {--tests}';
 
     /**
      * The console command description.
@@ -65,6 +65,17 @@ class MakeAuthCommand extends Command
                 file_get_contents(__DIR__.'/stubs/make/routes.stub'),
                 FILE_APPEND
             );
+
+            $this->fixExampleTest();
+        }
+
+        if ($this->option('tests')) {
+            file_put_contents(
+                base_path('tests/AuthTest.php'),
+                $this->compileTestStub()
+            );
+
+            $this->info('Created registration and authentication tests.');
         }
 
         $this->comment('Authentication scaffolding generated successfully!');
@@ -107,16 +118,55 @@ class MakeAuthCommand extends Command
     }
 
     /**
+     * Replace the App namespace.
+     *
+     * @param  string $stub
+     * @return string
+     */
+    protected function replaceAppNamespace($stub)
+    {
+        return str_replace('{{namespace}}', $this->getAppNamespace(), $stub);
+    }
+
+    /**
      * Compiles the HomeController stub.
      *
      * @return string
      */
     protected function compileControllerStub()
     {
-        return str_replace(
-            '{{namespace}}',
-            $this->getAppNamespace(),
+        return $this->replaceAppNamespace(
             file_get_contents(__DIR__.'/stubs/make/controllers/HomeController.stub')
         );
+    }
+
+    /**
+     * Compiles the AuthTest stub.
+     *
+     * @return string
+     */
+    protected function compileTestStub()
+    {
+        return $this->replaceAppNamespace(
+            file_get_contents(__DIR__.'/stubs/make/tests/AuthTest.stub')
+        );
+    }
+
+    /**
+     * Fix the example test.
+     */
+    protected function fixExampleTest()
+    {
+        $file = base_path('tests/ExampleTest.php');
+
+        if (file_exists($file)) {
+            $code = str_replace(
+                "->see('Laravel 5')",
+                "->see('Welcome')",
+                file_get_contents($file)
+            );
+
+            file_put_contents($file, $code);
+        }
     }
 }

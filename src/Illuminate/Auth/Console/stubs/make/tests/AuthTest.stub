@@ -1,0 +1,63 @@
+<?php
+
+use {{namespace}}User;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+
+class AuthTest extends TestCase
+{
+    use DatabaseMigrations;
+
+    protected $name = 'Your name';
+    protected $email = 'a@valid.email';
+    protected $password = 'secret';
+
+    public function test_registration()
+    {
+        $this->visit('register')
+            ->type($this->name, 'name')
+            ->type($this->email, 'email')
+            ->type($this->password, 'password')
+            ->type($this->password, 'password_confirmation')
+            ->press('Register')
+            ->seeCredentials([
+                'name' => $this->name,
+                'email' => $this->email,
+                'password' => $this->password,
+            ])
+            ->see('Welcome')
+            ->seePageIs('/')
+            ->seeIsAuthenticated();
+    }
+
+    public function test_login()
+    {
+        $this->createUser();
+
+        $this->visit('login')
+            ->type($this->email, 'email')
+            ->type($this->password, 'password')
+            ->press('Login')
+            ->see('Welcome')
+            ->seePageIs('/')
+            ->seeIsAuthenticated();
+    }
+
+    public function test_logout()
+    {
+        $user = $this->createUser();
+
+        $this->actingAs($user)
+            ->visit('logout')
+            ->seePageIs('/')
+            ->dontSeeIsAuthenticated();
+    }
+
+    protected function createUser()
+    {
+        return factory(User::class)->create([
+            'email' => $this->email,
+            'password' => bcrypt($this->password)
+        ]);
+    }
+}
