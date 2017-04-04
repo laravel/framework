@@ -173,6 +173,14 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Dump the collection and end the script.
+     */
+    public function dd()
+    {
+        dd($this);
+    }
+
+    /**
      * Get the items in the collection that are not present in the given items.
      *
      * @param  mixed  $items
