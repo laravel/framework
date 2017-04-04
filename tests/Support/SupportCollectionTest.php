@@ -1778,6 +1778,24 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['foo' => 1, 'bar' => 2, 'baz' => 3], $collection->toArray());
     }
 
+    public function testMakeDepthMethod()
+    {
+        $collection = Collection::makeDepth('foo');
+        $this->assertEquals(['foo'], $collection->all());
+    }
+
+    public function testMakeDepthMethodFromMultiLevelArray()
+    {
+        $collection = Collection::makeDepth([['foo'], ['bar', ['baz']]]);
+        $this->assertEquals([
+            collect(['foo']),
+            collect([
+                'bar',
+                collect(['baz'])
+            ])
+        ], $collection->all());
+    }
+
     public function testSplitCollectionWithADivisableCount()
     {
         $collection = new Collection(['a', 'b', 'c', 'd']);

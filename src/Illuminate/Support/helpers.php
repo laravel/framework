@@ -379,6 +379,19 @@ if (! function_exists('collect')) {
     }
 }
 
+if (! function_exists('collectDepth')) {
+    /**
+     * Create a collection from a multi-level array.
+     *
+     * @param  mixed  $value
+     * @return \Illuminate\Support\Collection
+     */
+    function collectDepth($value = null)
+    {
+        return Collection::makeDepth($value);
+    }
+}
+
 if (! function_exists('data_fill')) {
     /**
      * Fill in data where it's missing.
