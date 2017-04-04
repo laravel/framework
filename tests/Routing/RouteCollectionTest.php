@@ -99,15 +99,18 @@ class RouteCollectionTest extends PHPUnit_Framework_TestCase
     {
         $routeIndex = new Route('GET', 'foo/index', [
             'uses' => 'FooController@index',
+            'controller' => 'FooController@index',
             'as' => 'foo_index',
         ]);
 
         $this->routeCollection->add($routeIndex);
         $this->assertCount(1, $this->routeCollection);
+        $this->assertCount(1, $this->routeCollection->getRoutesByAction());
 
         // Add exactly the same route
         $this->routeCollection->add($routeIndex);
         $this->assertCount(1, $this->routeCollection);
+        $this->assertCount(1, $this->routeCollection->getRoutesByAction());
 
         // Add a non-existing route
         $this->routeCollection->add(new Route('GET', 'bar/show', [
@@ -115,6 +118,77 @@ class RouteCollectionTest extends PHPUnit_Framework_TestCase
             'as' => 'bar_show',
         ]));
         $this->assertCount(2, $this->routeCollection);
+    }
+
+    public function testRouteCollectionCanHandleSameRouteWithDifferentActions()
+    {
+        $url = 'foo/index';
+
+        $firstRoute = new Route('GET', $url, [
+            'uses' => 'FooController@index',
+            'controller' => 'FooController@index',
+            'as' => 'foo_name',
+        ]);
+
+        $secondRoute = new Route('GET', $url, [
+            'uses' => 'FooController@create',
+            'controller' => 'FooController@create',
+            'as' => 'foo_name',
+        ]);
+
+        $this->routeCollection->add($firstRoute);
+        $this->assertCount(1, $this->routeCollection);
+        $this->assertCount(1, $this->routeCollection->getRoutesByAction());
+
+        // Add exactly the same route with different controller action
+        $this->routeCollection->add($secondRoute);
+        $this->assertCount(1, $this->routeCollection);
+        $this->assertCount(1, $this->routeCollection->getRoutesByAction());
+
+        // Add a non-existing route
+        $this->routeCollection->add(new Route('GET', 'bar/show', [
+            'uses' => 'BarController@show',
+            'controller' => 'BarController@show',
+            'as' => 'bar_show',
+        ]));
+        $this->assertCount(2, $this->routeCollection);
+        $this->assertCount(2, $this->routeCollection->getRoutesByAction());
+    }
+
+    public function testRouteCollectionCanHandleSameRouteWithDifferentNames()
+    {
+        $url = 'foo/index';
+        $action = 'FooController@index';
+
+        $firstRoute = new Route('GET', $url, [
+            'uses' => $action,
+            'controller' => $action,
+            'as' => 'foo_index',
+        ]);
+
+        $secondRoute = new Route('GET', $url, [
+            'uses' => $action,
+            'controller' => $action,
+            'as' => 'bar_index',
+        ]);
+
+        $this->routeCollection->add($firstRoute);
+        $this->assertCount(1, $this->routeCollection);
+        $this->assertCount(1, $this->routeCollection->getRoutesByName());
+
+        // Add exactly the same route with different controller action
+        $this->routeCollection->add($secondRoute);
+        $this->assertCount(1, $this->routeCollection);
+        $this->assertCount(1, $this->routeCollection->getRoutesByName());
+
+        // Add a non-existing route
+        $this->routeCollection->add(new Route('GET', 'bar/show', [
+            'uses' => 'BarController@show',
+            'controller' => 'BarController@show',
+            'as' => 'bar_show',
+        ]));
+        $this->assertCount(2, $this->routeCollection);
+        $this->assertCount(2, $this->routeCollection->getRoutesByName());
     }
 
     public function testRouteCollectionCanRefreshNameLookups()

@@ -21,7 +21,7 @@ class RouteCollection implements Countable, IteratorAggregate
     protected $routes = [];
 
     /**
-     * An flattened array of all of the routes.
+     * A flattened array of all of the routes.
      *
      * @var array
      */
@@ -49,7 +49,14 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     public function add(Route $route)
     {
-        $this->addToCollections($route);
+        // Save the route in the collection and remember
+        // which routes has been overwritten.
+        $overwrittenRoutes = $this->addToCollections($route);
+
+        // Remove look-ups pointing to each overwritten route.
+        foreach($overwrittenRoutes as $overwrittenRoute) {
+            $this->removeLookups($overwrittenRoute);
+        }
 
         $this->addLookups($route);
 
@@ -60,17 +67,30 @@ class RouteCollection implements Countable, IteratorAggregate
      * Add the given route to the arrays of routes.
      *
      * @param  \Illuminate\Routing\Route  $route
-     * @return void
+     * @return array
      */
     protected function addToCollections($route)
     {
         $domainAndUri = $route->domain().$route->getUri();
 
+        $overwrittenRoutes = [];
+
         foreach ($route->methods() as $method) {
+            // If we are already routing to the same method and URI,
+            // overwrite the previous declaration, but save it
+            // in order to remove it from the look-up tables.
+            if (isset($this->routes[$method][$domainAndUri])) {
+                $overwrittenRoutes[] = $this->routes[$method][$domainAndUri];
+            }
+
             $this->routes[$method][$domainAndUri] = $route;
         }
 
         $this->allRoutes[$method.$domainAndUri] = $route;
+
+        // Remove duplicates such as GET+HEAD routes because
+        // they are stored once in any look-up table.
+        return array_unique($overwrittenRoutes, SORT_REGULAR);
     }
 
     /**
@@ -81,11 +101,11 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     protected function addLookups($route)
     {
+        $action = $route->getAction();
+
         // If the route has a name, we will add it to the name look-up table so that we
         // will quickly be able to find any route associate with a name and not have
         // to iterate through every route every time we need to perform a look-up.
-        $action = $route->getAction();
-
         if (isset($action['as'])) {
             $this->nameList[$action['as']] = $route;
         }
@@ -95,6 +115,31 @@ class RouteCollection implements Countable, IteratorAggregate
         // processing a request and easily generate URLs to the given controllers.
         if (isset($action['controller'])) {
             $this->addToActionList($action, $route);
+        }
+    }
+
+    /**
+     * Remove the route from any look-up tables if necessary.
+     *
+     * @param  \Illuminate\Routing\Route  $route
+     * @return void
+     */
+    protected function removeLookups($route)
+    {
+        $action = $route->getAction();
+
+        // If the route had a name, we will remove it from the name look-up table.
+        if (isset($action['as'])) {
+            unset($this->nameList[$action['as']]);
+        }
+
+        // When the route was routing to a controller we will
+        // also remove it from the controller look-up table.
+        //
+        // When the route was routing to a Closure, there
+        // is no entry in the controller look-up table.
+        if (isset($action['controller']) && is_string($action['controller'])) {
+            $this->removeFromActionList($action);
         }
     }
 
@@ -126,6 +171,17 @@ class RouteCollection implements Countable, IteratorAggregate
     protected function addToActionList($action, $route)
     {
         $this->actionList[trim($action['controller'], '\\')] = $route;
+    }
+
+    /**
+     * Remove a route from the controller action dictionary.
+     *
+     * @param  array  $action
+     * @return void
+     */
+    protected function removeFromActionList($action)
+    {
+        unset($this->actionList[trim($action['controller'], '\\')]);
     }
 
     /**
@@ -299,6 +355,26 @@ class RouteCollection implements Countable, IteratorAggregate
     public function getRoutesByMethod()
     {
         return $this->routes;
+    }
+
+    /**
+     * Get all of the controller routes keyed by their action.
+     *
+     * @return array
+     */
+    public function getRoutesByAction()
+    {
+        return $this->actionList;
+    }
+
+    /**
+     * Get all of the controller routes keyed by their name.
+     *
+     * @return array
+     */
+    public function getRoutesByName()
+    {
+        return $this->nameList;
     }
 
     /**
