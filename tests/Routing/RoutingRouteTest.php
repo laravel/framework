@@ -322,7 +322,6 @@ class RoutingRouteTest extends TestCase
         $this->assertInstanceOf('stdClass', $_SERVER['__test.route_inject'][0]);
         $this->assertEquals('bar', $_SERVER['__test.route_inject'][1]);
         $this->assertEquals('test', $_SERVER['__test.route_inject'][2]);
-        $this->assertArrayHasKey(3, $_SERVER['__test.route_inject']);
         unset($_SERVER['__test.route_inject']);
     }
 
