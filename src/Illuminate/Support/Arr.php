@@ -124,6 +124,26 @@ class Arr
     }
 
     /**
+     * Recursively filter an array.
+     *
+     * @param  array  $array
+     * @param  callable|null  $callback
+     * @return array
+     */
+    public static function filterRecursive($array, callable $callback = null)
+    {
+        $array = is_null($callback) ? array_filter($array) : array_filter($array, $callback);
+
+        foreach ($array as &$value) {
+            if (is_array($value)) {
+                $value = forward_static_call(['self', __FUNCTION__], $value, $callback);
+            }
+        }
+
+        return $array;
+    }
+
+    /**
      * Return the first element in an array passing a given truth test.
      *
      * @param  array  $array

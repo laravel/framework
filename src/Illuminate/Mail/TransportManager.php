@@ -13,6 +13,7 @@ use Illuminate\Mail\Transport\SesTransport;
 use Illuminate\Mail\Transport\ArrayTransport;
 use Illuminate\Mail\Transport\MailgunTransport;
 use Illuminate\Mail\Transport\MandrillTransport;
+use Illuminate\Mail\Transport\SendGridTransport;
 use Illuminate\Mail\Transport\SparkPostTransport;
 use Swift_SendmailTransport as SendmailTransport;
 
@@ -122,6 +123,16 @@ class TransportManager extends Manager
 
         return new MandrillTransport(
             $this->getHttpClient($config), $config['secret']
+        );
+    }
+
+    protected function createSendGridDriver()
+    {
+        $config = $this->app['config']->get('services.sendgrid', []);
+
+        return new SendGridTransport(
+            $this->getHttpClient($config),
+            $config['key']
         );
     }
 
