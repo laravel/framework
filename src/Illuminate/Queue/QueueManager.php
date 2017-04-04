@@ -75,17 +75,6 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
-     * Register an event listener for the daemon queue loop.
-     *
-     * @param  mixed  $callback
-     * @return void
-     */
-    public function looping($callback)
-    {
-        $this->app['events']->listen('illuminate.queue.looping', $callback);
-    }
-
-    /**
      * Register an event listener for the failed job event.
      *
      * @param  mixed  $callback
