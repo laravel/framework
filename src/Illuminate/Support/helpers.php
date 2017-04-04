@@ -804,6 +804,19 @@ if (! function_exists('str_slug')) {
      */
     function str_slug($title, $separator = '-')
     {
+        // Special chars
+        $title = strtr($title,
+			[
+				// Germany
+				"ä" => "ae",
+				"ü" => "ue",
+				"ö" => "oe",
+				"Ä" => "Ae",
+				"Ü" => "Ue",
+				"Ö" => "Oe",
+				"ß" => "ss"
+			]
+		);
         return Str::slug($title, $separator);
     }
 }
