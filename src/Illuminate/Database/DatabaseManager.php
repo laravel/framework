@@ -249,9 +249,9 @@ class DatabaseManager implements ConnectionResolverInterface {
 	 *
 	 * @throws \InvalidArgumentException
 	 */
-	protected function getConfig($name)
+	protected function getConfig($name = null)
 	{
-		$name = $name ?: $this->getDefaultConnection();
+		$name = !is_null($name) ? $name : $this->getDefaultConnection();
 
 		// To get the database connection configuration, we will just pull each of the
 		// connection configurations and get the configurations for the given name.
@@ -275,6 +275,17 @@ class DatabaseManager implements ConnectionResolverInterface {
 	{
 		return $this->app['config']['database.default'];
 	}
+
+	/**
+	 * Get the default connection's driver name.
+	 *
+	 * @return string
+	 */
+	public function getDefaultDatabaseDriver()
+	{
+		return array_get($this->getConfig(), 'driver');
+	}
+
 
 	/**
 	 * Set the default connection name.
