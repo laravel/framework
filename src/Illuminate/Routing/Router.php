@@ -825,7 +825,7 @@ class Router implements RegistrarContract
      */
     protected function performBinding($key, $value, $route)
     {
-        return call_user_func($this->binders[$key], $value, $route);
+        return $this->container->call($this->binders[$key], [$value, $route]);
     }
 
     /**
