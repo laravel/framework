@@ -376,7 +376,7 @@ if (! function_exists('dispatch')) {
     }
 }
 
-if (! function_exists('dispatchNow')) {
+if (! function_exists('dispatch_now')) {
     /**
      * Dispatch a command to its appropriate handler in the current process.
      *
@@ -384,7 +384,7 @@ if (! function_exists('dispatchNow')) {
      * @param  mixed  $handler
      * @return mixed
      */
-    function dispatchNow($job, $handler = null)
+    function dispatch_now($job, $handler = null)
     {
         return app(Dispatcher::class)->dispatchNow($job, $handler);
     }
