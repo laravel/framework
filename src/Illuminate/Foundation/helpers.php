@@ -376,6 +376,20 @@ if (! function_exists('dispatch')) {
     }
 }
 
+if (! function_exists('dispatchNow')) {
+    /**
+     * Dispatch a command to its appropriate handler in the current process.
+     *
+     * @param  mixed  $job
+     * @param  mixed  $handler
+     * @return mixed
+     */
+    function dispatchNow($job, $handler = null)
+    {
+        return app(Dispatcher::class)->dispatchNow($job, $handler);
+    }
+}
+
 if (! function_exists('elixir')) {
     /**
      * Get the path to a versioned Elixir file.
