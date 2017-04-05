@@ -7,6 +7,20 @@ use JsonSerializable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 
+/**
+ * Class Fluent.
+ *
+ * @see https://laravel.com/docs/master/migrations
+ *
+ * @method Fluent unsigned()
+ * @method Fluent nullable()
+ * @method Fluent unique()
+ * @method Fluent default(mixed $value)
+ * @method Fluent references(string $key)
+ * @method Fluent on(string $table)
+ * @method Fluent onDelete(string $action)
+ * @method Fluent onUpdate(string $action)
+ */
 class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
 {
     /**
