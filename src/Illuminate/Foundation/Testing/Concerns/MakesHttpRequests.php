@@ -46,7 +46,8 @@ trait MakesHttpRequests
         }
 
         $nullMiddleware = new class {
-            public function handle($request, $next) {
+            public function handle($request, $next)
+            {
                 return $next($request);
             }
         };
