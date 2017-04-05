@@ -118,7 +118,8 @@ class Mailer implements MailerContract, MailQueueContract
      *
      * @param  string  $text
      * @param  mixed  $callback
-     * @return void
+     * @throws \Exception  when tried to send an email, usually Swift_RfcComplianceException or RequestException
+     * @return mixed  result from Mail driver, usually a Response or int
      */
     public function raw($text, $callback)
     {
@@ -131,7 +132,8 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  string  $view
      * @param  array  $data
      * @param  mixed  $callback
-     * @return void
+     * @throws \Exception  when tried to send an email, usually Swift_RfcComplianceException or RequestException
+     * @return mixed  result from Mail driver, usually a Response or int
      */
     public function plain($view, array $data, $callback)
     {
@@ -144,7 +146,8 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  string|array  $view
      * @param  array  $data
      * @param  \Closure|string  $callback
-     * @return void
+     * @throws \Exception  when tried to send an email, usually Swift_RfcComplianceException or RequestException
+     * @return mixed  result from Mail driver, usually a Response or int
      */
     public function send($view, array $data, $callback)
     {
@@ -373,7 +376,8 @@ class Mailer implements MailerContract, MailQueueContract
      * Send a Swift Message instance.
      *
      * @param  \Swift_Message  $message
-     * @return void
+     * @throws \Exception  when tried to send an email, usually Swift_RfcComplianceException or RequestException
+     * @return mixed  result from Mail driver, usually a Response or int
      */
     protected function sendSwiftMessage($message)
     {
