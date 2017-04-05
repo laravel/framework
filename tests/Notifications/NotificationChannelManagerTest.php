@@ -62,6 +62,39 @@ class NotificationChannelManagerTest extends TestCase
 
         $manager->send([new NotificationChannelManagerTestNotifiable], new NotificationChannelManagerTestQueuedNotification);
     }
+
+    public function testChannelManagerRegisterChannelFactory()
+    {
+        $manager = new ChannelManager(null);
+        $manager->register(NotificationChannelManagerTestNotificationChannelFactory::class);
+
+        $this->assertSame([NotificationChannelManagerTestNotificationChannelFactory::class], $manager->getChannels());
+    }
+
+    public function testChannelManagerRegisterChannelFactoryNotGiven()
+    {
+        $manager = new ChannelManager(null);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $manager->register(NotificationChannelManagerTestNotifiable::class);
+    }
+
+    public function testChannelManagerDriverMethodReturnsChannelDispatcherInstance()
+    {
+        $manager = new ChannelManager(null);
+        $manager->register(NotificationChannelManagerTestNotificationChannelFactory::class);
+
+        $this->assertInstanceOf('\Illuminate\Contracts\Notifications\Channels\Dispatcher', $manager->driver('test'));
+    }
+
+    public function testChannelManagerDriverNotSupported()
+    {
+        $manager = new ChannelManager(null);
+        $manager->register(NotificationChannelManagerTestNotificationChannelFactory::class);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $manager->driver('notSupported');
+    }
 }
 
 class NotificationChannelManagerTestNotifiable
@@ -107,5 +140,18 @@ class NotificationChannelManagerTestQueuedNotification extends Notification impl
     public function message()
     {
         return $this->line('test')->action('Text', 'url');
+    }
+}
+
+class NotificationChannelManagerTestNotificationChannelFactory implements \Illuminate\Contracts\Notifications\Channels\Factory
+{
+    public static function canHandleNotification($driver)
+    {
+        return in_array($driver, ['test']);
+    }
+
+    public static function createDriver($driver)
+    {
+        return Mockery::mock('Illuminate\Contracts\Notifications\Channels\Dispatcher');
     }
 }

@@ -2,11 +2,15 @@
 
 namespace Illuminate\Notifications\Channels;
 
+use Illuminate\Container\Container;
 use Nexmo\Client as NexmoClient;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\NexmoMessage;
+use Nexmo\Client\Credentials\Basic as NexmoCredentials;
+use Illuminate\Contracts\Notifications\Channels\Factory;
+use Illuminate\Contracts\Notifications\Channels\Dispatcher;
 
-class NexmoSmsChannel
+class NexmoSmsChannel implements Factory, Dispatcher
 {
     /**
      * The Nexmo client instance.
@@ -60,5 +64,37 @@ class NexmoSmsChannel
             'to' => $to,
             'text' => trim($message->content),
         ]);
+    }
+
+    /**
+     * Check for the driver capacity.
+     *
+     * @param  string  $driver
+     * @return bool
+     */
+    public static function canHandleNotification($driver)
+    {
+        return in_array($driver, ['nexmo']);
+    }
+
+    /**
+     * Create a new driver instance.
+     *
+     * @param  $driver
+     * @return \Illuminate\Contracts\Notifications\Channels\Dispatcher
+     */
+    public static function createDriver($driver)
+    {
+        if(! static::canHandleNotification($driver)) return null;
+
+        $app = Container::getInstance();
+
+        return new static(
+            new NexmoClient(new NexmoCredentials(
+                $app['config']['services.nexmo.key'],
+                $app['config']['services.nexmo.secret']
+            )),
+            $app['config']['services.nexmo.sms_from']
+        );
     }
 }

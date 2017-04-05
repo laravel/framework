@@ -6,9 +6,11 @@ use GuzzleHttp\Client as HttpClient;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\SlackMessage;
 use Illuminate\Notifications\Messages\SlackAttachment;
+use Illuminate\Contracts\Notifications\Channels\Factory;
+use Illuminate\Contracts\Notifications\Channels\Dispatcher;
 use Illuminate\Notifications\Messages\SlackAttachmentField;
 
-class SlackWebhookChannel
+class SlackWebhookChannel implements Factory, Dispatcher
 {
     /**
      * The HTTP client instance.
@@ -108,5 +110,27 @@ class SlackWebhookChannel
 
             return ['title' => $key, 'value' => $value, 'short' => true];
         })->values()->all();
+    }
+
+    /**
+     * Check for the driver capacity.
+     *
+     * @param  string  $driver
+     * @return bool
+     */
+    public static function canHandleNotification($driver)
+    {
+        return in_array($driver, ['slack']);
+    }
+
+    /**
+     * Create a new driver instance.
+     *
+     * @param  $driver
+     * @return \Illuminate\Contracts\Notifications\Channels\Dispatcher
+     */
+    public static function createDriver($driver)
+    {
+        return static::canHandleNotification($driver) ? new static(new HttpClient) : null;
     }
 }
