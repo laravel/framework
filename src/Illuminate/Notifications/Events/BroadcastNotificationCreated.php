@@ -64,6 +64,20 @@ class BroadcastNotificationCreated implements ShouldBroadcast
     }
 
     /**
+     * Set broadcasting event name.
+     *
+     * @return string
+     */
+    public function broadcastAs()
+    {
+        if (method_exists($this->notification, 'broadcastAs')) {
+            return $this->notification->broadcastAs();
+        }
+
+        return get_class($this);
+    }
+
+    /**
      * Get the data that should be sent with the broadcasted event.
      *
      * @return array
