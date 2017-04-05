@@ -1,6 +1,6 @@
 # Release Notes for 5.4.x
 
-## [Unreleased]
+## v5.4.17 (2017-04-03)
 
 ### Added
 - Added `getManager()` and `setManager()` to queue worker ([#18452](https://github.com/laravel/framework/pull/18452))

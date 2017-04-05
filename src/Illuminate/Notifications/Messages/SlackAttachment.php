@@ -56,6 +56,13 @@ class SlackAttachment
     public $markdown;
 
     /**
+     * The attachment's image url.
+     *
+     * @var string
+     */
+    public $imageUrl;
+
+    /**
      * The attachment's footer.
      *
      * @var string
@@ -176,6 +183,19 @@ class SlackAttachment
     public function markdown(array $fields)
     {
         $this->markdown = $fields;
+
+        return $this;
+    }
+
+    /**
+     * Set the image URL.
+     *
+     * @param  string  $url
+     * @return $this
+     */
+    public function image($url)
+    {
+        $this->imageUrl = $url;
 
         return $this;
     }

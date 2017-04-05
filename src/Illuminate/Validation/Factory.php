@@ -46,6 +46,13 @@ class Factory implements FactoryContract
     protected $implicitExtensions = [];
 
     /**
+     * All of the custom dependent validator extensions.
+     *
+     * @var array
+     */
+    protected $dependentExtensions = [];
+
+    /**
      * All of the custom validator message replacers.
      *
      * @var array
@@ -162,6 +169,8 @@ class Factory implements FactoryContract
         // array of data that is given to a validator instances via instantiation.
         $validator->addImplicitExtensions($this->implicitExtensions);
 
+        $validator->addDependentExtensions($this->dependentExtensions);
+
         $validator->addReplacers($this->replacers);
 
         $validator->setFallbackMessages($this->fallbackMessages);
@@ -195,6 +204,23 @@ class Factory implements FactoryContract
     public function extendImplicit($rule, $extension, $message = null)
     {
         $this->implicitExtensions[$rule] = $extension;
+
+        if ($message) {
+            $this->fallbackMessages[Str::snake($rule)] = $message;
+        }
+    }
+
+    /**
+     * Register a custom implicit validator extension.
+     *
+     * @param  string   $rule
+     * @param  \Closure|string  $extension
+     * @param  string  $message
+     * @return void
+     */
+    public function extendDependent($rule, $extension, $message = null)
+    {
+        $this->dependentExtensions[$rule] = $extension;
 
         if ($message) {
             $this->fallbackMessages[Str::snake($rule)] = $message;
