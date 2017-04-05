@@ -11,6 +11,7 @@ use Illuminate\Session\SessionInterface;
 use Illuminate\Session\CookieSessionHandler;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Session\CacheBasedSessionHandler;
 
 class StartSession
 {
@@ -143,6 +144,14 @@ class StartSession
      */
     protected function collectGarbage(SessionInterface $session)
     {
+        // Some session handlers like cache based sessions use their own
+        // mechanism to invalidate entries once their lifetime expires.
+        // There's no need to perform a garbage collection for those kind of
+        // session handlers.
+        if (! $this->gcNeeded($session)) {
+            return;
+        }
+
         $config = $this->manager->getSessionConfig();
 
         // Here we will see if this request hits the garbage collection lottery by hitting
@@ -243,5 +252,17 @@ class StartSession
         }
 
         return $this->manager->driver()->getHandler() instanceof CookieSessionHandler;
+    }
+
+    /**
+     * Determines if the specified session needs garbage collection for expired
+     * sessions.
+     *
+     * @param  \Illuminate\Session\SessionInterface  $session
+     * @return bool
+     */
+    protected function gcNeeded(SessionInterface $session)
+    {
+        return ! ($session->getHandler() instanceof CacheBasedSessionHandler);
     }
 }
