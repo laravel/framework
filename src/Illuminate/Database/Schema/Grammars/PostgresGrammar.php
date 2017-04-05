@@ -152,7 +152,7 @@ class PostgresGrammar extends Grammar
     }
 
     /**
-     * Compile a drop all tables command.
+     * Compile the SQL needed to drop all tables.
      *
      * @param  string  $tables
      * @return string
@@ -163,14 +163,14 @@ class PostgresGrammar extends Grammar
     }
 
     /**
-     * Compile a get all tables command.
+     * Compile the SQL needed to retrieve all table names.
      *
      * @param  string  $schema
      * @return string
      */
     public function compileGetAllTables($schema)
     {
-        return "select tablename from pg_catalog.pg_tables where schemaname = '$schema'";
+        return "select tablename from pg_catalog.pg_tables where schemaname = '{$schema}'";
     }
 
     /**

@@ -200,7 +200,7 @@ class Builder
      */
     public function dropAllTables()
     {
-        throw new LogicException('This database builder type does not support dropAllTables()');
+        throw new LogicException('This database driver does not support dropping all tables.');
     }
 
     /**

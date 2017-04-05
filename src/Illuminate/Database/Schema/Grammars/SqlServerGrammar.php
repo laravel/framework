@@ -149,7 +149,7 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * Compile a drop all tables command.
+     * Compile the SQL needed to drop all tables.
      *
      * @return string
      */

@@ -208,7 +208,7 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
-     * Compile a drop all tables command.
+     * Compile the SQL needed to drop all tables.
      *
      * @return string
      */
@@ -303,7 +303,7 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
-     * Compile the command to enable a writable schema.
+     * Compile the SQL needed to enable a writable schema.
      *
      * @return string
      */
@@ -313,7 +313,7 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
-     * Compile the command to disable a writable schema.
+     * Compile the SQL needed to disable a writable schema.
      *
      * @return string
      */
