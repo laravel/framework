@@ -80,17 +80,18 @@ trait InteractsWithInput
     }
 
     /**
-     * Determine if the request contains a non-empty value for an input item.
+     * Determine if the request contains a value for an input item.
      *
      * @param  string|array  $key
+     * @param  bool          $strict
      * @return bool
      */
-    public function has($key)
+    public function has($key, $strict = false)
     {
         $keys = is_array($key) ? $key : func_get_args();
 
         foreach ($keys as $value) {
-            if ($this->isEmptyString($value)) {
+            if ($this->isEmptyString($value) && !$strict) {
                 return false;
             }
         }
