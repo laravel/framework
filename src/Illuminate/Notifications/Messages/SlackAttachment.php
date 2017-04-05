@@ -77,6 +77,13 @@ class SlackAttachment
     public $timestamp;
 
     /**
+     * The attachment's image url.
+     *
+     * @var string
+     */
+    public $imageUrl;
+
+    /**
      * Set the title of the attachment.
      *
      * @param  string  $title
@@ -215,6 +222,20 @@ class SlackAttachment
     public function timestamp(Carbon $timestamp)
     {
         $this->timestamp = $timestamp->getTimestamp();
+
+        return $this;
+    }
+
+    /**
+     * Set the image url.
+     *
+     * @param  string $url
+     *
+     * @return $this
+     */
+    public function imageUrl($url)
+    {
+        $this->imageUrl = $url;
 
         return $this;
     }
