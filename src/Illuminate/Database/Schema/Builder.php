@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Schema;
 
 use Closure;
+use LogicException;
 use Illuminate\Database\Connection;
 
 class Builder
@@ -188,6 +189,18 @@ class Builder
         $this->build(tap($this->createBlueprint($table), function ($blueprint) {
             $blueprint->dropIfExists();
         }));
+    }
+
+    /**
+     * Drop all tables from the database.
+     *
+     * @return void
+     *
+     * @throws \LogicException
+     */
+    public function dropAllTables()
+    {
+        throw new LogicException('This database builder type does not support dropAllTables()');
     }
 
     /**

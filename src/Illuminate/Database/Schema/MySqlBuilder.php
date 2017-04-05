@@ -5,6 +5,22 @@ namespace Illuminate\Database\Schema;
 class MySqlBuilder extends Builder
 {
     /**
+     * Drop all tables from the database.
+     *
+     * @return void
+     */
+    public function dropAllTables()
+    {
+        $this->disableForeignKeyConstraints();
+
+        foreach ($this->connection->select('SHOW TABLES') as $table) {
+            $this->drop(get_object_vars($table)[key($table)]);
+        }
+
+        $this->enableForeignKeyConstraints();
+    }
+
+    /**
      * Determine if the given table exists.
      *
      * @param  string  $table
