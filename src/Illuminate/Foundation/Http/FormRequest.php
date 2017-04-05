@@ -110,7 +110,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     public function validatedInputs()
     {
-        return $this->intersect(array_keys($this->rules()));
+        return $this->only(array_keys($this->rules()));
     }
 
     /**
