@@ -91,7 +91,7 @@ trait InteractsWithInput
         $keys = is_array($key) ? $key : func_get_args();
 
         foreach ($keys as $value) {
-            if ($this->isEmptyString($value) && !$strict) {
+            if ($this->isEmptyString($value) && ! $strict) {
                 return false;
             }
         }
