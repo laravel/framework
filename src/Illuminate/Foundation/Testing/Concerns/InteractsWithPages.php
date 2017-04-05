@@ -51,6 +51,13 @@ trait InteractsWithPages
     protected $uploads = [];
 
     /**
+     * Disabled validation fields array.
+     *
+     * @var array
+     */
+    protected $disabledValidationFields = [];
+
+    /**
      * Visit the given URI with a GET request.
      *
      * @param  string  $uri
@@ -547,6 +554,20 @@ trait InteractsWithPages
     }
 
     /**
+     * Select an option from a drop-down filled with Ajax.
+     *
+     * @param  string  $option
+     * @param  string  $element
+     * @return $this
+     */
+    protected function forceSelect($option, $element)
+    {
+        $this->disabledValidationFields[] = $element;
+
+        return $this->storeInput($element, $option);
+    }
+
+    /**
      * Attach a file to a form field on the page.
      *
      * @param  string  $absolutePath
@@ -601,7 +622,11 @@ trait InteractsWithPages
             $buttonText = null;
         }
 
-        return $this->getForm($buttonText)->setValues($inputs);
+        $form = $this->getForm($buttonText);
+
+        $this->disableValidationOn($form);
+
+        return $form->setValues($inputs);
     }
 
     /**
@@ -625,6 +650,25 @@ trait InteractsWithPages
                 "Could not find a form that has submit button [{$buttonText}]."
             );
         }
+    }
+
+    /**
+     * Disables validation for selected fields on the form.
+     *
+     * @param \Symfony\Component\DomCrawler\Form  $form
+     * @return void
+     */
+    private function disableValidationOn($form)
+    {
+        if (! is_array($this->disabledValidationFields)) {
+            return;
+        }
+
+        foreach ($this->disabledValidationFields as $field) {
+            $form->get($field)->disableValidation();
+        }
+
+        $this->disabledValidationFields = [];
     }
 
     /**
