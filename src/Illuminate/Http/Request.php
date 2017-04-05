@@ -287,6 +287,10 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function has($key)
     {
+        if ($this->hasFile($key)) {
+            return true;
+        }
+        
         $keys = is_array($key) ? $key : func_get_args();
 
         foreach ($keys as $value) {
