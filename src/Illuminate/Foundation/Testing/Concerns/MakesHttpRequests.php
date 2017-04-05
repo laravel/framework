@@ -45,15 +45,13 @@ trait MakesHttpRequests
             return $this;
         }
 
-        $nullMiddleware = new class {
-            public function handle($request, $next)
-            {
-                return $next($request);
-            }
-        };
-
         foreach ((array) $middleware as $abstract) {
-            $this->app->instance($abstract, $nullMiddleware);
+            $this->app->instance($abstract, new class {
+                public function handle($request, $next)
+                {
+                    return $next($request);
+                }
+            });
         }
 
         return $this;
