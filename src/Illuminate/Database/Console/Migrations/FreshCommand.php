@@ -39,7 +39,7 @@ class FreshCommand extends Command
             $database = $this->input->getOption('database')
         );
 
-        $this->info('All tables dropped on database successfully.');
+        $this->info('Dropped all tables successfully.');
 
         $this->call('migrate', [
             '--database' => $database,
