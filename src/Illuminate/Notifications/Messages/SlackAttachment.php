@@ -56,6 +56,13 @@ class SlackAttachment
     public $markdown;
 
     /**
+     * The attachment's image url.
+     *
+     * @var string
+     */
+    public $imageUrl;
+
+    /**
      * The attachment's footer.
      *
      * @var string
@@ -75,13 +82,6 @@ class SlackAttachment
      * @var int
      */
     public $timestamp;
-
-    /**
-     * The attachment's image url.
-     *
-     * @var string
-     */
-    public $imageUrl;
 
     /**
      * Set the title of the attachment.
@@ -188,6 +188,19 @@ class SlackAttachment
     }
 
     /**
+     * Set the image URL.
+     *
+     * @param  string  $url
+     * @return $this
+     */
+    public function image($url)
+    {
+        $this->imageUrl = $url;
+
+        return $this;
+    }
+
+    /**
      * Set the footer content.
      *
      * @param  string  $footer
@@ -222,20 +235,6 @@ class SlackAttachment
     public function timestamp(Carbon $timestamp)
     {
         $this->timestamp = $timestamp->getTimestamp();
-
-        return $this;
-    }
-
-    /**
-     * Set the image url.
-     *
-     * @param  string $url
-     *
-     * @return $this
-     */
-    public function imageUrl($url)
-    {
-        $this->imageUrl = $url;
 
         return $this;
     }
