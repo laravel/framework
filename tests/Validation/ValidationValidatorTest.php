@@ -2518,6 +2518,21 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testCustomDependentValidators()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans,
+            [
+                ['name' => 'Jamie', 'age' => 27],
+            ],
+            ['*.name' => 'dependent_rule:*.age']
+        );
+        $v->addDependentExtension('dependent_rule', function ($name) use ($v) {
+            return array_get($v->getData(), $name) == 'Jamie';
+        });
+        $this->assertTrue($v->passes());
+    }
+
     /**
      * @expectedException InvalidArgumentException
      */
