@@ -277,13 +277,45 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  string  $key
      * @param  mixed  $value
      * @param  bool  $strict
+     * @param  string  $operator
      * @return static
      */
-    public function where($key, $value, $strict = true)
+    public function where($key, $value, $strict = true, $operator = '==')
     {
-        return $this->filter(function ($item) use ($key, $value, $strict) {
-            return $strict ? data_get($item, $key) === $value
-                           : data_get($item, $key) == $value;
+        return $this->filter(function ($item) use ($key, $value, $strict, $operator) {
+            $itemKey = data_get($item, $key);
+            if (
+                $strict &&
+                ($operator == '!=' || $operator == '!==')
+            ) {
+                $operator = '!==';
+            }
+            if (
+                $strict &&
+                ($operator == '==' || $operator == '===')
+            ) {
+                $operator = '===';
+            }
+            switch ($operator) {
+                case '==':
+                    return $itemKey ==  $value;
+                case '===':
+                    return $itemKey === $value;
+                case '!=':
+                    return $itemKey !=  $value;
+                case '!==':
+                    return $itemKey !== $value;
+                case '>=':
+                    return $itemKey >=  $value;
+                case '=<':
+                    return $itemKey <=  $value;
+                case '>':
+                    return $itemKey >   $value;
+                case '<':
+                    return $itemKey <   $value;
+                default:
+                    return $itemKey ==  $value;
+            }
         });
     }
 
