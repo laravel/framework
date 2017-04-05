@@ -153,8 +153,6 @@ trait AuthenticatesUsers
 
         $request->session()->flush();
 
-        $request->session()->regenerate();
-
         return redirect('/');
     }
 
