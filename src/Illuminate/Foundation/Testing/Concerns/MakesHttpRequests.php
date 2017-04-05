@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
+use Illuminate\Http\Testing\NullMiddleware;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Testing\TestResponse;
@@ -34,11 +35,26 @@ trait MakesHttpRequests
     /**
      * Disable middleware for the test.
      *
+     * @param  string|array  $middleware
      * @return $this
      */
-    public function withoutMiddleware()
+    public function withoutMiddleware($middleware = null)
     {
-        $this->app->instance('middleware.disable', true);
+        if (is_null($middleware)) {
+            $this->app->instance('middleware.disable', true);
+
+            return $this;
+        }
+
+        $nullMiddleware = new class {
+            public function handle($request, $next) {
+                return $next($request);
+            }
+        };
+
+        foreach ((array) $middleware as $abstract) {
+            $this->app->instance($abstract, $nullMiddleware);
+        }
 
         return $this;
     }
