@@ -74,35 +74,11 @@ class ControllerMakeCommand extends GeneratorCommand
         $replace = [];
 
         if ($this->option('parent')) {
-            $parentModelClass = $this->parseModel($this->option('parent'));
-
-            if (! class_exists($parentModelClass)) {
-                if ($this->confirm("A {$parentModelClass} model does not exist. Do you want to generate it?", true)) {
-                    $this->call('make:model', ['name' => $parentModelClass]);
-                }
-            }
-
-            $replace = [
-                'ParentDummyFullModelClass' => $parentModelClass,
-                'ParentDummyModelClass' => class_basename($parentModelClass),
-                'ParentDummyModelVariable' => lcfirst(class_basename($parentModelClass)),
-            ];
+            $replace = $this->buildParentReplacements();
         }
 
         if ($this->option('model')) {
-            $modelClass = $this->parseModel($this->option('model'));
-
-            if (! class_exists($modelClass)) {
-                if ($this->confirm("A {$modelClass} model does not exist. Do you want to generate it?", true)) {
-                    $this->call('make:model', ['name' => $modelClass]);
-                }
-            }
-
-            $replace = array_merge($replace, [
-                'DummyFullModelClass' => $modelClass,
-                'DummyModelClass' => class_basename($modelClass),
-                'DummyModelVariable' => lcfirst(class_basename($modelClass)),
-            ]);
+            $replace = $this->buildModelReplacements($replace);
         }
 
         $replace["use {$controllerNamespace}\Controller;\n"] = '';
@@ -110,6 +86,51 @@ class ControllerMakeCommand extends GeneratorCommand
         return str_replace(
             array_keys($replace), array_values($replace), parent::buildClass($name)
         );
+    }
+
+    /**
+     * Build the replacemnets for a parent controller.
+     *
+     * @return array
+     */
+    protected function buildParentReplacements()
+    {
+        $parentModelClass = $this->parseModel($this->option('parent'));
+
+        if (! class_exists($parentModelClass)) {
+            if ($this->confirm("A {$parentModelClass} model does not exist. Do you want to generate it?", true)) {
+                $this->call('make:model', ['name' => $parentModelClass]);
+            }
+        }
+
+        return [
+            'ParentDummyFullModelClass' => $parentModelClass,
+            'ParentDummyModelClass' => class_basename($parentModelClass),
+            'ParentDummyModelVariable' => lcfirst(class_basename($parentModelClass)),
+        ];
+    }
+
+    /**
+     * Build the model replacement values.
+     *
+     * @param  array  $replace
+     * @return array
+     */
+    protected function buildModelReplacements(array $replace)
+    {
+        $modelClass = $this->parseModel($this->option('model'));
+
+        if (! class_exists($modelClass)) {
+            if ($this->confirm("A {$modelClass} model does not exist. Do you want to generate it?", true)) {
+                $this->call('make:model', ['name' => $modelClass]);
+            }
+        }
+
+        return array_merge($replace, [
+            'DummyFullModelClass' => $modelClass,
+            'DummyModelClass' => class_basename($modelClass),
+            'DummyModelVariable' => lcfirst(class_basename($modelClass)),
+        ]);
     }
 
     /**
