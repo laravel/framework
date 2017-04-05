@@ -442,8 +442,6 @@ class RoutingRouteTest extends TestCase
             'middleware' => SubstituteBindings::class,
             'uses' => 'Illuminate\Tests\Routing\RouteTestAnotherControllerWithParameterStub@withModels',
         ]);
-        $router->model('bar', 'Illuminate\Tests\Routing\RoutingTestUserModel');
-        $router->model('baz', 'Illuminate\Tests\Routing\RoutingTestTeamModel');
         $router->dispatch(Request::create($str.'/1', 'GET'));
 
         $values = array_values($_SERVER['__test.controller_callAction_parameters']);
