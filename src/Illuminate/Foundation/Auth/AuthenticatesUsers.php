@@ -144,7 +144,7 @@ trait AuthenticatesUsers
     /**
      * Log the user out of the application.
      *
-     * @param \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function logout(Request $request)
@@ -155,7 +155,7 @@ trait AuthenticatesUsers
 
         $request->session()->regenerate();
 
-        return redirect('/');
+        return redirect($this->redirectAfterLogoutPath());
     }
 
     /**
