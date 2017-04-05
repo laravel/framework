@@ -98,6 +98,20 @@ if (! function_exists('array_except')) {
     }
 }
 
+if (! function_exists('array_extend')) {
+    /**
+     * Recursively replace associative array values and merge non-associative arrays.
+     *
+     * @param  array  $array
+     * @param  array[]  ...$args
+     * @return array
+     */
+    function array_extend($array, ...$args)
+    {
+        return Arr::extend($array, ...$args);
+    }
+}
+
 if (! function_exists('array_first')) {
     /**
      * Return the first element in an array passing a given truth test.

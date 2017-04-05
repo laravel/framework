@@ -78,6 +78,39 @@ class SupportArrTest extends TestCase
         $this->assertFalse(Arr::exists(new Collection(['a' => null]), 'b'));
     }
 
+    public function testExtend()
+    {
+        $array1 = [
+            'options' => [
+                'foo' => false,
+                'baz' => false,
+            ],
+            'products' => ['desk'],
+            'name' => 'John',
+        ];
+
+        $array2 = [
+            'options' => [
+                'bar' => true,
+                'baz' => true,
+            ],
+            'products' => ['chair'],
+            'name' => 'Jane',
+        ];
+
+        $array = [
+            'options' => [
+                'foo' => false,
+                'bar' => true,
+                'baz' => true,
+            ],
+            'products' => ['desk', 'chair'],
+            'name' => 'Jane',
+        ];
+
+        $this->assertEquals($array, Arr::extend($array1, $array2));
+    }
+
     public function testFirst()
     {
         $array = [100, 200, 300];

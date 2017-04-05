@@ -138,6 +138,39 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals(['taylor'], $values);
     }
 
+    public function testArrayExtend()
+    {
+        $array1 = [
+            'options' => [
+                'foo' => false,
+                'baz' => false,
+            ],
+            'products' => ['desk'],
+            'name' => 'John',
+        ];
+
+        $array2 = [
+            'options' => [
+                'bar' => true,
+                'baz' => true,
+            ],
+            'products' => ['chair'],
+            'name' => 'Jane',
+        ];
+
+        $array = [
+            'options' => [
+                'foo' => false,
+                'bar' => true,
+                'baz' => true,
+            ],
+            'products' => ['desk', 'chair'],
+            'name' => 'Jane',
+        ];
+
+        $this->assertEquals($array, array_extend($array1, $array2));
+    }
+
     public function testArrayFirst()
     {
         $array = ['name' => 'taylor', 'otherDeveloper' => 'dayle'];

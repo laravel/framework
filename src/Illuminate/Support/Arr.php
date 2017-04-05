@@ -124,6 +124,38 @@ class Arr
     }
 
     /**
+     * Recursively replace associative array values and merge non-associative arrays.
+     *
+     * @param  array  $array
+     * @param  array[]  ...$args
+     * @return array
+     */
+    public static function extend($array, ...$args)
+    {
+        foreach ($args as $arg) {
+            foreach ($arg as $key => $value) {
+                if (is_int($key)) {
+                    $array[] = $value;
+                    continue;
+                }
+
+                if (is_array($arg[$key])) {
+                    if (! isset($array[$key])) {
+                        $array[$key] = [];
+                    }
+
+                    $array[$key] = static::extend($array[$key], $value);
+                    continue;
+                }
+
+                $array[$key] = $value;
+            }
+        }
+
+        return $array;
+    }
+
+    /**
      * Return the first element in an array passing a given truth test.
      *
      * @param  array  $array
