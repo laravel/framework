@@ -198,6 +198,19 @@ class TestResponse
     }
 
     /**
+     * Assert that the given string is contained within the response text.
+     *
+     * @param  string  $value
+     * @return $this
+     */
+    public function assertSeeText($value)
+    {
+        PHPUnit::assertContains($value, strip_tags($this->getContent()));
+
+        return $this;
+    }
+
+    /**
      * Assert that the given string is not contained within the response.
      *
      * @param  string  $value
@@ -206,6 +219,19 @@ class TestResponse
     public function assertDontSee($value)
     {
         PHPUnit::assertNotContains($value, $this->getContent());
+
+        return $this;
+    }
+
+    /**
+     * Assert that the given string is not contained within the response text.
+     *
+     * @param  string  $value
+     * @return $this
+     */
+    public function assertDontSeeText($value)
+    {
+        PHPUnit::assertNotContains($value, strip_tags($this->getContent()));
 
         return $this;
     }

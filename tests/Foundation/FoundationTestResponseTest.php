@@ -26,6 +26,19 @@ class FoundationTestResponseTest extends TestCase
         $response->assertViewHas('foo');
     }
 
+    public function testAssertSeeText()
+    {
+        $baseResponse = tap(new Response, function ($response) {
+            $response->setContent(\Mockery::mock(View::class, [
+                'render' => 'foo<strong>bar</strong>',
+            ]));
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        $response->assertSeeText('foobar');
+    }
+
     public function testAssertJsonWithArray()
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
