@@ -314,7 +314,10 @@ class RoutingRouteTest extends TestCase
         unset($_SERVER['__test.route_inject']);
         $router = $this->getRouter();
         $router->get('foo/{var}/{bar?}/{baz?}', function (stdClass $foo, $var, $bar = 'test', stdClass $baz = null) {
-            $_SERVER['__test.route_inject'] = func_get_args();
+            // We build the array manually to ensure that we get the actual values in the method,
+            // and not the values that were originally sent to us; func_get_args() will only return
+            // the original values sent to us, not what the method received, including default values.
+            $_SERVER['__test.route_inject'] = [$foo, $var, $bar, $baz];
 
             return 'hello';
         });
@@ -322,7 +325,7 @@ class RoutingRouteTest extends TestCase
         $this->assertInstanceOf('stdClass', $_SERVER['__test.route_inject'][0]);
         $this->assertEquals('bar', $_SERVER['__test.route_inject'][1]);
         $this->assertEquals('test', $_SERVER['__test.route_inject'][2]);
-        $this->assertInstanceOf('stdClass', $_SERVER['__test.route_inject'][3]);
+        $this->assertNull($_SERVER['__test.route_inject'][3]);
         $this->assertArrayHasKey(3, $_SERVER['__test.route_inject']);
         unset($_SERVER['__test.route_inject']);
     }

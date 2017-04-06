@@ -37,28 +37,19 @@ trait RouteDependencyResolverTrait
      */
     public function resolveMethodDependencies(array $parameters, ReflectionFunctionAbstract $reflector)
     {
-        $results = [];
-
-        $instanceCount = 0;
-
-        $values = array_values($parameters);
-
         foreach ($reflector->getParameters() as $key => $parameter) {
             $instance = $this->transformDependency(
                 $parameter, $parameters
             );
 
             if (! is_null($instance)) {
-                $instanceCount++;
-
-                $results[$parameter->getName()] = $instance;
-            } else {
-                $results[$parameter->getName()] = isset($values[$key - $instanceCount])
-                    ? $values[$key - $instanceCount] : $parameter->getDefaultValue();
+                array_splice(
+                    $parameters, $key, 0, [$instance]
+                );
             }
         }
 
-        return $results;
+        return $parameters;
     }
 
     /**
