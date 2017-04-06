@@ -70,7 +70,7 @@ class Encrypter implements EncrypterContract
      */
     public function encrypt($value, $serialize = true)
     {
-        $iv = random_bytes(16);
+        $iv = random_bytes(openssl_cipher_iv_length($this->cipher));
 
         // First we will encrypt the value using OpenSSL. After this is encrypted we
         // will proceed to calculating a MAC for the encrypted value so that this
