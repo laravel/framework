@@ -1,5 +1,15 @@
 # Release Notes for 5.4.x
 
+## v5.4.18 (Unreleased)
+
+### Added
+- Added `assertSuccessful()` and `assertRedirect()` for response testing ([#18629](https://github.com/laravel/framework/pull/18629))
+- Added support for attaching an image to Slack Attachments `$attachment->image($url)`([#18664](https://github.com/laravel/framework/pull/18664))
+- Added `Validator::extendDependent()` to allow adding custom rules that depend on other fields ([#18654](https://github.com/laravel/framework/pull/18654))
+
+### Fixed
+- Fixed an issue with `Collection::groupBy()` when the provided value is a boolean ([#18674](https://github.com/laravel/framework/pull/18674))
+
 ## v5.4.17 (2017-04-03)
 
 ### Added
