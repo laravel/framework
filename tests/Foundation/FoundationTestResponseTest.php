@@ -30,7 +30,7 @@ class FoundationTestResponseTest extends TestCase
     {
         $baseResponse = tap(new Response, function ($response) {
             $response->setContent(\Mockery::mock(View::class, [
-                'render' => 'foo<strong>bar</strong>'
+                'render' => 'foo<strong>bar</strong>',
             ]));
         });
 
