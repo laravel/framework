@@ -149,7 +149,7 @@ trait InteractsWithInput
 
         $input = $this->all();
 
-        $placeholder = '##'.str_random();
+        $placeholder = str_random();
 
         foreach ($keys as $key) {
             $value = data_get($input, $key, $placeholder);
