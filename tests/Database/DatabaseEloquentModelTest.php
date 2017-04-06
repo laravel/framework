@@ -67,6 +67,31 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->isDirty(['foo', 'bar']));
     }
 
+    public function testDirtyOnCastOrDateAttributes()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setDateFormat('Y-m-d H:i:s');
+        $model->boolAttribute = 1;
+        $model->foo = 1;
+        $model->bar = '2017-03-18';
+        $model->dateAttribute = '2017-03-18';
+        $model->datetimeAttribute = '2017-03-23 22:17:00';
+        $model->syncOriginal();
+
+        $model->boolAttribute = true;
+        $model->foo = true;
+        $model->bar = '2017-03-18 00:00:00';
+        $model->dateAttribute = '2017-03-18 00:00:00';
+        $model->datetimeAttribute = null;
+
+        $this->assertTrue($model->isDirty());
+        $this->assertTrue($model->isDirty('foo'));
+        $this->assertTrue($model->isDirty('bar'));
+        $this->assertFalse($model->isDirty('boolAttribute'));
+        $this->assertFalse($model->isDirty('dateAttribute'));
+        $this->assertTrue($model->isDirty('datetimeAttribute'));
+    }
+
     public function testCleanAttributes()
     {
         $model = new EloquentModelStub(['foo' => '1', 'bar' => 2, 'baz' => 3]);
