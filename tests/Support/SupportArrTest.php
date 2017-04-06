@@ -100,6 +100,10 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(200, $last);
 
         $this->assertEquals(300, Arr::last($array));
+
+        $array = [100, '#bar' => 200, 'baz' => 300];
+
+        $this->assertEquals(300, Arr::last($array));
     }
 
     public function testFlatten()
