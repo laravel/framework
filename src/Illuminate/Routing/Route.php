@@ -711,7 +711,7 @@ class Route
     /**
      * Get or set the middlewares attached to the route.
      *
-     * @param  array|string|null $middleware
+     * @param  array|string $middleware
      * @return $this|array
      */
     public function middleware($middleware = null)
@@ -734,22 +734,22 @@ class Route
     /**
      * Remove the given middlewares from the route. If no middleware is passed, all middlewares will be removed.
      *
-     * @param null $middleware
+     * @param array|string $middleware
      * @return $this
      */
     public function withoutMiddleware($middleware = null)
     {
         if (is_null($middleware)) {
             $this->action['middleware'] = [];
-        } else {
-            if (is_string($middleware)) {
-                $middleware = func_get_args();
-            }
 
-            $this->action['bypass'] = array_merge(
-                (array) Arr::get($this->action, 'bypass', []), $middleware
-            );
+            return $this;
         }
+
+        $middleware = is_array($middleware) ? $middleware : func_get_args();
+
+        $this->action['bypass'] = array_merge(
+            (array) Arr::get($this->action, 'bypass', []), $middleware
+        );
 
         return $this;
     }

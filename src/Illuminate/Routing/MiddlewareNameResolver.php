@@ -12,6 +12,7 @@ class MiddlewareNameResolver
      * @param  string  $name
      * @param  array  $map
      * @param  array  $middlewareGroups
+     * @param  array  $disabledMiddlewares
      * @return string|array
      */
     public static function resolve($name, $map, $middlewareGroups, $disabledMiddlewares)
@@ -51,6 +52,7 @@ class MiddlewareNameResolver
      * @param  string  $name
      * @param  array  $map
      * @param  array  $middlewareGroups
+     * @param  array  $disabledMiddlewares
      * @return array
      */
     protected static function parseMiddlewareGroup($name, $map, $middlewareGroups, $disabledMiddlewares)
