@@ -145,15 +145,7 @@ trait InteractsWithInput
     {
         $keys = is_array($keys) ? $keys : func_get_args();
 
-        $results = [];
-
-        $input = $this->all();
-
-        foreach ($keys as $key) {
-            Arr::set($results, $key, data_get($input, $key));
-        }
-
-        return $results;
+        return array_intersect_key($this->all(), array_flip($keys));
     }
 
     /**
@@ -171,17 +163,6 @@ trait InteractsWithInput
         Arr::forget($results, $keys);
 
         return $results;
-    }
-
-    /**
-     * Intersect an array of items with the input data.
-     *
-     * @param  array|mixed  $keys
-     * @return array
-     */
-    public function intersect($keys)
-    {
-        return array_filter($this->only(is_array($keys) ? $keys : func_get_args()));
     }
 
     /**

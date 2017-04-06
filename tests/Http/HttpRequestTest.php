@@ -245,13 +245,9 @@ class HttpRequestTest extends TestCase
 
     public function testOnlyMethod()
     {
-        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 25]);
-        $this->assertEquals(['age' => 25], $request->only('age'));
-        $this->assertEquals(['name' => 'Taylor', 'age' => 25], $request->only('name', 'age'));
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => null]);
 
-        $request = Request::create('/', 'GET', ['developer' => ['name' => 'Taylor', 'age' => 25]]);
-        $this->assertEquals(['developer' => ['age' => 25]], $request->only('developer.age'));
-        $this->assertEquals(['developer' => ['name' => 'Taylor'], 'test' => null], $request->only('developer.name', 'test'));
+        $this->assertEquals(['name' => 'Taylor', 'age' => null], $request->only('name', 'age', 'email'));
     }
 
     public function testExceptMethod()
@@ -259,12 +255,6 @@ class HttpRequestTest extends TestCase
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 25]);
         $this->assertEquals(['name' => 'Taylor'], $request->except('age'));
         $this->assertEquals([], $request->except('age', 'name'));
-    }
-
-    public function testIntersectMethod()
-    {
-        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => null]);
-        $this->assertEquals(['name' => 'Taylor'], $request->intersect('name', 'age', 'email'));
     }
 
     public function testQueryMethod()
