@@ -1,14 +1,18 @@
 # Release Notes for 5.4.x
 
-## v5.4.18 (Unreleased)
+## [Unreleased]
 
 ### Added
-- Added `assertSuccessful()` and `assertRedirect()` for response testing ([#18629](https://github.com/laravel/framework/pull/18629))
-- Added support for attaching an image to Slack Attachments `$attachment->image($url)`([#18664](https://github.com/laravel/framework/pull/18664))
+- Added `assertSuccessful()` and `assertRedirect()` to `TestResponse` ([#18629](https://github.com/laravel/framework/pull/18629))
+- Added `assertSeeText()` and `assertDontSeeText()` to `TestResponse` ([#18690](https://github.com/laravel/framework/pull/18690))
+- Added support for attaching an image to Slack attachments `$attachment->image($url)`([#18664](https://github.com/laravel/framework/pull/18664))
 - Added `Validator::extendDependent()` to allow adding custom rules that depend on other fields ([#18654](https://github.com/laravel/framework/pull/18654))
+- Added support for `--parent` option on `make:controller` ([#18606](https://github.com/laravel/framework/pull/18606))
 
 ### Fixed
 - Fixed an issue with `Collection::groupBy()` when the provided value is a boolean ([#18674](https://github.com/laravel/framework/pull/18674))
+- Bring back an old behaviour in resolving controller method dependencies ([#18646](https://github.com/laravel/framework/pull/18646))
+
 
 ## v5.4.17 (2017-04-03)
 
