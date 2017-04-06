@@ -11,6 +11,7 @@ use Illuminate\Auth\Console\ClearResetsCommand;
 use Illuminate\Cache\Console\CacheTableCommand;
 use Illuminate\Foundation\Console\ServeCommand;
 use Illuminate\Queue\Console\FailedTableCommand;
+use Illuminate\Foundation\Console\PresetCommand;
 use Illuminate\Foundation\Console\AppNameCommand;
 use Illuminate\Foundation\Console\JobMakeCommand;
 use Illuminate\Database\Console\Seeds\SeedCommand;
@@ -94,6 +95,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'MigrateRollback' => 'command.migrate.rollback',
         'MigrateStatus' => 'command.migrate.status',
         'Optimize' => 'command.optimize',
+        'Preset' => 'command.preset',
         'QueueFailed' => 'command.queue.failed',
         'QueueFlush' => 'command.queue.flush',
         'QueueForget' => 'command.queue.forget',
@@ -548,6 +550,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.optimize', function ($app) {
             return new OptimizeCommand($app['composer']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerPresetCommand()
+    {
+        $this->app->singleton('command.preset', function () {
+            return new PresetCommand;
         });
     }
 
