@@ -37,8 +37,6 @@ trait RouteDependencyResolverTrait
      */
     public function resolveMethodDependencies(array $parameters, ReflectionFunctionAbstract $reflector)
     {
-        $results = [];
-
         $instanceCount = 0;
 
         $values = array_values($parameters);
@@ -51,14 +49,14 @@ trait RouteDependencyResolverTrait
             if (! is_null($instance)) {
                 $instanceCount++;
 
-                $results[$parameter->getName()] = $instance;
-            } else {
-                $results[$parameter->getName()] = isset($values[$key - $instanceCount])
-                    ? $values[$key - $instanceCount] : $parameter->getDefaultValue();
+                $this->spliceIntoParameters($parameters, $key, $instance);
+            } elseif (! isset($values[$key - $instanceCount]) &&
+                      $parameter->isDefaultValueAvailable()) {
+                $this->spliceIntoParameters($parameters, $key, $parameter->getDefaultValue());
             }
         }
 
-        return $results;
+        return $parameters;
     }
 
     /**
@@ -92,5 +90,20 @@ trait RouteDependencyResolverTrait
         return ! is_null(Arr::first($parameters, function ($value) use ($class) {
             return $value instanceof $class;
         }));
+    }
+
+    /**
+     * Splice the given value into the parameter list.
+     *
+     * @param  array  $parameters
+     * @param  string  $offset
+     * @param  mixed  $value
+     * @return void
+     */
+    protected function spliceIntoParameters(array &$parameters, $offset, $value)
+    {
+        array_splice(
+            $parameters, $offset, 0, [$value]
+        );
     }
 }
