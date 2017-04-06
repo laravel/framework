@@ -374,6 +374,48 @@ trait MakesHttpRequests
     }
 
     /**
+     * Assert that the JSON response has exactly the given structure.
+     *
+     * @param  array  $structure
+     * @param  array|null  $responseData
+     * @return $this
+     */
+    public function seeJsonStructureEquals(array $structure, $responseData = null)
+    {
+        if (! $responseData) {
+            $responseData = $this->decodeResponseJson();
+        }
+
+        $structureFirstLevel = array_map(function ($value, $key) {
+            return is_array($value) ? $key : $value;
+        }, $structure, array_keys($structure));
+
+        $responseFirstLevel = array_keys($responseData);
+
+        if ($structureFirstLevel !== ['*']) {
+            $this->assertEquals($structureFirstLevel, $responseFirstLevel, '', 0.0, 10, true);
+        }
+
+        $structureOtherLevels = array_filter($structure, function ($value) {
+            return is_array($value);
+        });
+
+        foreach ($structureOtherLevels as $key => $childStructure) {
+            if ($key === '*') {
+                $this->assertInternalType('array', $responseData);
+
+                foreach ($responseData as $responseDataItem) {
+                    $this->seeJsonStructureEquals($childStructure, $responseDataItem);
+                }
+            } else {
+                $this->seeJsonStructureEquals($childStructure, $responseData[$key]);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Assert that the response contains the given JSON.
      *
      * @param  array  $data
