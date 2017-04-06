@@ -309,24 +309,6 @@ class RoutingRouteTest extends TestCase
         unset($_SERVER['__test.route_inject']);
     }
 
-    public function testClassesAndVariablesCanBeInjectedIntoRoutes()
-    {
-        unset($_SERVER['__test.route_inject']);
-        $router = $this->getRouter();
-        $router->get('foo/{var}/{bar?}/{baz?}', function (stdClass $foo, $var, $bar = 'test', stdClass $baz = null) {
-            $_SERVER['__test.route_inject'] = func_get_args();
-
-            return 'hello';
-        });
-        $this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
-        $this->assertInstanceOf('stdClass', $_SERVER['__test.route_inject'][0]);
-        $this->assertEquals('bar', $_SERVER['__test.route_inject'][1]);
-        $this->assertEquals('test', $_SERVER['__test.route_inject'][2]);
-        $this->assertNull($_SERVER['__test.route_inject'][3]);
-        $this->assertArrayHasKey(3, $_SERVER['__test.route_inject']);
-        unset($_SERVER['__test.route_inject']);
-    }
-
     public function testOptionsResponsesAreGeneratedByDefault()
     {
         $router = $this->getRouter();
@@ -418,6 +400,56 @@ class RoutingRouteTest extends TestCase
             return $bar;
         })->defaults('bar', 'foo');
         $this->assertEquals('foo', $router->dispatch(Request::create('foo', 'GET'))->getContent());
+    }
+
+    public function testControllerCallActionMethodParameters()
+    {
+        $router = $this->getRouter();
+
+        // Has one argument but receives two
+        unset($_SERVER['__test.controller_callAction_parameters']);
+        $router->get(($str = str_random()).'/{one}/{two}', 'Illuminate\Tests\Routing\RouteTestAnotherControllerWithParameterStub@oneArgument');
+        $router->dispatch(Request::create($str.'/one/two', 'GET'));
+        $this->assertEquals(['one' => 'one', 'two' => 'two'], $_SERVER['__test.controller_callAction_parameters']);
+
+        // Has two arguments and receives two
+        unset($_SERVER['__test.controller_callAction_parameters']);
+        $router->get(($str = str_random()).'/{one}/{two}', 'Illuminate\Tests\Routing\RouteTestAnotherControllerWithParameterStub@twoArguments');
+        $router->dispatch(Request::create($str.'/one/two', 'GET'));
+        $this->assertEquals(['one' => 'one', 'two' => 'two'], $_SERVER['__test.controller_callAction_parameters']);
+
+        // Has two arguments but with different names from the ones passed from the route
+        unset($_SERVER['__test.controller_callAction_parameters']);
+        $router->get(($str = str_random()).'/{one}/{two}', 'Illuminate\Tests\Routing\RouteTestAnotherControllerWithParameterStub@differentArgumentNames');
+        $router->dispatch(Request::create($str.'/one/two', 'GET'));
+        $this->assertEquals(['one' => 'one', 'two' => 'two'], $_SERVER['__test.controller_callAction_parameters']);
+
+        // Has two arguments with same name but argument order is reversed
+        unset($_SERVER['__test.controller_callAction_parameters']);
+        $router->get(($str = str_random()).'/{one}/{two}', 'Illuminate\Tests\Routing\RouteTestAnotherControllerWithParameterStub@reversedArguments');
+        $router->dispatch(Request::create($str.'/one/two', 'GET'));
+        $this->assertEquals(['one' => 'one', 'two' => 'two'], $_SERVER['__test.controller_callAction_parameters']);
+
+        // No route parameters while method has parameters
+        unset($_SERVER['__test.controller_callAction_parameters']);
+        $router->get(($str = str_random()).'', 'Illuminate\Tests\Routing\RouteTestAnotherControllerWithParameterStub@oneArgument');
+        $router->dispatch(Request::create($str, 'GET'));
+        $this->assertEquals([], $_SERVER['__test.controller_callAction_parameters']);
+
+        // With model bindings
+        unset($_SERVER['__test.controller_callAction_parameters']);
+        $router->get(($str = str_random()).'/{user}/{defaultNull?}/{team?}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => 'Illuminate\Tests\Routing\RouteTestAnotherControllerWithParameterStub@withModels',
+        ]);
+        $router->dispatch(Request::create($str.'/1', 'GET'));
+
+        $values = array_values($_SERVER['__test.controller_callAction_parameters']);
+
+        $this->assertInstanceOf('Illuminate\Http\Request', $values[0]);
+        $this->assertEquals(1, $values[1]->value);
+        $this->assertNull($values[2]);
+        $this->assertNull($values[3]);
     }
 
     /**
@@ -1339,6 +1371,34 @@ class RouteTestControllerWithParameterStub extends Controller
     }
 }
 
+class RouteTestAnotherControllerWithParameterStub extends Controller
+{
+    public function callAction($method, $parameters)
+    {
+        $_SERVER['__test.controller_callAction_parameters'] = $parameters;
+    }
+
+    public function oneArgument($one)
+    {
+    }
+
+    public function twoArguments($one, $two)
+    {
+    }
+
+    public function differentArgumentNames($bar, $baz)
+    {
+    }
+
+    public function reversedArguments($two, $one)
+    {
+    }
+
+    public function withModels(Request $request, RoutingTestUserModel $user, $defaultNull = null, RoutingTestTeamModel $team = null)
+    {
+    }
+}
+
 class RouteTestResourceControllerWithModelParameter extends Controller
 {
     public function show(RoutingTestUserModel $fooBar)
@@ -1493,6 +1553,31 @@ class RoutingTestMiddlewareGroupTwo
 }
 
 class RoutingTestUserModel extends Model
+{
+    public function getRouteKeyName()
+    {
+        return 'id';
+    }
+
+    public function where($key, $value)
+    {
+        $this->value = $value;
+
+        return $this;
+    }
+
+    public function first()
+    {
+        return $this;
+    }
+
+    public function firstOrFail()
+    {
+        return $this;
+    }
+}
+
+class RoutingTestTeamModel extends Model
 {
     public function getRouteKeyName()
     {
