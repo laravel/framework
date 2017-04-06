@@ -145,7 +145,21 @@ trait InteractsWithInput
     {
         $keys = is_array($keys) ? $keys : func_get_args();
 
-        return array_intersect_key($this->all(), array_flip($keys));
+        $results = [];
+
+        $input = $this->all();
+
+        $placeholder = '##'.str_random();
+
+        foreach ($keys as $key) {
+            $value = data_get($input, $key, $placeholder);
+
+            if ($value != $placeholder) {
+                Arr::set($results, $key, $value);
+            }
+        }
+
+        return $results;
     }
 
     /**

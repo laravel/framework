@@ -246,8 +246,12 @@ class HttpRequestTest extends TestCase
     public function testOnlyMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => null]);
-
         $this->assertEquals(['name' => 'Taylor', 'age' => null], $request->only('name', 'age', 'email'));
+
+        $request = Request::create('/', 'GET', ['developer' => ['name' => 'Taylor', 'age' => null]]);
+        $this->assertEquals(['developer' => ['name' => 'Taylor']], $request->only('developer.name', 'developer.skills'));
+        $this->assertEquals(['developer' => ['age' => null]], $request->only('developer.age'));
+        $this->assertEquals([], $request->only('developer.skills'));
     }
 
     public function testExceptMethod()
