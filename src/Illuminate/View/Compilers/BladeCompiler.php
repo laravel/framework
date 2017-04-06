@@ -401,7 +401,9 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     public function compileEchoDefaults($value)
     {
-        return preg_replace('/^(?=\$)(.+?)(?:\s+or\s+)(.+?)$/s', 'isset($1) ? $1 : $2', $value);
+        $expression = 'isset($1) && !is_null($1) ? $1 : $2';
+
+        return preg_replace('/^(?=\$)(.+?)(?:\s+or\s+)(.+?)$/s', $expression, $value);
     }
 
     /**
