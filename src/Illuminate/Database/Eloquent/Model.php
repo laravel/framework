@@ -2813,11 +2813,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Determine whether a value is JSON castable for inbound manipulation.
      *
      * @param  string  $key
+     * @param  mixed  $value
      * @return bool
      */
-    protected function isJsonCastable($key)
+    protected function isJsonCastable($key, $value)
     {
-        return $this->hasCast($key, ['array', 'json', 'object', 'collection']);
+        return $this->hasCast($key, ['array', 'json', 'object', 'collection']) &&
+                (is_array($value) || is_object($value));
     }
 
     /**
@@ -2899,7 +2901,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $value = $this->fromDateTime($value);
         }
 
-        if ($this->isJsonCastable($key) && ! is_null($value)) {
+        if ($this->isJsonCastable($key, $value) && ! is_null($value)) {
             $value = $this->asJson($value);
         }
 
