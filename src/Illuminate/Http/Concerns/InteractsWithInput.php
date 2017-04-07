@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http\Concerns;
 
+use stdClass;
 use SplFileInfo;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -147,7 +148,7 @@ trait InteractsWithInput
 
         $input = $this->all();
 
-        $placeholder = new class {};
+        $placeholder = new stdClass();
 
         foreach (is_array($keys) ? $keys : func_get_args() as $key) {
             $value = data_get($input, $key, $placeholder);
