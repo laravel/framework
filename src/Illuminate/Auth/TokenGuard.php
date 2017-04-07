@@ -32,17 +32,24 @@ class TokenGuard implements Guard
     protected $storageKey;
 
     /**
+     * The name of the field in the request headers containing the API token.
+     *
+     * @var string
+     */
+    protected $headerKey;
+
+    /**
      * Create a new authentication guard.
      *
      * @param  \Illuminate\Contracts\Auth\UserProvider  $provider
      * @param  \Illuminate\Http\Request  $request
-     * @return void
      */
     public function __construct(UserProvider $provider, Request $request)
     {
         $this->request = $request;
         $this->provider = $provider;
         $this->inputKey = 'api_token';
+        $this->headerKey = 'api_token';
         $this->storageKey = 'api_token';
     }
 
@@ -92,6 +99,10 @@ class TokenGuard implements Guard
 
         if (empty($token)) {
             $token = $this->request->getPassword();
+        }
+
+        if (empty($token)) {
+            $token = $this->request->header($this->headerKey, '');
         }
 
         return $token;
