@@ -255,6 +255,14 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(new Collection([$one]), $c->except([2, 3]));
     }
 
+    public function testAppendAddsAttributesToEntireCollection()
+    {
+        $c = new Collection([new TestEloquentCollectionModel]);
+        $c = $c->append(['visible']);
+
+        $this->assertEquals(['visible' => 'appended'], $c[0]->attributesToArray());
+    }
+
     public function testMakeHiddenAddsHiddenOnEntireCollection()
     {
         $c = new Collection([new TestEloquentCollectionModel]);
@@ -312,4 +320,9 @@ class TestEloquentCollectionModel extends Illuminate\Database\Eloquent\Model
 {
     protected $visible = ['visible'];
     protected $hidden = ['hidden'];
+
+    public function getVisibleAttribute()
+    {
+        return 'appended';
+    }
 }
