@@ -143,18 +143,16 @@ trait InteractsWithInput
      */
     public function only($keys)
     {
-        $keys = is_array($keys) ? $keys : func_get_args();
-
         $results = [];
 
         $input = $this->all();
 
-        $placeholder = str_random();
+        $placeholder = new class {};
 
-        foreach ($keys as $key) {
+        foreach (is_array($keys) ? $keys : func_get_args() as $key) {
             $value = data_get($input, $key, $placeholder);
 
-            if ($value != $placeholder) {
+            if ($value !== $placeholder) {
                 Arr::set($results, $key, $value);
             }
         }
