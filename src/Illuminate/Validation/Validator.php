@@ -3131,6 +3131,32 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Get the dependent rules for the validator.
+     *
+     * @return array
+     */
+    public function getDependentRules()
+    {
+        return $this->dependentRules;
+    }
+
+    /**
+     * Register an array of custom dependent rules.
+     *
+     * @param  array  $dependentRules
+     * @return void
+     */
+    public function addDependentRules(array $dependentRules)
+    {
+        // Ensure integrity of core validators.
+        $dependentRules = array_filter($dependentRules, function ($rule) {
+            return ! method_exists($this, "validate{$rule}");
+        });
+
+        $this->dependentRules = array_merge($this->dependentRules, $dependentRules);
+    }
+
+    /**
      * Get the failed validation rules.
      *
      * @return array
