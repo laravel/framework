@@ -103,6 +103,20 @@ class Worker
 
             $this->registerTimeoutHandler($job, $options);
 
+            $child = false;
+            if ($this->processShouldBeForked($options)) {
+                $processId = pcntl_fork();
+                if ($processId === -1) {
+                    throw new Exception('Could not fork process.');
+                } elseif ($processId) {
+                    pcntl_wait($status);
+                    continue;
+                } else {
+                    $child = true;
+                    // Child process, go on.
+                }
+            }
+
             // If the daemon should run (not in maintenance mode, etc.), then we can run
             // fire off this job for processing. Otherwise, we will need to sleep the
             // worker so no more jobs are processed until they should be processed.
@@ -116,6 +130,12 @@ class Worker
             // the queue should restart based on other indications. If so, we'll stop
             // this worker and let whatever is "monitoring" it restart the process.
             $this->stopIfNecessary($options, $lastRestart);
+
+            if ($this->processShouldBeForked($options)) {
+                if ($child) {
+                    exit;
+                }
+            }
         }
     }
 
@@ -163,6 +183,17 @@ class Worker
         return ! (($this->manager->isDownForMaintenance() && ! $options->force) ||
             $this->paused ||
             $this->events->until(new Events\Looping) === false);
+    }
+
+    /**
+     * Determine if job should be processed in a forked process.
+     *
+     * @param  WorkerOptions  $options
+     * @return bool
+     */
+    protected function processShouldBeForked(WorkerOptions $options)
+    {
+        return $options->fork;
     }
 
     /**
