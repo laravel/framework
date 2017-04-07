@@ -12,6 +12,7 @@ use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Arrayable;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 {
@@ -645,6 +646,10 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     {
         if (! isset($this->json)) {
             $this->json = new ParameterBag((array) json_decode($this->getContent(), true));
+            
+            if (JSON_ERROR_NONE !== json_last_error()) {
+                throw new BadRequestHttpException('JSON '.json_last_error_msg());
+            }
         }
 
         if (is_null($key)) {
@@ -853,8 +858,6 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         );
 
         $request->content = $content;
-
-        $request->request = $request->getInputSource();
 
         return $request;
     }
