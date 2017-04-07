@@ -289,10 +289,11 @@ class TestResponse
     /**
      * Assert that the response contains the given JSON fragment.
      *
-     * @param  array  $data
+     * @param  array $data
+     * @param bool $negate
      * @return $this
      */
-    public function assertJsonFragment(array $data)
+    public function assertJsonFragment(array $data, $negate = false)
     {
         $actual = json_encode(Arr::sortRecursive(
             (array) $this->decodeResponseJson()
@@ -301,14 +302,37 @@ class TestResponse
         foreach (Arr::sortRecursive($data) as $key => $value) {
             $expected = substr(json_encode([$key => $value]), 1, -1);
 
-            PHPUnit::assertTrue(
-                Str::contains($actual, $expected),
-                'Unable to find JSON fragment: '.PHP_EOL.PHP_EOL.
-                "[{$expected}]".PHP_EOL.PHP_EOL.
-                'within'.PHP_EOL.PHP_EOL.
-                "[{$actual}]."
-            );
+            if ($negate) {
+                PHPUnit::assertFalse(
+                    Str::contains($actual, $expected),
+                    'Found unexpected JSON fragment: '.PHP_EOL.PHP_EOL.
+                    "[{$expected}]".PHP_EOL.PHP_EOL.
+                    'within'.PHP_EOL.PHP_EOL.
+                    "[{$actual}]."
+                );
+            } else {
+                PHPUnit::assertTrue(
+                    Str::contains($actual, $expected),
+                    'Unable to find JSON fragment: '.PHP_EOL.PHP_EOL.
+                    "[{$expected}]".PHP_EOL.PHP_EOL.
+                    'within'.PHP_EOL.PHP_EOL.
+                    "[{$actual}]."
+                );
+            }
         }
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response does not contain the given JSON fragment.
+     *
+     * @param  array  $data
+     * @return $this
+     */
+    public function assertJsonFragmentMissing(array $data)
+    {
+        $this->assertJsonFragment($data, true);
 
         return $this;
     }
