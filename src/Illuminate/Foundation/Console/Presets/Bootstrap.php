@@ -2,9 +2,10 @@
 
 namespace Illuminate\Foundation\Console\Presets;
 
+use Illuminate\Support\Arr;
 use Illuminate\Filesystem\Filesystem;
 
-class React
+class Bootstrap
 {
     /**
      * Install the preset.
@@ -14,9 +15,8 @@ class React
     public static function install()
     {
         static::updatePackages();
-        static::updateWebpackConfiguration();
         static::updateBootstrapping();
-        static::updateComponent();
+        static::removeComponent();
         static::removeNodeModules();
     }
 
@@ -37,8 +37,6 @@ class React
             $packages['devDependencies']
         );
 
-        ksort($packages['devDependencies']);
-
         file_put_contents(
             base_path('package.json'),
             json_encode($packages, JSON_PRETTY_PRINT)
@@ -53,23 +51,7 @@ class React
      */
     protected static function updatePackageArray(array $packages)
     {
-        unset($packages['vue']);
-
-        return $packages += [
-            'babel-preset-react' => '^6.23.0',
-            'react' => '^15.4.2',
-            'react-dom' => '^15.4.2',
-        ];
-    }
-
-    /**
-     * Update the Webpack configuration.
-     *
-     * @return void
-     */
-    protected static function updateWebpackConfiguration()
-    {
-        copy(__DIR__.'/react-stubs/webpack.mix.js', base_path('webpack.mix.js'));
+        return Arr::except($packages, ['vue']);
     }
 
     /**
@@ -77,15 +59,10 @@ class React
      *
      * @return void
      */
-    protected static function updateComponent()
+    protected static function removeComponent()
     {
-        (new Filesystem)->delete(
-            resource_path('assets/js/components/Example.vue')
-        );
-
-        copy(
-            __DIR__.'/react-stubs/Example.js',
-            resource_path('assets/js/components/Example.js')
+        (new Filesystem)->deleteDirectory(
+            resource_path('assets/js/components')
         );
     }
 
@@ -96,9 +73,9 @@ class React
      */
     protected static function updateBootstrapping()
     {
-        copy(__DIR__.'/react-stubs/app.js', resource_path('assets/js/app.js'));
+        copy(__DIR__.'/bootstrap-stubs/app.js', resource_path('assets/js/app.js'));
 
-        copy(__DIR__.'/react-stubs/bootstrap.js', resource_path('assets/js/bootstrap.js'));
+        copy(__DIR__.'/bootstrap-stubs/bootstrap.js', resource_path('assets/js/bootstrap.js'));
     }
 
     /**

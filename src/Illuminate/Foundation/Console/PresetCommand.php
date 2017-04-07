@@ -12,7 +12,7 @@ class PresetCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'preset { type : The preset type (fresh, react) }';
+    protected $signature = 'preset { type : The preset type (fresh, bootstrap, react) }';
 
     /**
      * The console command description.
@@ -28,7 +28,7 @@ class PresetCommand extends Command
      */
     public function handle()
     {
-        if (! in_array($this->argument('type'), ['fresh', 'react'])) {
+        if (! in_array($this->argument('type'), ['fresh', 'bootstrap', 'react'])) {
             throw new InvalidArgumentException('Invalid preset.');
         }
 
@@ -48,6 +48,19 @@ class PresetCommand extends Command
     }
 
     /**
+     * Install the "fresh" preset.
+     *
+     * @return void
+     */
+    protected function bootstrap()
+    {
+        Presets\Bootstrap::install();
+
+        $this->info('Bootstrap scaffolding installed successfully.');
+        $this->comment('Please run "npm install && npm run dev" to compile your fresh scaffolding.');
+    }
+
+    /**
      * Install the "react" preset.
      *
      * @return void
@@ -57,6 +70,6 @@ class PresetCommand extends Command
         Presets\React::install();
 
         $this->info('React scaffolding installed successfully.');
-        $this->comment('Run "npm install && npm run dev" to compile your fresh scaffolding.');
+        $this->comment('Please run "npm install && npm run dev" to compile your fresh scaffolding.');
     }
 }
