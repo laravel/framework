@@ -28,7 +28,7 @@ class PresetCommand extends Command
      */
     public function handle()
     {
-        if (! in_array($this->argument('type'), ['fresh', 'bootstrap', 'react'])) {
+        if (! in_array($this->argument('type'), ['none', 'bootstrap', 'react'])) {
             throw new InvalidArgumentException('Invalid preset.');
         }
 
@@ -40,11 +40,11 @@ class PresetCommand extends Command
      *
      * @return void
      */
-    protected function fresh()
+    protected function none()
     {
-        Presets\Fresh::install();
+        Presets\None::install();
 
-        $this->info('Front-end scaffolding removed successfully.');
+        $this->info('Frontend scaffolding removed successfully.');
     }
 
     /**
