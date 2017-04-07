@@ -11,7 +11,7 @@ trait WithoutEvents
      *
      * @throws \Exception
      */
-    public function disableEventsForAllTests()
+    public function setUpDisableEventsForAllTests()
     {
         if (method_exists($this, 'withoutEvents')) {
             $this->withoutEvents();

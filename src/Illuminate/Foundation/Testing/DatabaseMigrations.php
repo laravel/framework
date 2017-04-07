@@ -11,7 +11,7 @@ trait DatabaseMigrations
      *
      * @return void
      */
-    public function runDatabaseMigrations()
+    public function setUpRunDatabaseMigrations()
     {
         $this->artisan('migrate');
 
