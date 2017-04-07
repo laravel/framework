@@ -64,7 +64,7 @@ trait InteractsWithInput
      * @param  string|array  $key
      * @return bool
      */
-    public function exists($key)
+    public function has($key)
     {
         $keys = is_array($key) ? $key : func_get_args();
 
@@ -85,7 +85,7 @@ trait InteractsWithInput
      * @param  string|array  $key
      * @return bool
      */
-    public function has($key)
+    public function filled($key)
     {
         $keys = is_array($key) ? $key : func_get_args();
 
