@@ -527,10 +527,6 @@ trait HasAttributes
             $value = $this->fromDateTime($value);
         }
 
-        if ($value && $value instanceof Model) {
-            $value = $value->getKey();
-        }
-
         if ($this->isJsonCastable($key) && ! is_null($value)) {
             $value = $this->castAttributeAsJson($key, $value);
         }
@@ -540,6 +536,10 @@ trait HasAttributes
         // attribute in the array's value in the case of deeply nested items.
         if (Str::contains($key, '->')) {
             return $this->fillJsonAttribute($key, $value);
+        }
+
+        if ($value && $value instanceof Model) {
+            $value = $value->getKey();
         }
 
         $this->attributes[$key] = $value;
