@@ -79,4 +79,31 @@ class BcryptHasher implements HasherContract
 
         return $this;
     }
+
+    /**
+     * Check if the given string is a hash produced by this hasher.
+     *
+     * @param  string  $value
+     * @param  array   $options
+     * @param  bool    $strict
+     * @return bool
+     */
+    public function isHash($value, array $options = [], $strict = false)
+    {
+        if (strlen($value) === 0) {
+            return false;
+        }
+
+        $info = password_get_info($value);
+
+        if ($info['algo'] !== PASSWORD_BCRYPT) {
+            return false;
+        }
+
+        if ($strict && count(array_diff_assoc($options, $info['options']))) {
+            return false;
+        }
+
+        return true;
+    }
 }

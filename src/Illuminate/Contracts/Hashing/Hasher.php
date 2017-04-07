@@ -31,4 +31,14 @@ interface Hasher
      * @return bool
      */
     public function needsRehash($hashedValue, array $options = []);
+
+    /**
+     * Check if the given string is a hash produced by this hasher.
+     *
+     * @param  string  $value
+     * @param  array   $options
+     * @param  bool    $strict
+     * @return bool
+     */
+    public function isHash($value, array $options = [], $strict = false);
 }
