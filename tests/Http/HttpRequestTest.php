@@ -190,33 +190,12 @@ class HttpRequestTest extends TestCase
         $this->assertTrue($request->secure());
     }
 
-    public function testExistsMethod()
-    {
-        $request = Request::create('/', 'GET', ['name' => 'Taylor']);
-        $this->assertTrue($request->exists('name'));
-        $this->assertFalse($request->exists('foo'));
-        $this->assertFalse($request->exists('name', 'email'));
-
-        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
-        $this->assertTrue($request->exists('name'));
-        $this->assertTrue($request->exists('name', 'email'));
-
-        $request = Request::create('/', 'GET', ['foo' => ['bar', 'bar']]);
-        $this->assertTrue($request->exists('foo'));
-
-        $request = Request::create('/', 'GET', ['foo' => '', 'bar' => null]);
-        $this->assertTrue($request->exists('foo'));
-        $this->assertTrue($request->exists('bar'));
-
-        $request = Request::create('/', 'GET', ['foo' => ['bar' => null, 'baz' => '']]);
-        $this->assertTrue($request->exists('foo.bar'));
-        $this->assertTrue($request->exists('foo.baz'));
-    }
-
     public function testHasMethod()
     {
-        $request = Request::create('/', 'GET', ['name' => 'Taylor']);
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
         $this->assertTrue($request->has('name'));
+        $this->assertTrue($request->has('age'));
+        $this->assertTrue($request->has('city'));
         $this->assertFalse($request->has('foo'));
         $this->assertFalse($request->has('name', 'email'));
 
@@ -224,12 +203,37 @@ class HttpRequestTest extends TestCase
         $this->assertTrue($request->has('name'));
         $this->assertTrue($request->has('name', 'email'));
 
-        //test arrays within query string
-        $request = Request::create('/', 'GET', ['foo' => ['bar', 'baz']]);
+        $request = Request::create('/', 'GET', ['foo' => ['bar', 'bar']]);
         $this->assertTrue($request->has('foo'));
 
-        $request = Request::create('/', 'GET', ['foo' => ['bar' => 'baz']]);
+        $request = Request::create('/', 'GET', ['foo' => '', 'bar' => null]);
+        $this->assertTrue($request->has('foo'));
+        $this->assertTrue($request->has('bar'));
+
+        $request = Request::create('/', 'GET', ['foo' => ['bar' => null, 'baz' => '']]);
         $this->assertTrue($request->has('foo.bar'));
+        $this->assertTrue($request->has('foo.baz'));
+    }
+
+    public function testFilledMethod()
+    {
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
+        $this->assertTrue($request->filled('name'));
+        $this->assertFalse($request->filled('age'));
+        $this->assertFalse($request->filled('city'));
+        $this->assertFalse($request->filled('foo'));
+        $this->assertFalse($request->filled('name', 'email'));
+
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
+        $this->assertTrue($request->filled('name'));
+        $this->assertTrue($request->filled('name', 'email'));
+
+        //test arrays within query string
+        $request = Request::create('/', 'GET', ['foo' => ['bar', 'baz']]);
+        $this->assertTrue($request->filled('foo'));
+
+        $request = Request::create('/', 'GET', ['foo' => ['bar' => 'baz']]);
+        $this->assertTrue($request->filled('foo.bar'));
     }
 
     public function testInputMethod()
