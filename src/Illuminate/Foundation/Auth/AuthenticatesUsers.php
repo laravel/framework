@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Auth;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Lang;
 
@@ -126,6 +127,12 @@ trait AuthenticatesUsers
      */
     protected function sendFailedLoginResponse(Request $request)
     {
+        if (($request->ajax() && ! $request->pjax()) || $request->wantsJson()) {
+          return new JsonResponse([
+              $this->loginUsername() => array($this->getFailedLoginMessage())
+          ], 401);
+        }
+        
         return redirect()->back()
             ->withInput($request->only($this->loginUsername(), 'remember'))
             ->withErrors([
