@@ -47,9 +47,7 @@ class TokenGuard implements Guard
     }
 
     /**
-     * Get the currently authenticated user.
-     *
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     * {@inheritdoc}
      */
     public function user()
     {
