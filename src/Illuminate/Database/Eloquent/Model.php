@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use ReflectionClass;
 use Closure;
 use Exception;
 use ArrayAccess;
@@ -103,6 +104,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @var array
      */
     protected $relations = [];
+
+    /**
+     * The name and class of the relationships for the model.
+     *
+     * @var array|null
+     */
+    protected $relationsMap = null;
 
     /**
      * The attributes that should be hidden for arrays.
@@ -655,12 +663,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Eager load relations on the model.
      *
-     * @param  array|string  $relations
+     * @param  array|string|null  $relations
      * @return $this
      */
-    public function load($relations)
+    public function load($relations = null)
     {
-        if (is_string($relations)) {
+        if (null === $relations) {
+            $relations = array_keys($this->getRelationsMap());
+        } elseif (is_string($relations)) {
             $relations = func_get_args();
         }
 
@@ -669,6 +679,18 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $query->eagerLoadRelations([$this]);
 
         return $this;
+    }
+
+    /**
+     * Begin querying a model with eager loading for all relationships.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    public static function withAll()
+    {
+        $relations = array_keys((new static)->getRelationsMap());
+
+        return static::with($relations);
     }
 
     /**
@@ -2716,6 +2738,86 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Return the key:value pairs for relationships and related model classes.
+     *
+     * @return array
+     */
+    public function getRelationsMap()
+    {
+        // Lazy load once since model relations are not dynamic.
+        if (null === $this->relationsMap) {
+            $this->setRelationsMap();
+        }
+
+        return $this->relationsMap;
+    }
+
+    /**
+     * Set the key:value pairs for relationships and related model classes.
+     *
+     * @param  array  $map
+     * @return array
+     */
+    public function setRelationsMap(array $map = null)
+    {
+        if ($map) {
+            // Set to provided relations map.
+            $this->relationsMap = $map;
+
+            return $this;
+        }
+
+        $this_func_name = __FUNCTION__;
+
+        // Currently instantiated Model.
+        $reflection = new ReflectionClass(new static);
+
+        // Model parent class, \Illuminate\Database\Eloquent\Model.
+        $parent_reflection = $reflection->getParentClass();
+
+        // Get names of all methods on the current (child) and parent classes.
+        $reflection_list = array_map(function ($v) {
+            return $v->name;
+        }, $reflection->getMethods());
+
+        $parent_reflection_list = array_map(function ($v) {
+            return $v->name;
+        }, $parent_reflection->getMethods());
+
+        // Remove the parent method names from the child method names.
+        $methods = array_diff($reflection_list, $parent_reflection_list);
+
+        // New model instance.
+        $model = new static;
+
+        $relations_map = [];
+
+        // Check each method to see if it is a relation.
+        foreach ($methods as $method) {
+            // Do not call this method. Avoid self-recursive loop.
+            if ($method == $this_func_name) {
+                continue;
+            }
+
+            try {
+                $result = $model->$method();
+                if ($result instanceof Relation) {
+                    // Record the method.
+                    $relations_map[$method] = [
+                        'class' => get_class($result->getRelated()),
+                    ];
+                }
+            } catch (\Exception $e) {
+                continue;
+            }
+        }
+
+        $this->relationsMap = $relations_map;
+
+        return $this;
+    }
+
+    /**
      * Determine if a get mutator exists for an attribute.
      *
      * @param  string  $key
@@ -3107,6 +3209,52 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         return $this->getKey() === $model->getKey() &&
                $this->getTable() === $model->getTable() &&
                $this->getConnectionName() === $model->getConnectionName();
+    }
+
+    /**
+     * Determine if two models are related.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return bool
+     */
+    public function is_related(Model $model)
+    {
+        // Fully qualified class name of the model.
+        $class_name = get_class($model);
+
+        // Assume the models are not related.
+        $pass = false;
+
+        // Check each known relation.
+        foreach ($this->getRelationsMap() as $name => $relation) {
+
+            // Check for exact class name match.
+            if ($relation['class'] !== $class_name) {
+                continue;
+            }
+
+            // Get the relation results.
+            $result = $this->$name()->get();
+
+            // Ensure results are in a collection.
+            $collection = new BaseCollection();
+
+            if ($result instanceof self) {
+                $collection->push($result);
+            } elseif ($result instanceof BaseCollection) {
+                $collection = $result;
+            }
+
+            // Compare if the models point to the same record.
+            foreach ($collection as $related) {
+                if ($related->is($model)) {
+                    $pass = true;
+                    break;
+                }
+            }
+        }
+
+        return $pass;
     }
 
     /**
