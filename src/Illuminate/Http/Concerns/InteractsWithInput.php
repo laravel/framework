@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http\Concerns;
 
+use stdClass;
 use SplFileInfo;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -143,14 +144,18 @@ trait InteractsWithInput
      */
     public function only($keys)
     {
-        $keys = is_array($keys) ? $keys : func_get_args();
-
         $results = [];
 
         $input = $this->all();
 
-        foreach ($keys as $key) {
-            Arr::set($results, $key, data_get($input, $key));
+        $placeholder = new stdClass;
+
+        foreach (is_array($keys) ? $keys : func_get_args() as $key) {
+            $value = data_get($input, $key, $placeholder);
+
+            if ($value !== $placeholder) {
+                Arr::set($results, $key, $value);
+            }
         }
 
         return $results;
@@ -171,17 +176,6 @@ trait InteractsWithInput
         Arr::forget($results, $keys);
 
         return $results;
-    }
-
-    /**
-     * Intersect an array of items with the input data.
-     *
-     * @param  array|mixed  $keys
-     * @return array
-     */
-    public function intersect($keys)
-    {
-        return array_filter($this->only(is_array($keys) ? $keys : func_get_args()));
     }
 
     /**
