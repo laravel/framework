@@ -18,6 +18,12 @@ use Symfony\Component\Debug\Exception\FatalThrowableError;
 class Pipeline extends BasePipeline
 {
     /**
+     * Number of exception nested level
+     * @var integer
+     */
+    private static $exceptionLevel = 0;
+
+    /**
      * Get a Closure that represents a slice of the application onion.
      *
      * @return \Closure
@@ -69,6 +75,11 @@ class Pipeline extends BasePipeline
      */
     protected function handleException($passable, Exception $e)
     {
+        if (self::$exceptionLevel >= 3) {
+            die($e->getMessage());
+        }
+        self::$exceptionLevel++;
+
         if (! $this->container->bound(ExceptionHandler::class) || ! $passable instanceof Request) {
             throw $e;
         }
@@ -83,6 +94,7 @@ class Pipeline extends BasePipeline
             $response->withException($e);
         }
 
+        self::$exceptionLevel--;
         return $response;
     }
 }
