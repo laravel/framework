@@ -875,7 +875,7 @@ class Route
      */
     public function name($name)
     {
-        $this->action['as'] = isset($this->action['as']) ? $this->action['as'].$name : $name;
+        $this->action['as'] = isset($this->action['as']) ? trim($this->action['as'], '.').'.'.$name : $name;
 
         return $this;
     }
