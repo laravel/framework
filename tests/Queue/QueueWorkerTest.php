@@ -9,7 +9,7 @@ use Illuminate\Container\Container;
 use Illuminate\Queue\WorkerOptions;
 use Illuminate\Queue\Events\Sleeping;
 use Illuminate\Queue\Events\JobFailed;
-use Illuminate\Queue\Events\NoJobsLeft;
+use Illuminate\Queue\Events\NoJobsAvailable;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -85,7 +85,7 @@ class QueueWorkerTest extends TestCase
     {
         $worker = $this->getWorker('default', ['queue' => []]);
         $worker->runNextJob('default', 'queue', $this->workerOptions(['sleep' => 5]));
-        $this->events->shouldHaveReceived('fire')->with(Mockery::type(NoJobsLeft::class))->once();
+        $this->events->shouldHaveReceived('fire')->with(Mockery::type(NoJobsAvailable::class))->once();
         $this->assertEquals(5, $worker->sleptFor);
     }
 

@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 use Illuminate\Queue\WorkerOptions;
 use Illuminate\Queue\Events\Sleeping;
 use Illuminate\Queue\Events\JobFailed;
-use Illuminate\Queue\Events\NoJobsLeft;
+use Illuminate\Queue\Events\NoJobsAvailable;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\QueueExceptionOccurred;
@@ -129,16 +129,22 @@ class WorkCommand extends Command
      */
     protected function listenForEvents()
     {
+        $this->laravel['events']->listen(NoJobsAvailable::class, function () {
+            $this->output->writeln('The queue seems to be empty.', OutputInterface::VERBOSITY_VERBOSE);
+        });
+
+        $this->laravel['events']->listen(JobProcessing::class, function ($event) {
+            $this->output->writeln('Popped a job from the queue: '.$event->job->resolveName(), OutputInterface::VERBOSITY_VERY_VERBOSE);
+        });
+
         $this->laravel['events']->listen(JobProcessed::class, function ($event) {
             $this->output->writeln('<info>['.Carbon::now()->format('Y-m-d H:i:s').'] Processed:</info> '.$event->job->resolveName());
         });
 
-        $this->laravel['events']->listen(JobProcessing::class, function ($event) {
-            $this->writeOutput($event->job, false);
-        });
+        $this->laravel['events']->listen(JobFailed::class, function ($event) {
+            $this->output->writeln('<error>['.Carbon::now()->format('Y-m-d H:i:s').'] Failed:</error> '.$event->job->resolveName());
 
-        $this->laravel['events']->listen(NoJobsLeft::class, function () {
-            $this->output->writeln('The queue seems to be empty.', OutputInterface::VERBOSITY_VERBOSE);
+            $this->logFailedJob($event);
         });
 
         $this->laravel['events']->listen(Sleeping::class, function ($event) {
@@ -148,12 +154,6 @@ class WorkCommand extends Command
         $this->laravel['events']->listen(QueueExceptionOccurred::class, function ($event) {
             $this->output->writeln($event->getMessage(), OutputInterface::VERBOSITY_VERY_VERBOSE);
             $this->output->writeln("Couldn't fetch a job from the queue. See the log file for more information.", OutputInterface::VERBOSITY_VERBOSE);
-        });
-
-        $this->laravel['events']->listen(JobFailed::class, function ($event) {
-            $this->output->writeln('<error>['.Carbon::now()->format('Y-m-d H:i:s').'] Failed:</error> '.$event->job->resolveName());
-
-            $this->logFailedJob($event);
         });
     }
 

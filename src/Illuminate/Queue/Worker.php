@@ -403,7 +403,7 @@ class Worker
      */
     protected function raiseEmptyQueueEvent($connectionName)
     {
-        $this->events->fire(new Events\NoJobsLeft(
+        $this->events->fire(new Events\NoJobsAvailable(
             $connectionName
         ));
     }

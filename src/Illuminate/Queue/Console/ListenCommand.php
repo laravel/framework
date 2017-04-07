@@ -93,9 +93,10 @@ class ListenCommand extends Command
     protected function gatherOptions()
     {
         return new ListenerOptions(
-            $this->option('delay'), $this->option('memory'),
-            $this->option('timeout'), $this->option('sleep'), $this->option('tries'),
-            $this->option('force'), $this->resolveExtraParameters()
+            $this->option('env'), $this->option('delay'),
+            $this->option('memory'), $this->option('timeout'),
+            $this->option('sleep'), $this->option('tries'),
+            $this->option('force'), $this->resolveVerbosityParameter()
         );
     }
 
@@ -113,17 +114,6 @@ class ListenCommand extends Command
     }
 
     /**
-     * @return string
-     */
-    private function resolveExtraParameters()
-    {
-        return ' '.implode(' ', array_filter([
-            $this->resolveEnvironmentParameter(),
-            $this->resolveVerbosityParameter(),
-        ]));
-    }
-
-    /**
      * Resolve a Symfony verbosity level back to its CLI parameter.
      *
      * @return string
@@ -133,17 +123,7 @@ class ListenCommand extends Command
         $map = array_flip($this->verbosityMap);
 
         if (isset($map[$this->output->getVerbosity()])) {
-            return '-'.$map[$this->output->getVerbosity()];
-        }
-    }
-
-    /**
-     * @return string
-     */
-    private function resolveEnvironmentParameter()
-    {
-        if ($this->option('env')) {
-            return '--env='.ProcessUtils::escapeArgument($this->option('env'));
+            return $map[$this->output->getVerbosity()];
         }
     }
 }
