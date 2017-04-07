@@ -59,7 +59,7 @@ trait AuthenticatesUsers
     protected function validateLogin(Request $request)
     {
         $this->validate($request, [
-            $this->username() => 'required', 'password' => 'required',
+            $this->username() => 'required', $this->password() => 'required',
         ]);
     }
 
@@ -84,7 +84,7 @@ trait AuthenticatesUsers
      */
     protected function credentials(Request $request)
     {
-        return $request->only($this->username(), 'password');
+        return $request->only($this->username()) + ['password' => $request->input($this->password())];
     }
 
     /**
@@ -142,6 +142,14 @@ trait AuthenticatesUsers
     public function username()
     {
         return 'email';
+    }
+    
+    /**
+     * Get the login password to be used by the controller.
+     */
+    public function password()
+    {
+        return 'password';
     }
 
     /**
