@@ -8,9 +8,9 @@ use Illuminate\Console\Command;
 use Illuminate\Queue\WorkerOptions;
 use Illuminate\Queue\Events\Sleeping;
 use Illuminate\Queue\Events\JobFailed;
-use Illuminate\Queue\Events\NoJobsAvailable;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Queue\Events\NoJobsAvailable;
 use Illuminate\Queue\Events\QueueExceptionOccurred;
 use Symfony\Component\Console\Output\OutputInterface;
 

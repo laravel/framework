@@ -145,12 +145,12 @@ class Listener
     }
 
     /**
-    * Add the environment option to the given command.
-    *
-    * @param  string  $command
-    * @param  \Illuminate\Queue\ListenerOptions  $options
-    * @return string
-    */
+     * Add the environment option to the given command.
+     *
+     * @param  string  $command
+     * @param  \Illuminate\Queue\ListenerOptions  $options
+     * @return string
+     */
     protected function addEnvironment($command, ListenerOptions $options)
     {
         return $command.' --env='.ProcessUtils::escapeArgument($options->environment);

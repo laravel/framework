@@ -5,7 +5,6 @@ namespace Illuminate\Queue\Console;
 use Illuminate\Queue\Listener;
 use Illuminate\Console\Command;
 use Illuminate\Queue\ListenerOptions;
-use Symfony\Component\Process\ProcessUtils;
 
 class ListenCommand extends Command
 {
