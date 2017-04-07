@@ -2,6 +2,7 @@
 
 namespace Illuminate\View;
 
+use Illuminate\Support\ViewErrorBag;
 use Illuminate\View\Engines\PhpEngine;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Engines\CompilerEngine;
@@ -119,6 +120,7 @@ class ViewServiceProvider extends ServiceProvider
             $env->setContainer($app);
 
             $env->share('app', $app);
+            $env->share('errors', new ViewErrorBag);
 
             return $env;
         });
