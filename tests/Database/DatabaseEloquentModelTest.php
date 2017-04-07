@@ -1603,6 +1603,18 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($result);
     }
 
+    public function testSettingModelAsAttribute()
+    {
+        $model = new EloquentModelStub;
+        $model->id = 1;
+
+        $association = new EloquentModelStub;
+        $association->id = 2;
+
+        $model->association_id = $association;
+        $this->assertEquals($association->id, $model->association_id);
+    }
+
     protected function addMockConnection($model)
     {
         $model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
