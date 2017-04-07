@@ -2,6 +2,8 @@
 
 namespace Illuminate\Queue\Events;
 
+use Illuminate\Support\Str;
+
 class QueueExceptionOccurred
 {
     /**
@@ -36,6 +38,6 @@ class QueueExceptionOccurred
      */
     public function getMessage()
     {
-        return str_limit($this->exception->getMessage(), 128);
+        return Str::limit($this->exception->getMessage(), 128);
     }
 }

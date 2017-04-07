@@ -28,7 +28,7 @@ class ListenerOptions extends WorkerOptions
      * @param  int  $sleep
      * @param  int  $maxTries
      * @param  bool  $force
-     * @param  int  $verbosity
+     * @param  string  $verbosity
      */
     public function __construct($environment = null, $delay = 0, $memory = 128, $timeout = 60, $sleep = 3, $maxTries = 0, $force = false, $verbosity = null)
     {

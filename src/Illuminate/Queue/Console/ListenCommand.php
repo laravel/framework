@@ -115,14 +115,13 @@ class ListenCommand extends Command
     /**
      * Resolve a Symfony verbosity level back to its CLI parameter.
      *
-     * @return string
+     * @return string|null
      */
     private function resolveVerbosityParameter()
     {
-        $map = array_flip($this->verbosityMap);
+        $currentVerbosity = $this->output->getVerbosity();
+        $parameter = array_search($currentVerbosity, $this->verbosityMap);
 
-        if (isset($map[$this->output->getVerbosity()])) {
-            return $map[$this->output->getVerbosity()];
-        }
+        return $parameter ?: null;
     }
 }
