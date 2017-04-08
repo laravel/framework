@@ -377,6 +377,9 @@ class Str
         if (! ctype_lower($value)) {
             $value = preg_replace('/\s+/u', '', $value);
 
+            // handle IDs
+            $value = preg_replace('/([^A-Z])ID$/u', '$1Id', $value);
+
             $value = static::lower(preg_replace('/(.)(?=[A-Z])/u', '$1'.$delimiter, $value));
         }
 

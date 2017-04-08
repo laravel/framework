@@ -193,6 +193,15 @@ class SupportStrTest extends TestCase
         // ensure cache keys don't overlap
         $this->assertEquals('laravel__php__framework', Str::snake('LaravelPhpFramework', '__'));
         $this->assertEquals('laravel_php_framework_', Str::snake('LaravelPhpFramework_', '_'));
+
+        // handle IDs
+        $this->assertEquals('user_id', Str::snake('UserID'));
+        $this->assertEquals('user_id', Str::snake('userId'));
+        $this->assertEquals('user_id', Str::snake('user_id'));
+        // ignored cases
+        $this->assertEquals('u_s_e_r_i_d', Str::snake('USERID'));
+        $this->assertEquals('u_i_d', Str::snake('UID'));
+        $this->assertEquals('use_r_i_d', Str::snake('useRID'));
     }
 
     public function testStudly()
