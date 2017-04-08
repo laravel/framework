@@ -4,6 +4,7 @@ namespace Illuminate\Pipeline;
 
 use Closure;
 use RuntimeException;
+use Illumisnate\Support\Str;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Pipeline\Pipeline as PipelineContract;
 
@@ -129,6 +130,20 @@ class Pipeline implements PipelineContract
                     // otherwise we'll resolve the pipes out of the container and call it with
                     // the appropriate method and arguments, returning the results back out.
                     return $pipe($passable, $stack);
+                } elseif (Str::contains($pipe, '||')) {
+                    // If there are multiple sub-pipes, we are dealing with a case of the user
+                    // intending to build an or-style pipe, that allows the user to specify
+                    // multiple pipes, using the one that returns a valid response first.
+                    $pipes = explode('||', $pipe);
+                    $pipeCollection = [];
+
+                    foreach ($pipes as $subPipe) {
+                        $pipeCollection[] = $this->parsePipeString($subPipe);
+                    }
+
+                    $pipe = new OrPipe($this->container, $this->method);
+
+                    $parameters = array_merge([$passable, $stack], [$pipeCollection]);
                 } elseif (! is_object($pipe)) {
                     list($name, $parameters) = $this->parsePipeString($pipe);
 
