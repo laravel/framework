@@ -3156,19 +3156,22 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function isDirty($attributes = null)
     {
-        $dirty = $this->getDirty();
-
         if (is_null($attributes)) {
-            return count($dirty) > 0;
-        }
-
-        if (! is_array($attributes)) {
+            $attributes = array_keys($this->attributes);
+        } elseif (! is_array($attributes)) {
             $attributes = func_get_args();
         }
 
-        foreach ($attributes as $attribute) {
-            if (array_key_exists($attribute, $dirty)) {
-                return true;
+        foreach ($attributes as $key) {
+            if (isset($this->attributes[$key])) {
+                if (! array_key_exists($key, $this->original)) {
+                    return true;
+                }
+
+                if ($this->attributes[$key] !== $this->original[$key] &&
+                        ! $this->originalIsNumericallyEquivalent($key)) {
+                    return true;
+                }
             }
         }
 
