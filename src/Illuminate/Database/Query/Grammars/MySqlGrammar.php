@@ -79,12 +79,12 @@ class MySqlGrammar extends Grammar {
 	{
 		$sql = parent::compileUpdate($query, $values);
 
-		if (isset($query->orders))
+		if ( ! empty($query->orders))
 		{
 			$sql .= ' '.$this->compileOrders($query, $query->orders);
 		}
 
-		if (isset($query->limit))
+		if ( ! empty($query->limit))
 		{
 			$sql .= ' '.$this->compileLimit($query, $query->limit);
 		}
