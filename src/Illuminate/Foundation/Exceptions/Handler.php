@@ -190,7 +190,11 @@ class Handler implements ExceptionHandlerContract
             resource_path('views/errors'),
             __DIR__.'/views',
         ]);
-
+        
+        if ($request->expectsJson()) {
+            return response()->json(['error' => $e->getMessage()], $status);
+        }
+        
         if (view()->exists("errors::{$status}")) {
             return response()->view("errors::{$status}", ['exception' => $e], $status, $e->getHeaders());
         } else {
