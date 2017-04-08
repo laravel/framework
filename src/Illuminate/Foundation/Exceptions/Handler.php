@@ -219,10 +219,12 @@ class Handler implements ExceptionHandlerContract
         $headers = $this->isHttpException($e) ? $e->getHeaders() : [];
 
         if (config('app.debug')) {
-            $response['message'] = $e->getMessage();
-            $response['file'] = $e->getFile();
-            $response['line'] = $e->getLine();
-            $response['trace'] = $e->getTrace();
+            $response = [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTrace(),
+            ];
         } else {
             $response['message'] = $this->isHttpException($e) ? $e->getMessage() : 'Server Error';
         }
