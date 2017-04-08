@@ -210,6 +210,21 @@ class RouteRegistrarTest extends TestCase
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.destroy'));
     }
 
+    public function testCanNotLimitMethodsAfterRegistered()
+    {
+        $resource = $this->router->resource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub');
+
+        $this->router->getRoutes();
+
+        // pending resources have now been registered and
+        // can not be limited to specific methods anymore
+
+        $resource->only('index', 'show');
+        $resource->except('index', 'show');
+
+        $this->assertCount(7, $this->router->getRoutes());
+    }
+
     public function testCanSetRouteName()
     {
         $this->router->as('users.index')->get('users', function () {
