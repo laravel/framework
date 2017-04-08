@@ -139,9 +139,7 @@ class Handler implements ExceptionHandlerContract
             return $this->convertValidationExceptionToResponse($e, $request);
         }
 
-        return $request->expectsJson() && config('app.debug')
-                        ? $this->prepareJsonResponse($request, $e)
-                        : $this->prepareResponse($request, $e);
+        return $request->expectsJson() ? $this->prepareJsonResponse($request, $e) : $this->prepareResponse($request, $e);
     }
 
     /**
@@ -220,12 +218,16 @@ class Handler implements ExceptionHandlerContract
 
         $headers = $this->isHttpException($e) ? $e->getHeaders() : [];
 
-        return response(json_encode([
-            'message' => $e->getMessage(),
-            'file' => $e->getFile(),
-            'line' => $e->getLine(),
-            'trace' => $e->getTrace(),
-        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), $status, array_merge($headers, [
+        if (config('app.debug')) {
+            $response['message'] = $e->getMessage();
+            $response['file'] = $e->getFile();
+            $response['line'] = $e->getLine();
+            $response['trace'] = $e->getTrace();
+        } else {
+            $response['message'] = $this->isHttpException($e) ? $e->getMessage() : 'Server Error';
+        }
+
+        return response(json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), $status, array_merge($headers, [
             'Content-Type' => 'application/json',
         ]));
     }
