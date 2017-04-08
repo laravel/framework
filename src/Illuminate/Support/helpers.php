@@ -508,9 +508,16 @@ if (! function_exists('dd')) {
      */
     function dd()
     {
-        array_map(function ($x) {
-            (new Dumper)->dump($x);
-        }, func_get_args());
+        $caller = debug_backtrace()[0];
+        $caller = $caller['function'].':'.$caller['line'];
+
+        if (config('app.debug')) {
+            array_map(function ($x) {
+                (new Dumper)->dump($x);
+            }, array_merge(["Executed in $caller"], func_get_args()));
+        } else {
+            logger()->warning("Attempted to use dd outside debug mode in $caller", func_get_args());
+        }
 
         die(1);
     }
