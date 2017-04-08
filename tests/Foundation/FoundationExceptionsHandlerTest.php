@@ -18,7 +18,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     protected $handler;
 
-    protected $rquest;
+    protected $request;
 
     public function setUp()
     {
