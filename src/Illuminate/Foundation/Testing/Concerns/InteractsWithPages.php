@@ -30,6 +30,13 @@ trait InteractsWithPages
     protected $crawler;
 
     /**
+     * The option to follow redirects.
+     *
+     * @var bool
+     */
+    protected $followingRedirects = true;
+
+    /**
      * Nested crawler instances used by the "within" method.
      *
      * @var array
@@ -89,7 +96,11 @@ trait InteractsWithPages
 
         $this->call($method, $uri, $parameters, $cookies, $files);
 
-        $this->clearInputs()->followRedirects()->assertPageLoaded($uri);
+        $this->clearInputs();
+
+        if ($this->followingRedirects) {
+            $this->followRedirects()->assertPageLoaded($uri);
+        }
 
         $this->currentUri = $this->app->make('request')->fullUrl();
 
@@ -755,5 +766,27 @@ trait InteractsWithPages
         return new UploadedFile(
             $file['tmp_name'], basename($uploads[$name]), $file['type'], $file['size'], $file['error'], true
         );
+    }
+
+    /**
+     * Set the follow redirects property.
+     *
+     * @param bool $option
+     */
+    public function setFollowingRedirects($option)
+    {
+        $this->followingRedirects = $option;
+
+        return $this;
+    }
+
+    /**
+     * Get the follow redirects property.
+     *
+     * @return bool
+     */
+    public function isFollowingRedirects()
+    {
+        return $this->followingRedirects;
     }
 }
