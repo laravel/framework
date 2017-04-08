@@ -398,6 +398,21 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Unregister a global scope on the model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Scope|string  $scope
+     * @return \Illuminate\Database\Eloquent\Scope|\Closure|null
+     */
+    public static function removeGlobalScope($scope)
+    {
+        if (! is_string($scope)) {
+            $scope = get_class($scope);
+        }
+
+        return Arr::forget(static::$globalScopes, static::class.'.'.$scope);
+    }
+
+    /**
      * Register an observer with the Model.
      *
      * @param  object|string  $class
