@@ -33,6 +33,6 @@ class NotificationDatabaseChannelTestNotification extends Notification
 {
     public function toDatabase($notifiable)
     {
-        return new DatabaseMessage(['invoice_id' => 1]);
+        return (new DatabaseMessage())->data(['invoice_id' => 1]);
     }
 }
