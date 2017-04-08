@@ -145,6 +145,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $this->fill($attributes);
     }
 
+    public function __destruct()
+    {
+        unset($this->attributes);
+        unset($this->original);
+        unset($this->relations);
+    }
+
     /**
      * Check if the model needs to be booted and if so, do it.
      *
