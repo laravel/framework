@@ -6,7 +6,6 @@ use Exception;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
-use Illuminate\Foundation\Application;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Foundation\Exceptions\Handler;
 
@@ -87,5 +86,4 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->assertNotContains('"line"', $response);
         $this->assertNotContains('"trace"', $response);
     }
-
 }
