@@ -60,12 +60,12 @@ class Handler implements ExceptionHandlerContract
      */
     public function report(Exception $e)
     {
-        if (method_exists($e, 'report')) {
-            return $e->report();
-        }
-
         if ($this->shouldntReport($e)) {
             return;
+        }
+
+        if (method_exists($e, 'report')) {
+            return $e->report();
         }
 
         try {
