@@ -226,7 +226,9 @@ class Handler implements ExceptionHandlerContract
                 'trace' => $e->getTrace(),
             ];
         } else {
-            $response['message'] = $this->isHttpException($e) ? $e->getMessage() : 'Server Error';
+            $response = [
+                'message' => $this->isHttpException($e) ? $e->getMessage() : 'Server Error',
+            ];
         }
 
         return response(json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), $status, array_merge($headers, [
