@@ -45,6 +45,7 @@ trait CompilesLoops
         if ($expression) {
             return "<?php if(empty{$expression}): ?>";
         }
+
         $empty = '$__empty_'.$this->forElseCounter--;
 
         return "<?php endforeach; \$__env->popLoop(); \$loop = \$__env->getLastLoop(); if ({$empty}): ?>";
