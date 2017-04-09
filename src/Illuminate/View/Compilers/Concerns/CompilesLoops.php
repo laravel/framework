@@ -42,7 +42,7 @@ trait CompilesLoops
      */
     protected function compileEmpty($expression)
     {
-        if($expression){
+        if ($expression) {
             return "<?php if(empty{$expression}): ?>";
         }
         $empty = '$__empty_'.$this->forElseCounter--;
