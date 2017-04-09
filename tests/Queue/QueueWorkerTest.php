@@ -257,9 +257,11 @@ class WorkerFakeJob
     public $callback;
     public $deleted = false;
     public $releaseAfter;
+    public $released = false;
     public $maxTries;
     public $attempts = 0;
     public $failedWith;
+    public $failed = false;
     public $connectionName;
 
     public function __construct($callback = null)
@@ -296,7 +298,14 @@ class WorkerFakeJob
 
     public function release($delay)
     {
+        $this->released = true;
+
         $this->releaseAfter = $delay;
+    }
+
+    public function isReleased()
+    {
+        return $this->released;
     }
 
     public function attempts()
@@ -306,12 +315,19 @@ class WorkerFakeJob
 
     public function markAsFailed()
     {
-        //
+        $this->failed = true;
     }
 
     public function failed($e)
     {
+        $this->markAsFailed();
+
         $this->failedWith = $e;
+    }
+
+    public function hasFailed()
+    {
+        return $this->failed;
     }
 
     public function setConnectionName($name)
