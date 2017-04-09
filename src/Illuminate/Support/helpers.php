@@ -506,11 +506,11 @@ if (! function_exists('dd')) {
      * @param  mixed
      * @return void
      */
-    function dd()
+    function dd(...$args)
     {
-        array_map(function ($x) {
+        foreach ($args as $x) {
             (new Dumper)->dump($x);
-        }, func_get_args());
+        }
 
         die(1);
     }
