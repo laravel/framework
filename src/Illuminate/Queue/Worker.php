@@ -328,7 +328,9 @@ class Worker
             // If we catch an exception, we will attempt to release the job back onto the queue
             // so it is not lost entirely. This'll let the job be retried at a later time by
             // another listener (or this same one). We will re-throw this exception after.
-            if (! $job->isDeleted()) {
+            // Do not release the job back onto the queue if the job is either deleted, failed
+            // or if the job has already been released from the JobExceptionOccurred event listener.
+            if (! ($job->isReleased() || $job->isDeleted() || $job->hasFailed())) {
                 $job->release($options->delay);
             }
         }
