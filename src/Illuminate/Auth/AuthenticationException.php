@@ -50,6 +50,6 @@ class AuthenticationException extends Exception
             return response()->json(['error' => 'Unauthenticated.'], 401);
         }
 
-        return redirect()->guest(config('auth.login_route', 'login'));
+        return redirect()->guest(route(config('auth.defaults.login_route', 'login')));
     }
 }
