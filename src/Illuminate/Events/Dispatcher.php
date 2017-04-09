@@ -201,7 +201,7 @@ class Dispatcher implements DispatcherContract
             // If a response is returned from the listener and event halting is enabled
             // we will just return this response, and not call the rest of the event
             // listeners. Otherwise we will add the response on the response list.
-            if (! is_null($response) && $halt) {
+            if ($halt && ! is_null($response)) {
                 return $response;
             }
 
