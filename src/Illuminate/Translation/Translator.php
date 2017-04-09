@@ -257,6 +257,10 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     protected function makeReplacements($line, array $replace)
     {
+        if (empty($replace)) {
+            return $line;
+        }
+
         $replace = $this->sortReplacements($replace);
 
         foreach ($replace as $key => $value) {

@@ -351,7 +351,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
         // it as the base URL instead of the default path. This allows the developer to
         // have full control over the base path for this filesystem's generated URLs.
         if ($config->has('url')) {
-            return trim($config->get('url'), '/').'/'.ltrim($path, '/');
+            return rtrim($config->get('url'), '/').'/'.ltrim($path, '/');
         }
 
         $path = '/storage/'.$path;
