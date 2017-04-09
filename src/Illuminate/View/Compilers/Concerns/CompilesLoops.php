@@ -69,6 +69,7 @@ trait CompilesLoops
     {
         return '<?php endif; ?>';
     }
+    
     /**
      * Compile the for statements into valid PHP.
      *
