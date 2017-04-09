@@ -98,4 +98,19 @@ class CallQueuedHandler
             $command->failed($e);
         }
     }
+
+    /**
+     * Call the finished method on the job instance.
+     *
+     * @param  array  $data
+     * @return void
+     */
+    public function finished(array $data)
+    {
+        $command = unserialize($data['command']);
+
+        if (method_exists($command, 'finished')) {
+            $command->finished();
+        }
+    }
 }

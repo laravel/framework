@@ -291,6 +291,8 @@ class Worker
             $job->fire();
 
             $this->raiseAfterJobEvent($connectionName, $job);
+
+            $job->finished();
         } catch (Exception $e) {
             $this->handleJobException($connectionName, $job, $options, $e);
         } catch (Throwable $e) {

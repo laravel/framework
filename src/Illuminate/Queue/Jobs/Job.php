@@ -160,6 +160,22 @@ abstract class Job
     }
 
     /**
+     * Signal that the job is finished.
+     *
+     * @return void
+     */
+    public function finished()
+    {
+        $payload = $this->payload();
+
+        list($class, $method) = JobName::parse($payload['job']);
+
+        if (method_exists($this->instance = $this->resolve($class), 'finished')) {
+            $this->instance->finished($payload['data']);
+        }
+    }
+
+    /**
      * Resolve the given class.
      *
      * @param  string  $class
