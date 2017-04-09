@@ -134,7 +134,7 @@ class Handler implements ExceptionHandlerContract
                         ? $this->prepareJsonResponse($request, $e)
                         : $this->prepareResponse($request, $e);
     }
-git
+
     /**
      * Prepare a response for the given exception.
      *
