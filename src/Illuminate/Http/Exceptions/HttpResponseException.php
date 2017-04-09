@@ -34,4 +34,15 @@ class HttpResponseException extends RuntimeException
     {
         return $this->response;
     }
+
+    /**
+     * Render the exception.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function render(Request $request)
+    {
+        return $this->getResponse();
+    }
 }
