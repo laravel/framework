@@ -1181,6 +1181,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Parse the route key value before query the model.
+     *
+     * @return mixed
+     */
+    public function parseRouteKey($key)
+    {
+        return $key;
+    }
+
+    /**
      * Get the route key for the model.
      *
      * @return string
