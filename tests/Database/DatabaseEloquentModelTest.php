@@ -1276,6 +1276,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $model->dateAttribute = '1969-07-20';
         $model->datetimeAttribute = '1969-07-20 22:56:00';
         $model->timestampAttribute = '1969-07-20 22:56:00';
+        $model->htmlAttribute = '<p>test</p>';
 
         $this->assertInternalType('int', $model->intAttribute);
         $this->assertInternalType('float', $model->floatAttribute);
@@ -1296,6 +1297,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('1969-07-20', $model->dateAttribute->toDateString());
         $this->assertEquals('1969-07-20 22:56:00', $model->datetimeAttribute->toDateTimeString());
         $this->assertEquals(-14173440, $model->timestampAttribute);
+        $this->assertInstanceOf('Illuminate\Support\HtmlString', $model->htmlAttribute);
 
         $arr = $model->toArray();
         $this->assertInternalType('int', $arr['intAttribute']);
@@ -1782,6 +1784,7 @@ class EloquentModelCastingStub extends Model
         'dateAttribute' => 'date',
         'datetimeAttribute' => 'datetime',
         'timestampAttribute' => 'timestamp',
+        'htmlAttribute' => 'html',
     ];
 
     public function jsonAttributeValue()

@@ -12,6 +12,7 @@ use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use Illuminate\Support\HtmlString;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
@@ -2855,6 +2856,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
                 return $this->asDateTime($value);
             case 'timestamp':
                 return $this->asTimeStamp($value);
+            case 'html':
+                return $this->asHtml($value);
             default:
                 return $value;
         }
@@ -3069,6 +3072,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function fromJson($value, $asObject = false)
     {
         return json_decode($value, ! $asObject);
+    }
+
+    /**
+     * Return the given value as HTML-safe object.
+     *
+     * @param  mixed  $value
+     * @return \Illuminate\Support\HtmlString
+     */
+    protected function asHtml($value)
+    {
+        return new HtmlString($value);
     }
 
     /**
