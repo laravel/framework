@@ -244,7 +244,8 @@ class Builder
         $instance = $this->model->newInstance();
 
         return $this->hydrate(
-            $instance->getConnection()->select($query, $bindings)
+            $instance->getConnection()->select($query, $bindings),
+            $this->query->getConnection()->getName()
         );
     }
 
