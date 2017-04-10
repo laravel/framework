@@ -1061,6 +1061,14 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals('Jule Doe', $johnWithFriends->friends->find(4)->pivot->friend->name);
     }
 
+    public function testIsAfterRetrievingTheSameModel()
+    {
+        $saved = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $retrieved = EloquentTestUser::find(1);
+
+        $this->assertTrue($saved->is($retrieved));
+    }
+
     /**
      * Helpers...
      */
