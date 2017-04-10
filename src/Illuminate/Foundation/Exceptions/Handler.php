@@ -217,9 +217,13 @@ class Handler implements ExceptionHandlerContract
      */
     protected function prepareJsonResponse($request, Exception $e)
     {
-        $status = $this->isHttpException($e) ? $e->getStatusCode() : 500;
-
-        $headers = $this->isHttpException($e) ? $e->getHeaders() : [];
+        if ($this->isHttpException($e)) {
+            $status = $e->getStatusCode();
+            $headers = $e->getHeaders();
+        } else {
+            $status = 500;
+            $headers = [];
+        }
 
         return new JsonResponse(
             $this->convertExceptionToArray($e), $status, $headers, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
