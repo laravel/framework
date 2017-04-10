@@ -221,20 +221,27 @@ class Handler implements ExceptionHandlerContract
 
         $headers = $this->isHttpException($e) ? $e->getHeaders() : [];
 
-        if (config('app.debug')) {
-            $response = [
-                'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTrace(),
-            ];
-        } else {
-            $response = [
-                'message' => $this->isHttpException($e) ? $e->getMessage() : 'Server Error',
-            ];
-        }
+        return new JsonResponse(
+            $this->convertExceptionToArray($e), $status, $headers, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+        );
+    }
 
-        return new JsonResponse($response, $status, $headers, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    /**
+     * Convert the given exception to an array.
+     *
+     * @param  \Exception  $e
+     * @return array
+     */
+    protected function convertExceptionToArray(Exception $e)
+    {
+        return config('app.debug') ? [
+            'message' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'trace' => $e->getTrace(),
+        ] : [
+            'message' => $this->isHttpException($e) ? $e->getMessage() : 'Server Error',
+        ];
     }
 
     /**
