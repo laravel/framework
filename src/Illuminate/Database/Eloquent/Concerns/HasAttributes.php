@@ -400,7 +400,7 @@ trait HasAttributes
         $relation = $this->$method();
 
         if (! $relation instanceof Relation) {
-            throw new LogicException($method.' relationship method must return an object of type '
+            throw new LogicException(get_class($this).'::'.$method.' relationship method must return an object of type '
                 .Relation::class);
         }
 
