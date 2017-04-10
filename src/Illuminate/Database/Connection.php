@@ -927,6 +927,19 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Get an array of indexes for a given table.
+     *
+     * @param  string $table
+     * @return Doctrine\DBAL\Schema\Index
+     */
+    public function getDoctrineIndexes($table)
+    {
+        $schema = $this->getDoctrineSchemaManager();
+
+        return $schema->listTableIndexes($table);
+    }
+
+    /**
      * Get the Doctrine DBAL schema manager for the connection.
      *
      * @return \Doctrine\DBAL\Schema\AbstractSchemaManager

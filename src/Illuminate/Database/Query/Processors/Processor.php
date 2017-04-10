@@ -46,4 +46,17 @@ class Processor
     {
         return $results;
     }
+
+    /**
+     * Process the results of a index listing.
+     *
+     * @param  array $results array of Doctrine\DBAL\Schema\Index
+     * @return array
+     */
+    public function processIndexListing($results)
+    {
+        return $results->map(function ($index) {
+            return strtolower($index->getName());
+        });
+    }
 }
