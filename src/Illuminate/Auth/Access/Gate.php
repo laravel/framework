@@ -79,12 +79,20 @@ class Gate implements GateContract
     /**
      * Determine if a given ability has been defined.
      *
-     * @param  string  $ability
+     * @param  string|array  $ability
      * @return bool
      */
     public function has($ability)
     {
-        return isset($this->abilities[$ability]);
+        $abilities = is_array($ability) ? $ability : func_get_args();
+
+        foreach ($abilities as $ability) {
+            if (! isset($this->abilities[$ability])) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
