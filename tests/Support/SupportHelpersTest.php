@@ -207,6 +207,25 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['#foo', '#bar', '#baz'], array_flatten([['#foo', '#bar'], ['#baz']]));
     }
 
+    public function testArrayKey()
+    {
+        // Testing with named key
+        $this->assertEquals('price', array_key(['name' => 'Desk', 'price' => 100, 'orders' => 10], 100));
+
+        // Testing with indexed key
+        $this->assertEquals(2, array_key([100, 200, 300], 300));
+
+        // Testing with multiple identical values must return first key
+        $this->assertEquals(0, array_key([100, 200, 300, 100], 100));
+
+        // Testing for a non-existant value
+        $this->assertFalse(array_key([100, 200, 300], 900));
+
+        // Does not work for nested arrays
+        $array = ['emails' => ['joe@example.com' => ['name' => 'Joe'], 'jane@localhost' => ['name' => 'Jane']]];
+        $this->assertFalse(array_key($array, 'Jane'));
+    }
+
     public function testStrIs()
     {
         $this->assertTrue(Str::is('*.dev', 'localhost.dev'));

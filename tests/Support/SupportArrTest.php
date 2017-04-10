@@ -469,4 +469,31 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         Arr::forget($array, ['emails.joe@example.com', 'emails.jane@localhost']);
         $this->assertEquals(['emails' => ['joe@example.com' => ['name' => 'Joe']]], $array);
     }
+
+    public function testKey()
+    {
+        // Testing with named key
+        $array = ['name' => 'Desk', 'price' => 100, 'orders' => 10];
+        $key = Arr::key($array, 100);
+        $this->assertEquals('price', $key);
+
+        // Testing with indexed key
+        $array = [100, 200, 300];
+        $key = Arr::key($array, 300);
+        $this->assertEquals(2, $key);
+
+        // Testing with multiple identical values must return the first key
+        $array = [100, 200, 300, 100];
+        $key = Arr::key($array, 100);
+        $this->assertEquals(0, $key);
+
+        // Testing for a non-existant value
+        $key = Arr::key($array, 900);
+        $this->assertFalse($key);
+
+        // Does not work for nested arrays
+        $array = ['emails' => ['joe@example.com' => ['name' => 'Joe'], 'jane@localhost' => ['name' => 'Jane']]];
+        $key = Arr::key($array, 'Jane');
+        $this->assertFalse($key);
+    }
 }

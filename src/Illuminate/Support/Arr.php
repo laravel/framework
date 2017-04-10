@@ -525,4 +525,20 @@ class Arr
 
         return $filtered;
     }
+
+    /**
+     * Get the array key for the given value.
+     *
+     * @param array $array
+     * @param mixed $value
+     * @return mixed
+     */
+    public static function key($array, $value)
+    {
+        if ($key = array_search($value, $array)) {
+            return $key;
+        }
+
+        return false;
+    }
 }

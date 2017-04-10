@@ -186,6 +186,20 @@ if (! function_exists('array_has')) {
     }
 }
 
+if (! function_exists('array_key')) {
+    /**
+     * Get the array key for the given value.
+     *
+     * @param array $array
+     * @param mixed $value
+     * @return mixed
+     */
+    function array_key($array, $value)
+    {
+        return Arr::key($array, $value);
+    }
+}
+
 if (! function_exists('array_last')) {
     /**
      * Return the last element in an array passing a given truth test.
