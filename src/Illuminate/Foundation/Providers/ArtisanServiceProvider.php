@@ -14,6 +14,7 @@ use Illuminate\Foundation\Console\PresetCommand;
 use Illuminate\Queue\Console\FailedTableCommand;
 use Illuminate\Foundation\Console\AppNameCommand;
 use Illuminate\Foundation\Console\JobMakeCommand;
+use Illuminate\Foundation\Console\Presets\Preset;
 use Illuminate\Database\Console\Seeds\SeedCommand;
 use Illuminate\Foundation\Console\MailMakeCommand;
 use Illuminate\Foundation\Console\OptimizeCommand;
@@ -560,6 +561,10 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerPresetCommand()
     {
+        $this->app->singleton(Preset::class, function () {
+            return new Preset;
+        });
+
         $this->app->singleton('command.preset', function () {
             return new PresetCommand;
         });

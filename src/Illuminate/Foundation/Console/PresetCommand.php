@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use InvalidArgumentException;
 use Illuminate\Console\Command;
+use Illuminate\Foundation\Console\Presets\Preset;
 
 class PresetCommand extends Command
 {
@@ -12,7 +13,7 @@ class PresetCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'preset { type : The preset type (fresh, bootstrap, react) }';
+    protected $signature = 'preset { type : The preset type (\'list\' to view available)}';
 
     /**
      * The console command description.
@@ -21,6 +22,21 @@ class PresetCommand extends Command
      */
     protected $description = 'Swap the front-end scaffolding for the application';
 
+    protected $preset = null;
+
+    /**
+     * Create a new command instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->preset = app(Preset::class);
+        $this->preset->setCommand($this);
+    }
+
     /**
      * Execute the console command.
      *
@@ -28,48 +44,27 @@ class PresetCommand extends Command
      */
     public function handle()
     {
-        if (! in_array($this->argument('type'), ['none', 'bootstrap', 'react'])) {
+        if ($this->argument('type') == 'list') {
+            return $this->listPresets();
+        }
+
+        if (! in_array($this->argument('type'), $this->preset->availablePresets())) {
             throw new InvalidArgumentException('Invalid preset.');
         }
 
-        return $this->{$this->argument('type')}();
+        return $this->preset->{$this->argument('type')}();
     }
 
     /**
-     * Install the "fresh" preset.
+     * Output all registered presets.
      *
      * @return void
      */
-    protected function none()
+    private function listPresets()
     {
-        Presets\None::install();
-
-        $this->info('Frontend scaffolding removed successfully.');
-    }
-
-    /**
-     * Install the "fresh" preset.
-     *
-     * @return void
-     */
-    protected function bootstrap()
-    {
-        Presets\Bootstrap::install();
-
-        $this->info('Bootstrap scaffolding installed successfully.');
-        $this->comment('Please run "npm install && npm run dev" to compile your fresh scaffolding.');
-    }
-
-    /**
-     * Install the "react" preset.
-     *
-     * @return void
-     */
-    public function react()
-    {
-        Presets\React::install();
-
-        $this->info('React scaffolding installed successfully.');
-        $this->comment('Please run "npm install && npm run dev" to compile your fresh scaffolding.');
+        collect($this->preset->availablePresets())
+            ->each(function ($preset) {
+                $this->info($preset);
+            });
     }
 }
