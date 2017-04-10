@@ -6,6 +6,7 @@ use Exception;
 use Psr\Log\LoggerInterface;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Router;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Auth\AuthenticationException;
@@ -212,7 +213,7 @@ class Handler implements ExceptionHandlerContract
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Exception $e
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     protected function prepareJsonResponse($request, Exception $e)
     {
@@ -233,9 +234,7 @@ class Handler implements ExceptionHandlerContract
             ];
         }
 
-        return response(json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), $status, array_merge($headers, [
-            'Content-Type' => 'application/json',
-        ]));
+        return new JsonResponse($response, $status, $headers, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
 
     /**
