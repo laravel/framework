@@ -22,7 +22,7 @@ trait ResetsPasswords
      */
     public function showResetForm(Request $request, $token = null)
     {
-        return view('auth.passwords.reset')->with(
+        return view(config('auth.views.passwords.reset'))->with(
             ['token' => $token, 'email' => $request->email]
         );
     }
