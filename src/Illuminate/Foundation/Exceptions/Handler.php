@@ -6,6 +6,7 @@ use Exception;
 use Psr\Log\LoggerInterface;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Router;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Auth\AuthenticationException;
@@ -139,7 +140,7 @@ class Handler implements ExceptionHandlerContract
             return $this->convertValidationExceptionToResponse($e, $request);
         }
 
-        return $request->expectsJson() && config('app.debug')
+        return $request->expectsJson()
                         ? $this->prepareJsonResponse($request, $e)
                         : $this->prepareResponse($request, $e);
     }
@@ -212,7 +213,7 @@ class Handler implements ExceptionHandlerContract
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Exception $e
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     protected function prepareJsonResponse($request, Exception $e)
     {
@@ -220,14 +221,20 @@ class Handler implements ExceptionHandlerContract
 
         $headers = $this->isHttpException($e) ? $e->getHeaders() : [];
 
-        return response(json_encode([
-            'message' => $e->getMessage(),
-            'file' => $e->getFile(),
-            'line' => $e->getLine(),
-            'trace' => $e->getTrace(),
-        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), $status, array_merge($headers, [
-            'Content-Type' => 'application/json',
-        ]));
+        if (config('app.debug')) {
+            $response = [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTrace(),
+            ];
+        } else {
+            $response = [
+                'message' => $this->isHttpException($e) ? $e->getMessage() : 'Server Error',
+            ];
+        }
+
+        return new JsonResponse($response, $status, $headers, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
 
     /**
