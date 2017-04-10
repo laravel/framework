@@ -55,7 +55,6 @@ class PresetCommand extends Command
         return $this->preset->{$this->argument('type')}();
     }
 
-
     /**
      * Output all registered presets.
      *
