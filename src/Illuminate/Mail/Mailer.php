@@ -225,6 +225,8 @@ class Mailer implements MailerContract, MailQueueContract
         }
 
         $this->sendSwiftMessage($message->getSwiftMessage());
+
+        $this->dispatchSentEvent($message);
     }
 
     /**
@@ -462,6 +464,21 @@ class Mailer implements MailerContract, MailQueueContract
         return $this->events->until(
             new Events\MessageSending($message)
         ) !== false;
+    }
+
+    /**
+     * Dispatch the message sent event.
+     *
+     * @param  \Illuminate\Mail\Message  $message
+     * @return void
+     */
+    protected function dispatchSentEvent($message)
+    {
+        if ($this->events) {
+            $this->events->dispatch(
+                new Events\MessageSent($message->getSwiftMessage())
+            );
+        }
     }
 
     /**

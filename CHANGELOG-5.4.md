@@ -5,14 +5,19 @@
 ### Added
 - Added `assertSuccessful()` and `assertRedirect()` to `TestResponse` ([#18629](https://github.com/laravel/framework/pull/18629))
 - Added `assertSeeText()` and `assertDontSeeText()` to `TestResponse` ([#18690](https://github.com/laravel/framework/pull/18690))
+- Added `assertJsonMissing()` to `TestResponse` ([#18721](https://github.com/laravel/framework/pull/18721), [786b782](https://github.com/laravel/framework/commit/786b7821e0009a4288bff032443f2b1a273ee459))
 - Added support for attaching an image to Slack attachments `$attachment->image($url)`([#18664](https://github.com/laravel/framework/pull/18664))
 - Added `Validator::extendDependent()` to allow adding custom rules that depend on other fields ([#18654](https://github.com/laravel/framework/pull/18654))
 - Added support for `--parent` option on `make:controller` ([#18606](https://github.com/laravel/framework/pull/18606))
 
+### Changed
+- Don't trim leading slashes on local filesystem base URLs ([acd66fe](https://github.com/laravel/framework/commit/acd66fef646fd5f7ca54380d55bc8e2e2cbe64b6))
+- Accept variable on `@empty()` directive ([#18738](https://github.com/laravel/framework/pull/18738))
+
 ### Fixed
 - Fixed an issue with `Collection::groupBy()` when the provided value is a boolean ([#18674](https://github.com/laravel/framework/pull/18674))
 - Bring back an old behaviour in resolving controller method dependencies ([#18646](https://github.com/laravel/framework/pull/18646))
-
+- Fixed job release when exception occurs ([#18737](https://github.com/laravel/framework/pull/18737))
 
 ## v5.4.17 (2017-04-03)
 

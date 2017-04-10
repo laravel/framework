@@ -132,9 +132,25 @@ class MailMailerTest extends TestCase
         $this->assertEquals(['taylorotwell@gmail.com'], $mailer->failures());
     }
 
-    protected function getMailer()
+    public function testEventsAreDispatched()
     {
-        return new \Illuminate\Mail\Mailer(m::mock('Illuminate\Contracts\View\Factory'), m::mock('Swift_Mailer'));
+        unset($_SERVER['__mailer.test']);
+        $events = m::mock('Illuminate\Contracts\Events\Dispatcher');
+        $events->shouldReceive('until')->once()->with(m::type('Illuminate\Mail\Events\MessageSending'));
+        $events->shouldReceive('dispatch')->once()->with(m::type('Illuminate\Mail\Events\MessageSent'));
+        $mailer = $this->getMailer($events);
+        $view = m::mock('StdClass');
+        $mailer->getViewFactory()->shouldReceive('make')->once()->andReturn($view);
+        $view->shouldReceive('render')->once()->andReturn('rendered.view');
+        $this->setSwiftMailer($mailer);
+        $mailer->getSwiftMailer()->shouldReceive('send')->once()->with(m::type('Swift_Message'), []);
+        $mailer->send('foo', ['data'], function ($m) {
+        });
+    }
+
+    protected function getMailer($events = null)
+    {
+        return new \Illuminate\Mail\Mailer(m::mock('Illuminate\Contracts\View\Factory'), m::mock('Swift_Mailer'), $events);
     }
 
     public function setSwiftMailer($mailer)
