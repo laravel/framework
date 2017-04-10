@@ -223,9 +223,9 @@ class Builder
      * @param  array  $items
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function hydrate(array $items)
+    public function hydrate(array $items, $connection = null)
     {
-        $instance = $this->model->newInstance();
+        $instance = $this->model->newInstance()->setConnection($connection);
 
         return $instance->newCollection(array_map(function ($item) use ($instance) {
             return $instance->newFromBuilder($item);
@@ -460,7 +460,7 @@ class Builder
     {
         return $this->model->hydrate(
             $this->query->get($columns)->all(),
-            $this->model->getConnectionName()
+            $this->query->getConnection()->getName()
         )->all();
     }
 
