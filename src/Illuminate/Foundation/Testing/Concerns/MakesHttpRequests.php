@@ -747,6 +747,23 @@ trait MakesHttpRequests
     }
 
     /**
+     * Assert that the response view has a given name.
+     *
+     * @param  string $name
+     * @return $this
+     */
+    public function assertViewIs(string $name)
+    {
+        if (! isset($this->response->original) || ! $this->response->original instanceof View) {
+            return PHPUnit::assertTrue(false, 'The response was not a view.');
+        }
+
+        PHPUnit::assertEquals($name, $this->response->original->getName());
+
+        return $this;
+    }
+
+    /**
      * Assert that the response view has a given piece of bound data.
      *
      * @param  string|array  $key
