@@ -3,7 +3,7 @@
 @section('title', 'Logged out')
 
 @section('message')
-    You have been logged out due to inactivity.
+    The page has expired due to inactivity.
     <br/><br/>
-    Please log in and try again.
+    Please refresh the page and try again.
 @stop
