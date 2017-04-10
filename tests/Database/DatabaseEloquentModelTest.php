@@ -1275,6 +1275,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     /**
      * @expectedException LogicException
+     * @expectedExceptionMessage incorrectRelationStub relationship method must return an object of type Illuminate\Database\Eloquent\Relations\Relation
      */
     public function testGetModelAttributeMethodThrowsExceptionIfNotRelation()
     {
