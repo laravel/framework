@@ -381,7 +381,8 @@ class Mailable implements MailableContract
                 $this->{$property}($user->email, isset($user->name) ? $user->name : null);
             }
         } else {
-            $this->{$property}[] = compact('address', 'name');
+            $temp[] = compact('address', 'name');
+            $this->{$property} = $temp;
         }
 
         return $this;
