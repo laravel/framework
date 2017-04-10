@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Mail;
 
 use Mockery as m;
+use Illuminate\Mail\Mailer;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\HtmlString;
 
@@ -148,9 +149,22 @@ class MailMailerTest extends TestCase
         });
     }
 
+    public function testMacroable()
+    {
+        Mailer::macro('foo', function () {
+            return 'bar';
+        });
+
+        $mailer = $this->getMailer();
+
+        $this->assertEquals(
+            'bar', $mailer->foo()
+        );
+    }
+
     protected function getMailer($events = null)
     {
-        return new \Illuminate\Mail\Mailer(m::mock('Illuminate\Contracts\View\Factory'), m::mock('Swift_Mailer'), $events);
+        return new Mailer(m::mock('Illuminate\Contracts\View\Factory'), m::mock('Swift_Mailer'), $events);
     }
 
     public function setSwiftMailer($mailer)
