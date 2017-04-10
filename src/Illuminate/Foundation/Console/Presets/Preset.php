@@ -9,14 +9,14 @@ class Preset
     use Macroable;
 
     /**
-     * Preset Command
+     * Preset Command.
      *
      * @var Illuminate\Console\Command
      */
     protected $command;
 
     /**
-     * Register framework default presets
+     * Register framework default presets.
      */
     public function __construct()
     {
@@ -26,10 +26,9 @@ class Preset
     }
 
     /**
-     * Set the command
+     * Set the command.
      *
      * @param Illuminate\Console\Command $command Preset Command
-     *
      * @return  void
      */
     public function setCommand($command)
@@ -38,7 +37,7 @@ class Preset
     }
 
     /**
-     * Get the available preset macros
+     * Get the available preset macros.
      *
      * @return array
      */
@@ -48,7 +47,7 @@ class Preset
     }
 
     /**
-     * Register the react preset
+     * Register the react preset.
      *
      * @return void
      */
@@ -62,7 +61,7 @@ class Preset
     }
 
     /**
-     * Register the bootstrap preset
+     * Register the bootstrap preset.
      *
      * @return void
      */
@@ -76,7 +75,7 @@ class Preset
     }
 
     /**
-     * Register the fresh preset
+     * Register the fresh preset.
      *
      * @return void
      */

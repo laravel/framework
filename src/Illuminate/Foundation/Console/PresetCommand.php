@@ -57,7 +57,7 @@ class PresetCommand extends Command
 
 
     /**
-     * Output all registered presets
+     * Output all registered presets.
      *
      * @return void
      */
