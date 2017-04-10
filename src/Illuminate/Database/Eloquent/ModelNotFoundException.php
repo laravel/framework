@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent;
 
 use RuntimeException;
 use Illuminate\Support\Arr;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ModelNotFoundException extends RuntimeException
 {
@@ -62,5 +63,15 @@ class ModelNotFoundException extends RuntimeException
     public function getIds()
     {
         return $this->ids;
+    }
+
+    /**
+     * Prepare the exception for rendering.
+     *
+     * @return \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function prepareException()
+    {
+        return new NotFoundHttpException($this->getMessage(), $this);
     }
 }

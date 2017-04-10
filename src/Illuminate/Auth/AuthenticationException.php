@@ -3,6 +3,7 @@
 namespace Illuminate\Auth;
 
 use Exception;
+use Illuminate\Http\Request;
 
 class AuthenticationException extends Exception
 {
@@ -35,5 +36,20 @@ class AuthenticationException extends Exception
     public function guards()
     {
         return $this->guards;
+    }
+
+    /**
+     * Render the exception.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function render(Request $request)
+    {
+        if ($request->expectsJson()) {
+            return response()->json(['error' => 'Unauthenticated.'], 401);
+        }
+
+        return redirect()->guest(route(config('auth.defaults.login_route', 'login')));
     }
 }

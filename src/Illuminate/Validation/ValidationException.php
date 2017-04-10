@@ -3,6 +3,7 @@
 namespace Illuminate\Validation;
 
 use Exception;
+use Illuminate\Http\Request;
 
 class ValidationException extends Exception
 {
@@ -43,5 +44,28 @@ class ValidationException extends Exception
     public function getResponse()
     {
         return $this->response;
+    }
+
+    /**
+     * Render the exception.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function render(Request $request)
+    {
+        if (! is_null($this->response)) {
+            return $this->response;
+        }
+
+        $errors = $this->validator->errors()->getMessages();
+
+        if ($request->expectsJson()) {
+            return response()->json($errors, 422);
+        }
+
+        return redirect()->back()->withInput(
+            $request->input()
+        )->withErrors($errors);
     }
 }

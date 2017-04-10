@@ -9,17 +9,12 @@ use Illuminate\Routing\Router;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Container\Container;
-use Illuminate\Validation\ValidationException;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Symfony\Component\Debug\Exception\FlattenException;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Debug\ExceptionHandler as SymfonyExceptionHandler;
 use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 use Symfony\Component\HttpFoundation\RedirectResponse as SymfonyRedirectResponse;
@@ -130,60 +125,13 @@ class Handler implements ExceptionHandlerContract
             return Router::prepareResponse($request, $response);
         }
 
-        $e = $this->prepareException($e);
-
-        if ($e instanceof HttpResponseException) {
-            return $e->getResponse();
-        } elseif ($e instanceof AuthenticationException) {
-            return $this->unauthenticated($request, $e);
-        } elseif ($e instanceof ValidationException) {
-            return $this->convertValidationExceptionToResponse($e, $request);
+        if (method_exists($e, 'prepareException')) {
+            $e = $e->prepareException();
         }
 
         return $request->expectsJson()
                         ? $this->prepareJsonResponse($request, $e)
                         : $this->prepareResponse($request, $e);
-    }
-
-    /**
-     * Prepare exception for rendering.
-     *
-     * @param  \Exception  $e
-     * @return \Exception
-     */
-    protected function prepareException(Exception $e)
-    {
-        if ($e instanceof ModelNotFoundException) {
-            $e = new NotFoundHttpException($e->getMessage(), $e);
-        } elseif ($e instanceof AuthorizationException) {
-            $e = new HttpException(403, $e->getMessage());
-        }
-
-        return $e;
-    }
-
-    /**
-     * Create a response object from the given validation exception.
-     *
-     * @param  \Illuminate\Validation\ValidationException  $e
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    protected function convertValidationExceptionToResponse(ValidationException $e, $request)
-    {
-        if ($e->response) {
-            return $e->response;
-        }
-
-        $errors = $e->validator->errors()->getMessages();
-
-        if ($request->expectsJson()) {
-            return response()->json($errors, 422);
-        }
-
-        return redirect()->back()->withInput(
-            $request->input()
-        )->withErrors($errors);
     }
 
     /**
@@ -261,9 +209,9 @@ class Handler implements ExceptionHandlerContract
 
         if (view()->exists("errors::{$status}")) {
             return response()->view("errors::{$status}", ['exception' => $e], $status, $e->getHeaders());
-        } else {
-            return $this->convertExceptionToResponse($e);
         }
+
+        return $this->convertExceptionToResponse($e);
     }
 
     /**
