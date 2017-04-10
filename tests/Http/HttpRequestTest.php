@@ -247,6 +247,21 @@ class HttpRequestTest extends TestCase
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\File\UploadedFile', $request['file']);
     }
 
+    public function testAllMethod()
+    {
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => null]);
+        $this->assertEquals(['name' => 'Taylor', 'age' => null, 'email' => null], $request->all('name', 'age', 'email'));
+        $this->assertEquals(['name' => 'Taylor'], $request->all('name'));
+        $this->assertEquals(['name' => 'Taylor', 'age' => null], $request->all());
+
+        $request = Request::create('/', 'GET', ['developer' => ['name' => 'Taylor', 'age' => null]]);
+        $this->assertEquals(['developer' => ['name' => 'Taylor', 'skills' => null]], $request->all('developer.name', 'developer.skills'));
+        $this->assertEquals(['developer' => ['name' => 'Taylor', 'skills' => null]], $request->all(['developer.name', 'developer.skills']));
+        $this->assertEquals(['developer' => ['age' => null]], $request->all('developer.age'));
+        $this->assertEquals(['developer' => ['skills' => null]], $request->all('developer.skills'));
+        $this->assertEquals(['developer' => ['name' => 'Taylor', 'age' => null]], $request->all());
+    }
+
     public function testOnlyMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => null]);

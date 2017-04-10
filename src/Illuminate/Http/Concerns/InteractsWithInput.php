@@ -128,9 +128,21 @@ trait InteractsWithInput
      *
      * @return array
      */
-    public function all()
+    public function all($keys = null)
     {
-        return array_replace_recursive($this->input(), $this->allFiles());
+        $input = array_replace_recursive($this->input(), $this->allFiles());
+
+        if (! $keys) {
+            return $input;
+        }
+
+        $results = [];
+
+        foreach (is_array($keys) ? $keys : func_get_args() as $key) {
+            Arr::set($results, $key, Arr::get($input, $key));
+        }
+
+        return $results;
     }
 
     /**
