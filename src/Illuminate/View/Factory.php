@@ -632,7 +632,7 @@ class Factory implements FactoryContract
         $sectionContent = str_replace('@@parent', '--parent--holder--', $sectionContent);
 
         return str_replace(
-            '--parent--holder--', '@parent', str_replace('@parent', '', $sectionContent)
+            '--parent--holder--', '@parent', str_replace('@parent', $default, $sectionContent)
         );
     }
 
