@@ -39,12 +39,21 @@ trait InteractsWithExceptionHandling
         $this->previousExceptionHandler = app(ExceptionHandler::class);
 
         $this->app->instance(ExceptionHandler::class, new class implements ExceptionHandler {
-            public function __construct() {}
-            public function report(Exception $e) {}
-            public function render($request, Exception $e) {
+            public function __construct()
+            {
+            }
+
+            public function report(Exception $e)
+            {
+            }
+
+            public function render($request, Exception $e)
+            {
                 throw $e;
             }
-            public function renderForConsole($output, Exception $e) {
+
+            public function renderForConsole($output, Exception $e)
+            {
                 (new ConsoleApplication)->renderException($e, $output);
             }
         });
