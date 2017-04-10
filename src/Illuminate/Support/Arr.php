@@ -483,4 +483,45 @@ class Arr
 
         return $filtered;
     }
+
+    /**
+     * Index the array by array of keys.
+     *
+     * @param  array  $data
+     * @param  array  $keys
+     * @param  bool|true  $unique
+     * @return array
+     */
+    public static function getIndexedByKeys(array $data, array $keys, $unique = true)
+    {
+        $result = [];
+
+        foreach ($data as $value) {
+            static::indexByKeys($result, $value, $keys, $unique);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param  array  $result
+     * @param  array  $toSave
+     * @param  array  $keys
+     * @param  bool|true $unique
+     */
+    protected static function indexByKeys(array &$result, array $toSave, array $keys, $unique = true)
+    {
+        foreach ($keys as $key) {
+            if (! isset($result[$toSave[$key]])) {
+                $result[$toSave[$key]] = [];
+            }
+            $result = &$result[$toSave[$key]];
+        }
+
+        if ($unique) {
+            $result = $toSave;
+        } else {
+            $result[] = $toSave;
+        }
+    }
 }
