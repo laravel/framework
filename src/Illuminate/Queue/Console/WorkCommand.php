@@ -152,10 +152,10 @@ class WorkCommand extends Command
                 $this->output->writeln('<comment>['.Carbon::now()->format('Y-m-d H:i:s').'] Processing:</comment> '.$job->resolveName());
                 break;
             case 'success':
-                $this->output->writeln('<info>['.Carbon::now()->format('Y-m-d H:i:s').'] Processed:</info> '.$job->resolveName());
+                $this->output->writeln('<info>['.Carbon::now()->format('Y-m-d H:i:s').'] Processed:</info>  '.$job->resolveName());
                 break;
             case 'failed':
-                $this->output->writeln('<error>['.Carbon::now()->format('Y-m-d H:i:s').'] Failed:</error> '.$job->resolveName());
+                $this->output->writeln('<error>['.Carbon::now()->format('Y-m-d H:i:s').'] Failed:</error>     '.$job->resolveName());
                 break;
         }
     }
