@@ -49,7 +49,7 @@ class SlackMessage
     public $content;
 
     /**
-     * Linkify channel names and usernames.
+     * Indicates if channel names and usernames should be linked.
      *
      * @var bool
      */
@@ -101,18 +101,6 @@ class SlackMessage
     public function error()
     {
         $this->level = 'error';
-
-        return $this;
-    }
-
-    /**
-     * Find and link channel names and usernames.
-     *
-     * @return $this
-     */
-    public function linkNames()
-    {
-        $this->linkNames = 1;
 
         return $this;
     }
@@ -204,6 +192,18 @@ class SlackMessage
             case 'warning':
                 return 'warning';
         }
+    }
+
+    /**
+     * Find and link channel names and usernames.
+     *
+     * @return $this
+     */
+    public function linkNames()
+    {
+        $this->linkNames = 1;
+
+        return $this;
     }
 
     /**
