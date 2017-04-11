@@ -76,6 +76,13 @@ class BelongsToMany extends Relation
     protected $pivotUpdatedAt;
 
     /**
+     * The storage format of the pivot table's date columns.
+     *
+     * @var string
+     */
+    protected $pivotDateFormat;
+
+    /**
      * The count of self joins.
      *
      * @var int
@@ -1135,7 +1142,7 @@ class BelongsToMany extends Relation
      */
     protected function setTimestampsOnAttach(array $record, $exists = false)
     {
-        $fresh = $this->parent->freshTimestamp();
+        $fresh = $this->freshTimestampString();
 
         if (! $exists && $this->hasPivotColumn($this->createdAt())) {
             $record[$this->createdAt()] = $fresh;
@@ -1338,6 +1345,54 @@ class BelongsToMany extends Relation
     public function updatedAt()
     {
         return $this->pivotUpdatedAt ?: $this->parent->getUpdatedAtColumn();
+    }
+
+    /**
+     * Get a fresh timestamp for the relation.
+     *
+     * @return string
+     */
+    public function freshTimestampString()
+    {
+        return $this->fromDateTime($this->parent->freshTimestamp());
+    }
+
+    /**
+     * Convert a DateTime to a storable string.
+     *
+     * @param  \DateTime|int  $value
+     * @return string
+     */
+    public function fromDateTime($value)
+    {
+        $format = $this->getDateFormat();
+
+        $value = $this->parent->asDateTime($value);
+
+        return $value->format($format);
+    }
+
+    /**
+     * Get the format for database stored dates.
+     *
+     * @return string
+     */
+    protected function getDateFormat()
+    {
+        return $this->pivotDateFormat ?: $this->parent->getDateFormat();
+    }
+
+    /**
+     * Set the date format used by the relation.
+     *
+     * @param  string  $format
+     * @return $this
+     */
+    public function setDateFormat($format)
+    {
+        $this->pivotDateFormat = $format;
+
+        return $this;
     }
 
     /**
