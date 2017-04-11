@@ -857,7 +857,7 @@ class EloquentBuilderTestPluckDatesStub extends Illuminate\Database\Eloquent\Mod
         $this->attributes = $attributes;
     }
 
-    protected function asDateTime($value)
+    public function asDateTime($value)
     {
         return 'date_'.$value;
     }
