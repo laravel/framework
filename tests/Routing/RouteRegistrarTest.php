@@ -241,6 +241,14 @@ class RouteRegistrarTest extends TestCase
         $this->assertContains('topic', $this->router->getRoutes()->getByName('posts.show')->uri);
     }
 
+    public function testCanSetMiddlewareOnRegisteredResource()
+    {
+        $this->router->resource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
+                     ->middleware('Illuminate\Tests\Routing\RouteRegistrarMiddlewareStub');
+
+        $this->seeMiddleware('Illuminate\Tests\Routing\RouteRegistrarMiddlewareStub');
+    }
+
     public function testCanSetRouteName()
     {
         $this->router->as('users.index')->get('users', function () {
@@ -310,4 +318,9 @@ class RouteRegistrarControllerStub
     {
         return 'deleted';
     }
+}
+
+class RouteRegistrarMiddlewareStub
+{
+
 }
