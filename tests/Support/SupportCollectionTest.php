@@ -551,6 +551,24 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['first_word' => 'Hello'], $c->intersect(new Collection(['first_world' => 'Hello', 'last_word' => 'World']))->all());
     }
 
+    public function testDisjointCollection()
+    {
+        $c = new Collection(['foo', 'BAR', 'baz']);
+        $this->assertTrue($c->disjoint(['123', '456', '789']));
+
+        $c = new Collection(['foo', 'BAR', 'baz']);
+        $this->assertFalse($c->disjoint(['123', 'BAR', '789']));
+    }
+
+    public function testJointCollection()
+    {
+        $c = new Collection(['foo', 'BAR', 'baz']);
+        $this->assertTrue($c->joint(['123', 'BAR', '789']));
+
+        $c = new Collection(['foo', 'BAR', 'baz']);
+        $this->assertFalse($c->joint(['123', '456', '789']));
+    }
+
     public function testUnique()
     {
         $c = new Collection(['Hello', 'World', 'World']);
