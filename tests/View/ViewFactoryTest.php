@@ -463,6 +463,8 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
             'last' => false,
             'depth' => 1,
             'parent' => null,
+            'even' => true,
+            'odd' => false,
         ];
 
         $this->assertEquals([$expectedLoop], $factory->getLoopStack());
@@ -478,6 +480,8 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
             'last' => false,
             'depth' => 2,
             'parent' => (object) $expectedLoop,
+            'even' => true,
+            'odd' => false,
         ];
         $this->assertEquals([$expectedLoop, $secondExpectedLoop], $factory->getLoopStack());
 
@@ -501,6 +505,8 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
             'last' => null,
             'depth' => 1,
             'parent' => null,
+            'even' => true,
+            'odd' => false,
         ];
 
         $this->assertEquals([$expectedLoop], $factory->getLoopStack());
