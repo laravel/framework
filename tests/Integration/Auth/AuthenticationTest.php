@@ -117,6 +117,7 @@ class AuthenticationTest extends TestCase
             $this->app['auth']->attempt(['email' => 'wrong', 'password' => 'password'])
         );
         $this->assertFalse($this->app['auth']->check());
+        $this->assertNull($this->app['auth']->user());
         Event::assertDispatched(\Illuminate\Auth\Events\Failed::class);
 
         $this->assertTrue(
