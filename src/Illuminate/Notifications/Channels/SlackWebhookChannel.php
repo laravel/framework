@@ -59,6 +59,7 @@ class SlackWebhookChannel
             'icon_emoji' => data_get($message, 'icon'),
             'icon_url' => data_get($message, 'image'),
             'channel' => data_get($message, 'channel'),
+            'link_names' => data_get($message, 'linkNames'),
         ]);
 
         return array_merge([

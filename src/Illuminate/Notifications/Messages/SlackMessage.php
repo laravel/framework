@@ -49,6 +49,13 @@ class SlackMessage
     public $content;
 
     /**
+     * Linkify channel names and usernames.
+     *
+     * @var bool
+     */
+    public $linkNames = 0;
+
+    /**
      * The message's attachments.
      *
      * @var array
@@ -94,6 +101,18 @@ class SlackMessage
     public function error()
     {
         $this->level = 'error';
+
+        return $this;
+    }
+
+    /**
+     * Find and link channel names and usernames.
+     *
+     * @return $this
+     */
+    public function linkNames()
+    {
+        $this->linkNames = 1;
 
         return $this;
     }
