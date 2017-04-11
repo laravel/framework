@@ -832,6 +832,9 @@ class Factory implements FactoryContract
 
             $loop['last'] = $loop['iteration'] == $loop['count'];
         }
+
+        $loop['even'] = $loop['iteration'] % 2 == 0;
+        $loop['odd'] = $loop['iteration'] % 2 != 0;
     }
 
     /**
