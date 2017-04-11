@@ -114,7 +114,7 @@ class RouteListCommand extends Command
             'method' => implode('|', $route->methods()),
             'uri'    => $route->uri(),
             'name'   => $route->getName(),
-            'action' => $route->getActionName(),
+            'action' => $this->stripCommonNamespace($route),
             'middleware' => $this->getMiddleware($route),
         ]);
     }
@@ -219,6 +219,23 @@ class RouteListCommand extends Command
     }
 
     /**
+     * Strip the common namespace from the action.
+     *
+     * @param  \Illuminate\Routing\Route  $route
+     * @return string
+     */
+    protected function stripCommonNamespace($route)
+    {
+        if ($this->option('strip-ns')) {
+            $namespace = $route->getAction()['namespace'].'\\';
+
+            return str_replace($namespace, '', $route->getActionName());
+        }
+
+        return $route->getActionName();
+    }
+
+    /**
      * Get the console command options.
      *
      * @return array
@@ -235,6 +252,8 @@ class RouteListCommand extends Command
             ['reverse', 'r', InputOption::VALUE_NONE, 'Reverse the ordering of the routes.'],
 
             ['sort', null, InputOption::VALUE_OPTIONAL, 'The column (host, method, uri, name, action, middleware) to sort by.', 'uri'],
+
+            ['strip-ns', null, InputOption::VALUE_NONE, 'Strip the common namespace from the action name.'],
         ];
     }
 }
