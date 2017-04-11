@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Routing;
 
 use Mockery as m;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use PHPUnit\Framework\TestCase;
