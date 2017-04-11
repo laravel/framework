@@ -705,7 +705,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
         $parent->shouldReceive('getKey')->andReturn(1);
         $parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
         $parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
-        $parent->shouldReceive('asDateTime')->andReturn('date');
+        $parent->shouldReceive('asDateTime')->andReturn(Carbon\Carbon::now());
         $parent->shouldReceive('getDateFormat')->andReturn('Y-m-d H:i:s');
 
         $builder = m::mock('Illuminate\Database\Eloquent\Builder');
