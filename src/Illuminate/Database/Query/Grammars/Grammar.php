@@ -165,11 +165,11 @@ class Grammar extends BaseGrammar
      */
     protected function compileWheres(Builder $query)
     {
-        $sql = [];
-
-        if (is_null($query->wheres)) {
+        if (empty($query->wheres)) {
             return '';
         }
+
+        $sql = [];
 
         // Each type of where clauses has its own compiler function which is responsible
         // for actually creating the where clauses SQL. This helps keep the code nice
@@ -180,18 +180,15 @@ class Grammar extends BaseGrammar
             $sql[] = $where['boolean'].' '.$this->$method($query, $where);
         }
 
-        // If we actually have some where clauses, we will strip off the first boolean
+        // As we actually have some where clauses, we will strip off the first boolean
         // operator, which is added by the query builders for convenience so we can
         // avoid checking for the first clauses in each of the compilers methods.
-        if (count($sql) > 0) {
-            $sql = implode(' ', $sql);
 
-            $conjunction = $query instanceof JoinClause ? 'on' : 'where';
+        $sql = implode(' ', $sql);
 
-            return $conjunction.' '.$this->removeLeadingBoolean($sql);
-        }
+        $conjunction = $query instanceof JoinClause ? 'on' : 'where';
 
-        return '';
+        return $conjunction.' '.$this->removeLeadingBoolean($sql);
     }
 
     /**
