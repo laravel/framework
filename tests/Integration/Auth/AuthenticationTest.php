@@ -32,6 +32,7 @@ class AuthenticationTest extends TestCase
             $table->string('email');
             $table->string('username');
             $table->string('password');
+            $table->string('remember_token')->default('');
             $table->tinyInteger('is_active')->default(0);
         });
 
@@ -128,6 +129,32 @@ class AuthenticationTest extends TestCase
 
         Event::assertDispatched(\Illuminate\Auth\Events\Login::class);
         Event::assertDispatched(\Illuminate\Auth\Events\Authenticated::class);
+    }
+
+    /**
+     * @test
+     */
+    public function test_logging_in_using_id()
+    {
+        $this->app['auth']->loginUsingId(1);
+        $this->assertEquals(1, $this->app['auth']->user()->id);
+
+        $this->assertFalse($this->app['auth']->loginUsingId(1000));
+    }
+
+    /**
+     * @test
+     */
+    public function test_logging_out()
+    {
+        Event::fake();
+
+        $this->app['auth']->loginUsingId(1);
+        $this->assertEquals(1, $this->app['auth']->user()->id);
+
+        $this->app['auth']->logout();
+        $this->assertNull($this->app['auth']->user());
+        Event::assertDispatched(\Illuminate\Auth\Events\Logout::class);
     }
 }
 
