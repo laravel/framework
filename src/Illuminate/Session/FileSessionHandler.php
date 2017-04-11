@@ -81,8 +81,6 @@ class FileSessionHandler implements SessionHandlerInterface
     public function write($sessionId, $data)
     {
         $this->files->put($this->path.'/'.$sessionId, $data, true);
-
-        return true;
     }
 
     /**
@@ -91,8 +89,6 @@ class FileSessionHandler implements SessionHandlerInterface
     public function destroy($sessionId)
     {
         $this->files->delete($this->path.'/'.$sessionId);
-
-        return true;
     }
 
     /**
