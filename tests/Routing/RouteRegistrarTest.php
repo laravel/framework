@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Routing;
 
 use Mockery as m;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use PHPUnit\Framework\TestCase;
@@ -208,6 +209,37 @@ class RouteRegistrarTest extends TestCase
 
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.update'));
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.destroy'));
+    }
+
+    public function testCanNameRoutesOnRegisteredResource()
+    {
+        $this->router->resource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
+                     ->only('create', 'store')->names([
+                         'create' => 'user.build',
+                         'store' => 'user.save',
+                     ]);
+
+        $this->router->resource('posts', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
+                    ->only('create', 'destroy')
+                    ->name('create', 'posts.make')
+                    ->name('destroy', 'posts.remove');
+
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.build'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.save'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('posts.make'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('posts.remove'));
+    }
+
+    public function testCanOverrideParametersOnRegisteredResource()
+    {
+        $this->router->resource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
+                     ->parameters(['users' => 'admin_user']);
+
+        $this->router->resource('posts', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
+                     ->parameter('posts', 'topic');
+
+        $this->assertContains('admin_user', $this->router->getRoutes()->getByName('users.show')->uri);
+        $this->assertContains('topic', $this->router->getRoutes()->getByName('posts.show')->uri);
     }
 
     public function testCanSetRouteName()
