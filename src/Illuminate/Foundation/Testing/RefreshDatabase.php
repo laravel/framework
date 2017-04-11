@@ -4,7 +4,7 @@ namespace Illuminate\Foundation\Testing;
 
 use Illuminate\Contracts\Console\Kernel;
 
-trait FreshDatabase
+trait RefreshDatabase
 {
     /**
      * Indicates if the test database has been migrated.
