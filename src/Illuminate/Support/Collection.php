@@ -363,6 +363,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Return the number of elements in the specified Collection equal to the specified object.
+     *
+     * @param  string  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return int
+     */
+    public function frequency($key, $operator, $value = null)
+    {
+        return $this->where($key, $operator, $value)->count();
+    }
+
+    /**
      * Get an operator checker callback.
      *
      * @param  string  $key
