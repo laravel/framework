@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\WorkerOptions;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
+use Illuminate\Queue\Events\JobProcessing;
 
 class WorkCommand extends Command
 {
@@ -122,12 +123,16 @@ class WorkCommand extends Command
      */
     protected function listenForEvents()
     {
+        $this->laravel['events']->listen(JobProcessing::class, function ($event) {
+            $this->writeOutput($event->job, 'starting');
+        });
+
         $this->laravel['events']->listen(JobProcessed::class, function ($event) {
-            $this->writeOutput($event->job, false);
+            $this->writeOutput($event->job, 'success');
         });
 
         $this->laravel['events']->listen(JobFailed::class, function ($event) {
-            $this->writeOutput($event->job, true);
+            $this->writeOutput($event->job, 'failed');
 
             $this->logFailedJob($event);
         });
@@ -137,15 +142,21 @@ class WorkCommand extends Command
      * Write the status output for the queue worker.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  bool  $failed
+     * @param  string $status
      * @return void
      */
-    protected function writeOutput(Job $job, $failed)
+    protected function writeOutput(Job $job, $status)
     {
-        if ($failed) {
-            $this->output->writeln('<error>['.Carbon::now()->format('Y-m-d H:i:s').'] Failed:</error> '.$job->resolveName());
-        } else {
-            $this->output->writeln('<info>['.Carbon::now()->format('Y-m-d H:i:s').'] Processed:</info> '.$job->resolveName());
+        switch ($status) {
+            case 'starting':
+                $this->output->writeln('<comment>['.Carbon::now()->format('Y-m-d H:i:s').'] Processing:</comment> '.$job->resolveName());
+                break;
+            case 'success':
+                $this->output->writeln('<info>['.Carbon::now()->format('Y-m-d H:i:s').'] Processed:</info> '.$job->resolveName());
+                break;
+            case 'failed':
+                $this->output->writeln('<error>['.Carbon::now()->format('Y-m-d H:i:s').'] Failed:</error> '.$job->resolveName());
+                break;
         }
     }
 
