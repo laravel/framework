@@ -63,19 +63,19 @@ class ResourceRegistrar
     }
 
     /**
-     * Route a resource to a controller lazy.
+     * Create a new PendingResourceRegistration.
      *
      * @param  string  $name
      * @param  string  $controller
      * @param  array   $options
      * @return \Illuminate\Routing\PendingResourceRegistration
      */
-    public function lazy($name, $controller, array $options = [])
+    public function registration($name, $controller, array $options = [])
     {
-        $registrar = new PendingResourceRegistration($this);
-        $registrar->remember($name, $controller, $options);
+        $registration = new PendingResourceRegistration($this);
+        $registration->remember($name, $controller, $options);
 
-        return $registrar;
+        return $registration;
     }
 
     /**

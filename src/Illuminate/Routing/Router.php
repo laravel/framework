@@ -255,7 +255,7 @@ class Router implements RegistrarContract, BindingRegistrar
             $registrar = new ResourceRegistrar($this);
         }
 
-        return $registrar->lazy($name, $controller, $options);
+        return $registrar->registration($name, $controller, $options);
     }
 
     /**
