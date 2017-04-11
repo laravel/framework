@@ -46,6 +46,20 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
     }
 
     /**
+     * Explicilty set an attribute.
+     *
+     * @param  string  $key
+     * @param  mixed   $value
+     * @return $this
+     */
+    public function set($key, $value = true)
+    {
+        $this->attributes[$key] = $value;
+
+        return $this;
+    }
+
+    /**
      * Get the attributes from the container.
      *
      * @return array
