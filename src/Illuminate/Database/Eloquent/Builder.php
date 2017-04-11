@@ -225,7 +225,9 @@ class Builder
      */
     public function hydrate(array $items)
     {
-        $instance = $this->model->newInstance();
+        $instance = $this->model->newInstance()->setConnection(
+            $this->query->getConnection()->getName()
+        );
 
         return $instance->newCollection(array_map(function ($item) use ($instance) {
             return $instance->newFromBuilder($item);
@@ -459,8 +461,7 @@ class Builder
     public function getModels($columns = ['*'])
     {
         return $this->model->hydrate(
-            $this->query->get($columns)->all(),
-            $this->model->getConnectionName()
+            $this->query->get($columns)->all()
         )->all();
     }
 
