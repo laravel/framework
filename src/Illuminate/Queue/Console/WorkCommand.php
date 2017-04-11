@@ -168,7 +168,8 @@ class WorkCommand extends Command
      * @param  string $colorStyle
      * @return void
      */
-    protected function writeStatus(Job $job, $status, $colorStyle) {
+    protected function writeStatus(Job $job, $status, $colorStyle)
+    {
         $this->output->writeln(sprintf("<$colorStyle>[%s] %s</$colorStyle> %s", Carbon::now()->format('Y-m-d H:i:s'), str_pad("$status:", 11), $job->resolveName()));
     }
 
