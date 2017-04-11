@@ -99,6 +99,10 @@ abstract class TestCase extends BaseTestCase
     {
         $uses = array_flip(class_uses_recursive(static::class));
 
+        if (isset($uses[FreshDatabase::class])) {
+            $this->refreshDatabase();
+        }
+
         if (isset($uses[DatabaseMigrations::class])) {
             $this->runDatabaseMigrations();
         }
