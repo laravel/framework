@@ -367,11 +367,15 @@ if (! function_exists('dispatch')) {
     /**
      * Dispatch a job to its appropriate handler.
      *
-     * @param  mixed  $job
+     * @param  dynamic  job instance|job class name|job class name, job arguments
      * @return mixed
      */
-    function dispatch($job)
+    function dispatch($job, ...$args)
     {
+        if (is_string($job)) {
+            $job = app()->makeWith($job, $args);
+        }
+
         return app(Dispatcher::class)->dispatch($job);
     }
 }
