@@ -108,7 +108,7 @@ class PendingResourceRegistration
     }
 
     /**
-     * Set the methods the controller should exclude.
+     * Set the route name for controller action.
      *
      * @param  string  $method
      * @param  string  $name
@@ -116,10 +116,6 @@ class PendingResourceRegistration
      */
     public function name($method, $name)
     {
-        if (! isset($this->options['names'])) {
-            $this->options['names'] = [];
-        }
-
         $this->options['names'][$method] = $name;
 
         return $this;
@@ -147,10 +143,6 @@ class PendingResourceRegistration
      */
     public function parameter($previous, $new)
     {
-        if (! isset($this->options['parameters'])) {
-            $this->options['parameters'] = [];
-        }
-
         $this->options['parameters'][$previous] = $new;
 
         return $this;
