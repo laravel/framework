@@ -1725,6 +1725,15 @@ class Builder
 
         $total = $this->getCountForPagination($columns);
 
+        /**
+         * We want to avoid having an overflow of pages
+         * If the page asked is bigger than the last page,
+         * return the last page
+         */
+        if(($page * $perPage) > $total) {
+            $page = ceil($total / $perPage);
+        }
+
         $results = $total ? $this->forPage($page, $perPage)->get($columns) : collect();
 
         return new LengthAwarePaginator($results, $total, $perPage, $page, [
