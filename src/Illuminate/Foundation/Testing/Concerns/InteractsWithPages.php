@@ -77,8 +77,6 @@ trait InteractsWithPages
 
         $this->call($method, $uri, $parameters, $cookies, $files);
 
-        $this->clearInputs()->followRedirects()->assertPageLoaded($uri);
-
         $this->currentUri = $this->app->make('request')->fullUrl();
 
         $this->crawler = new Crawler($this->response->getContent(), $this->currentUri);
@@ -189,6 +187,10 @@ trait InteractsWithPages
             $this->assertEquals(200, $status);
         } catch (PHPUnitException $e) {
             $message = $message ?: "A request to [{$uri}] failed. Received status code [{$status}].";
+
+            if (! in_array('--verbose', $_SERVER['argv'])) {
+                $this->fail($message);
+            }
 
             $responseException = isset($this->response->exception)
                     ? $this->response->exception : null;

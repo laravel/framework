@@ -516,7 +516,11 @@ trait MakesHttpRequests
 
         $kernel->terminate($request, $response);
 
-        return $this->response = $response;
+        $this->response = $response;
+
+        $this->clearInputs()->followRedirects()->assertPageLoaded($uri);
+
+        return $this->response;
     }
 
     /**
