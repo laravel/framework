@@ -298,6 +298,17 @@ class Builder
     }
 
     /**
+     * Execute the query and get the last result.
+     *
+     * @param  array  $columns
+     * @return \Illuminate\Database\Eloquent\Model|static|null
+     */
+    public function last($columns = ['*'])
+    {
+        return $this->take(1)->orderBy($this->model->getQualifiedKeyName(), 'desc')->get($columns);
+    }
+
+    /**
      * Execute the query and get the first result or throw an exception.
      *
      * @param  array  $columns
