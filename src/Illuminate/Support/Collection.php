@@ -544,6 +544,16 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         return empty($this->items);
     }
+    
+    /**
+     * Determine whether the collection contains items or not.
+     *
+     * @return bool
+     */
+    public function isNotEmpty()
+    {
+        return !$this->isEmpty();
+    }
 
     /**
      * Determine if the collection is not empty.
