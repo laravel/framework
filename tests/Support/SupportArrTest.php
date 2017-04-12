@@ -10,6 +10,12 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['name' => 'Desk', 'price' => 100], $array);
     }
 
+    public function testDig()
+    {
+        $array = Arr::dig(['foo.bar' => 'baz']);
+        $this->assertEquals(['foo' => ['bar' => 'baz']], $array);
+    }
+
     public function testDivide()
     {
         list($keys, $values) = Arr::divide(['name' => 'Desk']);
