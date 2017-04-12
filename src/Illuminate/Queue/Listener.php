@@ -17,13 +17,6 @@ class Listener
     protected $commandPath;
 
     /**
-     * The environment the workers should run under.
-     *
-     * @var string
-     */
-    protected $environment;
-
-    /**
      * The amount of seconds to wait before polling the queue.
      *
      * @var int
@@ -135,6 +128,10 @@ class Listener
             $command = $this->addEnvironment($command, $options);
         }
 
+        if (isset($options->verbosity)) {
+            $command = $this->addVerbosity($command, $options);
+        }
+
         // Next, we will just format out the worker commands with all of the various
         // options available for the command. This will produce the final command
         // line that we will pass into a Symfony process object for processing.
@@ -157,6 +154,18 @@ class Listener
     protected function addEnvironment($command, ListenerOptions $options)
     {
         return $command.' --env='.ProcessUtils::escapeArgument($options->environment);
+    }
+
+    /**
+     * Resolve a Symfony verbosity level back to its CLI parameter.
+     *
+     * @param  string  $command
+     * @param  \Illuminate\Queue\ListenerOptions  $options
+     * @return string
+     */
+    protected function addVerbosity($command, ListenerOptions $options)
+    {
+        return $command.' -'.$options->verbosity;
     }
 
     /**

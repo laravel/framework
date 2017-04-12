@@ -237,7 +237,10 @@ class Worker
                     return $job;
                 }
             }
+
+            $this->raiseEmptyQueueEvent($connection);
         } catch (Exception $e) {
+            $this->raiseQueueExceptionOccurredEvent($connection, $e);
             $this->exceptions->report($e);
         } catch (Throwable $e) {
             $this->exceptions->report(new FatalThrowableError($e));
@@ -390,6 +393,46 @@ class Worker
     protected function failJob($connectionName, $job, $e)
     {
         return FailingJob::handle($connectionName, $job, $e);
+    }
+
+    /**
+     * Raise the before queue job event.
+     *
+     * @param  string  $connectionName
+     * @return void
+     */
+    protected function raiseEmptyQueueEvent($connectionName)
+    {
+        $this->events->fire(new Events\NoJobsAvailable(
+            $connectionName
+        ));
+    }
+
+    /**
+     * Raise the before queue job event.
+     *
+     * @param  string  $connectionName
+     * @param  \Exception  $e
+     * @return void
+     */
+    protected function raiseQueueExceptionOccurredEvent($connectionName, $e)
+    {
+        $this->events->fire(new Events\QueueExceptionOccurred(
+            $connectionName, $e
+        ));
+    }
+
+    /**
+     * Raise the before queue job event.
+     *
+     * @param  int  $seconds
+     * @return void
+     */
+    protected function raiseSleepingEvent($seconds)
+    {
+        $this->events->fire(new Events\Sleeping(
+            $seconds
+        ));
     }
 
     /**
@@ -555,6 +598,7 @@ class Worker
      */
     public function sleep($seconds)
     {
+        $this->raiseSleepingEvent($seconds);
         sleep($seconds);
     }
 

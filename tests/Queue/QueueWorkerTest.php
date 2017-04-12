@@ -7,13 +7,16 @@ use RuntimeException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Queue\WorkerOptions;
+use Illuminate\Queue\Events\Sleeping;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Queue\Events\NoJobsAvailable;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\MaxAttemptsExceededException;
+use Illuminate\Queue\Events\QueueExceptionOccurred;
 
 class QueueWorkerTest extends TestCase
 {
@@ -64,7 +67,7 @@ class QueueWorkerTest extends TestCase
         $this->assertTrue($lowJob->fired);
     }
 
-    public function test_exception_is_reported_if_connection_throws_exception_on_job_pop()
+    public function test_exception_is_reported_and_event_is_dispatched_if_connection_throws_exception_on_job_pop()
     {
         $worker = new InsomniacWorker(
             new WorkerFakeManager('default', new BrokenQueueConnection($e = new RuntimeException)),
@@ -75,13 +78,22 @@ class QueueWorkerTest extends TestCase
         $worker->runNextJob('default', 'queue', $this->workerOptions());
 
         $this->exceptionHandler->shouldHaveReceived('report')->with($e);
+        $this->events->shouldHaveReceived('fire')->with(Mockery::type(QueueExceptionOccurred::class))->once();
     }
 
-    public function test_worker_sleeps_when_queue_is_empty()
+    public function test_worker_sleeps_and_dispatches_an_event_when_queue_is_empty()
     {
         $worker = $this->getWorker('default', ['queue' => []]);
         $worker->runNextJob('default', 'queue', $this->workerOptions(['sleep' => 5]));
+        $this->events->shouldHaveReceived('fire')->with(Mockery::type(NoJobsAvailable::class))->once();
         $this->assertEquals(5, $worker->sleptFor);
+    }
+
+    public function test_worker_dispatches_a_sleeping_event_when_it_sleeps()
+    {
+        $worker = $this->getWorker('default', ['queue' => []]);
+        $worker->runNextJob('default', 'queue', $this->workerOptions(['sleep' => 5]));
+        $this->events->shouldHaveReceived('fire')->with(Mockery::type(Sleeping::class))->once();
     }
 
     public function test_job_is_released_on_exception()
@@ -202,6 +214,7 @@ class InsomniacWorker extends \Illuminate\Queue\Worker
 
     public function sleep($seconds)
     {
+        $this->events->fire(new Sleeping($seconds));
         $this->sleptFor = $seconds;
     }
 }

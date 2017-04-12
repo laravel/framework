@@ -95,7 +95,7 @@ class ListenCommand extends Command
             $this->option('env'), $this->option('delay'),
             $this->option('memory'), $this->option('timeout'),
             $this->option('sleep'), $this->option('tries'),
-            $this->option('force')
+            $this->option('force'), $this->resolveVerbosityParameter()
         );
     }
 
@@ -110,5 +110,18 @@ class ListenCommand extends Command
         $listener->setOutputHandler(function ($type, $line) {
             $this->output->write($line);
         });
+    }
+
+    /**
+     * Resolve a Symfony verbosity level back to its CLI parameter.
+     *
+     * @return string|null
+     */
+    private function resolveVerbosityParameter()
+    {
+        $currentVerbosity = $this->output->getVerbosity();
+        $parameter = array_search($currentVerbosity, $this->verbosityMap);
+
+        return $parameter ?: null;
     }
 }
