@@ -157,7 +157,6 @@ class AuthenticationTest extends TestCase
     }
 }
 
-
 class AuthenticationTestUser extends Authenticatable
 {
     public $table = 'users';
