@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\WorkerOptions;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class WorkCommand extends Command
 {
@@ -75,10 +76,14 @@ class WorkCommand extends Command
         $connection = $this->argument('connection')
                         ?: $this->laravel['config']['queue.default'];
 
+        $this->output->writeln("Using connection: {$connection}", OutputInterface::VERBOSITY_VERBOSE);
+
         // We need to get the right queue for the connection which is set in the queue
         // configuration file for the application. We will pull it based on the set
         // connection being run for the queue operation currently being executed.
         $queue = $this->getQueue($connection);
+
+        $this->output->writeln("Using queue: {$queue}", OutputInterface::VERBOSITY_VERBOSE);
 
         $this->runWorker(
             $connection, $queue
@@ -95,6 +100,7 @@ class WorkCommand extends Command
     protected function runWorker($connection, $queue)
     {
         $this->worker->setCache($this->laravel['cache']->driver());
+        $this->worker->setOutput($this->output);
 
         return $this->worker->{$this->option('once') ? 'runNextJob' : 'daemon'}(
             $connection, $queue, $this->gatherWorkerOptions()
