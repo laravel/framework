@@ -1060,6 +1060,35 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidationNotExists()
+    {
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['email' => 'foo'], ['email' => 'NotExists:users']);
+        $mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+        $mock->shouldReceive('getCount')->once()->with('users', 'email', 'foo', null, null, [])->andReturn(true);
+        $v->setPresenceVerifier($mock);
+        $this->assertFalse($v->passes());
+
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['email' => 'foo'], ['email' => 'NotExists:users,email,account_id,1,name,taylor']);
+        $mock4 = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+        $mock4->shouldReceive('getCount')->once()->with('users', 'email', 'foo', null, null, ['account_id' => 1, 'name' => 'taylor'])->andReturn(true);
+        $v->setPresenceVerifier($mock4);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['email' => 'foo'], ['email' => 'NotExists:users,email_addr']);
+        $mock2 = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+        $mock2->shouldReceive('getCount')->once()->with('users', 'email_addr', 'foo', null, null, [])->andReturn(false);
+        $v->setPresenceVerifier($mock2);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['email' => ['foo']], ['email' => 'NotExists:users,email_addr']);
+        $mock3 = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+        $mock3->shouldReceive('getMultiCount')->once()->with('users', 'email_addr', ['foo'], [])->andReturn(false);
+        $v->setPresenceVerifier($mock3);
+        $this->assertTrue($v->passes());
+    }
+
     public function testValidateIp()
     {
         $trans = $this->getRealTranslator();
