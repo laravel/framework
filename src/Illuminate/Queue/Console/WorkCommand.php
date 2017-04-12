@@ -149,14 +149,11 @@ class WorkCommand extends Command
     {
         switch ($status) {
             case 'starting':
-                $this->writeStatus($job, 'Processing', 'comment');
-                break;
+                return $this->writeStatus($job, 'Processing', 'comment');
             case 'success':
-                $this->writeStatus($job, 'Processed', 'info');
-                break;
+                return $this->writeStatus($job, 'Processed', 'info');
             case 'failed':
-                $this->writeStatus($job, 'Failed', 'error');
-                break;
+                return $this->writeStatus($job, 'Failed', 'error');
         }
     }
 
@@ -164,13 +161,17 @@ class WorkCommand extends Command
      * Format the status output for the queue worker.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  string $status
-     * @param  string $colorStyle
+     * @param  string  $status
+     * @param  string  $type
      * @return void
      */
-    protected function writeStatus(Job $job, $status, $colorStyle)
+    protected function writeStatus(Job $job, $status, $type)
     {
-        $this->output->writeln(sprintf("<$colorStyle>[%s] %s</$colorStyle> %s", Carbon::now()->format('Y-m-d H:i:s'), str_pad("$status:", 11), $job->resolveName()));
+        $this->output->writeln(sprintf(
+            "<{$type}>[%s] %s</{$type}> %s",
+            Carbon::now()->format('Y-m-d H:i:s'),
+            str_pad("{$status}:", 11), $job->resolveName()
+        ));
     }
 
     /**
