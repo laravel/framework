@@ -138,9 +138,7 @@ class Arr
                 return value($default);
             }
 
-            foreach ($array as $item) {
-                return $item;
-            }
+            return $item[0];
         }
 
         foreach ($array as $key => $value) {
