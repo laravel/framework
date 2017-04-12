@@ -303,12 +303,14 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Filter items by the given key value pair.
      *
      * @param  string  $key
-     * @param  array  $values
+     * @param  mixed  $values
      * @param  bool  $strict
      * @return static
      */
-    public function whereIn($key, array $values, $strict = true)
+    public function whereIn($key, $values, $strict = true)
     {
+        $values = $this->getArrayableItems($values);
+
         return $this->filter(function ($item) use ($key, $values, $strict) {
             return in_array(data_get($item, $key), $values, $strict);
         });
@@ -318,11 +320,13 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Filter items by the given key value pair using loose comparison.
      *
      * @param  string  $key
-     * @param  array  $values
+     * @param  mixed  $values
      * @return static
      */
-    public function whereInLoose($key, array $values)
+    public function whereInLoose($key, $values)
     {
+        $values = $this->getArrayableItems($values);
+
         return $this->whereIn($key, $values, false);
     }
 
