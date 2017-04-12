@@ -1,6 +1,6 @@
 # Release Notes for 5.4.x
 
-## [Unreleased]
+## v5.4.18 (2017-04-10)
 
 ### Added
 - Added `assertSuccessful()` and `assertRedirect()` to `TestResponse` ([#18629](https://github.com/laravel/framework/pull/18629))
@@ -9,15 +9,19 @@
 - Added support for attaching an image to Slack attachments `$attachment->image($url)`([#18664](https://github.com/laravel/framework/pull/18664))
 - Added `Validator::extendDependent()` to allow adding custom rules that depend on other fields ([#18654](https://github.com/laravel/framework/pull/18654))
 - Added support for `--parent` option on `make:controller` ([#18606](https://github.com/laravel/framework/pull/18606))
+- Added `MessageSent` event to `Mailer` ([#18744](https://github.com/laravel/framework/pull/18744), [6c5f3a4](https://github.com/laravel/framework/commit/6c5f3a47c6308d1d4f2f5912c34cb85f57f0aeed))
 
 ### Changed
 - Don't trim leading slashes on local filesystem base URLs ([acd66fe](https://github.com/laravel/framework/commit/acd66fef646fd5f7ca54380d55bc8e2e2cbe64b6))
 - Accept variable on `@empty()` directive ([#18738](https://github.com/laravel/framework/pull/18738))
+- Added `string` validation rules to `AuthenticatesUsers` ([#18746](https://github.com/laravel/framework/pull/18746))
 
 ### Fixed
 - Fixed an issue with `Collection::groupBy()` when the provided value is a boolean ([#18674](https://github.com/laravel/framework/pull/18674))
 - Bring back an old behaviour in resolving controller method dependencies ([#18646](https://github.com/laravel/framework/pull/18646))
 - Fixed job release when exception occurs ([#18737](https://github.com/laravel/framework/pull/18737))
+- Fixed eloquent `increment()` and `decrement()` update attributes ([#18739](https://github.com/laravel/framework/pull/18739), [1728a88](https://github.com/laravel/framework/commit/1728a887e450f997a0dcde2ef84be2947b05af42))
+
 
 ## v5.4.17 (2017-04-03)
 

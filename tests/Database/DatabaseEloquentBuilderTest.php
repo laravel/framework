@@ -386,11 +386,10 @@ class DatabaseEloquentBuilderTest extends TestCase
         $records[] = ['name' => 'taylor', 'age' => 26];
         $records[] = ['name' => 'dayle', 'age' => 28];
         $builder->getQuery()->shouldReceive('get')->once()->with(['foo'])->andReturn(new BaseCollection($records));
-        $model = m::mock('Illuminate\Database\Eloquent\Model[getTable,getConnectionName,hydrate]');
+        $model = m::mock('Illuminate\Database\Eloquent\Model[getTable,hydrate]');
         $model->shouldReceive('getTable')->once()->andReturn('foo_table');
         $builder->setModel($model);
-        $model->shouldReceive('getConnectionName')->once()->andReturn('foo_connection');
-        $model->shouldReceive('hydrate')->once()->with($records, 'foo_connection')->andReturn(new Collection(['hydrated']));
+        $model->shouldReceive('hydrate')->once()->with($records)->andReturn(new Collection(['hydrated']));
         $models = $builder->getModels(['foo']);
 
         $this->assertEquals($models, ['hydrated']);
