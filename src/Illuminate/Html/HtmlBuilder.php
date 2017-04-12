@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Html;
 
+use DateTime;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Traits\MacroableTrait;
 
@@ -370,6 +371,38 @@ class HtmlBuilder {
 		}
 
 		return $safe;
+	}
+
+	/**
+	 * Output a datetime in a given format and wrap it in the HTML <time> tag.
+	 *
+	 * @param  \DateTime $value
+	 * @param  string    $format According to php's date() format
+	 *
+	 * @return string
+	 */
+	public function dateTime($value, $format)
+	{
+		if ( ! $value instanceof DateTime) return '';
+
+		return '<time datetime="' . $value->format(DateTime::RFC3339) . '">'
+			. $value->format($format) . '</time>';
+	}
+
+	/**
+	 * Output a datetime in a localized format and wrap it in a HTML <time> tag.
+	 *
+	 * @param  \DateTime $value
+	 * @param  string    $format According to php's strftime() format
+	 *
+	 * @return string
+	 */
+	public function localizedDateTime($value, $format)
+	{
+		if ( ! $value instanceof DateTime) return '';
+
+		return '<time datetime="' . $value->format(DateTime::RFC3339) . '">'
+			. strftime($format, $value->format('U')) . '</time>';
 	}
 
 }
