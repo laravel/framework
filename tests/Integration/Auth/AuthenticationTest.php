@@ -1,8 +1,8 @@
 <?php
 
+use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
-use Orchestra\Testbench\TestCase;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
@@ -53,7 +53,6 @@ class AuthenticationTest extends TestCase
                 ?: $this->app['auth']->user()->toJson();
         });
     }
-
 
     /**
      * @test
