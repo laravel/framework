@@ -518,7 +518,7 @@ class Event
 
         return $this->then(function () {
             $this->mutex->forget($this);
-        })->skip(function () use($callback) {
+        })->skip(function () use ($callback) {
             $isOverlap = $this->mutex->exists($this);
             if ($isOverlap && $callback && is_callable($callback)) {
                 $callback();
