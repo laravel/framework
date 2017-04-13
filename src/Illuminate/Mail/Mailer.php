@@ -11,7 +11,7 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
-use Illuminate\Contracts\Queue\Factory as QueueContract;
+use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Contracts\Mail\MailQueue as MailQueueContract;
 
