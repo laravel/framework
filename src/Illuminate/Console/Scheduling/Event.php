@@ -523,6 +523,7 @@ class Event
             if ($isOverlap && $callback && is_callable($callback)) {
                 $callback();
             }
+            
             return $isOverlap;
         });
     }
