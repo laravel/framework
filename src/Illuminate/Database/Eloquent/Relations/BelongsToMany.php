@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-class BelongsToMany extends Relation
+class BelongsToMany extends Relation implements MutableRelation
 {
     /**
      * The intermediate table for the relation.
@@ -111,6 +111,18 @@ class BelongsToMany extends Relation
     public function getResults()
     {
         return $this->get();
+    }
+
+    /**
+     * Set the the relationship value.
+     *
+     * @param $value
+     *
+     * @return void
+     */
+    public function setValue($value)
+    {
+        $this->sync($value);
     }
 
     /**

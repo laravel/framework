@@ -17,6 +17,18 @@ class MorphOne extends MorphOneOrMany
     }
 
     /**
+     * Set the the relationship value.
+     *
+     * @param $value
+     *
+     * @return void
+     */
+    public function setValue($value)
+    {
+        $this->save($value);
+    }
+
+    /**
      * Initialize the relation on a set of models.
      *
      * @param  array   $models

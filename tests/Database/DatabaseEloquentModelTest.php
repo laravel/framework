@@ -1483,6 +1483,42 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($result);
     }
 
+    public function testSetRelationValueFromAttribute()
+    {
+        // Related model
+        $relatedModel = m::mock('Illuminate\Database\Eloquent\Model');
+
+        $model = $this->getMockBuilder('EloquentModelStub')->setMethods(['setRelationValue'])->getMock();
+        $model->expects($this->once())->method('setRelationValue')->with('belongsToStub', $relatedModel);
+
+        $model->belongsToStub = $relatedModel;
+
+        // Related collection
+        $relatedCollection = m::mock('Illuminate\Database\Eloquent\Collection');
+
+        $model = $this->getMockBuilder('EloquentModelStub')->setMethods(['setRelationValue'])->getMock();
+        $model->expects($this->once())->method('setRelationValue')->with('belongsToStub', $relatedCollection);
+
+        $model->belongsToStub = $relatedCollection;
+
+        // Method doesn't exist
+        $related = m::mock('Illuminate\Database\Eloquent\Model');
+
+        $model = $this->getMockBuilder('EloquentModelStub')->setMethods(['setRelationValue'])->getMock();
+        $model->expects($this->never())->method('setRelationValue');
+
+        $model->nonExistingMethod = $related;
+
+        // Method exists but it's not a relation
+        $related = m::mock('Illuminate\Database\Eloquent\Model');
+
+        $model = new EloquentModelStub();
+
+        $this->expectException(\LogicException::class);
+
+        $model->incorrectRelationStub = $related;
+    }
+
     protected function addMockConnection($model)
     {
         $model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));

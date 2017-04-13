@@ -6,6 +6,7 @@ use Closure;
 use Exception;
 use ArrayAccess;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Relations\MutableRelation;
 use LogicException;
 use JsonSerializable;
 use DateTimeInterface;
@@ -2878,6 +2879,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return $this->{$method}($value);
         }
 
+        // If the "attribute" exists as a method on the model, we will just assume
+        // it is a relationship and will set the relationship value.
+        elseif (($value instanceof self || $value instanceof Collection) && method_exists($this, $key)) {
+            $this->setRelationValue($key, $value);
+        }
+
         // If an attribute is listed as a "date", we'll convert it from a DateTime
         // instance into a form proper for storage on the database tables using
         // the connection grammar's date format. We will auto set the values.
@@ -3305,6 +3312,25 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $this->relations = $relations;
 
         return $this;
+    }
+
+    /**
+     * Set the relationship value on the model.
+     *
+     * @param $method
+     * @param $value
+     *
+     * @return void
+     */
+    public function setRelationValue($method, $value)
+    {
+        $relation = $this->$method();
+
+        if (! $relation instanceof MutableRelation) {
+            throw new LogicException("{$method}() must return a mutable relation");
+        }
+
+        $relation->setValue($value);
     }
 
     /**
