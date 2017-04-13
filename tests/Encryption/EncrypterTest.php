@@ -111,4 +111,16 @@ class EncrypterTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('foo', $openSslEncrypter->decrypt($encrypted));
     }
+
+    public function testCompareEncryptedValues()
+    {
+        $e = new Encrypter(str_repeat('a', 16));
+        $encrypted1 = $e->encrypt('foo');
+        $encrypted2 = $e->encrypt('foo');
+        $encrypted3 = $e->encrypt('bar');
+
+        $this->assertTrue($e->compare($encrypted1, $encrypted2));
+        $this->assertTrue($e->compare($encrypted1, 'foo'));
+        $this->assertFalse($e->compare($encrypted1, $encrypted3));
+    }
 }

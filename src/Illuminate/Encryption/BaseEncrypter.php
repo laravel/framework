@@ -14,6 +14,41 @@ abstract class BaseEncrypter
     protected $key;
 
     /**
+     * Compare two encrypted values.
+     *
+     * @param  mixed  $e1
+     * @param  mixed  $e2
+     * @param  bool  $loose
+     * @return bool
+     */
+    public function compare($e1, $e2, $loose = false)
+    {
+        $v1 = $this->getCompareValue($e1);
+        $v2 = $this->getCompareValue($e2);
+
+        if ($loose) {
+            return $v1 == $v2;
+        } else {
+            return $v1 === $v2;
+        }
+    }
+
+    /**
+     * Get the decrypted value of a possibly encrypted variable.
+     * 
+     * @param  mixed  $encrypted
+     * @return mixed
+     */
+    protected function getCompareValue($encrypted)
+    {
+        try {
+            return $this->decrypt($encrypted);
+        } catch (DecryptException $e) {
+            return $encrypted;
+        }
+    }
+
+    /**
      * Create a MAC for the given value.
      *
      * @param  string  $iv
