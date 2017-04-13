@@ -116,12 +116,11 @@ trait InteractsWithPages
      * Make a request to the application using the given form.
      *
      * @param  \Symfony\Component\DomCrawler\Form  $form
-     * @param  array  $uploads
      * @return $this
      */
-    protected function makeRequestUsingForm(Form $form, array $uploads = [])
+    protected function makeRequestUsingForm(Form $form)
     {
-        $files = $this->convertUploadsForTesting($form, $uploads);
+        $files = $this->convertUploadsForTesting($form, $this->inputs);
 
         return $this->makeRequest(
             $form->getMethod(), $form->getUri(), $this->extractParametersFromForm($form), [], $files
@@ -568,7 +567,7 @@ trait InteractsWithPages
      */
     protected function press($buttonText)
     {
-        return $this->submitForm($buttonText, $this->inputs, $this->uploads);
+        return $this->submitForm($buttonText, $this->inputs);
     }
 
     /**
@@ -576,12 +575,11 @@ trait InteractsWithPages
      *
      * @param  string  $buttonText
      * @param  array  $inputs
-     * @param  array  $uploads
      * @return $this
      */
-    protected function submitForm($buttonText, $inputs = [], $uploads = [])
+    protected function submitForm($buttonText, $inputs = [])
     {
-        $this->makeRequestUsingForm($this->fillForm($buttonText, $inputs), $uploads);
+        $this->makeRequestUsingForm($this->fillForm($buttonText, $inputs));
 
         return $this;
     }
