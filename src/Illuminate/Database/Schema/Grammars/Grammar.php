@@ -190,6 +190,10 @@ abstract class Grammar extends BaseGrammar
      */
     protected function getType(Fluent $column)
     {
+        if ($column->custom) {
+            return $this->customType($column);
+        }
+
         return $this->{'type'.ucfirst($column->type)}($column);
     }
 

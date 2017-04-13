@@ -863,6 +863,18 @@ class Blueprint
     }
 
     /**
+     * Create a custom typed column on the table.
+     *
+     * @param  string  $type
+     * @param  string  $name
+     * @return \Illuminate\Support\Fluent
+     */
+    public function custom($type, $name)
+    {
+        return $this->addColumn($type, $name, ['custom' => true]);
+    }
+
+    /**
      * Add the proper columns for a polymorphic table.
      *
      * @param  string  $name
