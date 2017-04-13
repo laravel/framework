@@ -509,16 +509,22 @@ class Event
     /**
      * Do not allow the event to overlap each other.
      *
+     * @param  \Closure  $callback
      * @return $this
      */
-    public function withoutOverlapping()
+    public function withoutOverlapping(Closure $callback = null)
     {
         $this->withoutOverlapping = true;
 
         return $this->then(function () {
             $this->mutex->forget($this);
-        })->skip(function () {
-            return $this->mutex->exists($this);
+        })->skip(function () use ($callback) {
+            $isOverlap = $this->mutex->exists($this);
+            if ($isOverlap && $callback && is_callable($callback)) {
+                $callback();
+            }
+
+            return $isOverlap;
         });
     }
 
