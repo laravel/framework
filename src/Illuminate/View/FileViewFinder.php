@@ -22,7 +22,7 @@ class FileViewFinder implements ViewFinderInterface
     protected $paths;
 
     /**
-     * The array of views that have been located.
+     * The array of views that have been loaded.
      *
      * @var array
      */
@@ -252,6 +252,16 @@ class FileViewFinder implements ViewFinderInterface
     public function getPaths()
     {
         return $this->paths;
+    }
+
+    /**
+     * Get the views that have been loaded.
+     *
+     * @return array
+     */
+    public function getLoadedViews()
+    {
+        return $this->views;
     }
 
     /**

@@ -747,6 +747,42 @@ trait MakesHttpRequests
     }
 
     /**
+     * Assert that a view has been loaded.
+     *
+     * @param string|View $view
+     *
+     * @return $this
+     */
+    public function seeView($view)
+    {
+        $loadedViews = $this->app->make('view')->getFinder()->getLoadedViews();
+
+        $view = $view instanceof View ? $view->name() : $view;
+
+        PHPUnit::assertTrue(array_key_exists($view, $loadedViews), "Expected this view to be loaded: {$view}");
+
+        return $this;
+    }
+
+    /**
+     * Assert that a view has not been loaded.
+     *
+     * @param string|View $view
+     *
+     * @return $this
+     */
+    public function dontSeeView($view)
+    {
+        $loadedViews = $this->app->make('view')->getFinder()->getLoadedViews();
+
+        $view = $view instanceof View ? $view->name() : $view;
+
+        PHPUnit::assertFalse(array_key_exists($view, $loadedViews), "Did not expect this view to be loaded: {$view}");
+
+        return $this;
+    }
+
+    /**
      * Assert that the response view has a given piece of bound data.
      *
      * @param  string|array  $key
