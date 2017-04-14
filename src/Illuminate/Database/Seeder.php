@@ -22,6 +22,20 @@ abstract class Seeder
     protected $command;
 
     /**
+     * What seeders must be run before this seeder.
+     *
+     * @var array
+     */
+    protected $dependencies = [];
+
+    /**
+     * What seeders have been run already.
+     *
+     * @var array
+     */
+    protected $seedersRun = [];
+
+    /**
      * Run the database seeds.
      *
      * @return void
@@ -36,7 +50,18 @@ abstract class Seeder
      */
     public function call($class)
     {
-        $this->resolve($class)->run();
+        if (array_key_exists($class, $this->seedersRun)) {
+            return;
+        }
+
+        $seeder = $this->resolve($class);
+
+        foreach ($seeder->dependencies as $dependency) {
+            $this->call($dependency);
+        }
+
+        $seeder->run();
+        $this->seedersRun[$class] = true;
 
         if (isset($this->command)) {
             $this->command->getOutput()->writeln("<info>Seeded:</info> $class");
