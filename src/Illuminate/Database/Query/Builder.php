@@ -1356,6 +1356,12 @@ class Builder
      */
     public function orderBy($column, $direction = 'asc')
     {
+        // If the column is an array, we will assume it is an array of key-value
+        // pairs and we can add them each as a order by clause.
+        if (is_array($column)) {
+            return $this->addArrayOfOrderBy($column, $direction);
+        }
+
         $this->{$this->unions ? 'unionOrders' : 'orders'}[] = [
             'column' => $column,
             'direction' => strtolower($direction) == 'asc' ? 'asc' : 'desc',
@@ -1413,6 +1419,29 @@ class Builder
         $this->{$property}[] = compact('type', 'sql');
 
         $this->addBinding($bindings, 'order');
+
+        return $this;
+    }
+
+    /**
+     * Add array of "order by" clauses to the query.
+     *
+     * @param  array  $column
+     * @param  string  $direction
+     * @param  string  $method
+     * @return $this
+     */
+    protected function addArrayOfOrderBy($column, $direction, $method = 'orderBy')
+    {
+        foreach ($column as $key => $value) {
+            // If key is an integer, then value must be the column name.
+            if (is_numeric($key)) {
+                $key = $value;
+                $value = $direction;
+            }
+
+            $this->$method($key, $value);
+        }
 
         return $this;
     }
