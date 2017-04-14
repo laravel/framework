@@ -421,7 +421,7 @@ class Builder
             $this->orderBy($this->model->getQualifiedKeyName(), 'asc');
         }
 
-        return $this->chunk($count, function ($results) use ($callback) {
+        return $this->chunkById($count, function ($results) use ($callback) {
             foreach ($results as $key => $value) {
                 if ($callback($value, $key) === false) {
                     return false;
