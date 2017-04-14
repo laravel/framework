@@ -56,7 +56,7 @@ class BelongsToMany extends Relation
     /**
      * Any pivot table restrictions for whereIn clauses.
      *
-     * @var array
+     * @var string
      */
     protected $pivotWhereIns = [];
 
