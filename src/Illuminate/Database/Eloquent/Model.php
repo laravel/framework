@@ -2382,14 +2382,15 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Convert the model instance to JSON.
+     * Convert the model instance and any additional additions to JSON.
      *
      * @param  int  $options
+     * @param  array  $additions
      * @return string
      */
-    public function toJson($options = 0)
+    public function toJson($options = 0, $additions = [])
     {
-        return json_encode($this->jsonSerialize(), $options);
+        return json_encode(array_merge($this->jsonSerialize(), $additions), $options);
     }
 
     /**
