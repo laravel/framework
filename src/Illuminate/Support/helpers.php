@@ -950,3 +950,19 @@ if (! function_exists('with')) {
         return $object;
     }
 }
+
+if ( ! function_exists('dd'))
+{
+	/**
+	 * Dump the given value and kill the script.
+	 *
+	 * @param  mixed  $value,...
+	 * @return void
+	 */
+	function dd()
+	{
+		echo "<pre>";
+		call_user_func_array('var_dump', func_get_args());
+		die("</pre>");
+	}
+}
