@@ -367,6 +367,53 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         );
     }
 
+    public function testMagicWhere()
+    {
+        $c = new Collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
+
+        $this->assertEquals(
+            [['v' => 3], ['v' => '3']],
+            $c->whereV(3)->values()->all()
+        );
+        $this->assertEquals(
+            [['v' => 3], ['v' => '3']],
+            $c->whereV('=', 3)->values()->all()
+        );
+        $this->assertEquals(
+            [['v' => 3], ['v' => '3']],
+            $c->whereV('==', 3)->values()->all()
+        );
+        $this->assertEquals(
+            [['v' => 3], ['v' => '3']],
+            $c->whereV('garbage', 3)->values()->all()
+        );
+        $this->assertEquals(
+            [['v' => 3]],
+            $c->whereV('===', 3)->values()->all()
+        );
+
+        $this->assertEquals(
+            [['v' => 1], ['v' => 2], ['v' => 4]],
+            $c->whereV('<>', 3)->values()->all()
+        );
+        $this->assertEquals(
+            [['v' => 1], ['v' => 2], ['v' => 4]],
+            $c->whereV('!=', 3)->values()->all()
+        );
+        $this->assertEquals(
+            [['v' => 1], ['v' => 2], ['v' => '3'], ['v' => 4]],
+            $c->whereV('!==', 3)->values()->all()
+        );
+        $this->assertEquals(
+            [['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3']],
+            $c->whereV('<=', 3)->values()->all()
+        );
+        $this->assertEquals(
+            [['v' => 3], ['v' => '3'], ['v' => 4]],
+            $c->whereV('>=', 3)->values()->all()
+        );
+    }
+
     public function testWhereStrict()
     {
         $c = new Collection([['v' => 3], ['v' => '3']]);
