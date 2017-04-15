@@ -1,4 +1,6 @@
 <?php
+//add comments
+//
 
 namespace Illuminate\Tests\Auth;
 
