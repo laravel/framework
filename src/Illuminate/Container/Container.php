@@ -576,8 +576,6 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function resolve($abstract, $parameters = [])
     {
-        $this->with[] = $parameters;
-
         $needsContextualBuild = ! empty($parameters) || ! is_null(
             $this->getContextualConcrete($abstract = $this->getAlias($abstract))
         );
@@ -586,10 +584,10 @@ class Container implements ArrayAccess, ContainerContract
         // just return an existing instance instead of instantiating new instances
         // so the developer can keep using the same objects instance every time.
         if (isset($this->instances[$abstract]) && ! $needsContextualBuild) {
-            array_pop($this->with);
-
             return $this->instances[$abstract];
         }
+
+        $this->with[] = $parameters;
 
         $concrete = $this->getConcrete($abstract);
 
