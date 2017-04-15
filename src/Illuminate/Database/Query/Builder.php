@@ -1453,7 +1453,7 @@ class Builder
     {
         $property = $this->unions ? 'unionLimit' : 'limit';
 
-        if ($value >= 0) {
+        if ($value > 0) {
             $this->$property = $value;
         }
 
