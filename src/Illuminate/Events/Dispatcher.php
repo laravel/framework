@@ -43,6 +43,13 @@ class Dispatcher implements DispatcherContract
     protected $queueResolver;
 
     /**
+     * All of the events fired since enabling event logging.
+     *
+     * @var array
+     */
+    protected $eventLog = [];
+
+    /**
      * Create a new event dispatcher instance.
      *
      * @param  \Illuminate\Contracts\Container\Container|null  $container
@@ -545,5 +552,27 @@ class Dispatcher implements DispatcherContract
         $this->queueResolver = $resolver;
 
         return $this;
+    }
+
+    /**
+     * Enable logging of events.
+     *
+     * @return void
+     */
+    public function enableEventLog()
+    {
+        $this->listen('*', function ($event) {
+            array_push($this->eventLog, $event);
+        });
+    }
+
+    /**
+     * Get the event log.
+     *
+     * @return array
+     */
+    public function getEventLog()
+    {
+        return $this->eventLog;
     }
 }
