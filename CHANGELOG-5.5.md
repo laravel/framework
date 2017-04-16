@@ -10,6 +10,7 @@
 - Removed usages of the `with()` helper ([#17888](https://github.com/laravel/framework/pull/17888))
 - Support callable/invokable objects in `Pipeline` ([#18264](https://github.com/laravel/framework/pull/18264))
 - ⚠️ Prevent access to protected properties using array access on `Model` and `Fluent` ([#18403](https://github.com/laravel/framework/pull/18403))
+- Added frontend preset commands ([882f525](https://github.com/laravel/framework/commit/882f525a2c46caddfd94cfa7db9fbaf1abb1284b), [463b769](https://github.com/laravel/framework/commit/463b769270d462468e1b1dcc51a7a1144e003157), [34fd458](https://github.com/laravel/framework/commit/34fd458d370a39335810c1f040fad04af418fed4), [34fd458](https://github.com/laravel/framework/commit/34fd458d370a39335810c1f040fad04af418fed4), [d6c7abe](https://github.com/laravel/framework/commit/d6c7abe5e651cda813831afa5943791334361cd7), [0ed20b0](https://github.com/laravel/framework/commit/0ed20b0bb43335933a17972dce64cc63bbb3cc85), [f7f02c5](https://github.com/laravel/framework/commit/f7f02c5792079ab40f8adf7e14c747b4749406b5), [cf871f4](https://github.com/laravel/framework/commit/cf871f4bf40a75bc1713de7ef8a689477e19c677))
 
 ### Artisan Console
 - Added interactive prompt to `vendor:publish` ([#18230](https://github.com/laravel/framework/pull/18230))
@@ -29,6 +30,7 @@
 - ⚠️ Added `$parentKey` parameter to `belongsToMany()`, `BelongsToMany` and `MorphToMany` ([#17915](https://github.com/laravel/framework/pull/17915), [#18380](https://github.com/laravel/framework/pull/18380))
 - Support `null` comparison in `Model::is()` ([#18511](https://github.com/laravel/framework/pull/18511))
 - Added `getDirty()` checks for date and castable attributes ([#18400](https://github.com/laravel/framework/pull/18400), [e180e20](https://github.com/laravel/framework/commit/e180e20aa479525b34f77b9cf348148d329a4d2c))
+- Show method name in invalid relationship `LogicException` ([#18749](https://github.com/laravel/framework/pull/18749))
 
 ### Encryption
 - Use `openssl_cipher_iv_length()` in `Encrypter` ([#18684](https://github.com/laravel/framework/pull/18684))
@@ -36,10 +38,11 @@
 ### Errors & Logging
 - Added default 404 and 500 error pages ([#18483](https://github.com/laravel/framework/pull/18483))
 - Always show custom 500 error page for all exception types when not in debug mode ([#18481](https://github.com/laravel/framework/pull/18481), [3cb7b0f](https://github.com/laravel/framework/commit/3cb7b0f4304274f209ed0f776ef70ccd4f9fe5dd))
+- Show 419 error page on `TokenMismatchException` ([#18728](https://github.com/laravel/framework/pull/18728))
 - Added `throw_if()` and `throw_unless()` helpers ([18bb4df](https://github.com/laravel/framework/commit/18bb4dfc77c7c289e9b40c4096816ebeff1cd843))
 - Support `render()` method on exceptions ([ed51160](https://github.com/laravel/framework/commit/ed51160b97d8c4cf16526a0f8ba57ce7cb131b53), [c8a9413](https://github.com/laravel/framework/commit/c8a9413e2dc3bf00c206742e2bc76a88134cba84))
 - Support `report()` method on exceptions ([e77f6f7](https://github.com/laravel/framework/commit/e77f6f76049050fd4abced63ffa768432d8974f2))
-- Send exceptions as JSON in debug mode if the request wants JSON ([5225389](https://github.com/laravel/framework/commit/5225389dfdf03d656b862bba59cebf1820e0e8f4))
+- Send exceptions as JSON in debug mode if the request wants JSON ([5225389](https://github.com/laravel/framework/commit/5225389dfdf03d656b862bba59cebf1820e0e8f4), [#18732](https://github.com/laravel/framework/pull/18732), [4fe6091](https://github.com/laravel/framework/commit/4fe6091e9fc94817a70c47a6a1c2098d5a1805f8), [9ab58fd](https://github.com/laravel/framework/commit/9ab58fd1a0543b1c728124db7f70738b04dcf362))
 - Added `Handler::context()` method, that by default adds some default context to logs ([23b7d6b](https://github.com/laravel/framework/commit/23b7d6b45c675bcd93e9f1fb9cd33e71779142c6))
 
 ### Events
@@ -47,6 +50,15 @@
 
 ### HTTP Routing
 - ⚠️ Bind empty optional route parameter to `null` instead of empty model instance ([#17521](https://github.com/laravel/framework/pull/17521))
+
+### HTTP Requests
+- ⚠️ Made `Request::has()` work like `Collection::has()` ([#18715](https://github.com/laravel/framework/pull/18715))
+- Added `Request::filled()` ([#18715](https://github.com/laravel/framework/pull/18715))
+- ⚠️ Made `Request::only()` work like `Collection::only()` ([#18695](https://github.com/laravel/framework/pull/18695))
+- ⚠️ Renamed `Request::exists()` to `Collection::filled()` ([#18715](https://github.com/laravel/framework/pull/18715))
+- Aliased `Request::exists()` to `Request::has()` ([183bf16](https://github.com/laravel/framework/commit/183bf16a2c939889f4461e237a851b55cf858f8e))
+- Allow passing keys to `Request::all()` to behave like old `Request::only()` ([#18754](https://github.com/laravel/framework/pull/18754))
+- ⚠️ Removed `Request::intersect()` ([#18695](https://github.com/laravel/framework/pull/18695))
 
 ### HTTP Responses
 - ⚠️ Ensure `Arrayable` and `Jsonable` return a `JsonResponse` ([#17875](https://github.com/laravel/framework/pull/17875))
