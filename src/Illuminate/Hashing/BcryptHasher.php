@@ -20,9 +20,7 @@ class BcryptHasher implements HasherInterface {
 	 */
 	public function make($value, array $options = array())
 	{
-		$cost = isset($options['rounds']) ? $options['rounds'] : $this->rounds;
-
-		$hash = password_hash($value, PASSWORD_BCRYPT, array('cost' => $cost));
+		$hash = password_hash($value, PASSWORD_BCRYPT, ['cost' => $this->getCostOption($options)]);
 
 		if ($hash === false)
 		{
@@ -54,9 +52,18 @@ class BcryptHasher implements HasherInterface {
 	 */
 	public function needsRehash($hashedValue, array $options = array())
 	{
-		$cost = isset($options['rounds']) ? $options['rounds'] : $this->rounds;
+		return password_needs_rehash($hashedValue, PASSWORD_BCRYPT, ['cost' => $this->getCostOption($options)]);
+	}
 
-		return password_needs_rehash($hashedValue, PASSWORD_BCRYPT, array('cost' => $cost));
+	/**
+	 * Get the cost option.
+	 *
+	 * @param  array $options
+	 * @return int
+	 */
+	protected function getCostOption(array $options = [])
+	{
+		return array_get($options, 'rounds', $this->rounds);
 	}
 
 	/**
