@@ -209,7 +209,7 @@ class FormBuilder {
 	 */
 	protected function formatLabel($name, $value)
 	{
-		return $value ?: ucwords(str_replace('_', ' ', $name));
+		return (string)$value != '' ? $value : ucwords(str_replace('_', ' ', $name));
 	}
 
 	/**
