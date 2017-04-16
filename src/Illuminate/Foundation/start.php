@@ -31,6 +31,13 @@ if ( ! extension_loaded('mcrypt'))
 	exit(1);
 }
 
+if ( ! extension_loaded('mbstring'))
+{
+	echo 'mbstring PHP extension required.'.PHP_EOL;
+
+	exit(1);
+}
+
 /*
 |--------------------------------------------------------------------------
 | Register Class Imports
