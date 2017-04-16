@@ -798,9 +798,10 @@ class BelongsToMany extends Relation {
 	 */
 	protected function createAttachRecord($id, $timed)
 	{
-		$record[$this->foreignKey] = $this->parent->getKey();
-
-		$record[$this->otherKey] = $id;
+		$record = [
+			$this->foreignKey => $this->parent->getKey(),
+			$this->otherKey   => $id,
+		];
 
 		// If the record needs to have creation and update timestamps, we will make
 		// them by calling the parent model's "freshTimestamp" method which will
