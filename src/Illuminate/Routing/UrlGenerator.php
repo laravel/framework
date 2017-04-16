@@ -49,6 +49,10 @@ class UrlGenerator {
 		'%21' => '!',
 		'%2A' => '*',
 		'%7C' => '|',
+		'%23' => '#',
+		'%3F' => '?',
+		'%26' => '&',
+		'%25' => '%',
 	);
 
 	/**
@@ -243,10 +247,10 @@ class UrlGenerator {
 	{
 		$domain = $this->getRouteDomain($route, $parameters);
 
-		$uri = strtr(rawurlencode($this->trimUrl(
+		$uri = strtr(rawurlencode($this->addQueryString($this->trimUrl(
 			$root = $this->replaceRoot($route, $domain, $parameters),
 			$this->replaceRouteParameters($route->uri(), $parameters)
-		)), $this->dontEncode).$this->getRouteQueryString($parameters);
+		), $parameters)), $this->dontEncode);
 
 		return $absolute ? $uri : '/'.ltrim(str_replace($root, '', $uri), '/');
 	}
@@ -297,6 +301,30 @@ class UrlGenerator {
 			return isset($parameters[$m[1]]) ? array_pull($parameters, $m[1]) : $m[0];
 
 		}, $path);
+	}
+
+	/**
+	 * Add a query string to the URI.
+	 *
+	 * @param  string  $uri
+	 * @param  array  $parameters
+	 * @return mixed|string
+	 */
+	protected function addQueryString($uri, array $parameters)
+	{
+		$fragment = parse_url($uri, PHP_URL_FRAGMENT);
+		if (!is_null($fragment))
+		{
+			$uri = preg_replace('/#.*/', '', $uri);
+		}
+
+		$uri .= $this->getRouteQueryString($parameters);
+		if (!is_null($fragment))
+		{
+			$uri .= "#$fragment";
+		}
+
+		return $uri;
 	}
 
 	/**
