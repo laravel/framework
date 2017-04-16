@@ -546,6 +546,11 @@ class FormBuilder {
 
 		$options = array('value' => e($value), 'selected' => $selected);
 
+		if ($value == '')
+		{
+			$options[] = 'disabled';
+		}
+
 		return '<option'.$this->html->attributes($options).'>'.e($display).'</option>';
 	}
 
