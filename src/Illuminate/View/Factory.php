@@ -491,12 +491,9 @@ class Factory {
 	 */
 	public function startSection($section, $content = '')
 	{
-		if ($content === '')
+		if ($content === '' && ob_start())
 		{
-			if (ob_start())
-			{
-				$this->sectionStack[] = $section;
-			}
+			$this->sectionStack[] = $section;
 		}
 		else
 		{
