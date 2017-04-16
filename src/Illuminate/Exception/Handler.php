@@ -130,7 +130,7 @@ class Handler {
 	 */
 	public function handleError($level, $message, $file = '', $line = 0, $context = array())
 	{
-		if (error_reporting() & $level)
+		if (error_reporting() && $level)
 		{
 			throw new ErrorException($message, 0, $level, $file, $line);
 		}
