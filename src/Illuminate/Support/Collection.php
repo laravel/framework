@@ -115,6 +115,17 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Get all of the given collection except for a specified keys.
+	 *
+	 * @param  array  $keys
+	 * @return static
+	 */
+	public function except($keys)
+	{
+		return new static(array_except($this->items, $keys));
+	}
+
+	/**
 	 * Fetch a nested element of the collection.
 	 *
 	 * @param  string  $key
@@ -374,6 +385,17 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	public function prepend($value)
 	{
 		array_unshift($this->items, $value);
+	}
+
+	/**
+	 * Get a subset of the items from the given collection.
+	 *
+	 * @param  array  $keys
+	 * @return static
+	 */
+	public function only($keys)
+	{
+		return new static(array_only($this->items, $keys));
 	}
 
 	/**

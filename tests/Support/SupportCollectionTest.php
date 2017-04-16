@@ -238,6 +238,14 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testExcept()
+	{
+		$data = new Collection(['firstname' => 'taylor', 'name' => 'otwell', 'framework' => 'laravel']);
+		$this->assertEquals(['name' => 'otwell', 'framework' => 'laravel'], $data->except('firstname')->all());
+		$this->assertEquals(['name' => 'otwell'], $data->except(['firstname', 'framework'])->all());
+	}
+
+
 	public function testFlip()
 	{
 		$data = new Collection(array('name' => 'taylor', 'framework' => 'laravel'));
@@ -350,6 +358,14 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$data     = new Collection(array($model, $modelTwo));
 
 		$this->assertEquals(array('foo', 'bar'), $data->lists('some'));
+	}
+
+	
+	public function testOnly()
+	{
+		$data = new Collection(['firstname' => 'taylor', 'name' => 'otwell', 'framework' => 'laravel']);
+		$this->assertEquals(['name' => 'otwell'], $data->only('name')->all());
+		$this->assertEquals(['firstname' => 'taylor', 'name' => 'otwell'], $data->only(['firstname', 'name'])->all());
 	}
 
 
