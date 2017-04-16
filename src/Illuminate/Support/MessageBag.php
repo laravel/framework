@@ -119,13 +119,13 @@ class MessageBag implements ArrayableInterface, Countable, JsonableInterface, Me
 	 */
 	public function get($key, $format = null)
 	{
-		$format = $this->checkFormat($format);
-
 		// If the message exists in the container, we will transform it and return
 		// the message. Otherwise, we'll return an empty array since the entire
 		// methods is to return back an array of messages in the first place.
 		if (array_key_exists($key, $this->messages))
 		{
+			$format = $this->checkFormat($format);
+
 			return $this->transform($this->messages[$key], $format, $key);
 		}
 
