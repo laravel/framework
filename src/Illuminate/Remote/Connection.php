@@ -230,7 +230,7 @@ class Connection implements ConnectionInterface {
 	{
 		if ( ! $this->gateway->connected() && ! $this->gateway->connect($this->username))
 		{
-			throw new \RuntimeException("Unable to connect to remote server.");
+			throw new \RuntimeException("Unable to connect to remote server: " . implode("\n", $this->gateway->getConnection()->errors));
 		}
 
 		return $this->gateway;
