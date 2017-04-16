@@ -740,9 +740,15 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 
 		if (isset($new['domain'])) unset($old['domain']);
 
-		$new['where'] = array_merge(array_get($old, 'where', []), array_get($new, 'where', []));
+		$oldWhere = isset($old['where']) ? $old['where'] : [];
+		$newWhere = isset($new['where']) ? $new['where'] : [];
+		$new['where'] = array_merge($oldWhere, $newWhere);
 
-		return array_merge_recursive(array_except($old, array('namespace', 'prefix', 'where')), $new);
+		unset($old['where']);
+		unset($old['prefix']);
+		unset($old['namespace']);
+
+		return array_merge_recursive($old, $new);
 	}
 
 	/**
@@ -756,14 +762,14 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	{
 		if (isset($new['namespace']) && isset($old['namespace']))
 		{
-			return trim(array_get($old, 'namespace'), '\\').'\\'.trim($new['namespace'], '\\');
+			return trim($old['namespace'], '\\').'\\'.trim($new['namespace'], '\\');
 		}
 		elseif (isset($new['namespace']))
 		{
 			return trim($new['namespace'], '\\');
 		}
 
-		return array_get($old, 'namespace');
+		return isset($old['namespace']) ? $old['namespace'] : null;
 	}
 
 	/**
@@ -775,12 +781,8 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	protected static function formatGroupPrefix($new, $old)
 	{
-		if (isset($new['prefix']))
-		{
-			return trim(array_get($old, 'prefix'), '/').'/'.trim($new['prefix'], '/');
-		}
-
-		return array_get($old, 'prefix');
+		$oldPrefix = isset($old['prefix']) ? $old['prefix'] : null;
+		return isset($new['prefix']) ? trim($oldPrefix, '/').'/'.trim($new['prefix'], '/') : $oldPrefix;
 	}
 
 	/**
@@ -879,8 +881,9 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	protected function addWhereClausesToRoute($route)
 	{
+		$action = $route->getAction();
 		$route->where(
-			array_merge($this->patterns, array_get($route->getAction(), 'where', []))
+			array_merge($this->patterns, isset($action['where']) ? $action['where'] : [])
 		);
 
 		return $route;
@@ -909,7 +912,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	{
 		if ($action instanceof Closure) return false;
 
-		return is_string($action) || is_string(array_get($action, 'uses'));
+		return is_string($action) || (isset($action['uses']) && is_string($action['uses']));
 	}
 
 	/**
