@@ -75,7 +75,7 @@ class SqlServerGrammar extends Grammar {
 
 		if ( ! is_null($query->lock))
 		{
-			return $from.' with(rowlock,'.($query->lock ? 'updlock,' : '').'holdlock)';
+			return $from.' (rowlock,'.($query->lock ? 'updlock,' : '').'holdlock)';
 		}
 
 		return $from;

@@ -1235,12 +1235,12 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getSqlServerBuilder();
 		$builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock();
-		$this->assertEquals('select * from [foo] with(rowlock,updlock,holdlock) where [bar] = ?', $builder->toSql());
+		$this->assertEquals('select * from [foo] (rowlock,updlock,holdlock) where [bar] = ?', $builder->toSql());
 		$this->assertEquals(array('baz'), $builder->getBindings());
 
 		$builder = $this->getSqlServerBuilder();
 		$builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock(false);
-		$this->assertEquals('select * from [foo] with(rowlock,holdlock) where [bar] = ?', $builder->toSql());
+		$this->assertEquals('select * from [foo] (rowlock,holdlock) where [bar] = ?', $builder->toSql());
 		$this->assertEquals(array('baz'), $builder->getBindings());
 	}
 

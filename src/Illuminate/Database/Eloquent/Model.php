@@ -474,7 +474,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public static function hydrate(array $items, $connection = null)
 	{
-		$collection = with($instance = new static)->newCollection();
+		$collection = ($instance = new static)->newCollection();
 
 		foreach ($items as $item)
 		{
