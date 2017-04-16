@@ -1387,6 +1387,110 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testIteratingValidatorCanPasWithNoNesting()
+	{
+		$input = $this->iteratingInput();
+		$trans = $this->getRealTranslator();
+		$v = new Validator(
+			$trans,
+			$input,
+			array('iterable' => 'array', 'foo' => 'required')
+		);
+
+		$v->iterate('iterable', array('foo' => 'required|alpha', 'baz' => 'required|alpha'));
+		$this->assertTrue($v->passes());
+	}
+
+
+	public function testIteratingValidatorCanFailWithNoNesting()
+	{
+		$input = $this->iteratingInput();
+		$trans = $this->getRealTranslator();
+		$v = new Validator(
+			$trans,
+			$input,
+			array('iterable' => 'array', 'foo' => 'required')
+		);
+
+		$v->iterate('iterable', array('foo' => 'required|alpha', 'baz' => 'required|integer'));
+		$this->assertTrue($v->fails());
+	}
+
+
+	public function testIteratingValidatorCanPassWithNesting()
+	{
+		$trans = $this->getRealTranslator();
+		$input = $this->iteratingInput();
+		$input['foo'] = array(
+			array(
+				'bar' => array(
+					array('baz' => 'buz'),
+					array('baz' => 'foo'),
+				),
+			),
+		);
+		$v = new Validator(
+			$trans,
+			$input,
+			array('iterable' => 'array', 'foo' => 'array')
+		);
+
+		$v->iterate('iterable', array('foo' => 'required|alpha', 'baz' => 'required|alpha'));
+		$v->iterate(
+			'foo',
+			array(
+			'bar' => array(
+				'required',
+				'array',
+				'iterate' => array(
+					'rules' => array(
+						'baz' => 'required|alpha'
+						)
+					)
+				)
+			)
+		);
+		$this->assertTrue($v->passes());
+	}
+
+
+	public function testIteratingValidatorCanFailWithNesting()
+	{
+		$trans = $this->getRealTranslator();
+		$input = $this->iteratingInput();
+		$input['foo'] = array(
+			array(
+				'bar' => array(
+					array('baz' => 'buz'),
+					array('baz' => 'foo'),
+				),
+			),
+		);
+
+		$v = new Validator(
+			$trans,
+			$input,
+			array('iterable' => 'array', 'foo' => 'array')
+		);
+		$v->iterate('iterable', array('foo' => 'required|alpha', 'baz' => 'required|alpha'));
+		$v->iterate(
+			'foo',
+			array(
+				'bar' => array(
+					'array',
+					'iterate' => array(
+						'rules' => array(
+							'baz' => 'required|integer'
+						)
+					)
+				)
+			)
+		);
+
+		$this->assertTrue($v->fails());
+	}
+
+
 	protected function getTranslator()
 	{
 		return m::mock('Symfony\Component\Translation\TranslatorInterface');
@@ -1398,6 +1502,27 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$trans = new Symfony\Component\Translation\Translator('en', new Symfony\Component\Translation\MessageSelector);
 		$trans->addLoader('array', new Symfony\Component\Translation\Loader\ArrayLoader);
 		return $trans;
+	}
+
+	/**
+	 * @return array
+	 */
+	protected function iteratingInput()
+	{
+		$input = array(
+		  'iterable' => array(
+			array(
+			  'foo' => 'bar',
+			  'baz' => 'buz'
+			),
+			array(
+			  'foo' => 'ping',
+			  'baz' => 'pong'
+			),
+		  ),
+		  'foo' => 'bar'
+		);
+		return $input;
 	}
 
 }
