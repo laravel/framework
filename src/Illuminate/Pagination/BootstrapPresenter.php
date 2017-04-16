@@ -14,7 +14,7 @@ class BootstrapPresenter extends Presenter {
 	{
 		$rel = is_null($rel) ? '' : ' rel="'.$rel.'"';
 
-		return '<li><a href="'.$url.'"'.$rel.'>'.$page.'</a></li>';
+		return '<a href="'.$url.'"'.$rel.'><li>'.$page.'</li></a>';
 	}
 
 	/**
