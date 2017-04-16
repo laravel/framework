@@ -228,9 +228,12 @@ class Connection implements ConnectionInterface {
 	 */
 	public function getGateway()
 	{
-		if ( ! $this->gateway->connected() && ! $this->gateway->connect($this->username))
+		if ( ! $this->gateway->connected())
 		{
-			throw new \RuntimeException("Unable to connect to remote server.");
+			if ( ! $this->gateway->connect($this->username))
+			{
+				throw new \RuntimeException("Unable to connect to remote server.");
+			}
 		}
 
 		return $this->gateway;
