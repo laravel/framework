@@ -950,3 +950,19 @@ if (! function_exists('with')) {
         return $object;
     }
 }
+
+if ( ! function_exists('with_empty'))
+{
+	/**
+	 * Return list with empty option prepended. Useful in Form::select.
+	 * 
+	 * @param array  $list
+	 * @param mixed  $empty
+	 */
+	function with_empty($list, $empty='')
+	{
+		if(!is_array($empty)) $empty = array(''=>$empty);
+
+		return  $empty + $list;
+	}
+}
