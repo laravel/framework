@@ -49,8 +49,10 @@ class Builder {
 		$sql = $this->grammar->compileTableExists();
 
 		$table = $this->connection->getTablePrefix().$table;
+		
+		$database = $this->connection->getDatabaseName();
 
-		return count($this->connection->select($sql, array($table))) > 0;
+		return count($this->connection->select($sql, array($database, $table))) > 0;
 	}
 
 	/**
@@ -76,8 +78,10 @@ class Builder {
 	public function getColumnListing($table)
 	{
 		$table = $this->connection->getTablePrefix().$table;
+		
+		$database = $this->connection->getDatabaseName();
 
-		$results = $this->connection->select($this->grammar->compileColumnExists($table));
+		$results = $this->connection->select($this->grammar->compileColumnExists(), array($database, $table));
 
 		return $this->connection->getPostProcessor()->processColumnListing($results);
 	}
