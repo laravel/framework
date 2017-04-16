@@ -82,14 +82,15 @@ class Factory {
 	 * @param  array  $rules
 	 * @param  array  $messages
 	 * @param  array  $customAttributes
+	 * @param  array  $customValues
 	 * @return \Illuminate\Validation\Validator
 	 */
-	public function make(array $data, array $rules, array $messages = array(), array $customAttributes = array())
+	public function make(array $data, array $rules, array $messages = array(), array $customAttributes = array(), array $customValues = array())
 	{
 		// The presence verifier is responsible for checking the unique and exists data
 		// for the validator. It is behind an interface so that multiple versions of
 		// it may be written besides database. We'll inject it into the validator.
-		$validator = $this->resolve($data, $rules, $messages, $customAttributes);
+		$validator = $this->resolve($data, $rules, $messages, $customAttributes, $customValues);
 
 		if ( ! is_null($this->verifier))
 		{
@@ -138,13 +139,14 @@ class Factory {
 	 * @param  array  $rules
 	 * @param  array  $messages
 	 * @param  array  $customAttributes
+	 * @param  array  $customValues
 	 * @return \Illuminate\Validation\Validator
 	 */
-	protected function resolve(array $data, array $rules, array $messages, array $customAttributes)
+	protected function resolve(array $data, array $rules, array $messages, array $customAttributes, array $customValues)
 	{
 		if (is_null($this->resolver))
 		{
-			return new Validator($this->translator, $data, $rules, $messages, $customAttributes);
+			return new Validator($this->translator, $data, $rules, $messages, $customAttributes, $customValues);
 		}
 
 		return call_user_func($this->resolver, $this->translator, $data, $rules, $messages, $customAttributes);
