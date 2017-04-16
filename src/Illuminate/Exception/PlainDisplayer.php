@@ -14,9 +14,16 @@ class PlainDisplayer implements ExceptionDisplayerInterface {
 	 */
 	public function display(Exception $exception)
 	{
-		$status = $exception instanceof HttpExceptionInterface ? $exception->getStatusCode() : 500;
-
-		$headers = $exception instanceof HttpExceptionInterface ? $exception->getHeaders() : array();
+		if ($exception instanceof HttpExceptionInterface)
+		{
+			$status  = $exception->getStatusCode();
+			$headers = $exception->getHeaders();
+		}
+		else
+		{
+			$status  = 500;
+			$headers = [];
+		}
 
 		return new Response(file_get_contents(__DIR__.'/resources/plain.html'), $status, $headers);
 	}
