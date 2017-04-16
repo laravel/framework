@@ -101,6 +101,28 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	protected static $requestClass = 'Illuminate\Http\Request';
 
 	/**
+	 * The operating systems constants
+	 */
+	const DARWIN       = 0;
+	const WINDOWS      = 1;
+	const LINUX_I386   = 2;
+	const LINUX_X86_64 = 3;
+	const UNKNOWN      = 9;
+
+	/**
+	 * Names of the operating systems.
+	 *
+	 * @var array
+	 */
+	protected static $os = [
+		self::DARWIN       => 'macosx',
+		self::WINDOWS      => 'windows',
+		self::LINUX_I386   => 'linux-i686',
+		self::LINUX_X86_64 => 'linux-x86_64',
+		self::UNKNOWN      => 'unknown',
+	];
+
+	/**
 	 * Create a new Illuminate application instance.
 	 *
 	 * @param  \Illuminate\Http\Request  $request
@@ -279,6 +301,41 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	public function runningUnitTests()
 	{
 		return $this['env'] == 'testing';
+	}
+
+	/**
+	 * Get the operating system for the current platform.
+	 *
+	 * @return string
+	 */
+	public function getOperatingSystem()
+	{
+		$uname = strtolower(php_uname());
+
+		if (str_contains($uname, 'darwin'))
+		{
+			return static::DARWIN;
+		}
+		elseif (str_contains($uname, 'win'))
+		{
+			return static::WINDOWS;
+		}
+		elseif (str_contains($uname, 'linux'))
+		{
+			return PHP_INT_SIZE === 4 ? static::LINUX_I386 : static::LINUX_X86_64;
+		}
+
+		return static::UNKNOWN;
+	}
+
+	/**
+	 * Get the operating system name for the current platform.
+	 *
+	 * @return string
+	 */
+	public function getOperatingSystemName()
+	{
+		return static::$os[$this->getOperatingSystem()];
 	}
 
 	/**
