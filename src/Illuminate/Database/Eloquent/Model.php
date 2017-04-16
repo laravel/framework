@@ -582,7 +582,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  array  $attributes
 	 * @return static|null
 	 */
-	protected static function firstByAttributes($attributes)
+	public static function firstByAttributes($attributes)
 	{
 		return static::where($attributes)->first();
 	}
