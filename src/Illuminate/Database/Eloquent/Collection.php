@@ -18,7 +18,7 @@ class Collection extends BaseCollection {
 			$key = $key->getKey();
 		}
 
-		return array_first($this->items, function($itemKey, $model) use ($key)
+		return $this->first(function($itemKey, $model) use ($key)
 		{
 			return $model->getKey() == $key;
 
@@ -33,7 +33,7 @@ class Collection extends BaseCollection {
 	 */
 	public function load($relations)
 	{
-		if (count($this->items) > 0)
+		if ( ! $this->isEmpty())
 		{
 			if (is_string($relations)) $relations = func_get_args();
 
@@ -53,7 +53,7 @@ class Collection extends BaseCollection {
 	 */
 	public function add($item)
 	{
-		$this->items[] = $item;
+		$this->push($item);
 
 		return $this;
 	}
@@ -67,17 +67,6 @@ class Collection extends BaseCollection {
 	public function contains($key)
 	{
 		return ! is_null($this->find($key));
-	}
-
-	/**
-	 * Fetch a nested element of the collection.
-	 *
-	 * @param  string  $key
-	 * @return static
-	 */
-	public function fetch($key)
-	{
-		return new static(array_fetch($this->toArray(), $key));
 	}
 
 	/**
@@ -133,30 +122,7 @@ class Collection extends BaseCollection {
 			$dictionary[$item->getKey()] = $item;
 		}
 
-		return new static(array_values($dictionary));
-	}
-
-	/**
-	 * Diff the collection with the given items.
-	 *
-	 * @param  \ArrayAccess|array  $items
-	 * @return static
-	 */
-	public function diff($items)
-	{
-		$diff = new static;
-
-		$dictionary = $this->getDictionary($items);
-
-		foreach ($this->items as $item)
-		{
-			if ( ! isset($dictionary[$item->getKey()]))
-			{
-				$diff->add($item);
-			}
-		}
-
-		return $diff;
+		return (new static($dictionary))->values();
 	}
 
 	/**
@@ -167,31 +133,7 @@ class Collection extends BaseCollection {
 	 */
 	public function intersect($items)
 	{
-		$intersect = new static;
-
-		$dictionary = $this->getDictionary($items);
-
-		foreach ($this->items as $item)
-		{
-			if (isset($dictionary[$item->getKey()]))
-			{
-				$intersect->add($item);
-			}
-		}
-
-		return $intersect;
-	}
-
-	/**
-	 * Return only unique items from the collection.
-	 *
-	 * @return static
-	 */
-	public function unique()
-	{
-		$dictionary = $this->getDictionary();
-
-		return new static(array_values($dictionary));
+		return parent::intersect($items)->values();
 	}
 
 	/**
@@ -238,6 +180,14 @@ class Collection extends BaseCollection {
 		}
 
 		return $dictionary;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	protected function getArrayableItems($items)
+	{
+		return $this->getDictionary($items);
 	}
 
 	/**
