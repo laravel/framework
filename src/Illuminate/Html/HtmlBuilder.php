@@ -59,7 +59,7 @@ class HtmlBuilder {
 	{
 		$attributes['src'] = $this->url->asset($url, $secure);
 
-		return '<script'.$this->attributes($attributes).'></script>'.PHP_EOL;
+		return '<script'.$this->attributes($attributes).'></script>';
 	}
 
 	/**
@@ -78,7 +78,7 @@ class HtmlBuilder {
 
 		$attributes['href'] = $this->url->asset($url, $secure);
 
-		return '<link'.$this->attributes($attributes).'>'.PHP_EOL;
+		return '<link'.$this->attributes($attributes).'>';
 	}
 
 	/**
