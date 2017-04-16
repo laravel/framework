@@ -483,6 +483,21 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	}
 
 	/**
+	 * Set an item in the collection by key if it does not exist.
+	 *
+	 * @param  mixed  $key
+	 * @param  mixed  $value
+	 * @return void
+	 */
+	public function set($key, $value)
+	{
+		if ( ! $this->has($key))
+		{
+			$this->put($key, $value);
+		}
+	}
+
+	/**
 	 * Get and remove the first item from the collection.
 	 *
 	 * @return mixed|null

@@ -443,6 +443,25 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testPut()
+	{
+		$c = new Collection();
+		$c->put('foo', 'bar');
+		$this->assertTrue($c->has('foo'));
+		$this->assertEquals('bar', $c->get('foo'));
+	}
+
+
+	public function testSet()
+	{
+		$c = new Collection();
+		$c->put('foo', 'bar');
+		$c->set('foo', 'baz');
+		$this->assertTrue($c->has('foo'));
+		$this->assertEquals('bar', $c->get('foo'));
+	}
+
+
 	public function testPullRetrievesItemFromCollection()
 	{
 		$c = new Collection(array('foo', 'bar'));
