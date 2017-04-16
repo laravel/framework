@@ -521,8 +521,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public static function create(array $attributes)
 	{
-		$model = new static($attributes);
-
+		$model = new static();
+                $model->fill($attributes);
 		$model->save();
 
 		return $model;
