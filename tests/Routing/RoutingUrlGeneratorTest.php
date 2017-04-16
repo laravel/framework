@@ -34,6 +34,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		);
 
 		$this->assertEquals('http://www.foo.com/foo/bar', $url->asset('foo/bar'));
+		$this->assertEquals('http://www.foo.com/%CF%80', $url->asset('π'));
 		$this->assertEquals('https://www.foo.com/foo/bar', $url->asset('foo/bar', true));
 	}
 
