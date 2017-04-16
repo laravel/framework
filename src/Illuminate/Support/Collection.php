@@ -727,6 +727,29 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         return new static($result);
     }
 
+	/**
+	 * Map over the collection values and create a new one where the $index key of each item is
+	 * the final item index, And the value is an array of arrays, So the ones with the same
+	 * indexes, wouldnt be lost.
+	 *
+	 * Useful when doing multiple searches through database for rows with the columns such as "Date" or ... equal to a value...
+	 * This way we only use one query, and get the value with Collection get("index"), or plain php $array["index"].
+	 *
+	 *
+	 * @param  string  $index
+	 * @return static
+	 */
+	public function mapAllWithKeys( $index )
+	{
+		$result = [];
+
+		foreach ($this->items as $key => $value) {
+			$result[ $value[$index] ][] = $value;
+		}
+
+		return new static($result);
+	}
+
     /**
      * Map a collection and flatten the result by a single level.
      *
