@@ -918,6 +918,22 @@ if ( ! function_exists('str_singular'))
 	}
 }
 
+if ( ! function_exists('str_except'))
+{
+	/**
+	 * Get all of the given string except for a specified string of items.
+	 *
+	 * @param  string  $value
+	 * @param  array   $except
+	 * @param  bool    $trim
+	 * @return string
+	 */
+	function str_except($value, $except, $trim = false)
+	{
+		return Str::except($value, $except, $trim);
+	}
+}
+
 if ( ! function_exists('studly_case'))
 {
 	/**

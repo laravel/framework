@@ -362,5 +362,20 @@ class Str {
 
 		return static::$studlyCache[$key] = str_replace(' ', '', $value);
 	}
+	
+	/**
+	 * Get all of the given string except for a specified string of items.
+	 *
+	 * @param  string  $value
+	 * @param  string|array  $except
+	 * @param  bool    $trim
+	 * @return string
+	 */
+	public static function except($value, $except, $trim = true)
+	{
+		$value = str_replace($except, '', $value);
+
+		return ($trim === false) ? $value : trim($value);
+	}
 
 }

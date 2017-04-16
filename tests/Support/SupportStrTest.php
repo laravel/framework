@@ -29,6 +29,16 @@ class SupportStrTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('Jefferson Costella', Str::title('jefferson costella'));
 		$this->assertEquals('Jefferson Costella', Str::title('jefFErson coSTella'));
 	}
+	
+	
+        public function testStringExcept()
+	{
+		$str = 'Laravel is a web application framework with expressive, elegant syntax.';
+	        $except = array('application', 'elegant');
+		$this->assertEquals('Laravel is a web  framework with expressive,  syntax.', Str::except($str, $except));
+		$except = array('Laravel');
+		$this->assertEquals('is a web application framework with expressive, elegant syntax.', Str::except($str, $except, true));
+        }
 
 
 	public function testStringWithoutWordsDoesntProduceError()
