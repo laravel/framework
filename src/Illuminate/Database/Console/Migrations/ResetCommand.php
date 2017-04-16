@@ -50,7 +50,7 @@ class ResetCommand extends Command {
 	 */
 	public function fire()
 	{
-		if ( ! $this->confirmToProceed()) return;
+		if ( ! $this->confirmToProceed("About to run ".$this->name)) return;
 
 		$this->migrator->setConnection($this->input->getOption('database'));
 
