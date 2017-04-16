@@ -26,4 +26,16 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase {
 	 */
 	abstract public function createApplication();
 
+	/**
+	 * Tear down the test environment.
+	 *
+	 * @return void
+	 */
+	public function tearDown()
+	{
+		parent::tearDown();
+		Mockery::close();
+		Carbon\Carbon::setTimeNow();
+	}
+
 }
