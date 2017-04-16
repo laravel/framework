@@ -53,6 +53,8 @@ abstract class Grammar {
 			return $this->wrap($segments[0]).' as '.$this->wrapValue($segments[2]);
 		}
 
+		if ($value[0] === '`' && substr($value, -1) === '`' && substr_count($value, '`', 2)) return $value;
+
 		$wrapped = array();
 
 		$segments = explode('.', $value);
