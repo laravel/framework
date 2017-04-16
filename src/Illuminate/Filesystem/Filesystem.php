@@ -111,7 +111,7 @@ class Filesystem {
 
 		$success = true;
 
-		foreach ($paths as $path) { if ( ! @unlink($path)) $success = false; }
+		foreach ($paths as $path) { $success &= @unlink($path); }
 
 		return $success;
 	}
