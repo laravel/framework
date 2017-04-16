@@ -35,7 +35,7 @@ class EventMakeCommand extends GeneratorCommand
      */
     protected function alreadyExists($rawName)
     {
-        return class_exists($rawName);
+        return class_exists($this->parseName($rawName));
     }
 
     /**
