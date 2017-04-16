@@ -947,7 +947,7 @@ class Validator implements MessageProviderInterface {
 	{
 		if (function_exists('mb_strlen')) return mb_strlen($value);
 
-		return strlen($value);
+		return strlen(utf8_decode($value));
 	}
 
 	/**
