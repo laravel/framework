@@ -544,7 +544,7 @@ class FormBuilder {
 	{
 		$selected = $this->getSelectedValue($value, $selected);
 
-		$options = array('value' => e($value), 'selected' => $selected);
+		$options = array('value' => $value, 'selected' => $selected);
 
 		return '<option'.$this->html->attributes($options).'>'.e($display).'</option>';
 	}
