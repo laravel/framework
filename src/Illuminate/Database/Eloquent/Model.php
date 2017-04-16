@@ -2295,6 +2295,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// when we need to array or JSON the model for convenience to the coder.
 		foreach ($this->getArrayableAppends() as $key)
 		{
+			if (in_array($key, $this->hidden)) continue;
+
+			if (count($this->visible) > 0 && ! in_array($key, $this->visible)) continue;
+
 			$attributes[$key] = $this->mutateAttributeForArray($key, null);
 		}
 
