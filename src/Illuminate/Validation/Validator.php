@@ -124,7 +124,7 @@ class Validator implements MessageProviderInterface {
 	 * @var array
 	 */
 	protected $implicitRules = array(
-		'Required', 'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll', 'RequiredIf', 'Accepted'
+		'Required', 'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll', 'RequiredIf', 'RequiredIfNot', 'Accepted'
 	);
 
 	/**
@@ -656,6 +656,30 @@ class Validator implements MessageProviderInterface {
 		$values = array_slice($parameters, 1);
 
 		if (in_array($data, $values))
+		{
+			return $this->validateRequired($attribute, $value);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Validate that an attribute exists when another attribute has a given value.
+	 *
+	 * @param  string  $attribute
+	 * @param  mixed   $value
+	 * @param  mixed   $parameters
+	 * @return bool
+	 */
+	protected function validateRequiredIfNot($attribute, $value, $parameters)
+	{
+		$this->requireParameterCount(2, $parameters, 'required_if_not');
+
+		$data = array_get($this->data, $parameters[0]);
+
+		$values = array_slice($parameters, 1);
+
+		if ( ! in_array($data, $values))
 		{
 			return $this->validateRequired($attribute, $value);
 		}
@@ -1881,6 +1905,20 @@ class Validator implements MessageProviderInterface {
 		$parameters[0] = $this->getAttribute($parameters[0]);
 
 		return str_replace(array(':other', ':value'), $parameters, $message);
+	}
+
+	/**
+	 * Replace all place-holders for the required_if_not rule.
+	 *
+	 * @param  string  $message
+	 * @param  string  $attribute
+	 * @param  string  $rule
+	 * @param  array   $parameters
+	 * @return string
+	 */
+	protected function replaceRequiredIfNot($message, $attribute, $rule, $parameters)
+	{
+		return $this->replaceRequiredIf($message, $attribute, $rule, $parameters);
 	}
 
 	/**
