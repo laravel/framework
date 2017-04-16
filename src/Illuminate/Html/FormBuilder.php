@@ -233,6 +233,7 @@ class FormBuilder {
 		if ( ! in_array($type, $this->skipValueTypes))
 		{
 			$value = $this->getValueAttribute($name, $value);
+			if (is_array($value)) $value = reset($value);
 		}
 
 		// Once we have the type, value, and ID we can merge them into the rest of the
