@@ -74,7 +74,10 @@ abstract class Manager {
 	 */
 	protected function createDriver($driver)
 	{
-		$method = 'create'.ucfirst($driver).'Driver';
+		$methods = [
+			'create'.ucfirst($driver).'Driver',
+			'create'.studly_case($driver).'Driver'
+		];
 
 		// We'll check to see if a creator method exists for the given driver. If not we
 		// will check for a custom driver creator, which allows developers to create
@@ -83,9 +86,13 @@ abstract class Manager {
 		{
 			return $this->callCustomCreator($driver);
 		}
-		elseif (method_exists($this, $method))
+		
+		foreach($methods as $method)
 		{
-			return $this->$method();
+			if (method_exists($this, $method))
+			{
+				return $this->$method();
+			}	
 		}
 
 		throw new \InvalidArgumentException("Driver [$driver] not supported.");
