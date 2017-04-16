@@ -46,6 +46,12 @@ class PaginationFactoryTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(2, $env->getCurrentPage());
 
 		$env = $this->getFactory();
+		$request = Illuminate\Http\Request::create('http://foo.com?page=5a', 'GET');
+		$env->setRequest($request);
+
+		$this->assertEquals(5, $env->getCurrentPage());
+
+		$env = $this->getFactory();
 		$request = Illuminate\Http\Request::create('http://foo.com?page=-1', 'GET');
 		$env->setRequest($request);
 
@@ -61,6 +67,13 @@ class PaginationFactoryTest extends PHPUnit_Framework_TestCase {
 		$env->setCurrentPage(3);
 
 		$this->assertEquals(3, $env->getCurrentPage());
+
+		$env = $this->getFactory();
+		$request = Illuminate\Http\Request::create('http://foo.com?page=xx', 'GET');
+		$env->setRequest($request);
+		$env->setCurrentPage(2);
+
+		$this->assertEquals(2, $env->getCurrentPage());
 	}
 
 
