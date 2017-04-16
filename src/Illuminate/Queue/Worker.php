@@ -1,5 +1,7 @@
 <?php namespace Illuminate\Queue;
 
+use Exception;
+use RuntimeException;
 use Illuminate\Queue\Jobs\Job;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Cache\Repository as CacheRepository;
@@ -198,7 +200,8 @@ class Worker {
 	{
 		if ($maxTries > 0 && $job->attempts() > $maxTries)
 		{
-			return $this->logFailedJob($connection, $job);
+			$this->logFailedJob($connection, $job, new RuntimeException(sprintf('Max tries of %d attempted.', $maxTries)));
+			return;
 		}
 
 		try
@@ -215,6 +218,13 @@ class Worker {
 
 		catch (\Exception $e)
 		{
+			// If the job failed and hit the max, let's log it and exit the process early.
+			if ($maxTries > 0 && ($job->attempts() + 1) >= $maxTries)
+			{
+				$this->logFailedJob($connection, $job, $e);
+				return;
+			}
+
 			// If we catch an exception, we will attempt to release the job back onto
 			// the queue so it is not lost. This will let is be retried at a later
 			// time by another listener (or the same one). We will do that here.
@@ -235,13 +245,14 @@ class Worker {
 	 *
 	 * @param  string  $connection
 	 * @param  \Illuminate\Queue\Jobs\Job  $job
+	 * @param  \Exception  $exception
 	 * @return array
 	 */
-	protected function logFailedJob($connection, Job $job)
+	protected function logFailedJob($connection, Job $job, Exception $exception)
 	{
 		if ($this->failer)
 		{
-			$this->failer->log($connection, $job->getQueue(), $job->getRawBody());
+			$this->failer->log($connection, $job->getQueue(), $job->getRawBody(), $exception);
 
 			$job->delete();
 

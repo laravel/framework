@@ -58,11 +58,24 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase {
 		$job->shouldReceive('getQueue')->once()->andReturn('queue');
 		$job->shouldReceive('getRawBody')->once()->andReturn('body');
 		$job->shouldReceive('delete')->once();
-		$failer->shouldReceive('log')->once()->with('connection', 'queue', 'body');
+		$failer->shouldReceive('log')->once()->with('connection', 'queue', 'body', 'RuntimeException');
 
 		$worker->process('connection', $job, 3, 0);
 	}
 
+	public function testWorkerLogsJobToFailedQueueIfAnExceptionIsThrown()
+	{
+		$worker = new Illuminate\Queue\Worker(m::mock('Illuminate\Queue\QueueManager'), $failer = m::mock('Illuminate\Queue\Failed\FailedJobProviderInterface'));
+		$job = m::mock('Illuminate\Queue\Jobs\Job');
+		$job->shouldReceive('fire')->once()->andReturnUsing(function() { throw new RuntimeException('Oops'); });
+		$job->shouldReceive('attempts')->andReturn(0);
+		$job->shouldReceive('getQueue')->once()->andReturn('queue');
+		$job->shouldReceive('getRawBody')->once()->andReturn('body');
+		$job->shouldReceive('delete')->once();
+		$failer->shouldReceive('log')->once()->with('connection', 'queue', 'body', 'RuntimeException');
+
+		$worker->process('connection', $job, 1, 0);
+	}
 
 	public function testProcessFiresJobAndAutoDeletesIfTrue()
 	{
