@@ -189,7 +189,7 @@ class FormBuilder {
 	 * @param  array   $options
 	 * @return string
 	 */
-	public function label($name, $value = null, $options = array())
+	public function label($name, $value = null, array $options = array())
 	{
 		$this->labels[] = $name;
 
@@ -221,7 +221,7 @@ class FormBuilder {
 	 * @param  array   $options
 	 * @return string
 	 */
-	public function input($type, $name, $value = null, $options = array())
+	public function input($type, $name, $value = null, array $options = array())
 	{
 		if ( ! isset($options['name'])) $options['name'] = $name;
 
@@ -253,9 +253,22 @@ class FormBuilder {
 	 * @param  array   $options
 	 * @return string
 	 */
-	public function text($name, $value = null, $options = array())
+	public function text($name, $value = null, array $options = array())
 	{
 		return $this->input('text', $name, $value, $options);
+	}
+
+	/**
+	 * Create a number input field.
+	 *
+	 * @param  string  $name
+	 * @param  string  $value
+	 * @param  array   $options
+	 * @return string
+	 */
+	public function number($name, $value = null, array $options = array())
+	{
+		return $this->input('number', $name, $value, $options);
 	}
 
 	/**
@@ -265,7 +278,7 @@ class FormBuilder {
 	 * @param  array   $options
 	 * @return string
 	 */
-	public function password($name, $options = array())
+	public function password($name, array $options = array())
 	{
 		return $this->input('password', $name, '', $options);
 	}
@@ -278,7 +291,7 @@ class FormBuilder {
 	 * @param  array   $options
 	 * @return string
 	 */
-	public function hidden($name, $value = null, $options = array())
+	public function hidden($name, $value = null, array $options = array())
 	{
 		return $this->input('hidden', $name, $value, $options);
 	}
@@ -291,7 +304,7 @@ class FormBuilder {
 	 * @param  array   $options
 	 * @return string
 	 */
-	public function email($name, $value = null, $options = array())
+	public function email($name, $value = null, array $options = array())
 	{
 		return $this->input('email', $name, $value, $options);
 	}
@@ -304,7 +317,7 @@ class FormBuilder {
 	 * @param  array   $options
 	 * @return string
 	 */
-	public function url($name, $value = null, $options = array())
+	public function url($name, $value = null, array $options = array())
 	{
 		return $this->input('url', $name, $value, $options);
 	}
@@ -316,7 +329,7 @@ class FormBuilder {
 	 * @param  array   $options
 	 * @return string
 	 */
-	public function file($name, $options = array())
+	public function file($name, array $options = array())
 	{
 		return $this->input('file', $name, null, $options);
 	}
@@ -329,7 +342,7 @@ class FormBuilder {
 	 * @param  array   $options
 	 * @return string
 	 */
-	public function textarea($name, $value = null, $options = array())
+	public function textarea($name, $value = null, array $options = array())
 	{
 		if ( ! isset($options['name'])) $options['name'] = $name;
 
@@ -410,7 +423,7 @@ class FormBuilder {
 	 * @param  array   $options
 	 * @return string
 	 */
-	public function select($name, $list = array(), $selected = null, $options = array())
+	public function select($name, array $list = array(), $selected = null, array $options = array())
 	{
 		// When building a select box the "value" attribute is really the selected one
 		// so we will use that when checking the model or session for a value which
@@ -451,7 +464,7 @@ class FormBuilder {
 	 * @param  array   $options
 	 * @return string
 	 */
-	public function selectRange($name, $begin, $end, $selected = null, $options = array())
+	public function selectRange($name, $begin, $end, $selected = null, array $options = array())
 	{
 		$range = array_combine($range = range($begin, $end), $range);
 
@@ -482,7 +495,7 @@ class FormBuilder {
 	 * @param  string  $format
 	 * @return string
 	 */
-	public function selectMonth($name, $selected = null, $options = array(), $format = '%B')
+	public function selectMonth($name, $selected = null, array $options = array(), $format = '%B')
 	{
 		$months = array();
 
@@ -520,7 +533,7 @@ class FormBuilder {
 	 * @param  string  $selected
 	 * @return string
 	 */
-	protected function optionGroup($list, $label, $selected)
+	protected function optionGroup(array $list, $label, $selected)
 	{
 		$html = array();
 
@@ -575,7 +588,7 @@ class FormBuilder {
 	 * @param  array   $options
 	 * @return string
 	 */
-	public function checkbox($name, $value = 1, $checked = null, $options = array())
+	public function checkbox($name, $value = 1, $checked = null, array $options = array())
 	{
 		return $this->checkable('checkbox', $name, $value, $checked, $options);
 	}
@@ -589,7 +602,7 @@ class FormBuilder {
 	 * @param  array   $options
 	 * @return string
 	 */
-	public function radio($name, $value = null, $checked = null, $options = array())
+	public function radio($name, $value = null, $checked = null, array $options = array())
 	{
 		if (is_null($value)) $value = $name;
 
@@ -606,7 +619,7 @@ class FormBuilder {
 	 * @param  array   $options
 	 * @return string
 	 */
-	protected function checkable($type, $name, $value, $checked, $options)
+	protected function checkable($type, $name, $value, $checked, array $options = array())
 	{
 		$checked = $this->getCheckedState($type, $name, $value, $checked);
 
@@ -691,7 +704,7 @@ class FormBuilder {
 	 * @param  array   $attributes
 	 * @return string
 	 */
-	public function reset($value, $attributes = array())
+	public function reset($value, array $attributes = array())
 	{
 		return $this->input('reset', null, $value, $attributes);
 	}
@@ -704,7 +717,7 @@ class FormBuilder {
 	 * @param  array   $attributes
 	 * @return string
 	 */
-	public function image($url, $name = null, $attributes = array())
+	public function image($url, $name = null, array $attributes = array())
 	{
 		$attributes['src'] = $this->url->asset($url);
 
@@ -718,7 +731,7 @@ class FormBuilder {
 	 * @param  array   $options
 	 * @return string
 	 */
-	public function submit($value = null, $options = array())
+	public function submit($value = null, array $options = array())
 	{
 		return $this->input('submit', null, $value, $options);
 	}
@@ -730,7 +743,7 @@ class FormBuilder {
 	 * @param  array   $options
 	 * @return string
 	 */
-	public function button($value = null, $options = array())
+	public function button($value = null, array $options = array())
 	{
 		if ( ! array_key_exists('type', $options))
 		{
@@ -869,7 +882,7 @@ class FormBuilder {
 	 * @param  array   $attributes
 	 * @return string
 	 */
-	public function getIdAttribute($name, $attributes)
+	public function getIdAttribute($name, array $attributes)
 	{
 		if (array_key_exists('id', $attributes))
 		{
