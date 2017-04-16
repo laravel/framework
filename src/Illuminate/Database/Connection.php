@@ -131,10 +131,10 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Create a new database connection instance.
 	 *
-	 * @param  \PDO     $pdo
-	 * @param  string   $database
-	 * @param  string   $tablePrefix
-	 * @param  array    $config
+	 * @param  \PDO    $pdo
+	 * @param  string  $database
+	 * @param  string  $tablePrefix
+	 * @param  array   $config
 	 * @return void
 	 */
 	public function __construct(PDO $pdo, $database = '', $tablePrefix = '', array $config = array())
@@ -283,8 +283,8 @@ class Connection implements ConnectionInterface {
 	 * Run a select statement against the database.
 	 *
 	 * @param  string  $query
-	 * @param  array  $bindings
-	 * @param  bool  $useReadPdo
+	 * @param  array   $bindings
+	 * @param  bool    $useReadPdo
 	 * @return array
 	 */
 	public function select($query, $bindings = array(), $useReadPdo = true)
@@ -566,8 +566,8 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Run a SQL statement and log its execution context.
 	 *
-	 * @param  string    $query
-	 * @param  array     $bindings
+	 * @param  string  $query
+	 * @param  array   $bindings
 	 * @param  \Closure  $callback
 	 * @return mixed
 	 *
@@ -606,8 +606,8 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Run a SQL statement.
 	 *
-	 * @param  string    $query
-	 * @param  array     $bindings
+	 * @param  string  $query
+	 * @param  array   $bindings
 	 * @param  \Closure  $callback
 	 * @return mixed
 	 *
@@ -640,8 +640,8 @@ class Connection implements ConnectionInterface {
 	 * Handle a query exception that occurred during query execution.
 	 *
 	 * @param  \Illuminate\Database\QueryException  $e
-	 * @param  string    $query
-	 * @param  array     $bindings
+	 * @param  string  $query
+	 * @param  array   $bindings
 	 * @param  \Closure  $callback
 	 * @return mixed
 	 *
@@ -761,7 +761,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Get the elapsed time since a given starting point.
 	 *
-	 * @param  int    $start
+	 * @param  int  $start
 	 * @return float
 	 */
 	protected function getElapsedTime($start)

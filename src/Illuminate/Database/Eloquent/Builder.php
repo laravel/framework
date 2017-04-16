@@ -452,8 +452,8 @@ class Builder {
 	/**
 	 * Eagerly load the relationship on a set of models.
 	 *
-	 * @param  array     $models
-	 * @param  string    $name
+	 * @param  array   $models
+	 * @param  string  $name
 	 * @param  \Closure  $constraints
 	 * @return array
 	 */
@@ -659,10 +659,10 @@ class Builder {
 	/**
 	 * Add a relationship count condition to the query with where clauses.
 	 *
-	 * @param  string    $relation
+	 * @param  string  $relation
 	 * @param  \Closure  $callback
-	 * @param  string    $operator
-	 * @param  int       $count
+	 * @param  string  $operator
+	 * @param  int     $count
 	 * @return \Illuminate\Database\Eloquent\Builder|static
 	 */
 	public function whereHas($relation, Closure $callback, $operator = '>=', $count = 1)
@@ -698,10 +698,10 @@ class Builder {
 	/**
 	 * Add a relationship count condition to the query with where clauses and an "or".
 	 *
-	 * @param  string    $relation
+	 * @param  string  $relation
 	 * @param  \Closure  $callback
-	 * @param  string    $operator
-	 * @param  int       $count
+	 * @param  string  $operator
+	 * @param  int     $count
 	 * @return \Illuminate\Database\Eloquent\Builder|static
 	 */
 	public function orWhereHas($relation, Closure $callback, $operator = '>=', $count = 1)
@@ -715,7 +715,7 @@ class Builder {
 	 * @param  \Illuminate\Database\Eloquent\Builder  $hasQuery
 	 * @param  \Illuminate\Database\Eloquent\Relations\Relation  $relation
 	 * @param  string  $operator
-	 * @param  int  $count
+	 * @param  int     $count
 	 * @param  string  $boolean
 	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
@@ -929,7 +929,7 @@ class Builder {
 	/**
 	 * Extend the builder with a given callback.
 	 *
-	 * @param  string    $name
+	 * @param  string  $name
 	 * @param  \Closure  $callback
 	 * @return void
 	 */
