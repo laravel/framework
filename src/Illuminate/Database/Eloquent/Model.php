@@ -2827,7 +2827,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		$original = $this->original[$key];
 
-		return is_numeric($current) && is_numeric($original) && strcmp((string) $current, (string) $original) === 0;
+		return (is_numeric($current) || is_bool($current))
+			&& (is_numeric($original) || is_bool($original))
+			&& $current + 0 == $original + 0;
 	}
 
 	/**

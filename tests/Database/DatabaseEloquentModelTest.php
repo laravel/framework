@@ -45,6 +45,34 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($model->isDirty(['foo', 'bar']));
 	}
 
+	
+	public function testDirtyEquivalentAttributes()
+	{
+		$model = new EloquentModelStub(array('foo' => '1'));
+		$model->syncOriginal();
+
+		$model->foo = 1;
+		$this->assertFalse($model->isDirty('foo'));
+		$model->foo = 1.0;
+		$this->assertFalse($model->isDirty('foo'));
+		$model->foo = '1.0';
+		$this->assertFalse($model->isDirty('foo'));
+		$model->foo = true;
+		$this->assertFalse($model->isDirty('foo'));
+
+		$model = new EloquentModelStub(array('foo' => '0'));
+		$model->syncOriginal();
+
+		$model->foo = 0;
+		$this->assertFalse($model->isDirty('foo'));
+		$model->foo = 0.0;
+		$this->assertFalse($model->isDirty('foo'));
+		$model->foo = '0.0';
+		$this->assertFalse($model->isDirty('foo'));
+		$model->foo = false;
+		$this->assertFalse($model->isDirty('foo'));
+	}
+
 
 	public function testCalculatedAttributes()
 	{
