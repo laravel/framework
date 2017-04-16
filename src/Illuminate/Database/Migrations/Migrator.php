@@ -214,7 +214,13 @@ class Migrator {
 	 */
 	public function getMigrationFiles($path)
 	{
-		$files = $this->files->glob($path.'/*_*.php');
+        $allFiles = $this->files->allFiles($path);
+
+        $files = [];
+
+        foreach ($allFiles as $file) {
+            $filesArr[] = $file->getPathname();
+        }
 
 		// Once we have the array of files in the directory we will just remove the
 		// extension and take the basename of the file which is all we need when
