@@ -113,6 +113,13 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	}
 
 	/**
+	 * Execute the console command.
+	 *
+	 * @return void
+	 */
+	public function fire() {}
+
+	/**
 	 * Call another console command.
 	 *
 	 * @param  string  $command
