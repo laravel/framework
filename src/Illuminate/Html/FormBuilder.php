@@ -741,6 +741,39 @@ class FormBuilder {
 	}
 
 	/**
+	 * Create a keygen element.
+	 *
+	 * @param  string  $keytype
+	 * @param  array   $options
+	 * @return string
+	 */
+	public function keygen($keytype, $options = array())
+	{
+		if ( ! in_array($keytype, ['rsa', 'dca', 'ec']))
+		{
+			$keytype = 'rsa';
+		}
+
+		$options['keytype'] = $keytype;
+
+		return '<keygen'.$this->html->attributes($options).'>';
+	}
+
+	/**
+	 * Create an output element.
+	 *
+	 * @param  mixed|array $for
+	 * @param  array       $options
+	 * @return string
+	 */
+	public function output($for, $options = array())
+	{
+		$options['for'] = implode(' ', (array) $for);
+
+		return '<output'.$this->html->attributes($options).'></output>';
+	}
+
+	/**
 	 * Parse the form action method.
 	 *
 	 * @param  string  $method

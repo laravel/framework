@@ -388,6 +388,32 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testFormKeygen()
+	{
+		$form1 = $this->formBuilder->keygen('rsa', ['challenge' => 'bar']);
+		$this->assertEquals('<keygen challenge="bar" keytype="rsa">', $form1);
+
+		$form2 = $this->formBuilder->keygen('ec', ['challenge' => 'bar']);
+		$this->assertEquals('<keygen challenge="bar" keytype="ec">', $form2);
+
+		$form3 = $this->formBuilder->keygen('foo', ['challenge' => 'bar']);
+		$this->assertEquals('<keygen challenge="bar" keytype="rsa">', $form3);
+	}
+
+
+	public function testFormOutput()
+	{
+		$form1 = $this->formBuilder->output('a');
+		$this->assertEquals('<output for="a"></output>', $form1);
+
+		$form2 = $this->formBuilder->output('a b', ['form' => 'foo']);
+		$this->assertEquals('<output form="foo" for="a b"></output>', $form2);
+
+		$form3 = $this->formBuilder->output(['b', 'c'], ['form' => 'bar']);
+		$this->assertEquals('<output form="bar" for="b c"></output>', $form3);
+	}
+
+
 	public function testResetInput()
 	{
 		$resetInput = $this->formBuilder->reset('foo');
