@@ -111,7 +111,7 @@ class RemoteManager {
 	 */
 	protected function setOutput(Connection $connection)
 	{
-		$output = php_sapi_name() == 'cli' ? new ConsoleOutput : new NullOutput;
+		$output = $this->app->runningInConsole() ? new ConsoleOutput : new NullOutput;
 
 		$connection->setOutput($output);
 	}
