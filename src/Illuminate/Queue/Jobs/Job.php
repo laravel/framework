@@ -66,6 +66,13 @@ abstract class Job {
 	 * @return void
 	 */
 	abstract public function release($delay = 0);
+	
+	/**
+	 * Get the ID of the job
+	 * 
+	 * @return mixed
+	 */
+	abstract public function getJobId();
 
 	/**
 	 * Get the number of times the job has been attempted.
