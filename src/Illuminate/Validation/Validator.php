@@ -392,6 +392,26 @@ class Validator implements ValidatorContract
 
         return array_intersect_key($this->data, $this->messages()->toArray());
     }
+    
+    /**
+     * Returns the data which was validated, and passed.
+     *
+     * @return array
+     */
+    public function validated()
+    {
+        return array_intersect_key($this->valid(), $this->rules);
+    }
+
+    /**
+     * Returns the data which was not at all validated.
+     *
+     * @return array
+     */
+    public function unvalidated()
+    {
+        return array_diff_key($this->data, $this->rules);
+    }
 
     /**
      * Get the value of a given attribute.
