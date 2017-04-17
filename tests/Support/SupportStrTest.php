@@ -205,4 +205,38 @@ class StringableObjectStub
     {
         return $this->value;
     }
+
+<<<<<<< HEAD
+    public function testStudly()
+    {
+        $this->assertEquals('LaravelPHPFramework', Str::studly('laravel_p_h_p_framework'));
+        $this->assertEquals('LaravelPhpFramework', Str::studly('laravel_php_framework'));
+        $this->assertEquals('LaravelPhPFramework', Str::studly('laravel-phP-framework'));
+        $this->assertEquals('LaravelPhpFramework', Str::studly('laravel  -_-  php   -_-   framework   '));
+    }
+
+    public function testCamel()
+    {
+        $this->assertEquals('laravelPHPFramework', Str::camel('Laravel_p_h_p_framework'));
+        $this->assertEquals('laravelPhpFramework', Str::camel('Laravel_php_framework'));
+        $this->assertEquals('laravelPhPFramework', Str::camel('Laravel-phP-framework'));
+        $this->assertEquals('laravelPhpFramework', Str::camel('Laravel  -_-  php   -_-   framework   '));
+    }
+=======
+	public function testStudly()
+	{
+		$this->assertEquals('LaravelPHPFramework',	Str::studly('laravel_p_h_p_framework'));
+		$this->assertEquals('LaravelPhpFramework',	Str::studly('laravel_php_framework'));
+		$this->assertEquals('LaravelPhPFramework',	Str::studly('laravel-phP-framework'));
+		$this->assertEquals('LaravelPhpFramework',	Str::studly('laravel  -_-  php   -_-   framework   '));
+	}
+
+	public function testCamel()
+	{
+		$this->assertEquals('laravelPHPFramework',	Str::camel('Laravel_p_h_p_framework'));
+		$this->assertEquals('laravelPhpFramework',	Str::camel('Laravel_php_framework'));
+		$this->assertEquals('laravelPhPFramework',	Str::camel('Laravel-phP-framework'));
+		$this->assertEquals('laravelPhpFramework',	Str::camel('Laravel  -_-  php   -_-   framework   '));
+	}
+>>>>>>> 4f1a646... Missing Str tests
 }
