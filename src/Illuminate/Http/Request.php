@@ -599,6 +599,9 @@ class Request extends SymfonyRequest implements ArrayAccess
     /**
      * Determine if the current request is asking for JSON in return.
      *
+     * Be careful with this method as doesn't necessarily represent if the
+     * client understands json at all. See the acceptsJson method.
+     *
      * @return bool
      */
     public function wantsJson()
