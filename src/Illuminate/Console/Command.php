@@ -254,6 +254,17 @@ class Command extends SymfonyCommand
     }
 
     /**
+     * Check if a command option is set.
+     *
+     * @param  string  $key
+     * @return string|array
+     */
+    public function hasOption($key)
+    {
+        return $this->input->hasParameterOption('--'.$key);
+    }
+
+    /**
      * Confirm a question with the user.
      *
      * @param  string  $question
