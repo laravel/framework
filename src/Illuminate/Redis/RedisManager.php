@@ -47,11 +47,11 @@ class RedisManager implements Factory
      * @param  string|null  $name
      * @return \Illuminate\Redis\Connections\Connection
      */
-    public function connection($name = null, $forceNew = false)
+    public function connection($name = null)
     {
         $name = $name ?: 'default';
 
-        if (isset($this->connections[$name]) && $forceNew == false) {
+        if (isset($this->connections[$name])) {
             return $this->connections[$name];
         }
 
@@ -61,13 +61,15 @@ class RedisManager implements Factory
     /**
      * Resolve the given connection by name.
      *
-     * @param  string  $name
+     * @param  string|null  $name
      * @return \Illuminate\Redis\Connections\Connection
      *
      * @throws \InvalidArgumentException
      */
-    protected function resolve($name)
+    public function resolve($name = null)
     {
+        $name = $name ?: 'default';
+
         $options = Arr::get($this->config, 'options', []);
 
         if (isset($this->config[$name])) {
