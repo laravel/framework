@@ -10,6 +10,14 @@ use Illuminate\Contracts\Validation\ValidationException as ValidationExceptionCo
  */
 trait ValidatesWhenResolvedTrait
 {
+
+    /**
+     * Contains return of authorize method
+     *
+     * @var bool
+     */
+    protected $passesAuthorization;
+
     /**
      * Validate the class instance.
      *
@@ -56,8 +64,10 @@ trait ValidatesWhenResolvedTrait
      */
     protected function passesAuthorization()
     {
-        if (method_exists($this, 'authorize')) {
-            return $this->authorize();
+        if (!$this->passesAuthorization) {
+            return false;
+        } elseif (method_exists($this, 'authorize')) {
+            $this->authorize();
         }
 
         return true;
