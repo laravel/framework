@@ -953,13 +953,14 @@ class Route
     }
 
     /**
-     * Get the action array for the route.
+     * Get the action array or specific key for the route.
      *
+     * @param  string  $key
      * @return array
      */
-    public function getAction()
+    public function getAction($key = null)
     {
-        return $this->action;
+        return array_get($this->action, $key);
     }
 
     /**
