@@ -237,6 +237,59 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('foo.bar', $router->currentRouteName());
     }
 
+    public function testFluentResourceRouteNamingWithinAGroup()
+    {
+        // With 'as' on group
+        $router = $this->getRouter();
+        $router->group(['as' => 'foo.'], function () use ($router) {
+            $router->resource('bar', 'FooController', ['only' => ['show']]);
+        });
+
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertEquals('foo.bar.show', $routes[0]->getName());
+        $this->assertEquals('bar/{bar}', $routes[0]->getUri());
+
+        // With 'prefix' on group
+        $router = $this->getRouter();
+        $router->group(['prefix' => 'foo'], function () use ($router) {
+            $router->resource('bar', 'FooController', ['only' => ['show']]);
+        });
+
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertEquals('bar.show', $routes[0]->getName());
+        $this->assertEquals('foo/bar/{bar}', $routes[0]->getUri());
+
+        // With 'prefix' and 'as' on group
+        $router = $this->getRouter();
+        $router->group(['prefix' => 'foo', 'as' => 'foo.'], function () use ($router) {
+            $router->resource('bar', 'FooController', ['only' => ['show']]);
+        });
+
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertEquals('foo.bar.show', $routes[0]->getName());
+        $this->assertEquals('foo/bar/{bar}', $routes[0]->getUri());
+
+        // Two groups with 'prefix' and 'as'
+        $router = $this->getRouter();
+        $router->group(['as' => 'foo.', 'prefix' => 'bar'], function () use ($router) {
+            $router->group(['as' => 'bar.', 'prefix' => 'foo'], function () use ($router) {
+                $router->resource('foo', 'FooController', ['only' => ['show']]);
+            });
+        });
+
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertEquals('foo.bar.foo.show', $routes[0]->getName());
+        $this->assertEquals('bar/foo/foo/{foo}', $routes[0]->getUri());
+    }
+
     public function testMacro()
     {
         $router = $this->getRouter();
