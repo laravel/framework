@@ -201,22 +201,6 @@ class PasswordBroker implements PasswordBrokerContract
                 $this->passwordValidator, $credentials) && $password === $confirm;
         }
 
-        return $this->validatePasswordWithDefaults($credentials);
-    }
-
-    /**
-     * Determine if the passwords are valid for the request.
-     *
-     * @param  array  $credentials
-     * @return bool
-     */
-    protected function validatePasswordWithDefaults(array $credentials)
-    {
-        list($password, $confirm) = [
-            $credentials['password'],
-            $credentials['password_confirmation'],
-        ];
-
         return $password === $confirm && mb_strlen($password) >= 6;
     }
 
