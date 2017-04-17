@@ -35,7 +35,7 @@ class PresetCommand extends Command
             return call_user_func(static::$macros[$this->argument('type')], $this);
         }
 
-        if (! in_array($this->argument('type'), ['none', 'bootstrap', 'react'])) {
+        if (! in_array($this->argument('type'), ['none', 'bootstrap', 'vue', 'react'])) {
             throw new InvalidArgumentException('Invalid preset.');
         }
 
@@ -64,6 +64,19 @@ class PresetCommand extends Command
         Presets\Bootstrap::install();
 
         $this->info('Bootstrap scaffolding installed successfully.');
+        $this->comment('Please run "npm install && npm run dev" to compile your fresh scaffolding.');
+    }
+
+    /**
+     * Install the "vue" preset.
+     *
+     * @return void
+     */
+    public function vue()
+    {
+        Presets\Vue::install();
+
+        $this->info('Vue scaffolding installed successfully.');
         $this->comment('Please run "npm install && npm run dev" to compile your fresh scaffolding.');
     }
 
