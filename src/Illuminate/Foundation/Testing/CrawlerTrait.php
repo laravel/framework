@@ -499,6 +499,16 @@ trait CrawlerTrait
 
         return $server;
     }
+    
+    /**
+     * Returns the last response.
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function getResponse()
+    {
+        return $this->response;
+    }
 
     /**
      * Dump the content from the last response.
