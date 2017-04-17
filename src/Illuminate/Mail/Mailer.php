@@ -408,7 +408,13 @@ class Mailer implements MailerContract, MailQueueContract
      */
     protected function logMessage($message)
     {
-        $emails = implode(', ', array_keys((array) $message->getTo()));
+        $recipients = array_merge(
+            (array) $message->getTo(),
+            (array) $message->getCc(),
+            (array) $message->getBcc()
+        );
+
+        $emails = implode(', ', array_keys($recipients));
 
         $this->logger->info("Pretending to mail message to: {$emails}");
     }
