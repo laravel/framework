@@ -19,7 +19,6 @@ class Factory implements ArrayAccess
      * Create a new factory instance.
      *
      * @param  \Faker\Generator  $faker
-     * @return void
      */
     public function __construct(Faker $faker)
     {
