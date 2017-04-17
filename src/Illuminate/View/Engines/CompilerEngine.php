@@ -57,8 +57,6 @@ class CompilerEngine extends PhpEngine
         // which have been rendered for right exception messages to be generated.
         $results = $this->evaluatePath($compiled, $data);
 
-        array_pop($this->lastCompiled);
-
         return $results;
     }
 
