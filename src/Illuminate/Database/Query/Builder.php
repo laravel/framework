@@ -17,6 +17,7 @@ use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Pagination\OutOfPaginationRangeException;
 
 class Builder
 {
@@ -1718,12 +1719,20 @@ class Builder
      * @param  string  $pageName
      * @param  int|null  $page
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     *
+     * @throws \Illuminate\Pagination\OutOfPaginationRangeException
      */
     public function paginate($perPage = 15, $columns = ['*'], $pageName = 'page', $page = null)
     {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
         $total = $this->getCountForPagination($columns);
+
+        $pages = (int) ceil($total / $perPage);
+
+        if ($pages && $page > $pages || ! $pages && $page > 1) {
+            throw (new OutOfPaginationRangeException())->setPage($page);
+        }
 
         $results = $total ? $this->forPage($page, $perPage)->get($columns) : collect();
 

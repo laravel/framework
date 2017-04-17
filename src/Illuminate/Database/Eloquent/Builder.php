@@ -12,6 +12,7 @@ use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Pagination\OutOfPaginationRangeException;
 
 /**
  * @mixin \Illuminate\Database\Query\Builder
@@ -690,6 +691,12 @@ class Builder
         $results = ($total = $this->toBase()->getCountForPagination())
                                     ? $this->forPage($page, $perPage)->get($columns)
                                     : $this->model->newCollection();
+
+        $pages = (int) ceil($total / $perPage);
+
+        if ($pages && $page > $pages || ! $pages && $page > 1) {
+            throw (new OutOfPaginationRangeException())->setPage($page);
+        }
 
         return new LengthAwarePaginator($results, $total, $perPage, $page, [
             'path' => Paginator::resolveCurrentPath(),
