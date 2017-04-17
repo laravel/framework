@@ -518,7 +518,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function header($key = null, $default = null)
     {
-        return $this->retrieveItem('headers', $key, $default);
+        return $this->headers->get($key, $default, false);
     }
 
     /**

@@ -347,6 +347,8 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
     {
         $request = Request::create('/', 'GET', [], [], [], ['HTTP_DO_THIS' => 'foo']);
         $this->assertEquals('foo', $request->header('do-this'));
+        $request->headers->set('do-this', ['foo', 'bar']);
+        $this->assertEquals(['foo', 'bar'], $request->header('do-this'));
         $all = $request->header(null);
         $this->assertEquals('foo', $all['do-this'][0]);
     }
