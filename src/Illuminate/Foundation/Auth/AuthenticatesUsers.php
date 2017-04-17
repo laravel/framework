@@ -32,9 +32,9 @@ trait AuthenticatesUsers
      */
     public function postLogin(Request $request)
     {
-        $this->validate($request, [
-            $this->loginUsername() => 'required', 'password' => 'required',
-        ]);
+        $this->validate($request,
+            $this->loginValidateRules(),
+            $this->loginValidateMessages());
 
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
         // the login attempts for this application. We'll key this by the username and
@@ -49,6 +49,8 @@ trait AuthenticatesUsers
 
         if (Auth::attempt($credentials, $request->has('remember'))) {
             return $this->handleUserWasAuthenticated($request, $throttles);
+        } else {
+            $this->handleUserAuthenticateFailed($request);
         }
 
         // If the login attempt was unsuccessful we will increment the number of attempts
@@ -83,6 +85,40 @@ trait AuthenticatesUsers
         }
 
         return redirect()->intended($this->redirectPath());
+    }
+
+    /**
+     * Do something when user authenticate failed
+     *
+     * @param \Illuminate\Http\Request  $request
+     */
+    protected function handleUserAuthenticateFailed($request)
+    {
+        if (method_exists($this, 'authenticateFailed')) {
+            $this->authenticateFailed($request);
+        }
+    }
+
+    /**
+     * Get the login validate rules
+     *
+     * @return array
+     */
+    protected function loginValidateRules()
+    {
+        return [
+            $this->loginUsername() => 'required', 'password' => 'required',
+        ];
+    }
+
+    /**
+     * Get custom login validate messages
+     *
+     * @return array
+     */
+    protected function loginValidateMessages()
+    {
+        return [];
     }
 
     /**
