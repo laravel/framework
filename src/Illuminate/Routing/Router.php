@@ -464,6 +464,22 @@ class Router implements RegistrarContract
     }
 
     /**
+     * Get the name from the last group on the stack.
+     *
+     * @return string
+     */
+    public function getLastGroupName()
+    {
+        if (!empty($this->groupStack)) {
+            $last = end($this->groupStack);
+
+            return isset($last['as']) ? $last['as'] : '';
+        }
+
+        return '';
+    }
+
+    /**
      * Add a route to the underlying route collection.
      *
      * @param  array|string  $methods
