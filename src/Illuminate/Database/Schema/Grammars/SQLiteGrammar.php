@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
+use RuntimeException;
 use Illuminate\Support\Fluent;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
@@ -473,10 +474,12 @@ class SQLiteGrammar extends Grammar
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
+     *
+     * @throws \RuntimeException
      */
     protected function typeEnum(Fluent $column)
     {
-        return 'varchar';
+        throw new RuntimeException('Enum types are not supported by SQLite.');
     }
 
     /**
@@ -484,10 +487,12 @@ class SQLiteGrammar extends Grammar
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
+     *
+     * @throws \RuntimeException
      */
     protected function typeJson(Fluent $column)
     {
-        return 'text';
+        throw new RuntimeException('Json types are not supported by SQLite.');
     }
 
     /**
@@ -495,10 +500,12 @@ class SQLiteGrammar extends Grammar
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
+     *
+     * @throws \RuntimeException
      */
     protected function typeJsonb(Fluent $column)
     {
-        return 'text';
+        throw new RuntimeException('Jsonb types are not supported by SQLite.');
     }
 
     /**
