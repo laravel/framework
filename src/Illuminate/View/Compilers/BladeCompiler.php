@@ -132,7 +132,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     public function compileString($value)
     {
-        $result = '';
+        $result = $this->getHeader();
 
         $this->footer = [];
 
@@ -171,6 +171,16 @@ class BladeCompiler extends Compiler implements CompilerInterface
         }
 
         return $content;
+    }
+
+    /**
+     * Get header.
+     *
+     * @return string
+     */
+    protected function getHeader()
+    {
+        return "<?php // File: {$this->getPath()} ?>";
     }
 
     /**
