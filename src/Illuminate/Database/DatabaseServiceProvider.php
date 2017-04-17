@@ -14,8 +14,6 @@ class DatabaseServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap the application events.
-     *
-     * @return void
      */
     public function boot()
     {
@@ -26,8 +24,6 @@ class DatabaseServiceProvider extends ServiceProvider
 
     /**
      * Register the service provider.
-     *
-     * @return void
      */
     public function register()
     {
@@ -58,13 +54,11 @@ class DatabaseServiceProvider extends ServiceProvider
 
     /**
      * Register the Eloquent factory instance in the container.
-     *
-     * @return void
      */
     protected function registerEloquentFactory()
     {
-        $this->app->singleton(FakerGenerator::class, function () {
-            return FakerFactory::create();
+        $this->app->singleton(FakerGenerator::class, function ($app) {
+            return FakerFactory::create($app['config']->get('database.faker_locale', 'en_US'));
         });
 
         $this->app->singleton(EloquentFactory::class, function ($app) {
@@ -76,13 +70,11 @@ class DatabaseServiceProvider extends ServiceProvider
 
     /**
      * Register the queueable entity resolver implementation.
-     *
-     * @return void
      */
     protected function registerQueueableEntityResolver()
     {
         $this->app->singleton('Illuminate\Contracts\Queue\EntityResolver', function () {
-            return new QueueEntityResolver;
+            return new QueueEntityResolver();
         });
     }
 }
