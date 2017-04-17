@@ -4,6 +4,7 @@ namespace Illuminate\Bus;
 
 use Closure;
 use RuntimeException;
+use InvalidArgumentException;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -39,6 +40,13 @@ class Dispatcher implements QueueingDispatcher
      * @var \Closure|null
      */
     protected $queueResolver;
+
+    /**
+     * The mapper callback.
+     *
+     * @var \Closure|null
+     */
+    protected $mapper;
 
     /**
      * Create a new command dispatcher instance.
@@ -78,7 +86,11 @@ class Dispatcher implements QueueingDispatcher
     public function dispatchNow($command)
     {
         return $this->pipeline->send($command)->through($this->pipes)->then(function ($command) {
-            return $this->container->call([$command, 'handle']);
+            if (method_exists($command, 'handle')) {
+                return $this->container->call([$command, 'handle']);
+            }
+
+            return call_user_func([$this->getHandler($command), 'handle'], $command);
         });
     }
 
@@ -140,6 +152,34 @@ class Dispatcher implements QueueingDispatcher
         }
 
         return $queue->push($command);
+    }
+
+    /**
+     * Get the handler class for the given command.
+     *
+     * @param  mixed  $command
+     * @return string
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function getHandler($command)
+    {
+        if (! $this->mapper) {
+            throw new InvalidArgumentException("No handler registered for command [{$className}]");
+        }
+
+        return $this->container->make(call_user_func($this->mapper, $command));
+    }
+
+    /**
+     * Register a mapper.
+     *
+     * @param  \Closure  $mapper
+     * @return void
+     */
+    public function mapUsing(Closure $mapper)
+    {
+        $this->mapper = $mapper;
     }
 
     /**

@@ -59,7 +59,27 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase
             return $mock;
         });
 
-        $dispatcher->dispatch(new BusDispatcherBasicCommand);
+        $result = $dispatcher->dispatch(new BusDispatcherBasicCommand('hello'));
+
+        $this->assertEquals('hello', $result);
+    }
+
+    public function testDispatchNowWithHandler()
+    {
+        $container = new Container;
+        $mock = m::mock('Illuminate\Contracts\Queue\Queue');
+        $mock->shouldReceive('push')->never();
+        $dispatcher = new Dispatcher($container, function () use ($mock) {
+            return $mock;
+        });
+
+        $dispatcher->mapUsing(function ($command) {
+            return get_class($command).'Handler';
+        });
+
+        $result = $dispatcher->dispatch(new BusDispatcherCommand(123));
+
+        $this->assertEquals(165, $result);
     }
 }
 
@@ -78,7 +98,25 @@ class BusDispatcherBasicCommand
 
     public function handle(BusInjectionStub $stub)
     {
-        //
+        return $this->name;
+    }
+}
+
+class BusDispatcherCommand
+{
+    public $foo;
+
+    public function __construct($foo = null)
+    {
+        $this->foo = $foo;
+    }
+}
+
+class BusDispatcherCommandHandler
+{
+    public function handle(BusDispatcherCommand $command)
+    {
+        return $command->foo + 42;
     }
 }
 
