@@ -5,10 +5,11 @@ namespace Illuminate\Filesystem;
 use ErrorException;
 use FilesystemIterator;
 use Symfony\Component\Finder\Finder;
+use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
-class Filesystem
+class Filesystem implements FilesystemContract
 {
     use Macroable;
 
