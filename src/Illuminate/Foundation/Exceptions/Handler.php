@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation\Exceptions;
 
 use Exception;
-use Illuminate\Pagination\OutOfPaginationRangeException;
 use Psr\Log\LoggerInterface;
 use Illuminate\Http\Response;
 use Illuminate\Http\RedirectResponse;
@@ -14,6 +13,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Pagination\OutOfPaginationRangeException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
