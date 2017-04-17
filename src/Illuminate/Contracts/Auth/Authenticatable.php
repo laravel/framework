@@ -10,6 +10,13 @@ interface Authenticatable
      * @return mixed
      */
     public function getAuthIdentifier();
+    
+    /**
+     * Get the primary key for the model.
+     *
+     * @return string
+     */
+     public function getKeyName();
 
     /**
      * Get the password for the user.
