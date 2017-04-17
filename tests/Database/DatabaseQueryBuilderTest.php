@@ -1825,6 +1825,13 @@ class DatabaseQueryBuilderTest extends TestCase
         });
         $this->assertEquals($expectedSql, $builder->toSql());
         $this->assertEquals($expectedBindings, $builder->getBindings());
+
+        // extra clause removed
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->join('othertable', function ($join) { $join->where('bar', '=', 'foo'); })->where('registered', 1)->where('foo', '=', 'qux')->groupBy('city')->having('population', '>', 3)->orderByRaw('match ("foo") against(?)', ['bar']);
+        $builder->removeClause('where', 1);
+        $this->assertEquals($expectedSql, $builder->toSql());
+        $this->assertEquals($expectedBindings, $builder->getBindings());
     }
 
     public function testAddBindingWithArrayMergesBindings()
@@ -1862,6 +1869,38 @@ class DatabaseQueryBuilderTest extends TestCase
         $otherBuilder->addBinding('bar', 'where');
         $builder->mergeBindings($otherBuilder);
         $this->assertEquals(['foo', 'bar', 'baz'], $builder->getBindings());
+    }
+
+    public function testBindingIndexMatchesWhere()
+    {
+        $expectedBindings = [
+            0 => [0 => 'bar'],
+            2 => [0 => ['baz', 'qux']],
+        ];
+
+        $builder = $this->getBuilder();
+        $builder->where('foo', '=', 'bar');
+        $builder->whereNull('foo');
+        $builder->whereBetween('foo', ['baz', 'qux']);
+
+        $this->assertEquals($expectedBindings, $builder->getRawIndexedBindings()['where']);
+    }
+
+    public function testBindingAndClauseRemoval()
+    {
+        $expectedBindings = [
+            0 => [0 => 'bar'],
+            2 => [0 => ['baz', 'qux']],
+        ];
+
+        $builder = $this->getBuilder();
+        $builder->where('foo', '=', 'bar');
+        $builder->orWhere('foo', '=', 'qux');
+        $builder->whereBetween('foo', ['baz', 'qux']);
+
+        $builder->removeClause('where', 1);
+
+        $this->assertEquals($expectedBindings, $builder->getRawIndexedBindings()['where']);
     }
 
     public function testSubSelect()
