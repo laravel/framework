@@ -909,4 +909,17 @@ class Request extends SymfonyRequest implements ArrayAccess
             return $this->route($key);
         }
     }
+
+    /**
+     * Get a subset of the items from the input data.
+     *
+     * @param  array|mixed  $keys
+     * @return array
+     */
+    public function __invoke($keys)
+    {
+        $keys = is_array($keys) ? $keys : func_get_args();
+
+        return $this->only($keys);
+    }
 }
