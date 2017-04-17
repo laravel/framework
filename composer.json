@@ -16,6 +16,7 @@
     ],
     "require": {
         "php": ">=5.5.9",
+        "ext-fileinfo": "*",
         "ext-mbstring": "*",
         "ext-openssl": "*",
         "classpreloader/classpreloader": "~2.0|~3.0",
