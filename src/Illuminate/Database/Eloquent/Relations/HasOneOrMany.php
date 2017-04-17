@@ -305,7 +305,7 @@ abstract class HasOneOrMany extends Relation
      * @param  array  $attributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function create(array $attributes)
+    public function create(array $attributes = [])
     {
         // Here we will set the raw attributes to avoid hitting the "fill" method so
         // that we do not have to worry about a mass accessor rules blocking sets
@@ -342,7 +342,7 @@ abstract class HasOneOrMany extends Relation
      * @param  array  $attributes
      * @return int
      */
-    public function update(array $attributes)
+    public function update(array $attributes = [])
     {
         if ($this->related->usesTimestamps()) {
             $attributes[$this->relatedUpdatedAt()] = $this->related->freshTimestampString();

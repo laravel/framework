@@ -259,7 +259,7 @@ class BelongsTo extends Relation
      * @param  array  $attributes
      * @return mixed
      */
-    public function update(array $attributes)
+    public function update(array $attributes = [])
     {
         $instance = $this->getResults();
 
