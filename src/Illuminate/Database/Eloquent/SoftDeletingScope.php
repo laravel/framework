@@ -2,6 +2,8 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use Illuminate\Support\Collection as BaseCollection;
+
 class SoftDeletingScope implements ScopeInterface
 {
     /**
@@ -38,7 +40,7 @@ class SoftDeletingScope implements ScopeInterface
 
         $query = $builder->getQuery();
 
-        $query->wheres = collect($query->wheres)->reject(function ($where) use ($column) {
+        $query->wheres = (new BaseCollection($query->wheres))->reject(function ($where) use ($column) {
             return $this->isSoftDeleteConstraint($where, $column);
         })->values()->all();
     }
