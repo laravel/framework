@@ -47,11 +47,11 @@ class RedisManager implements Factory
      * @param  string|null  $name
      * @return \Illuminate\Redis\Connections\Connection
      */
-    public function connection($name = null)
+    public function connection($name = null, $forceNew = false)
     {
         $name = $name ?: 'default';
 
-        if (isset($this->connections[$name])) {
+        if (isset($this->connections[$name]) && $forceNew == false) {
             return $this->connections[$name];
         }
 
