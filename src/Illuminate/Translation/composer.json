@@ -15,6 +15,7 @@
     ],
     "require": {
         "php": ">=5.5.9",
+        "ext-mbstring": "*",
         "illuminate/filesystem": "5.1.*",
         "illuminate/support": "5.1.*",
         "symfony/translation": "2.7.*"
