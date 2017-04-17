@@ -23,12 +23,11 @@ class Parser
 
         preg_match('/[^\s]+/', $expression, $matches);
 
-        if (isset($matches[0])) {
-            $name = $matches[0];
-        } else {
+        if (! isset($matches[0])) {
             throw new InvalidArgumentException('Unable to determine command name from signature.');
         }
 
+        $name = $matches[0];
         preg_match_all('/\{\s*(.*?)\s*\}/', $expression, $matches);
 
         $tokens = isset($matches[1]) ? $matches[1] : [];
