@@ -798,3 +798,17 @@ if (! function_exists('with')) {
         return $object;
     }
 }
+if (!function_exists('dline')) {
+    /**
+     * Outputs the line where function was called
+     *
+     * @param  boolean $print_path include full path to file where function was called
+     * @return void
+     */
+    function dline($print_path=false)
+    {
+        $trace=debug_backtrace();
+        if($print_path) print_r($trace[0]['file'].": ");
+        print_r($trace[0]['line'].PHP_EOL);
+    }
+}
