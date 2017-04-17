@@ -43,7 +43,7 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
      * @param  \Illuminate\Database\ConnectionInterface  $connection
      * @param  string  $table
      * @param  string  $hashKey
-     * @param  int  $expires
+     * @param  int     $expires
      * @return void
      */
     public function __construct(ConnectionInterface $connection, $table, $hashKey, $expires = 60)
