@@ -653,16 +653,11 @@ class Router implements RegistrarContract
      */
     public function dispatchToRoute(Request $request)
     {
-        // First we will find a route that matches this request. We will also set the
-        // route resolver on the request so middlewares assigned to the route will
-        // receive access to this route instance for checking of the parameters.
-        $route = $this->findRoute($request);
-
-        $request->setRouteResolver(function () use ($route) {
-            return $route;
-        });
-
-        $this->events->fire('router.matched', [$route, $request]);
+        // Check if the request has already been matched to a route. If not perform
+        // the route matching now.
+        if (is_null($route = $request->route())) {
+            $route = $this->matchRoute($request);
+        }
 
         // Once we have successfully matched the incoming request to a given route we
         // can call the before filters on that route. This works similar to global
@@ -683,6 +678,28 @@ class Router implements RegistrarContract
         $this->callRouteAfter($route, $request, $response);
 
         return $response;
+    }
+
+    /**
+     * Match the request to its route.
+     * 
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Routing\Route
+     */
+    public function matchRoute(Request $request)
+    {
+        // First we will find a route that matches this request. We will also set the
+        // route resolver on the request so middlewares assigned to the route will
+        // receive access to this route instance for checking of the parameters.
+        $route = $this->findRoute($request);
+
+        $request->setRouteResolver(function () use ($route) {
+            return $route;
+        });
+
+        $this->events->fire('router.matched', [$route, $request]);
+        
+        return $route;
     }
 
     /**
