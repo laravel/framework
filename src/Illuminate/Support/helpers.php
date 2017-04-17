@@ -143,6 +143,20 @@ if (! function_exists('array_first')) {
     }
 }
 
+if (! function_exists('array_flatmap')) {
+    /**
+     * Map an array and flatten the result by a single level.
+     *
+     * @param  array  $array
+     * @param  callable  $callback
+     * @return array
+     */
+    function array_flatmap($array, callable $callback)
+    {
+        return Arr::flatmap($array, $callback);
+    }
+}
+
 if (! function_exists('array_flatten')) {
     /**
      * Flatten a multi-dimensional array into a single level.
