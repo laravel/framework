@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Exceptions;
 
 use Exception;
+use Illuminate\Pagination\OutOfPaginationRangeException;
 use Psr\Log\LoggerInterface;
 use Illuminate\Http\Response;
 use Illuminate\Http\RedirectResponse;
@@ -128,6 +129,8 @@ class Handler implements ExceptionHandlerContract
     protected function prepareException(Exception $e)
     {
         if ($e instanceof ModelNotFoundException) {
+            $e = new NotFoundHttpException($e->getMessage(), $e);
+        } elseif ($e instanceof OutOfPaginationRangeException) {
             $e = new NotFoundHttpException($e->getMessage(), $e);
         } elseif ($e instanceof AuthorizationException) {
             $e = new HttpException(403, $e->getMessage());
