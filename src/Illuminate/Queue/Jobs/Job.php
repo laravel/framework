@@ -3,6 +3,7 @@
 namespace Illuminate\Queue\Jobs;
 
 use DateTime;
+use Exception;
 use Illuminate\Support\Str;
 
 abstract class Job
@@ -206,10 +207,14 @@ abstract class Job
 
         list($class, $method) = $this->parseJob($payload['job']);
 
-        $this->instance = $this->resolve($class);
+        try {
+            $this->instance = $this->resolve($class);
 
-        if (method_exists($this->instance, 'failed')) {
-            $this->instance->failed($this->resolveQueueableEntities($payload['data']));
+            if (method_exists($this->instance, 'failed')) {
+                $this->instance->failed($this->resolveQueueableEntities($payload['data']));
+            }
+        } catch (Exception $e) {
+            //
         }
     }
 
