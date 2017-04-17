@@ -499,6 +499,18 @@ trait CrawlerTrait
 
         return $server;
     }
+    
+    /**
+     * Disable CSRF middleware for the test.
+     *
+     * @return $this
+     */
+    public function withoutCsrf()
+    {
+        $this->app->instance('csrf.disable', true);
+
+        return $this;
+    }
 
     /**
      * Dump the content from the last response.

@@ -46,7 +46,7 @@ class VerifyCsrfToken
      */
     public function handle($request, Closure $next)
     {
-        if ($this->isReading($request) || $this->shouldPassThrough($request) || $this->tokensMatch($request)) {
+        if ($this->isReading($request) || $this->shouldPassThrough($request) || $this->tokensMatch($request) || $this->isDisabled()) {
             return $this->addCookieToResponse($request, $next($request));
         }
 
@@ -127,5 +127,15 @@ class VerifyCsrfToken
     protected function isReading($request)
     {
         return in_array($request->method(), ['HEAD', 'GET', 'OPTIONS']);
+    }
+    
+    /**
+     * Determine if the CSRF check is disabled in our test.
+     *
+     * @return bool
+     */
+    protected function isDisabled()
+    {
+        return app()->bound('csrf.disable');
     }
 }
