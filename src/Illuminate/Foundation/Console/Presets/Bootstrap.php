@@ -2,9 +2,6 @@
 
 namespace Illuminate\Foundation\Console\Presets;
 
-use Illuminate\Support\Arr;
-use Illuminate\Filesystem\Filesystem;
-
 class Bootstrap extends Preset
 {
     /**
