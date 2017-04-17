@@ -8,6 +8,7 @@ use Exception;
 use ArrayAccess;
 use Carbon\Carbon;
 use LogicException;
+use RuntimeException;
 use JsonSerializable;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
@@ -2430,10 +2431,18 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @param  int  $options
      * @return string
+     *
+     * @throws \RuntimeException
      */
     public function toJson($options = 0)
     {
-        return json_encode($this->jsonSerialize(), $options);
+        $json = json_encode($this->jsonSerialize(), $options);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new RuntimeException('Error encoding model to JSON. Reason: '.json_last_error_msg(), json_last_error());
+        }
+
+        return $json;
     }
 
     /**
