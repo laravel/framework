@@ -414,14 +414,14 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
     {
         $container = new Container;
         $result = $container->call(function (StdClass $foo, $bar = []) {
-            return func_get_args();
+            return [$foo, $bar] + func_get_args();
         });
 
         $this->assertInstanceOf('stdClass', $result[0]);
         $this->assertEquals([], $result[1]);
 
         $result = $container->call(function (StdClass $foo, $bar = []) {
-            return func_get_args();
+            return [$foo, $bar] + func_get_args();
         }, ['bar' => 'taylor']);
 
         $this->assertInstanceOf('stdClass', $result[0]);
@@ -431,7 +431,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
          * Wrap a function...
          */
         $result = $container->wrap(function (StdClass $foo, $bar = []) {
-            return func_get_args();
+            return [$foo, $bar] + func_get_args();
         }, ['bar' => 'taylor']);
 
         $this->assertInstanceOf('Closure', $result);
@@ -469,6 +469,16 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
         $container = new Container;
         $result = $container->call('ContainerTestCallStub', ['foo', 'bar'], 'work');
         $this->assertEquals(['foo', 'bar'], $result);
+    }
+
+    public function testCallWithDefaultValueAndParameters()
+    {
+        $container = new Container;
+        $result = $container->call(function ($foo, $bar = []) {
+            return [$foo, $bar] + func_get_args();
+        }, ['foo', 'bar', 'baz']);
+
+        $this->assertEquals(['foo', 'bar', 'baz'], $result);
     }
 
     public function testCallWithCallableArray()
@@ -745,7 +755,7 @@ class ContainerTestCallStub
 
     public function inject(ContainerConcreteStub $stub, $default = 'taylor')
     {
-        return func_get_args();
+        return [$stub, $default] + func_get_args();
     }
 }
 
@@ -773,7 +783,7 @@ class ContainerStaticMethodStub
 {
     public static function inject(ContainerConcreteStub $stub, $default = 'taylor')
     {
-        return func_get_args();
+        return [$stub, $default] + func_get_args();
     }
 }
 
@@ -789,5 +799,5 @@ class ContainerInjectVariableStub
 
 function containerTestInject(ContainerConcreteStub $stub, $default = 'taylor')
 {
-    return func_get_args();
+    return [$stub, $default] + func_get_args();
 }
