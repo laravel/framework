@@ -17,7 +17,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
         $message = m::mock('Swift_Mime_Message');
         $mailer->expects($this->once())->method('createMessage')->will($this->returnValue($message));
         $view = m::mock('StdClass');
-        $mailer->getViewFactory()->shouldReceive('make')->once()->with('foo', ['data', 'message' => $message])->andReturn($view);
+        $mailer->getViewFactory()->shouldReceive('make')->once()->with('foo', ['data', '__message' => $message])->andReturn($view);
         $view->shouldReceive('render')->once()->andReturn('rendered.view');
         $message->shouldReceive('setBody')->once()->with('rendered.view', 'text/html');
         $message->shouldReceive('setFrom')->never();
@@ -37,8 +37,8 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
         $message = m::mock('Swift_Mime_Message');
         $mailer->expects($this->once())->method('createMessage')->will($this->returnValue($message));
         $view = m::mock('StdClass');
-        $mailer->getViewFactory()->shouldReceive('make')->once()->with('foo', ['data', 'message' => $message])->andReturn($view);
-        $mailer->getViewFactory()->shouldReceive('make')->once()->with('bar', ['data', 'message' => $message])->andReturn($view);
+        $mailer->getViewFactory()->shouldReceive('make')->once()->with('foo', ['data', '__message' => $message])->andReturn($view);
+        $mailer->getViewFactory()->shouldReceive('make')->once()->with('bar', ['data', '__message' => $message])->andReturn($view);
         $view->shouldReceive('render')->twice()->andReturn('rendered.view');
         $message->shouldReceive('setBody')->once()->with('rendered.view', 'text/html');
         $message->shouldReceive('addPart')->once()->with('rendered.view', 'text/plain');
@@ -59,8 +59,8 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
         $message = m::mock('Swift_Mime_Message');
         $mailer->expects($this->once())->method('createMessage')->will($this->returnValue($message));
         $view = m::mock('StdClass');
-        $mailer->getViewFactory()->shouldReceive('make')->once()->with('foo', ['data', 'message' => $message])->andReturn($view);
-        $mailer->getViewFactory()->shouldReceive('make')->once()->with('bar', ['data', 'message' => $message])->andReturn($view);
+        $mailer->getViewFactory()->shouldReceive('make')->once()->with('foo', ['data', '__message' => $message])->andReturn($view);
+        $mailer->getViewFactory()->shouldReceive('make')->once()->with('bar', ['data', '__message' => $message])->andReturn($view);
         $view->shouldReceive('render')->twice()->andReturn('rendered.view');
         $message->shouldReceive('setBody')->once()->with('rendered.view', 'text/html');
         $message->shouldReceive('addPart')->once()->with('rendered.view', 'text/plain');
@@ -132,7 +132,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
         $message = m::mock('Swift_Mime_Message');
         $mailer->expects($this->once())->method('createMessage')->will($this->returnValue($message));
         $view = m::mock('StdClass');
-        $mailer->getViewFactory()->shouldReceive('make')->once()->with('foo', ['data', 'message' => $message])->andReturn($view);
+        $mailer->getViewFactory()->shouldReceive('make')->once()->with('foo', ['data', '__message' => $message])->andReturn($view);
         $view->shouldReceive('render')->once()->andReturn('rendered.view');
         $message->shouldReceive('setBody')->once()->with('rendered.view', 'text/html');
         $message->shouldReceive('setFrom')->never();
@@ -162,7 +162,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
             return $mockMailer;
         });
         $mockMailer->shouldReceive('mail')->once()->with($message);
-        $mailer->getViewFactory()->shouldReceive('make')->once()->with('foo', ['data', 'message' => $message])->andReturn($view);
+        $mailer->getViewFactory()->shouldReceive('make')->once()->with('foo', ['data', '__message' => $message])->andReturn($view);
         $view->shouldReceive('render')->once()->andReturn('rendered.view');
         $message->shouldReceive('setBody')->once()->with('rendered.view', 'text/html');
         $message->shouldReceive('setFrom')->never();
