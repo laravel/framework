@@ -67,6 +67,30 @@ interface Dispatcher
     public function fire($event, $payload = [], $halt = false);
 
     /**
+     * Get all of the listeners for a given event name.
+     *
+     * @param  string  $eventName
+     * @return array
+     */
+    public function getListeners($eventName);
+
+    /**
+     * Register an event listener with the dispatcher.
+     *
+     * @param  mixed  $listener
+     * @return mixed
+     */
+    public function makeListener($listener);
+
+    /**
+     * Create a class based listener using the IoC container.
+     *
+     * @param  mixed  $listener
+     * @return \Closure
+     */
+    public function createClassListener($listener);
+
+    /**
      * Get the event that is currently firing.
      *
      * @return string
@@ -87,4 +111,12 @@ interface Dispatcher
      * @return void
      */
     public function forgetPushed();
+
+    /**
+     * Set the queue resolver implementation.
+     *
+     * @param  callable  $resolver
+     * @return $this
+     */
+    public function setQueueResolver(callable $resolver);
 }
