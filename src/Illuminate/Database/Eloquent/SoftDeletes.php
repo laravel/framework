@@ -166,4 +166,20 @@ trait SoftDeletes
     {
         return $this->getTable().'.'.$this->getDeletedAtColumn();
     }
+
+    /**
+     * Get the attributes that should be converted to dates.
+     *
+     * @return array
+     */
+    public function getDates()
+    {
+        $defaults = [
+            $this->getCreatedAtColumn(),
+            $this->getUpdatedAtColumn(),
+            $this->getDeletedAtColumn(),
+        ];
+
+        return $this->timestamps ? array_merge($this->dates, $defaults) : $this->dates;
+    }
 }
