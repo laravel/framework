@@ -566,6 +566,9 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, ['foo' => null], ['foo' => 'Accepted']);
         $this->assertFalse($v->passes());
 
+        $v = new Validator($trans, ['foo' => ''], ['foo' => 'Accepted']);
+        $this->assertFalse($v->passes());
+
         $v = new Validator($trans, [], ['foo' => 'Accepted']);
         $this->assertFalse($v->passes());
 
@@ -600,6 +603,15 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
     public function testValidateString()
     {
         $trans = $this->getRealTranslator();
+        $v = new Validator($trans, [], ['foo' => 'string']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => null], ['foo' => 'string']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => ''], ['foo' => 'string']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['x' => 'aslsdlks'], ['x' => 'string']);
         $this->assertTrue($v->passes());
 
@@ -641,6 +653,12 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, [], ['foo' => 'Boolean']);
         $this->assertTrue($v->passes());
 
+        $v = new Validator($trans, ['foo' => null], ['foo' => 'Boolean']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => ''], ['foo' => 'Boolean']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['foo' => false], ['foo' => 'Boolean']);
         $this->assertTrue($v->passes());
 
@@ -678,6 +696,12 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, [], ['foo' => 'Bool']);
         $this->assertTrue($v->passes());
 
+        $v = new Validator($trans, ['foo' => null], ['foo' => 'Bool']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => ''], ['foo' => 'Bool']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['foo' => false], ['foo' => 'Bool']);
         $this->assertTrue($v->passes());
 
@@ -700,6 +724,15 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
     public function testValidateNumeric()
     {
         $trans = $this->getRealTranslator();
+        $v = new Validator($trans, [], ['foo' => 'Numeric']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => null], ['foo' => 'Numeric']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => ''], ['foo' => 'Numeric']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['foo' => 'asdad'], ['foo' => 'Numeric']);
         $this->assertFalse($v->passes());
 
@@ -716,6 +749,15 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
     public function testValidateInteger()
     {
         $trans = $this->getRealTranslator();
+        $v = new Validator($trans, [], ['foo' => 'Integer']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => null], ['foo' => 'Integer']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => ''], ['foo' => 'Integer']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['foo' => 'asdad'], ['foo' => 'Integer']);
         $this->assertFalse($v->passes());
 
@@ -732,6 +774,15 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
     public function testValidateInt()
     {
         $trans = $this->getRealTranslator();
+        $v = new Validator($trans, [], ['foo' => 'Int']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => null], ['foo' => 'Int']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => ''], ['foo' => 'Int']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['foo' => 'asdad'], ['foo' => 'Int']);
         $this->assertFalse($v->passes());
 
