@@ -221,6 +221,17 @@ class PasswordBroker implements PasswordBrokerContract
     }
 
     /**
+     * Validates The Password Reset Token
+     *
+     * @param  string  $token
+     * @return boolean
+     */
+    public function validateToken($token)
+    {
+        return $this->tokens->validateTokenData($token);
+    }
+
+    /**
      * Get the user for the given credentials.
      *
      * @param  array  $credentials
