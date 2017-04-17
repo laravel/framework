@@ -798,3 +798,76 @@ if (! function_exists('with')) {
         return $object;
     }
 }
+
+if (! function_exists('array_flatten_values')) {
+    /**
+     * Normalise values using dot notation to signify sub-arrays
+     *
+     * The following array:
+     *   $array = [ 'foo', 'bar' => ['baz'], 'fizz' => ['buzz' => ['bing'], 'bang' => 'boom']]
+     *
+     * Would pre transformed into:
+     *   ['foo', 'bar.baz', 'fizz.buzz.bing', 'fizz.boom']
+     *
+     * @param  array  $array The array to normalise
+     * @return array
+     */
+    function array_flatten_values(array $array = [])
+    {
+        $vals = [];
+
+        foreach ($array as $k => $v) {
+            if (is_array($v)) {
+                $vals = array_merge($vals, array_map(function ($val) use ($k) { return $k.'.'.strval($val); }, array_flatten_values($v)));
+            } else {
+                $vals[] = $v;
+            }
+        }
+
+        return array_unique($vals);
+    }
+}
+
+if (! function_exists('array_flatten_keys')) {
+    /**
+     * Find all keys in the array and normalise into an array with dot notation
+     *
+     * The following array would be transformed with the function like this:
+     *   $array = ["key1" => "data", "key2" => ["subkey1" => "data"], "key3" => ["subkey2": "data"]]
+     *
+     * array_flatten_keys($array, false):
+     *   ["key1", "key2", "key3"]
+     *
+     * array_flatten_keys($array, true, true):
+     *   ["key1", "key2", "key2.subkey1", "key3", "key3.subkey2"]
+     *
+     * array_flatten_keys($array, true, false):
+     *   ["key1", "key2", "subkey1", "key2.subkey1", "key3", "subkey2", "key3.subkey2"]
+     *
+     * @param  array  $array The array to find keys for
+     * @param  bool|false  $deep Find keys for sub-arrays
+     * @param  bool|false  $strict If strict only include full key paths. If not, include all keys
+     * @return array
+     */
+    function array_flatten_keys(array $array = [], $deep = true, $strict = false)
+    {
+        $keys = array_keys($array);
+
+        if ($deep) {
+            foreach ($array as $k => $v) {
+                if (is_array($v)) {
+                    $sub = array_flatten_keys($v, $deep, $strict);
+
+                    if (! $strict) {
+                        $keys = array_unique(array_merge($keys, $sub));
+                    }
+
+                    // add dot-notation keys
+                    $keys = array_unique(array_merge($keys, array_map(function ($v) use ($k) { return $k.'.'.$v; }, $sub)));
+                }
+            }
+        }
+
+        return $keys;
+    }
+}

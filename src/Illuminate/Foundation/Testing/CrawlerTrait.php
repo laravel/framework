@@ -222,6 +222,82 @@ trait CrawlerTrait
     }
 
     /**
+     * Assert that the response contains the given JSON keys.
+     *
+     * Keys can be formatted with dot notation, or as nested arrays:
+     *   $keys = [ 'key1', 'key2' => ['subkey1'], 'key3.subkey2' ]
+     *
+     * Would match this json reponse:
+     *   {"key1": "data", "key2": {"subkey1": "data"}, "key3": {"subkey2": "data"}}
+     *
+     * @param  array|null  $data A list of JSON keys to look for
+     * @param  bool|false  $strict If strict, look for exact paths - if not, look for key anywhere in response
+     * @return $this
+     */
+    public function seeJsonKeys(array $data = null, $strict = false)
+    {
+        if (is_null($data)) {
+            $this->assertJson(
+                $this->response->getContent(), "Failed asserting that JSON returned [{$this->currentUri}]."
+            );
+
+            return $this;
+        }
+
+        return $this->seeJsonKeysContain($data, $strict, false);
+    }
+
+    /**
+     * Assert that the response does not contain the given JSON keys.
+     *
+     * @param  array|null  $data A list of JSON keys to look for
+     * @param  bool|false  $strict If strict, look for exact paths - if not, look for key anywhere in response
+     * @return $this
+     */
+    public function dontSeeJsonKeys(array $data = null, $strict = false)
+    {
+        if (is_null($data)) {
+            $this->assertJson(
+                $this->response->getContent(), "Failed asserting that JSON returned [{$this->currentUri}]."
+            );
+
+            return $this;
+        }
+
+        return $this->seeJsonKeysContain($data, $strict, true);
+    }
+
+    /**
+     * Assert that the response contains the given JSON keys.
+     *
+     * @param  array|null  $data A list of JSON keys to look for
+     * @param  bool|false  $strict If strict, look for exact paths - if not, look for key anywhere in response
+     * @param  bool  $negate
+     * @return $this
+     */
+    protected function seeJsonKeysContain(array $data, $strict = false, $negate = false)
+    {
+        $method = $negate ? 'assertFalse' : 'assertTrue';
+
+        // Normalise the values to dot notation
+        $data = array_flatten_values(array_sort_recursive($data));
+
+        // Get all array keys in a flat array with dot notation
+        $actual = array_sort_recursive(json_decode($this->response->getContent(), true));
+        $actualKeys = array_flatten_keys($actual, true, $strict);
+        $actual = json_encode($actual);
+
+        foreach ($data as $expected) {
+            $this->$method(
+                in_array($expected, $actualKeys),
+                ($negate ? 'Found unexpected' : 'Unable to find')." JSON key [{$expected}] within [{$actual}]."
+            );
+        }
+
+        return $this;
+    }
+
+    /**
      * Assert that the response doesn't contain JSON.
      *
      * @param  array|null  $data
