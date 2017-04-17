@@ -78,9 +78,10 @@ abstract class Manager
     {
         $method = 'create'.ucfirst($driver).'Driver';
 
-        // We'll check to see if a creator method exists for the given driver. If not we
-        // will check for a custom driver creator, which allows developers to create
-        // drivers using their own customized driver creator Closure to create it.
+        // We will check to see if a custom driver creator exists for the
+        // given driver, which allows developers to create drivers using
+        // their own customized driver creator Closure to create it.
+        // If we do not found we will check for a creator method.
         if (isset($this->customCreators[$driver])) {
             return $this->callCustomCreator($driver);
         } elseif (method_exists($this, $method)) {
