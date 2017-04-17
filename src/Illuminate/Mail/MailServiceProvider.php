@@ -104,7 +104,7 @@ class MailServiceProvider extends ServiceProvider
     protected function registerSwiftTransport()
     {
         $this->app['swift.transport'] = $this->app->share(function ($app) {
-            return new TransportManager($app);
+            return $app->make(TransportManager::class, [$app]);
         });
     }
 
