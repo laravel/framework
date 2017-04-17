@@ -96,7 +96,9 @@ class Redirector
      */
     public function intended($default = '/', $status = 302, $headers = [], $secure = null)
     {
-        $path = $this->session->pull('url.intended', $default);
+        // another approach using generator, but the $default parameter become useless
+        // $path = $this->generator->previous();
+        $path = $this->session->pull('_previous.url', $default);
 
         return $this->to($path, $status, $headers, $secure);
     }
