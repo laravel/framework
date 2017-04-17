@@ -221,7 +221,7 @@ trait ApplicationTrait
      * Assert that a given where condition exists in the database.
      *
      * @param  string  $table
-     * @param  array  $data
+     * @param  array   $data
      * @param  string  $connection
      * @return $this
      */
@@ -244,7 +244,7 @@ trait ApplicationTrait
      * Assert that a given where condition does not exist in the database.
      *
      * @param  string  $table
-     * @param  array  $data
+     * @param  array   $data
      * @param  string  $connection
      * @return $this
      */
@@ -257,7 +257,7 @@ trait ApplicationTrait
      * Assert that a given where condition does not exist in the database.
      *
      * @param  string  $table
-     * @param  array  $data
+     * @param  array   $data
      * @param  string  $connection
      * @return $this
      */
