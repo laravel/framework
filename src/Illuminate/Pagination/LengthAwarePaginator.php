@@ -128,7 +128,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
 
         $presenter = $presenter ?: new BootstrapThreePresenter($this);
 
-        return $presenter->render();
+        return new Expression($presenter->render());
     }
 
     /**
