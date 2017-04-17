@@ -105,6 +105,46 @@ class MySqlConnector extends Connector implements ConnectorInterface
     }
 
     /**
+     * Get the modes for the connection.
+     *
+     * @param  array  $config
+     * @return array
+     */
+    protected function getModes(array $config)
+    {
+        if (isset($config['modes'])) {
+            return (array) $config['modes'];
+        }
+
+        if ($config['strict'] === false) {
+            return ['NO_ENGINE_SUBSTITUTION'];
+        }
+
+        if ($config['strict'] === true) {
+            return [
+                'ERROR_FOR_DIVISION_BY_ZERO',
+                'NO_AUTO_CREATE_USER',
+                'NO_ENGINE_SUBSTITUTION',
+                'NO_ZERO_DATE',
+                'NO_ZERO_IN_DATE',
+                'ONLY_FULL_GROUP_BY',
+                'STRICT_TRANS_TABLES',
+            ];
+        }
+    }
+
+    /**
+     * Ensure that the SQL mode should be set.
+     *
+     * @param  array  $config
+     * @return bool
+     */
+    protected function shouldSetSqlMode(array $config)
+    {
+        return isset($config['modes']) || isset($config['strict']);
+    }
+
+    /**
      * Set the modes for the connection.
      *
      * @param  \PDO  $connection
@@ -113,16 +153,9 @@ class MySqlConnector extends Connector implements ConnectorInterface
      */
     protected function setModes(PDO $connection, array $config)
     {
-        if (isset($config['modes'])) {
-            $modes = implode(',', $config['modes']);
-
-            $connection->prepare("set session sql_mode='".$modes."'")->execute();
-        } elseif (isset($config['strict'])) {
-            if ($config['strict']) {
-                $connection->prepare("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'")->execute();
-            } else {
-                $connection->prepare("set session sql_mode='NO_ENGINE_SUBSTITUTION'")->execute();
-            }
+        if ($this->shouldSetSqlMode($config)) {
+            $sqlModes = str_replace("'", '', implode(',', $this->getModes($config)));
+            $connection->prepare("set session sql_mode='".$sqlModes."'")->execute();
         }
     }
 }
