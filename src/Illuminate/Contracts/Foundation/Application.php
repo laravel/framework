@@ -2,6 +2,7 @@
 
 namespace Illuminate\Contracts\Foundation;
 
+use Closure;
 use Illuminate\Contracts\Container\Container;
 
 interface Application extends Container
@@ -21,12 +22,27 @@ interface Application extends Container
     public function basePath();
 
     /**
+     * Get the path to the storage directory.
+     *
+     * @return string
+     */
+    public function storagePath();
+
+    /**
      * Get or check the current application environment.
      *
      * @param  mixed
      * @return string
      */
     public function environment();
+
+    /**
+     * Detect the application's current environment.
+     *
+     * @param  \Closure  $callback
+     * @return string
+     */
+    public function detectEnvironment(Closure $callback);
 
     /**
      * Determine if the application is currently down for maintenance.
