@@ -986,7 +986,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     {
         $builder = $this->getSQLiteBuilder();
         $builder->getConnection()->shouldReceive('insert')->once()->with('insert into "users" ("email", "name") select ? as "email", ? as "name" union all select ? as "email", ? as "name"', ['foo', 'taylor', 'bar', 'dayle'])->andReturn(true);
-        $result = $builder->from('users')->insert([['email' => 'foo', 'name' => 'taylor'], ['email' => 'bar', 'name' => 'dayle']]);
+        $result = $builder->from('users')->insert([['email' => 'foo', 'name' => 'taylor'], ['name' => 'dayle', 'email' => 'bar']]);
         $this->assertTrue($result);
     }
 
