@@ -104,6 +104,10 @@ trait MocksApplicationServices
             $this->firedEvents[] = $called;
         });
 
+        $mock->shouldReceive('listen')->andReturnUsing(function ($event, $listener, $priority) {
+            //
+        });
+
         $this->app->instance('events', $mock);
 
         return $this;
