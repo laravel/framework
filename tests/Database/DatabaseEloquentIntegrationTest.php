@@ -3,12 +3,12 @@
 namespace Illuminate\Tests\Database;
 
 use Exception;
-use Illuminate\Pagination\OutOfPaginationRangeException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Pagination\OutOfPaginationRangeException;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
 
 class DatabaseEloquentIntegrationTest extends TestCase
