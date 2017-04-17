@@ -615,11 +615,12 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Get one or more items randomly from the collection.
      *
      * @param  int  $amount
+     * @param  bool $forceArray
      * @return mixed
      *
      * @throws \InvalidArgumentException
      */
-    public function random($amount = 1)
+    public function random($amount = 1, $forceArray = false)
     {
         if ($amount > ($count = $this->count())) {
             throw new InvalidArgumentException("You requested {$amount} items, but there are only {$count} items in the collection");
@@ -627,11 +628,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         $keys = array_rand($this->items, $amount);
 
-        if ($amount == 1) {
+        if (!$forceArray && $amount == 1) {
             return $this->items[$keys];
         }
 
-        return new static(array_intersect_key($this->items, array_flip($keys)));
+        return new static(array_intersect_key($this->items, array_flip((array) $keys)));
     }
 
     /**
