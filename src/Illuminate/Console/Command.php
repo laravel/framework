@@ -68,11 +68,7 @@ class Command extends SymfonyCommand
         // We will go ahead and set the name, description, and parameters on console
         // commands just to make things a little easier on the developer. This is
         // so they don't have to all be manually specified in the constructors.
-        if (isset($this->signature)) {
-            $this->configureUsingFluentDefinition();
-        } else {
-            parent::__construct($this->name);
-        }
+        isset($this->signature) ? $this->configureUsingFluentDefinition() : parent::__construct($this->name);
 
         $this->setDescription($this->description);
 
