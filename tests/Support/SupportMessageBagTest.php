@@ -181,4 +181,11 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase
         $messageBag = new MessageBag(['country' => 'Azerbaijan', 'capital' => 'Baku']);
         $this->assertEquals(['country' => ['Azerbaijan'], 'capital' => ['Baku']], $messageBag->getMessages());
     }
+
+    public function testConstructorUniqueness()
+    {
+        $messageBag = new MessageBag(['messages' => ['first', 'second', 'third', 'third']]);
+        $messages = $messageBag->getMessages();
+        $this->assertEquals(['first', 'second', 'third'], $messages['messages']);
+    }
 }
