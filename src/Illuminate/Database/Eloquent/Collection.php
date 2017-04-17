@@ -118,8 +118,8 @@ class Collection extends BaseCollection
     {
         $dictionary = $this->getDictionary();
 
-        foreach ($items as $item) {
-            $dictionary[$item->getKey()] = $item;
+        foreach ($items as $key => $item) {
+            $dictionary[$key] = $item;
         }
 
         return new static(array_values($dictionary));
@@ -137,8 +137,8 @@ class Collection extends BaseCollection
 
         $dictionary = $this->getDictionary($items);
 
-        foreach ($this->items as $item) {
-            if (! isset($dictionary[$item->getKey()])) {
+        foreach ($this->items as $key => $item) {
+            if (! isset($dictionary[$key])) {
                 $diff->add($item);
             }
         }
@@ -158,8 +158,8 @@ class Collection extends BaseCollection
 
         $dictionary = $this->getDictionary($items);
 
-        foreach ($this->items as $item) {
-            if (isset($dictionary[$item->getKey()])) {
+        foreach ($this->items as $key => $item) {
+            if (isset($dictionary[$key])) {
                 $intersect->add($item);
             }
         }
@@ -235,8 +235,8 @@ class Collection extends BaseCollection
 
         $dictionary = [];
 
-        foreach ($items as $value) {
-            $dictionary[$value->getKey()] = $value;
+        foreach ($items as $key => $value) {
+            $dictionary[$key] = $value;
         }
 
         return $dictionary;
