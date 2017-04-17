@@ -512,7 +512,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileFor($expression)
     {
-        return "<?php for{$expression}: ?>";
+        return '<?php '.$this->beforeStartLoop($expression, false)." for{$expression}: ".$this->afterStartLoop().' ?>';
     }
 
     /**
@@ -523,7 +523,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileForeach($expression)
     {
-        return "<?php foreach{$expression}: ?>";
+        return '<?php '.$this->beforeStartLoop($expression)." foreach{$expression}: ".$this->afterStartLoop().' ?>';
     }
 
     /**
@@ -536,7 +536,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         $empty = '$__empty_'.++$this->forelseCounter;
 
-        return "<?php {$empty} = true; foreach{$expression}: {$empty} = false; ?>";
+        return "<?php {$empty} = true; ".$this->beforeStartLoop($expression)." foreach{$expression}: {$empty} = false; ".$this->afterStartLoop().' ?>';
     }
 
     /**
@@ -593,7 +593,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         $empty = '$__empty_'.$this->forelseCounter--;
 
-        return "<?php endforeach; if ({$empty}): ?>";
+        return '<?php '.$this->beforeEndLoop().' endforeach; '.$this->afterEndLoop()." if ({$empty}): ?>";
     }
 
     /**
@@ -604,7 +604,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileWhile($expression)
     {
-        return "<?php while{$expression}: ?>";
+        return '<?php '.$this->beforeStartLoop($expression, false)." while{$expression}: ".$this->afterStartLoop().' ?>';
     }
 
     /**
@@ -615,7 +615,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileEndwhile($expression)
     {
-        return '<?php endwhile; ?>';
+        return '<?php '.$this->beforeEndLoop().' endwhile; '.$this->afterEndLoop().' ?>';
     }
 
     /**
@@ -626,7 +626,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileEndfor($expression)
     {
-        return '<?php endfor; ?>';
+        return '<?php '.$this->beforeEndLoop().' endfor; '.$this->afterEndLoop().' ?>';
     }
 
     /**
@@ -637,7 +637,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileEndforeach($expression)
     {
-        return '<?php endforeach; ?>';
+        return '<?php '.$this->beforeEndLoop().' endforeach; '.$this->afterEndLoop().' ?>';
     }
 
     /**
@@ -885,5 +885,69 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function setEchoFormat($format)
     {
         $this->echoFormat = $format;
+    }
+
+    /**
+     * Set $_loop object default properties before loop.
+     *
+     * @param  string  $expression
+     * @param  bool    $count
+     * @return string
+     */
+    protected function beforeStartLoop(&$expression, $count = true)
+    {
+        // when counted replace collection variable with stored one
+        if ($count) {
+            $collection = substr($expression, 1, strpos(strtolower($expression), ' as '));
+            $expression = str_replace($collection, '$_loop->collection ', $expression);
+        }
+
+        return 'if (isset($_loop)) {
+            $__loopParent = $_loop;
+        } else {
+            $__loopParent = null;
+        }
+        $_loop = new \stdClass();
+        $_loop->parent = $__loopParent;
+        $_loop->index = 0;
+        $_loop->num = 0;
+        $_loop->first = true;
+        $_loop->total = '.($count ? 'count($_loop->collection = '.$collection.')' : 'null').';';
+    }
+
+    /**
+     * Update $_loop index, num and last properties.
+     *
+     * @return string
+     */
+    protected function afterStartLoop()
+    {
+        return '$_loop->num++;
+        $_loop->last = $_loop->num == $_loop->total;';
+    }
+
+    /**
+     * Update $_loop first and index properties.
+     *
+     * @return string
+     */
+    protected function beforeEndLoop()
+    {
+        return '$_loop->first = false;
+        $_loop->index++;';
+    }
+
+    /**
+     * Cleanup $_loop variable.
+     *
+     * @return string
+     */
+    protected function afterEndLoop()
+    {
+        return 'if ($_loop->parent) {
+            $_loop = $_loop->parent;
+        } else {
+            unset($_loop);
+        }';
     }
 }
