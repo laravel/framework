@@ -91,6 +91,26 @@ trait CrawlerTrait
     }
 
     /**
+     * Visit the given URI with a POST request with content type of application/json
+     *
+     * @param string $uri
+     * @param array $data
+     * @param array $headers
+     * @return $this
+     */
+    public function postJson($uri, $data = [], $headers = [])
+    {
+        $headers['CONTENT_TYPE'] = 'application/json';
+        $headers['Accept'] = 'application/json';
+
+        $server = $this->transformHeadersToServerVars($headers);
+
+        $this->call('POST', $uri, [], [], [], $server, json_encode($data));
+
+        return $this;
+    }
+
+    /**
      * Visit the given URI with a PUT request.
      *
      * @param  string  $uri
