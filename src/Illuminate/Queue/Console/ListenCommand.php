@@ -103,6 +103,8 @@ class ListenCommand extends Command
 
         $this->listener->setMaxTries($this->option('tries'));
 
+        $this->listener->setRuntimeLimit($this->option('runtimelimit'));
+
         $this->listener->setOutputHandler(function ($type, $line) {
             $this->output->write($line);
         });
@@ -139,6 +141,8 @@ class ListenCommand extends Command
             ['sleep', null, InputOption::VALUE_OPTIONAL, 'Seconds to wait before checking queue for jobs', 3],
 
             ['tries', null, InputOption::VALUE_OPTIONAL, 'Number of times to attempt a job before logging it failed', 0],
+
+            ['runtimelimit', null, InputOption::VALUE_OPTIONAL, 'Seconds a listener may run before timing out', 0],
         ];
     }
 }
