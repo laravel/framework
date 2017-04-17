@@ -56,6 +56,10 @@ class VendorPublishCommand extends Command
     {
         $tags = $this->option('tag');
 
+        if (!is_array($tags)) {
+            $tags = explode(',', $tags);
+        }
+
         $tags = $tags ?: [null];
 
         foreach ($tags as $tag) {
