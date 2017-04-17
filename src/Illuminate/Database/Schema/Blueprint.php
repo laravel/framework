@@ -785,6 +785,18 @@ class Blueprint
     }
 
     /**
+     * Add creation and update timestamps with default value to the table.
+     *
+     * @return void
+     */
+    public function defaultTimestamps($default)
+    {
+        $this->timestamp('created_at')->default($default);
+
+        $this->timestamp('updated_at')->default($default);
+    }
+
+    /**
      * Add creation and update timestamps to the table.
      *
      * @return void
