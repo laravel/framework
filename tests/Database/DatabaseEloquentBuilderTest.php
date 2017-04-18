@@ -315,6 +315,19 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $relation = $builder->getRelation('orders');
     }
 
+    public function testGetRelationProperlySetsPipedNestedRelationships()
+    {
+        $builder = $this->getBuilder();
+        $builder->setModel($this->getMockModel());
+        $builder->getModel()->shouldReceive('orders')->once()->andReturn($relation = m::mock('stdClass'));
+        $relationQuery = m::mock('stdClass');
+        $relation->shouldReceive('getQuery')->andReturn($relationQuery);
+        $relationQuery->shouldReceive('with')->once()->with(['groups' => null, 'lines.details' => null]);
+        $builder->setEagerLoads(['orders.groups|lines.details' => null]);
+
+        $relation = $builder->getRelation('orders');
+    }
+
     public function testGetRelationProperlySetsNestedRelationshipsWithSimilarNames()
     {
         $builder = $this->getBuilder();

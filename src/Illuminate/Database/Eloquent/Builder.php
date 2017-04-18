@@ -720,7 +720,17 @@ class Builder
         // that start with the given top relations and adds them to our arrays.
         foreach ($this->eagerLoad as $name => $constraints) {
             if ($this->isNested($name, $relation)) {
-                $nested[substr($name, strlen($relation.'.'))] = $constraints;
+                $nestedRelation = substr($name, strlen($relation.'.'));
+
+                if (Str::contains($name, '|')) {
+                    foreach (explode('|', $nestedRelation) as $nestededRelation) {
+                        $nested[$nestededRelation] = $constraints;
+                    }
+
+                    continue;
+                }
+
+                $nested[$nestedRelation] = $constraints;
             }
         }
 
