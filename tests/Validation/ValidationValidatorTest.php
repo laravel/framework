@@ -2882,6 +2882,41 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testCombineValidators()
+    {
+        $trans = $this->getRealTranslator();
+
+        $v = new Validator($trans, ['foo' => '1'], ['foo' => 'required|string'], ['required' => 'hey you!'], ['foo' => 'the foo']);
+        $v2 = new Validator($trans, ['bar' => 1], ['bar' => 'required|integer'], ['integer' => 'integer please.'], ['bar' => 'the bar']);
+        $v3 = $v->combine($v2);
+
+        $this->assertEquals(['foo' => '1', 'bar' => 1], $v3->getData());
+        $this->assertEquals(['foo' => ['required', 'string'], 'bar' => ['required', 'integer']], $v3->getRules());
+        $this->assertEquals(['required' => 'hey you!', 'integer' => 'integer please.'], $v3->getCustomMessages());
+        $this->assertEquals(['foo' => 'the foo', 'bar' => 'the bar'], $v3->getCustomAttributes());
+
+        $v = new Validator($trans, ['foo' => '1'], ['foo' => 'required']);
+        $v2 = new Validator($trans, ['foo' => 2], ['foo' => 'integer']);
+        $v3 = $v->combine($v2);
+
+        $this->assertEquals(['foo' => ['1', 2]], $v3->getData());
+        $this->assertEquals(['foo.0' => ['required'], 'foo.1' => ['integer']], $v3->getRules());
+
+        $v = new Validator($trans, ['foo' => [1, 2]], ['foo' => 'array']);
+        $v2 = new Validator($trans, ['foo' => [3, 4]], ['foo' => 'array']);
+        $v3 = $v->combine($v2);
+
+        $this->assertEquals(['foo' => [1, 2, 3, 4]], $v3->getData());
+        $this->assertEquals(['foo' => ['array']], $v3->getRules());
+
+        $v = new Validator($trans, ['users' => [['name' => 'a']]], ['users.*.name' => 'required']);
+        $v2 = new Validator($trans, ['users' => [['name' => 'b']]], ['users.*.name' => 'string']);
+        $v3 = $v->combine($v2);
+
+        $this->assertEquals(['users' => [['name' => 'a'], ['name' => 'b']]], $v3->getData());
+        $this->assertEquals(['users.0.name' => ['required', 'string'], 'users.1.name' => ['required', 'string']], $v3->getRules());
+    }
+
     public function testGetLeadingExplicitAttributePath()
     {
         $trans = $this->getRealTranslator();

@@ -244,11 +244,22 @@ class Validator implements ValidatorContract
 
                 unset($rules[$key]);
             } else {
-                $rules[$key] = (is_string($rule)) ? explode('|', $rule) : $rule;
+                $rules[$key] = $this->extractRulesArray($rule);
             }
         }
 
         return $rules;
+    }
+
+    /**
+     * Extract the rules in an array form.
+     *
+     * @param  string|array $rules
+     * @return array
+     */
+    protected function extractRulesArray($rules)
+    {
+        return (is_string($rules)) ? explode('|', $rules) : $rules;
     }
 
     /**
@@ -315,6 +326,10 @@ class Validator implements ValidatorContract
                         $this->implicitAttributes[$attribute][] = $key;
 
                         $this->mergeRules($key, $ruleValue);
+                    }
+
+                    if (! Str::contains($attribute, '*')) {
+                        $this->initialRules[$attribute.'.*.'.$ruleKey] = $ruleValue;
                     }
                 }
             }
@@ -406,6 +421,49 @@ class Validator implements ValidatorContract
         $this->rules[$attribute] = array_merge($current, $merge);
 
         return $this;
+    }
+
+    /**
+     * Combine a validator instance into the current instance.
+     *
+     * @param \Illuminate\Contracts\Validation\Validator $validator
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function combine(ValidatorContract $validator)
+    {
+        $newRules = $this->initialRules;
+
+        $newData = $this->parseData(
+            array_merge_recursive($this->getData(), $validator->getData())
+        );
+
+        $newCustomMessages = array_merge($this->getCustomMessages(), $validator->getCustomMessages());
+
+        $newCustomAttributes = array_merge($this->getCustomAttributes(), $validator->getCustomAttributes());
+
+        foreach ($validator->initialRules as $attribute => $rule) {
+            if (Str::contains($attribute, '*')) {
+                $newRules[$attribute] = array_merge(
+                    isset($newRules[$attribute]) ? $this->extractRulesArray($newRules[$attribute]) : [],
+                    $this->extractRulesArray($rule)
+                );
+            }
+
+            // If the attribute is not implicit and it already has rules in the
+            // original validator, we will separate the given rules for each
+            // instance alone since the data will be converted to an array.
+            elseif (isset($newRules[$attribute]) && ! is_array($this->getValue($attribute))) {
+                $newRules[$attribute.'.0'] = $newRules[$attribute];
+
+                $newRules[$attribute.'.1'] = $this->extractRulesArray($rule);
+
+                unset($newRules[$attribute]);
+            } else {
+                $newRules[$attribute] = $this->extractRulesArray($rule);
+            }
+        }
+
+        return new Validator($this->getTranslator(), $newData, $newRules, $newCustomMessages, $newCustomAttributes);
     }
 
     /**
