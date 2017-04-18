@@ -18,6 +18,7 @@
         "illuminate/container": "5.2.*",
         "illuminate/contracts": "5.2.*",
         "illuminate/support": "5.2.*",
+        "jeremeamia/superclosure": "~2.2",
         "psr/log": "~1.0",
         "swiftmailer/swiftmailer": "~5.1"
     },
