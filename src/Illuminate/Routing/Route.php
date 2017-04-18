@@ -117,6 +117,14 @@ class Route
             $this->methods[] = 'HEAD';
         }
 
+        if (in_array('PUT', $this->methods) && ! in_array('PATCH', $this->methods)) {
+            $this->methods[] = 'PATCH';
+        }
+
+        if (in_array('PATCH', $this->methods) && ! in_array('PUT', $this->methods)) {
+            $this->methods[] = 'PUT';
+        }
+
         if (isset($this->action['prefix'])) {
             $this->prefix($this->action['prefix']);
         }
