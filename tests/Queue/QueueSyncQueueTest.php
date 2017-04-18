@@ -69,7 +69,7 @@ class QueueSyncQueueTest extends PHPUnit_Framework_TestCase
         $encrypter = new Illuminate\Encryption\Encrypter(str_repeat('c', 16));
         $container->instance('Illuminate\Contracts\Encryption\Encrypter', $encrypter);
         $events = m::mock('Illuminate\Contracts\Events\Dispatcher');
-        $events->shouldReceive('fire')->once();
+        $events->shouldReceive('fire')->twice();
         $container->instance('events', $events);
         $sync->setContainer($container);
         $sync->setEncrypter($encrypter);
