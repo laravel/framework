@@ -9,11 +9,15 @@ class HasMany extends HasOneOrMany
     /**
      * Get the results of the relationship.
      *
-     * @return mixed
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     public function getResults()
     {
-        return $this->query->get();
+        if ($this->getParentKey()) {
+            return $this->query->get();
+        }
+
+        return new Collection;
     }
 
     /**

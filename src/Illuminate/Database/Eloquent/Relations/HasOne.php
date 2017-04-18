@@ -13,7 +13,9 @@ class HasOne extends HasOneOrMany
      */
     public function getResults()
     {
-        return $this->query->first();
+        if ($this->getParentKey()) {
+            return $this->query->first();
+        }
     }
 
     /**
