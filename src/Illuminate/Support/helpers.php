@@ -646,6 +646,36 @@ if (! function_exists('starts_with')) {
     }
 }
 
+if (! function_exists('str_after')) {
+
+    /**
+     * Return part of the string before occurrence
+    *
+     * @param string $haystack
+     * @param string $needles
+     * @return string
+    */
+    function str_after($haystack, $needles)
+    {
+        return Str::strAfter($haystack, $needles);
+    }
+}
+
+if (! function_exists('str_before')) {
+
+    /**
+     * Return part of the string after occurrence
+     *
+     * @param string $haystack
+     * @param string $needles
+     * @return string
+    */
+    function str_before($haystack, $needles)
+    {
+        return Str::strBefore($haystack, $needles);
+    }
+}
+
 if (! function_exists('str_contains')) {
     /**
      * Determine if a given string contains a given substring.

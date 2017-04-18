@@ -452,6 +452,42 @@ class Str
     }
 
     /**
+     * Return part of the string before occurrence
+     *
+     * @param string $haystack
+     * @param string $needles
+     * @return string
+    */
+    function strAfter($haystack, $needles) {
+
+        $pos = strpos($haystack, $needles);
+        
+        if ($pos === false){
+            return $haystack;
+        }
+
+        return(substr($haystack, $pos+strlen($needles)));
+    }
+
+    /**
+     * Return part of the string after occurrence
+     *
+     * @param string $haystack
+     * @param string $needles
+     * @return string
+    */
+    function strBefore($haystack, $needles) {
+        
+        $pos = strpos($haystack, $needles);
+        
+        if ($pos === false){
+            return $haystack;
+        }
+
+         return(substr($haystack, 0, $pos));
+    }
+
+    /**
      * Make a string's first character uppercase.
      *
      * @param  string  $string
