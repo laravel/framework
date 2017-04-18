@@ -945,13 +945,13 @@ class Builder
         // query as their own isolated nested where statement and avoid issues.
         $originalWhereCount = count($query->wheres);
 
-        $result = $scope(...array_values($parameters)) ?: $this;
+        $result = $scope(...array_values($parameters));
 
         if (count($query->wheres) > $originalWhereCount) {
             $this->addNewWheresWithinGroup($query, $originalWhereCount);
         }
 
-        return $result;
+        return $result === null ? $this : $result;
     }
 
     /**
