@@ -1451,13 +1451,28 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($builder, $builder->dynamicWhere($method, $parameters));
     }
 
+    public function testDynamicWhereOperators()
+    {
+        $method = 'whereFooBarAndBazGtAndQuxLtAndFubarGteAndNorfLte';
+        $parameters = ['corge', 'waldo', 'fred', 'linus', 'mike'];
+        $builder = m::mock('Illuminate\Database\Query\Builder')->makePartial();
+
+        $builder->shouldReceive('where')->with('foo_bar', '=', $parameters[0], 'and')->once()->andReturn($builder);
+        $builder->shouldReceive('where')->with('baz', '>', $parameters[1], 'and')->once()->andReturn($builder);
+        $builder->shouldReceive('where')->with('qux', '<', $parameters[2], 'and')->once()->andReturn($builder);
+        $builder->shouldReceive('where')->with('fubar', '>=', $parameters[3], 'and')->once()->andReturn($builder);
+        $builder->shouldReceive('where')->with('norf', '<=', $parameters[4], 'and')->once()->andReturn($builder);
+
+        $this->assertEquals($builder, $builder->dynamicWhere($method, $parameters));
+    }
+
     public function testDynamicWhereIsNotGreedy()
     {
-        $method = 'whereIosVersionAndAndroidVersionOrOrientation';
+        $method = 'whereIosVersionGteAndAndroidVersionOrOrientation';
         $parameters = ['6.1', '4.2', 'Vertical'];
         $builder = m::mock('Illuminate\Database\Query\Builder')->makePartial();
 
-        $builder->shouldReceive('where')->with('ios_version', '=', '6.1', 'and')->once()->andReturn($builder);
+        $builder->shouldReceive('where')->with('ios_version', '>=', '6.1', 'and')->once()->andReturn($builder);
         $builder->shouldReceive('where')->with('android_version', '=', '4.2', 'and')->once()->andReturn($builder);
         $builder->shouldReceive('where')->with('orientation', '=', 'Vertical', 'or')->once()->andReturn($builder);
 

@@ -1223,7 +1223,24 @@ class Builder
         // clause on the query. Then we'll increment the parameter index values.
         $bool = strtolower($connector);
 
-        $this->where(Str::snake($segment), '=', $parameters[$index], $bool);
+        $operator = '=';
+
+        // Determine if the operator should be anything other than equals
+        if (Str::endsWith($segment, 'Gt')) {
+            $operator = '>';
+            $segment = substr($segment, 0, -2);
+        } elseif (Str::endsWith($segment, 'Lt')) {
+            $operator = '<';
+            $segment = substr($segment, 0, -2);
+        } elseif (Str::endsWith($segment, 'Gte')) {
+            $operator = '>=';
+            $segment = substr($segment, 0, -3);
+        } elseif (Str::endsWith($segment, 'Lte')) {
+            $operator = '<=';
+            $segment = substr($segment, 0, -3);
+        }
+
+        $this->where(Str::snake($segment), $operator, $parameters[$index], $bool);
     }
 
     /**
