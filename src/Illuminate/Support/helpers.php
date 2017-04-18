@@ -890,3 +890,16 @@ if (! function_exists('with')) {
         return $object;
     }
 }
+
+if (! function_exists('object_to_array')) {
+    /**
+     * Contvert the given object into array.
+     *
+     * @param  mixed  $object
+     * @return array
+     */
+    function object_to_array($object)
+    {
+        return Arr::objToArr($object);
+    }
+}
