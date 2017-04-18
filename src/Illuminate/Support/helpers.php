@@ -515,6 +515,22 @@ if (! function_exists('dd')) {
     }
 }
 
+if (! function_exists('ddd')) {
+    /**
+     * Dump the passed variables and don't end the script.
+     *
+     * @param  mixed
+     * @return void
+     */
+    function ddd()
+    {
+        array_map(function ($x) {
+            (new Dumper)->dump($x);
+        }, func_get_args());
+    }
+}
+
+
 if (! function_exists('e')) {
     /**
      * Escape HTML entities in a string.
