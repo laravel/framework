@@ -39,7 +39,7 @@ class ComposerScripts
      */
     protected static function clearCompiled()
     {
-        $laravel = new Application(getcwd());
+        $laravel = static::createApplication(getcwd());
 
         if (file_exists($compiledPath = $laravel->getCachedCompilePath())) {
             @unlink($compiledPath);
@@ -48,5 +48,16 @@ class ComposerScripts
         if (file_exists($servicesPath = $laravel->getCachedServicesPath())) {
             @unlink($servicesPath);
         }
+    }
+
+    /**
+     * Creates a Laravel application instance.
+     *
+     * @param  string  $basePath
+     * @return \Illuminate\Contracts\Foundation\Application
+     */
+    protected static function createApplication($basePath)
+    {
+        return new Application($basePath);
     }
 }
