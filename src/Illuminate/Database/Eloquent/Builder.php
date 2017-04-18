@@ -355,33 +355,6 @@ class Builder
     }
 
     /**
-     * Chunk the results of the query.
-     *
-     * @param  int  $count
-     * @param  callable  $callback
-     * @return bool
-     */
-    public function chunk($count, callable $callback)
-    {
-        $results = $this->forPage($page = 1, $count)->get();
-
-        while (count($results) > 0) {
-            // On each chunk result set, we will pass them to the callback and then let the
-            // developer take care of everything within the callback, which allows us to
-            // keep the memory low for spinning through large result sets for working.
-            if (call_user_func($callback, $results) === false) {
-                return false;
-            }
-
-            $page++;
-
-            $results = $this->forPage($page, $count)->get();
-        }
-
-        return true;
-    }
-
-    /**
      * Chunk the results of a query by comparing numeric IDs.
      *
      * @param  int  $count
@@ -750,6 +723,8 @@ class Builder
      */
     public function when($value, $callback)
     {
+        // The callback will be passed this Eloquent Builder instance
+        // as a parameter, and has to return it.
         $builder = $this;
 
         if ($value) {
