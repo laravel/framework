@@ -528,11 +528,13 @@ class Connection implements ConnectionInterface
      * Execute a Closure within a transaction.
      *
      * @param  \Closure  $callback
+     * @param  callable|null  $success
+     * @param  callable|null  $error
      * @return mixed
      *
      * @throws \Exception|\Throwable
      */
-    public function transaction(Closure $callback)
+    public function transaction(Closure $callback, callable $success = null, callable $error = null)
     {
         $this->beginTransaction();
 
@@ -551,11 +553,23 @@ class Connection implements ConnectionInterface
         catch (Exception $e) {
             $this->rollBack();
 
+            if ($error) {
+                return call_user_func($error, $e, $this);
+            }
+
             throw $e;
         } catch (Throwable $e) {
             $this->rollBack();
 
+            if ($error) {
+                return call_user_func($error, $e, $this);
+            }
+
             throw $e;
+        }
+
+        if ($success) {
+            return call_user_func($success, $result, $this);
         }
 
         return $result;
