@@ -36,7 +36,7 @@ abstract class Grammar
             return $this->getValue($table);
         }
 
-        return $this->wrap($this->tablePrefix.$table, true);
+        return $this->wrap($table, true);
     }
 
     /**
@@ -62,7 +62,7 @@ abstract class Grammar
                 $segments[2] = $this->tablePrefix.$segments[2];
             }
 
-            return $this->wrap($segments[0]).' as '.$this->wrapValue($segments[2]);
+            return $this->wrap($segments[0], true).' as '.$this->wrapValue($segments[2]);
         }
 
         $wrapped = [];
@@ -76,6 +76,9 @@ abstract class Grammar
             if ($key == 0 && count($segments) > 1) {
                 $wrapped[] = $this->wrapTable($segment);
             } else {
+                if ($prefixAlias) {
+                    $segment = $this->tablePrefix.$segment;
+                }
                 $wrapped[] = $this->wrapValue($segment);
             }
         }
