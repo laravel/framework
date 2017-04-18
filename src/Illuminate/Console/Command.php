@@ -463,6 +463,67 @@ class Command extends SymfonyCommand
     }
 
     /**
+     * Iterate over a collection of items with a progress bar.
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable|array $items
+     * @param  callable                                      $callback
+     *
+     * @return void
+     */
+    public function progress($items, callable $callback)
+    {
+        $count = count($items);
+
+        // Work around Symfony issue
+        $this->output->newLine(2);
+
+        $bar = $this->output->createProgressBar($count);
+
+        $bar->setFormat($this->getProgressBarFormat($count));
+
+        foreach ($items as $key => $item) {
+            try {
+                $message = $bar->getMessage() ? "%message%\n" : '';
+
+                // We'll reset the format at each iteration in case it's been updated
+                $bar->setFormat($message.$this->getProgressBarFormat($count));
+
+                $callback($item, $key, $bar);
+            } catch (\Exception $e) {
+                // Log exception?
+            } finally {
+                $bar->advance();
+            }
+        }
+
+        $bar->finish();
+    }
+
+    /**
+     * Get the format for the progress bar.
+     *
+     * @param  int $count
+     *
+     * @return string
+     */
+    protected function getProgressBarFormat($count)
+    {
+        $barWidth = 28;
+        $percentWidth = 3;
+        $totalWidth = (strlen($count) * 2) + 2 + $barWidth + 2 + $percentWidth + 1;
+        $remainingWidth = $totalWidth / 2;
+        $memoryWidth = $totalWidth - $remainingWidth;
+
+        $progress = '%current%/%max%';
+        $bar = '%bar%';
+        $percent = "%percent:{$percentWidth}s%%";
+        $remaining = "%remaining:-{$remainingWidth}s%";
+        $memory = "%memory:{$memoryWidth}s%";
+
+        return "$progress $bar $percent\n<fg=cyan>$remaining</> <fg=green>$memory</>";
+    }
+
+    /**
      * Get the verbosity level in terms of Symfony's OutputInterface level.
      *
      * @param  string|int  $level
