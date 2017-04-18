@@ -179,4 +179,13 @@ class RouteCollectionTest extends PHPUnit_Framework_TestCase
         ];
         $this->assertEquals($allRoutes, $this->routeCollection->getRoutes());
     }
+
+    public function testRouteCollectionCanRemoveRoute()
+    {
+        $this->routeCollection->add($route1 = new Route('GET', 'foo/index', ['uses' => 'BarController@index']));
+        $this->routeCollection->add($route2 = new Route('GET', 'foo2/index', ['uses' => 'BarController@index2']));
+        $this->routeCollection->remove($route2);
+
+        $this->assertEquals($route1, $this->routeCollection->getRoutes()[0]);
+    }
 }

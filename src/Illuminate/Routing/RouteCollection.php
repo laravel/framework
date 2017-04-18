@@ -99,6 +99,70 @@ class RouteCollection implements Countable, IteratorAggregate
     }
 
     /**
+     * Remove the route from the collection.
+     *
+     * @param  \Illuminate\Routing\Route  $route
+     * @return void
+     */
+    public function remove(Route $route)
+    {
+        $this->removeLookups($route);
+        $this->removeFromCollections($route);
+    }
+
+    /**
+     * Remove the route from any look-up tables if necessary.
+     *
+     * @param  \Illuminate\Routing\Route  $route
+     * @return void
+     */
+    protected function removeLookups(Route $route)
+    {
+        $this->removeFromNameList($route);
+        $this->removeFromActionList($route);
+    }
+
+    /**
+     * Remove the given route from the arrays of routes.
+     *
+     * @param  \Illuminate\Routing\Route  $route
+     * @return void
+     */
+    protected function removeFromCollections(Route $route)
+    {
+        $domainAndUri = $route->domain().$route->getUri();
+
+        foreach ($route->methods() as $method) {
+            unset($this->routes[$method][$domainAndUri]);
+            unset($this->allRoutes[$method.$domainAndUri]);
+        }
+    }
+
+    /**
+     * Remove a route from the name list.
+     *
+     * @param  \Illuminate\Routing\Route  $route
+     * @return void
+     */
+    protected function removeFromNameList(Route $route)
+    {
+        if (! is_null($name = $route->getName())) {
+            unset($this->nameList[$name]);
+        }
+    }
+
+    /**
+     * Remove a route from the controller action dictionary.
+     *
+     * @param  \Illuminate\Routing\Route  $route
+     * @return void
+     */
+    protected function removeFromActionList(Route $route)
+    {
+        unset($this->actionList[trim($route->getActionName(), '\\')]);
+    }
+
+    /**
      * Refresh the name look-up table.
      *
      * This is done in case any names are fluently defined.
