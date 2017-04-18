@@ -59,7 +59,10 @@ trait RouteDependencyResolverTrait
             );
 
             if (! is_null($instance)) {
-                $this->spliceIntoParameters($parameters, $key, $instance);
+                $this->spliceIntoParameters($parameters, $parameter->getPosition(), $instance);
+            } elseif (array_key_exists($parameter->getName(), $parameters)) {
+                $this->spliceIntoParameters($parameters, $parameter->getPosition(), $parameters[$parameter->getName()]);
+                unset($parameters[$parameter->getName()]);
             }
         }
 
