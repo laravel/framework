@@ -2802,13 +2802,9 @@ class Validator implements ValidatorContract
      */
     public function addExtensions(array $extensions)
     {
-        if ($extensions) {
-            $keys = array_map('\Illuminate\Support\Str::snake', array_keys($extensions));
-
-            $extensions = array_combine($keys, array_values($extensions));
+        if ($extensions = $this->formatArray($extensions)) {
+            $this->extensions = array_merge($this->extensions, $extensions);
         }
-
-        $this->extensions = array_merge($this->extensions, $extensions);
     }
 
     /**
@@ -2870,13 +2866,26 @@ class Validator implements ValidatorContract
      */
     public function addReplacers(array $replacers)
     {
-        if ($replacers) {
-            $keys = array_map('\Illuminate\Support\Str::snake', array_keys($replacers));
+        if ($replacers = $this->formatArray($replacers)) {
+            $this->replacers = array_merge($this->replacers, $replacers);
+        }
+    }
 
-            $replacers = array_combine($keys, array_values($replacers));
+    /**
+     * Format an array of custom extensions or replacers.
+     *
+     * @param  array  $array
+     * @return array
+     */
+    protected function formatArray(array $array)
+    {
+        if (empty($array)) {
+            return [];
         }
 
-        $this->replacers = array_merge($this->replacers, $replacers);
+        $keys = array_map('\Illuminate\Support\Str::snake', array_keys($array));
+
+        return array_combine($keys, array_values($array));
     }
 
     /**
