@@ -525,4 +525,23 @@ class Arr
 
         return $filtered;
     }
+    
+     /**
+     * Contvert the given object into array.
+     *
+     * If object have assosiative array or object then will return assosiative array.
+     * 
+     * @param  object  $obj
+     * @return array
+     */
+    public static function objToArr($obj)
+    {
+        $array = is_object($obj) ? get_object_vars($obj) : $obj;
+        
+        foreach ($array as $key => $val) {
+            $array[$key] = (is_array($val) || is_object($val)) ? self::objectToArray($val) : $val;
+        }
+        
+        return $array;
+    }
 }
