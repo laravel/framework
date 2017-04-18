@@ -181,6 +181,42 @@ class Message
     }
 
     /**
+     * Attach multiple files to the message (with Zip compression option).
+     *
+     * @param  array  $files
+     * @param  array  $options
+     * @param  bool   $should_compress
+     * @param  string $archive_name
+     * @return $this
+     */
+    public function attachFiles($files, array $options = [], $should_compress = false, $archive_name = 'archive')
+    {
+        $compress_success = false;
+
+        if ($should_compress) {
+            $zip = new ZipArchive;
+            $filename = storage_path($archive_name.'_'.str_random(32).'.zip');
+            $compress_success = $zip->open($filename, ZipArchive::CREATE);
+            if ($compress_success === true) {
+                foreach ($files as $file) {
+                    $zip->addFile($file);
+                }
+                $zip->close();
+                $this->attach($filename, $options);
+            }
+        }
+
+        // If compression failed or was disabled, just attach all files
+        if (! $should_compress || ($should_compress && ! $compress_success)) {
+            foreach ($files as $file) {
+                $this->attach($file, $options);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Create a Swift Attachment instance.
      *
      * @param  string  $file
