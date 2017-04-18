@@ -324,6 +324,18 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Get all of the input and files for the request, with empty strings mapped as nullable.
+     *
+     * @return array
+     */
+    public function filtered()
+    {
+        return array_map(function ($value) {
+            return $value === '' ? null : $value;
+        }, $this->all());
+    }
+
+    /**
      * Retrieve an input item from the request.
      *
      * @param  string  $key

@@ -431,6 +431,13 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([1 => 'A', 2 => 'B', 3 => 'C'], $request2->all());
     }
 
+    public function testFilteredInputReturnsInputAndFilesWithEmptyStringsAsNull()
+    {
+        $file = $this->getMock('Illuminate\Http\UploadedFile', null, [__FILE__, 'photo.jpg']);
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'bool' => 0, 'nullable' => '', 'baz' => $file]);
+        $this->assertSame(['name' => 'Taylor', 'bool' => 0, 'nullable' => null, 'baz' => $file], $request->filtered());
+    }
+
     public function testInputWithEmptyFilename()
     {
         $invalidFiles = [
