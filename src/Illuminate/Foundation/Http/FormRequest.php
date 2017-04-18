@@ -53,6 +53,23 @@ class FormRequest extends Request implements ValidatesWhenResolved
     protected $redirectAction;
 
     /**
+     * The hash to append to the auto-generated redirect URL.
+     *
+     * This is useful when a form is not on top of the page to which the user is
+     * being redirected, so that the browser will automatically scroll down to
+     * the correct location in the page and the user can see the form and its
+     * error messages.
+     *
+     * Do not prefix this value with the actual hash symbol "#", e.g. if you
+     * want to redirect the user to "http://example.com/foo#bar", just set this
+     * value to "bar", and handle the actual URL with one of the other redirect
+     * attributes.
+     *
+     * @var string|null
+     */
+    protected $redirectHash;
+
+    /**
      * The key to be used for the view error bag.
      *
      * @var string
@@ -183,14 +200,23 @@ class FormRequest extends Request implements ValidatesWhenResolved
         $url = $this->redirector->getUrlGenerator();
 
         if ($this->redirect) {
-            return $url->to($this->redirect);
+            $redirectUrl = $url->to($this->redirect);
         } elseif ($this->redirectRoute) {
-            return $url->route($this->redirectRoute);
+            $redirectUrl = $url->route($this->redirectRoute);
         } elseif ($this->redirectAction) {
-            return $url->action($this->redirectAction);
+            $redirectUrl = $url->action($this->redirectAction);
+        } else {
+            $redirectUrl = $url->previous();
         }
 
-        return $url->previous();
+        // Append the hash only if it's defined and if it isn't already included
+        // in the generated URL, for example if the user has included it via the
+        // `$redirect` attribute.
+        if ($this->redirectHash && strpos($redirectUrl, '#') === false) {
+            $redirectUrl .= "#{$this->redirectHash}";
+        }
+
+        return $redirectUrl;
     }
 
     /**
@@ -237,5 +263,19 @@ class FormRequest extends Request implements ValidatesWhenResolved
     public function attributes()
     {
         return [];
+    }
+
+    /**
+     * Returns the configured redirect hash.
+     *
+     * Useful to keep things DRY in case of, for example, a controller using
+     * this request needs to redirect to the same hash in the case of successful
+     * form submission.
+     *
+     * @return string|null
+     */
+    public function getRedirectHash()
+    {
+        return $this->redirectHash;
     }
 }

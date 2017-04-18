@@ -76,6 +76,53 @@ class FoundationFormRequestTest extends PHPUnit_Framework_TestCase
 
         $request->response(['errors']);
     }
+
+    /**
+     * Tests whether redirect URLs get generated correctly when a redirect hash
+     * is configured on the FormRequest class.
+     *
+     * @return void
+     */
+    public function testRedirectWithHash()
+    {
+        $request = FoundationTestFormRequestWithHashStub::create('/', 'GET');
+        $request->setRedirector($redirector = m::mock('Illuminate\Routing\Redirector'));
+        $redirector->shouldReceive('getUrlGenerator')->andReturn($url = m::mock('StdClass'));
+        $url->shouldReceive('previous')->once()->andReturn('http://localhost/foo');
+
+        $this->assertEquals('http://localhost/foo#bar', $request->getRedirectUrl());
+    }
+
+    /**
+     * Tests to make sure that a duplicate hash doesn't get generated.
+     *
+     * @return void
+     */
+    public function testRedirectWithoutDuplicatingHash()
+    {
+        $request = FoundationTestFormRequestWithDuplicatedHashStub::create('/', 'GET');
+        $request->setRedirector($redirector = m::mock('Illuminate\Routing\Redirector'));
+        $redirector->shouldReceive('getUrlGenerator')->andReturn($url = m::mock('StdClass'));
+        $url->shouldReceive('to')->once()->andReturn('http://localhost/foo#bar');
+
+        $this->assertEquals('http://localhost/foo#bar', $request->getRedirectUrl());
+    }
+
+    /**
+     * Tests whether redirect URLs still get generated correctly when a redirect
+     * hash isn't configured on the FormRequest class.
+     *
+     * @return void
+     */
+    public function testRedirectWithoutHash()
+    {
+        $request = FoundationTestFormRequestWithoutHashStub::create('/', 'GET');
+        $request->setRedirector($redirector = m::mock('Illuminate\Routing\Redirector'));
+        $redirector->shouldReceive('getUrlGenerator')->andReturn($url = m::mock('StdClass'));
+        $url->shouldReceive('previous')->once()->andReturn('http://localhost/foo');
+
+        $this->assertEquals('http://localhost/foo', $request->getRedirectUrl());
+    }
 }
 
 class FoundationTestFormRequestStub extends Illuminate\Foundation\Http\FormRequest
@@ -101,5 +148,53 @@ class FoundationTestFormRequestForbiddenStub extends Illuminate\Foundation\Http\
     public function authorize()
     {
         return false;
+    }
+}
+
+class FoundationTestFormRequestWithHashStub extends Illuminate\Foundation\Http\FormRequest
+{
+    protected $redirectHash = 'bar';
+
+    /**
+     * {@inheritdoc}
+     *
+     * Exposed as public for testing.
+     */
+    public function getRedirectUrl()
+    {
+        return parent::getRedirectUrl();
+    }
+}
+
+class FoundationTestFormRequestWithDuplicatedHashStub extends Illuminate\Foundation\Http\FormRequest
+{
+    /**
+     * This triggers the logic that calls `to()` on the URL generator.
+     */
+    protected $redirect = 'dummy';
+
+    protected $redirectHash = 'baz';
+
+    /**
+     * {@inheritdoc}
+     *
+     * Exposed as public for testing.
+     */
+    public function getRedirectUrl()
+    {
+        return parent::getRedirectUrl();
+    }
+}
+
+class FoundationTestFormRequestWithoutHashStub extends Illuminate\Foundation\Http\FormRequest
+{
+    /**
+     * {@inheritdoc}
+     *
+     * Exposed as public for testing.
+     */
+    public function getRedirectUrl()
+    {
+        return parent::getRedirectUrl();
     }
 }
