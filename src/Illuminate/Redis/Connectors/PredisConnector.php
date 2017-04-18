@@ -21,7 +21,7 @@ class PredisConnector
         $completeOpts = array_merge(
             ['timeout' => 10.0], $options, Arr::pull($config, 'options', [])
         );
-        
+
         return new PredisConnection(new Client($config, $completeOpts));
     }
 
