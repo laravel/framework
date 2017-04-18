@@ -862,11 +862,12 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      *
      * @param  int   $offset
      * @param  int   $length
+     * @param  bool  $preserveKeys
      * @return static
      */
-    public function slice($offset, $length = null)
+    public function slice($offset, $length = null, $preserveKeys = true)
     {
-        return new static(array_slice($this->items, $offset, $length, true));
+        return new static(array_slice($this->items, $offset, $length, $preserveKeys));
     }
 
     /**
