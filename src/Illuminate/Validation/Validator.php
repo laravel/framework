@@ -45,6 +45,13 @@ class Validator implements ValidatorContract
     protected $container;
 
     /**
+     * The passed validation rules.
+     *
+     * @var array
+     */
+    protected $passedRules = [];
+
+    /**
      * The failed validation rules.
      *
      * @var array
@@ -485,6 +492,9 @@ class Validator implements ValidatorContract
         if ($validatable && ! $this->$method($attribute, $value, $parameters, $this)) {
             $this->addFailure($attribute, $rule, $parameters);
         }
+        else if ($validatable) {
+          $this->addPass($attribute, $rule, $parameters);
+        }
     }
 
     /**
@@ -619,6 +629,19 @@ class Validator implements ValidatorContract
     {
         return in_array($rule, ['Unique', 'Exists'])
                         ? ! $this->messages->has($attribute) : true;
+    }
+
+    /**
+     * Add a passed rule to the collection.
+     *
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return void
+     */
+    protected function addPass($attribute, $rule, $parameters)
+    {
+        $this->passedRules[$attribute][$rule] = $parameters;
     }
 
     /**
@@ -3128,6 +3151,16 @@ class Validator implements ValidatorContract
     public function setFallbackMessages(array $messages)
     {
         $this->fallbackMessages = $messages;
+    }
+
+    /**
+     * Get the passed validation rules.
+     *
+     * @return array
+     */
+    public function passed()
+    {
+        return $this->passedRules;
     }
 
     /**
