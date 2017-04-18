@@ -4,6 +4,7 @@ use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
+use Illuminate\Support\Facades\App;
 
 class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
 {
