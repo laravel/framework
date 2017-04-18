@@ -30,7 +30,7 @@ class Arr
      */
     public static function add($array, $key, $value)
     {
-        if (is_null(static::get($array, $key))) {
+        if (! static::has($array, $key)) {
             static::set($array, $key, $value);
         }
 

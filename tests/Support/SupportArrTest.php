@@ -22,11 +22,18 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
     {
         $array = Arr::add(['name' => 'Desk'], 'price', 100);
         $this->assertEquals(['name' => 'Desk', 'price' => 100], $array);
+
+        // do not add even null value
+        $array = Arr::add(['name' => null], 'name', 100);
+        $this->assertEquals(['name' => null], $array);
     }
 
     public function testCollapse()
     {
         $data = [['foo', 'bar'], ['baz']];
+        $this->assertEquals(['foo', 'bar', 'baz'], Arr::collapse($data));
+
+        $data = [new Collection(['foo', 'bar']), ['baz']];
         $this->assertEquals(['foo', 'bar', 'baz'], Arr::collapse($data));
     }
 
