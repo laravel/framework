@@ -5,6 +5,13 @@ namespace Illuminate\Routing;
 class PendingResourceRegistration
 {
     /**
+     * The resource registrar.
+     *
+     * @var \Illuminate\Routing\ResourceRegistrar
+     */
+    protected $registrar;
+
+    /**
      * The resource name.
      *
      * @var string
@@ -21,51 +28,25 @@ class PendingResourceRegistration
     /**
      * The resource options.
      *
-     * @var string
+     * @var array
      */
     protected $options = [];
-
-    /**
-     * The resource registrar.
-     *
-     * @var \Illuminate\Routing\ResourceRegistrar
-     */
-    protected $registrar;
 
     /**
      * Create a new pending resource registration instance.
      *
      * @param  \Illuminate\Routing\ResourceRegistrar  $registrar
-     * @return void
-     */
-    public function __construct(ResourceRegistrar $registrar)
-    {
-        $this->registrar = $registrar;
-    }
-
-    /**
-     * Handle the object's destruction.
-     *
-     * @return void
-     */
-    public function __destruct()
-    {
-        $this->registrar->register($this->name, $this->controller, $this->options);
-    }
-
-    /**
-     * The name, controller and options to use when ready to register.
-     *
      * @param  string  $name
      * @param  string  $controller
-     * @param  array   $options
+     * @param  array  $options
      * @return void
      */
-    public function remember($name, $controller, array $options)
+    public function __construct(ResourceRegistrar $registrar, $name, $controller, array $options)
     {
         $this->name = $name;
-        $this->controller = $controller;
         $this->options = $options;
+        $this->registrar = $registrar;
+        $this->controller = $controller;
     }
 
     /**
@@ -108,7 +89,7 @@ class PendingResourceRegistration
     }
 
     /**
-     * Set the route name for controller action.
+     * Set the route name for a controller action.
      *
      * @param  string  $method
      * @param  string  $name
@@ -135,7 +116,7 @@ class PendingResourceRegistration
     }
 
     /**
-     * Override the route parameter name.
+     * Override a route parameter's name.
      *
      * @param  string  $previous
      * @param  string  $new
@@ -159,5 +140,15 @@ class PendingResourceRegistration
         $this->options['middleware'] = $middleware;
 
         return $this;
+    }
+
+    /**
+     * Handle the object's destruction.
+     *
+     * @return void
+     */
+    public function __destruct()
+    {
+        $this->registrar->register($this->name, $this->controller, $this->options);
     }
 }
