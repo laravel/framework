@@ -469,4 +469,14 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         Arr::forget($array, ['emails.joe@example.com', 'emails.jane@localhost']);
         $this->assertEquals(['emails' => ['joe@example.com' => ['name' => 'Joe']]], $array);
     }
+
+    public function testMapOver()
+    {
+        $array = ['foo' => 'php', 'bar' => 'hhmv'];
+        $map = ['foo' => 'fast', 'bar' => 'faster'];
+
+        $array = Arr::mapOver($array, $map);
+
+        $this->assertEquals(['fast' => 'php', 'faster' => 'hhmv'], $array);
+    }
 }

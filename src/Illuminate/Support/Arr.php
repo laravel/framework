@@ -340,6 +340,25 @@ class Arr
     }
 
     /**
+     * Map one arrays keys to another.
+     *
+     * @param array $array
+     * @param array $mapArray
+     *
+     * @return array
+     */
+    public static function mapOver($array, $mapArray)
+    {
+        $results = [];
+
+        foreach (array_intersect_key($array, $mapArray) as $key => $value) {
+            $results[$mapArray[$key]] = $value;
+        }
+
+        return $results;
+    }
+
+    /**
      * Get a subset of the items from the given array.
      *
      * @param  array  $array
