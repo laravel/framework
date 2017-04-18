@@ -906,6 +906,17 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     }
 
     /**
+     * Register a custom exception handler.
+     *
+     * @param  \Closure   $callback
+     * @return void
+     */
+    public function handleException(Closure $callback)
+    {
+        $this['Illuminate\Contracts\Debug\ExceptionHandler']->register($callback);
+    }
+
+    /**
      * Register a terminating callback with the application.
      *
      * @param  \Closure  $callback

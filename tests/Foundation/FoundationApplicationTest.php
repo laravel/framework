@@ -157,6 +157,16 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase
         $this->assertArrayHasKey(0, $app['events']->getListeners('bootstrapped: Illuminate\Foundation\Bootstrap\RegisterFacades'));
         $this->assertSame($closure, $app['events']->getListeners('bootstrapped: Illuminate\Foundation\Bootstrap\RegisterFacades')[0]);
     }
+
+    public function testExceptionHandlerCanRegisterCustomHandlers()
+    {
+        $app = new Application;
+        $closure = function () {};
+        $app['Illuminate\Contracts\Debug\ExceptionHandler'] = $handler = m::mock('Illuminate\Contracts\Debug\ExceptionHandler');
+        $handler->shouldReceive('register')->once()->with($closure);
+
+        $app->handleException($closure);
+    }
 }
 
 class ApplicationDeferredSharedServiceProviderStub extends Illuminate\Support\ServiceProvider
