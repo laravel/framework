@@ -520,4 +520,42 @@ class Command extends SymfonyCommand
     {
         $this->laravel = $laravel;
     }
+
+    /**
+     * Determines if a task is running, and can alter the state of the current task.
+     * Called without an argument, returns timestamp from when the current task is running, or false if not.
+     * Called with a boolean, sets the running state of the current task.
+     * Called with a string/class, returns timestamp/false for whether that task is running.
+     *
+     * Based on Laravel's App:up and App:down functionality
+     *
+     * @param  mixed  $param
+     * @return bool
+     */
+    protected function isRunning($param = null)
+    {
+        // Defaults
+        $target = get_class($this);
+        $func = 'filemtime';
+
+        switch (gettype($param)) {
+            case 'boolean':
+                $func = $param
+                    ? 'touch'
+                    : 'unlink';
+                break;
+
+            case 'string':
+                $target = $param;
+                break;
+
+            case 'object':
+                $target = get_class($param);
+                break;
+        }
+
+        $file = $this->laravel['config']['app.manifest'].'/Task-'.str_replace('\\', '-', $target);
+
+        return @$func($file);
+    }
 }
