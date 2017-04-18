@@ -3,16 +3,16 @@
 namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Database\Migrations\Migrator;
-use Symfony\Component\Console\Input\InputOption;
 
 class StatusCommand extends BaseCommand
 {
     /**
-     * The console command name.
+     * The console command signature.
      *
      * @var string
      */
-    protected $name = 'migrate:status';
+    protected $signature = 'migrate:status {--database= : The database connection to use.}
+    {--path= : The path of migrations files to use.}';
 
     /**
      * The console command description.
@@ -52,9 +52,9 @@ class StatusCommand extends BaseCommand
             return $this->error('No migrations found.');
         }
 
-        $this->migrator->setConnection($this->input->getOption('database'));
+        $this->migrator->setConnection($this->option('database'));
 
-        if (! is_null($path = $this->input->getOption('path'))) {
+        if (! is_null($path = $this->option('path'))) {
             $path = $this->laravel->basePath().'/'.$path;
         } else {
             $path = $this->getMigrationPath();
@@ -84,19 +84,5 @@ class StatusCommand extends BaseCommand
     protected function getAllMigrationFiles($path)
     {
         return $this->migrator->getMigrationFiles($path);
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'],
-
-            ['path', null, InputOption::VALUE_OPTIONAL, 'The path of migrations files to use.'],
-        ];
     }
 }

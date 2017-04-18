@@ -5,18 +5,19 @@ namespace Illuminate\Database\Console\Migrations;
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Database\Migrations\Migrator;
-use Symfony\Component\Console\Input\InputOption;
 
 class RollbackCommand extends Command
 {
     use ConfirmableTrait;
 
     /**
-     * The console command name.
+     * The console command signature.
      *
      * @var string
      */
-    protected $name = 'migrate:rollback';
+    protected $signature = 'migrate:rollback {--database= : The database connection to use.}
+    {--force : Force the operation to run when in production.}
+    {--pretend : Dump the SQL queries that would be run.}';
 
     /**
      * The console command description.
@@ -56,9 +57,9 @@ class RollbackCommand extends Command
             return;
         }
 
-        $this->migrator->setConnection($this->input->getOption('database'));
+        $this->migrator->setConnection($this->option('database'));
 
-        $pretend = $this->input->getOption('pretend');
+        $pretend = $this->option('pretend');
 
         $this->migrator->rollback($pretend);
 
@@ -68,21 +69,5 @@ class RollbackCommand extends Command
         foreach ($this->migrator->getNotes() as $note) {
             $this->output->writeln($note);
         }
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'],
-
-            ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'],
-
-            ['pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'],
-        ];
     }
 }

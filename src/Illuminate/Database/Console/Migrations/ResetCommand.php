@@ -5,18 +5,19 @@ namespace Illuminate\Database\Console\Migrations;
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Database\Migrations\Migrator;
-use Symfony\Component\Console\Input\InputOption;
 
 class ResetCommand extends Command
 {
     use ConfirmableTrait;
 
     /**
-     * The console command name.
+     * The console command signature.
      *
      * @var string
      */
-    protected $name = 'migrate:reset';
+    protected $signature = 'migrate:reset {--database= : The database connection to use.}
+    {--force : Force the operation to run when in production.}
+    {--pretend : Dump the SQL queries that would be run.}';
 
     /**
      * The console command description.
@@ -56,7 +57,7 @@ class ResetCommand extends Command
             return;
         }
 
-        $this->migrator->setConnection($this->input->getOption('database'));
+        $this->migrator->setConnection($this->option('database'));
 
         if (! $this->migrator->repositoryExists()) {
             $this->output->writeln('<comment>Migration table not found.</comment>');
@@ -64,7 +65,7 @@ class ResetCommand extends Command
             return;
         }
 
-        $pretend = $this->input->getOption('pretend');
+        $pretend = $this->option('pretend');
 
         $this->migrator->reset($pretend);
 
@@ -74,21 +75,5 @@ class ResetCommand extends Command
         foreach ($this->migrator->getNotes() as $note) {
             $this->output->writeln($note);
         }
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'],
-
-            ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'],
-
-            ['pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'],
-        ];
     }
 }

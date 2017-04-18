@@ -4,18 +4,21 @@ namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
-use Symfony\Component\Console\Input\InputOption;
 
 class RefreshCommand extends Command
 {
     use ConfirmableTrait;
 
     /**
-     * The console command name.
+     * The console command signature.
      *
      * @var string
      */
-    protected $name = 'migrate:refresh';
+    protected $signature = 'migrate:refresh {--database= : The database connection to use.}
+    {--force : Force the operation to run when in production.}
+    {--path= : The path of migrations files to be executed.}
+    {--seed : Indicates if the seed task should be re-run.}
+    {--seeder : The class name of the root seeder.}';
 
     /**
      * The console command description.
@@ -35,11 +38,11 @@ class RefreshCommand extends Command
             return;
         }
 
-        $database = $this->input->getOption('database');
+        $database = $this->option('database');
 
-        $force = $this->input->getOption('force');
+        $force = $this->option('force');
 
-        $path = $this->input->getOption('path');
+        $path = $this->option('path');
 
         $this->call('migrate:reset', [
             '--database' => $database, '--force' => $force,
@@ -79,30 +82,10 @@ class RefreshCommand extends Command
     {
         $class = $this->option('seeder') ?: 'DatabaseSeeder';
 
-        $force = $this->input->getOption('force');
+        $force = $this->option('force');
 
         $this->call('db:seed', [
             '--database' => $database, '--class' => $class, '--force' => $force,
         ]);
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'],
-
-            ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'],
-
-            ['path', null, InputOption::VALUE_OPTIONAL, 'The path of migrations files to be executed.'],
-
-            ['seed', null, InputOption::VALUE_NONE, 'Indicates if the seed task should be re-run.'],
-
-            ['seeder', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder.'],
-        ];
     }
 }
