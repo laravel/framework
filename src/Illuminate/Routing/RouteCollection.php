@@ -66,7 +66,7 @@ class RouteCollection implements Countable, IteratorAggregate
     {
         $domainAndUri = $route->domain().$route->getUri();
 
-        foreach ($route->methods() as $method) {
+        foreach ($route->getMethods() as $method) {
             $this->routes[$method][$domainAndUri] = $route;
         }
 

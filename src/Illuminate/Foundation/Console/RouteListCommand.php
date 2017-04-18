@@ -111,7 +111,7 @@ class RouteListCommand extends Command
     {
         return $this->filterRoute([
             'host'   => $route->domain(),
-            'method' => implode('|', $route->methods()),
+            'method' => implode('|', $route->getMethods()),
             'uri'    => $route->uri(),
             'name'   => $route->getName(),
             'action' => $route->getActionName(),

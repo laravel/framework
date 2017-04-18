@@ -702,16 +702,6 @@ class Route
      */
     public function getMethods()
     {
-        return $this->methods();
-    }
-
-    /**
-     * Get the HTTP verbs the route responds to.
-     *
-     * @return array
-     */
-    public function methods()
-    {
         return $this->methods;
     }
 
