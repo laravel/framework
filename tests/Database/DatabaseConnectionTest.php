@@ -55,6 +55,18 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(is_numeric($log[0]['time']));
     }
 
+    /**
+     * @expectedException \Illuminate\Database\QueryException
+     */
+    public function testSelectThrowsQueryExceptionWhenPrepareIsFalse()
+    {
+        $pdo = $this->getMockBuilder('DatabaseConnectionTestMockPDO')->setMethods(['prepare'])->getMock();
+        $pdo->expects($this->once())->method('prepare')->with('foo')->will($this->returnValue(false));
+        $mock = $this->getMockConnection();
+        $mock->setReadPdo($pdo);
+        $mock->select('foo', ['foo' => 'bar']);
+    }
+
     public function testInsertCallsTheStatementMethod()
     {
         $connection = $this->getMockConnection(['statement']);
@@ -96,6 +108,17 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(is_numeric($log[0]['time']));
     }
 
+    /**
+     * @expectedException \Illuminate\Database\QueryException
+     */
+    public function testStatementThrowsQueryExceptionWhenPrepareIsFalse()
+    {
+        $pdo = $this->getMockBuilder('DatabaseConnectionTestMockPDO')->setMethods(['prepare'])->getMock();
+        $pdo->expects($this->once())->method('prepare')->with('foo')->will($this->returnValue(false));
+        $mock = $this->getMockConnection([], $pdo);
+        $mock->statement('foo', ['foo' => 'bar']);
+    }
+
     public function testAffectingStatementProperlyCallsPDO()
     {
         $pdo = $this->getMockBuilder('DatabaseConnectionTestMockPDO')->setMethods(['prepare'])->getMock();
@@ -112,6 +135,17 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $log[0]['query']);
         $this->assertEquals(['foo' => 'bar'], $log[0]['bindings']);
         $this->assertTrue(is_numeric($log[0]['time']));
+    }
+
+    /**
+     * @expectedException \Illuminate\Database\QueryException
+     */
+    public function testAffectingStatementThrowsQueryExceptionWhenPrepareIsFalse()
+    {
+        $pdo = $this->getMockBuilder('DatabaseConnectionTestMockPDO')->setMethods(['prepare'])->getMock();
+        $pdo->expects($this->once())->method('prepare')->with('foo')->will($this->returnValue(false));
+        $mock = $this->getMockConnection([], $pdo);
+        $mock->affectingStatement('foo', ['foo' => 'bar']);
     }
 
     public function testTransactionLevelNotIncrementedOnTransactionException()
