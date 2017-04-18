@@ -16,4 +16,14 @@ class User extends Model implements
     CanResetPasswordContract
 {
     use Authenticatable, Authorizable, CanResetPassword;
+
+    /**
+     * Set Bcrypt hashed password.
+     *
+     * @param  string $value
+     */
+    public function setPasswordAttribute($value)
+    {
+        $this->attributes['password'] = bcrypt($value);
+    }
 }
