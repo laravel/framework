@@ -69,6 +69,10 @@ class TokenGuard implements Guard
                 [$this->storageKey => $token]
             );
         }
+        
+        $this->request->setUserResolver(function () use ($user) {
+            return $user;
+        });
 
         return $this->user = $user;
     }
