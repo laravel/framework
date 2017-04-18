@@ -905,6 +905,28 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Compile the url statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileUrl($expression)
+    {
+        return "<?php echo app('url')->to$expression; ?>";
+    }
+
+    /**
+     * Compile the asset statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileAsset($expression)
+    {
+        return "<?php echo app('url')->asset$expression; ?>";
+    }
+
+    /**
      * Strip the parentheses from the given expression.
      *
      * @param  string  $expression

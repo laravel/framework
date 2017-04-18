@@ -783,4 +783,20 @@ test';
             ['(((', ')))'],
         ];
     }
+
+    public function testUrlIsCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@url(\'test-url\')';
+        $expected = '<?php echo app(\'url\')->to(\'test-url\'); ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
+    public function testAssetIsCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@asset(\'test-asset\')';
+        $expected = '<?php echo app(\'url\')->asset(\'test-asset\'); ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
 }
