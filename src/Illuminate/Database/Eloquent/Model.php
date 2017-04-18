@@ -3007,7 +3007,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  \DateTime  $date
      * @return string
      */
-    protected function serializeDate(DateTime $date)
+    protected function serializeDate($date)
     {
         return $date->format($this->getDateFormat());
     }
