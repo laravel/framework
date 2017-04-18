@@ -126,18 +126,27 @@ class FactoryBuilder
         $results = $this->make($attributes);
 
         if ($results instanceof Model) {
-            $results->setConnection($results->query()->getConnection()->getName());
-
-            $results->save();
+            $this->store(collect([$results]));
         } else {
-            $results->each(function ($model) {
-                $model->setConnection($model->query()->getConnection()->getName());
-
-                $model->save();
-            });
+            $this->store($results);
         }
 
         return $results;
+    }
+
+    /**
+     * Set the connection name on the results and store them.
+     *
+     * @param  \Illuminate\Support\Collection  $results
+     * @return void
+     */
+    protected function store($results)
+    {
+        $results->each(function ($model) {
+            $model->setConnection($model->query()->getConnection()->getName());
+
+            $model->save();
+        });
     }
 
     /**
