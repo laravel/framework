@@ -150,6 +150,19 @@ class View implements ArrayAccess, ViewContract
     }
 
     /**
+     * Add a parameter that will be passed to associated view composers.
+     *
+     * @param  mixed  $parameter
+     * @return $this
+     */
+    public function composeWith($parameter)
+    {
+        $this->factory->addComposerParameter($parameter);
+
+        return $this;
+    }
+
+    /**
      * Get the data bound to the view instance.
      *
      * @return array
