@@ -83,7 +83,7 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
      */
     public function read($sessionId)
     {
-        $session = (object) $this->getQuery()->find($sessionId);
+        $session = (object) $this->getQuery()->where('id', $sessionId)->first();
 
         if (isset($session->last_activity)) {
             if ($session->last_activity < Carbon::now()->subMinutes($this->minutes)->getTimestamp()) {
