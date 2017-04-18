@@ -298,6 +298,22 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\File\UploadedFile', $request->file('foo'));
     }
 
+    public function testMultipleFilesMethod()
+    {
+        $files = [
+            'foo' => [
+                'size' => [0],
+                'name' => [''],
+                'tmp_name' => [''],
+                'type' => [''],
+                'error' => [UPLOAD_ERR_NO_FILE],
+            ],
+        ];
+        $request = Request::create('/', 'POST', [], [], $files);
+        $all_files = $request->allFiles();
+        $this->assertEmpty($all_files);
+    }
+
     public function testHasFileMethod()
     {
         $request = Request::create('/', 'GET', [], [], []);

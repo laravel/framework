@@ -443,6 +443,15 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     protected function convertUploadedFiles(array $files)
     {
+        // filter out null files for multiple file upload
+        $files = array_filter($files, function ($file) {
+            if (count($file) == 1 && array_key_exists(0, $file) && is_null($file[0])) {
+                return false;
+            }
+
+            return ! is_null($file);
+        });
+
         return array_map(function ($file) {
             if (is_null($file) || (is_array($file) && empty(array_filter($file)))) {
                 return $file;
