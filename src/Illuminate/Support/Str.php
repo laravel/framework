@@ -221,12 +221,12 @@ class Str
     {
         $string = '';
 
-        while (($len = strlen($string)) < $length) {
+        while (($len = static::length($string)) < $length) {
             $size = $length - $len;
 
             $bytes = static::randomBytes($size);
 
-            $string .= substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $size);
+            $string .= static::substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $size);
         }
 
         return $string;
@@ -255,7 +255,7 @@ class Str
     {
         $pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
-        return substr(str_shuffle(str_repeat($pool, $length)), 0, $length);
+        return static::substr(str_shuffle(str_repeat($pool, $length)), 0, $length);
     }
 
     /**
@@ -283,9 +283,9 @@ class Str
             return hash_equals($knownString, $userInput);
         }
 
-        $knownLength = mb_strlen($knownString, '8bit');
+        $knownLength = static::length($knownString, '8bit');
 
-        if (mb_strlen($userInput, '8bit') !== $knownLength) {
+        if (static::length($userInput, '8bit') !== $knownLength) {
             return false;
         }
 
