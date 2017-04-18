@@ -73,7 +73,7 @@ class ThrottleRequests
      */
     protected function buildResponse($key, $maxAttempts)
     {
-        $response = new Response('Too Many Attempts.', 429);
+        $response = new Response('Too Many Attempts.', Response::HTTP_TOO_MANY_REQUESTS);
 
         $retryAfter = $this->limiter->availableIn($key);
 
