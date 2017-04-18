@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Auth;
 
 use Illuminate\Http\Request;
 use Illuminate\Cache\RateLimiter;
+use Illuminate\Auth\Events\Denial;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Lang;
 
@@ -135,6 +136,17 @@ trait ThrottlesLogins
     protected function lockoutTime()
     {
         return property_exists($this, 'lockoutTime') ? $this->lockoutTime : 60;
+    }
+
+    /**
+     * Fire an event when a denial occurs.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return void
+     */
+    protected function fireDenialEvent(Request $request)
+    {
+        event(new Denial($request));
     }
 
     /**
