@@ -636,9 +636,9 @@ if (! function_exists('secure_url')) {
      *
      * @param  string  $path
      * @param  mixed   $parameters
-     * @return string
+     * @return Illuminate\Contracts\Routing\UrlGenerator|string
      */
-    function secure_url($path, $parameters = [])
+    function secure_url($path = null, $parameters = [])
     {
         return url($path, $parameters, true);
     }
