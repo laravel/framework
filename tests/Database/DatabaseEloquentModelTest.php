@@ -46,6 +46,17 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($model->isDirty(['foo', 'bar']));
     }
 
+    public function testGetOriginalShouldAlwaysReturnArray()
+    {
+        $model = new EloquentModelStub;
+        $this->assertEquals([], $model->getOriginal());
+
+        $model->fill($attrs = ['foo' => '1', 'bar' => 2, 'baz' => 3]);
+        $model->syncOriginal();
+
+        $this->assertEquals($attrs, $model->getOriginal());
+    }
+
     public function testCalculatedAttributes()
     {
         $model = new EloquentModelStub;
