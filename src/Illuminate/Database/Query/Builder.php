@@ -1208,6 +1208,22 @@ class Builder
     }
 
     /**
+     * Handles dynamic "orWhere" clauses to the query.
+     *
+     * @param  string  $method
+     * @param  string  $parameters
+     * @return $this
+     */
+    protected function dynamicOrWhere($method, $parameters)
+    {
+        $segment = substr($method, 7);
+
+        $this->addDynamic($segment, 'or', $parameters, 0);
+
+        return $this;
+    }
+
+    /**
      * Add a single dynamic where clause statement to the query.
      *
      * @param  string  $segment
@@ -2398,6 +2414,10 @@ class Builder
 
         if (Str::startsWith($method, 'where')) {
             return $this->dynamicWhere($method, $parameters);
+        }
+
+        if (Str::startsWith($method, 'orWhere')) {
+            return $this->dynamicOrWhere($method, $parameters);
         }
 
         $className = static::class;

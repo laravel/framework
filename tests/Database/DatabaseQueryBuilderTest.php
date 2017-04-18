@@ -1461,7 +1461,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $builder->shouldReceive('where')->with('android_version', '=', '4.2', 'and')->once()->andReturn($builder);
         $builder->shouldReceive('where')->with('orientation', '=', 'Vertical', 'or')->once()->andReturn($builder);
 
-        $builder->dynamicWhere($method, $parameters);
+        $this->assertEquals($builder, $builder->dynamicWhere($method, $parameters));
     }
 
     public function testCallTriggersDynamicWhere()
@@ -1470,6 +1470,25 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals($builder, $builder->whereFooAndBar('baz', 'qux'));
         $this->assertCount(2, $builder->wheres);
+    }
+
+    public function testDynamicOrWhere()
+    {
+        $method = 'orWhereFooBar';
+        $parameters = ['corge'];
+        $builder = m::mock('Illuminate\Database\Query\Builder')->makePartial();
+
+        $builder->shouldReceive('where')->with('foo_bar', '=', 'corge', 'or')->once()->andReturn($builder);
+
+        $this->assertEquals($builder, $builder->dynamicOrWhere($method, $parameters));
+    }
+
+    public function testCallTriggersDynamicOrWhere()
+    {
+        $builder = $this->getBuilder();
+
+        $this->assertEquals($builder, $builder->orWhereFoo('bar'));
+        $this->assertCount(1, $builder->wheres);
     }
 
     /**
