@@ -28,6 +28,31 @@ class TaggedCache extends Repository
 
         $this->tags = $tags;
     }
+    
+    /**
+     * Determine if an item exists in the cache.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function has($key)
+    {
+        return ! is_null($this->get($key));
+    }
+
+    /**
+     * Retrieve an item from the cache by key.
+     *
+     * @param  string  $key
+     * @param  mixed   $default
+     * @return mixed
+     */
+    public function get($key, $default = null)
+    {
+        $value = $this->store->get($this->taggedItemKey($key));
+
+        return ! is_null($value) ? $value : value($default);
+    }
 
     /**
      * {@inheritdoc}
