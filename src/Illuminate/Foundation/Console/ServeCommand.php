@@ -44,6 +44,7 @@ class ServeCommand extends Command
         $binary = ProcessUtils::escapeArgument((new PhpExecutableFinder)->find(false));
 
         $this->info("Laravel development server started on http://{$host}:{$port}/");
+        $this->info('Press Ctrl-C to quit.');
 
         if (defined('HHVM_VERSION')) {
             if (version_compare(HHVM_VERSION, '3.8.0') >= 0) {
