@@ -281,6 +281,31 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         EloquentTestUser::findOrFail([1, 2]);
     }
 
+    public function testUpdateAll()
+    {
+        $user1 = EloquentTestUser::create(['email' => 'one@gmail.com']);
+        $user1->post()->create(['name' => 'First Post']);
+
+        $user2 = EloquentTestUser::create(['email' => 'two@gmail.com']);
+        $user2->post()->create(['name' => 'Second Post']);
+
+        EloquentTestPost::updateAll(['user_id' => $user1->id]);
+        $this->assertCount(2, EloquentTestPost::where('user_id', $user1->id)->get());
+    }
+
+    public function testUpdateAllWithMutatorAndDefaultAttributes()
+    {
+        $user1 = EloquentTestUser::create(['email' => 'one@gmail.com']);
+        $user1->post()->create(['name' => 'First Post']);
+
+        $user2 = EloquentTestUser::create(['email' => 'two@gmail.com']);
+        $user2->post()->create(['name' => 'Second Post']);
+
+        EloquentTestPostWithMutator::updateAll(['name' => 'A really long title']);
+        $this->assertCount(2, EloquentTestPostWithMutator::where('name', 'A really l...')->get());
+        $this->assertCount(1, EloquentTestPostWithMutator::where('user_id', $user1->id)->get());
+    }
+
     public function testOneToOneRelationship()
     {
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
@@ -972,6 +997,18 @@ class EloquentTestPost extends Eloquent
     public function parentPost()
     {
         return $this->belongsTo('EloquentTestPost', 'parent_id');
+    }
+}
+
+class EloquentTestPostWithMutator extends EloquentTestPost
+{
+    protected $attributes = [
+        'user_id' => 1,
+    ];
+
+    public function setNameAttribute($name)
+    {
+        $this->attributes['name'] = \Illuminate\Support\Str::limit($name, 10);
     }
 }
 

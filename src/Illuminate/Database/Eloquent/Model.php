@@ -1430,6 +1430,21 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Update all records in the database.
+     *
+     * @param  array  $attributes
+     * @return int
+     */
+    public static function updateAll(array $attributes)
+    {
+        $instance = new static;
+
+        $instance->setRawAttributes([])->fill($attributes);
+
+        return $instance->newQuery()->update($instance->getAttributes());
+    }
+
+    /**
      * Save the model and all of its relationships.
      *
      * @return bool
