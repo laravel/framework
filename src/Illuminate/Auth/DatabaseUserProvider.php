@@ -47,7 +47,7 @@ class DatabaseUserProvider implements UserProvider
     }
 
     /**
-     * Retrieve a user by their unique identifier.
+     * Retrieve a user by his unique identifier.
      *
      * @param  mixed  $identifier
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
@@ -60,7 +60,7 @@ class DatabaseUserProvider implements UserProvider
     }
 
     /**
-     * Retrieve a user by their unique identifier and "remember me" token.
+     * Retrieve a user by his unique identifier and "remember me" token.
      *
      * @param  mixed  $identifier
      * @param  string  $token
@@ -77,7 +77,7 @@ class DatabaseUserProvider implements UserProvider
     }
 
     /**
-     * Update the "remember me" token for the given user in storage.
+     * Update the "remember me" token for the given user in the storage.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @param  string  $token
