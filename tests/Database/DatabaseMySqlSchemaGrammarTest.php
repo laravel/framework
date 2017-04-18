@@ -252,6 +252,16 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table `users` add `id` int unsigned not null auto_increment primary key', $statements[0]);
     }
 
+    public function testAddingTinyIncrementingID()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->tinyIncrements('id');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table `users` add `id` tinyint unsigned not null auto_increment primary key', $statements[0]);
+    }
+
     public function testAddingSmallIncrementingID()
     {
         $blueprint = new Blueprint('users');

@@ -174,6 +174,16 @@ class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table "users" add "id" int identity primary key not null', $statements[0]);
     }
 
+    public function testAddingTinyIncrementingID()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->tinyIncrements('id');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table "users" add "id" tinyint identity primary key not null', $statements[0]);
+    }
+
     public function testAddingSmallIncrementingID()
     {
         $blueprint = new Blueprint('users');
