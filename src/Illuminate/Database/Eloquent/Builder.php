@@ -276,6 +276,22 @@ class Builder
     }
 
     /**
+     * Create or update a record matching the attributes, and fill it with values with force mass assignment
+     *
+     * @param array $attributes
+     * @param array $values
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function forceUpdateOrCreate(array $attributes, array $values = [])
+    {
+        $instance = $this->firstOrNew($attributes);
+
+        $instance->forceFill($values)->save();
+
+        return $instance;
+    }
+
+    /**
      * Execute the query and get the first result.
      *
      * @param  array  $columns
