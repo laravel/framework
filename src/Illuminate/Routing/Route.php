@@ -884,6 +884,10 @@ class Route
      */
     public function getCompiled()
     {
+        if (! isset($this->compiled)) {
+            $this->compileRoute();
+        }
+
         return $this->compiled;
     }
 

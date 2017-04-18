@@ -401,6 +401,16 @@ class Router implements RegistrarContract
     }
 
     /**
+     * Proxy to RouteCollection::processRoutes.
+     *
+     * @param callable $callable
+     */
+    public function processRoutes(callable $callable)
+    {
+        $this->routes->processRoutes($callable);
+    }
+
+    /**
      * Update the group stack with the given attributes.
      *
      * @param  array  $attributes

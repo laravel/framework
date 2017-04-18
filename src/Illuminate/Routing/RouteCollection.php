@@ -129,6 +129,19 @@ class RouteCollection implements Countable, IteratorAggregate
     }
 
     /**
+     * Process the route arrays with a Callable.
+     *
+     * @param callable $processor
+     */
+    public function processRoutes(callable $processor)
+    {
+        foreach ($this->routes as $method => $methodRoutes) {
+            $this->routes[$method] = $processor($methodRoutes);
+        }
+        $this->allRoutes = $processor($this->allRoutes);
+    }
+
+    /**
      * Find the first route matching a given request.
      *
      * @param  \Illuminate\Http\Request  $request
