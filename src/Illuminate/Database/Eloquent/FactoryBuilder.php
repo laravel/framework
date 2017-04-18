@@ -103,6 +103,19 @@ class FactoryBuilder
     }
 
     /**
+     * Create a model and persist it in the database if requested.
+     *
+     * @param  array  $attributes
+     * @return \Closure
+     */
+    public function lazy(array $attributes = [])
+    {
+        return function () use ($attributes) {
+            return $this->create($attributes);
+        };
+    }
+
+    /**
      * Create a collection of models and persist them to the database.
      *
      * @param  array  $attributes
