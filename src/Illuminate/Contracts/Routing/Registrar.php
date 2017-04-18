@@ -74,7 +74,7 @@ interface Registrar
      * @param  string  $name
      * @param  string  $controller
      * @param  array   $options
-     * @return void
+     * @return \Illuminate\Routing\PendingResourceRegistration
      */
     public function resource($name, $controller, array $options = []);
 

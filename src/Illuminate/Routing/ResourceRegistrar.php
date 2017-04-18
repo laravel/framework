@@ -63,6 +63,22 @@ class ResourceRegistrar
     }
 
     /**
+     * Create a new PendingResourceRegistration.
+     *
+     * @param  string  $name
+     * @param  string  $controller
+     * @param  array   $options
+     * @return \Illuminate\Routing\PendingResourceRegistration
+     */
+    public function registration($name, $controller, array $options = [])
+    {
+        $registration = new PendingResourceRegistration($this);
+        $registration->remember($name, $controller, $options);
+
+        return $registration;
+    }
+
+    /**
      * Route a resource to a controller.
      *
      * @param  string  $name
