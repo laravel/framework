@@ -7,7 +7,7 @@ use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Database\DetectsLostConnections;
 
-class Connector
+abstract class Connector
 {
     use DetectsLostConnections;
 
@@ -23,6 +23,14 @@ class Connector
         PDO::ATTR_STRINGIFY_FETCHES => false,
         PDO::ATTR_EMULATE_PREPARES => false,
     ];
+
+    /**
+     * Establish a database connection.
+     *
+     * @param  array  $config
+     * @return \PDO
+     */
+    abstract public function connect(array $config);
 
     /**
      * Get the PDO options based on the configuration.
