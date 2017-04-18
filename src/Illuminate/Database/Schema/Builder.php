@@ -49,10 +49,7 @@ class Builder
     public function hasTable($table)
     {
         $sql = $this->grammar->compileTableExists();
-
-        $table = $this->connection->getTablePrefix().$table;
-
-        return count($this->connection->select($sql, [$table])) > 0;
+        return count($this->connection->select($sql, $this->grammar->getTableBindings($this->connection, $table))) > 0;
     }
 
     /**
@@ -96,10 +93,11 @@ class Builder
      * @return array
      */
     public function getColumnListing($table)
-    {
-        $table = $this->connection->getTablePrefix().$table;
-
-        $results = $this->connection->select($this->grammar->compileColumnExists($table));
+    { 
+        $results = $this->connection->select(
+            $this->grammar->compileColumnExists(),
+            $this->grammar->getTableBindings($this->connection, $table)
+        );
 
         return $this->connection->getPostProcessor()->processColumnListing($results);
     }
