@@ -1709,8 +1709,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         if (isset($this->original[$this->getKeyName()])) {
             return $this->original[$this->getKeyName()];
         }
+        
+        $keyAttribute = $this->getAttribute($this->getKeyName());
+        
+        if (is_null($keyAttribute)) {
+            throw new Exception('Invalid primary key defined on model.');
+        }
 
-        return $this->getAttribute($this->getKeyName());
+        return $keyAttribute;
     }
 
     /**
