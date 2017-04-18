@@ -72,10 +72,6 @@ abstract class BaseEncrypter
      */
     protected function validMac(array $payload)
     {
-        $bytes = random_bytes(16);
-
-        $calcMac = hash_hmac('sha256', $this->hash($payload['iv'], $payload['value']), $bytes, true);
-
-        return hash_equals(hash_hmac('sha256', $payload['mac'], $bytes, true), $calcMac);
+        return hash_equals($this->hash($payload['iv'], $payload['value']), $payload['mac']);
     }
 }
