@@ -1613,7 +1613,7 @@ class Validator implements ValidatorContract
         }
 
         if (isset($parameters['ratio'])) {
-            list($numerator, $denominator) = array_pad(sscanf($parameters['ratio'], '%d/%d'), 2, 1);
+            list($numerator, $denominator) = array_pad(preg_split('/\/|:/', $parameters['ratio']), 2, 1);
 
             return $numerator / $denominator == $width / $height;
         }
