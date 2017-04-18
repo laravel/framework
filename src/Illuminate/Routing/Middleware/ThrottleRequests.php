@@ -4,6 +4,7 @@ namespace Illuminate\Routing\Middleware;
 
 use Closure;
 use Illuminate\Cache\RateLimiter;
+use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class ThrottleRequests
@@ -40,7 +41,7 @@ class ThrottleRequests
         $key = $this->resolveRequestSignature($request);
 
         if ($this->limiter->tooManyAttempts($key, $maxAttempts, $decayMinutes)) {
-            return $this->buildResponse($key, $maxAttempts);
+            return $this->buildResponse($request, $key, $maxAttempts);
         }
 
         $this->limiter->hit($key, $decayMinutes);
@@ -67,13 +68,19 @@ class ThrottleRequests
     /**
      * Create a 'too many attempts' response.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @param  string  $key
      * @param  int  $maxAttempts
      * @return \Illuminate\Http\Response
      */
-    protected function buildResponse($key, $maxAttempts)
+    protected function buildResponse($request, $key, $maxAttempts)
     {
-        $response = new Response('Too Many Attempts.', 429);
+        if (($request->ajax() && ! $request->pjax()) || $request->wantsJson()) {
+            $response = $this->buildTooManyAttemptsJsonResponse($request, $key, $maxAttempts);
+        }
+        else {
+            $response = new Response('Too Many Attempts.', 429);
+        }
 
         $retryAfter = $this->limiter->availableIn($key);
 
@@ -82,6 +89,19 @@ class ThrottleRequests
             $this->calculateRemainingAttempts($key, $maxAttempts, $retryAfter),
             $retryAfter
         );
+    }
+
+    /**
+     * Build 'too many attempts' json response.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $key
+     * @param  int  $maxAttempts
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function buildTooManyAttemptsJsonResponse($request, $key, $maxAttempts)
+    {
+        return new JsonResponse(['message' => 'Too Many Attempts.'], 429);
     }
 
     /**
