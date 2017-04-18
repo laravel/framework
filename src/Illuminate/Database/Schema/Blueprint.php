@@ -864,6 +864,17 @@ class Blueprint
     }
 
     /**
+     * Create a new medium binary column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Support\Fluent
+     */
+    public function mediumBinary($column)
+    {
+        return $this->addColumn('mediumBinary', $column);
+    }
+
+    /**
      * Create a new uuid column on the table.
      *
      * @param  string  $column
