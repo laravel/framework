@@ -95,7 +95,7 @@ class MigrateMakeCommand extends BaseCommand
     {
         $path = $this->getMigrationPath();
 
-        $file = pathinfo($this->creator->create($name, $path, $table, $create), PATHINFO_FILENAME);
+        $file = $this->creator->create($name, $path, $table, $create);
 
         $this->line("<info>Created Migration:</info> $file");
     }
