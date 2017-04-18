@@ -2,8 +2,10 @@
 
 namespace Illuminate\Database\Migrations;
 
+use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
@@ -107,14 +109,20 @@ class Migrator
         $batch = $this->repository->getNextBatchNumber();
 
         $pretend = Arr::get($options, 'pretend', false);
-
         $step = Arr::get($options, 'step', false);
 
         // Once we have the array of migrations, we will spin through them and run the
         // migrations "up" so the changes are made to the databases. We'll then log
         // that the migration was run so we don't repeat it next time we execute.
         foreach ($migrations as $file) {
-            $this->runUp($file, $batch, $pretend);
+            $success = $this->runMigration(
+                'runUp', $file, $batch, $pretend
+            );
+
+            // If a migration failed, do not run the rest
+            if (! $success) {
+                break;
+            }
 
             // If we are stepping through the migrations, then we will increment the
             // batch value for each individual migration that is run. That way we
@@ -123,6 +131,39 @@ class Migrator
                 $batch++;
             }
         }
+    }
+
+    /**
+     * Runs a particular migration. Based on the function specified,
+     * takes additional arguments.
+     *
+     * @param string $func The function that acts on the migration
+     * @param mixed $args,... The arguments to pass to func
+     * @return bool The return of $func. It should idicate whether the
+     *              migration ran successfully
+     */
+    protected function runMigration($func, $args)
+    {
+        $args = func_get_args();
+        $args = array_splice($args, 1); // Exclude $func
+
+        if (DB::connection()->hasFullTransactionSupport()) {
+            DB::beginTransaction();
+
+            $success = call_user_func_array([$this, $func], $args);
+
+            if ($success) {
+                DB::commit();
+            } else {
+                // If the migration was not successful,
+                // undo any potential schema changes
+                DB::rollback();
+            }
+        } else {
+            $success = call_user_func_array([$this, $func], $args);
+        }
+
+        return $success;
     }
 
     /**
@@ -144,14 +185,61 @@ class Migrator
             return $this->pretendToRun($migration, 'up');
         }
 
-        $migration->up();
+        try {
+            $migration->up();
 
-        // Once we have run a migrations class, we will log that it was run in this
-        // repository so that we don't try to run it next time we do a migration
-        // in the application. A migration repository keeps the migrate order.
-        $this->repository->log($file, $batch);
+            // Once we have run a migrations class, we will log that it was run in this
+            // repository so that we don't try to run it next time we do a migration
+            // in the application. A migration repository keeps the migrate order.
+            $this->repository->log($file, $batch);
 
-        $this->note("<info>Migrated:</info> $file");
+            $this->note("<info>Migrated:</info> $file");
+
+            return true;
+        } catch (Exception $e) {
+            $this->handleException($file, $e);
+
+            return false;
+        }
+    }
+
+    private function handleException($file, $exception)
+    {
+        $trace = $exception->getTrace();
+        $offsetFile = strlen(base_path()) + 1;
+        $ourTrace = [];
+
+        foreach ($trace as $point) {
+            // Only interested in lines and files
+            if (! isset($point['file'])) {
+                continue;
+            }
+
+            // Basically reversing the trace and doing an array_map
+            array_unshift($ourTrace, [
+                'file' => substr($point['file'], $offsetFile),
+                'line' => $point['line'],
+            ]);
+
+            // We are not interested in the rest of the trace, only the migration
+            // and maybe the files that it dealt with
+            if (basename($point['file']) === "{$file}.php") {
+                break;
+            }
+        }
+
+        // Pretty print
+        $message = "<info>An error occurred while running migrations:</info>\n\n";
+        $message .= '<error>'.$exception->getMessage()."</error>\n\n";
+
+        foreach ($ourTrace as $point) {
+            $line = str_pad($point['line'], 5);
+            $file = $point['file'];
+
+            $message .= "  <comment>Line:</comment> {$line} <comment>File:</comment> {$file}\n";
+        }
+
+        $this->note($message);
     }
 
     /**
@@ -178,7 +266,9 @@ class Migrator
             // to what they run on "up". It lets us backtrack through the migrations
             // and properly reverse the entire database schema operation that ran.
             foreach ($migrations as $migration) {
-                $this->runDown((object) $migration, $pretend);
+                $this->runMigration(
+                    'runDown', (object) $migration, $pretend
+                );
             }
         }
 
@@ -230,14 +320,22 @@ class Migrator
             return $this->pretendToRun($instance, 'down');
         }
 
-        $instance->down();
+        try {
+            $instance->down();
 
-        // Once we have successfully run the migration "down" we will remove it from
-        // the migration repository so it will be considered to have not been run
-        // by the application then will be able to fire by any later operation.
-        $this->repository->delete($migration);
+            // Once we have successfully run the migration "down" we will remove it from
+            // the migration repository so it will be considered to have not been run
+            // by the application then will be able to fire by any later operation.
+            $this->repository->delete($migration);
 
-        $this->note("<info>Rolled back:</info> $file");
+            $this->note("<info>Rolled back:</info> $file");
+
+            return true;
+        } catch (Exception $e) {
+            $this->handleException($file, $e);
+
+            return false;
+        }
     }
 
     /**
@@ -297,6 +395,8 @@ class Migrator
 
             $this->note("<info>{$name}:</info> {$query['query']}");
         }
+
+        return true;
     }
 
     /**

@@ -1,6 +1,7 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseMigratorTest extends PHPUnit_Framework_TestCase
 {
@@ -16,6 +17,7 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase
             $resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'),
             m::mock('Illuminate\Filesystem\Filesystem'),
         ]);
+
         $migrator->getFilesystem()->shouldReceive('glob')->once()->with(__DIR__.'/*_*.php')->andReturn([
             __DIR__.'/2_bar.php',
             __DIR__.'/1_foo.php',
@@ -29,6 +31,15 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase
         $migrator->getRepository()->shouldReceive('getRan')->once()->andReturn([
             '1_foo',
         ]);
+
+        $connectionMock = m::mock('stdClass');
+        $connectionMock->shouldReceive('hasFullTransactionSupport')->andReturn(true);
+
+        // Each migration should be done within a transaction
+        DB::shouldReceive('connection')->andReturn($connectionMock);
+        DB::shouldReceive('beginTransaction')->times(2);
+        DB::shouldReceive('commit')->times(2);
+
         $migrator->getRepository()->shouldReceive('getNextBatchNumber')->once()->andReturn(1);
         $migrator->getRepository()->shouldReceive('log')->once()->with('2_bar', 1);
         $migrator->getRepository()->shouldReceive('log')->once()->with('3_baz', 1);
