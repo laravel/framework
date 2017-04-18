@@ -120,7 +120,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
             return $this->container->call([$this, 'authorize']);
         }
 
-        return false;
+        return true;
     }
 
     /**
