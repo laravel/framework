@@ -83,7 +83,11 @@ trait ThrottlesLogins
      */
     protected function throttleKey(Request $request)
     {
-        return Str::lower($request->input($this->username())).'|'.$request->ip();
+        if (Config::get('auth.throttle_key') == 'ip') {
+            return $request->ip();
+        } else {
+            return Str::lower($request->input($this->username())).'|'.$request->ip();
+        }
     }
 
     /**
