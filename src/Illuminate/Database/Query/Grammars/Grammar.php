@@ -177,7 +177,10 @@ class Grammar extends BaseGrammar
             // Once we have everything ready to go, we will just concatenate all the parts to
             // build the final join statement SQL for the query and we can then return the
             // final clause back to the callers as a single, stringified join statement.
-            $sql[] = "$type join $table on $clauses";
+            if (starts_with($clauses, 'using('))
+                $sql[] = "$type join $table $clauses";
+            else
+                $sql[] = "$type join $table on $clauses";
         }
 
         return implode(' ', $sql);
@@ -207,7 +210,10 @@ class Grammar extends BaseGrammar
             $second = $this->wrap($clause['second']);
         }
 
-        return "{$clause['boolean']} $first {$clause['operator']} $second";
+        if (strtolower($clause['operator']) == 'using')
+            return "using({$first})";
+        else
+            return "{$clause['boolean']} $first {$clause['operator']} $second";
     }
 
     /**
