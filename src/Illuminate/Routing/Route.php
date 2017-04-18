@@ -6,6 +6,7 @@ use Closure;
 use LogicException;
 use ReflectionMethod;
 use ReflectionFunction;
+use ReflectionException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -277,7 +278,11 @@ class Route
         if (is_string($action['uses'])) {
             list($class, $method) = explode('@', $action['uses']);
 
-            $parameters = (new ReflectionMethod($class, $method))->getParameters();
+            try {
+                $parameters = (new ReflectionMethod($class, $method))->getParameters();
+            } catch (ReflectionException $e) {
+                $parameters = (new ReflectionMethod($class, '__call'))->getParameters();
+            }
         } else {
             $parameters = (new ReflectionFunction($action['uses']))->getParameters();
         }
