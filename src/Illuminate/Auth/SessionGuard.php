@@ -5,6 +5,7 @@ namespace Illuminate\Auth;
 use RuntimeException;
 use Illuminate\Support\Str;
 use Illuminate\Http\Response;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -16,7 +17,7 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 
 class SessionGuard implements StatefulGuard, SupportsBasicAuth
 {
-    use GuardHelpers;
+    use GuardHelpers, Macroable;
 
     /**
      * The name of the Guard. Typically "session".
@@ -155,7 +156,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * Pull a user from the repository by its "remember me" cookie token.
      *
-     * @param  string  $recaller
+     * @param  \Illuminate\Auth\Recaller  $recaller
      * @return mixed
      */
     protected function userFromRecaller($recaller)

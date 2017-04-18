@@ -1,5 +1,23 @@
 # Release Notes for 5.4.x
 
+## v5.4.19 (2017-04-16)
+
+### Added
+- Added ability to send `link_names` parameter in Slack notification ([#18765](https://github.com/laravel/framework/pull/18765))
+- Added `Mailable::hasFrom()` method ([#18790](https://github.com/laravel/framework/pull/18790))
+
+### Changed
+- Made `Mailer` macroable ([#18763](https://github.com/laravel/framework/pull/18763))
+- Made `SessionGuard` macroable ([#18796](https://github.com/laravel/framework/pull/18796))
+- Improved queue worker output ([#18773](https://github.com/laravel/framework/pull/18773))
+- Added `newModelInstance()` method to Eloquent Builder ([#18775](https://github.com/laravel/framework/pull/18775))
+- Use assertions instead of exceptions in `MocksApplicationServices` ([#18774](https://github.com/laravel/framework/pull/18774))
+
+### Fixed
+- Fixed memory issue in `Container` ([#18812](https://github.com/laravel/framework/pull/18812))
+- Set database connection while retrieving models ([#18769](https://github.com/laravel/framework/pull/18769))
+
+
 ## v5.4.18 (2017-04-10)
 
 ### Added

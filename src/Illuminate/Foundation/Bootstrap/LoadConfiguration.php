@@ -66,7 +66,7 @@ class LoadConfiguration
             throw new Exception('Unable to load the "app" configuration file.');
         }
 
-        foreach ($this->getConfigurationFiles($app) as $key => $path) {
+        foreach ($files as $key => $path) {
             $repository->set($key, require $path);
         }
     }
