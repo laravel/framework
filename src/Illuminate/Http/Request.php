@@ -665,7 +665,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
             return $this->json();
         }
 
-        return $this->getMethod() == 'GET' ? $this->query : $this->request;
+        return $this->method() == 'GET' ? $this->query : $this->request;
     }
 
     /**
