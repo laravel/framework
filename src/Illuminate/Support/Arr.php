@@ -495,6 +495,9 @@ class Arr
             if (is_array($value)) {
                 $value = static::sortRecursive($value);
             }
+            if (is_object($value)) {
+                $value = static::sortRecursive((array) $value);
+            }
         }
 
         if (static::isAssoc($array)) {
