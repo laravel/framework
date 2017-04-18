@@ -9,7 +9,7 @@ class DummyClass extends Job
     /**
      * Create a new job instance.
      *
-     * @return void
+     * @return self
      */
     public function __construct()
     {
