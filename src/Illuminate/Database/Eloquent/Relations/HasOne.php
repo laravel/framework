@@ -85,10 +85,8 @@ class HasOne extends HasOneOrMany
         );
 
         if (is_callable($this->withDefault)) {
-            return call_user_func($this->withDefault, $instance) ?: $instance;
-        }
-
-        if (is_array($this->withDefault)) {
+            call_user_func($this->withDefault, $instance);
+        } elseif (is_array($this->withDefault)) {
             $instance->forceFill($this->withDefault);
         }
 
