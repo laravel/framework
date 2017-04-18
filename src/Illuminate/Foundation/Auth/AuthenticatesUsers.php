@@ -175,7 +175,7 @@ trait AuthenticatesUsers
     {
         Auth::guard($this->getGuard())->logout();
 
-        return redirect(property_exists($this, 'redirectAfterLogout') ? $this->redirectAfterLogout : '/');
+        return redirect($this->redirectAfterLogout());
     }
 
     /**
@@ -196,6 +196,16 @@ trait AuthenticatesUsers
     public function loginUsername()
     {
         return property_exists($this, 'username') ? $this->username : 'email';
+    }
+
+    /**
+     * Get the logout redirect path.
+     *
+     * @return string
+     */
+    public function redirectAfterLogout()
+    {
+        return property_exists($this, 'redirectAfterLogout') ? $this->redirectAfterLogout : '/';
     }
 
     /**
