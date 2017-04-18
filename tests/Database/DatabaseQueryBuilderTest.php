@@ -1367,6 +1367,14 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->where('items->price->in_usd', '=', 1)->where('items->age', '=', 2);
         $this->assertEquals('select * from `users` where `items`->"$.price.in_usd" = ? and `items`->"$.age" = ?', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('field`safe`from`sql`injection->price', '=', 1);
+        $this->assertEquals('select * from `users` where `field``safe``from``sql``injection`->"$.price" = ?', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('items->value_safe_from_sql_injection_\'"\\', '=', 1);
+        $this->assertEquals('select * from `users` where `items`->"$.value_safe_from_sql_injection_\'\\"\\\\" = ?', $builder->toSql());
     }
 
     public function testPostgresWrappingJson()
