@@ -484,11 +484,15 @@ class Guard implements GuardContract
      */
     public function loginUsingId($id, $remember = false)
     {
-        $this->session->set($this->getName(), $id);
+        $user = $this->provider->retrieveById($id);
 
-        $this->login($user = $this->provider->retrieveById($id), $remember);
+        if (! is_null($user)) {
+            $this->login($user, $remember);
 
-        return $user;
+            return $user;
+        }
+
+        return false;
     }
 
     /**
@@ -499,7 +503,9 @@ class Guard implements GuardContract
      */
     public function onceUsingId($id)
     {
-        if (! is_null($user = $this->provider->retrieveById($id))) {
+        $user = $this->provider->retrieveById($id);
+
+        if (! is_null($user)) {
             $this->setUser($user);
 
             return true;
