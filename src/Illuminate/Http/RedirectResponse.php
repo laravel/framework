@@ -97,6 +97,29 @@ class RedirectResponse extends BaseRedirectResponse
 
         return $input;
     }
+    
+    /**
+     * Append the query string parameters from the last request.
+     *
+     * @param  bool  $overwriteOld
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    function withQueryString($overwriteOld = true)
+    {
+        parse_str($_SERVER['QUERY_STRING'], $oldParams);
+        parse_str(parse_url($this->getTargetUrl(), PHP_URL_QUERY), $newParams);
+        
+        if ($overwriteOld) {
+            $queryString = '?'.http_build_query(array_merge($oldParams, $newParams));
+        }
+        else {
+            $queryString = '?'.http_build_query(array_merge($newParams, $oldParams));
+        }
+        
+        $this->setTargetUrl(parse_url($this->getTargetUrl(), PHP_URL_PATH).$queryString);
+
+        return $this;
+    }
 
     /**
      * Flash an array of input to the session.
