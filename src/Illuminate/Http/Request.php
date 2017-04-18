@@ -8,6 +8,7 @@ use SplFileInfo;
 use RuntimeException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Routing\Route;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Arrayable;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -898,7 +899,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         if (is_null($route) || is_null($param)) {
             return $route;
         } else {
-            return $route->parameter($param);
+            return $route instanceof Route ? $route->parameter($param) : array_get($route[2], $param);
         }
     }
 
