@@ -1967,14 +1967,21 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Set the primary key for the model.
+     * Set the primary key and incrementing for the model.
      *
-     * @param  string  $key
+     * @param $key
+     * @param bool|null $incrementing
+     *
      * @return $this
      */
-    public function setKeyName($key)
+    public function setKeyName($key, $incrementing = null)
     {
         $this->primaryKey = $key;
+
+        if($incrementing != null && is_bool($incrementing))
+        {
+            $this->incrementing = $incrementing;
+        }
 
         return $this;
     }
