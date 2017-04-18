@@ -58,13 +58,19 @@ trait ThrottlesLogins
      */
     protected function sendLockoutResponse(Request $request)
     {
-        $seconds = $this->secondsRemainingOnLockout($request);
+        $errors = [
+            $this->loginUsername() => $this->getLockoutErrorMessage(
+                $this->secondsRemainingOnLockout($request)
+            ),
+        ];
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json($errors, 429);
+        }
 
         return redirect()->back()
             ->withInput($request->only($this->loginUsername(), 'remember'))
-            ->withErrors([
-                $this->loginUsername() => $this->getLockoutErrorMessage($seconds),
-            ]);
+            ->withErrors($errors);
     }
 
     /**
