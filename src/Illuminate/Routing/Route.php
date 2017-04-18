@@ -427,7 +427,9 @@ class Route
      */
     public function bind(Request $request)
     {
-        $this->compileRoute();
+        if (! isset($this->compiled)) {
+            $this->compileRoute();
+        }
 
         $this->bindParameters($request);
 
