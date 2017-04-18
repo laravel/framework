@@ -41,10 +41,13 @@ class VerifyPostSize
         switch ($metric) {
             case 'K':
                 return (int) $postMaxSize * 1024;
+
             case 'M':
                 return (int) $postMaxSize * 1048576;
+
             case 'G':
                 return (int) $postMaxSize * 1073741824;
+
             default:
                 return (int) $postMaxSize;
         }

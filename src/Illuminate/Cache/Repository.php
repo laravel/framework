@@ -81,18 +81,21 @@ class Repository implements CacheContract, ArrayAccess
                 }
 
                 return $this->events->fire(new Events\CacheHit($payload[0], $payload[1], $payload[2]));
+
             case 'missed':
                 if (count($payload) == 1) {
                     $payload[] = [];
                 }
 
                 return $this->events->fire(new Events\CacheMissed($payload[0], $payload[1]));
+
             case 'delete':
                 if (count($payload) == 1) {
                     $payload[] = [];
                 }
 
                 return $this->events->fire(new Events\KeyForgotten($payload[0], $payload[1]));
+
             case 'write':
                 if (count($payload) == 3) {
                     $payload[] = [];

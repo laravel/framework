@@ -843,8 +843,10 @@ class Connection implements ConnectionInterface
         switch ($event) {
             case 'beganTransaction':
                 return $this->events->fire(new Events\TransactionBeginning($this));
+
             case 'committed':
                 return $this->events->fire(new Events\TransactionCommitted($this));
+
             case 'rollingBack':
                 return $this->events->fire(new Events\TransactionRolledBack($this));
         }

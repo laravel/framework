@@ -389,13 +389,16 @@ abstract class Grammar extends BaseGrammar
             case 'biginteger':
                 $type = 'bigint';
                 break;
+
             case 'smallinteger':
                 $type = 'smallint';
                 break;
+
             case 'mediumtext':
             case 'longtext':
                 $type = 'text';
                 break;
+
             case 'binary':
                 $type = 'blob';
                 break;

@@ -2681,8 +2681,10 @@ class Validator implements ValidatorContract
         switch ($rule) {
             case 'Int':
                 return 'Integer';
+
             case 'Bool':
                 return 'Boolean';
+
             default:
                 return $rule;
         }
