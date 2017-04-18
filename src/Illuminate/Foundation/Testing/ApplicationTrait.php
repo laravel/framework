@@ -301,6 +301,57 @@ trait ApplicationTrait
     }
 
     /**
+     * Return true if the user is authenticated, false otherwise.
+     *
+     * @return bool
+     */
+    protected function isAuthenticated()
+    {
+        return $this->app->make('auth')->check();
+    }
+
+    /**
+     * Assert that the user is authenticated.
+     *
+     * @return $this
+     */
+    public function seeIsAuthenticated()
+    {
+        $this->assertTrue($this->isAuthenticated(), 'The user is not authenticated');
+
+        return $this;
+    }
+
+    /**
+     * Assert that the user is not authenticated.
+     *
+     * @return $this
+     */
+    public function dontSeeIsAuthenticated()
+    {
+        $this->assertFalse($this->isAuthenticated(), 'The user is authenticated');
+
+        return $this;
+    }
+
+    /**
+     * Assert that the user is authenticated as the given user.
+     *
+     * @param  $user
+     *
+     * @return $this
+     */
+    public function seeIsAuthenticatedAs($user)
+    {
+        $this->assertSame(
+            $this->app->make('auth')->user(), $user,
+            'The logged in user is not the same'
+        );
+
+        return $this;
+    }
+
+    /**
      * Call artisan command and return code.
      *
      * @param  string  $command
