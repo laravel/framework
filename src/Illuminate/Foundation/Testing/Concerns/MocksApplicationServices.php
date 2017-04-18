@@ -22,6 +22,13 @@ trait MocksApplicationServices
     protected $dispatchedJobs = [];
 
     /**
+     * Return values for specific jobs.
+     *
+     * @var array
+     */
+    protected $jobReturnValues = [];
+
+    /**
      * Specify a list of events that should be fired for the given operation.
      *
      * These events will be mocked, so that handlers will not actually be executed.
@@ -127,6 +134,8 @@ trait MocksApplicationServices
      * Specify a list of jobs that should be dispatched for the given operation.
      *
      * These jobs will be mocked, so that handlers will not actually be executed.
+     * When the job is passed as an array, the first value must contain the
+     * job and the second value the value you want to return.
      *
      * @param  array|string  $jobs
      * @return $this
@@ -134,13 +143,24 @@ trait MocksApplicationServices
     protected function expectsJobs($jobs)
     {
         $jobs = is_array($jobs) ? $jobs : func_get_args();
+        $jobList = [];
+        // Check if a return value is defined.
+        foreach ($jobs as $key => $job) {
+            if (is_array($job)) {
+                $this->jobReturnValues[$job[0]] = $job[1];
+                $jobList[] = $job[0];
+                continue;
+            }
+
+            $jobList[] = $job;
+        }
 
         $this->withoutJobs();
 
-        $this->beforeApplicationDestroyed(function () use ($jobs) {
-            $dispatched = $this->getDispatchedJobs($jobs);
+        $this->beforeApplicationDestroyed(function () use ($jobList) {
+            $dispatched = $this->getDispatchedJobs($jobList);
 
-            if ($jobsNotDispatched = array_diff($jobs, $dispatched)) {
+            if ($jobsNotDispatched = array_diff($jobList, $dispatched)) {
                 throw new Exception(
                     'These expected jobs were not dispatched: ['.implode(', ', $jobsNotDispatched).']'
                 );
@@ -178,6 +198,8 @@ trait MocksApplicationServices
     /**
      * Mock the job dispatcher so all jobs are silenced and collected.
      *
+     * When a return value is defined, return it when requested.
+     *
      * @return $this
      */
     protected function withoutJobs()
@@ -186,6 +208,10 @@ trait MocksApplicationServices
 
         $mock->shouldReceive('dispatch')->andReturnUsing(function ($dispatched) {
             $this->dispatchedJobs[] = $dispatched;
+            $dispatchedClass = is_string($dispatched) ? $dispatched : get_class($dispatched);
+            if (isset($this->jobReturnValues[$dispatchedClass])) {
+                return $this->jobReturnValues[$dispatchedClass];
+            }
         });
 
         $this->app->instance(
