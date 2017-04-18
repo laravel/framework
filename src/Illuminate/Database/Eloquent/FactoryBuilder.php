@@ -126,9 +126,15 @@ class FactoryBuilder
         $results = $this->make($attributes);
 
         if ($results instanceof Model) {
+            $results->setConnection($results->query()->getConnection()->getName());
+
             $results->save();
         } else {
-            $results->each->save();
+            $results->each(function ($model) {
+                $model->setConnection($model->query()->getConnection()->getName());
+
+                $model->save();
+            });
         }
 
         return $results;
