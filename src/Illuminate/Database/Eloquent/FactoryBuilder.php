@@ -103,19 +103,6 @@ class FactoryBuilder
     }
 
     /**
-     * Create a model and persist it in the database if requested.
-     *
-     * @param  array  $attributes
-     * @return \Closure
-     */
-    public function lazy(array $attributes = [])
-    {
-        return function () use ($attributes) {
-            return $this->create($attributes);
-        };
-    }
-
-    /**
      * Create a collection of models and persist them to the database.
      *
      * @param  array  $attributes
@@ -126,9 +113,15 @@ class FactoryBuilder
         $results = $this->make($attributes);
 
         if ($results instanceof Model) {
+            $results->setConnection($results->query()->getConnection()->getName());
+
             $results->save();
         } else {
-            $results->each->save();
+            $results->each(function ($model) {
+                $model->setConnection($model->query()->getConnection()->getName());
+
+                $model->save();
+            });
         }
 
         return $results;
