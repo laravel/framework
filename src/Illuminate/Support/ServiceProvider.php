@@ -68,6 +68,20 @@ abstract class ServiceProvider
     }
 
     /**
+     * Append the given configuration to the existing configuration.
+     *
+     * @param  string  $path
+     * @param  string  $key
+     * @return void
+     */
+    protected function appendConfigFrom($path, $key)
+    {
+        $config = $this->app['config']->get($key, []);
+
+        $this->app['config']->set($key, array_merge_recursive($config, require $path));
+    }
+
+    /**
      * Register a view file namespace.
      *
      * @param  string  $path
