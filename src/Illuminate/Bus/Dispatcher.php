@@ -85,17 +85,13 @@ class Dispatcher implements QueueingDispatcher
      */
     public function dispatchNow($command, $handler = null)
     {
-        if ($handler || $handler = $this->getCommandHandler($command)) {
-            $callback = function ($command) use ($handler) {
+        return $this->pipeline->send($command)->through($this->pipes)->then(function ($command) use ($handler) {
+            if ($handler || $handler = $this->getCommandHandler($command)) {
                 return $handler->handle($command);
-            };
-        } else {
-            $callback = function ($command) {
-                return $this->container->call([$command, 'handle']);
-            };
-        }
+            }
 
-        return $this->pipeline->send($command)->through($this->pipes)->then($callback);
+            return $this->container->call([$command, 'handle']);
+        });
     }
 
     /**
