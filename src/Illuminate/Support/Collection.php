@@ -426,16 +426,23 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Key an associative array by a field or using a callback.
      *
      * @param  callable|string  $keyBy
+     * @param  callable  $callback
      * @return static
      */
-    public function keyBy($keyBy)
+    public function keyBy($keyBy, callable $callback = null)
     {
         $keyBy = $this->valueRetriever($keyBy);
 
         $results = [];
 
         foreach ($this->items as $key => $item) {
-            $results[$keyBy($item, $key)] = $item;
+            $key = $keyBy($item, $key);
+
+            if (array_key_exists($key, $results) && ! is_null($results[$key]) && ! is_null($callback)) {
+                $item = $callback($results[$key], $item);
+            }
+
+            $results[$key] = $item;
         }
 
         return new static($results);
