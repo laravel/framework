@@ -943,7 +943,7 @@ class Blueprint
      */
     protected function createIndexName($type, array $columns)
     {
-        $index = strtolower($this->table.'_'.implode('_', $columns).'_'.$type);
+        $index = str_limit(strtolower($this->table.'_'.implode('_', $columns).'_'.$type), 64, '');
 
         return str_replace(['-', '.'], '_', $index);
     }
