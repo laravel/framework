@@ -540,6 +540,30 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateAllWhitespace()
+    {
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, [], ['name' => 'all_whitespace']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['name' => ''], ['name' => 'all_whitespace']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['name' => 'foo'], ['name' => 'all_whitespace']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['name' => ' '], ['name' => 'all_whitespace']);
+        $this->assertFalse($v->passes());
+
+        $file = new File('', false);
+        $v = new Validator($trans, ['name' => $file], ['name' => 'all_whitespace']);
+        $this->assertTrue($v->passes());
+
+        $file = new File(__FILE__, false);
+        $v = new Validator($trans, ['name' => $file], ['name' => 'all_whitespace']);
+        $this->assertTrue($v->passes());
+    }
+
     public function testValidateRequired()
     {
         $trans = $this->getIlluminateArrayTranslator();
