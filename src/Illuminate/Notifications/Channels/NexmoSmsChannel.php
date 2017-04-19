@@ -31,8 +31,8 @@ class NexmoSmsChannel
      */
     public function __construct(NexmoClient $nexmo, $from)
     {
-        $this->from = $from;
         $this->nexmo = $nexmo;
+        $this->from = $from;
     }
 
     /**
