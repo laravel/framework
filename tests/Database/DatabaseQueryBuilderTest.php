@@ -143,6 +143,27 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([0 => 1], $builder->getBindings());
     }
 
+    public function testWhereLike()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereLike('name', 'test');
+        
+        $this->assertEquals('select * from "users" where "name" like ?', $builder->toSql());
+        $this->assertEquals([0 => '%test%'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereLike('name', 'test%');
+        
+        $this->assertEquals('select * from "users" where "name" like ?', $builder->toSql());
+        $this->assertEquals([0 => 'test%'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereLike('name', 'not like', 'test');
+        
+        $this->assertEquals('select * from "users" where "name" not like ?', $builder->toSql());
+        $this->assertEquals([0 => '%test%'], $builder->getBindings());
+    }
+
     public function testMySqlWrappingProtectsQuotationMarks()
     {
         $builder = $this->getMySqlBuilder();

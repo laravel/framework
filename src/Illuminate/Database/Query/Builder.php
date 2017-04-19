@@ -1001,6 +1001,38 @@ class Builder
     }
 
     /**
+     * Add a "where like" clause to the query.
+     *
+     * @param string $column
+     * @param string $operator
+     * @param string $value
+     * @return $this
+     */
+    public function whereLike($column, $operator, $value = null)
+    {
+        if (func_num_args() === 2) {
+            list($value, $operator) = [$operator, 'like'];
+        }
+
+        if ($this->valueHasWildcard($value)) {
+            return $this->where($column, $operator, $value);
+        }
+
+        return $this->where($column, $operator, '%' . $value . '%');
+    }
+
+    /**
+     * Check to see if a query value has a wildcard.
+     *
+     * @param string $value
+     * @return bool
+     */
+    protected function valueHasWildcard($value)
+    {
+        return false != strpos($value, '%');
+    }
+
+    /**
      * Add a "where null" clause to the query.
      *
      * @param  string  $column
