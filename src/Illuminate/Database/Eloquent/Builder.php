@@ -184,7 +184,24 @@ class Builder
 
         return $this->get($columns);
     }
-
+    
+    /**
+     * Find a model by its primary key or throw an exception.
+     *
+     * @param  mixed  $id
+     * @param  array  $columns
+     * @param callable $callback 
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection |  $callback
+     */
+    public function findOrFailCallback($id, $columns = ['*'], callable $callback)
+    {
+        try {
+            return $this->findOrFail($id,$columns);
+        } catch (ModelNotFoundException $e) {
+            return $callback($e);
+        }
+    }
+    
     /**
      * Find a model by its primary key or throw an exception.
      *
