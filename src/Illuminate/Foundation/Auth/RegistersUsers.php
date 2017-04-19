@@ -11,13 +11,23 @@ trait RegistersUsers
     use RedirectsUsers;
 
     /**
+     * Get the registration form view name to be used by the controller.
+     *
+     * @return string
+     */
+    public function registrationFormViewName()
+    {
+        return property_exists($this, 'registrationFormViewName') ? $this->registrationFormViewName : 'auth.register';
+    }
+
+    /**
      * Show the application registration form.
      *
      * @return \Illuminate\Http\Response
      */
     public function showRegistrationForm()
     {
-        return view('auth.register');
+        return view($this->registrationFormViewName());
     }
 
     /**
