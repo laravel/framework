@@ -713,7 +713,7 @@ if (! function_exists('str_plural')) {
      */
     function str_plural($value, $count = 2)
     {
-        return Str::plural($value, $count);
+        return Str::plural($value, intval($count));
     }
 }
 
