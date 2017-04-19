@@ -4,7 +4,7 @@ namespace Illuminate\Support\Testing\Fakes;
 
 use Illuminate\Queue\QueueManager;
 use Illuminate\Contracts\Queue\Queue;
-use PHPUnit_Framework_Assert as PHPUnit;
+use PHPUnit\Framework\Assert as PHPUnit;
 
 class QueueFake extends QueueManager implements Queue
 {
