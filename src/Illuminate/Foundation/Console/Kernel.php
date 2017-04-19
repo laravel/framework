@@ -226,13 +226,11 @@ class Kernel implements KernelContract
      *
      * @param  string  $command
      * @param  array   $parameters
-     * @return void
+     * @return \Illuminate\Foundation\Bus\PendingDispatch
      */
     public function queue($command, array $parameters = [])
     {
-        $this->app[QueueContract::class]->push(
-            new QueuedCommand(func_get_args())
-        );
+        return QueuedCommand::dispatch(func_get_args());
     }
 
     /**
