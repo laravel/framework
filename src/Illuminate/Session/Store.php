@@ -324,6 +324,22 @@ class Store implements SessionInterface
     /**
      * {@inheritdoc}
      */
+    public function exists($key)
+    {
+        $keys = is_array($key) ? $key : func_get_args();
+
+        foreach ($keys as $value) {
+            if (! Arr::exists($this->attributes, $value)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function get($name, $default = null)
     {
         return Arr::get($this->attributes, $name, $default);
