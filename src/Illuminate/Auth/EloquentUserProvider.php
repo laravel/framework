@@ -44,7 +44,11 @@ class EloquentUserProvider implements UserProvider
      */
     public function retrieveById($identifier)
     {
-        return $this->createModel()->newQuery()->find($identifier);
+        $model = $this->createModel();
+
+        return $model->newQuery()
+            ->where($model->getAuthIdentifierName(), $identifier)
+            ->first();
     }
 
     /**
