@@ -2,6 +2,8 @@
 
 namespace Illuminate\Foundation\Bus;
 
+use Illuminate\Contracts\Bus\Dispatcher;
+
 class PendingDispatch
 {
     /**
@@ -74,6 +76,6 @@ class PendingDispatch
      */
     public function __destruct()
     {
-        dispatch($this->job);
+        app(Dispatcher::class)->dispatch($this->job);
     }
 }

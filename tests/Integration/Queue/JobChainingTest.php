@@ -28,6 +28,16 @@ class JobChainingTest extends TestCase
         $this->assertTrue(JobChainingTestSecondJob::$ran);
     }
 
+    public function test_jobs_can_be_chained_on_success_using_helper()
+    {
+        dispatch(new JobChainingTestFirstJob)->chain([
+            new JobChainingTestSecondJob,
+        ]);
+
+        $this->assertTrue(JobChainingTestFirstJob::$ran);
+        $this->assertTrue(JobChainingTestSecondJob::$ran);
+    }
+
     public function test_jobs_can_be_chained_via_queue()
     {
         Queue::connection('sync')->push((new JobChainingTestFirstJob)->chain([
