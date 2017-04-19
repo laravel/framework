@@ -173,6 +173,28 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Determine if an item exists in the collection (strict way).
+     *
+     * @param  mixed  $key
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function strictContains($key, $value = null)
+    {
+        if (func_num_args() == 2) {
+            return $this->contains(function ($k, $item) use ($key, $value) {
+                return data_get($item, $key) === $value;
+            });
+        }
+
+        if ($this->useAsCallable($key)) {
+            return ! is_null($this->first($key));
+        }
+
+        return in_array($key, $this->items, true);
+    }
+
+    /**
      * Get the items in the collection that are not present in the given items.
      *
      * @param  mixed  $items
