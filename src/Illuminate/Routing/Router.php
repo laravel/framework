@@ -734,10 +734,31 @@ class Router implements RegistrarContract
      */
     public function gatherRouteMiddlewares(Route $route)
     {
-        return Collection::make($route->middleware())->map(function ($name) {
+        $middleware = Collection::make($route->middleware())->map(function ($name) {
             return Collection::make($this->resolveMiddlewareClassName($name));
         })
         ->flatten()->all();
+
+        return $this->skipMiddleware($middleware);
+    }
+
+    /**
+     * Skip specific middleware.
+     *
+     * @param  array  $middleware
+     * @return array
+     */
+    public function skipMiddleware(array $middleware)
+    {
+        if (empty($middleware) || ! $this->container->bound('middleware.disable')) {
+            return $middleware;
+        }
+
+        if (is_array($skipped = $this->container->make('middleware.disable'))) {
+            $middleware = array_diff($middleware, $skipped);
+        }
+
+        return $middleware;
     }
 
     /**

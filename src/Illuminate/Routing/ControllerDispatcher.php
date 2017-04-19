@@ -113,7 +113,9 @@ class ControllerDispatcher
             }
         }
 
-        return $results->flatten()->all();
+        $middleware = $results->flatten()->all();
+
+        return $this->router->skipMiddleware($middleware);
     }
 
     /**
