@@ -181,7 +181,7 @@ class Builder
     public function findMany($ids, $columns = ['*'])
     {
         if (empty($ids)) {
-            return $this->model->newCollection();
+            return $this->collect($this->model->newCollection());
         }
 
         $this->query->whereIn($this->model->getQualifiedKeyName(), $ids);
@@ -333,7 +333,35 @@ class Builder
             $models = $builder->eagerLoadRelations($models);
         }
 
-        return $builder->getModel()->newCollection($models);
+        return $this->collect($builder->getModel()->newCollection($models));
+    }
+
+    /**
+     * Return collection passed through an optional callback.
+     *
+     * @param  \Illuminate\Database\Eloquent\Collection $collection
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function collect($collection)
+    {
+        if (isset($this->onCollect)) {
+            return call_user_func($this->onCollect, $collection);
+        }
+
+        return $collection;
+    }
+
+    /**
+     * Register a callback on new collections.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function onCollect(Closure $callback)
+    {
+        $this->onCollect = $callback;
+
+        return $this;
     }
 
     /**
