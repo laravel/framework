@@ -516,6 +516,24 @@ if (! function_exists('dd')) {
     }
 }
 
+if (! function_exists('ddd')) {
+    /**
+     * Dump the location of the call call to ddd(), the passed variables, and end the script.
+     *
+     * For those who like to practice "dd() Driven Design", using this instead of dd() might help
+     * you find those pesky dumps which are left in the code during debugging
+     *
+     * @param  mixed
+     * @return void
+     */
+    function ddd(...$args)
+    {
+        $calledFrom = debug_backtrace()[0];
+
+        dd('Dump called at ' . $calledFrom['file'] . ':' . $calledFrom['line'], $args);
+    }
+}
+
 if (! function_exists('e')) {
     /**
      * Escape HTML special characters in a string.
