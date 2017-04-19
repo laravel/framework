@@ -453,6 +453,42 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([[1, 2], [2, 3], [3, 4]], $c->unique()->values()->all());
     }
 
+    public function testUniqueWithKeys()
+    {
+        $c = new Collection([
+            [
+                'id' => '0',
+                'name' => 'zero',
+            ],
+            [
+                'id' => '00',
+                'name' => 'double zero',
+            ],
+            [
+                'id' => '0',
+                'name' => 'again zero',
+            ],
+        ]);
+
+        $this->assertEquals([
+            [
+                'id' => '0',
+                'name' => 'zero',
+            ],
+            [
+                'id' => '00',
+                'name' => 'double zero',
+            ],
+        ], $c->unique('id', true)->all());
+
+        $this->assertEquals([
+            [
+                'id' => '0',
+                'name' => 'zero',
+            ],
+        ], $c->unique('id')->all());
+    }
+
     public function testUniqueWithCallback()
     {
         $c = new Collection([

@@ -1021,9 +1021,10 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Return only unique items from the collection array.
      *
      * @param  string|callable|null  $key
+     * @param  bool  $strict
      * @return static
      */
-    public function unique($key = null)
+    public function unique($key = null, $strict = false)
     {
         if (is_null($key)) {
             return new static(array_unique($this->items, SORT_REGULAR));
@@ -1033,8 +1034,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         $exists = [];
 
-        return $this->reject(function ($item) use ($key, &$exists) {
-            if (in_array($id = $key($item), $exists)) {
+        return $this->reject(function ($item) use ($key, $strict, &$exists) {
+            if (in_array($id = $key($item), $exists, $strict)) {
                 return true;
             }
 
