@@ -249,6 +249,8 @@ class ConnectionFactory
                 return new SQLiteConnector;
             case 'sqlsrv':
                 return new SqlServerConnector;
+            case 'dblib':
+                return new SqlServerConnector;
         }
 
         throw new InvalidArgumentException("Unsupported driver [{$config['driver']}]");
@@ -280,6 +282,8 @@ class ConnectionFactory
             case 'sqlite':
                 return new SQLiteConnection($connection, $database, $prefix, $config);
             case 'sqlsrv':
+                return new SqlServerConnection($connection, $database, $prefix, $config);
+            case 'dblib':
                 return new SqlServerConnection($connection, $database, $prefix, $config);
         }
 
