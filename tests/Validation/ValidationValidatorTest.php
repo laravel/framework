@@ -1650,18 +1650,13 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($v->passes());
 
         $file4 = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', ['guessExtension'], $uploadedFile);
-        $file4->expects($this->any())->method('guessExtension')->will($this->returnValue('bmp'));
+        $file4->expects($this->any())->method('guessExtension')->will($this->returnValue('png'));
         $v->setFiles(['x' => $file4]);
         $this->assertTrue($v->passes());
 
         $file5 = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', ['guessExtension'], $uploadedFile);
-        $file5->expects($this->any())->method('guessExtension')->will($this->returnValue('png'));
+        $file5->expects($this->any())->method('guessExtension')->will($this->returnValue('svg'));
         $v->setFiles(['x' => $file5]);
-        $this->assertTrue($v->passes());
-
-        $file6 = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', ['guessExtension'], $uploadedFile);
-        $file6->expects($this->any())->method('guessExtension')->will($this->returnValue('svg'));
-        $v->setFiles(['x' => $file6]);
         $this->assertTrue($v->passes());
     }
 

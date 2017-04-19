@@ -1578,7 +1578,7 @@ class Validator implements ValidatorContract
      */
     protected function validateImage($attribute, $value)
     {
-        return $this->validateMimes($attribute, $value, ['jpeg', 'png', 'gif', 'bmp', 'svg']);
+        return $this->validateMimes($attribute, $value, ['jpeg', 'png', 'gif', 'svg']);
     }
 
     /**
