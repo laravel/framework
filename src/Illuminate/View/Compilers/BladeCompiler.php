@@ -846,6 +846,23 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Compile the includeFrom statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileIncludeFrom($expression)
+    {
+        preg_match_all('/[\w.-]+/', $expression, $views);
+
+        $folder = array_shift($views[0]);
+
+        $prefixed_views = preg_replace('/^(.*)$/', "'$folder.$0'", $views[0]);
+
+        return implode('', array_map([$this, 'compileInclude'], $prefixed_views));
+    }
+
+    /**
      * Compile the include statements into valid PHP.
      *
      * @param  string  $expression

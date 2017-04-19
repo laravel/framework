@@ -579,6 +579,13 @@ empty
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
+    public function testIncludeFromAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $this->assertEquals('<?php echo $__env->make(\'foo.bar\', array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?><?php echo $__env->make(\'foo.baz\', array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>', $compiler->compileString('@includeFrom(\'foo\', [\'bar\', \'baz\'])'));
+        $this->assertEquals('<?php echo $__env->make(\'foo.bar.baz\', array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?><?php echo $__env->make(\'foo.bar.xyzzy\', array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>', $compiler->compileString('@includeFrom(\'foo.bar\', [\'baz\', \'xyzzy\'])'));
+    }
+
     public function testIncludesAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
