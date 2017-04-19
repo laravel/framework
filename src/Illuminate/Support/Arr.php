@@ -516,4 +516,15 @@ class Arr
     {
         return array_filter($array, $callback, ARRAY_FILTER_USE_BOTH);
     }
+
+    /**
+     * Fetch a random array element.
+     *
+     * @param  array
+     * @return mixed
+     */
+    public static function random($array)
+    {
+        return $array[array_rand($array)];
+    }
 }
