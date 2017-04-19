@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Exceptions;
 use Exception;
 use Psr\Log\LoggerInterface;
 use Illuminate\Http\Response;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Auth\Access\UnauthorizedException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Console\Application as ConsoleApplication;
@@ -14,11 +15,11 @@ use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 class Handler implements ExceptionHandlerContract
 {
     /**
-     * The log implementation.
+     * The container implementation.
      *
-     * @var \Psr\Log\LoggerInterface
+     * @var \Illuminate\Contracts\Container\Container
      */
-    protected $log;
+    protected $container;
 
     /**
      * A list of the exception types that should not be reported.
@@ -30,24 +31,31 @@ class Handler implements ExceptionHandlerContract
     /**
      * Create a new exception handler instance.
      *
-     * @param  \Psr\Log\LoggerInterface  $log
+     * @param  \Illuminate\Contracts\Container\Container  $container
      * @return void
      */
-    public function __construct(LoggerInterface $log)
+    public function __construct(Container $container)
     {
-        $this->log = $log;
+        $this->container = $container;
     }
 
     /**
      * Report or log an exception.
      *
      * @param  \Exception  $e
+     * @throws \Exception  $e
      * @return void
      */
     public function report(Exception $e)
     {
         if ($this->shouldReport($e)) {
-            $this->log->error($e);
+            try {
+                $logger = $this->container->make(LoggerInterface::class);
+            } catch (Exception $ex) {
+                throw $e; // throw the original exception
+            }
+
+            $logger->error($e);
         }
     }
 
