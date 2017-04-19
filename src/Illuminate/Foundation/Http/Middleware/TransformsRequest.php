@@ -40,10 +40,10 @@ class TransformsRequest
     {
         $this->cleanParameterBag($request->query);
 
-        $this->cleanParameterBag($request->request);
-
         if ($request->isJson()) {
             $this->cleanParameterBag($request->json());
+        } else {
+            $this->cleanParameterBag($request->request);
         }
     }
 
