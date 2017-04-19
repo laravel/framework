@@ -19,6 +19,7 @@ use Illuminate\Contracts\Container\Container;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 
 class Validator implements ValidatorContract
@@ -205,6 +206,8 @@ class Validator implements ValidatorContract
      * @param  array   $data
      * @param  string  $arrayKey
      * @return array
+     *
+     * @throws FileException
      */
     protected function parseData(array $data, $arrayKey = null)
     {
@@ -214,6 +217,10 @@ class Validator implements ValidatorContract
 
         foreach ($data as $key => $value) {
             $key = ($arrayKey) ? "$arrayKey.$key" : $key;
+
+            if ($value instanceof UploadedFile && ! $value->isValid()) {
+                throw new FileException($value->getErrorMessage());
+            }
 
             // If this value is an instance of the HttpFoundation File class we will
             // remove it from the data array and add it to the files array, which
