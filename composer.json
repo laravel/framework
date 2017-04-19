@@ -1,7 +1,10 @@
 {
     "name": "laravel/framework",
     "description": "The Laravel Framework.",
-    "keywords": ["framework", "laravel"],
+    "keywords": [
+        "framework",
+        "laravel"
+    ],
     "license": "MIT",
     "homepage": "https://laravel.com",
     "support": {
