@@ -158,8 +158,6 @@ class Worker
         } catch (Throwable $e) {
             $this->exceptions->report(new FatalThrowableError($e));
         }
-
-        $this->sleep($options->sleep);
     }
 
     /**
