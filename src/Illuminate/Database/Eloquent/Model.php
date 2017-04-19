@@ -3055,7 +3055,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function fromJson($value, $asObject = false)
     {
-        return json_decode($value, ! $asObject);
+        $object = json_decode($value, ! $asObject);
+        if(json_last_error() === JSON_ERROR_NONE){
+            return $object;
+        }
+        
+        return $value;
     }
 
     /**
