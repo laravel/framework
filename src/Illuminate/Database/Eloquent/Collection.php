@@ -341,15 +341,15 @@ class Collection extends BaseCollection implements QueueableCollection
             return;
         }
 
-        $class = get_class($this->first());
+        $classes = $this->map(function ($model) {
+            return get_class($model);
+        })->toBase()->unique();
 
-        $this->each(function ($model) use ($class) {
-            if (get_class($model) !== $class) {
-                throw new LogicException('Queueing collections with multiple model types is not supported.');
-            }
-        });
+        if ($classes->count() > 1) {
+            throw new LogicException('Queueing collections with multiple model types is not supported.');
+        }
 
-        return $class;
+        return $classes->first();
     }
 
     /**
