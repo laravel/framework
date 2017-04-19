@@ -257,10 +257,10 @@ class Factory implements FactoryContract
     /**
      * Get the rendered contents of a partial from a loop.
      *
-     * @param  string  $view
-     * @param  array   $data
-     * @param  string  $iterator
-     * @param  string  $empty
+     * @param  sting|array  $view
+     * @param  array        $data
+     * @param  string       $iterator
+     * @param  string       $empty
      * @return string
      */
     public function renderEach($view, $data, $iterator, $empty = 'raw|')
@@ -274,7 +274,14 @@ class Factory implements FactoryContract
             foreach ($data as $key => $value) {
                 $data = ['key' => $key, $iterator => $value];
 
-                $result .= $this->make($view, $data)->render();
+                // Passing the view as an array in the format of key = the view file,
+                // value = array of parameters, it'll render the view with the additional
+                // blade parameters, rather than the pure $data object
+                if (is_array($view)) {
+                    $result .= $this->make(key($view), array_merge($view[key($view)], $data))->render();
+                } else {
+                    $result .= $this->make($view, $data)->render();
+                }
             }
         }
 
