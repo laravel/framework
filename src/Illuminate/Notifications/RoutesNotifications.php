@@ -20,6 +20,8 @@ trait RoutesNotifications
 
     /**
      * Get the notification routing information for the given driver.
+     * In case of an empty return value, the notification will
+     * not be sent.
      *
      * @param  string  $driver
      * @return mixed
