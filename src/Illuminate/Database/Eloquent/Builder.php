@@ -224,6 +224,21 @@ class Builder
     }
 
     /**
+     * Execute the query and get the first result or instantiate it.
+     *
+     * @param  array  $columns
+     * @return \Illuminate\Database\Eloquent\Model|static
+     */
+    public function firstOrNew($columns = ['*'])
+    {
+        if (! is_null($model = $this->first($columns))) {
+            return $model;
+        }
+
+        return $this->model->newInstance();
+    }
+
+    /**
      * Execute the query as a "select" statement.
      *
      * @param  array  $columns
