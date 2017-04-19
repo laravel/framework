@@ -115,7 +115,8 @@ trait AuthenticatesUsers
             return $this->authenticated($request, Auth::guard($this->getGuard())->user());
         }
 
-        return redirect()->intended($this->redirectPath());
+        return redirect()->intended($this->redirectPath())
+            ->header('Cache-Control', 'no-cache, max-age=0');
     }
 
     /**
@@ -130,7 +131,8 @@ trait AuthenticatesUsers
             ->withInput($request->only($this->loginUsername(), 'remember'))
             ->withErrors([
                 $this->loginUsername() => $this->getFailedLoginMessage(),
-            ]);
+            ])
+            ->header('Cache-Control', 'no-cache, max-age=0');
     }
 
     /**
@@ -175,7 +177,8 @@ trait AuthenticatesUsers
     {
         Auth::guard($this->getGuard())->logout();
 
-        return redirect(property_exists($this, 'redirectAfterLogout') ? $this->redirectAfterLogout : '/');
+        return redirect(property_exists($this, 'redirectAfterLogout') ? $this->redirectAfterLogout : '/')
+            ->header('Cache-Control', 'no-cache, max-age=0');
     }
 
     /**

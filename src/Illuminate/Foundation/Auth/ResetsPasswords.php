@@ -141,7 +141,8 @@ trait ResetsPasswords
      */
     protected function getSendResetLinkEmailSuccessResponse($response)
     {
-        return redirect()->back()->with('status', trans($response));
+        return redirect()->back()->with('status', trans($response))
+            ->header('Cache-Control', 'no-cache, max-age=0');
     }
 
     /**
@@ -152,7 +153,8 @@ trait ResetsPasswords
      */
     protected function getSendResetLinkEmailFailureResponse($response)
     {
-        return redirect()->back()->withErrors(['email' => trans($response)]);
+        return redirect()->back()->withErrors(['email' => trans($response)])
+            ->header('Cache-Control', 'no-cache, max-age=0');
     }
 
     /**
@@ -311,7 +313,8 @@ trait ResetsPasswords
      */
     protected function getResetSuccessResponse($response)
     {
-        return redirect($this->redirectPath())->with('status', trans($response));
+        return redirect($this->redirectPath())->with('status', trans($response))
+            ->header('Cache-Control', 'no-cache, max-age=0');
     }
 
     /**
@@ -325,7 +328,8 @@ trait ResetsPasswords
     {
         return redirect()->back()
             ->withInput($request->only('email'))
-            ->withErrors(['email' => trans($response)]);
+            ->withErrors(['email' => trans($response)])
+            ->header('Cache-Control', 'no-cache, max-age=0');
     }
 
     /**
