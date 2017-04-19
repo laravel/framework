@@ -44,7 +44,6 @@ class RedisQueue extends Queue implements QueueContract
      * @param  \Illuminate\Redis\Database  $redis
      * @param  string  $default
      * @param  string  $connection
-     * @return void
      */
     public function __construct(Database $redis, $default = 'default', $connection = null)
     {
@@ -120,8 +119,8 @@ class RedisQueue extends Queue implements QueueContract
     /**
      * Pop the next job off of the queue.
      *
-     * @param  string  $queue
-     * @return \Illuminate\Contracts\Queue\Job|null
+     * @param  string|null  $queue
+     * @return RedisJob|null
      */
     public function pop($queue = null)
     {
@@ -205,7 +204,7 @@ class RedisQueue extends Queue implements QueueContract
      * @param  int  $time
      * @return array
      */
-    protected function getExpiredJobs($transaction, $from, $time)
+    protected function getExpiredJobs(\Predis\Transaction\MultiExec $transaction, $from, $time)
     {
         return $transaction->zrangebyscore($from, '-inf', $time);
     }
@@ -218,7 +217,7 @@ class RedisQueue extends Queue implements QueueContract
      * @param  int  $time
      * @return void
      */
-    protected function removeExpiredJobs($transaction, $from, $time)
+    protected function removeExpiredJobs(\Predis\Transaction\MultiExec $transaction, $from, $time)
     {
         $transaction->multi();
 
@@ -233,7 +232,7 @@ class RedisQueue extends Queue implements QueueContract
      * @param  array  $jobs
      * @return void
      */
-    protected function pushExpiredJobsOntoNewQueue($transaction, $to, $jobs)
+    protected function pushExpiredJobsOntoNewQueue(\Predis\Transaction\MultiExec $transaction, $to, $jobs)
     {
         call_user_func_array([$transaction, 'rpush'], array_merge([$to], $jobs));
     }
