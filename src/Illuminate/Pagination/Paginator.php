@@ -66,7 +66,7 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
     {
         $this->hasMore = count($this->items) > ($this->perPage);
 
-        $this->items = $this->items->slice(0, $this->perPage);
+        $this->items = $this->items->slice(($this->currentPage - 1) * $this->perPage, $this->perPage);
     }
 
     /**
