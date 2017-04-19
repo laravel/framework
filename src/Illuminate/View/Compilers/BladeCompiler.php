@@ -708,6 +708,17 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Compile the count statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileCount($expression)
+    {
+        return "<?php echo count{$expression}; ?>";
+    }
+
+    /**
      * Compile the while statements into valid PHP.
      *
      * @param  string  $expression

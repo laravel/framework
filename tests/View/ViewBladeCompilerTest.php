@@ -321,6 +321,12 @@ breeze
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
+    public function testCountStatementsAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $this->assertEquals('<?php echo count($countable); ?>', $compiler->compileString('@count($countable)'));
+    }
+
     public function testWhileStatementsAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
