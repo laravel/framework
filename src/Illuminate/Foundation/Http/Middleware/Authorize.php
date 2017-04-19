@@ -31,14 +31,15 @@ class Authorize
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
      * @param  string  $ability
-     * @param  string|null  $model
      * @return mixed
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function handle($request, Closure $next, $ability, $model = null)
+    public function handle($request, Closure $next, $ability)
     {
-        $this->gate->authorize($ability, $this->getGateArguments($request, $model));
+        $args = func_get_args();
+        $model_args = array_slice($args, 3);
+        $this->gate->authorize($ability, $this->getGateArguments($request, $model_args));
 
         return $next($request);
     }
@@ -47,22 +48,27 @@ class Authorize
      * Get the arguments parameter for the gate.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  string|null  $model
+     * @param  array|null  $model_args
      * @return array|string|\Illuminate\Database\Eloquent\Model
      */
-    protected function getGateArguments($request, $model)
+    protected function getGateArguments($request, $model_args)
     {
         // If there's no model, we'll pass an empty array to the gate. If it
         // looks like a FQCN of a model, we'll send it to the gate as is.
         // Otherwise, we'll resolve the Eloquent model from the route.
-        if (is_null($model)) {
+        if (is_null($model_args)) {
             return [];
         }
 
-        if (strpos($model, '\\') !== false) {
-            return $model;
+        $gate_args = [];
+        foreach ($model_args as $model) {
+            if (strpos($model, '\\') !== false) {
+                $gate_args[] = $model;
+            } else {
+                $gate_args[] = $request->route($model);
+            }
         }
 
-        return $request->route($model);
+        return $gate_args;
     }
 }
