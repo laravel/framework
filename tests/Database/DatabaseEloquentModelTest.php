@@ -777,7 +777,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
     public function testFillable()
     {
         $model = new EloquentModelStub;
-        $model->fillable(['name', 'age']);
+        $model->setFillable(['name', 'age']);
         $model->fill(['name' => 'foo', 'age' => 'bar']);
         $this->assertEquals('foo', $model->name);
         $this->assertEquals('bar', $model->age);
@@ -812,7 +812,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
     {
         $model = new EloquentModelStub;
         EloquentModelStub::unguard();
-        $model->guard(['*']);
+        $model->setGuarded(['*']);
         $model->fill(['name' => 'foo', 'age' => 'bar']);
         $this->assertEquals('foo', $model->name);
         $this->assertEquals('bar', $model->age);
@@ -829,7 +829,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
     public function testGuarded()
     {
         $model = new EloquentModelStub;
-        $model->guard(['name', 'age']);
+        $model->setGuarded(['name', 'age']);
         $model->fill(['name' => 'foo', 'age' => 'bar', 'foo' => 'bar']);
         $this->assertFalse(isset($model->name));
         $this->assertFalse(isset($model->age));
@@ -839,8 +839,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
     public function testFillableOverridesGuarded()
     {
         $model = new EloquentModelStub;
-        $model->guard(['name', 'age']);
-        $model->fillable(['age', 'foo']);
+        $model->setGuarded(['name', 'age']);
+        $model->setFillable(['age', 'foo']);
         $model->fill(['name' => 'foo', 'age' => 'bar', 'foo' => 'bar']);
         $this->assertFalse(isset($model->name));
         $this->assertEquals('bar', $model->age);
@@ -853,14 +853,14 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
     public function testGlobalGuarded()
     {
         $model = new EloquentModelStub;
-        $model->guard(['*']);
+        $model->setGuarded(['*']);
         $model->fill(['name' => 'foo', 'age' => 'bar', 'votes' => 'baz']);
     }
 
     public function testUnguardedRunsCallbackWhileBeingUnguarded()
     {
         $model = Model::unguarded(function () {
-            return (new EloquentModelStub)->guard(['*'])->fill(['name' => 'Taylor']);
+            return (new EloquentModelStub)->setGuarded(['*'])->fill(['name' => 'Taylor']);
         });
         $this->assertEquals('Taylor', $model->name);
         $this->assertFalse(Model::isUnguarded());
@@ -870,7 +870,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
     {
         Model::unguard();
         $model = Model::unguarded(function () {
-            return (new EloquentModelStub)->guard(['*'])->fill(['name' => 'Taylor']);
+            return (new EloquentModelStub)->setGuarded(['*'])->fill(['name' => 'Taylor']);
         });
         $this->assertEquals('Taylor', $model->name);
         $this->assertTrue(Model::isUnguarded());
