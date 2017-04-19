@@ -21,7 +21,7 @@ class QueueRedisJobTest extends PHPUnit_Framework_TestCase
     public function testDeleteRemovesTheJobFromRedis()
     {
         $job = $this->getJob();
-        $job->getRedisQueue()->shouldReceive('deleteReserved')->once()->with('default', $job->getRedisJob());
+        $job->getRedisQueue()->shouldReceive('deleteReserved')->once()->with('default', $job->getRawBody());
 
         $job->delete();
     }
@@ -29,8 +29,8 @@ class QueueRedisJobTest extends PHPUnit_Framework_TestCase
     public function testReleaseProperlyReleasesJobOntoRedis()
     {
         $job = $this->getJob();
-        $job->getRedisQueue()->shouldReceive('deleteReserved')->once()->with('default', $job->getRedisJob());
-        $job->getRedisQueue()->shouldReceive('release')->once()->with('default', $job->getRedisJob(), 1, 2);
+        $job->getRedisQueue()->shouldReceive('deleteReserved')->once()->with('default', $job->getRawBody());
+        $job->getRedisQueue()->shouldReceive('release')->once()->with('default', $job->getRawBody(), 1, 2);
 
         $job->release(1);
     }
