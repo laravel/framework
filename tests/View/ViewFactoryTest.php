@@ -250,7 +250,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         $factory->startSection('foo');
         echo 'there';
         $factory->stopSection();
-        $this->assertEquals('hi there', $factory->yieldContent('foo'));
+        $this->assertEquals('hi @parent', $factory->yieldContent('foo'));
     }
 
     public function testSectionMultipleExtending()
@@ -265,7 +265,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         $factory->startSection('foo');
         echo 'friend';
         $factory->stopSection();
-        $this->assertEquals('hello my friend nice to see you my friend', $factory->yieldContent('foo'));
+        $this->assertEquals('hello @parent nice to see you @parent', $factory->yieldContent('foo'));
     }
 
     public function testSingleStackPush()

@@ -631,7 +631,7 @@ class Factory implements FactoryContract
     protected function extendSection($section, $content)
     {
         if (isset($this->sections[$section])) {
-            $content = str_replace('@parent', $content, $this->sections[$section]);
+            $content = $this->sections[$section];
         }
 
         $this->sections[$section] = $content;
@@ -652,11 +652,7 @@ class Factory implements FactoryContract
             $sectionContent = $this->sections[$section];
         }
 
-        $sectionContent = str_replace('@@parent', '--parent--holder--', $sectionContent);
-
-        return str_replace(
-            '--parent--holder--', '@parent', str_replace('@parent', '', $sectionContent)
-        );
+        return $sectionContent;
     }
 
     /**
