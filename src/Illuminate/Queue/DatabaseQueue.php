@@ -308,7 +308,7 @@ class DatabaseQueue extends Queue implements QueueContract
      */
     protected function getQueue($queue)
     {
-        return $queue ?: $this->default;
+        return $this->getQueuePrefix().($queue ?: $this->default);
     }
 
     /**
