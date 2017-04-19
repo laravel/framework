@@ -34,4 +34,16 @@ class DatabaseSchemaBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($builder->hasColumns('users', ['id', 'firstname']));
         $this->assertFalse($builder->hasColumns('users', ['id', 'address']));
     }
+
+    public function testTableHasIndex()
+    {
+        $connection = m::mock('Illuminate\Database\Connection');
+        $grammar = m::mock('StdClass');
+        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
+        $builder = m::mock('Illuminate\Database\Schema\Builder[getIndexListing]', [$connection]);
+        $builder->shouldReceive('getIndexListing')->with('users')->twice()->andReturn(['id', 'firstname']);
+
+        $this->assertTrue($builder->hasIndex('users', 'id'));
+        $this->assertFalse($builder->hasIndex('users', 'mr_yuck'));
+    }
 }

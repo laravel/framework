@@ -105,6 +105,30 @@ class Builder
     }
 
     /**
+     * Get the index listing for a given table
+     *
+     * @param  string $table
+     * @return array
+     */
+    public function getIndexListing($table)
+    {
+        $results = $this->connection->getDoctrineIndexes($table);
+        return $this->connection->getPostProcessor()->processIndexListing($results);
+    }
+
+    /**
+     * Checks to see if a table contains a given index
+     *
+     * @param  string  $table
+     * @param  string  $index
+     * @return boolean
+     */
+    public function hasIndex($table, $index)
+    {
+        return in_array($index, $this->getIndexListing($table));
+    }
+
+    /**
      * Modify a table on the schema.
      *
      * @param  string    $table
