@@ -230,8 +230,11 @@ class Kernel implements KernelContract
      */
     public function queue($command, array $parameters = [])
     {
+        $queue = isset($parameters['--queue']) ? $parameters['--queue'] : null;
+        unset($parameters['--queue']);
+
         $this->app[QueueContract::class]->push(
-            new QueuedCommand(func_get_args())
+            new QueuedCommand([$command, $parameters]), '', $queue
         );
     }
 
