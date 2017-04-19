@@ -576,7 +576,9 @@ class Connection implements ConnectionInterface
                 $this->getPdo()->beginTransaction();
             } catch (Exception $e) {
                 --$this->transactions;
-
+                if ($this->causedByLostConnection($e)) {
+                    $this->reconnect();
+                }
                 throw $e;
             }
         } elseif ($this->transactions > 1 && $this->queryGrammar->supportsSavepoints()) {
