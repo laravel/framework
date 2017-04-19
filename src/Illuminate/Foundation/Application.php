@@ -12,6 +12,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Events\EventServiceProvider;
 use Illuminate\Routing\RoutingServiceProvider;
+use Illuminate\Translation\Events\LocaleChanged;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
@@ -1050,7 +1051,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 
         $this['translator']->setLocale($locale);
 
-        $this['events']->fire('locale.changed', [$locale]);
+        $this['events']->fire(new LocaleChanged($locale));
     }
 
     /**
