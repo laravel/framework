@@ -140,7 +140,7 @@ class Str
      */
     public static function length($value)
     {
-        return mb_strlen($value);
+        return mb_strlen($value, 'UTF-8');
     }
 
     /**
