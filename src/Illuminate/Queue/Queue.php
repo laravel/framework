@@ -72,7 +72,7 @@ abstract class Queue
     /**
      * Create a payload string from the given job and data.
      *
-     * @param  string  $job
+     * @param  mixed  $job
      * @param  mixed   $data
      * @param  string  $queue
      * @return string
