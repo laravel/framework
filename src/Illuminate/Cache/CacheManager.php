@@ -209,7 +209,7 @@ class CacheManager implements FactoryContract
 
         return $this->repository(
             new DatabaseStore(
-                $connection, $this->app['encrypter'], $config['table'], $this->getPrefix($config)
+                $connection, $config['table'], $this->getPrefix($config)
             )
         );
     }
