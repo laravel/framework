@@ -197,7 +197,8 @@ class Writer implements LogContract, PsrLoggerInterface
      */
     protected function writeLog($level, $message, $context)
     {
-        $this->fireLogEvent($level, $message = $this->formatMessage($message), $context);
+        $message = $this->formatMessage($message);
+        $this->fireLogEvent($level, $message, $context);
 
         $this->monolog->{$level}($message, $context);
     }
@@ -286,13 +287,16 @@ class Writer implements LogContract, PsrLoggerInterface
      * @param  array   $context
      * @return void
      */
-    protected function fireLogEvent($level, $message, array $context = [])
+    protected function fireLogEvent($level, &$message, array $context = [])
     {
         // If the event dispatcher is set, we will pass along the parameters to the
         // log listeners. These are useful for building profilers or other tools
         // that aggregate all of the log messages for a given "request" cycle.
         if (isset($this->dispatcher)) {
-            $this->dispatcher->fire('illuminate.log', compact('level', 'message', 'context'));
+            $reslut = $this->dispatcher->fire('illuminate.log', compact('level', 'message', 'context'));
+            if (! empty($result['message'])) {
+                $message = $result['message'];
+            }
         }
     }
 
