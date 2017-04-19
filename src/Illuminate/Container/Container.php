@@ -821,9 +821,9 @@ class Container implements ArrayAccess, ContainerContract
         if (! is_null($concrete = $this->getContextualConcrete('$'.$parameter->name))) {
             if ($concrete instanceof Closure) {
                 return call_user_func($concrete, $this);
-            } else {
-                return $concrete;
             }
+            
+            return $concrete;
         }
 
         if ($parameter->isDefaultValueAvailable()) {
