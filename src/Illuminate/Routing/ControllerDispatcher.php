@@ -113,7 +113,17 @@ class ControllerDispatcher
             }
         }
 
-        return $results->flatten()->all();
+        $middleware = $results->flatten()->all();
+
+        if (empty($middleware) || ! $this->container->bound('middleware.skipped')) {
+            return $middleware;
+        }
+
+        if ($skipped = $this->container->make('middleware.skipped')) {
+            $middleware = array_diff($middleware, $skipped);
+        }
+
+        return $middleware;
     }
 
     /**

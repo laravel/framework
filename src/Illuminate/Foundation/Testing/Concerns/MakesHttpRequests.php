@@ -48,6 +48,19 @@ trait MakesHttpRequests
     }
 
     /**
+     * Skip one or many middleware for the test.
+     *
+     * @param  mixed  $middleware
+     * @return $this
+     */
+    public function skipMiddleware($middleware = [])
+    {
+        $this->app->instance('middleware.skipped', is_array($middleware) ? $middleware : func_get_args());
+
+        return $this;
+    }
+
+    /**
      * Visit the given URI with a JSON request.
      *
      * @param  string  $method
