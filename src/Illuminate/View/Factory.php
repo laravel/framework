@@ -10,6 +10,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\View\Engines\EngineResolver;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Contracts\View\Factory as FactoryContract;
 
 class Factory implements FactoryContract
@@ -505,7 +506,7 @@ class Factory implements FactoryContract
      * @param  \Illuminate\Contracts\View\View  $view
      * @return void
      */
-    public function callComposer(View $view)
+    public function callComposer(ViewContract $view)
     {
         $this->events->fire('composing: '.$view->getName(), [$view]);
     }
@@ -516,7 +517,7 @@ class Factory implements FactoryContract
      * @param  \Illuminate\Contracts\View\View  $view
      * @return void
      */
-    public function callCreator(View $view)
+    public function callCreator(ViewContract $view)
     {
         $this->events->fire('creating: '.$view->getName(), [$view]);
     }
