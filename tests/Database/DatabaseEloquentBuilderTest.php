@@ -7,8 +7,43 @@ use Illuminate\Support\Collection as BaseCollection;
 
 class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
 {
+    public function setUp()
+    {
+        $db = new Illuminate\Database\Capsule\Manager;
+
+        $db->addConnection([
+            'driver'    => 'sqlite',
+            'database'  => ':memory:',
+        ]);
+
+        $db->bootEloquent();
+        $db->setAsGlobal();
+
+        $this->createSchema();
+    }
+
+    /**
+     * Setup the database schema.
+     *
+     * @return void
+     */
+    public function createSchema()
+    {
+        $this->schema()->create('users', function ($table) {
+            $table->increments('id');
+            $table->string('email')->unique();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Tear down the database schema.
+     *
+     * @return void
+     */
     public function tearDown()
     {
+        $this->schema()->drop('users');
         m::close();
     }
 
@@ -581,6 +616,15 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['foo' => $builder], $builder->delete());
     }
 
+    public function testAggregatedValuesOfDatetimeField()
+    {
+        EloquentBuilderTestUser::create(['id' => 1, 'email' => 'test1@test.test', 'created_at' => '2016-08-10 09:21:00']);
+        EloquentBuilderTestUser::create(['id' => 2, 'email' => 'test2@test.test', 'created_at' => '2016-08-01 12:00:00']);
+
+        $this->assertEquals('2016-08-10 09:21:00', EloquentBuilderTestUser::max('created_at'));
+        $this->assertEquals('2016-08-01 12:00:00', EloquentBuilderTestUser::min('created_at'));
+    }
+
     public function testWithCount()
     {
         $model = new EloquentBuilderTestModelParentStub;
@@ -812,6 +856,26 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
 
         return $query;
     }
+
+    /**
+     * Get a database connection instance.
+     *
+     * @return Illuminate\Database\Connection
+     */
+    protected function connection()
+    {
+        return Illuminate\Database\Eloquent\Model::getConnectionResolver()->connection();
+    }
+
+    /**
+     * Get a schema builder instance.
+     *
+     * @return Illuminate\Database\Schema\Builder
+     */
+    protected function schema()
+    {
+        return $this->connection()->getSchemaBuilder();
+    }
 }
 
 class EloquentBuilderTestScopeStub extends Illuminate\Database\Eloquent\Model
@@ -931,4 +995,11 @@ class EloquentBuilderTestModelSelfRelatedStub extends Illuminate\Database\Eloque
     {
         return $this->hasMany('EloquentBuilderTestModelFarRelatedStub', 'foreign_key', 'id', 'bar');
     }
+}
+
+class EloquentBuilderTestUser extends Illuminate\Database\Eloquent\Model
+{
+    protected $table = 'users';
+    protected $guarded = [];
+    public $timestamps = false;
 }
