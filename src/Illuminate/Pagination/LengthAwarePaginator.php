@@ -35,7 +35,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
      * @param  int  $total
      * @param  int  $perPage
      * @param  int|null  $currentPage
-     * @param  array  $options (path, query, fragment, pageName)
+     * @param  array  $options (path, query, fragment, pageName, onEachSide)
      * @return void
      */
     public function __construct($items, $total, $perPage, $currentPage = null, array $options = [])
@@ -127,7 +127,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
      */
     public function render($view = null)
     {
-        $window = UrlWindow::make($this);
+        $window = UrlWindow::make($this, $this->onEachSide);
 
         $elements = [
             $window['first'],
