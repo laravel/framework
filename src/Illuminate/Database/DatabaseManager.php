@@ -72,6 +72,13 @@ class DatabaseManager implements ConnectionResolverInterface
             $this->connections[$name] = $this->prepare($connection);
         }
 
+        // If the connection already exists, we must take the type of the connection
+        // into consideration, otherwise we will never be able to switch the type 
+        // of any already existing connection. This will affect future queries.
+        else {
+            $this->setPdoForType($this->connections[$name], $type);
+        }
+
         return $this->connections[$name];
     }
 
