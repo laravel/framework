@@ -49,6 +49,35 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Load only the specified relationships onto the collection.
+     *
+     * @param  mixed  $relations
+     * @return $this
+     */
+    public function loadOnly($relations)
+    {
+        if (count($this->items) > 0) {
+            if (is_string($relations)) {
+                $relations = func_get_args();
+            }
+
+            $model = $this->first();
+
+            $without = array_diff($model->with, $relations);
+
+            if (empty($without)) {
+                $query = $model->newQuery()->with($relations);
+            } else {
+                $query = $model->newQuery()->with($relations)->without($model->with);
+            }
+
+            $this->items = $query->eagerLoadRelations($this->items);
+        }
+
+        return $this;
+    }
+
+    /**
      * Add an item to the collection.
      *
      * @param  mixed  $item

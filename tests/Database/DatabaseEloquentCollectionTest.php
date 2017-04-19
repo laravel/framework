@@ -113,6 +113,21 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['results'], $c->all());
     }
 
+    public function testLoadOnlyMethodEagerLoadsOnlyGivenRelationships()
+    {
+        $c = $this->getMock('Illuminate\Database\Eloquent\Collection', ['first'], [['foo']]);
+        $mockItem = m::mock('StdClass');
+        $mockItem->with = ['qux'];
+        $c->expects($this->once())->method('first')->will($this->returnValue($mockItem));
+        $mockItem->shouldReceive('newQuery')->once()->andReturn($mockItem);
+        $mockItem->shouldReceive('with')->with(['bar', 'baz'])->andReturn($mockItem);
+        $mockItem->shouldReceive('without')->with(['qux'])->andReturn($mockItem);
+        $mockItem->shouldReceive('eagerLoadRelations')->once()->with(['foo'])->andReturn(['results']);
+        $c->loadOnly('bar', 'baz');
+
+        $this->assertEquals(['results'], $c->all());
+    }
+
     public function testCollectionDictionaryReturnsModelKeys()
     {
         $one = m::mock('Illuminate\Database\Eloquent\Model');
@@ -284,4 +299,5 @@ class TestEloquentCollectionModel extends Illuminate\Database\Eloquent\Model
 {
     protected $visible = ['visible'];
     protected $hidden = ['hidden'];
+    public $with = ['foo'];
 }
