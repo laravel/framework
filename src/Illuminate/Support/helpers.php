@@ -808,6 +808,20 @@ if (! function_exists('str_slug')) {
     }
 }
 
+if (! function_exists('str_unslug')) {
+    /**
+     * Un-slug a slugged string.
+     *
+     * @param string $string
+     * @param string $delimiter
+     * @return string
+     */
+    function str_unslug($string, $delimiter)
+    {
+        return Str::unSlug($string, $delimiter);
+    }
+}
+
 if (! function_exists('studly_case')) {
     /**
      * Convert a value to studly caps case.

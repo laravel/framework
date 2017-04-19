@@ -378,6 +378,18 @@ class Str
     }
 
     /**
+     * Un-slug a slugged string
+     *
+     * @param string $string
+     * @param string $delimiter
+     * @return string
+     */
+    public static function unSlug($string, $delimiter = '-')
+    {
+        return str_replace($delimiter, ' ', $string);
+    }
+
+    /**
      * Convert a string to snake case.
      *
      * @param  string  $value
