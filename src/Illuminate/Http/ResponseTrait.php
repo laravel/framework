@@ -50,7 +50,11 @@ trait ResponseTrait
     public function withHeaders(array $headers)
     {
         foreach ($headers as $key => $value) {
-            $this->headers->set($key, $value);
+            if (is_array($value)) {
+                $this->headers->set($key, $value[0], $value[1]);
+            } else {
+                $this->headers->set($key, $value);
+            }
         }
 
         return $this;
