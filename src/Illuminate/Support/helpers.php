@@ -229,6 +229,22 @@ if (! function_exists('array_prepend')) {
     }
 }
 
+
+if (! function_exists('array_append')) {
+    /**
+     * Push an item at the end of an array.
+     *
+     * @param  array  $array
+     * @param  mixed  $value
+     * @param  mixed  $key
+     * @return array
+     */
+    function array_append($array, $value, $key = null)
+    {
+        return Arr::append($array, $value, $key);
+    }
+}
+
 if (! function_exists('array_pull')) {
     /**
      * Get a value from the array, and remove it.

@@ -329,6 +329,15 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['zero' => 0, 'one' => 1, 'two' => 2], $array);
     }
 
+    public function testAppend()
+    {
+        $array = Arr::append(['one', 'two', 'three', 'four'], 'five');
+        $this->assertEquals(['one', 'two', 'three', 'four', 'five'], $array);
+
+        $array = Arr::prepend(['one' => 1, 'two' => 2], 3, 'three');
+        $this->assertEquals(['one' => 1, 'two' => 2, 'three' => 3], $array);
+    }
+
     public function testPull()
     {
         $array = ['name' => 'Desk', 'price' => 100];
