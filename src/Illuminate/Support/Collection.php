@@ -670,6 +670,20 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Concatenate the collection and the given items.
+     *
+     * @param  mixed  $items
+     * @return static
+     */
+    public function concatenate($items)
+    {
+        return new static(array_merge(
+            array_values($this->items),
+            array_values($this->getArrayableItems($items))
+        ));
+    }
+
+    /**
      * Create a collection by using this collection for keys and another for its values.
      *
      * @param  mixed  $values

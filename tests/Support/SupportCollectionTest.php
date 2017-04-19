@@ -475,6 +475,67 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['name' => 'World', 'id' => 1], $c->merge(new Collection(['name' => 'World', 'id' => 1]))->all());
     }
 
+    public function testConcatenateNull()
+    {
+        $c = new Collection(['name' => 'Hello']);
+
+        $this->assertEquals(['Hello'], $c->concatenate(null)->all());
+    }
+
+    public function testConcatenateArrayWithDifferentKeys()
+    {
+        $first = new Collection(['name' => 'Hello']);
+        $second = ['id' => 1];
+
+        $this->assertEquals(['Hello', 1], $first->concatenate($second)->all());
+    }
+
+    public function testConcatenateArrayWithRepeatingKeys()
+    {
+        $first = new Collection(['name' => 'Hello', 'id' => 1]);
+        $second = ['name' => 'World', 'id' => 2];
+
+        $this->assertEquals(['Hello', 1, 'World', 2], $first->concatenate($second)->all());
+    }
+
+    public function testConcatenateCollectionWithDifferentKeys()
+    {
+        $first = new Collection(['name' => 'Hello']);
+        $second = new Collection(['id' => 1]);
+
+        $this->assertEquals(['Hello', 1], $first->concatenate($second)->all());
+    }
+
+    public function testConcatenateCollectionWithRepeatingKeys()
+    {
+        $first = new Collection(['name' => 'Hello', 'id' => 1]);
+        $second = new Collection(['name' => 'World', 'id' => 2]);
+
+        $this->assertEquals(['Hello', 1, 'World', 2], $first->concatenate($second)->all());
+    }
+
+    public function testConcatenateNonAssociativeCollectionWorksLikeMerge()
+    {
+        $first = new Collection(['first', 'second']);
+        $second = new Collection(['third', 'fourth']);
+
+        $expected = $first->merge($second);
+        $actual = $first->concatenate($second);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testConcatenateNonAssociativeArrayWorksLikeMerge()
+    {
+        $first = new Collection(['first', 'second']);
+        $second = ['third', 'fourth'];
+
+        $expected = $first->merge($second);
+        $actual = $first->concatenate($second);
+
+        $this->assertEquals($expected, $actual);
+    }
+
     public function testUnionNull()
     {
         $c = new Collection(['name' => 'Hello']);

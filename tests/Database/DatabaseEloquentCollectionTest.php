@@ -146,6 +146,43 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(new Collection([$one, $two, $three]), $c1->merge($c2));
     }
 
+    public function testCollectionConcatenateDoesNotRemoveDuplicates()
+    {
+        $one = m::mock('Illuminate\Database\Eloquent\Model');
+        $one->shouldReceive('getKey')->andReturn(1);
+
+        $two = m::mock('Illuminate\Database\Eloquent\Model');
+        $two->shouldReceive('getKey')->andReturn(2);
+
+        $three = m::mock('Illuminate\Database\Eloquent\Model');
+        $three->shouldReceive('getKey')->andReturn(3);
+
+        $c1 = new Collection([$one, $two]);
+        $c2 = new Collection([$two, $three]);
+
+        $this->assertEquals(new Collection([$one, $two, $two, $three]), $c1->concatenate($c2));
+    }
+
+    public function testCollectionConcatenateWorksLikeMergeWhenNoDuplicatesArePresent()
+    {
+        $one = m::mock('Illuminate\Database\Eloquent\Model');
+        $one->shouldReceive('getKey')->andReturn(1);
+
+        $two = m::mock('Illuminate\Database\Eloquent\Model');
+        $two->shouldReceive('getKey')->andReturn(2);
+
+        $three = m::mock('Illuminate\Database\Eloquent\Model');
+        $three->shouldReceive('getKey')->andReturn(3);
+
+        $four = m::mock('Illuminate\Database\Eloquent\Model');
+        $four->shouldReceive('getKey')->andReturn(4);
+
+        $c1 = new Collection([$one, $two]);
+        $c2 = new Collection([$three, $four]);
+
+        $this->assertEquals(new Collection([$one, $two, $three, $four]), $c1->concatenate($c2));
+    }
+
     public function testMap()
     {
         $one = m::mock('Illuminate\Database\Eloquent\Model');
