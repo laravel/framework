@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use \ReflectionClass;
 use Closure;
 use Exception;
 use ArrayAccess;
@@ -103,6 +104,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @var array
      */
     protected $relations = [];
+
+    /**
+     * The names of the relationships for the model.
+     *
+     * @var array|null
+     */
+    protected $relation_names = null;
 
     /**
      * The attributes that should be hidden for arrays.
@@ -655,13 +663,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Eager load relations on the model.
      *
-     * @param  array|string  $relations
+     * @param  array|string|null  $relations
      * @return $this
      */
-    public function load($relations)
+    public function load($relations = null)
     {
         if (is_string($relations)) {
             $relations = func_get_args();
+        }
+
+        if (null == $relations) {
+            $relations = $this->getRelationshipNames();
         }
 
         $query = $this->newQuery()->with($relations);
@@ -669,6 +681,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $query->eagerLoadRelations([$this]);
 
         return $this;
+    }
+
+    /**
+     * Begin querying a model with eager loading for all relationships.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    public static function withAll()
+    {
+        $relations = (new static)->getRelationshipNames();
+        return static::with($relations);
     }
 
     /**
@@ -2713,6 +2736,46 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $this->setRelation($method, $results = $relations->getResults());
 
         return $results;
+    }
+
+    /**
+     * Get the names of the relationships for the model.
+     *
+     * @return array
+     */
+    public function getRelationshipNames()
+    {
+        if ($this->relation_names) return $this->relation_names;
+
+        $this_func_name = __FUNCTION__;
+        $reflection = new ReflectionClass(new static);
+        $parent_reflection = $reflection->getParentClass();
+
+        // Get names of all methods on the current (child) and parent classes.
+        $reflection_list = array_map(function($v) {return $v->name;}, $reflection->getMethods());
+        $parent_reflection_list = array_map(function($v) {return $v->name;}, $parent_reflection->getMethods());
+
+        // Remove the parent method names from the child method names.
+        $methods = array_diff($reflection_list, $parent_reflection_list);
+
+        // New model instance.
+        $model = new static;
+
+        $relations = [];
+
+        foreach ($methods as $method) {
+            // avoid recursion
+            if ($method == $this_func_name) continue;
+
+            try {
+                if ($model->$method() instanceof Relation)
+                    $relations[] = $method;
+            } catch (\Exception $e) {
+                continue;
+            }
+        }
+
+        return $this->relation_names = $relations;
     }
 
     /**
