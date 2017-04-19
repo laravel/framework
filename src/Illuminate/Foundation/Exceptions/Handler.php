@@ -10,6 +10,7 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Access\AuthorizationException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Illuminate\Http\Exception\HttpResponseException;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -150,9 +151,9 @@ class Handler implements ExceptionHandlerContract
     protected function prepareResponse($request, Exception $e)
     {
         if ($this->isHttpException($e)) {
-            return $this->toIlluminateResponse($this->renderHttpException($e), $e);
+            return $this->toIlluminateResponse($this->renderHttpException($e, $request), $e);
         } else {
-            return $this->toIlluminateResponse($this->convertExceptionToResponse($e), $e);
+            return $this->toIlluminateResponse($this->convertExceptionToResponse($e, $request), $e);
         }
     }
 
@@ -190,16 +191,17 @@ class Handler implements ExceptionHandlerContract
      * Render the given HttpException.
      *
      * @param  \Symfony\Component\HttpKernel\Exception\HttpException  $e
+     * @param  \Illuminate\Http\Request  $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function renderHttpException(HttpException $e)
+    protected function renderHttpException(HttpException $e, $request)
     {
         $status = $e->getStatusCode();
 
-        if (view()->exists("errors.{$status}")) {
+        if (! $request->wantsJson() && view()->exists("errors.{$status}")) {
             return response()->view("errors.{$status}", ['exception' => $e], $status, $e->getHeaders());
         } else {
-            return $this->convertExceptionToResponse($e);
+            return $this->convertExceptionToResponse($e, $request);
         }
     }
 
@@ -229,11 +231,25 @@ class Handler implements ExceptionHandlerContract
      * Create a Symfony response for the given exception.
      *
      * @param  \Exception  $e
+     * @param  \Illuminate\Http\Request  $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function convertExceptionToResponse(Exception $e)
+    protected function convertExceptionToResponse(Exception $e, $request)
     {
         $e = FlattenException::create($e);
+
+        if ($request->wantsJson()) {
+            $data = [
+                'code' => $e->getStatusCode(),
+                'message' => $e->getMessage(),
+            ];
+
+            if (config('app.debug')) {
+                $data['stack'] = $e->toArray();
+            }
+
+            return JsonResponse::create($data, $e->getStatusCode(), $e->getHeaders());
+        }
 
         $handler = new SymfonyExceptionHandler(config('app.debug'));
 
