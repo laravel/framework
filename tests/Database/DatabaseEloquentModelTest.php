@@ -180,6 +180,13 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($model->save());
     }
 
+    public function testGetModelEventName()
+    {
+        $model = new EloquentModelStub;
+
+        $this->assertEquals($model::getModelEventName('saving'), 'eloquent.saving: EloquentModelStub');
+    }
+
     public function testSaveIsCancelledIfSavingEventReturnsFalse()
     {
         $model = $this->getMock('EloquentModelStub', ['newQueryWithoutScopes']);
