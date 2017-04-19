@@ -672,6 +672,25 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Eager load relations on the model with a condition.
+     *
+     * @param  string  $relation
+     * @param  string  $column
+     * @param  string  $operator
+     * @param  mixed   $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function loadWhere($relation, $column, $operator = null, $value = null, $boolean = 'and')
+    {
+        return $this->load([
+            $relation => function ($query) use ($column, $operator, $value, $boolean) {
+                return call_user_func([$query, 'where'], $column, $operator, $value, $boolean);
+            },
+        ]);
+    }
+
+    /**
      * Begin querying a model with eager loading.
      *
      * @param  array|string  $relations
@@ -686,6 +705,25 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $instance = new static;
 
         return $instance->newQuery()->with($relations);
+    }
+
+    /**
+     * Begin querying a model with eager loading with a condition.
+     *
+     * @param  string  $relation
+     * @param  string  $column
+     * @param  string  $operator
+     * @param  mixed   $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public static function withWhere($relation, $column, $operator = null, $value = null, $boolean = 'and')
+    {
+        return static::with([
+            $relation => function ($query) use ($column, $operator, $value, $boolean) {
+                return call_user_func([$query, 'where'], $column, $operator, $value, $boolean);
+            },
+        ]);
     }
 
     /**

@@ -679,6 +679,13 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
 
         $post = EloquentTestPost::with('user')->where('name', 'First Post')->get();
         $this->assertEquals('taylorotwell@gmail.com', $post->first()->user->email);
+
+        $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
+        $user->friends()->create(['email' => 'matt@cantseethecode.com']);
+
+        $taylor = EloquentTestUser::withWhere('friends', 'email', 'matt@cantseethecode.com')->first();
+        $this->assertEquals(1, $taylor->friends->count());
+        $this->assertEquals(1, $user->loadWhere('friends', ['email' => 'abigailotwell@gmail.com'])->friends->count());
     }
 
     public function testBasicNestedSelfReferencingHasManyEagerLoading()
