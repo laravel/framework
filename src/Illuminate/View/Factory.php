@@ -806,6 +806,8 @@ class Factory implements FactoryContract
             'index' => 0,
             'remaining' => isset($length) ? $length : null,
             'count' => $length,
+            'even' => false,
+            'odd' => true,
             'first' => true,
             'last' => isset($length) ? $length == 1 : null,
             'depth' => count($this->loopsStack) + 1,
@@ -832,6 +834,12 @@ class Factory implements FactoryContract
 
             $loop['last'] = $loop['iteration'] == $loop['count'];
         }
+
+        $even = ($loop['index'] & 1) === 0;
+
+        $loop['even'] = $even;
+
+        $loop['odd'] = ! $even;
     }
 
     /**
