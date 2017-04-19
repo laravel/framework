@@ -16,11 +16,14 @@
 </head>
 
 <?php
+$rtl_languages = ['ar', 'dv', 'he', 'ku', 'fa', 'ur'];
+
+$support_rtl_lang = in_array(config('app.locale'), $rtl_languages) ? 'direction: rtl;' : 'direction: ltr;';
 
 $style = [
     /* Layout ------------------------------ */
 
-    'body' => 'margin: 0; padding: 0; width: 100%; background-color: #F2F4F6;',
+    'body' => 'margin: 0; padding: 0; width: 100%; background-color: #F2F4F6;' . $support_rtl_lang,
     'email-wrapper' => 'width: 100%; margin: 0; padding: 0; background-color: #F2F4F6;',
 
     /* Masthead ----------------------- */
@@ -43,7 +46,7 @@ $style = [
     /* Type ------------------------------ */
 
     'anchor' => 'color: #3869D4;',
-    'header-1' => 'margin-top: 0; color: #2F3133; font-size: 19px; font-weight: bold; text-align: left;',
+    'header-1' => 'margin-top: 0; color: #2F3133; font-size: 19px; font-weight: bold;',
     'paragraph' => 'margin-top: 0; color: #74787E; font-size: 16px; line-height: 1.5em;',
     'paragraph-sub' => 'margin-top: 0; color: #74787E; font-size: 12px; line-height: 1.5em;',
     'paragraph-center' => 'text-align: center;',
