@@ -10,18 +10,36 @@ use Illuminate\Contracts\Foundation\Application;
 class DetectEnvironment
 {
     /**
+     * The application implementation.
+     *
+     * @var \Illuminate\Contracts\Foundation\Application
+     */
+    protected $app;
+
+    /**
+     * Create a new BootProviders instance.
+     *
+     * @param \Illuminate\Contracts\Foundation\Application $app
+     * @return void
+     */
+    public function __construct(Application $app)
+    {
+        $this->app = $app;
+    }
+
+    /**
      * Bootstrap the given application.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
-    public function bootstrap(Application $app)
+    public function bootstrap()
     {
-        if (! $app->configurationIsCached()) {
-            $this->checkForSpecificEnvironmentFile($app);
+        if (! $this->app->configurationIsCached()) {
+            $this->checkForSpecificEnvironmentFile();
 
             try {
-                (new Dotenv($app->environmentPath(), $app->environmentFile()))->load();
+                (new Dotenv($this->app->environmentPath(), $this->app->environmentFile()))->load();
             } catch (InvalidPathException $e) {
                 //
             }
@@ -34,15 +52,15 @@ class DetectEnvironment
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
-    protected function checkForSpecificEnvironmentFile($app)
+    protected function checkForSpecificEnvironmentFile()
     {
         if (php_sapi_name() == 'cli') {
             $input = new ArgvInput;
 
             if ($input->hasParameterOption('--env')) {
-                $file = $app->environmentFile().'.'.$input->getParameterOption('--env');
+                $file = $this->app->environmentFile().'.'.$input->getParameterOption('--env');
 
-                $this->loadEnvironmentFile($app, $file);
+                $this->loadEnvironmentFile($file);
             }
         }
 
@@ -51,9 +69,9 @@ class DetectEnvironment
         }
 
         if (empty($file)) {
-            $file = $app->environmentFile().'.'.env('APP_ENV');
+            $file = $this->app->environmentFile().'.'.env('APP_ENV');
 
-            $this->loadEnvironmentFile($app, $file);
+            $this->loadEnvironmentFile($file);
         }
     }
 
@@ -64,10 +82,10 @@ class DetectEnvironment
      * @param  string  $file
      * @return void
      */
-    protected function loadEnvironmentFile($app, $file)
+    protected function loadEnvironmentFile($file)
     {
-        if (file_exists($app->environmentPath().'/'.$file)) {
-            $app->loadEnvironmentFrom($file);
+        if (file_exists($this->app->environmentPath().'/'.$file)) {
+            $this->app->loadEnvironmentFrom($file);
         }
     }
 }

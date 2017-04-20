@@ -12,11 +12,22 @@ use Symfony\Component\Debug\Exception\FatalThrowableError;
 class HandleExceptions
 {
     /**
-     * The application instance.
+     * The application implementation.
      *
      * @var \Illuminate\Contracts\Foundation\Application
      */
     protected $app;
+
+    /**
+     * Create a new BootProviders instance.
+     *
+     * @param \Illuminate\Contracts\Foundation\Application $app
+     * @return void
+     */
+    public function __construct(Application $app)
+    {
+        $this->app = $app;
+    }
 
     /**
      * Bootstrap the given application.
@@ -24,10 +35,8 @@ class HandleExceptions
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
-    public function bootstrap(Application $app)
+    public function bootstrap()
     {
-        $this->app = $app;
-
         error_reporting(-1);
 
         set_error_handler([$this, 'handleError']);
@@ -36,7 +45,7 @@ class HandleExceptions
 
         register_shutdown_function([$this, 'handleShutdown']);
 
-        if (! $app->environment('testing')) {
+        if (! $this->app->environment('testing')) {
             ini_set('display_errors', 'Off');
         }
     }

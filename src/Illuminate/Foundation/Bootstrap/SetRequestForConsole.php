@@ -8,15 +8,33 @@ use Illuminate\Contracts\Foundation\Application;
 class SetRequestForConsole
 {
     /**
+     * The application implementation.
+     *
+     * @var \Illuminate\Contracts\Foundation\Application
+     */
+    protected $app;
+
+    /**
+     * Create a new BootProviders instance.
+     *
+     * @param \Illuminate\Contracts\Foundation\Application $app
+     * @return void
+     */
+    public function __construct(Application $app)
+    {
+        $this->app = $app;
+    }
+
+    /**
      * Bootstrap the given application.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
-    public function bootstrap(Application $app)
+    public function bootstrap()
     {
-        $url = $app->make('config')->get('app.url', 'http://localhost');
+        $url = $this->app->make('config')->get('app.url', 'http://localhost');
 
-        $app->instance('request', Request::create($url, 'GET', [], [], [], $_SERVER));
+        $this->app->instance('request', Request::create($url, 'GET', [], [], [], $_SERVER));
     }
 }
