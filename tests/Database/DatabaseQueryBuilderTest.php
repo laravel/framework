@@ -737,6 +737,48 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([4], $builder->getBindings());
     }
 
+    public function testGetCountForPaginationWithDistinctWhileColumnsSelected()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('users')->select('users.id')->distinct();
+
+        $builder->getConnection()->shouldReceive('select')->once()->with('select count(distinct "users"."id") as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
+            return $results;
+        });
+
+        $count = $builder->getCountForPagination();
+        $this->assertEquals(1, $count);
+    }
+
+    public function testGetCountForPaginationWithDistinctWithNoColumnsSelected()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('users')->distinct();
+
+        $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
+            return $results;
+        });
+
+        $count = $builder->getCountForPagination();
+        $this->assertEquals(1, $count);
+    }
+
+    public function testGetCountForPaginationWithoutDistinct()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('users')->select('one', 'two');
+
+        $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
+            return $results;
+        });
+
+        $count = $builder->getCountForPagination();
+        $this->assertEquals(1, $count);
+    }
+
     public function testGetCountForPaginationWithColumnAliases()
     {
         $builder = $this->getBuilder();

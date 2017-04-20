@@ -1702,6 +1702,10 @@ class Builder
      */
     public function getCountForPagination($columns = ['*'])
     {
+        if ($this->distinct && $columns == ['*'] && $column = Arr::first($this->columns)) {
+            $columns = [$column];
+        }
+
         $this->backupFieldsForCount();
 
         $this->aggregate = ['function' => 'count', 'columns' => $this->clearSelectAliases($columns)];
