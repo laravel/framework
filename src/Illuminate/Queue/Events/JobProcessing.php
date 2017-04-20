@@ -27,7 +27,7 @@ class JobProcessing
      */
     public function __construct($connectionName, $job)
     {
-        $this->job = $job;
         $this->connectionName = $connectionName;
+        $this->job = $job;
     }
 }

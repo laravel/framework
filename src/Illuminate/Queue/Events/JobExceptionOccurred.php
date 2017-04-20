@@ -35,8 +35,8 @@ class JobExceptionOccurred
      */
     public function __construct($connectionName, $job, $exception)
     {
+        $this->connectionName = $connectionName;
         $this->job = $job;
         $this->exception = $exception;
-        $this->connectionName = $connectionName;
     }
 }
