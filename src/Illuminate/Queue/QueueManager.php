@@ -240,7 +240,7 @@ class QueueManager implements FactoryContract, MonitorContract
      */
     public function getQueuePrefix()
     {
-        return isset($this->app['config']['queue.prefix']) ? $this->app['config']['queue.prefix'] : null;
+        return $this->app['config']->get('queue.prefix');
     }
 
     /**
