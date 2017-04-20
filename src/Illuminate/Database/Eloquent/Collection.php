@@ -353,6 +353,25 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Apply append to all models within the collection.
+     *
+     * @param  array|string  $attributes
+     * @return BaseCollection
+     */
+    public function append($attributes)
+    {
+        if (is_string($attributes)) {
+            $attributes = func_get_args();
+        }
+
+        return $this->each(function ($item) use ($attributes) {
+            if ($item instanceof Model) {
+                call_user_func_array([$item, 'append'], $attributes);
+            }
+        });
+    }
+
+    /**
      * Get the identifiers for all of the entities.
      *
      * @return array

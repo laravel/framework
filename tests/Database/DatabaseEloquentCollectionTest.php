@@ -306,6 +306,20 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
         $c = new Collection([new TestEloquentCollectionModel, (object) ['id' => 'something']]);
         $c->getQueueableClass();
     }
+
+    public function testAppendIsCalledOnEachModelInTheCollection()
+    {
+        $mockModel1 = m::mock('Illuminate\Database\Eloquent\Model');
+        $mockModel1->shouldReceive('append')->with('attribute');
+        $mockModel2 = m::mock('Illuminate\Database\Eloquent\Model');
+        $mockModel2->shouldReceive('append')->with('attribute');
+        $mockModel3 = m::mock('Illuminate\Database\Eloquent\Model');
+        $mockModel3->shouldReceive('append')->with('attribute');
+
+        $c = new Collection([$mockModel1, $mockModel2, $mockModel3]);
+
+        $c->append('attribute');
+    }
 }
 
 class TestEloquentCollectionModel extends Illuminate\Database\Eloquent\Model
