@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Http;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Redirector;
 use Illuminate\Contracts\Container\Container;
@@ -136,7 +137,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
     public function response(array $errors)
     {
         if ($this->expectsJson()) {
-            return new JsonResponse($errors, 422);
+            return new JsonResponse($errors, Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         return $this->redirector->to($this->getRedirectUrl())
