@@ -593,7 +593,7 @@ class MySqlGrammar extends Grammar
     protected function typeTimestamp(Fluent $column)
     {
         if ($column->useCurrent) {
-            return "timestamp($column->precision) default CURRENT_TIMESTAMP($column->precision)";
+            return "timestamp($column->precision) default CURRENT_TIMESTAMP";
         }
 
         return "timestamp($column->precision)";
@@ -608,7 +608,7 @@ class MySqlGrammar extends Grammar
     protected function typeTimestampTz(Fluent $column)
     {
         if ($column->useCurrent) {
-            return "timestamp($column->precision) default CURRENT_TIMESTAMP($column->precision)";
+            return "timestamp($column->precision) default CURRENT_TIMESTAMP";
         }
 
         return "timestamp($column->precision)";
