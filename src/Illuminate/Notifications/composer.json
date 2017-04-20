@@ -35,7 +35,8 @@
     "suggest": {
         "guzzlehttp/guzzle": "Required to use the Slack transport.",
         "illuminate/database": "Required to use the database transport (5.3.*).",
-        "nexmo/client": "Required to use the Nexmo transport."
+        "nexmo/client": "Required to use the Nexmo transport.",
+        "ramsey/uuid": "Required to generating universally unique identifiers (UUID)."
     },
     "config": {
         "sort-packages": true
