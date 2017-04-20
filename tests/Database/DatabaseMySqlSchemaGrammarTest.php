@@ -586,7 +586,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
-        $this->assertEquals('alter table `users` add `foo` datetime not null', $statements[0]);
+        $this->assertEquals('alter table `users` add `foo` datetime(0) not null', $statements[0]);
     }
 
     public function testAddingDateTimeTz()
@@ -596,7 +596,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
-        $this->assertEquals('alter table `users` add `foo` datetime not null', $statements[0]);
+        $this->assertEquals('alter table `users` add `foo` datetime(0) not null', $statements[0]);
     }
 
     public function testAddingTime()
@@ -626,7 +626,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
-        $this->assertEquals('alter table `users` add `foo` timestamp not null', $statements[0]);
+        $this->assertEquals('alter table `users` add `foo` timestamp(0) not null', $statements[0]);
     }
 
     public function testAddingTimeStampWithDefault()
@@ -636,7 +636,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
-        $this->assertEquals('alter table `users` add `foo` timestamp not null default \'2015-07-22 11:43:17\'', $statements[0]);
+        $this->assertEquals('alter table `users` add `foo` timestamp(0) not null default \'2015-07-22 11:43:17\'', $statements[0]);
     }
 
     public function testAddingTimeStampTz()
@@ -646,7 +646,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
-        $this->assertEquals('alter table `users` add `foo` timestamp not null', $statements[0]);
+        $this->assertEquals('alter table `users` add `foo` timestamp(0) not null', $statements[0]);
     }
 
     public function testAddingTimeStampTzWithDefault()
@@ -656,7 +656,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
-        $this->assertEquals('alter table `users` add `foo` timestamp not null default \'2015-07-22 11:43:17\'', $statements[0]);
+        $this->assertEquals('alter table `users` add `foo` timestamp(0) not null default \'2015-07-22 11:43:17\'', $statements[0]);
     }
 
     public function testAddingTimeStamps()
@@ -666,7 +666,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
-        $this->assertEquals('alter table `users` add `created_at` timestamp null, add `updated_at` timestamp null', $statements[0]);
+        $this->assertEquals('alter table `users` add `created_at` timestamp(0) null, add `updated_at` timestamp(0) null', $statements[0]);
     }
 
     public function testAddingTimeStampsTz()
@@ -676,7 +676,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
-        $this->assertEquals('alter table `users` add `created_at` timestamp null, add `updated_at` timestamp null', $statements[0]);
+        $this->assertEquals('alter table `users` add `created_at` timestamp(0) null, add `updated_at` timestamp(0) null', $statements[0]);
     }
 
     public function testAddingRememberToken()

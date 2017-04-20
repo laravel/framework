@@ -734,22 +734,24 @@ class Blueprint
      * Create a new date-time column on the table.
      *
      * @param  string  $column
+     * @param  int     $precision
      * @return \Illuminate\Support\Fluent
      */
-    public function dateTime($column)
+    public function dateTime($column, $precision = 0)
     {
-        return $this->addColumn('dateTime', $column);
+        return $this->addColumn('dateTime', $column, compact('precision'));
     }
 
     /**
      * Create a new date-time column (with time zone) on the table.
      *
      * @param  string  $column
+     * @param  int     $precision
      * @return \Illuminate\Support\Fluent
      */
-    public function dateTimeTz($column)
+    public function dateTimeTz($column, $precision = 0)
     {
-        return $this->addColumn('dateTimeTz', $column);
+        return $this->addColumn('dateTimeTz', $column, compact('precision'));
     }
 
     /**
@@ -778,22 +780,24 @@ class Blueprint
      * Create a new timestamp column on the table.
      *
      * @param  string  $column
+     * @param  int     $precision
      * @return \Illuminate\Support\Fluent
      */
-    public function timestamp($column)
+    public function timestamp($column, $precision = 0)
     {
-        return $this->addColumn('timestamp', $column);
+        return $this->addColumn('timestamp', $column, compact('precision'));
     }
 
     /**
      * Create a new timestamp (with time zone) column on the table.
      *
      * @param  string  $column
+     * @param  int     $precision
      * @return \Illuminate\Support\Fluent
      */
-    public function timestampTz($column)
+    public function timestampTz($column, $precision = 0)
     {
-        return $this->addColumn('timestampTz', $column);
+        return $this->addColumn('timestampTz', $column, compact('precision'));
     }
 
     /**
