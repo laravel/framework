@@ -83,17 +83,19 @@ $style = [
                                 <tr>
                                     <td style="{{ $fontFamily }} {{ $style['email-body_cell'] }}">
                                         <!-- Greeting -->
-                                        <h1 style="{{ $style['header-1'] }}">
-                                            @if (! empty($greeting))
-                                                {{ $greeting }}
-                                            @else
-                                                @if ($level == 'error')
-                                                    Whoops!
+                                        @if (! empty($greeting) || is_null($greeting))
+                                            <h1 style="{{ $style['header-1'] }}">
+                                                @if (! is_null($greeting))
+                                                    {{ $greeting }}
                                                 @else
-                                                    Hello!
+                                                    @if ($level == 'error')
+                                                        Whoops!
+                                                    @else
+                                                        Hello!
+                                                    @endif
                                                 @endif
-                                            @endif
-                                        </h1>
+                                            </h1>
+                                        @endif
 
                                         <!-- Intro -->
                                         @foreach ($introLines as $line)

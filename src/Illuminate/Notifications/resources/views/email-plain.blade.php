@@ -1,6 +1,6 @@
 <?php
 
-if (! empty($greeting)) {
+if (! is_null($greeting)) {
     echo $greeting, "\n\n";
 } else {
     echo $level == 'error' ? 'Whoops!' : 'Hello!', "\n\n";
