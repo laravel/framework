@@ -6,6 +6,7 @@ use Closure;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Session\SessionManager;
 use Illuminate\Session\SessionInterface;
 use Illuminate\Session\CookieSessionHandler;
@@ -86,6 +87,9 @@ class StartSession
     {
         if ($this->sessionHandled && $this->sessionConfigured() && ! $this->usingCookieSessions()) {
             $this->manager->driver()->save();
+            if ($response instanceof RedirectResponse) {
+                $this->manager->driver()->reflash();
+            }
         }
     }
 
