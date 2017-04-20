@@ -87,4 +87,14 @@ class DatabaseNotification extends Model
     {
         return new DatabaseNotificationCollection($models);
     }
+    
+    /**
+     * Get the name attribute of the instance.
+     *
+     * @return string
+     */
+    public function getNameAttribute()
+    {
+        return snake_case(class_basename($this->type));
+    }
 }
