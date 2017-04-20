@@ -803,13 +803,14 @@ class Blueprint
     /**
      * Add nullable creation and update timestamps to the table.
      *
+     * @param  int     $precision
      * @return void
      */
-    public function timestamps()
+    public function timestamps($precision = 0)
     {
-        $this->timestamp('created_at')->nullable();
+        $this->timestamp('created_at', $precision)->nullable();
 
-        $this->timestamp('updated_at')->nullable();
+        $this->timestamp('updated_at', $precision)->nullable();
     }
 
     /**
@@ -817,43 +818,47 @@ class Blueprint
      *
      * Alias for self::timestamps().
      *
+     * @param  int     $precision
      * @return void
      */
-    public function nullableTimestamps()
+    public function nullableTimestamps($precision = 0)
     {
-        $this->timestamps();
+        $this->timestamps($precision);
     }
 
     /**
      * Add creation and update timestampTz columns to the table.
      *
+     * @param  int     $precision
      * @return void
      */
-    public function timestampsTz()
+    public function timestampsTz($precision = 0)
     {
-        $this->timestampTz('created_at')->nullable();
+        $this->timestampTz('created_at', $precision)->nullable();
 
-        $this->timestampTz('updated_at')->nullable();
+        $this->timestampTz('updated_at', $precision)->nullable();
     }
 
     /**
      * Add a "deleted at" timestamp for the table.
      *
+     * @param  int     $precision
      * @return \Illuminate\Support\Fluent
      */
-    public function softDeletes()
+    public function softDeletes($precision = 0)
     {
-        return $this->timestamp('deleted_at')->nullable();
+        return $this->timestamp('deleted_at', $precision)->nullable();
     }
 
     /**
      * Add a "deleted at" timestampTz for the table.
      *
+     * @param  int     $precision
      * @return \Illuminate\Support\Fluent
      */
-    public function softDeletesTz()
+    public function softDeletesTz($precision = 0)
     {
-        return $this->timestampTz('deleted_at')->nullable();
+        return $this->timestampTz('deleted_at', $precision)->nullable();
     }
 
     /**
