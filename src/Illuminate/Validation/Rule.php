@@ -64,4 +64,16 @@ class Rule
     {
         return new Rules\Unique($table, $column);
     }
+
+    /**
+     * Get a mime constraint builder instance.
+     *
+     * @param $mimes
+     *
+     * @return \Illuminate\Validation\Rules\Mimes
+     */
+    public static function mime(array $mimes = [])
+    {
+        return new Rules\Mimes($mimes);
+    }
 }
