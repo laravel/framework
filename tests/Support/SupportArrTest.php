@@ -24,6 +24,38 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['name' => 'Desk', 'price' => 100], $array);
     }
 
+    public function testAny()
+    {
+        $array = ['products.desk' => ['price' => 100]];
+        $this->assertTrue(Arr::any($array, 'products.desk'));
+
+        $array = ['products' => ['desk' => ['price' => 100], 'foo' => ['price' => 100]]];
+        $this->assertTrue(Arr::any($array, ['products.foo', 'products.desk']));
+        $this->assertTrue(Arr::any($array, ['products.desk.price', 'products.desk.count']));
+        $this->assertFalse(Arr::any($array, ['products.baz', 'products.desk.count']));
+
+        $array = ['foo' => null, 'bar' => ['baz' => null]];
+        $this->assertTrue(Arr::any($array, ['foo', 'desk']));
+        $this->assertTrue(Arr::any($array, ['foo.foo', 'bar.baz']));
+
+        $array = new ArrayObject(['foo' => 10, 'bar' => new ArrayObject(['baz' => 10])]);
+        $this->assertTrue(Arr::any($array, ['foo.foo', 'baz.bar', 'bar']));
+        $this->assertTrue(Arr::any($array, ['bar', 'baz']));
+
+        $array = ['foo', 'bar'];
+        $this->assertFalse(Arr::any($array, null));
+
+        $this->assertFalse(Arr::any(null, ['foo', 'baz']));
+        $this->assertFalse(Arr::any(false, ['foo', 'bar.foo']));
+        $this->assertFalse(Arr::any(true, ['foo', 'bar', 'baz']));
+
+        $this->assertFalse(Arr::any(null, null));
+        $this->assertFalse(Arr::any([], null));
+
+        $this->assertFalse(Arr::any([], [null, true]));
+        $this->assertFalse(Arr::any(null, [null, false]));
+    }
+
     public function testCollapse()
     {
         $data = [['foo', 'bar'], ['baz']];

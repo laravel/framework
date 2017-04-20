@@ -38,6 +38,28 @@ class Arr
     }
 
     /**
+     * Check if any item or items exist in an array using "dot" notation.
+     *
+     * @param  \ArrayAccess|array  $array
+     * @param  string|array  $keys
+     * @return bool
+     */
+    public static function any($array, $keys)
+    {
+        if (! static::accessible($array)) {
+            return false;
+        }
+
+        foreach ((array) $keys as $key) {
+            if(static::has($array, $key)){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Collapse an array of arrays into a single array.
      *
      * @param  array  $array
