@@ -114,6 +114,26 @@ class Container implements ArrayAccess, ContainerContract
     protected $afterResolvingCallbacks = [];
 
     /**
+     * {@inheritdoc}
+     */
+    public function get($id)
+    {
+        if (! $this->bound($id)) {
+            throw new NotFoundException("Type [{$id}] is not bounded.");
+        }
+
+        return $this->make($id);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function has($id)
+    {
+        return $this->bound($id);
+    }
+
+    /**
      * Define a contextual binding.
      *
      * @param  string  $concrete

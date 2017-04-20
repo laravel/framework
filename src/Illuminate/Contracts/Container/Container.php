@@ -3,8 +3,9 @@
 namespace Illuminate\Contracts\Container;
 
 use Closure;
+use Psr\Container\ContainerInterface;
 
-interface Container
+interface Container extends ContainerInterface
 {
     /**
      * Determine if the given abstract type has been bound.
