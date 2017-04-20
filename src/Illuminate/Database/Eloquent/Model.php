@@ -161,6 +161,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected $casts = [];
 
     /**
+     * Set an option on the casts encoding.
+     * @link http://php.net/manual/en/json.constants.php
+     *
+     * @var string
+     */
+    protected $json_encode_option = 0;
+
+    /**
      * The relationships that should be touched on save.
      *
      * @var array
@@ -3056,7 +3064,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function asJson($value)
     {
-        return json_encode($value);
+        return json_encode($value, $this->json_encode_option);
     }
 
     /**
