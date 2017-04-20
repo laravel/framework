@@ -370,23 +370,30 @@ class Filesystem
      * Get an array of all files in a directory.
      *
      * @param  string  $directory
+     * @param  bool  $ignoreDotFiles
      * @return array
      */
-    public function files($directory, $hidden = false)
+    public function files($directory, $ignoreDotFiles = false)
     {
-        return iterator_to_array(Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory)->depth(0), false);
+        return iterator_to_array(
+            Finder::create()->files()->ignoreDotFiles(! $ignoreDotFiles)->in($directory)->depth(0),
+            false
+        );
     }
 
     /**
      * Get all of the files from the given directory (recursive).
      *
      * @param  string  $directory
-     * @param  bool  $hidden
+     * @param  bool  $ignoreDotFiles
      * @return array
      */
-    public function allFiles($directory, $hidden = false)
+    public function allFiles($directory, $ignoreDotFiles = false)
     {
-        return iterator_to_array(Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory), false);
+        return iterator_to_array(
+            Finder::create()->files()->ignoreDotFiles(! $ignoreDotFiles)->in($directory),
+            false
+        );
     }
 
     /**
