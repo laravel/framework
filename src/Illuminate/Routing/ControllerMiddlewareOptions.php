@@ -25,12 +25,12 @@ class ControllerMiddlewareOptions
     /**
      * Set the controller methods the middleware should apply to.
      *
-     * @param  array|string|dynamic  $methods
+     * @param  array  $methods
      * @return $this
      */
-    public function only($methods)
+    public function only(...$methods)
     {
-        $this->options['only'] = is_array($methods) ? $methods : func_get_args();
+        $this->options['only'] = $methods;
 
         return $this;
     }
@@ -38,12 +38,12 @@ class ControllerMiddlewareOptions
     /**
      * Set the controller methods the middleware should exclude.
      *
-     * @param  array|string|dynamic  $methods
+     * @param  array  $methods
      * @return $this
      */
-    public function except($methods)
+    public function except(...$methods)
     {
-        $this->options['except'] = is_array($methods) ? $methods : func_get_args();
+        $this->options['except'] = $methods;
 
         return $this;
     }
