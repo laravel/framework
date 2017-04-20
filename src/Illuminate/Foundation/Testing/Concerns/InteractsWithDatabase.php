@@ -2,6 +2,9 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
+use PHPUnit_Framework_Constraint_Not as ReverseConstraint;
+use Illuminate\Foundation\Testing\Constraints\HasInDatabase;
+
 trait InteractsWithDatabase
 {
     /**
@@ -10,21 +13,39 @@ trait InteractsWithDatabase
      * @param  string  $table
      * @param  array  $data
      * @param  string  $connection
+     * @param  bool  $reverse
      * @return $this
      */
-    protected function seeInDatabase($table, array $data, $connection = null)
+    protected function seeInDatabase($table, array $data, $connection = null, $reverse = false)
     {
-        $database = $this->app->make('db');
+        $constraint = new HasInDatabase($data, $this->getConnection($connection));
 
-        $connection = $connection ?: $database->getDefaultConnection();
+        if ($reverse) {
+            $constraint = new ReverseConstraint($constraint);
+        }
 
-        $count = $database->connection($connection)->table($table)->where($data)->count();
-
-        $this->assertGreaterThan(0, $count, sprintf(
-            'Unable to find row in database table [%s] that matched attributes [%s].', $table, json_encode($data)
-        ));
+        $this->assertThat($table, $constraint);
 
         return $this;
+    }
+
+    /**
+     * Assert that a given where condition exists in the database and retrieve the results found.
+     *
+     * @param  string  $table
+     * @param  array  $data
+     * @param  string  $connection
+     * @return $this
+     */
+    protected function seeAndGetInDatabase($table, array $data, $connection = null)
+    {
+        $constraint = new HasInDatabase($data, $this->getConnection($connection));
+
+        $this->assertThat($table, $constraint);
+
+        $results = $constraint->getResults();
+
+        return $results->count() == 1 ? $results->first() : $results;
     }
 
     /**
@@ -63,17 +84,7 @@ trait InteractsWithDatabase
      */
     protected function notSeeInDatabase($table, array $data, $connection = null)
     {
-        $database = $this->app->make('db');
-
-        $connection = $connection ?: $database->getDefaultConnection();
-
-        $count = $database->connection($connection)->table($table)->where($data)->count();
-
-        $this->assertEquals(0, $count, sprintf(
-            'Found unexpected records in database table [%s] that matched attributes [%s].', $table, json_encode($data)
-        ));
-
-        return $this;
+        return $this->seeInDatabase($table, $data, $connection, true);
     }
 
     /**
@@ -87,5 +98,20 @@ trait InteractsWithDatabase
         $this->artisan('db:seed', ['--class' => $class]);
 
         return $this;
+    }
+
+    /**
+     * Get the database connection.
+     *
+     * @param  string|null  $connection
+     * @return \Illuminate\Database\Collection
+     */
+    protected function getConnection($connection = null)
+    {
+        $database = $this->app->make('db');
+
+        $connection = $connection ?: $database->getDefaultConnection();
+
+        return $database->connection($connection);
     }
 }
