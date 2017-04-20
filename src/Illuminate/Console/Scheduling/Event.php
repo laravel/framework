@@ -71,6 +71,34 @@ class Event
     public $runInBackground = false;
 
     /**
+     * Indicates if the command should run in asyn and will check the status.
+     *
+     * @var bool
+     */
+    public $runAsynBackground = false;
+
+    /**
+     * The lengthest seconds of the command can run. (-1 indicates no limits).
+     *
+     * @var int
+     */
+    public $mostRunTime = -1;
+
+    /**
+     * The expiredTime the command can run. (-1 indicates no limits).
+     *
+     * @var int
+     */
+    public $expiredTime = -1;
+
+    /**
+     * The email to alarm when command run in exception.
+     *
+     * @var int
+     */
+    public $alarmEmail = '';
+
+    /**
      * The array of filter callbacks.
      *
      * @var array
@@ -149,10 +177,17 @@ class Event
      */
     public function run(Container $container)
     {
+        // We can use runCommandAsynBackground instead of runCommandInForeground
         if (! $this->runInBackground) {
             $this->runCommandInForeground($container);
+        } elseif ($this->runAsynBackground) {
+            $this->runCommandAsynBackground($container);
         } else {
             $this->runCommandInBackground();
+        }
+
+        if (0 < $this->mostRunTime) {
+            $this->expiredTime = time() + $this->mostRunTime;
         }
     }
 
@@ -166,11 +201,57 @@ class Event
     {
         $this->callBeforeCallbacks($container);
 
+        $timeout = (0 < $this->mostRunTime) ? $this->mostRunTime : 60;
         (new Process(
-            trim($this->buildCommand(), '& '), base_path(), null, null, null
+            trim($this->buildCommand(), '& '), base_path(), null, null, $timeout
         ))->run();
+        $this->callAfterCallbacks($container);
+    }
+
+    /**
+     * Run the command in the background.
+     *
+     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @return void
+     */
+    protected function runCommandAsynBackground(Container $container)
+    {
+        $this->callBeforeCallbacks($container);
+
+        $timeout = (0 < $this->mostRunTime) ? $this->mostRunTime : 60;
+        (new Process(
+            $this->buildCommand(), base_path(), null, null, $timeout
+        ))->run();
+    }
+
+    /**
+     * try clean up finished command.
+     *
+     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @return bool
+     */
+    public function tryCleanUp(Container $container)
+    {
+        if (! $this->runAsynBackground) {
+            return true;
+        }
+
+        // timeout alarm
+        if (0 < $this->expiredTime && time() >= $this->expiredTime) {
+            // alert
+            $this->alarmTimeout($container);
+
+            return true;
+        }
+
+        // is running
+        if (file_exists($this->mutexPath())) {
+            return false;
+        }
 
         $this->callAfterCallbacks($container);
+
+        return true;
     }
 
     /**
@@ -180,8 +261,9 @@ class Event
      */
     protected function runCommandInBackground()
     {
+        $timeout = (0 < $this->mostRunTime) ? $this->mostRunTime : 60;
         (new Process(
-            $this->buildCommand(), base_path(), null, null, null
+            $this->buildCommand(), base_path(), null, null, $timeout
         ))->run();
     }
 
@@ -222,7 +304,7 @@ class Event
 
         $redirect = $this->shouldAppendOutput ? ' >> ' : ' > ';
 
-        if ($this->withoutOverlapping) {
+        if ($this->withoutOverlapping || $this->runAsynBackground) {
             if (windows_os()) {
                 $command = '(echo \'\' > "'.$this->mutexPath().'" & '.$this->command.' & del "'.$this->mutexPath().'")'.$redirect.$output.' 2>&1 &';
             } else {
@@ -670,6 +752,32 @@ class Event
     }
 
     /**
+     * State that the command should run in background and will check status.
+     *
+     * @return $this
+     */
+    public function runAsynBackground()
+    {
+        $this->runAsynBackground = true;
+        $this->runInBackground = true;
+
+        return $this;
+    }
+
+    /**
+     * State the lengthest seconds of the command can run. (-1 indicates no limits).
+     *
+     * @var int
+     * @return $this
+     */
+    public function mostRunTime($seconds = -1)
+    {
+        $this->mostRunTime = $seconds;
+
+        return $this;
+    }
+
+    /**
      * Set the timezone the date should be evaluated on.
      *
      * @param  \DateTimeZone|string  $timezone
@@ -820,6 +928,19 @@ class Event
     public function emailWrittenOutputTo($addresses)
     {
         return $this->emailOutputTo($addresses, true);
+    }
+
+    /**
+     * E-mail to developers if it run in exception.
+     *
+     * @param  array|mixed  $addresses
+     * @return $this
+     *
+     * @throws \LogicException
+     */
+    public function failEmailTo($addresses)
+    {
+        return $this->alarmEmail = $addresses;
     }
 
     /**
@@ -986,5 +1107,30 @@ class Event
     public function getExpression()
     {
         return $this->expression;
+    }
+
+    /**
+     * alerm where the command run too long.
+     *
+     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @return void
+     */
+    private function alarmTimeout(Container $container)
+    {
+        $addresses = $this->alarmEmail;
+
+        if (empty($addresses)) {
+            return;
+        }
+
+        $container->call(function (Mailer $mailer) use ($addresses) {
+            $mailer->raw('run timeout', function ($m) use ($addresses) {
+                $m->subject($this->getEmailSubject());
+
+                foreach ($addresses as $address) {
+                    $m->to($address);
+                }
+            });
+        });
     }
 }
