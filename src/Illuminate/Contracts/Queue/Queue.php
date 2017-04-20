@@ -96,19 +96,4 @@ interface Queue
      * @return $this
      */
     public function setConnectionName($name);
-
-    /**
-     * Set the queue prefix.
-     *
-     * @param  string  $prefix
-     * @return $this
-     */
-    public function setQueuePrefix($prefix = null);
-
-    /**
-     * Get the queue prefix.
-     *
-     * @return string
-     */
-    public function getQueuePrefix();
 }
