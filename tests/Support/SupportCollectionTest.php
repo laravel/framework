@@ -389,6 +389,126 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([['v' => 1], ['v' => 3]], $c->whereInStrict('v', [1, 3])->values()->all());
     }
 
+    public function testLike()
+    {
+        $c = new Collection([['v' => 'Taylor'], ['v' => 'Jeffrey'], ['v' => 'Eric'], ['v' => 'Amo'], ['v' => 'Jack']]);
+
+        $this->assertEquals(
+            [['v' => 'Taylor']],
+            $c->like('v', 'Tay')->values()->all()
+        );
+
+        $this->assertEquals(
+            [['v' => 'Jeffrey']],
+            $c->like('v', 'ff')->values()->all()
+        );
+
+        $this->assertEquals(
+            [['v' => 'Amo']],
+            $c->like('v', 'Amo')->values()->all()
+        );
+
+        $this->assertEquals(
+            [['v' => 'Taylor'], ['v' => 'Amo'], ['v' => 'Jack']],
+            $c->like('v', 'a')->values()->all()
+        );
+    }
+
+    public function testNotLike()
+    {
+        $c = new Collection([['v' => 'Taylor'], ['v' => 'Jeffrey'], ['v' => 'Eric'], ['v' => 'Amo'], ['v' => 'Jack']]);
+
+        $this->assertEquals(
+            [['v' => 'Jeffrey'], ['v' => 'Eric'], ['v' => 'Amo'], ['v' => 'Jack']],
+            $c->notLike('v', 'Tay')->values()->all()
+        );
+
+        $this->assertEquals(
+            [['v' => 'Taylor'], ['v' => 'Eric'], ['v' => 'Amo'], ['v' => 'Jack']],
+            $c->notLike('v', 'ff')->values()->all()
+        );
+
+        $this->assertEquals(
+            [['v' => 'Taylor'], ['v' => 'Jeffrey'], ['v' => 'Eric'], ['v' => 'Jack']],
+            $c->notLike('v', 'Amo')->values()->all()
+        );
+
+        $this->assertEquals(
+            [['v' => 'Jeffrey'], ['v' => 'Eric']],
+            $c->notLike('v', 'a')->values()->all()
+        );
+    }
+
+    public function testLikeCaseSensitive()
+    {
+        $c = new Collection([['v' => 'Taylor'], ['v' => 'Jeffrey'], ['v' => 'Eric'], ['v' => 'Amo'], ['v' => 'Jack']]);
+
+        $this->assertEquals(
+            [['v' => 'Taylor']],
+            $c->likeCaseSensitive('v', 'Tay')->values()->all()
+        );
+
+        $this->assertEquals(
+            [],
+            $c->likeCaseSensitive('v', 'tay')->values()->all()
+        );
+
+        $this->assertEquals(
+            [['v' => 'Jeffrey']],
+            $c->likeCaseSensitive('v', 'ff')->values()->all()
+        );
+
+        $this->assertEquals(
+            [],
+            $c->likeCaseSensitive('v', 'FF')->values()->all()
+        );
+
+        $this->assertEquals(
+            [['v' => 'Amo']],
+            $c->likeCaseSensitive('v', 'Amo')->values()->all()
+        );
+
+        $this->assertEquals(
+            [],
+            $c->likeCaseSensitive('v', 'amo')->values()->all()
+        );
+
+        $this->assertEquals(
+            [['v' => 'Taylor'], ['v' => 'Jack']],
+            $c->likeCaseSensitive('v', 'a')->values()->all()
+        );
+    }
+
+    public function testNotLikeCaseSensitive()
+    {
+        $c = new Collection([['v' => 'Taylor'], ['v' => 'Jeffrey'], ['v' => 'Eric'], ['v' => 'Amo'], ['v' => 'Jack']]);
+
+        $this->assertEquals(
+            [['v' => 'Taylor'], ['v' => 'Jeffrey'], ['v' => 'Eric'], ['v' => 'Amo'], ['v' => 'Jack']],
+            $c->notLikeCaseSensitive('v', 'tay')->values()->all()
+        );
+
+        $this->assertEquals(
+            [['v' => 'Jeffrey'], ['v' => 'Eric'], ['v' => 'Amo'], ['v' => 'Jack']],
+            $c->notLikeCaseSensitive('v', 'Tay')->values()->all()
+        );
+
+        $this->assertEquals(
+            [['v' => 'Jeffrey'], ['v' => 'Eric'], ['v' => 'Amo'], ['v' => 'Jack']],
+            $c->notLikeCaseSensitive('v', 'T')->values()->all()
+        );
+
+        $this->assertEquals(
+            [['v' => 'Taylor'], ['v' => 'Jeffrey'], ['v' => 'Eric'], ['v' => 'Amo'], ['v' => 'Jack']],
+            $c->notLikeCaseSensitive('v', 'amo')->values()->all()
+        );
+
+        $this->assertEquals(
+            [['v' => 'Jeffrey'], ['v' => 'Eric'], ['v' => 'Amo']],
+            $c->notLikeCaseSensitive('v', 'a')->values()->all()
+        );
+    }
+
     public function testValues()
     {
         $c = new Collection([['id' => 1, 'name' => 'Hello'], ['id' => 2, 'name' => 'World']]);
