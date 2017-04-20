@@ -63,12 +63,12 @@ class PusherBroadcaster extends Broadcaster
             return $this->decodePusherResponse(
                 $this->pusher->socket_auth($request->channel_name, $request->socket_id)
             );
-        } else {
-            return $this->decodePusherResponse(
-                $this->pusher->presence_auth(
-                    $request->channel_name, $request->socket_id, $request->user()->getAuthIdentifier(), $result)
-            );
         }
+
+        return $this->decodePusherResponse(
+            $this->pusher->presence_auth(
+                $request->channel_name, $request->socket_id, $request->user()->getAuthIdentifier(), $result)
+        );
     }
 
     /**
