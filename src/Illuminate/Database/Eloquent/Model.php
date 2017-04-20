@@ -552,13 +552,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Save a new model and return the instance.
      *
      * @param  array  $attributes
+     * @param  array  $options
      * @return static
      */
-    public static function create(array $attributes = [])
+    public static function create(array $attributes = [], array $options = [])
     {
         $model = new static($attributes);
 
-        $model->save();
+        $model->save($options);
 
         return $model;
     }
@@ -567,12 +568,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Save a new model and return the instance. Allow mass-assignment.
      *
      * @param  array  $attributes
+     * @param  array  $options
      * @return static
      */
-    public static function forceCreate(array $attributes)
+    public static function forceCreate(array $attributes, array $options = [])
     {
-        return static::unguarded(function () use ($attributes) {
-            return (new static)->create($attributes);
+        return static::unguarded(function () use ($attributes, $options) {
+            return (new static)->create($attributes, $options);
         });
     }
 
