@@ -2111,9 +2111,8 @@ class Builder
         // bindings are structured in a way that is convenient for building these
         // inserts statements by verifying the elements are actually an array.
         else {
-            foreach ($values as $key => $value) {
+            foreach ($values as &$value) {
                 ksort($value);
-                $values[$key] = $value;
             }
         }
 
