@@ -1186,4 +1186,41 @@ class Container implements ArrayAccess, ContainerContract
     {
         $this[$key] = $value;
     }
+
+    /**
+     * Decorate a given type with chained dependencies.
+     *
+     * @param  string $abstract
+     * @param  string $outer
+     * @param  string[] ...$chain
+     * @return void
+     */
+    public function decorate($abstract, $outer, ...$chain)
+    {
+        $this->bind($abstract, $outer);
+
+        $this->buildDecoratorChain($abstract, $outer, $chain);
+    }
+
+    /**
+     * Builds a contextual dependency chain recursively, so that each element of the chain
+     * depends on the next one, up until the last one.
+     *
+     * This assumes that the last element is not a decorator anymore, so its dependencies will
+     * be resolved normally, as with any given type.
+     *
+     * @param  string $abstract
+     * @param  string $decorator
+     * @param  string[] $chain
+     * @return void
+     */
+    protected function buildDecoratorChain($abstract, $decorator, array $chain)
+    {
+        $concrete = array_shift($chain);
+        $this->when($decorator)->needs($abstract)->give($concrete);
+
+        if (! empty($chain)) {
+            $this->buildDecoratorChain($abstract, $concrete, $chain);
+        }
+    }
 }
