@@ -418,4 +418,44 @@ trait MocksApplicationServices
 
         return $this;
     }
+
+    /**
+     * Specify a list of notifications that should not be dispatched for the given operation.
+     *
+     * These notifications will be mocked, so that handlers will not actually be executed.
+     *
+     * @param  array|string  $notifications
+     * @return $this
+     */
+    protected function doesntExpectNotification($notifications)
+    {
+        $notifications = is_array($notifications) ? $notifications : func_get_args();
+
+        $this->withoutNotifications();
+
+        $this->beforeApplicationDestroyed(function () use ($notifications) {
+            if ($dispatched = $this->getDispatchedNotifications($notifications)) {
+                throw new Exception(
+                    'These unexpected notifications were dispatched: ['.implode(', ', $dispatched).']'
+                );
+            }
+        });
+
+        return $this;
+    }
+
+    /**
+     * Filter the given notifications against the dispatched notifications.
+     *
+     * @param  array  $notifications
+     * @return array
+     */
+    protected function getDispatchedNotifications(array $notifications)
+    {
+        return $this->getDispatched($notifications,
+            collect($this->dispatchedNotifications)->map(function ($notification) {
+                return $notification['instance'];
+            })->all()
+        );
+    }
 }
