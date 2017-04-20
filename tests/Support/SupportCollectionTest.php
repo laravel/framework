@@ -707,6 +707,11 @@ class SupportCollectionTest extends TestCase
 
         $this->assertSame([1 => 'alan', 0 => 'zaeed'], $reversed->all());
 
+        $data = new Collection(['zaeed', 'alan']);
+        $reversed = $data->reverse(false);
+
+        $this->assertSame([0 => 'alan', 1 => 'zaeed'], $reversed->all());
+
         $data = new Collection(['name' => 'taylor', 'framework' => 'laravel']);
         $reversed = $data->reverse();
 
