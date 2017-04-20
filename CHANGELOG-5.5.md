@@ -9,7 +9,6 @@
 - Removed `build` scripts ([7c16b15](https://github.com/laravel/framework/pull/17048/commits/7c16b154ede10ff9a37756e32d7dddf317524634))
 - Support callable/invokable objects in `Pipeline` ([#18264](https://github.com/laravel/framework/pull/18264))
 - ⚠️ Prevent access to protected properties using array access on `Model` and `Fluent` ([#18403](https://github.com/laravel/framework/pull/18403))
-- Added frontend preset commands ([882f525](https://github.com/laravel/framework/commit/882f525a2c46caddfd94cfa7db9fbaf1abb1284b), [463b769](https://github.com/laravel/framework/commit/463b769270d462468e1b1dcc51a7a1144e003157), [34fd458](https://github.com/laravel/framework/commit/34fd458d370a39335810c1f040fad04af418fed4), [34fd458](https://github.com/laravel/framework/commit/34fd458d370a39335810c1f040fad04af418fed4), [d6c7abe](https://github.com/laravel/framework/commit/d6c7abe5e651cda813831afa5943791334361cd7), [0ed20b0](https://github.com/laravel/framework/commit/0ed20b0bb43335933a17972dce64cc63bbb3cc85), [f7f02c5](https://github.com/laravel/framework/commit/f7f02c5792079ab40f8adf7e14c747b4749406b5), [cf871f4](https://github.com/laravel/framework/commit/cf871f4bf40a75bc1713de7ef8a689477e19c677))
 
 ### Artisan Console
 - Added interactive prompt to `vendor:publish` ([#18230](https://github.com/laravel/framework/pull/18230))
@@ -18,8 +17,14 @@
 - Support default value(s) on command arguments ([#18572](https://github.com/laravel/framework/pull/18572))
 - Improved CLI detection for phpdbg ([#18781](https://github.com/laravel/framework/pull/18781))
 
+### Assets
+- Added frontend preset commands ([882f525](https://github.com/laravel/framework/commit/882f525a2c46caddfd94cfa7db9fbaf1abb1284b), [463b769](https://github.com/laravel/framework/commit/463b769270d462468e1b1dcc51a7a1144e003157), [34fd458](https://github.com/laravel/framework/commit/34fd458d370a39335810c1f040fad04af418fed4), [34fd458](https://github.com/laravel/framework/commit/34fd458d370a39335810c1f040fad04af418fed4), [d6c7abe](https://github.com/laravel/framework/commit/d6c7abe5e651cda813831afa5943791334361cd7), [0ed20b0](https://github.com/laravel/framework/commit/0ed20b0bb43335933a17972dce64cc63bbb3cc85), [f7f02c5](https://github.com/laravel/framework/commit/f7f02c5792079ab40f8adf7e14c747b4749406b5), [cf871f4](https://github.com/laravel/framework/commit/cf871f4bf40a75bc1713de7ef8a689477e19c677), [bc5084e](https://github.com/laravel/framework/commit/bc5084efe27a576230f16f447e63b9f4e9b1c5e2))
+
 ### Authorization
 - Support multiple values in `Gate::has()` ([#18758](https://github.com/laravel/framework/pull/18758))
+
+### Cache
+- Don't encrypt database cache values ([f0c72ec](https://github.com/laravel/framework/commit/f0c72ec9bcbdecb7e6267f7ec8f7ecbf8169a388))
 
 ### Collections
 - Support multiple values in `Collection::has()` ([#18758](https://github.com/laravel/framework/pull/18758))
@@ -34,9 +39,12 @@
 - ⚠️ Don't add `_count` suffix to column name when using `withCount()` with an alias ([#17871](https://github.com/laravel/framework/pull/17871))
 - ⚠️ Renamed `$events` to `$dispatchesEvents` ([#17961](https://github.com/laravel/framework/pull/17961), [b6472bf](https://github.com/laravel/framework/commit/b6472bf6fec1af6e76604aaf3f7fed665440ac66), [3dbe12f](https://github.com/laravel/framework/commit/3dbe12f16f470e3bca868576d517d57876bc50af))
 - ⚠️ Added `$parentKey` parameter to `belongsToMany()`, `BelongsToMany` and `MorphToMany` ([#17915](https://github.com/laravel/framework/pull/17915), [#18380](https://github.com/laravel/framework/pull/18380))
+- ⚠️ Only return query builder when the result is null for `callScope()` ([#18845](https://github.com/laravel/framework/pull/18845))
+- Allow setting a factory's attribute to a factory instance ([#18879](https://github.com/laravel/framework/pull/18879))
 - Support `null` comparison in `Model::is()` ([#18511](https://github.com/laravel/framework/pull/18511))
 - Added `getDirty()` checks for date and castable attributes ([#18400](https://github.com/laravel/framework/pull/18400), [e180e20](https://github.com/laravel/framework/commit/e180e20aa479525b34f77b9cf348148d329a4d2c))
 - Show method name in invalid relationship `LogicException` ([#18749](https://github.com/laravel/framework/pull/18749))
+
 
 ### Encryption
 - Use `openssl_cipher_iv_length()` in `Encrypter` ([#18684](https://github.com/laravel/framework/pull/18684))
@@ -59,11 +67,20 @@
 - Handle lower case words better in as `Str::snake()` ([#18764](https://github.com/laravel/framework/pull/18764))
 - Removed usages of the `with()` helper ([#17888](https://github.com/laravel/framework/pull/17888))
 
-### HTTP Routing
-- ⚠️ Bind empty optional route parameter to `null` instead of empty model instance ([#17521](https://github.com/laravel/framework/pull/17521))
-- Support multiple values in `Router::has()` ([#18758](https://github.com/laravel/framework/pull/18758))
+### Mail
+- Allow mailables to be rendered directly to views ([d9a6dfa](https://github.com/laravel/framework/commit/d9a6dfa4f46a10feceb67921b78c60a905b7c28c))
+- Allow for per-mailable theme configuration ([b2c35ca](https://github.com/laravel/framework/commit/b2c35ca9eb769d1a4752a64e936defd7f7099043))
+- ⚠️ Removed `$data` and `$callback` parameters from `Mailer` and `MailQueue`
 
-### HTTP Requests
+### Queues
+- Added support for chainable jobs ([81bcb03](https://github.com/laravel/framework/commit/81bcb03b303707cdc94420983b9d72ed558a2b3d), [94c01b1](https://github.com/laravel/framework/commit/94c01b1f37bfbb8e0d5f133b7dd34040b2bdc065), [91f5357](https://github.com/laravel/framework/commit/91f535704d4f6cff5e8393825dbdf46965234fa3))
+- ⚠️ Removed redundant `$queue` parameter from `Queue::createPayload()` ([#17948](https://github.com/laravel/framework/pull/17948))
+- Made all `getQueue()` methods `public` ([#18501](https://github.com/laravel/framework/pull/18501))
+
+### Redis
+- Removed `PhpRedisConnection::proxyToEval()` method ([#17360](https://github.com/laravel/framework/pull/17360))
+
+### Requests
 - ⚠️ Made `Request::has()` work like `Collection::has()` ([#18715](https://github.com/laravel/framework/pull/18715))
 - Added `Request::filled()` ([#18715](https://github.com/laravel/framework/pull/18715))
 - ⚠️ Made `Request::only()` work like `Collection::only()` ([#18695](https://github.com/laravel/framework/pull/18695))
@@ -72,28 +89,23 @@
 - Allow passing keys to `Request::all()` to behave like old `Request::only()` ([#18754](https://github.com/laravel/framework/pull/18754))
 - ⚠️ Removed `Request::intersect()` ([#18695](https://github.com/laravel/framework/pull/18695))
 
-### HTTP Responses
+### Routing
+- Support fluent resource options ([#18767](https://github.com/laravel/framework/pull/18767), [bb02fb2](https://github.com/laravel/framework/commit/bb02fb27387a8aeb2a47da1fe5ff2e086920b744))
+- Support multiple values in `Router::has()` ([#18758](https://github.com/laravel/framework/pull/18758))
+- ⚠️ Bind empty optional route parameter to `null` instead of empty model instance ([#17521](https://github.com/laravel/framework/pull/17521))
+
+### Responses
 - ⚠️ Ensure `Arrayable` and `Jsonable` return a `JsonResponse` ([#17875](https://github.com/laravel/framework/pull/17875))
 - ⚠️ Ensure `Arrayable` objects are also morphed by `Response` ([#17868](https://github.com/laravel/framework/pull/17868))
 - Added `SameSite` support to `CookieJar` ([#18040](https://github.com/laravel/framework/pull/18040), [#18059](https://github.com/laravel/framework/pull/18059), [e69d722](https://github.com/laravel/framework/commit/e69d72296cfd9969db569b950721461a521100c4))
 - Accept `HeaderBag` in `ResponseTrait::withHeaders()` ([#18161](https://github.com/laravel/framework/pull/18161))
 - ⚠️ Reset response content-type in `Response::setContent()` ([#18314](https://github.com/laravel/framework/pull/18314))
 
-### Mail
-- Allow mailables to be rendered directly to views ([d9a6dfa](https://github.com/laravel/framework/commit/d9a6dfa4f46a10feceb67921b78c60a905b7c28c))
-- Allow for per-mailable theme configuration ([b2c35ca](https://github.com/laravel/framework/commit/b2c35ca9eb769d1a4752a64e936defd7f7099043))
-- ⚠️ Removed `$data` and `$callback` parameters from `Mailer` and `MailQueue`
-
-### Queues
-- Added support for chainable jobs ([81bcb03](https://github.com/laravel/framework/commit/81bcb03b303707cdc94420983b9d72ed558a2b3d), [94c01b1](https://github.com/laravel/framework/commit/94c01b1f37bfbb8e0d5f133b7dd34040b2bdc065))
-- ⚠️ Removed redundant `$queue` parameter from `Queue::createPayload()` ([#17948](https://github.com/laravel/framework/pull/17948))
-- Made all `getQueue()` methods `public` ([#18501](https://github.com/laravel/framework/pull/18501))
-
-### Redis
-- Removed `PhpRedisConnection::proxyToEval()` method ([#17360](https://github.com/laravel/framework/pull/17360))
-
 ### Session
 - ⚠️ Default value to `true` in `Store::flash()` ([#18136](https://github.com/laravel/framework/pull/18136))
+
+### Task Scheduling
+- Fire before callbacks on closure-based scheduling events ([#18861](https://github.com/laravel/framework/pull/18861))
 
 ### Testing
 - ⚠️ Switched to PHPUnit 6 ([#17755](https://github.com/laravel/framework/pull/17755), [#17864](https://github.com/laravel/framework/pull/17864))
