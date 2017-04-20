@@ -379,6 +379,21 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a "where bits" clause.
+     *
+     * @param  Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereBits(Builder $query, $where)
+    {
+        $maskBits = 'b\''.decbin($where['bits']).'\'';
+        $valueBits = 'b\''.decbin($where['compareValue']).'\'';
+
+        return $this->wrap($where['column'])." {$where['bitwise']} {$maskBits} {$where['compare']} {$valueBits}";
+    }
+
+    /**
      * Compile a "where date" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

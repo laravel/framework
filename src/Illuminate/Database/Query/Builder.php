@@ -1055,6 +1055,55 @@ class Builder
     }
 
     /**
+     * Add a "where bits" statement to the query.
+     *
+     * @param  string  $column
+     * @param  string  $bitwise
+     * @param  int  $bits
+     * @param  string  $compare
+     * @param  int  $compareValue
+     * @param  string  $boolean
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function whereBits($column, $bitwise = '&', $bits = 0, $compare = '=', $compareValue = null, $boolean = 'and')
+    {
+        // Shorthand if we want a simple comparison, much like `where(...)`
+        if (func_num_args() == 2) {
+            $bits = $bitwise;
+            $bitwise = '&';
+        }
+
+        if (! in_array($bitwise, $this->operators) || ! in_array($compare, $this->operators)) {
+            throw new InvalidArgumentException('Illegal operators');
+        }
+
+        if (is_null($compareValue)) {
+            $compareValue = $bits;
+        }
+
+        $type = 'Bits';
+
+        $this->wheres[] = compact('type', 'column', 'bits', 'bitwise', 'compare', 'compareValue', 'boolean');
+
+        return $this;
+    }
+
+    /**
+     * Add an "or where bits" statement to the query.
+     *
+     * @param  string  $column
+     * @param  string  $bitwise
+     * @param  int  $bits
+     * @param  string  $compare
+     * @param  int  $compareValue
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function orWhereBits($column, $bitwise = '&', $bits = 0, $compare = '=', $compareValue = null)
+    {
+        return $this->whereBits($column, $bitwise, $bits, $compare, $compareValue, 'or');
+    }
+
+    /**
      * Add a "where date" statement to the query.
      *
      * @param  string  $column
