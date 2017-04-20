@@ -328,7 +328,10 @@ class Mailer implements MailerContract, MailQueueContract
     protected function addContent($message, $view, $plain, $raw, $data)
     {
         if (isset($view)) {
-            $message->setBody($this->getView($view, $data), 'text/html');
+            $view = $this->getView($view, $data);
+
+            $message->setBody($view, 'text/html');
+            $message->addPart(strip_tags($view), 'text/plain');
         }
 
         if (isset($plain)) {
