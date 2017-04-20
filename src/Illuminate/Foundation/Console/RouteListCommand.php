@@ -48,6 +48,13 @@ class RouteListCommand extends Command
     protected $headers = ['Domain', 'Method', 'URI', 'Name', 'Action', 'Middleware'];
 
     /**
+     * The table headers for the command.
+     *
+     * @var array
+     */
+    protected $simpleHeaders = ['Method', 'URI', 'Name', 'Description'];
+
+    /**
      * Create a new route command instance.
      *
      * @param  \Illuminate\Routing\Router  $router
@@ -85,7 +92,9 @@ class RouteListCommand extends Command
         $results = [];
 
         foreach ($this->routes as $route) {
-            $results[] = $this->getRouteInformation($route);
+            $results[] = $this->option('simple')
+                       ? $this->getSimpleRouteInformation($route)
+                       : $this->getRouteInformation($route);
         }
 
         if ($sort = $this->option('sort')) {
@@ -120,6 +129,22 @@ class RouteListCommand extends Command
     }
 
     /**
+     * Get the route information for a given route.
+     *
+     * @param  \Illuminate\Routing\Route  $route
+     * @return array
+     */
+    protected function getSimpleRouteInformation(Route $route)
+    {
+        return $this->filterRoute([
+            'method' => implode('|', $route->methods()),
+            'uri'    => $route->uri(),
+            'name'   => $route->getName(),
+            'description' => $route->getDescription(),
+        ]);
+    }
+
+    /**
      * Display the route information on the console.
      *
      * @param  array  $routes
@@ -127,7 +152,10 @@ class RouteListCommand extends Command
      */
     protected function displayRoutes(array $routes)
     {
-        $this->table($this->headers, $routes);
+        $this->table(
+            $this->option('simple') ? $this->simpleHeaders : $this->headers,
+            $routes
+        );
     }
 
     /**
@@ -175,6 +203,8 @@ class RouteListCommand extends Command
             ['path', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by path.'],
 
             ['reverse', 'r', InputOption::VALUE_NONE, 'Reverse the ordering of the routes.'],
+
+            ['simple', null, InputOption::VALUE_NONE, 'Display a simple version of the routes'],
 
             ['sort', null, InputOption::VALUE_OPTIONAL, 'The column (host, method, uri, name, action, middleware) to sort by.', 'uri'],
         ];

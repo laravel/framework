@@ -44,6 +44,13 @@ class Route
     protected $action;
 
     /**
+     * A friendly description of the route.
+     *
+     * @var string
+     */
+    protected $description;
+
+    /**
      * The controller instance.
      *
      * @var mixed
@@ -843,6 +850,29 @@ class Route
     public function setUri($uri)
     {
         $this->uri = $uri;
+
+        return $this;
+    }
+
+    /**
+     * Get the friendly description of the route.
+     *
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * Set the description of the route.
+     *
+     * @param  string  $description
+     * @return $this
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
 
         return $this;
     }
