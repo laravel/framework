@@ -225,6 +225,22 @@ breeze
 breeze
 <?php endif; ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
+
+        $string = '@if ("(test" == "(test")
+test
+@endif';
+        $expected = '<?php if("(test" == "(test"): ?>
+test
+<?php endif; ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+
+        $string = '@if ($test == "(test")
+test
+@endif';
+        $expected = '<?php if($test == "(test"): ?>
+test
+<?php endif; ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
     }
 
     public function testHasSectionStatementsAreCompiled()
