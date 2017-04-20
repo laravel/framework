@@ -20,6 +20,7 @@ class DatabaseMigrationRepositoryTest extends PHPUnit_Framework_TestCase
         $query->shouldReceive('orderBy')->once()->with('batch', 'asc')->andReturn($query);
         $query->shouldReceive('orderBy')->once()->with('migration', 'asc')->andReturn($query);
         $query->shouldReceive('lists')->once()->with('migration')->andReturn('bar');
+        $query->shouldReceive('useWritePdo')->once()->andReturn($query);
 
         $this->assertEquals('bar', $repo->getRan());
     }
@@ -37,6 +38,7 @@ class DatabaseMigrationRepositoryTest extends PHPUnit_Framework_TestCase
         $query->shouldReceive('where')->once()->with('batch', 1)->andReturn($query);
         $query->shouldReceive('orderBy')->once()->with('migration', 'desc')->andReturn($query);
         $query->shouldReceive('get')->once()->andReturn('foo');
+        $query->shouldReceive('useWritePdo')->once()->andReturn($query);
 
         $this->assertEquals('foo', $repo->getLast());
     }
@@ -49,6 +51,7 @@ class DatabaseMigrationRepositoryTest extends PHPUnit_Framework_TestCase
         $repo->getConnectionResolver()->shouldReceive('connection')->with(null)->andReturn($connectionMock);
         $repo->getConnection()->shouldReceive('table')->once()->with('migrations')->andReturn($query);
         $query->shouldReceive('insert')->once()->with(['migration' => 'bar', 'batch' => 1]);
+        $query->shouldReceive('useWritePdo')->once()->andReturn($query);
 
         $repo->log('bar', 1);
     }
@@ -62,6 +65,7 @@ class DatabaseMigrationRepositoryTest extends PHPUnit_Framework_TestCase
         $repo->getConnection()->shouldReceive('table')->once()->with('migrations')->andReturn($query);
         $query->shouldReceive('where')->once()->with('migration', 'foo')->andReturn($query);
         $query->shouldReceive('delete')->once();
+        $query->shouldReceive('useWritePdo')->once()->andReturn($query);
         $migration = (object) ['migration' => 'foo'];
 
         $repo->delete($migration);
@@ -85,6 +89,7 @@ class DatabaseMigrationRepositoryTest extends PHPUnit_Framework_TestCase
         $repo->getConnectionResolver()->shouldReceive('connection')->with(null)->andReturn($connectionMock);
         $repo->getConnection()->shouldReceive('table')->once()->with('migrations')->andReturn($query);
         $query->shouldReceive('max')->once()->andReturn(1);
+        $query->shouldReceive('useWritePdo')->once()->andReturn($query);
 
         $this->assertEquals(1, $repo->getLastBatchNumber());
     }

@@ -148,7 +148,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
      */
     protected function table()
     {
-        return $this->getConnection()->table($this->table);
+        return $this->getConnection()->table($this->table)->useWritePdo();
     }
 
     /**
