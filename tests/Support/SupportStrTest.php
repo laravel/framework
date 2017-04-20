@@ -209,6 +209,7 @@ class SupportStrTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('laravelPhpFramework', Str::camel('Laravel_php_framework'));
         $this->assertEquals('laravelPhPFramework', Str::camel('Laravel-phP-framework'));
         $this->assertEquals('laravelPhpFramework', Str::camel('Laravel  -_-  php   -_-   framework   '));
+        $this->assertEquals('laravelPhpFramework', Str::camel('LARAVEL_PHP_FRAMEWORK'));
     }
 
     public function testSubstr()
