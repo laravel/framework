@@ -822,10 +822,20 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      *
      * @return bool
      */
-    public function shouldSkipMiddleware()
+    public function shouldDisableMiddleware()
     {
         return $this->bound('middleware.disable') &&
                $this->make('middleware.disable') === true;
+    }
+
+    /**
+     * Determine which middleware, if any, has been disabled for the application.
+     *
+     * @return array
+     */
+    public function shouldSkipMiddleware()
+    {
+        return $this->bound('middleware.skip') ? $this->make('middleware.skip') : [];
     }
 
     /**

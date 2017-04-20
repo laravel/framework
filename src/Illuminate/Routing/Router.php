@@ -640,10 +640,15 @@ class Router implements RegistrarContract
      */
     protected function runRouteWithinStack(Route $route, Request $request)
     {
-        $shouldSkipMiddleware = $this->container->bound('middleware.disable') &&
-                                $this->container->make('middleware.disable') === true;
+        $shouldDisableMiddleware = $this->container->bound('middleware.disable') &&
+                                   $this->container->make('middleware.disable') === true;
 
-        $middleware = $shouldSkipMiddleware ? [] : $this->gatherRouteMiddleware($route);
+        $shouldSkipMiddleware = $this->container->bound('middleware.skip') ? $this->container->make('middleware.skip') : [];
+
+        $middleware = $shouldDisableMiddleware ? [] : $this->filterMiddleware(
+            $this->gatherRouteMiddleware($route),
+            $shouldSkipMiddleware
+        );
 
         return (new Pipeline($this->container))
                         ->send($request)
@@ -703,6 +708,47 @@ class Router implements RegistrarContract
             return (isset($map[$name]) ? $map[$name] : $name).
                    (! is_null($parameters) ? ':'.$parameters : '');
         }
+    }
+
+    /**
+     * Filters specific middleware out of a list of middleware.
+     *
+     * @param  array  $all
+     * @param  array  $skip
+     * @return array
+     */
+    public function filterMiddleware($all, $skip = [])
+    {
+        if (empty($skip)) {
+            return $all;
+        }
+
+        return array_values(
+            array_filter(
+                $all,
+                function ($middleware) use ($skip) {
+                    foreach ($skip as $s) {
+                        if ($middleware === $s) {
+                            return false;
+                        } elseif (gettype($middleware) == gettype($s)) {
+                            if ($middleware == $s) {
+                                return false;
+                            }
+                        } elseif (is_string($s) && is_object($middleware)) {
+                            if (is_a($middleware, $s)) {
+                                return false;
+                            }
+                        } elseif (is_object($s) && is_string($middleware)) {
+                            if (is_a($s, $middleware)) {
+                                return false;
+                            }
+                        }
+                    }
+
+                    return true;
+                }
+            )
+        );
     }
 
     /**

@@ -51,6 +51,37 @@ trait MakesHttpRequests
     }
 
     /**
+     * Re-enable middleware for the test, even if disabled by the WithoutMiddleware trait.
+     *
+     * @return $this
+     */
+    public function withMiddleware()
+    {
+        $this->app->instance('middleware.disable', false);
+
+        return $this;
+    }
+
+    /**
+     * Disable specific middleware for the test.
+     *
+     * @param  array  $middleware
+     * @return $this
+     */
+    public function skipMiddleware(array $middleware = [])
+    {
+        $middleware = collect($middleware)->map(
+            function ($name) {
+                return (array) $this->app['router']->resolveMiddlewareClassName($name);
+            }
+        )->flatten()->toArray();
+
+        $this->app->instance('middleware.skip', $middleware);
+
+        return $this;
+    }
+
+    /**
      * Visit the given URI with a JSON request.
      *
      * @param  string  $method
