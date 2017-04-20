@@ -2,66 +2,46 @@
 
 namespace Illuminate\Validation;
 
+use Illuminate\Support\Str;
+use InvalidArgumentException;
 use Illuminate\Support\Traits\Macroable;
 
 class Rule
 {
-    use Macroable;
-
-    /**
-     * Get a dimensions constraint builder instance.
-     *
-     * @param  array  $constraints
-     * @return \Illuminate\Validation\Rules\Dimensions
-     */
-    public static function dimensions(array $constraints = [])
-    {
-        return new Rules\Dimensions($constraints);
+    use Macroable {
+        __callStatic as macroCallStatic;
     }
 
     /**
-     * Get a exists constraint builder instance.
+     * Get the rule class.
      *
-     * @param  string  $table
-     * @param  string  $column
-     * @return \Illuminate\Validation\Rules\Exists
+     * @param  string $name
+     * @return string
      */
-    public static function exists($table, $column = 'NULL')
+    protected static function getRuleClass($name)
     {
-        return new Rules\Exists($table, $column);
+        return 'Illuminate\Validation\Rules\\'.Str::studly($name);
     }
 
     /**
-     * Get an in constraint builder instance.
+     * Handle magic static calls.
      *
-     * @param  array  $values
-     * @return \Illuminate\Validation\Rules\In
+     * @param  string $method
+     * @param  mixed $args
+     * @return mixed
      */
-    public static function in(array $values)
+    public static function __callStatic($method, $args)
     {
-        return new Rules\In($values);
-    }
+        if (self::hasMacro($method)) {
+            return self::macroCallStatic($method, $args);
+        }
 
-    /**
-     * Get a not_in constraint builder instance.
-     *
-     * @param  array  $values
-     * @return \Illuminate\Validation\Rules\NotIn
-     */
-    public static function notIn(array $values)
-    {
-        return new Rules\NotIn($values);
-    }
+        $class = self::getRuleClass($method);
 
-    /**
-     * Get a unique constraint builder instance.
-     *
-     * @param  string  $table
-     * @param  string  $column
-     * @return \Illuminate\Validation\Rules\Unique
-     */
-    public static function unique($table, $column = 'NULL')
-    {
-        return new Rules\Unique($table, $column);
+        if (! class_exists($class)) {
+            throw new InvalidArgumentException("Could not find rule '$method'");
+        }
+
+        return new $class(...$args);
     }
 }
