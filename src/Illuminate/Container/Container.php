@@ -776,18 +776,22 @@ class Container implements ArrayAccess, ContainerContract
             return new $concrete;
         }
 
-        $dependencies = $constructor->getParameters();
+        // If parameters is empty, reslove the dependency for constructor's
+        // parameters, otherwise pass parameters to constructor.
+        if (empty($parameters)) {
+            $reflectedParameters = $constructor->getParameters();
+            $instances = $this->getDependencies($reflectedParameters);
+        } else {
+            // If the parameters number is less than the constructor's
+            // required parameters number, then throw Exception.
+            $number = $constructor->getNumberOfRequiredParameters();
+            if (count($parameters) < $number) {
+                $message = "The parameters is not suited for {$concrete} construct.";
+                throw new BindingResolutionException($message);
+            }
 
-        // Once we have all the constructor's parameters we can create each of the
-        // dependency instances and then use the reflection instances to make a
-        // new instance of this class, injecting the created dependencies in.
-        $parameters = $this->keyParametersByArgument(
-            $dependencies, $parameters
-        );
-
-        $instances = $this->getDependencies(
-            $dependencies, $parameters
-        );
+            $instances = $parameters;
+        }
 
         array_pop($this->buildStack);
 
@@ -798,10 +802,9 @@ class Container implements ArrayAccess, ContainerContract
      * Resolve all of the dependencies from the ReflectionParameters.
      *
      * @param  array  $parameters
-     * @param  array  $primitives
      * @return array
      */
-    protected function getDependencies(array $parameters, array $primitives = [])
+    protected function getDependencies(array $parameters)
     {
         $dependencies = [];
 
@@ -811,9 +814,7 @@ class Container implements ArrayAccess, ContainerContract
             // If the class is null, it means the dependency is a string or some other
             // primitive type which we can not resolve since it is not a class and
             // we will just bomb out with an error since we have no-where to go.
-            if (array_key_exists($parameter->name, $primitives)) {
-                $dependencies[] = $primitives[$parameter->name];
-            } elseif (is_null($dependency)) {
+            if (is_null($dependency)) {
                 $dependencies[] = $this->resolveNonClass($parameter);
             } else {
                 $dependencies[] = $this->resolveClass($parameter);
@@ -874,26 +875,6 @@ class Container implements ArrayAccess, ContainerContract
 
             throw $e;
         }
-    }
-
-    /**
-     * If extra parameters are passed by numeric ID, rekey them by argument name.
-     *
-     * @param  array  $dependencies
-     * @param  array  $parameters
-     * @return array
-     */
-    protected function keyParametersByArgument(array $dependencies, array $parameters)
-    {
-        foreach ($parameters as $key => $value) {
-            if (is_numeric($key)) {
-                unset($parameters[$key]);
-
-                $parameters[$dependencies[$key]->name] = $value;
-            }
-        }
-
-        return $parameters;
     }
 
     /**

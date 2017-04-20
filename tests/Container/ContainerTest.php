@@ -371,14 +371,20 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
     public function testPassingSomePrimitiveParameters()
     {
         $container = new Container;
-        $value = $container->make('ContainerMixedPrimitiveStub', ['first' => 'taylor', 'last' => 'otwell']);
+        $stub = $container->make('ContainerConcreteStub');
+        $parameters = ['taylor', $stub, 'otwell'];
+        $value = $container->make('ContainerMixedPrimitiveStub', $parameters);
+
         $this->assertInstanceOf('ContainerMixedPrimitiveStub', $value);
         $this->assertEquals('taylor', $value->first);
         $this->assertEquals('otwell', $value->last);
         $this->assertInstanceOf('ContainerConcreteStub', $value->stub);
 
         $container = new Container;
-        $value = $container->make('ContainerMixedPrimitiveStub', [0 => 'taylor', 2 => 'otwell']);
+        $stub = $container->make('ContainerConcreteStub');
+        $parameters = ['taylor', $stub, 'otwell'];
+        $value = $container->make('ContainerMixedPrimitiveStub', $parameters);
+
         $this->assertInstanceOf('ContainerMixedPrimitiveStub', $value);
         $this->assertEquals('taylor', $value->first);
         $this->assertEquals('otwell', $value->last);
