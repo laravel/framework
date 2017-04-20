@@ -795,13 +795,21 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
     /**
      * Push an item onto the end of the collection.
+     * only not null values will be pushed if $nullable is false.
      *
      * @param  mixed  $value
+     * @param  bool  $nullable
      * @return $this
      */
-    public function push($value)
+    public function push($value, $nullable = true)
     {
-        $this->offsetSet(null, $value);
+        if (! $nullable) {
+            if (! is_null($value)) {
+                $this->offsetSet(null, $value);
+            }
+        } else {
+            $this->offsetSet(null, $value);
+        }
 
         return $this;
     }
