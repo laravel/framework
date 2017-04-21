@@ -179,6 +179,19 @@ if (! function_exists('base_path')) {
     }
 }
 
+if (! function_exists('routes_path')) {
+    /**
+     * Get the path to the routes folder.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    function routes_path($path = '')
+    {
+        return app('path.routes').($path ? DIRECTORY_SEPARATOR.$path : $path);
+    }
+}
+
 if (! function_exists('bcrypt')) {
     /**
      * Hash the given value.
