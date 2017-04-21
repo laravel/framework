@@ -1,22 +1,24 @@
-<?php
+@if(! empty($greeting)) {
+    {{ $greeting }}
+@else
+    {{ $level == 'error' ? 'Whoops!' : 'Hello!' }}
+@endif
 
-if (! empty($greeting)) {
-    echo $greeting, "\n\n";
-} else {
-    echo $level == 'error' ? 'Whoops!' : 'Hello!', "\n\n";
-}
 
-if (! empty($introLines)) {
-    echo implode("\n", $introLines), "\n\n";
-}
+@if(! empty($introLines)) {
+    {{ implode("\n", $introLines) }}
+@endif
 
-if (isset($actionText)) {
-    echo "{$actionText}: {$actionUrl}", "\n\n";
-}
 
-if (! empty($outroLines)) {
-    echo implode("\n", $outroLines), "\n\n";
-}
+@if(isset($actionText)) {
+    {{ $actionText }}: {{ $actionUrl }}
+@endif
 
-echo 'Regards,', "\n";
-echo config('app.name'), "\n";
+
+@if(! empty($outroLines)) {
+    {{ implode("\n", $outroLines) }}
+@endif
+
+
+Regards,
+{{ config('app.name') }}
