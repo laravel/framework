@@ -51,4 +51,12 @@ interface Dispatcher
      * @return $this
      */
     public function pipeThrough(array $pipes);
+
+    /**
+     * Set the pipes through which commands should always be piped before dispatching.
+     *
+     * @param  array  $alwaysPipes
+     * @return $this
+     */
+    public function alwaysPipeThrough(array $alwaysPipes);
 }

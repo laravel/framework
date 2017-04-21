@@ -42,6 +42,13 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
     protected $pipes = [];
 
     /**
+     * The pipes to always send commands through before dispatching.
+     *
+     * @var array
+     */
+    protected $alwaysPipes = [];
+
+    /**
      * The queue resolver callback.
      *
      * @var \Closure|null
@@ -61,6 +68,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
      * @var \Closure
      */
     protected $mapper;
+
 
     /**
      * Create a new command dispatcher instance.
@@ -187,21 +195,23 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
      */
     public function dispatchNow($command, Closure $afterResolving = null)
     {
-        return $this->pipeline->send($command)->through($this->pipes)->then(function ($command) use ($afterResolving) {
-            if ($command instanceof SelfHandling) {
-                return $this->container->call([$command, 'handle']);
-            }
+        return $this->pipeline->send($command)->through(array_merge($this->pipes, $this->alwaysPipes))
+            ->then(function ($command) use ($afterResolving) {
 
-            $handler = $this->resolveHandler($command);
+                if ($command instanceof SelfHandling) {
+                    return $this->container->call([$command, 'handle']);
+                }
 
-            if ($afterResolving) {
-                call_user_func($afterResolving, $handler);
-            }
+                $handler = $this->resolveHandler($command);
 
-            return call_user_func(
-                [$handler, $this->getHandlerMethod($command)], $command
-            );
-        });
+                if ($afterResolving) {
+                    call_user_func($afterResolving, $handler);
+                }
+
+                return call_user_func(
+                    [$handler, $this->getHandlerMethod($command)], $command
+                );
+            });
     }
 
     /**
@@ -403,6 +413,19 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
     public function pipeThrough(array $pipes)
     {
         $this->pipes = $pipes;
+
+        return $this;
+    }
+
+    /**
+     * Set the pipes through which commands should always be piped before dispatching.
+     *
+     * @param  array  $alwaysPipes
+     * @return $this
+     */
+    public function alwaysPipeThrough(array $alwaysPipes)
+    {
+        $this->alwaysPipes = $alwaysPipes;
 
         return $this;
     }
