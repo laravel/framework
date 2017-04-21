@@ -60,6 +60,12 @@ abstract class ServiceProvider
         $this->app['config']->set($key, $config);
     }
 
+    /**
+     * Merge recursive of the config
+     * @param  $config
+     * @param  $newConfig
+     * @param  bool  $override
+     */
     protected function mergeConfigRecursiveFrom(&$config, $newConfig, $override = false)
     {
         foreach ($newConfig as $newKey => $newValue) {
