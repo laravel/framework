@@ -103,6 +103,22 @@ class FormRequest extends Request implements ValidatesWhenResolved
     }
 
     /**
+     * Get a subset containing keys from the validation rules with values.
+     *
+     * @return array
+     */
+    public function onlyRulesValues()
+    {
+        $rules = $this->rules();
+
+        if (! empty($rules)) {
+            return $this->only(array_keys($rules));
+        }
+
+        return [];
+    }
+
+    /**
      * Handle a failed validation attempt.
      *
      * @param  \Illuminate\Contracts\Validation\Validator  $validator
