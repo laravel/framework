@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Queue;
 
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Config\Repository;
 use Illuminate\Queue\QueueManager;
 
 class QueueManagerTest extends TestCase
@@ -15,11 +16,13 @@ class QueueManagerTest extends TestCase
 
     public function testDefaultConnectionCanBeResolved()
     {
+        $config = new Repository([
+            'queue.default' => 'sync',
+            'queue.connections.sync' => ['driver' => 'sync'],
+        ]);
+
         $app = [
-            'config' => [
-                'queue.default' => 'sync',
-                'queue.connections.sync' => ['driver' => 'sync'],
-            ],
+            'config' => $config,
             'encrypter' => $encrypter = m::mock('Illuminate\Contracts\Encryption\Encrypter'),
         ];
 
@@ -27,6 +30,7 @@ class QueueManagerTest extends TestCase
         $connector = m::mock('StdClass');
         $queue = m::mock('StdClass');
         $queue->shouldReceive('setConnectionName')->once()->with('sync')->andReturnSelf();
+        $queue->shouldReceive('setQueuePrefix')->once()->with('')->andReturnSelf();
         $connector->shouldReceive('connect')->once()->with(['driver' => 'sync'])->andReturn($queue);
         $manager->addConnector('sync', function () use ($connector) {
             return $connector;
@@ -38,11 +42,13 @@ class QueueManagerTest extends TestCase
 
     public function testOtherConnectionCanBeResolved()
     {
+        $config = new Repository([
+            'queue.default' => 'sync',
+            'queue.connections.foo' => ['driver' => 'bar'],
+        ]);
+
         $app = [
-            'config' => [
-                'queue.default' => 'sync',
-                'queue.connections.foo' => ['driver' => 'bar'],
-            ],
+            'config' => $config,
             'encrypter' => $encrypter = m::mock('Illuminate\Contracts\Encryption\Encrypter'),
         ];
 
@@ -50,6 +56,7 @@ class QueueManagerTest extends TestCase
         $connector = m::mock('StdClass');
         $queue = m::mock('StdClass');
         $queue->shouldReceive('setConnectionName')->once()->with('foo')->andReturnSelf();
+        $queue->shouldReceive('setQueuePrefix')->once()->with('')->andReturnSelf();
         $connector->shouldReceive('connect')->once()->with(['driver' => 'bar'])->andReturn($queue);
         $manager->addConnector('bar', function () use ($connector) {
             return $connector;
@@ -61,10 +68,12 @@ class QueueManagerTest extends TestCase
 
     public function testNullConnectionCanBeResolved()
     {
+        $config = new Repository([
+            'queue.default' => 'null',
+        ]);
+
         $app = [
-            'config' => [
-                'queue.default' => 'null',
-            ],
+            'config' => $config,
             'encrypter' => $encrypter = m::mock('Illuminate\Contracts\Encryption\Encrypter'),
         ];
 
@@ -72,6 +81,7 @@ class QueueManagerTest extends TestCase
         $connector = m::mock('StdClass');
         $queue = m::mock('StdClass');
         $queue->shouldReceive('setConnectionName')->once()->with('null')->andReturnSelf();
+        $queue->shouldReceive('setQueuePrefix')->once()->with('')->andReturnSelf();
         $connector->shouldReceive('connect')->once()->with(['driver' => 'null'])->andReturn($queue);
         $manager->addConnector('null', function () use ($connector) {
             return $connector;

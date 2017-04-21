@@ -30,6 +30,13 @@ abstract class Queue
     protected $connectionName;
 
     /**
+     * The queue prefix.
+     *
+     * @var string
+     */
+    protected $queuePrefix;
+
+    /**
      * Push a new job onto the queue.
      *
      * @param  string  $queue
@@ -187,5 +194,28 @@ abstract class Queue
     public function setContainer(Container $container)
     {
         $this->container = $container;
+    }
+
+    /**
+     * Set the queue prefix.
+     *
+     * @param  string  $prefix
+     * @return $this
+     */
+    public function setQueuePrefix($prefix = null)
+    {
+        $this->queuePrefix = $prefix;
+
+        return $this;
+    }
+
+    /**
+     * Get the queue prefix.
+     *
+     * @return string
+     */
+    public function getQueuePrefix()
+    {
+        return $this->queuePrefix;
     }
 }
