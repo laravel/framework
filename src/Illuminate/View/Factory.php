@@ -313,6 +313,16 @@ class Factory implements FactoryContract
     }
 
     /**
+     * Bind view engine alias with a given extension.
+     * @param $extension
+     * @param $engineAlias
+     */
+    public function bindEngine($extension, $engineAlias)
+    {
+        $this->extensions[$extension] = $engineAlias;
+    }
+
+    /**
      * Add a piece of shared data to the environment.
      *
      * @param  array|string  $key
