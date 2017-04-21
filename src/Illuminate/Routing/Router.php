@@ -316,12 +316,16 @@ class Router implements RegistrarContract
     /**
      * Create a route group with shared attributes.
      *
-     * @param  array  $attributes
+     * @param  array|string  $attributes
      * @param  \Closure  $callback
      * @return void
      */
-    public function group(array $attributes, Closure $callback)
+    public function group($attributes, Closure $callback)
     {
+        if (is_string($attributes)) {
+            $attributes = ['prefix' => $attributes];
+        }
+
         $this->updateGroupStack($attributes);
 
         // Once we have updated the group stack, we will execute the user Closure and
