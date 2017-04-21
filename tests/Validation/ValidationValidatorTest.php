@@ -432,7 +432,7 @@ class ValidationValidatorTest extends TestCase
         $v->addExtension('alliteration', function ($attribute, $value, $parameters, $validator) {
             $other = array_get($validator->getData(), $parameters[0]);
 
-            return $value{0} == $other{0};
+            return $value[0] == $other[0];
         });
         $v->addReplacer('alliteration', function ($message, $attribute, $rule, $parameters, $validator) {
             return str_replace(':other', $validator->getDisplayableAttribute($parameters[0]), $message);
@@ -449,7 +449,7 @@ class ValidationValidatorTest extends TestCase
         $v->addExtension('alliteration', function ($attribute, $value, $parameters, $validator) {
             $other = array_get($validator->getData(), $parameters[0]);
 
-            return $value{0} == $other{0};
+            return $value[0] == $other[0];
         });
         $v->addReplacer('alliteration', function ($message, $attribute, $rule, $parameters, $validator) {
             return str_replace(':other', $validator->getDisplayableAttribute($parameters[0]), $message);
