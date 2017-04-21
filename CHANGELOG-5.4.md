@@ -6,6 +6,7 @@
 - Added higher order tap ([3abc4fb](https://github.com/laravel/framework/commit/3abc4fb90fe59a90c2d8cccd27e310b20e5e2631))
 - Added `FactoryBuilder::lazy()` method ([#18823](https://github.com/laravel/framework/pull/18823))
 - Support Redis Sentinel configuration ([#18850](https://github.com/laravel/framework/pull/18850))
+- Added queue prefix option ([#18860](https://github.com/laravel/framework/pull/18860))
 
 ### Changed
 - Return `PendingDispatch` for `Kernel::queue()` ([51647eb](https://github.com/laravel/framework/commit/51647eb701307e7682f7489b605a146e750abf0f))
