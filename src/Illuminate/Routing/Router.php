@@ -276,7 +276,7 @@ class Router implements RegistrarContract
      *
      * @param  string  $name
      * @param  string  $controller
-     * @param  array  $options
+     * 
      * @return void
      */
     public function resource($name, $controller, array $options = [])
@@ -292,25 +292,31 @@ class Router implements RegistrarContract
 
     /**
      * Register the typical authentication routes for an application.
-     *
+     * @param  array  $options
      * @return void
      */
-    public function auth()
+    public function auth(Array $options=['login', 'register', 'password'])
     {
         // Authentication Routes...
-        $this->get('login', 'Auth\LoginController@showLoginForm')->name('login');
-        $this->post('login', 'Auth\LoginController@login');
-        $this->post('logout', 'Auth\LoginController@logout')->name('logout');
+        if(in_array('login', $options)){
+            $this->get('login', 'Auth\LoginController@showLoginForm')->name('login');
+            $this->post('login', 'Auth\LoginController@login');
+            $this->post('logout', 'Auth\LoginController@logout')->name('logout');  
+        }
 
         // Registration Routes...
-        $this->get('register', 'Auth\RegisterController@showRegistrationForm')->name('register');
-        $this->post('register', 'Auth\RegisterController@register');
+        if(in_array('register', $options)){
+            $this->get('register', 'Auth\RegisterController@showRegistrationForm')->name('register');
+            $this->post('register', 'Auth\RegisterController@register');
+        }
 
         // Password Reset Routes...
-        $this->get('password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm');
-        $this->post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail');
-        $this->get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm');
-        $this->post('password/reset', 'Auth\ResetPasswordController@reset');
+        if(in_array('password', $options)){
+            $this->get('password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm');
+            $this->post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail');
+            $this->get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm');
+            $this->post('password/reset', 'Auth\ResetPasswordController@reset');
+        }
     }
 
     /**
