@@ -2,7 +2,7 @@
 
 namespace DummyNamespace;
 
-use DummyRootNamespaceCommands\Command;
+use Illuminate\Bus\Command;
 use Illuminate\Contracts\Bus\SelfHandling;
 
 class DummyClass extends Command implements SelfHandling

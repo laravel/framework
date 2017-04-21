@@ -2,7 +2,7 @@
 
 namespace DummyNamespace;
 
-use DummyRootNamespaceCommands\Command;
+use Illuminate\Bus\Command;
 
 class DummyClass extends Command
 {
