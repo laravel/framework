@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use Illuminate\Console\Application as Artisan;
+use Illuminate\Database\Eloquent\Factory as EloquentFactory;
 
 abstract class ServiceProvider
 {
@@ -113,6 +114,17 @@ abstract class ServiceProvider
                 $migrator->path($path);
             }
         });
+    }
+
+    /**
+     * Register factories.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    protected function registerEloquentFactoriesFrom($path)
+    {
+        $this->app->make(EloquentFactory::class)->load($path);
     }
 
     /**
