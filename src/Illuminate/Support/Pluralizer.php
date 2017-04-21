@@ -33,6 +33,7 @@ class Pluralizer
         'metadata',
         'money',
         'moose',
+        'music',
         'nutrition',
         'offspring',
         'plankton',
@@ -45,7 +46,9 @@ class Pluralizer
         'species',
         'swine',
         'traffic',
+        'travel',
         'wheat',
+        'wine',
     ];
 
     /**
