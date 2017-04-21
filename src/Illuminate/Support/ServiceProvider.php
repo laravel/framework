@@ -52,13 +52,24 @@ abstract class ServiceProvider
      * @param  string  $key
      * @return void
      */
-    protected function mergeConfigFrom($path, $key)
+    protected function mergeConfigFrom($path, $key, $override=false)
     {
         $config = $this->app['config']->get($key, []);
-
-        $this->app['config']->set($key, array_merge(require $path, $config));
+        $newConfig = require $path;
+        $this->mergeConfigRecursiveFrom($config, $newConfig, $override);
+        $this->app['config']->set($key, $config);
     }
 
+    protected function mergeConfigRecursiveFrom(&$config, $newConfig, $override = false)
+    {
+        foreach ($newConfig as $newKey => $newValue) {
+            if (is_array($newValue) && key_exists($newKey, $config)) {
+                $this->mergeConfigRecursiveFrom($config[$newKey], $newValue);
+            } else {
+                $config[$newKey] = $newValue;
+            }
+        }
+    }
     /**
      * Load the given routes file if routes are not already cached.
      *
