@@ -272,11 +272,27 @@ trait InteractsWithPages
         }
 
         self::assertThat(
-            $this->crawler() ?: $this->response->getContent(),
+            $this->crawler() ?: $this->getResponseDOMDocument(),
             $constraint, $message
         );
 
         return $this;
+    }
+
+    /**
+     * Return response content wrapped in DOMDocument.
+     *
+     * @return DOMDocument
+     */
+    protected function getResponseDOMDocument()
+    {
+        $dom = new \DOMDocument;
+        $html = $this->response->getContent();
+        $encoding = $this->response->getEncoding();
+        $html = mb_convert_encoding($html, 'HTML-ENTITIES', $encoding);
+        @$dom->loadHTML($html);
+
+        return $dom;
     }
 
     /**

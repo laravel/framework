@@ -36,14 +36,51 @@ class FoundationInteractsWithPagesTest extends PHPUnit_Framework_TestCase
 
     public function testSeeThroughResponse()
     {
+        $this->setUpResponse('<p>The PHP Framework For Web Artisans</p>');
+        $this->see('Web Artisans');
+    }
+
+    public function testSeeThroughResponseWithNonEnglishCharacters()
+    {
+        $this->setUpResponse('<p>馬鹿は死ななきゃ治らない</p>');
+        $this->see('馬鹿');
+    }
+
+    public function testSeeTextThroughResponseWithNonEnglishCharacters()
+    {
+        $this->setUpResponse('<p>馬鹿は死ななきゃ治らない</p>');
+        $this->seeText('馬鹿');
+    }
+
+    public function testSeeInElementThroughResponseWithInvalidHtml()
+    {
+        $this->setUpResponse('<p>AT&T</p>');
+        $this->seeInElement('p', 'AT');
+    }
+
+    public function testSeeInElementThroughResponseWithNonEnglishCharacters()
+    {
+        $this->setUpResponse('<p>馬鹿は死ななきゃ治らない</p>');
+        $this->seeInElement('p', '馬鹿');
+    }
+
+    public function testSeeInFieldThroughResponseWithNonEnglishCharacters()
+    {
+        $this->setUpResponse('<input name="proverb" value="馬鹿は死ななきゃ治らない">');
+        $this->seeInField('proverb', '馬鹿は死ななきゃ治らない');
+    }
+
+    public function setUpResponse($response)
+    {
         $this->crawler = null;
 
         $this->response = m::mock(Response::class);
         $this->response->shouldReceive('getContent')
             ->once()
-            ->andReturn('<p>The PHP Framework For Web Artisans</p>');
-
-        $this->see('Web Artisans');
+            ->andReturn($response);
+        $this->response->shouldReceive('getEncoding')
+            ->once()
+            ->andReturn('UTF-8');
     }
 
     public function testSeeWithSpecialCharacters()

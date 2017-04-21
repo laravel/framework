@@ -17,7 +17,7 @@ abstract class PageConstraint extends PHPUnit_Framework_Constraint
      */
     protected function html($crawler)
     {
-        return is_object($crawler) ? $crawler->html() : $crawler;
+        return is_object($crawler) ? $this->crawler($crawler)->html() : $crawler;
     }
 
     /**
@@ -28,7 +28,7 @@ abstract class PageConstraint extends PHPUnit_Framework_Constraint
      */
     protected function text($crawler)
     {
-        return is_object($crawler) ? $crawler->text() : strip_tags($crawler);
+        return is_object($crawler) ? $this->crawler($crawler)->text() : strip_tags($crawler);
     }
 
     /**
@@ -39,7 +39,10 @@ abstract class PageConstraint extends PHPUnit_Framework_Constraint
      */
     protected function crawler($crawler)
     {
-        return is_object($crawler) ? $crawler : new Crawler($crawler);
+        return is_object($crawler)
+        && ! $crawler instanceof \DOMDocument
+            ? $crawler
+            : new Crawler($crawler);
     }
 
     /**
