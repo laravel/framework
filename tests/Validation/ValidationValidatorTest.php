@@ -422,6 +422,48 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals('type must be included in Short, Long.', $v->messages()->first('type'));
     }
 
+    public function testDisplayableAttributesAreReplacedInCustomReplacers()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.alliteration' => ':attribute needs to begin with the same letter as :other'], 'en');
+        $trans->addLines(['validation.attributes.firstname' => 'Firstname'], 'en');
+        $trans->addLines(['validation.attributes.lastname' => 'Lastname'], 'en');
+        $v = new Validator($trans, ['firstname' => 'Bob', 'lastname' => 'Smith'], ['lastname' => 'alliteration:firstname']);
+        $v->addExtension('alliteration', function ($attribute, $value, $parameters, $validator) {
+            $other = array_get($validator->getData(), $parameters[0]);
+
+            return $value{0} == $other{0};
+        });
+        $v->addReplacer('alliteration', function ($message, $attribute, $rule, $parameters, $validator) {
+            return str_replace(':other', $validator->getDisplayableAttribute($parameters[0]), $message);
+        });
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertEquals('Lastname needs to begin with the same letter as Firstname', $v->messages()->first('lastname'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.alliteration' => ':attribute needs to begin with the same letter as :other'], 'en');
+        $customAttributes = ['firstname' => 'Firstname', 'lastname' => 'Lastname'];
+        $v = new Validator($trans, ['firstname' => 'Bob', 'lastname' => 'Smith'], ['lastname' => 'alliteration:firstname']);
+        $v->addCustomAttributes($customAttributes);
+        $v->addExtension('alliteration', function ($attribute, $value, $parameters, $validator) {
+            $other = array_get($validator->getData(), $parameters[0]);
+
+            return $value{0} == $other{0};
+        });
+        $v->addReplacer('alliteration', function ($message, $attribute, $rule, $parameters, $validator) {
+            return str_replace(':other', $validator->getDisplayableAttribute($parameters[0]), $message);
+        });
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertEquals('Lastname needs to begin with the same letter as Firstname', $v->messages()->first('lastname'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.alliteration' => ':attribute needs to begin with the same letter as :other'], 'en');
+        $customAttributes = ['firstname' => 'Firstname', 'lastname' => 'Lastname'];
+        $v = new Validator($trans, ['firstname' => 'Bob', 'lastname' => 'Smith'], ['lastname' => 'alliteration:firstname']);
+    }
+
     public function testCustomValidationLinesAreRespected()
     {
         $trans = $this->getIlluminateArrayTranslator();
