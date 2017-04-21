@@ -1137,6 +1137,7 @@ class Builder
             // an empty Closure with the loader so that we can treat all the same.
             if (is_numeric($name)) {
                 if (Str::contains($constraints, ':')) {
+                    $constraints = preg_replace('/\s+/', '', $constraints);
                     list($constraints, $columns) = explode(':', $constraints);
 
                     $f = function ($q) use ($columns) {
