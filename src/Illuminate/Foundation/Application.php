@@ -307,6 +307,16 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     }
 
     /**
+     * Get the path to the routes directory.
+     *
+     * @return string
+     */
+    public function routesPath()
+    {
+        return $this->basePath.DIRECTORY_SEPARATOR.'routes';
+    }
+
+    /**
      * Get the path to the bootstrap directory.
      *
      * @return string
