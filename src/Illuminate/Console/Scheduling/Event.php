@@ -374,6 +374,18 @@ class Event
      * @param  int  $second
      * @return $this
      */
+    public function twiceDailyAt($first = 1, $second = 13)
+    {
+        return $this->twiceDaily($first, $second);
+    }
+
+    /**
+     * Schedule the event to run twice daily.
+     *
+     * @param  int  $first
+     * @param  int  $second
+     * @return $this
+     */
     public function twiceDaily($first = 1, $second = 13)
     {
         $hours = $first.','.$second;
