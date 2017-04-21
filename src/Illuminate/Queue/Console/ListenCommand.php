@@ -83,7 +83,7 @@ class ListenCommand extends Command
             "queue.connections.{$connection}.queue", 'default'
         );
 
-        return $this->laravel['config']->get('queue.prefix', null).$queue;
+        return $this->laravel['config']->get('queue.prefix').$queue;
     }
 
     /**

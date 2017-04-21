@@ -186,18 +186,7 @@ abstract class Queue
     }
 
     /**
-     * Set the IoC container instance.
-     *
-     * @param  \Illuminate\Container\Container  $container
-     * @return void
-     */
-    public function setContainer(Container $container)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * Set the queue prefix.
+     * Set the queue name prefix.
      *
      * @param  string  $prefix
      * @return $this
@@ -210,12 +199,23 @@ abstract class Queue
     }
 
     /**
-     * Get the queue prefix.
+     * Get the queue name prefix.
      *
      * @return string
      */
     public function getQueuePrefix()
     {
         return $this->queuePrefix;
+    }
+
+    /**
+     * Set the IoC container instance.
+     *
+     * @param  \Illuminate\Container\Container  $container
+     * @return void
+     */
+    public function setContainer(Container $container)
+    {
+        $this->container = $container;
     }
 }
