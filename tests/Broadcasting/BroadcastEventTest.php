@@ -46,7 +46,6 @@ class TestBroadcastEvent
     public $firstName = 'Taylor';
     public $lastName = 'Otwell';
     public $collection;
-    private $title = 'Developer';
 
     public function __construct()
     {
