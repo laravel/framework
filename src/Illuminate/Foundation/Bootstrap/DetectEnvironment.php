@@ -34,7 +34,7 @@ class DetectEnvironment
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
-    protected function checkForSpecificEnvironmentFile($app)
+    protected function checkForSpecificEnvironmentFile(Application $app)
     {
         if (php_sapi_name() == 'cli') {
             $input = new ArgvInput;
@@ -64,7 +64,7 @@ class DetectEnvironment
      * @param  string  $file
      * @return void
      */
-    protected function loadEnvironmentFile($app, $file)
+    protected function loadEnvironmentFile(Application $app, $file)
     {
         if (file_exists($app->environmentPath().'/'.$file)) {
             $app->loadEnvironmentFrom($file);
