@@ -42,6 +42,13 @@ interface PasswordBroker
     const INVALID_TOKEN = 'passwords.token';
 
     /**
+     * Constant representing an expired token.
+     *
+     * @var string
+     */
+    const EXPIRED_TOKEN = 'passwords.expired';
+
+    /**
      * Send a password reset link to a user.
      *
      * @param  array  $credentials

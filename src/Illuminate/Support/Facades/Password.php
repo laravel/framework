@@ -43,6 +43,13 @@ class Password extends Facade
     const INVALID_TOKEN = 'passwords.token';
 
     /**
+     * Constant representing an expired token.
+     *
+     * @var string
+     */
+    const EXPIRED_TOKEN = 'passwords.expired';
+
+    /**
      * Get the registered name of the component.
      *
      * @return string
