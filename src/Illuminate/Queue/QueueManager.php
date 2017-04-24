@@ -152,7 +152,8 @@ class QueueManager implements FactoryContract, MonitorContract
 
         return $this->getConnector($config['driver'])
                         ->connect($config)
-                        ->setConnectionName($name);
+                        ->setConnectionName($name)
+                        ->setQueuePrefix($this->getQueuePrefix());
     }
 
     /**
@@ -241,6 +242,16 @@ class QueueManager implements FactoryContract, MonitorContract
     public function getName($connection = null)
     {
         return $connection ?: $this->getDefaultDriver();
+    }
+
+    /**
+     * Get the queue name prefix.
+     *
+     * @return string
+     */
+    public function getQueuePrefix()
+    {
+        return $this->app['config']->get('queue.prefix');
     }
 
     /**

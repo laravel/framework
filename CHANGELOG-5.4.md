@@ -1,5 +1,25 @@
 # Release Notes for 5.4.x
 
+## [Unreleased]
+
+### Added
+- Added higher order tap ([3abc4fb](https://github.com/laravel/framework/commit/3abc4fb90fe59a90c2d8cccd27e310b20e5e2631))
+- Added `FactoryBuilder::lazy()` method ([#18823](https://github.com/laravel/framework/pull/18823))
+- Support Redis Sentinel configuration ([#18850](https://github.com/laravel/framework/pull/18850))
+- Added queue prefix option ([#18860](https://github.com/laravel/framework/pull/18860))
+
+### Changed
+- Return `PendingDispatch` for `Kernel::queue()` ([51647eb](https://github.com/laravel/framework/commit/51647eb701307e7682f7489b605a146e750abf0f))
+- Made `RedisManager::resolve()` public ([#18830](https://github.com/laravel/framework/pull/18830), [eb9b99d](https://github.com/laravel/framework/commit/eb9b99dfe80ca266bf675e8aaa3fdfdf6c4a69f3))
+- Changed email body color to match wrapper color ([#18824](https://github.com/laravel/framework/pull/18824))
+- Break and hyphenate long words in emails ([#18827](https://github.com/laravel/framework/pull/18827))
+
+### Fixed
+- Set connection on model factory ([#18846](https://github.com/laravel/framework/pull/18846), [95a0663](https://github.com/laravel/framework/commit/95a06638633359965961a11ab05967d32351cfdf))
+- Fixed route parameter binding for routes with leading slashes ([#18855](https://github.com/laravel/framework/pull/18855))
+- Don't call `cleanParameterBag()` twice during JSON request ([#18840](https://github.com/laravel/framework/pull/18840))
+
+
 ## v5.4.19 (2017-04-16)
 
 ### Added

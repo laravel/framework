@@ -255,7 +255,7 @@ class RedisQueue extends Queue implements QueueContract
      */
     public function getQueue($queue)
     {
-        return 'queues:'.($queue ?: $this->default);
+        return 'queues:'.$this->getQueuePrefix().($queue ?: $this->default);
     }
 
     /**
