@@ -483,6 +483,20 @@ if (! function_exists('event')) {
     }
 }
 
+if (! function_exists('listen')) {
+    /**
+     * Register an event listener.
+     *
+     * @param  string|array  $events
+     * @param  mixed  $listener
+     * @return void
+     */
+    function listen(...$args)
+    {
+        app('events')->listen(...$args);
+    }
+}
+
 if (! function_exists('factory')) {
     /**
      * Create a model factory builder for a given class, name, and amount.
