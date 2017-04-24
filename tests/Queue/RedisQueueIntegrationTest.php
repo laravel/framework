@@ -333,6 +333,33 @@ class RedisQueueIntegrationTest extends TestCase
     }
 
     /**
+     * @dataProvider redisDriverProvider
+     *
+     * @param string $driver
+     */
+    public function testReservedJobNotMigratedIfTimeoutOfJobNotReached($driver)
+    {
+        $this->queue = new RedisQueue($this->redis[$driver], 'default', null, 0.5);
+        $this->queue->setContainer(m::mock(Container::class));
+
+        $jobs = [
+            new RedisQueueIntegrationTestWithTimeout(0, 300),
+            new RedisQueueIntegrationTestJob(1, 0.5),
+        ];
+
+        $this->queue->push($jobs[0]);
+        $this->queue->push($jobs[1]);
+
+        $this->assertEquals($jobs[0], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
+        sleep(1);
+        $this->assertEquals($jobs[1], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
+        $this->assertNull($this->queue->pop());
+
+        $this->assertEquals(0, $this->redis[$driver]->connection()->zcard('queues:default:delayed'));
+        $this->assertEquals(2, $this->redis[$driver]->connection()->zcard('queues:default:reserved'));
+    }
+
+    /**
      * @param string $driver
      */
     private function setQueue($driver)
@@ -353,5 +380,16 @@ class RedisQueueIntegrationTestJob
 
     public function handle()
     {
+    }
+}
+
+class RedisQueueIntegrationTestWithTimeout extends RedisQueueIntegrationTestJob
+{
+    public $timeout;
+
+    public function __construct($i, $timeout)
+    {
+        $this->timeout = $timeout;
+        parent::__construct($i);
     }
 }
