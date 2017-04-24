@@ -44,18 +44,18 @@ if(job ~= false) then
     -- Increment the attempt count and place job on the reserved queue...
     reserved = cjson.decode(job)    
     reserved['attempts'] = reserved['attempts'] + 1
+
     
      -- Retrieve the timeout of the job if set, per documentation it has precedence
      -- on the one of the queue
-    if(reserved['timeout'] ~= nil) then
-        timeout = tonumber(reserved['timeout'])
+    local timeoutJob = tonumber(reserved['timeout']);
+    if(timeoutJob ~= nil) then
+        timeout =  timeoutJob
     end
     
-    if(timeout == nil) then
-       timeout = 0
+    if(timeout ~= nil) then
+       score = score + timeout    
     end
-    
-    score = score + timeout
     
     reserved = cjson.encode(reserved)
     redis.call('zadd', KEYS[2], score, reserved)
