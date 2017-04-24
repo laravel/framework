@@ -84,16 +84,14 @@ class JsonResponse extends BaseJsonResponse
         return $this->setData($this->getData());
     }
 
-
-
     /**
      * Checks if error happened during json_encode.
      *
      * @param  int  $jsonLastError
-     * @return boolean
+     * @return bool
      */
     protected function hasJsonError($jsonLastError)
     {
-        return ($jsonLastError !== JSON_ERROR_NONE && ($jsonLastError !== JSON_ERROR_UNSUPPORTED_TYPE || !($this->encodingOptions & JSON_PARTIAL_OUTPUT_ON_ERROR)));
+        return $jsonLastError !== JSON_ERROR_NONE && ($jsonLastError !== JSON_ERROR_UNSUPPORTED_TYPE || ! ($this->encodingOptions & JSON_PARTIAL_OUTPUT_ON_ERROR));
     }
 }
