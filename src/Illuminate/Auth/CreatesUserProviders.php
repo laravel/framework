@@ -27,9 +27,8 @@ trait CreatesUserProviders
         $provider = $provider ?: $this->getDefaultUserProvider();
 
         $config = $this->app['config']['auth.providers.'.$provider];
-        $driver = Arr::get($config, 'driver');
 
-        if (isset($this->customProviderCreators[$driver])) {
+        if (isset($this->customProviderCreators[$driver = Arr::get($config, 'driver')])) {
             return call_user_func(
                 $this->customProviderCreators[$driver], $this->app, $config
             );
@@ -43,16 +42,6 @@ trait CreatesUserProviders
             default:
                 throw new InvalidArgumentException("Authentication user provider [{$driver}] is not defined.");
         }
-    }
-
-    /**
-     * Get the default user provider name.
-     *
-     * @return string
-     */
-    public function getDefaultUserProvider()
-    {
-        return $this->app['config']['auth.defaults.provider'];
     }
 
     /**
@@ -77,5 +66,15 @@ trait CreatesUserProviders
     protected function createEloquentProvider($config)
     {
         return new EloquentUserProvider($this->app['hash'], $config['model']);
+    }
+
+    /**
+     * Get the default user provider name.
+     *
+     * @return string
+     */
+    public function getDefaultUserProvider()
+    {
+        return $this->app['config']['auth.defaults.provider'];
     }
 }
