@@ -67,7 +67,7 @@ class JsonResponse extends BaseJsonResponse
             $this->data = json_encode($data, $this->encodingOptions);
         }
 
-        if (JSON_ERROR_NONE !== json_last_error()) {
+        if ($this->hasJsonError(json_last_error())) {
             throw new InvalidArgumentException(json_last_error_msg());
         }
 
@@ -82,5 +82,29 @@ class JsonResponse extends BaseJsonResponse
         $this->encodingOptions = (int) $options;
 
         return $this->setData($this->getData());
+    }
+
+    /**
+     * Checks the JSON encoding option is set.
+     *
+     * @param  int  $option
+     * @return bool
+     */
+    public function isEncodingOptionSet($option)
+    {
+        return (bool) ($this->encodingOptions & $option);
+    }
+
+    /**
+     * Checks if error happened during json_encode.
+     *
+     * @param  int  $jsonError
+     * @return bool
+     */
+    protected function hasJsonError($jsonError)
+    {
+        return $jsonError !== JSON_ERROR_NONE &&
+                ($jsonError !== JSON_ERROR_UNSUPPORTED_TYPE ||
+                ! $this->isEncodingOptionSet(JSON_PARTIAL_OUTPUT_ON_ERROR));
     }
 }
