@@ -1192,7 +1192,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function resolveRouteKey($keytoresolve)
     {
         return $keytoresolve;
-    } 
+    }
 
     /**
      * Get the route key for the model.
