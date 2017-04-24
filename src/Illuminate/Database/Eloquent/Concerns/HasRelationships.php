@@ -192,7 +192,7 @@ trait HasRelationships
      */
     public static function getActualClassNameForMorph($class)
     {
-        return Arr::get(Relation::morphMap(), $class, $class);
+        return Arr::get(Relation::morphMap() ?: [], $class, $class);
     }
 
     /**
