@@ -47,9 +47,12 @@ if(job ~= false) then
     
      -- Retrieve the timeout of the job if set, per documentation it has precedence
      -- on the one of the queue
-    local timeoutJob = tonumber(reserved['timeout'])
-    if(timeoutJob ~= nil) then
-        timeout = timeoutJob;
+    if(reserved['timeout'] ~= nil) then
+        timeout = tonumber(reserved['timeout'])
+    end
+    
+    if(timeout == nil) then
+       timeout = 0
     end
     
     score = score + timeout
