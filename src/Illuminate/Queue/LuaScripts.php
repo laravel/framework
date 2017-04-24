@@ -35,13 +35,21 @@ LUA;
 -- Pop the first job off of the queue...
 local job = redis.call('lpop', KEYS[1])
 local reserved = false
+local timeout = ARGV[2]
 
 if(job ~= false) then
     -- Increment the attempt count and place job on the reserved queue...
-    reserved = cjson.decode(job)
+    reserved = cjson.decode(job)    
     reserved['attempts'] = reserved['attempts'] + 1
+    
+     -- Retrieve the timeout of the job if set, per documentation it has precedence
+     -- on the one of the queue
+    if(reserved['timeout'] ~= nil) then
+        timeout = reserved['timeout']
+    end
+    
     reserved = cjson.encode(reserved)
-    redis.call('zadd', KEYS[2], ARGV[1], reserved)
+    redis.call('zadd', KEYS[2], ARGV[1] + timeout , reserved)
 end
 
 return {job, reserved}
