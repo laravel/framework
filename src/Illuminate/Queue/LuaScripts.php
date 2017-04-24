@@ -48,8 +48,10 @@ if(job ~= false) then
         timeout = reserved['timeout']
     end
     
+    local score = tonumber(ARGV[1]) + tonumber(timeout)
+    
     reserved = cjson.encode(reserved)
-    redis.call('zadd', KEYS[2], ARGV[1] + timeout , reserved)
+    redis.call('zadd', KEYS[2], score, reserved)
 end
 
 return {job, reserved}
