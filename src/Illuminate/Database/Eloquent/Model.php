@@ -1186,7 +1186,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Resolve route key value for retrieving a record.
      *
-     * @param $keytoresolve Record identifier to resolve
+     * @param mixed $keytoresolve Record identifier to resolve
      * @return mixed ID Resolved record identifier
      */
     public function resolveRouteKey($keytoresolve)
