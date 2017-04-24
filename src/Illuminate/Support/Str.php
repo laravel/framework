@@ -458,8 +458,8 @@ class Str
      * Returns the portion of string between the first start and the last end strings.
      *
      * @param string $value
-     * @param string $start
-     * @param string $end
+     * @param string|null $start
+     * @param string|null $end
      * @return string
      */
     public static function between($value, $start = null, $end = null)
