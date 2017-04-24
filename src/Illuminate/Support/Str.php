@@ -455,6 +455,29 @@ class Str
     }
 
     /**
+     * Returns the portion of string between the first start and the last end strings.
+     *
+     * @param string $value
+     * @param string $start
+     * @param string $end
+     * @return string
+     */
+    public static function between($value, $start = null, $end = null)
+    {
+        if ($start) {
+            $position = strpos($value, $start);
+            $length = is_int($position) ? $position + strlen($start) : strlen($value);
+            $value = substr_replace($value, '', 0, $length);
+        }
+
+        if ($end) {
+            $value = substr_replace($value, '', strrpos($value, $end));
+        }
+
+        return $value;
+    }
+
+    /**
      * Make a string's first character uppercase.
      *
      * @param  string  $string
