@@ -35,7 +35,8 @@ LUA;
 -- Pop the first job off of the queue...
 local job = redis.call('lpop', KEYS[1])
 local reserved = false
-local timeout = ARGV[2]
+local timeout  = tonumber(ARGV[2])
+local score    = tonumber(ARGV[1])
 
 if(job ~= false) then
     -- Increment the attempt count and place job on the reserved queue...
@@ -44,11 +45,12 @@ if(job ~= false) then
     
      -- Retrieve the timeout of the job if set, per documentation it has precedence
      -- on the one of the queue
-    if(reserved['timeout'] ~= nil) then
-        timeout = reserved['timeout']
+    local timeoutJob = tonumber(reserved['timeout'])
+    if(timeoutJob ~= nil) then
+        timeout = timeoutJob;
     end
     
-    local score = tonumber(ARGV[1]) + tonumber(timeout)
+    score = score + timeout
     
     reserved = cjson.encode(reserved)
     redis.call('zadd', KEYS[2], score, reserved)
