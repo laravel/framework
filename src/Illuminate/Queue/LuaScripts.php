@@ -25,7 +25,9 @@ LUA;
      *
      * KEYS[1] - The queue to pop jobs from, for example: queues:foo
      * KEYS[2] - The queue to place reserved jobs on, for example: queues:foo:reserved
-     * ARGV[1] - The time at which the reserved job will expire
+     * ARGV[1] - Current time
+     * ARGV[2] - Default timeout. USed with ARGV[1] to calculate when the job should have finished.
+     *
      *
      * @return string
      */
