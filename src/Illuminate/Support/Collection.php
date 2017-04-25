@@ -85,6 +85,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Gets whether any item in the collection matches the callback
+     *
+     * @param  callable|null $callback
+     * @return bool
+     */
+    public function any(callable $callback = null)
+    {
+        return $this->filter($callback)->count() > 0;
+    }
+
+    /**
      * Get the average value of a given key.
      *
      * @param  callable|string|null  $callback
