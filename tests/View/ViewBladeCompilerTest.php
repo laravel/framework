@@ -541,7 +541,7 @@ empty
     public function testRawTagsCanBeSetToLegacyValues()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $compiler->setEchoFormat('%s');
+        $compiler->setContentTagsEscaped(false);
 
         $this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{{ $name }}}'));
         $this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{ $name }}'));

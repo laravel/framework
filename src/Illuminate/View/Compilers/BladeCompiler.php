@@ -64,11 +64,11 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected $escapedTags = ['{{{', '}}}'];
 
     /**
-     * The "regular" / legacy echo string format.
+     * Switch to track escape setting for contentTags.
      *
-     * @var string
+     * @var bool
      */
-    protected $echoFormat = 'e(%s)';
+    protected $contentTagsEscaped = true;
 
     /**
      * Array of footer lines to be added to template.
@@ -310,7 +310,11 @@ class BladeCompiler extends Compiler implements CompilerInterface
         $callback = function ($matches) {
             $whitespace = empty($matches[3]) ? '' : $matches[3].$matches[3];
 
-            $wrapped = sprintf($this->echoFormat, $this->compileEchoDefaults($matches[2]));
+            if ($this->contentTagsEscaped) {
+                $wrapped = sprintf('e(%s)', $this->compileEchoDefaults($matches[2]));
+            } else {
+                $wrapped = sprintf('%s', $this->compileEchoDefaults($matches[2]));
+            }
 
             return $matches[1] ? substr($matches[0], 1) : '<?php echo '.$wrapped.'; ?>'.$whitespace;
         };
@@ -824,11 +828,11 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * @param  bool    $escaped
      * @return void
      */
-    public function setContentTags($openTag, $closeTag, $escaped = false)
+    public function setContentTags($openTag, $closeTag, $escaped = true)
     {
-        $property = ($escaped === true) ? 'escapedTags' : 'contentTags';
+        $this->setContentTagsEscaped($escaped);
 
-        $this->{$property} = [preg_quote($openTag), preg_quote($closeTag)];
+        $this->contentTags = [preg_quote($openTag), preg_quote($closeTag)];
     }
 
     /**
@@ -840,7 +844,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     public function setEscapedContentTags($openTag, $closeTag)
     {
-        $this->setContentTags($openTag, $closeTag, true);
+        $this->escapedTags = array(preg_quote($openTag), preg_quote($closeTag));
     }
 
     /**
@@ -877,13 +881,13 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
-     * Set the echo format to be used by the compiler.
+     * Enable/Disable escape setting for contentTags.
      *
-     * @param  string  $format
+     * @param  bool  $escaped
      * @return void
      */
-    public function setEchoFormat($format)
+    public function setContentTagsEscaped($escaped = true) 
     {
-        $this->echoFormat = $format;
+        $this->contentTagsEscaped = $escaped;
     }
 }
