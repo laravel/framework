@@ -15,7 +15,7 @@ class PresetCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'preset { type : The preset type (fresh, bootstrap, react) }';
+    protected $signature = 'preset { type : The preset type (none, bootstrap, vue, react) }';
 
     /**
      * The console command description.
