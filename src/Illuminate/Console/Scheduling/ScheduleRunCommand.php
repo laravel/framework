@@ -44,12 +44,16 @@ class ScheduleRunCommand extends Command
      * Execute the console command.
      *
      * @return void
+     *
+     * @throws \Symfony\Component\Process\Exception\LogicException
+     * @throws \Symfony\Component\Process\Exception\RuntimeException
      */
     public function fire()
     {
         $eventsRan = false;
 
         foreach ($this->schedule->dueEvents($this->laravel) as $event) {
+            /** @var Event $event */
             if (! $event->filtersPass($this->laravel)) {
                 continue;
             }

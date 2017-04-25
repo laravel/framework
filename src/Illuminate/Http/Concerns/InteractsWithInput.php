@@ -56,6 +56,8 @@ trait InteractsWithInput
         if (Str::startsWith($header, 'Bearer ')) {
             return Str::substr($header, 7);
         }
+
+        return null;
     }
 
     /**

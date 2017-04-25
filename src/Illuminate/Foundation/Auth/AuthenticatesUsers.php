@@ -102,7 +102,7 @@ trait AuthenticatesUsers
 
         return $this->authenticated($request, $this->guard()->user())
                 ?: redirect()->intended($this->redirectPath());
-    }
+    }/** @noinspection PhpInconsistentReturnPointsInspection */
 
     /**
      * The user has been authenticated.

@@ -33,6 +33,9 @@ class PusherBroadcaster extends Broadcaster
      *
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \ReflectionException
      */
     public function auth($request)
     {
@@ -89,6 +92,8 @@ class PusherBroadcaster extends Broadcaster
      * @param  string  $event
      * @param  array  $payload
      * @return void
+     *
+     * @throws \Illuminate\Broadcasting\BroadcastException
      */
     public function broadcast(array $channels, $event, array $payload = [])
     {
@@ -98,8 +103,7 @@ class PusherBroadcaster extends Broadcaster
             $this->formatChannels($channels), $event, $payload, $socket, true
         );
 
-        if ((is_array($response) && $response['status'] >= 200 && $response['status'] <= 299)
-            || $response === true) {
+        if ($response === true || (is_array($response) && $response['status'] >= 200 && $response['status'] <= 299)) {
             return;
         }
 

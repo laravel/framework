@@ -75,7 +75,7 @@ class DatabaseStore implements Store
         // time on the system and see if the record has expired. If it has, we will
         // remove the records from the database table so it isn't returned again.
         if (is_null($cache)) {
-            return;
+            return null;
         }
 
         $cache = is_array($cache) ? (object) $cache : $cache;
@@ -86,7 +86,7 @@ class DatabaseStore implements Store
         if (Carbon::now()->getTimestamp() >= $cache->expiration) {
             $this->forget($key);
 
-            return;
+            return null;
         }
 
         return $this->encrypter->decrypt($cache->value);
@@ -124,6 +124,8 @@ class DatabaseStore implements Store
      * @param  string  $key
      * @param  mixed   $value
      * @return int|bool
+     *
+     * @throws \Throwable
      */
     public function increment($key, $value = 1)
     {
@@ -138,6 +140,8 @@ class DatabaseStore implements Store
      * @param  string  $key
      * @param  mixed   $value
      * @return int|bool
+     *
+     * @throws \Throwable
      */
     public function decrement($key, $value = 1)
     {
@@ -153,6 +157,8 @@ class DatabaseStore implements Store
      * @param  mixed  $value
      * @param  \Closure  $callback
      * @return int|bool
+     *
+     * @throws \Throwable
      */
     protected function incrementOrDecrement($key, $value, Closure $callback)
     {

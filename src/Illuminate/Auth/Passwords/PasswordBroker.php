@@ -51,6 +51,8 @@ class PasswordBroker implements PasswordBrokerContract
      *
      * @param  array  $credentials
      * @return string
+     *
+     * @throws \UnexpectedValueException
      */
     public function sendResetLink(array $credentials)
     {
@@ -79,6 +81,8 @@ class PasswordBroker implements PasswordBrokerContract
      * @param  array  $credentials
      * @param  \Closure  $callback
      * @return mixed
+     *
+     * @throws \UnexpectedValueException
      */
     public function reset(array $credentials, Closure $callback)
     {
@@ -107,7 +111,9 @@ class PasswordBroker implements PasswordBrokerContract
      * Validate a password reset for the given credentials.
      *
      * @param  array  $credentials
-     * @return \Illuminate\Contracts\Auth\CanResetPassword
+     * @return \Illuminate\Contracts\Auth\CanResetPassword|string
+     *
+     * @throws \UnexpectedValueException
      */
     protected function validateReset(array $credentials)
     {
@@ -145,15 +151,15 @@ class PasswordBroker implements PasswordBrokerContract
      */
     public function validateNewPassword(array $credentials)
     {
-        if (isset($this->passwordValidator)) {
+        if (is_callable($this->passwordValidator)) {
             list($password, $confirm) = [
                 $credentials['password'],
                 $credentials['password_confirmation'],
             ];
 
-            return call_user_func(
+            return $password === $confirm && call_user_func(
                 $this->passwordValidator, $credentials
-            ) && $password === $confirm;
+            );
         }
 
         return $this->validatePasswordWithDefaults($credentials);

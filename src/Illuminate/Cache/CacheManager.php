@@ -48,6 +48,8 @@ class CacheManager implements FactoryContract
      *
      * @param  string|null  $name
      * @return mixed
+     *
+     * @throws \InvalidArgumentException
      */
     public function store($name = null)
     {
@@ -61,6 +63,8 @@ class CacheManager implements FactoryContract
      *
      * @param  string  $driver
      * @return mixed
+     *
+     * @throws \InvalidArgumentException
      */
     public function driver($driver = null)
     {
@@ -72,6 +76,8 @@ class CacheManager implements FactoryContract
      *
      * @param  string  $name
      * @return \Illuminate\Contracts\Cache\Repository
+     *
+     * @throws \InvalidArgumentException
      */
     protected function get($name)
     {
@@ -96,15 +102,15 @@ class CacheManager implements FactoryContract
 
         if (isset($this->customCreators[$config['driver']])) {
             return $this->callCustomCreator($config);
-        } else {
-            $driverMethod = 'create'.ucfirst($config['driver']).'Driver';
-
-            if (method_exists($this, $driverMethod)) {
-                return $this->{$driverMethod}($config);
-            } else {
-                throw new InvalidArgumentException("Driver [{$config['driver']}] is not supported.");
-            }
         }
+
+        $driverMethod = 'create'.ucfirst($config['driver']).'Driver';
+
+        if (method_exists($this, $driverMethod)) {
+            return $this->{$driverMethod}($config);
+        }
+
+        throw new InvalidArgumentException("Driver [{$config['driver']}] is not supported.");
     }
 
     /**
@@ -122,7 +128,7 @@ class CacheManager implements FactoryContract
      * Create an instance of the APC cache driver.
      *
      * @param  array  $config
-     * @return \Illuminate\Cache\ApcStore
+     * @return \Illuminate\Cache\ApcStore|\Illuminate\Cache\Repository
      */
     protected function createApcDriver(array $config)
     {
@@ -134,7 +140,7 @@ class CacheManager implements FactoryContract
     /**
      * Create an instance of the array cache driver.
      *
-     * @return \Illuminate\Cache\ArrayStore
+     * @return \Illuminate\Cache\ArrayStore|\Illuminate\Cache\Repository
      */
     protected function createArrayDriver()
     {
@@ -145,7 +151,7 @@ class CacheManager implements FactoryContract
      * Create an instance of the file cache driver.
      *
      * @param  array  $config
-     * @return \Illuminate\Cache\FileStore
+     * @return \Illuminate\Cache\FileStore|\Illuminate\Cache\Repository
      */
     protected function createFileDriver(array $config)
     {
@@ -156,7 +162,7 @@ class CacheManager implements FactoryContract
      * Create an instance of the Memcached cache driver.
      *
      * @param  array  $config
-     * @return \Illuminate\Cache\MemcachedStore
+     * @return \Illuminate\Cache\MemcachedStore|\Illuminate\Cache\Repository
      */
     protected function createMemcachedDriver(array $config)
     {
@@ -175,7 +181,7 @@ class CacheManager implements FactoryContract
     /**
      * Create an instance of the Null cache driver.
      *
-     * @return \Illuminate\Cache\NullStore
+     * @return \Illuminate\Cache\NullStore|\Illuminate\Cache\Repository
      */
     protected function createNullDriver()
     {
@@ -186,7 +192,7 @@ class CacheManager implements FactoryContract
      * Create an instance of the Redis cache driver.
      *
      * @param  array  $config
-     * @return \Illuminate\Cache\RedisStore
+     * @return \Illuminate\Cache\RedisStore|\Illuminate\Cache\Repository
      */
     protected function createRedisDriver(array $config)
     {
@@ -201,7 +207,7 @@ class CacheManager implements FactoryContract
      * Create an instance of the database cache driver.
      *
      * @param  array  $config
-     * @return \Illuminate\Cache\DatabaseStore
+     * @return \Illuminate\Cache\DatabaseStore|\Illuminate\Cache\Repository
      */
     protected function createDatabaseDriver(array $config)
     {
@@ -296,6 +302,8 @@ class CacheManager implements FactoryContract
      * @param  string  $method
      * @param  array   $parameters
      * @return mixed
+     *
+     * @throws \InvalidArgumentException
      */
     public function __call($method, $parameters)
     {

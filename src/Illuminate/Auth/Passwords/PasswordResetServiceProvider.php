@@ -35,6 +35,7 @@ class PasswordResetServiceProvider extends ServiceProvider
         });
 
         $this->app->bind('auth.password.broker', function ($app) {
+            /** @var $app \Illuminate\Contracts\Container\Container */
             return $app->make('auth.password')->broker();
         });
     }

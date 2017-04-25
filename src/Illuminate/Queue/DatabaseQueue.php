@@ -102,10 +102,12 @@ class DatabaseQueue extends Queue implements QueueContract
      * @param  mixed   $data
      * @param  string  $queue
      * @return void
+     *
+     * @throws \Illuminate\Queue\InvalidPayloadException
      */
     public function later($delay, $job, $data = '', $queue = null)
     {
-        return $this->pushToDatabase($queue, $this->createPayload($job, $data), $delay);
+        $this->pushToDatabase($queue, $this->createPayload($job, $data), $delay);
     }
 
     /**
@@ -115,6 +117,8 @@ class DatabaseQueue extends Queue implements QueueContract
      * @param  mixed   $data
      * @param  string  $queue
      * @return mixed
+     *
+     * @throws \Illuminate\Queue\InvalidPayloadException
      */
     public function bulk($jobs, $data = '', $queue = null)
     {
@@ -184,6 +188,8 @@ class DatabaseQueue extends Queue implements QueueContract
      *
      * @param  string  $queue
      * @return \Illuminate\Contracts\Queue\Job|null
+     *
+     * @throws \Exception
      */
     public function pop($queue = null)
     {
@@ -196,6 +202,8 @@ class DatabaseQueue extends Queue implements QueueContract
         }
 
         $this->database->commit();
+
+        return null;
     }
 
     /**

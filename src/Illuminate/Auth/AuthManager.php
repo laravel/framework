@@ -60,6 +60,8 @@ class AuthManager implements FactoryContract
      *
      * @param  string  $name
      * @return \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard
+     *
+     * @throws \InvalidArgumentException
      */
     public function guard($name = null)
     {
@@ -117,6 +119,8 @@ class AuthManager implements FactoryContract
      * @param  string  $name
      * @param  array  $config
      * @return \Illuminate\Auth\SessionGuard
+     *
+     * @throws \InvalidArgumentException
      */
     public function createSessionDriver($name, $config)
     {
@@ -148,6 +152,8 @@ class AuthManager implements FactoryContract
      * @param  string  $name
      * @param  array  $config
      * @return \Illuminate\Auth\TokenGuard
+     *
+     * @throws \InvalidArgumentException
      */
     public function createTokenDriver($name, $config)
     {
@@ -288,6 +294,8 @@ class AuthManager implements FactoryContract
      * @param  string  $method
      * @param  array  $parameters
      * @return mixed
+     *
+     * @throws \InvalidArgumentException
      */
     public function __call($method, $parameters)
     {

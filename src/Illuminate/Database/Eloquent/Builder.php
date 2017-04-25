@@ -411,13 +411,15 @@ class Builder
      * Get a single column's value from the first result of a query.
      *
      * @param  string  $column
-     * @return mixed
+     * @return mixed|null
      */
     public function value($column)
     {
         if ($result = $this->first([$column])) {
             return $result->{$column};
         }
+
+        return null;
     }
 
     /**
@@ -1204,14 +1206,14 @@ class Builder
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
+     * @return mixed|null
      */
     public function __call($method, $parameters)
     {
         if ($method === 'macro') {
             $this->localMacros[$parameters[0]] = $parameters[1];
 
-            return;
+            return null;
         }
 
         if (isset($this->localMacros[$method])) {
@@ -1246,7 +1248,7 @@ class Builder
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
+     * @return mixed|null
      *
      * @throws \BadMethodCallException
      */
@@ -1255,7 +1257,7 @@ class Builder
         if ($method === 'macro') {
             static::$macros[$parameters[0]] = $parameters[1];
 
-            return;
+            return null;
         }
 
         if (! isset(static::$macros[$method])) {

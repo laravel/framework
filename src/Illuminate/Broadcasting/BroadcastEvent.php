@@ -5,7 +5,6 @@ namespace Illuminate\Broadcasting;
 use ReflectionClass;
 use ReflectionProperty;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
@@ -37,6 +36,8 @@ class BroadcastEvent implements ShouldQueue
      *
      * @param  \Illuminate\Contracts\Broadcasting\Broadcaster  $broadcaster
      * @return void
+     *
+     * @throws \ReflectionException
      */
     public function handle(Broadcaster $broadcaster)
     {
@@ -54,6 +55,8 @@ class BroadcastEvent implements ShouldQueue
      *
      * @param  mixed  $event
      * @return array
+     *
+     * @throws \ReflectionException
      */
     protected function getPayloadFromEvent($event)
     {

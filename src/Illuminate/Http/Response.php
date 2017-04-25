@@ -17,6 +17,8 @@ class Response extends BaseResponse
      *
      * @param  mixed  $content
      * @return $this
+     *
+     * @throws \UnexpectedValueException
      */
     public function setContent($content)
     {

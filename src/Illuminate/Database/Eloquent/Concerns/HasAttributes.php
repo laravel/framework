@@ -295,7 +295,7 @@ trait HasAttributes
     public function getAttribute($key)
     {
         if (! $key) {
-            return;
+            return null;
         }
 
         // If the attribute exists in the attribute array or has a "get" mutator we will
@@ -310,7 +310,7 @@ trait HasAttributes
         // since we do not want to treat any of those methods are relationships since
         // they are all intended as helper methods and none of these are relations.
         if (method_exists(self::class, $key)) {
-            return;
+            return null;
         }
 
         return $this->getRelationValue($key);
@@ -343,8 +343,7 @@ trait HasAttributes
         // If the attribute is listed as a date, we will convert it to a DateTime
         // instance on retrieval, which makes it quite convenient to work with
         // date fields without having to create a mutator for each property.
-        if (in_array($key, $this->getDates()) &&
-            ! is_null($value)) {
+        if (! is_null($value) && in_array($key, $this->getDates())) {
             return $this->asDateTime($value);
         }
 
@@ -355,13 +354,15 @@ trait HasAttributes
      * Get an attribute from the $attributes array.
      *
      * @param  string  $key
-     * @return mixed
+     * @return mixed|null
      */
     protected function getAttributeFromArray($key)
     {
         if (isset($this->attributes[$key])) {
             return $this->attributes[$key];
         }
+
+        return null;
     }
 
     /**
@@ -369,6 +370,8 @@ trait HasAttributes
      *
      * @param  string  $key
      * @return mixed
+     *
+     * @throws \LogicException
      */
     public function getRelationValue($key)
     {
@@ -385,6 +388,8 @@ trait HasAttributes
         if (method_exists($this, $key)) {
             return $this->getRelationshipFromMethod($key);
         }
+
+        return null;
     }
 
     /**

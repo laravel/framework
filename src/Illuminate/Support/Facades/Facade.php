@@ -101,6 +101,8 @@ abstract class Facade
         if ($root = static::getFacadeRoot()) {
             return get_class($root);
         }
+
+        return null;
     }
 
     /**

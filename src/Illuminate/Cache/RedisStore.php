@@ -173,7 +173,7 @@ class RedisStore extends TaggableStore implements Store
      */
     public function forget($key)
     {
-        return (bool) $this->connection()->del($this->prefix.$key);
+        return (bool) $this->connection()->del([$this->prefix.$key]);
     }
 
     /**

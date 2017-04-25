@@ -46,6 +46,9 @@ abstract class GeneratorCommand extends Command
      * Execute the console command.
      *
      * @return bool|null
+     *
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     * @throws \RuntimeException
      */
     public function fire()
     {
@@ -70,6 +73,8 @@ abstract class GeneratorCommand extends Command
         $this->files->put($path, $this->buildClass($name));
 
         $this->info($this->type.' created successfully.');
+
+        return null;
     }
 
     /**
@@ -77,6 +82,8 @@ abstract class GeneratorCommand extends Command
      *
      * @param  string  $name
      * @return string
+     *
+     * @throws \RuntimeException
      */
     protected function qualifyClass($name)
     {
@@ -109,6 +116,8 @@ abstract class GeneratorCommand extends Command
      *
      * @param  string  $rawName
      * @return bool
+     *
+     * @throws \RuntimeException
      */
     protected function alreadyExists($rawName)
     {
@@ -120,6 +129,8 @@ abstract class GeneratorCommand extends Command
      *
      * @param  string  $name
      * @return string
+     *
+     * @throws \RuntimeException
      */
     protected function getPath($name)
     {
@@ -148,6 +159,8 @@ abstract class GeneratorCommand extends Command
      *
      * @param  string  $name
      * @return string
+     *
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     protected function buildClass($name)
     {
@@ -213,6 +226,8 @@ abstract class GeneratorCommand extends Command
      * Get the root namespace for the class.
      *
      * @return string
+     *
+     * @throws \RuntimeException
      */
     protected function rootNamespace()
     {

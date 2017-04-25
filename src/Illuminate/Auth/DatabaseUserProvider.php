@@ -128,6 +128,8 @@ class DatabaseUserProvider implements UserProvider
         if (! is_null($user)) {
             return new GenericUser((array) $user);
         }
+
+        return null;
     }
 
     /**

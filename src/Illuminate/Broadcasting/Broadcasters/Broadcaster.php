@@ -47,6 +47,9 @@ abstract class Broadcaster implements BroadcasterContract
      * @param  \Illuminate\Http\Request  $request
      * @param  string  $channel
      * @return mixed
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \ReflectionException
      */
     protected function verifyUserCanAccessChannel($request, $channel)
     {
@@ -72,6 +75,9 @@ abstract class Broadcaster implements BroadcasterContract
      * @param  string  $channel
      * @param  callable  $callback
      * @return array
+     *
+     * @throws \ReflectionException
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
     protected function extractAuthParameters($pattern, $channel, $callback)
     {
@@ -105,6 +111,8 @@ abstract class Broadcaster implements BroadcasterContract
      * @param  string  $value
      * @param  array  $callbackParameters
      * @return mixed
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
     protected function resolveBinding($key, $value, $callbackParameters)
     {
@@ -140,6 +148,8 @@ abstract class Broadcaster implements BroadcasterContract
      * @param  mixed  $value
      * @param  array  $callbackParameters
      * @return mixed
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
     protected function resolveImplicitBindingIfPossible($key, $value, $callbackParameters)
     {
@@ -148,6 +158,7 @@ abstract class Broadcaster implements BroadcasterContract
                 continue;
             }
 
+            /** @var \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Builder $model */
             $model = $parameter->getClass()->newInstance();
 
             return $model->where($model->getRouteKeyName(), $value)->firstOr(function () {

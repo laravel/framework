@@ -38,6 +38,8 @@ class PasswordBrokerManager implements FactoryContract
      *
      * @param  string  $name
      * @return \Illuminate\Contracts\Auth\PasswordBroker
+     *
+     * @throws \InvalidArgumentException
      */
     public function broker($name = null)
     {
@@ -136,6 +138,8 @@ class PasswordBrokerManager implements FactoryContract
      * @param  string  $method
      * @param  array   $parameters
      * @return mixed
+     *
+     * @throws \InvalidArgumentException
      */
     public function __call($method, $parameters)
     {

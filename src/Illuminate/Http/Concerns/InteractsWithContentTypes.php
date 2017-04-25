@@ -116,6 +116,8 @@ trait InteractsWithContentTypes
                 }
             }
         }
+
+        return null;
     }
 
     /**

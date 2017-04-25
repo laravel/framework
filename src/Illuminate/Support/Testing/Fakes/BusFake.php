@@ -98,6 +98,8 @@ class BusFake implements Dispatcher
     public function dispatchNow($command, $handler = null)
     {
         $this->commands[get_class($command)][] = $command;
+
+        return null;
     }
 
     /**
@@ -108,6 +110,6 @@ class BusFake implements Dispatcher
      */
     public function pipeThrough(array $pipes)
     {
-        //
+        return $this;
     }
 }

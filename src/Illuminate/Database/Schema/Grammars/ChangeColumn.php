@@ -179,7 +179,7 @@ class ChangeColumn
         switch ($attribute) {
             case 'type':
             case 'name':
-                return;
+                return null;
             case 'nullable':
                 return 'notnull';
             case 'total':

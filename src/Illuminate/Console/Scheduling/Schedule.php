@@ -42,6 +42,8 @@ class Schedule
      * @param  string|callable  $callback
      * @param  array   $parameters
      * @return \Illuminate\Console\Scheduling\Event
+     *
+     * @throws \InvalidArgumentException
      */
     public function call($callback, array $parameters = [])
     {
@@ -75,6 +77,8 @@ class Schedule
      *
      * @param  object|string  $job
      * @return \Illuminate\Console\Scheduling\Event
+     *
+     * @throws \InvalidArgumentException
      */
     public function job($job)
     {
@@ -114,7 +118,7 @@ class Schedule
                 $value = collect($value)->map(function ($value) {
                     return ProcessUtils::escapeArgument($value);
                 })->implode(' ');
-            } elseif (! is_numeric($value) && ! preg_match('/^(-.$|--.*)/i', $value)) {
+            } elseif (! is_numeric($value) && ! preg_match('/^(-.$|--.*)/', $value)) {
                 $value = ProcessUtils::escapeArgument($value);
             }
 

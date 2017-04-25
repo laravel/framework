@@ -17,7 +17,7 @@ trait Dispatchable
     /**
      * Broadcast the event with the given arguments.
      *
-     * @return \Illuminate\Broadcasting\PendingBroadcast
+     * @return \Illuminate\Broadcasting\PendingBroadcast|null
      */
     public static function broadcast()
     {

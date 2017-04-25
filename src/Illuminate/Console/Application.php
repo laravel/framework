@@ -227,6 +227,8 @@ class Application extends SymfonyApplication implements ApplicationContract
      * Get the global environment option for the definition.
      *
      * @return \Symfony\Component\Console\Input\InputOption
+     *
+     * @throws \InvalidArgumentException
      */
     protected function getEnvironmentOption()
     {
@@ -238,7 +240,7 @@ class Application extends SymfonyApplication implements ApplicationContract
     /**
      * Get the Laravel application instance.
      *
-     * @return \Illuminate\Contracts\Foundation\Application
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Container\Container|\Illuminate\Foundation\Application
      */
     public function getLaravel()
     {

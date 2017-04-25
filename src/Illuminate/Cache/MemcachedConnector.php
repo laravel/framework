@@ -50,7 +50,7 @@ class MemcachedConnector
     {
         $memcached = $this->createMemcachedInstance($connectionId);
 
-        if (count($credentials) == 2) {
+        if (count($credentials) === 2) {
             $this->setCredentials($memcached, $credentials);
         }
 
@@ -93,6 +93,8 @@ class MemcachedConnector
      *
      * @param  \Memcached  $memcached
      * @return \Memcached
+     *
+     * @throws \RuntimeException
      */
     protected function validateConnection($memcached)
     {
