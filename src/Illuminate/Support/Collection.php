@@ -495,13 +495,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Remove an item from the collection by key.
+     * Remove items from the collection.
      *
-     * @param  string|array  $keys
+     * @param  string|array|callable  $keys
      * @return $this
      */
     public function forget($keys)
     {
+        if (! is_array($keys) && $this->useAsCallable($keys)) {
+            $keys = $this->filter($keys)->keys()->all();
+        }
+
         foreach ((array) $keys as $key) {
             $this->offsetUnset($key);
         }
