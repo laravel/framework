@@ -451,6 +451,7 @@ trait InteractsWithPivotTable
         if ($applyScope !== null) {
             $applyScope($query);
         }
+        
         return $query;
     }
 
