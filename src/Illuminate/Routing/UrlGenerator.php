@@ -615,12 +615,27 @@ class UrlGenerator implements UrlGeneratorContract
      * Set the forced root URL.
      *
      * @param  string  $root
-     * @return void
+     * @return $this
      */
     public function forceRootUrl($root)
     {
         $this->forcedRoot = rtrim($root, '/');
         $this->cachedRoot = null;
+
+        return $this;
+    }
+
+    /**
+     * Clear the forced root URL.
+     *
+     * @return $this
+     */
+    public function clearForceRootUrl($root)
+    {
+        $this->forcedRoot = null;
+        $this->cachedRoot = $this->request->root();
+
+        return $this;
     }
 
     /**
