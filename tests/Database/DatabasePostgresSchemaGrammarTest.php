@@ -546,6 +546,13 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "foo" macaddr not null', $statements[0]);
     }
 
+    public function testDropAllTablesEscapesTableNames()
+    {
+        $statement = $this->getGrammar()->compileDropAllTables(['alpha', 'beta', 'gamma']);
+
+        $this->assertEquals('drop table "alpha","beta","gamma" cascade', $statement);
+    }
+
     protected function getConnection()
     {
         return m::mock('Illuminate\Database\Connection');

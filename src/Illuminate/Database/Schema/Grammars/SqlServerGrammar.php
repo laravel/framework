@@ -149,6 +149,16 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile the SQL needed to drop all tables.
+     *
+     * @return string
+     */
+    public function compileDropAllTables()
+    {
+        return "EXEC sp_msforeachtable 'DROP TABLE ?'";
+    }
+
+    /**
      * Compile a drop column command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint

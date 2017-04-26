@@ -9,7 +9,6 @@ use ReflectionClass;
 use JsonSerializable;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Collection;
-use PHPUnit_Framework_Error_Notice;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 
@@ -228,15 +227,6 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals('bar', $c->offsetGet(1));
     }
 
-    /**
-     * @expectedException PHPUnit_Framework_Error_Notice
-     */
-    public function testArrayAccessOffsetGetOnNonExist()
-    {
-        $c = new Collection(['foo', 'bar']);
-        $c->offsetGet(1000);
-    }
-
     public function testArrayAccessOffsetSet()
     {
         $c = new Collection(['foo', 'foo']);
@@ -248,15 +238,12 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals('qux', $c[2]);
     }
 
-    /**
-     * @expectedException PHPUnit_Framework_Error_Notice
-     */
     public function testArrayAccessOffsetUnset()
     {
         $c = new Collection(['foo', 'bar']);
 
         $c->offsetUnset(1);
-        $c[1];
+        $this->assertFalse(isset($c[1]));
     }
 
     public function testForgetSingleKey()

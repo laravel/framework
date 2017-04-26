@@ -1311,7 +1311,7 @@ class Builder
         foreach ($groups as $group) {
             $this->groups = array_merge(
                 (array) $this->groups,
-                array_wrap($group)
+                Arr::wrap($group)
             );
         }
 
@@ -1954,7 +1954,7 @@ class Builder
      */
     public function count($columns = '*')
     {
-        return (int) $this->aggregate(__FUNCTION__, array_wrap($columns));
+        return (int) $this->aggregate(__FUNCTION__, Arr::wrap($columns));
     }
 
     /**

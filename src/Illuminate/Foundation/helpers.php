@@ -6,6 +6,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Foundation\Bus\PendingDispatch;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Contracts\View\Factory as ViewFactory;
@@ -368,11 +369,25 @@ if (! function_exists('dispatch')) {
      * Dispatch a job to its appropriate handler.
      *
      * @param  mixed  $job
-     * @return mixed
+     * @return \Illuminate\Foundation\Bus\PendingDispatch
      */
     function dispatch($job)
     {
-        return app(Dispatcher::class)->dispatch($job);
+        return new PendingDispatch($job);
+    }
+}
+
+if (! function_exists('dispatch_now')) {
+    /**
+     * Dispatch a command to its appropriate handler in the current process.
+     *
+     * @param  mixed  $job
+     * @param  mixed  $handler
+     * @return mixed
+     */
+    function dispatch_now($job, $handler = null)
+    {
+        return app(Dispatcher::class)->dispatchNow($job, $handler);
     }
 }
 
@@ -803,6 +818,38 @@ if (! function_exists('storage_path')) {
     function storage_path($path = '')
     {
         return app('path.storage').($path ? DIRECTORY_SEPARATOR.$path : $path);
+    }
+}
+
+if (! function_exists('throw_if')) {
+    /**
+     * Throw the given exception if the given boolean is true.
+     *
+     * @param  bool  $boolean
+     * @param  \Throwable  $exception
+     * @return void
+     */
+    function throw_if($boolean, $exception)
+    {
+        if ($boolean) {
+            throw $exception;
+        }
+    }
+}
+
+if (! function_exists('throw_unless')) {
+    /**
+     * Throw the given exception unless the given boolean is true.
+     *
+     * @param  bool  $boolean
+     * @param  \Throwable  $exception
+     * @return void
+     */
+    function throw_unless($boolean, $exception)
+    {
+        if (! $boolean) {
+            throw $exception;
+        }
     }
 }
 

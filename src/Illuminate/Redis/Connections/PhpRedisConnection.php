@@ -156,18 +156,16 @@ class PhpRedisConnection extends Connection
     }
 
     /**
-     * Proxy a call to the eval function of PhpRedis.
+     * Evaluate a script and retunr its result.
      *
-     * @param  array  $parameters
+     * @param  string  $script
+     * @param  int  $numberOfKeys
+     * @param  dynamic  $arguments
      * @return mixed
      */
-    protected function proxyToEval(array $parameters)
+    public function eval($script, $numberOfKeys, ...$arguments)
     {
-        return $this->command('eval', [
-            isset($parameters[0]) ? $parameters[0] : null,
-            array_slice($parameters, 2),
-            isset($parameters[1]) ? $parameters[1] : null,
-        ]);
+        return $this->client->eval($script, $arguments, $numberOfKeys);
     }
 
     /**
