@@ -19,7 +19,7 @@ class TransformsRequestTest extends \PHPUnit_Framework_TestCase
         });
     }
 
-    public function testAjaxTransform()
+    public function testAjaxLowerAgeAndAddBeer()
     {
         $middleware = new ManipulateInput();
         $request = new Request(['name' => 'Damian', 'beers' => 4,], [], [], [], [],
