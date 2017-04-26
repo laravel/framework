@@ -114,7 +114,7 @@ trait AuthorizesRequests
     }
 
     /**
-     * Get the list of resource methods which not wait for a parameter.
+     * Get the list of resource methods which do not have model parameters.
      *
      * @return array
      */
