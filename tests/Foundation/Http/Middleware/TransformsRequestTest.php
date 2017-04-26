@@ -11,7 +11,10 @@ class TransformsRequestTest extends \PHPUnit_Framework_TestCase
     {
         $middleware = new ManipulateInput();
         $request = new Request(
-            ['name' => 'Damian', 'beers' => 4,],
+            [
+                'name' => 'Damian',
+                'beers' => 4,
+            ],
             ['age' => 28]
         );
 
@@ -26,7 +29,10 @@ class TransformsRequestTest extends \PHPUnit_Framework_TestCase
     {
         $middleware = new ManipulateInput();
         $request = new Request(
-            ['name' => 'Damian', 'beers' => 4,],
+            [
+                'name' => 'Damian',
+                'beers' => 4,
+            ],
             [],
             [],
             [],
