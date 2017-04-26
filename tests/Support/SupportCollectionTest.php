@@ -1049,6 +1049,35 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['programming', 'basketball', 'music', 'powerlifting'], $data->all());
     }
 
+    public function testMapToGroups()
+    {
+        $data = new Collection([
+            ['id' => 1, 'name' => 'A'],
+            ['id' => 2, 'name' => 'B'],
+            ['id' => 3, 'name' => 'C'],
+            ['id' => 4, 'name' => 'B'],
+        ]);
+
+        $groups = $data->mapToGroups(function ($item, $key) {
+            return [$item['name'] => $item['id']];
+        });
+
+        $this->assertInstanceOf(Collection::class, $groups);
+        $this->assertEquals(['A' => [1], 'B' => [2, 4], 'C' => [3]], $groups->toArray());
+        $this->assertInstanceOf(Collection::class, $groups['A']);
+    }
+
+    public function testMapToGroupsWithNumericKeys()
+    {
+        $data = new Collection([1, 2, 3, 2, 1]);
+
+        $groups = $data->mapToGroups(function ($item, $key) {
+            return [$item => $key];
+        });
+
+        $this->assertEquals([1 => [0, 4], 2 => [1, 3], 3 => [2]], $groups->toArray());
+    }
+
     public function testMapWithKeys()
     {
         $data = new Collection([
