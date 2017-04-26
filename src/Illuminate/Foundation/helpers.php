@@ -574,7 +574,7 @@ if (! function_exists('mix')) {
         }
 
         if (file_exists(public_path($manifestDirectory.'/hot'))) {
-            return new HtmlString("http://localhost:8080{$path}");
+            return new HtmlString("//localhost:8080{$path}");
         }
 
         if (! $manifest) {
