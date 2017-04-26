@@ -54,9 +54,7 @@ class OptimizeCommand extends Command {
 		if ($this->option('psr'))
 		{
 			$this->composer->dumpAutoloads();
-		}
-		else
-		{
+		} else {
 			$this->composer->dumpOptimized();
 		}
 
@@ -69,9 +67,7 @@ class OptimizeCommand extends Command {
 			$this->info('Compiling views');
 
 			$this->compileViews();
-		}
-		else
-		{
+		} else {
 			$this->call('clear-compiled');
 		}
 	}
@@ -129,12 +125,9 @@ class OptimizeCommand extends Command {
 		{
 			foreach ($this->laravel['files']->allFiles($path) as $file)
 			{
-				try
-				{
+				try {
 					$engine = $this->laravel['view']->getEngineFromPath($file);
-				}
-				catch (\InvalidArgumentException $e)
-				{
+				} catch (\InvalidArgumentException $e) {
 					continue;
 				}
 
@@ -155,7 +148,6 @@ class OptimizeCommand extends Command {
 	{
 		return array(
 			array('force', null, InputOption::VALUE_NONE, 'Force the compiled class file to be written.'),
-
 			array('psr', null, InputOption::VALUE_NONE, 'Do not optimize Composer dump-autoload.'),
 		);
 	}
