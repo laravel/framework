@@ -10,7 +10,10 @@ class TransformsRequestTest extends \PHPUnit_Framework_TestCase
     public function testLowerAgeAndAddBeer()
     {
         $middleware = new ManipulateInput();
-        $request = new Request(['name' => 'Damian', 'beers' => 4,], ['age' => 28]);
+        $request = new Request(
+            ['name' => 'Damian', 'beers' => 4,],
+            ['age' => 28]
+        );
 
         $middleware->handle($request, function (Request $request) {
             $this->assertEquals('Damian', $request->get('name'));
@@ -22,8 +25,15 @@ class TransformsRequestTest extends \PHPUnit_Framework_TestCase
     public function testAjaxLowerAgeAndAddBeer()
     {
         $middleware = new ManipulateInput();
-        $request = new Request(['name' => 'Damian', 'beers' => 4,], [], [], [], [],
-            ['CONTENT_TYPE' => '/json'], json_encode(['age' => 28]));
+        $request = new Request(
+            ['name' => 'Damian', 'beers' => 4,],
+            [],
+            [],
+            [],
+            [],
+            ['CONTENT_TYPE' => '/json'],
+            json_encode(['age' => 28])
+        );
 
         $middleware->handle($request, function (Request $request) {
             $this->assertEquals('Damian', $request->input('name'));
