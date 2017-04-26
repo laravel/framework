@@ -575,6 +575,7 @@ if (! function_exists('mix')) {
 
         if (file_exists(public_path($manifestDirectory.'/hot'))) {
             $hotProtocol = request()->secure() ? 'https' : 'http';
+            
             return new HtmlString("{$hotProtocol}://localhost:8080{$path}");
         }
 
