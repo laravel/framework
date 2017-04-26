@@ -15,9 +15,10 @@ trait InteractsWithPivotTable
      *
      * @param  mixed  $ids
      * @param  bool   $touch
+     * @param  \Closure|null  $applyPivotScope
      * @return array
      */
-    public function toggle($ids, $touch = true)
+    public function toggle($ids, $touch = true, \Closure $applyPivotScope = null)
     {
         $changes = [
             'attached' => [], 'detached' => [],
@@ -29,7 +30,7 @@ trait InteractsWithPivotTable
         // checking which of the given ID/records is in the list of current records
         // and removing all of those rows from this "intermediate" joining table.
         $detach = array_values(array_intersect(
-            $this->newPivotQuery()->pluck($this->relatedKey)->all(),
+            $this->newScopedPivotQuery($applyPivotScope)->pluck($this->relatedKey)->all(),
             array_keys($records)
         ));
 
@@ -65,21 +66,23 @@ trait InteractsWithPivotTable
      * Sync the intermediate tables with a list of IDs without detaching.
      *
      * @param  \Illuminate\Database\Eloquent\Collection|array  $ids
+     * @param  \Closure|null  $applyPivotScope
      * @return array
      */
-    public function syncWithoutDetaching($ids)
+    public function syncWithoutDetaching($ids, \Closure $applyPivotScope = null)
     {
-        return $this->sync($ids, false);
+        return $this->sync($ids, false, $applyPivotScope);
     }
 
     /**
      * Sync the intermediate tables with a list of IDs or collection of models.
      *
      * @param  \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|array  $ids
-     * @param  bool   $detaching
+     * @param  bool  $detaching
+     * @param  \Closure|null  $applyPivotScope
      * @return array
      */
-    public function sync($ids, $detaching = true)
+    public function sync($ids, $detaching = true, \Closure $applyPivotScope = null)
     {
         $changes = [
             'attached' => [], 'detached' => [], 'updated' => [],
@@ -88,7 +91,7 @@ trait InteractsWithPivotTable
         // First we need to attach any of the associated models that are not currently
         // in this joining table. We'll spin through the given IDs, checking to see
         // if they exist in the array of current ones, and if not we will insert.
-        $current = $this->newPivotQuery()->pluck(
+        $current = $this->newScopedPivotQuery($applyPivotScope)->pluck(
             $this->relatedKey
         )->all();
 
@@ -434,6 +437,21 @@ trait InteractsWithPivotTable
         }
 
         return $query->where($this->foreignKey, $this->parent->getKey());
+    }
+
+    /**
+     * Create a new query builder for the pivot table, and optionally apply a query scope.
+     *
+     * @param  \Closure|null  $applyScope
+     * @return \Illuminate\Database\Query\Builder
+     */
+    protected function newScopedPivotQuery(\Closure $applyScope = null)
+    {
+        $query = $this->newPivotQuery();
+        if ($applyScope !== null) {
+            $applyScope($query);
+        }
+        return $query;
     }
 
     /**
