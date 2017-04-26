@@ -73,6 +73,25 @@ class HttpJsonResponseTest extends TestCase
         $response->setStatusCode(404);
         $this->assertSame(404, $response->getStatusCode());
     }
+
+    /**
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage Type is not supported
+     */
+    public function testJsonErrorResource()
+    {
+        $resource = tmpfile();
+        $response = new \Illuminate\Http\JsonResponse(['resource' => $resource]);
+    }
+
+    public function testJsonErrorResourceWithPartialOutputOnError()
+    {
+        $resource = tmpfile();
+        $response = new \Illuminate\Http\JsonResponse(['resource' => $resource], 200, [], JSON_PARTIAL_OUTPUT_ON_ERROR);
+        $data = $response->getData();
+        $this->assertInstanceOf('StdClass', $data);
+        $this->assertNull($data->resource);
+    }
 }
 
 class JsonResponseTestJsonableObject implements Jsonable
