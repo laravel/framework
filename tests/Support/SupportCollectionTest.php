@@ -1835,10 +1835,6 @@ class SupportCollectionTest extends TestCase
         $collection = collect([$person1, $person2]);
 
         $this->assertEquals(['Taylor', 'Yaz'], $collection->map->name->toArray());
-
-        $collection = collect([new TestSupportCollectionHigherOrderItem, new TestSupportCollectionHigherOrderItem]);
-
-        $this->assertEquals(['TAYLOR', 'TAYLOR'], $collection->each->uppercase()->map->name->toArray());
     }
 
     public function testPartition()
