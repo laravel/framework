@@ -2,6 +2,7 @@
 
 namespace Illuminate\Cache;
 
+use Memcached;
 use Illuminate\Contracts\Cache\Store;
 
 class MemcachedStore extends TaggableStore implements Store
@@ -43,7 +44,7 @@ class MemcachedStore extends TaggableStore implements Store
     {
         $value = $this->memcached->get($this->prefix.$key);
 
-        if ($this->memcached->getResultCode() == 0) {
+        if ($this->memcached->getResultCode() == Memcached::RES_SUCCESS) {
             return $value;
         }
     }
