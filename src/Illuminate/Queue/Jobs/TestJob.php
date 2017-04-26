@@ -22,5 +22,4 @@ class TestJob extends Job implements ShouldQueue
     {
         Log::info('Fetched message from queue: '.$this->message);
     }
-
 }

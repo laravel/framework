@@ -22,7 +22,6 @@ class TestCommand extends Command
      */
     protected $description = 'Add a message to the queue';
 
-
     /**
      * Execute the console command.
      *
@@ -37,7 +36,5 @@ class TestCommand extends Command
 
         dispatch(new TestJob($message));
         $this->info('Message added to queue');
-
     }
-
 }

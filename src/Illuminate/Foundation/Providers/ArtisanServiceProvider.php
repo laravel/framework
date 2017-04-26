@@ -623,7 +623,6 @@ class ArtisanServiceProvider extends ServiceProvider
         });
     }
 
-
     /**
      * Register the command.
      *
