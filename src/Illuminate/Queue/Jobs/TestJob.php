@@ -20,7 +20,7 @@ class TestJob extends Job implements ShouldQueue
 
     public function handle()
     {
-        Log::info("Fetched message from queue: " . $this->message);
+        Log::info('Fetched message from queue: '.$this->message);
     }
 
 }

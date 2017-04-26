@@ -2,9 +2,9 @@
 
 namespace Illuminate\Queue\Console;
 
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Queue\Jobs\TestJob;
-use Carbon\Carbon;
 
 class TestCommand extends Command
 {
@@ -31,8 +31,8 @@ class TestCommand extends Command
     public function fire()
     {
         $message = $this->argument('message');
-        if (!$message) {
-            $message = "Queue test message - " . Carbon::now()->toDateTimeString();
+        if (! $message) {
+            $message = 'Queue test message - '.Carbon::now()->toDateTimeString();
         }
 
         dispatch(new TestJob($message));
