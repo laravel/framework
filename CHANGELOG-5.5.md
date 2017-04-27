@@ -18,7 +18,10 @@
 - Improved CLI detection for phpdbg ([#18781](https://github.com/laravel/framework/pull/18781))
 
 ### Assets
-- Added frontend preset commands ([882f525](https://github.com/laravel/framework/commit/882f525a2c46caddfd94cfa7db9fbaf1abb1284b), [463b769](https://github.com/laravel/framework/commit/463b769270d462468e1b1dcc51a7a1144e003157), [34fd458](https://github.com/laravel/framework/commit/34fd458d370a39335810c1f040fad04af418fed4), [34fd458](https://github.com/laravel/framework/commit/34fd458d370a39335810c1f040fad04af418fed4), [d6c7abe](https://github.com/laravel/framework/commit/d6c7abe5e651cda813831afa5943791334361cd7), [0ed20b0](https://github.com/laravel/framework/commit/0ed20b0bb43335933a17972dce64cc63bbb3cc85), [f7f02c5](https://github.com/laravel/framework/commit/f7f02c5792079ab40f8adf7e14c747b4749406b5), [cf871f4](https://github.com/laravel/framework/commit/cf871f4bf40a75bc1713de7ef8a689477e19c677), [bc5084e](https://github.com/laravel/framework/commit/bc5084efe27a576230f16f447e63b9f4e9b1c5e2))
+- Added frontend preset commands (10+ commits)
+
+### Authentication
+- ⚠️ Support default user providers and pass user provider to `RequestGuard` ([#18856](https://github.com/laravel/framework/pull/18856))
 
 ### Authorization
 - Support multiple values in `Gate::has()` ([#18758](https://github.com/laravel/framework/pull/18758))
@@ -31,6 +34,7 @@
 
 ### Database
 - ⚠️ Added `dropAllTables()` to schema builder ([#18484](https://github.com/laravel/framework/pull/18484), [d910bc8](https://github.com/laravel/framework/commit/d910bc8039f3cec2d906797818984e825601a3f5))
+- Add precision to `dateTime` and `timestamp` column types ([#18847](https://github.com/laravel/framework/pull/18847), [f85f6db](https://github.com/laravel/framework/commit/f85f6db7c00a43ae45d963d089458477cf3e44b3), [#18962](https://github.com/laravel/framework/pull/18962))
 
 ### Eloquent ORM
 - ⚠️ Indicate soft deleted models as existing ([#17613](https://github.com/laravel/framework/pull/17613))
@@ -44,7 +48,7 @@
 - Support `null` comparison in `Model::is()` ([#18511](https://github.com/laravel/framework/pull/18511))
 - Added `getDirty()` checks for date and castable attributes ([#18400](https://github.com/laravel/framework/pull/18400), [e180e20](https://github.com/laravel/framework/commit/e180e20aa479525b34f77b9cf348148d329a4d2c))
 - Show method name in invalid relationship `LogicException` ([#18749](https://github.com/laravel/framework/pull/18749))
-
+- Add support for additional values in `firstOrCreate()` and `firstOrNew()` ([#18878](https://github.com/laravel/framework/pull/18878))
 
 ### Encryption
 - Use `openssl_cipher_iv_length()` in `Encrypter` ([#18684](https://github.com/laravel/framework/pull/18684))
@@ -62,7 +66,7 @@
 - ⚠️ Removed calling queue method on handlers ([0360cb1](https://github.com/laravel/framework/commit/0360cb1c6b71ec89d406517b19d1508511e98fb5), [ec96979](https://github.com/laravel/framework/commit/ec969797878f2c731034455af2397110732d14c4), [d9be4bf](https://github.com/laravel/framework/commit/d9be4bfe0367a8e07eed4931bdabf135292abb1b))
 
 ### Filesystem
-- ⚠️ Made `Storage::files()` work like `Storage::allFiles()` ([#18874](https://github.com/laravel/framework/pull/18874))
+- ⚠️ Made `Storage::files()` work like `Storage::allFiles()` ([#18874](https://github.com/laravel/framework/pull/18874), [7073457](https://github.com/laravel/framework/commit/7073457041a29ada14e0ed01d7d65f5c76a92689))
 
 ### Helpers
 - Added `throw_if()` and `throw_unless()` helpers ([18bb4df](https://github.com/laravel/framework/commit/18bb4dfc77c7c289e9b40c4096816ebeff1cd843))
