@@ -18,7 +18,7 @@
 - Improved CLI detection for phpdbg ([#18781](https://github.com/laravel/framework/pull/18781))
 
 ### Assets
-- Added frontend preset commands (10+ commits)
+- Added frontend preset commands (_too many commits, sorry_)
 
 ### Authentication
 - ⚠️ Support default user providers and pass user provider to `RequestGuard` ([#18856](https://github.com/laravel/framework/pull/18856))
