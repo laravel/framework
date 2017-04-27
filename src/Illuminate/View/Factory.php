@@ -185,7 +185,7 @@ class Factory implements FactoryContract
         // view. Alternatively, the "empty view" could be a raw string that begins
         // with "raw|" for convenience and to let this know that it is a string.
         else {
-            $empty = ($empty) ?: 'raw|';
+            $empty = ($empty === false) ? 'raw|' : $empty;
             $result = Str::startsWith($empty, 'raw|')
                         ? substr($empty, 4)
                         : $this->make($empty, $mergeData)->render();
