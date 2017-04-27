@@ -548,9 +548,9 @@ class Dispatcher implements DispatcherContract
 
         return $this;
     }
-    
+
     /**
-     * Check if event should be broadcasted by condition
+     * Check if event should be broadcasted by condition.
      *
      * @param $event
      *
@@ -558,10 +558,10 @@ class Dispatcher implements DispatcherContract
      */
     protected function checkBroadcastCondition($event)
     {
-        if (method_exists($event, 'broadcastCondition')) {
-            return $event->broadcastCondition();
+        if (method_exists($event, 'broadcastWhen')) {
+            return $event->broadcastWhen();
         }
-        
+
         return true;
     }
 }
