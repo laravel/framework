@@ -468,7 +468,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeDateTime(Fluent $column)
     {
-        return "datetime($column->precision)";
+        return "datetime2($column->precision)";
     }
 
     /**
@@ -513,10 +513,10 @@ class SqlServerGrammar extends Grammar
     protected function typeTimestamp(Fluent $column)
     {
         if ($column->useCurrent) {
-            return "datetime($column->precision) default CURRENT_TIMESTAMP";
+            return "datetime2($column->precision) default CURRENT_TIMESTAMP";
         }
 
-        return "datetime($column->precision)";
+        return "datetime2($column->precision)";
     }
 
     /**
