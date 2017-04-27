@@ -239,6 +239,15 @@ class EventsDispatcherTest extends TestCase
         $this->assertSame('fooo', $_SERVER['__event.test1']);
         $this->assertSame('baar', $_SERVER['__event.test2']);
     }
+
+    public function testCanLogEvents()
+    {
+        $d = new Dispatcher;
+        $d->enableEventLog();
+        $d->fire(new ExampleEvent);
+
+        $this->assertEquals(['Illuminate\Tests\Events\ExampleEvent'], $d->getEventLog());
+    }
 }
 
 class TestDispatcherQueuedHandler implements \Illuminate\Contracts\Queue\ShouldQueue
