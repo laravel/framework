@@ -602,13 +602,13 @@ class Str
     {
         static $languageSpecific;
 
-        if (!isset($languageSpecific)) {
+        if (! isset($languageSpecific)) {
             $languageSpecific = [
                 'de' => [
                     ['ä',  'ö',  'ü',  'Ä',  'Ö',  'Ü'],
                     ['ae', 'oe', 'ue', 'AE', 'OE', 'UE'],
                 ],
-            ];            
+            ];
         }
 
         return $languageSpecific[$language] ?? null;
