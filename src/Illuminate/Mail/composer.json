@@ -18,7 +18,7 @@
         "illuminate/container": "5.5.*",
         "illuminate/contracts": "5.5.*",
         "illuminate/support": "5.5.*",
-        "league/commonmark": "^0.11",
+        "league/commonmark": "^0.15",
         "psr/log": "~1.0",
         "swiftmailer/swiftmailer": "~5.4",
         "tijsverkoyen/css-to-inline-styles": "~2.2"
