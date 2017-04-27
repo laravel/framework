@@ -188,7 +188,7 @@ class Factory implements FactoryContract
             $empty = ($empty) ?: 'raw|';
             $result = Str::startsWith($empty, 'raw|')
                         ? substr($empty, 4)
-                        : $this->make($empty)->render();
+                        : $this->make($empty, $mergeData)->render();
         }
 
         return $result;
