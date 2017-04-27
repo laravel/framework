@@ -18,8 +18,35 @@ trait InteractsWithDatabase
      */
     protected function assertDatabaseHas($table, array $data, $connection = null)
     {
+        return $this->assertDatabaseHasMany($table, null, $data, $connection);
+    }
+
+    /**
+     * Assert that a given where condition exists only one time in the database.
+     *
+     * @param  string  $table
+     * @param  array  $data
+     * @param  string  $connection
+     * @return $this
+     */
+    protected function assertDatabaseHasOne($table, array $data, $connection = null)
+    {
+        return $this->assertDatabaseHasMany($table, 1, $data, $connection);
+    }
+
+    /**
+     * Assert that a given where condition exists only a certain amount of times in the database.
+     *
+     * @param  string  $table
+     * @param  integer  $number
+     * @param  array  $data
+     * @param  string  $connection
+     * @return $this
+     */
+    protected function assertDatabaseHasMany($table, $number, array $data, $connection = null)
+    {
         $this->assertThat(
-            $table, new HasInDatabase($this->getConnection($connection), $data)
+            $table, new HasInDatabase($this->getConnection($connection), $data, $number)
         );
 
         return $this;

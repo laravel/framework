@@ -29,17 +29,27 @@ class HasInDatabase extends PHPUnit_Framework_Constraint
     protected $data;
 
     /**
+     * The exact number of rows expected in the database table.
+     *
+     * @var integer|null
+     */
+    protected $number;
+
+    /**
      * Create a new constraint instance.
      *
      * @param  \Illuminate\Database\Connection  $database
      * @param  array  $data
+     * @param  integer  $number
      * @return void
      */
-    public function __construct(Connection $database, array $data)
+    public function __construct(Connection $database, array $data, $number = null)
     {
+        $this->database = $database;
+
         $this->data = $data;
 
-        $this->database = $database;
+        $this->number = $number;
     }
 
     /**
@@ -50,7 +60,13 @@ class HasInDatabase extends PHPUnit_Framework_Constraint
      */
     public function matches($table)
     {
-        return $this->database->table($table)->where($this->data)->count() > 0;
+        $found = $this->database->table($table)->where($this->data)->count();
+
+        if ($this->number) {
+            return $found === $this->number;
+        }
+
+        return $found > 0;
     }
 
     /**
@@ -62,9 +78,27 @@ class HasInDatabase extends PHPUnit_Framework_Constraint
     public function failureDescription($table)
     {
         return sprintf(
-            "a row in the table [%s] matches the attributes %s.\n\n%s",
-            $table, $this->toString(JSON_PRETTY_PRINT), $this->getAdditionalInfo($table)
+            $this->baseFailureDescription(), $table,
+            $this->toString(JSON_PRETTY_PRINT), $this->getAdditionalInfo($table)
         );
+    }
+
+    /**
+     * Get the base failure description (will vary depending on the number of expected rows).
+     *
+     * @return string
+     */
+    protected function baseFailureDescription()
+    {
+        if ($this->number === null) {
+            return "a row in the table [%s] matches the attributes %s.\n\n%s";
+        }
+
+        if ($this->number === 1) {
+            return "exactly one row in the table [%s] matches the attributes %s.\n\n%s";
+        }
+
+        return "{$this->number} rows in the table [%s] match the attributes %s.\n\n%s";
     }
 
     /**
