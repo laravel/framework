@@ -149,6 +149,16 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile the SQL needed to drop all tables.
+     *
+     * @return string
+     */
+    public function compileDropAllTables()
+    {
+        return "EXEC sp_msforeachtable 'DROP TABLE ?'";
+    }
+
+    /**
      * Compile a drop column command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
@@ -458,7 +468,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeDateTime(Fluent $column)
     {
-        return 'datetime';
+        return "datetime($column->precision)";
     }
 
     /**
@@ -469,7 +479,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeDateTimeTz(Fluent $column)
     {
-        return 'datetimeoffset(0)';
+        return "datetimeoffset($column->precision)";
     }
 
     /**
@@ -503,10 +513,10 @@ class SqlServerGrammar extends Grammar
     protected function typeTimestamp(Fluent $column)
     {
         if ($column->useCurrent) {
-            return 'datetime default CURRENT_TIMESTAMP';
+            return "datetime($column->precision) default CURRENT_TIMESTAMP";
         }
 
-        return 'datetime';
+        return "datetime($column->precision)";
     }
 
     /**
@@ -520,10 +530,10 @@ class SqlServerGrammar extends Grammar
     protected function typeTimestampTz(Fluent $column)
     {
         if ($column->useCurrent) {
-            return 'datetimeoffset(0) default CURRENT_TIMESTAMP';
+            return "datetimeoffset($column->precision) default CURRENT_TIMESTAMP";
         }
 
-        return 'datetimeoffset(0)';
+        return "datetimeoffset($column->precision)";
     }
 
     /**

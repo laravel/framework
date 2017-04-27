@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database;
 
+use Illuminate\Database\Schema\SQLiteBuilder;
 use Illuminate\Database\Query\Processors\SQLiteProcessor;
 use Doctrine\DBAL\Driver\PDOSqlite\Driver as DoctrineDriver;
 use Illuminate\Database\Query\Grammars\SQLiteGrammar as QueryGrammar;
@@ -17,6 +18,20 @@ class SQLiteConnection extends Connection
     protected function getDefaultQueryGrammar()
     {
         return $this->withTablePrefix(new QueryGrammar);
+    }
+
+    /**
+     * Get a schema builder instance for the connection.
+     *
+     * @return \Illuminate\Database\Schema\SQLiteBuilder
+     */
+    public function getSchemaBuilder()
+    {
+        if (is_null($this->schemaGrammar)) {
+            $this->useDefaultSchemaGrammar();
+        }
+
+        return new SQLiteBuilder($this);
     }
 
     /**

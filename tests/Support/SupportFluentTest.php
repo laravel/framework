@@ -58,6 +58,18 @@ class SupportFluentTest extends TestCase
         $this->assertNull($fluent->foo);
     }
 
+    public function testArrayAccessToAttributes()
+    {
+        $fluent = new Fluent(['attributes' => '1']);
+
+        $this->assertTrue(isset($fluent['attributes']));
+        $this->assertEquals($fluent['attributes'], 1);
+
+        $fluent->attributes();
+
+        $this->assertTrue($fluent['attributes']);
+    }
+
     public function testMagicMethodsCanBeUsedToSetAttributes()
     {
         $fluent = new Fluent;

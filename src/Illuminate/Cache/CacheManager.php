@@ -47,7 +47,7 @@ class CacheManager implements FactoryContract
      * Get a cache store instance by name.
      *
      * @param  string|null  $name
-     * @return mixed
+     * @return \Illuminate\Contracts\Cache\Repository
      */
     public function store($name = null)
     {
@@ -209,7 +209,7 @@ class CacheManager implements FactoryContract
 
         return $this->repository(
             new DatabaseStore(
-                $connection, $this->app['encrypter'], $config['table'], $this->getPrefix($config)
+                $connection, $config['table'], $this->getPrefix($config)
             )
         );
     }
