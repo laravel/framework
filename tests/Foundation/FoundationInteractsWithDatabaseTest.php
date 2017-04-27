@@ -28,9 +28,9 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         m::close();
     }
 
-    public function testSeeInDatabaseFindsResults()
+    public function testAssertDatabaseHasFindsResults()
     {
-        $this->mockCountBuilder(1);
+        $this->mockQueryBuilder(1);
 
         $this->assertDatabaseHas($this->table, $this->data);
     }
@@ -39,11 +39,9 @@ class FoundationInteractsWithDatabaseTest extends TestCase
      * @expectedException \PHPUnit_Framework_ExpectationFailedException
      * @expectedExceptionMessage The table is empty.
      */
-    public function testSeeInDatabaseDoesNotFindResults()
+    public function testAssertDatabaseHasDoesNotFindResults()
     {
-        $builder = $this->mockCountBuilder(0);
-
-        $builder->shouldReceive('get')->andReturn(collect());
+        $this->mockQueryBuilder(0, []);
 
         $this->assertDatabaseHas($this->table, $this->data);
     }
@@ -51,14 +49,11 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     /**
      * @expectedException \PHPUnit_Framework_ExpectationFailedException
      */
-    public function testSeeInDatabaseFindsNotMatchingResults()
+    public function testAssertDatabaseHasFindsNotMatchingResults()
     {
         $this->expectExceptionMessage('Found: '.json_encode([['title' => 'Forge']], JSON_PRETTY_PRINT));
 
-        $builder = $this->mockCountBuilder(0);
-
-        $builder->shouldReceive('take')->andReturnSelf();
-        $builder->shouldReceive('get')->andReturn(collect([['title' => 'Forge']]));
+        $this->mockQueryBuilder(0, [['title' => 'Forge']]);
 
         $this->assertDatabaseHas($this->table, $this->data);
     }
@@ -66,23 +61,54 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     /**
      * @expectedException \PHPUnit_Framework_ExpectationFailedException
      */
-    public function testSeeInDatabaseFindsManyNotMatchingResults()
+    public function testAssertDatabaseHasFindsManyNotMatchingResults()
     {
         $this->expectExceptionMessage('Found: '.json_encode(['data', 'data', 'data'], JSON_PRETTY_PRINT).' and 2 others.');
 
-        $builder = $this->mockCountBuilder(0);
-
-        $builder->shouldReceive('take')->andReturnSelf();
-        $builder->shouldReceive('get')->andReturn(
-            collect(array_fill(0, 5, 'data'))
-        );
+        $this->mockQueryBuilder(0, array_fill(0, 5, 'data'));
 
         $this->assertDatabaseHas($this->table, $this->data);
     }
 
-    public function testDontSeeInDatabaseDoesNotFindResults()
+    public function testAssertDatabaseHasOneFindsOneResult()
     {
-        $this->mockCountBuilder(0);
+        $this->mockQueryBuilder(1);
+
+        $this->assertDatabaseHas($this->table, $this->data);
+    }
+
+    /**
+     * @expectedException \PHPUnit_Framework_ExpectationFailedException
+     * @expectedExceptionMessage Failed asserting that exactly one row in the table [products] matches the attributes
+     */
+    public function testAssertDatabaseHasOneFindsManyResults()
+    {
+        $this->mockQueryBuilder(2, []);
+
+        $this->assertDatabaseHasOne($this->table, $this->data);
+    }
+
+    public function testAssertDatabaseHasManyFindsTheExactAmountOfResults()
+    {
+        $this->mockQueryBuilder(3);
+
+        $this->assertDatabaseHasMany($this->table, 3, $this->data);
+    }
+
+    /**
+     * @expectedException \PHPUnit_Framework_ExpectationFailedException
+     * @expectedExceptionMessage Failed asserting that 3 rows in the table [products] match the attributes
+     */
+    public function testAssertDatabaseHasManyDoesNotFindTheExactAmountOfResults()
+    {
+        $this->mockQueryBuilder(2, []);
+
+        $this->assertDatabaseHasMany($this->table, 3, $this->data);
+    }
+
+    public function testAssertDatabaseMissingDoesNotFindResults()
+    {
+        $this->mockQueryBuilder(0);
 
         $this->assertDatabaseMissing($this->table, $this->data);
     }
@@ -90,19 +116,16 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     /**
      * @expectedException \PHPUnit_Framework_ExpectationFailedException
      */
-    public function testDontSeeInDatabaseFindsResults()
+    public function testAssertDatabaseMissingFindsResults()
     {
-        $builder = $this->mockCountBuilder(1);
-
-        $builder->shouldReceive('take')->andReturnSelf();
-        $builder->shouldReceive('get')->andReturn(collect([$this->data]));
+        $this->mockQueryBuilder(1, $this->data);
 
         $this->assertDatabaseMissing($this->table, $this->data);
     }
 
     public function testSeeSoftDeletedInDatabaseFindsResults()
     {
-        $this->mockCountBuilder(1);
+        $this->mockQueryBuilder(1);
 
         $this->assertSoftDeleted($this->table, $this->data);
     }
@@ -113,14 +136,12 @@ class FoundationInteractsWithDatabaseTest extends TestCase
      */
     public function testSeeSoftDeletedInDatabaseDoesNotFindResults()
     {
-        $builder = $this->mockCountBuilder(0);
-
-        $builder->shouldReceive('get')->andReturn(collect());
+        $this->mockQueryBuilder(0, []);
 
         $this->assertSoftDeleted($this->table, $this->data);
     }
 
-    protected function mockCountBuilder($countResult)
+    protected function mockQueryBuilder($countResult, $data = null)
     {
         $builder = m::mock(Builder::class);
 
@@ -129,6 +150,10 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $builder->shouldReceive('whereNotNull')->with('deleted_at')->andReturnSelf();
 
         $builder->shouldReceive('count')->andReturn($countResult);
+
+        if ($data !== null) {
+            $builder->shouldReceive('get')->andReturn(collect($data));
+        }
 
         $this->connection->shouldReceive('table')
             ->with($this->table)
