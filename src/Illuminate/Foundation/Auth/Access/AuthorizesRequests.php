@@ -86,7 +86,7 @@ trait AuthorizesRequests
         $middleware = [];
 
         foreach ($this->resourceAbilityMap() as $method => $ability) {
-            $modelName = in_array($method, $this->methodsWithoutModels()) ? $model : $parameter;
+            $modelName = in_array($method, $this->resourceMethodsWithoutModels()) ? $model : $parameter;
 
             $middleware["can:{$ability},{$modelName}"][] = $method;
         }
@@ -118,7 +118,7 @@ trait AuthorizesRequests
      *
      * @return array
      */
-    protected function methodsWithoutModels()
+    protected function resourceMethodsWithoutModels()
     {
         return ['index', 'create', 'store'];
     }
