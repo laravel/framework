@@ -85,7 +85,7 @@ class NotificationSender
 
             $notificationId = Uuid::uuid4()->toString();
 
-            foreach ($viaChannels as $channel) {
+            foreach ((array) $viaChannels as $channel) {
                 $this->sendToNotifiable($notifiable, $notificationId, clone $original, $channel);
             }
         }
