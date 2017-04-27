@@ -64,7 +64,7 @@ class ViewFactoryTest extends TestCase
         $factory->shouldReceive('make')->once()->with('foo')->andReturn($mockView = m::mock('StdClass'));
         $mockView->shouldReceive('render')->once()->andReturn('empty');
 
-        $this->assertEquals('empty', $factory->renderEach('view', [], 'iterator', 'foo'));
+        $this->assertEquals('empty', $factory->renderEach('view', [], 'iterator', 'foo', []));
     }
 
     public function testRawStringsMayBeReturnedFromRenderEach()
