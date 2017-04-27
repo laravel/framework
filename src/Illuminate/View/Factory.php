@@ -159,13 +159,14 @@ class Factory implements FactoryContract
     /**
      * Get the rendered contents of a partial from a loop.
      *
-     * @param  string  $view
-     * @param  array   $data
-     * @param  string  $iterator
-     * @param  string  $empty
+     * @param  string       $view
+     * @param  array        $data
+     * @param  string       $iterator
+     * @param  string|bool  $empty
+     * @param  array        $mergeData
      * @return string
      */
-    public function renderEach($view, $data, $iterator, $empty = 'raw|')
+    public function renderEach($view, $data, $iterator, $empty = 'raw|', $mergeData = [])
     {
         $result = '';
 
@@ -175,7 +176,7 @@ class Factory implements FactoryContract
         if (count($data) > 0) {
             foreach ($data as $key => $value) {
                 $result .= $this->make(
-                    $view, ['key' => $key, $iterator => $value]
+                    $view, array_merge(['key' => $key, $iterator => $value], $mergeData)
                 )->render();
             }
         }
@@ -184,6 +185,7 @@ class Factory implements FactoryContract
         // view. Alternatively, the "empty view" could be a raw string that begins
         // with "raw|" for convenience and to let this know that it is a string.
         else {
+            $empty = ($empty) ?: 'raw|';
             $result = Str::startsWith($empty, 'raw|')
                         ? substr($empty, 4)
                         : $this->make($empty)->render();
