@@ -38,7 +38,7 @@ trait InteractsWithDatabase
      * Assert that a given where condition exists only a certain amount of times in the database.
      *
      * @param  string  $table
-     * @param  integer  $number
+     * @param  int|null  $number
      * @param  array  $data
      * @param  string  $connection
      * @return $this

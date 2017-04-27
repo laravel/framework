@@ -31,7 +31,7 @@ class HasInDatabase extends PHPUnit_Framework_Constraint
     /**
      * The exact number of rows expected in the database table.
      *
-     * @var integer|null
+     * @var int|null
      */
     protected $number;
 
@@ -40,7 +40,7 @@ class HasInDatabase extends PHPUnit_Framework_Constraint
      *
      * @param  \Illuminate\Database\Connection  $database
      * @param  array  $data
-     * @param  integer  $number
+     * @param  int|null  $number
      * @return void
      */
     public function __construct(Connection $database, array $data, $number = null)
