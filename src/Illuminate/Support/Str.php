@@ -33,10 +33,17 @@ class Str
      * Transliterate a UTF-8 value to ASCII.
      *
      * @param  string  $value
+     * @param  string  $language
      * @return string
      */
-    public static function ascii($value)
+    public static function ascii($value, $language = 'en')
     {
+        $languageSpecific = static::languageSpecificCharsArray();
+
+        if (isset($languageSpecific[$language])) {
+            $value = str_replace($languageSpecific[$language][0], $languageSpecific[$language][1], $value);
+        }
+
         foreach (static::charsArray() as $key => $val) {
             $value = str_replace($val, $key, $value);
         }
@@ -349,6 +356,9 @@ class Str
         $flip = $separator == '-' ? '_' : '-';
 
         $title = preg_replace('!['.preg_quote($flip).']+!u', $separator, $title);
+        
+        // Replace @ with the word 'at'
+        $title = str_replace('@', $separator.'at'.$separator, $title);
 
         // Remove all characters that are not the separator, letters, numbers, or whitespace.
         $title = preg_replace('![^'.preg_quote($separator).'\pL\pN\s]+!u', '', mb_strtolower($title));
@@ -574,6 +584,31 @@ class Str
             'Yu'   => ['Ю'],
             'Zh'   => ['Ж'],
             ' '    => ["\xC2\xA0", "\xE2\x80\x80", "\xE2\x80\x81", "\xE2\x80\x82", "\xE2\x80\x83", "\xE2\x80\x84", "\xE2\x80\x85", "\xE2\x80\x86", "\xE2\x80\x87", "\xE2\x80\x88", "\xE2\x80\x89", "\xE2\x80\x8A", "\xE2\x80\xAF", "\xE2\x81\x9F", "\xE3\x80\x80", "\xEF\xBE\xA0"],
+        ];
+    }
+    
+    /**
+     * Returns the language specific replacements for the ascii method.
+     *
+     * Note: Adapted from Stringy\Stringy.
+     *
+     * @see https://github.com/danielstjules/Stringy/blob/3.0.1/LICENSE.txt
+     *
+     * @return array
+     */
+    protected static function languageSpecificCharsArray()
+    {
+        static $languageSpecific;
+
+        if (isset($languageSpecific)) {
+            return $languageSpecific;
+        }
+
+        return $languageSpecific = [
+            'de' => [
+                ['ä',  'ö',  'ü',  'Ä',  'Ö',  'Ü' ],
+                ['ae', 'oe', 'ue', 'AE', 'OE', 'UE'],
+            ]
         ];
     }
 }
