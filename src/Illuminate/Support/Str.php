@@ -38,10 +38,10 @@ class Str
      */
     public static function ascii($value, $language = 'en')
     {
-        $languageSpecific = static::languageSpecificCharsArray();
+        $languageSpecific = static::languageSpecificCharsArray($language);
 
-        if (isset($languageSpecific[$language])) {
-            $value = str_replace($languageSpecific[$language][0], $languageSpecific[$language][1], $value);
+        if ($languageSpecific != null) {
+            $value = str_replace($languageSpecific[0], $languageSpecific[1], $value);
         }
 
         foreach (static::charsArray() as $key => $val) {
@@ -346,11 +346,12 @@ class Str
      *
      * @param  string  $title
      * @param  string  $separator
+     * @param  string  $language
      * @return string
      */
-    public static function slug($title, $separator = '-')
+    public static function slug($title, $separator = '-', $language = 'en')
     {
-        $title = static::ascii($title);
+        $title = static::ascii($title, $language);
 
         // Convert all dashes/underscores into separator
         $flip = $separator == '-' ? '_' : '-';
@@ -594,21 +595,22 @@ class Str
      *
      * @see https://github.com/danielstjules/Stringy/blob/3.0.1/LICENSE.txt
      *
+     * @param  string  $language
      * @return array
      */
-    protected static function languageSpecificCharsArray()
+    protected static function languageSpecificCharsArray($language)
     {
         static $languageSpecific;
 
-        if (isset($languageSpecific)) {
-            return $languageSpecific;
+        if (!isset($languageSpecific)) {
+            $languageSpecific = [
+                'de' => [
+                    ['ä',  'ö',  'ü',  'Ä',  'Ö',  'Ü'],
+                    ['ae', 'oe', 'ue', 'AE', 'OE', 'UE'],
+                ],
+            ];            
         }
 
-        return $languageSpecific = [
-            'de' => [
-                ['ä',  'ö',  'ü',  'Ä',  'Ö',  'Ü'],
-                ['ae', 'oe', 'ue', 'AE', 'OE', 'UE'],
-            ],
-        ];
+        return $languageSpecific[$language] ?? null;
     }
 }
