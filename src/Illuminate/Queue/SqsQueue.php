@@ -137,7 +137,7 @@ class SqsQueue extends Queue implements QueueContract
      */
     public function getQueue($queue)
     {
-        $queue = $this->getQueuePrefix().($queue ?: $this->default);
+        $queue = $queue ?: $this->default;
 
         return filter_var($queue, FILTER_VALIDATE_URL) === false
                         ? rtrim($this->prefix, '/').'/'.$queue : $queue;

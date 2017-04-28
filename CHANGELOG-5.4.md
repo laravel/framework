@@ -1,23 +1,32 @@
 # Release Notes for 5.4.x
 
-## [Unreleased]
+## v5.4.20 (2017-04-27)
 
 ### Added
 - Added higher order tap ([3abc4fb](https://github.com/laravel/framework/commit/3abc4fb90fe59a90c2d8cccd27e310b20e5e2631))
+- Added `Collection::mapToGroups()` ([#18949](https://github.com/laravel/framework/pull/18949))
 - Added `FactoryBuilder::lazy()` method ([#18823](https://github.com/laravel/framework/pull/18823))
 - Support Redis Sentinel configuration ([#18850](https://github.com/laravel/framework/pull/18850))
-- Added queue prefix option ([#18860](https://github.com/laravel/framework/pull/18860))
+- Added `queue.prefix` option ([#18860](https://github.com/laravel/framework/pull/18860), [8510bf9](https://github.com/laravel/framework/commit/8510bf9986fffd8af58d288a297de573e78d97a5))
+- Allow `getDisplayableAttribute()` to be used in custom replacers ([#18895](https://github.com/laravel/framework/pull/18895))
+- Added `resourceMethodsWithoutModels()` method to `AuthorizesRequests` ([#18916](https://github.com/laravel/framework/pull/18916), [#18964](https://github.com/laravel/framework/pull/18964))
+- Added name to `home` route ([#18942](https://github.com/laravel/framework/pull/18942))
 
 ### Changed
 - Return `PendingDispatch` for `Kernel::queue()` ([51647eb](https://github.com/laravel/framework/commit/51647eb701307e7682f7489b605a146e750abf0f))
 - Made `RedisManager::resolve()` public ([#18830](https://github.com/laravel/framework/pull/18830), [eb9b99d](https://github.com/laravel/framework/commit/eb9b99dfe80ca266bf675e8aaa3fdfdf6c4a69f3))
 - Changed email body color to match wrapper color ([#18824](https://github.com/laravel/framework/pull/18824))
 - Break and hyphenate long words in emails ([#18827](https://github.com/laravel/framework/pull/18827))
+- Force database migration to use the write PDO ([#18898](https://github.com/laravel/framework/pull/18898))
+- Support `JSON_PARTIAL_OUTPUT_ON_ERROR` on `JsonResponse` ([#18917](https://github.com/laravel/framework/pull/18917), [db5f011](https://github.com/laravel/framework/commit/db5f011d8ba9d0bcb5d768bea9d94688739f5b4c))
 
 ### Fixed
 - Set connection on model factory ([#18846](https://github.com/laravel/framework/pull/18846), [95a0663](https://github.com/laravel/framework/commit/95a06638633359965961a11ab05967d32351cfdf))
 - Fixed route parameter binding for routes with leading slashes ([#18855](https://github.com/laravel/framework/pull/18855))
 - Don't call `cleanParameterBag()` twice during JSON request ([#18840](https://github.com/laravel/framework/pull/18840))
+- Prevent exception in `getActualClassNameForMorph()` when morph map is `null` ([#18921](https://github.com/laravel/framework/pull/18921))
+- Use protocol-relative URL in `mix()` helper ([#18943](https://github.com/laravel/framework/pull/18943))
+- Cast `$viaChannels` to array ([#18960](https://github.com/laravel/framework/pull/18960))
 
 
 ## v5.4.19 (2017-04-16)
