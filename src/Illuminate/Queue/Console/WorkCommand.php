@@ -196,11 +196,9 @@ class WorkCommand extends Command
      */
     protected function getQueue($connection)
     {
-        $queue = $this->option('queue') ?: $this->laravel['config']->get(
+        return $this->option('queue') ?: $this->laravel['config']->get(
             "queue.connections.{$connection}.queue", 'default'
         );
-
-        return $this->laravel['config']->get('queue.prefix').$queue;
     }
 
     /**
