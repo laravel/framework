@@ -34,8 +34,8 @@ trait QueriesRelationships
         // the subquery to only run a "where exists" clause instead of this full "count"
         // clause. This will make these queries run much faster compared with a count.
         $method = $this->canUseExistsForExistenceCheck($operator, $count)
-                        ? 'getRelationExistenceQuery'
-                        : 'getRelationExistenceCountQuery';
+            ? 'getRelationExistenceQuery'
+            : 'getRelationExistenceCountQuery';
 
         $hasQuery = $relation->{$method}(
             $relation->getRelated()->newQuery(), $this
@@ -110,11 +110,11 @@ trait QueriesRelationships
     /**
      * Add a relationship count / exists condition to the query with where clauses.
      *
-     * @param  string  $relation
-     * @param  \Closure|null  $callback
-     * @param  string  $operator
-     * @param  int     $count
-     * @return \Illuminate\Database\Eloquent\Builder|static
+     * @param  string $relation
+     * @param  \Closure|null $callback
+     * @param  string $operator
+     * @param  int $count
+     * @return Builder|static
      */
     public function whereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)
     {
@@ -127,7 +127,7 @@ trait QueriesRelationships
 
     /**
      * Add a relationship count / exists condition to the query with where clauses
-     * according to a given Collection / Model relation
+     * according to a given Collection / Model relation.
      *
      * @param $relation
      * @param $operator
@@ -137,9 +137,9 @@ trait QueriesRelationships
      */
     public function whereHasModelRelation($relation, $operator, $count, $boolean)
     {
-        $relationMethod     = key($relation);
-        $relationModel      = $relation[$relationMethod];
-        $relationKeyName    = $this->getRelationWithoutConstraints($relationMethod)
+        $relationMethod = key($relation);
+        $relationModel = $relation[$relationMethod];
+        $relationKeyName = $this->getRelationWithoutConstraints($relationMethod)
             ->getRelated()
             ->getKeyName();
         $relationForeignKey = $this->getRelationWithoutConstraints($relationMethod)
@@ -156,10 +156,10 @@ trait QueriesRelationships
             $relation->getRelated()->newQuery(), $this
         );
 
-        $hasQuery->callScope(function($query) use ($relationForeignKey, $relationKeyName, $relationModel, $relationMethod) {
+        $hasQuery->callScope(function ($query) use ($relationForeignKey, $relationKeyName, $relationModel, $relationMethod) {
             $keysArray = $relationModel->pluck($relationKeyName);
             $relationTableName = $this->getRelationWithoutConstraints($relationMethod)->getRelated()->getTable();
-            return $query->whereIn($relationTableName . '.' . $relationKeyName, $keysArray);
+            return $query->whereIn($relationTableName.'.'.$relationKeyName, $keysArray);
         });
 
         return $this->addHasWhere(
@@ -258,8 +258,8 @@ trait QueriesRelationships
         $hasQuery->mergeConstraintsFrom($relation->getQuery());
 
         return $this->canUseExistsForExistenceCheck($operator, $count)
-                ? $this->addWhereExistsQuery($hasQuery->toBase(), $boolean, $not = ($operator === '<' && $count === 1))
-                : $this->addWhereCountQuery($hasQuery->toBase(), $operator, $count, $boolean);
+            ? $this->addWhereExistsQuery($hasQuery->toBase(), $boolean, $not = ($operator === '<' && $count === 1))
+            : $this->addWhereCountQuery($hasQuery->toBase(), $operator, $count, $boolean);
     }
 
     /**
