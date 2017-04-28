@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Queue;
 
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Config\Repository;
 use Illuminate\Queue\QueueManager;
 
 class QueueManagerTest extends TestCase
