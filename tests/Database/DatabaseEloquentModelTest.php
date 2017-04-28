@@ -67,6 +67,19 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->isDirty(['foo', 'bar']));
     }
 
+    public function testCastedAttributesDirty()
+    {
+        $model = new EloquentModelCastingStub(['booleanAttribute' => 0, 'nonCastedAttribute' => 'John']);
+        $model->syncOriginal();
+
+        $this->assertSame(false, $model->booleanAttribute);
+
+        $model->nonCastedAttribute = 'John';
+        $model->booleanAttribute = false;
+
+        $this->assertEquals([], $model->getDirty());
+    }
+
     public function testCleanAttributes()
     {
         $model = new EloquentModelStub(['foo' => '1', 'bar' => 2, 'baz' => 3]);
@@ -1893,6 +1906,8 @@ class EloquentModelGetMutatorsStub extends Model
 
 class EloquentModelCastingStub extends Model
 {
+    protected $guarded = [];
+
     protected $casts = [
         'intAttribute' => 'int',
         'floatAttribute' => 'float',
