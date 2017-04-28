@@ -21,6 +21,13 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertEquals(['foo', 'bar', 'baz'], $c->all());
     }
 
+    public function testAddingManyItemsToCollection()
+    {
+        $c = new Collection(['foo']);
+        $c->addMany(['bar', 'baz'])->addMany(['qux', 'foobar']);
+        $this->assertEquals(['foo', 'bar', 'baz', 'qux', 'foobar'], $c->all());
+    }
+
     public function testGettingMaxItemsFromCollection()
     {
         $c = new Collection([(object) ['foo' => 10], (object) ['foo' => 20]]);

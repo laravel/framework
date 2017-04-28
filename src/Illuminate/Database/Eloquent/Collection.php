@@ -70,6 +70,21 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Add many items to the collection.
+     *
+     * @param  array  $items
+     * @return $this
+     */
+    public function addMany($items)
+    {
+        foreach ($items as $item) {
+            $this->add($item);
+        }
+
+        return $this;
+    }
+
+    /**
      * Determine if a key exists in the collection.
      *
      * @param  mixed  $key
