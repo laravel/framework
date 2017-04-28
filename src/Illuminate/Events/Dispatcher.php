@@ -244,7 +244,19 @@ class Dispatcher implements DispatcherContract
     {
         return isset($payload[0]) &&
                $payload[0] instanceof ShouldBroadcast &&
-               $this->checkBroadcastCondition($payload[0]);
+               $this->broadcastWhen($payload[0]);
+    }
+
+    /**
+     * Check if event should be broadcasted by condition.
+     *
+     * @param  mixed  $event
+     * @return bool
+     */
+    protected function broadcastWhen($event)
+    {
+        return method_exists($event, 'broadcastWhen')
+                ? $event->broadcastWhen() : true;
     }
 
     /**
@@ -547,21 +559,5 @@ class Dispatcher implements DispatcherContract
         $this->queueResolver = $resolver;
 
         return $this;
-    }
-
-    /**
-     * Check if event should be broadcasted by condition.
-     *
-     * @param $event
-     *
-     * @return bool
-     */
-    protected function checkBroadcastCondition($event)
-    {
-        if (method_exists($event, 'broadcastWhen')) {
-            return $event->broadcastWhen();
-        }
-
-        return true;
     }
 }
