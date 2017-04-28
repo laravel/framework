@@ -40,7 +40,7 @@ class Str
     {
         $languageSpecific = static::languageSpecificCharsArray($language);
 
-        if ($languageSpecific !== null) {
+        if (! is_null($languageSpecific)) {
             $value = str_replace($languageSpecific[0], $languageSpecific[1], $value);
         }
 
@@ -596,7 +596,7 @@ class Str
      * @see https://github.com/danielstjules/Stringy/blob/3.0.1/LICENSE.txt
      *
      * @param  string  $language
-     * @return array
+     * @return array|null
      */
     protected static function languageSpecificCharsArray($language)
     {
