@@ -264,9 +264,13 @@ class FactoryBuilder
         foreach ($attributes as &$attribute) {
             if ($attribute instanceof Closure) {
                 $attribute = $attribute($attributes);
-            } elseif ($attribute instanceof static) {
+            }
+
+            if ($attribute instanceof static) {
                 $attribute = $attribute->create()->getKey();
-            } elseif ($attribute instanceof Model) {
+            }
+
+            if ($attribute instanceof Model) {
                 $attribute = $attribute->getKey();
             }
         }
