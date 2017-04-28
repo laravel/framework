@@ -42,7 +42,7 @@ trait SoftDeletes {
 	{
 		if ($this->forceDeleting)
 		{
-			return $this->withTrashed()->where($this->getKeyName(), $this->getKey())->forceDelete();
+			return $this->withTrashed()->where($this->getPrimaryKeyName(), $this->getKey())->forceDelete();
 		}
 
 		return $this->runSoftDelete();
@@ -55,7 +55,7 @@ trait SoftDeletes {
 	 */
 	protected function runSoftDelete()
 	{
-		$query = $this->newQuery()->where($this->getKeyName(), $this->getKey());
+		$query = $this->newQuery()->where($this->getPrimaryKeyName(), $this->getKey());
 
 		$this->{$this->getDeletedAtColumn()} = $time = $this->freshTimestamp();
 
@@ -167,4 +167,20 @@ trait SoftDeletes {
 		return $this->getTable().'.'.$this->getDeletedAtColumn();
 	}
 
+    /**
+     * Get the primary key name
+     *
+     * @return string
+     */
+    public function getPrimaryKeyName()
+    {
+        if (count($this->getQuery()->joins) > 0)
+        {
+            return $this->getQualifiedKeyName();
+        }
+        else
+        {
+            return $this->getKeyName();
+        }
+    }
 }

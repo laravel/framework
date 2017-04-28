@@ -65,6 +65,10 @@ class DatabaseSoftDeletingTraitStub {
 	{
 		return 'id';
 	}
+	public function getPrimaryKeyName()
+	{
+		return 'id';
+	}
 	public function save()
 	{
 		//
