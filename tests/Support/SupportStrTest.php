@@ -38,6 +38,13 @@ class SupportStrTest extends TestCase
         $this->assertEquals($nbsp, Str::words($nbsp));
     }
 
+    public function testStringAscii()
+    {
+        $this->assertEquals('@', Str::ascii('@'));
+        $this->assertEquals('u', Str::ascii('ü'));
+        $this->assertEquals('ue', Str::ascii('ü', 'de'));
+    }
+
     public function testStartsWith()
     {
         $this->assertTrue(Str::startsWith('jason', 'jas'));
@@ -99,6 +106,7 @@ class SupportStrTest extends TestCase
         $this->assertEquals('hello-world', Str::slug('hello-world'));
         $this->assertEquals('hello-world', Str::slug('hello_world'));
         $this->assertEquals('hello_world', Str::slug('hello_world', '_'));
+        $this->assertEquals('user-at-host', Str::slug('user@host'));
     }
 
     public function testFinish()
