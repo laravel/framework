@@ -471,6 +471,7 @@ trait HasAttributes
                 return (string) $value;
             case 'bool':
             case 'boolean':
+                $this->original[$key] = (bool) $value;
                 return (bool) $value;
             case 'object':
                 return $this->fromJson($value, true);
