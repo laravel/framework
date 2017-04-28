@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Events;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 class EventsDispatcherTest extends TestCase
 {
@@ -239,6 +240,28 @@ class EventsDispatcherTest extends TestCase
         $this->assertSame('fooo', $_SERVER['__event.test1']);
         $this->assertSame('baar', $_SERVER['__event.test2']);
     }
+
+    public function testShouldBroadcastSuccess()
+    {
+        $d = m::mock(Dispatcher::class);
+
+        $d->makePartial()->shouldAllowMockingProtectedMethods();
+
+        $event = new BroadcastEvent();
+
+        $this->assertTrue($d->shouldBroadcast([$event]));
+    }
+
+    public function testShouldBroadcastFail()
+    {
+        $d = m::mock(Dispatcher::class);
+
+        $d->makePartial()->shouldAllowMockingProtectedMethods();
+
+        $event = new BroadcastFalseCondition();
+
+        $this->assertFalse($d->shouldBroadcast([$event]));
+    }
 }
 
 class TestDispatcherQueuedHandler implements \Illuminate\Contracts\Queue\ShouldQueue
@@ -273,4 +296,25 @@ interface SomeEventInterface
 class AnotherEvent implements SomeEventInterface
 {
     //
+}
+
+class BroadcastEvent implements ShouldBroadcast
+{
+    public function broadcastOn()
+    {
+        return ['test-channel'];
+    }
+
+    public function broadcastWhen()
+    {
+        return true;
+    }
+}
+
+class BroadcastFalseCondition extends BroadcastEvent
+{
+    public function broadcastWhen()
+    {
+        return false;
+    }
 }
