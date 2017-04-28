@@ -32,19 +32,20 @@ class CacheRedisStoreTest extends TestCase
     {
         $redis = $this->getRedis();
         $redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
-        $redis->getRedis()->shouldReceive('mget')->once()->with(['prefix:foo', 'prefix:fizz', 'prefix:norf'])
+        $redis->getRedis()->shouldReceive('mget')->once()->with(['prefix:foo', 'prefix:fizz', 'prefix:norf', 'prefix:null'])
             ->andReturn([
                 serialize('bar'),
                 serialize('buzz'),
                 serialize('quz'),
+                null,
             ]);
-        $this->assertEquals([
-            'foo'   => 'bar',
-            'fizz'  => 'buzz',
-            'norf'  => 'quz',
-        ], $redis->many([
-            'foo', 'fizz', 'norf',
-        ]));
+
+        $results = $redis->many(['foo', 'fizz', 'norf', 'null']);
+
+        $this->assertEquals('bar', $results['foo']);
+        $this->assertEquals('buzz', $results['fizz']);
+        $this->assertEquals('quz', $results['norf']);
+        $this->assertNull($results['null']);
     }
 
     public function testRedisValueIsReturnedForNumerics()
