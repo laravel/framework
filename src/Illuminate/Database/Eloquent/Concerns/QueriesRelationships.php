@@ -118,7 +118,53 @@ trait QueriesRelationships
      */
     public function whereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)
     {
+        if (is_array($relation)) {
+            return $this->whereHasModelRelation($relation, $operator, $count, 'and');
+        }
+
         return $this->has($relation, $operator, $count, 'and', $callback);
+    }
+
+    /**
+     * Add a relationship count / exists condition to the query with where clauses
+     * according to a given Collection / Model relation
+     *
+     * @param $relation
+     * @param $operator
+     * @param $count
+     * @param $boolean
+     * @return Builder|static
+     */
+    public function whereHasModelRelation($relation, $operator, $count, $boolean)
+    {
+        $relationMethod     = key($relation);
+        $relationModel      = $relation[$relationMethod];
+        $relationKeyName    = $this->getRelationWithoutConstraints($relationMethod)
+            ->getRelated()
+            ->getKeyName();
+        $relationForeignKey = $this->getRelationWithoutConstraints($relationMethod)
+            ->getRelated()
+            ->getForeignKey();
+
+        $relation = $this->getRelationWithoutConstraints($relationMethod);
+
+        $method = $this->canUseExistsForExistenceCheck($operator, $count)
+            ? 'getRelationExistenceQuery'
+            : 'getRelationExistenceCountQuery';
+
+        $hasQuery = $relation->{$method}(
+            $relation->getRelated()->newQuery(), $this
+        );
+
+        $hasQuery->callScope(function($query) use ($relationForeignKey, $relationKeyName, $relationModel, $relationMethod) {
+            $keysArray = $relationModel->pluck($relationKeyName);
+            $relationTableName = $this->getRelationWithoutConstraints($relationMethod)->getRelated()->getTable();
+            return $query->whereIn($relationTableName . '.' . $relationKeyName, $keysArray);
+        });
+
+        return $this->addHasWhere(
+            $hasQuery, $relation, $operator, $count, $boolean
+        );
     }
 
     /**
