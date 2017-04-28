@@ -1,5 +1,15 @@
 # Release Notes for 5.4.x
 
+## v5.4.21 (2017-04-28)
+
+### Added
+- Support conditional broadcasting ([#18970](https://github.com/laravel/framework/pull/18970), [2665d9b](https://github.com/laravel/framework/commit/2665d9b9a49633d73c71db735c2597c8b960c985))
+
+### Fixed
+- Reverted queue prefix option [#18860](https://github.com/laravel/framework/pull/18860) ([#18987](https://github.com/laravel/framework/pull/18987))
+- Return `null` if key is not found from `RedisStore:many()` ([#18984](https://github.com/laravel/framework/pull/18984))
+
+
 ## v5.4.20 (2017-04-27)
 
 ### Added
