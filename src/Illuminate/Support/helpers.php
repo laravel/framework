@@ -752,6 +752,20 @@ if (! function_exists('str_limit')) {
     }
 }
 
+if (! function_exists( 'str_ordinal')) {
+    /**
+     * Append an ordinal indicator to a numeric value.
+     *
+     * @param  string|int  $value
+     * @param  bool  $superscript
+     * @return string
+     */
+    function str_ordinal($value, $superscript)
+    {
+        return Str::ordinal($value, $superscript);
+    }
+}
+
 if (! function_exists('str_plural')) {
     /**
      * Get the plural form of an English word.

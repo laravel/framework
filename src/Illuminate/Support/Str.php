@@ -214,6 +214,27 @@ class Str
     }
 
     /**
+     * Append an ordinal indicator to a numeric value.
+     *
+     * @param  string|int  $value
+     * @param  bool  $superscript
+     * @return string
+     */
+    public static function ordinal($value, $superscript = false)
+    {
+    	$number = abs((int)$value);
+
+        $indicators = ['th','st','nd','rd','th','th','th','th','th','th'];
+
+        $suffix = $superscript ? '<sup>' . $indicators[$number % 10] . '</sup>' : $indicators[$number % 10];
+        if ($number % 100 >= 11 && $number % 100 <= 13) {
+            $suffix = $superscript ? '<sup>th</sup>' : 'th';
+        }
+
+        return number_format($number) . $suffix;
+    }
+
+    /**
      * Get the plural form of an English word.
      *
      * @param  string  $value

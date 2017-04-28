@@ -286,6 +286,21 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals('这是一', Str::limit($nonAsciiString, 6, ''));
     }
 
+    public function testStrOrdinal()
+    {
+        $this->assertEquals('0th', Str::ordinal('foo'));
+        $this->assertEquals('0th', Str::ordinal(0));
+        $this->assertEquals('0th', Str::ordinal('0'));
+        $this->assertEquals('1st', Str::ordinal('1'));
+        $this->assertEquals('2nd', Str::ordinal('2'));
+        $this->assertEquals('3rd', Str::ordinal('3'));
+        $this->assertEquals('4th', Str::ordinal('4'));
+        $this->assertEquals('11th', Str::ordinal('11'));
+        $this->assertEquals('112th', Str::ordinal('112'));
+        $this->assertEquals('1,113th', Str::ordinal('1113'));
+        $this->assertEquals('1,000<sup>th</sup>', Str::ordinal('1000', true));
+    }
+
     public function testCamelCase()
     {
         $this->assertEquals('fooBar', camel_case('FooBar'));
