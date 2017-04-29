@@ -47,7 +47,6 @@ class EloquentFactoryBuilderTest extends TestCase
             ];
         });
 
-
         $app->singleton(Factory::class, function ($app) use ($factory) {
             return $factory;
         });
