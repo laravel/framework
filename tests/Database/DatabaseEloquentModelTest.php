@@ -1139,7 +1139,7 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = new EloquentModelNonIncrementingStub;
         $model->id = 'foo';
-        $this->assertEquals('stub.foo', $model->getRouteKey());
+        $this->assertEquals('foo', $model->getRouteKey());
     }
 
     public function testRouteNameIsPrimaryKeyName()
