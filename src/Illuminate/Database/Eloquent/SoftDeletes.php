@@ -70,6 +70,12 @@ trait SoftDeletes
      */
     public function restore()
     {
+        // If the model is not soft-deleted, we will not proceed with restore operation
+        // as there is no point in doing so.
+        if ($this->trashed() === false) {
+            return false;
+        }
+
         // If the restoring event does not return false, we will proceed with this
         // restore operation. Otherwise, we bail out so the developer will stop
         // the restore totally. We will clear the deleted timestamp and save.

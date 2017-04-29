@@ -29,6 +29,21 @@ class DatabaseSoftDeletingTraitTest extends PHPUnit_Framework_TestCase
         $model->shouldReceive('fireModelEvent')->with('restoring')->andReturn(true);
         $model->shouldReceive('save')->once();
         $model->shouldReceive('fireModelEvent')->with('restored', false)->andReturn(true);
+        $model->deleted_at = new \DateTime;
+
+        $model->restore();
+
+        $this->assertNull($model->deleted_at);
+    }
+
+    public function testRestoreNotSoftDeleted()
+    {
+        $model = m::mock('DatabaseSoftDeletingTraitStub');
+        $model->shouldDeferMissing();
+        $model->shouldReceive('fireModelEvent')->with('restoring')->never();
+        $model->shouldReceive('save')->never();
+        $model->shouldReceive('fireModelEvent')->with('restored', false)->never();
+        $model->deleted_at = null;
 
         $model->restore();
 
