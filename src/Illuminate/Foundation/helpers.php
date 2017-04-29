@@ -595,6 +595,7 @@ if (! function_exists('mix')) {
         if ($full) {
             return new HtmlString(url($manifestDirectory.$manifest[$path]));
         }
+
         return new HtmlString($manifestDirectory.$manifest[$path]);
     }
 }
