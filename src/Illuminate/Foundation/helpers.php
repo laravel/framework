@@ -557,11 +557,12 @@ if (! function_exists('mix')) {
      *
      * @param  string  $path
      * @param  string  $manifestDirectory
+     * @param  bool    $full
      * @return \Illuminate\Support\HtmlString
      *
      * @throws \Exception
      */
-    function mix($path, $manifestDirectory = '')
+    function mix($path, $manifestDirectory = '', $full = false)
     {
         static $manifest;
 
@@ -591,7 +592,9 @@ if (! function_exists('mix')) {
                 'webpack.mix.js output paths and try again.'
             );
         }
-
+        if ($full) {
+            return new HtmlString(url($manifestDirectory.$manifest[$path]));
+        }
         return new HtmlString($manifestDirectory.$manifest[$path]);
     }
 }
