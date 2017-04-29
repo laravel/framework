@@ -139,26 +139,24 @@ trait QueriesRelationships
     {
         $relationMethod = key($relation);
         $relationModel = $relation[$relationMethod];
-        $relationKeyName = $this->getRelationWithoutConstraints($relationMethod)
-            ->getRelated()
-            ->getKeyName();
-        $relationForeignKey = $this->getRelationWithoutConstraints($relationMethod)
-            ->getRelated()
-            ->getForeignKey();
-
-        $relation = $this->getRelationWithoutConstraints($relationMethod);
+        $relationQuery = $this->getRelationWithoutConstraints($relationMethod);
+        $relatedModel = $relationQuery->getRelated();
+        $relationKeyName = $relatedModel->getKeyName();
+        $relationForeignKey = $relatedModel->getForeignKey();
 
         $method = $this->canUseExistsForExistenceCheck($operator, $count)
             ? 'getRelationExistenceQuery'
             : 'getRelationExistenceCountQuery';
 
-        $hasQuery = $relation->{$method}(
-            $relation->getRelated()->newQuery(), $this
+        $hasQuery = $relationQuery->{$method}(
+            $relationQuery->getRelated()->newQuery(), $this
         );
 
-        $hasQuery->callScope(function ($query) use ($relationForeignKey, $relationKeyName, $relationModel, $relationMethod) {
+        $hasQuery->callScope(function ($query) use (
+            $relationForeignKey, $relationKeyName, $relationModel, $relationMethod, $relatedModel
+        ) {
             $keysArray = $relationModel->pluck($relationKeyName);
-            $relationTableName = $this->getRelationWithoutConstraints($relationMethod)->getRelated()->getTable();
+            $relationTableName = $relatedModel->getTable();
 
             return $query->whereIn($relationTableName.'.'.$relationKeyName, $keysArray);
         });
