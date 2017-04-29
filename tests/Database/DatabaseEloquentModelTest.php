@@ -1139,13 +1139,13 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = new EloquentModelNonIncrementingStub;
         $model->id = 'foo';
-        $this->assertEquals('foo', $model->getRouteKey());
+        $this->assertEquals('stub.foo', $model->getRouteKey());
     }
 
     public function testRouteNameIsPrimaryKeyName()
     {
         $model = new EloquentModelStub;
-        $this->assertEquals('id', $model->getRouteKeyName());
+        $this->assertEquals('stub.id', $model->getRouteKeyName());
     }
 
     public function testCloneModelMakesAFreshCopyOfTheModel()
