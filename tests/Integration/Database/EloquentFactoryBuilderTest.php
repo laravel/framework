@@ -1,10 +1,10 @@
 <?php
 
 use Faker\Generator;
-use Illuminate\Database\Eloquent\Factory;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factory;
 
 /**
  * @group integration
