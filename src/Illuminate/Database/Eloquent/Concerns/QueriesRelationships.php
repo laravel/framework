@@ -159,6 +159,7 @@ trait QueriesRelationships
         $hasQuery->callScope(function ($query) use ($relationForeignKey, $relationKeyName, $relationModel, $relationMethod) {
             $keysArray = $relationModel->pluck($relationKeyName);
             $relationTableName = $this->getRelationWithoutConstraints($relationMethod)->getRelated()->getTable();
+
             return $query->whereIn($relationTableName.'.'.$relationKeyName, $keysArray);
         });
 
