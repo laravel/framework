@@ -1,0 +1,163 @@
+<?php
+
+use Faker\Generator;
+use Orchestra\Testbench\TestCase;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factory;
+
+/**
+ * @group integration
+ */
+class EloquentFactoryBuilderTest extends TestCase
+{
+    protected function getEnvironmentSetUp($app)
+    {
+        $app['config']->set('app.debug', 'true');
+
+        $app['config']->set('database.default', 'testbench');
+        $app['config']->set('database.connections.testbench', [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => '',
+        ]);
+
+        $factory = new Factory($app->make(Generator::class));
+
+        $factory->define(FactoryBuildableUser::class, function (Generator $faker) {
+            return [
+                'name' => $faker->name,
+                'email' => $faker->unique()->safeEmail,
+            ];
+        });
+
+        $factory->define(FactoryBuildableServer::class, function (Generator $faker) {
+            return [
+                'name' => $faker->name,
+                'status' => 'active',
+                'user_id' => function () {
+                    return factory(FactoryBuildableUser::class)->create()->id;
+                },
+            ];
+        });
+
+        $factory->state(FactoryBuildableServer::class, 'inactive', function (Generator $faker) {
+            return [
+                'status' => 'inactive',
+            ];
+        });
+
+        $app->singleton(Factory::class, function ($app) use ($factory) {
+            return $factory;
+        });
+    }
+
+    public function setUp()
+    {
+        parent::setUp();
+
+        Schema::create('users', function ($table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->string('email');
+        });
+
+        Schema::create('servers', function ($table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->integer('user_id');
+            $table->string('status');
+        });
+    }
+
+    /**
+     * @test
+     */
+    public function creating_factory_models()
+    {
+        $user = factory(FactoryBuildableUser::class)->create();
+
+        $dbUser = FactoryBuildableUser::find(1);
+
+        $this->assertTrue($user->is($dbUser));
+    }
+
+    /**
+     * @test
+     */
+    public function creating_factory_models_overriding_attributes()
+    {
+        $user = factory(FactoryBuildableUser::class)->create(['name' => 'Zain']);
+
+        $this->assertEquals('Zain', $user->name);
+    }
+
+    /**
+     * @test
+     */
+    public function creating_collection_of_models()
+    {
+        $users = factory(FactoryBuildableUser::class, 3)->create();
+
+        $instances = factory(FactoryBuildableUser::class, 3)->make();
+
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $users);
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $instances);
+        $this->assertCount(3, $users);
+        $this->assertCount(3, $instances);
+        $this->assertCount(3, FactoryBuildableUser::find($users->pluck('id')->toArray()));
+        $this->assertCount(0, FactoryBuildableUser::find($instances->pluck('id')->toArray()));
+    }
+
+    /**
+     * @test
+     */
+    public function creating_models_with_states()
+    {
+        $server = factory(FactoryBuildableServer::class)->create();
+
+        $inactiveServer = factory(FactoryBuildableServer::class)->states('inactive')->create();
+
+        $this->assertEquals('active', $server->status);
+        $this->assertEquals('inactive', $inactiveServer->status);
+    }
+
+    /**
+     * @test
+     */
+    public function creating_models_with_relationships()
+    {
+        factory(FactoryBuildableUser::class, 2)
+            ->create()
+            ->each(function ($user) {
+                $user->servers()->saveMany(factory(FactoryBuildableServer::class, 2)->make());
+            })
+            ->each(function ($user) {
+                $this->assertCount(2, $user->servers);
+            });
+    }
+}
+
+class FactoryBuildableUser extends Model
+{
+    public $table = 'users';
+    public $timestamps = false;
+    protected $guarded = ['id'];
+
+    public function servers()
+    {
+        return $this->hasMany(FactoryBuildableServer::class, 'user_id');
+    }
+}
+
+class FactoryBuildableServer extends Model
+{
+    public $table = 'servers';
+    public $timestamps = false;
+    protected $guarded = ['id'];
+
+    public function user()
+    {
+        return $this->belongsTo(FactoryBuildableUser::class, 'user_id');
+    }
+}
