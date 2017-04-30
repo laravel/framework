@@ -38,6 +38,17 @@ abstract class Seeder
     }
 
     /**
+     * Seed the given connection from the given path silently.
+     *
+     * @param  string  $class
+     * @return void
+     */
+    public function callSilent($class)
+    {
+        $this->resolve($class)->__invoke();
+    }
+
+    /**
      * Resolve an instance of the given seeder class.
      *
      * @param  string  $class
