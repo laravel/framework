@@ -114,6 +114,14 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals('taylor', $model->name);
     }
 
+    public function testMakeMethodDoesNotSaveNewModel()
+    {
+        $_SERVER['__eloquent.saved'] = false;
+        $model = EloquentModelSaveStub::make(['name' => 'taylor']);
+        $this->assertFalse($_SERVER['__eloquent.saved']);
+        $this->assertEquals('taylor', $model->name);
+    }
+
     public function testForceCreateMethodSavesNewModelWithGuardedAttributes()
     {
         $_SERVER['__eloquent.saved'] = false;

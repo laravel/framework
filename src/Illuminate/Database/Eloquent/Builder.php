@@ -713,6 +713,17 @@ class Builder
     }
 
     /**
+     * Create and return and un-saved model instance.
+     *
+     * @param  array  $attributes
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function make(array $attributes = [])
+    {
+        return $this->newModelInstance($attributes);
+    }
+
+    /**
      * Save a new model and return the instance.
      *
      * @param  array  $attributes
