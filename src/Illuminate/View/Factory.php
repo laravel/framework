@@ -159,23 +159,35 @@ class Factory implements FactoryContract
     /**
      * Get the rendered contents of a partial from a loop.
      *
-     * @param  string  $view
-     * @param  array   $data
-     * @param  string  $iterator
-     * @param  string  $empty
+     * @param  string        $view
+     * @param  array         $data
+     * @param  string        $iterator
+     * @param  string|array  $empty
+     * @param  array         $mergeData
      * @return string
      */
-    public function renderEach($view, $data, $iterator, $empty = 'raw|')
+    public function renderEach($view, $data, $iterator, $empty = 'raw|', $mergeData = [])
     {
         $result = '';
+
+        // Although no necessary, user can assign the $empty as null or false
+        // this way the $empty will receive the same value as the standard
+        // one - "raw|", which will print nothing if the data is empty
+        $empty = ($empty) ?: 'raw|';
+
+        // If $empty if an array, instead of an string, it will assign the
+        // array to the $mergeData, making it unnecessary to define an
+        // empty view to assign data to be passed to the view
+        $mergeData = (is_array($empty)) ? $empty : $mergeData;
 
         // If is actually data in the array, we will loop through the data and append
         // an instance of the partial view to the final result HTML passing in the
         // iterated value of this data array, allowing the views to access them.
-        if (count($data) > 0) {
+        if (count($data) > 0) {cd ~
+        
             foreach ($data as $key => $value) {
                 $result .= $this->make(
-                    $view, ['key' => $key, $iterator => $value]
+                    $view, array_merge(['key' => $key, $iterator => $value], $mergeData)
                 )->render();
             }
         }
@@ -186,7 +198,7 @@ class Factory implements FactoryContract
         else {
             $result = Str::startsWith($empty, 'raw|')
                         ? substr($empty, 4)
-                        : $this->make($empty)->render();
+                        : $this->make($empty, $mergeData)->render();
         }
 
         return $result;
