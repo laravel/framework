@@ -61,7 +61,7 @@ class ViewFactoryTest extends TestCase
     public function testEmptyViewsCanBeReturnedFromRenderEach()
     {
         $factory = m::mock('Illuminate\View\Factory[make]', $this->getFactoryArgs());
-        $factory->shouldReceive('make')->once()->with('foo')->andReturn($mockView = m::mock('StdClass'));
+        $factory->shouldReceive('make')->once()->with('foo', [])->andReturn($mockView = m::mock('StdClass'));
         $mockView->shouldReceive('render')->once()->andReturn('empty');
 
         $this->assertEquals('empty', $factory->renderEach('view', [], 'iterator', 'foo'));
