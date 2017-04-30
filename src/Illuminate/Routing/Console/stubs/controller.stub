@@ -2,6 +2,7 @@
 
 namespace DummyNamespace;
 
+use View;
 use Illuminate\Http\Request;
 use DummyRootNamespaceHttp\Controllers\Controller;
 
