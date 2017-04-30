@@ -38,7 +38,7 @@ abstract class Seeder
     }
 
     /**
-     * Seed the given connection from the given path silently.
+     * Silently seed the given connection from the given path.
      *
      * @param  string  $class
      * @return void
