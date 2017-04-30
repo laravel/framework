@@ -183,8 +183,8 @@ class Factory implements FactoryContract
         // If is actually data in the array, we will loop through the data and append
         // an instance of the partial view to the final result HTML passing in the
         // iterated value of this data array, allowing the views to access them.
-        if (count($data) > 0) {cd ~
-        
+        if (count($data) > 0) {
+
             foreach ($data as $key => $value) {
                 $result .= $this->make(
                     $view, array_merge(['key' => $key, $iterator => $value], $mergeData)
