@@ -283,3 +283,14 @@ img {
     font-size: 15px;
     text-align: center;
 }
+
+/* Code Blocks */
+
+pre {
+    width: 570px;
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 3px;
+    background: #F9F9F9;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.16);
+}
