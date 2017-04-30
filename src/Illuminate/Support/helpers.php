@@ -845,11 +845,12 @@ if (! function_exists('str_slug')) {
      *
      * @param  string  $title
      * @param  string  $separator
+     * @param  string  $language
      * @return string
      */
-    function str_slug($title, $separator = '-')
+    function str_slug($title, $separator = '-', $language = 'en')
     {
-        return Str::slug($title, $separator);
+        return Str::slug($title, $separator, $language);
     }
 }
 
