@@ -637,6 +637,21 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['qux', true], $builder->getBindings());
     }
 
+    public function testWithCountAndGlobalScope()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        EloquentBuilderTestModelCloseRelatedStub::addGlobalScope('withCount', function ($query) {
+            return $query->addSelect('id');
+        });
+
+        $builder = $model->select('id')->withCount(['foo']);
+
+        // Remove the global scope so it doesn't interfere with any other tests
+        EloquentBuilderTestModelCloseRelatedStub::addGlobalScope('withCount', function ($query) {});
+
+        $this->assertEquals('select "id", (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+    }
+
     public function testWithCountAndContraintsAndHaving()
     {
         $model = new EloquentBuilderTestModelParentStub;
