@@ -77,6 +77,29 @@ trait InteractsWithDatabase
     }
 
     /**
+     * Assert that a given where condition matches a soft deleted record.
+     *
+     * @param  string $table
+     * @param  array $data
+     * @param  string $connection
+     * @return $this
+     */
+    protected function seeInDatabaseSoftDeleted($table, array $data, $connection = null)
+    {
+        $database = $this->app->make('db');
+
+        $connection = $connection ?: $database->getDefaultConnection();
+
+        $count = $database->connection($connection)->table($table)->where($data)->whereNotNull('deleted_at')->count();
+
+        $this->assertGreaterThan(0, $count, sprintf(
+            'Unable to find soft deleted row in database table [%s] that matched attributes [%s].', $table, json_encode($data)
+        ));
+
+        return $this;
+    }
+
+    /**
      * Seed a given database connection.
      *
      * @param  string  $class
