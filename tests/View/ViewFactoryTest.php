@@ -72,6 +72,45 @@ class ViewFactoryTest extends TestCase
         $this->assertEquals('foo', $this->getFactory()->renderEach('foo', [], 'item', 'raw|foo'));
     }
 
+    public function testRenderEachPassesExtraDataForViewOnPlaceOfEmptyView()
+    {
+        $extraVariable = ['extra' => 'variable'];
+
+        $factory = m::mock('Illuminate\View\Factory[make]', $this->getFactoryArgs());
+        $factory->shouldReceive('make')->once()->with('foo', array_merge(['key' => 'bar', 'value' => 'baz'], $extraVariable))->andReturn($mockView1 = m::mock('StdClass'));
+        $factory->shouldReceive('make')->once()->with('foo', array_merge(['key' => 'breeze', 'value' => 'boom'], $extraVariable))->andReturn($mockView2 = m::mock('StdClass'));
+        $mockView1->shouldReceive('render')->once()->andReturn('mock1');
+        $mockView2->shouldReceive('render')->once()->andReturn('mock2');
+
+        $result = $factory->renderEach('foo', ['bar' => 'baz', 'breeze' => 'boom'], 'value', $extraVariable);
+
+        $this->assertEquals('mock1mock2', $result);
+    }
+
+    public function testRenderEachPassesExtraDataForView()
+    {
+        $extraVariable = ['extra' => 'variable'];
+
+        $factory = m::mock('Illuminate\View\Factory[make]', $this->getFactoryArgs());
+        $factory->shouldReceive('make')->once()->with('foo', array_merge(['key' => 'bar', 'value' => 'baz'], $extraVariable))->andReturn($mockView1 = m::mock('StdClass'));
+        $factory->shouldReceive('make')->once()->with('foo', array_merge(['key' => 'breeze', 'value' => 'boom'], $extraVariable))->andReturn($mockView2 = m::mock('StdClass'));
+        $mockView1->shouldReceive('render')->once()->andReturn('mock1');
+        $mockView2->shouldReceive('render')->once()->andReturn('mock2');
+
+        $result = $factory->renderEach('foo', ['bar' => 'baz', 'breeze' => 'boom'], 'value', false, $extraVariable);
+
+        $this->assertEquals('mock1mock2', $result);
+    }
+
+    public function testRenderEachPassesExtraDataForEmptyView()
+    {
+        $factory = m::mock('Illuminate\View\Factory[make]', $this->getFactoryArgs());
+        $factory->shouldReceive('make')->once()->with('foo', array_merge([], ['extra' => 'variable']))->andReturn($mockView = m::mock('StdClass'));
+        $mockView->shouldReceive('render')->once()->andReturn('variable');
+
+        $this->assertEquals('variable', $factory->renderEach('view', [], 'iterator', 'foo', ['extra' => 'variable']));
+    }
+
     public function testEnvironmentAddsExtensionWithCustomResolver()
     {
         $factory = $this->getFactory();
