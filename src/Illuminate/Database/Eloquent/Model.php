@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use Lang;
 use Exception;
 use ArrayAccess;
 use JsonSerializable;
@@ -1200,7 +1201,23 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function getTranslationName()
     {
+        $key = $this->getTranslationNameKey();
+
+        if (Lang::has($key)) {
+            return Lang::get($key);
+        }
+
         return Str::snake(class_basename($this), ' ');
+    }
+
+    /**
+     * Get the translation name key for the model.
+     *
+     * @return string
+     */
+    public function getTranslationNameKey()
+    {
+        return 'models.'.Str::snake(class_basename($this));
     }
 
     /**
