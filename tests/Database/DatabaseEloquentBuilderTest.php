@@ -104,6 +104,18 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals('baz', $result);
     }
 
+    public function testFindWithManyUsingCollection()
+    {
+        $ids = collect([1, 2]);
+        $builder = m::mock('Illuminate\Database\Eloquent\Builder[get]', [$this->getMockQueryBuilder()]);
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo', $ids);
+        $builder->setModel($this->getMockModel());
+        $builder->shouldReceive('get')->with(['column'])->andReturn('baz');
+
+        $result = $builder->find($ids, ['column']);
+        $this->assertEquals('baz', $result);
+    }
+
     public function testFirstMethod()
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[get,take]', [$this->getMockQueryBuilder()]);
