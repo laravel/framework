@@ -69,12 +69,11 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testCastedAttributesDirty()
     {
-        $model = new EloquentModelCastingStub(['booleanAttribute' => 0, 'nonCastedAttribute' => 'John']);
+        $model = new EloquentModelCastingStub(['booleanAttribute' => 0]);
         $model->syncOriginal();
 
         $this->assertSame(false, $model->booleanAttribute);
 
-        $model->nonCastedAttribute = 'John';
         $model->booleanAttribute = false;
 
         $this->assertEquals([], $model->getDirty());
