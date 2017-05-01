@@ -1007,7 +1007,9 @@ trait HasAttributes
      */
     protected function originalIsNumericallyEquivalent($key)
     {
-        if (in_array($this->getCastType($key), ['bool', 'boolean'])) return true;
+        if (in_array($this->getCastType($key), ['bool', 'boolean'], true)) {
+            return true;
+        }
 
         $current = $this->attributes[$key];
 
