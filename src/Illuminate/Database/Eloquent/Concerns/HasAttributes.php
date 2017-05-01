@@ -981,7 +981,7 @@ trait HasAttributes
     protected function originalIsEquivalent($key)
     {
         return $this->originalIsNumericallyEquivalent($key)
-            && $this->originalIsBooleanEquivalent($key);
+            && ($this->originalIsBooleanEquivalent($key));
     }
 
     /**
@@ -1007,6 +1007,8 @@ trait HasAttributes
      */
     protected function originalIsNumericallyEquivalent($key)
     {
+        if (in_array($this->getCastType($key), ['bool', 'boolean'])) return true;
+
         $current = $this->attributes[$key];
 
         $original = $this->original[$key];
