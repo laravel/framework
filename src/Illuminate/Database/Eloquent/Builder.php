@@ -98,6 +98,17 @@ class Builder
     }
 
     /**
+     * Create and return and un-saved model instance.
+     *
+     * @param  array  $attributes
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function make(array $attributes = [])
+    {
+        return $this->newModelInstance($attributes);
+    }
+
+    /**
      * Register a new global scope.
      *
      * @param  string  $identifier
@@ -710,17 +721,6 @@ class Builder
             'path' => Paginator::resolveCurrentPath(),
             'pageName' => $pageName,
         ]);
-    }
-
-    /**
-     * Create and return and un-saved model instance.
-     *
-     * @param  array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model
-     */
-    public function make(array $attributes = [])
-    {
-        return $this->newModelInstance($attributes);
     }
 
     /**
