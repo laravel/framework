@@ -264,7 +264,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         $replace = $this->sortReplacements($replace);
 
         foreach ($replace as $key => $value) {
-            if ($value instanceOf \Illuminate\Database\Eloquent\Model) {
+            if ($value instanceof \Illuminate\Database\Eloquent\Model) {
                 $value = $value->getTranslationName();
             }
 
