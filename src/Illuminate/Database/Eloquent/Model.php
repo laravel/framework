@@ -1194,6 +1194,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Get the translation name for the model.
+     *
+     * @return string
+     */
+    public function getTranslationName()
+    {
+        return Str::snake(class_basename($this), ' ');
+    }
+
+    /**
      * Get the default foreign key name for the model.
      *
      * @return string
