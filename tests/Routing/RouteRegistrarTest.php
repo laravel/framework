@@ -249,6 +249,23 @@ class RouteRegistrarTest extends TestCase
         $this->seeMiddleware('Illuminate\Tests\Routing\RouteRegistrarMiddlewareStub');
     }
 
+    public function testCanFluentlySetArbitraryOptionsOnPendingResource()
+    {
+        $registrar = m::mock(\Illuminate\Routing\ResourceRegistrar::class)
+            ->shouldReceive('register')
+            ->once()
+            ->with(m::any(), m::any(), m::on(function ($options) {
+                return ! $this->assertArraySubset(
+                    $options,
+                    ['something' => 'else', 'random' => true]
+                );
+            }))->mock();
+
+        (new \Illuminate\Routing\PendingResourceRegistration(
+            $registrar, 'posts', RouteRegistrarControllerStub::class, []
+        ))->something('else')->random();
+    }
+
     public function testCanSetRouteName()
     {
         $this->router->as('users.index')->get('users', function () {
