@@ -337,9 +337,7 @@ class Dispatcher implements DispatcherContract
      */
     public function makeListener($listener, $wildcard = false)
     {
-        if (is_string($listener)) {
-            return $this->createClassListener($listener, $wildcard);
-        }
+        $listener = is_string($listener) ? $this->createClassCallable($listener) : $listener;
 
         return function ($event, $payload) use ($listener, $wildcard) {
             if ($wildcard) {
@@ -353,21 +351,15 @@ class Dispatcher implements DispatcherContract
     /**
      * Create a class based listener using the IoC container.
      *
+     * @deprecated since version 5.4. Use the "makeListener" method directly.
+     *
      * @param  string  $listener
      * @param  bool  $wildcard
      * @return \Closure
      */
     public function createClassListener($listener, $wildcard = false)
     {
-        return function ($event, $payload) use ($listener, $wildcard) {
-            if ($wildcard) {
-                return call_user_func($this->createClassCallable($listener), $event, $payload);
-            } else {
-                return call_user_func_array(
-                    $this->createClassCallable($listener), $payload
-                );
-            }
-        };
+        return $this->makeListener($listener, $wildcard);
     }
 
     /**
