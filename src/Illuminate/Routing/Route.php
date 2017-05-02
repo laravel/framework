@@ -173,7 +173,7 @@ class Route
      */
     protected function isControllerAction()
     {
-        return is_string($this->action['uses']);
+        return is_string($this->action['uses']) || is_array($this->action['uses']);
     }
 
     /**
@@ -237,6 +237,10 @@ class Route
      */
     protected function parseControllerCallback()
     {
+        if (is_array($this->action['uses'])) {
+            return $this->action['uses'];
+        }
+
         return Str::parseCallback($this->action['uses']);
     }
 
