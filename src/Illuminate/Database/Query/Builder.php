@@ -279,6 +279,8 @@ class Builder
     protected function parseSubSelect($query)
     {
         if ($query instanceof self) {
+            $query->columns = [$query->columns[0]];
+
             return [$query->toSql(), $query->getBindings()];
         } elseif (is_string($query)) {
             return [$query, []];

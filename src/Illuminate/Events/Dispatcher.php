@@ -334,7 +334,7 @@ class Dispatcher implements DispatcherContract
      *
      * @param  string|\Closure  $listener
      * @param  bool  $wildcard
-     * @return mixed
+     * @return \Closure
      */
     public function makeListener($listener, $wildcard = false)
     {
