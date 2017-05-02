@@ -510,11 +510,11 @@ class Command extends SymfonyCommand
     protected function parseVerbosity($level = null)
     {
         if (isset($this->verbosityMap[$level])) {
-           return $this->verbosityMap[$level];
+            return $this->verbosityMap[$level];
         }
 
         if (! is_int($level)) {
-           return $this->verbosity;
+            return $this->verbosity;
         }
 
         return $level;
