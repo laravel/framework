@@ -233,13 +233,13 @@ if (! function_exists('cache')) {
 
         if (! is_array($arguments[0])) {
             throw new Exception(
-                'The argument passed to the cache must be a string or an array.'
+                'When setting a value in the cache, you must pass an array of key / value pairs.'
             );
         }
 
         if (! isset($arguments[1])) {
             throw new Exception(
-                'You must set an expiration time when putting to the cache.'
+                'You must specify an expiration time when setting a value in the cache.'
             );
         }
 
