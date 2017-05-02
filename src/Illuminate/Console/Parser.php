@@ -64,7 +64,7 @@ class Parser
         foreach ($tokens as $token) {
             if (preg_match('/-{2,}(.*)/', $token, $matches)) {
                 $options[] = static::parseOption($matches[1]);
-                
+
                 continue;
             }
 
