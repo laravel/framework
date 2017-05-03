@@ -147,11 +147,12 @@ class Str
      * Return the length of the given string.
      *
      * @param  string  $value
+     * @param  string  $encoding
      * @return int
      */
-    public static function length($value)
+    public static function length($value, $encoding = null)
     {
-        return mb_strlen($value);
+        return mb_strlen($value, $encoding ?: mb_internal_encoding());
     }
 
     /**
