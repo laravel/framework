@@ -53,7 +53,7 @@ class PhpRedisConnection extends Connection
      * @param string|null  $flag
      * @return bool
      */
-   public function set($key, $value, $expireResolution = null, $expireTTL = null, $flag = null)
+    public function set($key, $value, $expireResolution = null, $expireTTL = null, $flag = null)
     {
         $extendedOptions = null;
         if ($expireResolution) {
