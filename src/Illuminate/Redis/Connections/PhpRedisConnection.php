@@ -62,6 +62,7 @@ class PhpRedisConnection extends Connection
         if ($expireTTL && $flag) {
             $extendedOptions[$flag] = $expireTTL;
         }
+        
         return $this->command('set', [
             $key,
             $value,
