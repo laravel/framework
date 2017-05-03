@@ -38,7 +38,7 @@ trait SendsPasswordResetEmails
                     ? $this->sendResetLinkResponse($response)
                     : $this->sendResetLinkFailedResponse($request, $response);
     }
-    
+
     /**
      * Validates the email.
      *
