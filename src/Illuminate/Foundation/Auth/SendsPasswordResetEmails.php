@@ -40,7 +40,7 @@ trait SendsPasswordResetEmails
     }
 
     /**
-     * Validates the email.
+     * Validate the email for the given request.
      *
      * @param \Illuminate\Http\Request  $request
      * @return void
