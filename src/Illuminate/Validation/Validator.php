@@ -679,7 +679,11 @@ class Validator implements ValidatorContract
 
         $values = array_slice($parameters, 1);
 
-        if (in_array($data, $values)) {
+        if (is_array($data)) {
+            if (count(array_intersect($data, $values)) > 0) {
+                return $this->validateRequired($attribute, $value);
+            }
+        } elseif (in_array($data, $values)) {
             return $this->validateRequired($attribute, $value);
         }
 
@@ -1979,7 +1983,15 @@ class Validator implements ValidatorContract
      */
     protected function replaceRequiredIf($message, $attribute, $rule, $parameters)
     {
-        $parameters[1] = $this->getDisplayableValue($parameters[0], Arr::get($this->data, $parameters[0]));
+        if ($this->hasRule($parameters[0], 'Array')) {
+            $values = [];
+            foreach (array_slice($parameters, 1) as $value) {
+                array_push($values, $this->getDisplayableValue($parameters[0], $value));
+            }
+            $parameters[1] = implode(', ', $values);
+        } else {
+            $parameters[1] = $this->getDisplayableValue($parameters[0], Arr::get($this->data, $parameters[0]));
+        }
 
         $parameters[0] = $this->getAttribute($parameters[0]);
 

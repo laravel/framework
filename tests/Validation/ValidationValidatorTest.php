@@ -455,9 +455,12 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
     public function testRequiredIf()
     {
+        // other field is a non array
         $trans = $this->getRealTranslator();
+        $trans->addResource('array', ['validation.required_if' => 'The :attribute field is required when :other is :value.'], 'en', 'messages');
         $v = new Validator($trans, ['first' => 'taylor'], ['last' => 'required_if:first,taylor']);
         $this->assertTrue($v->fails());
+        $this->assertEquals('The last field is required when first is taylor.', $v->messages()->first('last'));
 
         $trans = $this->getRealTranslator();
         $v = new Validator($trans, ['first' => 'taylor', 'last' => 'otwell'], ['last' => 'required_if:first,taylor']);
@@ -474,9 +477,36 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         // error message when passed multiple values (required_if:foo,bar,baz)
         $trans = $this->getRealTranslator();
         $trans->addResource('array', ['validation.required_if' => 'The :attribute field is required when :other is :value.'], 'en', 'messages');
-        $v = new Validator($trans, ['first' => 'dayle', 'last' => ''], ['last' => 'RequiredIf:first,taylor,dayle']);
+        $v = new Validator($trans, ['first' => 'dayle', 'last' => ''], ['last' => 'required_if:first,taylor,dayle']);
         $this->assertFalse($v->passes());
         $this->assertEquals('The last field is required when first is dayle.', $v->messages()->first('last'));
+
+        // other field is an array
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['speaker' => ['other'], 'other' => ''], ['speaker' => 'array', 'other' => 'required_if:speaker,other']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['speaker' => ['other'], 'other' => 'dayle'], ['speaker' => 'array', 'other' => 'required_if:speaker,other']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['speaker' => ['taylor', 'dayle'], 'other' => 'abigail'], ['speaker' => 'array', 'other' => 'required_if:speaker,taylor,other']);
+        $this->assertTrue($v->passes());
+
+        // error message when passed single value (required_if:foo,bar)
+        $trans = $this->getRealTranslator();
+        $trans->addResource('array', ['validation.required_if' => 'The :attribute field is required when :other is :value.'], 'en', 'messages');
+        $v = new Validator($trans, ['speaker' => ['other'], 'other' => ''], ['speaker' => 'array', 'other' => 'required_if:speaker,other']);
+        $this->assertFalse($v->passes());
+        $this->assertEquals('The other field is required when speaker is other.', $v->messages()->first('other'));
+
+        // error message when passed multiple values (required_if:foo,bar,baz)
+        $trans = $this->getRealTranslator();
+        $trans->addResource('array', ['validation.required_if' => 'The :attribute field is required when :other is :value.'], 'en', 'messages');
+        $v = new Validator($trans, ['speaker' => ['other'], 'other' => ''], ['speaker' => 'array', 'other' => 'required_if:speaker,taylor,other']);
+        $this->assertFalse($v->passes());
+        $this->assertEquals('The other field is required when speaker is taylor, other.', $v->messages()->first('other'));
     }
 
     public function testRequiredUnless()
