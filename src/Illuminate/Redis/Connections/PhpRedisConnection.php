@@ -57,10 +57,10 @@ class PhpRedisConnection extends Connection
     {
         $extendedOptions = null;
         if ($expireResolution) {
-            $extendedOptions = [$expireResolution]
+            $extendedOptions = [$expireResolution];
         }
         if ($expireTTL && $flag) {
-            $extendedOptions[$flag] = $expireTTL
+            $extendedOptions[$flag] = $expireTTL;
         }
         return $this->command('set', [
             $key,
