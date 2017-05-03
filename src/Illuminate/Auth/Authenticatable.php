@@ -28,7 +28,7 @@ trait Authenticatable
      */
     public function getAuthIdentifier()
     {
-        return $this->getAttribute($this->getAuthIdentifierName());
+        return $this->{$this->getAuthIdentifierName()};
     }
 
     /**
