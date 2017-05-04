@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Schema;
 
 use Closure;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Fluent;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Grammars\Grammar;
@@ -921,7 +922,8 @@ class Blueprint
      */
     protected function createIndexName($type, array $columns)
     {
-        $index = strtolower($this->table.'_'.implode('_', $columns).'_'.$type);
+        $prefix = DB::getTablePrefix();
+        $index = strtolower($prefix.$this->table.'_'.implode('_', $columns).'_'.$type);
 
         return str_replace(['-', '.'], '_', $index);
     }
