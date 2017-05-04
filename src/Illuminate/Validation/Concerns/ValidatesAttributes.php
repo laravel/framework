@@ -303,7 +303,7 @@ trait ValidatesAttributes
      */
     protected function validateBoolean($attribute, $value)
     {
-        $acceptable = [true, false, 0, 1, '0', '1'];
+        $acceptable = [true, false, 0, 1, '0', '1', 'on'];
 
         return in_array($value, $acceptable, true);
     }
@@ -1072,9 +1072,11 @@ trait ValidatesAttributes
     protected function convertValuesToBoolean($values)
     {
         return array_map(function ($value) {
-            if ($value === 'true') {
+            if ($value === 'true' || $value === 'on') {
                 return true;
-            } elseif ($value === 'false') {
+            }
+
+            if ($value === 'false') {
                 return false;
             }
 
