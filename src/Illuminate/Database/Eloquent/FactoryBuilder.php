@@ -265,7 +265,7 @@ class FactoryBuilder
             $attribute = $attribute instanceof Closure
                             ? $attribute($attributes) : $attribute;
 
-            $attribute = $attribute instanceof Model
+            $attribute = ($attribute instanceof Model && $attribute->exists)
                             ? $attribute->getKey() : $attribute;
         }
 
