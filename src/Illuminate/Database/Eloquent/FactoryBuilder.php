@@ -254,7 +254,7 @@ class FactoryBuilder
     }
 
     /**
-     * Get the state attributes
+     * Get the state attributes.
      *
      * @param string $state
      * @param array $attributes
@@ -264,7 +264,7 @@ class FactoryBuilder
     {
         $stateAttributes = $this->states[$this->class][$state];
 
-        if (!is_callable($stateAttributes)) {
+        if (! is_callable($stateAttributes)) {
             return $stateAttributes;
         }
 
