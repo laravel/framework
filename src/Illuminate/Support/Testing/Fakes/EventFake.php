@@ -192,6 +192,6 @@ class EventFake implements Dispatcher
      */
     public function until($event, $payload = [])
     {
-        //
+        return $this->dispatch($event, $payload, true);
     }
 }
