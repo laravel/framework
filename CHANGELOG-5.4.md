@@ -1,5 +1,22 @@
 # Release Notes for 5.4.x
 
+## [Unreleased]
+
+### Added
+- Support dynamic number of keys in `MessageBag::hasAny()` ([#19002](https://github.com/laravel/framework/pull/19002))
+- Added `Seeder::callSilent()` method ([#19007](https://github.com/laravel/framework/pull/19007))
+- Add `make()` method to Eloquent query builder ([#19015](https://github.com/laravel/framework/pull/19015))
+- Support `Arrayable` on Eloquent's `find()` method ([#19019](https://github.com/laravel/framework/pull/19019))
+
+### Changed
+- Throw exception when invalid first argument is passed to `cache()` helper ([d9459b2](https://github.com/laravel/framework/commit/d9459b2f8bec4a807e7ba2b3301de4c5248aa933))
+- Use `getAuthIdentifierName()` in `Authenticatable::getAuthIdentifier()` ([#19038](https://github.com/laravel/framework/pull/19038))
+
+### Fixed
+- Set data key when testing file uploads in nested array ([#18954](https://github.com/laravel/framework/pull/18954))
+- Fixed a bug related to sub select queries and extra select statements ([#19013](https://github.com/laravel/framework/pull/19013))
+
+
 ## v5.4.21 (2017-04-28)
 
 ### Added
