@@ -204,7 +204,7 @@ class FactoryBuilder
             $this->faker, $attributes
         );
 
-        return $this->callClosureAttributes(
+        return $this->callDynamicAttributes(
             array_merge($this->applyStates($definition, $attributes), $attributes)
         );
     }
@@ -254,16 +254,20 @@ class FactoryBuilder
     }
 
     /**
-     * Evaluate any Closure attributes on the attribute array.
+     * Evaluate any dynamic attributes on the attribute array.
      *
      * @param  array  $attributes
      * @return array
      */
-    protected function callClosureAttributes(array $attributes)
+    protected function callDynamicAttributes(array $attributes)
     {
         foreach ($attributes as &$attribute) {
             $attribute = $attribute instanceof Closure
                             ? $attribute($attributes) : $attribute;
+
+            if (is_string($attribute) && class_exists($attribute)) {
+                $attribute = factory($attribute)->create();
+            }
 
             $attribute = $attribute instanceof Model
                             ? $attribute->getKey() : $attribute;
