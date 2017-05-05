@@ -4,12 +4,12 @@ namespace Illuminate\Queue;
 
 use Exception;
 use Throwable;
-use Illuminate\Database\QueryException;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\DetectsLostConnections;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
+use Illuminate\Database\QueryException;
 
 class Worker
 {
@@ -49,6 +49,13 @@ class Worker
      * @var bool
      */
     public $shouldQuit = false;
+
+    /**
+     * Indicates if the worker should stop.
+     *
+     * @var bool
+     */
+    public $shouldStop = false;
 
     /**
      * Indicates if the worker is paused.
@@ -199,6 +206,8 @@ class Worker
             $this->stop(12);
         } elseif ($this->queueShouldRestart($lastRestart)) {
             $this->stop();
+        } elseif ($this->shouldStop) {
+            $this->stop(1);
         }
     }
 
@@ -244,7 +253,7 @@ class Worker
         } catch (Exception $e) {
             $this->exceptions->report($e);
 
-            $this->handleDatabaseException($e);
+            $this->handleException($e);
         } catch (Throwable $e) {
             $this->exceptions->report(new FatalThrowableError($e));
         }
@@ -265,24 +274,22 @@ class Worker
         } catch (Exception $e) {
             $this->exceptions->report($e);
 
-            $this->handleDatabaseException($e);
+            $this->handleException($e);
         } catch (Throwable $e) {
             $this->exceptions->report(new FatalThrowableError($e));
         }
     }
 
     /**
-     * Handle a database exception.
+     * Handle a serious job exception.
      *
      * @param  \Exception  $e
      * @return void
      */
-    protected function handleDatabaseException($e)
+    protected function handleException($e)
     {
-        if ($e instanceof QueryException && $this->causedByLostConnection($e->getPrevious())) {
-            $this->stop(1);
-        } elseif ($this->causedByLostConnection($e)) {
-            $this->stop(1);
+        if ($this->causedByLostConnection($e)) {
+            $this->shouldStop = true;
         }
     }
 
