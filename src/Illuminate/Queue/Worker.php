@@ -9,7 +9,6 @@ use Illuminate\Database\DetectsLostConnections;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
-use Illuminate\Database\QueryException;
 
 class Worker
 {
