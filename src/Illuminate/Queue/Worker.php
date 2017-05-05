@@ -3,6 +3,8 @@
 namespace Illuminate\Queue;
 
 use Exception;
+use Illuminate\Database\DetectsLostConnections;
+use PDOException;
 use Throwable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Debug\ExceptionHandler;
@@ -11,6 +13,7 @@ use Illuminate\Contracts\Cache\Repository as CacheContract;
 
 class Worker
 {
+    use DetectsLostConnections;
     /**
      * The queue manager instance.
      *
@@ -233,9 +236,13 @@ class Worker
     {
         try {
             foreach (explode(',', $queue) as $queue) {
-                if (! is_null($job = $connection->pop($queue))) {
+                if (!is_null($job = $connection->pop($queue))) {
                     return $job;
                 }
+            }
+        } catch (PDOException $e) {
+            if ($this->causedByLostConnection($e)) {
+                $this->stop(1);
             }
         } catch (Exception $e) {
             $this->exceptions->report($e);
