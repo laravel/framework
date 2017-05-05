@@ -277,7 +277,7 @@ class Worker
      * @param  \Exception  $e
      * @return void
      */
-    protected function handleDatabaseException($e) 
+    protected function handleDatabaseException($e)
     {
         if ($e instanceof QueryException && $this->causedByLostConnection($e->getPrevious())) {
             $this->stop(1);
