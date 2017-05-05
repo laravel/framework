@@ -180,7 +180,7 @@ class VerifyCsrfToken
                 return true;
             }
         }
-        
+
         return false;
     }
 }
