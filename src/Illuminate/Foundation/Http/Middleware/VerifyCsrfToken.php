@@ -154,7 +154,7 @@ class VerifyCsrfToken
         $config = config('session');
 
         $isXSRFDeleted = $this->isXSRFDeleted($response->headers->getCookies());
-        if (!$isXSRFDeleted) {
+        if (! $isXSRFDeleted) {
             $response->headers->setCookie(
                 new Cookie(
                     'XSRF-TOKEN', $request->session()->token(),
@@ -168,7 +168,6 @@ class VerifyCsrfToken
     }
 
     /**
-     *
      * Checks if XSRF is to be deleted as part of the response
      *
      * @param $cookies
