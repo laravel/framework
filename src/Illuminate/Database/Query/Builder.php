@@ -2075,6 +2075,12 @@ class Builder
     {
         $this->aggregate = compact('function', 'columns');
 
+        if (empty($this->groups)) {
+            $this->orders = null;
+
+            $this->bindings['order'] = [];
+        }
+
         return $this;
     }
 
