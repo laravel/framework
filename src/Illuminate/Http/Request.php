@@ -242,7 +242,7 @@ class Request extends SymfonyRequest implements ArrayAccess
      */
     public function has($key)
     {
-        $keys = is_array($key) ? $key : func_get_args();
+        $keys = is_array($key) ? func_get_args() : $key;
 
         foreach ($keys as $value) {
             if ($this->isEmptyString($value)) {
