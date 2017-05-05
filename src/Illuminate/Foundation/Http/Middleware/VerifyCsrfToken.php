@@ -168,7 +168,7 @@ class VerifyCsrfToken
     }
 
     /**
-     * Checks if XSRF is to be deleted as part of the response
+     * Checks if XSRF is to be deleted as part of the response.
      *
      * @param $cookies
      * @return bool
