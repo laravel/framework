@@ -23,7 +23,7 @@ class MakeAuthCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Scaffold basic login and registration views and routes';
+    protected $description = 'Scaffold basic login and registration views, language files and routes';
 
     /**
      * The views that need to be exported.
@@ -49,6 +49,8 @@ class MakeAuthCommand extends Command
         $this->createDirectories();
 
         $this->exportViews();
+
+        $this->exportLang();
 
         if (! $this->option('views')) {
             file_put_contents(
@@ -101,6 +103,24 @@ class MakeAuthCommand extends Command
                 resource_path('views/'.$value)
             );
         }
+    }
+
+    /**
+     * Export the authentication language files.
+     *
+     * @return void
+     */
+    protected function exportLang()
+    {
+        file_put_contents(
+            base_path('resources/lang/en/auth.php'),
+            file_get_contents(__DIR__.'/stubs/make/lang/auth.stub')
+        );
+
+        file_put_contents(
+            base_path('resources/lang/en/app.php'),
+            file_get_contents(__DIR__.'/stubs/make/lang/app.stub')
+        );
     }
 
     /**
