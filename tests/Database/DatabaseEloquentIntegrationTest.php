@@ -750,6 +750,24 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('05-12-12', $array['updated_at']);
     }
 
+    public function testTimestampsCanBeDisabledOnUpdate()
+    {
+        $model = new EloquentTestUser;
+        $model->email = 'taylor@laravel.com';
+        $model->created_at = '2016-01-01 00:00:00';
+        $model->updated_at = '2016-01-01 00:00:00';
+        $model->save();
+
+        $updatedAt = $model->updated_at->timestamp;
+        $model->email = 'otwell@laravel.com';
+        $model->save(['timestamps' => false]);
+        $this->assertEquals($updatedAt, $model->updated_at->timestamp);
+
+        $model->email = 'foo@bar.com';
+        $model->save();
+        $this->assertNotEquals($updatedAt, $model->updated_at->timestamp);
+    }
+
     /**
      * Helpers...
      */

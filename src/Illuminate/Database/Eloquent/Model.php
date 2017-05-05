@@ -1515,6 +1515,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             // convenience. Then we will just continue saving the model instances.
             if ($this->timestamps && Arr::get($options, 'timestamps', true)) {
                 $this->updateTimestamps();
+            } else {
+                $query->withoutTimestamps();
             }
 
             // Once we have run the update operation, we will fire the "updated" event for
@@ -1550,6 +1552,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // convenience. After, we will just continue saving these model instances.
         if ($this->timestamps && Arr::get($options, 'timestamps', true)) {
             $this->updateTimestamps();
+        } else {
+            $query->withoutTimestamps();
         }
 
         // If the model has an incrementing key, we can use the "insertGetId" method on

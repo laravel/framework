@@ -200,6 +200,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $model = $this->getMock('EloquentModelStub', ['newQueryWithoutScopes', 'updateTimestamps', 'fireModelEvent']);
         $model->timestamps = false;
         $query = m::mock('Illuminate\Database\Eloquent\Builder');
+        $query->shouldReceive('withoutTimestamps')->once();
         $query->shouldReceive('where')->once()->with('id', '=', 1);
         $query->shouldReceive('update')->once()->with(['name' => 'taylor'])->andReturn(1);
         $model->expects($this->once())->method('newQueryWithoutScopes')->will($this->returnValue($query));
@@ -1158,6 +1159,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
     {
         $model = m::mock('EloquentModelStub[newQueryWithoutScopes]');
         $query = m::mock('Illuminate\Database\Eloquent\Builder');
+        $query->shouldReceive('withoutTimestamps')->once();
         $query->shouldReceive('where')->once()->with('id', '=', 1);
         $query->shouldReceive('update')->once()->with(['name' => 'taylor'])->andReturn(1);
         $model->shouldReceive('newQueryWithoutScopes')->once()->andReturn($query);

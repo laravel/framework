@@ -49,6 +49,13 @@ class Builder
     protected $onDelete;
 
     /**
+     * Indicates if timestamps are disabled for the current query.
+     *
+     * @var bool
+     */
+    protected $timestampsDisabled = false;
+
+    /**
      * The methods that should be returned from query builder.
      *
      * @var array
@@ -422,13 +429,25 @@ class Builder
      */
     protected function addUpdatedAtColumn(array $values)
     {
-        if (! $this->model->usesTimestamps()) {
+        if (! $this->model->usesTimestamps() || $this->timestampsDisabled) {
             return $values;
         }
 
         $column = $this->model->getUpdatedAtColumn();
 
         return Arr::add($values, $column, $this->model->freshTimestampString());
+    }
+
+    /**
+     * Disable timestamps for the current query.
+     *
+     * @return $this
+     */
+    public function withoutTimestamps()
+    {
+        $this->timestampsDisabled = true;
+
+        return $this;
     }
 
     /**
