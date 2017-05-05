@@ -577,7 +577,7 @@ class Container implements ArrayAccess, ContainerContract
     protected function resolve($abstract, $parameters = [])
     {
         $abstract = $this->getAlias($abstract);
-        
+
         $needsContextualBuild = ! empty($parameters) || ! is_null(
             $this->getContextualConcrete($abstract)
         );
