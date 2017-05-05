@@ -8,9 +8,13 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
+use Illuminate\Database\QueryException;
+use Illuminate\Database\DetectsLostConnections;
 
 class Worker
 {
+    use DetectsLostConnections;
+
     /**
      * The queue manager instance.
      *
@@ -239,6 +243,8 @@ class Worker
             }
         } catch (Exception $e) {
             $this->exceptions->report($e);
+
+            $this->handleDatabaseException($e);
         } catch (Throwable $e) {
             $this->exceptions->report(new FatalThrowableError($e));
         }
@@ -258,8 +264,25 @@ class Worker
             return $this->process($connectionName, $job, $options);
         } catch (Exception $e) {
             $this->exceptions->report($e);
+
+            $this->handleDatabaseException($e);
         } catch (Throwable $e) {
             $this->exceptions->report(new FatalThrowableError($e));
+        }
+    }
+
+    /**
+     * Handle a database exception.
+     *
+     * @param  \Exception  $e
+     * @return void
+     */
+    protected function handleDatabaseException($e) {
+        if ($e instanceof QueryException && $this->causedByLostConnection($e->getPrevious())) {
+            $this->stop(1);
+        }
+        elseif ($this->causedByLostConnection($e)) {
+            $this->stop(1);
         }
     }
 
