@@ -153,13 +153,34 @@ class VerifyCsrfToken
     {
         $config = config('session');
 
-        $response->headers->setCookie(
-            new Cookie(
-                'XSRF-TOKEN', $request->session()->token(), Carbon::now()->getTimestamp() + 60 * $config['lifetime'],
-                $config['path'], $config['domain'], $config['secure'], false
-            )
-        );
+        $isXSRFDeleted = $this->isXSRFDeleted($response->headers->getCookies());
+        if (!$isXSRFDeleted)
+        {
+            $response->headers->setCookie(
+                new Cookie(
+                    'XSRF-TOKEN', $request->session()->token(),
+                    Carbon::now()->getTimestamp() + 60 * $config['lifetime'],
+                    $config['path'], $config['domain'], $config['secure'], false
+                )
+            );
+        }
 
         return $response;
+    }
+
+    /**
+     * Checks if XSRF is to be deleted as part of the response
+     *
+     * @param $cookies
+     * @return bool
+     */
+    private function isXSRFDeleted($cookies)
+    {
+        foreach ($cookies as $cookie) {
+            if ($cookie->getName() == 'XSRF-TOKEN' && $cookie->getValue() == null) {
+                return true;
+            }
+        }
+        return false;
     }
 }
