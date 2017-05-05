@@ -124,7 +124,7 @@ class ContainerTest extends TestCase
     public function testAliasesWithArrayOfParameters()
     {
         $container = new Container;
-        $container->bind('foo', function($app, $config) {
+        $container->bind('foo', function ($app, $config) {
             return $config;
         });
         $container->alias('foo', 'baz');
