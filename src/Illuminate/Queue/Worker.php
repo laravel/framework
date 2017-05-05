@@ -4,12 +4,12 @@ namespace Illuminate\Queue;
 
 use Exception;
 use Throwable;
+use Illuminate\Database\QueryException;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Database\DetectsLostConnections;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
-use Illuminate\Database\QueryException;
-use Illuminate\Database\DetectsLostConnections;
 
 class Worker
 {
@@ -277,11 +277,11 @@ class Worker
      * @param  \Exception  $e
      * @return void
      */
-    protected function handleDatabaseException($e) {
+    protected function handleDatabaseException($e) 
+    {
         if ($e instanceof QueryException && $this->causedByLostConnection($e->getPrevious())) {
             $this->stop(1);
-        }
-        elseif ($this->causedByLostConnection($e)) {
+        } elseif ($this->causedByLostConnection($e)) {
             $this->stop(1);
         }
     }
