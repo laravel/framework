@@ -41,11 +41,13 @@ class EloquentFactoryBuilderTest extends TestCase
             ];
         });
 
-        $factory->state(FactoryBuildableServer::class, 'inactive', function (Generator $faker) {
+        $factory->state(FactoryBuildableServer::class, 'callable', function (Generator $faker) {
             return [
-                'status' => 'inactive',
+                'status' => 'callable',
             ];
         });
+
+        $factory->state(FactoryBuildableServer::class, 'inline', ['status' => 'inline']);
 
         $app->singleton(Factory::class, function ($app) use ($factory) {
             return $factory;
@@ -112,14 +114,27 @@ class EloquentFactoryBuilderTest extends TestCase
     /**
      * @test
      */
-    public function creating_models_with_states()
+    public function creating_models_with_callable_states()
     {
         $server = factory(FactoryBuildableServer::class)->create();
 
-        $inactiveServer = factory(FactoryBuildableServer::class)->states('inactive')->create();
+        $callableServer = factory(FactoryBuildableServer::class)->states('callable')->create();
 
         $this->assertEquals('active', $server->status);
-        $this->assertEquals('inactive', $inactiveServer->status);
+        $this->assertEquals('callable', $callableServer->status);
+    }
+
+    /**
+     * @test
+     */
+    public function creating_models_with_inline_states()
+    {
+        $server = factory(FactoryBuildableServer::class)->create();
+
+        $inlineServer = factory(FactoryBuildableServer::class)->states('inline')->create();
+
+        $this->assertEquals('active', $server->status);
+        $this->assertEquals('inline', $inlineServer->status);
     }
 
     /**

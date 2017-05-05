@@ -244,13 +244,34 @@ class FactoryBuilder
                 throw new InvalidArgumentException("Unable to locate [{$state}] state for [{$this->class}].");
             }
 
-            $definition = array_merge($definition, call_user_func(
-                $this->states[$this->class][$state],
-                $this->faker, $attributes
-            ));
+            $definition = array_merge(
+                $definition,
+                $this->stateAttributes($state, $attributes)
+            );
         }
 
         return $definition;
+    }
+
+    /**
+     * Get the state attributes.
+     *
+     * @param string $state
+     * @param array $attributes
+     * @return array
+     */
+    protected function stateAttributes($state, array $attributes)
+    {
+        $stateAttributes = $this->states[$this->class][$state];
+
+        if (! is_callable($stateAttributes)) {
+            return $stateAttributes;
+        }
+
+        return call_user_func(
+            $stateAttributes,
+            $this->faker, $attributes
+        );
     }
 
     /**
