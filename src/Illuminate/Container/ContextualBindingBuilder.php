@@ -58,6 +58,8 @@ class ContextualBindingBuilder implements ContextualBindingBuilderContract
      *
      * @param  \Closure|string  $implementation
      * @return void
+     *
+     * @throws \LogicException
      */
     public function give($implementation)
     {

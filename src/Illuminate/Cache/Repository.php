@@ -68,8 +68,8 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string  $key
-     * @param  mixed   $default
+     * @param  string|array $key
+     * @param  mixed $default
      * @return mixed
      */
     public function get($key, $default = null)
@@ -157,7 +157,7 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * Store an item in the cache.
      *
-     * @param  string  $key
+     * @param  string|array  $key
      * @param  mixed   $value
      * @param  \DateTime|float|int  $minutes
      * @return void
@@ -165,7 +165,7 @@ class Repository implements CacheContract, ArrayAccess
     public function put($key, $value, $minutes = null)
     {
         if (is_array($key)) {
-            return $this->putMany($key, $value);
+            $this->putMany($key, $value);
         }
 
         if (! is_null($minutes = $this->getMinutes($minutes))) {
@@ -179,7 +179,7 @@ class Repository implements CacheContract, ArrayAccess
      * Store multiple items in the cache for a given number of minutes.
      *
      * @param  array  $values
-     * @param  float|int  $minutes
+     * @param  \DateTime|float|int  $minutes
      * @return void
      */
     public function putMany(array $values, $minutes)
@@ -495,6 +495,8 @@ class Repository implements CacheContract, ArrayAccess
      * @param  string  $method
      * @param  array   $parameters
      * @return mixed
+     *
+     * @throws \BadMethodCallException
      */
     public function __call($method, $parameters)
     {

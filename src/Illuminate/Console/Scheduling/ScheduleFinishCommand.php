@@ -55,6 +55,7 @@ class ScheduleFinishCommand extends Command
     public function fire()
     {
         collect($this->schedule->events())->filter(function ($value) {
+            /** @var Event $value */
             return $value->mutexName() == $this->argument('id');
         })->each->callAfterCallbacks($this->laravel);
     }

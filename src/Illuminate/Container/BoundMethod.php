@@ -3,6 +3,7 @@
 namespace Illuminate\Container;
 
 use Closure;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use ReflectionMethod;
 use ReflectionFunction;
 use InvalidArgumentException;
@@ -17,10 +18,15 @@ class BoundMethod
      * @param  array  $parameters
      * @param  string|null  $defaultMethod
      * @return mixed
+     *
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \ReflectionException
+     * @throws BindingResolutionException
      */
     public static function call($container, $callback, array $parameters = [], $defaultMethod = null)
     {
-        if (static::isCallableWithAtSign($callback) || $defaultMethod) {
+        if ($defaultMethod || static::isCallableWithAtSign($callback)) {
             return static::callClass($container, $callback, $parameters, $defaultMethod);
         }
 
@@ -41,6 +47,9 @@ class BoundMethod
      * @return mixed
      *
      * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \ReflectionException
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException;
      */
     protected static function callClass($container, $target, array $parameters = [], $defaultMethod = null)
     {
@@ -49,7 +58,7 @@ class BoundMethod
         // We will assume an @ sign is used to delimit the class name from the method
         // name. We will split on this @ sign and then build a callable array that
         // we can pass right back into the "call" method for dependency binding.
-        $method = count($segments) == 2
+        $method = count($segments) === 2
                         ? $segments[1] : $defaultMethod;
 
         if (is_null($method)) {
@@ -107,6 +116,10 @@ class BoundMethod
      * @param  callable|string  $callback
      * @param  array  $parameters
      * @return array
+     *
+     * @throws \LogicException
+     * @throws \ReflectionException
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException;
      */
     protected static function getMethodDependencies($container, $callback, array $parameters = [])
     {
@@ -124,6 +137,8 @@ class BoundMethod
      *
      * @param  callable|string  $callback
      * @return \ReflectionFunctionAbstract
+     *
+     * @throws \ReflectionException
      */
     protected static function getCallReflector($callback)
     {
@@ -143,7 +158,11 @@ class BoundMethod
      * @param  \ReflectionParameter  $parameter
      * @param  array  $parameters
      * @param  array  $dependencies
-     * @return mixed
+     * @return void
+     *
+     * @throws \LogicException
+     * @throws \ReflectionException
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException;
      */
     protected static function addDependencyForCallParameter($container, $parameter,
                                                             array &$parameters, &$dependencies)

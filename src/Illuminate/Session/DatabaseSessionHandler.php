@@ -90,7 +90,7 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
         if ($this->expired($session)) {
             $this->exists = true;
 
-            return;
+            return '';
         }
 
         if (isset($session->payload)) {
@@ -98,6 +98,8 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
 
             return base64_decode($session->payload);
         }
+
+        return '';
     }
 
     /**
@@ -136,13 +138,13 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
      * Perform an insert operation on the session ID.
      *
      * @param  string  $sessionId
-     * @param  string  $payload
+     * @param  array   $payload
      * @return void
      */
     protected function performInsert($sessionId, $payload)
     {
         try {
-            return $this->getQuery()->insert(Arr::set($payload, 'id', $sessionId));
+            $this->getQuery()->insert(Arr::set($payload, 'id', $sessionId));
         } catch (QueryException $e) {
             $this->performUpdate($sessionId, $payload);
         }
@@ -152,7 +154,7 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
      * Perform an update operation on the session ID.
      *
      * @param  string  $sessionId
-     * @param  string  $payload
+     * @param  array   $payload
      * @return int
      */
     protected function performUpdate($sessionId, $payload)
@@ -217,10 +219,9 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
     protected function addRequestInformation(&$payload)
     {
         if ($this->container->bound('request')) {
-            $payload = array_merge($payload, [
-                'ip_address' => $this->ipAddress(),
-                'user_agent' => $this->userAgent(),
-            ]);
+            // $payload is reference !
+            $payload['ip_address'] = $this->ipAddress();
+            $payload['user_agent'] = $this->userAgent();
         }
 
         return $this;

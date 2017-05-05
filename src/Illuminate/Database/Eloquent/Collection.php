@@ -343,7 +343,7 @@ class Collection extends BaseCollection implements QueueableCollection
     public function getQueueableClass()
     {
         if ($this->count() === 0) {
-            return;
+            return null;
         }
 
         $class = get_class($this->first());

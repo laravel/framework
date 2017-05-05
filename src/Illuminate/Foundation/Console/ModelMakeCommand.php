@@ -33,6 +33,8 @@ class ModelMakeCommand extends GeneratorCommand
      * Execute the console command.
      *
      * @return void
+     *
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     public function fire()
     {

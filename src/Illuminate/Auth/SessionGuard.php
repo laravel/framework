@@ -112,7 +112,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     public function user()
     {
         if ($this->loggedOut) {
-            return;
+            return null;
         }
 
         // If we've already retrieved the user for the current request we can just
@@ -143,7 +143,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         if (is_null($user) && ! is_null($recaller)) {
             $user = $this->userFromRecaller($recaller);
 
-            if ($user) {
+            if (null !== $user) {
                 $this->updateSession($user->getAuthIdentifier());
 
                 $this->fireLoginEvent($user, true);
@@ -157,12 +157,12 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * Pull a user from the repository by its "remember me" cookie token.
      *
      * @param  \Illuminate\Auth\Recaller  $recaller
-     * @return mixed
+     * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
     protected function userFromRecaller($recaller)
     {
         if (! $recaller->valid() || $this->recallAttempted) {
-            return;
+            return null;
         }
 
         // If the user is null, but we decrypt a "recaller" cookie we can attempt to
@@ -185,7 +185,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     protected function recaller()
     {
         if (is_null($this->request)) {
-            return;
+            return null;
         }
 
         if ($recaller = $this->request->cookies->get($this->getRecallerName())) {
@@ -201,7 +201,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     public function id()
     {
         if ($this->loggedOut) {
-            return;
+            return null;
         }
 
         return $this->user()
@@ -264,18 +264,21 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  string  $field
      * @param  array  $extraConditions
      * @return \Symfony\Component\HttpFoundation\Response|null
+     *
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
-    public function basic($field = 'email', $extraConditions = [])
+    public function basic($field = 'email', array $extraConditions = [])
     {
         if ($this->check()) {
-            return;
+            return null;
         }
 
         // If a username is set on the HTTP basic request, we will return out without
         // interrupting the request lifecycle. Otherwise, we'll need to generate a
         // request indicating that the given credentials were invalid for login.
         if ($this->attemptBasic($this->getRequest(), $field, $extraConditions)) {
-            return;
+            return null;
         }
 
         return $this->failedBasicResponse();
@@ -287,14 +290,18 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  string  $field
      * @param  array  $extraConditions
      * @return \Symfony\Component\HttpFoundation\Response|null
+     *
+     * @throws \InvalidArgumentException
      */
-    public function onceBasic($field = 'email', $extraConditions = [])
+    public function onceBasic($field = 'email', array $extraConditions = [])
     {
         $credentials = $this->basicCredentials($this->getRequest(), $field);
 
         if (! $this->once(array_merge($credentials, $extraConditions))) {
             return $this->failedBasicResponse();
         }
+
+        return null;
     }
 
     /**
@@ -304,8 +311,10 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  string  $field
      * @param  array  $extraConditions
      * @return bool
+     *
+     * @throws \RuntimeException
      */
-    protected function attemptBasic(Request $request, $field, $extraConditions = [])
+    protected function attemptBasic(Request $request, $field, array $extraConditions = [])
     {
         if (! $request->getUser()) {
             return false;
@@ -332,6 +341,8 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * Get the response for basic authentication.
      *
      * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @throws \InvalidArgumentException
      */
     protected function failedBasicResponse()
     {
@@ -344,6 +355,8 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  array  $credentials
      * @param  bool   $remember
      * @return bool
+     *
+     * @throws \RuntimeException
      */
     public function attempt(array $credentials = [], $remember = false)
     {
@@ -386,6 +399,8 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  mixed  $id
      * @param  bool   $remember
      * @return \Illuminate\Contracts\Auth\Authenticatable|false
+     *
+     * @throws \RuntimeException
      */
     public function loginUsingId($id, $remember = false)
     {
@@ -404,6 +419,8 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @param  bool  $remember
      * @return void
+     *
+     * @throws \RuntimeException
      */
     public function login(AuthenticatableContract $user, $remember = false)
     {
@@ -457,6 +474,8 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @return void
+     *
+     * @throws \RuntimeException
      */
     protected function queueRecallerCookie(AuthenticatableContract $user)
     {
@@ -470,6 +489,8 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      *
      * @param  string  $value
      * @return \Symfony\Component\HttpFoundation\Cookie
+     *
+     * @throws \RuntimeException
      */
     protected function createRecaller($value)
     {
@@ -480,6 +501,8 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * Log the user out of the application.
      *
      * @return void
+     *
+     * @throws \RuntimeException
      */
     public function logout()
     {
@@ -510,6 +533,8 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * Remove the user data from the session and cookies.
      *
      * @return void
+     *
+     * @throws \RuntimeException
      */
     protected function clearUserDataFromStorage()
     {
@@ -695,7 +720,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * Get the session store used by the guard.
      *
-     * @return \Illuminate\Session\Store
+     * @return \Illuminate\Contracts\Session\Session
      */
     public function getSession()
     {

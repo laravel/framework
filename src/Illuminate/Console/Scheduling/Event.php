@@ -148,7 +148,7 @@ class Event
      */
     public function getDefaultOutput()
     {
-        return (DIRECTORY_SEPARATOR == '\\') ? 'NUL' : '/dev/null';
+        return (DIRECTORY_SEPARATOR === '\\') ? 'NUL' : '/dev/null';
     }
 
     /**
@@ -156,6 +156,9 @@ class Event
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
      * @return void
+     *
+     * @throws \Symfony\Component\Process\Exception\LogicException;
+     * @throws \Symfony\Component\Process\Exception\RuntimeException;
      */
     public function run(Container $container)
     {
@@ -184,6 +187,9 @@ class Event
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
      * @return void
+     *
+     * @throws \Symfony\Component\Process\Exception\LogicException
+     * @throws \Symfony\Component\Process\Exception\RuntimeException
      */
     protected function runCommandInForeground(Container $container)
     {
@@ -201,6 +207,9 @@ class Event
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
      * @return void
+     *
+     * @throws \Symfony\Component\Process\Exception\LogicException
+     * @throws \Symfony\Component\Process\Exception\RuntimeException
      */
     protected function runCommandInBackground(Container $container)
     {

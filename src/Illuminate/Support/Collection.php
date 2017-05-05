@@ -95,13 +95,15 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         if ($count = $this->count()) {
             return $this->sum($callback) / $count;
         }
+
+        return null;
     }
 
     /**
      * Alias for the "avg" method.
      *
      * @param  callable|string|null  $callback
-     * @return mixed
+     * @return mixed|null
      */
     public function average($callback = null)
     {
@@ -118,10 +120,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         $count = $this->count();
 
-        if ($count == 0) {
-            return;
+        if ($count === 0) {
+            return null;
         }
 
+        /** @var self $values */
         $values = with(isset($key) ? $this->pluck($key) : $this)
                     ->sort()->values();
 
@@ -146,8 +149,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         $count = $this->count();
 
-        if ($count == 0) {
-            return;
+        if ($count === 0) {
+            return null;
         }
 
         $collection = isset($key) ? $this->pluck($key) : $this;
@@ -187,7 +190,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function contains($key, $operator = null, $value = null)
     {
-        if (func_num_args() == 1) {
+        if (func_num_args() === 1) {
             if ($this->useAsCallable($key)) {
                 return ! is_null($this->first($key));
             }
@@ -195,7 +198,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return in_array($key, $this->items);
         }
 
-        if (func_num_args() == 2) {
+        if (func_num_args() === 2) {
             $value = $operator;
 
             $operator = '=';
@@ -213,7 +216,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function containsStrict($key, $value = null)
     {
-        if (func_num_args() == 2) {
+        if (func_num_args() === 2) {
             return $this->contains(function ($item) use ($key, $value) {
                 return data_get($item, $key) === $value;
             });
@@ -275,7 +278,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function every($key, $operator = null, $value = null)
     {
-        if (func_num_args() == 1) {
+        if (func_num_args() === 1) {
             $callback = $this->valueRetriever($key);
 
             foreach ($this->items as $k => $v) {
@@ -287,7 +290,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return true;
         }
 
-        if (func_num_args() == 2) {
+        if (func_num_args() === 2) {
             $value = $operator;
 
             $operator = '=';
@@ -353,7 +356,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function where($key, $operator, $value = null)
     {
-        if (func_num_args() == 2) {
+        if (func_num_args() === 2) {
             $value = $operator;
 
             $operator = '=';
@@ -990,7 +993,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         $keys = array_rand($this->items, $amount);
 
-        if (count(func_get_args()) == 0) {
+        if (count(func_get_args()) === 0) {
             return $this->items[$keys];
         }
 
@@ -1054,7 +1057,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         foreach ($this->items as $key => $item) {
-            if (call_user_func($value, $item, $key)) {
+            if ($value($item, $key)) {
                 return $key;
             }
         }

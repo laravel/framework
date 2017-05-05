@@ -35,6 +35,8 @@ class Parser
      *
      * @param  string  $expression
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected static function name($expression)
     {
@@ -54,6 +56,8 @@ class Parser
      *
      * @param  array  $tokens
      * @return array
+     *
+     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      */
     protected static function parameters(array $tokens)
     {
@@ -77,6 +81,8 @@ class Parser
      *
      * @param  string  $token
      * @return \Symfony\Component\Console\Input\InputArgument
+     *
+     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      */
     protected static function parseArgument($token)
     {
@@ -101,6 +107,8 @@ class Parser
      *
      * @param  string  $token
      * @return \Symfony\Component\Console\Input\InputOption
+     *
+     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      */
     protected static function parseOption($token)
     {
@@ -109,8 +117,7 @@ class Parser
         $matches = preg_split('/\s*\|\s*/', $token, 2);
 
         if (isset($matches[1])) {
-            $shortcut = $matches[0];
-            $token = $matches[1];
+            list($shortcut, $token) = $matches;
         } else {
             $shortcut = null;
         }

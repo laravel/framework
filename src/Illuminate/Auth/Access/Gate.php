@@ -291,6 +291,8 @@ class Gate implements GateContract
                 return $result;
             }
         }
+
+        return null;
     }
 
     /**
@@ -340,7 +342,7 @@ class Gate implements GateContract
      * Get a policy instance for a given class.
      *
      * @param  object|string  $class
-     * @return mixed
+     * @return mixed|null
      */
     public function getPolicyFor($class)
     {
@@ -361,6 +363,8 @@ class Gate implements GateContract
                 return $this->resolvePolicy($policy);
             }
         }
+
+        return null;
     }
 
     /**
@@ -422,13 +426,15 @@ class Gate implements GateContract
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @param  string  $ability
      * @param  array  $arguments
-     * @return mixed
+     * @return mixed|null
      */
     protected function callPolicyBefore($policy, $user, $ability, $arguments)
     {
         if (method_exists($policy, 'before')) {
             return $policy->before($user, $ability, ...$arguments);
         }
+
+        return null;
     }
 
     /**

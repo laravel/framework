@@ -36,14 +36,16 @@ class MemcachedStore extends TaggableStore implements Store
      * @param  \Memcached  $memcached
      * @param  string      $prefix
      * @return void
+     *
+     * @throws \ReflectionException
      */
     public function __construct($memcached, $prefix = '')
     {
         $this->setPrefix($prefix);
         $this->memcached = $memcached;
 
-        $this->onVersionThree = (new ReflectionMethod('Memcached', 'getMulti'))
-                            ->getNumberOfParameters() == 2;
+        $this->onVersionThree = (new ReflectionMethod(Memcached::class, 'getMulti'))
+                            ->getNumberOfParameters() === 2;
     }
 
     /**
@@ -56,9 +58,11 @@ class MemcachedStore extends TaggableStore implements Store
     {
         $value = $this->memcached->get($this->prefix.$key);
 
-        if ($this->memcached->getResultCode() == 0) {
+        if ($this->memcached->getResultCode() === 0) {
             return $value;
         }
+
+        return null;
     }
 
     /**
@@ -83,7 +87,7 @@ class MemcachedStore extends TaggableStore implements Store
             $values = $this->memcached->getMulti($prefixedKeys, $null, Memcached::GET_PRESERVE_ORDER);
         }
 
-        if ($this->memcached->getResultCode() != 0) {
+        if ($this->memcached->getResultCode() !== 0) {
             return array_fill_keys($keys, null);
         }
 

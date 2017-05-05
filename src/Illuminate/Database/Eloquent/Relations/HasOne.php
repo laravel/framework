@@ -51,7 +51,7 @@ class HasOne extends HasOneOrMany
     protected function getDefaultFor(Model $model)
     {
         if (! $this->withDefault) {
-            return;
+            return null;
         }
 
         $instance = $this->related->newInstance()->setAttribute(

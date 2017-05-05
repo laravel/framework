@@ -292,7 +292,7 @@ class Connection implements ConnectionInterface
      * @param  array   $bindings
      * @return array
      */
-    public function selectFromWriteConnection($query, $bindings = [])
+    public function selectFromWriteConnection($query, array $bindings = [])
     {
         return $this->select($query, $bindings, false);
     }
@@ -732,7 +732,7 @@ class Connection implements ConnectionInterface
     public function reconnect()
     {
         if (is_callable($this->reconnector)) {
-            return call_user_func($this->reconnector, $this);
+            call_user_func($this->reconnector, $this);
         }
 
         throw new LogicException('Lost connection and no reconnector available.');
@@ -742,6 +742,8 @@ class Connection implements ConnectionInterface
      * Reconnect to the database if a PDO connection is missing.
      *
      * @return void
+     *
+     * @throws \LogicException
      */
     protected function reconnectIfMissingConnection()
     {
@@ -787,11 +789,14 @@ class Connection implements ConnectionInterface
 
         switch ($event) {
             case 'beganTransaction':
-                return $this->events->dispatch(new Events\TransactionBeginning($this));
+                $this->events->dispatch(new Events\TransactionBeginning($this));
+                break;
             case 'committed':
-                return $this->events->dispatch(new Events\TransactionCommitted($this));
+                $this->events->dispatch(new Events\TransactionCommitted($this));
+                break;
             case 'rollingBack':
-                return $this->events->dispatch(new Events\TransactionRolledBack($this));
+                $this->events->dispatch(new Events\TransactionRolledBack($this));
+                break;
         }
     }
 
@@ -1133,7 +1138,7 @@ class Connection implements ConnectionInterface
      * Set the name of the connected database.
      *
      * @param  string  $database
-     * @return string
+     * @return void
      */
     public function setDatabaseName($database)
     {

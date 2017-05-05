@@ -39,7 +39,7 @@ class ApcStore extends TaggableStore implements Store
      * Retrieve an item from the cache by key.
      *
      * @param  string|array  $key
-     * @return mixed
+     * @return mixed|null
      */
     public function get($key)
     {
@@ -48,6 +48,8 @@ class ApcStore extends TaggableStore implements Store
         if ($value !== false) {
             return $value;
         }
+
+        return null;
     }
 
     /**

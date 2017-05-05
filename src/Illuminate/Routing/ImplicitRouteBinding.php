@@ -54,5 +54,7 @@ class ImplicitRouteBinding
         if (array_key_exists($snakedName, $parameters)) {
             return $snakedName;
         }
+
+        return null;
     }
 }

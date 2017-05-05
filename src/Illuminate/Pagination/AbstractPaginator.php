@@ -115,6 +115,8 @@ abstract class AbstractPaginator implements Htmlable
         if ($this->currentPage() > 1) {
             return $this->url($this->currentPage() - 1);
         }
+
+        return null;
     }
 
     /**

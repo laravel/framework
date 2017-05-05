@@ -159,7 +159,7 @@ trait HasEvents
     protected function fireCustomModelEvent($event, $method)
     {
         if (! isset($this->events[$event])) {
-            return;
+            return null;
         }
 
         $result = static::$dispatcher->$method(new $this->events[$event]($this));
@@ -167,6 +167,8 @@ trait HasEvents
         if (! is_null($result)) {
             return $result;
         }
+
+        return null;
     }
 
     /**

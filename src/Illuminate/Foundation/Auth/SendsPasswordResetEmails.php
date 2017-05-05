@@ -22,6 +22,8 @@ trait SendsPasswordResetEmails
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
+     *
+     * @throws \UnexpectedValueException
      */
     public function sendResetLinkEmail(Request $request)
     {

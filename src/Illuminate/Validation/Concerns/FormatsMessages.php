@@ -101,6 +101,8 @@ trait FormatsMessages
                 }
             }
         }
+
+        return null;
     }
 
     /**
@@ -340,6 +342,8 @@ trait FormatsMessages
         } elseif (is_string($callback)) {
             return $this->callClassBasedReplacer($callback, $message, $attribute, $rule, $parameters, $validator);
         }
+
+        return null;
     }
 
     /**

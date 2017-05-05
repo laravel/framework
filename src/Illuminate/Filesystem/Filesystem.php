@@ -214,7 +214,7 @@ class Filesystem
     public function link($target, $link)
     {
         if (! windows_os()) {
-            return symlink($target, $link);
+            symlink($target, $link);
         }
 
         $mode = $this->isDirectory($target) ? 'J' : 'H';

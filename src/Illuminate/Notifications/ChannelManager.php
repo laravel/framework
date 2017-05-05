@@ -28,10 +28,11 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
      * @param  mixed  $notification
      * @return void
+     * @throws \LogicException
      */
     public function send($notifiables, $notification)
     {
-        return (new NotificationSender(
+        (new NotificationSender(
             $this, $this->app->make(Bus::class), $this->app->make(Dispatcher::class))
         )->send($notifiables, $notification);
     }
@@ -43,10 +44,12 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      * @param  mixed  $notification
      * @param  array|null  $channels
      * @return void
+     *
+     * @throws \LogicException
      */
     public function sendNow($notifiables, $notification, array $channels = null)
     {
-        return (new NotificationSender(
+        (new NotificationSender(
             $this, $this->app->make(Bus::class), $this->app->make(Dispatcher::class))
         )->sendNow($notifiables, $notification, $channels);
     }

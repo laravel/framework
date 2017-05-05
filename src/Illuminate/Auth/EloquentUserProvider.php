@@ -60,6 +60,7 @@ class EloquentUserProvider implements UserProvider
      */
     public function retrieveByToken($identifier, $token)
     {
+        /** @var \Illuminate\Contracts\Auth\Authenticatable $model */
         $model = $this->createModel();
 
         return $model->newQuery()
@@ -97,7 +98,7 @@ class EloquentUserProvider implements UserProvider
     public function retrieveByCredentials(array $credentials)
     {
         if (empty($credentials)) {
-            return;
+            return null;
         }
 
         // First we will add each credential element to the query as a where clause.

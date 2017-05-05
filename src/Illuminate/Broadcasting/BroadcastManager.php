@@ -76,7 +76,7 @@ class BroadcastManager implements FactoryContract
     public function socket($request = null)
     {
         if (! $request && ! $this->app->bound('request')) {
-            return;
+            return null;
         }
 
         $request = $request ?: $this->app['request'];
@@ -84,13 +84,15 @@ class BroadcastManager implements FactoryContract
         if ($request->hasHeader('X-Socket-ID')) {
             return $request->header('X-Socket-ID');
         }
+
+        return null;
     }
 
     /**
      * Begin broadcasting an event.
      *
      * @param  mixed|null  $event
-     * @return \Illuminate\Broadcasting\PendingBroadcast|void
+     * @return \Illuminate\Broadcasting\PendingBroadcast
      */
     public function event($event = null)
     {
@@ -129,6 +131,8 @@ class BroadcastManager implements FactoryContract
      *
      * @param  string  $driver
      * @return mixed
+     *
+     * @throws \InvalidArgumentException
      */
     public function connection($driver = null)
     {
@@ -140,6 +144,8 @@ class BroadcastManager implements FactoryContract
      *
      * @param  string  $name
      * @return mixed
+     *
+     * @throws \InvalidArgumentException
      */
     public function driver($name = null)
     {
@@ -153,6 +159,8 @@ class BroadcastManager implements FactoryContract
      *
      * @param  string  $name
      * @return \Illuminate\Contracts\Broadcasting\Broadcaster
+     *
+     * @throws \InvalidArgumentException
      */
     protected function get($name)
     {
@@ -302,6 +310,8 @@ class BroadcastManager implements FactoryContract
      * @param  string  $method
      * @param  array   $parameters
      * @return mixed
+     *
+     * @throws \InvalidArgumentException
      */
     public function __call($method, $parameters)
     {

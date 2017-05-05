@@ -153,6 +153,8 @@ abstract class Grammar extends BaseGrammar
         if (count($commands) > 0) {
             return reset($commands);
         }
+
+        return null;
     }
 
     /**

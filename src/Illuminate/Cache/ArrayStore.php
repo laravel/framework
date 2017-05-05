@@ -26,6 +26,8 @@ class ArrayStore extends TaggableStore implements Store
         if (array_key_exists($key, $this->storage)) {
             return $this->storage[$key];
         }
+
+        return null;
     }
 
     /**

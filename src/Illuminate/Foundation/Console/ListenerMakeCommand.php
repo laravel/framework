@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Str;
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
@@ -33,11 +34,14 @@ class ListenerMakeCommand extends GeneratorCommand
      * Execute the console command.
      *
      * @return void
+     *
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     * @throws \RuntimeException
      */
     public function fire()
     {
         if (! $this->option('event')) {
-            return $this->error('Missing required option: --event');
+            $this->error('Missing required option: --event');
         }
 
         parent::fire();
@@ -48,6 +52,9 @@ class ListenerMakeCommand extends GeneratorCommand
      *
      * @param  string  $name
      * @return string
+     *
+     * @throws \RuntimeException
+     * @throws FileNotFoundException
      */
     protected function buildClass($name)
     {

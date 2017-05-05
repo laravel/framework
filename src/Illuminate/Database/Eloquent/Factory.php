@@ -237,7 +237,7 @@ class Factory implements ArrayAccess
      */
     public function offsetSet($offset, $value)
     {
-        return $this->define($offset, $value);
+        $this->define($offset, $value);
     }
 
     /**

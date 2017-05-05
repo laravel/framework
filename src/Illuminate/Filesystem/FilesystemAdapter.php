@@ -179,7 +179,9 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      *
      * @param  string  $path
      * @param  string  $visibility
-     * @return void
+     * @return bool
+     *
+     * @throws \InvalidArgumentException
      */
     public function setVisibility($path, $visibility)
     {
@@ -475,7 +477,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     protected function parseVisibility($visibility)
     {
         if (is_null($visibility)) {
-            return;
+            return null;
         }
 
         switch ($visibility) {

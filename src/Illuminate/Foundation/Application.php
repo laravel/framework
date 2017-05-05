@@ -219,7 +219,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function afterLoadingEnvironment(Closure $callback)
     {
-        return $this->afterBootstrapping(
+        $this->afterBootstrapping(
             LoadEnvironmentVariables::class, $callback
         );
     }
@@ -696,6 +696,8 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      *
      * @param  string  $abstract
      * @return mixed
+     *
+     * @throws \LogicException
      */
     public function make($abstract)
     {
@@ -760,13 +762,15 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      * Boot the given service provider.
      *
      * @param  \Illuminate\Support\ServiceProvider  $provider
-     * @return mixed
+     * @return mixed|null
      */
     protected function bootProvider(ServiceProvider $provider)
     {
         if (method_exists($provider, 'boot')) {
             return $this->call([$provider, 'boot']);
         }
+
+        return null;
     }
 
     /**

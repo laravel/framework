@@ -123,7 +123,7 @@ class Grammar extends BaseGrammar
         // compiler handle the building of the select clauses, as it will need some
         // more syntax that is best handled by that function to keep things neat.
         if (! is_null($query->aggregate)) {
-            return;
+            return null;
         }
 
         $select = $query->distinct ? 'select distinct ' : 'select ';

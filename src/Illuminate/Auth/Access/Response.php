@@ -7,16 +7,16 @@ class Response
     /**
      * The response message.
      *
-     * @var string|null
+     * @var string
      */
-    protected $message;
+    protected $message = '';
 
     /**
      * Create a new response.
      *
-     * @param  string|null  $message
+     * @param  string  $message
      */
-    public function __construct($message = null)
+    public function __construct($message)
     {
         $this->message = $message;
     }
@@ -24,7 +24,7 @@ class Response
     /**
      * Get the response message.
      *
-     * @return string|null
+     * @return string
      */
     public function message()
     {

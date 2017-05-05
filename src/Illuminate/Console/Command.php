@@ -18,7 +18,7 @@ class Command extends SymfonyCommand
     /**
      * The Laravel application instance.
      *
-     * @var \Illuminate\Contracts\Foundation\Application
+     * @var \Illuminate\Contracts\Foundation\Application|\Illuminate\Foundation\Application
      */
     protected $laravel;
 
