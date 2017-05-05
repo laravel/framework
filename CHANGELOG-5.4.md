@@ -7,14 +7,21 @@
 - Added `Seeder::callSilent()` method ([#19007](https://github.com/laravel/framework/pull/19007))
 - Add `make()` method to Eloquent query builder ([#19015](https://github.com/laravel/framework/pull/19015))
 - Support `Arrayable` on Eloquent's `find()` method ([#19019](https://github.com/laravel/framework/pull/19019))
+- Added `SendsPasswordResetEmails::validateEmail()` method ([#19042](https://github.com/laravel/framework/pull/19042))
+- Allow factory attributes to be factory instances themselves ([#19055](https://github.com/laravel/framework/pull/19055))
+- Implemented `until()` method on `EventFake` ([#19062](https://github.com/laravel/framework/pull/19062))
+- Added `$encoding` parameter to `Str::length()` ([#19047](https://github.com/laravel/framework/pull/19047))
 
 ### Changed
 - Throw exception when invalid first argument is passed to `cache()` helper ([d9459b2](https://github.com/laravel/framework/commit/d9459b2f8bec4a807e7ba2b3301de4c5248aa933))
 - Use `getAuthIdentifierName()` in `Authenticatable::getAuthIdentifier()` ([#19038](https://github.com/laravel/framework/pull/19038))
+- Changed replacements for `Öö` and `Üü` ([#19045](https://github.com/laravel/framework/pull/19045))
+- Clone queries without order by for aggregates ([#19064](https://github.com/laravel/framework/pull/19064))
 
 ### Fixed
 - Set data key when testing file uploads in nested array ([#18954](https://github.com/laravel/framework/pull/18954))
 - Fixed a bug related to sub select queries and extra select statements ([#19013](https://github.com/laravel/framework/pull/19013))
+- Resolve aliases from container when using parameters ([#19071](https://github.com/laravel/framework/pull/19071))
 
 
 ## v5.4.21 (2017-04-28)
