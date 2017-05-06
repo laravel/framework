@@ -626,7 +626,7 @@ class TestResponse
      * Handle dynamic calls into macros or pass missing methods to the base response.
      *
      * @param  string  $method
-     * @param  array  $parameters
+     * @param  array  $args
      * @return mixed
      */
     public function __call($method, $args)
