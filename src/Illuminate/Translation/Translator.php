@@ -59,10 +59,10 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     public function __construct(LoaderInterface $loader, $locale)
     {
-        Carbon::setLocale($locale);
-
         $this->loader = $loader;
         $this->locale = $locale;
+
+        Carbon::setLocale($locale);
     }
 
     /**
@@ -446,6 +446,8 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     public function setLocale($locale)
     {
         $this->locale = $locale;
+
+        Carbon::setLocale($locale);
     }
 
     /**

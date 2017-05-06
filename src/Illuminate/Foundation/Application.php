@@ -1051,8 +1051,6 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 
         $this['translator']->setLocale($locale);
 
-        Carbon::setLocale($locale);
-
         $this['events']->dispatch(new Events\LocaleUpdated($locale));
     }
 
