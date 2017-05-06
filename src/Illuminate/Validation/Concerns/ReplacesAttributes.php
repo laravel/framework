@@ -260,6 +260,7 @@ trait ReplacesAttributes
     protected function replaceRequiredIf($message, $attribute, $rule, $parameters)
     {
         $value = Arr::get($this->data, $parameters[0]);
+        
         if (is_array($value)) {
             $validValues = array_unique(array_splice($parameters, 1, count($parameters) - 1));
             $value = implode(' or ', $validValues);
