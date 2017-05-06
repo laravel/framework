@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation;
 
 use Closure;
+use Carbon\Carbon;
 use RuntimeException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -1049,6 +1050,8 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         $this['config']->set('app.locale', $locale);
 
         $this['translator']->setLocale($locale);
+
+        Carbon::setLocale($locale);
 
         $this['events']->dispatch(new Events\LocaleUpdated($locale));
     }
