@@ -45,6 +45,7 @@ use Illuminate\Console\Scheduling\ScheduleFinishCommand;
 use Illuminate\Database\Console\Seeds\SeederMakeCommand;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
 use Illuminate\Foundation\Console\NotificationMakeCommand;
+use Illuminate\Database\Console\Factories\FactoryMakeCommand;
 use Illuminate\Queue\Console\WorkCommand as QueueWorkCommand;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Illuminate\Notifications\Console\NotificationTableCommand;
@@ -127,6 +128,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'ControllerMake' => 'command.controller.make',
         'EventGenerate' => 'command.event.generate',
         'EventMake' => 'command.event.make',
+        'FactoryMake' => 'command.factory.make',
         'JobMake' => 'command.job.make',
         'ListenerMake' => 'command.listener.make',
         'MailMake' => 'command.mail.make',
@@ -327,6 +329,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.event.make', function ($app) {
             return new EventMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerFactoryMakeCommand()
+    {
+        $this->app->singleton('command.factory.make', function ($app) {
+            return new FactoryMakeCommand($app['files']);
         });
     }
 
