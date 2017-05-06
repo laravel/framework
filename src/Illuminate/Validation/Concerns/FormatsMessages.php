@@ -328,7 +328,7 @@ trait FormatsMessages
      * @param  string  $attribute
      * @param  string  $rule
      * @param  array   $parameters
-     * @param  Illuminate\Validation\Validator  $validator
+     * @param  \Illuminate\Validation\Validator  $validator
      * @return string|null
      */
     protected function callReplacer($message, $attribute, $rule, $parameters, $validator)
@@ -350,7 +350,7 @@ trait FormatsMessages
      * @param  string  $attribute
      * @param  string  $rule
      * @param  array   $parameters
-     * @param  Illuminate\Validation\Validator  $validator
+     * @param  \Illuminate\Validation\Validator  $validator
      * @return string
      */
     protected function callClassBasedReplacer($callback, $message, $attribute, $rule, $parameters, $validator)
