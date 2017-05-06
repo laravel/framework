@@ -42,6 +42,21 @@ class Handler implements ExceptionHandlerContract
     protected $dontReport = [];
 
     /**
+     * A list of the internal exception types that should not be reported.
+     *
+     * @var array
+     */
+    protected $internalDontReport = [
+        \Illuminate\Auth\AuthenticationException::class,
+        \Illuminate\Auth\Access\AuthorizationException::class,
+        \Symfony\Component\HttpKernel\Exception\HttpException::class,
+        HttpResponseException::class,
+        \Illuminate\Database\Eloquent\ModelNotFoundException::class,
+        \Illuminate\Session\TokenMismatchException::class,
+        \Illuminate\Validation\ValidationException::class,
+    ];
+
+    /**
      * Create a new exception handler instance.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
@@ -98,7 +113,7 @@ class Handler implements ExceptionHandlerContract
      */
     protected function shouldntReport(Exception $e)
     {
-        $dontReport = array_merge($this->dontReport, [HttpResponseException::class]);
+        $dontReport = array_merge($this->dontReport, $this->internalDontReport);
 
         return ! is_null(collect($dontReport)->first(function ($type) use ($e) {
             return $e instanceof $type;
