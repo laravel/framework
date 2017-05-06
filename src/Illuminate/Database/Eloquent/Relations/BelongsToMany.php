@@ -110,8 +110,8 @@ class BelongsToMany extends Relation
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @param  \Illuminate\Database\Eloquent\Model  $parent
      * @param  string  $table
-     * @param  string  $foreignKey
-     * @param  string  $relatedKey
+     * @param  string  $foreignPivotKey
+     * @param  string  $relatedPivotKey
      * @param  string  $parentKey
      * @param  string  $localKey
      * @param  string  $relationName
