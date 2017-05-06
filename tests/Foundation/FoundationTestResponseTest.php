@@ -80,6 +80,9 @@ class FoundationTestResponseTest extends TestCase
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
 
+        // Without structure
+        $response->assertJsonStructure();
+
         // At root
         $response->assertJsonStructure(['foo']);
 
