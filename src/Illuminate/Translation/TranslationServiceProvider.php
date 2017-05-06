@@ -4,7 +4,6 @@ namespace Illuminate\Translation;
 
 use Carbon\Carbon;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Config\Repository as Config;
 
 class TranslationServiceProvider extends ServiceProvider
 {
