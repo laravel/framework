@@ -2,7 +2,6 @@
 
 namespace Illuminate\Translation;
 
-use Carbon\Carbon;
 use Illuminate\Support\ServiceProvider;
 
 class TranslationServiceProvider extends ServiceProvider
