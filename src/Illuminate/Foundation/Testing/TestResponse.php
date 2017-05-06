@@ -350,7 +350,7 @@ class TestResponse
     public function assertJsonStructure(array $structure = null, $responseData = null)
     {
         if (is_null($structure)) {
-            return $this->assertJson();
+            return $this->assertJson($this->json());
         }
 
         if (is_null($responseData)) {
