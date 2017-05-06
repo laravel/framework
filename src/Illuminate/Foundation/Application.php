@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation;
 
 use Closure;
-use Carbon\Carbon;
 use RuntimeException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
