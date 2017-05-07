@@ -50,6 +50,16 @@ class DatabaseMigrationCreatorTest extends TestCase
         $creator->create('create_bar', 'foo', 'baz', true);
     }
 
+    public function testTableCreationMigrationStoresMigrationFileDummyTableMigrationName()
+    {
+        $creator = $this->getCreator();
+        $creator->expects($this->any())->method('getDatePrefix')->will($this->returnValue('foo'));
+        $creator->getFilesystem()->shouldReceive('get')->once()->with($creator->stubPath().'/create.stub')->andReturn('DummyClass DummyTable');
+        $creator->getFilesystem()->shouldReceive('put')->once()->with('foo/foo_create_dummy_table.php', 'CreateDummyTable dummy');
+
+        $creator->create('create_dummy_table', 'foo', 'dummy', true);
+    }
+
     public function testTableUpdateMigrationWontCreateDuplicateClass()
     {
         $creator = $this->getCreator();
