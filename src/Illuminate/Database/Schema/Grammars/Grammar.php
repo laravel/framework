@@ -248,7 +248,7 @@ abstract class Grammar extends BaseGrammar
             return "'".(int) $value."'";
         }
 
-        return "'".strval($value)."'";
+        return "'".addslashes(strval($value))."'";
     }
 
     /**
