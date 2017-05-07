@@ -3,6 +3,8 @@
 namespace Illuminate\Queue\Console;
 
 use Carbon\Carbon;
+use Illuminate\Queue\Supervisor\Supervisor;
+use Illuminate\Queue\Supervisor\SupervisorOptions;
 use Illuminate\Queue\Worker;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Queue\Job;
@@ -45,16 +47,25 @@ class WorkCommand extends Command
     protected $worker;
 
     /**
+     * The supervisor instance.
+     *
+     * @var Supervisor
+     */
+    protected $supervisor;
+
+    /**
      * Create a new queue listen command.
      *
      * @param  \Illuminate\Queue\Worker  $worker
+     * @param  \Illuminate\Queue\Supervisor\Supervisor $supervisor
      * @return void
      */
-    public function __construct(Worker $worker)
+    public function __construct(Worker $worker, Supervisor $supervisor)
     {
         parent::__construct();
 
         $this->worker = $worker;
+        $this->supervisor = $supervisor;
     }
 
     /**
@@ -97,9 +108,15 @@ class WorkCommand extends Command
     {
         $this->worker->setCache($this->laravel['cache']->driver());
 
-        return $this->worker->{$this->option('once') ? 'runNextJob' : 'daemon'}(
-            $connection, $queue, $this->gatherWorkerOptions()
-        );
+        $worker = function () use ($connection, $queue) {
+            return $this->worker->runNextJob($connection, $queue, $this->gatherWorkerOptions());
+        };
+
+        if ($this->option('once')) {
+            return $worker();
+        }
+
+        return $this->supervisor->supervise($worker, $this->gatherSupervisorOptions());
     }
 
     /**
@@ -110,9 +127,23 @@ class WorkCommand extends Command
     protected function gatherWorkerOptions()
     {
         return new WorkerOptions(
-            $this->option('delay'), $this->option('memory'),
-            $this->option('timeout'), $this->option('sleep'),
-            $this->option('tries'), $this->option('force')
+            $this->option('delay'),
+            $this->option('sleep'),
+            $this->option('tries')
+        );
+    }
+
+    /**
+     * Gather all of the supervisor options as a single object.
+     *
+     * @return \Illuminate\Queue\Supervisor\SupervisorOptions
+     */
+    protected function gatherSupervisorOptions()
+    {
+        return new SupervisorOptions(
+            $this->option('timeout'),
+            $this->option('memory'),
+            $this->option('force')
         );
     }
 
