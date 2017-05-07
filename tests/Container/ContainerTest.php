@@ -121,6 +121,16 @@ class ContainerTest extends TestCase
         $this->assertEquals('bar', $container->make('bat'));
     }
 
+    public function testAliasesWithArrayOfParameters()
+    {
+        $container = new Container;
+        $container->bind('foo', function ($app, $config) {
+            return $config;
+        });
+        $container->alias('foo', 'baz');
+        $this->assertEquals([1, 2, 3], $container->makeWith('baz', [1, 2, 3]));
+    }
+
     public function testBindingsCanBeOverridden()
     {
         $container = new Container;

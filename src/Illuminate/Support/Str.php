@@ -154,10 +154,15 @@ class Str
      * Return the length of the given string.
      *
      * @param  string  $value
+     * @param  string  $encoding
      * @return int
      */
-    public static function length($value)
+    public static function length($value, $encoding = null)
     {
+        if ($encoding) {
+            return mb_strlen($value, $encoding);
+        }
+
         return mb_strlen($value);
     }
 
@@ -522,7 +527,7 @@ class Str
             'kh'   => ['х', 'خ', 'ხ'],
             'lj'   => ['љ'],
             'nj'   => ['њ'],
-            'oe'   => ['œ', 'ؤ'],
+            'oe'   => ['ö', 'œ', 'ؤ'],
             'oi'   => ['ऑ'],
             'oii'  => ['ऒ'],
             'ps'   => ['ψ'],
@@ -532,6 +537,7 @@ class Str
             'sx'   => ['ŝ'],
             'th'   => ['þ', 'ϑ', 'ث', 'ذ', 'ظ'],
             'ts'   => ['ц', 'ც', 'წ'],
+            'ue'   => ['ü'],
             'uu'   => ['ऊ'],
             'ya'   => ['я'],
             'yu'   => ['ю'],
