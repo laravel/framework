@@ -98,7 +98,7 @@ class TokenGuard implements Guard
     }
 
     /**
-     * Validate a user's credentials.
+     * Validate a user's input key credentials.
      *
      * @param  array  $credentials
      * @return bool
@@ -116,6 +116,31 @@ class TokenGuard implements Guard
         }
 
         return false;
+    }
+
+    /**
+     * Determine if the user matches the credentials.
+     *
+     * @param  mixed  $user
+     * @param  array  $credentials
+     * @return bool
+     */
+    protected function hasValidCredentials($user, $credentials)
+    {
+        return ! is_null($user) && $this->provider->validateCredentials($user, $credentials);
+    }
+
+    /**
+     * Validate a user's credentials.
+     *
+     * @param  array  $credentials
+     * @return bool
+     */
+    public function validateCredentials(array $credentials = [])
+    {
+        $user = $this->provider->retrieveByCredentials($credentials);
+
+        return $this->hasValidCredentials($user, $credentials);
     }
 
     /**
