@@ -178,7 +178,7 @@ class GateTest extends TestCase
         $this->assertTrue($gate->check('update-dash', new AccessGateTestDummy));
     }
 
-    public function test_policy_default_to_false_if_method_does_not_exist()
+    public function test_policy_default_to_false_if_method_does_not_exist_and_gate_does_not_exist()
     {
         $gate = $this->getBasicGate();
 
@@ -216,6 +216,19 @@ class GateTest extends TestCase
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
 
         $this->assertTrue($gate->check('update', new AccessGateTestDummy));
+    }
+
+    public function test_policies_defer_to_gates_if_method_does_not_exist()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->define('nonexistent_method', function ($user) {
+            return true;
+        });
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
+
+        $this->assertTrue($gate->check('nonexistent_method', new AccessGateTestDummy));
     }
 
     public function test_for_user_method_attaches_a_new_user_to_a_new_gate_instance()
