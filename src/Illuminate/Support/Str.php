@@ -228,8 +228,8 @@ class Str
      */
     public static function plural($value, $count = 2, $add_count = false)
      {
-        return ($add_count ? $count . ' ' : '')
-            . Pluralizer::plural($value, $count);
+        return ($add_count ? $count.' ' : '')
+            .Pluralizer::plural($value, $count);
     }
 
     /**
