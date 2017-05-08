@@ -33,7 +33,7 @@ class Processor
 
         $id = $query->getConnection()->getPdo()->lastInsertId($sequence);
 
-        return is_numeric($id) ? (int) $id : $id;
+        return filter_var($id, FILTER_VALIDATE_INT) !== false ? (int) $id : $id;
     }
 
     /**
