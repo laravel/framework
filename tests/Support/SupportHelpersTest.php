@@ -174,21 +174,32 @@ class SupportHelpersTest extends TestCase
         ];
 
         $this->assertEquals([
-            0 => [
+            'post-1' => [
                 'tags' => [
                     '#foo', '#bar',
                 ],
             ],
-            1 => [
+            'post-2' => [
                 'tags' => [
                     '#baz',
                 ],
             ],
         ], array_pluck($data, 'comments'));
 
-        $this->assertEquals([['#foo', '#bar'], ['#baz']], array_pluck($data, 'comments.tags'));
-        $this->assertEquals([null, null], array_pluck($data, 'foo'));
-        $this->assertEquals([null, null], array_pluck($data, 'foo.bar'));
+        $this->assertEquals([
+            'post-1' => ['#foo', '#bar'],
+            'post-2' => ['#baz'],
+        ], array_pluck($data, 'comments.tags'));
+
+        $this->assertEquals([
+            'post-1' => null,
+            'post-2' => null,
+        ], array_pluck($data, 'foo'));
+
+        $this->assertEquals([
+            'post-1' => null,
+            'post-2' => null,
+        ], array_pluck($data, 'foo.bar'));
     }
 
     public function testArrayPrepend()
