@@ -27,7 +27,7 @@ class Looping
      */
     public function __construct($connectionName, $queue)
     {
-        $this->connectionName = $connectionName;
         $this->queue = $queue;
+        $this->connectionName = $connectionName;
     }
 }
