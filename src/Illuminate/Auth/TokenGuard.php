@@ -125,7 +125,7 @@ class TokenGuard implements Guard
      * @param  array  $credentials
      * @return bool
      */
-    protected function hasValidCredentials($user, $credentials)
+    protected function hasValidCredentials($user, array $credentials)
     {
         return ! is_null($user) && $this->provider->validateCredentials($user, $credentials);
     }
