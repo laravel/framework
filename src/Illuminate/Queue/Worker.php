@@ -50,13 +50,6 @@ class Worker
     public $shouldQuit = false;
 
     /**
-     * Indicates if the worker should stop.
-     *
-     * @var bool
-     */
-    public $shouldStop = false;
-
-    /**
      * Indicates if the worker is paused.
      *
      * @var bool
@@ -205,8 +198,6 @@ class Worker
             $this->stop(12);
         } elseif ($this->queueShouldRestart($lastRestart)) {
             $this->stop();
-        } elseif ($this->shouldStop) {
-            $this->stop(1);
         }
     }
 
@@ -252,7 +243,7 @@ class Worker
         } catch (Exception $e) {
             $this->exceptions->report($e);
 
-            $this->handleException($e);
+            $this->stopWorkerIfLostConnection($e);
         } catch (Throwable $e) {
             $this->exceptions->report(new FatalThrowableError($e));
         }
@@ -273,22 +264,22 @@ class Worker
         } catch (Exception $e) {
             $this->exceptions->report($e);
 
-            $this->handleException($e);
+            $this->stopWorkerIfLostConnection($e);
         } catch (Throwable $e) {
             $this->exceptions->report(new FatalThrowableError($e));
         }
     }
 
     /**
-     * Handle a serious job exception.
+     * Stop the worker if we have lost connection to a database.
      *
      * @param  \Exception  $e
      * @return void
      */
-    protected function handleException($e)
+    protected function stopWorkerIfLostConnection($e)
     {
         if ($this->causedByLostConnection($e)) {
-            $this->shouldStop = true;
+            $this->shouldQuit = true;
         }
     }
 
