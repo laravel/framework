@@ -5,12 +5,15 @@ namespace Illuminate\Queue;
 use Exception;
 use Throwable;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Database\DetectsLostConnections;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 
 class Worker
 {
+    use DetectsLostConnections;
+
     /**
      * The queue manager instance.
      *
@@ -45,6 +48,13 @@ class Worker
      * @var bool
      */
     public $shouldQuit = false;
+
+    /**
+     * Indicates if the worker should stop.
+     *
+     * @var bool
+     */
+    public $shouldStop = false;
 
     /**
      * Indicates if the worker is paused.
@@ -195,6 +205,8 @@ class Worker
             $this->stop(12);
         } elseif ($this->queueShouldRestart($lastRestart)) {
             $this->stop();
+        } elseif ($this->shouldStop) {
+            $this->stop(1);
         }
     }
 
@@ -239,6 +251,8 @@ class Worker
             }
         } catch (Exception $e) {
             $this->exceptions->report($e);
+
+            $this->handleException($e);
         } catch (Throwable $e) {
             $this->exceptions->report(new FatalThrowableError($e));
         }
@@ -258,8 +272,23 @@ class Worker
             return $this->process($connectionName, $job, $options);
         } catch (Exception $e) {
             $this->exceptions->report($e);
+
+            $this->handleException($e);
         } catch (Throwable $e) {
             $this->exceptions->report(new FatalThrowableError($e));
+        }
+    }
+
+    /**
+     * Handle a serious job exception.
+     *
+     * @param  \Exception  $e
+     * @return void
+     */
+    protected function handleException($e)
+    {
+        if ($this->causedByLostConnection($e)) {
+            $this->shouldStop = true;
         }
     }
 
