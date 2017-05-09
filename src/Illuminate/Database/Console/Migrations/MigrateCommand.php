@@ -19,7 +19,8 @@ class MigrateCommand extends BaseCommand
                 {--path= : The path of migrations files to be executed.}
                 {--pretend : Dump the SQL queries that would be run.}
                 {--seed : Indicates if the seed task should be re-run.}
-                {--step : Force the migrations to be run so they can be rolled back individually.}';
+                {--step : Force the migrations to be run so they can be rolled back individually.}
+                {--once : Only run the first migration, so you can run them one by one.}';
 
     /**
      * The console command description.
@@ -65,6 +66,7 @@ class MigrateCommand extends BaseCommand
         // we will use the path relative to the root of this installation folder
         // so that migrations may be run for any path within the applications.
         $this->migrator->run($this->getMigrationPaths(), [
+            'once' => $this->option('once'),
             'pretend' => $this->option('pretend'),
             'step' => $this->option('step'),
         ]);
