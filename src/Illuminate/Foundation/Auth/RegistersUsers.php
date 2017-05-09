@@ -9,6 +9,16 @@ use Illuminate\Auth\Events\Registered;
 trait RegistersUsers
 {
     use RedirectsUsers;
+    
+    /**
+     * Get the registration form view name to be used by the controller.
+     *
+     * @return string
+     */
+    public function registrationFormViewName()
+    {
+        return property_exists($this, 'registrationFormViewName') ? $this->registrationFormViewName : 'auth.register';
+    }
 
     /**
      * Show the application registration form.
@@ -17,7 +27,7 @@ trait RegistersUsers
      */
     public function showRegistrationForm()
     {
-        return view('auth.register');
+        return view($this->registrationFormViewName());
     }
 
     /**
