@@ -695,7 +695,9 @@ if (! function_exists('request')) {
             return app('request')->only($key);
         }
 
-        return data_get(app('request')->all(), $key, $default);
+        $value = app('request')->__get($key);
+
+        return is_null($value) ? value($default) : $value;
     }
 }
 
