@@ -386,19 +386,24 @@ class Blueprint
     /**
      * Create a new basic foreign key column on the table.
      *
-     * @param  string  $string
+     * @param  string  $columnName
+     * @param  bool  $nullable
      * @param  string  $name
      * @return \Illuminate\Support\Fluent
      */
-    public function basicForeignKey($column, $name = null)
+    public function basicForeignKey($columnName, $nullable = false, $name = null)
     {
-        $this->integer($column)->unsigned();
+        $localColumn = $this->integer($columnName)->unsigned();
 
-        $on = Str::plural(
-            Str::replaceLast('_id', '', $column)
+        if ($nullable) {
+            $localColumn->nullable();
+        }
+
+        $table = Str::plural(
+            Str::replaceLast('_id', '', $columnName)
         );
 
-        return $this->foreign($column, $name)->references('id')->on($on);
+        return $this->foreign($columnName, $name)->references('id')->on($table);
     }
 
     /**
