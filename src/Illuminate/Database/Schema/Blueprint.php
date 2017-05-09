@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Schema;
 
 use Closure;
+use Illuminate\Support\Str;
 use Illuminate\Support\Fluent;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Grammars\Grammar;
@@ -380,6 +381,24 @@ class Blueprint
     public function index($columns, $name = null, $algorithm = null)
     {
         return $this->indexCommand('index', $columns, $name, $algorithm);
+    }
+
+    /**
+     * Create a new basic foreign key column on the table.
+     *
+     * @param  string  $string
+     * @param  string  $name
+     * @return \Illuminate\Support\Fluent
+     */
+    public function basicForeignKey($column, $name = null)
+    {
+        $this->integer($column)->unsigned();
+
+        $on = Str::plural(
+            Str::replaceLast('_id', '', $column)
+        );
+
+        return $this->foreign($column, $name)->references('id')->on($on);
     }
 
     /**
