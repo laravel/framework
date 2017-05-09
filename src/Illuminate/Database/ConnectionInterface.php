@@ -147,4 +147,18 @@ interface ConnectionInterface
      * @return array
      */
     public function pretend(Closure $callback);
+
+    /**
+     * Get the current PDO connection.
+     *
+     * @return \PDO
+     */
+    public function getPdo();
+
+    /**
+     * Get the table prefix for the connection.
+     *
+     * @return string
+     */
+    public function getTablePrefix();
 }
