@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Fixed
+- Fixed inversion of expected and actual on assertHeader ([#19110](https://github.com/laravel/framework/pull/19110))
+
+
+## v5.4.22 (2017-05-08)
+
 ### Added
 - Support dynamic number of keys in `MessageBag::hasAny()` ([#19002](https://github.com/laravel/framework/pull/19002))
 - Added `Seeder::callSilent()` method ([#19007](https://github.com/laravel/framework/pull/19007))
@@ -10,18 +16,20 @@
 - Added `SendsPasswordResetEmails::validateEmail()` method ([#19042](https://github.com/laravel/framework/pull/19042))
 - Allow factory attributes to be factory instances themselves ([#19055](https://github.com/laravel/framework/pull/19055))
 - Implemented `until()` method on `EventFake` ([#19062](https://github.com/laravel/framework/pull/19062))
-- Added `$encoding` parameter to `Str::length()` ([#19047](https://github.com/laravel/framework/pull/19047))
+- Added `$encoding` parameter to `Str::length()` ([#19047](https://github.com/laravel/framework/pull/19047), [#19079](https://github.com/laravel/framework/pull/19079))
 
 ### Changed
 - Throw exception when invalid first argument is passed to `cache()` helper ([d9459b2](https://github.com/laravel/framework/commit/d9459b2f8bec4a807e7ba2b3301de4c5248aa933))
 - Use `getAuthIdentifierName()` in `Authenticatable::getAuthIdentifier()` ([#19038](https://github.com/laravel/framework/pull/19038))
-- Changed replacements for `Öö` and `Üü` ([#19045](https://github.com/laravel/framework/pull/19045))
 - Clone queries without order by for aggregates ([#19064](https://github.com/laravel/framework/pull/19064))
+- Force host on password reset notification ([cef1055](https://github.com/laravel/framework/commit/cef10551820530632a86fa6f1306fee95c5cac43))
 
 ### Fixed
 - Set data key when testing file uploads in nested array ([#18954](https://github.com/laravel/framework/pull/18954))
 - Fixed a bug related to sub select queries and extra select statements ([#19013](https://github.com/laravel/framework/pull/19013))
 - Resolve aliases from container when using parameters ([#19071](https://github.com/laravel/framework/pull/19071))
+- Stop worker if database disconnect occurred ([#19080](https://github.com/laravel/framework/pull/19080), [583b1b8](https://github.com/laravel/framework/commit/583b1b885bbc6883073baa1a0417fffcdbe5ebed))
+- Fixed internal call to `assertJson()` in `assertJsonStructure()` ([#19090](https://github.com/laravel/framework/pull/19090))
 
 
 ## v5.4.21 (2017-04-28)
