@@ -393,7 +393,7 @@ class Blueprint
      */
     public function basicForeignKey($columnName, $nullable = false, $name = null)
     {
-        $localColumn = $this->integer($columnName)->unsigned();
+        $localColumn = $this->unsignedInteger($column);
 
         if ($nullable) {
             $localColumn->nullable();
@@ -403,7 +403,9 @@ class Blueprint
             Str::replaceLast('_id', '', $columnName)
         );
 
-        return $this->foreign($columnName, $name)->references('id')->on($table);
+        return $this->indexCommand('foreign', $columnName, $name)
+                    ->references('id')
+                    ->on($table);
     }
 
     /**
