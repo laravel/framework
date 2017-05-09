@@ -66,4 +66,15 @@ class SendQueuedNotifications implements ShouldQueue
     {
         return get_class($this->notification);
     }
+
+    /**
+     * Prepare the instance for cloning.
+     *
+     * @return void
+     */
+    public function __clone()
+    {
+        $this->notifiables = clone $this->notifiables;
+        $this->notification = clone $this->notification;
+    }
 }

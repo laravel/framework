@@ -97,4 +97,14 @@ class BroadcastEvent implements ShouldQueue
     {
         return get_class($this->event);
     }
+
+    /**
+     * Prepare the instance for cloning.
+     *
+     * @return void
+     */
+    public function __clone()
+    {
+        $this->event = clone $this->event;
+    }
 }
