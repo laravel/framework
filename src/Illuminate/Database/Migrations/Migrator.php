@@ -135,8 +135,8 @@ class Migrator
         // each migration's execution. We will also extract a few of the options.
         $batch = $this->repository->getNextBatchNumber();
 
+        $once = Arr::get($options, 'once', false);
         $pretend = Arr::get($options, 'pretend', false);
-
         $step = Arr::get($options, 'step', false);
 
         // Once we have the array of migrations, we will spin through them and run the
@@ -147,6 +147,10 @@ class Migrator
 
             if ($step) {
                 $batch++;
+            }
+
+            if ($once) {
+                return;
             }
         }
     }
