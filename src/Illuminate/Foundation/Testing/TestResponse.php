@@ -114,7 +114,7 @@ class TestResponse
 
         if (! is_null($value)) {
             PHPUnit::assertEquals(
-                $this->headers->get($headerName), $value,
+                $value, $this->headers->get($headerName),
                 "Header [{$headerName}] was found, but value [{$actual}] does not match [{$value}]."
             );
         }
