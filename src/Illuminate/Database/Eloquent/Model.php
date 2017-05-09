@@ -1198,7 +1198,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function getForeignKey()
     {
-        return Str::snake(class_basename($this)).'_'.$this->primaryKey;
+        return Str::singular($this->getTable()).'_'.$this->primaryKey;
     }
 
     /**
