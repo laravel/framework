@@ -2,99 +2,175 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Exception;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Routing\Redirector;
 use Illuminate\Container\Container;
+use Illuminate\Routing\UrlGenerator;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Validation\Factory as ValidationFactory;
+use Illuminate\Contracts\Validation\Factory as ValidationFactoryContract;
 
 class FoundationFormRequestTest extends TestCase
 {
+    protected $mocks = [];
+
     public function tearDown()
     {
         m::close();
-    }
 
-    public function testValidateFunctionRunsValidatorOnSpecifiedRules()
-    {
-        $request = FoundationTestFormRequestStub::create('/', 'GET', ['name' => 'abigail']);
-        $request->setContainer($container = new Container);
-        $factory = m::mock('Illuminate\Validation\Factory');
-        $factory->shouldReceive('make')->once()->with(['name' => 'abigail'], ['name' => 'required'], [], [])->andReturn(
-            $validator = m::mock('Illuminate\Validation\Validator')
-        );
-        $container->instance('Illuminate\Contracts\Validation\Factory', $factory);
-        $validator->shouldReceive('passes')->once()->andReturn(true);
-
-        $request->validate($factory);
+        $this->mocks = [];
     }
 
     /**
      * @expectedException \Illuminate\Validation\ValidationException
      */
-    public function testValidateFunctionThrowsValidationExceptionIfValidationFails()
+    public function test_validate_throws_when_validation_fails()
     {
-        $request = m::mock('Illuminate\Tests\Foundation\FoundationTestFormRequestStub[response]');
-        $request->initialize(['name' => null]);
-        $request->setContainer($container = new Container);
-        $factory = m::mock('Illuminate\Validation\Factory');
-        $factory->shouldReceive('make')->once()->with(['name' => null], ['name' => 'required'], [], [])->andReturn(
-            $validator = m::mock('Illuminate\Validation\Validator')
-        );
-        $container->instance('Illuminate\Contracts\Validation\Factory', $factory);
-        $validator->shouldReceive('passes')->once()->andReturn(false);
-        $validator->shouldReceive('getMessageBag')->once()->andReturn($messages = m::mock('Illuminate\Support\MessageBag'));
-        $messages->shouldReceive('toArray')->once()->andReturn(['name' => ['Name required']]);
-        $request->shouldReceive('response')->once()->andReturn(new \Illuminate\Http\Response);
+        $request = $this->createRequest(['no' => 'name']);
 
-        $request->validate($factory);
+        $this->mocks['redirect']->shouldReceive('withInput->withErrors');
+
+        $request->validate();
     }
 
     /**
      * @expectedException \Illuminate\Auth\Access\AuthorizationException
      */
-    public function testValidateFunctionThrowsHttpResponseExceptionIfAuthorizationFails()
+    public function test_validate_method_throws_when_authorization_fails()
     {
-        $request = m::mock('Illuminate\Tests\Foundation\FoundationTestFormRequestForbiddenStub[forbiddenResponse]');
-        $request->initialize(['name' => null]);
-        $request->setContainer($container = new Container);
-        $factory = m::mock('Illuminate\Validation\Factory');
-        $factory->shouldReceive('make')->once()->with(['name' => null], ['name' => 'required'], [], [])->andReturn(
-            $validator = m::mock('Illuminate\Validation\Validator')
-        );
-        $container->instance('Illuminate\Contracts\Validation\Factory', $factory);
-        $validator->shouldReceive('passes')->never();
-
-        $request->validate($factory);
+        $this->createRequest([], FoundationTestFormRequestForbiddenStub::class)->validate();
     }
 
-    public function testRedirectResponseIsProperlyCreatedWithGivenErrors()
+    public function test_redirect_response_is_properly_created_with_given_errors()
     {
-        $request = FoundationTestFormRequestStub::create('/', 'GET');
-        $request->setRedirector($redirector = m::mock('Illuminate\Routing\Redirector'));
-        $redirector->shouldReceive('to')->once()->with('previous')->andReturn($response = m::mock('Illuminate\Http\RedirectResponse'));
-        $redirector->shouldReceive('getUrlGenerator')->andReturn($url = m::mock('StdClass'));
-        $url->shouldReceive('previous')->once()->andReturn('previous');
-        $response->shouldReceive('withInput')->andReturn($response);
-        $response->shouldReceive('withErrors')->with(['errors'], 'default')->andReturn($response);
+        $request = $this->createRequest();
 
-        $request->response(['errors']);
+        $this->mocks['redirect']->shouldReceive('withInput')->andReturnSelf();
+
+        $this->mocks['redirect']
+             ->shouldReceive('withErrors')
+             ->with(['name' => ['error']], 'default')
+             ->andReturnSelf();
+
+        $e = $this->catchException(ValidationException::class, function () use ($request) {
+            $request->validate();
+        });
+
+        $this->assertInstanceOf(RedirectResponse::class, $e->getResponse());
     }
 
-    public function testValidateFunctionRunsBeforeValidationFunction()
+    public function test_prepare_for_validation_runs_before_validation()
     {
-        $request = FoundationTestFormRequestHooks::create('/', 'GET', ['name' => 'abigail']);
-        $request->setContainer($container = new Container);
-        $factory = m::mock('Illuminate\Validation\Factory');
-        $factory->shouldReceive('make')->once()->with(['name' => 'Taylor'], ['name' => 'required'], [], [])->andReturn(
-            $validator = m::mock('Illuminate\Validation\Validator')
-        );
-        $container->instance('Illuminate\Contracts\Validation\Factory', $factory);
-        $validator->shouldReceive('passes')->once()->andReturn(true);
+        $this->createRequest([], FoundationTestFormRequestHooks::class)->validate();
+    }
 
-        $request->validate($factory);
+    /**
+     * Catch the given exception thrown from the executor, and return it.
+     *
+     * @param  string  $class
+     * @param  \Closure  $excecutor
+     * @return \Exception
+     */
+    protected function catchException($class, $excecutor)
+    {
+        try {
+            $excecutor();
+        } catch (Exception $e) {
+            if (is_a($e, $class)) {
+                return $e;
+            }
+
+            throw $e;
+        }
+
+        throw new Exception("No exception thrown. Expected exception {$class}");
+    }
+
+    /**
+     * Create a new request of the given type.
+     *
+     * @param  array  $payload
+     * @param  string  $class
+     * @return \Illuminate\Foundation\Http\FormRequest
+     */
+    protected function createRequest($payload = [], $class = FoundationTestFormRequestStub::class)
+    {
+        $container = tap(new Container, function ($container) {
+            $container->instance(
+                ValidationFactoryContract::class,
+                $this->createValidationFactory($container)
+            );
+        });
+
+        $request = $class::create('/', 'GET', $payload);
+
+        return $request->setRedirector($this->createMockRedirector($request))
+                       ->setContainer($container);
+    }
+
+    /**
+     * Create a new validation factory.
+     *
+     * @param  \Illuminate\Container\Container  $container
+     * @return \Illuminate\Validation\Factory
+     */
+    protected function createValidationFactory($container)
+    {
+        $translator = m::mock(Translator::class)->shouldReceive('trans')
+                       ->zeroOrMoreTimes()->andReturn('error')->getMock();
+
+        return new ValidationFactory($translator, $container);
+    }
+
+    /**
+     * Create a mock redirector.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Routing\Redirector
+     */
+    protected function createMockRedirector($request)
+    {
+        $redirector = $this->mocks['redirector'] = m::mock(Redirector::class);
+
+        $redirector->shouldReceive('getUrlGenerator')->zeroOrMoreTimes()
+                   ->andReturn($generator = $this->createMockUrlGenerator());
+
+        $redirector->shouldReceive('to')->zeroOrMoreTimes()
+                   ->andReturn($this->createMockRedirectResponse());
+
+        $generator->shouldReceive('previous')->zeroOrMoreTimes()
+                  ->andReturn('previous');
+
+        return $redirector;
+    }
+
+    /**
+     * Create a mock URL generator.
+     *
+     * @return \Illuminate\Routing\UrlGenerator
+     */
+    protected function createMockUrlGenerator()
+    {
+        return $this->mocks['generator'] = m::mock(UrlGenerator::class);
+    }
+
+    /**
+     * Create a mock redirect response.
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    protected function createMockRedirectResponse()
+    {
+        return $this->mocks['redirect'] = m::mock(RedirectResponse::class);
     }
 }
 
-class FoundationTestFormRequestStub extends \Illuminate\Foundation\Http\FormRequest
+class FoundationTestFormRequestStub extends FormRequest
 {
     public function rules()
     {
@@ -107,7 +183,7 @@ class FoundationTestFormRequestStub extends \Illuminate\Foundation\Http\FormRequ
     }
 }
 
-class FoundationTestFormRequestForbiddenStub extends \Illuminate\Foundation\Http\FormRequest
+class FoundationTestFormRequestForbiddenStub extends FormRequest
 {
     public function rules()
     {
@@ -119,7 +195,7 @@ class FoundationTestFormRequestForbiddenStub extends \Illuminate\Foundation\Http
         return false;
     }
 }
-class FoundationTestFormRequestHooks extends \Illuminate\Foundation\Http\FormRequest
+class FoundationTestFormRequestHooks extends FormRequest
 {
     public function rules()
     {
