@@ -26,6 +26,15 @@ class FoundationFormRequestTest extends TestCase
         $this->mocks = [];
     }
 
+    public function test_validated_method_returns_the_validated_data()
+    {
+        $request = $this->createRequest(['name' => 'specified', 'with' => 'extras']);
+
+        $request->validate();
+
+        $this->assertEquals(['name' => 'specified'], $request->validated());
+    }
+
     /**
      * @expectedException \Illuminate\Validation\ValidationException
      */
