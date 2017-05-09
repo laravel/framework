@@ -540,6 +540,13 @@ class Builder
             return $this->whereNull($column, $boolean, $operator != '=');
         }
 
+        // If the value is an array, we will assume the developer wants to add a
+        // where in clause to the query. We will allow a short-cut here
+        // for convenience so the developer doesn't have to check.
+        if (is_array($value)) {
+            return $this->whereIn($column, $value, $boolean, $operator != '=');
+        }
+
         // If the column is making a JSON reference we'll check to see if the value
         // is a boolean. If it is, we'll add the raw boolean string as an actual
         // value to the query to ensure this is properly handled by the query.
