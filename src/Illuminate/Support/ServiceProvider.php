@@ -46,7 +46,7 @@ abstract class ServiceProvider
     }
 
     /**
-     * Merge the given configuration with the existing configuration.
+     * Merge the configuration at the given path with the existing configuration.
      *
      * @param  string  $path
      * @param  string  $key
@@ -54,9 +54,26 @@ abstract class ServiceProvider
      */
     protected function mergeConfigFrom($path, $key)
     {
-        $config = $this->app['config']->get($key, []);
+        $this->app['config']->set(
+            $key,
+            $this->mergeConfig(
+                $key,
+                require $path,
+                $this->app['config']->get($key, [])
+            )
+        );
+    }
 
-        $this->app['config']->set($key, array_merge(require $path, $config));
+    /**
+     * Merge two configurations together.
+     * @param  string $key
+     * @param  array  $baseConfig
+     * @param  array  $mergeConfig
+     * @return array
+     */
+    protected function mergeConfig($key, array $baseConfig, array $mergeConfig)
+    {
+        return array_merge($baseConfig, $mergeConfig);
     }
 
     /**
