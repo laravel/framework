@@ -49,7 +49,7 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface
         $query = $this->table($collection)->where($column, '=', $value);
 
         if (! is_null($excludeId) && $excludeId != 'NULL') {
-            $query->where($idColumn ?: 'id', '<>', $excludeId);
+            $query->where($idColumn ?: 'id', '<>', stripslashes($excludeId));
         }
 
         return $this->addConditions($query, $extra)->count();
