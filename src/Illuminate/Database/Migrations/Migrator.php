@@ -85,6 +85,27 @@ class Migrator
         // run each of the outstanding migrations against a database connection.
         $files = $this->getMigrationFiles($paths);
 
+        // If passed the 'only' attribute, we will attempt to run *only* the specified
+        // migration.  We will compare the requested migration against the list of
+        // migration files above. If it does not exist, throw an error, otherwise
+        // replace $files with only the matching key/value.
+        //
+        // We sanitize (via basename+trim) so the input can be any variation of:
+        //   2017_04_25_10111_test  (correct)
+        //   2017_04_25_10111_test.php
+        //   /path/to/database/migrations/2017_04_25_10111_test.php
+        if ($only = Arr::get($options, 'only')) {
+            $only = basename(trim($only), '.php');
+            if (! Arr::has($files, $only)) {
+                $this->note('<error>Unknown migration '.$only.'</error>');
+                $this->note('<comment>For list of migrations, see: migrate:status</comment>');
+
+                return [];
+            }
+
+            $files = Arr::only($files, $only);
+        }
+
         $this->requireFiles($migrations = $this->pendingMigrations(
             $files, $this->repository->getRan()
         ));
