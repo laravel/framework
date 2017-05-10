@@ -326,7 +326,7 @@ class Arr
     }
 
     /**
-     * Get a subset of the items from the given array.
+     * Get a subset of the items from the given array using "dot" notation.
      *
      * @param  array  $array
      * @param  array|string  $keys
@@ -334,7 +334,19 @@ class Arr
      */
     public static function only($array, $keys)
     {
-        return array_intersect_key($array, array_flip((array) $keys));
+        $results = [];
+
+        foreach ((array) $keys as $key) {
+            $keyValue = static::get($array, $key, '__missing__');
+
+            if ($keyValue == '__missing__') {
+                continue;
+            }
+
+            static::set($results, $key, $keyValue);
+        }
+
+        return $results;
     }
 
     /**
