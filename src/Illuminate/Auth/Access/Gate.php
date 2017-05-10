@@ -330,12 +330,10 @@ class Gate implements GateContract
      */
     protected function resolveAuthCallback($user, $ability, array $arguments)
     {
-        if (isset($arguments[0])) {
-            if (! is_null($policy = $this->getPolicyFor($arguments[0]))) {
-                if ($policyCallback = $this->resolvePolicyCallback($user, $ability, $arguments, $policy)) {
-                    return $policyCallback;
-                }
-            }
+        if (isset($arguments[0]) &&
+            ! is_null($policy = $this->getPolicyFor($arguments[0])) &&
+            $callback = $this->resolvePolicyCallback($user, $ability, $arguments, $policy)) {
+            return $callback;
         }
 
         if (isset($this->abilities[$ability])) {
@@ -396,7 +394,6 @@ class Gate implements GateContract
      */
     protected function resolvePolicyCallback($user, $ability, array $arguments, $policy)
     {
-        // Check the method exists on the policy before we try to resolve it.
         if (! is_callable([$policy, $this->formatAbilityToMethod($ability)])) {
             return false;
         }
