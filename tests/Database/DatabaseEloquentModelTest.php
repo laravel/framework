@@ -275,6 +275,26 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->save());
     }
 
+    public function testUpdateProcessTimestampOnlyWithUpdatedAt()
+    {
+        $model = $this->getMockBuilder('Illuminate\Tests\Database\EloquentModelEventObjectStub')->setMethods(['newQueryWithoutScopes', 'updateTimestamps', 'setCreatedAt', 'setUpdatedAt', 'fireModelEvent'])->getMock();
+        $model->timestamps = ['updated_at'];
+        $query = m::mock('Illuminate\Database\Eloquent\Builder');
+        $query->shouldReceive('where')->once()->with('id', '=', 1);
+        $query->shouldReceive('update')->once()->with(['name' => 'taylor'])->andReturn(1);
+        $model->expects($this->once())->method('newQueryWithoutScopes')->will($this->returnValue($query));
+        $model->expects($this->once())->method('updateTimestamps');
+        $model->expects($this->never())->method('setCreatedAt');
+        $model->expects($this->once())->method('setUpdatedAt');
+        $model->expects($this->any())->method('fireModelEvent')->will($this->returnValue(true));
+
+        $model->id = 1;
+        $model->syncOriginal();
+        $model->name = 'taylor';
+        $model->exists = true;
+        $this->assertTrue($model->save());
+    }
+
     public function testUpdateUsesOldPrimaryKey()
     {
         $model = $this->getMockBuilder('Illuminate\Tests\Database\EloquentModelStub')->setMethods(['newQueryWithoutScopes', 'updateTimestamps'])->getMock();
