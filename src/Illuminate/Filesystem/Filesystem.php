@@ -372,20 +372,9 @@ class Filesystem
      * @param  string  $directory
      * @return array
      */
-    public function files($directory)
+    public function files($directory, $hidden = false)
     {
-        $glob = glob($directory.'/*');
-
-        if ($glob === false) {
-            return [];
-        }
-
-        // To get the appropriate files, we'll simply glob the directory and filter
-        // out any "files" that are not truly files so we do not end up with any
-        // directories in our list, but only true files within the directory.
-        return array_filter($glob, function ($file) {
-            return filetype($file) == 'file';
-        });
+        return iterator_to_array(Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory)->depth(0), false);
     }
 
     /**
