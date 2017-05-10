@@ -736,7 +736,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $result = [];
 
         foreach ($this->items as $key => $value) {
-            $assoc = $callback($value, $key);
+            $assoc = $callback($value, $key, $result);
 
             foreach ($assoc as $mapKey => $mapValue) {
                 $result[$mapKey] = $mapValue;
