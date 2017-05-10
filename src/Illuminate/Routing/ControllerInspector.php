@@ -80,7 +80,7 @@ class ControllerInspector
     {
         $verb = $this->getVerb($name = $method->name);
 
-        $uri = $this->addUriWildcards($plain = $this->getPlainUri($name, $prefix));
+        $uri = $this->addUriWildcards($plain = $this->getPlainUri($name, $prefix), $method);
 
         return compact('verb', 'plain', 'uri');
     }
@@ -123,11 +123,16 @@ class ControllerInspector
     /**
      * Add wildcards to the given URI.
      *
-     * @param  string  $uri
+     * @param  string $uri
+     * @param ReflectionMethod $method
      * @return string
      */
-    public function addUriWildcards($uri)
+    public function addUriWildcards($uri, $method)
     {
-        return $uri.'/{one?}/{two?}/{three?}/{four?}/{five?}';
+        $parameters = [];
+        foreach ($method->getParameters() as $parameter) {
+            $parameters[] = $parameter->isOptional() ? "{{$parameter->getName()}?}" : "{{$parameter->getName()}}";
+        }
+        return $uri . '/' . implode('/', $parameters);
     }
 }
