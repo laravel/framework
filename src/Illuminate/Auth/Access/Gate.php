@@ -332,7 +332,9 @@ class Gate implements GateContract
     {
         if (isset($arguments[0])) {
             if (! is_null($policy = $this->getPolicyFor($arguments[0]))) {
-                return $this->resolvePolicyCallback($user, $ability, $arguments, $policy);
+                if ($policyCallback = $this->resolvePolicyCallback($user, $ability, $arguments, $policy)) {
+                    return $policyCallback;
+                }
             }
         }
 
@@ -390,10 +392,15 @@ class Gate implements GateContract
      * @param  string  $ability
      * @param  array  $arguments
      * @param  mixed  $policy
-     * @return callable
+     * @return bool|callable
      */
     protected function resolvePolicyCallback($user, $ability, array $arguments, $policy)
     {
+        // Check the method exists on the policy before we try to resolve it.
+        if (! is_callable([$policy, $this->formatAbilityToMethod($ability)])) {
+            return false;
+        }
+
         return function () use ($user, $ability, $arguments, $policy) {
             // This callback will be responsible for calling the policy's before method and
             // running this policy method if necessary. This is used to when objects are
