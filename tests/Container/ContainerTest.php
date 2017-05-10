@@ -838,6 +838,24 @@ class ContainerTest extends TestCase
         $this->assertEquals(['name' => 'taylor'], $container->makeWith('foo', ['name' => 'taylor']));
         $this->assertEquals(['name' => 'abigail'], $container->makeWith('foo', ['name' => 'abigail']));
     }
+
+    public function testDecorationChain()
+    {
+        $container = new Container;
+
+        $container->decorate(
+            ContainerDecoratorChainComponent::class,
+            ContainerDecoratorChainOuter::class,
+            ContainerDecoratorChainInner::class,
+            ContainerDecoratorChainConcreteComponent::class
+        );
+
+        $instance = $container->make(ContainerDecoratorChainComponent::class);
+
+        $this->assertInstanceOf(ContainerDecoratorChainOuter::class, $instance);
+        $this->assertInstanceOf(ContainerDecoratorChainInner::class, $instance->wrapped);
+        $this->assertInstanceOf(ContainerDecoratorChainConcreteComponent::class, $instance->wrapped->wrapped);
+    }
 }
 
 class ContainerConcreteStub
@@ -990,4 +1008,41 @@ class ContainerTestContextInjectInstantiations implements IContainerContractStub
     {
         static::$instantiations++;
     }
+}
+
+interface ContainerDecoratorChainComponent
+{
+}
+
+class ContainerDecoratorChainConcreteComponent implements ContainerDecoratorChainComponent
+{
+}
+
+abstract class ContainerDecoratorChainAbstractDecorator implements ContainerDecoratorChainComponent
+{
+    /** @var ContainerDecoratorChainComponent */
+    public $wrapped;
+
+    /**
+     * @param ContainerDecoratorChainComponent $wrapped
+     */
+    public function __construct(ContainerDecoratorChainComponent $wrapped)
+    {
+        $this->wrapped = $wrapped;
+    }
+}
+
+class ContainerDecoratorChainInner extends ContainerDecoratorChainAbstractDecorator
+{
+    public $stub;
+
+    public function __construct(ContainerDecoratorChainComponent $wrapped, ContainerConcreteStub $stub)
+    {
+        parent::__construct($wrapped);
+        $this->stub = $stub;
+    }
+}
+
+class ContainerDecoratorChainOuter extends ContainerDecoratorChainAbstractDecorator
+{
 }
