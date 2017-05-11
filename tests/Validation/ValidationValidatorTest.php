@@ -3403,10 +3403,13 @@ class ValidationValidatorTest extends TestCase
             $this->getIlluminateArrayTranslator(),
             ['name' => 'taylor'],
             ['name' => new class implements ValidationRule {
-                public function passes($attribute, $value) {
+                public function passes($attribute, $value)
+                {
                     return $value === 'taylor';
                 }
-                public function message() {
+
+                public function message()
+                {
                     return ':attribute must be taylor';
                 }
             }]
@@ -3419,10 +3422,13 @@ class ValidationValidatorTest extends TestCase
             $this->getIlluminateArrayTranslator(),
             ['name' => 'adam'],
             ['name' => [new class implements ValidationRule {
-                public function passes($attribute, $value) {
+                public function passes($attribute, $value)
+                {
                     return $value === 'taylor';
                 }
-                public function message() {
+
+                public function message()
+                {
                     return ':attribute must be taylor';
                 }
             }]]
@@ -3464,10 +3470,13 @@ class ValidationValidatorTest extends TestCase
             ['name' => 'taylor', 'states' => ['AR', 'TX'], 'number' => 9],
             [
                 'states.*' => new class implements ValidationRule {
-                    public function passes($attribute, $value) {
+                    public function passes($attribute, $value)
+                    {
                         return in_array($value, ['AK', 'HI']);
                     }
-                    public function message() {
+
+                    public function message()
+                    {
                         return ':attribute must be AR or TX';
                     }
                 },
@@ -3483,8 +3492,8 @@ class ValidationValidatorTest extends TestCase
                         if ($value % 4 !== 0) {
                             $fail(':attribute must be divisible by 4');
                         }
-                    }
-                ]
+                    },
+                ],
             ]
         );
 
