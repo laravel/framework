@@ -827,38 +827,6 @@ if (! function_exists('storage_path')) {
     }
 }
 
-if (! function_exists('throw_if')) {
-    /**
-     * Throw the given exception if the given boolean is true.
-     *
-     * @param  bool  $boolean
-     * @param  \Throwable  $exception
-     * @return void
-     */
-    function throw_if($boolean, $exception)
-    {
-        if ($boolean) {
-            throw $exception;
-        }
-    }
-}
-
-if (! function_exists('throw_unless')) {
-    /**
-     * Throw the given exception unless the given boolean is true.
-     *
-     * @param  bool  $boolean
-     * @param  \Throwable  $exception
-     * @return void
-     */
-    function throw_unless($boolean, $exception)
-    {
-        if (! $boolean) {
-            throw $exception;
-        }
-    }
-}
-
 if (! function_exists('trans')) {
     /**
      * Translate the given message.
