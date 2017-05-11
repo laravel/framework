@@ -11,13 +11,6 @@ use Illuminate\Validation\Rules\Unique;
 class ValidationRuleParser
 {
     /**
-     * The validator instance.
-     *
-     * @var \Illuminate\Validation\Validator
-     */
-    public $validator;
-
-    /**
      * The data being validated.
      *
      * @var array
@@ -34,14 +27,12 @@ class ValidationRuleParser
     /**
      * Create a new validation rule parser.
      *
-     * @param  \Illuminate\Validation\Validator  $validator
      * @param  array  $data
      * @return void
      */
-    public function __construct(Validator $validator)
+    public function __construct(array $data)
     {
-        $this->validator = $validator;
-        $this->data = $validator->getData();
+        $this->data = $data;
     }
 
     /**

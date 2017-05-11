@@ -770,7 +770,7 @@ class Validator implements ValidatorContract
         // The primary purpose of this parser is to expand any "*" rules to the all
         // of the explicit rules needed for the given data. For example the rule
         // names.* would get expanded to names.0, names.1, etc. for this data.
-        $response = (new ValidationRuleParser($this))
+        $response = (new ValidationRuleParser($this->data))
                             ->explode($rules);
 
         $this->rules = array_merge_recursive(
