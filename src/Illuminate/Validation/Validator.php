@@ -412,7 +412,7 @@ class Validator implements ValidatorContract
     /**
      * Determine if the attribute is validatable.
      *
-     * @param  string  $rule
+     * @param  object|string  $rule
      * @param  string  $attribute
      * @param  mixed   $value
      * @return bool
@@ -428,7 +428,7 @@ class Validator implements ValidatorContract
     /**
      * Determine if the field is present, or the rule implies required.
      *
-     * @param  string  $rule
+     * @param  object|string  $rule
      * @param  string  $attribute
      * @param  mixed   $value
      * @return bool
@@ -439,18 +439,20 @@ class Validator implements ValidatorContract
             return $this->isImplicit($rule);
         }
 
-        return $this->validatePresent($attribute, $value) || $this->isImplicit($rule);
+        return $this->validatePresent($attribute, $value) ||
+               $this->isImplicit($rule);
     }
 
     /**
      * Determine if a given rule implies the attribute is required.
      *
-     * @param  string  $rule
+     * @param  object|string  $rule
      * @return bool
      */
     protected function isImplicit($rule)
     {
-        return in_array($rule, $this->implicitRules);
+        return $rule instanceof ImplicitValidationRule ||
+               in_array($rule, $this->implicitRules);
     }
 
     /**
@@ -480,7 +482,7 @@ class Validator implements ValidatorContract
      */
     protected function isNotNullIfMarkedAsNullable($rule, $attribute)
     {
-        if (in_array($rule, $this->implicitRules) || ! $this->hasRule($attribute, ['Nullable'])) {
+        if ($this->isImplicit($rule) || ! $this->hasRule($attribute, ['Nullable'])) {
             return true;
         }
 

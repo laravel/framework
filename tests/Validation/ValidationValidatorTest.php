@@ -11,6 +11,7 @@ use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
 use Illuminate\Validation\ValidationRule;
 use Symfony\Component\HttpFoundation\File\File;
+use Illuminate\Validation\ImplicitValidationRule;
 
 class ValidationValidatorTest extends TestCase
 {
@@ -3501,6 +3502,32 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals('states.0 must be AR or TX', $v->errors()->get('states.0')[0]);
         $this->assertEquals('states.1 must be AR or TX', $v->errors()->get('states.1')[0]);
         $this->assertEquals('number must be divisible by 4', $v->errors()->get('number')[0]);
+    }
+
+    public function testImplicitCustomValidationObjects()
+    {
+        // Test passing case...
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['name' => ''],
+            ['name' => $rule = new class implements ImplicitValidationRule {
+                public $called = false;
+
+                public function passes($attribute, $value)
+                {
+                    $this->called = true;
+                    return true;
+                }
+
+                public function message()
+                {
+                    return 'message';
+                }
+            }]
+        );
+
+        $this->assertTrue($v->passes());
+        $this->assertTrue($rule->called);
     }
 
     protected function getTranslator()
