@@ -838,6 +838,19 @@ class ContainerTest extends TestCase
         $this->assertEquals(['name' => 'taylor'], $container->makeWith('foo', ['name' => 'taylor']));
         $this->assertEquals(['name' => 'abigail'], $container->makeWith('foo', ['name' => 'abigail']));
     }
+
+    public function testCanBuildWithoutParameterStackWithNoConstructors()
+    {
+        $container = new Container;
+        $this->assertInstanceOf(ContainerConcreteStub::class, $container->build(ContainerConcreteStub::class));
+    }
+
+    public function testCanBuildWithoutParameterStackWithConstructors()
+    {
+        $container = new Container;
+        $container->bind('Illuminate\Tests\Container\IContainerContractStub', 'Illuminate\Tests\Container\ContainerImplementationStub');
+        $this->assertInstanceOf(ContainerDependentStub::class, $container->build(ContainerDependentStub::class));
+    }
 }
 
 class ContainerConcreteStub
