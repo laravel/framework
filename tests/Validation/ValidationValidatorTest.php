@@ -13,7 +13,6 @@ use Illuminate\Contracts\Validation\Rule;
 use Symfony\Component\HttpFoundation\File\File;
 use Illuminate\Contracts\Validation\ImplicitRule;
 
-
 class ValidationValidatorTest extends TestCase
 {
     public function tearDown()
