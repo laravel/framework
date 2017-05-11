@@ -1482,7 +1482,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function finishSave(array $options)
     {
-        $this->fireModelEvent('saved', false);
+        if ($this->isDirty()) {
+            $this->fireModelEvent('saved', false);
+        }
 
         $this->syncOriginal();
 
