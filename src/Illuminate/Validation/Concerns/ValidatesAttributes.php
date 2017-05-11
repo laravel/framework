@@ -819,7 +819,7 @@ trait ValidatesAttributes
      */
     protected function validateInteger($attribute, $value)
     {
-        return filter_var($value, FILTER_VALIDATE_INT) !== false;
+        return filter_var($value, FILTER_VALIDATE_INT, FILTER_FLAG_ALLOW_OCTAL | FILTER_FLAG_ALLOW_HEX) !== false;
     }
 
     /**
