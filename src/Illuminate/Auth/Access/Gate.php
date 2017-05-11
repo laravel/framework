@@ -471,11 +471,11 @@ class Gate implements GateContract
     }
 
     /**
-     * Get the abilities.
+     * Get all of the defined abilities.
      *
      * @return array
      */
-    public function getAbilities()
+    public function abilities()
     {
         return $this->abilities;
     }
