@@ -104,6 +104,10 @@ class MorphTo extends BelongsTo
      */
     public function match(array $models, Collection $results, $relation)
     {
+        foreach (array_keys($this->dictionary) as $type) {
+            $this->matchToMorphParents($type, $this->getResultsByType($type), $relation);
+        }
+
         return $models;
     }
 
@@ -137,34 +141,18 @@ class MorphTo extends BelongsTo
     }
 
     /**
-     * Get the results of the relationship.
-     *
-     * Called via eager load method of Eloquent query builder.
-     *
-     * @return mixed
-     */
-    public function getEager()
-    {
-        foreach (array_keys($this->dictionary) as $type) {
-            $this->matchToMorphParents($type, $this->getResultsByType($type));
-        }
-
-        return $this->models;
-    }
-
-    /**
      * Match the results for a given type to their parents.
      *
-     * @param  string  $type
-     * @param  \Illuminate\Database\Eloquent\Collection  $results
-     * @return void
+     * @param  string $type
+     * @param  \Illuminate\Database\Eloquent\Collection $results
+     * @param string $relation
      */
-    protected function matchToMorphParents($type, Collection $results)
+    protected function matchToMorphParents($type, Collection $results, $relation)
     {
         foreach ($results as $result) {
             if (isset($this->dictionary[$type][$result->getKey()])) {
                 foreach ($this->dictionary[$type][$result->getKey()] as $model) {
-                    $model->setRelation($this->relation, $result);
+                    $model->setRelation($relation, $result);
                 }
             }
         }
