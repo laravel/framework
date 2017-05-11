@@ -9,9 +9,10 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Validation\Validator;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
-use Illuminate\Validation\ValidationRule;
+use Illuminate\Contracts\Validation\Rule;
 use Symfony\Component\HttpFoundation\File\File;
-use Illuminate\Validation\ImplicitValidationRule;
+use Illuminate\Contracts\Validation\ImplicitRule;
+
 
 class ValidationValidatorTest extends TestCase
 {
@@ -3403,7 +3404,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator(
             $this->getIlluminateArrayTranslator(),
             ['name' => 'taylor'],
-            ['name' => new class implements ValidationRule {
+            ['name' => new class implements Rule {
                 public function passes($attribute, $value)
                 {
                     return $value === 'taylor';
@@ -3422,7 +3423,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator(
             $this->getIlluminateArrayTranslator(),
             ['name' => 'adam'],
-            ['name' => [new class implements ValidationRule {
+            ['name' => [new class implements Rule {
                 public function passes($attribute, $value)
                 {
                     return $value === 'taylor';
@@ -3470,7 +3471,7 @@ class ValidationValidatorTest extends TestCase
             $this->getIlluminateArrayTranslator(),
             ['name' => 'taylor', 'states' => ['AR', 'TX'], 'number' => 9],
             [
-                'states.*' => new class implements ValidationRule {
+                'states.*' => new class implements Rule {
                     public function passes($attribute, $value)
                     {
                         return in_array($value, ['AK', 'HI']);
@@ -3510,7 +3511,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator(
             $this->getIlluminateArrayTranslator(),
             ['name' => ''],
-            ['name' => $rule = new class implements ImplicitValidationRule {
+            ['name' => $rule = new class implements ImplicitRule {
                 public $called = false;
 
                 public function passes($attribute, $value)

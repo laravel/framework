@@ -2,7 +2,9 @@
 
 namespace Illuminate\Validation;
 
-class ClosureValidationRule implements ValidationRule
+use Illuminate\Contracts\Validation\Rule as RuleContract;
+
+class ClosureValidationRule implements RuleContract
 {
     /**
      * The callback that validates the attribute.

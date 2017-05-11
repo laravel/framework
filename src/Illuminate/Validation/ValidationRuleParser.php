@@ -7,6 +7,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
+use Illuminate\Contracts\Validation\Rule as RuleContract;
 
 class ValidationRuleParser
 {
@@ -104,7 +105,7 @@ class ValidationRuleParser
         }
 
         if (! is_object($rule) ||
-            $rule instanceof ValidationRule ||
+            $rule instanceof RuleContract ||
             ($rule instanceof Exists && $rule->queryCallbacks()) ||
             ($rule instanceof Unique && $rule->queryCallbacks())) {
             return $rule;
@@ -190,7 +191,7 @@ class ValidationRuleParser
      */
     public static function parse($rules)
     {
-        if ($rules instanceof ValidationRule) {
+        if ($rules instanceof RuleContract) {
             return [$rules, []];
         }
 

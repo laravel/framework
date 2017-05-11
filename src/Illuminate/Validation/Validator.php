@@ -11,7 +11,9 @@ use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Contracts\Validation\ImplicitRule;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 
 class Validator implements ValidatorContract
@@ -333,7 +335,7 @@ class Validator implements ValidatorContract
         // attribute is invalid and we will add a failure message for this failing attribute.
         $validatable = $this->isValidatable($rule, $attribute, $value);
 
-        if ($validatable && $rule instanceof ValidationRule) {
+        if ($validatable && $rule instanceof RuleContract) {
             return $this->validateUsingCustomRule($attribute, $value, $rule);
         }
 
@@ -451,7 +453,7 @@ class Validator implements ValidatorContract
      */
     protected function isImplicit($rule)
     {
-        return $rule instanceof ImplicitValidationRule ||
+        return $rule instanceof ImplicitRule ||
                in_array($rule, $this->implicitRules);
     }
 
@@ -508,7 +510,7 @@ class Validator implements ValidatorContract
      *
      * @param  string  $attribute
      * @param  mixed  $value
-     * @param  \Illuminate\Validation\ValidationRule  $rule
+     * @param  \Illuminate\Contracts\Validation\Rule  $rule
      * @return void
      */
     protected function validateUsingCustomRule($attribute, $value, $rule)

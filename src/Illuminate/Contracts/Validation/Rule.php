@@ -1,8 +1,8 @@
 <?php
 
-namespace Illuminate\Validation;
+namespace Illuminate\Contracts\Validation;
 
-interface ValidationRule
+interface Rule
 {
     /**
      * Determine if the validation rule passes.
