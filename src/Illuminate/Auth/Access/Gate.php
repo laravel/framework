@@ -482,4 +482,14 @@ class Gate implements GateContract
     {
         return call_user_func($this->userResolver);
     }
+
+    /**
+     * Get all of the defined abilities.
+     *
+     * @return array
+     */
+    public function abilities()
+    {
+        return $this->abilities;
+    }
 }

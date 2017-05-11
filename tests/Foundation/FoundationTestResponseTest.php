@@ -39,6 +39,22 @@ class FoundationTestResponseTest extends TestCase
         $response->assertSeeText('foobar');
     }
 
+    public function testAssertHeader()
+    {
+        $baseResponse = tap(new Response, function ($response) {
+            $response->header('Location', '/foo');
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        try {
+            $response->assertHeader('Location', '/bar');
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+            $this->assertEquals('/bar', $e->getComparisonFailure()->getExpected());
+            $this->assertEquals('/foo', $e->getComparisonFailure()->getActual());
+        }
+    }
+
     public function testAssertJsonWithArray()
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));

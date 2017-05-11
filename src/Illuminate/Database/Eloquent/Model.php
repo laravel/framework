@@ -68,6 +68,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected $with = [];
 
     /**
+     * The relationship counts that should be eager loaded on every query.
+     *
+     * @var array
+     */
+    protected $withCount = [];
+
+    /**
      * The number of models to return for pagination.
      *
      * @var int
@@ -809,7 +816,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // Once we have the query builders, we will set the model instances so the
         // builder can easily access any information it may need from the model
         // while it is constructing and executing various queries against it.
-        return $builder->setModel($this)->with($this->with);
+        return $builder->setModel($this)
+                    ->with($this->with)
+                    ->withCount($this->withCount);
     }
 
     /**
