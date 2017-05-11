@@ -3516,6 +3516,7 @@ class ValidationValidatorTest extends TestCase
                 public function passes($attribute, $value)
                 {
                     $this->called = true;
+
                     return true;
                 }
 
