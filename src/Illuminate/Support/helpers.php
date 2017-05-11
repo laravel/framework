@@ -915,7 +915,7 @@ if (! function_exists('throw_unless')) {
      */
     function throw_unless($boolean, $exception, $message)
     {
-        if (!$boolean) {
+        if (! $boolean) {
             throw (is_string($exception) ? new $exception($message) : $exception);
         }
     }
