@@ -936,6 +936,46 @@ class Builder
     }
 
     /**
+     * Add an "or where date" statement to the query.
+     *
+     * @param  string  $column
+     * @param  string   $operator
+     * @param  int   $value
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function orWhereDate($column, $operator, $value)
+    {
+        return $this->whereDate($column, $operator, $value, 'or');
+    }
+
+    /**
+     * Add a "where time" statement to the query.
+     *
+     * @param  string  $column
+     * @param  string   $operator
+     * @param  int   $value
+     * @param  string   $boolean
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function whereTime($column, $operator, $value, $boolean = 'and')
+    {
+       return $this->addDateBasedWhere('Time', $column, $operator, $value, $boolean);
+    }
+
+    /**
+     * Add an "or where time" statement to the query.
+     *
+     * @param  string  $column
+     * @param  string   $operator
+     * @param  int   $value
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function orWhereTime($column, $operator, $value)
+    {
+       return $this->whereTime($column, $operator, $value, 'or');
+    }
+
+    /**
      * Add a "where day" statement to the query.
      *
      * @param  string  $column
@@ -978,7 +1018,7 @@ class Builder
     }
 
     /**
-     * Add a date based (year, month, day) statement to the query.
+     * Add a date based (year, month, day, time) statement to the query.
      *
      * @param  string  $type
      * @param  string  $column
