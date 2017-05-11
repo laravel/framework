@@ -333,6 +333,10 @@ class Validator implements ValidatorContract
         // attribute is invalid and we will add a failure message for this failing attribute.
         $validatable = $this->isValidatable($rule, $attribute, $value);
 
+        if ($validatable && $rule instanceof ValidationRule) {
+            return $this->validateUsingCustomRule($attribute, $value, $rule);
+        }
+
         $method = "validate{$rule}";
 
         if ($validatable && ! $this->$method($attribute, $value, $parameters, $this)) {
@@ -495,6 +499,25 @@ class Validator implements ValidatorContract
     protected function hasNotFailedPreviousRuleIfPresenceRule($rule, $attribute)
     {
         return in_array($rule, ['Unique', 'Exists']) ? ! $this->messages->has($attribute) : true;
+    }
+
+    /**
+     * Validate an attribute using a custom rule object.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  \Illuminate\Validation\ValidationRule  $rule
+     * @return void
+     */
+    protected function validateUsingCustomRule($attribute, $value, $rule)
+    {
+        if (! $rule->passes($attribute, $value)) {
+            $this->failedRules[$attribute][get_class($rule)] = [];
+
+            $this->messages->add($attribute, $this->makeReplacements(
+                $rule->message(), $attribute, get_class($rule), []
+            ));
+        }
     }
 
     /**
@@ -747,7 +770,7 @@ class Validator implements ValidatorContract
         // The primary purpose of this parser is to expand any "*" rules to the all
         // of the explicit rules needed for the given data. For example the rule
         // names.* would get expanded to names.0, names.1, etc. for this data.
-        $response = (new ValidationRuleParser($this->data))
+        $response = (new ValidationRuleParser($this))
                             ->explode($rules);
 
         $this->rules = array_merge_recursive(

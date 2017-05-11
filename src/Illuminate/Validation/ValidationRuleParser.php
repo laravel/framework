@@ -2,6 +2,7 @@
 
 namespace Illuminate\Validation;
 
+use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Exists;
@@ -9,6 +10,13 @@ use Illuminate\Validation\Rules\Unique;
 
 class ValidationRuleParser
 {
+    /**
+     * The validator instance.
+     *
+     * @var \Illuminate\Validation\Validator
+     */
+    public $validator;
+
     /**
      * The data being validated.
      *
@@ -26,12 +34,14 @@ class ValidationRuleParser
     /**
      * Create a new validation rule parser.
      *
+     * @param  \Illuminate\Validation\Validator  $validator
      * @param  array  $data
      * @return void
      */
-    public function __construct(array $data)
+    public function __construct(Validator $validator)
     {
-        $this->data = $data;
+        $this->validator = $validator;
+        $this->data = $validator->getData();
     }
 
     /**
@@ -98,7 +108,12 @@ class ValidationRuleParser
      */
     protected function prepareRule($rule)
     {
+        if ($rule instanceof Closure) {
+            $rule = new ClosureValidationRule($rule);
+        }
+
         if (! is_object($rule) ||
+            $rule instanceof ValidationRule ||
             ($rule instanceof Exists && $rule->queryCallbacks()) ||
             ($rule instanceof Unique && $rule->queryCallbacks())) {
             return $rule;
@@ -184,6 +199,10 @@ class ValidationRuleParser
      */
     public static function parse($rules)
     {
+        if ($rules instanceof ValidationRule) {
+            return [$rules, []];
+        }
+
         if (is_array($rules)) {
             $rules = static::parseArrayRule($rules);
         } else {
