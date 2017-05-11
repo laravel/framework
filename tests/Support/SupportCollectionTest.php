@@ -1136,6 +1136,19 @@ class SupportCollectionTest extends TestCase
         );
     }
 
+    public function testPairMap()
+    {
+        $data = new Collection([2, 3, 5, 6]);
+        $data = $data->pairMap();
+        $this->assertSame([[2, 3], [3, 5], [5, 6]], $data->toArray());
+    }
+
+    public function testPairMapInsufficientElements()
+    {
+        $this->assertSame([], collect([])->pairMap()->toArray());
+        $this->assertSame([], collect([1])->pairMap()->toArray());
+    }
+
     public function testNth()
     {
         $data = new Collection([

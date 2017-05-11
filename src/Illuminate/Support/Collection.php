@@ -766,6 +766,20 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Map a collection to adjacent pairs.
+     *
+     * @return static
+     */
+    public function pairMap()
+    {
+        $count = $this->count();
+        $firstSlice = $this->slice(0, $count - 1);
+        $secondSlice = $this->slice(1, $count - 1);
+
+        return $firstSlice->zip($secondSlice);
+    }
+
+    /**
      * Get the max value of a given key.
      *
      * @param  callable|string|null  $callback
