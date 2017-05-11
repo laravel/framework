@@ -543,7 +543,7 @@ class Builder
         // If the value is an array, we will assume the developer wants to add a
         // where in clause to the query. We will allow a short-cut here
         // for convenience so the developer doesn't have to check.
-        if (is_array($value)) {
+        if (is_array($value) || $value instanceof Arrayable) {
             return $this->whereIn($column, $value, $boolean, $operator != '=');
         }
 

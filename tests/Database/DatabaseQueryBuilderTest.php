@@ -240,6 +240,14 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1, 1 => 2, 2 => 3], $builder->getBindings());
     }
 
+    public function testArrayablePassedToWhereMapToWhereIn()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', collect([1, 2, 3]));
+        $this->assertEquals('select * from "users" where "id" in (?, ?, ?)', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2, 2 => 3], $builder->getBindings());
+    }
+
     public function testMySqlWrappingProtectsQuotationMarks()
     {
         $builder = $this->getMySqlBuilder();
