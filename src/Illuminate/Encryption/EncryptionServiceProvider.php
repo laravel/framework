@@ -2,6 +2,7 @@
 
 namespace Illuminate\Encryption;
 
+use RuntimeException;
 use Illuminate\Support\Str;
 use Illuminate\Support\ServiceProvider;
 
@@ -22,6 +23,12 @@ class EncryptionServiceProvider extends ServiceProvider
             // want to make sure to convert them back to the raw bytes before encrypting.
             if (Str::startsWith($key = $config['key'], 'base64:')) {
                 $key = base64_decode(substr($key, 7));
+            }
+
+            if (is_null($key) || $key === '') {
+                throw new RuntimeException(
+                    'The application encryption key is missing. Run php artisan key:generate to generate it.'
+                );
             }
 
             return new Encrypter($key, $config['cipher']);
