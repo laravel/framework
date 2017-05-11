@@ -325,7 +325,7 @@ class Validator implements ValidatorContract
         if ($value instanceof UploadedFile && ! $value->isValid() &&
             $this->hasRule($attribute, array_merge($this->fileRules, $this->implicitRules))
         ) {
-            return $this->addFailure($attribute, 'uploaded', []);
+            return $this->addFailure($attribute, 'uploaded', [], $rule);
         }
 
         // If we have made it this far we will make sure the attribute is validatable and if it is
@@ -336,7 +336,7 @@ class Validator implements ValidatorContract
         $method = "validate{$rule}";
 
         if ($validatable && ! $this->$method($attribute, $value, $parameters, $this)) {
-            $this->addFailure($attribute, $rule, $parameters);
+            $this->addFailure($attribute, $rule, $parameters, $rule);
         }
     }
 
@@ -534,7 +534,7 @@ class Validator implements ValidatorContract
     {
         $this->messages->add($attribute, $this->makeReplacements(
             $this->getMessage($attribute, $rule), $attribute, $rule, $parameters
-        ));
+        ), $rule);
 
         $this->failedRules[$attribute][$rule] = $parameters;
     }

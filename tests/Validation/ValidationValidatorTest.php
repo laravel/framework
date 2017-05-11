@@ -39,7 +39,7 @@ class ValidationValidatorTest extends TestCase
             $_SERVER['__validator.after.test'] = true;
 
             // For asserting we can actually work with the instance
-            $validator->errors()->add('bar', 'foo');
+            $validator->errors()->add('bar', 'foo', 'Required');
         });
 
         $this->assertFalse($v->passes());
@@ -170,11 +170,11 @@ class ValidationValidatorTest extends TestCase
             'x' => 'string', 'y' => 'integer', 'z' => 'numeric', 'a' => 'array', 'b' => 'bool',
         ]);
         $this->assertTrue($v->fails());
-        $this->assertEquals('validation.string', $v->messages()->get('x')[0]);
-        $this->assertEquals('validation.integer', $v->messages()->get('y')[0]);
-        $this->assertEquals('validation.numeric', $v->messages()->get('z')[0]);
-        $this->assertEquals('validation.array', $v->messages()->get('a')[0]);
-        $this->assertEquals('validation.boolean', $v->messages()->get('b')[0]);
+        $this->assertEquals('validation.string', $v->messages()->get('x')['String']);
+        $this->assertEquals('validation.integer', $v->messages()->get('y')['Integer']);
+        $this->assertEquals('validation.numeric', $v->messages()->get('z')['Numeric']);
+        $this->assertEquals('validation.array', $v->messages()->get('a')['Array']);
+        $this->assertEquals('validation.boolean', $v->messages()->get('b')['Boolean']);
     }
 
     public function testNullableMakesNoDifferenceIfImplicitRuleExists()
@@ -196,7 +196,7 @@ class ValidationValidatorTest extends TestCase
             'y' => 'nullable|required_with:x|integer',
         ]);
         $this->assertTrue($v->fails());
-        $this->assertEquals('validation.integer', $v->messages()->get('x')[0]);
+        $this->assertEquals('validation.integer', $v->messages()->get('x')['Integer']);
 
         $v = new Validator($trans, [
             'x' => 123, 'y' => null,
@@ -205,7 +205,7 @@ class ValidationValidatorTest extends TestCase
             'y' => 'nullable|required_with:x|integer',
         ]);
         $this->assertTrue($v->fails());
-        $this->assertEquals('validation.required_with', $v->messages()->get('y')[0]);
+        $this->assertEquals('validation.required_with', $v->messages()->get('y')['RequiredWith']);
     }
 
     public function testProperLanguageLineIsSet()
@@ -601,19 +601,19 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['name' => null], ['name' => 'Required|string']);
         $v->passes();
-        $this->assertEquals(['validation.required'], $v->errors()->get('name'));
+        $this->assertEquals(['Required' => 'validation.required'], $v->errors()->get('name'));
 
         $v = new Validator($trans, ['name' => null, 'email' => 'email'], ['name' => 'required_with:email|string']);
         $v->passes();
-        $this->assertEquals(['validation.required_with'], $v->errors()->get('name'));
+        $this->assertEquals(['RequiredWith' => 'validation.required_with'], $v->errors()->get('name'));
 
         $v = new Validator($trans, ['name' => null, 'email' => ''], ['name' => 'required_with:email|string']);
         $v->passes();
-        $this->assertEquals(['validation.string'], $v->errors()->get('name'));
+        $this->assertEquals(['String' => 'validation.string'], $v->errors()->get('name'));
 
         $v = new Validator($trans, [], ['name' => 'present|string']);
         $v->passes();
-        $this->assertEquals(['validation.present'], $v->errors()->get('name'));
+        $this->assertEquals(['Present' => 'validation.present'], $v->errors()->get('name'));
     }
 
     public function testValidatePresent()
@@ -915,14 +915,14 @@ class ValidationValidatorTest extends TestCase
         $file->shouldNotReceive('getSize');
         $v = new Validator($trans, ['photo' => $file], ['photo' => 'Max:10']);
         $this->assertTrue($v->fails());
-        $this->assertEquals(['validation.uploaded'], $v->errors()->get('photo'));
+        $this->assertEquals(['uploaded' => 'validation.uploaded'], $v->errors()->get('photo'));
 
         // Even "required" will not run if the file failed to upload.
         $file = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile');
         $file->shouldReceive('isValid')->once()->andReturn(false);
         $v = new Validator($trans, ['photo' => $file], ['photo' => 'required']);
         $this->assertTrue($v->fails());
-        $this->assertEquals(['validation.uploaded'], $v->errors()->get('photo'));
+        $this->assertEquals(['uploaded' => 'validation.uploaded'], $v->errors()->get('photo'));
 
         // It should only fail with that rule if a validation rule implies it's
         // a file. Otherwise it should fail with the regular rule.
@@ -930,14 +930,14 @@ class ValidationValidatorTest extends TestCase
         $file->shouldReceive('isValid')->andReturn(false);
         $v = new Validator($trans, ['photo' => $file], ['photo' => 'string']);
         $this->assertTrue($v->fails());
-        $this->assertEquals(['validation.string'], $v->errors()->get('photo'));
+        $this->assertEquals(['String' => 'validation.string'], $v->errors()->get('photo'));
 
         // Validation shouldn't continue if a file failed to upload.
         $file = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile');
         $file->shouldReceive('isValid')->once()->andReturn(false);
         $v = new Validator($trans, ['photo' => $file], ['photo' => 'file|mimes:pdf|min:10']);
         $this->assertTrue($v->fails());
-        $this->assertEquals(['validation.uploaded'], $v->errors()->get('photo'));
+        $this->assertEquals(['uploaded' => 'validation.uploaded'], $v->errors()->get('photo'));
     }
 
     public function testValidateInArray()
@@ -2667,7 +2667,7 @@ class ValidationValidatorTest extends TestCase
         $data = ['names' => [['second' => ['Taylor']]]];
         $v = new Validator($trans, $data, ['names.*.second' => 'sometimes|required|string']);
         $this->assertFalse($v->passes());
-        $this->assertEquals(['validation.string'], $v->errors()->get('names.0.second'));
+        $this->assertEquals(['String' => 'validation.string'], $v->errors()->get('names.0.second'));
     }
 
     public function testValidateImplicitEachWithAsterisksForRequiredNonExistingKey()

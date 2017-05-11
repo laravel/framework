@@ -16,9 +16,10 @@ interface MessageBag
      *
      * @param  string  $key
      * @param  string  $message
+     * @param  string  $rule
      * @return $this
      */
-    public function add($key, $message);
+    public function add($key, $message, $rule);
 
     /**
      * Merge a new array of messages into the bag.

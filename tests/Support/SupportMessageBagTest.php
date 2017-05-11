@@ -16,22 +16,22 @@ class SupportMessageBagTest extends TestCase
     public function testUniqueness()
     {
         $container = new MessageBag;
-        $container->add('foo', 'bar');
-        $container->add('foo', 'bar');
+        $container->add('foo', 'bar', 'Required');
+        $container->add('foo', 'bar', 'Required');
         $messages = $container->getMessages();
-        $this->assertEquals(['bar'], $messages['foo']);
+        $this->assertEquals(['Required' => 'bar'], $messages['foo']);
     }
 
     public function testMessagesAreAdded()
     {
         $container = new MessageBag;
         $container->setFormat(':message');
-        $container->add('foo', 'bar');
-        $container->add('foo', 'baz');
-        $container->add('boom', 'bust');
+        $container->add('foo', 'bar', 'Required');
+        $container->add('foo', 'baz', 'Unique');
+        $container->add('boom', 'bust', 'Required');
         $messages = $container->getMessages();
-        $this->assertEquals(['bar', 'baz'], $messages['foo']);
-        $this->assertEquals(['bust'], $messages['boom']);
+        $this->assertEquals(['Required' => 'bar', 'Unique' => 'baz'], $messages['foo']);
+        $this->assertEquals(['Required' => 'bust'], $messages['boom']);
     }
 
     public function testMessagesMayBeMerged()
@@ -53,26 +53,26 @@ class SupportMessageBagTest extends TestCase
     {
         $container = new MessageBag;
         $container->setFormat(':message');
-        $container->add('foo', 'bar');
-        $container->add('foo', 'baz');
-        $this->assertEquals(['bar', 'baz'], $container->get('foo'));
+        $container->add('foo', 'bar', 'Required');
+        $container->add('foo', 'baz', 'Unique');
+        $this->assertEquals(['Required' => 'bar', 'Unique' => 'baz'], $container->get('foo'));
     }
 
     public function testGetReturnsArrayOfMessagesByImplicitKey()
     {
         $container = new MessageBag;
         $container->setFormat(':message');
-        $container->add('foo.1', 'bar');
-        $container->add('foo.2', 'baz');
-        $this->assertEquals(['foo.1' => ['bar'], 'foo.2' => ['baz']], $container->get('foo.*'));
+        $container->add('foo.1', 'bar', 'Required');
+        $container->add('foo.2', 'baz', 'Unique');
+        $this->assertEquals(['foo.1' => ['Required' => 'bar'], 'foo.2' => ['Unique' => 'baz']], $container->get('foo.*'));
     }
 
     public function testFirstReturnsSingleMessage()
     {
         $container = new MessageBag;
         $container->setFormat(':message');
-        $container->add('foo', 'bar');
-        $container->add('foo', 'baz');
+        $container->add('foo', 'bar', 'Required');
+        $container->add('foo', 'baz', 'Unique');
         $messages = $container->getMessages();
         $this->assertEquals('bar', $container->first('foo'));
     }
@@ -89,8 +89,8 @@ class SupportMessageBagTest extends TestCase
     {
         $container = new MessageBag;
         $container->setFormat(':message');
-        $container->add('name.first', 'jon');
-        $container->add('name.last', 'snow');
+        $container->add('name.first', 'jon', 'Required');
+        $container->add('name.last', 'snow', 'Unique');
         $messages = $container->getMessages();
         $this->assertEquals('jon', $container->first('name.*'));
     }
@@ -99,7 +99,7 @@ class SupportMessageBagTest extends TestCase
     {
         $container = new MessageBag;
         $container->setFormat(':message');
-        $container->add('foo', 'bar');
+        $container->add('foo', 'bar', 'Required');
         $this->assertTrue($container->has('foo'));
         $this->assertFalse($container->has('bar'));
     }
@@ -108,9 +108,9 @@ class SupportMessageBagTest extends TestCase
     {
         $container = new MessageBag;
         $container->setFormat(':message');
-        $container->add('foo', 'bar');
-        $container->add('bar', 'foo');
-        $container->add('boom', 'baz');
+        $container->add('foo', 'bar', 'Required');
+        $container->add('bar', 'foo', 'Unique');
+        $container->add('boom', 'baz', 'Min');
         $this->assertTrue($container->hasAny(['foo', 'bar']));
         $this->assertTrue($container->hasAny('foo', 'bar'));
         $this->assertTrue($container->hasAny(['boom', 'baz']));
@@ -124,9 +124,9 @@ class SupportMessageBagTest extends TestCase
     {
         $container = new MessageBag;
         $container->setFormat(':message');
-        $container->add('foo', 'bar');
-        $container->add('bar', 'foo');
-        $container->add('boom', 'baz');
+        $container->add('foo', 'bar', 'Required');
+        $container->add('bar', 'foo', 'Unique');
+        $container->add('boom', 'baz', 'Min');
         $this->assertTrue($container->has(['foo', 'bar', 'boom']));
         $this->assertFalse($container->has(['foo', 'bar', 'boom', 'baz']));
         $this->assertFalse($container->has(['foo', 'baz']));
@@ -144,23 +144,23 @@ class SupportMessageBagTest extends TestCase
     {
         $container = new MessageBag;
         $container->setFormat(':message');
-        $container->add('foo', 'bar');
-        $container->add('boom', 'baz');
-        $this->assertEquals(['bar', 'baz'], $container->all());
+        $container->add('foo', 'bar', 'Required');
+        $container->add('boom', 'baz', 'Unique');
+        $this->assertEquals(['Required' => 'bar', 'Unique' => 'baz'], $container->all());
     }
 
     public function testFormatIsRespected()
     {
         $container = new MessageBag;
         $container->setFormat('<p>:message</p>');
-        $container->add('foo', 'bar');
-        $container->add('boom', 'baz');
+        $container->add('foo', 'bar', 'Required');
+        $container->add('boom', 'baz', 'Unique');
         $this->assertEquals('<p>bar</p>', $container->first('foo'));
-        $this->assertEquals(['<p>bar</p>'], $container->get('foo'));
-        $this->assertEquals(['<p>bar</p>', '<p>baz</p>'], $container->all());
+        $this->assertEquals(['Required' => '<p>bar</p>'], $container->get('foo'));
+        $this->assertEquals(['Required' => '<p>bar</p>', 'Unique' => '<p>baz</p>'], $container->all());
         $this->assertEquals('bar', $container->first('foo', ':message'));
-        $this->assertEquals(['bar'], $container->get('foo', ':message'));
-        $this->assertEquals(['bar', 'baz'], $container->all(':message'));
+        $this->assertEquals(['Required' => 'bar'], $container->get('foo', ':message'));
+        $this->assertEquals(['Required' => 'bar', 'Unique' => 'baz'], $container->all(':message'));
 
         $container->setFormat(':key :message');
         $this->assertEquals('foo bar', $container->first('foo'));
@@ -170,20 +170,20 @@ class SupportMessageBagTest extends TestCase
     {
         $container = new MessageBag;
         $container->setFormat(':message');
-        $container->add('foo', 'bar');
-        $container->add('boom', 'baz');
+        $container->add('foo', 'bar', 'Required');
+        $container->add('boom', 'baz', 'Unique');
 
-        $this->assertEquals(['foo' => ['bar'], 'boom' => ['baz']], $container->toArray());
+        $this->assertEquals(['foo' => ['Required' => 'bar'], 'boom' => ['Unique' => 'baz']], $container->toArray());
     }
 
     public function testMessageBagReturnsExpectedJson()
     {
         $container = new MessageBag;
         $container->setFormat(':message');
-        $container->add('foo', 'bar');
-        $container->add('boom', 'baz');
+        $container->add('foo', 'bar', 'Required');
+        $container->add('boom', 'baz', 'Unique');
 
-        $this->assertEquals('{"foo":["bar"],"boom":["baz"]}', $container->toJson());
+        $this->assertEquals('{"foo":{"Required":"bar"},"boom":{"Unique":"baz"}}', $container->toJson());
     }
 
     public function testCountReturnsCorrectValue()
@@ -191,9 +191,9 @@ class SupportMessageBagTest extends TestCase
         $container = new MessageBag;
         $this->assertCount(0, $container);
 
-        $container->add('foo', 'bar');
-        $container->add('foo', 'baz');
-        $container->add('boom', 'baz');
+        $container->add('foo', 'bar', 'Required');
+        $container->add('foo', 'baz', 'Unique');
+        $container->add('boom', 'baz', 'Required');
 
         $this->assertCount(3, $container);
     }
@@ -202,8 +202,8 @@ class SupportMessageBagTest extends TestCase
     {
         $container = new MessageBag;
 
-        $container->add('foo', 'bar');
-        $container->add('boom', 'baz');
+        $container->add('foo', 'bar', 'Required');
+        $container->add('boom', 'baz', 'Required');
 
         $this->assertCount(2, $container);
     }
@@ -218,7 +218,7 @@ class SupportMessageBagTest extends TestCase
     {
         $container = new MessageBag;
         $container->setFormat(':message');
-        $container->add('foo.bar', 'baz');
+        $container->add('foo.bar', 'baz', 'Required');
         $messages = $container->getMessages();
         $this->assertEquals('baz', $container->first('foo.*'));
     }
