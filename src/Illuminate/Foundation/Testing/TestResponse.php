@@ -551,6 +551,19 @@ class TestResponse
     }
 
     /**
+     * Assert that the session has the given errors.
+     *
+     * @param  string  $errorBag
+     * @param  string|array  $keys
+     * @param  mixed  $format
+     * @return $this
+     */
+    public function assertSessionHasErrorsIn($errorBag, $keys = [], $format = null)
+    {
+        return $this->assertSessionHasErrors($keys, $format, $errorBag);
+    }
+
+    /**
      * Assert that the session does not have a given key.
      *
      * @param  string|array  $key
