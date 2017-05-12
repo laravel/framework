@@ -340,7 +340,8 @@ class Builder
     {
         $total = $this->query->getCountForPagination();
 
-        $this->query->forPage(
+        $this->query->forPageWithTotal(
+            $total,
             $page = $page ?: Paginator::resolveCurrentPage($pageName),
             $perPage = $perPage ?: $this->model->getPerPage()
         );

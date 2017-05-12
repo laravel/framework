@@ -1263,6 +1263,25 @@ class Builder
     }
 
     /**
+     * Set the limit and offset for a given total item and page.
+     *
+     * @param  int  $total
+     * @param  int  $page
+     * @param  int  $perPage
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function forPageWithTotal($total, $page, $perPage = 15)
+    {
+        $offset = ($page - 1) * $perPage;
+
+        if ($offset > $total) {
+            $offset = (ceil($total / $perPage) - 1) * $perPage;
+        }
+
+        return $this->skip($offset)->take($perPage);
+    }
+
+    /**
      * Add a union statement to the query.
      *
      * @param  \Illuminate\Database\Query\Builder|\Closure  $query
@@ -1446,7 +1465,7 @@ class Builder
 
         $total = $this->getCountForPagination($columns);
 
-        $results = $this->forPage($page, $perPage)->get($columns);
+        $results = $this->forPageWithTotal($total, $page, $perPage)->get($columns);
 
         return new LengthAwarePaginator($results, $total, $perPage, $page, [
             'path' => Paginator::resolveCurrentPath(),
