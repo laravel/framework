@@ -58,19 +58,6 @@ abstract class Controller
     /**
      * Handle calls to missing methods on the controller.
      *
-     * @param  array   $parameters
-     * @return mixed
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
-    public function missingMethod($parameters = [])
-    {
-        throw new NotFoundHttpException('Controller method not found.');
-    }
-
-    /**
-     * Handle calls to missing methods on the controller.
-     *
      * @param  string  $method
      * @param  array   $parameters
      * @return mixed
