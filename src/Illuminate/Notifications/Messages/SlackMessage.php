@@ -60,14 +60,14 @@ class SlackMessage
      *
      * @var bool
      */
-    public $unfurlLinks = true;
+    public $unfurlLinks;
 
     /**
      * Indicates if you want a preview of links to media inlined in the message.
      *
      * @var bool
      */
-    public $unfurlMedia = true;
+    public $unfurlMedia;
 
     /**
      * The message's attachments.
@@ -225,7 +225,7 @@ class SlackMessage
      *
      * @return $this
      */
-    public function unfurlLinks($unfurl = true)
+    public function unfurlLinks($unfurl)
     {
         $this->unfurlLinks = $unfurl;
 
@@ -237,7 +237,7 @@ class SlackMessage
      *
      * @return $this
      */
-    public function unfurlMedia($unfurl = true)
+    public function unfurlMedia($unfurl)
     {
         $this->unfurlMedia = $unfurl;
 
