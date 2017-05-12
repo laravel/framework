@@ -264,11 +264,11 @@ class Worker
     protected function logFailedJob($connection, Job $job)
     {
         if ($this->failer) {
+            $job->failed();
+
             $this->failer->log($connection, $job->getQueue(), $job->getRawBody());
 
             $job->delete();
-
-            $job->failed();
 
             $this->raiseFailedJobEvent($connection, $job);
         }
