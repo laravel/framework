@@ -438,6 +438,9 @@ class Arr
      */
     public static function sort($array, callable $callback)
     {
+        if($array instanceof Collection)
+            return $array->sortBy($callback)->all();
+
         return Collection::make($array)->sortBy($callback)->all();
     }
 
