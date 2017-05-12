@@ -10,9 +10,13 @@ trait DatabaseMigrations
     public function runDatabaseMigrations()
     {
         $this->artisan('migrate');
+    }
 
-        $this->beforeApplicationDestroyed(function () {
-            $this->artisan('migrate:rollback');
-        });
+    /**
+     * @after
+     */
+    public function runDatabaseMigrateRefresh()
+    {
+        $this->artisan('migrate:refresh');
     }
 }
