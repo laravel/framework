@@ -109,6 +109,30 @@ class Gate implements GateContract
     }
 
     /**
+     * Define abilities for a resource.
+     *
+     * @param  string  $name
+     * @param  string  $class
+     * @param  array   $abilities
+     * @return $this
+     */
+    public function resource($name, $class, array $abilities = null)
+    {
+        $abilities = $abilities ?: [
+            'view'   => 'view',
+            'create' => 'create',
+            'update' => 'update',
+            'delete' => 'delete',
+        ];
+
+        foreach ($abilities as $ability => $method) {
+            $this->define($name . '.' . $ability, $class . '@' . $method);
+        }
+
+        return $this;
+    }
+
+    /**
      * Create the ability callback for a callback string.
      *
      * @param  string  $callback
