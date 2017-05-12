@@ -126,7 +126,7 @@ class Gate implements GateContract
         ];
 
         foreach ($abilities as $ability => $method) {
-            $this->define($name . '.' . $ability, $class . '@' . $method);
+            $this->define($name.'.'.$ability, $class.'@'.$method);
         }
 
         return $this;
