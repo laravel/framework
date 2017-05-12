@@ -944,6 +944,23 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Reload the current model instance with fresh attributes from the database.
+     *
+     * @param  array|string  $with
+     * @return static|null
+     */
+    public function refresh()
+    {
+        if (! $this->exists) {
+            return;
+        }
+
+        $this->load(array_keys($this->relations));
+
+        $this->setRawAttributes(static::find($this->getKey())->attributes);
+    }
+
+    /**
      * Clone the model into a new, non-existing instance.
      *
      * @param  array|null  $except
