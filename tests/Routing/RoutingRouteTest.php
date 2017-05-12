@@ -1076,6 +1076,17 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($router->getRoutes()->hasNamedRoute('bar'));
     }
 
+    public function testResourceRouteNamingInGroup()
+    {
+        $router = $this->getRouter();
+        $router->group(['prefix' => 'foo', 'as' => 'Foo::'], function () use ($router) {
+            $router->resource('foo', 'FooController');
+        });
+        $routes = $router->getRoutes();
+
+        $this->assertTrue($routes->hasNamedRoute('Foo::foo.index'));
+    }
+
     public function testRouterFiresRoutedEvent()
     {
         $events = new Illuminate\Events\Dispatcher();

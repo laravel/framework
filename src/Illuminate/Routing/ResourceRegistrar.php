@@ -210,7 +210,7 @@ class ResourceRegistrar
      */
     protected function getGroupResourceName($prefix, $resource, $method)
     {
-        $group = trim(str_replace('/', '.', $this->router->getLastGroupPrefix()), '.');
+        $group = !empty($this->router->getLastGroupName()) ? '' : trim(str_replace('/', '.', $this->router->getLastGroupPrefix()), '.');
 
         if (empty($group)) {
             return trim("{$prefix}{$resource}.{$method}", '.');
