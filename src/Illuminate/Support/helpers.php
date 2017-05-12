@@ -892,13 +892,14 @@ if (! function_exists('throw_if')) {
      * Throw the given exception if the given boolean is true.
      *
      * @param  bool  $boolean
-     * @param  \Throwable  $exception
+     * @param  \Throwable|string  $exception
+     * @param  string  $message
      * @return void
      */
-    function throw_if($boolean, $exception)
+    function throw_if($boolean, $exception, $message = '')
     {
         if ($boolean) {
-            throw $exception;
+            throw (is_string($exception) ? new $exception($message) : $exception);
         }
     }
 }
@@ -908,13 +909,14 @@ if (! function_exists('throw_unless')) {
      * Throw the given exception unless the given boolean is true.
      *
      * @param  bool  $boolean
-     * @param  \Throwable  $exception
+     * @param  \Throwable|string  $exception
+     * @param  string  $message
      * @return void
      */
-    function throw_unless($boolean, $exception)
+    function throw_unless($boolean, $exception, $message)
     {
         if (! $boolean) {
-            throw $exception;
+            throw (is_string($exception) ? new $exception($message) : $exception);
         }
     }
 }
