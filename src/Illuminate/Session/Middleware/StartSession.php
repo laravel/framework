@@ -3,7 +3,6 @@
 namespace Illuminate\Session\Middleware;
 
 use Closure;
-use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Session\SessionManager;
@@ -68,8 +67,12 @@ class StartSession
             $this->storeCurrentUrl($request, $session);
 
             $this->collectGarbage($session);
-
-            $this->addCookieToResponse($response, $session);
+            //cookie to add to response,only when session id changed
+            $sessionCookieName = $session->getName();
+            $sessionCookieValue = $session->getId();
+            if (($oldCookie = $request->cookie($sessionCookieName)) == null || $oldCookie !== $sessionCookieValue) {
+                $this->addCookieToResponse($response, $session);
+            }
         }
 
         return $response;
@@ -200,9 +203,9 @@ class StartSession
      */
     protected function getCookieExpirationDate()
     {
-        $config = $this->manager->getSessionConfig();
-
-        return $config['expire_on_close'] ? 0 : Carbon::now()->addMinutes($config['lifetime']);
+        //only sesssion can be expired. cookie will not
+        //when session is invalid,return a new session id
+        return 0;
     }
 
     /**
