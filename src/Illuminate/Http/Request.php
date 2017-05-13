@@ -594,4 +594,21 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 
         return $this->route($key);
     }
+
+    /**
+     * Determine if an an input element (inaccessible property) triggered by calling isset() or empty() exists or is empty.
+     *
+     * @param $key
+     * @return bool
+     */
+    public function __isset($key)
+    {
+        $all = $this->all();
+
+        if (array_key_exists($key, $all)) {
+            return true;
+        }
+
+        return false;
+    }
 }

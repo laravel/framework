@@ -777,4 +777,19 @@ class HttpRequestTest extends TestCase
         $request->setLaravelSession($session);
         $request->flashExcept(['email']);
     }
+
+    public function testMagicMethodsWithRouterResolver()
+    {
+        $base = SymfonyRequest::create('/', 'GET', ['foo' => 'bar', 'empty' => '']);
+        $request = Request::createFromBase($base);
+        $this->assertEquals($request->foo, 'bar');
+        $this->assertEquals(isset($request->foo), true);
+        $this->assertEquals(empty($request->foo), false);
+        $this->assertEquals($request->empty, '');
+        $this->assertEquals(isset($request->empty), true);
+        $this->assertEquals(empty($request->empty), true);
+        $this->assertEquals($request->otherFoo, null);
+        $this->assertEquals(isset($request->otherFoo), false);
+        $this->assertEquals(empty($request->otherFoo), true);
+    }
 }
