@@ -92,7 +92,7 @@ class FactoryBuilder
     /**
      * Set the states to be applied to the model.
      *
-     * @param  array|dynamic  $states
+     * @param  array|mixed  $states
      * @return $this
      */
     public function states($states)

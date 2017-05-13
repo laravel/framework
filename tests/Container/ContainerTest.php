@@ -799,6 +799,14 @@ class ContainerTest extends TestCase
         $this->assertEquals([1, 2, 3], $container->makeWith('foo', [1, 2, 3]));
     }
 
+    public function testResolvingWithUsingAnInterface()
+    {
+        $container = new Container;
+        $container->bind(IContainerContractStub::class, ContainerInjectVariableStubWithInterfaceImplementation::class);
+        $instance = $container->makeWith(IContainerContractStub::class, ['something' => 'laurence']);
+        $this->assertEquals('laurence', $instance->something);
+    }
+
     public function testNestedParameterOverride()
     {
         $container = new Container;
@@ -864,6 +872,7 @@ interface IContainerContractStub
 class ContainerImplementationStub implements IContainerContractStub
 {
 }
+
 class ContainerImplementationStubTwo implements IContainerContractStub
 {
 }
@@ -981,6 +990,16 @@ class ContainerStaticMethodStub
 }
 
 class ContainerInjectVariableStub
+{
+    public $something;
+
+    public function __construct(ContainerConcreteStub $concrete, $something)
+    {
+        $this->something = $something;
+    }
+}
+
+class ContainerInjectVariableStubWithInterfaceImplementation implements IContainerContractStub
 {
     public $something;
 

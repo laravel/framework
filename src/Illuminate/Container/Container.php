@@ -241,9 +241,11 @@ class Container implements ArrayAccess, ContainerContract
     protected function getClosure($abstract, $concrete)
     {
         return function ($container, $parameters = []) use ($abstract, $concrete) {
-            $method = ($abstract == $concrete) ? 'build' : 'make';
+            if ($abstract == $concrete) {
+                return $container->build($concrete);
+            }
 
-            return $container->$method($concrete, $parameters);
+            return $container->makeWith($concrete, $parameters);
         };
     }
 

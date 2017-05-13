@@ -692,6 +692,26 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     /**
      * Resolve the given type from the container.
      *
+     * (Overriding Container::makeWith)
+     *
+     * @param  string  $abstract
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function makeWith($abstract, array $parameters)
+    {
+        $abstract = $this->getAlias($abstract);
+
+        if (isset($this->deferredServices[$abstract])) {
+            $this->loadDeferredProvider($abstract);
+        }
+
+        return parent::makeWith($abstract, $parameters);
+    }
+
+    /**
+     * Resolve the given type from the container.
+     *
      * (Overriding Container::make)
      *
      * @param  string  $abstract
