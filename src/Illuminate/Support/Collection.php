@@ -1381,7 +1381,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function similar($value, $threshold = 85)
     {
         return $this->filter(function ($item) use ($value, $threshold) {
-
             similar_text((string) $item, (string) $value, $similarity);
 
             return $similarity >= $threshold;
