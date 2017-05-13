@@ -1543,6 +1543,24 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([3, 6, null], $c[2]->all());
     }
 
+    public function testSimilar()
+    {
+        $c = new Collection(['coat', 'cost', 'code']);
+        
+        $f = $c->similar('foo');
+        $this->assertInstanceOf(Collection::class, $f);
+        $this->assertCount(0, $f);
+
+        $f = $c->similar('costs');
+        $this->assertEquals(['cost'], $f->values()->toArray());
+
+        $f = $c->similar('coast');
+        $this->assertEquals(['coat', 'cost'], $f->values()->toArray());
+        
+        $f = $c->similar('coast', 40);
+        $this->assertEquals(['coat', 'cost', 'code'], $f->values()->toArray());
+    }
+
     public function testGettingMaxItemsFromCollection()
     {
         $c = new Collection([(object) ['foo' => 10], (object) ['foo' => 20]]);
