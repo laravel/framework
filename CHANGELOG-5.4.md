@@ -1,9 +1,18 @@
 # Release Notes for 5.4.x
 
-## [Unreleased]
+## v5.4.23 (2017-05-11)
+
+### Added
+- Added `Gate::abilities()` accessor ([#19143](https://github.com/laravel/framework/pull/19143), [e9e34b5](https://github.com/laravel/framework/commit/e9e34b5acd3feccec5ffe3ff6d84ff9009ff2a7a))
+- Added ability to eager load counts via `$withCount` property ([#19154](https://github.com/laravel/framework/pull/19154))
 
 ### Fixed
 - Fixed inversion of expected and actual on assertHeader ([#19110](https://github.com/laravel/framework/pull/19110))
+- Fixed filesystem bug in `Filesystem::files()` method on Windows ([#19157](https://github.com/laravel/framework/pull/19157))
+- Fixed bug in `Container::build()` ([#19161](https://github.com/laravel/framework/pull/19161), [bf669e1](https://github.com/laravel/framework/commit/bf669e16d61ef0225b86adc781ddcc752aafd62b))
+
+### Removed
+- Removed `window.Laravel` object ([#19135](https://github.com/laravel/framework/pull/19135))
 
 
 ## v5.4.22 (2017-05-08)

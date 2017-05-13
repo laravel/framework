@@ -1205,6 +1205,17 @@ class RoutingRouteTest extends TestCase
         $this->assertFalse(isset($_SERVER['route.test.controller.except.middleware']));
     }
 
+    public function testCallableControllerRouting()
+    {
+        $router = $this->getRouter();
+
+        $router->get('foo/bar', 'Illuminate\Tests\Routing\RouteTestControllerCallableStub@bar');
+        $router->get('foo/baz', 'Illuminate\Tests\Routing\RouteTestControllerCallableStub@baz');
+
+        $this->assertEquals('bar', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+        $this->assertEquals('baz', $router->dispatch(Request::create('foo/baz', 'GET'))->getContent());
+    }
+
     public function testControllerMiddlewareGroups()
     {
         unset(
@@ -1369,6 +1380,14 @@ class RouteTestControllerStub extends Controller
     public function index()
     {
         return 'Hello World';
+    }
+}
+
+class RouteTestControllerCallableStub extends Controller
+{
+    public function __call($method, $arguments = [])
+    {
+        return $method;
     }
 }
 
