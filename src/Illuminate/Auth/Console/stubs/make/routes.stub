@@ -1,4 +1,4 @@
 
-Auth::routes();
+Route::auth();
 
 Route::get('/home', 'HomeController@index')->name('home');
