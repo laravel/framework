@@ -324,9 +324,10 @@ class Router implements RegistrarContract
      * @param  string  $name
      * @param  string  $controller
      * @param  array   $options
+     * @param  bool    $nested
      * @return void
      */
-    public function resource($name, $controller, array $options = [])
+    public function resource($name, $controller, array $options = [], $nested = false)
     {
         if ($this->container && $this->container->bound('Illuminate\Routing\ResourceRegistrar')) {
             $registrar = $this->container->make('Illuminate\Routing\ResourceRegistrar');
@@ -334,7 +335,7 @@ class Router implements RegistrarContract
             $registrar = new ResourceRegistrar($this);
         }
 
-        $registrar->register($name, $controller, $options);
+        $registrar->register($name, $controller, $options, $nested);
     }
 
     /**
