@@ -1374,8 +1374,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Filter items by the similarity of the given value.
      *
-     * @param  mixed   $value
-     * @param  integer $threshold
+     * @param  mixed $value
+     * @param  int $threshold
      * @return static
      */
     public function similar($value, $threshold = 85)

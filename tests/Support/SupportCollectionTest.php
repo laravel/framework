@@ -1546,7 +1546,7 @@ class SupportCollectionTest extends TestCase
     public function testSimilar()
     {
         $c = new Collection(['coat', 'cost', 'code']);
-        
+
         $f = $c->similar('foo');
         $this->assertInstanceOf(Collection::class, $f);
         $this->assertCount(0, $f);
@@ -1556,7 +1556,7 @@ class SupportCollectionTest extends TestCase
 
         $f = $c->similar('coast');
         $this->assertEquals(['coat', 'cost'], $f->values()->toArray());
-        
+
         $f = $c->similar('coast', 40);
         $this->assertEquals(['coat', 'cost', 'code'], $f->values()->toArray());
     }
