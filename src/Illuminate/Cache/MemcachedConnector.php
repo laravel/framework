@@ -3,7 +3,6 @@
 namespace Illuminate\Cache;
 
 use Memcached;
-use RuntimeException;
 
 class MemcachedConnector
 {
