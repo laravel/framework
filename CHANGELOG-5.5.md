@@ -9,10 +9,12 @@
 - Removed `build` scripts ([7c16b15](https://github.com/laravel/framework/pull/17048/commits/7c16b154ede10ff9a37756e32d7dddf317524634))
 - Support callable/invokable objects in `Pipeline` ([#18264](https://github.com/laravel/framework/pull/18264))
 - ⚠️ Prevent access to protected properties using array access on `Model` and `Fluent` ([#18403](https://github.com/laravel/framework/pull/18403))
+- Throw `RuntimeException` when app key is missing ([#19145](https://github.com/laravel/framework/pull/19145), [8adbaa7](https://github.com/laravel/framework/commit/8adbaa714d37bb7214f29b12c52354900a1c6dc5))
 
 ### Artisan Console
 - Added interactive prompt to `vendor:publish` ([#18230](https://github.com/laravel/framework/pull/18230))
 - Added `migrate:fresh` command ([f6511d4](https://github.com/laravel/framework/commit/f6511d477f73b3033ef2336257f4cac5f20594a0))
+- Added `make:factory` command and added `--factory` to `make:model` ([a6ffd8b](https://github.com/laravel/framework/commit/a6ffd8bfa896844fee4b4c83cc6aed9d0c33fd9d))
 - ⚠️ Added `runningInConsole()` method `Application` contract ([#18658](https://github.com/laravel/framework/pull/18658))
 - Support default value(s) on command arguments ([#18572](https://github.com/laravel/framework/pull/18572))
 - Improved CLI detection for phpdbg ([#18781](https://github.com/laravel/framework/pull/18781))
@@ -26,6 +28,7 @@
 
 ### Authorization
 - Support multiple values in `Gate::has()` ([#18758](https://github.com/laravel/framework/pull/18758))
+- ⚠️ Prevent policies from being too greedy ([#19120](https://github.com/laravel/framework/pull/19120))
 
 ### Cache
 - Don't encrypt database cache values ([f0c72ec](https://github.com/laravel/framework/commit/f0c72ec9bcbdecb7e6267f7ec8f7ecbf8169a388))
@@ -50,18 +53,21 @@
 - Added `getDirty()` checks for date and castable attributes ([#18400](https://github.com/laravel/framework/pull/18400), [e180e20](https://github.com/laravel/framework/commit/e180e20aa479525b34f77b9cf348148d329a4d2c))
 - Show method name in invalid relationship `LogicException` ([#18749](https://github.com/laravel/framework/pull/18749))
 - Add support for additional values in `firstOrCreate()` and `firstOrNew()` ([#18878](https://github.com/laravel/framework/pull/18878))
+- Added a second local key to `HasManyThrough` ([#19114](https://github.com/laravel/framework/pull/19114))
 
 ### Encryption
 - Use `openssl_cipher_iv_length()` in `Encrypter` ([#18684](https://github.com/laravel/framework/pull/18684))
 
 ### Errors & Logging
 - Added default 404 and 500 error pages ([#18483](https://github.com/laravel/framework/pull/18483))
-- Always show custom 500 error page for all exception types when not in debug mode ([#18481](https://github.com/laravel/framework/pull/18481), [3cb7b0f](https://github.com/laravel/framework/commit/3cb7b0f4304274f209ed0f776ef70ccd4f9fe5dd))
-- Show 419 error page on `TokenMismatchException` ([#18728](https://github.com/laravel/framework/pull/18728))
+- ⚠️ Always show custom 500 error page for all exception types when not in debug mode ([#18481](https://github.com/laravel/framework/pull/18481), [3cb7b0f](https://github.com/laravel/framework/commit/3cb7b0f4304274f209ed0f776ef70ccd4f9fe5dd))
+- ⚠️ Show 419 error page on `TokenMismatchException` ([#18728](https://github.com/laravel/framework/pull/18728))
 - Support `render()` method on exceptions ([ed51160](https://github.com/laravel/framework/commit/ed51160b97d8c4cf16526a0f8ba57ce7cb131b53), [c8a9413](https://github.com/laravel/framework/commit/c8a9413e2dc3bf00c206742e2bc76a88134cba84))
 - Support `report()` method on exceptions ([e77f6f7](https://github.com/laravel/framework/commit/e77f6f76049050fd4abced63ffa768432d8974f2))
-- Send exceptions as JSON in debug mode if the request wants JSON ([5225389](https://github.com/laravel/framework/commit/5225389dfdf03d656b862bba59cebf1820e0e8f4), [#18732](https://github.com/laravel/framework/pull/18732), [4fe6091](https://github.com/laravel/framework/commit/4fe6091e9fc94817a70c47a6a1c2098d5a1805f8), [9ab58fd](https://github.com/laravel/framework/commit/9ab58fd1a0543b1c728124db7f70738b04dcf362))
+- ⚠️ Send exceptions as JSON in debug mode if the request wants JSON ([5225389](https://github.com/laravel/framework/commit/5225389dfdf03d656b862bba59cebf1820e0e8f4), [#18732](https://github.com/laravel/framework/pull/18732), [4fe6091](https://github.com/laravel/framework/commit/4fe6091e9fc94817a70c47a6a1c2098d5a1805f8), [9ab58fd](https://github.com/laravel/framework/commit/9ab58fd1a0543b1c728124db7f70738b04dcf362))
+- ⚠️ Moved exceptions from `$dontReport` into `$internalDontReport` ([841b36c](https://github.com/laravel/framework/commit/841b36cc005ee5c400f1276175db9e2692d1e167))
 - Added `Handler::context()` method, that by default adds some default context to logs ([23b7d6b](https://github.com/laravel/framework/commit/23b7d6b45c675bcd93e9f1fb9cd33e71779142c6))
+- ⚠️ Don't set formatter on `ErrorLogHandler` ([a044f17](https://github.com/laravel/framework/commit/a044f17897eeda3ab909ea47eeba3804dabdf9ad))
 
 ### Events
 - ⚠️ Removed calling queue method on handlers ([0360cb1](https://github.com/laravel/framework/commit/0360cb1c6b71ec89d406517b19d1508511e98fb5), [ec96979](https://github.com/laravel/framework/commit/ec969797878f2c731034455af2397110732d14c4), [d9be4bf](https://github.com/laravel/framework/commit/d9be4bfe0367a8e07eed4931bdabf135292abb1b))
@@ -70,7 +76,7 @@
 - ⚠️ Made `Storage::files()` work like `Storage::allFiles()` ([#18874](https://github.com/laravel/framework/pull/18874), [7073457](https://github.com/laravel/framework/commit/7073457041a29ada14e0ed01d7d65f5c76a92689))
 
 ### Helpers
-- Added `throw_if()` and `throw_unless()` helpers ([18bb4df](https://github.com/laravel/framework/commit/18bb4dfc77c7c289e9b40c4096816ebeff1cd843))
+- Added `throw_if()` and `throw_unless()` helpers ([18bb4df](https://github.com/laravel/framework/commit/18bb4dfc77c7c289e9b40c4096816ebeff1cd843), [#19166](https://github.com/laravel/framework/pull/19166))
 - Added `dispatch_now()` helper function ([#18668](https://github.com/laravel/framework/pull/18668), [61f2e7b](https://github.com/laravel/framework/commit/61f2e7b4106f8eb0b79603d9792426f7c6a6d273))
 - Add `$language` parameter to `str_slug()` helper ([#19011](https://github.com/laravel/framework/pull/19011))
 - Handle lower case words better in as `Str::snake()` ([#18764](https://github.com/laravel/framework/pull/18764))
@@ -84,10 +90,15 @@
 - Allow for per-mailable theme configuration ([b2c35ca](https://github.com/laravel/framework/commit/b2c35ca9eb769d1a4752a64e936defd7f7099043))
 - ⚠️ Removed `$data` and `$callback` parameters from `Mailer` and `MailQueue`
 
+### Notifications
+- Added methods for Slack `unfurl_*` options ([#19150](https://github.com/laravel/framework/pull/19150))
+
 ### Queues
 - Added support for chainable jobs ([81bcb03](https://github.com/laravel/framework/commit/81bcb03b303707cdc94420983b9d72ed558a2b3d), [94c01b1](https://github.com/laravel/framework/commit/94c01b1f37bfbb8e0d5f133b7dd34040b2bdc065), [91f5357](https://github.com/laravel/framework/commit/91f535704d4f6cff5e8393825dbdf46965234fa3))
 - ⚠️ Removed redundant `$queue` parameter from `Queue::createPayload()` ([#17948](https://github.com/laravel/framework/pull/17948))
 - Made all `getQueue()` methods `public` ([#18501](https://github.com/laravel/framework/pull/18501))
+- Pass connection and queue to `Looping` event ([#19081](https://github.com/laravel/framework/pull/19081))
+- ⚠️ Clone Job specific properties ([#19123](https://github.com/laravel/framework/pull/19123))
 
 ### Redis
 - Removed `PhpRedisConnection::proxyToEval()` method ([#17360](https://github.com/laravel/framework/pull/17360))
@@ -102,11 +113,14 @@
 - ⚠️ Removed `Request::intersect()` ([#18695](https://github.com/laravel/framework/pull/18695))
 - Return request data from `ValidatesRequests` calls ([#19033](https://github.com/laravel/framework/pull/19033))
 - Added a `validate()` macro onto `Request` ([#19063](https://github.com/laravel/framework/pull/19063))
+- Added `FormRequest::validated()` method ([#19112](https://github.com/laravel/framework/pull/19112))
+- ⚠️ Made `request()` helper and `Request::__get()` consistent ([a6ff272](https://github.com/laravel/framework/commit/a6ff272c54677a9f52718292fc0938ffb1871832))
 
 ### Routing
 - Support fluent resource options ([#18767](https://github.com/laravel/framework/pull/18767), [bb02fb2](https://github.com/laravel/framework/commit/bb02fb27387a8aeb2a47da1fe5ff2e086920b744))
 - Support multiple values in `Router::has()` ([#18758](https://github.com/laravel/framework/pull/18758))
 - ⚠️ Bind empty optional route parameter to `null` instead of empty model instance ([#17521](https://github.com/laravel/framework/pull/17521))
+- ⚠️ Removed `Controller::missingMethod()` ([bf5d221](https://github.com/laravel/framework/commit/bf5d221037d9857a74020f2623839e282035a420))
 
 ### Responses
 - ⚠️ Ensure `Arrayable` and `Jsonable` return a `JsonResponse` ([#17875](https://github.com/laravel/framework/pull/17875))
@@ -129,6 +143,10 @@
 - Allow disabling of specific middleware ([#18673](https://github.com/laravel/framework/pull/18673))
 - Added `withoutExceptionHandling()` method ([a171f44](https://github.com/laravel/framework/commit/a171f44594c248afe066fee74fad640765b12da0))
 - Support inline eloquent factory states ([#19060](https://github.com/laravel/framework/pull/19060))
+- Allow `assertSessionHasErrors()` to look into different error bags ([#19172](https://github.com/laravel/framework/pull/19172), [4287ebc](https://github.com/laravel/framework/commit/4287ebc76025cd31e0ba6730481a95aeb471e305))
+
+### Validation
+- Added support for custom validation rule objects ([#19155](https://github.com/laravel/framework/pull/19155))
 
 ### Views
 - ⚠️ Camel case variables names passed to views ([#18083](https://github.com/laravel/framework/pull/18083))
