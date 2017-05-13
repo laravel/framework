@@ -100,10 +100,9 @@ trait ResetsPasswords
      */
     protected function resetPassword($user, $password)
     {
-        $user->forceFill([
-            'password' => bcrypt($password),
-            'remember_token' => Str::random(60),
-        ])->save();
+        $user->password = bcrypt($password);
+        $user->setRememberToken(Str::random(60));
+        $user->save();
 
         $this->guard()->login($user);
     }
