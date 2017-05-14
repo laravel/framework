@@ -208,7 +208,7 @@ class UrlGenerator implements UrlGeneratorContract
         // Once we get the root URL, we will check to see if it contains an index.php
         // file in the paths. If it does, we will remove it since it is not needed
         // for asset paths, but only for routes to endpoints in the application.
-        $root = $this->getRootUrl($this->getScheme($secure));
+        $root = $this->getRootUrl($secure ? 'https://' : '//');
 
         return $this->removeIndex($root).'/'.trim($path, '/');
     }
@@ -226,7 +226,7 @@ class UrlGenerator implements UrlGeneratorContract
         // Once we get the root URL, we will check to see if it contains an index.php
         // file in the paths. If it does, we will remove it since it is not needed
         // for asset paths, but only for routes to endpoints in the application.
-        $root = $this->getRootUrl($this->getScheme($secure), $root);
+        $root = $this->getRootUrl($secure ? 'https://' : '//', $root);
 
         return $this->removeIndex($root).'/'.trim($path, '/');
     }

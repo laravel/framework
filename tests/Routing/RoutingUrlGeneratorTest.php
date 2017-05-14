@@ -38,7 +38,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
             $request = Request::create('http://www.foo.com/index.php/')
         );
 
-        $this->assertEquals('http://www.foo.com/foo/bar', $url->asset('foo/bar'));
+        $this->assertEquals('//www.foo.com/foo/bar', $url->asset('foo/bar'));
         $this->assertEquals('https://www.foo.com/foo/bar', $url->asset('foo/bar', true));
     }
 
