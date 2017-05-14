@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Http;
 
 use Exception;
+use Illuminate\Foundation\Http\Events\RequestTerminated;
 use Throwable;
 use Illuminate\Routing\Router;
 use Illuminate\Routing\Pipeline;
@@ -185,6 +186,8 @@ class Kernel implements KernelContract
     public function terminate($request, $response)
     {
         $this->terminateMiddleware($request, $response);
+
+        event(new RequestTerminated($request, $response));
 
         $this->app->terminate();
     }
