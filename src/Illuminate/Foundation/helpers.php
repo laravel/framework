@@ -508,6 +508,27 @@ if (! function_exists('public_path')) {
     }
 }
 
+if (! function_exists('uncacheable_asset')) {
+    /**
+     * Generate a new asset version path for the application.
+     *
+     * @param  string  $path
+     * @param  bool    $secure
+     * @return string
+     */
+    function uncacheable_asset($path, $secure = null)
+    {
+        $asset = asset($path, $secure);
+        
+        // prevents the browser to use the cached version 
+        // by using last_modif timestamps as an index version
+        $file = public_path($path);
+        $version = filemtime($file);
+        
+        return $asset.'?v='.$version;
+    }
+}
+
 if (! function_exists('put')) {
     /**
      * Register a new PUT route with the router.
