@@ -245,7 +245,7 @@ class Container implements ArrayAccess, ContainerContract
                 return $container->build($concrete);
             }
 
-            return $container->makeWith($concrete, $parameters);
+            return $container->make($concrete, $parameters);
         };
     }
 
@@ -547,26 +547,27 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
-     * Resolve the given type with the given parameter overrides.
+     * An alias function name for make().
      *
      * @param  string  $abstract
      * @param  array  $parameters
      * @return mixed
      */
-    public function makeWith($abstract, array $parameters)
+    public function makeWith($abstract, array $parameters = [])
     {
-        return $this->resolve($abstract, $parameters);
+        return $this->make($abstract, $parameters);
     }
 
     /**
      * Resolve the given type from the container.
      *
      * @param  string  $abstract
+     * @param  array  $parameters
      * @return mixed
      */
-    public function make($abstract)
+    public function make($abstract, array $parameters = [])
     {
-        return $this->resolve($abstract);
+        return $this->resolve($abstract, $parameters);
     }
 
     /**
@@ -788,7 +789,7 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
-     * Determine if the given dependency has a parameter override from makeWith.
+     * Determine if the given dependency has a parameter override.
      *
      * @param  \ReflectionParameter  $dependency
      * @return bool

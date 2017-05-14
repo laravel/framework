@@ -109,9 +109,10 @@ interface Container
      * Resolve the given type from the container.
      *
      * @param  string  $abstract
+     * @param  array  $parameters
      * @return mixed
      */
-    public function make($abstract);
+    public function make($abstract, array $parameters = []);
 
     /**
      * Call the given Closure / class@method and inject its dependencies.
