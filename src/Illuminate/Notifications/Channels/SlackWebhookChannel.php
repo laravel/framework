@@ -88,6 +88,7 @@ class SlackWebhookChannel
                 'footer' => $attachment->footer,
                 'footer_icon' => $attachment->footerIcon,
                 'image_url' => $attachment->imageUrl,
+                'thumb_url' => $attachment->thumbUrl,
                 'mrkdwn_in' => $attachment->markdown,
                 'text' => $attachment->content,
                 'title' => $attachment->title,

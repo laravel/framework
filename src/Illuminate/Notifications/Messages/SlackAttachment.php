@@ -56,6 +56,13 @@ class SlackAttachment
     public $markdown;
 
     /**
+     * The attachment's thumb url.
+     *
+     * @var string
+     */
+    public $thumbUrl;
+
+    /**
      * The attachment's image url.
      *
      * @var string
@@ -196,6 +203,19 @@ class SlackAttachment
     public function image($url)
     {
         $this->imageUrl = $url;
+
+        return $this;
+    }
+
+    /**
+     * Set the thumb URL.
+     *
+     * @param string $url
+     * @return $this
+     */
+    public function thumb($url)
+    {
+        $this->thumbUrl = $url;
 
         return $this;
     }
