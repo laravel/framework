@@ -3,9 +3,10 @@
 namespace Illuminate\Tests\Foundation\Http\Middleware;
 
 use Illuminate\Http\Request;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Http\Middleware\TransformsRequest;
 
-class TransformsRequestTest extends \PHPUnit_Framework_TestCase
+class TransformsRequestTest extends TestCase
 {
     public function testLowerAgeAndAddBeer()
     {

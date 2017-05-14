@@ -190,33 +190,12 @@ class HttpRequestTest extends TestCase
         $this->assertTrue($request->secure());
     }
 
-    public function testExistsMethod()
-    {
-        $request = Request::create('/', 'GET', ['name' => 'Taylor']);
-        $this->assertTrue($request->exists('name'));
-        $this->assertFalse($request->exists('foo'));
-        $this->assertFalse($request->exists('name', 'email'));
-
-        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
-        $this->assertTrue($request->exists('name'));
-        $this->assertTrue($request->exists('name', 'email'));
-
-        $request = Request::create('/', 'GET', ['foo' => ['bar', 'bar']]);
-        $this->assertTrue($request->exists('foo'));
-
-        $request = Request::create('/', 'GET', ['foo' => '', 'bar' => null]);
-        $this->assertTrue($request->exists('foo'));
-        $this->assertTrue($request->exists('bar'));
-
-        $request = Request::create('/', 'GET', ['foo' => ['bar' => null, 'baz' => '']]);
-        $this->assertTrue($request->exists('foo.bar'));
-        $this->assertTrue($request->exists('foo.baz'));
-    }
-
     public function testHasMethod()
     {
-        $request = Request::create('/', 'GET', ['name' => 'Taylor']);
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
         $this->assertTrue($request->has('name'));
+        $this->assertTrue($request->has('age'));
+        $this->assertTrue($request->has('city'));
         $this->assertFalse($request->has('foo'));
         $this->assertFalse($request->has('name', 'email'));
 
@@ -224,12 +203,37 @@ class HttpRequestTest extends TestCase
         $this->assertTrue($request->has('name'));
         $this->assertTrue($request->has('name', 'email'));
 
-        //test arrays within query string
-        $request = Request::create('/', 'GET', ['foo' => ['bar', 'baz']]);
+        $request = Request::create('/', 'GET', ['foo' => ['bar', 'bar']]);
         $this->assertTrue($request->has('foo'));
 
-        $request = Request::create('/', 'GET', ['foo' => ['bar' => 'baz']]);
+        $request = Request::create('/', 'GET', ['foo' => '', 'bar' => null]);
+        $this->assertTrue($request->has('foo'));
+        $this->assertTrue($request->has('bar'));
+
+        $request = Request::create('/', 'GET', ['foo' => ['bar' => null, 'baz' => '']]);
         $this->assertTrue($request->has('foo.bar'));
+        $this->assertTrue($request->has('foo.baz'));
+    }
+
+    public function testFilledMethod()
+    {
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
+        $this->assertTrue($request->filled('name'));
+        $this->assertFalse($request->filled('age'));
+        $this->assertFalse($request->filled('city'));
+        $this->assertFalse($request->filled('foo'));
+        $this->assertFalse($request->filled('name', 'email'));
+
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
+        $this->assertTrue($request->filled('name'));
+        $this->assertTrue($request->filled('name', 'email'));
+
+        //test arrays within query string
+        $request = Request::create('/', 'GET', ['foo' => ['bar', 'baz']]);
+        $this->assertTrue($request->filled('foo'));
+
+        $request = Request::create('/', 'GET', ['foo' => ['bar' => 'baz']]);
+        $this->assertTrue($request->filled('foo.bar'));
     }
 
     public function testInputMethod()
@@ -243,15 +247,30 @@ class HttpRequestTest extends TestCase
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\File\UploadedFile', $request['file']);
     }
 
+    public function testAllMethod()
+    {
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => null]);
+        $this->assertEquals(['name' => 'Taylor', 'age' => null, 'email' => null], $request->all('name', 'age', 'email'));
+        $this->assertEquals(['name' => 'Taylor'], $request->all('name'));
+        $this->assertEquals(['name' => 'Taylor', 'age' => null], $request->all());
+
+        $request = Request::create('/', 'GET', ['developer' => ['name' => 'Taylor', 'age' => null]]);
+        $this->assertEquals(['developer' => ['name' => 'Taylor', 'skills' => null]], $request->all('developer.name', 'developer.skills'));
+        $this->assertEquals(['developer' => ['name' => 'Taylor', 'skills' => null]], $request->all(['developer.name', 'developer.skills']));
+        $this->assertEquals(['developer' => ['age' => null]], $request->all('developer.age'));
+        $this->assertEquals(['developer' => ['skills' => null]], $request->all('developer.skills'));
+        $this->assertEquals(['developer' => ['name' => 'Taylor', 'age' => null]], $request->all());
+    }
+
     public function testOnlyMethod()
     {
-        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 25]);
-        $this->assertEquals(['age' => 25], $request->only('age'));
-        $this->assertEquals(['name' => 'Taylor', 'age' => 25], $request->only('name', 'age'));
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => null]);
+        $this->assertEquals(['name' => 'Taylor', 'age' => null], $request->only('name', 'age', 'email'));
 
-        $request = Request::create('/', 'GET', ['developer' => ['name' => 'Taylor', 'age' => 25]]);
-        $this->assertEquals(['developer' => ['age' => 25]], $request->only('developer.age'));
-        $this->assertEquals(['developer' => ['name' => 'Taylor'], 'test' => null], $request->only('developer.name', 'test'));
+        $request = Request::create('/', 'GET', ['developer' => ['name' => 'Taylor', 'age' => null]]);
+        $this->assertEquals(['developer' => ['name' => 'Taylor']], $request->only('developer.name', 'developer.skills'));
+        $this->assertEquals(['developer' => ['age' => null]], $request->only('developer.age'));
+        $this->assertEquals([], $request->only('developer.skills'));
     }
 
     public function testExceptMethod()
@@ -259,12 +278,6 @@ class HttpRequestTest extends TestCase
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 25]);
         $this->assertEquals(['name' => 'Taylor'], $request->except('age'));
         $this->assertEquals([], $request->except('age', 'name'));
-    }
-
-    public function testIntersectMethod()
-    {
-        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => null]);
-        $this->assertEquals(['name' => 'Taylor'], $request->intersect('name', 'age', 'email'));
     }
 
     public function testQueryMethod()
@@ -680,8 +693,8 @@ class HttpRequestTest extends TestCase
 
         // Parameter 'empty' is '', then it ISSET and is EMPTY.
         $this->assertEquals($request->empty, '');
-        $this->assertEquals(isset($request->empty), true);
-        $this->assertEquals(empty($request->empty), true);
+        $this->assertTrue(isset($request->empty));
+        $this->assertTrue(empty($request->empty));
 
         // Parameter 'undefined' is undefined/null, then it NOT ISSET and is EMPTY.
         $this->assertEquals($request->undefined, null);
@@ -698,7 +711,8 @@ class HttpRequestTest extends TestCase
         });
 
         // Router parameter 'foo' is 'bar', then it ISSET and is NOT EMPTY.
-        $this->assertEquals($request->foo, 'bar');
+        $this->assertEquals('bar', $request->foo);
+        $this->assertEquals('bar', $request['foo']);
         $this->assertEquals(isset($request->foo), true);
         $this->assertEquals(empty($request->foo), false);
 

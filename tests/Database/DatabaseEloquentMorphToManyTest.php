@@ -74,7 +74,7 @@ class DatabaseEloquentMorphToManyTest extends TestCase
     {
         list($builder, $parent) = $this->getRelationArguments();
 
-        return new MorphToMany($builder, $parent, 'taggable', 'taggables', 'taggable_id', 'tag_id');
+        return new MorphToMany($builder, $parent, 'taggable', 'taggables', 'taggable_id', 'tag_id', 'id', 'id');
     }
 
     public function getRelationArguments()
@@ -85,6 +85,7 @@ class DatabaseEloquentMorphToManyTest extends TestCase
         $parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
         $parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
         $parent->shouldReceive('getMorphClass')->andReturn(get_class($parent));
+        $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
 
         $builder = m::mock('Illuminate\Database\Eloquent\Builder');
         $related = m::mock('Illuminate\Database\Eloquent\Model');
@@ -98,7 +99,7 @@ class DatabaseEloquentMorphToManyTest extends TestCase
         $builder->shouldReceive('where')->once()->with('taggables.taggable_id', '=', 1);
         $builder->shouldReceive('where')->once()->with('taggables.taggable_type', get_class($parent));
 
-        return [$builder, $parent, 'taggable', 'taggables', 'taggable_id', 'tag_id', 'relation_name', false];
+        return [$builder, $parent, 'taggable', 'taggables', 'taggable_id', 'tag_id', 'id', 'id', 'relation_name', false];
     }
 }
 

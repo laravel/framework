@@ -9,7 +9,9 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Validation\Validator;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
+use Illuminate\Contracts\Validation\Rule;
 use Symfony\Component\HttpFoundation\File\File;
+use Illuminate\Contracts\Validation\ImplicitRule;
 
 class ValidationValidatorTest extends TestCase
 {
@@ -3393,6 +3395,140 @@ class ValidationValidatorTest extends TestCase
         $file = new File(__FILE__, false);
         $v = new Validator($trans, ['file' => $file], ['file' => 'Required|mimes:xls']);
         $this->assertFalse($v->passes());
+    }
+
+    public function testCustomValidationObject()
+    {
+        // Test passing case...
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['name' => 'taylor'],
+            ['name' => new class implements Rule {
+                public function passes($attribute, $value)
+                {
+                    return $value === 'taylor';
+                }
+
+                public function message()
+                {
+                    return ':attribute must be taylor';
+                }
+            }]
+        );
+
+        $this->assertTrue($v->passes());
+
+        // Test failing case...
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['name' => 'adam'],
+            ['name' => [new class implements Rule {
+                public function passes($attribute, $value)
+                {
+                    return $value === 'taylor';
+                }
+
+                public function message()
+                {
+                    return ':attribute must be taylor';
+                }
+            }]]
+        );
+
+        $this->assertTrue($v->fails());
+        $this->assertEquals('name must be taylor', $v->errors()->all()[0]);
+
+        // Test passing case with Closure...
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['name' => 'taylor'],
+            ['name.*' => function ($attribute, $value, $fail) {
+                if ($value !== 'taylor') {
+                    $fail(':attribute was '.$value.' instead of taylor');
+                }
+            }]
+        );
+
+        $this->assertTrue($v->passes());
+
+        // Test failing case with Closure...
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['name' => 'adam'],
+            ['name' => function ($attribute, $value, $fail) {
+                if ($value !== 'taylor') {
+                    $fail(':attribute was '.$value.' instead of taylor');
+                }
+            }]
+        );
+
+        $this->assertTrue($v->fails());
+        $this->assertEquals('name was adam instead of taylor', $v->errors()->all()[0]);
+
+        // Test complex failing case...
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['name' => 'taylor', 'states' => ['AR', 'TX'], 'number' => 9],
+            [
+                'states.*' => new class implements Rule {
+                    public function passes($attribute, $value)
+                    {
+                        return in_array($value, ['AK', 'HI']);
+                    }
+
+                    public function message()
+                    {
+                        return ':attribute must be AR or TX';
+                    }
+                },
+                'name' => function ($attribute, $value, $fail) {
+                    if ($value !== 'taylor') {
+                        $fail(':attribute must be taylor');
+                    }
+                },
+                'number' => [
+                    'required',
+                    'integer',
+                    function ($attribute, $value, $fail) {
+                        if ($value % 4 !== 0) {
+                            $fail(':attribute must be divisible by 4');
+                        }
+                    },
+                ],
+            ]
+        );
+
+        $this->assertFalse($v->passes());
+        $this->assertEquals('states.0 must be AR or TX', $v->errors()->get('states.0')[0]);
+        $this->assertEquals('states.1 must be AR or TX', $v->errors()->get('states.1')[0]);
+        $this->assertEquals('number must be divisible by 4', $v->errors()->get('number')[0]);
+    }
+
+    public function testImplicitCustomValidationObjects()
+    {
+        // Test passing case...
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['name' => ''],
+            ['name' => $rule = new class implements ImplicitRule {
+                public $called = false;
+
+                public function passes($attribute, $value)
+                {
+                    $this->called = true;
+
+                    return true;
+                }
+
+                public function message()
+                {
+                    return 'message';
+                }
+            }]
+        );
+
+        $this->assertTrue($v->passes());
+        $this->assertTrue($rule->called);
     }
 
     protected function getTranslator()

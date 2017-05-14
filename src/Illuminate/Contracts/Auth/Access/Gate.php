@@ -101,4 +101,11 @@ interface Gate
      * @return static
      */
     public function forUser($user);
+
+    /**
+     * Get all of the defined abilities.
+     *
+     * @return array
+     */
+    public function abilities();
 }

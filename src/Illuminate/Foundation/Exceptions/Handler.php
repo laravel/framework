@@ -5,9 +5,13 @@ namespace Illuminate\Foundation\Exceptions;
 use Exception;
 use Psr\Log\LoggerInterface;
 use Illuminate\Http\Response;
+use Illuminate\Routing\Router;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Session\TokenMismatchException;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -38,6 +42,21 @@ class Handler implements ExceptionHandlerContract
     protected $dontReport = [];
 
     /**
+     * A list of the internal exception types that should not be reported.
+     *
+     * @var array
+     */
+    protected $internalDontReport = [
+        \Illuminate\Auth\AuthenticationException::class,
+        \Illuminate\Auth\Access\AuthorizationException::class,
+        \Symfony\Component\HttpKernel\Exception\HttpException::class,
+        HttpResponseException::class,
+        \Illuminate\Database\Eloquent\ModelNotFoundException::class,
+        \Illuminate\Session\TokenMismatchException::class,
+        \Illuminate\Validation\ValidationException::class,
+    ];
+
+    /**
      * Create a new exception handler instance.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
@@ -52,7 +71,7 @@ class Handler implements ExceptionHandlerContract
      * Report or log an exception.
      *
      * @param  \Exception  $e
-     * @return void
+     * @return mixed
      *
      * @throws \Exception
      */
@@ -62,13 +81,17 @@ class Handler implements ExceptionHandlerContract
             return;
         }
 
+        if (method_exists($e, 'report')) {
+            return $e->report();
+        }
+
         try {
             $logger = $this->container->make(LoggerInterface::class);
         } catch (Exception $ex) {
             throw $e; // throw the original exception
         }
 
-        $logger->error($e);
+        $logger->error($e, $this->context());
     }
 
     /**
@@ -90,11 +113,24 @@ class Handler implements ExceptionHandlerContract
      */
     protected function shouldntReport(Exception $e)
     {
-        $dontReport = array_merge($this->dontReport, [HttpResponseException::class]);
+        $dontReport = array_merge($this->dontReport, $this->internalDontReport);
 
         return ! is_null(collect($dontReport)->first(function ($type) use ($e) {
             return $e instanceof $type;
         }));
+    }
+
+    /**
+     * Get the default context variables for logging.
+     *
+     * @return array
+     */
+    protected function context()
+    {
+        return array_filter([
+            'userId' => Auth::id(),
+            'email' => Auth::user()->email ?? null,
+        ]);
     }
 
     /**
@@ -106,6 +142,10 @@ class Handler implements ExceptionHandlerContract
      */
     public function render($request, Exception $e)
     {
+        if (method_exists($e, 'render') && $response = $e->render($request)) {
+            return Router::prepareResponse($request, $response);
+        }
+
         $e = $this->prepareException($e);
 
         if ($e instanceof HttpResponseException) {
@@ -116,7 +156,9 @@ class Handler implements ExceptionHandlerContract
             return $this->convertValidationExceptionToResponse($e, $request);
         }
 
-        return $this->prepareResponse($request, $e);
+        return $request->expectsJson()
+                        ? $this->prepareJsonResponse($request, $e)
+                        : $this->prepareResponse($request, $e);
     }
 
     /**
@@ -131,6 +173,8 @@ class Handler implements ExceptionHandlerContract
             $e = new NotFoundHttpException($e->getMessage(), $e);
         } elseif ($e instanceof AuthorizationException) {
             $e = new HttpException(403, $e->getMessage());
+        } elseif ($e instanceof TokenMismatchException) {
+            $e = new HttpException(419, $e->getMessage());
         }
 
         return $e;
@@ -161,7 +205,7 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
-     * Prepare response containing exception render.
+     * Prepare a response for the given exception.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Exception $e
@@ -169,11 +213,53 @@ class Handler implements ExceptionHandlerContract
      */
     protected function prepareResponse($request, Exception $e)
     {
-        if ($this->isHttpException($e)) {
-            return $this->toIlluminateResponse($this->renderHttpException($e), $e);
-        } else {
+        if (! $this->isHttpException($e) && config('app.debug')) {
             return $this->toIlluminateResponse($this->convertExceptionToResponse($e), $e);
         }
+
+        if (! $this->isHttpException($e)) {
+            $e = new HttpException(500, $e->getMessage());
+        }
+
+        return $this->toIlluminateResponse(
+            $this->renderHttpException($e), $e
+        );
+    }
+
+    /**
+     * Prepare a JSON response for the given exception.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Exception $e
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function prepareJsonResponse($request, Exception $e)
+    {
+        $status = $this->isHttpException($e) ? $e->getStatusCode() : 500;
+
+        $headers = $this->isHttpException($e) ? $e->getHeaders() : [];
+
+        return new JsonResponse(
+            $this->convertExceptionToArray($e), $status, $headers, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+        );
+    }
+
+    /**
+     * Convert the given exception to an array.
+     *
+     * @param  \Exception  $e
+     * @return array
+     */
+    protected function convertExceptionToArray(Exception $e)
+    {
+        return config('app.debug') ? [
+            'message' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'trace' => $e->getTrace(),
+        ] : [
+            'message' => $this->isHttpException($e) ? $e->getMessage() : 'Server Error',
+        ];
     }
 
     /**

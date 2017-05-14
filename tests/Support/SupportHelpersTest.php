@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Support;
 use stdClass;
 use ArrayAccess;
 use Mockery as m;
+use RuntimeException;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 
@@ -709,6 +710,23 @@ class SupportHelpersTest extends TestCase
         $mock = m::mock();
         $mock->shouldReceive('foo')->once()->andReturn('bar');
         $this->assertEquals($mock, tap($mock)->foo());
+    }
+
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testThrow()
+    {
+        throw_if(true, new RuntimeException);
+    }
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage Test Message
+     */
+    public function testThrowWithString()
+    {
+        throw_if(true, RuntimeException::class, 'Test Message');
     }
 }
 

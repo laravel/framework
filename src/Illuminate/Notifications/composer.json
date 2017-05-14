@@ -14,15 +14,15 @@
         }
     ],
     "require": {
-        "php": ">=5.6.4",
-        "illuminate/broadcasting": "5.4.*",
-        "illuminate/bus": "5.4.*",
-        "illuminate/container": "5.4.*",
-        "illuminate/contracts": "5.4.*",
-        "illuminate/filesystem": "5.4.*",
-        "illuminate/mail": "5.4.*",
-        "illuminate/queue": "5.4.*",
-        "illuminate/support": "5.4.*",
+        "php": ">=7.0",
+        "illuminate/broadcasting": "5.5.*",
+        "illuminate/bus": "5.5.*",
+        "illuminate/container": "5.5.*",
+        "illuminate/contracts": "5.5.*",
+        "illuminate/filesystem": "5.5.*",
+        "illuminate/mail": "5.5.*",
+        "illuminate/queue": "5.5.*",
+        "illuminate/support": "5.5.*",
         "ramsey/uuid": "~3.0"
     },
     "autoload": {
@@ -32,12 +32,12 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.4-dev"
+            "dev-master": "5.5-dev"
         }
     },
     "suggest": {
-        "guzzlehttp/guzzle": "Required to use the Slack transport (~6.0).",
-        "illuminate/database": "Required to use the database transport (5.4.*).",
+        "guzzlehttp/guzzle": "Required to use the Slack transport (~6.0)",
+        "illuminate/database": "Required to use the database transport (5.5.*).",
         "nexmo/client": "Required to use the Nexmo transport (~1.0)."
     },
     "config": {

@@ -9,6 +9,7 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Auth\RequestGuard;
 use Illuminate\Container\Container;
+use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Middleware\Authenticate;
@@ -166,7 +167,7 @@ class AuthenticateMiddlewareTest extends TestCase
     {
         return new RequestGuard(function () use ($authenticated) {
             return $authenticated ? new stdClass : null;
-        }, m::mock(Request::class));
+        }, m::mock(Request::class), m::mock(EloquentUserProvider::class));
     }
 
     /**

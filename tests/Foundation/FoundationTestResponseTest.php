@@ -49,7 +49,7 @@ class FoundationTestResponseTest extends TestCase
 
         try {
             $response->assertHeader('Location', '/bar');
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $this->assertEquals('/bar', $e->getComparisonFailure()->getExpected());
             $this->assertEquals('/foo', $e->getComparisonFailure()->getActual());
         }
