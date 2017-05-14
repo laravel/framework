@@ -221,7 +221,7 @@ class Gate implements GateContract
             return $result;
         }
 
-        return $result ? $this->allow() : $this->deny();
+        return $result ? $this->allow() : $this->deny($arguments);
     }
 
     /**
