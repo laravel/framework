@@ -128,7 +128,7 @@ class ContainerTest extends TestCase
             return $config;
         });
         $container->alias('foo', 'baz');
-        $this->assertEquals([1, 2, 3], $container->makeWith('baz', [1, 2, 3]));
+        $this->assertEquals([1, 2, 3], $container->make('baz', [1, 2, 3]));
     }
 
     public function testBindingsCanBeOverridden()
@@ -783,10 +783,26 @@ class ContainerTest extends TestCase
         $this->assertEquals('taylor', $instance->name);
     }
 
+    public function testMakeWithMethodIsAnAliasForMakeMethod()
+    {
+        $mock = $this->getMockBuilder(Container::class)
+                     ->setMethods(['make'])
+                     ->getMock();
+
+        $mock->expects($this->once())
+             ->method('make')
+             ->with(ContainerDefaultValueStub::class, ['default' => 'laurence'])
+             ->will($this->returnValue(new StdClass));
+
+        $result = $mock->makeWith(ContainerDefaultValueStub::class, ['default' => 'laurence']);
+
+        $this->assertInstanceOf(StdClass::class, $result);
+    }
+
     public function testResolvingWithArrayOfParameters()
     {
         $container = new Container;
-        $instance = $container->makeWith(ContainerDefaultValueStub::class, ['default' => 'adam']);
+        $instance = $container->make(ContainerDefaultValueStub::class, ['default' => 'adam']);
         $this->assertEquals('adam', $instance->default);
 
         $instance = $container->make(ContainerDefaultValueStub::class);
@@ -796,14 +812,14 @@ class ContainerTest extends TestCase
             return $config;
         });
 
-        $this->assertEquals([1, 2, 3], $container->makeWith('foo', [1, 2, 3]));
+        $this->assertEquals([1, 2, 3], $container->make('foo', [1, 2, 3]));
     }
 
     public function testResolvingWithUsingAnInterface()
     {
         $container = new Container;
         $container->bind(IContainerContractStub::class, ContainerInjectVariableStubWithInterfaceImplementation::class);
-        $instance = $container->makeWith(IContainerContractStub::class, ['something' => 'laurence']);
+        $instance = $container->make(IContainerContractStub::class, ['something' => 'laurence']);
         $this->assertEquals('laurence', $instance->something);
     }
 
@@ -811,7 +827,7 @@ class ContainerTest extends TestCase
     {
         $container = new Container;
         $container->bind('foo', function ($app, $config) {
-            return $app->makeWith('bar', ['name' => 'Taylor']);
+            return $app->make('bar', ['name' => 'Taylor']);
         });
         $container->bind('bar', function ($app, $config) {
             return $config;
@@ -832,7 +848,7 @@ class ContainerTest extends TestCase
             return $config;
         });
 
-        $this->assertEquals([], $container->makeWith('foo', ['something']));
+        $this->assertEquals([], $container->make('foo', ['something']));
     }
 
     public function testSingletonBindingsNotRespectedWithMakeParameters()
@@ -843,8 +859,8 @@ class ContainerTest extends TestCase
             return $config;
         });
 
-        $this->assertEquals(['name' => 'taylor'], $container->makeWith('foo', ['name' => 'taylor']));
-        $this->assertEquals(['name' => 'abigail'], $container->makeWith('foo', ['name' => 'abigail']));
+        $this->assertEquals(['name' => 'taylor'], $container->make('foo', ['name' => 'taylor']));
+        $this->assertEquals(['name' => 'abigail'], $container->make('foo', ['name' => 'abigail']));
     }
 
     public function testCanBuildWithoutParameterStackWithNoConstructors()
