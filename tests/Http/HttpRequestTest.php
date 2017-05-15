@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Http;
 
-use Mockery as m;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
@@ -155,6 +155,21 @@ class HttpRequestTest extends TestCase
         $request = Request::create('/', 'GET');
 
         $this->assertTrue($request->is('/'));
+    }
+
+    public function testIsRouteNameMethod()
+    {
+        $request = Request::create('/foo/bar', 'GET');
+
+        $request->setRouteResolver(function () use ($request) {
+            $route = new Route('GET', '/foo/bar', ['as' => 'foo.bar']);
+            $route->bind($request);
+
+            return $route;
+        });
+
+        $this->assertTrue($request->isRouteName('foo.bar'));
+        $this->assertFalse($request->isRouteName('foo.foo'));
     }
 
     public function testAjaxMethod()
