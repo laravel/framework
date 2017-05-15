@@ -164,9 +164,9 @@ class CacheManager implements FactoryContract
 
         $memcached = $this->app['memcached.connector']->connect(
             $config['servers'],
-            array_get($config, 'persistent_id'),
-            array_get($config, 'options', []),
-            array_filter(array_get($config, 'sasl', []))
+            Arr::get($config, 'persistent_id'),
+            Arr::get($config, 'options', []),
+            array_filter(Arr::get($config, 'sasl', []))
         );
 
         return $this->repository(new MemcachedStore($memcached, $prefix));

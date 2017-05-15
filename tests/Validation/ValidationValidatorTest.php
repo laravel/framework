@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Validation;
 use DateTime;
 use Mockery as m;
 use Carbon\Carbon;
+use Illuminate\Support\Arr;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Validation\Validator;
 use Illuminate\Validation\Rules\Exists;
@@ -432,7 +433,7 @@ class ValidationValidatorTest extends TestCase
         $trans->addLines(['validation.attributes.lastname' => 'Lastname'], 'en');
         $v = new Validator($trans, ['firstname' => 'Bob', 'lastname' => 'Smith'], ['lastname' => 'alliteration:firstname']);
         $v->addExtension('alliteration', function ($attribute, $value, $parameters, $validator) {
-            $other = array_get($validator->getData(), $parameters[0]);
+            $other = Arr::get($validator->getData(), $parameters[0]);
 
             return $value[0] == $other[0];
         });
@@ -449,7 +450,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['firstname' => 'Bob', 'lastname' => 'Smith'], ['lastname' => 'alliteration:firstname']);
         $v->addCustomAttributes($customAttributes);
         $v->addExtension('alliteration', function ($attribute, $value, $parameters, $validator) {
-            $other = array_get($validator->getData(), $parameters[0]);
+            $other = Arr::get($validator->getData(), $parameters[0]);
 
             return $value[0] == $other[0];
         });
@@ -2572,7 +2573,7 @@ class ValidationValidatorTest extends TestCase
             ['*.name' => 'dependent_rule:*.age']
         );
         $v->addDependentExtension('dependent_rule', function ($name) use ($v) {
-            return array_get($v->getData(), $name) == 'Jamie';
+            return Arr::get($v->getData(), $name) == 'Jamie';
         });
         $this->assertTrue($v->passes());
     }
