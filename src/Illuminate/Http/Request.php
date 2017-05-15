@@ -197,7 +197,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      *
      * @param  string  $name
      *
-     * @return boolean
+     * @return bool
      */
     public function isRouteName($name)
     {

@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Http;
 
+use Mockery as m;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
