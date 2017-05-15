@@ -3,6 +3,7 @@
 namespace Illuminate\Http;
 
 use ArrayObject;
+use JsonSerializable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Renderable;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
@@ -79,6 +80,7 @@ class Response extends BaseResponse
     {
         return $content instanceof Jsonable ||
                $content instanceof ArrayObject ||
+               $content instanceof JsonSerializable ||
                is_array($content);
     }
 
