@@ -62,6 +62,7 @@ class ControllerMakeCommand extends GeneratorCommand
     {
         return [
             ['plain', null, InputOption::VALUE_NONE, 'Generate an empty controller class.'],
+            ['resource', null, InputOption::VALUE_REQUIRED, 'Generate a resource controller class.'],
         ];
     }
 }
