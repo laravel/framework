@@ -467,19 +467,19 @@ class Dispatcher implements DispatcherContract
     {
         $listener = (new ReflectionClass($class))->newInstanceWithoutConstructor();
 
-        return [$listener, $this->propogateListenerOptions(
+        return [$listener, $this->propagateListenerOptions(
             $listener, new CallQueuedListener($class, $method, $arguments)
         )];
     }
 
     /**
-     * Propogate listener options to the job.
+     * Propagate listener options to the job.
      *
      * @param  mixed  $listener
      * @param  mixed  $job
      * @return mixed
      */
-    protected function propogateListenerOptions($listener, $job)
+    protected function propagateListenerOptions($listener, $job)
     {
         return tap($job, function ($job) use ($listener) {
             $job->tries = isset($listener->tries) ? $listener->tries : null;
