@@ -349,6 +349,18 @@ class ViewFactoryTest extends TestCase
         $this->assertFalse($factory->hasSection('bar'));
     }
 
+    public function testGetSection()
+    {
+        $factory = $this->getFactory();
+        $factory->startSection('foo');
+        echo 'hi';
+        $factory->stopSection();
+
+        $this->assertEquals('hi', $factory->getSection('foo'));
+        $this->assertNull($factory->getSection('bar'));
+        $this->assertEquals('default', $factory->getSection('bar', 'default'));
+    }
+
     public function testMakeWithSlashAndDot()
     {
         $factory = $this->getFactory();

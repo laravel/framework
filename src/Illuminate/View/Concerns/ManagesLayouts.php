@@ -183,6 +183,18 @@ trait ManagesLayouts
     }
 
     /**
+     * Return a section if it exists otherwise return $default
+     *
+     * @param  string  $name
+     * @param  string  $default
+     * @return mixed
+     */
+    public function getSection($name, $default=null)
+    {
+        return $this->getSections()[$name] ?? $default;
+    }
+
+    /**
      * Get the entire array of sections.
      *
      * @return array
