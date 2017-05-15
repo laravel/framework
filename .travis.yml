@@ -15,6 +15,10 @@ matrix:
       env: setup=lowest
     - php: 7.0
       env: setup=stable
+    - php: 7.1
+      env: setup=lowest
+    - php: 7.1
+      env: setup=stable
 
 sudo: false
 
