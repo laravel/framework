@@ -19,7 +19,7 @@ class SupportHelpersTest extends TestCase
 
     public function testArrayDot()
     {
-        $array = array_dot(['name' => 'taylor', 'languages' => ['php' => true]]);
+        $array = Arr::dot(['name' => 'taylor', 'languages' => ['php' => true]]);
         $this->assertEquals($array, ['name' => 'taylor', 'languages.php' => true]);
     }
 
@@ -110,13 +110,13 @@ class SupportHelpersTest extends TestCase
     public function testArrayExcept()
     {
         $array = ['name' => 'taylor', 'age' => 26];
-        $this->assertEquals(['age' => 26], array_except($array, ['name']));
-        $this->assertEquals(['age' => 26], array_except($array, 'name'));
+        $this->assertEquals(['age' => 26], Arr::except($array, ['name']));
+        $this->assertEquals(['age' => 26], Arr::except($array, 'name'));
 
         $array = ['name' => 'taylor', 'framework' => ['language' => 'PHP', 'name' => 'Laravel']];
-        $this->assertEquals(['name' => 'taylor'], array_except($array, 'framework'));
-        $this->assertEquals(['name' => 'taylor', 'framework' => ['name' => 'Laravel']], array_except($array, 'framework.language'));
-        $this->assertEquals(['framework' => ['language' => 'PHP']], array_except($array, ['name', 'framework.name']));
+        $this->assertEquals(['name' => 'taylor'], Arr::except($array, 'framework'));
+        $this->assertEquals(['name' => 'taylor', 'framework' => ['name' => 'Laravel']], Arr::except($array, 'framework.language'));
+        $this->assertEquals(['framework' => ['language' => 'PHP']], Arr::except($array, ['name', 'framework.name']));
     }
 
     public function testArrayOnly()
@@ -129,13 +129,13 @@ class SupportHelpersTest extends TestCase
     public function testArrayCollapse()
     {
         $array = [[1], [2], [3], ['foo', 'bar'], collect(['baz', 'boom'])];
-        $this->assertEquals([1, 2, 3, 'foo', 'bar', 'baz', 'boom'], array_collapse($array));
+        $this->assertEquals([1, 2, 3, 'foo', 'bar', 'baz', 'boom'], Arr::collapse($array));
     }
 
     public function testArrayDivide()
     {
         $array = ['name' => 'taylor'];
-        list($keys, $values) = array_divide($array);
+        list($keys, $values) = Arr::divide($array);
         $this->assertEquals(['name'], $keys);
         $this->assertEquals(['taylor'], $values);
     }
@@ -690,8 +690,8 @@ class SupportHelpersTest extends TestCase
 
     public function testArrayAdd()
     {
-        $this->assertEquals(['surname' => 'Mövsümov'], array_add([], 'surname', 'Mövsümov'));
-        $this->assertEquals(['developer' => ['name' => 'Ferid']], array_add([], 'developer.name', 'Ferid'));
+        $this->assertEquals(['surname' => 'Mövsümov'], Arr::add([], 'surname', 'Mövsümov'));
+        $this->assertEquals(['developer' => ['name' => 'Ferid']], Arr::add([], 'developer.name', 'Ferid'));
     }
 
     public function testArrayPull()
