@@ -183,7 +183,7 @@ trait ManagesLayouts
     }
 
     /**
-     * Return a section if it exists otherwise return $default.
+     * Get the contents of a section.
      *
      * @param  string  $name
      * @param  string  $default
