@@ -1,5 +1,15 @@
 # Release Notes for 5.4.x
 
+## [Unreleased]
+
+### Added
+- Support magic controller methods ([#19168](https://github.com/laravel/framework/pull/19168))
+- Added `Gate` resources ([#19124](https://github.com/laravel/framework/pull/19124))
+
+### Fixed
+- Fixed `Container::makeWith()` not using parameters when resolving interfaces ([#19178](https://github.com/laravel/framework/pull/19178))
+
+
 ## v5.4.23 (2017-05-11)
 
 ### Added

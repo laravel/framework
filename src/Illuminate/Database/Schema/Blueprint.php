@@ -842,12 +842,13 @@ class Blueprint
     /**
      * Add a "deleted at" timestamp for the table.
      *
-     * @param  int     $precision
+     * @param  string  $column
+     * @param  int  $precision
      * @return \Illuminate\Support\Fluent
      */
-    public function softDeletes($precision = 0)
+    public function softDeletes($column = 'deleted_at', $precision = 0)
     {
-        return $this->timestamp('deleted_at', $precision)->nullable();
+        return $this->timestamp($column, $precision)->nullable();
     }
 
     /**

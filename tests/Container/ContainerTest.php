@@ -337,6 +337,20 @@ class ContainerTest extends TestCase
         $this->assertTrue($_SERVER['__test.rebind']);
     }
 
+    public function testReboundListenersOnInstancesOnlyFiresIfWasAlreadyBound()
+    {
+        $_SERVER['__test.rebind'] = false;
+
+        $container = new Container;
+        $container->rebinding('foo', function () {
+            $_SERVER['__test.rebind'] = true;
+        });
+        $container->instance('foo', function () {
+        });
+
+        $this->assertFalse($_SERVER['__test.rebind']);
+    }
+
     /**
      * @expectedException \Illuminate\Contracts\Container\BindingResolutionException
      * @expectedExceptionMessage Unresolvable dependency resolving [Parameter #0 [ <required> $first ]] in class Illuminate\Tests\Container\ContainerMixedPrimitiveStub
