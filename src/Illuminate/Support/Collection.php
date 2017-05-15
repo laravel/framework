@@ -1129,7 +1129,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      *
      * @param  int  $size
      * @param  bool $preserve_keys
-     * 
      * @return static
      */
     public function chunk($size, $preserve_keys = true)
