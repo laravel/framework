@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing;
 
+use BadMethodCallException;
 use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
@@ -154,9 +155,15 @@ class ControllerDispatcher
      * @param  \Illuminate\Routing\Route  $route
      * @param  string  $method
      * @return mixed
+     *
+     * @throws \BadMethodCallException
      */
     protected function call($instance, $route, $method)
     {
+        if (! in_array($method, get_class_methods($instance))) {
+            throw new BadMethodCallException("Method [$method] does not exist.");
+        }
+
         $parameters = $this->resolveClassMethodDependencies(
             $route->parametersWithoutNulls(), $instance, $method
         );

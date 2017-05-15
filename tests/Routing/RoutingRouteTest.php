@@ -1152,6 +1152,28 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertFalse(isset($_SERVER['route.test.controller.except.middleware']));
     }
 
+    /**
+     * @expectedException BadMethodCallException
+     */
+    public function testProtectControllerInternalMethods()
+    {
+        unset(
+            $_SERVER['route.test.controller.before.filter'], $_SERVER['route.test.controller.after.filter'],
+            $_SERVER['route.test.controller.middleware'], $_SERVER['route.test.controller.except.middleware'],
+            $_SERVER['route.test.controller.middleware.class'],
+            $_SERVER['route.test.controller.middleware.parameters.one'], $_SERVER['route.test.controller.middleware.parameters.two']
+        );
+        $router = new Router(new Illuminate\Events\Dispatcher, $container = new Illuminate\Container\Container);
+
+        $container->singleton('illuminate.route.dispatcher', function ($container) use ($router) {
+            return new Illuminate\Routing\ControllerDispatcher($router, $container);
+        });
+
+        $router->get('foo/bar', 'RouteTestControllerStub@protectedMethod');
+
+        $router->dispatch(Request::create('foo/bar', 'GET'));
+    }
+
     public function testControllerInspection()
     {
         $router = $this->getRouter();
@@ -1178,6 +1200,11 @@ class RouteTestControllerStub extends Illuminate\Routing\Controller
     }
 
     public function index()
+    {
+        return 'Hello World';
+    }
+
+    protected function protectedMethod()
     {
         return 'Hello World';
     }
