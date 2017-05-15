@@ -474,6 +474,11 @@ class Builder
      */
     public function getModels($columns = ['*'])
     {
+        // Add model table name for alias fields
+        if ($columns == ['*']) {
+            $columns = [$this->model->getTable().'.*'];
+        }
+
         $results = $this->query->get($columns);
 
         $connection = $this->model->getConnectionName();
