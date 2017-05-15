@@ -2025,7 +2025,7 @@ class Builder
      */
     public function aggregate($function, $columns = ['*'])
     {
-        $results = $this->cloneWithout(['columns'])
+        $results = $this->cloneWithout(['columns', 'orders'])
                         ->cloneWithoutBindings(['select'])
                         ->setAggregate($function, $columns)
                         ->get($columns);
