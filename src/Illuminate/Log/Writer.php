@@ -50,6 +50,13 @@ class Writer implements LogContract, PsrLoggerInterface
     ];
 
     /**
+     * The permission mode for for new log files.
+     *
+     * @var int|null
+     */
+    protected $filePermission;
+
+    /**
      * Create a new log writer instance.
      *
      * @param  \Monolog\Logger  $monolog
@@ -211,7 +218,7 @@ class Writer implements LogContract, PsrLoggerInterface
      */
     public function useFiles($path, $level = 'debug')
     {
-        $this->monolog->pushHandler($handler = new StreamHandler($path, $this->parseLevel($level)));
+        $this->monolog->pushHandler($handler = new StreamHandler($path, $this->parseLevel($level), true, $this->filePermission));
 
         $handler->setFormatter($this->getDefaultFormatter());
     }
@@ -227,7 +234,7 @@ class Writer implements LogContract, PsrLoggerInterface
     public function useDailyFiles($path, $days = 0, $level = 'debug')
     {
         $this->monolog->pushHandler(
-            $handler = new RotatingFileHandler($path, $days, $this->parseLevel($level))
+            $handler = new RotatingFileHandler($path, $days, $this->parseLevel($level), true, $this->filePermission)
         );
 
         $handler->setFormatter($this->getDefaultFormatter());
@@ -339,7 +346,7 @@ class Writer implements LogContract, PsrLoggerInterface
     }
 
     /**
-     * Get a defaut Monolog formatter instance.
+     * Get a default Monolog formatter instance.
      *
      * @return \Monolog\Formatter\LineFormatter
      */
@@ -367,5 +374,26 @@ class Writer implements LogContract, PsrLoggerInterface
     public function setEventDispatcher(Dispatcher $dispatcher)
     {
         $this->dispatcher = $dispatcher;
+    }
+
+    /**
+     * Get the file permission for creating files
+     *
+     * @return int|null
+     */
+    public function getFilePermission()
+    {
+        return $this->filePermission;
+    }
+
+    /**
+     * Set the file permission for newly created files
+     *
+     * @param  int|null  $filePermission
+     * @return void
+     */
+    public function setFilePermission($filePermission)
+    {
+        $this->filePermission = $filePermission;
     }
 }
