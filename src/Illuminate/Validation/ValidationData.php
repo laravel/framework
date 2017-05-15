@@ -61,7 +61,7 @@ class ValidationData
         $data = [];
 
         foreach ($keys as $key) {
-            $data[$key] = array_get($masterData, $key);
+            $data[$key] = Arr::get($masterData, $key);
         }
 
         return $data;
