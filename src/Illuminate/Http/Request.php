@@ -201,11 +201,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function isRouteName($name)
     {
-        if ($this->route()->getName() == $name) {
-            return true;
-        }
-
-        return false;
+        return $this->route()->getName() === $name;
     }
 
     /**
