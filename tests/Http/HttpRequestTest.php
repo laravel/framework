@@ -168,8 +168,8 @@ class HttpRequestTest extends TestCase
             return $route;
         });
 
-        $this->assertTrue($request->isRouteName('foo.bar'));
-        $this->assertFalse($request->isRouteName('foo.foo'));
+        $this->assertTrue($request->routeIs('foo.bar'));
+        $this->assertFalse($request->routeIs('foo.foo'));
     }
 
     public function testAjaxMethod()
