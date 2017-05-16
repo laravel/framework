@@ -295,7 +295,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         return $this->evaluate($this->operatorForWhere($key, $operator, $value));
     }
-    
+
     /**
      * Determine if all items in the collection pass the given test.
      *
