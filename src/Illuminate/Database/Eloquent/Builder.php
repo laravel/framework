@@ -180,6 +180,26 @@ class Builder
     }
 
     /**
+     * Get the first record matching the attributes or create it with the given values.
+     *
+     * @param  array $attributes
+     * @param  array $values
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function firstOrCreateWithValues(array $attributes, array $values)
+    {
+        if (! is_null($instance = $this->where($attributes)->first())) {
+            return $instance;
+        }
+
+        $instance = $this->model->newInstance(array_merge($attributes, $values));
+
+        $instance->save();
+
+        return $instance;
+    }
+
+    /**
      * Create or update a record matching the attributes, and fill it with values.
      *
      * @param  array  $attributes

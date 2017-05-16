@@ -687,6 +687,24 @@ class BelongsToMany extends Relation
     }
 
     /**
+     * Get the first related record matching the attributes or create it with the given values.
+     *
+     * @param  array  $attributes
+     * @param  array  $values
+     * @param  array  $joining
+     * @param  bool   $touch
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function firstOrCreateWithValues(array $attributes, array $values, array $joining = [], $touch = true)
+    {
+        if (is_null($instance = $this->where($attributes)->first())) {
+            $instance = $this->create(array_merge($attributes, $values), $joining, $touch);
+        }
+
+        return $instance;
+    }
+
+    /**
      * Create or update a related record matching the attributes, and fill it with values.
      *
      * @param  array  $attributes
