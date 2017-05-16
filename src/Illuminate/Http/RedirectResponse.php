@@ -91,9 +91,7 @@ class RedirectResponse extends BaseRedirectResponse
         foreach ($input as $key => $value) {
             if (is_array($value)) {
                 $input[$key] = $this->removeFilesFromInput($value);
-            }
-
-            if ($value instanceof SymfonyUploadedFile) {
+            } elseif ($value instanceof SymfonyUploadedFile) {
                 unset($input[$key]);
             }
         }
