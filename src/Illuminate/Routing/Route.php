@@ -592,16 +592,6 @@ class Route
     }
 
     /**
-     * Checks whether the route's name is equal to a given one.
-     * @param  string  $name
-     * @return bool
-     */
-    public function isName($name)
-    {
-        return $this->getName() === $name;
-    }
-
-    /**
      * Add or change the route name.
      *
      * @param  string  $name
@@ -612,6 +602,17 @@ class Route
         $this->action['as'] = isset($this->action['as']) ? $this->action['as'].$name : $name;
 
         return $this;
+    }
+
+    /**
+     * Determine whether the route's name matches the given name.
+     *
+     * @param  string  $name
+     * @return bool
+     */
+    public function named($name)
+    {
+        return $this->getName() === $name;
     }
 
     /**

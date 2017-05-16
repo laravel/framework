@@ -200,7 +200,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function routeIs($name)
     {
-        return $this->route() && $this->route()->isName($name);
+        return $this->route() && $this->route()->named($name);
     }
 
     /**
