@@ -23,6 +23,12 @@ body {
 
 p,
 ul,
+ol {
+    margin: 1em 0;
+}
+
+p,
+ul,
 ol,
 blockquote {
     line-height: 1.4;
