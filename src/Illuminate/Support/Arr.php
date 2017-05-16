@@ -61,6 +61,23 @@ class Arr
     }
 
     /**
+     * Cross join the given arrays, returning all possible permutations.
+     *
+     * @param  array  ...$arrays
+     * @return array
+     */
+    public static function crossJoin(...$arrays)
+    {
+        return array_reduce($arrays, function ($results, $array) {
+            return static::collapse(array_map(function ($parent) use ($array) {
+                return array_map(function ($item) use ($parent) {
+                    return array_merge($parent, [$item]);
+                }, $array);
+            }, $results));
+        }, [[]]);
+    }
+
+    /**
      * Divide an array into two arrays. One with keys and the other with values.
      *
      * @param  array  $array
