@@ -48,15 +48,7 @@ trait Macroable
      */
     public static function __callStatic($method, $parameters)
     {
-        if (! static::hasMacro($method)) {
-            throw new BadMethodCallException("Method {$method} does not exist.");
-        }
-
-        if (static::$macros[$method] instanceof Closure) {
-            return call_user_func_array(Closure::bind(static::$macros[$method], null, static::class), $parameters);
-        }
-
-        return call_user_func_array(static::$macros[$method], $parameters);
+        return static::resolveMacroCall($method, $parameters, Closure::bind(static::$macros[$method], null, static::class));
     }
 
     /**
@@ -70,12 +62,27 @@ trait Macroable
      */
     public function __call($method, $parameters)
     {
+        return static::resolveMacroCall($method, $parameters, static::$macros[$method]->bindTo($this, static::class));
+    }
+
+    /**
+     * Dynamically handle calls to the class.
+     *
+     * @param  string  $method
+     * @param  array   $parameters
+     * @param  Closure $bind
+     * @return mixed
+     *
+     * @throws \BadMethodCallException
+     */
+    protected static function resolveMacroCall($method, $parameters, $bind)
+    {
         if (! static::hasMacro($method)) {
             throw new BadMethodCallException("Method {$method} does not exist.");
         }
 
         if (static::$macros[$method] instanceof Closure) {
-            return call_user_func_array(static::$macros[$method]->bindTo($this, static::class), $parameters);
+            return call_user_func_array($bind, $parameters);
         }
 
         return call_user_func_array(static::$macros[$method], $parameters);
