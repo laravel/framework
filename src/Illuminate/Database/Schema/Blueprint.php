@@ -285,11 +285,13 @@ class Blueprint
     /**
      * Indicate that the timestamp columns should be dropped.
      *
+	 * @param  string  $createdAt
+	 * @param  string  $updatedAt
      * @return void
      */
-    public function dropTimestamps()
+    public function dropTimestamps($createdAt = 'created_at', $updatedAt = 'updated_at')
     {
-        $this->dropColumn('created_at', 'updated_at');
+        $this->dropColumn(compact($createdAt, $updatedAt));
     }
 
     /**
@@ -305,11 +307,12 @@ class Blueprint
     /**
      * Indicate that the soft delete column should be dropped.
      *
+	 * @param  string  $column
      * @return void
      */
-    public function dropSoftDeletes()
+    public function dropSoftDeletes($column = 'deleted_at')
     {
-        $this->dropColumn('deleted_at');
+        $this->dropColumn($column);
     }
 
     /**
@@ -799,13 +802,15 @@ class Blueprint
     /**
      * Add nullable creation and update timestamps to the table.
      *
+	 * @param  string  $createdAt
+	 * @param  string  $updatedAt
      * @return void
      */
-    public function timestamps()
+    public function timestamps($createdAt = 'created_at', $updatedAt = 'updated_at')
     {
-        $this->timestamp('created_at')->nullable();
+        $this->timestamp($createdAt)->nullable();
 
-        $this->timestamp('updated_at')->nullable();
+        $this->timestamp($updatedAt)->nullable();
     }
 
     /**
@@ -823,13 +828,15 @@ class Blueprint
     /**
      * Add creation and update timestampTz columns to the table.
      *
+	 * @param  string  $createdAt
+	 * @param  string  $updatedAt
      * @return void
      */
-    public function timestampsTz()
+    public function timestampsTz($createdAt = 'created_at', $updatedAt = 'updated_at')
     {
-        $this->timestampTz('created_at')->nullable();
+        $this->timestampTz($createdAt)->nullable();
 
-        $this->timestampTz('updated_at')->nullable();
+        $this->timestampTz($updatedAt)->nullable();
     }
 
     /**
@@ -846,11 +853,12 @@ class Blueprint
     /**
      * Add a "deleted at" timestampTz for the table.
      *
+	 * @param  string  $column
      * @return \Illuminate\Support\Fluent
      */
-    public function softDeletesTz()
+    public function softDeletesTz($column = 'deleted_at')
     {
-        return $this->timestampTz('deleted_at')->nullable();
+        return $this->timestampTz($column)->nullable();
     }
 
     /**
