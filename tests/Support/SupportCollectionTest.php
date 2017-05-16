@@ -552,6 +552,25 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([1, 2, 'foo' => 'bar'], $result);
     }
 
+    public function testEachSpread()
+    {
+        $c = new Collection([[1, 'a'], [2, 'b']]);
+
+        $result = [];
+        $c->eachSpread(function ($number, $character) use (&$result) {
+            $result[] = [$number, $character];
+        });
+        $this->assertEquals($c->all(), $result);
+
+        $result = [];
+        $c->eachSpread(function ($number, $character) use (&$result) {
+            $result[] = [$number, $character];
+
+            return false;
+        });
+        $this->assertEquals([[1, 'a']], $result);
+    }
+
     public function testIntersectNull()
     {
         $c = new Collection(['id' => 1, 'first_word' => 'Hello']);
@@ -1035,6 +1054,16 @@ class SupportCollectionTest extends TestCase
             return $key.'-'.strrev($item);
         });
         $this->assertEquals(['first' => 'first-rolyat', 'last' => 'last-llewto'], $data->all());
+    }
+
+    public function testMapSpread()
+    {
+        $c = new Collection([[1, 'a'], [2, 'b']]);
+
+        $result = $c->mapSpread(function ($number, $character) use (&$result) {
+            return "{$number}-{$character}";
+        });
+        $this->assertEquals(['1-a', '2-b'], $result->all());
     }
 
     public function testFlatMap()
