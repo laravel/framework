@@ -157,7 +157,7 @@ class HttpRequestTest extends TestCase
         $this->assertTrue($request->is('/'));
     }
 
-    public function testIsRouteNameMethod()
+    public function testRouteIsMethod()
     {
         $request = Request::create('/foo/bar', 'GET');
 

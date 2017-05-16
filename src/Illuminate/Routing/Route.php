@@ -592,6 +592,16 @@ class Route
     }
 
     /**
+     * Checks whether the route's name is equal to a given one
+     * @param $name
+     * @return bool
+     */
+    public function isName($name)
+    {
+        return $this->getName() === $name;
+    }
+
+    /**
      * Add or change the route name.
      *
      * @param  string  $name
