@@ -10,6 +10,7 @@ use LogicException;
 use JsonSerializable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
@@ -266,14 +267,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Create a new Eloquent model instance.
      *
-     * @param  array  $attributes
+     * @param  array                        $attributes
+     * @param \Illuminate\Http\Request|null $request
      * @return void
      */
-    public function __construct(array $attributes = [])
+    public function __construct(array $attributes = [], Request $request = null)
     {
         $this->bootIfNotBooted();
 
         $this->syncOriginal();
+
+        $attributes = $this->merge($attributes, $request);
 
         $this->fill($attributes);
     }
@@ -398,6 +402,28 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
                 static::registerModelEvent($event, $className.'@'.$event, $priority);
             }
         }
+    }
+
+    /**
+     * Merge the given attributes with those from the request.
+     *
+     * @param array                         $attributes
+     * @param \Illuminate\Http\Request|null $request
+     * @return array
+     */
+    protected function merge(array $attributes = [], Request $request = null)
+    {
+        if (is_null($request)) {
+            return $attributes;
+        }
+
+        $fromRequest = $request->input(class_basename($this));
+
+        if (! is_array($fromRequest)) {
+            return $attributes;
+        }
+
+        return array_merge($attributes, $fromRequest);
     }
 
     /**
