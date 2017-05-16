@@ -55,7 +55,7 @@ trait RegistersUsers
      * @param  mixed  $user
      * @return mixed
      */
-    protected function registered(Request $request, $user)
+    protected function registered($request, $user)
     {
         //
     }
