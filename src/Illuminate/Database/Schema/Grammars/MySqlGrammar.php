@@ -337,6 +337,10 @@ class MySqlGrammar extends Grammar
      */
     protected function typeBigInteger(Fluent $column)
     {
+        if ($column->length) {
+            return "bigint({$column->length})";
+        }
+
         return 'bigint';
     }
 
@@ -348,6 +352,10 @@ class MySqlGrammar extends Grammar
      */
     protected function typeInteger(Fluent $column)
     {
+        if ($column->length) {
+            return "int({$column->length})";
+        }
+
         return 'int';
     }
 
@@ -359,6 +367,10 @@ class MySqlGrammar extends Grammar
      */
     protected function typeMediumInteger(Fluent $column)
     {
+        if ($column->length) {
+            return "mediumint({$column->length})";
+        }
+
         return 'mediumint';
     }
 
@@ -370,6 +382,10 @@ class MySqlGrammar extends Grammar
      */
     protected function typeTinyInteger(Fluent $column)
     {
+        if ($column->length) {
+            return "tinyint({$column->length})";
+        }
+
         return 'tinyint';
     }
 
@@ -381,6 +397,10 @@ class MySqlGrammar extends Grammar
      */
     protected function typeSmallInteger(Fluent $column)
     {
+        if ($column->length) {
+            return "smallint({$column->length})";
+        }
+
         return 'smallint';
     }
 
