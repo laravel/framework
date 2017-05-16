@@ -47,15 +47,16 @@ class CookieJar implements JarContract
      * @param  string  $domain
      * @param  bool    $secure
      * @param  bool    $httpOnly
+     * @param  string  $sameSite
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
-    public function make($name, $value, $minutes = 0, $path = null, $domain = null, $secure = false, $httpOnly = true)
+    public function make($name, $value, $minutes = 0, $path = null, $domain = null, $secure = false, $httpOnly = true, $sameSite = null)
     {
         list($path, $domain, $secure) = $this->getPathAndDomain($path, $domain, $secure);
 
         $time = ($minutes == 0) ? 0 : Carbon::now()->getTimestamp() + ($minutes * 60);
 
-        return new Cookie($name, $value, $time, $path, $domain, $secure, $httpOnly);
+        return new Cookie($name, $value, $time, $path, $domain, $secure, $httpOnly, $sameSite);
     }
 
     /**
@@ -67,11 +68,12 @@ class CookieJar implements JarContract
      * @param  string  $domain
      * @param  bool    $secure
      * @param  bool    $httpOnly
+     * @param  string  $sameSite
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
-    public function forever($name, $value, $path = null, $domain = null, $secure = false, $httpOnly = true)
+    public function forever($name, $value, $path = null, $domain = null, $secure = false, $httpOnly = true, $sameSite = null)
     {
-        return $this->make($name, $value, 2628000, $path, $domain, $secure, $httpOnly);
+        return $this->make($name, $value, 2628000, $path, $domain, $secure, $httpOnly, $sameSite);
     }
 
     /**
