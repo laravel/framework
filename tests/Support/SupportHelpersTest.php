@@ -290,11 +290,11 @@ class SupportHelpersTest extends TestCase
 
     public function testCamelCase()
     {
-        $this->assertEquals('fooBar', camel_case('FooBar'));
-        $this->assertEquals('fooBar', camel_case('foo_bar'));
-        $this->assertEquals('fooBar', camel_case('foo_bar')); // test cache
-        $this->assertEquals('fooBarBaz', camel_case('Foo-barBaz'));
-        $this->assertEquals('fooBarBaz', camel_case('foo-bar_baz'));
+        $this->assertEquals('fooBar', Str::camel('FooBar'));
+        $this->assertEquals('fooBar', Str::camel('foo_bar'));
+        $this->assertEquals('fooBar', Str::camel('foo_bar')); // test cache
+        $this->assertEquals('fooBarBaz', Str::camel('Foo-barBaz'));
+        $this->assertEquals('fooBarBaz', Str::camel('foo-bar_baz'));
     }
 
     public function testStudlyCase()

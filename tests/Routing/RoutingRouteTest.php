@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Routing;
 
 use stdClass;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use UnexpectedValueException;
@@ -408,37 +409,37 @@ class RoutingRouteTest extends TestCase
 
         // Has one argument but receives two
         unset($_SERVER['__test.controller_callAction_parameters']);
-        $router->get(($str = str_random()).'/{one}/{two}', 'Illuminate\Tests\Routing\RouteTestAnotherControllerWithParameterStub@oneArgument');
+        $router->get(($str = Str::random()).'/{one}/{two}', 'Illuminate\Tests\Routing\RouteTestAnotherControllerWithParameterStub@oneArgument');
         $router->dispatch(Request::create($str.'/one/two', 'GET'));
         $this->assertEquals(['one' => 'one', 'two' => 'two'], $_SERVER['__test.controller_callAction_parameters']);
 
         // Has two arguments and receives two
         unset($_SERVER['__test.controller_callAction_parameters']);
-        $router->get(($str = str_random()).'/{one}/{two}', 'Illuminate\Tests\Routing\RouteTestAnotherControllerWithParameterStub@twoArguments');
+        $router->get(($str = Str::random()).'/{one}/{two}', 'Illuminate\Tests\Routing\RouteTestAnotherControllerWithParameterStub@twoArguments');
         $router->dispatch(Request::create($str.'/one/two', 'GET'));
         $this->assertEquals(['one' => 'one', 'two' => 'two'], $_SERVER['__test.controller_callAction_parameters']);
 
         // Has two arguments but with different names from the ones passed from the route
         unset($_SERVER['__test.controller_callAction_parameters']);
-        $router->get(($str = str_random()).'/{one}/{two}', 'Illuminate\Tests\Routing\RouteTestAnotherControllerWithParameterStub@differentArgumentNames');
+        $router->get(($str = Str::random()).'/{one}/{two}', 'Illuminate\Tests\Routing\RouteTestAnotherControllerWithParameterStub@differentArgumentNames');
         $router->dispatch(Request::create($str.'/one/two', 'GET'));
         $this->assertEquals(['one' => 'one', 'two' => 'two'], $_SERVER['__test.controller_callAction_parameters']);
 
         // Has two arguments with same name but argument order is reversed
         unset($_SERVER['__test.controller_callAction_parameters']);
-        $router->get(($str = str_random()).'/{one}/{two}', 'Illuminate\Tests\Routing\RouteTestAnotherControllerWithParameterStub@reversedArguments');
+        $router->get(($str = Str::random()).'/{one}/{two}', 'Illuminate\Tests\Routing\RouteTestAnotherControllerWithParameterStub@reversedArguments');
         $router->dispatch(Request::create($str.'/one/two', 'GET'));
         $this->assertEquals(['one' => 'one', 'two' => 'two'], $_SERVER['__test.controller_callAction_parameters']);
 
         // No route parameters while method has parameters
         unset($_SERVER['__test.controller_callAction_parameters']);
-        $router->get(($str = str_random()).'', 'Illuminate\Tests\Routing\RouteTestAnotherControllerWithParameterStub@oneArgument');
+        $router->get(($str = Str::random()).'', 'Illuminate\Tests\Routing\RouteTestAnotherControllerWithParameterStub@oneArgument');
         $router->dispatch(Request::create($str, 'GET'));
         $this->assertEquals([], $_SERVER['__test.controller_callAction_parameters']);
 
         // With model bindings
         unset($_SERVER['__test.controller_callAction_parameters']);
-        $router->get(($str = str_random()).'/{user}/{defaultNull?}/{team?}', [
+        $router->get(($str = Str::random()).'/{user}/{defaultNull?}/{team?}', [
             'middleware' => SubstituteBindings::class,
             'uses' => 'Illuminate\Tests\Routing\RouteTestAnotherControllerWithParameterStub@withModels',
         ]);
