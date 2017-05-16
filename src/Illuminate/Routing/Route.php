@@ -593,7 +593,7 @@ class Route
 
     /**
      * Checks whether the route's name is equal to a given one.
-     * @param $name
+     * @param  string  $name
      * @return bool
      */
     public function isName($name)
