@@ -16,7 +16,7 @@ trait AuthenticatesUsers
      */
     public function showLoginForm()
     {
-        return view('auth.login');
+        return isset($this->view) ? view($this->view) : view('auth.login');
     }
 
     /**
