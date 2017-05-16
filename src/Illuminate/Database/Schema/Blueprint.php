@@ -285,8 +285,8 @@ class Blueprint
     /**
      * Indicate that the timestamp columns should be dropped.
      *
-	 * @param  string  $createdAt
-	 * @param  string  $updatedAt
+     * @param  string  $createdAt
+     * @param  string  $updatedAt
      * @return void
      */
     public function dropTimestamps($createdAt = 'created_at', $updatedAt = 'updated_at')
@@ -307,7 +307,7 @@ class Blueprint
     /**
      * Indicate that the soft delete column should be dropped.
      *
-	 * @param  string  $column
+     * @param  string  $column
      * @return void
      */
     public function dropSoftDeletes($column = 'deleted_at')
@@ -802,8 +802,8 @@ class Blueprint
     /**
      * Add nullable creation and update timestamps to the table.
      *
-	 * @param  string  $createdAt
-	 * @param  string  $updatedAt
+     * @param  string  $createdAt
+     * @param  string  $updatedAt
      * @return void
      */
     public function timestamps($createdAt = 'created_at', $updatedAt = 'updated_at')
@@ -828,8 +828,8 @@ class Blueprint
     /**
      * Add creation and update timestampTz columns to the table.
      *
-	 * @param  string  $createdAt
-	 * @param  string  $updatedAt
+     * @param  string  $createdAt
+     * @param  string  $updatedAt
      * @return void
      */
     public function timestampsTz($createdAt = 'created_at', $updatedAt = 'updated_at')
@@ -853,7 +853,7 @@ class Blueprint
     /**
      * Add a "deleted at" timestampTz for the table.
      *
-	 * @param  string  $column
+     * @param  string  $column
      * @return \Illuminate\Support\Fluent
      */
     public function softDeletesTz($column = 'deleted_at')
