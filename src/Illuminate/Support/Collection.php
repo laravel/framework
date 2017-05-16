@@ -266,6 +266,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Execute a callback over each nested chunk of items.
+     *
+     * @param  callable  $callback
+     * @return static
+     */
+    public function eachSpread(callable $callback)
+    {
+        return $this->each(function ($chunk) use ($callback) {
+            return $callback(...$chunk);
+        });
+    }
+
+    /**
      * Determine if all items in the collection pass the given test.
      *
      * @param  string|callable  $key
@@ -702,6 +715,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $items = array_map($callback, $this->items, $keys);
 
         return new static(array_combine($keys, $items));
+    }
+
+    /**
+     * Run a map over each nested chunk of items.
+     *
+     * @param  callable  $callback
+     * @return static
+     */
+    public function mapSpread(callable $callback)
+    {
+        return $this->map(function ($chunk) use ($callback) {
+            return $callback(...$chunk);
+        });
     }
 
     /**
