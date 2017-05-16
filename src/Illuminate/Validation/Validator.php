@@ -1389,7 +1389,7 @@ class Validator implements ValidatorContract
 
         $date = date_parse($value);
 
-        return checkdate($date['month'], $date['day'], $date['year']);
+        return $date['error_count'] == 0;
     }
 
     /**
