@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Foundation;
+
 use Illuminate\Support\Str;
 use Illuminate\View\Expression;
 use Illuminate\Container\Container;
