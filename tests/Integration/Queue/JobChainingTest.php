@@ -16,6 +16,7 @@ class JobChainingTest extends TestCase
     {
         JobChainingTestFirstJob::$ran = false;
         JobChainingTestSecondJob::$ran = false;
+        JobChainingTestThirdJob::$ran = false;
     }
 
     public function test_jobs_can_be_chained_on_success()
@@ -26,6 +27,18 @@ class JobChainingTest extends TestCase
 
         $this->assertTrue(JobChainingTestFirstJob::$ran);
         $this->assertTrue(JobChainingTestSecondJob::$ran);
+    }
+
+    public function test_jobs_can_be_chained_on_success_with_several_jobs()
+    {
+        JobChainingTestFirstJob::dispatch()->chain([
+            new JobChainingTestSecondJob,
+            new JobChainingTestThirdJob,
+        ]);
+
+        $this->assertTrue(JobChainingTestFirstJob::$ran);
+        $this->assertTrue(JobChainingTestSecondJob::$ran);
+        $this->assertTrue(JobChainingTestThirdJob::$ran);
     }
 
     public function test_jobs_can_be_chained_on_success_using_helper()
@@ -71,6 +84,18 @@ class JobChainingTestFirstJob implements ShouldQueue
 }
 
 class JobChainingTestSecondJob implements ShouldQueue
+{
+    use Dispatchable, Queueable;
+
+    public static $ran = false;
+
+    public function handle()
+    {
+        static::$ran = true;
+    }
+}
+
+class JobChainingTestThirdJob implements ShouldQueue
 {
     use Dispatchable, Queueable;
 
