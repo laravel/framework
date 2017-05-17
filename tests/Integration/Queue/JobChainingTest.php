@@ -69,6 +69,17 @@ class JobChainingTest extends TestCase
 
         $this->assertFalse(JobChainingTestSecondJob::$ran);
     }
+
+    public function test_third_job_is_not_fired_if_second_fails()
+    {
+        Queue::connection('sync')->push((new JobChainingTestFirstJob)->chain([
+            new JobChainingTestFailingJob,
+            new JobChainingTestThirdJob,
+        ]));
+
+        $this->assertTrue(JobChainingTestFirstJob::$ran);
+        $this->assertFalse(JobChainingTestThirdJob::$ran);
+    }
 }
 
 class JobChainingTestFirstJob implements ShouldQueue
