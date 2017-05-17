@@ -32,7 +32,7 @@ class ServeCommand extends Command
      */
     public function fire()
     {
-        chdir($this->laravel->publicPath());
+        chdir($this->laravel->make('path.public'));
 
         $this->line("<info>Laravel development server started:</info> <http://{$this->host()}:{$this->port()}>");
 
