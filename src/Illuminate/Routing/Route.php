@@ -407,7 +407,7 @@ class Route
      */
     protected function compileParameterNames()
     {
-        preg_match_all('/\{(.*?)\}/', $this->domain().$this->uri, $matches);
+        preg_match_all('/\{(.*?)\}/', $this->getDomain().$this->uri, $matches);
 
         return array_map(function ($m) {
             return trim($m, '?');
@@ -527,10 +527,23 @@ class Route
      *
      * @return string|null
      */
-    public function domain()
+    public function getDomain()
     {
         return isset($this->action['domain'])
                 ? str_replace(['http://', 'https://'], '', $this->action['domain']) : null;
+    }
+
+    /**
+     * Add a domain to the route URI.
+     *
+     * @param  string  $domain
+     * @return $this
+     */
+    public function domain($domain)
+    {
+        $this->action['domain'] = $domain;
+
+        return $this;
     }
 
     /**

@@ -155,7 +155,7 @@ class RouteRegistrarTest extends TestCase
             $router->get('users', 'UsersController@index');
         });
 
-        $this->assertEquals('{account}.myapp.com', $this->getRoute()->domain());
+        $this->assertEquals('{account}.myapp.com', $this->getRoute()->getDomain());
     }
 
     public function testCanRegisterGroupWithDomainAndNamePrefix()
@@ -164,7 +164,7 @@ class RouteRegistrarTest extends TestCase
             $router->get('users', 'UsersController@index')->name('users');
         });
 
-        $this->assertEquals('{account}.myapp.com', $this->getRoute()->domain());
+        $this->assertEquals('{account}.myapp.com', $this->getRoute()->getDomain());
         $this->assertEquals('api.users', $this->getRoute()->getName());
     }
 

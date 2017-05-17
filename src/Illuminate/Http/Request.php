@@ -456,7 +456,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         }
 
         return sha1(implode('|', array_merge(
-            $route->methods(), [$route->domain(), $route->uri(), $this->ip()]
+            $route->methods(), [$route->getDomain(), $route->uri(), $this->ip()]
         )));
     }
 
