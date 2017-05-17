@@ -391,6 +391,10 @@ trait CrawlerTrait
             $cookies, $files, array_replace($this->serverVariables, $server), $content
         );
 
+        if ($this->app['session']->isStarted()) {
+            $request->setSession($this->app['session.store']);
+        }
+
         $response = $kernel->handle($request);
 
         $kernel->terminate($request, $response);
