@@ -506,6 +506,25 @@ class Arr
     }
 
     /**
+     * Retrieve values that don't have a key & keys that have a truthy value.
+     *
+     * @param  array  $array
+     * @return array
+     */
+    public static function toggledValues($array)
+    {
+        $values = array_map(function ($value, $key) {
+            if (is_numeric($key)) {
+                return $value;
+            }
+
+            return $value ? $key : null;
+        }, $array, array_keys($array));
+
+        return array_unique(array_filter($values));
+    }
+
+    /**
      * Filter the array using the given callback.
      *
      * @param  array  $array

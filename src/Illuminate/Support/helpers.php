@@ -289,6 +289,19 @@ if (! function_exists('array_sort_recursive')) {
     }
 }
 
+if (! function_exists('array_toggled_values')) {
+    /**
+     * Retrieve values that don't have a key & keys that have a truthy value.
+     *
+     * @param  array  $array
+     * @return array
+     */
+    function array_toggled_values($array)
+    {
+        return Arr::toggledValues($array);
+    }
+}
+
 if (! function_exists('array_where')) {
     /**
      * Filter the array using the given callback.
