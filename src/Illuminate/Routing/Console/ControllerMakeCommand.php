@@ -37,12 +37,32 @@ class ControllerMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        if ($this->option('parent')) {
+        if ($this->option('api')) {
+            return $this->getApiStub();
+        } elseif ($this->option('parent')) {
             return __DIR__.'/stubs/controller.nested.stub';
         } elseif ($this->option('model')) {
             return __DIR__.'/stubs/controller.model.stub';
         } elseif ($this->option('resource')) {
             return __DIR__.'/stubs/controller.stub';
+        }
+
+        return __DIR__.'/stubs/controller.plain.stub';
+    }
+
+    /**
+     * Get the API specific stub file for the generator.
+     *
+     * @return string
+     */
+    protected function getApiStub()
+    {
+        if ($this->option('parent')) {
+            return __DIR__.'/stubs/controller.api.nested.stub';
+        } elseif ($this->option('model')) {
+            return __DIR__.'/stubs/controller.api.model.stub';
+        } elseif ($this->option('resource')) {
+            return __DIR__.'/stubs/controller.api.stub';
         }
 
         return __DIR__.'/stubs/controller.plain.stub';
@@ -167,6 +187,8 @@ class ControllerMakeCommand extends GeneratorCommand
             ['resource', 'r', InputOption::VALUE_NONE, 'Generate a resource controller class.'],
 
             ['parent', 'p', InputOption::VALUE_OPTIONAL, 'Generate a nested resource controller class.'],
+
+            ['api', 'a', InputOption::VALUE_NONE, 'Generate a api resource controller class.'],
         ];
     }
 }
