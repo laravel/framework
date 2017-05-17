@@ -1159,6 +1159,13 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('hello', $router->dispatch(Request::create('home/foo', 'GET'))->getContent());
     }
 
+    public function testRouterActionReferencedAsArray()
+    {
+        $router = $this->getRouter();
+        $router->get('home/foo', [RouteTestInspectedControllerStub::class => 'getFoo']);
+        $this->assertEquals('hello', $router->dispatch(Request::create('home/foo', 'GET'))->getContent());
+    }
+
     protected function getRouter()
     {
         return new Router(new Illuminate\Events\Dispatcher);
