@@ -499,6 +499,15 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('hello', $router->dispatch(Request::create('http://api.baz.boom/foo/bar', 'GET'))->getContent());
     }
 
+    public function testRouteDomainRegistration()
+    {
+        $router = $this->getRouter();
+        $route = $router->get('/foo/bar')->domain('api.foo.bar')->uses(function () {
+            return 'hello';
+        });
+        $this->assertEquals('hello', $router->dispatch(Request::create('http://api.foo.bar/foo/bar', 'GET'))->getContent());
+    }
+
     public function testMatchesMethodAgainstRequests()
     {
         /*
