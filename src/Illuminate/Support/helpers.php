@@ -893,13 +893,13 @@ if (! function_exists('throw_if')) {
      *
      * @param  bool  $boolean
      * @param  \Throwable|string  $exception
-     * @param  string  $message
+     * @param  array  ...$arguments
      * @return void
      */
-    function throw_if($boolean, $exception, $message = '')
+    function throw_if($boolean, $exception, ...$arguments)
     {
         if ($boolean) {
-            throw (is_string($exception) ? new $exception($message) : $exception);
+            throw (is_string($exception) ? new $exception(...$arguments) : $exception);
         }
     }
 }
@@ -910,13 +910,13 @@ if (! function_exists('throw_unless')) {
      *
      * @param  bool  $boolean
      * @param  \Throwable|string  $exception
-     * @param  string  $message
+     * @param  array  ...$arguments
      * @return void
      */
-    function throw_unless($boolean, $exception, $message)
+    function throw_unless($boolean, $exception, ...$arguments)
     {
         if (! $boolean) {
-            throw (is_string($exception) ? new $exception($message) : $exception);
+            throw (is_string($exception) ? new $exception(...$arguments) : $exception);
         }
     }
 }
