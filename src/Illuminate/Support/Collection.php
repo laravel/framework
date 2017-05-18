@@ -633,6 +633,28 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Indicates if the given items and the collection have no elements in common.
+     *
+     * @param  mixed  $items
+     * @return bool
+     */
+    public function disjoint($items)
+    {
+        return $this->intersect($items)->isEmpty();
+    }
+
+    /**
+     * Indicates if the given items and the collection have elements in common.
+     *
+     * @param  mixed  $items
+     * @return bool
+     */
+    public function joint($items)
+    {
+        return $this->intersect($items)->isNotEmpty();
+    }
+
+    /**
      * Determine if the collection is empty or not.
      *
      * @return bool
