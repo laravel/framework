@@ -523,6 +523,23 @@ class Route
     }
 
     /**
+     * Get or set the domain for the route.
+     *
+     * @param  string|null  $domain
+     * @return $this
+     */
+    public function domain($domain = null)
+    {
+        if (is_null($domain)) {
+            return $this->getDomain();
+        }
+
+        $this->action['domain'] = $domain;
+
+        return $this;
+    }
+
+    /**
      * Get the domain defined for the route.
      *
      * @return string|null
@@ -531,19 +548,6 @@ class Route
     {
         return isset($this->action['domain'])
                 ? str_replace(['http://', 'https://'], '', $this->action['domain']) : null;
-    }
-
-    /**
-     * Add a domain to the route URI.
-     *
-     * @param  string  $domain
-     * @return $this
-     */
-    public function domain($domain)
-    {
-        $this->action['domain'] = $domain;
-
-        return $this;
     }
 
     /**
