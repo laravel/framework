@@ -227,6 +227,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Cross join with the given lists, returning all possible permutations.
+     *
+     * @param  mixed  ...$lists
+     * @return static
+     */
+    public function crossJoin(...$lists)
+    {
+        return new static(Arr::crossJoin(
+            $this->items, ...array_map([$this, 'getArrayableItems'], $lists)
+        ));
+    }
+
+    /**
      * Get the items in the collection that are not present in the given items.
      *
      * @param  mixed  $items
@@ -263,6 +276,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         return $this;
+    }
+
+    /**
+     * Execute a callback over each nested chunk of items.
+     *
+     * @param  callable  $callback
+     * @return static
+     */
+    public function eachSpread(callable $callback)
+    {
+        return $this->each(function ($chunk) use ($callback) {
+            return $callback(...$chunk);
+        });
     }
 
     /**
@@ -710,6 +736,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $items = array_map($callback, $this->items, $keys);
 
         return new static(array_combine($keys, $items));
+    }
+
+    /**
+     * Run a map over each nested chunk of items.
+     *
+     * @param  callable  $callback
+     * @return static
+     */
+    public function mapSpread(callable $callback)
+    {
+        return $this->map(function ($chunk) use ($callback) {
+            return $callback(...$chunk);
+        });
     }
 
     /**

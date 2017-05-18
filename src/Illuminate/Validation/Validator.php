@@ -172,6 +172,20 @@ class Validator implements ValidatorContract
     ];
 
     /**
+     * The size related validation rules.
+     *
+     * @var array
+     */
+    protected $sizeRules = ['Size', 'Between', 'Min', 'Max'];
+
+    /**
+     * The numeric related validation rules.
+     *
+     * @var array
+     */
+    protected $numericRules = ['Numeric', 'Integer'];
+
+    /**
      * Create a new Validator instance.
      *
      * @param  \Illuminate\Contracts\Translation\Translator  $translator

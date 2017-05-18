@@ -99,6 +99,17 @@ class Filesystem
     }
 
     /**
+     * Get the MD5 hash of the file at the given path.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    public function hash($path)
+    {
+        return md5_file($path);
+    }
+
+    /**
      * Write the contents of a file.
      *
      * @param  string  $path
