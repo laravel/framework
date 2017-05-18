@@ -598,7 +598,7 @@ class ContainerTest extends TestCase
     {
         $container = new Container;
 
-        $container->alias('Illuminate\Tests\Container\IContainerContractStub','stub');
+        $container->alias('Illuminate\Tests\Container\IContainerContractStub', 'stub');
         $container->bind('stub', ContainerImplementationStub::class);
 
         $container->when('Illuminate\Tests\Container\ContainerTestContextInjectOne')->needs('stub')->give('Illuminate\Tests\Container\ContainerImplementationStubTwo');
