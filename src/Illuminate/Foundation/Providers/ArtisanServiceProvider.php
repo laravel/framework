@@ -1,7 +1,7 @@
 <?php
-
 namespace Illuminate\Foundation\Providers;
 
+use Illuminate\Foundation\Console\ViewMakeCommand;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Queue\Console\TableCommand;
 use Illuminate\Auth\Console\MakeAuthCommand;
@@ -147,6 +147,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'Serve' => 'command.serve',
         'TestMake' => 'command.test.make',
         'VendorPublish' => 'command.vendor.publish',
+        'ViewMake' => 'command.view.make',
     ];
 
     /**
@@ -896,6 +897,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.notification.table', function ($app) {
             return new NotificationTableCommand($app['files'], $app['composer']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerViewMakeCommand()
+    {
+        $this->app->singleton('command.view.make', function ($app) {
+            return new ViewMakeCommand($app['files']);
         });
     }
 
