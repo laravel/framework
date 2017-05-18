@@ -68,7 +68,10 @@ class ConfigureLogging
      */
     protected function configureSingleHandler(Application $app, Writer $log)
     {
-        $log->useFiles($app->storagePath().'/logs/laravel.log');
+        $log->useFiles(
+            $app->storagePath().'/logs/laravel.log',
+            $app->make('config')->get('app.log_level', 'debug')
+        );
     }
 
     /**
@@ -82,7 +85,8 @@ class ConfigureLogging
     {
         $log->useDailyFiles(
             $app->storagePath().'/logs/laravel.log',
-            $app->make('config')->get('app.log_max_files', 5)
+            $app->make('config')->get('app.log_max_files', 5),
+            $app->make('config')->get('app.log_level', 'debug')
         );
     }
 
@@ -95,7 +99,10 @@ class ConfigureLogging
      */
     protected function configureSyslogHandler(Application $app, Writer $log)
     {
-        $log->useSyslog('laravel');
+        $log->useSyslog(
+            'laravel',
+            $app->make('config')->get('app.log_level', 'debug')
+        );
     }
 
     /**
@@ -107,6 +114,6 @@ class ConfigureLogging
      */
     protected function configureErrorlogHandler(Application $app, Writer $log)
     {
-        $log->useErrorLog();
+        $log->useErrorLog($app->make('config')->get('app.log_level', 'debug'));
     }
 }
