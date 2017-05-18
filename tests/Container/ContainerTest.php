@@ -590,7 +590,11 @@ class ContainerTest extends TestCase
         );
     }
 
-    public function testContextualBindingNotWorksOnBoundAliase()
+    /**
+     * @expectedException \Illuminate\Contracts\Container\BindingResolutionException
+     * @expectedExceptionMessage Target [Illuminate\Tests\Container\IContainerContractStub] is not instantiable while building [Illuminate\Tests\Container\ContainerTestContextInjectOne].
+     */
+    public function testContextualBindingNotWorksOnBoundAlias()
     {
         $container = new Container;
 
@@ -599,14 +603,7 @@ class ContainerTest extends TestCase
 
         $container->when('Illuminate\Tests\Container\ContainerTestContextInjectOne')->needs('stub')->give('Illuminate\Tests\Container\ContainerImplementationStubTwo');
 
-        try {
-            $container->make('Illuminate\Tests\Container\ContainerTestContextInjectOne');
-
-            throw new \Exception('Contextual binding works on the bound aliase');
-        }catch (\Exception $e){
-            $this->assertSame('Target [Illuminate\Tests\Container\IContainerContractStub] is not instantiable while building [Illuminate\Tests\Container\ContainerTestContextInjectOne].',
-                $e->getMessage());
-        }
+        $container->make('Illuminate\Tests\Container\ContainerTestContextInjectOne');
     }
 
     public function testContextualBindingDoesntOverrideNonContextualResolution()
