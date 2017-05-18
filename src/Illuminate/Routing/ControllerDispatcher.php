@@ -98,8 +98,9 @@ class ControllerDispatcher
     {
         $shouldSkipMiddleware = $this->container->bound('middleware.disable') &&
                                 $this->container->make('middleware.disable') === true;
+        $skipMiddleware = $this->container->bound('middleware.skip') ? $this->container->make('middleware.skip') : [];
 
-        $middleware = $shouldSkipMiddleware ? [] : $this->getMiddleware($instance, $method);
+        $middleware = $shouldSkipMiddleware ? [] : array_diff($this->getMiddleware($instance, $method), $skipMiddleware);
 
         // Here we will make a stack onion instance to execute this request in, which gives
         // us the ability to define middlewares on controllers. We will return the given

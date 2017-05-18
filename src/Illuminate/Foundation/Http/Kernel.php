@@ -118,7 +118,7 @@ class Kernel implements KernelContract
 
         return (new Pipeline($this->app))
                     ->send($request)
-                    ->through($this->app->shouldSkipMiddleware() ? [] : $this->middleware)
+                    ->through($this->app->shouldSkipMiddleware() ? [] : array_diff($this->middleware, $this->app->skipMiddleware()))
                     ->then($this->dispatchToRouter());
     }
 
@@ -131,9 +131,12 @@ class Kernel implements KernelContract
      */
     public function terminate($request, $response)
     {
-        $middlewares = $this->app->shouldSkipMiddleware() ? [] : array_merge(
-            $this->gatherRouteMiddlewares($request),
-            $this->middleware
+        $middlewares = $this->app->shouldSkipMiddleware() ? [] : array_diff(
+            array_merge(
+                $this->gatherRouteMiddlewares($request),
+                $this->middleware
+            ),
+            $this->app->skipMiddleware()
         );
 
         foreach ($middlewares as $middleware) {
