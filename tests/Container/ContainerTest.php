@@ -236,6 +236,29 @@ class ContainerTest extends TestCase
         $this->assertEquals('foobar', $container->make('foo'));
     }
 
+    public function testExtendReBindingCallback()
+    {
+        $_SERVER['_test_rebind'] = false;
+
+        $container = new Container;
+        $container->rebinding('foo',function (){
+            $_SERVER['_test_rebind'] = true;
+        });
+        $container->bind('foo',function (){
+            $obj = new StdClass;
+
+            return $obj;
+        });
+
+        $container->make('foo');
+
+        $container->extend('foo', function ($obj, $container) {
+            return $obj;
+        });
+
+        $this->assertTrue($_SERVER['_test_rebind']);
+    }
+
     public function testResolutionOfDefaultParameters()
     {
         $container = new Container;
