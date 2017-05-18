@@ -169,6 +169,7 @@ class HttpRequestTest extends TestCase
         });
 
         $this->assertTrue($request->routeIs('foo.bar'));
+        $this->assertTrue($request->routeIs('foo*', '*bar'));
         $this->assertFalse($request->routeIs('foo.foo'));
     }
 
