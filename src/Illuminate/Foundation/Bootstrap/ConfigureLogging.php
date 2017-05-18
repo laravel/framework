@@ -54,9 +54,9 @@ class ConfigureLogging
      */
     protected function configureHandlers(Application $app, Writer $log)
     {
-        $method = 'configure'.ucfirst($app['config']['app.log']).'Handler';
-
-        $this->{$method}($app, $log);
+        $method = 'configure'.ucfirst($app['config']->get('app.log')).'Handler';
+        $level = $app['config']->get('app.level', 'debug');
+        $this->{$method}($app, $log, $level);
     }
 
     /**
@@ -64,11 +64,12 @@ class ConfigureLogging
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @param  \Illuminate\Log\Writer  $log
+     * @param  string  $level minimum level to be logged
      * @return void
      */
-    protected function configureSingleHandler(Application $app, Writer $log)
+    protected function configureSingleHandler(Application $app, Writer $log, $level = 'debug')
     {
-        $log->useFiles($app->storagePath().'/logs/laravel.log');
+        $log->useFiles($app->storagePath().'/logs/laravel.log', $level);
     }
 
     /**
@@ -76,13 +77,15 @@ class ConfigureLogging
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @param  \Illuminate\Log\Writer  $log
+     * @param  string  $level minimum level to be logged
      * @return void
      */
-    protected function configureDailyHandler(Application $app, Writer $log)
+    protected function configureDailyHandler(Application $app, Writer $log, $level = 'debug')
     {
         $log->useDailyFiles(
             $app->storagePath().'/logs/laravel.log',
-            $app->make('config')->get('app.log_max_files', 5)
+            $app->make('config')->get('app.log_max_files', 5),
+            $level
         );
     }
 
@@ -91,11 +94,12 @@ class ConfigureLogging
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @param  \Illuminate\Log\Writer  $log
+     * @param  string  $level minimum level to be logged
      * @return void
      */
-    protected function configureSyslogHandler(Application $app, Writer $log)
+    protected function configureSyslogHandler(Application $app, Writer $log, $level = 'debug')
     {
-        $log->useSyslog('laravel');
+        $log->useSyslog('laravel', $level);
     }
 
     /**
@@ -103,10 +107,11 @@ class ConfigureLogging
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @param  \Illuminate\Log\Writer  $log
+     * @param  string  $level minimum level to be logged
      * @return void
      */
-    protected function configureErrorlogHandler(Application $app, Writer $log)
+    protected function configureErrorlogHandler(Application $app, Writer $log, $level = 'debug')
     {
-        $log->useErrorLog();
+        $log->useErrorLog($level);
     }
 }
