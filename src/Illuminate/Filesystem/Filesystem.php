@@ -99,6 +99,17 @@ class Filesystem
     }
 
     /**
+     * Get the hash of a file.
+     *
+     * @param  string  $file
+     * @return string
+     */
+    public function hash($file)
+    {
+        return md5_file($file);
+    }
+
+    /**
      * Write the contents of a file.
      *
      * @param  string  $path
