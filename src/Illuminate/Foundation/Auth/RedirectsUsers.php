@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Auth;
 
+
 trait RedirectsUsers
 {
     /**
@@ -17,4 +18,18 @@ trait RedirectsUsers
 
         return property_exists($this, 'redirectTo') ? $this->redirectTo : '/home';
     }
+	
+	/**
+     * Get the post logout redirect path.
+     *
+     * @return string
+     */
+	public function redirectPathLogout()
+	{
+		if (method_exists($this, 'redirectAfterLogout')) {
+			return $this->redirectAfterLogout();
+		}
+		
+		return property_exists($this, 'redirectAfterLogout') ? $this->redirectAfterLogout : '/';
+	}
 }
