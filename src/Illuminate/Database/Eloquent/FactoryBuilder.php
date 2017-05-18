@@ -143,7 +143,7 @@ class FactoryBuilder
     protected function store($results)
     {
         $results->each(function ($model) {
-            $model->setConnection($model->query()->getConnection()->getName());
+            $model->setConnection($model->newQueryWithoutScopes()->getConnection()->getName());
 
             $model->save();
         });
