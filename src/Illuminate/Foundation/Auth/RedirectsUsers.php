@@ -17,4 +17,14 @@ trait RedirectsUsers
 
         return property_exists($this, 'redirectTo') ? $this->redirectTo : '/home';
     }
+
+    /**
+     * Get the logout redirect path.
+     *
+     * @return string
+     */
+    public function logoutRedirectPath()
+    {
+        return property_exists($this, 'logoutRedirectTo') ? $this->logoutRedirectTo : '/';
+    }
 }
