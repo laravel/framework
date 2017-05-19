@@ -21,7 +21,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->string('email');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('create table "users" ("id" serial primary key not null, "email" varchar(255) not null)', $statements[0]);
 
         $blueprint = new Blueprint('users');
@@ -29,7 +29,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->string('email');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "id" serial primary key not null, add column "email" varchar(255) not null', $statements[0]);
     }
 
@@ -39,7 +39,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->drop();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('drop table "users"', $statements[0]);
     }
 
@@ -49,7 +49,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->dropIfExists();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('drop table if exists "users"', $statements[0]);
     }
 
@@ -59,21 +59,21 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->dropColumn('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" drop column "foo"', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->dropColumn(['foo', 'bar']);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" drop column "foo", drop column "bar"', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->dropColumn('foo', 'bar');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" drop column "foo", drop column "bar"', $statements[0]);
     }
 
@@ -83,7 +83,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->dropPrimary();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" drop constraint "users_pkey"', $statements[0]);
     }
 
@@ -93,7 +93,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->dropUnique('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" drop constraint "foo"', $statements[0]);
     }
 
@@ -103,7 +103,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->dropIndex('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('drop index "foo"', $statements[0]);
     }
 
@@ -113,7 +113,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->dropForeign('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" drop constraint "foo"', $statements[0]);
     }
 
@@ -123,7 +123,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->dropTimestamps();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" drop column "created_at", drop column "updated_at"', $statements[0]);
     }
 
@@ -133,7 +133,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->dropTimestampsTz();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" drop column "created_at", drop column "updated_at"', $statements[0]);
     }
 
@@ -143,7 +143,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->rename('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" rename to "foo"', $statements[0]);
     }
 
@@ -153,7 +153,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->primary('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add primary key ("foo")', $statements[0]);
     }
 
@@ -163,7 +163,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->unique('foo', 'bar');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add constraint "bar" unique ("foo")', $statements[0]);
     }
 
@@ -173,7 +173,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->index(['foo', 'bar'], 'baz');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('create index "baz" on "users" ("foo", "bar")', $statements[0]);
     }
 
@@ -183,7 +183,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->index(['foo', 'bar'], 'baz', 'hash');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('create index "baz" on "users" using hash ("foo", "bar")', $statements[0]);
     }
 
@@ -193,7 +193,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->increments('id');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "id" serial primary key not null', $statements[0]);
     }
 
@@ -203,7 +203,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->smallIncrements('id');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "id" smallserial primary key not null', $statements[0]);
     }
 
@@ -213,7 +213,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->mediumIncrements('id');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "id" serial primary key not null', $statements[0]);
     }
 
@@ -223,7 +223,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->bigIncrements('id');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "id" bigserial primary key not null', $statements[0]);
     }
 
@@ -233,21 +233,21 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->string('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "foo" varchar(255) not null', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->string('foo', 100);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "foo" varchar(100) not null', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->string('foo', 100)->nullable()->default('bar');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "foo" varchar(100) null default \'bar\'', $statements[0]);
     }
 
@@ -257,7 +257,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->text('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "foo" text not null', $statements[0]);
     }
 
@@ -267,14 +267,14 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->bigInteger('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "foo" bigint not null', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->bigInteger('foo', true);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "foo" bigserial primary key not null', $statements[0]);
     }
 
@@ -284,14 +284,14 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->integer('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "foo" integer not null', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->integer('foo', true);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "foo" serial primary key not null', $statements[0]);
     }
 
@@ -301,14 +301,14 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->mediumInteger('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "foo" integer not null', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->mediumInteger('foo', true);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "foo" serial primary key not null', $statements[0]);
     }
 
@@ -318,14 +318,14 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->tinyInteger('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "foo" smallint not null', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->tinyInteger('foo', true);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "foo" smallserial primary key not null', $statements[0]);
     }
 
@@ -335,14 +335,14 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->smallInteger('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "foo" smallint not null', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->smallInteger('foo', true);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "foo" smallserial primary key not null', $statements[0]);
     }
 
@@ -352,7 +352,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->float('foo', 5, 2);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "foo" double precision not null', $statements[0]);
     }
 
@@ -362,7 +362,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->double('foo', 15, 8);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "foo" double precision not null', $statements[0]);
     }
 
@@ -372,7 +372,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->decimal('foo', 5, 2);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "foo" decimal(5, 2) not null', $statements[0]);
     }
 
@@ -382,7 +382,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->boolean('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "foo" boolean not null', $statements[0]);
     }
 
@@ -392,7 +392,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->enum('foo', ['bar', 'baz']);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "foo" varchar(255) check ("foo" in (\'bar\', \'baz\')) not null', $statements[0]);
     }
 
@@ -402,7 +402,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->date('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "foo" date not null', $statements[0]);
     }
 
@@ -412,7 +412,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->json('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "foo" json not null', $statements[0]);
     }
 
@@ -422,7 +422,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->jsonb('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "foo" jsonb not null', $statements[0]);
     }
 
@@ -432,7 +432,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->dateTime('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "foo" timestamp(0) without time zone not null', $statements[0]);
     }
 
@@ -442,7 +442,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->dateTimeTz('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "foo" timestamp(0) with time zone not null', $statements[0]);
     }
 
@@ -452,7 +452,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->time('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "foo" time(0) without time zone not null', $statements[0]);
     }
 
@@ -462,7 +462,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->timeTz('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "foo" time(0) with time zone not null', $statements[0]);
     }
 
@@ -472,7 +472,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->timestamp('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "foo" timestamp(0) without time zone not null', $statements[0]);
     }
 
@@ -482,7 +482,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->timestampTz('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "foo" timestamp(0) with time zone not null', $statements[0]);
     }
 
@@ -492,7 +492,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->timestamps();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "created_at" timestamp(0) without time zone null, add column "updated_at" timestamp(0) without time zone null', $statements[0]);
     }
 
@@ -502,7 +502,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->timestampsTz();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "created_at" timestamp(0) with time zone null, add column "updated_at" timestamp(0) with time zone null', $statements[0]);
     }
 
@@ -512,7 +512,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->binary('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "foo" bytea not null', $statements[0]);
     }
 
@@ -522,7 +522,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->uuid('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "foo" uuid not null', $statements[0]);
     }
 
@@ -532,7 +532,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->ipAddress('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "foo" inet not null', $statements[0]);
     }
 
@@ -542,7 +542,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->macAddress('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "foo" macaddr not null', $statements[0]);
     }
 
