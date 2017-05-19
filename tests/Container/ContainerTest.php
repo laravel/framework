@@ -236,6 +236,32 @@ class ContainerTest extends TestCase
         $this->assertEquals('foobar', $container->make('foo'));
     }
 
+    public function testUnsetExtend()
+    {
+        $container = new Container;
+        $container->bind('foo', function () {
+            $obj = new StdClass;
+            $obj->foo = 'bar';
+
+            return $obj;
+        });
+
+        $container->extend('foo', function ($obj, $container) {
+            $obj->bar = 'baz';
+
+            return $obj;
+        });
+
+        unset($container['foo']);
+        $container->forgetExtenders('foo');
+
+        $container->bind('foo', function () {
+            return 'foo';
+        });
+
+        $this->assertEquals('foo', $container->make('foo'));
+    }
+
     public function testResolutionOfDefaultParameters()
     {
         $container = new Container;
