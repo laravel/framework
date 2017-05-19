@@ -260,8 +260,12 @@ class Collection extends BaseCollection implements QueueableCollection
 
         $dictionary = [];
 
-        foreach ($items as $value) {
-            $dictionary[$value->getKey()] = $value;
+        foreach ($items as $k => $value) {
+            if(method_exists($value, 'getKey')){
+                $dictionary[$value->getKey()] = $value;
+            }else{
+                $dictionary[$k] = $value;
+            }
         }
 
         return $dictionary;
