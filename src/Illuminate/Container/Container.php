@@ -1065,7 +1065,7 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
-     * Remove all the extend closure of abstract
+     * Remove all the extend closure of abstract.
      *
      * @param string $abstract
      */
