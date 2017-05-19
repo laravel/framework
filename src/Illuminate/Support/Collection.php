@@ -71,7 +71,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return new static;
         }
 
-        if ($callback == null) {
+        if (is_null($callback)) {
             return new static(range(1, $amount));
         }
 
