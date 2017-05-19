@@ -1006,15 +1006,15 @@ class SupportCollectionTest extends TestCase
     public function testTimesWithKeysMethod()
     {
         $two = Collection::times(2, function ($number) {
-            return ['slug-'.$number => 'Title ' . $number];
+            return ['slug-'.$number => 'Title '.$number];
         });
 
         $zero = Collection::times(0, function ($number) {
-            return ['slug-'.$number => 'Title ' . $number];
+            return ['slug-'.$number => 'Title '.$number];
         });
 
         $negative = Collection::times(-4, function ($number) {
-            return ['slug-'.$number => 'Title ' . $number];
+            return ['slug-'.$number => 'Title '.$number];
         });
 
         $this->assertEquals([['slug-1' => 'Title 1'], ['slug-2' => 'Title 2']], $two->all());
