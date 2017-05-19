@@ -1065,17 +1065,14 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
-     * Remove all the extend closure of abstract.
+     * Remove all of the extender callbacks for a given type.
      *
-     * @param string $abstract
+     * @param  string  $abstract
+     * @return void
      */
     public function forgetExtenders($abstract)
     {
-        $abstract = $this->getAlias($abstract);
-
-        if (isset($this->extenders[$abstract])) {
-            unset($this->extenders[$abstract]);
-        }
+        unset($this->extenders[$this->getAlias($abstract)]);
     }
 
     /**
