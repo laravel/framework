@@ -1610,6 +1610,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
                 $this->$relation->touchOwners();
             } elseif ($this->$relation instanceof Collection) {
                 $this->$relation->each(function (Model $relation) {
+                    $relation->fireModelEvent('saved', false);
                     $relation->touchOwners();
                 });
             }
