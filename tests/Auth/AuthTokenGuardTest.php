@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Auth\TokenGuard;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Tests\Auth\Fixtures\AuthTokenGuardTestUser;
 
 class AuthTokenGuardTest extends TestCase
 {
@@ -95,15 +96,5 @@ class AuthTokenGuardTest extends TestCase
         $guard = new TokenGuard($provider, $request);
 
         $this->assertFalse($guard->validate(['api_token' => '']));
-    }
-}
-
-class AuthTokenGuardTestUser
-{
-    public $id;
-
-    public function getAuthIdentifier()
-    {
-        return $this->id;
     }
 }

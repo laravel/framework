@@ -2,12 +2,10 @@
 
 namespace Illuminate\Tests\Auth;
 
-use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Routing\Controller;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Tests\Auth\Fixtures\AuthorizesResourcesController;
 
 class AuthorizesResourcesTest extends TestCase
 {
@@ -65,66 +63,13 @@ class AuthorizesResourcesTest extends TestCase
     {
         $router = new Router(new \Illuminate\Events\Dispatcher);
 
-        $router->aliasMiddleware('can', '\Illuminate\Tests\Auth\AuthorizesResourcesMiddleware');
-        $router->get($method)->uses('\Illuminate\Tests\Auth\AuthorizesResourcesController@'.$method);
+        $router->aliasMiddleware('can', '\Illuminate\Tests\Auth\Fixtures\AuthorizesResourcesMiddleware');
+        $router->get($method)->uses('\Illuminate\Tests\Auth\Fixtures\AuthorizesResourcesController@'.$method);
 
         $this->assertEquals(
             'caught '.$middleware,
             $router->dispatch(Request::create($method, 'GET'))->getContent(),
             "The [{$middleware}] middleware was not registered for method [{$method}]"
         );
-    }
-}
-
-class AuthorizesResourcesController extends Controller
-{
-    use AuthorizesRequests;
-
-    public function __construct()
-    {
-        $this->authorizeResource('App\User', 'user');
-    }
-
-    public function index()
-    {
-        //
-    }
-
-    public function create()
-    {
-        //
-    }
-
-    public function store()
-    {
-        //
-    }
-
-    public function show()
-    {
-        //
-    }
-
-    public function edit()
-    {
-        //
-    }
-
-    public function update()
-    {
-        //
-    }
-
-    public function destroy()
-    {
-        //
-    }
-}
-
-class AuthorizesResourcesMiddleware
-{
-    public function handle($request, Closure $next, $method, $parameter)
-    {
-        return "caught can:{$method},{$parameter}";
     }
 }

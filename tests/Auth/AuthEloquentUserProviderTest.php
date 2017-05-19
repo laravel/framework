@@ -56,10 +56,10 @@ class AuthEloquentUserProviderTest extends TestCase
     public function testModelsCanBeCreated()
     {
         $hasher = m::mock('Illuminate\Contracts\Hashing\Hasher');
-        $provider = new EloquentUserProvider($hasher, 'Illuminate\Tests\Auth\EloquentProviderUserStub');
+        $provider = new EloquentUserProvider($hasher, 'Illuminate\Tests\Auth\Fixtures\EloquentProviderUserStub');
         $model = $provider->createModel();
 
-        $this->assertInstanceOf('Illuminate\Tests\Auth\EloquentProviderUserStub', $model);
+        $this->assertInstanceOf('Illuminate\Tests\Auth\Fixtures\EloquentProviderUserStub', $model);
     }
 
     protected function getProviderMock()
@@ -68,8 +68,4 @@ class AuthEloquentUserProviderTest extends TestCase
 
         return $this->getMockBuilder('Illuminate\Auth\EloquentUserProvider')->setMethods(['createModel'])->setConstructorArgs([$hasher, 'foo'])->getMock();
     }
-}
-
-class EloquentProviderUserStub
-{
 }
