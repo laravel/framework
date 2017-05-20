@@ -5,9 +5,24 @@
 ### Added
 - Support magic controller methods ([#19168](https://github.com/laravel/framework/pull/19168))
 - Added `Gate` resources ([#19124](https://github.com/laravel/framework/pull/19124))
+- Added `Request::routeIs()` method ([#19202](https://github.com/laravel/framework/pull/19202), [26681eb](https://github.com/laravel/framework/commit/26681eb1c8ba35a0129ad47d4f0f03af9c2baa45))
+- Route `Route::isName()` shorthand method ([#19227](https://github.com/laravel/framework/pull/19227))
+- Added support for custom columns in `softDeletes()` method ([#19203](https://github.com/laravel/framework/pull/19203))
+- Added `ManagesLayouts::getSection()` method ([#19213](https://github.com/laravel/framework/pull/19213))
+- Added `Model::refresh()` shorthand ([#19174](https://github.com/laravel/framework/pull/19174))
+- Added `Container::forgetExtenders()` method ([#19269](https://github.com/laravel/framework/pull/19269), [7c17bf5](https://github.com/laravel/framework/commit/7c17bf540f37f8b4667be5332c94d7423780ca83))
+- Added `Filesystem::hash()` method ([#19256](https://github.com/laravel/framework/pull/19256))
+
+### Changed
+- Move `$sizeRules` and `$numericRules` properties from `FormatsMessages` to `Validator` ([dc7e7cb](https://github.com/laravel/framework/commit/dc7e7cb26500fcba91e7e32762e367d59b12913b))
+- Allows calls to `Collection::times()` without the `$callback` parameter ([#19278](https://github.com/laravel/framework/pull/19278))
 
 ### Fixed
 - Fixed `Container::makeWith()` not using parameters when resolving interfaces ([#19178](https://github.com/laravel/framework/pull/19178))
+- Stop validating Memcached connection ([#19192](https://github.com/laravel/framework/pull/19192))
+- Fixed the position of `bound()` in `Container::instance()` ([#19207](https://github.com/laravel/framework/pull/19207))
+- Prevent applying global scopes on the factory while setting the connection ([#19258](https://github.com/laravel/framework/pull/19258))
+- Fixed database connection issue in queue worker ([#19263](https://github.com/laravel/framework/pull/19263))
 
 
 ## v5.4.23 (2017-05-11)

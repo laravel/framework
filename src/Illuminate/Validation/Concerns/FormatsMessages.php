@@ -12,20 +12,6 @@ trait FormatsMessages
     use ReplacesAttributes;
 
     /**
-     * The size related validation rules.
-     *
-     * @var array
-     */
-    protected $sizeRules = ['Size', 'Between', 'Min', 'Max'];
-
-    /**
-     * The numeric related validation rules.
-     *
-     * @var array
-     */
-    protected $numericRules = ['Numeric', 'Integer'];
-
-    /**
      * Get the validation message for an attribute and rule.
      *
      * @param  string  $attribute

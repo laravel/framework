@@ -65,10 +65,14 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  callable  $callback
      * @return static
      */
-    public static function times($amount, callable $callback)
+    public static function times($amount, callable $callback = null)
     {
         if ($amount < 1) {
             return new static;
+        }
+
+        if (is_null($callback)) {
+            return new static(range(1, $amount));
         }
 
         return (new static(range(1, $amount)))->map($callback);

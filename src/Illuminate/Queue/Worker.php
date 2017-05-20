@@ -246,6 +246,8 @@ class Worker
             $this->stopWorkerIfLostConnection($e);
         } catch (Throwable $e) {
             $this->exceptions->report(new FatalThrowableError($e));
+
+            $this->stopWorkerIfLostConnection($e);
         }
     }
 
@@ -267,6 +269,8 @@ class Worker
             $this->stopWorkerIfLostConnection($e);
         } catch (Throwable $e) {
             $this->exceptions->report(new FatalThrowableError($e));
+
+            $this->stopWorkerIfLostConnection($e);
         }
     }
 
