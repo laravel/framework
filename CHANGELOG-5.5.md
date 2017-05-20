@@ -18,6 +18,7 @@
 - ⚠️ Added `runningInConsole()` method `Application` contract ([#18658](https://github.com/laravel/framework/pull/18658))
 - Support default value(s) on command arguments ([#18572](https://github.com/laravel/framework/pull/18572))
 - Improved CLI detection for phpdbg ([#18781](https://github.com/laravel/framework/pull/18781))
+- ⚠️ Always return array from `RetryCommand::getJobIds()` ([#19232](https://github.com/laravel/framework/pull/19232))
 
 ### Assets
 - Added frontend preset commands (_too many commits, sorry_)
@@ -25,10 +26,13 @@
 ### Authentication
 - ⚠️ Support default user providers and pass user provider to `RequestGuard` ([#18856](https://github.com/laravel/framework/pull/18856))
 - Made the user provider parameter on `RequestGuard` optional ([d7f0b26](https://github.com/laravel/framework/commit/d7f0b2603ce0a0a568f84a8861c351a2c00d5613))
+- Use `setRememberToken()` in `ResetsPasswords` ([#19189](https://github.com/laravel/framework/pull/19189))
+- Added a `PasswordReset` event ([#19188](https://github.com/laravel/framework/pull/19188))
 
 ### Authorization
 - Support multiple values in `Gate::has()` ([#18758](https://github.com/laravel/framework/pull/18758))
 - ⚠️ Prevent policies from being too greedy ([#19120](https://github.com/laravel/framework/pull/19120))
+- ⚠️ Added `abilities()` method to `Gate` contract ([#19173](https://github.com/laravel/framework/pull/19173))
 
 ### Cache
 - Don't encrypt database cache values ([f0c72ec](https://github.com/laravel/framework/commit/f0c72ec9bcbdecb7e6267f7ec8f7ecbf8169a388))
@@ -76,7 +80,7 @@
 - ⚠️ Made `Storage::files()` work like `Storage::allFiles()` ([#18874](https://github.com/laravel/framework/pull/18874), [7073457](https://github.com/laravel/framework/commit/7073457041a29ada14e0ed01d7d65f5c76a92689))
 
 ### Helpers
-- Added `throw_if()` and `throw_unless()` helpers ([18bb4df](https://github.com/laravel/framework/commit/18bb4dfc77c7c289e9b40c4096816ebeff1cd843), [#19166](https://github.com/laravel/framework/pull/19166))
+- Added `throw_if()` and `throw_unless()` helpers ([18bb4df](https://github.com/laravel/framework/commit/18bb4dfc77c7c289e9b40c4096816ebeff1cd843), [#19166](https://github.com/laravel/framework/pull/19166), [#19255](https://github.com/laravel/framework/pull/19255))
 - Added `dispatch_now()` helper function ([#18668](https://github.com/laravel/framework/pull/18668), [61f2e7b](https://github.com/laravel/framework/commit/61f2e7b4106f8eb0b79603d9792426f7c6a6d273))
 - Add `$language` parameter to `str_slug()` helper ([#19011](https://github.com/laravel/framework/pull/19011))
 - Handle lower case words better in as `Str::snake()` ([#18764](https://github.com/laravel/framework/pull/18764))
@@ -91,10 +95,10 @@
 - ⚠️ Removed `$data` and `$callback` parameters from `Mailer` and `MailQueue`
 
 ### Notifications
-- Added methods for Slack `unfurl_*` options ([#19150](https://github.com/laravel/framework/pull/19150))
+- Added methods for Slack's `thumb_url` and `unfurl_*` options ([#19150](https://github.com/laravel/framework/pull/19150), [#19200](https://github.com/laravel/framework/pull/19200))
 
 ### Queues
-- Added support for chainable jobs ([81bcb03](https://github.com/laravel/framework/commit/81bcb03b303707cdc94420983b9d72ed558a2b3d), [94c01b1](https://github.com/laravel/framework/commit/94c01b1f37bfbb8e0d5f133b7dd34040b2bdc065), [91f5357](https://github.com/laravel/framework/commit/91f535704d4f6cff5e8393825dbdf46965234fa3))
+- Added support for chainable jobs ([81bcb03](https://github.com/laravel/framework/commit/81bcb03b303707cdc94420983b9d72ed558a2b3d), [94c01b1](https://github.com/laravel/framework/commit/94c01b1f37bfbb8e0d5f133b7dd34040b2bdc065), [91f5357](https://github.com/laravel/framework/commit/91f535704d4f6cff5e8393825dbdf46965234fa3), [434245f](https://github.com/laravel/framework/commit/434245f73e694f90476437da8554b58d54ced25c), [b880ad1](https://github.com/laravel/framework/commit/b880ad19282db768718cfd1629ebbc41054daadc))
 - ⚠️ Removed redundant `$queue` parameter from `Queue::createPayload()` ([#17948](https://github.com/laravel/framework/pull/17948))
 - Made all `getQueue()` methods `public` ([#18501](https://github.com/laravel/framework/pull/18501))
 - Pass connection and queue to `Looping` event ([#19081](https://github.com/laravel/framework/pull/19081))
@@ -121,6 +125,7 @@
 - Support multiple values in `Router::has()` ([#18758](https://github.com/laravel/framework/pull/18758))
 - ⚠️ Bind empty optional route parameter to `null` instead of empty model instance ([#17521](https://github.com/laravel/framework/pull/17521))
 - ⚠️ Removed `Controller::missingMethod()` ([bf5d221](https://github.com/laravel/framework/commit/bf5d221037d9857a74020f2623839e282035a420))
+- Added `domain()` setter/getter to `Route` ([#19245](https://github.com/laravel/framework/pull/19245), [bba04a1](https://github.com/laravel/framework/commit/bba04a1598c44a892e918c4f308407b0d297f217))
 
 ### Responses
 - ⚠️ Ensure `Arrayable` and `Jsonable` return a `JsonResponse` ([#17875](https://github.com/laravel/framework/pull/17875))
@@ -128,6 +133,9 @@
 - Added `SameSite` support to `CookieJar` ([#18040](https://github.com/laravel/framework/pull/18040), [#18059](https://github.com/laravel/framework/pull/18059), [e69d722](https://github.com/laravel/framework/commit/e69d72296cfd9969db569b950721461a521100c4))
 - Accept `HeaderBag` in `ResponseTrait::withHeaders()` ([#18161](https://github.com/laravel/framework/pull/18161))
 - ⚠️ Reset response content-type in `Response::setContent()` ([#18314](https://github.com/laravel/framework/pull/18314))
+
+### Service Container
+- ⚠️ Refactored `Container` ([#19201](https://github.com/laravel/framework/pull/19201))
 
 ### Session
 - ⚠️ Default value to `true` in `Store::flash()` ([#18136](https://github.com/laravel/framework/pull/18136))
@@ -138,7 +146,7 @@
 ### Testing
 - ⚠️ Switched to PHPUnit 6 ([#17755](https://github.com/laravel/framework/pull/17755), [#17864](https://github.com/laravel/framework/pull/17864))
 - ⚠️ Renamed authentication assertion methods ([#17924](https://github.com/laravel/framework/pull/17924), [494a177](https://github.com/laravel/framework/commit/494a1774f217f0cd6b4efade63e200e3ac65f201))
-- ⚠️ Unify database testing traits into `RefreshDatabase` trait ([79c6f67](https://github.com/laravel/framework/commit/79c6f6774eecf77aef8ed5e2f270551a6f378f1d))
+- ⚠️ Unify database testing traits into `RefreshDatabase` trait ([79c6f67](https://github.com/laravel/framework/commit/79c6f6774eecf77aef8ed5e2f270551a6f378f1d), [0322e32](https://github.com/laravel/framework/commit/0322e3226196a435db436e2a00c035be892c2466))
 - Added integration tests for the framework itself ([182027d](https://github.com/laravel/framework/commit/182027d3290e9a2e1bd9e2d52c125177ef6c6af6), [#18438](https://github.com/laravel/framework/pull/18438), [#18780](https://github.com/laravel/framework/pull/18780), [#19001](https://github.com/laravel/framework/pull/19001))
 - Allow disabling of specific middleware ([#18673](https://github.com/laravel/framework/pull/18673))
 - Added `withoutExceptionHandling()` method ([a171f44](https://github.com/laravel/framework/commit/a171f44594c248afe066fee74fad640765b12da0))
@@ -146,7 +154,7 @@
 - Allow `assertSessionHasErrors()` to look into different error bags ([#19172](https://github.com/laravel/framework/pull/19172), [4287ebc](https://github.com/laravel/framework/commit/4287ebc76025cd31e0ba6730481a95aeb471e305))
 
 ### Validation
-- Added support for custom validation rule objects ([#19155](https://github.com/laravel/framework/pull/19155))
+- Added support for custom validation rule objects ([#19155](https://github.com/laravel/framework/pull/19155), [2aa5ea8](https://github.com/laravel/framework/commit/2aa5ea8a898bd220015ab9be453b36723ffb186e))
 
 ### Views
 - ⚠️ Camel case variables names passed to views ([#18083](https://github.com/laravel/framework/pull/18083))
