@@ -344,7 +344,7 @@ class Container implements ArrayAccess, ContainerContract
         } else {
             $this->extenders[$abstract][] = $closure;
 
-            if($this->resolved($abstract)) {
+            if($this->resolved($abstract))  {
                 $this->rebound($abstract);
             }
         }
