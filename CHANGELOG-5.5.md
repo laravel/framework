@@ -115,6 +115,7 @@
 - Added a `validate()` macro onto `Request` ([#19063](https://github.com/laravel/framework/pull/19063))
 - Added `FormRequest::validated()` method ([#19112](https://github.com/laravel/framework/pull/19112))
 - ⚠️ Made `request()` helper and `Request::__get()` consistent ([a6ff272](https://github.com/laravel/framework/commit/a6ff272c54677a9f52718292fc0938ffb1871832))
+- Made `request()->routeIs()` work like `request()->fullUrlIs()` ([#19267](https://github.com/laravel/framework/pull/19267))
 
 ### Routing
 - Support fluent resource options ([#18767](https://github.com/laravel/framework/pull/18767), [bb02fb2](https://github.com/laravel/framework/commit/bb02fb27387a8aeb2a47da1fe5ff2e086920b744))
