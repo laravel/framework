@@ -241,7 +241,7 @@ class ContainerTest extends TestCase
         $_SERVER['_test_rebind'] = false;
 
         $container = new Container;
-        $container->rebinding('foo', function (){
+        $container->rebinding('foo', function () {
             $_SERVER['_test_rebind'] = true;
         });
 
@@ -260,10 +260,10 @@ class ContainerTest extends TestCase
         $_SERVER['_test_rebind'] = false;
 
         $container = new Container;
-        $container->rebinding('foo', function (){
+        $container->rebinding('foo', function () {
             $_SERVER['_test_rebind'] = true;
         });
-        $container->bind('foo', function (){
+        $container->bind('foo', function () {
             $obj = new StdClass;
 
             return $obj;
