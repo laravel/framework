@@ -406,6 +406,21 @@ class TestResponse
     }
 
     /**
+     * Assert that the response view equals the given value.
+     *
+     * @param  string $value
+     * @return $this
+     */
+    public function assertViewIs($value)
+    {
+        $this->ensureResponseHasView();
+
+        PHPUnit::assertEquals($value, $this->original->getName());
+
+        return $this;
+    }
+
+    /**
      * Assert that the response view has a given piece of bound data.
      *
      * @param  string|array  $key
