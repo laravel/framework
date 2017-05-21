@@ -44,11 +44,21 @@ trait SoftDeletes
      */
     protected function performDeleteOnModel()
     {
-        if ($this->forceDeleting) {
+        if ($this->isForceDeleting()) {
             return $this->newQueryWithoutScopes()->where($this->getKeyName(), $this->getKey())->forceDelete();
         }
 
         return $this->runSoftDelete();
+    }
+
+    /**
+     * Determine if the model uses soft delete.
+     *
+     * @return bool
+     */
+    public function isSoftDeleting()
+    {
+        return ! $this->isForceDeleting();
     }
 
     /**
