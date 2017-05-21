@@ -1,6 +1,6 @@
 <?php
 
-use Fake\Generator as Faker;
+use Faker\Generator as Faker;
 
 /*
 |--------------------------------------------------------------------------
