@@ -17,7 +17,7 @@ class TestResponse
     }
 
     /**
-     * The reponse to delegate to.
+     * The response to delegate to.
      *
      * @var \Illuminate\Http\Response
      */
