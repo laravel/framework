@@ -91,6 +91,18 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Combine the collection with the given items using the collection as keys.
+     *
+     * @param  mixed  $items
+     * @param  bool  $includeKeyDeprivedValues
+     * @return static
+     */
+    public function combine($items, $includeKeyDeprivedValues = true)
+    {
+        return new static(Arr::combine($this->items, $items, $includeKeyDeprivedValues));
+    }
+
+    /**
      * Determine if an item exists in the collection.
      *
      * @param  mixed  $key
