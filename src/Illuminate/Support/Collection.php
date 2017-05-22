@@ -659,7 +659,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Intersect the collection with the given items by key
+     * Intersect the collection with the given items by key.
      *
      * @param  mixed  $items
      * @return static
