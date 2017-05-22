@@ -17,7 +17,7 @@ class TestResponse
     }
 
     /**
-     * The reponse to delegate to.
+     * The response to delegate to.
      *
      * @var \Illuminate\Http\Response
      */
@@ -403,6 +403,21 @@ class TestResponse
     public function json()
     {
         return $this->decodeResponseJson();
+    }
+
+    /**
+     * Assert that the response view equals the given value.
+     *
+     * @param  string $value
+     * @return $this
+     */
+    public function assertViewIs($value)
+    {
+        $this->ensureResponseHasView();
+
+        PHPUnit::assertEquals($value, $this->original->getName());
+
+        return $this;
     }
 
     /**

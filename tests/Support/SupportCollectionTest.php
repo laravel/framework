@@ -997,9 +997,12 @@ class SupportCollectionTest extends TestCase
             return 'slug-'.$number;
         });
 
+        $range = Collection::times(5);
+
         $this->assertEquals(['slug-1', 'slug-2'], $two->all());
         $this->assertTrue($zero->isEmpty());
         $this->assertTrue($negative->isEmpty());
+        $this->assertEquals(range(1, 5), $range->all());
     }
 
     public function testConstructMakeFromObject()
