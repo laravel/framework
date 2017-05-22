@@ -223,6 +223,7 @@ class SlackMessage
     /**
      * Find and link channel names and usernames.
      *
+     * @param  string  $unfurl
      * @return $this
      */
     public function unfurlLinks($unfurl)
@@ -235,6 +236,7 @@ class SlackMessage
     /**
      * Find and link channel names and usernames.
      *
+     * @param  string  $unfurl
      * @return $this
      */
     public function unfurlMedia($unfurl)

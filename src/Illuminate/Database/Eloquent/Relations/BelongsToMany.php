@@ -113,7 +113,7 @@ class BelongsToMany extends Relation
      * @param  string  $foreignPivotKey
      * @param  string  $relatedPivotKey
      * @param  string  $parentKey
-     * @param  string  $localKey
+     * @param  string  $relatedKey
      * @param  string  $relationName
      * @return void
      */
