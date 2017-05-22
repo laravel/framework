@@ -660,13 +660,15 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
     /**
      * Intersect the collection with the given items by key
-     * 
+     *
      * @param  mixed  $items
      * @return static
      */
     public function intersectByKeys($items)
     {
-        return new static(array_intersect_key($this->items, $this->getArrayableItems($items)));
+        return new static(array_intersect_key(
+            $this->items, $this->getArrayableItems($items)
+        ));
     }
 
     /**
