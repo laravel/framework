@@ -58,6 +58,20 @@ class DatabaseEloquentMorphTest extends TestCase
         $relation->addEagerConstraints([$model1, $model2]);
     }
 
+    public function testMakeFunctionOnMorph()
+    {
+        $_SERVER['__eloquent.saved'] = false;
+        // Doesn't matter which relation type we use since they share the code...
+        $relation = $this->getOneRelation();
+        $instance = m::mock('Illuminate\Database\Eloquent\Model');
+        $instance->shouldReceive('setAttribute')->once()->with('morph_id', 1);
+        $instance->shouldReceive('setAttribute')->once()->with('morph_type', get_class($relation->getParent()));
+        $instance->shouldReceive('save')->never();
+        $relation->getRelated()->shouldReceive('newInstance')->once()->with(['name' => 'taylor'])->andReturn($instance);
+
+        $this->assertEquals($instance, $relation->make(['name' => 'taylor']));
+    }
+
     public function testCreateFunctionOnMorph()
     {
         // Doesn't matter which relation type we use since they share the code...
