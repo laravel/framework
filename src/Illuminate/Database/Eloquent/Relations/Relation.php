@@ -145,7 +145,7 @@ abstract class Relation
      */
     public function getRelationCountQuery(Builder $query, Builder $parent)
     {
-        $query->select(new Expression('count(*)'));
+        $query->select(new Expression('count(*) AS `aggregate`'));
 
         $key = $this->wrap($this->getQualifiedParentKeyName());
 
