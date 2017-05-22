@@ -165,7 +165,7 @@ class BelongsTo extends Relation
         // it so the query doesn't fail, but will not return any results, which should
         // be what this developer is expecting in a case where this happens to them.
         if (count($keys) == 0) {
-            return [0];
+            return [];
         }
 
         return array_values(array_unique($keys));
