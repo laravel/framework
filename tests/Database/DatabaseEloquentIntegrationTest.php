@@ -675,7 +675,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $friend = $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
 
         EloquentTestUser::first()->friends()->chunk(2, function ($friends) use ($user, $friend) {
-            $this->assertEquals(1, count($friends));
+            $this->assertCount(1, $friends);
             $this->assertEquals('abigailotwell@gmail.com', $friends->first()->email);
             $this->assertEquals($user->id, $friends->first()->pivot->user_id);
             $this->assertEquals($friend->id, $friends->first()->pivot->friend_id);
