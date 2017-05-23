@@ -9,7 +9,7 @@ class LengthAwarePaginatorTest extends TestCase
 {
     public function setUp()
     {
-        $this->p = new LengthAwarePaginator($array = ['item3', 'item4', 'item5'], 4, 2, 2);
+        $this->p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2);
     }
 
     public function tearDown()
