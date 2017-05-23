@@ -199,17 +199,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function routeIs()
     {
-        if (! ($route = $this->route()) || ! $routeName = $route->getName()) {
-            return false;
-        }
-
-        foreach (func_get_args() as $pattern) {
-            if (Str::is($pattern, $routeName)) {
-                return true;
-            }
-        }
-
-        return false;
+        return ($route = $this->route()) && call_user_func_array([$route, 'named'], func_get_args());
     }
 
     /**

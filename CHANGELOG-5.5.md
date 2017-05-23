@@ -122,6 +122,8 @@
 - Support multiple values in `Router::has()` ([#18758](https://github.com/laravel/framework/pull/18758))
 - ⚠️ Bind empty optional route parameter to `null` instead of empty model instance ([#17521](https://github.com/laravel/framework/pull/17521))
 - ⚠️ Removed `Controller::missingMethod()` ([bf5d221](https://github.com/laravel/framework/commit/bf5d221037d9857a74020f2623839e282035a420))
+- Route `named()` accept patterns ([#19267](https://github.com/laravel/framework/pull/19267))
+- Router `is()` and `currentRouteNamed()` accepts patterns ([#19267](https://github.com/laravel/framework/pull/19267))
 
 ### Responses
 - ⚠️ Ensure `Arrayable` and `Jsonable` return a `JsonResponse` ([#17875](https://github.com/laravel/framework/pull/17875))

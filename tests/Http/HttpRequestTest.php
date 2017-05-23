@@ -161,6 +161,8 @@ class HttpRequestTest extends TestCase
     {
         $request = Request::create('/foo/bar', 'GET');
 
+        $this->assertFalse($request->routeIs('foo.bar'));
+
         $request->setRouteResolver(function () use ($request) {
             $route = new Route('GET', '/foo/bar', ['as' => 'foo.bar']);
             $route->bind($request);
