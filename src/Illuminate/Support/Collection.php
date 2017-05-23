@@ -62,13 +62,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Create a new collection by invoking the callback a given amount of times.
      *
      * @param  int  $amount
-     * @param  callable  $callback
+     * @param  callable|null  $callback
      * @return static
      */
-    public static function times($amount, callable $callback)
+    public static function times($amount, callable $callback = null)
     {
         if ($amount < 1) {
             return new static;
+        }
+
+        if (is_null($callback)) {
+            return new static(range(1, $amount));
         }
 
         return (new static(range(1, $amount)))->map($callback);
@@ -656,6 +660,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function intersect($items)
     {
         return new static(array_intersect($this->items, $this->getArrayableItems($items)));
+    }
+
+    /**
+     * Intersect the collection with the given items by key.
+     *
+     * @param  mixed  $items
+     * @return static
+     */
+    public function intersectByKeys($items)
+    {
+        return new static(array_intersect_key(
+            $this->items, $this->getArrayableItems($items)
+        ));
     }
 
     /**

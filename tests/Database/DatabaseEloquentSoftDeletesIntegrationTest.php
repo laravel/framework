@@ -395,34 +395,34 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $post = $abigail->posts()->create(['title' => 'First Title']);
 
         $users = SoftDeletesTestUser::where('email', 'taylorotwell@gmail.com')->has('posts')->get();
-        $this->assertEquals(0, count($users));
+        $this->assertCount(0, $users);
 
         $users = SoftDeletesTestUser::where('email', 'abigailotwell@gmail.com')->has('posts')->get();
-        $this->assertEquals(1, count($users));
+        $this->assertCount(1, $users);
 
         $users = SoftDeletesTestUser::where('email', 'doesnt@exist.com')->orHas('posts')->get();
-        $this->assertEquals(1, count($users));
+        $this->assertCount(1, $users);
 
         $users = SoftDeletesTestUser::whereHas('posts', function ($query) {
             $query->where('title', 'First Title');
         })->get();
-        $this->assertEquals(1, count($users));
+        $this->assertCount(1, $users);
 
         $users = SoftDeletesTestUser::whereHas('posts', function ($query) {
             $query->where('title', 'Another Title');
         })->get();
-        $this->assertEquals(0, count($users));
+        $this->assertCount(0, $users);
 
         $users = SoftDeletesTestUser::where('email', 'doesnt@exist.com')->orWhereHas('posts', function ($query) {
             $query->where('title', 'First Title');
         })->get();
-        $this->assertEquals(1, count($users));
+        $this->assertCount(1, $users);
 
         // With Post Deleted...
 
         $post->delete();
         $users = SoftDeletesTestUser::has('posts')->get();
-        $this->assertEquals(0, count($users));
+        $this->assertCount(0, $users);
     }
 
     /**
@@ -437,17 +437,17 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $post->delete();
 
         $users = SoftDeletesTestUser::has('posts')->get();
-        $this->assertEquals(0, count($users));
+        $this->assertCount(0, $users);
 
         $users = SoftDeletesTestUser::whereHas('posts', function ($q) {
             $q->onlyTrashed();
         })->get();
-        $this->assertEquals(1, count($users));
+        $this->assertCount(1, $users);
 
         $users = SoftDeletesTestUser::whereHas('posts', function ($q) {
             $q->withTrashed();
         })->get();
-        $this->assertEquals(1, count($users));
+        $this->assertCount(1, $users);
     }
 
     /**
@@ -463,10 +463,10 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $comment->delete();
 
         $users = SoftDeletesTestUser::has('posts.comments')->get();
-        $this->assertEquals(0, count($users));
+        $this->assertCount(0, $users);
 
         $users = SoftDeletesTestUser::doesntHave('posts.comments')->get();
-        $this->assertEquals(1, count($users));
+        $this->assertCount(1, $users);
     }
 
     /**
@@ -481,7 +481,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $post->delete();
 
         $users = SoftDeletesTestUserWithTrashedPosts::has('posts')->get();
-        $this->assertEquals(1, count($users));
+        $this->assertCount(1, $users);
     }
 
     /**

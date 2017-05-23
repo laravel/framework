@@ -357,7 +357,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
 
         $result = $relation->findMany(['foo', 'bar']);
 
-        $this->assertEquals(2, count($result));
+        $this->assertCount(2, $result);
         $this->assertInstanceOf(StdClass::class, $result->first());
     }
 

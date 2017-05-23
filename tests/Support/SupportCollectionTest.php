@@ -570,6 +570,18 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['first_word' => 'Hello'], $c->intersect(new Collection(['first_world' => 'Hello', 'last_word' => 'World']))->all());
     }
 
+    public function testIntersectByKeysNull()
+    {
+        $c = new Collection(['name' => 'Mateus', 'age' => 18]);
+        $this->assertEquals([], $c->intersectByKeys(null)->all());
+    }
+
+    public function testIntersectByKeys()
+    {
+        $c = new Collection(['name' => 'Mateus', 'age' => 18]);
+        $this->assertEquals(['name' => 'Mateus'], $c->intersectByKeys(new Collection(['name' => 'Mateus', 'surname' => 'Guimaraes']))->all());
+    }
+
     public function testUnique()
     {
         $c = new Collection(['Hello', 'World', 'World']);
@@ -985,9 +997,12 @@ class SupportCollectionTest extends TestCase
             return 'slug-'.$number;
         });
 
+        $range = Collection::times(5);
+
         $this->assertEquals(['slug-1', 'slug-2'], $two->all());
         $this->assertTrue($zero->isEmpty());
         $this->assertTrue($negative->isEmpty());
+        $this->assertEquals(range(1, 5), $range->all());
     }
 
     public function testConstructMakeFromObject()

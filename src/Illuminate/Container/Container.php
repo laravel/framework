@@ -1066,6 +1066,17 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
+     * Remove all of the extender callbacks for a given type.
+     *
+     * @param  string  $abstract
+     * @return void
+     */
+    public function forgetExtenders($abstract)
+    {
+        unset($this->extenders[$this->getAlias($abstract)]);
+    }
+
+    /**
      * Drop all of the stale instances and aliases.
      *
      * @param  string  $abstract

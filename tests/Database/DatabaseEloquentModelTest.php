@@ -617,7 +617,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->push());
         $this->assertEquals(1, $model->id);
         $this->assertTrue($model->exists);
-        $this->assertEquals(2, count($model->relationMany));
+        $this->assertCount(2, $model->relationMany);
         $this->assertEquals([2, 3], $model->relationMany->pluck('id')->all());
     }
 

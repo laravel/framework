@@ -12,6 +12,21 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class FoundationTestResponseTest extends TestCase
 {
+    public function testAssertViewIs()
+    {
+        $baseResponse = tap(new Response, function ($response) {
+            $response->setContent(\Mockery::mock(View::class, [
+                'render' => 'hello world',
+                'getData' => ['foo' => 'bar'],
+                'getName' => 'dir.my-view',
+            ]));
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        $response->assertViewIs('dir.my-view');
+    }
+
     public function testAssertViewHas()
     {
         $baseResponse = tap(new Response, function ($response) {
