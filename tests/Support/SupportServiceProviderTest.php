@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Support;
 
-use Illuminate\Config\Repository;
-use Illuminate\Foundation\Application;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Config\Repository;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 
 class SupportServiceProviderTest extends TestCase
@@ -36,23 +36,23 @@ class SupportServiceProviderTest extends TestCase
         ];
         $this->assertEquals($expected, $toPublish, 'Publishable service providers do not return expected set of providers.');
     }
-	
-	public function testPublishesViews()
-	{
-		$app = new Application();
-		$app->instance('config', new Repository([
-			'view' => [
-				'paths' => [
-					'path/to/views'
-				]
-			]
-		]));
-		$provider = new ServiceProviderForTestingThree($app);
-		$provider->boot();
-		
-		$haystack = ServiceProvider::pathsToPublish(ServiceProviderForTestingThree::class);
-		$this->assertContains('path/to/views/vendor/my-namespace', $haystack, 'publishesViews does not publish to the configured view directory'.print_r($haystack, true));
-	}
+
+    public function testPublishesViews()
+    {
+        $app = new Application();
+        $app->instance('config', new Repository([
+            'view' => [
+                'paths' => [
+                    'path/to/views',
+                ],
+            ],
+        ]));
+        $provider = new ServiceProviderForTestingThree($app);
+        $provider->boot();
+
+        $haystack = ServiceProvider::pathsToPublish(ServiceProviderForTestingThree::class);
+        $this->assertContains('path/to/views/vendor/my-namespace', $haystack, 'publishesViews does not publish to the configured view directory'.print_r($haystack, true));
+    }
 
     public function testPublishableGroups()
     {
@@ -156,12 +156,12 @@ class ServiceProviderForTestingTwo extends ServiceProvider
 
 class ServiceProviderForTestingThree extends ServiceProvider
 {
-	public function register()
-	{
-	}
-	
-	public function boot()
-	{
-		$this->publishesViews('source/unmarked/three/a', 'my-namespace');
-	}
+    public function register()
+    {
+    }
+
+    public function boot()
+    {
+        $this->publishesViews('source/unmarked/three/a', 'my-namespace');
+    }
 }
