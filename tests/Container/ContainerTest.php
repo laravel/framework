@@ -586,11 +586,11 @@ class ContainerTest extends TestCase
         );
     }
 
-    public function testContextualBindingNotWorksOnExistingAliasedInstancesBack()
+    public function testContextualBindingWorksOnExistingAliasedInstanceBack()
     {
         $container = new Container;
 
-        $container->alias('Illuminate\Tests\Container\IContainerContractStub','stub');
+        $container->alias('Illuminate\Tests\Container\IContainerContractStub', 'stub');
         $container->instance('stub', new ContainerImplementationStub);
 
         $container->when('Illuminate\Tests\Container\ContainerTestContextInjectOne')->needs('stub')->give('Illuminate\Tests\Container\ContainerImplementationStubTwo');
@@ -601,11 +601,11 @@ class ContainerTest extends TestCase
         );
     }
 
-    public function testContextualBindingWorksOnExistingAliasedSingtontonBack()
+    public function testContextualBindingWorksOnExistingAliasedbindBack()
     {
         $container = new Container;
 
-        $container->alias('Illuminate\Tests\Container\IContainerContractStub','stub');
+        $container->alias('Illuminate\Tests\Container\IContainerContractStub', 'stub');
         $container->bind('stub', ContainerImplementationStub::class);
 
         $container->when('Illuminate\Tests\Container\ContainerTestContextInjectOne')->needs('stub')->give('Illuminate\Tests\Container\ContainerImplementationStubTwo');
