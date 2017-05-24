@@ -102,7 +102,9 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('fred25', $router->dispatch(Request::create('fred', 'GET'))->getContent());
         $this->assertEquals('fred30', $router->dispatch(Request::create('fred/30', 'GET'))->getContent());
         $this->assertTrue($router->currentRouteNamed('foo'));
+        $this->assertTrue($router->currentRouteNamed('fo*'));
         $this->assertTrue($router->is('foo'));
+        $this->assertTrue($router->is('foo', 'bar'));
         $this->assertFalse($router->is('bar'));
 
         $router = $this->getRouter();

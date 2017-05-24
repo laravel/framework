@@ -945,24 +945,17 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function is()
     {
-        foreach (func_get_args() as $pattern) {
-            if (Str::is($pattern, $this->currentRouteName())) {
-                return true;
-            }
-        }
-
-        return false;
+        return call_user_func_array([$this, 'currentRouteNamed'], func_get_args());
     }
 
     /**
-     * Determine if the current route matches a given name.
+     * Determine if the current route matches a pattern.
      *
-     * @param  string  $name
      * @return bool
      */
-    public function currentRouteNamed($name)
+    public function currentRouteNamed()
     {
-        return $this->current() ? $this->current()->named($name) : false;
+        return ($route = $this->current()) && call_user_func_array([$route, 'named'], func_get_args());
     }
 
     /**

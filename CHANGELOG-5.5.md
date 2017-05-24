@@ -119,13 +119,17 @@
 - Added a `validate()` macro onto `Request` ([#19063](https://github.com/laravel/framework/pull/19063))
 - Added `FormRequest::validated()` method ([#19112](https://github.com/laravel/framework/pull/19112))
 - ⚠️ Made `request()` helper and `Request::__get()` consistent ([a6ff272](https://github.com/laravel/framework/commit/a6ff272c54677a9f52718292fc0938ffb1871832))
+- Made `request()->routeIs()` work like `request()->fullUrlIs()` ([#19267](https://github.com/laravel/framework/pull/19267))
 
 ### Routing
 - Support fluent resource options ([#18767](https://github.com/laravel/framework/pull/18767), [bb02fb2](https://github.com/laravel/framework/commit/bb02fb27387a8aeb2a47da1fe5ff2e086920b744))
 - Support multiple values in `Router::has()` ([#18758](https://github.com/laravel/framework/pull/18758))
 - ⚠️ Bind empty optional route parameter to `null` instead of empty model instance ([#17521](https://github.com/laravel/framework/pull/17521))
 - ⚠️ Removed `Controller::missingMethod()` ([bf5d221](https://github.com/laravel/framework/commit/bf5d221037d9857a74020f2623839e282035a420))
+- Route `named()` accept patterns ([#19267](https://github.com/laravel/framework/pull/19267))
+- Router `is()` and `currentRouteNamed()` accepts patterns ([#19267](https://github.com/laravel/framework/pull/19267))
 - Added `domain()` setter/getter to `Route` ([#19245](https://github.com/laravel/framework/pull/19245), [bba04a1](https://github.com/laravel/framework/commit/bba04a1598c44a892e918c4f308407b0d297f217))
+
 
 ### Responses
 - ⚠️ Ensure `Arrayable` and `Jsonable` return a `JsonResponse` ([#17875](https://github.com/laravel/framework/pull/17875))

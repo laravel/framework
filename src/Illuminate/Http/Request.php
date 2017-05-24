@@ -193,14 +193,13 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Check if the route name matches the given string.
+     * Determine if the route name matches a pattern.
      *
-     * @param  string  $name
      * @return bool
      */
-    public function routeIs($name)
+    public function routeIs()
     {
-        return $this->route() && $this->route()->named($name);
+        return ($route = $this->route()) && call_user_func_array([$route, 'named'], func_get_args());
     }
 
     /**
