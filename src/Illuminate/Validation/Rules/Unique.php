@@ -58,15 +58,34 @@ class Unique
      */
     public function __construct($table, $column = 'NULL')
     {
-        if ($table instanceof Model) {
-            $this->ignore = $table->getKey();
-            $this->idColumn = $table->getKeyName();
+        $this->table = is_string($table) ? $table : null;
+        $this->column = $column;
 
-            $table = $table->getTable();
+        $this->fill($table);
+    }
+
+    /**
+     * Fill the instance data from a possible model.
+     *
+     * @param  string|\Illuminate\Database\Eloquent\Model  $model
+     * @return void
+     */
+    protected function fill($model)
+    {
+        if (is_string($model) && is_subclass_of($model, Model::class)) {
+            $model = new $model;
         }
 
-        $this->table = $table;
-        $this->column = $column;
+        if (! ($model instanceof Model)) {
+            return;
+        }
+
+        $this->table = $model->getTable();
+        $this->idColumn = $model->getKeyName();
+
+        if (($key = $model->getKey()) !== null) {
+            $this->ignore = $key;
+        }
     }
 
     /**

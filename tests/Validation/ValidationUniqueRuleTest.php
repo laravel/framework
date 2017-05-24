@@ -38,6 +38,12 @@ class ValidationUniqueRuleTest extends TestCase
 
         $rule = new \Illuminate\Validation\Rules\Unique($model, 'column');
         $this->assertEquals('unique:table,column,"Connor Parks",id_column', (string) $rule);
+
+        $rule = new \Illuminate\Validation\Rules\Unique(ValidationUniqueRuleTestModel::class);
+        $this->assertEquals('unique:table,NULL,NULL,id_column', (string) $rule);
+
+        $rule = new \Illuminate\Validation\Rules\Unique(ValidationUniqueRuleTestModel::class, 'column');
+        $this->assertEquals('unique:table,column,NULL,id_column', (string) $rule);
     }
 }
 
