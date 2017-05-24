@@ -182,6 +182,21 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Conjoin all values of a collection with those of another, regardless of keys.
+     *
+     * @param  \Traversable  $source
+     * @return self
+     */
+    public function conJoin($source)
+    {
+        foreach ($source as $item) {
+            $this->push($item);
+        }
+
+        return $this;
+    }
+
+    /**
      * Determine if an item exists in the collection.
      *
      * @param  mixed  $key

@@ -1722,6 +1722,41 @@ class SupportCollectionTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
+    public function testConJoinWithArray()
+    {
+        $expected = [
+            0 => 4,
+            1 => 5,
+            2 => 6,
+            3 => 'a',
+            4 => 'b',
+            5 => 'c',
+        ];
+
+        $collection = new Collection([4, 5, 6]);
+        $actual = $collection->conJoin(['a', 'b', 'c'])->toArray();
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function testConJoinWithCollection()
+    {
+        $expected = [
+            0 => 4,
+            1 => 5,
+            2 => 6,
+            3 => 'a',
+            4 => 'b',
+            5 => 'c',
+        ];
+
+        $firstCollection = new Collection([4, 5, 6]);
+        $secondCollection = new Collection(['a', 'b', 'c']);
+        $actual = $firstCollection->conJoin($secondCollection)->toArray();
+
+        $this->assertSame($expected, $actual);
+    }
+
     public function testReduce()
     {
         $data = new Collection([1, 2, 3]);
