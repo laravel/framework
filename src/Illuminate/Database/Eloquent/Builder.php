@@ -97,7 +97,7 @@ class Builder
     }
 
     /**
-     * Create and return and un-saved model instance.
+     * Create and return an un-saved model instance.
      *
      * @param  array  $attributes
      * @return \Illuminate\Database\Eloquent\Model
