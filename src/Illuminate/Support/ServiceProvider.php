@@ -75,7 +75,12 @@ abstract class ServiceProvider
      */
     protected function loadViewsFrom($path, $namespace)
     {
-        if (is_dir($appPath = $this->app->basePath().'/resources/views/vendor/'.$namespace)) {
+        $appBasePath = $this->app->basePath();
+        $namespacePath = str_replace('.', '/', $namespace);
+
+        if ($this->app['files']->isDirectory($appPath = "{$appBasePath}/resources/views/vendor/{$namespace}")) {
+            $this->app['view']->addNamespace($namespace, $appPath);
+        } elseif ($this->app['files']->isDirectory($appPath = "{$appBasePath}/resources/views/vendor/{$namespacePath}")) {
             $this->app['view']->addNamespace($namespace, $appPath);
         }
 
