@@ -1,10 +1,8 @@
 <?php
 
-use Faker\Generator;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factory;
 
 /**
  * @group integration
@@ -45,7 +43,6 @@ class EloquentCustomPivotCastTest extends TestCase
         });
     }
 
-
     public function test_casts_are_respected_on_attach()
     {
         $user = CustomPivotCastTestUser::forceCreate([
@@ -61,7 +58,6 @@ class EloquentCustomPivotCastTest extends TestCase
 
         $this->assertEquals(['foo' => 'bar'], $project->collaborators[0]->pivot->permissions);
     }
-
 
     public function test_casts_are_respected_on_sync()
     {
@@ -86,7 +82,6 @@ class CustomPivotCastTestUser extends Model
     public $timestamps = false;
 }
 
-
 class CustomPivotCastTestProject extends Model
 {
     public $table = 'projects';
@@ -99,7 +94,6 @@ class CustomPivotCastTestProject extends Model
         )->using(CustomPivotCastTestCollaborator::class)->withPivot('permissions');
     }
 }
-
 
 class CustomPivotCastTestCollaborator extends Illuminate\Database\Eloquent\Relations\Pivot
 {

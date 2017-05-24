@@ -236,7 +236,7 @@ trait InteractsWithPivotTable
         // To create the attachment records, we will simply spin through the IDs given
         // and create a new record to insert for each ID. Each ID may actually be a
         // key in the array, with extra attributes to be placed in other columns.
-        $attributes = $this->using 
+        $attributes = $this->using
                 ? $this->newPivot()->forceFill($attributes)->getAttributes()
                 : $attributes;
 
