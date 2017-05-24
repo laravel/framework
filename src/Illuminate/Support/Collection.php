@@ -189,11 +189,13 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function conJoin($source)
     {
+        $joinedCollection = new static($this);
+
         foreach ($source as $item) {
-            $this->push($item);
+            $joinedCollection->push($item);
         }
 
-        return $this;
+        return $joinedCollection;
     }
 
     /**
