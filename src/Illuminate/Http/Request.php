@@ -179,11 +179,12 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * Determine if the current request URI matches a pattern.
      *
+     * @param  dynamic  $patterns
      * @return bool
      */
-    public function is()
+    public function is(...$patterns)
     {
-        foreach (func_get_args() as $pattern) {
+        foreach ($patterns as $pattern) {
             if (Str::is($pattern, $this->decodedPath())) {
                 return true;
             }
@@ -206,13 +207,14 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * Determine if the current request URL and query string matches a pattern.
      *
+     * @param  dynamic  $patterns
      * @return bool
      */
-    public function fullUrlIs()
+    public function fullUrlIs(...$patterns)
     {
         $url = $this->fullUrl();
 
-        foreach (func_get_args() as $pattern) {
+        foreach ($patterns as $pattern) {
             if (Str::is($pattern, $url)) {
                 return true;
             }
