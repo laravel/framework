@@ -3,6 +3,7 @@
 namespace Illuminate\Validation\Rules;
 
 use Closure;
+use Illuminate\Database\Eloquent\Model;
 
 class Unique
 {
@@ -51,12 +52,19 @@ class Unique
     /**
      * Create a new unique rule instance.
      *
-     * @param  string  $table
+     * @param  string|\Illuminate\Database\Eloquent\Model  $table
      * @param  string  $column
      * @return void
      */
     public function __construct($table, $column = 'NULL')
     {
+        if ($table instanceof Model) {
+            $this->ignore = $table->getKey();
+            $this->idColumn = $table->getKeyName();
+
+            $table = $table->getTable();
+        }
+
         $this->table = $table;
         $this->column = $column;
     }

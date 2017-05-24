@@ -56,7 +56,7 @@ class Rule
     /**
      * Get a unique constraint builder instance.
      *
-     * @param  string  $table
+     * @param  string|\Illuminate\Database\Eloquent\Model  $table
      * @param  string  $column
      * @return \Illuminate\Validation\Rules\Unique
      */
