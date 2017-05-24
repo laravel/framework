@@ -24,6 +24,7 @@ class PaginatorTest extends TestCase
                     'from' => 3,
                     'to' => 4,
                     'data' => ['item3', 'item4'],
+                    'path' => '/',
                     ];
 
         $this->assertEquals($pageInfo, $p->toArray());
