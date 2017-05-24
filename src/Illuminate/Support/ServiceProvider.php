@@ -19,6 +19,13 @@ abstract class ServiceProvider
      * @var bool
      */
     protected $defer = false;
+	
+	/**
+	 * Indicates whether the default view locations have been registered
+	 *
+	 * @var bool
+	 */
+    protected $viewNamespacesRegistered = false;
 
     /**
      * The paths that should be published.
@@ -50,13 +57,18 @@ abstract class ServiceProvider
      *
      * @param  string  $path
      * @param  string  $key
+     * @param  bool  $publish
      * @return void
      */
-    protected function mergeConfigFrom($path, $key)
+    protected function mergeConfigFrom($path, $key, $publish = false)
     {
         $config = $this->app['config']->get($key, []);
 
         $this->app['config']->set($key, array_merge(require $path, $config));
+        
+        if ($publish) {
+        	$this->publishesConfig($path, $key);
+        }
     }
 
     /**
@@ -77,13 +89,24 @@ abstract class ServiceProvider
      *
      * @param  string  $path
      * @param  string  $namespace
+     * @param  bool  $publish
      * @return void
      */
-    protected function loadViewsFrom($path, $namespace)
+    protected function loadViewsFrom($path, $namespace, $publish = false)
     {
-        if (is_dir($appPath = $this->app->resourcePath().'/views/vendor/'.$namespace)) {
-            $this->app['view']->addNamespace($namespace, $appPath);
-        }
+    	if (!$this->viewNamespacesRegistered) {
+    		$viewPaths = $this->app['config']->get('view.paths', []);
+    		foreach ($viewPaths as $viewPath) {
+			    $viewPath = rtrim($viewPath, '/').'/vendor/'.$namespace;
+			    $this->app['view']->addNamespace($namespace, $viewPath);
+		    }
+		    
+		    if ($publish) {
+    			$this->publishesViews($path, $namespace);
+		    }
+		    
+		    $this->viewNamespacesRegistered = true;
+	    }
 
         $this->app['view']->addNamespace($namespace, $path);
     }
@@ -132,6 +155,78 @@ abstract class ServiceProvider
             $this->addPublishGroup($group, $paths);
         }
     }
+	
+	/**
+	 * Register a view path to be published to the app's configured view directory
+	 *
+	 * @param $path
+	 * @param $namespace
+	 * @param null $group
+	 */
+    protected function publishesViews($path, $namespace, $group = null)
+    {
+	    $viewPaths = $this->app['config']->get('view.paths', [resource_path('views/vendor/')]);
+	    $this->publishes([
+		    $path => rtrim($viewPaths[0], '/')."/vendor/$namespace"
+	    ], $group);
+    }
+	
+	/**
+	 * Register a config file to be published to the app's config directory
+	 *
+	 * @param $path
+	 * @param null $namespace
+	 */
+    protected function publishesConfig($path, $namespace = null, $group = null)
+    {
+    	if (null === $namespace) {
+		    $namespace = basename($path, '.php');
+	    }
+	    
+    	$this->publishes([$path => config_path("$namespace.php")], $group);
+    }
+	
+	/**
+	 * Register a path to be published to the app's lang directory
+	 *
+	 * @param  string  $path
+	 * @param  string  $namespace
+	 * @param  string  $group
+	 * @return void
+	 */
+    protected function publishesTranslations($path, $namespace, $group = null)
+    {
+    	$langPath = method_exists($this->app, 'langPath')
+		    ? $this->app->langPath()
+		    : resource_path('lang');
+    	
+	    $this->publishes([$path => rtrim($langPath, '/')."/vendor/$namespace"], $group);
+    }
+	
+	/**
+	 * Register a path to be published to the app's public directory
+	 *
+	 * @param  string  $path
+	 * @param  string  $namespace
+	 * @param  string  $group
+	 * @return void
+	 */
+	protected function publishesPublicAssets($path, $namespace, $group = null)
+	{
+		$this->publishes([$path => public_path("/vendor/$namespace")], $group);
+	}
+	
+	/**
+	 * Register a path to be published to the app's public directory
+	 *
+	 * @param  string  $path
+	 * @param  string  $group
+	 * @return void
+	 */
+	protected function publishesMigrations($path, $group = null)
+	{
+		$this->publishes([$path => database_path('migrations')], $group);
+	}
 
     /**
      * Ensure the publish array for the service provider is initialized.
