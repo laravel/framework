@@ -57,10 +57,23 @@ class RoutingRedirectorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(59, $response->headers->get('X-RateLimit-Remaining'));
     }
 
-    public function testGuestPutCurrentUrlInSession()
+    public function testGuestPutCurrentUrlInSessionIfSafe()
     {
+        $this->request->shouldReceive('isMethodSafe')->andReturn(true);
         $this->url->shouldReceive('full')->andReturn('http://foo.com/bar');
         $this->session->shouldReceive('put')->once()->with('url.intended', 'http://foo.com/bar');
+
+        $response = $this->redirect->guest('login');
+
+        $this->assertEquals('http://foo.com/login', $response->getTargetUrl());
+    }
+
+    public function testGuestPutsPreviousUrlInSessionIfCurrentUrlNotSafe()
+    {
+        $this->request->shouldReceive('isMethodSafe')->andReturn(false);
+        $this->session->shouldReceive('previousUrl')->once()->andReturn('http://foo.com/bar');
+        $this->session->shouldReceive('put')->once()->with('url.intended', 'http://foo.com/bar');
+        $this->session->shouldReceive('pull')->with('url.intended', '/')->andReturn('http://foo.com/bar');
 
         $response = $this->redirect->guest('login');
 
