@@ -941,21 +941,23 @@ class Router implements RegistrarContract, BindingRegistrar
     /**
      * Alias for the "currentRouteNamed" method.
      *
+     * @param  dynamic  $patterns
      * @return bool
      */
-    public function is()
+    public function is(...$patterns)
     {
-        return call_user_func_array([$this, 'currentRouteNamed'], func_get_args());
+        return $this->currentRouteNamed(...$patterns);
     }
 
     /**
      * Determine if the current route matches a pattern.
      *
+     * @param  dynamic  $patterns
      * @return bool
      */
-    public function currentRouteNamed()
+    public function currentRouteNamed(...$patterns)
     {
-        return ($route = $this->current()) && call_user_func_array([$route, 'named'], func_get_args());
+        return $this->current() && $this->current()->named(...$patterns);
     }
 
     /**

@@ -622,17 +622,18 @@ class Route
     }
 
     /**
-     * Determine whether the route's name matches a pattern.
+     * Determine whether the route's name matches the given patterns.
      *
+     * @param  dynamic  $patterns
      * @return bool
      */
-    public function named()
+    public function named(...$patterns)
     {
         if (is_null($routeName = $this->getName())) {
             return false;
         }
 
-        foreach (func_get_args() as $pattern) {
+        foreach ($patterns as $pattern) {
             if (Str::is($pattern, $routeName)) {
                 return true;
             }
