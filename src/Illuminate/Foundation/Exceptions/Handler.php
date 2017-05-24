@@ -196,7 +196,9 @@ class Handler implements ExceptionHandlerContract
         $errors = $e->validator->errors()->getMessages();
 
         if ($request->expectsJson()) {
-            return response()->json($errors, 422);
+            return response()->json([
+                'message' => $e->getMessage(), 'errors' => $errors,
+            ], 422);
         }
 
         return redirect()->back()->withInput(
