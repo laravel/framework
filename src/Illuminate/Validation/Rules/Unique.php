@@ -81,11 +81,8 @@ class Unique
         }
 
         $this->table = $model->getTable();
-        $this->idColumn = $model->getKeyName();
 
-        if (($key = $model->getKey()) !== null) {
-            $this->ignore = $key;
-        }
+        $this->ignore($model);
     }
 
     /**
@@ -149,6 +146,11 @@ class Unique
      */
     public function ignore($id, $idColumn = 'id')
     {
+        if ($id instanceof Model) {
+            $idColumn = $id->getKeyName();
+            $id = $id->getKey();
+        }
+
         $this->ignore = $id;
         $this->idColumn = $idColumn;
 
