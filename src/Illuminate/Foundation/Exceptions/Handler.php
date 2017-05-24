@@ -197,7 +197,7 @@ class Handler implements ExceptionHandlerContract
 
         if ($request->expectsJson()) {
             return response()->json([
-                'message' => $e->getMessage(), 'errors' => $errors
+                'message' => $e->getMessage(), 'errors' => $errors,
             ], 422);
         }
 
