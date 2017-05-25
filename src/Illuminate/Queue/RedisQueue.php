@@ -133,7 +133,7 @@ class RedisQueue extends Queue implements QueueContract
             $this->migrateAllExpiredJobs($queue);
         }
 
-        $job = $this->getConnection()->lpop($queue);
+        list($selected_queue, $job) = $this->getConnection()->blpop($queue, 0);
 
         if (! is_null($job)) {
             $this->getConnection()->zadd($queue.':reserved', $this->getTime() + $this->expire, $job);
