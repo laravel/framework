@@ -120,16 +120,8 @@ class Kernel implements KernelContract
             }
 
             return $this->getArtisan()->run($input, $output);
-        } catch (Exception $e) {
-            $this->reportException($e);
-
-            $this->renderException($output, $e);
-
-            return 1;
         } catch (Throwable $e) {
-            $e = new FatalThrowableError($e);
-
-            $this->reportException($e);
+            $this->reportException($e = $e instanceof Exception ? $e : new FatalThrowableError($e));
 
             $this->renderException($output, $e);
 
