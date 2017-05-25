@@ -2,7 +2,6 @@
 
 namespace Illuminate\View;
 
-use Exception;
 use Throwable;
 use ArrayAccess;
 use BadMethodCallException;

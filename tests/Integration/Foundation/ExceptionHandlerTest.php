@@ -1,6 +1,5 @@
 <?php
 
-use Faker\Generator;
 use Orchestra\Testbench\TestCase;
 
 /**
@@ -13,7 +12,7 @@ class ExceptionHandlerTest extends TestCase
         parent::setUp();
 
         $this->app->make('router')->get('exception', function () {
-            throw new \Exception("I must fail");
+            throw new \Exception('I must fail');
         });
     }
 
