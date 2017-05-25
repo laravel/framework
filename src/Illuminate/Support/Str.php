@@ -223,11 +223,13 @@ class Str
      *
      * @param  string  $value
      * @param  int     $count
+     * @param  bool    $add_count
      * @return string
      */
-    public static function plural($value, $count = 2)
+    public static function plural($value, $count = 2, $add_count = false)
     {
-        return Pluralizer::plural($value, $count);
+        return ($add_count ? $count.' ' : '')
+            .Pluralizer::plural($value, $count);
     }
 
     /**

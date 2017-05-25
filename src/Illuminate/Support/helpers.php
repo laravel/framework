@@ -760,9 +760,9 @@ if (! function_exists('str_plural')) {
      * @param  int     $count
      * @return string
      */
-    function str_plural($value, $count = 2)
+    function str_plural($value, $count = 2, $add_count = false)
     {
-        return Str::plural($value, $count);
+        return Str::plural($value, $count, $add_count);
     }
 }
 
