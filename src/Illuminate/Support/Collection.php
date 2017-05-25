@@ -187,7 +187,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  \Traversable  $source
      * @return self
      */
-    public function conJoin($source)
+    public function conjoin($source)
     {
         $joinedCollection = new static($this);
 
