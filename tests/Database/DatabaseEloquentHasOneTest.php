@@ -76,7 +76,7 @@ class DatabaseEloquentHasOneTest extends TestCase
     public function testMakeMethodDoesNotSaveNewModel()
     {
         $relation = $this->getRelation();
-        $instance = $this->getMockBuilder('Illuminate\Database\Eloquent\Model')->setMethods(['newInstance', 'setAttribute'])->getMock();
+        $instance = $this->getMockBuilder('Illuminate\Database\Eloquent\Model')->setMethods(['save', 'newInstance', 'setAttribute'])->getMock();
         $relation->getRelated()->shouldReceive('newInstance')->with(['name' => 'taylor'])->andReturn($instance);
         $instance->expects($this->once())->method('setAttribute')->with('foreign_key', 1);
         $instance->expects($this->never())->method('save');

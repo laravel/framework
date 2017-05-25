@@ -182,23 +182,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Conjoin all values of a collection with those of another, regardless of keys.
-     *
-     * @param  \Traversable  $source
-     * @return self
-     */
-    public function conjoin($source)
-    {
-        $joinedCollection = new static($this);
-
-        foreach ($source as $item) {
-            $joinedCollection->push($item);
-        }
-
-        return $joinedCollection;
-    }
-
-    /**
      * Determine if an item exists in the collection.
      *
      * @param  mixed  $key
@@ -1006,6 +989,23 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $this->offsetSet(null, $value);
 
         return $this;
+    }
+
+    /**
+     * Push all of the given items onto the collection.
+     *
+     * @param  \Traversable  $source
+     * @return self
+     */
+    public function concat($source)
+    {
+        $result = new static($this);
+
+        foreach ($source as $item) {
+            $result->push($item);
+        }
+
+        return $result;
     }
 
     /**

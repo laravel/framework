@@ -1722,7 +1722,7 @@ class SupportCollectionTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function testConJoinWithArray()
+    public function testConcatWithArray()
     {
         $expected = [
             0 => 4,
@@ -1740,14 +1740,14 @@ class SupportCollectionTest extends TestCase
         ];
 
         $collection = new Collection([4, 5, 6]);
-        $collection = $collection->conjoin(['a', 'b', 'c']);
-        $collection = $collection->conjoin(['who' => 'Jonny', 'preposition' => 'from', 'where' => 'Laroe']);
-        $actual = $collection->conjoin(['who' => 'Jonny', 'preposition' => 'from', 'where' => 'Laroe'])->toArray();
+        $collection = $collection->concat(['a', 'b', 'c']);
+        $collection = $collection->concat(['who' => 'Jonny', 'preposition' => 'from', 'where' => 'Laroe']);
+        $actual = $collection->concat(['who' => 'Jonny', 'preposition' => 'from', 'where' => 'Laroe'])->toArray();
 
         $this->assertSame($expected, $actual);
     }
 
-    public function testConJoinWithCollection()
+    public function testConcatWithCollection()
     {
         $expected = [
             0 => 4,
@@ -1767,9 +1767,9 @@ class SupportCollectionTest extends TestCase
         $firstCollection = new Collection([4, 5, 6]);
         $secondCollection = new Collection(['a', 'b', 'c']);
         $thirdCollection = new Collection(['who' => 'Jonny', 'preposition' => 'from', 'where' => 'Laroe']);
-        $firstCollection = $firstCollection->conjoin($secondCollection);
-        $firstCollection = $firstCollection->conjoin($thirdCollection);
-        $actual = $firstCollection->conjoin($thirdCollection)->toArray();
+        $firstCollection = $firstCollection->concat($secondCollection);
+        $firstCollection = $firstCollection->concat($thirdCollection);
+        $actual = $firstCollection->concat($thirdCollection)->toArray();
 
         $this->assertSame($expected, $actual);
     }
