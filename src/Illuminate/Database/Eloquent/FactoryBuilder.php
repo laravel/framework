@@ -92,12 +92,12 @@ class FactoryBuilder
     /**
      * Set the states to be applied to the model.
      *
-     * @param  array|mixed  $states
+     * @param  array  ...$states
      * @return $this
      */
-    public function states($states)
+    public function states(...$states)
     {
-        $this->activeStates = is_array($states) ? $states : func_get_args();
+        $this->activeStates = $states;
 
         return $this;
     }
