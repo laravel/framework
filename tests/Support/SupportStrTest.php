@@ -234,6 +234,20 @@ class SupportStrTest extends TestCase
         $this->assertEmpty(Str::substr('Б', 2));
     }
 
+    public function testBetween()
+    {
+        $this->assertEquals('bar', Str::between('foobarbaz', 'foo', 'baz'));
+        $this->assertEquals('foobar', Str::between('foobarbaz', null, 'baz'));
+        $this->assertEquals('foobar', Str::between('foobarbaz', '', 'baz'));
+        $this->assertEquals('barbaz', Str::between('foobarbaz', 'foo', null));
+        $this->assertEquals('barbaz', Str::between('foobarbaz', 'foo', ''));
+        $this->assertEquals('', Str::between('foobarbaz', 'foo', 'nope'));
+        $this->assertEquals('', Str::between('foobarbaz', 'nope', 'baz'));
+        $this->assertEquals('', Str::between('foobarbaz', 'nope', 'baz'));
+        $this->assertEquals('ar', Str::between('foobarbaz', 'b', 'b'));
+        $this->assertEquals('foobarbaz', Str::between('foobarbaz'));
+    }
+
     public function testUcfirst()
     {
         $this->assertEquals('Laravel', Str::ucfirst('laravel'));
