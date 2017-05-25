@@ -577,21 +577,21 @@ if (! function_exists('mix')) {
             $manifestDirectory = "/{$manifestDirectory}";
         }
 
-		$manifestKey = $manifestDirectory ? $manifestDirectory : '/';
+        $manifestKey = $manifestDirectory ? $manifestDirectory : '/';
 
         if (file_exists(public_path($manifestDirectory.'/hot'))) {
             return new HtmlString("//localhost:8080{$path}");
         }
 
-		if (in_array($manifestKey, $manifests)){
-			$manifest = $manifests[$manifestKey];
-		} else {
+        if (in_array($manifestKey, $manifests)){
+            $manifest = $manifests[$manifestKey];
+        } else {
             if (! file_exists($manifestPath = public_path($manifestDirectory.'/mix-manifest.json'))) {
                 throw new Exception('The Mix manifest does not exist.');
             }
 
             $manifest = json_decode(file_get_contents($manifestPath), true);
-			$manifests[$manifestKey] = $manifest;
+            $manifests[$manifestKey] = $manifest;
         }
 
         if (! array_key_exists($path, $manifest)) {
