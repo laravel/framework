@@ -21,20 +21,22 @@ trait ConfirmableTrait
 
         $shouldConfirm = $callback instanceof Closure ? call_user_func($callback) : $callback;
 
-        if ($shouldConfirm) {
-            if ($this->option('force')) {
-                return true;
-            }
+        if (! $shouldConfirm) {
+            return true;
+        }
 
-            $this->alert($warning);
+        if ($this->option('force')) {
+            return true;
+        }
 
-            $confirmed = $this->confirm('Do you really wish to run this command?');
+        $this->alert($warning);
 
-            if (! $confirmed) {
-                $this->comment('Command Cancelled!');
+        $confirmed = $this->confirm('Do you really wish to run this command?');
 
-                return false;
-            }
+        if (! $confirmed) {
+            $this->comment('Command Cancelled!');
+
+            return false;
         }
 
         return true;
