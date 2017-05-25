@@ -252,7 +252,7 @@ class Router implements RegistrarContract, BindingRegistrar
 
         $registrar->register($name, $controller, $options);
     }
-    
+
     /**
      * Route an api resource to a controller.
      *
