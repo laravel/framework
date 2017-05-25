@@ -127,7 +127,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         $values = with(isset($key) ? $this->pluck($key) : $this)
-                    ->sort()->values();
+            ->sort()->values();
 
         $middle = (int) ($count / 2);
 
@@ -553,6 +553,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         return value($default);
+    }
+
+    /**
+     * Get an item from the collection by dotted key.
+     *
+     * @param mixed $key
+     * @param mixed $default
+     *
+     * @return mixed
+     */
+    public function getDot($key, $default = null)
+    {
+        return Arr::get($this->items, $key, $default);
     }
 
     /**
@@ -1227,7 +1240,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         $descending ? arsort($results, $options)
-                    : asort($results, $options);
+            : asort($results, $options);
 
         // Once we have sorted all of the keys in the array, we will loop through them
         // and grab the corresponding model so we can set the underlying items list
