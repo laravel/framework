@@ -3,10 +3,10 @@
 namespace Illuminate\Cookie\Middleware;
 
 use Closure;
+use Exception;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
 class EncryptCookies
@@ -74,7 +74,7 @@ class EncryptCookies
 
             try {
                 $request->cookies->set($key, $this->decryptCookie($c));
-            } catch (DecryptException $e) {
+            } catch (Exception $e) {
                 $request->cookies->set($key, null);
             }
         }
