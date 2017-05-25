@@ -102,7 +102,9 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('fred25', $router->dispatch(Request::create('fred', 'GET'))->getContent());
         $this->assertEquals('fred30', $router->dispatch(Request::create('fred/30', 'GET'))->getContent());
         $this->assertTrue($router->currentRouteNamed('foo'));
+        $this->assertTrue($router->currentRouteNamed('fo*'));
         $this->assertTrue($router->is('foo'));
+        $this->assertTrue($router->is('foo', 'bar'));
         $this->assertFalse($router->is('bar'));
 
         $router = $this->getRouter();
@@ -497,6 +499,15 @@ class RoutingRouteTest extends TestCase
             return 'hello';
         }]);
         $this->assertEquals('hello', $router->dispatch(Request::create('http://api.baz.boom/foo/bar', 'GET'))->getContent());
+    }
+
+    public function testRouteDomainRegistration()
+    {
+        $router = $this->getRouter();
+        $route = $router->get('/foo/bar')->domain('api.foo.bar')->uses(function () {
+            return 'hello';
+        });
+        $this->assertEquals('hello', $router->dispatch(Request::create('http://api.foo.bar/foo/bar', 'GET'))->getContent());
     }
 
     public function testMatchesMethodAgainstRequests()

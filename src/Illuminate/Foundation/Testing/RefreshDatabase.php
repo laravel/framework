@@ -7,13 +7,6 @@ use Illuminate\Contracts\Console\Kernel;
 trait RefreshDatabase
 {
     /**
-     * Indicates if the test database has been migrated.
-     *
-     * @var bool
-     */
-    protected static $migrated = false;
-
-    /**
      * Define hooks to migrate the database before and after each test.
      *
      * @return void
@@ -56,12 +49,12 @@ trait RefreshDatabase
      */
     protected function refreshTestDatabase()
     {
-        if (! static::$migrated) {
+        if (! RefreshDatabaseState::$migrated) {
             $this->artisan('migrate:fresh');
 
             $this->app[Kernel::class]->setArtisan(null);
 
-            static::$migrated = true;
+            RefreshDatabaseState::$migrated = true;
         }
 
         $this->beginDatabaseTransaction();

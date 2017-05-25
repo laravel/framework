@@ -157,9 +157,11 @@ class HttpRequestTest extends TestCase
         $this->assertTrue($request->is('/'));
     }
 
-    public function testIsRouteNameMethod()
+    public function testRouteIsMethod()
     {
         $request = Request::create('/foo/bar', 'GET');
+
+        $this->assertFalse($request->routeIs('foo.bar'));
 
         $request->setRouteResolver(function () use ($request) {
             $route = new Route('GET', '/foo/bar', ['as' => 'foo.bar']);
@@ -169,6 +171,7 @@ class HttpRequestTest extends TestCase
         });
 
         $this->assertTrue($request->routeIs('foo.bar'));
+        $this->assertTrue($request->routeIs('foo*', '*bar'));
         $this->assertFalse($request->routeIs('foo.foo'));
     }
 

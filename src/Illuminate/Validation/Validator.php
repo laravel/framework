@@ -172,6 +172,20 @@ class Validator implements ValidatorContract
     ];
 
     /**
+     * The size related validation rules.
+     *
+     * @var array
+     */
+    protected $sizeRules = ['Size', 'Between', 'Min', 'Max'];
+
+    /**
+     * The numeric related validation rules.
+     *
+     * @var array
+     */
+    protected $numericRules = ['Numeric', 'Integer'];
+
+    /**
      * Create a new Validator instance.
      *
      * @param  \Illuminate\Contracts\Translation\Translator  $translator
@@ -335,8 +349,10 @@ class Validator implements ValidatorContract
         // attribute is invalid and we will add a failure message for this failing attribute.
         $validatable = $this->isValidatable($rule, $attribute, $value);
 
-        if ($validatable && $rule instanceof RuleContract) {
-            return $this->validateUsingCustomRule($attribute, $value, $rule);
+        if ($rule instanceof RuleContract) {
+            return $validatable
+                    ? $this->validateUsingCustomRule($attribute, $value, $rule)
+                    : null;
         }
 
         $method = "validate{$rule}";

@@ -179,11 +179,12 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * Determine if the current request URI matches a pattern.
      *
+     * @param  dynamic  $patterns
      * @return bool
      */
-    public function is()
+    public function is(...$patterns)
     {
-        foreach (func_get_args() as $pattern) {
+        foreach ($patterns as $pattern) {
             if (Str::is($pattern, $this->decodedPath())) {
                 return true;
             }
@@ -193,26 +194,27 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Check if the route name matches the given string.
+     * Determine if the route name matches a given pattern.
      *
-     * @param  string  $name
+     * @param  dynamic  $patterns
      * @return bool
      */
-    public function routeIs($name)
+    public function routeIs(...$patterns)
     {
-        return $this->route() && $this->route()->getName() === $name;
+        return $this->route() && $this->route()->named(...$patterns);
     }
 
     /**
      * Determine if the current request URL and query string matches a pattern.
      *
+     * @param  dynamic  $patterns
      * @return bool
      */
-    public function fullUrlIs()
+    public function fullUrlIs(...$patterns)
     {
         $url = $this->fullUrl();
 
-        foreach (func_get_args() as $pattern) {
+        foreach ($patterns as $pattern) {
             if (Str::is($pattern, $url)) {
                 return true;
             }
@@ -456,7 +458,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         }
 
         return sha1(implode('|', array_merge(
-            $route->methods(), [$route->domain(), $route->uri(), $this->ip()]
+            $route->methods(), [$route->getDomain(), $route->uri(), $this->ip()]
         )));
     }
 

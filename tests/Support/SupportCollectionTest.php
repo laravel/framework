@@ -539,6 +539,25 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([1, 2, 'foo' => 'bar'], $result);
     }
 
+    public function testEachSpread()
+    {
+        $c = new Collection([[1, 'a'], [2, 'b']]);
+
+        $result = [];
+        $c->eachSpread(function ($number, $character) use (&$result) {
+            $result[] = [$number, $character];
+        });
+        $this->assertEquals($c->all(), $result);
+
+        $result = [];
+        $c->eachSpread(function ($number, $character) use (&$result) {
+            $result[] = [$number, $character];
+
+            return false;
+        });
+        $this->assertEquals([[1, 'a']], $result);
+    }
+
     public function testIntersectNull()
     {
         $c = new Collection(['id' => 1, 'first_word' => 'Hello']);
@@ -549,6 +568,18 @@ class SupportCollectionTest extends TestCase
     {
         $c = new Collection(['id' => 1, 'first_word' => 'Hello']);
         $this->assertEquals(['first_word' => 'Hello'], $c->intersect(new Collection(['first_world' => 'Hello', 'last_word' => 'World']))->all());
+    }
+
+    public function testIntersectByKeysNull()
+    {
+        $c = new Collection(['name' => 'Mateus', 'age' => 18]);
+        $this->assertEquals([], $c->intersectByKeys(null)->all());
+    }
+
+    public function testIntersectByKeys()
+    {
+        $c = new Collection(['name' => 'Mateus', 'age' => 18]);
+        $this->assertEquals(['name' => 'Mateus'], $c->intersectByKeys(new Collection(['name' => 'Mateus', 'surname' => 'Guimaraes']))->all());
     }
 
     public function testUnique()
@@ -631,6 +662,35 @@ class SupportCollectionTest extends TestCase
     {
         $data = new Collection([new Collection([1, 2, 3]), new Collection([4, 5, 6])]);
         $this->assertEquals([1, 2, 3, 4, 5, 6], $data->collapse()->all());
+    }
+
+    public function testCrossJoin()
+    {
+        // Cross join with an array
+        $this->assertEquals(
+            [[1, 'a'], [1, 'b'], [2, 'a'], [2, 'b']],
+            (new Collection([1, 2]))->crossJoin(['a', 'b'])->all()
+        );
+
+        // Cross join with a collection
+        $this->assertEquals(
+            [[1, 'a'], [1, 'b'], [2, 'a'], [2, 'b']],
+            (new Collection([1, 2]))->crossJoin(new Collection(['a', 'b']))->all()
+        );
+
+        // Cross join with 2 collections
+        $this->assertEquals(
+            [
+                [1, 'a', 'I'], [1, 'a', 'II'],
+                [1, 'b', 'I'], [1, 'b', 'II'],
+                [2, 'a', 'I'], [2, 'a', 'II'],
+                [2, 'b', 'I'], [2, 'b', 'II'],
+            ],
+            (new Collection([1, 2]))->crossJoin(
+                new Collection(['a', 'b']),
+                new Collection(['I', 'II'])
+            )->all()
+        );
     }
 
     public function testSort()
@@ -937,9 +997,12 @@ class SupportCollectionTest extends TestCase
             return 'slug-'.$number;
         });
 
+        $range = Collection::times(5);
+
         $this->assertEquals(['slug-1', 'slug-2'], $two->all());
         $this->assertTrue($zero->isEmpty());
         $this->assertTrue($negative->isEmpty());
+        $this->assertEquals(range(1, 5), $range->all());
     }
 
     public function testConstructMakeFromObject()
@@ -1022,6 +1085,16 @@ class SupportCollectionTest extends TestCase
             return $key.'-'.strrev($item);
         });
         $this->assertEquals(['first' => 'first-rolyat', 'last' => 'last-llewto'], $data->all());
+    }
+
+    public function testMapSpread()
+    {
+        $c = new Collection([[1, 'a'], [2, 'b']]);
+
+        $result = $c->mapSpread(function ($number, $character) use (&$result) {
+            return "{$number}-{$character}";
+        });
+        $this->assertEquals(['1-a', '2-b'], $result->all());
     }
 
     public function testFlatMap()
