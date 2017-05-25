@@ -35,6 +35,8 @@ trait BuildsQueries
             if ($callback($results, $page) === false) {
                 return false;
             }
+            
+            unset($results);
 
             $page++;
         } while ($countResults == $count);
