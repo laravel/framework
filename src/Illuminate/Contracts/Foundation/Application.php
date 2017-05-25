@@ -28,6 +28,13 @@ interface Application extends Container
     public function environment();
 
     /**
+     * Determine if application is in local environment.
+     *
+     * @return bool
+     */
+    public function isLocal();
+
+    /**
      * Determine if the application is currently down for maintenance.
      *
      * @return bool
