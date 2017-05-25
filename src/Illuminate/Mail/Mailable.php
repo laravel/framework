@@ -179,7 +179,7 @@ class Mailable implements MailableContract, Renderable
      *
      * @return array|string
      */
-    protected function buildView()
+    public function buildView()
     {
         if (isset($this->markdown)) {
             return $this->buildMarkdownView();
