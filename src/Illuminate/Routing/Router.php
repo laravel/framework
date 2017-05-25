@@ -6,6 +6,7 @@ use Closure;
 use ArrayObject;
 use JsonSerializable;
 use Illuminate\Support\Str;
+use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;

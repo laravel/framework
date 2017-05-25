@@ -119,6 +119,7 @@ class TransportManager extends Manager
     protected function createMailgunDriver()
     {
         $config = $this->app['config']->get('services.mailgun', []);
+        $client = new HttpClient(Arr::get($config, 'guzzleOptions', []));
 
         return new MailgunTransport(
             $this->guzzle($config),
@@ -134,6 +135,7 @@ class TransportManager extends Manager
     protected function createMandrillDriver()
     {
         $config = $this->app['config']->get('services.mandrill', []);
+        $client = new HttpClient(Arr::get($config, 'guzzleOptions', []));
 
         return new MandrillTransport(
             $this->guzzle($config), $config['secret']
