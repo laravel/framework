@@ -353,7 +353,7 @@ class Event
     /**
      * E-mail the results of the scheduled operation.
      *
-     * @param  array|mixed  $addresses
+     * @param  array|string  $addresses
      * @param  bool  $onlyIfOutputExists
      * @return $this
      *
@@ -363,7 +363,7 @@ class Event
     {
         $this->ensureOutputIsBeingCapturedForEmail();
 
-        $addresses = is_array($addresses) ? $addresses : func_get_args();
+        $addresses = is_array($addresses) ? $addresses : [$addresses];
 
         return $this->then(function (Mailer $mailer) use ($addresses, $onlyIfOutputExists) {
             $this->emailOutput($mailer, $addresses, $onlyIfOutputExists);
