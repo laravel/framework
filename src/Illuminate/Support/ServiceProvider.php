@@ -165,7 +165,7 @@ abstract class ServiceProvider
      */
     protected function publishesViews($path, $namespace, $group = null)
     {
-        $viewPaths = $this->app['config']->get('view.paths', [resource_path('views/vendor/')]);
+        $viewPaths = $this->app['config']->get('view.paths', [resource_path('views')]);
         $this->publishes([
             $path => rtrim($viewPaths[0], '/')."/vendor/$namespace",
         ], $group);
