@@ -414,7 +414,7 @@ class Blueprint
      * @param  string  $references
      * @return \Illuminate\Support\Fluent
      */
-    public function relationship($columns, $table, $references = 'id')
+    public function relationship($column, $table, $references = 'id')
     {
         return $this->foreign($column)
                     ->references($references)
