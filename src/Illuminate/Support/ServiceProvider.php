@@ -94,21 +94,31 @@ abstract class ServiceProvider
      */
     protected function loadViewsFrom($path, $namespace, $publish = false)
     {
-        if (! $this->viewNamespacesRegistered) {
-            $viewPaths = $this->app['config']->get('view.paths', []);
-            foreach ($viewPaths as $viewPath) {
-                $viewPath = rtrim($viewPath, '/').'/vendor/'.$namespace;
-                $this->app['view']->addNamespace($namespace, $viewPath);
-            }
-
-            if ($publish) {
-                $this->publishesViews($path, $namespace);
-            }
-
-            $this->viewNamespacesRegistered = true;
+        if ($publish) {
+            $this->publishesViews($path, $namespace);
         }
 
+        $this->registerAlternateViewNamespaces($namespace);
         $this->app['view']->addNamespace($namespace, $path);
+    }
+
+    /**
+     * @param  string  $namespace
+     * @return void
+     */
+    protected function registerAlternateViewNamespaces($namespace)
+    {
+        if ($this->viewNamespacesRegistered) {
+            return;
+        }
+
+        $viewPaths = $this->app['config']->get('view.paths', []);
+        foreach ($viewPaths as $viewPath) {
+            $viewPath = rtrim($viewPath, '/').'/vendor/'.$namespace;
+            $this->app['view']->addNamespace($namespace, $viewPath);
+        }
+
+        $this->viewNamespacesRegistered = true;
     }
 
     /**
