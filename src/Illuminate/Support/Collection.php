@@ -8,6 +8,7 @@ use ArrayAccess;
 use Traversable;
 use ArrayIterator;
 use CachingIterator;
+use LengthException;
 use JsonSerializable;
 use IteratorAggregate;
 use InvalidArgumentException;
@@ -1347,6 +1348,32 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $this->items = $this->map($callback)->all();
 
         return $this;
+    }
+
+    /**
+     * Rotate the multidimensional array, turning the rows into columns and the columns into rows.
+     *
+     * @return static
+     *
+     * @throws \LengthException
+     */
+    public function transpose()
+    {
+        if (count($this->items, COUNT_RECURSIVE) <= count($this->items) * 2) {
+            throw new LengthException('Collection is not multidimensional with at least one child each!');
+        }
+
+        $arrayLength = count(reset($this->items));
+
+        $items = array_map(function (...$items) use ($arrayLength) {
+            if (count(array_filter($items)) != $arrayLength) {
+                throw new LengthException('The child collections do not have an even length!');
+            }
+
+            return new static($items);
+        }, ...$this->values());
+
+        return new static($items);
     }
 
     /**
