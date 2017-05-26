@@ -34,6 +34,7 @@ class Pluralizer
         'metadata',
         'money',
         'moose',
+        'news',
         'nutrition',
         'offspring',
         'plankton',
