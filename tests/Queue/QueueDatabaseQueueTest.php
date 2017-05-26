@@ -76,4 +76,62 @@ class QueueDatabaseQueueTest extends PHPUnit_Framework_TestCase
 
         $queue->bulk(['foo', 'bar'], ['data'], 'queue');
     }
+
+    public function testSchedulerUpdatesExpiredJobsWhenNeeded()
+    {
+        $queue = $this->getMock('Illuminate\Queue\DatabaseQueue', ['getNextAvailableJob'], [$database = m::mock('Illuminate\Database\Connection'), 'table', 'default', 1]);
+        $queue->expects($this->any())->method('getNextAvailableJob')->will($this->returnValue(null));
+        $database->shouldReceive('commit');
+        $database->shouldReceive('table')->with('table')->andReturn($query = m::mock('StdClass'));
+        $query->shouldReceive('where')->andReturn($query);
+        $mockJobs = [];
+        for ($i = 0; $i < 3; ++$i) {
+            $mockJobs[$i] = new StdClass();
+            $mockJobs[$i]->id = $i + 1;
+        }
+        $query->shouldReceive('get')->andReturn($mockJobs);
+        $query->shouldReceive('lockForUpdate')->andReturn($query);
+        $query->shouldReceive('select')->once()->andReturnUsing(function ($array) use ($query) {
+            $this->assertEquals('id', $array[0]);
+
+            return $query;
+        });
+        $query->shouldReceive('whereIn')->once()->andReturnUsing(function ($column, $values) use ($query, $mockJobs) {
+            $this->assertEquals('id', $column);
+            foreach ($values as $idx => $v) {
+                $this->assertEquals($mockJobs[$idx]->id, $v);
+            }
+
+            return $query;
+        });
+        $query->shouldReceive('update')->once()->andReturnUsing(function ($array) use ($query) {
+            $this->assertEquals(0, $array['reserved']);
+            $this->assertEquals(null, $array['reserved_at']);
+            $this->assertEquals('attempts + 1', $array['attempts']->getValue());
+
+            return $query;
+        });
+
+        $queue->pop();
+    }
+
+    public function testSchedulerDoesNotTryToExpireJobsWhenNotNeeded()
+    {
+        $queue = $this->getMock('Illuminate\Queue\DatabaseQueue', ['getNextAvailableJob'], [$database = m::mock('Illuminate\Database\Connection'), 'table', 'default', 1]);
+        $queue->expects($this->any())->method('getNextAvailableJob')->will($this->returnValue(null));
+        $database->shouldReceive('table')->with('table')->andReturn($query = m::mock('StdClass'));
+        $database->shouldReceive('commit');
+        $query->shouldReceive('where')->andReturn($query);
+        $query->shouldReceive('get')->andReturn(null);
+        $query->shouldReceive('lockForUpdate')->andReturn($query);
+        $query->shouldReceive('select')->once()->andReturnUsing(function ($array) use ($query) {
+            $this->assertEquals('id', $array[0]);
+
+            return $query;
+        });
+        $query->shouldReceive('whereIn')->never();
+        $query->shouldReceive('update')->never();
+
+        $queue->pop();
+    }
 }
