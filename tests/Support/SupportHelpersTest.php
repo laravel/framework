@@ -252,6 +252,13 @@ class SupportHelpersTest extends TestCase
         $this->assertFalse(Str::endsWith('jason', ['no']));
     }
 
+    public function testStrAfter()
+    {
+        $this->assertEquals('nah', str_after('hannah', 'han'));
+        $this->assertEquals('nah', str_after('hannah', 'n'));
+        $this->assertEmpty(str_after('hannah', 'caleb'));
+    }
+
     public function testStrContains()
     {
         $this->assertTrue(Str::contains('taylor', 'ylo'));

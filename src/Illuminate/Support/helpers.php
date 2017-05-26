@@ -695,6 +695,20 @@ if (! function_exists('starts_with')) {
     }
 }
 
+if (! function_exists('str_after')) {
+    /**
+     * Return the remainder of a string after a given value.
+     *
+     * @param  string  $subject
+     * @param  string  $search
+     * @return string
+     */
+    function str_after($subject, $search)
+    {
+        return Str::after($subject, $search);
+    }
+}
+
 if (! function_exists('str_contains')) {
     /**
      * Determine if a given string contains a given substring.
