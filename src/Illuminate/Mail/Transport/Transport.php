@@ -3,8 +3,8 @@
 namespace Illuminate\Mail\Transport;
 
 use Swift_Transport;
-use Swift_Mime_SimpleMessage;
 use Swift_Events_SendEvent;
+use Swift_Mime_SimpleMessage;
 use Swift_Events_EventListener;
 
 abstract class Transport implements Swift_Transport
