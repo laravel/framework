@@ -3,8 +3,8 @@
 namespace Illuminate\Support\Traits;
 
 use Closure;
-use BadMethodCallException;
 use ReflectionFunction;
+use BadMethodCallException;
 
 trait Macroable
 {
@@ -56,7 +56,7 @@ trait Macroable
         if (static::$macros[$method] instanceof Closure) {
             $reflection = new ReflectionFunction(static::$macros[$method]);
 
-            /**
+            /*
              * If the closure from Closure::fromCallable() or ReflectionFunctionAbstract::getClosure(),
              * its name is not "{closure}".
              */
@@ -86,7 +86,7 @@ trait Macroable
         if (static::$macros[$method] instanceof Closure) {
             $reflection = new ReflectionFunction(static::$macros[$method]);
 
-            /**
+            /*
              * If it is a static closure, it looks like:
              * Closure [ <user, prototype Closure> static function {closure} ] {
              *     ... ...
@@ -97,7 +97,7 @@ trait Macroable
              *     ... ...
              * }
              */
-            if ($reflection->name === '{closure}' && strpos(explode(PHP_EOL, (string)$reflection)[0], 'static') !== false) {
+            if ($reflection->name === '{closure}' && strpos(explode(PHP_EOL, (string) $reflection)[0], 'static') !== false) {
                 return call_user_func_array(static::$macros[$method]->bindTo($this, static::class), $parameters);
             }
         }
