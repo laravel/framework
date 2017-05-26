@@ -51,7 +51,18 @@ class SupportServiceProviderTest extends TestCase
         $provider->boot();
 
         $haystack = ServiceProvider::pathsToPublish(ServiceProviderForTestingThree::class);
-        $this->assertContains('path/to/views/vendor/my-namespace', $haystack, 'publishesViews does not publish to the configured view directory'.print_r($haystack, true));
+        $this->assertContains('path/to/views/vendor/my-namespace', $haystack, 'publishesViews does not publish to the configured view directory');
+    }
+
+    public function testPublishesDefaultViews()
+    {
+        $app = new Application();
+        $app->instance('config', new Repository([]));
+        $provider = new ServiceProviderForTestingThree($app);
+        $provider->boot();
+
+        $haystack = ServiceProvider::pathsToPublish(ServiceProviderForTestingThree::class);
+        $this->assertContains($app->resourcePath('views/vendor/my-namespace'), $haystack, 'publishesViews does not publish to the default view directory when no view.paths are set');
     }
 
     public function testPublishableGroups()
