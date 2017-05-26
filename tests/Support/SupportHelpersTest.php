@@ -256,7 +256,7 @@ class SupportHelpersTest extends TestCase
     {
         $this->assertEquals('nah', str_after('hannah', 'han'));
         $this->assertEquals('nah', str_after('hannah', 'n'));
-        $this->assertEmpty(str_after('hannah', 'caleb'));
+        $this->assertEmpty(str_after('hannah', 'xxxx'));
     }
 
     public function testStrContains()
