@@ -25,7 +25,7 @@
         "mtdowling/cron-expression": "~1.0",
         "nesbot/carbon": "~1.20",
         "ramsey/uuid": "~3.0",
-        "swiftmailer/swiftmailer": "~5.4",
+        "swiftmailer/swiftmailer": "~6.0",
         "symfony/console": "~3.2",
         "symfony/debug": "~3.2",
         "symfony/finder": "~3.2",
