@@ -25,7 +25,7 @@ abstract class ServiceProvider
      *
      * @var bool
      */
-    protected $viewNamespacesRegistered = false;
+    protected $applicationViewNamespacesRegistered = false;
 
     /**
      * The paths that should be published.
@@ -98,7 +98,7 @@ abstract class ServiceProvider
             $this->publishesViews($path, $namespace);
         }
 
-        $this->registerAlternateViewNamespaces($namespace);
+        $this->registerApplicationViewNamespaces($namespace);
         $this->app['view']->addNamespace($namespace, $path);
     }
 
@@ -106,9 +106,9 @@ abstract class ServiceProvider
      * @param  string  $namespace
      * @return void
      */
-    protected function registerAlternateViewNamespaces($namespace)
+    protected function registerApplicationViewNamespaces($namespace)
     {
-        if ($this->viewNamespacesRegistered) {
+        if ($this->applicationViewNamespacesRegistered) {
             return;
         }
 
@@ -118,7 +118,7 @@ abstract class ServiceProvider
             $this->app['view']->addNamespace($namespace, $viewPath);
         }
 
-        $this->viewNamespacesRegistered = true;
+        $this->applicationViewNamespacesRegistered = true;
     }
 
     /**
