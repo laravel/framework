@@ -4,6 +4,7 @@ namespace Illuminate\Support\Traits;
 
 use Closure;
 use BadMethodCallException;
+use ReflectionFunction;
 
 trait Macroable
 {
@@ -53,7 +54,15 @@ trait Macroable
         }
 
         if (static::$macros[$method] instanceof Closure) {
-            return call_user_func_array(Closure::bind(static::$macros[$method], null, static::class), $parameters);
+            $reflection = new ReflectionFunction(static::$macros[$method]);
+
+            /**
+             * If the closure from Closure::fromCallable() or ReflectionFunctionAbstract::getClosure(),
+             * its name is not "{closure}".
+             */
+            if ($reflection->name === '{closure}') {
+                return call_user_func_array(Closure::bind(static::$macros[$method], null, static::class), $parameters);
+            }
         }
 
         return call_user_func_array(static::$macros[$method], $parameters);
@@ -75,7 +84,22 @@ trait Macroable
         }
 
         if (static::$macros[$method] instanceof Closure) {
-            return call_user_func_array(static::$macros[$method]->bindTo($this, static::class), $parameters);
+            $reflection = new ReflectionFunction(static::$macros[$method]);
+
+            /**
+             * If it is a static closure, it looks like:
+             * Closure [ <user, prototype Closure> static function {closure} ] {
+             *     ... ...
+             * }
+             *
+             * If it is not a static closure, it looks like:
+             * Closure [ <user, prototype Closure> function {closure} ] {
+             *     ... ...
+             * }
+             */
+            if ($reflection->name === '{closure}' && strpos(explode(PHP_EOL, (string)$reflection)[0], 'static') !== false) {
+                return call_user_func_array(static::$macros[$method]->bindTo($this, static::class), $parameters);
+            }
         }
 
         return call_user_func_array(static::$macros[$method], $parameters);
