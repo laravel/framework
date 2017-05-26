@@ -1,11 +1,11 @@
 <?php
 
-use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Mail\Markdown;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Channels\MailChannel;
@@ -66,7 +66,7 @@ class SendingMailNotificationsTest extends TestCase
         $this->mailer->shouldReceive('send')->once()->with(
             ['html' => 'htmlContent', 'text' => 'textContent'],
             $notification->toMail($user)->toArray(),
-            Mockery::on(function($closure){
+            Mockery::on(function ($closure) {
                 $message = Mockery::mock(\Illuminate\Mail\Message::class);
 
                 $message->shouldReceive('to')->once()->with(['taylor@laravel.com']);
@@ -102,7 +102,7 @@ class SendingMailNotificationsTest extends TestCase
         $this->mailer->shouldReceive('send')->once()->with(
             ['html' => 'htmlContent', 'text' => 'textContent'],
             $notification->toMail($user)->toArray(),
-            Mockery::on(function($closure){
+            Mockery::on(function ($closure) {
                 $message = Mockery::mock(\Illuminate\Mail\Message::class);
 
                 $message->shouldReceive('to')->once()->with(['taylor@laravel.com']);
