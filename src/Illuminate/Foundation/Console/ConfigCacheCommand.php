@@ -54,7 +54,7 @@ class ConfigCacheCommand extends Command
         $config = $this->getFreshConfiguration();
 
         $this->files->put(
-            $this->laravel->getCachedConfigPath(), '<?php return '.var_export($config, true).';'.PHP_EOL
+            $this->laravel->getCachedConfigPath(), '<?php return '.str_replace('stdClass::__set_state', '(object)', var_export($config, true)).';'.PHP_EOL
         );
 
         $this->info('Configuration cached successfully!');
