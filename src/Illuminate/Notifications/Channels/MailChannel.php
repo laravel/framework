@@ -2,7 +2,6 @@
 
 namespace Illuminate\Notifications\Channels;
 
-use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Mail\Markdown;
@@ -30,6 +29,7 @@ class MailChannel
      * Create a new mail channel instance.
      *
      * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
+     * @param  \Illuminate\Mail\Markdown  $markdown
      * @return void
      */
     public function __construct(Mailer $mailer, Markdown $markdown)

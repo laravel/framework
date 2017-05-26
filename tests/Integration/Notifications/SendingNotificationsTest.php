@@ -1,13 +1,13 @@
 <?php
 
-use Illuminate\Contracts\Mail\Mailer;
-use Illuminate\Notifications\Channels\MailChannel;
-use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Notifications\Notification;
 use Orchestra\Testbench\TestCase;
+use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Channels\MailChannel;
 
 /**
  * @group integration
