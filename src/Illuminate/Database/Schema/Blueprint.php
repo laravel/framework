@@ -283,7 +283,7 @@ class Blueprint
     }
 
     /**
-     * Drops a relationship
+     * Drops a relationship.
      *
      * @param  string  $table
      * @param  string  $column
@@ -407,7 +407,7 @@ class Blueprint
     }
 
     /**
-     * Creates a relationship
+     * Creates a relationship.
      *
      * @param  string  $column
      * @param  string  $name
