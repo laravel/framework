@@ -410,14 +410,15 @@ class Blueprint
      * Creates a relationship.
      *
      * @param  string  $column
-     * @param  string  $name
+     * @param  string  $table
+     * @param  string  $references
      * @return \Illuminate\Support\Fluent
      */
-    public function relationship($columns, $references, $on = 'id')
+    public function relationship($columns, $table, $references = 'id')
     {
         return $this->foreign($column)
                     ->references($references)
-                    ->on($on);
+                    ->on($table);
     }
 
     /**
