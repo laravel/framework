@@ -36,6 +36,8 @@ trait BuildsQueries
                 return false;
             }
 
+            unset($results);
+
             $page++;
         } while ($countResults == $count);
 
