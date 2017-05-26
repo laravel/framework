@@ -24,4 +24,15 @@ class Notification
     {
         return [];
     }
+
+    /**
+     * Sets the notification id.
+     *
+     * @param  string  $id
+     * @return void
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
 }

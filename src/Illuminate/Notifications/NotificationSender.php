@@ -143,21 +143,15 @@ class NotificationSender
     {
         $notifiables = $this->formatNotifiables($notifiables);
 
-        $original = clone $notification;
-
         foreach ($notifiables as $notifiable) {
-            $notificationId = Uuid::uuid4()->toString();
+            $singleNotification = tap(clone $notification)->setId(Uuid::uuid4()->toString());
 
-            foreach ($original->via($notifiable) as $channel) {
-                $notification = clone $original;
-
-                $notification->id = $notificationId;
-
+            foreach ($notification->via($notifiable) as $channel) {
                 $this->bus->dispatch(
-                    (new SendQueuedNotifications($this->formatNotifiables($notifiable), $notification, [$channel]))
-                            ->onConnection($notification->connection)
-                            ->onQueue($notification->queue)
-                            ->delay($notification->delay)
+                    (new SendQueuedNotifications($this->formatNotifiables($notifiable), $singleNotification, [$channel]))
+                            ->onConnection($singleNotification->connection)
+                            ->onQueue($singleNotification->queue)
+                            ->delay($singleNotification->delay)
                 );
             }
         }
