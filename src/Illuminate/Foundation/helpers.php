@@ -482,7 +482,7 @@ if (! function_exists('env')) {
         if (strlen($value) > 1 && Str::startsWith($value, '"') && Str::endsWith($value, '"')) {
             return substr($value, 1, -1);
         }
-        
+
         if (Str::startsWith($value, 'base64:')) {
             return base64_decode(substr($value, 7));
         }
