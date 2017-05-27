@@ -189,7 +189,7 @@ abstract class Relation
     public function getRelationExistenceAggregateQuery(Builder $query, Builder $parentQuery, $type, $column)
     {
         return $this->getRelationExistenceQuery(
-            $query, $parentQuery, new Expression($type . '(' . $this->query->getQuery()->getGrammar()->wrap($column) . ')')
+            $query, $parentQuery, new Expression($type.'('.$this->query->getQuery()->getGrammar()->wrap($column).')')
         );
     }
 
