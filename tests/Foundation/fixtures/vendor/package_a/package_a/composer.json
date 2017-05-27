@@ -1,0 +1,9 @@
+{
+    "extra": {
+        "providers": "foo",
+        "facades": {
+            "Foo": "FooClass",
+            "Bar": "BarClass"
+        }
+    }
+}
