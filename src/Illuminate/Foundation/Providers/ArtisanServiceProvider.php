@@ -10,6 +10,7 @@ use Illuminate\Foundation\Console\DownCommand;
 use Illuminate\Auth\Console\ClearResetsCommand;
 use Illuminate\Cache\Console\CacheTableCommand;
 use Illuminate\Foundation\Console\ServeCommand;
+use Illuminate\Foundation\Console\PresetCommand;
 use Illuminate\Queue\Console\FailedTableCommand;
 use Illuminate\Foundation\Console\AppNameCommand;
 use Illuminate\Foundation\Console\JobMakeCommand;
@@ -44,6 +45,7 @@ use Illuminate\Console\Scheduling\ScheduleFinishCommand;
 use Illuminate\Database\Console\Seeds\SeederMakeCommand;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
 use Illuminate\Foundation\Console\NotificationMakeCommand;
+use Illuminate\Database\Console\Factories\FactoryMakeCommand;
 use Illuminate\Queue\Console\WorkCommand as QueueWorkCommand;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Illuminate\Notifications\Console\NotificationTableCommand;
@@ -55,6 +57,7 @@ use Illuminate\Queue\Console\RestartCommand as QueueRestartCommand;
 use Illuminate\Queue\Console\ListFailedCommand as ListFailedQueueCommand;
 use Illuminate\Queue\Console\FlushFailedCommand as FlushFailedQueueCommand;
 use Illuminate\Queue\Console\ForgetFailedCommand as ForgetFailedQueueCommand;
+use Illuminate\Database\Console\Migrations\FreshCommand as MigrateFreshCommand;
 use Illuminate\Database\Console\Migrations\ResetCommand as MigrateResetCommand;
 use Illuminate\Database\Console\Migrations\StatusCommand as MigrateStatusCommand;
 use Illuminate\Database\Console\Migrations\InstallCommand as MigrateInstallCommand;
@@ -86,12 +89,14 @@ class ArtisanServiceProvider extends ServiceProvider
         'Environment' => 'command.environment',
         'KeyGenerate' => 'command.key.generate',
         'Migrate' => 'command.migrate',
+        'MigrateFresh' => 'command.migrate.fresh',
         'MigrateInstall' => 'command.migrate.install',
         'MigrateRefresh' => 'command.migrate.refresh',
         'MigrateReset' => 'command.migrate.reset',
         'MigrateRollback' => 'command.migrate.rollback',
         'MigrateStatus' => 'command.migrate.status',
         'Optimize' => 'command.optimize',
+        'Preset' => 'command.preset',
         'QueueFailed' => 'command.queue.failed',
         'QueueFlush' => 'command.queue.flush',
         'QueueForget' => 'command.queue.forget',
@@ -123,6 +128,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'ControllerMake' => 'command.controller.make',
         'EventGenerate' => 'command.event.generate',
         'EventMake' => 'command.event.make',
+        'FactoryMake' => 'command.factory.make',
         'JobMake' => 'command.job.make',
         'ListenerMake' => 'command.listener.make',
         'MailMake' => 'command.mail.make',
@@ -331,6 +337,18 @@ class ArtisanServiceProvider extends ServiceProvider
      *
      * @return void
      */
+    protected function registerFactoryMakeCommand()
+    {
+        $this->app->singleton('command.factory.make', function ($app) {
+            return new FactoryMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
     protected function registerDownCommand()
     {
         $this->app->singleton('command.down', function () {
@@ -419,6 +437,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.migrate', function ($app) {
             return new MigrateCommand($app['migrator']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerMigrateFreshCommand()
+    {
+        $this->app->singleton('command.migrate.fresh', function () {
+            return new MigrateFreshCommand;
         });
     }
 
@@ -534,6 +564,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.optimize', function ($app) {
             return new OptimizeCommand($app['composer']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerPresetCommand()
+    {
+        $this->app->singleton('command.preset', function () {
+            return new PresetCommand;
         });
     }
 

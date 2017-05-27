@@ -227,15 +227,6 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals('bar', $c->offsetGet(1));
     }
 
-    /**
-     * @expectedException \PHPUnit\Framework\Error\Notice
-     */
-    public function testArrayAccessOffsetGetOnNonExist()
-    {
-        $c = new Collection(['foo', 'bar']);
-        $c->offsetGet(1000);
-    }
-
     public function testArrayAccessOffsetSet()
     {
         $c = new Collection(['foo', 'foo']);
@@ -247,15 +238,12 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals('qux', $c[2]);
     }
 
-    /**
-     * @expectedException \PHPUnit\Framework\Error\Notice
-     */
     public function testArrayAccessOffsetUnset()
     {
         $c = new Collection(['foo', 'bar']);
 
         $c->offsetUnset(1);
-        $c[1];
+        $this->assertFalse(isset($c[1]));
     }
 
     public function testForgetSingleKey()
@@ -551,6 +539,25 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([1, 2, 'foo' => 'bar'], $result);
     }
 
+    public function testEachSpread()
+    {
+        $c = new Collection([[1, 'a'], [2, 'b']]);
+
+        $result = [];
+        $c->eachSpread(function ($number, $character) use (&$result) {
+            $result[] = [$number, $character];
+        });
+        $this->assertEquals($c->all(), $result);
+
+        $result = [];
+        $c->eachSpread(function ($number, $character) use (&$result) {
+            $result[] = [$number, $character];
+
+            return false;
+        });
+        $this->assertEquals([[1, 'a']], $result);
+    }
+
     public function testIntersectNull()
     {
         $c = new Collection(['id' => 1, 'first_word' => 'Hello']);
@@ -561,6 +568,18 @@ class SupportCollectionTest extends TestCase
     {
         $c = new Collection(['id' => 1, 'first_word' => 'Hello']);
         $this->assertEquals(['first_word' => 'Hello'], $c->intersect(new Collection(['first_world' => 'Hello', 'last_word' => 'World']))->all());
+    }
+
+    public function testIntersectByKeysNull()
+    {
+        $c = new Collection(['name' => 'Mateus', 'age' => 18]);
+        $this->assertEquals([], $c->intersectByKeys(null)->all());
+    }
+
+    public function testIntersectByKeys()
+    {
+        $c = new Collection(['name' => 'Mateus', 'age' => 18]);
+        $this->assertEquals(['name' => 'Mateus'], $c->intersectByKeys(new Collection(['name' => 'Mateus', 'surname' => 'Guimaraes']))->all());
     }
 
     public function testUnique()
@@ -643,6 +662,35 @@ class SupportCollectionTest extends TestCase
     {
         $data = new Collection([new Collection([1, 2, 3]), new Collection([4, 5, 6])]);
         $this->assertEquals([1, 2, 3, 4, 5, 6], $data->collapse()->all());
+    }
+
+    public function testCrossJoin()
+    {
+        // Cross join with an array
+        $this->assertEquals(
+            [[1, 'a'], [1, 'b'], [2, 'a'], [2, 'b']],
+            (new Collection([1, 2]))->crossJoin(['a', 'b'])->all()
+        );
+
+        // Cross join with a collection
+        $this->assertEquals(
+            [[1, 'a'], [1, 'b'], [2, 'a'], [2, 'b']],
+            (new Collection([1, 2]))->crossJoin(new Collection(['a', 'b']))->all()
+        );
+
+        // Cross join with 2 collections
+        $this->assertEquals(
+            [
+                [1, 'a', 'I'], [1, 'a', 'II'],
+                [1, 'b', 'I'], [1, 'b', 'II'],
+                [2, 'a', 'I'], [2, 'a', 'II'],
+                [2, 'b', 'I'], [2, 'b', 'II'],
+            ],
+            (new Collection([1, 2]))->crossJoin(
+                new Collection(['a', 'b']),
+                new Collection(['I', 'II'])
+            )->all()
+        );
     }
 
     public function testSort()
@@ -935,6 +983,28 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $collection->all());
     }
 
+    public function testTimesMethod()
+    {
+        $two = Collection::times(2, function ($number) {
+            return 'slug-'.$number;
+        });
+
+        $zero = Collection::times(0, function ($number) {
+            return 'slug-'.$number;
+        });
+
+        $negative = Collection::times(-4, function ($number) {
+            return 'slug-'.$number;
+        });
+
+        $range = Collection::times(5);
+
+        $this->assertEquals(['slug-1', 'slug-2'], $two->all());
+        $this->assertTrue($zero->isEmpty());
+        $this->assertTrue($negative->isEmpty());
+        $this->assertEquals(range(1, 5), $range->all());
+    }
+
     public function testConstructMakeFromObject()
     {
         $object = new stdClass();
@@ -1017,6 +1087,16 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['first' => 'first-rolyat', 'last' => 'last-llewto'], $data->all());
     }
 
+    public function testMapSpread()
+    {
+        $c = new Collection([[1, 'a'], [2, 'b']]);
+
+        $result = $c->mapSpread(function ($number, $character) use (&$result) {
+            return "{$number}-{$character}";
+        });
+        $this->assertEquals(['1-a', '2-b'], $result->all());
+    }
+
     public function testFlatMap()
     {
         $data = new Collection([
@@ -1027,6 +1107,35 @@ class SupportCollectionTest extends TestCase
             return $person['hobbies'];
         });
         $this->assertEquals(['programming', 'basketball', 'music', 'powerlifting'], $data->all());
+    }
+
+    public function testMapToGroups()
+    {
+        $data = new Collection([
+            ['id' => 1, 'name' => 'A'],
+            ['id' => 2, 'name' => 'B'],
+            ['id' => 3, 'name' => 'C'],
+            ['id' => 4, 'name' => 'B'],
+        ]);
+
+        $groups = $data->mapToGroups(function ($item, $key) {
+            return [$item['name'] => $item['id']];
+        });
+
+        $this->assertInstanceOf(Collection::class, $groups);
+        $this->assertEquals(['A' => [1], 'B' => [2, 4], 'C' => [3]], $groups->toArray());
+        $this->assertInstanceOf(Collection::class, $groups['A']);
+    }
+
+    public function testMapToGroupsWithNumericKeys()
+    {
+        $data = new Collection([1, 2, 3, 2, 1]);
+
+        $groups = $data->mapToGroups(function ($item, $key) {
+            return [$item => $key];
+        });
+
+        $this->assertEquals([1 => [0, 4], 2 => [1, 3], 3 => [2]], $groups->toArray());
     }
 
     public function testMapWithKeys()

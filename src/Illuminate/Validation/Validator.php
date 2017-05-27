@@ -11,7 +11,9 @@ use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Contracts\Validation\ImplicitRule;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 
 class Validator implements ValidatorContract
@@ -168,6 +170,20 @@ class Validator implements ValidatorContract
         'RequiredIf', 'RequiredUnless', 'Confirmed', 'Same', 'Different', 'Unique',
         'Before', 'After', 'BeforeOrEqual', 'AfterOrEqual',
     ];
+
+    /**
+     * The size related validation rules.
+     *
+     * @var array
+     */
+    protected $sizeRules = ['Size', 'Between', 'Min', 'Max'];
+
+    /**
+     * The numeric related validation rules.
+     *
+     * @var array
+     */
+    protected $numericRules = ['Numeric', 'Integer'];
 
     /**
      * Create a new Validator instance.
@@ -333,6 +349,12 @@ class Validator implements ValidatorContract
         // attribute is invalid and we will add a failure message for this failing attribute.
         $validatable = $this->isValidatable($rule, $attribute, $value);
 
+        if ($rule instanceof RuleContract) {
+            return $validatable
+                    ? $this->validateUsingCustomRule($attribute, $value, $rule)
+                    : null;
+        }
+
         $method = "validate{$rule}";
 
         if ($validatable && ! $this->$method($attribute, $value, $parameters, $this)) {
@@ -408,7 +430,7 @@ class Validator implements ValidatorContract
     /**
      * Determine if the attribute is validatable.
      *
-     * @param  string  $rule
+     * @param  object|string  $rule
      * @param  string  $attribute
      * @param  mixed   $value
      * @return bool
@@ -417,14 +439,14 @@ class Validator implements ValidatorContract
     {
         return $this->presentOrRuleIsImplicit($rule, $attribute, $value) &&
                $this->passesOptionalCheck($attribute) &&
-               $this->isNotNullIfMarkedAsNullable($attribute, $value) &&
+               $this->isNotNullIfMarkedAsNullable($rule, $attribute) &&
                $this->hasNotFailedPreviousRuleIfPresenceRule($rule, $attribute);
     }
 
     /**
      * Determine if the field is present, or the rule implies required.
      *
-     * @param  string  $rule
+     * @param  object|string  $rule
      * @param  string  $attribute
      * @param  mixed   $value
      * @return bool
@@ -435,18 +457,20 @@ class Validator implements ValidatorContract
             return $this->isImplicit($rule);
         }
 
-        return $this->validatePresent($attribute, $value) || $this->isImplicit($rule);
+        return $this->validatePresent($attribute, $value) ||
+               $this->isImplicit($rule);
     }
 
     /**
      * Determine if a given rule implies the attribute is required.
      *
-     * @param  string  $rule
+     * @param  object|string  $rule
      * @return bool
      */
     protected function isImplicit($rule)
     {
-        return in_array($rule, $this->implicitRules);
+        return $rule instanceof ImplicitRule ||
+               in_array($rule, $this->implicitRules);
     }
 
     /**
@@ -470,13 +494,13 @@ class Validator implements ValidatorContract
     /**
      * Determine if the attribute fails the nullable check.
      *
+     * @param  string  $rule
      * @param  string  $attribute
-     * @param  mixed  $value
      * @return bool
      */
-    protected function isNotNullIfMarkedAsNullable($attribute, $value)
+    protected function isNotNullIfMarkedAsNullable($rule, $attribute)
     {
-        if (! $this->hasRule($attribute, ['Nullable'])) {
+        if ($this->isImplicit($rule) || ! $this->hasRule($attribute, ['Nullable'])) {
             return true;
         }
 
@@ -495,6 +519,25 @@ class Validator implements ValidatorContract
     protected function hasNotFailedPreviousRuleIfPresenceRule($rule, $attribute)
     {
         return in_array($rule, ['Unique', 'Exists']) ? ! $this->messages->has($attribute) : true;
+    }
+
+    /**
+     * Validate an attribute using a custom rule object.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  \Illuminate\Contracts\Validation\Rule  $rule
+     * @return void
+     */
+    protected function validateUsingCustomRule($attribute, $value, $rule)
+    {
+        if (! $rule->passes($attribute, $value)) {
+            $this->failedRules[$attribute][get_class($rule)] = [];
+
+            $this->messages->add($attribute, $this->makeReplacements(
+                $rule->message(), $attribute, get_class($rule), []
+            ));
+        }
     }
 
     /**
@@ -813,6 +856,21 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Register an array of custom implicit validator extensions.
+     *
+     * @param  array  $extensions
+     * @return void
+     */
+    public function addDependentExtensions(array $extensions)
+    {
+        $this->addExtensions($extensions);
+
+        foreach ($extensions as $rule => $extension) {
+            $this->dependentRules[] = Str::studly($rule);
+        }
+    }
+
+    /**
      * Register a custom validator extension.
      *
      * @param  string  $rule
@@ -836,6 +894,20 @@ class Validator implements ValidatorContract
         $this->addExtension($rule, $extension);
 
         $this->implicitRules[] = Str::studly($rule);
+    }
+
+    /**
+     * Register a custom dependent validator extension.
+     *
+     * @param  string   $rule
+     * @param  \Closure|string  $extension
+     * @return void
+     */
+    public function addDependentExtension($rule, $extension)
+    {
+        $this->addExtension($rule, $extension);
+
+        $this->dependentRules[] = Str::studly($rule);
     }
 
     /**
@@ -1026,7 +1098,7 @@ class Validator implements ValidatorContract
     {
         $callback = $this->extensions[$rule];
 
-        if ($callback instanceof Closure) {
+        if (is_callable($callback)) {
             return call_user_func_array($callback, $parameters);
         } elseif (is_string($callback)) {
             return $this->callClassBasedExtension($callback, $parameters);

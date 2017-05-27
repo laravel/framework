@@ -476,6 +476,21 @@ class Command extends SymfonyCommand
     }
 
     /**
+     * Write a string in an alert box.
+     *
+     * @param  string  $string
+     * @return void
+     */
+    public function alert($string)
+    {
+        $this->comment(str_repeat('*', strlen($string) + 12));
+        $this->comment('*     '.$string.'     *');
+        $this->comment(str_repeat('*', strlen($string) + 12));
+
+        $this->output->writeln('');
+    }
+
+    /**
      * Set the verbosity level.
      *
      * @param  string|int  $level

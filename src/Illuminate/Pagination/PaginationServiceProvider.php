@@ -17,7 +17,7 @@ class PaginationServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__.'/resources/views' => resource_path('views/vendor/pagination'),
+                __DIR__.'/resources/views' => $this->app->resourcePath('views/vendor/pagination'),
             ], 'laravel-pagination');
         }
     }

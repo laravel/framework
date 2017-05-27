@@ -6,7 +6,6 @@ use Mockery as m;
 use ReflectionProperty;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Connection;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Connectors\ConnectionFactory;
 

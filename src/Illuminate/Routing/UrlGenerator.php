@@ -3,6 +3,7 @@
 namespace Illuminate\Routing;
 
 use Closure;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
@@ -363,7 +364,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function formatParameters($parameters)
     {
-        $parameters = array_wrap($parameters);
+        $parameters = Arr::wrap($parameters);
 
         foreach ($parameters as $key => $parameter) {
             if ($parameter instanceof UrlRoutable) {
@@ -444,7 +445,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function isValidUrl($path)
     {
-        if (! Str::startsWith($path, ['#', '//', 'mailto:', 'tel:', 'http://', 'https://'])) {
+        if (! preg_match('~^(#|//|https?://|mailto:|tel:)~', $path)) {
             return filter_var($path, FILTER_VALIDATE_URL) !== false;
         }
 

@@ -36,6 +36,10 @@ class RouteSignatureParameters
     {
         list($class, $method) = Str::parseCallback($uses);
 
+        if (! method_exists($class, $method) && is_callable($class, $method)) {
+            return [];
+        }
+
         return (new ReflectionMethod($class, $method))->getParameters();
     }
 }

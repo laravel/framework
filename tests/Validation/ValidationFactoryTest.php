@@ -34,20 +34,22 @@ class ValidationFactoryTest extends TestCase
         };
         $factory->extend('foo', $noop1);
         $factory->extendImplicit('implicit', $noop2);
+        $factory->extendDependent('dependent', $noop3);
         $factory->replacer('replacer', $noop3);
         $factory->setPresenceVerifier($presence);
         $validator = $factory->make([], []);
-        $this->assertEquals(['foo' => $noop1, 'implicit' => $noop2], $validator->extensions);
+        $this->assertEquals(['foo' => $noop1, 'implicit' => $noop2, 'dependent' => $noop3], $validator->extensions);
         $this->assertEquals(['replacer' => $noop3], $validator->replacers);
         $this->assertEquals($presence, $validator->getPresenceVerifier());
 
         $presence = m::mock(PresenceVerifierInterface::class);
         $factory->extend('foo', $noop1, 'foo!');
         $factory->extendImplicit('implicit', $noop2, 'implicit!');
+        $factory->extendImplicit('dependent', $noop3, 'dependent!');
         $factory->setPresenceVerifier($presence);
         $validator = $factory->make([], []);
-        $this->assertEquals(['foo' => $noop1, 'implicit' => $noop2], $validator->extensions);
-        $this->assertEquals(['foo' => 'foo!', 'implicit' => 'implicit!'], $validator->fallbackMessages);
+        $this->assertEquals(['foo' => $noop1, 'implicit' => $noop2, 'dependent' => $noop3], $validator->extensions);
+        $this->assertEquals(['foo' => 'foo!', 'implicit' => 'implicit!', 'dependent' => 'dependent!'], $validator->fallbackMessages);
         $this->assertEquals($presence, $validator->getPresenceVerifier());
     }
 

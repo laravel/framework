@@ -10,18 +10,10 @@ use Illuminate\Contracts\Mail\Mailer;
 use Symfony\Component\Process\Process;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Container\Container;
-use Illuminate\Contracts\Cache\Repository as Cache;
 
 class Event
 {
     use Macroable, ManagesFrequencies;
-
-    /**
-     * The cache store implementation.
-     *
-     * @var \Illuminate\Contracts\Cache\Repository
-     */
-    protected $cache;
 
     /**
      * The command string.
@@ -129,15 +121,22 @@ class Event
     public $description;
 
     /**
+     * The mutex implementation.
+     *
+     * @var \Illuminate\Console\Scheduling\Mutex
+     */
+    public $mutex;
+
+    /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Contracts\Cache\Repository  $cache
+     * @param  \Illuminate\Console\Scheduling\Mutex  $mutex
      * @param  string  $command
      * @return void
      */
-    public function __construct(Cache $cache, $command)
+    public function __construct(Mutex $mutex, $command)
     {
-        $this->cache = $cache;
+        $this->mutex = $mutex;
         $this->command = $command;
         $this->output = $this->getDefaultOutput();
     }
@@ -160,8 +159,9 @@ class Event
      */
     public function run(Container $container)
     {
-        if ($this->withoutOverlapping) {
-            $this->cache->put($this->mutexName(), true, 1440);
+        if ($this->withoutOverlapping &&
+            ! $this->mutex->create($this)) {
+            return;
         }
 
         $this->runInBackground
@@ -405,7 +405,7 @@ class Event
      */
     protected function emailOutput(Mailer $mailer, $addresses, $onlyIfOutputExists = false)
     {
-        $text = file_get_contents($this->output);
+        $text = file_exists($this->output) ? file_get_contents($this->output) : '';
 
         if ($onlyIfOutputExists && empty($text)) {
             return;
@@ -516,9 +516,9 @@ class Event
         $this->withoutOverlapping = true;
 
         return $this->then(function () {
-            $this->cache->forget($this->mutexName());
+            $this->mutex->forget($this);
         })->skip(function () {
-            return $this->cache->has($this->mutexName());
+            return $this->mutex->exists($this);
         });
     }
 
@@ -631,5 +631,18 @@ class Event
     public function getExpression()
     {
         return $this->expression;
+    }
+
+    /**
+     * Set the mutex implementation to be used.
+     *
+     * @param  \Illuminate\Console\Scheduling\Mutex  $mutex
+     * @return $this
+     */
+    public function preventOverlapsUsing(Mutex $mutex)
+    {
+        $this->mutex = $mutex;
+
+        return $this;
     }
 }

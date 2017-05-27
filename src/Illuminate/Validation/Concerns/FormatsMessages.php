@@ -12,20 +12,6 @@ trait FormatsMessages
     use ReplacesAttributes;
 
     /**
-     * The size related validation rules.
-     *
-     * @var array
-     */
-    protected $sizeRules = ['Size', 'Between', 'Min', 'Max'];
-
-    /**
-     * The numeric related validation rules.
-     *
-     * @var array
-     */
-    protected $numericRules = ['Numeric', 'Integer'];
-
-    /**
      * Get the validation message for an attribute and rule.
      *
      * @param  string  $attribute
@@ -205,7 +191,7 @@ trait FormatsMessages
         );
 
         if (isset($this->replacers[Str::snake($rule)])) {
-            return $this->callReplacer($message, $attribute, Str::snake($rule), $parameters);
+            return $this->callReplacer($message, $attribute, Str::snake($rule), $parameters, $this);
         } elseif (method_exists($this, $replacer = "replace{$rule}")) {
             return $this->$replacer($message, $attribute, $rule, $parameters);
         }
@@ -219,7 +205,7 @@ trait FormatsMessages
      * @param  string  $attribute
      * @return string
      */
-    protected function getDisplayableAttribute($attribute)
+    public function getDisplayableAttribute($attribute)
     {
         $primaryAttribute = $this->getPrimaryAttribute($attribute);
 
@@ -328,16 +314,17 @@ trait FormatsMessages
      * @param  string  $attribute
      * @param  string  $rule
      * @param  array   $parameters
+     * @param  \Illuminate\Validation\Validator  $validator
      * @return string|null
      */
-    protected function callReplacer($message, $attribute, $rule, $parameters)
+    protected function callReplacer($message, $attribute, $rule, $parameters, $validator)
     {
         $callback = $this->replacers[$rule];
 
         if ($callback instanceof Closure) {
             return call_user_func_array($callback, func_get_args());
         } elseif (is_string($callback)) {
-            return $this->callClassBasedReplacer($callback, $message, $attribute, $rule, $parameters);
+            return $this->callClassBasedReplacer($callback, $message, $attribute, $rule, $parameters, $validator);
         }
     }
 
@@ -349,9 +336,10 @@ trait FormatsMessages
      * @param  string  $attribute
      * @param  string  $rule
      * @param  array   $parameters
+     * @param  \Illuminate\Validation\Validator  $validator
      * @return string
      */
-    protected function callClassBasedReplacer($callback, $message, $attribute, $rule, $parameters)
+    protected function callClassBasedReplacer($callback, $message, $attribute, $rule, $parameters, $validator)
     {
         list($class, $method) = Str::parseCallback($callback, 'replace');
 

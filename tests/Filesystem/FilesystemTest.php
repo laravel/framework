@@ -414,4 +414,28 @@ class FilesystemTest extends TestCase
         $this->assertTrue($filesystem->isFile($this->tempDir.'/foo/foo.txt'));
         $this->assertFalse($filesystem->isFile($this->tempDir.'./foo'));
     }
+
+    public function testFilesMethodReturnsFileInfoObjects()
+    {
+        mkdir($this->tempDir.'/foo');
+        file_put_contents($this->tempDir.'/foo/1.txt', '1');
+        file_put_contents($this->tempDir.'/foo/2.txt', '2');
+        mkdir($this->tempDir.'/foo/bar');
+        $files = new Filesystem();
+        foreach ($files->files($this->tempDir.'/foo') as $file) {
+            $this->assertInstanceOf(\SplFileInfo::class, $file);
+        }
+        unset($files);
+    }
+
+    public function testAllFilesReturnsFileInfoObjects()
+    {
+        file_put_contents($this->tempDir.'/foo.txt', 'foo');
+        file_put_contents($this->tempDir.'/bar.txt', 'bar');
+        $files = new Filesystem();
+        $allFiles = [];
+        foreach ($files->allFiles($this->tempDir) as $file) {
+            $this->assertInstanceOf(\SplFileInfo::class, $file);
+        }
+    }
 }

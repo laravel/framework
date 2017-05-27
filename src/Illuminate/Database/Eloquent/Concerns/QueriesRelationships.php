@@ -130,7 +130,7 @@ trait QueriesRelationships
      * @param  int       $count
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function orWhereHas($relation, Closure $callback, $operator = '>=', $count = 1)
+    public function orWhereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)
     {
         return $this->has($relation, $operator, $count, 'or', $callback);
     }
@@ -155,6 +155,10 @@ trait QueriesRelationships
      */
     public function withCount($relations)
     {
+        if (empty($relations)) {
+            return $this;
+        }
+
         if (is_null($this->query->columns)) {
             $this->query->select([$this->query->from.'.*']);
         }
@@ -189,7 +193,7 @@ trait QueriesRelationships
             // Finally we will add the proper result column alias to the query and run the subselect
             // statement against the query builder. Then we will return the builder instance back
             // to the developer for further constraint chaining that needs to take place on it.
-            $column = isset($alias) ? $alias : snake_case($name.'_count');
+            $column = isset($alias) ? $alias : Str::snake($name.'_count');
 
             $this->selectSub($query->toBase(), $column);
         }

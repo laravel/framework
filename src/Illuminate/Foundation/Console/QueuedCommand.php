@@ -2,11 +2,15 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Contracts\Console\Kernel as KernelContract;
 
 class QueuedCommand implements ShouldQueue
 {
+    use Dispatchable, Queueable;
+
     /**
      * The data to pass to the Artisan command.
      *

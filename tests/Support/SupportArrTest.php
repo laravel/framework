@@ -35,6 +35,41 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['foo', 'bar', 'baz'], Arr::collapse($data));
     }
 
+    public function testCrossJoin()
+    {
+        // Single dimension
+        $this->assertEquals(
+            [[1, 'a'], [1, 'b'], [1, 'c']],
+            Arr::crossJoin([1], ['a', 'b', 'c'])
+        );
+
+        // Square matrix
+        $this->assertEquals(
+            [[1, 'a'], [1, 'b'], [2, 'a'], [2, 'b']],
+            Arr::crossJoin([1, 2], ['a', 'b'])
+        );
+
+        // Rectangular matrix
+        $this->assertEquals(
+            [[1, 'a'], [1, 'b'], [1, 'c'], [2, 'a'], [2, 'b'], [2, 'c']],
+            Arr::crossJoin([1, 2], ['a', 'b', 'c'])
+        );
+
+        // 3D matrix
+        $this->assertEquals(
+            [
+                [1, 'a', 'I'], [1, 'a', 'II'], [1, 'a', 'III'],
+                [1, 'b', 'I'], [1, 'b', 'II'], [1, 'b', 'III'],
+                [2, 'a', 'I'], [2, 'a', 'II'], [2, 'a', 'III'],
+                [2, 'b', 'I'], [2, 'b', 'II'], [2, 'b', 'III'],
+            ],
+            Arr::crossJoin([1, 2], ['a', 'b'], ['I', 'II', 'III'])
+        );
+
+        // With 1 empty dimension
+        $this->assertEquals([], Arr::crossJoin([1, 2], [], ['I', 'II', 'III']));
+    }
+
     public function testDivide()
     {
         list($keys, $values) = Arr::divide(['name' => 'Desk']);
@@ -521,5 +556,16 @@ class SupportArrTest extends TestCase
         $array = ['emails' => ['joe@example.com' => ['name' => 'Joe'], 'jane@localhost' => ['name' => 'Jane']]];
         Arr::forget($array, ['emails.joe@example.com', 'emails.jane@localhost']);
         $this->assertEquals(['emails' => ['joe@example.com' => ['name' => 'Joe']]], $array);
+    }
+
+    public function testWrap()
+    {
+        $string = 'a';
+        $array = ['a'];
+        $object = new stdClass;
+        $object->value = 'a';
+        $this->assertEquals(['a'], Arr::wrap($string));
+        $this->assertEquals($array, Arr::wrap($array));
+        $this->assertEquals([$object], Arr::wrap($object));
     }
 }

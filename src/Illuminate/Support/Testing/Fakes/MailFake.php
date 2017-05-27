@@ -31,7 +31,7 @@ class MailFake implements Mailer
     }
 
     /**
-     * Determine if a mailable was sent based on a truth-test callback.
+     * Determine if a mailable was not sent based on a truth-test callback.
      *
      * @param  string  $mailable
      * @param  callable|null  $callback
@@ -43,6 +43,16 @@ class MailFake implements Mailer
             $this->sent($mailable, $callback)->count() === 0,
             "The unexpected [{$mailable}] mailable was sent."
         );
+    }
+
+    /**
+     * Assert that no mailables were sent.
+     *
+     * @return void
+     */
+    public function assertNothingSent()
+    {
+        PHPUnit::assertEmpty($this->mailables, 'Mailables were sent unexpectedly.');
     }
 
     /**

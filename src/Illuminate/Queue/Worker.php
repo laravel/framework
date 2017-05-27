@@ -5,12 +5,15 @@ namespace Illuminate\Queue;
 use Exception;
 use Throwable;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Database\DetectsLostConnections;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 
 class Worker
 {
+    use DetectsLostConnections;
+
     /**
      * The queue manager instance.
      *
@@ -88,7 +91,7 @@ class Worker
             // Before reserving any jobs, we will make sure this queue is not paused and
             // if it is we will just pause this worker for a given amount of time and
             // make sure we do not need to kill this worker process off completely.
-            if (! $this->daemonShouldRun($options)) {
+            if (! $this->daemonShouldRun($options, $connectionName, $queue)) {
                 $this->pauseWorker($options, $lastRestart);
 
                 continue;
@@ -128,7 +131,9 @@ class Worker
      */
     protected function registerTimeoutHandler($job, WorkerOptions $options)
     {
-        if ($options->timeout > 0 && $this->supportsAsyncSignals()) {
+        $timeout = $this->timeoutForJob($job, $options);
+
+        if ($timeout > 0 && $this->supportsAsyncSignals()) {
             // We will register a signal handler for the alarm signal so that we can kill this
             // process if it is running too long because it has frozen. This uses the async
             // signals supported in recent versions of PHP to accomplish it conveniently.
@@ -136,7 +141,7 @@ class Worker
                 $this->kill(1);
             });
 
-            pcntl_alarm($this->timeoutForJob($job, $options) + $options->sleep);
+            pcntl_alarm($timeout + $options->sleep);
         }
     }
 
@@ -156,13 +161,15 @@ class Worker
      * Determine if the daemon should process on this iteration.
      *
      * @param  WorkerOptions  $options
+     * @param  string  $connectionName
+     * @param  string  $queue
      * @return bool
      */
-    protected function daemonShouldRun(WorkerOptions $options)
+    protected function daemonShouldRun(WorkerOptions $options, $connectionName, $queue)
     {
         return ! (($this->manager->isDownForMaintenance() && ! $options->force) ||
             $this->paused ||
-            $this->events->until(new Events\Looping) === false);
+            $this->events->until(new Events\Looping($connectionName, $queue)) === false);
     }
 
     /**
@@ -239,8 +246,12 @@ class Worker
             }
         } catch (Exception $e) {
             $this->exceptions->report($e);
+
+            $this->stopWorkerIfLostConnection($e);
         } catch (Throwable $e) {
             $this->exceptions->report(new FatalThrowableError($e));
+
+            $this->stopWorkerIfLostConnection($e);
         }
     }
 
@@ -258,8 +269,25 @@ class Worker
             return $this->process($connectionName, $job, $options);
         } catch (Exception $e) {
             $this->exceptions->report($e);
+
+            $this->stopWorkerIfLostConnection($e);
         } catch (Throwable $e) {
             $this->exceptions->report(new FatalThrowableError($e));
+
+            $this->stopWorkerIfLostConnection($e);
+        }
+    }
+
+    /**
+     * Stop the worker if we have lost connection to a database.
+     *
+     * @param  \Exception  $e
+     * @return void
+     */
+    protected function stopWorkerIfLostConnection($e)
+    {
+        if ($this->causedByLostConnection($e)) {
+            $this->shouldQuit = true;
         }
     }
 
@@ -328,7 +356,7 @@ class Worker
             // If we catch an exception, we will attempt to release the job back onto the queue
             // so it is not lost entirely. This'll let the job be retried at a later time by
             // another listener (or this same one). We will re-throw this exception after.
-            if (! $job->isDeleted()) {
+            if (! $job->isDeleted() && ! $job->isReleased() && ! $job->hasFailed()) {
                 $job->release($options->delay);
             }
         }
@@ -567,5 +595,26 @@ class Worker
     public function setCache(CacheContract $cache)
     {
         $this->cache = $cache;
+    }
+
+    /**
+     * Get the queue manager instance.
+     *
+     * @return \Illuminate\Queue\QueueManager
+     */
+    public function getManager()
+    {
+        return $this->manager;
+    }
+
+    /**
+     * Set the queue manager instance.
+     *
+     * @param  \Illuminate\Queue\QueueManager  $manager
+     * @return void
+     */
+    public function setManager(QueueManager $manager)
+    {
+        $this->manager = $manager;
     }
 }

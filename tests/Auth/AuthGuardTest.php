@@ -111,6 +111,19 @@ class AuthGuardTest extends TestCase
         $mock->login($user);
     }
 
+    public function testSessionGuardIsMacroable()
+    {
+        $guard = $this->getGuard();
+
+        $guard->macro('foo', function () {
+            return 'bar';
+        });
+
+        $this->assertEquals(
+            'bar', $guard->foo()
+        );
+    }
+
     public function testLoginFiresLoginAndAuthenticatedEvents()
     {
         list($session, $provider, $request, $cookie) = $this->getMocks();

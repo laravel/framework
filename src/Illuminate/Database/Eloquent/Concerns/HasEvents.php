@@ -136,7 +136,9 @@ trait HasEvents
         // returns a result we can return that result, or we'll call the string events.
         $method = $halt ? 'until' : 'fire';
 
-        $result = $this->fireCustomModelEvent($event, $method);
+        $result = $this->filterModelEventResults(
+            $this->fireCustomModelEvent($event, $method)
+        );
 
         if ($result === false) {
             return false;
@@ -165,6 +167,23 @@ trait HasEvents
         if (! is_null($result)) {
             return $result;
         }
+    }
+
+    /**
+     * Filter the model event results.
+     *
+     * @param  mixed  $result
+     * @return mixed
+     */
+    protected function filterModelEventResults($result)
+    {
+        if (is_array($result)) {
+            $result = array_filter($result, function ($response) {
+                return ! is_null($response);
+            });
+        }
+
+        return $result;
     }
 
     /**

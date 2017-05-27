@@ -5,11 +5,14 @@ namespace Illuminate\Tests\Validation;
 use DateTime;
 use Mockery as m;
 use Carbon\Carbon;
+use Illuminate\Support\Arr;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Validation\Validator;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
+use Illuminate\Contracts\Validation\Rule;
 use Symfony\Component\HttpFoundation\File\File;
+use Illuminate\Contracts\Validation\ImplicitRule;
 
 class ValidationValidatorTest extends TestCase
 {
@@ -175,6 +178,37 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals('validation.numeric', $v->messages()->get('z')[0]);
         $this->assertEquals('validation.array', $v->messages()->get('a')[0]);
         $this->assertEquals('validation.boolean', $v->messages()->get('b')[0]);
+    }
+
+    public function testNullableMakesNoDifferenceIfImplicitRuleExists()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, [
+            'x' => null, 'y' => null,
+        ], [
+            'x' => 'nullable|required_with:y|integer',
+            'y' => 'nullable|required_with:x|integer',
+        ]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, [
+            'x' => 'value', 'y' => null,
+        ], [
+            'x' => 'nullable|required_with:y|integer',
+            'y' => 'nullable|required_with:x|integer',
+        ]);
+        $this->assertTrue($v->fails());
+        $this->assertEquals('validation.integer', $v->messages()->get('x')[0]);
+
+        $v = new Validator($trans, [
+            'x' => 123, 'y' => null,
+        ], [
+            'x' => 'nullable|required_with:y|integer',
+            'y' => 'nullable|required_with:x|integer',
+        ]);
+        $this->assertTrue($v->fails());
+        $this->assertEquals('validation.required_with', $v->messages()->get('y')[0]);
     }
 
     public function testProperLanguageLineIsSet()
@@ -389,6 +423,48 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
         $this->assertEquals('type must be included in Short, Long.', $v->messages()->first('type'));
+    }
+
+    public function testDisplayableAttributesAreReplacedInCustomReplacers()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.alliteration' => ':attribute needs to begin with the same letter as :other'], 'en');
+        $trans->addLines(['validation.attributes.firstname' => 'Firstname'], 'en');
+        $trans->addLines(['validation.attributes.lastname' => 'Lastname'], 'en');
+        $v = new Validator($trans, ['firstname' => 'Bob', 'lastname' => 'Smith'], ['lastname' => 'alliteration:firstname']);
+        $v->addExtension('alliteration', function ($attribute, $value, $parameters, $validator) {
+            $other = Arr::get($validator->getData(), $parameters[0]);
+
+            return $value[0] == $other[0];
+        });
+        $v->addReplacer('alliteration', function ($message, $attribute, $rule, $parameters, $validator) {
+            return str_replace(':other', $validator->getDisplayableAttribute($parameters[0]), $message);
+        });
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertEquals('Lastname needs to begin with the same letter as Firstname', $v->messages()->first('lastname'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.alliteration' => ':attribute needs to begin with the same letter as :other'], 'en');
+        $customAttributes = ['firstname' => 'Firstname', 'lastname' => 'Lastname'];
+        $v = new Validator($trans, ['firstname' => 'Bob', 'lastname' => 'Smith'], ['lastname' => 'alliteration:firstname']);
+        $v->addCustomAttributes($customAttributes);
+        $v->addExtension('alliteration', function ($attribute, $value, $parameters, $validator) {
+            $other = Arr::get($validator->getData(), $parameters[0]);
+
+            return $value[0] == $other[0];
+        });
+        $v->addReplacer('alliteration', function ($message, $attribute, $rule, $parameters, $validator) {
+            return str_replace(':other', $validator->getDisplayableAttribute($parameters[0]), $message);
+        });
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertEquals('Lastname needs to begin with the same letter as Firstname', $v->messages()->first('lastname'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.alliteration' => ':attribute needs to begin with the same letter as :other'], 'en');
+        $customAttributes = ['firstname' => 'Firstname', 'lastname' => 'Lastname'];
+        $v = new Validator($trans, ['firstname' => 'Bob', 'lastname' => 'Smith'], ['lastname' => 'alliteration:firstname']);
     }
 
     public function testCustomValidationLinesAreRespected()
@@ -1976,7 +2052,11 @@ class ValidationValidatorTest extends TestCase
 
         $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension'])->setConstructorArgs($uploadedFile)->getMock();
         $file->expects($this->any())->method('guessExtension')->will($this->returnValue('php'));
+
         $v = new Validator($trans, ['x' => $file], ['x' => 'mimetypes:text/x-php']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => $file], ['x' => 'mimetypes:text/*']);
         $this->assertTrue($v->passes());
     }
 
@@ -2479,6 +2559,21 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, [], ['implicit_rule' => 'foo']);
         $v->addImplicitExtension('implicit_rule', function () {
             return true;
+        });
+        $this->assertTrue($v->passes());
+    }
+
+    public function testCustomDependentValidators()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans,
+            [
+                ['name' => 'Jamie', 'age' => 27],
+            ],
+            ['*.name' => 'dependent_rule:*.age']
+        );
+        $v->addDependentExtension('dependent_rule', function ($name) use ($v) {
+            return Arr::get($v->getData(), $name) == 'Jamie';
         });
         $this->assertTrue($v->passes());
     }
@@ -3301,6 +3396,140 @@ class ValidationValidatorTest extends TestCase
         $file = new File(__FILE__, false);
         $v = new Validator($trans, ['file' => $file], ['file' => 'Required|mimes:xls']);
         $this->assertFalse($v->passes());
+    }
+
+    public function testCustomValidationObject()
+    {
+        // Test passing case...
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['name' => 'taylor'],
+            ['name' => new class implements Rule {
+                public function passes($attribute, $value)
+                {
+                    return $value === 'taylor';
+                }
+
+                public function message()
+                {
+                    return ':attribute must be taylor';
+                }
+            }]
+        );
+
+        $this->assertTrue($v->passes());
+
+        // Test failing case...
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['name' => 'adam'],
+            ['name' => [new class implements Rule {
+                public function passes($attribute, $value)
+                {
+                    return $value === 'taylor';
+                }
+
+                public function message()
+                {
+                    return ':attribute must be taylor';
+                }
+            }]]
+        );
+
+        $this->assertTrue($v->fails());
+        $this->assertEquals('name must be taylor', $v->errors()->all()[0]);
+
+        // Test passing case with Closure...
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['name' => 'taylor'],
+            ['name.*' => function ($attribute, $value, $fail) {
+                if ($value !== 'taylor') {
+                    $fail(':attribute was '.$value.' instead of taylor');
+                }
+            }]
+        );
+
+        $this->assertTrue($v->passes());
+
+        // Test failing case with Closure...
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['name' => 'adam'],
+            ['name' => function ($attribute, $value, $fail) {
+                if ($value !== 'taylor') {
+                    $fail(':attribute was '.$value.' instead of taylor');
+                }
+            }]
+        );
+
+        $this->assertTrue($v->fails());
+        $this->assertEquals('name was adam instead of taylor', $v->errors()->all()[0]);
+
+        // Test complex failing case...
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['name' => 'taylor', 'states' => ['AR', 'TX'], 'number' => 9],
+            [
+                'states.*' => new class implements Rule {
+                    public function passes($attribute, $value)
+                    {
+                        return in_array($value, ['AK', 'HI']);
+                    }
+
+                    public function message()
+                    {
+                        return ':attribute must be AR or TX';
+                    }
+                },
+                'name' => function ($attribute, $value, $fail) {
+                    if ($value !== 'taylor') {
+                        $fail(':attribute must be taylor');
+                    }
+                },
+                'number' => [
+                    'required',
+                    'integer',
+                    function ($attribute, $value, $fail) {
+                        if ($value % 4 !== 0) {
+                            $fail(':attribute must be divisible by 4');
+                        }
+                    },
+                ],
+            ]
+        );
+
+        $this->assertFalse($v->passes());
+        $this->assertEquals('states.0 must be AR or TX', $v->errors()->get('states.0')[0]);
+        $this->assertEquals('states.1 must be AR or TX', $v->errors()->get('states.1')[0]);
+        $this->assertEquals('number must be divisible by 4', $v->errors()->get('number')[0]);
+    }
+
+    public function testImplicitCustomValidationObjects()
+    {
+        // Test passing case...
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['name' => ''],
+            ['name' => $rule = new class implements ImplicitRule {
+                public $called = false;
+
+                public function passes($attribute, $value)
+                {
+                    $this->called = true;
+
+                    return true;
+                }
+
+                public function message()
+                {
+                    return 'message';
+                }
+            }]
+        );
+
+        $this->assertTrue($v->passes());
+        $this->assertTrue($rule->called);
     }
 
     protected function getTranslator()

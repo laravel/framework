@@ -107,4 +107,41 @@ class ConsoleParserTest extends TestCase
         $this->assertTrue($results[2][0]->acceptValue());
         $this->assertTrue($results[2][0]->isArray());
     }
+
+    public function testDefaultValueParsing()
+    {
+        $results = Parser::parse('command:name {argument=defaultArgumentValue} {--option=defaultOptionValue}');
+
+        $this->assertFalse($results[1][0]->isRequired());
+        $this->assertEquals('defaultArgumentValue', $results[1][0]->getDefault());
+        $this->assertTrue($results[2][0]->acceptValue());
+        $this->assertEquals('defaultOptionValue', $results[2][0]->getDefault());
+
+        $results = Parser::parse('command:name {argument=*defaultArgumentValue1,defaultArgumentValue2} {--option=*defaultOptionValue1,defaultOptionValue2}');
+
+        $this->assertTrue($results[1][0]->isArray());
+        $this->assertFalse($results[1][0]->isRequired());
+        $this->assertEquals(['defaultArgumentValue1', 'defaultArgumentValue2'], $results[1][0]->getDefault());
+        $this->assertTrue($results[2][0]->acceptValue());
+        $this->assertTrue($results[2][0]->isArray());
+        $this->assertEquals(['defaultOptionValue1', 'defaultOptionValue2'], $results[2][0]->getDefault());
+    }
+
+    public function testArgumentDefaultValue()
+    {
+        $results = Parser::parse('command:name {argument= : The argument description.}');
+        $this->assertNull($results[1][0]->getDefault());
+
+        $results = Parser::parse('command:name {argument=default : The argument description.}');
+        $this->assertSame('default', $results[1][0]->getDefault());
+    }
+
+    public function testOptionDefaultValue()
+    {
+        $results = Parser::parse('command:name {--option= : The option description.}');
+        $this->assertNull($results[2][0]->getDefault());
+
+        $results = Parser::parse('command:name {--option=default : The option description.}');
+        $this->assertSame('default', $results[2][0]->getDefault());
+    }
 }

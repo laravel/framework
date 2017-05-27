@@ -61,6 +61,23 @@ class Arr
     }
 
     /**
+     * Cross join the given arrays, returning all possible permutations.
+     *
+     * @param  array  ...$arrays
+     * @return array
+     */
+    public static function crossJoin(...$arrays)
+    {
+        return array_reduce($arrays, function ($results, $array) {
+            return static::collapse(array_map(function ($parent) use ($array) {
+                return array_map(function ($item) use ($parent) {
+                    return array_merge($parent, [$item]);
+                }, $array);
+            }, $results));
+        }, [[]]);
+    }
+
+    /**
      * Divide an array into two arrays. One with keys and the other with values.
      *
      * @param  array  $array
@@ -515,5 +532,16 @@ class Arr
     public static function where($array, callable $callback)
     {
         return array_filter($array, $callback, ARRAY_FILTER_USE_BOTH);
+    }
+
+    /**
+     * If the given value is not an array, wrap it in one.
+     *
+     * @param  mixed  $value
+     * @return array
+     */
+    public static function wrap($value)
+    {
+        return ! is_array($value) ? [$value] : $value;
     }
 }

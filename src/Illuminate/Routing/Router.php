@@ -245,7 +245,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  string  $name
      * @param  string  $controller
      * @param  array  $options
-     * @return void
+     * @return \Illuminate\Routing\PendingResourceRegistration
      */
     public function resource($name, $controller, array $options = [])
     {
@@ -255,7 +255,9 @@ class Router implements RegistrarContract, BindingRegistrar
             $registrar = new ResourceRegistrar($this);
         }
 
-        $registrar->register($name, $controller, $options);
+        return new PendingResourceRegistration(
+            $registrar, $name, $controller, $options
+        );
     }
 
     /**
@@ -599,7 +601,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  mixed  $response
      * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      */
-    public function prepareResponse($request, $response)
+    public static function prepareResponse($request, $response)
     {
         if ($response instanceof PsrResponseInterface) {
             $response = (new HttpFoundationFactory)->createResponse($response);
@@ -915,7 +917,15 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function has($name)
     {
-        return $this->routes->hasNamedRoute($name);
+        $names = is_array($name) ? $name : func_get_args();
+
+        foreach ($names as $value) {
+            if (! $this->routes->hasNamedRoute($value)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -931,28 +941,23 @@ class Router implements RegistrarContract, BindingRegistrar
     /**
      * Alias for the "currentRouteNamed" method.
      *
+     * @param  dynamic  $patterns
      * @return bool
      */
-    public function is()
+    public function is(...$patterns)
     {
-        foreach (func_get_args() as $pattern) {
-            if (Str::is($pattern, $this->currentRouteName())) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->currentRouteNamed(...$patterns);
     }
 
     /**
-     * Determine if the current route matches a given name.
+     * Determine if the current route matches a pattern.
      *
-     * @param  string  $name
+     * @param  dynamic  $patterns
      * @return bool
      */
-    public function currentRouteNamed($name)
+    public function currentRouteNamed(...$patterns)
     {
-        return $this->current() ? $this->current()->getName() == $name : false;
+        return $this->current() && $this->current()->named(...$patterns);
     }
 
     /**

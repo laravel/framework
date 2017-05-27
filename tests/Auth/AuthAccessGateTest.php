@@ -35,6 +35,35 @@ class GateTest extends TestCase
         $this->assertFalse($gate->check('bar'));
     }
 
+    public function test_resource_gates_can_be_defined()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->resource('test', AccessGateTestResource::class);
+
+        $dummy = new AccessGateTestDummy;
+
+        $this->assertTrue($gate->check('test.view'));
+        $this->assertTrue($gate->check('test.create'));
+        $this->assertTrue($gate->check('test.update', $dummy));
+        $this->assertTrue($gate->check('test.delete', $dummy));
+    }
+
+    public function test_custom_resource_gates_can_be_defined()
+    {
+        $gate = $this->getBasicGate();
+
+        $abilities = [
+            'ability1' => 'foo',
+            'ability2' => 'bar',
+        ];
+
+        $gate->resource('test', AccessGateTestCustomResource::class, $abilities);
+
+        $this->assertTrue($gate->check('test.ability1'));
+        $this->assertTrue($gate->check('test.ability2'));
+    }
+
     public function test_before_callbacks_can_override_result_if_necessary()
     {
         $gate = $this->getBasicGate();
@@ -178,7 +207,7 @@ class GateTest extends TestCase
         $this->assertTrue($gate->check('update-dash', new AccessGateTestDummy));
     }
 
-    public function test_policy_default_to_false_if_method_does_not_exist()
+    public function test_policy_default_to_false_if_method_does_not_exist_and_gate_does_not_exist()
     {
         $gate = $this->getBasicGate();
 
@@ -216,6 +245,19 @@ class GateTest extends TestCase
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
 
         $this->assertTrue($gate->check('update', new AccessGateTestDummy));
+    }
+
+    public function test_policies_defer_to_gates_if_method_does_not_exist()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->define('nonexistent_method', function ($user) {
+            return true;
+        });
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
+
+        $this->assertTrue($gate->check('nonexistent_method', new AccessGateTestDummy));
     }
 
     public function test_for_user_method_attaches_a_new_user_to_a_new_gate_instance()
@@ -341,5 +383,41 @@ class AccessGateTestPolicyWithBefore
     public function update($user, AccessGateTestDummy $dummy)
     {
         return false;
+    }
+}
+
+class AccessGateTestResource
+{
+    public function view($user)
+    {
+        return true;
+    }
+
+    public function create($user)
+    {
+        return true;
+    }
+
+    public function update($user, AccessGateTestDummy $dummy)
+    {
+        return true;
+    }
+
+    public function delete($user, AccessGateTestDummy $dummy)
+    {
+        return true;
+    }
+}
+
+class AccessGateTestCustomResource
+{
+    public function foo($user)
+    {
+        return true;
+    }
+
+    public function bar($user)
+    {
+        return true;
     }
 }

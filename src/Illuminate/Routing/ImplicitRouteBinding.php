@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 
 class ImplicitRouteBinding
@@ -18,18 +19,39 @@ class ImplicitRouteBinding
         $parameters = $route->parameters();
 
         foreach ($route->signatureParameters(Model::class) as $parameter) {
-            $class = $parameter->getClass();
-
-            if (array_key_exists($parameter->name, $parameters) &&
-                ! $route->parameter($parameter->name) instanceof Model) {
-                $model = $container->make($class->name);
-
-                $route->setParameter(
-                    $parameter->name, $model->where(
-                        $model->getRouteKeyName(), $parameters[$parameter->name]
-                    )->firstOrFail()
-                );
+            if (! $parameterName = static::getParameterName($parameter->name, $parameters)) {
+                continue;
             }
+
+            $parameterValue = $parameters[$parameterName];
+
+            if ($parameterValue instanceof Model) {
+                continue;
+            }
+
+            $model = $container->make($parameter->getClass()->name);
+
+            $route->setParameter($parameterName, $model->where(
+                $model->getRouteKeyName(), $parameterValue
+            )->firstOrFail());
+        }
+    }
+
+    /**
+     * Return the parameter name if it exists in the given parameters.
+     *
+     * @param  string  $name
+     * @param  array  $parameters
+     * @return string|null
+     */
+    protected static function getParameterName($name, $parameters)
+    {
+        if (array_key_exists($name, $parameters)) {
+            return $name;
+        }
+
+        if (array_key_exists($snakedName = Str::snake($name), $parameters)) {
+            return $snakedName;
         }
     }
 }

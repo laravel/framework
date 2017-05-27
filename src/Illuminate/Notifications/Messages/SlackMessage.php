@@ -49,6 +49,27 @@ class SlackMessage
     public $content;
 
     /**
+     * Indicates if channel names and usernames should be linked.
+     *
+     * @var bool
+     */
+    public $linkNames = 0;
+
+    /**
+     * Indicates if you want a preview of links inlined in the message.
+     *
+     * @var bool
+     */
+    public $unfurlLinks;
+
+    /**
+     * Indicates if you want a preview of links to media inlined in the message.
+     *
+     * @var bool
+     */
+    public $unfurlMedia;
+
+    /**
      * The message's attachments.
      *
      * @var array
@@ -119,7 +140,7 @@ class SlackMessage
     /**
      * Set a custom image icon the message should use.
      *
-     * @param  string $channel
+     * @param  string  $image
      * @return $this
      */
     public function image($image)
@@ -185,6 +206,42 @@ class SlackMessage
             case 'warning':
                 return 'warning';
         }
+    }
+
+    /**
+     * Find and link channel names and usernames.
+     *
+     * @return $this
+     */
+    public function linkNames()
+    {
+        $this->linkNames = 1;
+
+        return $this;
+    }
+
+    /**
+     * Find and link channel names and usernames.
+     *
+     * @return $this
+     */
+    public function unfurlLinks($unfurl)
+    {
+        $this->unfurlLinks = $unfurl;
+
+        return $this;
+    }
+
+    /**
+     * Find and link channel names and usernames.
+     *
+     * @return $this
+     */
+    public function unfurlMedia($unfurl)
+    {
+        $this->unfurlMedia = $unfurl;
+
+        return $this;
     }
 
     /**

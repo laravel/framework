@@ -67,6 +67,31 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->isDirty(['foo', 'bar']));
     }
 
+    public function testDirtyOnCastOrDateAttributes()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setDateFormat('Y-m-d H:i:s');
+        $model->boolAttribute = 1;
+        $model->foo = 1;
+        $model->bar = '2017-03-18';
+        $model->dateAttribute = '2017-03-18';
+        $model->datetimeAttribute = '2017-03-23 22:17:00';
+        $model->syncOriginal();
+
+        $model->boolAttribute = true;
+        $model->foo = true;
+        $model->bar = '2017-03-18 00:00:00';
+        $model->dateAttribute = '2017-03-18 00:00:00';
+        $model->datetimeAttribute = null;
+
+        $this->assertTrue($model->isDirty());
+        $this->assertTrue($model->isDirty('foo'));
+        $this->assertTrue($model->isDirty('bar'));
+        $this->assertFalse($model->isDirty('boolAttribute'));
+        $this->assertFalse($model->isDirty('dateAttribute'));
+        $this->assertTrue($model->isDirty('datetimeAttribute'));
+    }
+
     public function testCleanAttributes()
     {
         $model = new EloquentModelStub(['foo' => '1', 'bar' => 2, 'baz' => 3]);
@@ -98,6 +123,20 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals($hash, $model->password_hash);
     }
 
+    public function testArrayAccessToAttributes()
+    {
+        $model = new EloquentModelStub(['attributes' => 1, 'connection' => 2, 'table' => 3]);
+        unset($model['table']);
+
+        $this->assertTrue(isset($model['attributes']));
+        $this->assertEquals($model['attributes'], 1);
+        $this->assertTrue(isset($model['connection']));
+        $this->assertEquals($model['connection'], 2);
+        $this->assertFalse(isset($model['table']));
+        $this->assertEquals($model['table'], null);
+        $this->assertFalse(isset($model['with']));
+    }
+
     public function testNewInstanceReturnsNewInstanceWithAttributesSet()
     {
         $model = new EloquentModelStub;
@@ -111,6 +150,14 @@ class DatabaseEloquentModelTest extends TestCase
         $_SERVER['__eloquent.saved'] = false;
         $model = EloquentModelSaveStub::create(['name' => 'taylor']);
         $this->assertTrue($_SERVER['__eloquent.saved']);
+        $this->assertEquals('taylor', $model->name);
+    }
+
+    public function testMakeMethodDoesNotSaveNewModel()
+    {
+        $_SERVER['__eloquent.saved'] = false;
+        $model = EloquentModelSaveStub::make(['name' => 'taylor']);
+        $this->assertFalse($_SERVER['__eloquent.saved']);
         $this->assertEquals('taylor', $model->name);
     }
 
@@ -570,7 +617,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->push());
         $this->assertEquals(1, $model->id);
         $this->assertTrue($model->exists);
-        $this->assertEquals(2, count($model->relationMany));
+        $this->assertCount(2, $model->relationMany);
         $this->assertEquals([2, 3], $model->relationMany->pluck('id')->all());
     }
 
@@ -1015,8 +1062,8 @@ class DatabaseEloquentModelTest extends TestCase
         $this->addMockConnection($model);
 
         $relation = $model->belongsToMany('Illuminate\Tests\Database\EloquentModelSaveStub');
-        $this->assertEquals('eloquent_model_save_stub_eloquent_model_stub.eloquent_model_stub_id', $relation->getQualifiedForeignKeyName());
-        $this->assertEquals('eloquent_model_save_stub_eloquent_model_stub.eloquent_model_save_stub_id', $relation->getQualifiedRelatedKeyName());
+        $this->assertEquals('eloquent_model_save_stub_eloquent_model_stub.eloquent_model_stub_id', $relation->getQualifiedForeignPivotKeyName());
+        $this->assertEquals('eloquent_model_save_stub_eloquent_model_stub.eloquent_model_save_stub_id', $relation->getQualifiedRelatedPivotKeyName());
         $this->assertSame($model, $relation->getParent());
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentModelSaveStub', $relation->getQuery()->getModel());
         $this->assertEquals(__FUNCTION__, $relation->getRelationName());
@@ -1024,8 +1071,8 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelStub;
         $this->addMockConnection($model);
         $relation = $model->belongsToMany('Illuminate\Tests\Database\EloquentModelSaveStub', 'table', 'foreign', 'other');
-        $this->assertEquals('table.foreign', $relation->getQualifiedForeignKeyName());
-        $this->assertEquals('table.other', $relation->getQualifiedRelatedKeyName());
+        $this->assertEquals('table.foreign', $relation->getQualifiedForeignPivotKeyName());
+        $this->assertEquals('table.other', $relation->getQualifiedRelatedPivotKeyName());
         $this->assertSame($model, $relation->getParent());
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentModelSaveStub', $relation->getQuery()->getModel());
     }
@@ -1314,10 +1361,13 @@ class DatabaseEloquentModelTest extends TestCase
         $query->shouldReceive('where')->andReturn($query);
         $query->shouldReceive('increment');
 
-        $model->publicIncrement('foo');
-
-        $this->assertEquals(3, $model->foo);
+        $model->publicIncrement('foo', 1);
         $this->assertFalse($model->isDirty());
+
+        $model->publicIncrement('foo', 1, ['category' => 1]);
+        $this->assertEquals(4, $model->foo);
+        $this->assertEquals(1, $model->category);
+        $this->assertTrue($model->isDirty('category'));
     }
 
     public function testRelationshipTouchOwnersIsPropagated()
@@ -1569,6 +1619,14 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame($scopes, $model->scopesCalled);
     }
 
+    public function testIsWithNull()
+    {
+        $firstInstance = new EloquentModelStub(['id' => 1]);
+        $secondInstance = null;
+
+        $this->assertFalse($firstInstance->is($secondInstance));
+    }
+
     public function testIsWithTheSameModelInstance()
     {
         $firstInstance = new EloquentModelStub(['id' => 1]);
@@ -1651,9 +1709,9 @@ class EloquentModelStub extends Model
         $this->attributes['password_hash'] = sha1($value);
     }
 
-    public function publicIncrement($column, $amount = 1)
+    public function publicIncrement($column, $amount = 1, $extra = [])
     {
-        return $this->increment($column, $amount);
+        return $this->increment($column, $amount, $extra);
     }
 
     public function belongsToStub()

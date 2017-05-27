@@ -64,7 +64,7 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     protected function addToCollections($route)
     {
-        $domainAndUri = $route->domain().$route->uri();
+        $domainAndUri = $route->getDomain().$route->uri();
 
         foreach ($route->methods() as $method) {
             $this->routes[$method][$domainAndUri] = $route;
@@ -113,7 +113,7 @@ class RouteCollection implements Countable, IteratorAggregate
     /**
      * Refresh the name look-up table.
      *
-     * This is done in case any names are fluently defined.
+     * This is done in case any names are fluently defined or if routes are overwritten.
      *
      * @return void
      */
@@ -124,6 +124,24 @@ class RouteCollection implements Countable, IteratorAggregate
         foreach ($this->allRoutes as $route) {
             if ($route->getName()) {
                 $this->nameList[$route->getName()] = $route;
+            }
+        }
+    }
+
+    /**
+     * Refresh the action look-up table.
+     *
+     * This is done in case any actions are overwritten with new controllers.
+     *
+     * @return void
+     */
+    public function refreshActionLookups()
+    {
+        $this->actionList = [];
+
+        foreach ($this->allRoutes as $route) {
+            if (isset($route->getAction()['controller'])) {
+                $this->addToActionList($route->getAction(), $route);
             }
         }
     }

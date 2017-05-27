@@ -6,13 +6,19 @@ body, body *:not(html):not(style):not(br):not(tr):not(code) {
 }
 
 body {
-    background-color: #F2F4F6;
+    background-color: #f5f8fa;
     color: #74787E;
     height: 100%;
+    hyphens: auto;
     line-height: 1.4;
     margin: 0;
+    -moz-hyphens: auto;
+    -ms-word-break: break-all;
     width: 100% !important;
+    -webkit-hyphens: auto;
     -webkit-text-size-adjust: none;
+    word-break: break-all;
+    word-break: break-word;
 }
 
 p,

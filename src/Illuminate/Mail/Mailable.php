@@ -8,11 +8,12 @@ use BadMethodCallException;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Contracts\Queue\Factory as Queue;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
 
-class Mailable implements MailableContract
+class Mailable implements MailableContract, Renderable
 {
     /**
      * The person the message is from.
@@ -160,6 +161,20 @@ class Mailable implements MailableContract
     }
 
     /**
+     * Render the mailable into a view.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function render()
+    {
+        Container::getInstance()->call([$this, 'build']);
+
+        return Container::getInstance()->make('mailer')->render(
+            $this->buildView(), $this->buildViewData()
+        );
+    }
+
+    /**
      * Build the view for the message.
      *
      * @return array|string
@@ -187,6 +202,10 @@ class Mailable implements MailableContract
     protected function buildMarkdownView()
     {
         $markdown = Container::getInstance()->make(Markdown::class);
+
+        if (isset($this->theme)) {
+            $markdown->theme($this->theme);
+        }
 
         $data = $this->buildViewData();
 
@@ -326,6 +345,18 @@ class Mailable implements MailableContract
     public function from($address, $name = null)
     {
         return $this->setAddress($address, $name, 'from');
+    }
+
+    /**
+     * Determine if the given recipient is set on the mailable.
+     *
+     * @param  object|array|string  $address
+     * @param  string|null  $name
+     * @return bool
+     */
+    public function hasFrom($address, $name = null)
+    {
+        return $this->hasRecipient($address, $name, 'from');
     }
 
     /**
@@ -520,7 +551,7 @@ class Mailable implements MailableContract
     public function markdown($view, array $data = [])
     {
         $this->markdown = $view;
-        $this->viewData = $data;
+        $this->viewData = array_merge($this->viewData, $data);
 
         return $this;
     }
@@ -535,7 +566,7 @@ class Mailable implements MailableContract
     public function view($view, array $data = [])
     {
         $this->view = $view;
-        $this->viewData = $data;
+        $this->viewData = array_merge($this->viewData, $data);
 
         return $this;
     }
@@ -550,7 +581,7 @@ class Mailable implements MailableContract
     public function text($textView, array $data = [])
     {
         $this->textView = $textView;
-        $this->viewData = $data;
+        $this->viewData = array_merge($this->viewData, $data);
 
         return $this;
     }

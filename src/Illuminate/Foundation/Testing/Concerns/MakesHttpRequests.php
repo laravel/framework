@@ -34,11 +34,25 @@ trait MakesHttpRequests
     /**
      * Disable middleware for the test.
      *
+     * @param  string|array  $middleware
      * @return $this
      */
-    public function withoutMiddleware()
+    public function withoutMiddleware($middleware = null)
     {
-        $this->app->instance('middleware.disable', true);
+        if (is_null($middleware)) {
+            $this->app->instance('middleware.disable', true);
+
+            return $this;
+        }
+
+        foreach ((array) $middleware as $abstract) {
+            $this->app->instance($abstract, new class {
+                public function handle($request, $next)
+                {
+                    return $next($request);
+                }
+            });
+        }
 
         return $this;
     }
@@ -303,6 +317,12 @@ trait MakesHttpRequests
                 $files[$key] = $value;
 
                 unset($data[$key]);
+            }
+
+            if (is_array($value)) {
+                $files[$key] = $this->extractFilesFromDataArray($value);
+
+                $data[$key] = $value;
             }
         }
 

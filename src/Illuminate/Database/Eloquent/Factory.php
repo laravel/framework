@@ -87,10 +87,10 @@ class Factory implements ArrayAccess
      *
      * @param  string  $class
      * @param  string  $state
-     * @param  callable  $attributes
+     * @param  callable|array  $attributes
      * @return $this
      */
-    public function state($class, $state, callable $attributes)
+    public function state($class, $state, $attributes)
     {
         $this->states[$class][$state] = $attributes;
 
@@ -198,7 +198,7 @@ class Factory implements ArrayAccess
         $factory = $this;
 
         if (is_dir($path)) {
-            foreach (Finder::create()->files()->in($path) as $file) {
+            foreach (Finder::create()->files()->name('*.php')->in($path) as $file) {
                 require $file->getRealPath();
             }
         }

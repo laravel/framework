@@ -172,6 +172,8 @@ class Migrator
             return $this->pretendToRun($migration, 'up');
         }
 
+        $this->note("<comment>Migrating:</comment> {$name}");
+
         $this->runMigration($migration, 'up');
 
         // Once we have run a migrations class, we will log that it was run in this
@@ -179,7 +181,7 @@ class Migrator
         // in the application. A migration repository keeps the migrate order.
         $this->repository->log($name, $batch);
 
-        $this->note("<info>Migrated:</info> {$name}");
+        $this->note("<info>Migrated:</info>  {$name}");
     }
 
     /**
@@ -226,11 +228,11 @@ class Migrator
      * Rollback the given migrations.
      *
      * @param  array  $migrations
-     * @param  array  $paths
+     * @param  array|string  $paths
      * @param  array  $options
      * @return array
      */
-    protected function rollbackMigrations(array $migrations, array $paths, array $options)
+    protected function rollbackMigrations(array $migrations, $paths, array $options)
     {
         $rolledBack = [];
 
@@ -317,6 +319,8 @@ class Migrator
             $name = $this->getMigrationName($file)
         );
 
+        $this->note("<comment>Rolling back:</comment> {$name}");
+
         if ($pretend) {
             return $this->pretendToRun($instance, 'down');
         }
@@ -328,7 +332,7 @@ class Migrator
         // by the application then will be able to fire by any later operation.
         $this->repository->delete($migration);
 
-        $this->note("<info>Rolled back:</info> {$name}");
+        $this->note("<info>Rolled back:</info>  {$name}");
     }
 
     /**
@@ -345,7 +349,9 @@ class Migrator
         );
 
         $callback = function () use ($migration, $method) {
-            $migration->{$method}();
+            if (method_exists($migration, $method)) {
+                $migration->{$method}();
+            }
         };
 
         $this->getSchemaGrammar($connection)->supportsSchemaTransactions()
@@ -386,7 +392,9 @@ class Migrator
         );
 
         return $db->pretend(function () use ($migration, $method) {
-            $migration->$method();
+            if (method_exists($migration, $method)) {
+                $migration->{$method}();
+            }
         });
     }
 

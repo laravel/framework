@@ -5,6 +5,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Debug\Dumper;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\HigherOrderTapProxy;
 
 if (! function_exists('append_config')) {
     /**
@@ -311,7 +312,7 @@ if (! function_exists('array_wrap')) {
      */
     function array_wrap($value)
     {
-        return ! is_array($value) ? [$value] : $value;
+        return Arr::wrap($value);
     }
 }
 
@@ -506,11 +507,11 @@ if (! function_exists('dd')) {
      * @param  mixed
      * @return void
      */
-    function dd()
+    function dd(...$args)
     {
-        array_map(function ($x) {
+        foreach ($args as $x) {
             (new Dumper)->dump($x);
-        }, func_get_args());
+        }
 
         die(1);
     }
@@ -844,11 +845,12 @@ if (! function_exists('str_slug')) {
      *
      * @param  string  $title
      * @param  string  $separator
+     * @param  string  $language
      * @return string
      */
-    function str_slug($title, $separator = '-')
+    function str_slug($title, $separator = '-', $language = 'en')
     {
-        return Str::slug($title, $separator);
+        return Str::slug($title, $separator, $language);
     }
 }
 
@@ -870,14 +872,52 @@ if (! function_exists('tap')) {
      * Call the given Closure with the given value then return the value.
      *
      * @param  mixed  $value
-     * @param  callable  $callback
+     * @param  callable|null  $callback
      * @return mixed
      */
-    function tap($value, $callback)
+    function tap($value, $callback = null)
     {
+        if (is_null($callback)) {
+            return new HigherOrderTapProxy($value);
+        }
+
         $callback($value);
 
         return $value;
+    }
+}
+
+if (! function_exists('throw_if')) {
+    /**
+     * Throw the given exception if the given boolean is true.
+     *
+     * @param  bool  $boolean
+     * @param  \Throwable|string  $exception
+     * @param  array  ...$parameters
+     * @return void
+     */
+    function throw_if($boolean, $exception, ...$parameters)
+    {
+        if ($boolean) {
+            throw (is_string($exception) ? new $exception(...$parameters) : $exception);
+        }
+    }
+}
+
+if (! function_exists('throw_unless')) {
+    /**
+     * Throw the given exception unless the given boolean is true.
+     *
+     * @param  bool  $boolean
+     * @param  \Throwable|string  $exception
+     * @param  array  ...$parameters
+     * @return void
+     */
+    function throw_unless($boolean, $exception, ...$parameters)
+    {
+        if (! $boolean) {
+            throw (is_string($exception) ? new $exception(...$parameters) : $exception);
+        }
     }
 }
 

@@ -208,6 +208,16 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Compile the SQL needed to drop all tables.
+     *
+     * @return string
+     */
+    public function compileDropAllTables()
+    {
+        return "delete from sqlite_master where type in ('table', 'index', 'trigger')";
+    }
+
+    /**
      * Compile a drop column command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
@@ -290,6 +300,26 @@ class SQLiteGrammar extends Grammar
     public function compileDisableForeignKeyConstraints()
     {
         return 'PRAGMA foreign_keys = OFF;';
+    }
+
+    /**
+     * Compile the SQL needed to enable a writable schema.
+     *
+     * @return string
+     */
+    public function compileEnableWriteableSchema()
+    {
+        return 'PRAGMA writable_schema = 1;';
+    }
+
+    /**
+     * Compile the SQL needed to disable a writable schema.
+     *
+     * @return string
+     */
+    public function compileDisableWriteableSchema()
+    {
+        return 'PRAGMA writable_schema = 0;';
     }
 
     /**

@@ -5,7 +5,6 @@ namespace Illuminate\Foundation\Testing;
 use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Illuminate\Http\Response;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
@@ -18,7 +17,7 @@ class TestResponse
     }
 
     /**
-     * The reponse to delegate to.
+     * The response to delegate to.
      *
      * @var \Illuminate\Http\Response
      */
@@ -47,6 +46,21 @@ class TestResponse
     }
 
     /**
+     * Assert that the response has a successful status code.
+     *
+     * @return $this
+     */
+    public function assertSuccessful()
+    {
+        PHPUnit::assertTrue(
+            $this->isSuccessful(),
+            'Response status code ['.$this->getStatusCode().'] is not a successful status code.'
+        );
+
+        return $this;
+    }
+
+    /**
      * Assert that the response has the given status code.
      *
      * @param  int  $status
@@ -70,13 +84,15 @@ class TestResponse
      * @param  string  $uri
      * @return $this
      */
-    public function assertRedirect($uri)
+    public function assertRedirect($uri = null)
     {
         PHPUnit::assertTrue(
-            $this->isRedirect(), 'Response status code ['.$this->status().'] is not a redirect status code.'
+            $this->isRedirect(), 'Response status code ['.$this->getStatusCode().'] is not a redirect status code.'
         );
 
-        PHPUnit::assertEquals(app('url')->to($uri), $this->headers->get('Location'));
+        if (! is_null($uri)) {
+            PHPUnit::assertEquals(app('url')->to($uri), $this->headers->get('Location'));
+        }
 
         return $this;
     }
@@ -98,7 +114,7 @@ class TestResponse
 
         if (! is_null($value)) {
             PHPUnit::assertEquals(
-                $this->headers->get($headerName), $value,
+                $value, $this->headers->get($headerName),
                 "Header [{$headerName}] was found, but value [{$actual}] does not match [{$value}]."
             );
         }
@@ -156,7 +172,7 @@ class TestResponse
      * Get the given cookie from the response.
      *
      * @param  string  $cookieName
-     * @return Cookie|null
+     * @return \Symfony\Component\HttpFoundation\Cookie|null
      */
     protected function getCookie($cookieName)
     {
@@ -181,6 +197,19 @@ class TestResponse
     }
 
     /**
+     * Assert that the given string is contained within the response text.
+     *
+     * @param  string  $value
+     * @return $this
+     */
+    public function assertSeeText($value)
+    {
+        PHPUnit::assertContains($value, strip_tags($this->getContent()));
+
+        return $this;
+    }
+
+    /**
      * Assert that the given string is not contained within the response.
      *
      * @param  string  $value
@@ -189,6 +218,19 @@ class TestResponse
     public function assertDontSee($value)
     {
         PHPUnit::assertNotContains($value, $this->getContent());
+
+        return $this;
+    }
+
+    /**
+     * Assert that the given string is not contained within the response text.
+     *
+     * @param  string  $value
+     * @return $this
+     */
+    public function assertDontSeeText($value)
+    {
+        PHPUnit::assertNotContains($value, strip_tags($this->getContent()));
 
         return $this;
     }
@@ -271,6 +313,33 @@ class TestResponse
     }
 
     /**
+     * Assert that the response does not contain the given JSON fragment.
+     *
+     * @param  array  $data
+     * @return $this
+     */
+    public function assertJsonMissing(array $data)
+    {
+        $actual = json_encode(Arr::sortRecursive(
+            (array) $this->decodeResponseJson()
+        ));
+
+        foreach (Arr::sortRecursive($data) as $key => $value) {
+            $expected = substr(json_encode([$key => $value]), 1, -1);
+
+            PHPUnit::assertFalse(
+                Str::contains($actual, $expected),
+                'Found unexpected JSON fragment: '.PHP_EOL.PHP_EOL.
+                "[{$expected}]".PHP_EOL.PHP_EOL.
+                'within'.PHP_EOL.PHP_EOL.
+                "[{$actual}]."
+            );
+        }
+
+        return $this;
+    }
+
+    /**
      * Assert that the response has a given JSON structure.
      *
      * @param  array|null  $structure
@@ -280,7 +349,7 @@ class TestResponse
     public function assertJsonStructure(array $structure = null, $responseData = null)
     {
         if (is_null($structure)) {
-            return $this->assertJson();
+            return $this->assertJson($this->json());
         }
 
         if (is_null($responseData)) {
@@ -334,6 +403,21 @@ class TestResponse
     public function json()
     {
         return $this->decodeResponseJson();
+    }
+
+    /**
+     * Assert that the response view equals the given value.
+     *
+     * @param  string $value
+     * @return $this
+     */
+    public function assertViewIs($value)
+    {
+        $this->ensureResponseHasView();
+
+        PHPUnit::assertEquals($value, $this->original->getName());
+
+        return $this;
     }
 
     /**
@@ -459,15 +543,16 @@ class TestResponse
      *
      * @param  string|array  $keys
      * @param  mixed  $format
+     * @param  string  $errorBag
      * @return $this
      */
-    public function assertSessionHasErrors($keys = [], $format = null)
+    public function assertSessionHasErrors($keys = [], $format = null, $errorBag = 'default')
     {
         $this->assertSessionHas('errors');
 
         $keys = (array) $keys;
 
-        $errors = app('session.store')->get('errors');
+        $errors = app('session.store')->get('errors')->getBag($errorBag);
 
         foreach ($keys as $key => $value) {
             if (is_int($key)) {
@@ -478,6 +563,19 @@ class TestResponse
         }
 
         return $this;
+    }
+
+    /**
+     * Assert that the session has the given errors.
+     *
+     * @param  string  $errorBag
+     * @param  string|array  $keys
+     * @param  mixed  $format
+     * @return $this
+     */
+    public function assertSessionHasErrorsIn($errorBag, $keys = [], $format = null)
+    {
+        return $this->assertSessionHasErrors($keys, $format, $errorBag);
     }
 
     /**
@@ -556,7 +654,7 @@ class TestResponse
      * Handle dynamic calls into macros or pass missing methods to the base response.
      *
      * @param  string  $method
-     * @param  array   $parameters
+     * @param  array  $args
      * @return mixed
      */
     public function __call($method, $args)

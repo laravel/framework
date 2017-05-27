@@ -12,6 +12,21 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class FoundationTestResponseTest extends TestCase
 {
+    public function testAssertViewIs()
+    {
+        $baseResponse = tap(new Response, function ($response) {
+            $response->setContent(\Mockery::mock(View::class, [
+                'render' => 'hello world',
+                'getData' => ['foo' => 'bar'],
+                'getName' => 'dir.my-view',
+            ]));
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        $response->assertViewIs('dir.my-view');
+    }
+
     public function testAssertViewHas()
     {
         $baseResponse = tap(new Response, function ($response) {
@@ -24,6 +39,35 @@ class FoundationTestResponseTest extends TestCase
         $response = TestResponse::fromBaseResponse($baseResponse);
 
         $response->assertViewHas('foo');
+    }
+
+    public function testAssertSeeText()
+    {
+        $baseResponse = tap(new Response, function ($response) {
+            $response->setContent(\Mockery::mock(View::class, [
+                'render' => 'foo<strong>bar</strong>',
+            ]));
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        $response->assertSeeText('foobar');
+    }
+
+    public function testAssertHeader()
+    {
+        $baseResponse = tap(new Response, function ($response) {
+            $response->header('Location', '/foo');
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        try {
+            $response->assertHeader('Location', '/bar');
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+            $this->assertEquals('/bar', $e->getComparisonFailure()->getExpected());
+            $this->assertEquals('/foo', $e->getComparisonFailure()->getActual());
+        }
     }
 
     public function testAssertJsonWithArray()
@@ -66,6 +110,9 @@ class FoundationTestResponseTest extends TestCase
     public function testAssertJsonStructure()
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        // Without structure
+        $response->assertJsonStructure();
 
         // At root
         $response->assertJsonStructure(['foo']);

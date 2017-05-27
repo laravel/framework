@@ -41,6 +41,17 @@ class HttpResponseTest extends TestCase
         $this->assertEquals('application/json', $response->headers->get('Content-Type'));
     }
 
+    public function testResponseHeaderTypeIsReset()
+    {
+        $response = new \Illuminate\Http\Response(new ArrayableStub);
+        $this->assertEquals('{"foo":"bar"}', $response->getContent());
+        $this->assertEquals('application/json', $response->headers->get('Content-Type'));
+
+        $response->setContent('foo');
+        $this->assertEquals('foo', $response->getContent());
+        $this->assertNotEquals('application/json', $response->headers->get('Content-Type'));
+    }
+
     public function testRenderablesAreRendered()
     {
         $mock = m::mock('Illuminate\Contracts\Support\Renderable');

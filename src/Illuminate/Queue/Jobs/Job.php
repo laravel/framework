@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue\Jobs;
 
+use Illuminate\Support\Arr;
 use Illuminate\Queue\InteractsWithTime;
 
 abstract class Job
@@ -187,7 +188,7 @@ abstract class Job
      */
     public function maxTries()
     {
-        return array_get($this->payload(), 'maxTries');
+        return Arr::get($this->payload(), 'maxTries');
     }
 
     /**
@@ -197,7 +198,7 @@ abstract class Job
      */
     public function timeout()
     {
-        return array_get($this->payload(), 'timeout');
+        return Arr::get($this->payload(), 'timeout');
     }
 
     /**

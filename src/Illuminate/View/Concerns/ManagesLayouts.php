@@ -183,6 +183,18 @@ trait ManagesLayouts
     }
 
     /**
+     * Get the contents of a section.
+     *
+     * @param  string  $name
+     * @param  string  $default
+     * @return mixed
+     */
+    public function getSection($name, $default = null)
+    {
+        return isset($this->getSections()[$name]) ? $this->getSections()[$name] : $default;
+    }
+
+    /**
      * Get the entire array of sections.
      *
      * @return array

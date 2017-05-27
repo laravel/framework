@@ -111,7 +111,37 @@ class PhpRedisConnection extends Connection
     }
 
     /**
-     * Evaluate a LUA script from the SHA1 hash of the script.
+     * Execute commands in a pipeline.
+     *
+     * @param  callable  $callback
+     * @return array|\Redis
+     */
+    public function pipeline(callable $callback = null)
+    {
+        $pipeline = $this->client()->pipeline();
+
+        return is_null($callback)
+            ? $pipeline
+            : tap($pipeline, $callback)->exec();
+    }
+
+    /**
+     * Execute commands in a transaction.
+     *
+     * @param  callable  $callback
+     * @return array|\Redis
+     */
+    public function transaction(callable $callback = null)
+    {
+        $transaction = $this->client()->multi();
+
+        return is_null($callback)
+            ? $transaction
+            : tap($transaction, $callback)->exec();
+    }
+
+    /**
+     * Evaluate a LUA script serverside, from the SHA1 hash of the script instead of the script itself.
      *
      * @param  string  $script
      * @param  int  $numkeys
@@ -177,6 +207,17 @@ class PhpRedisConnection extends Connection
     public function createSubscription($channels, Closure $callback, $method = 'subscribe')
     {
         //
+    }
+
+    /**
+     * Execute a raw command.
+     *
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function executeRaw(array $parameters)
+    {
+        return $this->command('rawCommand', $parameters);
     }
 
     /**

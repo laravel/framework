@@ -17,7 +17,7 @@ class Queue extends Facade
      */
     public static function fake()
     {
-        static::swap(new QueueFake);
+        static::swap(new QueueFake(static::getFacadeApplication()));
     }
 
     /**
