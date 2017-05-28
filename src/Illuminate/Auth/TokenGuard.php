@@ -5,6 +5,7 @@ namespace Illuminate\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 
 class TokenGuard implements Guard
 {
@@ -129,5 +130,16 @@ class TokenGuard implements Guard
         $this->request = $request;
 
         return $this;
+    }
+
+    /**
+     * Stub this method so it's possible to use this Guard for user registration.
+     *
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  bool  $remember
+     * @return void
+     */
+    public function login(AuthenticatableContract $user, $remember = false)
+    {
     }
 }
