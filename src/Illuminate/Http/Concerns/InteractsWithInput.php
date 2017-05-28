@@ -92,6 +92,25 @@ trait InteractsWithInput
     }
 
     /**
+     * Determine if the request contains any of the given inputs.
+     *
+     * @param  dynamic  $key
+     * @return bool
+     */
+    public function hasAny(...$keys)
+    {
+        $input = $this->all();
+
+        foreach ($keys as $key) {
+            if (Arr::has($input, $key)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Determine if the request contains a non-empty value for an input item.
      *
      * @param  string|array  $key

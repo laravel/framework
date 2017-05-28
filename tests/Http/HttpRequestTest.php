@@ -233,6 +233,25 @@ class HttpRequestTest extends TestCase
         $this->assertTrue($request->has('foo.baz'));
     }
 
+    public function testHasAnyMethod()
+    {
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
+        $this->assertTrue($request->hasAny('name'));
+        $this->assertTrue($request->hasAny('age'));
+        $this->assertTrue($request->hasAny('city'));
+        $this->assertFalse($request->hasAny('foo'));
+        $this->assertTrue($request->hasAny('name', 'email'));
+
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
+        $this->assertTrue($request->hasAny('name', 'email'));
+        $this->assertFalse($request->hasAny('surname', 'password'));
+
+        $request = Request::create('/', 'GET', ['foo' => ['bar' => null, 'baz' => '']]);
+        $this->assertTrue($request->hasAny('foo.bar'));
+        $this->assertTrue($request->hasAny('foo.baz'));
+        $this->assertFalse($request->hasAny('foo.bax'));
+    }
+
     public function testFilledMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
