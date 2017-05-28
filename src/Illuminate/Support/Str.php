@@ -39,7 +39,7 @@ class Str
     public static function after($subject, $search)
     {
         if (! static::contains($subject, $search)) {
-            return '';
+            return $subject;
         }
 
         $searchEndPos = strpos($subject, $search) + static::length($search);

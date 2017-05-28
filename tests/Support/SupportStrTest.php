@@ -80,7 +80,7 @@ class SupportStrTest extends TestCase
     {
         $this->assertEquals('nah', Str::after('hannah', 'han'));
         $this->assertEquals('nah', Str::after('hannah', 'n'));
-        $this->assertEmpty(Str::after('hannah', 'xxxx'));
+        $this->assertEquals('hannah', Str::after('hannah', 'xxxx'));
     }
 
     public function testStrContains()
