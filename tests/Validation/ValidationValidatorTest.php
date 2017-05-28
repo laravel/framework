@@ -553,6 +553,36 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals('all must be required!', $v->messages()->first('name.1'));
     }
 
+    public function testInlineValidationMessagesAreReturnedForSizes()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['name' => '3'], ['name' => 'Numeric|Min:5'], ['name.min' => ['numeric' => ':attribute must be at least :min.']]);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertEquals('name must be at least 5.', $v->messages()->first('name'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['name' => 'asasdfadsfd'], ['name' => 'Size:2'], ['name.size' => ['string' => ':attribute must be :size characters long.']]);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertEquals('name must be 2 characters long.', $v->messages()->first('name'));
+
+        $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['getSize', 'isValid'])->setConstructorArgs([__FILE__, false])->getMock();
+        $file->expects($this->any())->method('getSize')->will($this->returnValue(4072));
+        $file->expects($this->any())->method('isValid')->will($this->returnValue(true));
+        $v = new Validator($trans, ['photo' => $file], ['photo' => 'Max:3'], ['photo.max' => ['file' => ':attribute must be at most :max kilobytes.']]);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertEquals('photo must be at most 3 kilobytes.', $v->messages()->first('photo'));
+
+        // Check we fall back to default validation message if no inline messages are supplied
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['name' => ['first' => 'John', 'middle' => 'Francis', 'surname' => 'Doe']], ['name' => 'Array|Size:2'], ['name.size' => []]);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertEquals('validation.size.array', $v->messages()->first('name'));
+    }
+
     public function testIfRulesAreSuccessfullyAdded()
     {
         $trans = $this->getIlluminateArrayTranslator();
