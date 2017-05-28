@@ -42,9 +42,9 @@ class Str
             return $subject;
         }
 
-        $searchEndPos = strpos($subject, $search) + static::length($search);
+        $end = strpos($subject, $search) + static::length($search);
 
-        return static::substr($subject, $searchEndPos, static::length($subject));
+        return static::substr($subject, $end, static::length($subject));
     }
 
     /**
