@@ -21,5 +21,9 @@ class ValidationDimensionsRuleTest extends TestCase
         $rule = Rule::dimensions()->maxWidth(1000)->maxHeight(500)->ratio(3 / 2);
 
         $this->assertEquals('dimensions:max_width=1000,max_height=500,ratio=1.5', (string) $rule);
+
+        $rule = Rule::dimensions()->maxWidth(1000)->maxHeight(500)->maxRatio(3)->minRatio(2);
+
+        $this->assertEquals('dimensions:max_width=1000,max_height=500,max_ratio=3,min_ratio=2', (string) $rule);
     }
 }

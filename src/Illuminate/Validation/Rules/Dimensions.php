@@ -114,6 +114,32 @@ class Dimensions
     }
 
     /**
+     * Set the "min_ratio" constraint.
+     *
+     * @param float $value
+     * @return $this
+     */
+    public function minRatio($value)
+    {
+        $this->constraints['min_ratio'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Set the "max_ratio" constraint.
+     *
+     * @param float $value
+     * @return $this
+     */
+    public function maxRatio($value)
+    {
+        $this->constraints['max_ratio'] = $value;
+
+        return $this;
+    }
+
+    /**
      * Convert the rule to a validation string.
      *
      * @return string
