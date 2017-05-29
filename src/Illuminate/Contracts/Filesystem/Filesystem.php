@@ -44,7 +44,7 @@ interface Filesystem
      * @param  mixed  $options
      * @return bool
      */
-    public function put($path, $contents, $visibility = []);
+    public function put($path, $contents, $options = []);
 
     /**
      * Get the visibility for the given path.
