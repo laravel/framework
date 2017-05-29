@@ -103,7 +103,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     public function put($path, $contents, $options = [])
     {
         $options = is_string($options) ? ['visibility' => $options]
-            : (array) $options;
+                : (array) $options;
 
         // If the given contents is actually a file or uploaded file instance than we will
         // automatically store the file using a stream. This provides a convenient path
@@ -114,8 +114,8 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
         }
 
         return is_resource($contents)
-            ? $this->driver->putStream($path, $contents, $options)
-            : $this->driver->put($path, $contents, $options);
+                ? $this->driver->putStream($path, $contents, $options)
+                : $this->driver->put($path, $contents, $options);
     }
 
     /**
