@@ -16,12 +16,8 @@ class FoundationPackageAssetsTest extends TestCase
 
     public function testAssetLoading()
     {
-        $discovery = new PackageAssetLoader(new Filesystem, __DIR__ . '/fixtures/vendor');
+        $assetLoader = new PackageAssetLoader(new Filesystem, __DIR__ . '/fixtures/vendor');
 
-        $this->assertEquals($discovery->get('providers'), ['foo', 'bar', 'baz']);
-        $this->assertEquals($discovery->get('facades'), [
-            'Foo' => 'FooClass',
-            'Bar' => 'BarClass',
-        ]);
+        $this->assertEquals($assetLoader->get('providers'), ['foo', 'bar', 'baz']);
     }
 }

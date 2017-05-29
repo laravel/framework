@@ -839,6 +839,16 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     }
 
     /**
+     * Get the path to the cached services.php file.
+     *
+     * @return string
+     */
+    public function getCachedPackagesPath()
+    {
+        return $this->bootstrapPath().'/cache/packages.php';
+    }
+
+    /**
      * Determine if the application configuration is cached.
      *
      * @return bool

@@ -44,5 +44,9 @@ class ComposerScripts
         if (file_exists($servicesPath = $laravel->getCachedServicesPath())) {
             @unlink($servicesPath);
         }
+
+        if (file_exists($packagesPath = $laravel->getCachedPackagesPath())) {
+            @unlink($packagesPath);
+        }
     }
 }

@@ -1,8 +1,0 @@
-{
-    "extra": {
-        "providers": [
-            "bar",
-            "baz"
-        ]
-    }
-}

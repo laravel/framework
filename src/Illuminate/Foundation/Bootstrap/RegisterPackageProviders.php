@@ -3,11 +3,10 @@
 namespace Illuminate\Foundation\Bootstrap;
 
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Foundation\AliasLoader;
 use Illuminate\Foundation\PackageAssetLoader;
 use Illuminate\Contracts\Foundation\Application;
 
-class LoadPackageAssets
+class RegisterPackageProviders
 {
     /**
      * Bootstrap the given application.
@@ -17,12 +16,10 @@ class LoadPackageAssets
      */
     public function bootstrap(Application $app)
     {
-        $assetLoader = new PackageAssetLoader(new Filesystem, base_path('vendor'));
+        $assetLoader = new PackageAssetLoader(new Filesystem, base_path('vendor'), $app->getCachedPackagesPath());
 
         foreach ($assetLoader->get('providers') as $provider) {
             $app->register($provider);
         }
-
-        AliasLoader::getInstance($assetLoader->get('facades'))->register();
     }
 }
