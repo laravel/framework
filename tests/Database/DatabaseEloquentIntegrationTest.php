@@ -8,6 +8,7 @@ use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Pagination\OutOfPaginationRangeException;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
 
 class DatabaseEloquentIntegrationTest extends TestCase
@@ -211,6 +212,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testPaginatedModelCollectionRetrievalWhenNoElements()
     {
+        $this->expectException(OutOfPaginationRangeException::class);
+
         Paginator::currentPageResolver(function () {
             return 1;
         });
@@ -222,17 +225,15 @@ class DatabaseEloquentIntegrationTest extends TestCase
         Paginator::currentPageResolver(function () {
             return 2;
         });
-        $models = EloquentTestUser::oldest('id')->paginate(2);
 
-        $this->assertEquals(0, $models->count());
+        EloquentTestUser::oldest('id')->paginate(2);
     }
 
     public function testPaginatedModelCollectionRetrievalWhenNoElementsAndDefaultPerPage()
     {
-        $models = EloquentTestUser::oldest('id')->paginate();
+        $this->expectException(OutOfPaginationRangeException::class);
 
-        $this->assertEquals(0, $models->count());
-        $this->assertInstanceOf('Illuminate\Pagination\LengthAwarePaginator', $models);
+        EloquentTestUser::oldest('id')->paginate();
     }
 
     public function testCountForPaginationWithGrouping()
