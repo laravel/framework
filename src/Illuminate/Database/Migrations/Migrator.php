@@ -4,8 +4,6 @@ namespace Illuminate\Database\Migrations;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use RecursiveIteratorIterator;
-use RecursiveDirectoryIterator;
 use Illuminate\Support\Collection;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
@@ -438,16 +436,13 @@ class Migrator
      */
     public function getAllMigrationFiles($path)
     {
-        $directoryIterator = new RecursiveDirectoryIterator($path);
-        $iteratorIterator = new RecursiveIteratorIterator($directoryIterator);
-        $files = [];
-        foreach ($iteratorIterator as $iteratee) {
-            if ($iteratee->isFile() && preg_match('/^.*_.*\.php$/', $iteratee->getFilename())) {
-                $files[] = $iteratee->getRealPath();
-            }
-        }
+        $files = $this->files->allFiles($path);
 
-        return $files;
+        return Collection::make($files)->filter(function ($file) {
+            return preg_match('/^.*_.*\.php$/', $file->getFilename());
+        })->map(function ($file) {
+            return $file->getRealPath();
+        })->all();
     }
 
     /**
