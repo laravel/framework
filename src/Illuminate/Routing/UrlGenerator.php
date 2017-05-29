@@ -285,6 +285,18 @@ class UrlGenerator implements UrlGeneratorContract
 
         return $this->cachedSchema;
     }
+    
+    /**
+     * Force schemaless URLs.
+     *
+     * @return void
+     */
+    public function forceSchemaless()
+    {
+        $this->cachedSchema = null;
+
+        $this->forceSchema = '//';
+    }
 
     /**
      * Get the URL to a named route.
