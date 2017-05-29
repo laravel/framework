@@ -338,7 +338,7 @@ trait ValidatesAttributes
         }
 
         $date = date_parse($value);
-        
+
         if (isset($date['relative'])) {
             $date = date_parse(date('Y-m-d H:i:s', strtotime($value)));
         }
