@@ -34,7 +34,7 @@ class PackageAssetLoader
         $manifest = [];
 
         if (file_exists($this->manifestPath)) {
-            $manifest = json_decode($this->manifestPath, true);
+            $manifest = $this->files->getRequire($this->manifestPath);
 
             // If the manifest has a key for the given asset type,
             // we'll simply return the assets without loading
