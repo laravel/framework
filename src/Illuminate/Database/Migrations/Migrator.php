@@ -436,16 +436,17 @@ class Migrator
      * @param  string  $path
      * @return array
      */
-    public function getAllMigrationFiles(string $path)
+    public function getAllMigrationFiles($path)
     {
         $directoryIterator = new RecursiveDirectoryIterator($path);
         $iteratorIterator = new RecursiveIteratorIterator($directoryIterator);
         $files = [];
         foreach ($iteratorIterator as $iteratee) {
             if ($iteratee->isFile() && preg_match('/^.*_.*\.php$/', $iteratee->getFilename())) {
-                array_push($files, $iteratee->getRealPath());
+                $files[] = $iteratee->getRealPath();
             }
         }
+
         return $files;
     }
 
