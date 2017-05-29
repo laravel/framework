@@ -273,6 +273,7 @@ class RedisStore extends TaggableStore implements Store
     protected function unserialize($value)
     {
         $unserialized = @unserialize($value);
+        
         return (is_numeric($value) || is_string($value)) ? $value : $unserialized;
     }
 }
