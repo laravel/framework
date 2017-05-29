@@ -79,8 +79,8 @@ trait BuildsQueries
      * Apply the callback's query changes if the given "value" is true.
      *
      * @param  mixed  $value
-     * @param  \Closure  $callback
-     * @param  \Closure  $default
+     * @param  callable|\Closure  $callback
+     * @param  callable|\Closure  $default
      * @return mixed
      */
     public function when($value, $callback, $default = null)
