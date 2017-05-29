@@ -16,6 +16,10 @@ class RegisterPackageProviders
      */
     public function bootstrap(Application $app)
     {
+        if (! $app->make('config')->get('app.autoload_package_providers', true)) {
+            return;
+        }
+
         $assetLoader = new PackageAssetLoader(new Filesystem, base_path('vendor'), $app->getCachedPackagesPath());
 
         foreach ($assetLoader->get('providers') as $provider) {
