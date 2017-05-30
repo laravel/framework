@@ -19,6 +19,7 @@ use Illuminate\Contracts\Container\Container;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Validator\Constraints\UrlValidator;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 
 class Validator implements ValidatorContract
@@ -1223,7 +1224,13 @@ class Validator implements ValidatorContract
      */
     protected function validateUrl($attribute, $value)
     {
-        return filter_var($value, FILTER_VALIDATE_URL) !== false;
+        foreach (['http', 'https', 'ftp'] as $protocol) {
+            if (preg_match(sprintf(UrlValidator::PATTERN, $protocol), $value) == 1) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
