@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Contracts\Routing\UrlRoutable;
+use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class RoutingUrlGeneratorTest extends TestCase
 {
@@ -372,7 +373,7 @@ class RoutingUrlGeneratorTest extends TestCase
 
     public function testRoutesWithDomainsThroughProxy()
     {
-        Request::setTrustedProxies(['10.0.0.1']);
+        Request::setTrustedProxies(['10.0.0.1'], SymfonyRequest::HEADER_X_FORWARDED_ALL);
 
         $url = new UrlGenerator(
             $routes = new RouteCollection,

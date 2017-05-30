@@ -55,9 +55,8 @@ class FoundationExceptionsHandlerTest extends TestCase
         $response = $this->handler->render($this->request, new Exception('My custom error message'))->getContent();
 
         $this->assertContains('<!DOCTYPE html>', $response);
-        $this->assertContains('<h1>Whoops, looks like something went wrong.</h1>', $response);
+        $this->assertContains('Whoops, looks like something went wrong.', $response);
         $this->assertContains('My custom error message', $response);
-        $this->assertContains('::main()', $response);
         $this->assertNotContains('"message":', $response);
     }
 
