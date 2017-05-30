@@ -57,18 +57,13 @@ abstract class ServiceProvider
      *
      * @param  string  $path
      * @param  string  $key
-     * @param  bool  $publish
      * @return void
      */
-    protected function mergeConfigFrom($path, $key, $publish = false)
+    protected function mergeConfigFrom($path, $key)
     {
         $config = $this->app['config']->get($key, []);
 
         $this->app['config']->set($key, array_merge(require $path, $config));
-
-        if ($publish) {
-            $this->publishesConfig($path, $key);
-        }
     }
 
     /**
@@ -89,15 +84,10 @@ abstract class ServiceProvider
      *
      * @param  string  $path
      * @param  string  $namespace
-     * @param  bool  $publish
      * @return void
      */
-    protected function loadViewsFrom($path, $namespace, $publish = false)
+    protected function loadViewsFrom($path, $namespace)
     {
-        if ($publish) {
-            $this->publishesViews($path, $namespace);
-        }
-
         $this->registerApplicationViewNamespaces($namespace);
         $this->app['view']->addNamespace($namespace, $path);
     }
