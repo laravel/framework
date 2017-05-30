@@ -585,7 +585,7 @@ class TestResponse
 
         return $this;
     }
-    
+
     /**
      * Assert that the an exception was thrown within the response.
      *
