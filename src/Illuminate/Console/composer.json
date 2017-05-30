@@ -18,7 +18,7 @@
         "illuminate/contracts": "5.5.*",
         "illuminate/support": "5.5.*",
         "nesbot/carbon": "~1.20",
-        "symfony/console": "~3.2"
+        "symfony/console": "~3.3"
     },
     "autoload": {
         "psr-4": {
@@ -33,7 +33,7 @@
     "suggest": {
         "guzzlehttp/guzzle": "Required to use the ping methods on schedules (~6.0).",
         "mtdowling/cron-expression": "Required to use scheduling component (~1.0).",
-        "symfony/process": "Required to use scheduling component (~3.2)."
+        "symfony/process": "Required to use scheduling component (~3.3)."
     },
     "config": {
         "sort-packages": true
