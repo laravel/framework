@@ -1,6 +1,6 @@
 # Release Notes for 5.4.x
 
-## [Unreleased]
+## v5.4.24 (2017-05-30)
 
 ### Added
 - Support magic controller methods ([#19168](https://github.com/laravel/framework/pull/19168))
@@ -25,6 +25,7 @@
 - Don't ignore jobs with a timeout of `0` ([#19266](https://github.com/laravel/framework/pull/19266))
 - Resolve database paginators from the container ([#19328](https://github.com/laravel/framework/pull/19328))
 - Added `news` to `Pluralizer::$uncountable()` ([#19353](https://github.com/laravel/framework/pull/19353))
+- Switched to using `app()->getLocale()` in `app.stub` ([#19405](https://github.com/laravel/framework/pull/19405))
 
 ### Fixed
 - Fixed `Container::makeWith()` not using parameters when resolving interfaces ([#19178](https://github.com/laravel/framework/pull/19178))
