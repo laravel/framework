@@ -587,7 +587,7 @@ class TestResponse
     }
     
     /**
-     * Assert that the an exception was thrown within the response
+     * Assert that the an exception was thrown within the response.
      *
      * @param  string  $exception
      * @return $this
