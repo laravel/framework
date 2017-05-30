@@ -61,7 +61,7 @@ class Markdown
             'mail', $this->htmlComponentPaths()
         )->make($view, $data)->render();
 
-        return new HtmlString(with($inliner ?: new CssToInlineStyles)->convert(
+        return new HtmlString(($inliner ?: new CssToInlineStyles)->convert(
             $contents, $this->view->make('mail::themes.'.$this->theme)->render()
         ));
     }
@@ -140,5 +140,18 @@ class Markdown
     public function loadComponentsFrom(array $paths = [])
     {
         $this->componentPaths = $paths;
+    }
+
+    /**
+     * Set the default theme to be used.
+     *
+     * @param  string  $theme
+     * @return $this
+     */
+    public function theme($theme)
+    {
+        $this->theme = $theme;
+
+        return $this;
     }
 }

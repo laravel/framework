@@ -14,11 +14,11 @@
         }
     ],
     "require": {
-        "php": ">=5.6.4",
-        "illuminate/bus": "5.4.*",
-        "illuminate/contracts": "5.4.*",
-        "illuminate/queue": "5.4.*",
-        "illuminate/support": "5.4.*"
+        "php": ">=7.0",
+        "illuminate/bus": "5.5.*",
+        "illuminate/contracts": "5.5.*",
+        "illuminate/queue": "5.5.*",
+        "illuminate/support": "5.5.*"
     },
     "autoload": {
         "psr-4": {
@@ -27,7 +27,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.4-dev"
+            "dev-master": "5.5-dev"
         }
     },
     "suggest": {

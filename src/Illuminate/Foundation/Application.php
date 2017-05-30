@@ -28,7 +28,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      *
      * @var string
      */
-    const VERSION = '5.4.23';
+    const VERSION = '5.5-dev';
 
     /**
      * The base path for the Laravel installation.
@@ -692,13 +692,13 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     /**
      * Resolve the given type from the container.
      *
-     * (Overriding Container::makeWith)
+     * (Overriding Container::make)
      *
      * @param  string  $abstract
      * @param  array  $parameters
      * @return mixed
      */
-    public function makeWith($abstract, array $parameters)
+    public function make($abstract, array $parameters = [])
     {
         $abstract = $this->getAlias($abstract);
 
@@ -706,26 +706,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             $this->loadDeferredProvider($abstract);
         }
 
-        return parent::makeWith($abstract, $parameters);
-    }
-
-    /**
-     * Resolve the given type from the container.
-     *
-     * (Overriding Container::make)
-     *
-     * @param  string  $abstract
-     * @return mixed
-     */
-    public function make($abstract)
-    {
-        $abstract = $this->getAlias($abstract);
-
-        if (isset($this->deferredServices[$abstract])) {
-            $this->loadDeferredProvider($abstract);
-        }
-
-        return parent::make($abstract);
+        return parent::make($abstract, $parameters);
     }
 
     /**

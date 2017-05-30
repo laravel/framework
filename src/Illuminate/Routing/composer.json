@@ -14,13 +14,13 @@
         }
     ],
     "require": {
-        "php": ">=5.6.4",
-        "illuminate/container": "5.4.*",
-        "illuminate/contracts": "5.4.*",
-        "illuminate/http": "5.4.*",
-        "illuminate/pipeline": "5.4.*",
-        "illuminate/session": "5.4.*",
-        "illuminate/support": "5.4.*",
+        "php": ">=7.0",
+        "illuminate/container": "5.5.*",
+        "illuminate/contracts": "5.5.*",
+        "illuminate/http": "5.5.*",
+        "illuminate/pipeline": "5.5.*",
+        "illuminate/session": "5.5.*",
+        "illuminate/support": "5.5.*",
         "symfony/debug": "~3.2",
         "symfony/http-foundation": "~3.2",
         "symfony/http-kernel": "~3.2",
@@ -33,11 +33,11 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.4-dev"
+            "dev-master": "5.5-dev"
         }
     },
     "suggest": {
-        "illuminate/console": "Required to use the make commands (5.4.*).",
+        "illuminate/console": "Required to use the make commands (5.5.*).",
         "symfony/psr-http-message-bridge": "Required to psr7 bridging features (0.2.*)."
     },
     "config": {

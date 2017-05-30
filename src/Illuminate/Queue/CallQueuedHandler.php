@@ -42,6 +42,10 @@ class CallQueuedHandler
             $command, $handler = $this->resolveHandler($job, $command)
         );
 
+        if (! $job->hasFailed() && ! $job->isReleased()) {
+            $this->ensureNextJobInChainIsDispatched($command);
+        }
+
         if (! $job->isDeletedOrReleased()) {
             $job->delete();
         }
@@ -79,6 +83,19 @@ class CallQueuedHandler
         }
 
         return $instance;
+    }
+
+    /**
+     * Ensure the next job in the chain is dispatched if applicable.
+     *
+     * @param  mixed  $command
+     * @return void
+     */
+    protected function ensureNextJobInChainIsDispatched($command)
+    {
+        if (method_exists($command, 'dispatchNextJobInChain')) {
+            $command->dispatchNextJobInChain();
+        }
     }
 
     /**
