@@ -585,6 +585,23 @@ class TestResponse
 
         return $this;
     }
+    
+    /**
+     * Assert that the an exception was thrown within the response
+     *
+     * @param  string  $exception
+     * @return $this
+     */
+    public function assertExceptionThrown($exception)
+    {
+        if ($this->exception) {
+            PHPUnit::assertEquals($exception, get_class($this->exception));
+        } else {
+            PHPUnit::fail("Expected exception [{$exception}] not thrown.");
+        }
+
+        return $this;
+    }
 
     /**
      * Get the current session store.
