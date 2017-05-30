@@ -15,6 +15,15 @@ class DatabaseEloquentHasManyTest extends TestCase
         m::close();
     }
 
+    public function testMakeMethodDoesNotSaveNewModel()
+    {
+        $relation = $this->getRelation();
+        $instance = $this->expectNewModel($relation, ['name' => 'taylor']);
+        $instance->expects($this->never())->method('save');
+
+        $this->assertEquals($instance, $relation->make(['name' => 'taylor']));
+    }
+
     public function testCreateMethodProperlyCreatesNewModel()
     {
         $relation = $this->getRelation();

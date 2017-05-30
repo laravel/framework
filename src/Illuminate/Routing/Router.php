@@ -261,6 +261,21 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
+     * Route an api resource to a controller.
+     *
+     * @param  string  $name
+     * @param  string  $controller
+     * @param  array  $options
+     * @return void
+     */
+    public function apiResource($name, $controller, array $options = [])
+    {
+        $this->resource($name, $controller, array_merge([
+            'only' => ['index', 'show', 'store', 'update', 'destroy'],
+        ], $options));
+    }
+
+    /**
      * Create a route group with shared attributes.
      *
      * @param  array  $attributes

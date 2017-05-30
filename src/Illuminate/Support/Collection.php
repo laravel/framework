@@ -1013,6 +1013,23 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Push all of the given items onto the collection.
+     *
+     * @param  \Traversable  $source
+     * @return self
+     */
+    public function concat($source)
+    {
+        $result = new static($this);
+
+        foreach ($source as $item) {
+            $result->push($item);
+        }
+
+        return $result;
+    }
+
+    /**
      * Get and remove an item from the collection.
      *
      * @param  mixed  $key

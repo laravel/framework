@@ -12,10 +12,19 @@
 - Added `Model::refresh()` shorthand ([#19174](https://github.com/laravel/framework/pull/19174))
 - Added `Container::forgetExtenders()` method ([#19269](https://github.com/laravel/framework/pull/19269), [7c17bf5](https://github.com/laravel/framework/commit/7c17bf540f37f8b4667be5332c94d7423780ca83))
 - Added `Filesystem::hash()` method ([#19256](https://github.com/laravel/framework/pull/19256))
+- Added `TestResponse::assertViewIs()` method ([#19291](https://github.com/laravel/framework/pull/19291))
+- Added `path` to `Paginator` ([#19314](https://github.com/laravel/framework/pull/19314))
+- Added `Collection::concat()` method ([#19318](https://github.com/laravel/framework/pull/19318), [0f5337f](https://github.com/laravel/framework/commit/0f5337f854ecdd722e7e289ff58cc252337e7a9d))
+- Added `make()` method to `HasOneOrMany` and `MorphOneOrMany` relations ([#19307](https://github.com/laravel/framework/pull/19307))
+- Added `str_after()` helper function ([#19357](https://github.com/laravel/framework/pull/19357))
+- Added `Router::apiResource()` method ([#19347](https://github.com/laravel/framework/pull/19347))
 
 ### Changed
 - Move `$sizeRules` and `$numericRules` properties from `FormatsMessages` to `Validator` ([dc7e7cb](https://github.com/laravel/framework/commit/dc7e7cb26500fcba91e7e32762e367d59b12913b))
 - Allows calls to `Collection::times()` without the `$callback` parameter ([#19278](https://github.com/laravel/framework/pull/19278))
+- Don't ignore jobs with a timeout of `0` ([#19266](https://github.com/laravel/framework/pull/19266))
+- Resolve database paginators from the container ([#19328](https://github.com/laravel/framework/pull/19328))
+- Added `news` to `Pluralizer::$uncountable()` ([#19353](https://github.com/laravel/framework/pull/19353))
 
 ### Fixed
 - Fixed `Container::makeWith()` not using parameters when resolving interfaces ([#19178](https://github.com/laravel/framework/pull/19178))
@@ -23,6 +32,9 @@
 - Fixed the position of `bound()` in `Container::instance()` ([#19207](https://github.com/laravel/framework/pull/19207))
 - Prevent applying global scopes on the factory while setting the connection ([#19258](https://github.com/laravel/framework/pull/19258))
 - Fixed database connection issue in queue worker ([#19263](https://github.com/laravel/framework/pull/19263))
+- Don't use HTML comments in notification email template ([#19289](https://github.com/laravel/framework/pull/19289))
+- Fire rebinding callback when using `bind()` method to bind abstract ([#19288](https://github.com/laravel/framework/pull/19288))
+- Return `0` from `callScope()` if `$query->wheres` is `null` ([#19381](https://github.com/laravel/framework/pull/19381))
 
 
 ## v5.4.23 (2017-05-11)

@@ -30,6 +30,24 @@ class Str
     protected static $studlyCache = [];
 
     /**
+     * Return the remainder of a string after a given value.
+     *
+     * @param  string  $subject
+     * @param  string  $search
+     * @return string
+     */
+    public static function after($subject, $search)
+    {
+        if (! static::contains($subject, $search)) {
+            return $subject;
+        }
+
+        $end = strpos($subject, $search) + static::length($search);
+
+        return static::substr($subject, $end, static::length($subject));
+    }
+
+    /**
      * Transliterate a UTF-8 value to ASCII.
      *
      * @param  string  $value

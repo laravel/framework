@@ -83,6 +83,13 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::endsWith(0.27, '8'));
     }
 
+    public function testStrAfter()
+    {
+        $this->assertEquals('nah', Str::after('hannah', 'han'));
+        $this->assertEquals('nah', Str::after('hannah', 'n'));
+        $this->assertEquals('hannah', Str::after('hannah', 'xxxx'));
+    }
+
     public function testStrContains()
     {
         $this->assertTrue(Str::contains('taylor', 'ylo'));
