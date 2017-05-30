@@ -19,8 +19,8 @@
         "illuminate/filesystem": "5.5.*",
         "illuminate/support": "5.5.*",
         "nesbot/carbon": "~1.20",
-        "symfony/finder": "~3.2",
-        "symfony/http-foundation": "~3.2"
+        "symfony/finder": "~3.3",
+        "symfony/http-foundation": "~3.3"
     },
     "autoload": {
         "psr-4": {
