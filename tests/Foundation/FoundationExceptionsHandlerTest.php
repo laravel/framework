@@ -57,7 +57,6 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->assertContains('<!DOCTYPE html>', $response);
         $this->assertContains('Whoops, looks like something went wrong.', $response);
         $this->assertContains('My custom error message', $response);
-        $this->assertContains('PHPUnit\TextUI\TestRunner', $response);
         $this->assertNotContains('"message":', $response);
     }
 
