@@ -35,7 +35,7 @@ class Application extends SymfonyApplication implements ApplicationContract
      * @param  string  $version
      * @return void
      */
-    public function __construct(Container $laravel, Dispatcher $events, $version)
+    public function __construct(Container $laravel, Dispatcher $events, $version = 'UNKNOWN')
     {
         parent::__construct('Laravel Framework', $version);
 
