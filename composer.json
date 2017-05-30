@@ -26,14 +26,14 @@
         "nesbot/carbon": "~1.20",
         "ramsey/uuid": "~3.0",
         "swiftmailer/swiftmailer": "~6.0",
-        "symfony/console": "~3.2",
-        "symfony/debug": "~3.2",
-        "symfony/finder": "~3.2",
-        "symfony/http-foundation": "~3.2",
-        "symfony/http-kernel": "~3.2",
-        "symfony/process": "~3.2",
-        "symfony/routing": "~3.2",
-        "symfony/var-dumper": "~3.2",
+        "symfony/console": "~3.3",
+        "symfony/debug": "~3.3",
+        "symfony/finder": "~3.3",
+        "symfony/http-foundation": "~3.3",
+        "symfony/http-kernel": "~3.3",
+        "symfony/process": "~3.3",
+        "symfony/routing": "~3.3",
+        "symfony/var-dumper": "~3.3",
         "tijsverkoyen/css-to-inline-styles": "~2.2",
         "vlucas/phpdotenv": "~2.2"
     },
@@ -77,8 +77,8 @@
         "pda/pheanstalk": "~3.0",
         "phpunit/phpunit": "~6.0",
         "predis/predis": "~1.0",
-        "symfony/css-selector": "~3.2",
-        "symfony/dom-crawler": "~3.2"
+        "symfony/css-selector": "~3.3",
+        "symfony/dom-crawler": "~3.3"
     },
     "autoload": {
         "files": [
@@ -114,8 +114,8 @@
         "pda/pheanstalk": "Required to use the beanstalk queue driver (~3.0).",
         "predis/predis": "Required to use the redis cache and queue drivers (~1.0).",
         "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (~2.0).",
-        "symfony/css-selector": "Required to use some of the crawler integration testing tools (~3.2).",
-        "symfony/dom-crawler": "Required to use most of the crawler integration testing tools (~3.2).",
+        "symfony/css-selector": "Required to use some of the crawler integration testing tools (~3.3).",
+        "symfony/dom-crawler": "Required to use most of the crawler integration testing tools (~3.3).",
         "symfony/psr-http-message-bridge": "Required to psr7 bridging features (0.2.*)."
     },
     "config": {
