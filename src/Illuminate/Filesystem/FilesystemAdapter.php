@@ -102,7 +102,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      */
     public function put($path, $contents, $options = [])
     {
-        $options = is_string($options) 
+        $options = is_string($options)
                      ? ['visibility' => $options]
                      : (array) $options;
 
