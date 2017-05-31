@@ -356,7 +356,7 @@ class UrlGenerator implements UrlGeneratorContract
             );
         }
 
-        return trim(preg_replace('/\{.*?\?\}/', '', $path), '/');
+        return trim(preg_replace('/\{[^?}]+?\?\}/', '', $path), '/');
     }
 
     /**
