@@ -32,7 +32,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @var array
      */
     protected static $proxies = [
-        'contains', 'each', 'every', 'filter', 'first', 'flatMap',
+        'contains', 'each', 'every', 'evaluate', 'filter', 'first', 'flatMap',
         'map', 'partition', 'reject', 'sortBy', 'sortByDesc', 'sum',
     ];
 
@@ -303,7 +303,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  mixed  $value
      * @return bool
      */
-    public function every($key, $operator = null, $value = null)
+    public function evaluate($key, $operator = null, $value = null)
     {
         if (func_num_args() == 1) {
             $callback = $this->valueRetriever($key);
@@ -323,7 +323,22 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             $operator = '=';
         }
 
-        return $this->every($this->operatorForWhere($key, $operator, $value));
+        return $this->evaluate($this->operatorForWhere($key, $operator, $value));
+    }
+
+    /**
+     * Determine if all items in the collection pass the given test.
+     *
+     * @deprecated Use evaluate() method instead.
+     *
+     * @param  string|callable  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function every($key, $operator = null, $value = null)
+    {
+        $this->evaluate($key, $operator, $value);
     }
 
     /**
