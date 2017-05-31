@@ -69,7 +69,7 @@ class StartSession
         if ($this->sessionConfigured()) {
             $this->storeCurrentUrl($request, $session);
 
-            $this->addCookieToResponse($response, $session);
+            $this->addCookieToResponse($request, $response, $session);
         }
 
         return $response;
@@ -163,11 +163,12 @@ class StartSession
     /**
      * Add the session cookie to the application response.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @param  \Symfony\Component\HttpFoundation\Response  $response
      * @param  \Illuminate\Contracts\Session\Session  $session
      * @return void
      */
-    protected function addCookieToResponse(Response $response, Session $session)
+    protected function addCookieToResponse(Request $request, Response $response, Session $session)
     {
         if ($this->usingCookieSessions()) {
             $this->manager->driver()->save();
@@ -176,7 +177,7 @@ class StartSession
         if ($this->sessionIsPersistent($config = $this->manager->getSessionConfig())) {
             $response->headers->setCookie(new Cookie(
                 $session->getName(), $session->getId(), $this->getCookieExpirationDate(),
-                $config['path'], $config['domain'], Arr::get($config, 'secure', false),
+                $config['path'], $config['domain'], Arr::get($config, 'secure', $request->secure()),
                 Arr::get($config, 'http_only', true)
             ));
         }
