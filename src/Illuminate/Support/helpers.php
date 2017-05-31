@@ -138,7 +138,7 @@ if (! function_exists('array_forget')) {
      */
     function array_forget(&$array, $keys)
     {
-        return Arr::forget($array, $keys);
+        Arr::forget($array, $keys);
     }
 }
 
