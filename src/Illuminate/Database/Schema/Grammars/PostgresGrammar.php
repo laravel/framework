@@ -607,6 +607,17 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Create the column definition for a tsvector type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeTsvector(Fluent $column)
+    {
+        return 'tsvector';
+    }
+
+    /**
      * Get the SQL for a nullable column modifier.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
