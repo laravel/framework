@@ -70,7 +70,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals(['alter table "users" add column "created" timestamp(0) without time zone default CURRENT_TIMESTAMP(0) not null'], $blueprint->toSql($connection, new PostgresGrammar));
 
         $blueprint = clone $base;
-        $this->assertEquals(['alter table "users" add column "created" datetime default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new SQLiteGrammar));
+        $this->assertEquals(['alter table "users" add column "created" datetime default CURRENT_TIMESTAMP'], $blueprint->toSql($connection, new SQLiteGrammar));
 
         $blueprint = clone $base;
         $this->assertEquals(['alter table "users" add "created" datetime default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new SqlServerGrammar));

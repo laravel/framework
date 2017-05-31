@@ -135,7 +135,7 @@ class SQLiteGrammar extends Grammar
         $columns = $this->prefixArray('add column', $this->getColumns($blueprint));
 
         return collect($columns)->map(function ($column) use ($blueprint) {
-            $column = trim($column, ' not null');
+            $column = str_replace(' not null', '', $column);
 
             return 'alter table '.$this->wrapTable($blueprint).' '.$column;
         })->all();
