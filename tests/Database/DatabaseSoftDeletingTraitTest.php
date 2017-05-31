@@ -25,6 +25,17 @@ class DatabaseSoftDeletingTraitTest extends TestCase
         $this->assertInstanceOf('Carbon\Carbon', $model->deleted_at);
     }
 
+    public function testDeleteWithUpdateSetsDirtyAttributes()
+    {
+        $model = m::mock('Illuminate\Tests\Database\DatabaseSoftDeletingTraitStub');
+        $model->shouldDeferMissing();
+        // $model->shouldReceive('newQuery')->andReturn($query = m::mock('StdClass'));
+        $model->shouldReceive('newQueryWithoutScopes')->andReturn($query = m::mock('StdClass'));
+        $query->shouldReceive('where')->once()->with('id', 1)->andReturn($query);
+        $query->shouldReceive('update')->once()->with(['deleted_at' => 'date-time', 'dirty' => true]);
+        $model->deleteWithUpdate();
+    }
+
     public function testRestore()
     {
         $model = m::mock('Illuminate\Tests\Database\DatabaseSoftDeletingTraitStub');
@@ -92,5 +103,10 @@ class DatabaseSoftDeletingTraitStub
     public function fromDateTime()
     {
         return 'date-time';
+    }
+
+    public function getDirty()
+    {
+        return ['dirty' => true];
     }
 }
