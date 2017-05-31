@@ -36,6 +36,13 @@ trait HasAttributes
     protected $casts = [];
 
     /**
+     * Map relationships to null objects that should be returned if the result is null.
+     *
+     * @var array
+     */
+    protected $relationshipNullObjects = [];
+
+    /**
      * The attributes that should be mutated to dates.
      *
      * @var array
@@ -405,6 +412,9 @@ trait HasAttributes
         }
 
         return tap($relation->getResults(), function ($results) use ($method) {
+            if ($results === null && array_key_exists($method, $this->relationshipNullObjects)) {
+                $results = new $this->relationshipNullObjects[$method];
+            }
             $this->setRelation($method, $results);
         });
     }
