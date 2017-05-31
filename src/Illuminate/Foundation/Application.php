@@ -547,6 +547,11 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     {
         (new ProviderRepository($this, new Filesystem, $this->getCachedServicesPath()))
                     ->load($this->config['app.providers']);
+
+        if (env('APP_ENV', 'local') == 'local') {
+            (new ProviderRepository($this, new Filesystem, $manifestPath))
+                ->load($this->config['app.dev-providers']);
+        }
     }
 
     /**
