@@ -39,6 +39,9 @@ class Auth extends Facade
     /**
      * Register the typical authentication routes for an application.
      *
+     * @deprecated For code consistency Route::auth() should be used instead of this method.
+     * @see \Illuminate\Routing\Router::auth() For method parameters and usage.
+     *
      * @return void
      */
     public static function routes()
