@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use SplFileObject;
 use LogicException;
 use InvalidArgumentException;
 use Illuminate\Contracts\Container\Container;
@@ -57,6 +58,7 @@ class CallbackEvent extends Event
 
         try {
             $response = $container->call($this->callback, $this->parameters);
+            $this->writeResponse($response);
         } finally {
             $this->removeMutex();
         }
@@ -64,6 +66,23 @@ class CallbackEvent extends Event
         parent::callAfterCallbacks($container);
 
         return $response;
+    }
+
+    /**
+     * Write the given response to the disk.
+     *
+     * @param  string  $response
+     * @return void
+     */
+    protected function writeResponse($response)
+    {
+        if (! is_string($response)) {
+            return;
+        }
+
+        $openMode = $this->shouldAppendOutput ? 'a' : 'w';
+        
+        (new SplFileObject($this->output, $openMode))->fwrite($response);
     }
 
     /**
