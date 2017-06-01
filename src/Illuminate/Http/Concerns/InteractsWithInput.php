@@ -66,7 +66,7 @@ trait InteractsWithInput
      */
     public function exists($key)
     {
-        $keys = is_array($key) ? $key : func_get_args();
+        $keys = array_wrap_args($key);
 
         $input = $this->all();
 
@@ -87,7 +87,7 @@ trait InteractsWithInput
      */
     public function has($key)
     {
-        $keys = is_array($key) ? $key : func_get_args();
+        $keys = array_wrap_args($key);
 
         foreach ($keys as $value) {
             if ($this->isEmptyString($value)) {
@@ -143,7 +143,7 @@ trait InteractsWithInput
      */
     public function only($keys)
     {
-        $keys = is_array($keys) ? $keys : func_get_args();
+        $keys = array_wrap_args($keys);
 
         $results = [];
 
@@ -164,7 +164,7 @@ trait InteractsWithInput
      */
     public function except($keys)
     {
-        $keys = is_array($keys) ? $keys : func_get_args();
+        $keys = array_wrap_args($keys);
 
         $results = $this->all();
 
@@ -181,7 +181,7 @@ trait InteractsWithInput
      */
     public function intersect($keys)
     {
-        return array_filter($this->only(is_array($keys) ? $keys : func_get_args()));
+        return array_filter($this->only(array_wrap_args($keys)));
     }
 
     /**
