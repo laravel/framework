@@ -495,6 +495,24 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['name' => 'World', 'id' => 1], $c->merge(new Collection(['name' => 'World', 'id' => 1]))->all());
     }
 
+    public function testDeepMergeNull()
+    {
+        $c = new Collection(['names' => ['Hello']]);
+        $this->assertEquals(['names' => ['Hello']], $c->deepMerge(null)->all());
+    }
+
+    public function testDeepMergeArray()
+    {
+        $c = new Collection(['names' => ['Hello']]);
+        $this->assertEquals(['names' => ['Hello', 'World']], $c->deepMerge(['names' => ['World']])->all());
+    }
+
+    public function testDeepMergeCollection()
+    {
+        $c = new Collection(['names' => ['Hello']]);
+        $this->assertEquals(['names' => ['Hello', 'World']], $c->deepMerge(new Collection(['names' => ['World']]))->all());
+    }
+
     public function testUnionNull()
     {
         $c = new Collection(['name' => 'Hello']);
