@@ -2,9 +2,9 @@
 
 namespace Illuminate\Mail;
 
-use Parsedown;
 use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
+use League\CommonMark\CommonMarkConverter;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 
@@ -90,9 +90,9 @@ class Markdown
      */
     public static function parse($text)
     {
-        $parsedown = new Parsedown;
-
-        return new HtmlString($parsedown->text($text));
+        return new HtmlString(
+            (new CommonMarkConverter)->convertToHtml($text)
+        );
     }
 
     /**
