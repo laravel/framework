@@ -619,10 +619,12 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public static function prepareResponse($request, $response)
     {
+        if ($response instanceof Responsable) {
+            $response = $response->toResponse();
+        }
+
         if ($response instanceof PsrResponseInterface) {
             $response = (new HttpFoundationFactory)->createResponse($response);
-        } elseif ($response instanceof Responsable) {
-            $response = $response->toResponse();
         } elseif (! $response instanceof SymfonyResponse &&
                    ($response instanceof Arrayable ||
                     $response instanceof Jsonable ||
