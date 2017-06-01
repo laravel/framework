@@ -285,6 +285,21 @@ class SupportCollectionTest extends TestCase
         $this->assertTrue(isset($c['name']));
     }
 
+    public function testForgetWithCallback()
+    {
+        $c = new Collection([
+            1 => 'foo',
+            2 => 'bar',
+            3 => 'baz',
+        ]);
+
+        $this->assertEquals([
+            1 => 'foo',
+        ], $c->forget(function ($item) {
+            return substr($item, 0, 1) === 'b';
+        })->all());
+    }
+
     public function testCountable()
     {
         $c = new Collection(['foo', 'bar']);
