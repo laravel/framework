@@ -370,7 +370,7 @@ class SqlServerGrammar extends Grammar
     {
         return true;
     }
-    
+
     /**
      * Compile the SQL statement to define a savepoint.
      *
