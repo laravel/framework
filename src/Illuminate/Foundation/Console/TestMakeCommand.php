@@ -37,7 +37,6 @@ class TestMakeCommand extends GeneratorCommand
         if ($this->option('unit')) {
             return __DIR__.'/stubs/unit-test.stub';
         }
-        
         return __DIR__.'/stubs/test.stub';
     }
 
@@ -65,7 +64,6 @@ class TestMakeCommand extends GeneratorCommand
         if ($this->option('unit')) {
             return $rootNamespace.'\Unit';
         }
-        
         return $rootNamespace.'\Feature';
     }
 
