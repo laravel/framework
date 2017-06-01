@@ -97,7 +97,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     public function trans($key, array $replace = [], $locale = null)
     {
-        return $this->get($key, $replace, $locale);
+        return $this->getFromJson($key, $replace, $locale);
     }
 
     /**
