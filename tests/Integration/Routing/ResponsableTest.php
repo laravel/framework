@@ -23,7 +23,6 @@ class ResponsableTest extends TestCase
     }
 }
 
-
 class TestResponsableResponse implements Responsable
 {
     public function toResponse()
