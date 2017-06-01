@@ -46,9 +46,10 @@ trait CompilesLayouts
     /**
      * Replace the @parent directive to a placeholder.
      *
+     * @param  string  $expression
      * @return string
      */
-    protected function compileParent()
+    protected function compileParent($expression)
     {
         return ViewFactory::parentPlaceholder($this->lastSection ?: '');
     }

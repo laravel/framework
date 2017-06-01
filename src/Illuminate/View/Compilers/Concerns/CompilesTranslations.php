@@ -24,9 +24,10 @@ trait CompilesTranslations
     /**
      * Compile the end-lang statements into valid PHP.
      *
+     * @param  string  $expression
      * @return string
      */
-    protected function compileEndlang()
+    protected function compileEndlang($expression)
     {
         return '<?php echo $__env->renderTranslation(); ?>';
     }
