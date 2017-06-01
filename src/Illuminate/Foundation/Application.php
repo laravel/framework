@@ -839,7 +839,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     }
 
     /**
-     * Get the path to the cached services.php file.
+     * Get the path to the cached packages.php file.
      *
      * @return string
      */
