@@ -20,4 +20,14 @@ abstract class Migration
     {
         return $this->connection;
     }
+
+    /**
+     * Set the migration connection name.
+     *
+     * @param  string  $connection
+     */
+    public function setConnection($connection)
+    {
+        $this->connection = $connection;
+    }
 }

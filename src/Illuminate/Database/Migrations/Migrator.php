@@ -168,6 +168,9 @@ class Migrator
             $name = $this->getMigrationName($file)
         );
 
+        // Set database connection name
+        $migration->setConnection($this->connection);
+
         if ($pretend) {
             return $this->pretendToRun($migration, 'up');
         }
