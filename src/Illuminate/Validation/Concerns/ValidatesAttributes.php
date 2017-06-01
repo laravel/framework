@@ -644,7 +644,7 @@ trait ValidatesAttributes
         }
 
         if (filter_var($id, FILTER_VALIDATE_INT) !== false) {
-            $id = intval($id);
+            $id = (int) $id;
         }
 
         return $id;
