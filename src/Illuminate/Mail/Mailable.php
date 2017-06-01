@@ -192,7 +192,7 @@ class Mailable implements MailableContract
 
         return [
             'html' => $markdown->render($this->markdown, $data),
-            'text' => $markdown->renderText($this->markdown, $data),
+            'text' => isset($this->textView) ? $this->textView : $markdown->renderText($this->markdown, $data),
         ];
     }
 
