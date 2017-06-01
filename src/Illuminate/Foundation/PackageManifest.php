@@ -150,6 +150,10 @@ class PackageManifest
      */
     protected function packagesToIgnore()
     {
+        if (! file_exists($this->basePath.'/composer.json')) {
+            return [];
+        }
+
         return json_decode(file_get_contents(
             $this->basePath.'/composer.json'
         ), true)['extra']['laravel']['dont-discover'] ?? [];

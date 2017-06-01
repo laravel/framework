@@ -1,8 +1,10 @@
 {
     "extra": {
-        "providers": [
-            "bar",
-            "baz"
-        ]
+        "laravel": {
+            "providers": [
+                "bar",
+                "baz"
+            ]
+        }
     }
 }

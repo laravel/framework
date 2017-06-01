@@ -1,5 +1,7 @@
 {
     "extra": {
-        "providers": "foo"
+        "laravel": {
+            "providers": "foo"
+        }
     }
 }
