@@ -23,7 +23,9 @@ class RegisterPackageProviders
         $assetLoader = new PackageAssetLoader(new Filesystem, base_path('vendor'), $app->getCachedPackagesPath());
 
         foreach ($assetLoader->get('providers') as $provider) {
-            $app->register($provider);
+            if (class_exists($provider)) {
+                $app->register($provider);
+            }
         }
     }
 }
