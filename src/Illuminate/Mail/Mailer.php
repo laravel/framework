@@ -176,7 +176,7 @@ class Mailer implements MailerContract, MailQueueContract
     /**
      * Render the given message as a view.
      *
-     * @param  string|array  $view
+     * @param  string|array|MailableContract  $view
      * @param  array  $data
      * @return \Illuminate\View\View
      */
