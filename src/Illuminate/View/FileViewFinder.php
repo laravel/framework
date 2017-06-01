@@ -4,9 +4,12 @@ namespace Illuminate\View;
 
 use InvalidArgumentException;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Traits\Macroable;
 
 class FileViewFinder implements ViewFinderInterface
 {
+    use Macroable;
+
     /**
      * The filesystem instance.
      *
