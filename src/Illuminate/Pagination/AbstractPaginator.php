@@ -118,6 +118,18 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
+     * Get the URL for the next page.
+     *
+     * @return string|null
+     */
+    public function nextPageUrl()
+    {
+        if ($this->hasMorePages()) {
+            return $this->url($this->currentPage() + 1);
+        }
+    }
+
+    /**
      * Create a range of pagination URLs.
      *
      * @param  int  $start
