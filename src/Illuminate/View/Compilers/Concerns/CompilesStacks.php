@@ -16,6 +16,17 @@ trait CompilesStacks
     }
 
     /**
+     * Compile the reverse-stack statements into the content.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileReversestack($expression)
+    {
+        return "<?php echo \$__env->yieldReversedPushContent{$expression}; ?>";
+    }
+
+    /**
      * Compile the push statements into valid PHP.
      *
      * @param  string  $expression
