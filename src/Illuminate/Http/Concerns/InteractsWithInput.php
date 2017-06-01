@@ -185,6 +185,27 @@ trait InteractsWithInput
     }
 
     /**
+     * Intersect an array of items with the input data or fallback to default values.
+     *
+     * @param  array  $keys
+     * @return array
+     */
+    public function defaults($keys)
+    {
+        $defaults = [];
+
+        foreach ($keys as $key => $value) {
+            if (is_numeric($key)) {
+                list($key, $value) = [$value, null];
+            }
+
+            $defaults[$key] = $this->has($key) ? $this->get($key) : $value;
+        }
+
+        return $defaults;
+    }
+
+    /**
      * Retrieve a query string item from the request.
      *
      * @param  string  $key
