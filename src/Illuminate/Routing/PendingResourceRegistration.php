@@ -143,6 +143,20 @@ class PendingResourceRegistration
     }
 
     /**
+     * Handle dynamic calls to set options fluently.
+     *
+     * @param  string  $method
+     * @param  array  $args
+     * @return \Illuminate\Routing\PendingResourceRegistration
+     */
+    public function __call($method, $args)
+    {
+        $this->options[$method] = empty($args) ? true : $args[0];
+
+        return $this;
+    }
+
+    /**
      * Handle the object's destruction.
      *
      * @return void
