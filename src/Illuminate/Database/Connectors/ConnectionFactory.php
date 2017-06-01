@@ -5,6 +5,7 @@ namespace Illuminate\Database\Connectors;
 use PDO;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
+use Illuminate\Database\OdbcConnection;
 use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Database\PostgresConnection;
@@ -187,6 +188,9 @@ class ConnectionFactory
                 return new SQLiteConnector;
             case 'sqlsrv':
                 return new SqlServerConnector;
+
+            case 'odbc':
+                return new OdbcConnector;
         }
 
         throw new InvalidArgumentException("Unsupported driver [{$config['driver']}]");
@@ -219,6 +223,9 @@ class ConnectionFactory
                 return new SQLiteConnection($connection, $database, $prefix, $config);
             case 'sqlsrv':
                 return new SqlServerConnection($connection, $database, $prefix, $config);
+
+            case 'odbc':
+                return new OdbcConnection($connection, $database, $prefix, $config);
         }
 
         throw new InvalidArgumentException("Unsupported driver [$driver]");
