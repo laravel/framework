@@ -208,6 +208,30 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1], $builder->getBindings());
     }
 
+    public function testWhereAll()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereAll(['first_name', 'last_name'], 'like', 't%');
+        $this->assertEquals('select * from "users" where "first_name" like ? and "last_name" like ?', $builder->toSql());
+        $this->assertEquals([0 => 't%', 1 => 't%'], $builder->getBindings());
+    }
+
+    public function testWhereAllThroughWhere()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where(['type_1', 'type_2'], 1);
+        $this->assertEquals('select * from "users" where "type_1" = ? and "type_2" = ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 1], $builder->getBindings());
+    }
+
+    public function testWhereAny()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereAny(['email', 'secondary_email'], 'like', '%.com');
+        $this->assertEquals('select * from "users" where ("email" like ? or "secondary_email" like ?)', $builder->toSql());
+        $this->assertEquals([0 => '%.com', 1 => '%.com'], $builder->getBindings());
+    }
+
     public function testMySqlWrappingProtectsQuotationMarks()
     {
         $builder = $this->getMySqlBuilder();

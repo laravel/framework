@@ -497,6 +497,10 @@ class Builder
      */
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
+        if (is_array($column) && $operator !== null) {
+            return $this->whereAll($column, $operator, $value, $boolean);
+        }
+
         // If the column is an array, we will assume it is an array of key-value pairs
         // and can add them each as a where clause. We will maintain the boolean we
         // received when the method was called and pass it into the nested where.
@@ -642,6 +646,39 @@ class Builder
     public function orWhere($column, $operator = null, $value = null)
     {
         return $this->where($column, $operator, $value, 'or');
+    }
+
+    /**
+     * Add an nested "or where" clause of any columns to the query.
+     *
+     * @param  array   $columns
+     * @param  string  $operator
+     * @param  mixed   $value
+     * @return $this
+     */
+    public function whereAny(array $columns, $operator = null, $value = null)
+    {
+        return $this->whereNested(function ($query) use ($columns, $operator, $value) {
+            $query->whereAll($columns, $operator, $value, 'or');
+        });
+    }
+
+    /**
+     * Add a basic where clause of all columns to the query.
+     *
+     * @param  array   $columns
+     * @param  string  $operator
+     * @param  mixed   $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereAll(array $columns, $operator = null, $value = null, $boolean = 'and')
+    {
+        foreach ($columns as $column) {
+            $this->where($column, $operator, $value, $boolean);
+        }
+
+        return $this;
     }
 
     /**
