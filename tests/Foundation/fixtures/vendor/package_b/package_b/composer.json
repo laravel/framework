@@ -1,0 +1,8 @@
+{
+    "extra": {
+        "providers": [
+            "bar",
+            "baz"
+        ]
+    }
+}
