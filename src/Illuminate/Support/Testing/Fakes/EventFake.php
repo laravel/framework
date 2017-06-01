@@ -17,6 +17,7 @@ class EventFake implements Dispatcher
 
     /**
      * The event types that should be intercepted instead of dispatched.
+     *
      * @var array
      */
     protected $eventsToFake;
