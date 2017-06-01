@@ -38,13 +38,17 @@ class Str
      */
     public static function after($subject, $search)
     {
-        if (! static::contains($subject, $search)) {
+        if ($search == '') {
             return $subject;
         }
 
-        $end = strpos($subject, $search) + static::length($search);
+        $pos = strpos($subject, $search);
 
-        return static::substr($subject, $end, static::length($subject));
+        if ($pos === false) {
+            return $subject;
+        }
+
+        return substr($subject, $pos + strlen($search));
     }
 
     /**
