@@ -47,19 +47,6 @@ class FoundationExceptionsHandlerTest extends TestCase
         m::close();
     }
 
-    public function testReturnsHtmlPageWithStackTraceWhenHtmlRequestAndDebugTrue()
-    {
-        $this->config->shouldReceive('get')->with('app.debug', null)->twice()->andReturn(true);
-        $this->request->shouldReceive('expectsJson')->once()->andReturn(false);
-
-        $response = $this->handler->render($this->request, new Exception('My custom error message'))->getContent();
-
-        $this->assertContains('<!DOCTYPE html>', $response);
-        $this->assertContains('Whoops, looks like something went wrong.', $response);
-        $this->assertContains('My custom error message', $response);
-        $this->assertNotContains('"message":', $response);
-    }
-
     public function testReturnsJsonWithStackTraceWhenAjaxRequestAndDebugTrue()
     {
         $this->config->shouldReceive('get')->with('app.debug', null)->once()->andReturn(true);
