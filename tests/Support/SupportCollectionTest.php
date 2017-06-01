@@ -1006,6 +1006,16 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(range(1, 5), $range->all());
     }
 
+    public function testSizeMethod()
+    {
+        $one = Collection::size(1);
+
+        $three = Collection::size(3);
+
+        $this->assertEquals([null], $one->all());
+        $this->assertEquals([null, null, null], $three->all());
+    }
+
     public function testConstructMakeFromObject()
     {
         $object = new stdClass();
