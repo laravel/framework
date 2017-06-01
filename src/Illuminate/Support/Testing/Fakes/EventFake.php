@@ -197,6 +197,7 @@ class EventFake implements Dispatcher
 
     /**
      * Determine if an event should be faked or actually dispatched.
+     *
      * @param  string  $eventName
      * @return bool
      */
