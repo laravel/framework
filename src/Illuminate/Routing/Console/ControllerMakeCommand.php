@@ -130,6 +130,7 @@ class ControllerMakeCommand extends GeneratorCommand
             'DummyFullModelClass' => $modelClass,
             'DummyModelClass' => class_basename($modelClass),
             'DummyModelVariable' => lcfirst(class_basename($modelClass)),
+            'DummyModelPlural' => Str::plural(lcfirst(class_basename($modelClass))),
         ]);
     }
 

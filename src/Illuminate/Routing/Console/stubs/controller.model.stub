@@ -15,7 +15,7 @@ class DummyClass extends Controller
      */
     public function index()
     {
-        //
+        return view('DummyModelPlural.index')->with('DummyModelPlural', DummyModelClass::paginate(25));
     }
 
     /**
@@ -25,7 +25,7 @@ class DummyClass extends Controller
      */
     public function create()
     {
-        //
+        return view('DummyModelPlural.create');
     }
 
     /**
@@ -36,7 +36,13 @@ class DummyClass extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->validate($request, [
+            //
+        ]);
+
+        $DummyModelVariable = DummyModelClass::create($request->all());
+
+        return redirect()->route('DummyModelPlural.show', $DummyModelVariable);
     }
 
     /**
@@ -47,7 +53,7 @@ class DummyClass extends Controller
      */
     public function show(DummyModelClass $DummyModelVariable)
     {
-        //
+        return view('DummyModelPlural.show')->withDummyModelClass($DummyModelVariable);
     }
 
     /**
@@ -58,7 +64,7 @@ class DummyClass extends Controller
      */
     public function edit(DummyModelClass $DummyModelVariable)
     {
-        //
+        return view('DummyModelPlural.edit')->withDummyModelClass($DummyModelVariable);
     }
 
     /**
@@ -70,7 +76,13 @@ class DummyClass extends Controller
      */
     public function update(Request $request, DummyModelClass $DummyModelVariable)
     {
-        //
+        $this->validate($request, [
+            //
+        ]);
+
+        $DummyModelVariable->update($request->all());
+
+        return redirect()->route('DummyModelPlural.show', $DummyModelVariable);
     }
 
     /**
@@ -81,6 +93,8 @@ class DummyClass extends Controller
      */
     public function destroy(DummyModelClass $DummyModelVariable)
     {
-        //
+        $DummyModelVariable->delete();
+
+        return redirect()->route('DummyModelPlural.index');
     }
 }
