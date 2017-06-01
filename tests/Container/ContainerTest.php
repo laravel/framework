@@ -181,6 +181,16 @@ class ContainerTest extends TestCase
         $this->assertEquals('foobarbaz', $container->make('foo'));
     }
 
+    public function testBindingAnInstanceReturnsTheInstance()
+    {
+        $container = new Container;
+
+        $bound = new StdClass;
+        $resolved = $container->instance('foo', $bound);
+
+        $this->assertSame($bound, $resolved);
+    }
+
     public function testExtendInstancesArePreserved()
     {
         $container = new Container;

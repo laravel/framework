@@ -355,7 +355,7 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @param  string  $abstract
      * @param  mixed   $instance
-     * @return void
+     * @return mixed
      */
     public function instance($abstract, $instance)
     {
@@ -373,6 +373,8 @@ class Container implements ArrayAccess, ContainerContract
         if ($isBound) {
             $this->rebound($abstract);
         }
+
+        return $instance;
     }
 
     /**
