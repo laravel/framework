@@ -249,7 +249,7 @@ class AppNameCommand extends Command
      *
      * @return string
      */
-    protected function getBootstrapPath()
+    protected function getBootstrapPath(): string
     {
         return $this->laravel->bootstrapPath().'/app.php';
     }
@@ -259,7 +259,7 @@ class AppNameCommand extends Command
      *
      * @return string
      */
-    protected function getComposerPath()
+    protected function getComposerPath(): string
     {
         return $this->laravel->basePath().'/composer.json';
     }
@@ -270,7 +270,7 @@ class AppNameCommand extends Command
      * @param  string  $name
      * @return string
      */
-    protected function getConfigPath($name)
+    protected function getConfigPath($name): string
     {
         return $this->laravel['path.config'].'/'.$name.'.php';
     }
@@ -280,7 +280,7 @@ class AppNameCommand extends Command
      *
      * @return array
      */
-    protected function getArguments()
+    protected function getArguments(): array
     {
         return [
             ['name', InputArgument::REQUIRED, 'The desired namespace.'],
