@@ -10,7 +10,7 @@ class FoundationPackageAssetsTest extends TestCase
 {
     public function testAssetLoading()
     {
-        $assetLoader = new PackageAssetLoader(new Filesystem, __DIR__ . '/fixtures/vendor');
+        $assetLoader = new PackageAssetLoader(new Filesystem, __DIR__.'/fixtures/vendor');
 
         $this->assertEquals($assetLoader->get('providers'), ['foo', 'bar', 'baz']);
     }

@@ -59,7 +59,7 @@ class PackageAssetLoader
 
         foreach ($this->files->directories($this->vendorPath) as $vendor) {
             foreach ($this->files->directories($vendor) as $package) {
-                $config = json_decode($this->files->get($package . '/composer.json'), true);
+                $config = json_decode($this->files->get($package.'/composer.json'), true);
 
                 $assets = array_merge($assets, (array) ($config['extra'][$key] ?? []));
             }
