@@ -10,7 +10,8 @@ class EventFake implements Dispatcher
 {
     /**
      * The original event dispatcher.
-     * @var Illuminate\Contracts\Events\Dispatcher
+     *
+     * @var \Illuminate\Contracts\Events\Dispatcher
      */
     protected $dispatcher;
 
@@ -30,6 +31,7 @@ class EventFake implements Dispatcher
     public function __construct(Dispatcher $dispatcher, $eventsToFake = [])
     {
         $this->dispatcher = $dispatcher;
+
         $this->eventsToFake = Arr::wrap($eventsToFake);
     }
 
