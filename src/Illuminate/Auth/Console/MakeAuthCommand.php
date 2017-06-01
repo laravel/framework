@@ -3,6 +3,7 @@
 namespace Illuminate\Auth\Console;
 
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Input\InputOption;
 use Illuminate\Console\DetectsApplicationNamespace;
 
 class MakeAuthCommand extends Command
@@ -10,13 +11,11 @@ class MakeAuthCommand extends Command
     use DetectsApplicationNamespace;
 
     /**
-     * The name and signature of the console command.
+     * The console command name.
      *
      * @var string
      */
-    protected $signature = 'make:auth
-                    {--views : Only scaffold the authentication views}
-                    {--force : Overwrite existing views by default}';
+    protected $name = 'make:auth';
 
     /**
      * The console command description.
@@ -24,6 +23,15 @@ class MakeAuthCommand extends Command
      * @var string
      */
     protected $description = 'Scaffold basic login and registration views and routes';
+
+    /**
+     * The controllers that need to be exported.
+     *
+     * @var array
+     */
+    protected $controllers = [
+        'HomeController.stub' => 'HomeController.php',
+    ];
 
     /**
      * The views that need to be exported.
@@ -51,16 +59,18 @@ class MakeAuthCommand extends Command
         $this->exportViews();
 
         if (! $this->option('views')) {
-            file_put_contents(
-                app_path('Http/Controllers/HomeController.php'),
-                $this->compileControllerStub()
-            );
+            $this->exportControllers();
 
-            file_put_contents(
-                base_path('routes/web.php'),
-                file_get_contents(__DIR__.'/stubs/make/routes.stub'),
-                FILE_APPEND
-            );
+            $routeFile = base_path('routes/web.php');
+            $routes = file_get_contents(__DIR__.'/stubs/make/routes.stub');
+
+            if (strpos(file_get_contents($routeFile), $routes) === false) {
+                file_put_contents(
+                    $routeFile,
+                    $routes,
+                    FILE_APPEND
+                );
+            }
         }
 
         $this->info('Authentication scaffolding generated successfully.');
@@ -79,6 +89,27 @@ class MakeAuthCommand extends Command
 
         if (! is_dir(resource_path('views/auth/passwords'))) {
             mkdir(resource_path('views/auth/passwords'), 0755, true);
+        }
+    }
+
+    /**
+     * Export the authentication controllers.
+     *
+     * @return bool
+     */
+    protected function exportControllers()
+    {
+        foreach ($this->controllers as $key => $value) {
+            if (file_exists(app_path('Http/Controllers/'.$value)) && ! $this->option('force')) {
+                if (! $this->confirm("The [{$value}] controller already exists. Do you want to replace it?", true)) {
+                    continue;
+                }
+            }
+
+            file_put_contents(
+                app_path('Http/Controllers/'.$value),
+                $this->compileControllerStub($key)
+            );
         }
     }
 
@@ -104,16 +135,31 @@ class MakeAuthCommand extends Command
     }
 
     /**
-     * Compiles the HomeController stub.
+     * Compiles the Controller stubs.
      *
+     * @param string $file
      * @return string
      */
-    protected function compileControllerStub()
+    protected function compileControllerStub($file)
     {
         return str_replace(
             '{{namespace}}',
             $this->getAppNamespace(),
-            file_get_contents(__DIR__.'/stubs/make/controllers/HomeController.stub')
+            file_get_contents(__DIR__."/stubs/make/controllers/{$file}")
         );
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['views', null, InputOption::VALUE_OPTIONAL, 'Only scaffold the authentication views.'],
+
+            ['force', null, InputOption::VALUE_OPTIONAL, 'Overwrite existing views by default.'],
+        ];
     }
 }
