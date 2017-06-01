@@ -15,9 +15,9 @@ class Event extends Facade
      *
      * @return void
      */
-    public static function fake()
+    public static function fake($eventsToFake = [])
     {
-        static::swap($fake = new EventFake);
+        static::swap($fake = new EventFake(static::getFacadeRoot(), $eventsToFake));
 
         Model::setEventDispatcher($fake);
     }
