@@ -87,52 +87,52 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase
         !!}'));
         $this->assertEquals('<?php echo isset($name) ? $name : \'foo\'; ?>', $compiler->compileString('{!! $name or \'foo\' !!}'));
 
-        $this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{{$name}}}'));
-        $this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{$name}}'));
-        $this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{ $name }}'));
-        $this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{
+        $this->assertEquals('<?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities($name); ?>', $compiler->compileString('{{{$name}}}'));
+        $this->assertEquals('<?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities($name); ?>', $compiler->compileString('{{$name}}'));
+        $this->assertEquals('<?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities($name); ?>', $compiler->compileString('{{ $name }}'));
+        $this->assertEquals('<?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities($name); ?>', $compiler->compileString('{{
             $name
         }}'));
-        $this->assertEquals("<?php echo e(\$name); ?>\n\n", $compiler->compileString("{{ \$name }}\n"));
-        $this->assertEquals("<?php echo e(\$name); ?>\r\n\r\n", $compiler->compileString("{{ \$name }}\r\n"));
-        $this->assertEquals("<?php echo e(\$name); ?>\n\n", $compiler->compileString("{{ \$name }}\n"));
-        $this->assertEquals("<?php echo e(\$name); ?>\r\n\r\n", $compiler->compileString("{{ \$name }}\r\n"));
+        $this->assertEquals("<?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities(\$name); ?>\n\n", $compiler->compileString("{{ \$name }}\n"));
+        $this->assertEquals("<?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities(\$name); ?>\r\n\r\n", $compiler->compileString("{{ \$name }}\r\n"));
+        $this->assertEquals("<?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities(\$name); ?>\n\n", $compiler->compileString("{{ \$name }}\n"));
+        $this->assertEquals("<?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities(\$name); ?>\r\n\r\n", $compiler->compileString("{{ \$name }}\r\n"));
 
-        $this->assertEquals('<?php echo e(isset($name) ? $name : "foo"); ?>', $compiler->compileString('{{ $name or "foo" }}'));
-        $this->assertEquals('<?php echo e(isset($user->name) ? $user->name : "foo"); ?>', $compiler->compileString('{{ $user->name or "foo" }}'));
-        $this->assertEquals('<?php echo e(isset($name) ? $name : "foo"); ?>', $compiler->compileString('{{$name or "foo"}}'));
-        $this->assertEquals('<?php echo e(isset($name) ? $name : "foo"); ?>', $compiler->compileString('{{
+        $this->assertEquals('<?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities(isset($name) ? $name : "foo"); ?>', $compiler->compileString('{{ $name or "foo" }}'));
+        $this->assertEquals('<?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities(isset($user->name) ? $user->name : "foo"); ?>', $compiler->compileString('{{ $user->name or "foo" }}'));
+        $this->assertEquals('<?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities(isset($name) ? $name : "foo"); ?>', $compiler->compileString('{{$name or "foo"}}'));
+        $this->assertEquals('<?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities(isset($name) ? $name : "foo"); ?>', $compiler->compileString('{{
             $name or "foo"
         }}'));
 
-        $this->assertEquals('<?php echo e(isset($name) ? $name : \'foo\'); ?>', $compiler->compileString('{{ $name or \'foo\' }}'));
-        $this->assertEquals('<?php echo e(isset($name) ? $name : \'foo\'); ?>', $compiler->compileString('{{$name or \'foo\'}}'));
-        $this->assertEquals('<?php echo e(isset($name) ? $name : \'foo\'); ?>', $compiler->compileString('{{
+        $this->assertEquals('<?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities(isset($name) ? $name : \'foo\'); ?>', $compiler->compileString('{{ $name or \'foo\' }}'));
+        $this->assertEquals('<?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities(isset($name) ? $name : \'foo\'); ?>', $compiler->compileString('{{$name or \'foo\'}}'));
+        $this->assertEquals('<?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities(isset($name) ? $name : \'foo\'); ?>', $compiler->compileString('{{
             $name or \'foo\'
         }}'));
 
-        $this->assertEquals('<?php echo e(isset($age) ? $age : 90); ?>', $compiler->compileString('{{ $age or 90 }}'));
-        $this->assertEquals('<?php echo e(isset($age) ? $age : 90); ?>', $compiler->compileString('{{$age or 90}}'));
-        $this->assertEquals('<?php echo e(isset($age) ? $age : 90); ?>', $compiler->compileString('{{
+        $this->assertEquals('<?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities(isset($age) ? $age : 90); ?>', $compiler->compileString('{{ $age or 90 }}'));
+        $this->assertEquals('<?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities(isset($age) ? $age : 90); ?>', $compiler->compileString('{{$age or 90}}'));
+        $this->assertEquals('<?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities(isset($age) ? $age : 90); ?>', $compiler->compileString('{{
             $age or 90
         }}'));
 
-        $this->assertEquals('<?php echo e("Hello world or foo"); ?>', $compiler->compileString('{{ "Hello world or foo" }}'));
-        $this->assertEquals('<?php echo e("Hello world or foo"); ?>', $compiler->compileString('{{"Hello world or foo"}}'));
-        $this->assertEquals('<?php echo e($foo + $or + $baz); ?>', $compiler->compileString('{{$foo + $or + $baz}}'));
-        $this->assertEquals('<?php echo e("Hello world or foo"); ?>', $compiler->compileString('{{
+        $this->assertEquals('<?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities("Hello world or foo"); ?>', $compiler->compileString('{{ "Hello world or foo" }}'));
+        $this->assertEquals('<?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities("Hello world or foo"); ?>', $compiler->compileString('{{"Hello world or foo"}}'));
+        $this->assertEquals('<?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities($foo + $or + $baz); ?>', $compiler->compileString('{{$foo + $or + $baz}}'));
+        $this->assertEquals('<?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities("Hello world or foo"); ?>', $compiler->compileString('{{
             "Hello world or foo"
         }}'));
 
-        $this->assertEquals('<?php echo e(\'Hello world or foo\'); ?>', $compiler->compileString('{{ \'Hello world or foo\' }}'));
-        $this->assertEquals('<?php echo e(\'Hello world or foo\'); ?>', $compiler->compileString('{{\'Hello world or foo\'}}'));
-        $this->assertEquals('<?php echo e(\'Hello world or foo\'); ?>', $compiler->compileString('{{
+        $this->assertEquals('<?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities(\'Hello world or foo\'); ?>', $compiler->compileString('{{ \'Hello world or foo\' }}'));
+        $this->assertEquals('<?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities(\'Hello world or foo\'); ?>', $compiler->compileString('{{\'Hello world or foo\'}}'));
+        $this->assertEquals('<?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities(\'Hello world or foo\'); ?>', $compiler->compileString('{{
             \'Hello world or foo\'
         }}'));
 
-        $this->assertEquals('<?php echo e(myfunc(\'foo or bar\')); ?>', $compiler->compileString('{{ myfunc(\'foo or bar\') }}'));
-        $this->assertEquals('<?php echo e(myfunc("foo or bar")); ?>', $compiler->compileString('{{ myfunc("foo or bar") }}'));
-        $this->assertEquals('<?php echo e(myfunc("$name or \'foo\'")); ?>', $compiler->compileString('{{ myfunc("$name or \'foo\'") }}'));
+        $this->assertEquals('<?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities(myfunc(\'foo or bar\')); ?>', $compiler->compileString('{{ myfunc(\'foo or bar\') }}'));
+        $this->assertEquals('<?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities(myfunc("foo or bar")); ?>', $compiler->compileString('{{ myfunc("foo or bar") }}'));
+        $this->assertEquals('<?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities(myfunc("$name or \'foo\'")); ?>', $compiler->compileString('{{ myfunc("$name or \'foo\'") }}'));
     }
 
     public function testEscapedWithAtEchosAreCompiled()
@@ -229,6 +229,23 @@ breeze
 breeze
 <?php endif; ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
+    public function testEchoIsProperlyWrapped()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = 'Hello {{ "@parent" }}';
+        $expected = 'Hello <?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities("@parent"); ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
+    public function testEscapeEntities()
+    {
+        $str = 'A \'@parent\' is escaped';
+        $this->assertEquals('A &#039;&commat;parent&#039; is escaped', BladeCompiler::escapeEntities($str));
+        $html = m::mock('Illuminate\Contracts\Support\Htmlable');
+        $html->shouldReceive('toHtml')->andReturn($str);
+        $this->assertEquals($str, BladeCompiler::escapeEntities($html));
     }
 
     public function testCannotStatementsAreCompiled()
@@ -496,7 +513,7 @@ empty
     public function testMixingYieldAndEcho()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $this->assertEquals('<?php echo $__env->yieldContent(\'title\'); ?> - <?php echo e(Config::get(\'site.title\')); ?>', $compiler->compileString("@yield('title') - {{Config::get('site.title')}}"));
+        $this->assertEquals('<?php echo $__env->yieldContent(\'title\'); ?> - <?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities(Config::get(\'site.title\')); ?>', $compiler->compileString("@yield('title') - {{Config::get('site.title')}}"));
     }
 
     public function testCustomExtensionsAreCompiled()
@@ -543,7 +560,7 @@ empty
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $compiler->setEchoFormat('%s');
 
-        $this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{{ $name }}}'));
+        $this->assertEquals('<?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities($name); ?>', $compiler->compileString('{{{ $name }}}'));
         $this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{ $name }}'));
         $this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{
             $name
@@ -559,9 +576,9 @@ empty
     public function testExpressionWithinHTML()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $this->assertEquals('<html <?php echo e($foo); ?>>', $compiler->compileString('<html {{ $foo }}>'));
-        $this->assertEquals('<html<?php echo e($foo); ?>>', $compiler->compileString('<html{{ $foo }}>'));
-        $this->assertEquals('<html <?php echo e($foo); ?> <?php echo app(\'translator\')->get(\'foo\'); ?>>', $compiler->compileString('<html {{ $foo }} @lang(\'foo\')>'));
+        $this->assertEquals('<html <?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities($foo); ?>>', $compiler->compileString('<html {{ $foo }}>'));
+        $this->assertEquals('<html<?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities($foo); ?>>', $compiler->compileString('<html{{ $foo }}>'));
+        $this->assertEquals('<html <?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities($foo); ?> <?php echo app(\'translator\')->get(\'foo\'); ?>>', $compiler->compileString('<html {{ $foo }} @lang(\'foo\')>'));
     }
 
     protected function getFiles()
