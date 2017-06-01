@@ -43,6 +43,7 @@ use Illuminate\Foundation\Console\EventGenerateCommand;
 use Illuminate\Foundation\Console\VendorPublishCommand;
 use Illuminate\Console\Scheduling\ScheduleFinishCommand;
 use Illuminate\Database\Console\Seeds\SeederMakeCommand;
+use Illuminate\Foundation\Console\PackageDiscoverCommand;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
 use Illuminate\Foundation\Console\NotificationMakeCommand;
 use Illuminate\Database\Console\Factories\FactoryMakeCommand;
@@ -96,6 +97,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'MigrateRollback' => 'command.migrate.rollback',
         'MigrateStatus' => 'command.migrate.status',
         'Optimize' => 'command.optimize',
+        'PackageDiscover' => 'command.package.discover',
         'Preset' => 'command.preset',
         'QueueFailed' => 'command.queue.failed',
         'QueueFlush' => 'command.queue.flush',
@@ -564,6 +566,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.optimize', function ($app) {
             return new OptimizeCommand($app['composer']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerPackageDiscoverCommand()
+    {
+        $this->app->singleton('command.package.discover', function ($app) {
+            return new PackageDiscoverCommand;
         });
     }
 

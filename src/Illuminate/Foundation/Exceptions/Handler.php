@@ -127,10 +127,14 @@ class Handler implements ExceptionHandlerContract
      */
     protected function context()
     {
-        return array_filter([
-            'userId' => Auth::id(),
-            'email' => Auth::user()->email ?? null,
-        ]);
+        try {
+            return array_filter([
+                'userId' => Auth::id(),
+                'email' => Auth::user() ? Auth::user()->email : null,
+            ]);
+        } catch (Exception $e) {
+            return [];
+        }
     }
 
     /**

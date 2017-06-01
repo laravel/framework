@@ -11,6 +11,7 @@ use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Log\LogServiceProvider;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Foundation\PackageManifest;
 use Illuminate\Events\EventServiceProvider;
 use Illuminate\Routing\RoutingServiceProvider;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -176,6 +177,10 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         $this->instance('app', $this);
 
         $this->instance(Container::class, $this);
+
+        $this->instance(PackageManifest::class, new PackageManifest(
+            new Filesystem, $this->basePath(), $this->getCachedPackagesPath()
+        ));
     }
 
     /**
@@ -545,8 +550,10 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function registerConfiguredProviders()
     {
+        $providers = $this->make(PackageManifest::class)->providers();
+
         (new ProviderRepository($this, new Filesystem, $this->getCachedServicesPath()))
-                    ->load($this->config['app.providers']);
+                    ->load(array_merge($this->config['app.providers'], $providers));
     }
 
     /**

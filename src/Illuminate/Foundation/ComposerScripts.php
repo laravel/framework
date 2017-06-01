@@ -33,6 +33,19 @@ class ComposerScripts
     }
 
     /**
+     * Handle the post-autoload-dump Composer event.
+     *
+     * @param  \Composer\Script\Event  $event
+     * @return void
+     */
+    public static function postAutoloadDump(Event $event)
+    {
+        require_once $event->getComposer()->getConfig()->get('vendor-dir').'/autoload.php';
+
+        static::clearCompiled();
+    }
+
+    /**
      * Clear the cached Laravel bootstrapping files.
      *
      * @return void
