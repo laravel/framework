@@ -499,6 +499,19 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
+     * Transform each item in the collection using a callback.
+     *
+     * @param  callable $callback
+     * @return $this
+     */
+    public function transform(callable $callback)
+    {
+        $this->items = $this->items->transform($callback);
+
+        return $this;
+    }
+
+    /**
      * Determine if the given item exists.
      *
      * @param  mixed  $key
