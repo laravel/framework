@@ -525,7 +525,9 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function runningInConsole()
     {
-        return php_sapi_name() == 'cli' || php_sapi_name() == 'phpdbg';
+        return php_sapi_name() == 'cli' ||
+            php_sapi_name() == 'phpdbg' ||
+            (php_sapi_name() == 'cgi-fcgi' && array_key_exists('SHELL', $_SERVER));
     }
 
     /**
