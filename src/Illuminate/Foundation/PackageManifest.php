@@ -121,12 +121,12 @@ class PackageManifest
             $packages = json_decode($this->files->get($path), true);
         }
 
-        $ignore = $this->packagesToIgnore();
+        $ignoreAll = in_array('*', $ignore = $this->packagesToIgnore());
 
         $this->write(collect($packages)->mapWithKeys(function ($package) {
             return [$this->format($package['name']) => $package['extra']['laravel'] ?? []];
-        })->reject(function ($configuration, $package) use ($ignore) {
-            return in_array($package, $ignore);
+        })->reject(function ($configuration, $package) use ($ignore, $ignoreAll) {
+            return $ignoreAll || in_array($package, $ignore);
         })->filter()->all());
     }
 
