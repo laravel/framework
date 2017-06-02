@@ -97,7 +97,9 @@ class QueueServiceProvider extends ServiceProvider
             return new WorkCommand($app['queue.worker']);
         });
 
-        $this->commands('command.queue.work');
+        $this->commands([
+            'command.queue.work',
+        ]);
     }
 
     /**
@@ -125,7 +127,9 @@ class QueueServiceProvider extends ServiceProvider
             return new ListenCommand($app['queue.listener']);
         });
 
-        $this->commands('command.queue.listen');
+        $this->commands([
+            'command.queue.listen',
+        ]);
     }
 
     /**
@@ -139,7 +143,9 @@ class QueueServiceProvider extends ServiceProvider
             return new RestartCommand;
         });
 
-        $this->commands('command.queue.restart');
+        $this->commands([
+            'command.queue.restart',
+        ]);
     }
 
     /**
@@ -153,7 +159,9 @@ class QueueServiceProvider extends ServiceProvider
             return new SubscribeCommand;
         });
 
-        $this->commands('command.queue.subscribe');
+        $this->commands([
+            'command.queue.subscribe',
+        ]);
     }
 
     /**

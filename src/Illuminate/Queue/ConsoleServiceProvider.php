@@ -50,10 +50,14 @@ class ConsoleServiceProvider extends ServiceProvider
             return new FailedTableCommand($app['files'], $app['composer']);
         });
 
-        $this->commands(
-            'command.queue.table', 'command.queue.failed', 'command.queue.retry',
-            'command.queue.forget', 'command.queue.flush', 'command.queue.failed-table'
-        );
+        $this->commands([
+            'command.queue.table',
+            'command.queue.failed',
+            'command.queue.retry',
+            'command.queue.forget',
+            'command.queue.flush',
+            'command.queue.failed-table',
+        ]);
     }
 
     /**

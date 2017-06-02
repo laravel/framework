@@ -52,7 +52,10 @@ class CacheServiceProvider extends ServiceProvider
             return new CacheTableCommand($app['files'], $app['composer']);
         });
 
-        $this->commands('command.cache.clear', 'command.cache.table');
+        $this->commands([
+            'command.cache.clear',
+            'command.cache.table',
+        ]);
     }
 
     /**

@@ -30,7 +30,10 @@ class SeedServiceProvider extends ServiceProvider
             return new Seeder;
         });
 
-        $this->commands('command.seed', 'command.seeder.make');
+        $this->commands([
+            'command.seed',
+            'command.seeder.make',
+        ]);
     }
 
     /**
