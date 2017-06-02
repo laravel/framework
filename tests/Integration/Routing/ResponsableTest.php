@@ -139,7 +139,7 @@ class ResponsableTest extends TestCase
 
         Route::get('/responsable', function () use ($users) {
             return (new TestResponsableApiResponse($users->first()))->withMeta([
-                'foo' => 'bar'
+                'foo' => 'bar',
             ]);
         });
 
@@ -152,14 +152,14 @@ class ResponsableTest extends TestCase
 
     public function test_responsable_api_objects_with_related()
     {
-        $users = factory(TestResponsableApiResponseUser::class, 5)->create()->each(function($user){
+        $users = factory(TestResponsableApiResponseUser::class, 5)->create()->each(function ($user) {
             $user->posts()->createMany(
                 factory(TestResponsableApiResponsePost::class, 2)->make()->toArray()
             );
         });
 
         Route::get('/responsable', function () use ($users) {
-            return (new TestResponsableApiResponse($users->first()));
+            return TestResponsableApiResponse::with($users->first());
         });
 
         $response = json_decode($this->get('/responsable')->getContent(), true);
@@ -222,7 +222,8 @@ class TestResponsableApiResponseUser extends Model
     public $timestamps = false;
     protected $guarded = ['id'];
 
-    public function posts(){
+    public function posts()
+    {
         return $this->hasMany(TestResponsableApiResponsePost::class, 'user_id');
     }
 }
