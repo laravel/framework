@@ -115,11 +115,10 @@ class PackageManifest
      */
     public function build()
     {
-        $installedFile = $this->vendorPath.'/composer/installed.json';
-
         $packages = [];
-        if ($this->files->exists($installedFile)) {
-            $packages = json_decode($this->files->get($installedFile), true);
+
+        if ($this->files->exists($path = $this->vendorPath.'/composer/installed.json')) {
+            $packages = json_decode($this->files->get($path), true);
         }
 
         $ignore = $this->packagesToIgnore();
