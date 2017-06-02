@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
 use Whoops\Handler\PrettyPageHandler;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Session\TokenMismatchException;
@@ -279,10 +280,13 @@ class Handler implements ExceptionHandlerContract
      */
     protected function whoopsHandler()
     {
-        return tap(new PrettyPageHandler)->setApplicationPaths([
-            app_path(), base_path('bootstrap'), config_path(), database_path(),
-            public_path(), resource_path(), base_path('routes'), storage_path(),
-        ]);
+        $files = new Filesystem;
+
+        return tap(new PrettyPageHandler)->setApplicationPaths(
+            array_flip(array_except(
+                array_flip($files->directories(base_path())), [base_path('vendor')]
+            ))
+        );
     }
 
     /**
