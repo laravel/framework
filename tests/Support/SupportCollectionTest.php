@@ -396,6 +396,24 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([['v' => 2], ['v' => '3'], ['v' => 4]], $c->whereNotInStrict('v', [1, 3])->values()->all());
     }
 
+    public function testFrequency()
+    {
+        $c = new Collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
+
+        $this->assertSame(0, $c->frequency('v', 3));
+        $this->assertSame(2, $c->frequency('v', '=', 3));
+        $this->assertSame(2, $c->frequency('v', '==', 3));
+        $this->assertSame(2, $c->frequency('v', 'garbage', 3));
+        $this->assertSame(1, $c->frequency('v', '===', 3));
+        $this->assertSame(3, $c->frequency('v', '<>', 3));
+        $this->assertSame(3, $c->frequency('v', '!=', 3));
+        $this->assertSame(4, $c->frequency('v', '!==', 3));
+        $this->assertSame(4, $c->frequency('v', '<=', 3));
+        $this->assertSame(3, $c->frequency('v', '>=', 3));
+        $this->assertSame(2, $c->frequency('v', '<', 3));
+        $this->assertSame(1, $c->frequency('v', '>', 3));
+    }
+
     public function testValues()
     {
         $c = new Collection([['id' => 1, 'name' => 'Hello'], ['id' => 2, 'name' => 'World']]);
