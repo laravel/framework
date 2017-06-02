@@ -115,7 +115,7 @@ class PackageManifest
      */
     public function build()
     {
-        $installedFile = $this->vendorPath . '/composer/installed.json';
+        $installedFile = $this->vendorPath.'/composer/installed.json';
 
         $packages = [];
         if ($this->files->exists($installedFile)) {
