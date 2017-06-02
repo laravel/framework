@@ -30,9 +30,9 @@ class PackageDiscoverCommand extends Command
     public function handle(PackageManifest $manifest)
     {
         $manifest->build();
-        
+
         foreach (array_keys($manifest->manifest) as $package) {
-            $this->info('Auto discovered: '.$package);
+            $this->info("Discovered Package: {$package}");
         }
 
         $this->info('Package manifest generated successfully.');
