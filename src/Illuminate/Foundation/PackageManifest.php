@@ -115,18 +115,12 @@ class PackageManifest
      */
     public function build()
     {
-        $vendors = $this->files->directories($this->vendorPath);
+        $installed = $this->files->get($this->vendorPath . '/composer/installed.json');
 
         $ignore = $this->packagesToIgnore();
 
-        $this->write(collect($vendors)->flatMap(function ($vendor) {
-            return $this->files->directories($vendor);
-        })->filter(function ($package) {
-            return $this->files->exists($package.'/composer.json');
-        })->mapWithKeys(function ($package) {
-            return [$this->format($package) => json_decode(
-                $this->files->get($package.'/composer.json'), true
-            )['extra']['laravel'] ?? []];
+        $this->write(collect(json_decode($installed, true))->mapWithKeys(function ($package) {
+            return [$this->format($package['name']) => $package['extra']['laravel'] ?? []];
         })->reject(function ($configuration, $package) use ($ignore) {
             return in_array($package, $ignore);
         })->filter()->all());
