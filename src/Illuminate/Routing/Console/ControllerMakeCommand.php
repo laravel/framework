@@ -144,7 +144,7 @@ class ControllerMakeCommand extends GeneratorCommand
         if ($this->confirm("A {$class} model does not exist. Do you want to generate it?", true)) {
             $options = ['name' => $class];
 
-            if ($this->confirm("Do you want a migration file too?", true)) {
+            if ($this->confirm('Do you want a migration file too?', true)) {
                 $options += ['--migration' => true];
             }
 
