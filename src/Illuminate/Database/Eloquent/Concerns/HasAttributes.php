@@ -883,6 +883,23 @@ trait HasAttributes
     }
 
     /**
+     * Get a subset containing the provided attributes with values from the model.
+     * 
+     * @param  array|mixed  $attributes
+     * @return array
+     */
+    public function only($attributes)
+    {
+        $results = [];
+
+        foreach (is_array($attributes) ? $attributes : func_get_args() as $attribute) {
+            $results[$attribute] = $this->getAttribute($attribute);
+        }
+
+        return $results;
+    }
+
+    /**
      * Sync the original attributes with the current.
      *
      * @return $this
