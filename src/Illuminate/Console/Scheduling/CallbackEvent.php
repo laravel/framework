@@ -55,8 +55,9 @@ class CallbackEvent extends Event
      */
     public function run(Container $container)
     {
-        if ($this->description) {
-            $this->mutex->create($this);
+        if ($this->description && $this->withoutOverlapping &&
+            ! $this->mutex->create($this)) {
+            return;
         }
 
         try {
