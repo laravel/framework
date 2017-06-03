@@ -91,9 +91,9 @@ class MakeAuthCommand extends Command
     {
         foreach ($this->views as $key => $value) {
             if (file_exists(resource_path('views/'.$value)) && ! $this->option('force')) {
-                // if (! $this->confirm("The [{$value}] view already exists. Do you want to replace it?")) {
-                //     continue;
-                // }
+                if (! $this->confirm("The [{$value}] view already exists. Do you want to replace it?")) {
+                    continue;
+                }
             }
 
             copy(
