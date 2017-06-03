@@ -7,6 +7,7 @@ use Countable;
 use Exception;
 use Throwable;
 use DateTimeZone;
+use Ramsey\Uuid\Uuid;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -1318,6 +1319,18 @@ trait ValidatesAttributes
         $~ixu';
 
         return preg_match($pattern, $value) > 0;
+    }
+
+    /**
+     * Validate that an attribute is a valid UUID.
+     *
+     * @param string  $attribute
+     * @param mixed   $value
+     * @return bool
+     */
+    protected function validateUuid($attribute, $value)
+    {
+        return Uuid::isValid($value);
     }
 
     /**
