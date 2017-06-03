@@ -68,6 +68,10 @@ class TokenGuard implements Guard
             $user = $this->provider->retrieveByCredentials(
                 [$this->storageKey => $token]
             );
+            
+            if (is_null($user)) {
+                throw new AuthenticationException;
+            }
         }
 
         return $this->user = $user;
