@@ -186,6 +186,8 @@ class Kernel implements KernelContract
     {
         $this->terminateMiddleware($request, $response);
 
+        event(new Events\RequestTerminated($request, $response));
+
         $this->app->terminate();
     }
 
