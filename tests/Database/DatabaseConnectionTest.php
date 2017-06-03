@@ -265,7 +265,7 @@ class DatabaseConnectionTest extends TestCase
         $pdo->shouldReceive('prepare')->once()->andReturn($statement);
         $statement->shouldReceive('execute')->once()->andThrow(new \PDOException('server has gone away'));
 
-        $connection = new \Illuminate\Database\Connection($pdo);
+        $connection = $this->getMockConnection([], $pdo);
         $connection->beginTransaction();
         $connection->statement('foo');
     }
@@ -280,7 +280,7 @@ class DatabaseConnectionTest extends TestCase
 
         $pdo->shouldReceive('prepare')->twice()->andReturn($statement);
 
-        $connection = new \Illuminate\Database\Connection($pdo);
+        $connection = $this->getMockConnection([], $pdo);
 
         $called = false;
 
@@ -379,7 +379,7 @@ class DatabaseConnectionTest extends TestCase
     protected function getMockConnection($methods = [], $pdo = null)
     {
         $pdo = $pdo ?: new DatabaseConnectionTestMockPDO;
-        $defaults = ['getDefaultQueryGrammar', 'getDefaultPostProcessor', 'getDefaultSchemaGrammar'];
+        $defaults = ['getDefaultQueryGrammar', 'getDefaultPostProcessor', 'getDefaultSchemaGrammar', 'getDoctrineDriver'];
         $connection = $this->getMockBuilder('Illuminate\Database\Connection')->setMethods(array_merge($defaults, $methods))->setConstructorArgs([$pdo])->getMock();
         $connection->enableQueryLog();
 
