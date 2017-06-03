@@ -586,7 +586,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function __isset($key)
     {
-        return ! is_null($this->__get($key));
+        return true;
     }
 
     /**
