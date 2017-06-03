@@ -1209,6 +1209,18 @@ class SupportCollectionTest extends TestCase
         );
     }
 
+    public function testMapInto()
+    {
+        $data = new Collection([
+            'first', 'second',
+        ]);
+
+        $data = $data->mapInto(TestCollectionMapIntoObject::class);
+
+        $this->assertEquals('first', $data[0]->value);
+        $this->assertEquals('second', $data[1]->value);
+    }
+
     public function testNth()
     {
         $data = new Collection([
@@ -2198,5 +2210,15 @@ class TestJsonSerializeObject implements JsonSerializable
     public function jsonSerialize()
     {
         return ['foo' => 'bar'];
+    }
+}
+
+class TestCollectionMapIntoObject
+{
+    public $value;
+
+    public function __construct($value)
+    {
+        $this->value = $value;
     }
 }
