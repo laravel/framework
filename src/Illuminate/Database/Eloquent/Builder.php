@@ -187,6 +187,10 @@ class Builder
             return $this;
         }
 
+        if ($this->model->incrementing) {
+            $id = (int) $id;
+        }
+
         return $this->where($this->model->getQualifiedKeyName(), '=', $id);
     }
 
