@@ -138,6 +138,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     const UPDATED_AT = 'updated_at';
 
     /**
+     * The attributes that accept default values.
+     *
+     * @var array
+     */
+    protected $defaultable = [];
+
+    /**
      * Create a new Eloquent model instance.
      *
      * @param  array  $attributes
@@ -219,6 +226,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function fill(array $attributes)
     {
         $totallyGuarded = $this->totallyGuarded();
+
+        foreach ($this->fillable as $field) {
+            if( ! array_key_exists($field, $attributes) && array_key_exists($field, $this->defaultable)) {
+                $attributes[$field] = $this->defaultable[$field];
+            }
+        }
 
         foreach ($this->fillableFromArray($attributes) as $key => $value) {
             $key = $this->removeTableFromKey($key);
