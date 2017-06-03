@@ -228,7 +228,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $totallyGuarded = $this->totallyGuarded();
 
         foreach ($this->fillable as $field) {
-            if( ! array_key_exists($field, $attributes) && array_key_exists($field, $this->defaultable)) {
+            if(! array_key_exists($field, $attributes) && array_key_exists($field, $this->defaultable)) {
                 $attributes[$field] = $this->defaultable[$field];
             }
         }
