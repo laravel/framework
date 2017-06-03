@@ -5,7 +5,7 @@ namespace Illuminate\Foundation\Console\Presets;
 use Illuminate\Support\Arr;
 use Illuminate\Filesystem\Filesystem;
 
-class Bootstrap extends Preset
+class UIKit3 extends Preset
 {
     /**
      * Install the preset.
@@ -15,9 +15,9 @@ class Bootstrap extends Preset
     public static function install()
     {
         static::updatePackages();
-        static::updateSass();
+        static::updateWebpackConfiguration();
         static::updateBootstrapping();
-        static::removeNodeModules();
+        //static::removeNodeModules();
     }
 
     /**
@@ -28,20 +28,19 @@ class Bootstrap extends Preset
      */
     protected static function updatePackageArray(array $packages)
     {
-        return ['bootstrap-sass' => '^3.3.7', 'jquery' => '^3.1.1'] + Arr::except($packages, [
-            'uikit'
+        return ['uikit' => '*', 'jquery' => '^3.1.1' ] + Arr::except($packages, [
+            'bootstrap-sass'
         ]);
     }
 
     /**
-     * Update the Sass files for the application.
+     * Update the Webpack configuration.
      *
      * @return void
      */
-    protected static function updateSass()
+    protected static function updateWebpackConfiguration()
     {
-        copy(__DIR__.'/bootstrap-stubs/_variables.scss', resource_path('assets/sass/_variables.scss'));
-        copy(__DIR__.'/bootstrap-stubs/app.scss', resource_path('assets/sass/app.scss'));
+        copy(__DIR__.'/vue-stubs/webpack.mix.js', base_path('webpack.mix.js'));
     }
 
     /**
@@ -51,10 +50,14 @@ class Bootstrap extends Preset
      */
     protected static function updateBootstrapping()
     {
+        copy(__DIR__.'/uikit3-stubs/app.scss', resource_path('assets/sass/app.scss'));
+
         tap(new Filesystem, function ($filesystem) {
+            $filesystem->delete(resource_path('assets/sass/_variables.scss'));
+
             $bootstrapJs = str_replace(
-                "window.UIkit = require('uikit');",
                 "require('bootstrap-sass');",
+                "window.UIkit = require('uikit');",
                 $filesystem->get(resource_path('assets/js/bootstrap.js'))
             );
 

@@ -1,0 +1,74 @@
+// Breakpoints
+$xsmall-min: 0;
+$xsmall-max: 479px;
+
+$small-min: 480px;
+$small-max: 767px;
+
+$medium-min: 768px;
+$medium-max:  959px;
+
+$large-min: 960px;
+$large-max: 1219px;
+
+$xlarge-min: 1220px;
+
+// UIkit 3
+
+// Base
+@import 'node_modules/uikit/src/scss/variables.scss';
+@import 'node_modules/uikit/src/scss/mixins.scss';
+@import 'node_modules/uikit/src/scss/components/base.scss';
+@import 'node_modules/uikit/src/scss/components/inverse.scss';
+
+// Elements
+@import 'node_modules/uikit/src/scss/components/link.scss';
+@import 'node_modules/uikit/src/scss/components/heading.scss';
+@import 'node_modules/uikit/src/scss/components/divider.scss';
+@import 'node_modules/uikit/src/scss/components/list.scss';
+@import 'node_modules/uikit/src/scss/components/description-list.scss';
+@import 'node_modules/uikit/src/scss/components/table.scss';
+@import 'node_modules/uikit/src/scss/components/icon.scss';
+@import 'node_modules/uikit/src/scss/components/form.scss'; // After: Icon
+@import 'node_modules/uikit/src/scss/components/button.scss';
+
+// Layout
+@import 'node_modules/uikit/src/scss/components/section.scss';
+@import 'node_modules/uikit/src/scss/components/container.scss';
+@import 'node_modules/uikit/src/scss/components/grid.scss';
+@import 'node_modules/uikit/src/scss/components/tile.scss';
+@import 'node_modules/uikit/src/scss/components/card.scss';
+
+// Common
+@import 'node_modules/uikit/src/scss/components/close.scss'; // After: Icon
+@import 'node_modules/uikit/src/scss/components/spinner.scss'; // After: Icon
+@import 'node_modules/uikit/src/scss/components/totop.scss'; // After: Icon
+@import 'node_modules/uikit/src/scss/components/alert.scss'; // After: Close
+@import 'node_modules/uikit/src/scss/components/badge.scss';
+@import 'node_modules/uikit/src/scss/components/label.scss';
+@import 'node_modules/uikit/src/scss/components/overlay.scss'; // After: Icon
+@import 'node_modules/uikit/src/scss/components/article.scss'; // After: Subnav
+@import 'node_modules/uikit/src/scss/components/comment.scss'; // After: Subnav
+@import 'node_modules/uikit/src/scss/components/search.scss'; // After: Icon
+
+// Navs
+@import 'node_modules/uikit/src/scss/components/nav.scss';
+@import 'node_modules/uikit/src/scss/components/navbar.scss'; // After: Card, Grid, Nav, Icon, Search
+@import 'node_modules/uikit/src/scss/components/subnav.scss';
+@import 'node_modules/uikit/src/scss/components/breadcrumb.scss';
+@import 'node_modules/uikit/src/scss/components/pagination.scss';
+@import 'node_modules/uikit/src/scss/components/tab.scss';
+@import 'node_modules/uikit/src/scss/components/slidenav.scss'; // After: Icon
+@import 'node_modules/uikit/src/scss/components/dotnav.scss';
+
+// JavaScript
+@import 'node_modules/uikit/src/scss/components/accordion.scss';
+@import 'node_modules/uikit/src/scss/components/drop.scss'; // After: Card
+@import 'node_modules/uikit/src/scss/components/dropdown.scss'; // After: Card
+@import 'node_modules/uikit/src/scss/components/modal.scss'; // After: Close
+@import 'node_modules/uikit/src/scss/components/sticky.scss';
+@import 'node_modules/uikit/src/scss/components/offcanvas.scss';
+@import 'node_modules/uikit/src/scss/components/switcher.scss';
+@import 'node_modules/uikit/src/scss/components/notification.scss';
+
+@import 'node_modules/uikit/src/scss/components/_import.utilities.scss';
