@@ -253,12 +253,8 @@ class Handler implements ExceptionHandlerContract
                 $this->renderExceptionWithWhoops($e), $statusCode, $headers
             );
         } else {
-            $e = FlattenException::create($e);
-
             return SymfonyResponse::create(
-                (new SymfonyExceptionHandler(false))->getHtml($e),
-                $statusCode,
-                $headers
+                $this->renderExceptionWithSymfony($e), $statusCode, $headers
             );
         }
     }
@@ -278,6 +274,19 @@ class Handler implements ExceptionHandlerContract
         });
 
         return $whoops->handleException($e);
+    }
+
+    /**
+     * Render an exception to a string using Symfony.
+     *
+     * @param  \Exception  $e
+     * @return string
+     */
+    protected function renderExceptionWithSymfony(Exception $e)
+    {
+        $e = FlattenException::create($e);
+
+        return (new SymfonyExceptionHandler(false))->getHtml($e);
     }
 
     /**
