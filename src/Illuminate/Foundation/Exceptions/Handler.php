@@ -268,9 +268,11 @@ class Handler implements ExceptionHandlerContract
      */
     protected function renderExceptionWithWhoops(Exception $e)
     {
-        return tap(
-            (new Whoops)->pushHandler($this->whoopsHandler())
-        )->handleException($e);
+        $whoops = tap(new Whoops, function ($whoops) {
+            $whoops->pushHandler($this->whoopsHandler());
+        });
+
+        return $whoops->handleException($e);
     }
 
     /**
@@ -280,13 +282,15 @@ class Handler implements ExceptionHandlerContract
      */
     protected function whoopsHandler()
     {
-        $files = new Filesystem;
+        return tap(new PrettyPageHandler, function ($handler) {
+            $files = new Filesystem;
 
-        return tap(new PrettyPageHandler)->setApplicationPaths(
-            array_flip(array_except(
-                array_flip($files->directories(base_path())), [base_path('vendor')]
-            ))
-        );
+            $handler->setApplicationPaths(
+                array_flip(array_except(
+                    array_flip($files->directories(base_path())), [base_path('vendor')]
+                ))
+            );
+        });
     }
 
     /**
