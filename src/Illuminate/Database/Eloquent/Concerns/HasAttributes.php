@@ -287,6 +287,17 @@ trait HasAttributes
     }
 
     /**
+     * Determine if an attribute exists.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function hasAttribute($key)
+    {
+        return ! is_null($this->getAttribute($key));
+    }
+
+    /**
      * Get an attribute from the model.
      *
      * @param  string  $key
