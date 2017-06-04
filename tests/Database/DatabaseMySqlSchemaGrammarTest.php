@@ -201,6 +201,16 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table `users` drop index `foo`', $statements[0]);
     }
 
+    public function testDropFulltext()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->dropFulltext('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table `users` drop index `foo`', $statements[0]);
+    }
+
     public function testDropForeign()
     {
         $blueprint = new Blueprint('users');
@@ -269,6 +279,16 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table `users` add unique `bar`(`foo`)', $statements[0]);
+    }
+
+    public function testAddingFulltextKey()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->fulltext('foo', 'bar');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table `users` add fulltext `bar`(`foo`)', $statements[0]);
     }
 
     public function testAddingIndex()
