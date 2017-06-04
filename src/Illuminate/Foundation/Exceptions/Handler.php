@@ -246,16 +246,15 @@ class Handler implements ExceptionHandlerContract
     protected function convertExceptionToResponse(Exception $e)
     {
         $headers = $this->isHttpException($e) ? $e->getHeaders() : [];
+
         $statusCode = $this->isHttpException($e) ? $e->getStatusCode() : 500;
 
-        $showStackTraces = config('app.debug');
-
         try {
-            $content = $showStackTraces
-                ? $this->renderExceptionWithWhoops($e)
-                : $this->renderExceptionWithSymfony($e, $showStackTraces);
-        } finally {
-            $content = $content ?? $this->renderExceptionWithSymfony($e, $showStackTraces);
+            $content = config('app.debug')
+                    ? $this->renderExceptionWithWhoops($e)
+                    : $this->renderExceptionWithSymfony($e, config('app.debug'));
+        } catch (Exception $e) {
+            $content = $content ?? $this->renderExceptionWithSymfony($e, config('app.debug'));
         }
 
         return SymfonyResponse::create(
@@ -271,26 +270,27 @@ class Handler implements ExceptionHandlerContract
      */
     protected function renderExceptionWithWhoops(Exception $e)
     {
-        $whoops = tap(new Whoops, function ($whoops) {
+        return tap(new Whoops, function ($whoops) {
             $whoops->pushHandler($this->whoopsHandler());
-            $whoops->writeToOutput(false);
-            $whoops->allowQuit(false);
-        });
 
-        return $whoops->handleException($e);
+            $whoops->writeToOutput(false);
+
+            $whoops->allowQuit(false);
+        })->handleException($e);
     }
 
     /**
      * Render an exception to a string using Symfony.
      *
      * @param  \Exception  $e
+     * @param  bool  $debug
      * @return string
      */
-    protected function renderExceptionWithSymfony(Exception $e, $showStackTraces)
+    protected function renderExceptionWithSymfony(Exception $e, $debug)
     {
-        $e = FlattenException::create($e);
-
-        return (new SymfonyExceptionHandler($showStackTraces))->getHtml($e);
+        return (new SymfonyExceptionHandler($debug))->getHtml(
+            FlattenException::create($e)
+        );
     }
 
     /**
