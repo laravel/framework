@@ -75,10 +75,8 @@ trait ManagesStacks
             $this->pushes[$section] = [];
         }
 
-        if (! isset($this->pushes[$section][$this->renderCount])) {
-            $this->pushes[$section][$this->renderCount] = $content;
-        } else {
-            $this->pushes[$section][$this->renderCount] .= $content;
+        if (!in_array(trim($content),$this->pushes[$section])) {
+            $this->pushes[$section][] = trim($content);
         }
     }
 
