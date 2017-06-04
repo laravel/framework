@@ -187,6 +187,26 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertEquals('create index "baz" on "users" using hash ("foo", "bar")', $statements[0]);
     }
 
+    public function testAddingIndexWithOpClass()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->index(['foo' => 'varchar_pattern_ops'], 'baz');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('create index "baz" on "users" ("foo" varchar_pattern_ops)', $statements[0]);
+    }
+
+    public function testAddingIndexWithAlgorithmAndOpClass()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->index(['foo' => 'gist_trgm_ops'], 'baz', 'gist');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('create index "baz" on "users" using gist ("foo" gist_trgm_ops)', $statements[0]);
+    }
+
     public function testAddingIncrementingID()
     {
         $blueprint = new Blueprint('users');

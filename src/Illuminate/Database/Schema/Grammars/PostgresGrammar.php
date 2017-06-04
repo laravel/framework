@@ -123,7 +123,7 @@ class PostgresGrammar extends Grammar
             $this->wrap($command->index),
             $this->wrapTable($blueprint),
             $command->algorithm ? ' using '.$command->algorithm : '',
-            $this->columnize($command->columns)
+            $this->columnizeWithKeys($command->columns)
         );
     }
 

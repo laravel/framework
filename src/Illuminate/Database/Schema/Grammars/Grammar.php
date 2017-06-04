@@ -252,4 +252,21 @@ abstract class Grammar extends BaseGrammar
     {
         return $this->transactions;
     }
+
+    /**
+     * Convert an array of column names into a delimited string.
+     *
+     * @param  array $columns
+     * @return string
+     */
+    public function columnizeWithKeys(array $columns)
+    {
+        if (($keys = array_keys($columns)) !== array_keys($keys)) {
+            $columns = array_map(function ($key, $value) {
+                return new Expression($this->wrap($key).' '.$value);
+            }, $keys, $columns);
+        }
+
+        return parent::columnize($columns);
+    }
 }
