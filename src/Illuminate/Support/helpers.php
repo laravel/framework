@@ -653,6 +653,23 @@ if (! function_exists('object_get')) {
     }
 }
 
+if (! function_exists('preg_fetch')) {
+    /**
+     * Perform a regular expression match and returns the matches.
+     *
+     * @param  string  $pattern
+     * @param  string  $subject
+     * @param  int     $flags
+     * @return array
+     */
+    function preg_fetch($pattern, $subject, $flags = 0)
+    {
+        $result = preg_match($pattern, $subject, $matches, $flags);
+        
+        return array_slice($matches, 1);
+    }
+}
+
 if (! function_exists('preg_replace_array')) {
     /**
      * Replace a given pattern with each value in the array in sequentially.
