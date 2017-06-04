@@ -3,7 +3,7 @@
 namespace Illuminate\Support\Facades;
 
 /**
- * @see \Illuminate\Hashing\BcryptHasher
+ * @see \Illuminate\Hashing\Hasher
  */
 class Hash extends Facade
 {

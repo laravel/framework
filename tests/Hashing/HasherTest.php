@@ -4,15 +4,15 @@ namespace Illuminate\Tests\Hashing;
 
 use PHPUnit\Framework\TestCase;
 
-class BcryptHasherTest extends TestCase
+class HasherTest extends TestCase
 {
     public function testBasicHashing()
     {
-        $hasher = new \Illuminate\Hashing\BcryptHasher;
+        $hasher = new \Illuminate\Hashing\Hasher;
         $value = $hasher->make('password');
         $this->assertNotSame('password', $value);
         $this->assertTrue($hasher->check('password', $value));
         $this->assertFalse($hasher->needsRehash($value));
-        $this->assertTrue($hasher->needsRehash($value, ['rounds' => 1]));
+        $this->assertTrue($hasher->needsRehash($value, ['cost' => 1]));
     }
 }
