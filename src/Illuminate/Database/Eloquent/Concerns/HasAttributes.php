@@ -7,6 +7,7 @@ use LogicException;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\HtmlString;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection as BaseCollection;
@@ -165,6 +166,12 @@ trait HasAttributes
     {
         foreach ($this->getCasts() as $key => $value) {
             if (! array_key_exists($key, $attributes) || in_array($key, $mutatedAttributes)) {
+                continue;
+            }
+
+            // If the attribute cast was html, we don't want to cast the value to an HtmlString
+            // since we will generally want to use a plain text string in the array instead.
+            if ($attributes[$key] && $value === 'html') {
                 continue;
             }
 
@@ -485,6 +492,8 @@ trait HasAttributes
                 return $this->asDateTime($value);
             case 'timestamp':
                 return $this->asTimestamp($value);
+            case 'html':
+                return new HtmlString($value);
             default:
                 return $value;
         }
