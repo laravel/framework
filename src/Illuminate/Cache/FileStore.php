@@ -7,7 +7,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Filesystem\Filesystem;
 
-class FileStore implements Store
+class FileStore extends TaggableStore implements Store
 {
     /**
      * The Illuminate Filesystem instance.
