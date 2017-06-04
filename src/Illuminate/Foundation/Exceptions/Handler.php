@@ -248,15 +248,19 @@ class Handler implements ExceptionHandlerContract
         $headers = $this->isHttpException($e) ? $e->getHeaders() : [];
         $statusCode = $this->isHttpException($e) ? $e->getStatusCode() : 500;
 
-        if (config('app.debug')) {
-            return SymfonyResponse::create(
-                $this->renderExceptionWithWhoops($e), $statusCode, $headers
-            );
-        } else {
-            return SymfonyResponse::create(
-                $this->renderExceptionWithSymfony($e), $statusCode, $headers
-            );
+        $showStackTraces = config('app.debug');
+
+        try {
+            $content = $showStackTraces
+                ? $this->renderExceptionWithWhoops($e)
+                : $this->renderExceptionWithSymfony($e, $showStackTraces);
+        } finally {
+            $content = $content ?? $this->renderExceptionWithSymfony($e, $showStackTraces);
         }
+
+        return SymfonyResponse::create(
+            $content, $statusCode, $headers
+        );
     }
 
     /**
@@ -282,11 +286,11 @@ class Handler implements ExceptionHandlerContract
      * @param  \Exception  $e
      * @return string
      */
-    protected function renderExceptionWithSymfony(Exception $e)
+    protected function renderExceptionWithSymfony(Exception $e, $showStackTraces)
     {
         $e = FlattenException::create($e);
 
-        return (new SymfonyExceptionHandler(false))->getHtml($e);
+        return (new SymfonyExceptionHandler($showStackTraces))->getHtml($e);
     }
 
     /**
