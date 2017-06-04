@@ -270,6 +270,8 @@ class Handler implements ExceptionHandlerContract
     {
         $whoops = tap(new Whoops, function ($whoops) {
             $whoops->pushHandler($this->whoopsHandler());
+            $whoops->writeToOutput(false);
+            $whoops->allowQuit(false);
         });
 
         return $whoops->handleException($e);
@@ -285,6 +287,7 @@ class Handler implements ExceptionHandlerContract
         return tap(new PrettyPageHandler, function ($handler) {
             $files = new Filesystem;
 
+            $handler->handleUnconditionally(true);
             $handler->setApplicationPaths(
                 array_flip(array_except(
                     array_flip($files->directories(base_path())), [base_path('vendor')]
