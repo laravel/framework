@@ -131,6 +131,16 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('create index "baz" on "users" ("foo", "bar")', $statements[0]);
     }
 
+    public function testAddingIndexWithColumnSortOrder()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->index(['foo' => 'ASC', 'bar' => 'DESC'], 'baz');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('create index "baz" on "users" ("foo" ASC, "bar" DESC)', $statements[0]);
+    }
+
     public function testAddingIncrementingID()
     {
         $blueprint = new Blueprint('users');

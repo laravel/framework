@@ -291,6 +291,26 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table `users` add index `baz` using hash(`foo`, `bar`)', $statements[0]);
     }
 
+    public function testAddingIndexWithColumnSortOrder()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->index(['foo' => 'DESC', 'bar' => 'ASC'], 'baz');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add index `baz`(`foo` DESC, `bar` ASC)', $statements[0]);
+    }
+
+    public function testAddingIndexWithColumnSortOrderAndAlgorithm()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->index(['foo' => 'DESC', 'bar' => 'ASC'], 'baz', 'btree');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add index `baz` using btree(`foo` DESC, `bar` ASC)', $statements[0]);
+    }
+
     public function testAddingForeignKey()
     {
         $blueprint = new Blueprint('users');

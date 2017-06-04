@@ -208,7 +208,7 @@ class MySqlGrammar extends Grammar
             $type,
             $this->wrap($command->index),
             $command->algorithm ? ' using '.$command->algorithm : '',
-            $this->columnize($command->columns)
+            $this->columnizeWithKeys($command->columns)
         );
     }
 
