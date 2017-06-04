@@ -276,7 +276,8 @@ class Handler implements ExceptionHandlerContract
             $whoops->writeToOutput(false);
 
             $whoops->allowQuit(false);
-        })->handleException($e);
+        }
+        )->handleException($e);
     }
 
     /**
