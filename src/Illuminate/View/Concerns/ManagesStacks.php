@@ -75,7 +75,7 @@ trait ManagesStacks
             $this->pushes[$section] = [];
         }
 
-        if (!in_array(trim($content),$this->pushes[$section])) {
+        if (! in_array(trim($content), $this->pushes[$section])) {
             $this->pushes[$section][] = trim($content);
         }
     }
