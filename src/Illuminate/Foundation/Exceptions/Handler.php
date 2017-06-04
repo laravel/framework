@@ -245,17 +245,20 @@ class Handler implements ExceptionHandlerContract
      */
     protected function convertExceptionToResponse(Exception $e)
     {
+        $headers = $this->isHttpException($e) ? $e->getHeaders() : [];
+        $statusCode = $this->isHttpException($e) ? $e->getStatusCode() : 500;
+
         if (config('app.debug')) {
             return SymfonyResponse::create(
-                $this->renderExceptionWithWhoops($e), $e->getStatusCode(), $e->getHeaders()
+                $this->renderExceptionWithWhoops($e), $statusCode, $headers
             );
         } else {
             $e = FlattenException::create($e);
 
             return SymfonyResponse::create(
                 (new SymfonyExceptionHandler(false))->getHtml($e),
-                $e->getStatusCode(),
-                $e->getHeaders()
+                $statusCode,
+                $headers
             );
         }
     }
