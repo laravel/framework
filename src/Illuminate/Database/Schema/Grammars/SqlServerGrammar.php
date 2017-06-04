@@ -117,7 +117,7 @@ class SqlServerGrammar extends Grammar
         return sprintf('create index %s on %s (%s)',
             $this->wrap($command->index),
             $this->wrapTable($blueprint),
-            $this->columnize($command->columns)
+            $this->columnizeWithKeys($command->columns)
         );
     }
 
