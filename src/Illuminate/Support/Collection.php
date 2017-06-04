@@ -1144,13 +1144,13 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         if (is_null($seed)) {
             shuffle($items);
-        } else {
-            srand($seed);
-
-            usort($items, function () {
-                return rand(-1, 1);
-            });
         }
+
+        srand($seed);
+
+        usort($items, function () {
+            return rand(-1, 1);
+        });
 
         return new static($items);
     }
