@@ -165,7 +165,8 @@ class Migrator
         // migration file name. Once we have the instances we can run the actual
         // command such as "up" or "down", or we can just simulate the action.
         $migration = $this->resolve(
-            $name = $this->getMigrationName($file)
+            $name = $this->getMigrationName($file),
+            $file
         );
 
         if ($pretend) {
@@ -404,9 +405,13 @@ class Migrator
      * @param  string  $file
      * @return object
      */
-    public function resolve($file)
+    public function resolve($file, $path = '')
     {
         $class = Str::studly(implode('_', array_slice(explode('_', $file), 4)));
+
+        if (preg_match('#^namespace\s+(.+?);$#sm', $this->files->sharedGet($path), $m)) {
+            $class = $m[1].'\\'.$class;
+        }
 
         return new $class;
     }
