@@ -1548,9 +1548,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         if (is_null($key)) {
             $this->items[] = $value;
-        } else {
-            $this->items[$key] = $value;
         }
+
+        $this->items[$key] = $value;
     }
 
     /**
