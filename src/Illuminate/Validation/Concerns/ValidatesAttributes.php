@@ -511,11 +511,23 @@ trait ValidatesAttributes
      *
      * @param  string  $attribute
      * @param  mixed   $value
+     * @param  array   $parameters
      * @return bool
      */
-    protected function validateEmail($attribute, $value)
+    protected function validateEmail($attribute, $value, $parameters)
     {
-        return filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
+        $validSyntax = filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
+
+        // If checkdomain is specified as a parameter, we will check
+        // MX and A records to ensure that the domain really exists.
+        if ($validSyntax && count($parameters) == 1 && $parameters[0] == 'checkdomain') {
+            list($user, $domain) = explode('@', $value);
+
+            // Perform A check only if there's no MX record.
+            return checkdnsrr($domain, 'MX') || checkdnsrr($domain, 'A');
+        }
+
+        return $validSyntax;
     }
 
     /**
