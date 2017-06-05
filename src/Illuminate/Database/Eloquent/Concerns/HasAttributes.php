@@ -117,6 +117,11 @@ trait HasAttributes
             if (! isset($attributes[$key])) {
                 continue;
             }
+            
+            if (empty($attributes[$key])) {
+                $attributes[$key] = null;
+                continue;
+            }
 
             $attributes[$key] = $this->serializeDate(
                 $this->asDateTime($attributes[$key])
