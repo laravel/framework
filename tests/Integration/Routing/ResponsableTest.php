@@ -179,7 +179,7 @@ class TestResponsableResponse implements Responsable
 
 class TestResponsableApiResponse implements Responsable
 {
-    use \Illuminate\Http\ApiResponseTrait;
+    use \Illuminate\Http\IsApiResponse;
 
     private $resource;
 
@@ -199,7 +199,7 @@ class TestResponsableApiResponse implements Responsable
 
 class TestResponsableApiResponseForPosts implements Responsable
 {
-    use \Illuminate\Http\ApiResponseTrait;
+    use \Illuminate\Http\IsApiResponse;
 
     private $resource;
 
