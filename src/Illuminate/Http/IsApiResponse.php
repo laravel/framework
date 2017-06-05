@@ -3,10 +3,10 @@
 namespace Illuminate\Http;
 
 use InvalidArgumentException;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 use Illuminate\Pagination\AbstractPaginator;
 
-trait ApiResponseTrait
+trait IsApiResponse
 {
     /**
      * The status code for the response.
@@ -20,7 +20,21 @@ trait ApiResponseTrait
      *
      * @var array
      */
-    public $metaData = [];
+    public $metadata = [];
+
+    /**
+     * The headers sent with the response.
+     *
+     * @var array
+     */
+    public $headers = [];
+
+    /**
+     * The options used while encoding data to JSON.
+     *
+     * @var int
+     */
+    public $encodingOptions = 0;
 
     /**
      * Get a displayable API output for the given object.
@@ -32,7 +46,7 @@ trait ApiResponseTrait
     {
         $object = $object ?? $this->resource;
 
-        $meta = $this->metaData;
+        $meta = $this->metadata;
 
         $data = $object instanceof Collection || $object instanceof AbstractPaginator
                     ? $object->map([$this, 'transformResource'])->toArray()
@@ -66,7 +80,33 @@ trait ApiResponseTrait
      */
     public function withMeta($data)
     {
-        $this->metaData = $data;
+        $this->metadata = $data;
+
+        return $this;
+    }
+
+    /**
+     * Add an array of headers to the response.
+     *
+     * @param  array  $headers
+     * @return $this
+     */
+    public function withHeaders($headers)
+    {
+        $this->headers = $headers;
+
+        return $this;
+    }
+
+    /**
+     * Set the options used while encoding data to JSON.
+     *
+     * @param  int  $options
+     * @return $this
+     */
+    public function withEncodingOptions($options)
+    {
+        $this->encodingOptions = $options;
 
         return $this;
     }
@@ -74,13 +114,15 @@ trait ApiResponseTrait
     /**
      * Create an HTTP response that represents the object.
      *
-     * @return \Illuminate\Http\Response
-     * @throws InvalidArgumentException
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \InvalidArgumentException
      */
     public function toResponse()
     {
         if (isset($this->resource)) {
-            return response()->json($this->transform(), $this->status);
+            return response()->json($this->transform(),
+                $this->status, $this->headers, $this->encodingOptions
+            );
         }
 
         throw new InvalidArgumentException(static::class.' must implement toResponse() or have a $resource property.');
