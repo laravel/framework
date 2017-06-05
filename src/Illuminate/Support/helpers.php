@@ -264,7 +264,7 @@ if (! function_exists('array_set')) {
 
 if (! function_exists('array_sort')) {
     /**
-     * Sort the array using the given callback or "dot" notation.
+     * Sort the array by the given callback or attribute name.
      *
      * @param  array  $array
      * @param  callable|string  $callback
