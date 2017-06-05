@@ -32,20 +32,20 @@ trait GuardsAttributes
      *
      * @return array
      */
-	public function getFillable()
-	{
-		return array_merge($this->fillable,$this->getFillableTraits());
-	}
-	/**
-	 * Get the fillable attributes for the traits.
-	 *
-	 * @return array
-	 */
-	protected function getFillableTraits()
-	{
-		return $this->getTraitAttributes('fillable');
-	}
+    public function getFillable()
+    {
+        return array_merge($this->fillable, $this->getFillableTraits());
+    }
 
+    /**
+     * Get the fillable attributes for the traits.
+     *
+     * @return array
+     */
+    protected function getFillableTraits()
+    {
+        return $this->getTraitAttributes('fillable');
+    }
 
     /**
      * Set the fillable attributes for the model.
@@ -65,18 +65,20 @@ trait GuardsAttributes
      *
      * @return array
      */
-	public function getGuarded()
-	{
-		return array_merge($this->guarded, $this->getGuardedTraits());
-	}
-	/**
-	 * Get the guarded attributes for the traits.
-	 *
-	 * @return array
-	 */
-	protected function getGuardedTraits() {
-		return $this->getTraitAttributes('guarded');
-	}
+    public function getGuarded()
+    {
+        return array_merge($this->guarded, $this->getGuardedTraits());
+    }
+
+    /**
+     * Get the guarded attributes for the traits.
+     *
+     * @return array
+     */
+    protected function getGuardedTraits()
+    {
+        return $this->getTraitAttributes('guarded');
+    }
 
     /**
      * Set the guarded attributes for the model.

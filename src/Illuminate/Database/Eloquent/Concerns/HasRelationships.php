@@ -441,7 +441,7 @@ trait HasRelationships
      */
     public function touches($relation)
     {
-		return in_array($relation, $this->getTouchedRelations());
+        return in_array($relation, $this->getTouchedRelations());
     }
 
     /**
@@ -574,19 +574,20 @@ trait HasRelationships
      *
      * @return array
      */
-	public function getTouchedRelations()
-	{
-		return array_merge($this->touches, $this->getTouchedTraits());
-	}
-	/**
-	 * Get the relationships that are touched on save from traits.
-	 *
-	 * @return array
-	 */
-	public function getTouchedTraits()
-	{
-		return $this->getTraitAttributes('touches');
-	}
+    public function getTouchedRelations()
+    {
+        return array_merge($this->touches, $this->getTouchedTraits());
+    }
+
+    /**
+     * Get the relationships that are touched on save from traits.
+     *
+     * @return array
+     */
+    public function getTouchedTraits()
+    {
+        return $this->getTraitAttributes('touches');
+    }
 
     /**
      * Set the relationships that are touched on save.

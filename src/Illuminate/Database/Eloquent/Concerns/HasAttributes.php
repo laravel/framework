@@ -202,25 +202,27 @@ trait HasAttributes
      *
      * @return array
      */
-	protected function getArrayableAppends()
-	{
-		$appends = array_merge($this->appends, $this->getArrayableAppendsTraits());
-		if (! count($appends)) {
-			return [];
-		}
-		return $this->getArrayableItems(
-			array_combine($appends, $appends)
-		);
-	}
-	/**
-	 * Get all of the appendable values that are arrayable from traits.
-	 *
-	 * @return array
-	 */
-	protected function getArrayableAppendsTraits()
-	{
-		return $this->getTraitAttributes('appends');
-	}
+    protected function getArrayableAppends()
+    {
+        $appends = array_merge($this->appends, $this->getArrayableAppendsTraits());
+        if (! count($appends)) {
+            return [];
+        }
+
+        return $this->getArrayableItems(
+            array_combine($appends, $appends)
+        );
+    }
+
+    /**
+     * Get all of the appendable values that are arrayable from traits.
+     *
+     * @return array
+     */
+    protected function getArrayableAppendsTraits()
+    {
+        return $this->getTraitAttributes('appends');
+    }
 
     /**
      * Get the model's relationships in array form.
@@ -769,21 +771,23 @@ trait HasAttributes
      *
      * @return array
      */
-	public function getDates()
-	{
-		$dates = array_merge($this->dates, $this->getDatesTraits());
-		$defaults = [static::CREATED_AT, static::UPDATED_AT];
-		return $this->usesTimestamps() ? array_merge($dates, $defaults) : $dates;
-	}
-	/**
-	 * Get the attributes that should be converted to dates from traits.
-	 *
-	 * @return array
-	 */
-	public function getDatesTraits()
-	{
-		return $this->getTraitAttributes('dates');
-	}
+    public function getDates()
+    {
+        $dates = array_merge($this->dates, $this->getDatesTraits());
+        $defaults = [static::CREATED_AT, static::UPDATED_AT];
+
+        return $this->usesTimestamps() ? array_merge($dates, $defaults) : $dates;
+    }
+
+    /**
+     * Get the attributes that should be converted to dates from traits.
+     *
+     * @return array
+     */
+    public function getDatesTraits()
+    {
+        return $this->getTraitAttributes('dates');
+    }
 
     /**
      * Get the format for database stored dates.
@@ -829,23 +833,25 @@ trait HasAttributes
      *
      * @return array
      */
-	public function getCasts()
-	{
-		$casts = array_merge($this->casts, $this->getCastsTraits());
-		if ($this->getIncrementing()) {
-			return array_merge([$this->getKeyName() => $this->getKeyType()], $casts);
-		}
-		return $casts;
-	}
-	/**
-	 * Get the casts array from traits.
-	 *
-	 * @return array
-	 */
-	public function getCastsTraits()
-	{
-		return $this->getTraitAttributes('casts');
-	}
+    public function getCasts()
+    {
+        $casts = array_merge($this->casts, $this->getCastsTraits());
+        if ($this->getIncrementing()) {
+            return array_merge([$this->getKeyName() => $this->getKeyType()], $casts);
+        }
+
+        return $casts;
+    }
+
+    /**
+     * Get the casts array from traits.
+     *
+     * @return array
+     */
+    public function getCastsTraits()
+    {
+        return $this->getTraitAttributes('casts');
+    }
 
     /**
      * Determine whether a value is Date / DateTime castable for inbound manipulation.
