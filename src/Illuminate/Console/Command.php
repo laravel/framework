@@ -115,7 +115,7 @@ class Command extends SymfonyCommand
         // when using $this->info in derived classes
         // Symfony\Component\Debug\Exception\FatalThrowableError]
         // Call to a member function writeln() on null
-        $this->output = new Symfony\Component\Console\Output\ConsoleOutput();
+        $this->output = new \Symfony\Component\Console\Output\ConsoleOutput();
     }
 
     /**
