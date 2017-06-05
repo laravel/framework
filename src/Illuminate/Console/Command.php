@@ -110,7 +110,7 @@ class Command extends SymfonyCommand
         if (! isset($this->signature)) {
             $this->specifyParameters();
         }
-        
+
         // Set the default value to avoid the following error
         // when using $this->info in derived classes
         // Symfony\Component\Debug\Exception\FatalThrowableError]
