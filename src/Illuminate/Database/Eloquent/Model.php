@@ -959,6 +959,24 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $this->setRawAttributes(static::findOrFail($this->getKey())->attributes);
     }
 
+	/**
+	 * Get all attributes from traits with suffix trait name $attribute[TraitName].
+	 *
+	 * @param string $attribute
+	 * @return array
+	 */
+	protected function getTraitAttributes(string $attribute)
+	{
+		$class = static::class;
+		$attributes = [];
+		foreach (class_uses_recursive($class) as $trait) {
+			if(property_exists($this, $attribute.class_basename($trait))) {
+				$attributes = array_merge($this->{$attribute.class_basename($trait)}, $attributes);
+			}
+		}
+		return $attributes;
+	}
+
     /**
      * Clone the model into a new, non-existing instance.
      *

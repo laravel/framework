@@ -51,17 +51,26 @@ trait HasEvents
      *
      * @return array
      */
-    public function getObservableEvents()
-    {
-        return array_merge(
-            [
-                'creating', 'created', 'updating', 'updated',
-                'deleting', 'deleted', 'saving', 'saved',
-                'restoring', 'restored',
-            ],
-            $this->observables
-        );
-    }
+	public function getObservableEvents()
+	{
+		return array_merge(
+			[
+				'creating', 'created', 'updating', 'updated',
+				'deleting', 'deleted', 'saving', 'saved',
+				'restoring', 'restored',
+			],
+			array_merge($this->observables, $this->getObservableEventTraits())
+		);
+	}
+	/**
+	 * Get the observable event names for traits.
+	 *
+	 * @return array
+	 */
+	protected function getObservableEventTraits()
+	{
+		return $this->getTraitAttributes('observables');
+	}
 
     /**
      * Set the observable event names.
