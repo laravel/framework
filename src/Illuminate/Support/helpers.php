@@ -264,13 +264,13 @@ if (! function_exists('array_set')) {
 
 if (! function_exists('array_sort')) {
     /**
-     * Sort the array using the given callback.
+     * Sort the array using the given callback or "dot" notation.
      *
      * @param  array  $array
-     * @param  callable  $callback
+     * @param  callable|string  $callback
      * @return array
      */
-    function array_sort($array, callable $callback)
+    function array_sort($array, $callback)
     {
         return Arr::sort($array, $callback);
     }
