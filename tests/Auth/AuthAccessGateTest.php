@@ -2,13 +2,18 @@
 
 namespace Illuminate\Tests\Auth;
 
-use StdClass;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Container\Container;
 use Illuminate\Auth\Access\Response;
-use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Tests\Auth\Fixtures\AccessGateTestDummy;
+use Illuminate\Tests\Auth\Fixtures\AccessGateTestPolicy;
+use Illuminate\Tests\Auth\Fixtures\AccessGateTestResource;
+use Illuminate\Tests\Auth\Fixtures\AccessGateTestSubDummy;
+use Illuminate\Tests\Auth\Fixtures\AccessGateTestCustomResource;
+use Illuminate\Tests\Auth\Fixtures\AccessGateTestDummyInterface;
+use Illuminate\Tests\Auth\Fixtures\AccessGateTestPolicyWithBefore;
 
 class GateTest extends TestCase
 {
@@ -166,7 +171,7 @@ class GateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', '\Illuminate\Tests\Auth\AccessGateTestClass@foo');
+        $gate->define('foo', '\Illuminate\Tests\Auth\Fixtures\AccessGateTestClass@foo');
 
         $this->assertTrue($gate->check('foo'));
     }
@@ -317,107 +322,5 @@ class GateTest extends TestCase
         return new Gate(new Container, function () use ($isAdmin) {
             return (object) ['id' => 1, 'isAdmin' => $isAdmin];
         });
-    }
-}
-
-class AccessGateTestClass
-{
-    public function foo()
-    {
-        return true;
-    }
-}
-
-interface AccessGateTestDummyInterface
-{
-    //
-}
-
-class AccessGateTestDummy implements AccessGateTestDummyInterface
-{
-    //
-}
-
-class AccessGateTestSubDummy extends AccessGateTestDummy
-{
-    //
-}
-
-class AccessGateTestPolicy
-{
-    use HandlesAuthorization;
-
-    public function createAny($user, $additional)
-    {
-        return $additional;
-    }
-
-    public function create($user)
-    {
-        return $user->isAdmin ? $this->allow() : $this->deny('You are not an admin.');
-    }
-
-    public function updateAny($user, AccessGateTestDummy $dummy)
-    {
-        return ! $user->isAdmin;
-    }
-
-    public function update($user, AccessGateTestDummy $dummy)
-    {
-        return ! $user->isAdmin;
-    }
-
-    public function updateDash($user, AccessGateTestDummy $dummy)
-    {
-        return $user instanceof StdClass;
-    }
-}
-
-class AccessGateTestPolicyWithBefore
-{
-    public function before($user, $ability)
-    {
-        return true;
-    }
-
-    public function update($user, AccessGateTestDummy $dummy)
-    {
-        return false;
-    }
-}
-
-class AccessGateTestResource
-{
-    public function view($user)
-    {
-        return true;
-    }
-
-    public function create($user)
-    {
-        return true;
-    }
-
-    public function update($user, AccessGateTestDummy $dummy)
-    {
-        return true;
-    }
-
-    public function delete($user, AccessGateTestDummy $dummy)
-    {
-        return true;
-    }
-}
-
-class AccessGateTestCustomResource
-{
-    public function foo($user)
-    {
-        return true;
-    }
-
-    public function bar($user)
-    {
-        return true;
     }
 }
