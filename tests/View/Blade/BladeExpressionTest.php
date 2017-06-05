@@ -27,6 +27,18 @@ class BladeExpressionTest extends TestCase
         $this->assertEquals('<html <?php echo e($foo); ?> <?php echo app(\'translator\')->getFromJson(\'foo\'); ?>>', $compiler->compileString('<html {{ $foo }} @lang(\'foo\')>'));
     }
 
+    public function testExpressionParse()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $this->assertEquals('<?php echo $__env->yieldContent(\'test\'); ?>', $compiler->compileString('@yield(\'test\')'));
+        $this->assertEquals('<?php echo $__env->yieldContent; ?>(\'te\'st\')', $compiler->compileString('@yield(\'te\'st\')'));
+        $this->assertEquals('<?php echo $__env->yieldContent; ?>(\'test")', $compiler->compileString('@yield(\'test")'));
+        $this->assertEquals('<?php echo $__env->yieldContent(\'te\\\'st\'); ?>', $compiler->compileString('@yield(\'te\\\'st\')'));
+        $this->assertEquals('<?php echo $__env->yieldContent(\'te"st\'); ?>', $compiler->compileString('@yield(\'te"st\')'));
+        $this->assertEquals('<?php echo $__env->yieldContent(\'(: test :)\'); ?>', $compiler->compileString('@yield(\'(: test :)\')'));
+        $this->assertEquals('<?php echo $__env->yieldContent(\'test :)\'); ?> <?php echo $__env->yieldContent(("\'that :)\'")); ?>', $compiler->compileString('@yield(\'test :)\') @yield(("\'that :)\'"))'));
+    }
+
     protected function getFiles()
     {
         return m::mock('Illuminate\Filesystem\Filesystem');

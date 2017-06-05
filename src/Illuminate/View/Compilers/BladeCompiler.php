@@ -268,7 +268,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected function compileStatements($value)
     {
         return preg_replace_callback(
-            '/\B@(@?\w+(?:::\w+)?)([ \t]*)(\( ( (?>[^()]+) | (?3) )* \))?/x', function ($match) {
+            '/\B@(@?\w+(?:::\w+)?)([ \t]*)(\( ( (?>( (([\\\'"])(?>(?>(?!\7)[^\\\\]|\\\\.)+ | (?6))*?\7) |[^()"\\\']+)) | (?3) )* \))?/x', function ($match) {
                 return $this->compileStatement($match);
             }, $value
         );
