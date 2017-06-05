@@ -64,4 +64,17 @@ class Rule
     {
         return new Rules\Unique($table, $column);
     }
+
+    /**
+     * Get a date constraint builder instance.
+     *
+     * @param string $type
+     * @param string|\DateTime $date
+     * @throws \InvalidArgumentException
+     * @return \Illuminate\Validation\Rules\Date
+     */
+    public static function date($type = 'date', $date = '')
+    {
+        return new Rules\Date($type, $date);
+    }
 }
