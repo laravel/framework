@@ -68,7 +68,7 @@ class Builder
      */
     protected $passthru = [
         'insert', 'insertGetId', 'getBindings', 'toSql',
-        'exists', 'count', 'min', 'max', 'avg', 'sum', 'getConnection',
+        'exists', 'count', 'min', 'max', 'avg', 'sum', 'getConnection', 'implode',
     ];
 
     /**
