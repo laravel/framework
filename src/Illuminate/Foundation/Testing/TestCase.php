@@ -113,7 +113,7 @@ abstract class TestCase extends BaseTestCase
         if (isset($uses[WithoutEvents::class])) {
             $this->disableEventsForAllTests();
         }
-        
+
         return $uses;
     }
 
