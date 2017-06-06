@@ -358,12 +358,9 @@ trait ValidatesAttributes
             return false;
         }
 
-        if (!preg_match('/v/', $parameters[0])) {
-            $date = DateTime::createFromFormat($parameters[0], $value);
-        } else {
-            $dateString = date($parameters[0], strtotime($value));
-            $date = new DateTime($dateString);
-        }
+        $date = strpos($parameters[0], 'v') === false
+            ? DateTime::createFromFormat($parameters[0], $value)
+            : new DateTime(date($parameters[0], strtotime($value)));
 
         return $date && $date->format($parameters[0]) == $value;
     }
