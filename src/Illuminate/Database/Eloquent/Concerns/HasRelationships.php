@@ -520,7 +520,32 @@ trait HasRelationships
      */
     public function relationLoaded($key)
     {
-        return array_key_exists($key, $this->relations);
+        // Check if this is a nested relationship
+        if (strpos($key, '.') === false) {
+            return array_key_exists($key, $this->relations);
+        } else {
+
+            // Split first key from nested relations
+            $name = strstr($key, '.', true);
+            $nested = substr(strstr($key, '.'), 1);
+
+            // Check if first relation is loaded
+            if (array_key_exists($name, $this->relations)) {
+
+                // Get existing relation
+                $relation = $this->{$name};
+
+                // If model is null relations are still loaded, but nothing was found
+                if (! $relation) {
+                    return true;
+                }
+
+                // Check nested relations
+                return $relation->relationLoaded($nested);
+            } else {
+                return false;
+            }
+        }
     }
 
     /**

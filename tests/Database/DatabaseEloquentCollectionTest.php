@@ -147,6 +147,40 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertEquals(['results'], $c->all());
     }
 
+    public function testRelationLoadedMethod()
+    {
+        // Nested relationship of collections (i.e. many-to-many)
+        $nested = new TestEloquentCollectionModel;
+        $nested->setRelation('bar', []);
+        $model = new TestEloquentCollectionModel;
+        $model->setRelation('foo', new Collection([$nested]));
+        $c = new Collection([$model]);
+
+        $this->assertTrue($c->relationLoaded('foo.bar'));
+
+        // Nested relationship missing on one model
+        $monkeyWrench = new TestEloquentCollectionModel; // No nested relations
+        $model->setRelation('foo', new Collection([$nested, $monkeyWrench]));
+        $c2 = new Collection([$model]);
+
+        $this->assertFalse($c2->relationLoaded('foo.bar'));
+
+        // Nested ralationship with single model (i.e. one-to-many)
+        $modelTwo = new TestEloquentCollectionModel;
+        $modelTwo->setRelation('bar', []);
+        $model->setRelation('foo', $modelTwo);
+        $c3 = new Collection([$model]);
+
+        $this->assertTrue($c3->relationLoaded('foo.bar'));
+
+        // Empty collection on first level of nesting
+        // Relations should still be considered as loaded
+        $model->setRelation('foo', new Collection([]));
+        $c4 = new Collection([$model]);
+
+        $this->assertTrue($c4->relationLoaded('foo.bar'));
+    }
+
     public function testCollectionDictionaryReturnsModelKeys()
     {
         $one = m::mock('Illuminate\Database\Eloquent\Model');
