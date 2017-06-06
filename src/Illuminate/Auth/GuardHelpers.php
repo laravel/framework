@@ -83,4 +83,16 @@ trait GuardHelpers
 
         return $this;
     }
+
+    /**
+     * Unset the current user.
+     *
+     * @return $this
+     */
+    public function unsetUser()
+    {
+        $this->user = null;
+
+        return $this;
+    }
 }
