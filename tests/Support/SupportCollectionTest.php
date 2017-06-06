@@ -1444,6 +1444,28 @@ class SupportCollectionTest extends TestCase
         $this->assertTrue($c->contains('v', '>', 4));
     }
 
+    public function testCount()
+    {
+        $c = new Collection([1, 3, 5, 7]);
+
+        $this->assertEquals(4, $c->count());
+    }
+
+    public function testCountWithFilter()
+    {
+        $c = new Collection([1, 3, 5, 7]);
+
+        $this->assertEquals(3, $c->count(function ($v) {
+            return $v > 1;
+        }));
+
+        $c = new Collection([['id'=>7, 'name'=>'foo'], ['id'=>12, 'name'=>'bar'], ['id'=>12, 'name'=>'baz']]);
+
+        $this->assertEquals(2, $c->count(function ($v) {
+            return substr($v['name'], 0, 1) === 'b';
+        }));
+    }
+
     public function testGettingSumFromCollection()
     {
         $c = new Collection([(object) ['foo' => 50], (object) ['foo' => 50]]);
