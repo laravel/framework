@@ -55,10 +55,18 @@ class PhpRedisConnection extends Connection
      */
     public function set($key, $value, $expireResolution = null, $expireTTL = null, $flag = null)
     {
+        $extendedOptions = [];
+        if ($expireResolution) {
+            $extendedOptions[] = $expireResolution;
+        }
+        if ($expireTTL && $flag) {
+            $extendedOptions[$flag] = $expireTTL;
+        }
+
         return $this->command('set', [
             $key,
             $value,
-            $expireResolution ? [$expireResolution, $flag => $expireTTL] : null,
+            $extendedOptions ? $extendedOptions : null,
         ]);
     }
 
