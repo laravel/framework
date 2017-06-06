@@ -4,6 +4,7 @@ namespace Illuminate\View\Compilers;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 
 class BladeCompiler extends Compiler implements CompilerInterface
 {
@@ -35,6 +36,13 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * @var array
      */
     protected $customDirectives = [];
+
+    /**
+     * All filters, including custom filters.
+     *
+     * @var array
+     */
+    protected $filters = [];
 
     /**
      * The file currently being compiled.
@@ -365,6 +373,44 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function getCustomDirectives()
     {
         return $this->customDirectives;
+    }
+
+    /**
+     * Register a handler for a filter.
+     *
+     * @param  string  $name
+     * @param  callable  $handler
+     * @return void
+     */
+    public function filter($name, callable $handler)
+    {
+        $this->filters[$name] = $handler;
+    }
+
+    /**
+     * Get the list of filters.
+     *
+     * @return array
+     */
+    public function getFilters()
+    {
+        return $this->filters;
+    }
+
+    /**
+     * Call the given filter with the given value.
+     *
+     * @param  string  $name
+     * @param  string|null  $value
+     * @return string
+     */
+    protected function callFilter($name, $value)
+    {
+        if (! isset($this->filters[$name])) {
+            throw new InvalidArgumentException("Filter [$name] does not exist.");
+        }
+
+        return call_user_func($this->filters[$name], trim($value));
     }
 
     /**
