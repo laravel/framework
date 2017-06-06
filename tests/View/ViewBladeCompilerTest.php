@@ -86,9 +86,7 @@ class ViewBladeCompilerTest extends TestCase
 
         $this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{{ $name }}}'));
         $this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{ $name }}'));
-        $this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{
-            $name
-        }}'));
+        $this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{ $name }}'));
     }
 
     protected function getFiles()
