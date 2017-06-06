@@ -715,10 +715,10 @@ class Builder
      * Add a raw or where clause to the query.
      *
      * @param  string  $sql
-     * @param  array   $bindings
+     * @param  mixed   $bindings
      * @return \Illuminate\Database\Query\Builder|static
      */
-    public function orWhereRaw($sql, array $bindings = [])
+    public function orWhereRaw($sql, $bindings = [])
     {
         return $this->whereRaw($sql, $bindings, 'or');
     }
