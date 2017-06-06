@@ -96,6 +96,16 @@ class AuthTokenGuardTest extends TestCase
 
         $this->assertFalse($guard->validate(['api_token' => '']));
     }
+
+    // public function testValidateCredentialsCanDetermineIfCredentialsAreValid()
+    // {
+    //
+    // }
+
+    // public function testValidateCredentialsCanDetermineIfCredentialsAreInvalid()
+    // {
+    //
+    // }
 }
 
 class AuthTokenGuardTestUser
