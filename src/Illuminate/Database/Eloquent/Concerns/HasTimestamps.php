@@ -9,7 +9,7 @@ trait HasTimestamps
     /**
      * Indicates if the model should be timestamped.
      *
-     * @var bool
+     * @var bool|array
      */
     public $timestamps = true;
 
@@ -38,11 +38,14 @@ trait HasTimestamps
     {
         $time = $this->freshTimestamp();
 
-        if (! $this->isDirty(static::UPDATED_AT)) {
+        if ((! is_array($this->timestamps) || in_array(static::UPDATED_AT, $this->timestamps))
+            && ! $this->isDirty(static::UPDATED_AT)) {
             $this->setUpdatedAt($time);
         }
 
-        if (! $this->exists && ! $this->isDirty(static::CREATED_AT)) {
+        if (! $this->exists
+            && (! is_array($this->timestamps) || in_array(static::CREATED_AT, $this->timestamps))
+            && ! $this->isDirty(static::CREATED_AT)) {
             $this->setCreatedAt($time);
         }
     }
