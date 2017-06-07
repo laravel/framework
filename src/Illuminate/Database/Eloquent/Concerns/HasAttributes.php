@@ -884,7 +884,7 @@ trait HasAttributes
 
     /**
      * Get a subset of the model's attributes.
-     * 
+     *
      * @param  array|mixed  $attributes
      * @return array
      */
