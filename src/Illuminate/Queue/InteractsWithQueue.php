@@ -31,7 +31,7 @@ trait InteractsWithQueue
     public function delete()
     {
         if ($this->job) {
-            return $this->job->delete();
+            $this->job->delete();
         }
     }
 

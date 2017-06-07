@@ -415,7 +415,7 @@ class Worker
      */
     protected function failJob($connectionName, $job, $e)
     {
-        return FailingJob::handle($connectionName, $job, $e);
+        FailingJob::handle($connectionName, $job, $e);
     }
 
     /**
