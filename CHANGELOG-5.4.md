@@ -1,5 +1,34 @@
 # Release Notes for 5.4.x
 
+## [Unreleased]
+
+### Fixed
+- Resume scheduled task if an error occurs ([#19419](https://github.com/laravel/framework/pull/19419))
+
+
+## v5.4.25 (2017-06-07)
+
+### Added
+- Added `Macroable` trait to `FactoryBuilder` ([#19425](https://github.com/laravel/framework/pull/19425))
+- Allow a plain text alternative view when using markdown within Mailables ([#19436](https://github.com/laravel/framework/pull/19436), [ad2eaf7](https://github.com/laravel/framework/commit/ad2eaf72d7fc003a98215d4a373ea603658c646a))
+- Added nested transactions support for SqlServer ([#19439](https://github.com/laravel/framework/pull/19439))
+
+### Changed
+- Moved `env()` helper to Support component ([#19409](https://github.com/laravel/framework/pull/19409))
+- Prevent `BadMethodCallException` in `RedirectResponse::withErrors()` ([#19426](https://github.com/laravel/framework/pull/19426))
+- Suppress error if calling `Str::replaceFirst()` with an empty search ([#19427](https://github.com/laravel/framework/pull/19427))
+- Removed the `callable` type hint for `array_sort()` ([#19483](https://github.com/laravel/framework/pull/19483))
+- Return the used traits from `TestCase::setUpTraits()` ([#19486](https://github.com/laravel/framework/pull/19486))
+
+### Fixed
+- Fixes and optimizations for `Str::after()` ([#19428](https://github.com/laravel/framework/pull/19428))
+- Fixed queue size when using Beanstalkd driver ([#19465](https://github.com/laravel/framework/pull/19465))
+- Check if a mutex can be created before running the callback task in `CallbackEvent::run()` ([#19466](https://github.com/laravel/framework/pull/19466))
+- Flip expected and actual value on `TestResponse::assertCookie()` ([#19495](https://github.com/laravel/framework/pull/19495))
+- Fixed undefined variable error in `Mailable` class ([#19504](https://github.com/laravel/framework/pull/19504))
+- Prevent error notice when `database.collation` is not set ([#19507](https://github.com/laravel/framework/pull/19507))
+
+
 ## v5.4.24 (2017-05-30)
 
 ### Added
