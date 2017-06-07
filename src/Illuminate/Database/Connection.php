@@ -688,6 +688,7 @@ class Connection implements ConnectionInterface
      * @param  array  $bindings
      * @param  \Closure  $callback
      * @return mixed
+     * @throws \Exception
      */
     protected function handleQueryException($e, $query, $bindings, Closure $callback)
     {
