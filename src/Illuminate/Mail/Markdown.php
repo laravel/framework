@@ -77,9 +77,13 @@ class Markdown
     {
         $this->view->flushFinderCache();
 
-        return new HtmlString(preg_replace("/[\r\n]{2,}/", "\n\n", $this->view->replaceNamespace(
+        $contents = $this->view->replaceNamespace(
             'mail', $this->markdownComponentPaths()
-        )->make($view, $data)->render()));
+        )->make($view, $data)->render();
+
+        return new HtmlString(
+            html_entity_decode(preg_replace("/[\r\n]{2,}/", "\n\n", $contents), ENT_QUOTES, 'UTF-8')
+        );
     }
 
     /**
