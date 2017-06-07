@@ -412,7 +412,7 @@ class Str
             return static::$studlyCache[$key];
         }
 
-        $value = ucwords(str_replace(['-', '_'], ' ', $value));
+        $value = static::ucwords(str_replace(['-', '_'], ' ', $value));
 
         return static::$studlyCache[$key] = str_replace(' ', '', $value);
     }
@@ -439,5 +439,16 @@ class Str
     public static function ucfirst($string)
     {
         return static::upper(static::substr($string, 0, 1)).static::substr($string, 1);
+    }
+
+    /**
+     * Make uppercase the first character of each word in a string.
+     *
+     * @param  string $string
+     * @return string
+     */
+    public static function ucwords($string)
+    {
+        return mb_convert_case($string, MB_CASE_TITLE, 'UTF-8');
     }
 }
