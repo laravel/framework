@@ -5,12 +5,32 @@ namespace Illuminate\Tests\Foundation;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
+use Illuminate\Contracts\Bus\Dispatcher;
 
 class FoundationHelpersTest extends TestCase
 {
     public function tearDown()
     {
         m::close();
+    }
+
+    public function testDispatch()
+    {
+        $app = new Application;
+        $app[Dispatcher::class] = $dipatcher = m::mock('StdClass');
+
+        // 1. dispatch(new Job)
+        $job = m::mock('JobName');
+        $dipatcher->shouldReceive('dispatch')->with($job);
+        dispatch($job);
+
+        // 1. dispatch(Job::class)
+        $dipatcher->shouldReceive('dispatch')->once()->with(m::type('StdClass'));
+        dispatch(\StdClass::class);
+
+        // 1. dispatch(Job::class, 'arg1', 'arg2')
+        $dipatcher->shouldReceive('dispatch')->once()->with(m::type('StdClass'));
+        dispatch(\StdClass::class, 'arg1', 'arg2');
     }
 
     public function testCache()
