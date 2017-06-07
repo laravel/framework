@@ -63,6 +63,21 @@ class ResourceRegistrar
     }
 
     /**
+     * Create a pending resource registration.
+     *
+     * @param  string  $name
+     * @param  string  $controller
+     * @param  array   $options
+     * @return \Illuminate\Routing\PendingResourceRegistration
+     */
+    public function registration($name, $controller, array $options = [])
+    {
+        return new PendingResourceRegistration(
+            $this, compact('name', 'controller', 'options')
+        );
+    }
+
+    /**
      * Route a resource to a controller.
      *
      * @param  string  $name
@@ -113,7 +128,7 @@ class ResourceRegistrar
         // are supported in the framework, but we need to know what name to use for a
         // place-holder on the route parameters, which should be the base resources.
         $callback = function ($me) use ($name, $controller, $options) {
-            $me->resource($name, $controller, $options);
+            $me->resource($name, $controller, $options)->register();
         };
 
         return $this->router->group(compact('prefix'), $callback);

@@ -95,6 +95,13 @@ class Router implements RegistrarContract, BindingRegistrar
     protected $patterns = [];
 
     /**
+     * The resources not yet registered.
+     *
+     * @var array
+     */
+    protected $pendingResources = [];
+
+    /**
      * The route group attribute stack.
      *
      * @var array
@@ -240,7 +247,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  string  $name
      * @param  string  $controller
      * @param  array  $options
-     * @return void
+     * @return \Illuminate\Routing\PendingResourceRegistration
      */
     public function resource($name, $controller, array $options = [])
     {
@@ -250,7 +257,7 @@ class Router implements RegistrarContract, BindingRegistrar
             $registrar = new ResourceRegistrar($this);
         }
 
-        $registrar->register($name, $controller, $options);
+        return $this->pendingResources[] = $registrar->registration($name, $controller, $options);
     }
 
     /**
@@ -545,7 +552,7 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     protected function findRoute($request)
     {
-        $this->current = $route = $this->routes->match($request);
+        $this->current = $route = $this->getRoutes()->match($request);
 
         $this->container->instance(Route::class, $route);
 
@@ -918,7 +925,7 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function has($name)
     {
-        return $this->routes->hasNamedRoute($name);
+        return $this->getRoutes()->hasNamedRoute($name);
     }
 
     /**
@@ -1064,7 +1071,23 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function getRoutes()
     {
+        $this->registerPendingResources();
+
         return $this->routes;
+    }
+
+    /**
+     * Register all pending resources.
+     *
+     * @return void
+     */
+    public function registerPendingResources()
+    {
+        foreach ($this->pendingResources as $key => $resource) {
+            $resource->register();
+        }
+
+        $this->pendingResources = [];
     }
 
     /**

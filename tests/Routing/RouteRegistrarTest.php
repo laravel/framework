@@ -187,6 +187,44 @@ class RouteRegistrarTest extends TestCase
         $this->seeMiddleware('resource-middleware');
     }
 
+    public function testCanLimitMethodsOnRegisteredResource()
+    {
+        $this->router->resource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
+                     ->only('index', 'show', 'destroy');
+
+        $this->assertCount(3, $this->router->getRoutes());
+
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.index'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.show'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.destroy'));
+    }
+
+    public function testCanExcludeMethodsOnRegisteredResource()
+    {
+        $this->router->resource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
+                     ->except(['index', 'create', 'store', 'show', 'edit']);
+
+        $this->assertCount(2, $this->router->getRoutes());
+
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.update'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.destroy'));
+    }
+
+    public function testCanNotLimitMethodsAfterRegistered()
+    {
+        $resource = $this->router->resource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub');
+
+        $this->router->getRoutes();
+
+        // pending resources have now been registered and
+        // can not be limited to specific methods anymore
+
+        $resource->only('index', 'show');
+        $resource->except('index', 'show');
+
+        $this->assertCount(7, $this->router->getRoutes());
+    }
+
     public function testCanSetRouteName()
     {
         $this->router->as('users.index')->get('users', function () {
