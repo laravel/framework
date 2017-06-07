@@ -678,7 +678,7 @@ class Container implements ArrayAccess, ContainerContract
         }
 
         foreach ($this->abstractAliases[$abstract] as $alias) {
-            if (! is_null($binding = $this->findInContextualBindings($alias))) {
+            if (! isset($this->bindings[$alias]) && ! is_null($binding = $this->findInContextualBindings($alias))) {
                 return $binding;
             }
         }
