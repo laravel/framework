@@ -57,7 +57,7 @@ class LoadConfiguration
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @param  \Illuminate\Contracts\Config\Repository  $repository
      * @return void
-     * @throws Exception
+     * @throws \Exception
      */
     protected function loadConfigurationFiles(Application $app, RepositoryContract $repository)
     {
