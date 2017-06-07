@@ -84,6 +84,9 @@ if (! function_exists('action')) {
      */
     function action($name, $parameters = [], $absolute = true)
     {
+        if ( php_sapi_name() == "cli") {
+            return $name;
+        }
         return app('url')->action($name, $parameters, $absolute);
     }
 }
@@ -131,6 +134,9 @@ if (! function_exists('asset')) {
      */
     function asset($path, $secure = null)
     {
+        if(php_sapi_name() == 'cli'){
+            return $path;
+        }
         return app('url')->asset($path, $secure);
     }
 }
@@ -702,6 +708,9 @@ if (! function_exists('route')) {
      */
     function route($name, $parameters = [], $absolute = true)
     {
+        if ( php_sapi_name() == "cli") {
+            return $name;
+        }
         return app('url')->route($name, $parameters, $absolute);
     }
 }
@@ -715,6 +724,10 @@ if (! function_exists('secure_asset')) {
      */
     function secure_asset($path)
     {
+
+        if ( php_sapi_name() == "cli") {
+            return $path;
+        }
         return asset($path, true);
     }
 }
@@ -729,6 +742,9 @@ if (! function_exists('secure_url')) {
      */
     function secure_url($path, $parameters = [])
     {
+        if ( php_sapi_name() == "cli") {
+            return $path;
+        }
         return url($path, $parameters, true);
     }
 }
@@ -831,6 +847,10 @@ if (! function_exists('url')) {
      */
     function url($path = null, $parameters = [], $secure = null)
     {
+        if ( php_sapi_name() == "cli") {
+            return $path;
+        }
+
         if (is_null($path)) {
             return app(UrlGenerator::class);
         }
