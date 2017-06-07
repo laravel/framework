@@ -60,6 +60,10 @@ class CallbackEvent extends Event
             return;
         }
 
+        register_shutdown_function(function()  {
+            $this->removeMutex();
+        });
+
         try {
             $response = $container->call($this->callback, $this->parameters);
         } finally {
