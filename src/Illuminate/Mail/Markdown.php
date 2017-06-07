@@ -34,7 +34,7 @@ class Markdown
     /**
      * Create a new Markdown renderer instance.
      *
-     * @param  \Illuminate\View\Factory  $view
+     * @param  \Illuminate\Contracts\View\Factory  $view
      * @param  array  $options
      * @return void
      */
