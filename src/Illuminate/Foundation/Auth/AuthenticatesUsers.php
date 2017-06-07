@@ -99,6 +99,10 @@ trait AuthenticatesUsers
         $request->session()->regenerate();
 
         $this->clearLoginAttempts($request);
+        
+        if ($request->expectsJson()) {
+            return response()->json([$this->username() => trans('auth.success')], 200);
+        }
 
         return $this->authenticated($request, $this->guard()->user())
                 ?: redirect()->intended($this->redirectPath());
