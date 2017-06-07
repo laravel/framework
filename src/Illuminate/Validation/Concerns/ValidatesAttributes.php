@@ -1055,7 +1055,11 @@ trait ValidatesAttributes
         if (is_bool($other)) {
             $values = $this->convertValuesToBoolean($values);
         }
-
+        
+        if (is_array($other)) {
+            return empty(array_intersect($other, $values));
+        }
+        
         if (in_array($other, $values)) {
             return $this->validateRequired($attribute, $value);
         }
