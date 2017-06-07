@@ -1,12 +1,7 @@
 <?php
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Database\Eloquent\Model;
 use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Queue;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * @group integration
@@ -53,11 +48,11 @@ class ModelSerializationTest extends TestCase
     public function it_serialize_user_on_default_connection()
     {
         $user = ModelSerializationTestUser::create([
-            'email' => 'mohamed@laravel.com'
+            'email' => 'mohamed@laravel.com',
         ]);
 
-        $user2 =ModelSerializationTestUser::create([
-            'email' => 'taylor@laravel.com'
+        $user2 = ModelSerializationTestUser::create([
+            'email' => 'taylor@laravel.com',
         ]);
 
         $serialized = serialize(new ModelSerializationTestClass($user));
@@ -83,11 +78,11 @@ class ModelSerializationTest extends TestCase
     public function it_serialize_user_on_different_connection()
     {
         $user = ModelSerializationTestUser::on('custom')->create([
-            'email' => 'mohamed@laravel.com'
+            'email' => 'mohamed@laravel.com',
         ]);
 
-        $user2 =ModelSerializationTestUser::on('custom')->create([
-            'email' => 'taylor@laravel.com'
+        $user2 = ModelSerializationTestUser::on('custom')->create([
+            'email' => 'taylor@laravel.com',
         ]);
 
         $serialized = serialize(new ModelSerializationTestClass($user));
@@ -115,11 +110,11 @@ class ModelSerializationTest extends TestCase
     public function it_fails_if_models_on_multi_connections()
     {
         $user = ModelSerializationTestUser::on('custom')->create([
-            'email' => 'mohamed@laravel.com'
+            'email' => 'mohamed@laravel.com',
         ]);
 
-        $user2 =ModelSerializationTestUser::create([
-            'email' => 'taylor@laravel.com'
+        $user2 = ModelSerializationTestUser::create([
+            'email' => 'taylor@laravel.com',
         ]);
 
         $serialized = serialize(new ModelSerializationTestClass(
@@ -137,12 +132,14 @@ class ModelSerializationTestUser extends Model
     public $timestamps = false;
 }
 
-class ModelSerializationTestClass{
+class ModelSerializationTestClass
+{
     use \Illuminate\Queue\SerializesModels;
 
     public $user;
 
-    public function __construct($user){
+    public function __construct($user)
+    {
 
         $this->user = $user;
     }
