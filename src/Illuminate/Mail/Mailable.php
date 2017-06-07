@@ -217,6 +217,8 @@ class Mailable implements MailableContract
     /**
      * Build the text view for a Markdown message.
      *
+     * @param  \Illuminate\Mail\Markdown  $markdown
+     * @param  array  $data
      * @return string
      */
     protected function buildMarkdownText($markdown, $data)
