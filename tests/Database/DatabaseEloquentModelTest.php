@@ -562,11 +562,13 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $model->name = 'foo';
         $model->age = null;
         $model->password = 'password1';
+        $model->override = false;
         $model->setHidden(['password']);
         $model->setRelation('names', new Illuminate\Database\Eloquent\Collection([
             new EloquentModelStub(['bar' => 'baz']), new EloquentModelStub(['bam' => 'boom']),
         ]));
         $model->setRelation('partner', new EloquentModelStub(['name' => 'abby']));
+        $model->setRelation('override', null);
         $model->setRelation('group', null);
         $model->setRelation('multi', new Illuminate\Database\Eloquent\Collection);
         $array = $model->toArray();
@@ -577,6 +579,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('boom', $array['names'][1]['bam']);
         $this->assertEquals('abby', $array['partner']['name']);
         $this->assertNull($array['group']);
+        $this->assertFalse($array['override']);
         $this->assertEquals([], $array['multi']);
         $this->assertFalse(isset($array['password']));
 
