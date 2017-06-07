@@ -14,11 +14,11 @@ class FileLoader implements LoaderInterface
     protected $files;
 
     /**
-     * The default path for the loader.
+     * The default paths for the loader.
      *
-     * @var string
+     * @var array
      */
-    protected $path;
+    protected $paths;
 
     /**
      * All of the namespace hints.
@@ -31,12 +31,12 @@ class FileLoader implements LoaderInterface
      * Create a new file loader instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @param  string  $path
+     * @param  array  $paths
      * @return void
      */
-    public function __construct(Filesystem $files, $path)
+    public function __construct(Filesystem $files, $paths)
     {
-        $this->path = $path;
+        $this->paths = array_wrap($paths);
         $this->files = $files;
     }
 
@@ -51,11 +51,11 @@ class FileLoader implements LoaderInterface
     public function load($locale, $group, $namespace = null)
     {
         if ($group == '*' && $namespace == '*') {
-            return $this->loadJsonPath($this->path, $locale);
+            return $this->loadJsonPath($this->paths, $locale);
         }
 
         if (is_null($namespace) || $namespace == '*') {
-            return $this->loadPath($this->path, $locale, $group);
+            return $this->loadPath($this->paths, $locale, $group);
         }
 
         return $this->loadNamespaced($locale, $group, $namespace);
@@ -91,43 +91,51 @@ class FileLoader implements LoaderInterface
      */
     protected function loadNamespaceOverrides(array $lines, $locale, $group, $namespace)
     {
-        $file = "{$this->path}/vendor/{$namespace}/{$locale}/{$group}.php";
+        foreach ($this->paths as $path) {
+            $file = "{$path}/vendor/{$namespace}/{$locale}/{$group}.php";
 
-        if ($this->files->exists($file)) {
-            return array_replace_recursive($lines, $this->files->getRequire($file));
+            if ($this->files->exists($file)) {
+                return array_replace_recursive($lines, $this->files->getRequire($file));
+            }
         }
 
         return $lines;
     }
 
     /**
-     * Load a locale from a given path.
+     * Load a locale from a given paths.
      *
-     * @param  string  $path
+     * @param  array  $paths
      * @param  string  $locale
      * @param  string  $group
      * @return array
      */
-    protected function loadPath($path, $locale, $group)
+    protected function loadPath($paths, $locale, $group)
     {
-        if ($this->files->exists($full = "{$path}/{$locale}/{$group}.php")) {
-            return $this->files->getRequire($full);
+        $paths = array_wrap($paths);
+        foreach ($paths as $path) {
+            if ($this->files->exists($full = "{$path}/{$locale}/{$group}.php")) {
+                return $this->files->getRequire($full);
+            }
         }
 
         return [];
     }
 
     /**
-     * Load a locale from the given JSON file path.
+     * Load a locale from the given JSON file paths.
      *
-     * @param  string  $path
+     * @param  array  $paths
      * @param  string  $locale
      * @return array
      */
-    protected function loadJsonPath($path, $locale)
+    protected function loadJsonPath($paths, $locale)
     {
-        if ($this->files->exists($full = "{$path}/{$locale}.json")) {
-            return json_decode($this->files->get($full), true);
+        $paths = array_wrap($paths);
+        foreach ($paths as $path) {
+            if ($this->files->exists($full = "{$path}/{$locale}.json")) {
+                return json_decode($this->files->get($full), true);
+            }
         }
 
         return [];
