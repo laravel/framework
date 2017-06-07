@@ -379,7 +379,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
             }
 
             if (empty($files[$key])) {
-                unset($files[$key]);
+                $files[$key] = [];
             }
         }
 
