@@ -278,7 +278,7 @@ abstract class HasOneOrMany extends Relation
      * @param  array  $attributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function create(array $attributes)
+    public function create(array $attributes = [])
     {
         return tap($this->related->newInstance($attributes), function ($instance) {
             $instance->setAttribute($this->getForeignKeyName(), $this->getParentKey());
