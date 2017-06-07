@@ -230,7 +230,7 @@ trait ValidatesAttributes
      */
     protected function validateAlpha($attribute, $value)
     {
-        return is_string($value) && preg_match('/^[\pL\pM]+$/u', $value);
+        return is_string($value) && preg_match('/\A[\pL\pM]+\z/u', $value);
     }
 
     /**
@@ -246,7 +246,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        return preg_match('/^[\pL\pM\pN_-]+$/u', $value) > 0;
+        return preg_match('/\A[\pL\pM\pN_-]+\z/u', $value) > 0;
     }
 
     /**
@@ -262,7 +262,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        return preg_match('/^[\pL\pM\pN]+$/u', $value) > 0;
+        return preg_match('/\A[\pL\pM\pN]+\z/u', $value) > 0;
     }
 
     /**
