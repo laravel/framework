@@ -964,12 +964,39 @@ trait HasAttributes
             if (! array_key_exists($key, $this->original)) {
                 $dirty[$key] = $value;
             } elseif ($value !== $this->original[$key] &&
-                    ! $this->originalIsNumericallyEquivalent($key)) {
+                    ! $this->originalIsEquivalent($key)) {
                 $dirty[$key] = $value;
             }
         }
 
         return $dirty;
+    }
+
+    /**
+     * Determine if the new and old values for a given key are equivalent.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function originalIsEquivalent($key)
+    {
+        return $this->originalIsNumericallyEquivalent($key)
+            && ($this->originalIsBooleanEquivalent($key));
+    }
+
+    /**
+     * Determine if the new and old values for a given key are boolean equivalent.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function originalIsBooleanEquivalent($key)
+    {
+        $current = $this->attributes[$key];
+
+        $original = $this->original[$key];
+
+        return (bool) $current === (bool) $original;
     }
 
     /**
@@ -980,6 +1007,10 @@ trait HasAttributes
      */
     protected function originalIsNumericallyEquivalent($key)
     {
+        if (in_array($this->getCastType($key), ['bool', 'boolean'], true)) {
+            return true;
+        }
+
         $current = $this->attributes[$key];
 
         $original = $this->original[$key];
