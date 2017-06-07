@@ -1200,6 +1200,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Get the queueable identity for the entity.
+     *
+     * @return mixed
+     */
+    public function getQueueableConnection()
+    {
+        return $this->getConnectionName();
+    }
+
+    /**
      * Get the value of the model's route key.
      *
      * @return mixed
