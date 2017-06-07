@@ -490,7 +490,9 @@ class Connection implements ConnectionInterface
                 return true;
             }
 
-            return (bool) $this->getPdo()->exec($query);
+            $statement = $this->getPdo()->query($query);
+
+            return (bool) $statement->rowCount();
         });
     }
 
