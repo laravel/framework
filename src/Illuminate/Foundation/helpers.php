@@ -5,6 +5,7 @@ use Illuminate\Support\HtmlString;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Foundation\Bus\ChainConductor;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Foundation\Bus\PendingDispatch;
 use Illuminate\Contracts\Routing\ResponseFactory;
@@ -372,12 +373,12 @@ if (! function_exists('dispatch')) {
     /**
      * Dispatch a job to its appropriate handler.
      *
-     * @param  mixed  $job
+     * @param  array|object  $job
      * @return \Illuminate\Foundation\Bus\PendingDispatch
      */
     function dispatch($job)
     {
-        return new PendingDispatch($job);
+        return new PendingDispatch($job, app(ChainConductor::class));
     }
 }
 

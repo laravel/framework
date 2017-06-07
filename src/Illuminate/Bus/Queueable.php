@@ -26,11 +26,11 @@ trait Queueable
     public $delay;
 
     /**
-     * The jobs that should run if this job is successful.
+     * The chain of jobs in the job chain.
      *
-     * @var array
+     * @var \Illuminate\Bus\ChainLink
      */
-    public $chained = [];
+    public $chain;
 
     /**
      * Set the desired connection for the job.
@@ -71,32 +71,4 @@ trait Queueable
         return $this;
     }
 
-    /**
-     * Set the jobs that should run if this job is successful.
-     *
-     * @param  array  $chain
-     * @return $this
-     */
-    public function chain($chain)
-    {
-        $this->chained = collect($chain)->map(function ($job) {
-            return serialize($job);
-        })->all();
-
-        return $this;
-    }
-
-    /**
-     * Dispatch the next job on the chain.
-     *
-     * @return void
-     */
-    public function dispatchNextJobInChain()
-    {
-        if (! empty($this->chained)) {
-            dispatch(tap(unserialize(array_shift($this->chained)), function ($next) {
-                $next->chained = $this->chained;
-            }));
-        }
-    }
 }

@@ -59,6 +59,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Create a new collection instance from a list or a single item.
+     *
+     * @param  mixed  $value
+     * @return static
+     */
+    public static function wrap($value)
+    {
+        $isList = is_array($value) || $value instanceof self;
+
+        return new static($isList ? $value : [$value]);
+    }
+
+    /**
      * Create a new collection by invoking the callback a given amount of times.
      *
      * @param  int  $amount
@@ -1164,6 +1177,21 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function shift()
     {
         return array_shift($this->items);
+    }
+
+    /**
+     * Create overlapping chunks of the given size, by passing a "sliding window" over them.
+     *
+     * @param  int  $size
+     * @return static
+     */
+    public function sliding($size)
+    {
+        $chunks = $this->count() - $size + 1;
+
+        return static::times($chunks, function ($number) use ($size) {
+            return $this->slice($number - 1, $size);
+        });
     }
 
     /**

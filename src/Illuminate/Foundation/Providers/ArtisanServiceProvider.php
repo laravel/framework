@@ -9,6 +9,7 @@ use Illuminate\Foundation\Console\UpCommand;
 use Illuminate\Foundation\Console\DownCommand;
 use Illuminate\Auth\Console\ClearResetsCommand;
 use Illuminate\Cache\Console\CacheTableCommand;
+use Illuminate\Queue\Console\ChainTableCommand;
 use Illuminate\Foundation\Console\ServeCommand;
 use Illuminate\Foundation\Console\PresetCommand;
 use Illuminate\Queue\Console\FailedTableCommand;
@@ -141,6 +142,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'NotificationTable' => 'command.notification.table',
         'PolicyMake' => 'command.policy.make',
         'ProviderMake' => 'command.provider.make',
+        'QueueChainTable' => 'command.queue.chain-table',
         'QueueFailedTable' => 'command.queue.failed-table',
         'QueueTable' => 'command.queue.table',
         'RequestMake' => 'command.request.make',
@@ -686,6 +688,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.queue.work', function ($app) {
             return new QueueWorkCommand($app['queue.worker']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerQueueChainTableCommand()
+    {
+        $this->app->singleton('command.queue.chain-table', function ($app) {
+            return new ChainTableCommand($app['files'], $app['composer']);
         });
     }
 
