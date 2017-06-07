@@ -303,7 +303,7 @@ trait ValidatesAttributes
      */
     protected function validateBoolean($attribute, $value)
     {
-        $acceptable = [true, false, 0, 1, '0', '1'];
+        $acceptable = [true, false, 'true', 'false', 0, 1, '0', '1'];
 
         return in_array($value, $acceptable, true);
     }
