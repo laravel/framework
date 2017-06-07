@@ -5,11 +5,15 @@ namespace Illuminate\Notifications\Channels;
 use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Mail\Markdown;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Notifications\Notification;
+use Illuminate\Contracts\Notifications\Channels\Factory;
+use Illuminate\Contracts\Notifications\Channels\Dispatcher;
 
-class MailChannel
+class MailChannel implements Factory, Dispatcher
 {
     /**
      * The mailer implementation.
@@ -184,5 +188,33 @@ class MailChannel
         $this->markdownResolver = $callback;
 
         return $this;
+    }
+
+    /**
+     * Check for the driver capacity.
+     *
+     * @param  string  $driver
+     * @return bool
+     */
+    public static function canHandleNotification($driver)
+    {
+        return in_array($driver, ['mail']);
+    }
+
+    /**
+     * Create a new driver instance.
+     *
+     * @param  $driver
+     * @return \Illuminate\Contracts\Notifications\Channels\Dispatcher
+     */
+    public static function createDriver($driver)
+    {
+        if(! static::canHandleNotification($driver)) return null;
+
+        $app = Container::getInstance();
+
+        return $app->make(MailChannel::class)->setMarkdownResolver(function () use ($app) {
+            return $app->make(Markdown::class);
+        });
     }
 }

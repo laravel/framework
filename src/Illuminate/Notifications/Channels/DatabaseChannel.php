@@ -3,9 +3,12 @@
 namespace Illuminate\Notifications\Channels;
 
 use RuntimeException;
+use Illuminate\Container\Container;
 use Illuminate\Notifications\Notification;
+use Illuminate\Contracts\Notifications\Channels\Factory;
+use Illuminate\Contracts\Notifications\Channels\Dispatcher;
 
-class DatabaseChannel
+class DatabaseChannel implements Factory, Dispatcher
 {
     /**
      * Send the given notification.
@@ -47,5 +50,29 @@ class DatabaseChannel
         throw new RuntimeException(
             'Notification is missing toDatabase / toArray method.'
         );
+    }
+
+    /**
+     * Check for the driver capacity.
+     *
+     * @param  string  $driver
+     * @return bool
+     */
+    public static function canHandleNotification($driver)
+    {
+        return in_array($driver, ['database']);
+    }
+
+    /**
+     * Create a new driver instance.
+     *
+     * @param  $driver
+     * @return \Illuminate\Contracts\Notifications\Channels\Dispatcher
+     */
+    public static function createDriver($driver)
+    {
+        return static::canHandleNotification($driver)
+            ? Container::getInstance()->make(DatabaseChannel::class)
+            : null;
     }
 }

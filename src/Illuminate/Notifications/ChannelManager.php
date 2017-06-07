@@ -12,6 +12,8 @@ use Illuminate\Contracts\Bus\Dispatcher as Bus;
 use Nexmo\Client\Credentials\Basic as NexmoCredentials;
 use Illuminate\Contracts\Notifications\Factory as FactoryContract;
 use Illuminate\Contracts\Notifications\Dispatcher as DispatcherContract;
+use Illuminate\Contracts\Notifications\Channels\Factory as ChannelFactory;
+use Illuminate\Contracts\Notifications\Channels\Dispatcher as ChannelDispatcher;
 
 class ChannelManager extends Manager implements DispatcherContract, FactoryContract
 {
@@ -21,6 +23,13 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      * @var string
      */
     protected $defaultChannel = 'mail';
+
+    /**
+     * Registered Channels factories.
+     *
+     * @var array
+     */
+    protected $channels = [];
 
     /**
      * Send the given notification to the given notifiable entities.
@@ -131,14 +140,68 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     protected function createDriver($driver)
     {
         try {
+            $channel = $this->createChannel($driver);
+
+            if($channel instanceof ChannelDispatcher) {
+                return $channel;
+            }
+
             return parent::createDriver($driver);
-        } catch (InvalidArgumentException $e) {
+        }
+        catch (InvalidArgumentException $e) {
             if (class_exists($driver)) {
                 return $this->app->make($driver);
             }
 
             throw $e;
         }
+    }
+
+    /**
+     * Create a new driver instance.
+     *
+     * @param  $driver
+     * @return null|\Illuminate\Contracts\Notifications\Channels\Dispatcher
+     */
+    protected function createChannel($driver)
+    {
+        foreach($this->channels as $channel) {
+            if ($channel::canHandleNotification($driver) &&
+                $channel = $channel::createDriver($driver)) {
+                return $channel;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Register a new channel driver.
+     *
+     * @param  string $channel
+     * @return void
+     * @throws \InvalidArgumentException
+     */
+    public function register($channel)
+    {
+        if (! (new \ReflectionClass($channel))->implementsInterface(ChannelFactory::class)) {
+            throw new InvalidArgumentException(sprintf(
+                "class [$channel] is not a valid implementation of '%s' interface.",
+                ChannelFactory::class
+            ));
+        }
+
+        $this->channels[] = $channel;
+    }
+
+    /**
+     * Get all of the registered channels.
+     *
+     * @return array
+     */
+    public function getChannels()
+    {
+        return $this->channels;
     }
 
     /**
