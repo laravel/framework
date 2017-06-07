@@ -53,7 +53,7 @@ class Pivot extends Model
         // many to many relationship that are defined by this developer's classes.
         $this->setConnection($parent->getConnectionName())
              ->setTable($table)
-             ->forceFill($attributes)
+             ->setRawAttributes($attributes)
              ->syncOriginal();
 
         // We store off the parent instance so we will access the timestamp column names
