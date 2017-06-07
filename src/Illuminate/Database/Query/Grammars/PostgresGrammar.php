@@ -18,6 +18,19 @@ class PostgresGrammar extends Grammar
     ];
 
     /**
+     * Compile a single union statement.
+     *
+     * @param  array  $union
+     * @return string
+     */
+    protected function compileUnion(array $union)
+    {
+        $joiner = $union['all'] ? ' union all ' : ' union ';
+
+        return $joiner.'('.$union['query']->toSql().')';
+    }
+
+    /**
      * Compile the lock into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -241,5 +254,22 @@ class PostgresGrammar extends Grammar
     public function compileTruncate(Builder $query)
     {
         return ['truncate '.$this->wrapTable($query->from).' restart identity' => []];
+    }
+
+    /**
+     * Concatenate an array of segments, removing empties.
+     *
+     * @param  array   $segments
+     * @return string
+     */
+    protected function concatenate($segments)
+    {
+        if (! empty($segments['unions'])) {
+            array_unshift($segments, '(');
+            $unionIndex = array_search('unions', array_keys($segments), true);
+            array_splice($segments, $unionIndex, 0, ')');
+        }
+
+        return parent::concatenate($segments);
     }
 }
