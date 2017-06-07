@@ -1039,7 +1039,7 @@ class Builder
     public function newModelInstance($attributes = [])
     {
         return $this->model->newInstance($attributes)->setConnection(
-            $this->query->getConnection()->getName()
+            $this->model->getConnectionName()
         );
     }
 
