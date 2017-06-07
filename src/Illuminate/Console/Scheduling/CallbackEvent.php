@@ -60,7 +60,7 @@ class CallbackEvent extends Event
             return;
         }
 
-        register_shutdown_function(function()  {
+        register_shutdown_function(function () {
             $this->removeMutex();
         });
 
