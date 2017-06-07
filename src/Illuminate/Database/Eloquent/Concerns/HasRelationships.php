@@ -236,9 +236,10 @@ trait HasRelationships
      * @param  string|null  $firstKey
      * @param  string|null  $secondKey
      * @param  string|null  $localKey
+     * @param  string|null  $secondLocalKey
      * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
      */
-    public function hasManyThrough($related, $through, $firstKey = null, $secondKey = null, $localKey = null)
+    public function hasManyThrough($related, $through, $firstKey = null, $secondKey = null, $localKey = null, $secondLocalKey = null)
     {
         $through = new $through;
 
@@ -248,9 +249,11 @@ trait HasRelationships
 
         $localKey = $localKey ?: $this->getKeyName();
 
+        $secondLocalKey = $secondLocalKey ?: $through->getKeyName();
+
         $instance = $this->newRelatedInstance($related);
 
-        return new HasManyThrough($instance->newQuery(), $this, $through, $firstKey, $secondKey, $localKey);
+        return new HasManyThrough($instance->newQuery(), $this, $through, $firstKey, $secondKey, $localKey, $secondLocalKey);
     }
 
     /**
