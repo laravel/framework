@@ -44,6 +44,7 @@ use Illuminate\Console\Scheduling\ScheduleFinishCommand;
 use Illuminate\Database\Console\Seeds\SeederMakeCommand;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
 use Illuminate\Foundation\Console\NotificationMakeCommand;
+use Illuminate\Queue\Console\TestCommand as QueueTestCommand;
 use Illuminate\Queue\Console\WorkCommand as QueueWorkCommand;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Illuminate\Notifications\Console\NotificationTableCommand;
@@ -135,6 +136,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'ProviderMake' => 'command.provider.make',
         'QueueFailedTable' => 'command.queue.failed-table',
         'QueueTable' => 'command.queue.table',
+        'QueueTest' => 'command.queue.test',
         'RequestMake' => 'command.request.make',
         'SeederMake' => 'command.seeder.make',
         'SessionTable' => 'command.session.table',
@@ -618,6 +620,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.queue.retry', function () {
             return new QueueRetryCommand;
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerQueueTestCommand()
+    {
+        $this->app->singleton('command.queue.test', function () {
+            return new QueueTestCommand;
         });
     }
 
