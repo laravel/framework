@@ -31,7 +31,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      */
     public function send($notifiables, $notification)
     {
-        return (new NotificationSender(
+        (new NotificationSender(
             $this, $this->app->make(Bus::class), $this->app->make(Dispatcher::class))
         )->send($notifiables, $notification);
     }
@@ -46,7 +46,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      */
     public function sendNow($notifiables, $notification, array $channels = null)
     {
-        return (new NotificationSender(
+        (new NotificationSender(
             $this, $this->app->make(Bus::class), $this->app->make(Dispatcher::class))
         )->sendNow($notifiables, $notification, $channels);
     }
