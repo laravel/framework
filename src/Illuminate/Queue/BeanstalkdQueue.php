@@ -55,7 +55,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
     {
         $queue = $this->getQueue($queue);
 
-        return (int) $this->pheanstalk->statsTube($queue)->total_jobs;
+        return (int) $this->pheanstalk->statsTube($queue)->current_jobs_ready;
     }
 
     /**

@@ -87,7 +87,9 @@ class SupportStrTest extends TestCase
     {
         $this->assertEquals('nah', Str::after('hannah', 'han'));
         $this->assertEquals('nah', Str::after('hannah', 'n'));
+        $this->assertEquals('nah', Str::after('ééé hannah', 'han'));
         $this->assertEquals('hannah', Str::after('hannah', 'xxxx'));
+        $this->assertEquals('hannah', Str::after('hannah', ''));
     }
 
     public function testStrContains()
@@ -188,6 +190,7 @@ class SupportStrTest extends TestCase
         $this->assertEquals('foo/qux? foo/bar?', Str::replaceFirst('bar?', 'qux?', 'foo/bar? foo/bar?'));
         $this->assertEquals('foo foobar', Str::replaceFirst('bar', '', 'foobar foobar'));
         $this->assertEquals('foobar foobar', Str::replaceFirst('xxx', 'yyy', 'foobar foobar'));
+        $this->assertEquals('foobar foobar', Str::replaceFirst('', 'yyy', 'foobar foobar'));
     }
 
     public function testReplaceLast()
@@ -196,6 +199,7 @@ class SupportStrTest extends TestCase
         $this->assertEquals('foo/bar? foo/qux?', Str::replaceLast('bar?', 'qux?', 'foo/bar? foo/bar?'));
         $this->assertEquals('foobar foo', Str::replaceLast('bar', '', 'foobar foobar'));
         $this->assertEquals('foobar foobar', Str::replaceLast('xxx', 'yyy', 'foobar foobar'));
+        $this->assertEquals('foobar foobar', Str::replaceLast('', 'yyy', 'foobar foobar'));
     }
 
     public function testSnake()

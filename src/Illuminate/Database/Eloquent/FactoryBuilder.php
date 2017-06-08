@@ -5,9 +5,12 @@ namespace Illuminate\Database\Eloquent;
 use Closure;
 use Faker\Generator as Faker;
 use InvalidArgumentException;
+use Illuminate\Support\Traits\Macroable;
 
 class FactoryBuilder
 {
+    use Macroable;
+
     /**
      * The model definitions in the container.
      *

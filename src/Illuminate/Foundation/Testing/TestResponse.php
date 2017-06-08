@@ -161,7 +161,7 @@ class TestResponse
             ? app('encrypter')->decrypt($cookieValue) : $cookieValue;
 
         PHPUnit::assertEquals(
-            $actual, $value,
+            $value, $actual,
             "Cookie [{$cookieName}] was found, but value [{$actual}] does not match [{$value}]."
         );
 

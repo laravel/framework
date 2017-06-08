@@ -368,7 +368,29 @@ class SqlServerGrammar extends Grammar
      */
     public function supportsSavepoints()
     {
-        return false;
+        return true;
+    }
+
+    /**
+     * Compile the SQL statement to define a savepoint.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    public function compileSavepoint($name)
+    {
+        return 'SAVE TRANSACTION '.$name;
+    }
+
+    /**
+     * Compile the SQL statement to execute a savepoint rollback.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    public function compileSavepointRollBack($name)
+    {
+        return 'ROLLBACK TRANSACTION '.$name;
     }
 
     /**
