@@ -483,6 +483,10 @@ if (! function_exists('env')) {
             return substr($value, 1, -1);
         }
 
+        if (Str::startsWith($value, 'base64:')) {
+            return base64_decode(substr($value, 7));
+        }
+
         return $value;
     }
 }
