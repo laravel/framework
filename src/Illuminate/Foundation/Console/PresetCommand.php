@@ -15,7 +15,7 @@ class PresetCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'preset { type : The preset type (none, bootstrap, vue, react) }';
+    protected $signature = 'preset { type : The preset type (none, bootstrap, vue, react, uikit3) }';
 
     /**
      * The console command description.
@@ -35,7 +35,7 @@ class PresetCommand extends Command
             return call_user_func(static::$macros[$this->argument('type')], $this);
         }
 
-        if (! in_array($this->argument('type'), ['none', 'bootstrap', 'vue', 'react'])) {
+        if (! in_array($this->argument('type'), ['none', 'bootstrap', 'vue', 'react', 'uikit3'])) {
             throw new InvalidArgumentException('Invalid preset.');
         }
 
@@ -90,6 +90,19 @@ class PresetCommand extends Command
         Presets\React::install();
 
         $this->info('React scaffolding installed successfully.');
+        $this->comment('Please run "npm install && npm run dev" to compile your fresh scaffolding.');
+    }
+
+    /**
+     * Install the "uikit3" preset.
+     *
+     * @return void
+     */
+    public function uikit3()
+    {
+        Presets\UIKit3::install();
+
+        $this->info('UIKit3 scaffolding installed successfully.');
         $this->comment('Please run "npm install && npm run dev" to compile your fresh scaffolding.');
     }
 }

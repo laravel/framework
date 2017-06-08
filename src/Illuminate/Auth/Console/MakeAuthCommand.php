@@ -97,7 +97,7 @@ class MakeAuthCommand extends Command
             }
 
             copy(
-                __DIR__.'/stubs/make/views/'.$key,
+                $this->getStubPathForViews().$key,
                 resource_path('views/'.$value)
             );
         }
@@ -115,5 +115,16 @@ class MakeAuthCommand extends Command
             $this->getAppNamespace(),
             file_get_contents(__DIR__.'/stubs/make/controllers/HomeController.stub')
         );
+    }
+
+    protected function getStubPathForViews()
+    {
+        $packages = json_decode(file_get_contents(base_path('package.json')), true);
+
+        if (! empty($packages['devDependencies']['uikit'])) {
+            return  __DIR__.'/../../Foundation/Console/Presets/uikit3-stubs/views/';
+        }
+
+        return __DIR__.'/stubs/make/views/';
     }
 }
