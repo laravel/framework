@@ -2,8 +2,10 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\StrictFluent;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -47,12 +49,22 @@ trait HasRelationships
      * Define a one-to-one relationship.
      *
      * @param  string  $related
-     * @param  string  $foreignKey
+     * @param  string|Closure  $foreignKey
      * @param  string  $localKey
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function hasOne($related, $foreignKey = null, $localKey = null)
     {
+        // If the second argument is a Closure, we will ignore other arguments
+        // and set up the relationship with values provided in the Closure.
+        if ($foreignKey instanceof Closure) {
+            extract(
+                StrictFluent::withNullArray(['foreignKey', 'localKey'])
+                            ->applyClosure($foreignKey)
+                            ->getAttributes()
+            );
+        }
+
         $instance = $this->newRelatedInstance($related);
 
         $foreignKey = $foreignKey ?: $this->getForeignKey();
@@ -67,13 +79,23 @@ trait HasRelationships
      *
      * @param  string  $related
      * @param  string  $name
-     * @param  string  $type
+     * @param  string|Closure  $type
      * @param  string  $id
      * @param  string  $localKey
      * @return \Illuminate\Database\Eloquent\Relations\MorphOne
      */
     public function morphOne($related, $name, $type = null, $id = null, $localKey = null)
     {
+        // If the second argument is a Closure, we will ignore other arguments
+        // and set up the relationship with values provided in the Closure.
+        if ($type instanceof Closure) {
+            extract(
+                StrictFluent::withNullArray(['type', 'id', 'localKey'])
+                            ->applyClosure($type)
+                            ->getAttributes()
+            );
+        }
+
         $instance = $this->newRelatedInstance($related);
 
         list($type, $id) = $this->getMorphs($name, $type, $id);
@@ -89,13 +111,23 @@ trait HasRelationships
      * Define an inverse one-to-one or many relationship.
      *
      * @param  string  $related
-     * @param  string  $foreignKey
+     * @param  string|Closure  $foreignKey
      * @param  string  $ownerKey
      * @param  string  $relation
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function belongsTo($related, $foreignKey = null, $ownerKey = null, $relation = null)
     {
+        // If the second argument is a Closure, we will ignore other arguments
+        // and set up the relationship with values provided in the Closure.
+        if ($foreignKey instanceof Closure) {
+            extract(
+                StrictFluent::withNullArray(['foreignKey', 'ownerKey', 'relation'])
+                            ->applyClosure($foreignKey)
+                            ->getAttributes()
+            );
+        }
+
         // If no relation name was given, we will use this debug backtrace to extract
         // the calling method's name and use that as the relationship name as most
         // of the time this will be what we desire to use for the relationships.
@@ -125,13 +157,23 @@ trait HasRelationships
     /**
      * Define a polymorphic, inverse one-to-one or many relationship.
      *
-     * @param  string  $name
+     * @param  string|Closure  $name
      * @param  string  $type
      * @param  string  $id
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
     public function morphTo($name = null, $type = null, $id = null)
     {
+        // If the second argument is a Closure, we will ignore other arguments
+        // and set up the relationship with values provided in the Closure.
+        if ($name instanceof Closure) {
+            extract(
+                StrictFluent::withNullArray(['name', 'type', 'id'])
+                            ->applyClosure($name)
+                            ->getAttributes()
+            );
+        }
+
         // If no name is provided, we will use the backtrace to get the function name
         // since that is most likely the name of the polymorphic interface. We can
         // use that to get both the class and foreign key that will be utilized.
@@ -211,12 +253,22 @@ trait HasRelationships
      * Define a one-to-many relationship.
      *
      * @param  string  $related
-     * @param  string  $foreignKey
+     * @param  string|Closure  $foreignKey
      * @param  string  $localKey
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function hasMany($related, $foreignKey = null, $localKey = null)
     {
+        // If the second argument is a Closure, we will ignore other arguments
+        // and set up the relationship with values provided in the Closure.
+        if ($foreignKey instanceof Closure) {
+            extract(
+                StrictFluent::withNullArray(['foreignKey', 'localKey'])
+                            ->applyClosure($foreignKey)
+                            ->getAttributes()
+            );
+        }
+
         $instance = $this->newRelatedInstance($related);
 
         $foreignKey = $foreignKey ?: $this->getForeignKey();
@@ -233,7 +285,7 @@ trait HasRelationships
      *
      * @param  string  $related
      * @param  string  $through
-     * @param  string|null  $firstKey
+     * @param  string|Closure|null  $firstKey
      * @param  string|null  $secondKey
      * @param  string|null  $localKey
      * @param  string|null  $secondLocalKey
@@ -241,6 +293,16 @@ trait HasRelationships
      */
     public function hasManyThrough($related, $through, $firstKey = null, $secondKey = null, $localKey = null, $secondLocalKey = null)
     {
+        // If the second argument is a Closure, we will ignore other arguments
+        // and set up the relationship with values provided in the Closure.
+        if ($firstKey instanceof Closure) {
+            extract(
+                StrictFluent::withNullArray(['firstKey', 'secondKey', 'localKey'])
+                            ->applyClosure($firstKey)
+                            ->getAttributes()
+            );
+        }
+
         $through = new $through;
 
         $firstKey = $firstKey ?: $this->getForeignKey();
@@ -261,13 +323,23 @@ trait HasRelationships
      *
      * @param  string  $related
      * @param  string  $name
-     * @param  string  $type
+     * @param  string|Closure  $type
      * @param  string  $id
      * @param  string  $localKey
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
     public function morphMany($related, $name, $type = null, $id = null, $localKey = null)
     {
+        // If the second argument is a Closure, we will ignore other arguments
+        // and set up the relationship with values provided in the Closure.
+        if ($type instanceof Closure) {
+            extract(
+                StrictFluent::withNullArray(['type', 'id', 'localKey'])
+                            ->applyClosure($type)
+                            ->getAttributes()
+            );
+        }
+
         $instance = $this->newRelatedInstance($related);
 
         // Here we will gather up the morph type and ID for the relationship so that we
@@ -286,7 +358,7 @@ trait HasRelationships
      * Define a many-to-many relationship.
      *
      * @param  string  $related
-     * @param  string  $table
+     * @param  string|Closure  $table
      * @param  string  $foreignPivotKey
      * @param  string  $relatedPivotKey
      * @param  string  $parentKey
@@ -297,6 +369,16 @@ trait HasRelationships
     public function belongsToMany($related, $table = null, $foreignPivotKey = null, $relatedPivotKey = null,
                                   $parentKey = null, $relatedKey = null, $relation = null)
     {
+        // If the second argument is a Closure, we will ignore other arguments
+        // and set up the relationship with values provided in the Closure.
+        if ($table instanceof Closure) {
+            extract(
+                StrictFluent::withNullArray(['table', 'foreignPivotKey', 'relatedPivotKey', 'parentKey', 'relatedKey', 'relation'])
+                            ->applyClosure($table)
+                            ->getAttributes()
+            );
+        }
+
         // If no relationship name was passed, we will pull backtraces to get the
         // name of the calling function. We will use that function name as the
         // title of this relation since that is a great convention to apply.
@@ -332,7 +414,7 @@ trait HasRelationships
      *
      * @param  string  $related
      * @param  string  $name
-     * @param  string  $table
+     * @param  string|Closure  $table
      * @param  string  $foreignPivotKey
      * @param  string  $relatedPivotKey
      * @param  string  $parentKey
@@ -344,6 +426,16 @@ trait HasRelationships
                                 $relatedPivotKey = null, $parentKey = null,
                                 $relatedKey = null, $inverse = false)
     {
+        // If the second argument is a Closure, we will ignore other arguments
+        // and set up the relationship with values provided in the Closure.
+        if ($table instanceof Closure) {
+            extract(
+                StrictFluent::withNullArray(['table', 'foreignPivotKey', 'relatedPivotKey', 'parentKey', 'relatedKey', 'inverse'])
+                            ->applyClosure($table)
+                            ->getAttributes()
+            );
+        }
+
         $caller = $this->guessBelongsToManyRelation();
 
         // First, we will need to determine the foreign key and "other key" for the
@@ -372,7 +464,7 @@ trait HasRelationships
      *
      * @param  string  $related
      * @param  string  $name
-     * @param  string  $table
+     * @param  string|Closure  $table
      * @param  string  $foreignPivotKey
      * @param  string  $relatedPivotKey
      * @param  string  $parentKey
@@ -382,6 +474,16 @@ trait HasRelationships
     public function morphedByMany($related, $name, $table = null, $foreignPivotKey = null,
                                   $relatedPivotKey = null, $parentKey = null, $relatedKey = null)
     {
+        // If the second argument is a Closure, we will ignore other arguments
+        // and set up the relationship with values provided in the Closure.
+        if ($table instanceof Closure) {
+            extract(
+                StrictFluent::withNullArray(['table', 'foreignPivotKey', 'relatedPivotKey', 'parentKey', 'relatedKey'])
+                            ->applyClosure($table)
+                            ->getAttributes()
+            );
+        }
+
         $foreignPivotKey = $foreignPivotKey ?: $this->getForeignKey();
 
         // For the inverse of the polymorphic many-to-many relations, we will change
