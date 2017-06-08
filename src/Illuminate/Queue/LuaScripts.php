@@ -25,7 +25,9 @@ LUA;
      *
      * KEYS[1] - The queue to pop jobs from, for example: queues:foo
      * KEYS[2] - The queue to place reserved jobs on, for example: queues:foo:reserved
-     * ARGV[1] - The time at which the reserved job will expire
+     * ARGV[1] - Current time
+     * ARGV[2] - Default timeout. USed with ARGV[1] to calculate when the job should have finished.
+     *
      *
      * @return string
      */
@@ -35,13 +37,27 @@ LUA;
 -- Pop the first job off of the queue...
 local job = redis.call('lpop', KEYS[1])
 local reserved = false
+local timeout  = tonumber(ARGV[2])
+local score    = tonumber(ARGV[1])
 
 if(job ~= false) then
     -- Increment the attempt count and place job on the reserved queue...
     reserved = cjson.decode(job)
     reserved['attempts'] = reserved['attempts'] + 1
+
+    -- Retrieve the timeout of the job if set, per documentation it has precedence
+    -- on the one of the queue
+    local timeoutJob = tonumber(reserved['timeout']);
+    if(timeoutJob ~= nil) then
+        timeout =  timeoutJob
+    end
+
+    if(timeout ~= nil) then
+       score = score + timeout    
+    end
+
     reserved = cjson.encode(reserved)
-    redis.call('zadd', KEYS[2], ARGV[1], reserved)
+    redis.call('zadd', KEYS[2], score, reserved)
 end
 
 return {job, reserved}
