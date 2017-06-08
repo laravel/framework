@@ -1067,7 +1067,7 @@ class Connection implements ConnectionInterface
      */
     public function pretending()
     {
-        return $this->pretending === true;
+        return $this->pretending;
     }
 
     /**
