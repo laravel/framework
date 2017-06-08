@@ -871,6 +871,24 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->whereKey($collection);
     }
 
+    public function testOnlyWith()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $constraint = function ($q) {
+            $q->where('baz', 'bam');
+        };
+
+        $result = $model->onlyWith('foo', $constraint)
+                        ->onlyWith(['address' => $constraint])->toSql();
+
+        $builder = $model->whereHas('foo', $constraint)->with(['foo' => $constraint])
+                         ->whereHas('address', $constraint)->with(['address' => $constraint])
+                         ->toSql();
+
+        $this->assertEquals($builder, $result);
+    }
+
     protected function mockConnectionForModel($model, $database)
     {
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';

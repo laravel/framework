@@ -1016,6 +1016,25 @@ class Builder
     }
 
     /**
+     * Set the relationships that should be eager loaded and
+     * add a exists condition to the query with where clauses.
+     *
+     * @param  string|array  $relation
+     * @param  \Closure      $constraint
+     * @return $this
+     */
+    public function onlyWith($relation, Closure $constraint = null)
+    {
+        if (is_array($relation) && ! $constraint) {
+            $constraint = reset($relation);
+            $relation = key($relation);
+        }
+
+        return $this->whereHas($relation, $constraint)
+                    ->with([$relation => $constraint]);
+    }
+
+    /**
      * Prevent the specified relations from being eager loaded.
      *
      * @param  mixed  $relations
