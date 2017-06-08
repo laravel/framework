@@ -2,7 +2,9 @@
 
 namespace Illuminate\Support;
 
-class HigherOrderCollectionProxy
+use ArrayAccess;
+
+class HigherOrderCollectionProxy implements ArrayAccess
 {
     /**
      * The collection being operated on.
@@ -40,7 +42,7 @@ class HigherOrderCollectionProxy
     public function __get($key)
     {
         return $this->collection->{$this->method}(function ($value) use ($key) {
-            return is_array($value) ? $value[$key] : $value->{$key};
+            return $value->{$key};
         });
     }
 
@@ -56,5 +58,58 @@ class HigherOrderCollectionProxy
         return $this->collection->{$this->method}(function ($value) use ($method, $parameters) {
             return $value->{$method}(...$parameters);
         });
+    }
+
+    /**
+     * Get an item at a given offset.
+     *
+     * @param  mixed  $key
+     * @return mixed
+     */
+    public function offsetGet($key)
+    {
+        return $this->collection->{$this->method}(function ($value) use ($key) {
+            return $value[$key];
+        });
+    }
+
+    /**
+     * Determine if an item exists at an offset.
+     *
+     * @param  mixed  $key
+     * @return bool
+     */
+    public function offsetExists($key)
+    {
+        throw new Exception(
+            __CLASS__.' does not support array access other than retrieving array elements.'
+        );
+    }
+
+    /**
+     * Set the item at a given offset.
+     *
+     * @param  mixed  $key
+     * @param  mixed  $value
+     * @return void
+     */
+    public function offsetSet($key, $value)
+    {
+        throw new Exception(
+            __CLASS__.' does not support array access other than retrieving array elements.'
+        );
+    }
+
+    /**
+     * Unset the item at a given offset.
+     *
+     * @param  string  $key
+     * @return void
+     */
+    public function offsetUnset($key)
+    {
+        throw new Exception(
+            __CLASS__.' does not support array access other than retrieving array elements.'
+        );
     }
 }
