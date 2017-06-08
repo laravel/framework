@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
+use Symfony\Component\Console\Input\InputOption;
 
 class ProviderMakeCommand extends GeneratorCommand
 {
@@ -34,6 +35,10 @@ class ProviderMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
+        if ($this->option('template')) {
+            return __DIR__.'/stubs/provider-'.$this->option('template').'.stub';
+        }
+
         return __DIR__.'/stubs/provider.stub';
     }
 
@@ -46,5 +51,17 @@ class ProviderMakeCommand extends GeneratorCommand
     protected function getDefaultNamespace($rootNamespace)
     {
         return $rootNamespace.'\Providers';
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['template', 't', InputOption::VALUE_OPTIONAL, 'One of the predefined provider templates'],
+        ];
     }
 }

@@ -44,6 +44,7 @@ use Illuminate\Console\Scheduling\ScheduleFinishCommand;
 use Illuminate\Database\Console\Seeds\SeederMakeCommand;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
 use Illuminate\Foundation\Console\NotificationMakeCommand;
+use Illuminate\Foundation\Console\ViewComposerMakeCommand;
 use Illuminate\Queue\Console\WorkCommand as QueueWorkCommand;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Illuminate\Notifications\Console\NotificationTableCommand;
@@ -141,6 +142,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'Serve' => 'command.serve',
         'TestMake' => 'command.test.make',
         'VendorPublish' => 'command.vendor.publish',
+        'ViewComposerMake' => 'command.view-composer.make',
     ];
 
     /**
@@ -498,6 +500,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.migrate.status', function ($app) {
             return new MigrateStatusCommand($app['migrator']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerViewComposerMakeCommand()
+    {
+        $this->app->singleton('command.view-composer.make', function ($app) {
+            return new ViewComposerMakeCommand($app['files']);
         });
     }
 
