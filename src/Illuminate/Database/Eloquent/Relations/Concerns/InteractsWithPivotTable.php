@@ -82,7 +82,7 @@ trait InteractsWithPivotTable
     public function sync($ids, $detaching = true)
     {
         $changes = [
-            'attached' => [], 'detached' => [], 'updated' => [],
+            'attached' => [], 'detached' => [], 'to_detach' => [], 'updated' => [],
         ];
 
         // First we need to attach any of the associated models that are not currently
@@ -99,10 +99,13 @@ trait InteractsWithPivotTable
         // Next, we will take the differences of the currents and given IDs and detach
         // all of the entities that exist in the "current" array but are not in the
         // array of the new IDs given to the method which will complete the sync.
-        if ($detaching && count($detach) > 0) {
-            $this->detach($detach);
-
-            $changes['detached'] = $this->castKeys($detach);
+        if (count($detach) > 0) {
+            if ($detaching) {
+                $this->detach($detach);
+                $changes['detached'] = $this->castKeys($detach);
+            } else {
+                $changes['to_detach'] = $this->castKeys($detach);
+            }
         }
 
         // Now we are finally ready to attach the new records. Note that we'll disable
