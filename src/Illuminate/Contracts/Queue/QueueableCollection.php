@@ -12,16 +12,16 @@ interface QueueableCollection
     public function getQueueableClass();
 
     /**
-     * Get the connection of the entities being queued.
-     *
-     * @return string|null
-     */
-    public function getQueueableConnection();
-
-    /**
      * Get the identifiers for all of the entities.
      *
      * @return array
      */
     public function getQueueableIds();
+
+    /**
+     * Get the connection of the entities being queued.
+     *
+     * @return string|null
+     */
+    public function getQueueableConnection();
 }

@@ -12,13 +12,6 @@ class ModelIdentifier
     public $class;
 
     /**
-     * The connection name of the model.
-     *
-     * @var string|null
-     */
-    public $connection;
-
-    /**
      * The unique identifier of the model.
      *
      * This may be either a single ID or an array of IDs.
@@ -28,17 +21,24 @@ class ModelIdentifier
     public $id;
 
     /**
+     * The connection name of the model.
+     *
+     * @var string|null
+     */
+    public $connection;
+
+    /**
      * Create a new model identifier.
      *
      * @param  string  $class
-     * @param  mixed  $connection
      * @param  mixed  $id
+     * @param  mixed  $connection
      * @return void
      */
-    public function __construct($class, $connection, $id)
+    public function __construct($class, $id, $connection)
     {
         $this->id = $id;
-        $this->connection = $connection;
         $this->class = $class;
+        $this->connection = $connection;
     }
 }

@@ -18,11 +18,19 @@ trait SerializesAndRestoresModelIdentifiers
     protected function getSerializedPropertyValue($value)
     {
         if ($value instanceof QueueableCollection) {
-            return new ModelIdentifier($value->getQueueableClass(), $value->getQueueableConnection(), $value->getQueueableIds());
+            return new ModelIdentifier(
+                $value->getQueueableClass(),
+                $value->getQueueableIds(),
+                $value->getQueueableConnection()
+            );
         }
 
         if ($value instanceof QueueableEntity) {
-            return new ModelIdentifier(get_class($value), $value->getQueueableConnection(), $value->getQueueableId());
+            return new ModelIdentifier(
+                get_class($value),
+                $value->getQueueableId(),
+                $value->getQueueableConnection()
+            );
         }
 
         return $value;

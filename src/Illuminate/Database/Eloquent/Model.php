@@ -1200,7 +1200,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Get the queueable identity for the entity.
+     * Get the queueable connection for the entity.
      *
      * @return mixed
      */

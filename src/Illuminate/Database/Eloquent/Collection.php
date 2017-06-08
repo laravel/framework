@@ -358,6 +358,16 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Get the identifiers for all of the entities.
+     *
+     * @return array
+     */
+    public function getQueueableIds()
+    {
+        return $this->modelKeys();
+    }
+
+    /**
      * Get the connection of the entities being queued.
      *
      * @return string|null
@@ -377,15 +387,5 @@ class Collection extends BaseCollection implements QueueableCollection
         });
 
         return $connection;
-    }
-
-    /**
-     * Get the identifiers for all of the entities.
-     *
-     * @return array
-     */
-    public function getQueueableIds()
-    {
-        return $this->modelKeys();
     }
 }
