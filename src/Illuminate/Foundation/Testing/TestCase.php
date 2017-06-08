@@ -35,6 +35,8 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
         if (! $this->app) {
             $this->refreshApplication();
         }
+
+        $this->setUpTraits();
     }
 
     /**
@@ -60,6 +62,28 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
 
         if (class_exists('Mockery')) {
             Mockery::close();
+        }
+    }
+
+    /**
+     * Boot the testing helper traits.
+     *
+     * @return void
+     */
+    protected function setUpTraits()
+    {
+        $uses = array_flip(class_uses_recursive(get_class($this)));
+        if (isset($uses[DatabaseTransactions::class])) {
+            $this->beginDatabaseTransaction();
+        }
+        if (isset($uses[DatabaseMigrations::class])) {
+            $this->runDatabaseMigrations();
+        }
+        if (isset($uses[WithoutMiddleware::class])) {
+            $this->disableMiddlewareForAllTests();
+        }
+        if (isset($uses[WithoutEvents::class])) {
+            $this->disableEventsForAllTests();
         }
     }
 
