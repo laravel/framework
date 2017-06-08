@@ -7,6 +7,7 @@ use ArrayAccess;
 use JsonSerializable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Routing\UrlRoutable;
@@ -1216,6 +1217,32 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function getRouteKeyName()
     {
         return $this->getKeyName();
+    }
+
+    /**
+     * Get the translation name for the model.
+     *
+     * @return string
+     */
+    public function getTranslationName()
+    {
+        $key = $this->getTranslationNameKey();
+
+        if (Lang::has($key)) {
+            return Lang::get($key);
+        }
+
+        return Str::snake(class_basename($this), ' ');
+    }
+
+    /**
+     * Get the translation name key for the model.
+     *
+     * @return string
+     */
+    public function getTranslationNameKey()
+    {
+        return 'models.'.Str::snake(class_basename($this));
     }
 
     /**
