@@ -97,10 +97,8 @@ class ControllerMakeCommand extends GeneratorCommand
     {
         $parentModelClass = $this->parseModel($this->option('parent'));
 
-        if (! class_exists($parentModelClass)) {
-            if ($this->confirm("A {$parentModelClass} model does not exist. Do you want to generate it?", true)) {
-                $this->call('make:model', ['name' => $parentModelClass]);
-            }
+        if ($options = $this->buildMakeModelOptions($parentModelClass)) {
+            $this->call('make:model', $options);
         }
 
         return [
@@ -120,10 +118,8 @@ class ControllerMakeCommand extends GeneratorCommand
     {
         $modelClass = $this->parseModel($this->option('model'));
 
-        if (! class_exists($modelClass)) {
-            if ($this->confirm("A {$modelClass} model does not exist. Do you want to generate it?", true)) {
-                $this->call('make:model', ['name' => $modelClass]);
-            }
+        if ($options = $this->buildMakeModelOptions($modelClass)) {
+            $this->call('make:model', $options);
         }
 
         return array_merge($replace, [
@@ -131,6 +127,29 @@ class ControllerMakeCommand extends GeneratorCommand
             'DummyModelClass' => class_basename($modelClass),
             'DummyModelVariable' => lcfirst(class_basename($modelClass)),
         ]);
+    }
+
+    /**
+     * Get the options for the make:model command.
+     *
+     * @param  string  $class
+     * @return array
+     */
+    protected function buildMakeModelOptions($class)
+    {
+        if (class_exists($class)) {
+            return;
+        }
+
+        if ($this->confirm("A {$class} model does not exist. Do you want to generate it?", true)) {
+            $options = ['name' => $class];
+
+            if ($this->confirm('Do you want a migration file too?', true)) {
+                $options += ['--migration' => true];
+            }
+
+            return $options;
+        }
     }
 
     /**
