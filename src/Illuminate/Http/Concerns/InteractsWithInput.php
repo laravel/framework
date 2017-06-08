@@ -185,6 +185,19 @@ trait InteractsWithInput
     }
 
     /**
+     * Get a subset containing the provided keys with values from the input data.
+     *
+     * @param  array|mixed  $keys
+     * @return array
+     */
+    public function pick($keys)
+    {
+        $keys = is_array($keys) ? $keys : func_get_args();
+
+        return array_intersect_key($this->all(), array_flip($keys));
+    }
+
+    /**
      * Retrieve a query string item from the request.
      *
      * @param  string  $key
