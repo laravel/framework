@@ -64,38 +64,58 @@ class Dispatcher implements QueueingDispatcher
     /**
      * Dispatch a command to its appropriate handler.
      *
-     * @param  mixed  $command
+     * @param  mixed $command
+     * @param Closure|null $errorCallback
      * @return mixed
+     * @throws \Exception
      */
-    public function dispatch($command)
+    public function dispatch($command, Closure $errorCallback = null)
     {
-        if ($this->queueResolver && $this->commandShouldBeQueued($command)) {
-            return $this->dispatchToQueue($command);
-        } else {
-            return $this->dispatchNow($command);
+        try {
+            if ($this->queueResolver && $this->commandShouldBeQueued($command)) {
+                return $this->dispatchToQueue($command);
+            } else {
+                return $this->dispatchNow($command);
+            }
+        } catch(\Exception $e) {
+            if($errorCallback) {
+                return $errorCallback();
+            }
+            throw $e;
         }
     }
 
     /**
      * Dispatch a command to its appropriate handler in the current process.
      *
-     * @param  mixed  $command
-     * @param  mixed  $handler
+     * @param  mixed $command
+     * @param  mixed $handler
+     * @param Closure|null $errorCallback
      * @return mixed
+     * @throws \Exception
      */
-    public function dispatchNow($command, $handler = null)
+    public function dispatchNow($command, $handler = null, Closure $errorCallback = null)
     {
-        if ($handler || $handler = $this->getCommandHandler($command)) {
-            $callback = function ($command) use ($handler) {
-                return $handler->handle($command);
-            };
-        } else {
-            $callback = function ($command) {
-                return $this->container->call([$command, 'handle']);
-            };
-        }
+        try {
 
-        return $this->pipeline->send($command)->through($this->pipes)->then($callback);
+            if ($handler || $handler = $this->getCommandHandler($command)) {
+                $callback = function ($command) use ($handler) {
+                    return $handler->handle($command);
+                };
+            } else {
+                $callback = function ($command) {
+                    return $this->container->call([$command, 'handle']);
+                };
+            }
+
+            return $this->pipeline->send($command)->through($this->pipes)->then($callback);
+
+        } catch(\Exception $e) {
+            if($errorCallback) {
+                return $errorCallback();
+            }
+            throw $e;
+        }
     }
 
     /**
