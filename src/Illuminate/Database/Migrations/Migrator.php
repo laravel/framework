@@ -420,11 +420,28 @@ class Migrator
     public function getMigrationFiles($paths)
     {
         return Collection::make($paths)->flatMap(function ($path) {
-            return $this->files->glob($path.'/*_*.php');
+            return $this->getAllMigrationFiles($path);
         })->filter()->sortBy(function ($file) {
             return $this->getMigrationName($file);
         })->values()->keyBy(function ($file) {
             return $this->getMigrationName($file);
+        })->all();
+    }
+
+    /**
+     * Get all of the migration files including files in sub-directories in a given path.
+     *
+     * @param  string  $path
+     * @return array
+     */
+    public function getAllMigrationFiles($path)
+    {
+        $files = $this->files->allFiles($path);
+
+        return Collection::make($files)->filter(function ($file) {
+            return preg_match('/^.*_.*\.php$/', $file->getFilename());
+        })->map(function ($file) {
+            return $file->getRealPath();
         })->all();
     }
 
