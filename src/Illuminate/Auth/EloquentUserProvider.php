@@ -75,7 +75,7 @@ class EloquentUserProvider implements UserProvider
     {
         $user->setRememberToken($token);
 
-        $user->save();
+        $user->update();
     }
 
     /**
