@@ -32,13 +32,12 @@ class TestMakeCommand extends GeneratorCommand
      *
      * @return string
      */
-    protected function getStub()
+    protected function getStub(): string
     {
         if ($this->option('unit')) {
             return __DIR__.'/stubs/unit-test.stub';
-        } else {
-            return __DIR__.'/stubs/test.stub';
         }
+        return __DIR__.'/stubs/test.stub';
     }
 
     /**
@@ -47,7 +46,7 @@ class TestMakeCommand extends GeneratorCommand
      * @param  string  $name
      * @return string
      */
-    protected function getPath($name)
+    protected function getPath($name): string
     {
         $name = str_replace_first($this->rootNamespace(), '', $name);
 
@@ -60,13 +59,12 @@ class TestMakeCommand extends GeneratorCommand
      * @param  string  $rootNamespace
      * @return string
      */
-    protected function getDefaultNamespace($rootNamespace)
+    protected function getDefaultNamespace($rootNamespace): string
     {
         if ($this->option('unit')) {
             return $rootNamespace.'\Unit';
-        } else {
-            return $rootNamespace.'\Feature';
         }
+        return $rootNamespace.'\Feature';
     }
 
     /**
@@ -74,7 +72,7 @@ class TestMakeCommand extends GeneratorCommand
      *
      * @return string
      */
-    protected function rootNamespace()
+    protected function rootNamespace(): string
     {
         return 'Tests';
     }
