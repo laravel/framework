@@ -710,9 +710,19 @@ class Route
     }
 
     /**
+     * Return all disabled middlewares.
+     *
+     * @return array
+     */
+    public function gatherDisabledMiddlewares()
+    {
+        return (array) Arr::get($this->action, 'bypass', []);
+    }
+
+    /**
      * Get or set the middlewares attached to the route.
      *
-     * @param  array|string|null $middleware
+     * @param  array|string $middleware
      * @return $this|array
      */
     public function middleware($middleware = null)
@@ -727,6 +737,29 @@ class Route
 
         $this->action['middleware'] = array_merge(
             (array) Arr::get($this->action, 'middleware', []), $middleware
+        );
+
+        return $this;
+    }
+
+    /**
+     * Remove the given middlewares from the route. If no middleware is passed, all middlewares will be removed.
+     *
+     * @param array|string $middleware
+     * @return $this
+     */
+    public function withoutMiddleware($middleware = null)
+    {
+        if (is_null($middleware)) {
+            $this->action['middleware'] = [];
+
+            return $this;
+        }
+
+        $middleware = is_array($middleware) ? $middleware : func_get_args();
+
+        $this->action['bypass'] = array_merge(
+            (array) Arr::get($this->action, 'bypass', []), $middleware
         );
 
         return $this;

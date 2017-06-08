@@ -12,15 +12,18 @@ class MiddlewareNameResolver
      * @param  string  $name
      * @param  array  $map
      * @param  array  $middlewareGroups
+     * @param  array  $disabledMiddlewares
      * @return string|array
      */
-    public static function resolve($name, $map, $middlewareGroups)
+    public static function resolve($name, $map, $middlewareGroups, $disabledMiddlewares)
     {
         // When the middleware is simply a Closure, we will return this Closure instance
         // directly so that Closures can be registered as middleware inline, which is
         // convenient on occasions when the developers are experimenting with them.
         if ($name instanceof Closure) {
             return $name;
+        } elseif (in_array($name, $disabledMiddlewares)) {
+            return [];
         } elseif (isset($map[$name]) && $map[$name] instanceof Closure) {
             return $map[$name];
 
@@ -29,7 +32,7 @@ class MiddlewareNameResolver
         // set of middleware under single keys that can be conveniently referenced.
         } elseif (isset($middlewareGroups[$name])) {
             return static::parseMiddlewareGroup(
-                $name, $map, $middlewareGroups
+                $name, $map, $middlewareGroups, $disabledMiddlewares
             );
 
         // Finally, when the middleware is simply a string mapped to a class name the
@@ -49,19 +52,23 @@ class MiddlewareNameResolver
      * @param  string  $name
      * @param  array  $map
      * @param  array  $middlewareGroups
+     * @param  array  $disabledMiddlewares
      * @return array
      */
-    protected static function parseMiddlewareGroup($name, $map, $middlewareGroups)
+    protected static function parseMiddlewareGroup($name, $map, $middlewareGroups, $disabledMiddlewares)
     {
         $results = [];
 
         foreach ($middlewareGroups[$name] as $middleware) {
+            if (in_array($middleware, $disabledMiddlewares)) {
+                continue;
+            }
             // If the middleware is another middleware group we will pull in the group and
             // merge its middleware into the results. This allows groups to conveniently
             // reference other groups without needing to repeat all their middlewares.
             if (isset($middlewareGroups[$middleware])) {
                 $results = array_merge($results, static::parseMiddlewareGroup(
-                    $middleware, $map, $middlewareGroups
+                    $middleware, $map, $middlewareGroups, $disabledMiddlewares
                 ));
 
                 continue;

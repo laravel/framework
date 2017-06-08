@@ -175,6 +175,18 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('caught', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
     }
 
+    public function testDisableMiddleware()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/bar', ['middleware' => 'foo', function () {
+            return 'hello';
+        }])->withoutMiddleware('foo');
+        $router->aliasMiddleware('foo', function ($request, $next) {
+            return 'caught';
+        });
+        $this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+    }
+
     public function testControllerClosureMiddleware()
     {
         $router = $this->getRouter();
@@ -244,6 +256,23 @@ class RoutingRouteTest extends TestCase
         $router->middlewareGroup('web', ['Illuminate\Tests\Routing\RoutingTestMiddlewareGroupOne', 'two:taylor']);
 
         $this->assertEquals('caught taylor', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+        $this->assertTrue($_SERVER['__middleware.group']);
+
+        unset($_SERVER['__middleware.group']);
+    }
+
+    public function testWithoutMiddlewareGroups()
+    {
+        unset($_SERVER['__middleware.group']);
+        $router = $this->getRouter();
+        $router->get('foo/bar', ['middleware' => 'web', function () {
+            return 'hello';
+        }])->withoutMiddleware('two:taylor');
+
+        $router->aliasMiddleware('two', 'Illuminate\Tests\Routing\RoutingTestMiddlewareGroupTwo');
+        $router->middlewareGroup('web', ['Illuminate\Tests\Routing\RoutingTestMiddlewareGroupOne', 'two:taylor']);
+
+        $this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
         $this->assertTrue($_SERVER['__middleware.group']);
 
         unset($_SERVER['__middleware.group']);
