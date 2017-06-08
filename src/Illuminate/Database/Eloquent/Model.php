@@ -3329,6 +3329,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * reset the booted models array
+     *
+     * @return void
+     */
+    public static function resetBootedModels()
+    {
+        self::$booted = [];
+    }
+
+    /**
      * Dynamically retrieve attributes on the model.
      *
      * @param  string  $key
