@@ -16,6 +16,17 @@ trait CompilesConditionals
     }
 
     /**
+     * Compile the has-any-sections statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileHasAnySections($expression)
+    {
+        return "<?php if (! empty(trim(implode('', array_map(function(\$section) use (\$__env) { return \$__env->yieldContent(\$section); }, {$expression}))))): ?>";
+    }
+
+    /**
      * Compile the if statements into valid PHP.
      *
      * @param  string  $expression
