@@ -13,6 +13,7 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Events\QueryExecuted;
 use Doctrine\DBAL\Connection as DoctrineConnection;
+use Illuminate\Database\Events\BeforeQueryExecuted;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
@@ -599,6 +600,8 @@ class Connection implements ConnectionInterface
         $this->reconnectIfMissingConnection();
 
         $start = microtime(true);
+
+        $this->event(new BeforeQueryExecuted($query, $bindings, $this));
 
         // Here we will run this query. If an exception occurs we'll determine if it was
         // caused by a connection that has been lost. If that is the cause, we'll try
