@@ -137,8 +137,10 @@ class ConnectionFactory
      */
     protected function getReadWriteConfig(array $config, $type)
     {
+        $randomConfig = mt_rand(0, count($config[$type]) - 1);
+
         return isset($config[$type][0])
-                        ? $config[$type][array_rand($config[$type])]
+                        ? $config[$type][$randomConfig]
                         : $config[$type];
     }
 
