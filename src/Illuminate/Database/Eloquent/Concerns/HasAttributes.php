@@ -890,13 +890,10 @@ trait HasAttributes
      */
     public function only($attributes)
     {
-        $results = [];
-
-        foreach (is_array($attributes) ? $attributes : func_get_args() as $attribute) {
-            $results[$attribute] = $this->getAttribute($attribute);
-        }
-
-        return $results;
+        return Arr::only(
+            $this->getAttributes(),
+            is_array($attributes) ? $attributes : func_get_args()
+        );
     }
 
     /**
