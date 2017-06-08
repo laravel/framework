@@ -470,15 +470,33 @@ trait ValidatesAttributes
      */
     protected function failsRatioCheck($parameters, $width, $height)
     {
-        if (! isset($parameters['ratio'])) {
+        if (! isset($parameters['ratio']) && ! isset($parameters['min_ratio']) && ! isset($parameters['max_ratio'])) {
             return false;
         }
 
-        list($numerator, $denominator) = array_replace(
-            [1, 1], array_filter(sscanf($parameters['ratio'], '%f/%d'))
-        );
+        $realRatio = $width / $height;
 
-        return abs($numerator / $denominator - $width / $height) > 0.000001;
+        $getDiff = function ($parameter) use ($realRatio) {
+            list($numerator, $denominator) = array_replace(
+                [1, 1], array_filter(sscanf($parameter, '%f/%d'))
+            );
+
+            return $realRatio - $numerator / $denominator;
+        };
+
+        if (isset($parameters['ratio']) && abs($getDiff($parameters['ratio'])) > 0.000001) {
+            return true;
+        }
+
+        if (isset($parameters['max_ratio']) && $getDiff($parameters['max_ratio']) > 0) {
+            return true;
+        }
+
+        if (isset($parameters['min_ratio']) && $getDiff($parameters['min_ratio']) < 0) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
