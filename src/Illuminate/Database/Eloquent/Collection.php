@@ -2,10 +2,10 @@
 
 namespace Illuminate\Database\Eloquent;
 
-use LogicException;
-use Illuminate\Support\Arr;
 use Illuminate\Contracts\Queue\QueueableCollection;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
+use LogicException;
 
 class Collection extends BaseCollection implements QueueableCollection
 {
@@ -260,8 +260,12 @@ class Collection extends BaseCollection implements QueueableCollection
 
         $dictionary = [];
 
-        foreach ($items as $value) {
-            $dictionary[$value->getKey()] = $value;
+        foreach ($items as $k => $value) {
+            if(method_exists($value, 'getKey')){
+                $dictionary[$value->getKey()] = $value;
+            }else{
+                $dictionary[$k] = $value;
+            }
         }
 
         return $dictionary;
