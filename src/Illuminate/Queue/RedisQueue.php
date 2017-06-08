@@ -123,7 +123,7 @@ class RedisQueue extends Queue implements QueueContract
     protected function laterRaw($delay, $payload, $queue = null)
     {
         $this->getConnection()->zadd(
-            $this->getQueue($queue).':delayed', $this->availableAt($delay), $payload
+            $this->getQueue($queue).':delayed', [$this->availableAt($delay) => $payload]
         );
 
         return Arr::get(json_decode($payload, true), 'id');
