@@ -283,6 +283,18 @@ class Blueprint
     }
 
     /**
+     * Drops a relationship.
+     *
+     * @param  string  $table
+     * @param  string  $column
+     * @return \Illuminate\Support\Fluent
+     */
+    public function dropRelationship($table, $column)
+    {
+        return $this->dropForeign("{$table}_{$column}_foreign");
+    }
+
+    /**
      * Indicate that the timestamp columns should be dropped.
      *
      * @return void
@@ -392,6 +404,21 @@ class Blueprint
     public function foreign($columns, $name = null)
     {
         return $this->indexCommand('foreign', $columns, $name);
+    }
+
+    /**
+     * Creates a relationship.
+     *
+     * @param  string  $column
+     * @param  string  $table
+     * @param  string  $references
+     * @return \Illuminate\Support\Fluent
+     */
+    public function relationship($column, $table, $references = 'id')
+    {
+        return $this->foreign($column)
+                    ->references($references)
+                    ->on($table);
     }
 
     /**
