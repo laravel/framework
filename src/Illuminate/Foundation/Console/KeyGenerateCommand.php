@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use DotEnvWriter\DotEnvWriter;
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 
@@ -89,22 +90,8 @@ class KeyGenerateCommand extends Command
      */
     protected function writeNewEnvironmentFileWith($key)
     {
-        file_put_contents($this->laravel->environmentFilePath(), preg_replace(
-            $this->keyReplacementPattern(),
-            'APP_KEY='.$key,
-            file_get_contents($this->laravel->environmentFilePath())
-        ));
-    }
-
-    /**
-     * Get a regex pattern that will match env APP_KEY with any random key.
-     *
-     * @return string
-     */
-    protected function keyReplacementPattern()
-    {
-        $escaped = preg_quote('='.$this->laravel['config']['app.key'], '/');
-
-        return "/^APP_KEY{$escaped}/m";
+        (new DotEnvWriter($this->laravel->environmentFilePath()))
+            ->set('APP_KEY', $key)
+            ->save();
     }
 }
