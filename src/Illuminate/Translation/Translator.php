@@ -3,6 +3,7 @@
 namespace Illuminate\Translation;
 
 use Countable;
+use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
@@ -60,6 +61,8 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     {
         $this->loader = $loader;
         $this->locale = $locale;
+
+        Carbon::setLocale($locale);
     }
 
     /**
@@ -443,6 +446,8 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     public function setLocale($locale)
     {
         $this->locale = $locale;
+
+        Carbon::setLocale($locale);
     }
 
     /**
