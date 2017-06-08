@@ -1432,6 +1432,22 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Filter items by the similarity of the given value.
+     *
+     * @param  mixed $value
+     * @param  int $threshold
+     * @return static
+     */
+    public function similar($value, $threshold = 85)
+    {
+        return $this->filter(function ($item) use ($value, $threshold) {
+            similar_text((string) $item, (string) $value, $similarity);
+
+            return $similarity >= $threshold;
+        });
+    }
+
+    /**
      * Get the collection of items as a plain array.
      *
      * @return array
