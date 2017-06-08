@@ -318,6 +318,9 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['first' => 'Hello', 'second' => 'World'], $c->filter(function ($item, $key) {
             return $key != 'id';
         })->all());
+
+        $c = new Collection([['id' => 1, 'name' => 'Hello'], ['id' => 2, 'name' => null]]);
+        $this->assertEquals([['id' => 1, 'name' => 'Hello']], $c->filter('name')->all());
     }
 
     public function testWhere()
