@@ -109,7 +109,7 @@ class MessageSelector
      */
     public function getPluralIndex($locale, $number)
     {
-        switch ($locale) {
+        switch (preg_replace('/^([^-_]+).*/', '$1', $locale)) {
             case 'az':
             case 'bo':
             case 'dz':
