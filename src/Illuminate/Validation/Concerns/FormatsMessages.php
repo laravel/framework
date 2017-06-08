@@ -20,9 +20,7 @@ trait FormatsMessages
      */
     protected function getMessage($attribute, $rule)
     {
-        $inlineMessage = $this->getFromLocalArray(
-            $attribute, $lowerRule = Str::snake($rule)
-        );
+        $inlineMessage = $this->getFromLocalArray($attribute, $rule);
 
         // First we will retrieve the custom message for the validation rule if one
         // exists. If a custom validation message is being used we'll return the
@@ -30,6 +28,8 @@ trait FormatsMessages
         if (! is_null($inlineMessage)) {
             return $inlineMessage;
         }
+
+        $lowerRule = Str::snake($rule);
 
         $customMessage = $this->getCustomMessageFromTranslator(
             $customKey = "validation.custom.{$attribute}.{$lowerRule}"
@@ -59,7 +59,7 @@ trait FormatsMessages
         }
 
         return $this->getFromLocalArray(
-            $attribute, $lowerRule, $this->fallbackMessages
+            $attribute, $rule, $this->fallbackMessages
         ) ?: $key;
     }
 
@@ -67,13 +67,14 @@ trait FormatsMessages
      * Get the inline message for a rule if it exists.
      *
      * @param  string  $attribute
-     * @param  string  $lowerRule
+     * @param  string  $rule
      * @param  array   $source
      * @return string|null
      */
-    protected function getFromLocalArray($attribute, $lowerRule, $source = null)
+    protected function getFromLocalArray($attribute, $rule, $source = null)
     {
         $source = $source ?: $this->customMessages;
+        $lowerRule = Str::snake($rule);
 
         $keys = ["{$attribute}.{$lowerRule}", $lowerRule];
 
@@ -83,10 +84,40 @@ trait FormatsMessages
         foreach ($keys as $key) {
             foreach (array_keys($source) as $sourceKey) {
                 if (Str::is($sourceKey, $key)) {
+
+                    // If this is a "size" rule, we check for a custom
+                    // error message for that type of attribute.
+                    if (in_array($rule, $this->sizeRules)) {
+                        return $this->getLocalSizeMessage(
+                            $source[$sourceKey], $attribute
+                        );
+                    }
+
                     return $source[$sourceKey];
                 }
             }
         }
+    }
+
+    /**
+     * Get the inline message for a size rule's attribute, if it exists.
+     *
+     * @param  mixed  $message
+     * @param  string  $attribute
+     * @return mixed|null
+     */
+    protected function getLocalSizeMessage($message, $attribute)
+    {
+        if (! is_array($message)) {
+            return $message;
+        }
+
+        // numeric|array|file|string
+        $type = $this->getAttributeType($attribute);
+
+        // If a message doesn't exist for this attribute type
+        // just continue with normal message check flow
+        return isset($message[$type]) ? $message[$type] : null;
     }
 
     /**
@@ -143,8 +174,8 @@ trait FormatsMessages
     {
         $lowerRule = Str::snake($rule);
 
-        // There are three different types of size validations. The attribute may be
-        // either a number, file, or string so we will check a few things to know
+        // There are four different types of size validation. The attribute may be either
+        // a number, array, file, or string so we will check a few things to know
         // which type of value it is and return the correct line for that type.
         $type = $this->getAttributeType($attribute);
 
