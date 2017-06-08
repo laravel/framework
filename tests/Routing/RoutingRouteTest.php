@@ -132,6 +132,28 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('closure', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
     }
 
+    /**
+     * @expectedException \Illuminate\Routing\RoutingException
+     * @expectedExceptionMessage The route has no action. Failed for route foo/bar
+     */
+    public function testFluentRouting()
+    {
+        $router = $this->getRouter();
+
+        $router->get('foo/bar')->uses(function () { return 'hello'; });
+        $this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+
+        $router->post('foo/bar')->uses(function () { return 'hello'; });
+        $this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'POST'))->getContent());
+
+        $router->get('foo/bar')->uses(function () { return 'middleware'; })->middleware('RouteTestControllerMiddleware');
+        $this->assertEquals('middleware', $router->dispatch(Request::create('foo/bar'))->getContent());
+        $this->assertContains('RouteTestControllerMiddleware', $router->getCurrentRoute()->middleware());
+
+        $router->get('foo/bar');
+        $router->dispatch(Request::create('foo/bar', 'GET'));
+    }
+
     public function testFluentRouteNamingWithinAGroup()
     {
         $router = $this->getRouter();
