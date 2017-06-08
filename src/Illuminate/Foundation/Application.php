@@ -552,7 +552,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         $providers = $this->make(PackageManifest::class)->providers();
 
         (new ProviderRepository($this, new Filesystem, $this->getCachedServicesPath()))
-                    ->load(array_merge($providers, $this->config['app.providers']));
+                    ->load(array_merge($this->config['app.providers'], $providers));
     }
 
     /**
