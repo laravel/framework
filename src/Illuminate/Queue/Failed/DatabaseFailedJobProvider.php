@@ -58,6 +58,8 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface
 
         $exception = (string) $exception;
 
+        $queue = $this->stripQueuePrefix($queue);
+
         return $this->getTable()->insertGetId(compact(
             'connection', 'queue', 'payload', 'exception', 'failed_at'
         ));
@@ -113,5 +115,16 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface
     protected function getTable()
     {
         return $this->resolver->connection($this->database)->table($this->table);
+    }
+
+    /**
+     * Remove the driver based queue prefix from the queue name before storing in table.
+     *
+     * @param  string  $queue
+     * @return string
+     */
+    protected function stripQueuePrefix($queue)
+    {
+        return ltrim($queue, app('config')->get('queue.prefix'));
     }
 }
