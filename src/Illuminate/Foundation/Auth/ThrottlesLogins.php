@@ -78,7 +78,7 @@ trait ThrottlesLogins
      */
     protected function fireLockoutEvent(Request $request)
     {
-        event(new Lockout($request));
+        dispatch(new Lockout($request));
     }
 
     /**
