@@ -574,6 +574,29 @@ class RoutingRouteTest extends TestCase
         $route = new Route('GET', 'foo/{bar}', ['baz' => true, function () {
         }]);
         $this->assertTrue($route->matches($request));
+
+        /*
+         * Subdomain checks
+         */
+        $request = Request::create('http://api.foo.com/bar', 'GET');
+        $route = new Route('GET', 'bar', ['subdomain' => 'api', function () {
+        }]);
+        $this->assertTrue($route->matches($request));
+
+        $request = Request::create('http://api.v2.foo.co.uk/bar', 'GET');
+        $route = new Route('GET', 'bar', ['subdomain' => ['api.v2', 'backend'], function () {
+        }]);
+        $this->assertTrue($route->matches($request));
+
+        $request = Request::create('http://api.foo.com/bar', 'GET');
+        $route = new Route('GET', 'bar', ['subdomain' => 'backend', function () {
+        }]);
+        $this->assertFalse($route->matches($request));
+
+        $request = Request::create('http://api.v1.foo.co.uk/bar', 'GET');
+        $route = new Route('GET', 'bar', ['subdomain' => ['api.v2', 'api.latest'], function () {
+        }]);
+        $this->assertFalse($route->matches($request));
     }
 
     public function testWherePatternsProperlyFilter()
@@ -897,6 +920,29 @@ class RoutingRouteTest extends TestCase
             ['boo:foo', 'baz:gaz'],
             $route->middleware()
         );
+    }
+
+    public function testRouteGroupWithSubdomainRestriction()
+    {
+        $router = $this->getRouter();
+        $router->group(['subdomain' => 'api'], function () use ($router) {
+            $router->get('bar', function () {
+                return 'hello';
+            });
+        });
+
+        $routes = $router->getRoutes()->getRoutes();
+        $route = $routes[0];
+        $this->assertEquals(
+            ['api'],
+            $route->subdomain()
+        );
+
+        $request = Request::create('http://api.foo.com/bar', 'GET');
+        $this->assertTrue($route->matches($request));
+
+        $request = Request::create('http://foo.com/bar', 'GET');
+        $this->assertFalse($route->matches($request));
     }
 
     public function testRoutePrefixing()
