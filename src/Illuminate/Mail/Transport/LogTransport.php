@@ -33,6 +33,10 @@ class LogTransport extends Transport
     {
         $this->beforeSendPerformed($message);
 
+        if($this->beforeSendEvent->bubbleCancelled()) {
+            return 0;
+        }
+
         $this->logger->debug($this->getMimeEntityString($message));
 
         $this->sendPerformed($message);

@@ -50,6 +50,10 @@ class SparkPostTransport extends Transport
     {
         $this->beforeSendPerformed($message);
 
+        if($this->beforeSendEvent->bubbleCancelled()) {
+            return 0;
+        }
+
         $recipients = $this->getRecipients($message);
 
         $message->setBcc([]);
