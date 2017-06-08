@@ -2250,6 +2250,12 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['x' => new DateTime()], ['x' => 'date']);
         $this->assertTrue($v->passes());
 
+        $v = new Validator($trans, ['x' => '2006-12-12 10:00:00.5 +1 week +1 hour'], ['x' => 'date']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'tomorrow'], ['x' => 'date']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['x' => '2000-01-01'], ['x' => 'date_format:Y-m-d']);
         $this->assertTrue($v->passes());
 
