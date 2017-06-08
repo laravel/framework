@@ -25,7 +25,17 @@ trait HidesAttributes
      */
     public function getHidden()
     {
-        return $this->hidden;
+        return array_merge($this->hidden, $this->getHiddenTraits());
+    }
+
+    /**
+     * Get the hidden attributes for the model traits.
+     *
+     * @return array
+     */
+    public function getHiddenTraits()
+    {
+        return $this->getTraitAttributes('hidden');
     }
 
     /**
@@ -61,7 +71,17 @@ trait HidesAttributes
      */
     public function getVisible()
     {
-        return $this->visible;
+        return array_merge($this->visible, $this->getVisibleTraits());
+    }
+
+    /**
+     * Get the visible attributes for the traits.
+     *
+     * @return array
+     */
+    public function getVisibleTraits()
+    {
+        return $this->getTraitAttributes('visible');
     }
 
     /**

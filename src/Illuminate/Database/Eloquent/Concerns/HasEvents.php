@@ -59,8 +59,18 @@ trait HasEvents
                 'deleting', 'deleted', 'saving', 'saved',
                 'restoring', 'restored',
             ],
-            $this->observables
+            array_merge($this->observables, $this->getObservableEventTraits())
         );
+    }
+
+    /**
+     * Get the observable event names for traits.
+     *
+     * @return array
+     */
+    protected function getObservableEventTraits()
+    {
+        return $this->getTraitAttributes('observables');
     }
 
     /**

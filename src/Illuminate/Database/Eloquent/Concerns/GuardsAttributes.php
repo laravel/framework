@@ -34,7 +34,17 @@ trait GuardsAttributes
      */
     public function getFillable()
     {
-        return $this->fillable;
+        return array_merge($this->fillable, $this->getFillableTraits());
+    }
+
+    /**
+     * Get the fillable attributes for the traits.
+     *
+     * @return array
+     */
+    protected function getFillableTraits()
+    {
+        return $this->getTraitAttributes('fillable');
     }
 
     /**
@@ -57,7 +67,17 @@ trait GuardsAttributes
      */
     public function getGuarded()
     {
-        return $this->guarded;
+        return array_merge($this->guarded, $this->getGuardedTraits());
+    }
+
+    /**
+     * Get the guarded attributes for the traits.
+     *
+     * @return array
+     */
+    protected function getGuardedTraits()
+    {
+        return $this->getTraitAttributes('guarded');
     }
 
     /**
