@@ -24,7 +24,7 @@ class LoadEnvironmentVariables
         $this->checkForSpecificEnvironmentFile($app);
 
         try {
-            (new Dotenv($app->environmentPath(), $app->environmentFile()))->load();
+            (new Dotenv($app->environmentPath(), $app->environmentFile()))->overload();
         } catch (InvalidPathException $e) {
             //
         }
