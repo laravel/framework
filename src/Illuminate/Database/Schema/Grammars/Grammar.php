@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Fluent;
 use Doctrine\DBAL\Schema\TableDiff;
 use Illuminate\Database\Connection;
@@ -251,5 +252,22 @@ abstract class Grammar extends BaseGrammar
     public function supportsSchemaTransactions()
     {
         return $this->transactions;
+    }
+
+    /**
+     * Convert an array of column names into a delimited string.
+     *
+     * @param  array $columns
+     * @return string
+     */
+    public function columnizeWithKeys(array $columns)
+    {
+        if (Arr::isAssoc($columns)) {
+            $columns = array_map(function ($column, $specification) {
+                return new Expression($this->wrap($column).' '.$specification);
+            }, array_keys($columns), $columns);
+        }
+
+        return parent::columnize($columns);
     }
 }
