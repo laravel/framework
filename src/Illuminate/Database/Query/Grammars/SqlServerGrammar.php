@@ -186,7 +186,7 @@ class SqlServerGrammar extends Grammar
      */
     public function compileRandom($seed)
     {
-        return 'NEWID()';
+        return 'RAND()';
     }
 
     /**
