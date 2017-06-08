@@ -21,6 +21,13 @@ abstract class ServiceProvider
     protected $defer = false;
 
     /**
+     * Indicates whether the default view locations have been registered.
+     *
+     * @var bool
+     */
+    protected $applicationViewNamespacesRegistered = false;
+
+    /**
      * The paths that should be published.
      *
      * @var array
@@ -81,11 +88,27 @@ abstract class ServiceProvider
      */
     protected function loadViewsFrom($path, $namespace)
     {
-        if (is_dir($appPath = $this->app->resourcePath().'/views/vendor/'.$namespace)) {
-            $this->app['view']->addNamespace($namespace, $appPath);
+        $this->registerApplicationViewNamespaces($namespace);
+        $this->app['view']->addNamespace($namespace, $path);
+    }
+
+    /**
+     * @param  string  $namespace
+     * @return void
+     */
+    protected function registerApplicationViewNamespaces($namespace)
+    {
+        if ($this->applicationViewNamespacesRegistered) {
+            return;
         }
 
-        $this->app['view']->addNamespace($namespace, $path);
+        $viewPaths = $this->app['config']->get('view.paths', []);
+        foreach ($viewPaths as $viewPath) {
+            $viewPath = rtrim($viewPath, '/').'/vendor/'.$namespace;
+            $this->app['view']->addNamespace($namespace, $viewPath);
+        }
+
+        $this->applicationViewNamespacesRegistered = true;
     }
 
     /**
@@ -131,6 +154,78 @@ abstract class ServiceProvider
         if ($group) {
             $this->addPublishGroup($group, $paths);
         }
+    }
+
+    /**
+     * Register a view path to be published to the app's configured view directory.
+     *
+     * @param $path
+     * @param $namespace
+     * @param null $group
+     */
+    protected function publishesViews($path, $namespace, $group = null)
+    {
+        $viewPaths = $this->app['config']->get('view.paths', [resource_path('views')]);
+        $this->publishes([
+            $path => rtrim($viewPaths[0], '/')."/vendor/$namespace",
+        ], $group);
+    }
+
+    /**
+     * Register a config file to be published to the app's config directory.
+     *
+     * @param $path
+     * @param null $namespace
+     */
+    protected function publishesConfig($path, $namespace = null, $group = null)
+    {
+        if (null === $namespace) {
+            $namespace = basename($path, '.php');
+        }
+
+        $this->publishes([$path => config_path("$namespace.php")], $group);
+    }
+
+    /**
+     * Register a path to be published to the app's lang directory.
+     *
+     * @param  string  $path
+     * @param  string  $namespace
+     * @param  string  $group
+     * @return void
+     */
+    protected function publishesTranslations($path, $namespace, $group = null)
+    {
+        $langPath = method_exists($this->app, 'langPath')
+            ? $this->app->langPath()
+            : resource_path('lang');
+
+        $this->publishes([$path => rtrim($langPath, '/')."/vendor/$namespace"], $group);
+    }
+
+    /**
+     * Register a path to be published to the app's public directory.
+     *
+     * @param  string  $path
+     * @param  string  $namespace
+     * @param  string  $group
+     * @return void
+     */
+    protected function publishesPublicAssets($path, $namespace, $group = null)
+    {
+        $this->publishes([$path => public_path("/vendor/$namespace")], $group);
+    }
+
+    /**
+     * Register a path to be published to the app's public directory.
+     *
+     * @param  string  $path
+     * @param  string  $group
+     * @return void
+     */
+    protected function publishesMigrations($path, $group = null)
+    {
+        $this->publishes([$path => database_path('migrations')], $group);
     }
 
     /**
