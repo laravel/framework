@@ -5,6 +5,7 @@ namespace Illuminate\Console\Scheduling;
 use Closure;
 use Carbon\Carbon;
 use Cron\CronExpression;
+use DateTime;
 use GuzzleHttp\Client as HttpClient;
 use Illuminate\Contracts\Mail\Mailer;
 use Symfony\Component\Process\Process;
@@ -645,4 +646,22 @@ class Event
 
         return $this;
     }
+
+    /**
+     * Determine next due date for Event.
+     * @param DateTime|string $currentTime Relative calculation date
+     * @param int $nth Number of matches to skip before returning a matching next run date
+     * @param bool $allowCurrentDate Return the current date if it matches the cron expression.
+     * @return Carbon
+     */
+    public function nextDue($currentTime = 'now', $nth = 0, $allowCurrentDate = false)
+    {
+        $nextDue = CronExpression::factory(
+            $this->getExpression()
+        )->getNextRunDate($currentTime, $nth, $allowCurrentDate);
+
+        return Carbon::instance($nextDue);
+    }
+
+
 }
