@@ -21,7 +21,7 @@ class DatabaseSoftDeletingTraitTest extends TestCase
         $query->shouldReceive('where')->once()->with('id', 1)->andReturn($query);
         $query->shouldReceive('update')->once()->with([
             'deleted_at' => 'date-time',
-            'updated_at' => 'date-time'
+            'updated_at' => 'date-time',
         ]);
         $model->delete();
 

@@ -67,7 +67,7 @@ trait SoftDeletes
 
         $query->update([
             $this->getDeletedAtColumn() => $this->fromDateTime($time),
-            $this->getUpdatedAtColumn() => $this->fromDateTime($time)
+            $this->getUpdatedAtColumn() => $this->fromDateTime($time),
         ]);
     }
 
