@@ -479,7 +479,7 @@ trait ValidatesAttributes
         );
 
         $maxDimension = max($width, $height);
-        $precision = $maxDimension / pow($maxDimension, 2);
+        $precision = $maxDimension / $maxDimension ** 2;
 
         return abs($numerator / $denominator - $width / $height) > $precision;
     }
