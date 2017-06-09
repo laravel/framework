@@ -83,6 +83,15 @@ class BladeEchoTest extends TestCase
             $compiler->compileString('{{ myfunc("foo or bar") }}'));
         $this->assertEquals('<?php echo e(myfunc("$name or \'foo\'")); ?>',
             $compiler->compileString('{{ myfunc("$name or \'foo\'") }}'));
+
+        $this->assertEquals('<?php echo \'<pre>\', var_dump($name), \'</pre>\' ; ?>', $compiler->compileString('{##$name##}'));
+        $this->assertEquals('<?php echo \'<pre>\', var_dump($name), \'</pre>\' ; ?>', $compiler->compileString('{## $name ##}'));
+        $this->assertEquals('<?php echo \'<pre>\', var_dump($name), \'</pre>\' ; ?>', $compiler->compileString('{##
+            $name
+        ##}'));
+        $this->assertEquals('<?php echo \'<pre>\', var_dump(isset($name) ? $name : \'foo\'), \'</pre>\' ; ?>',
+            $compiler->compileString('{## $name or \'foo\' ##}'));
+
     }
 
     public function testEscapedWithAtEchosAreCompiled()

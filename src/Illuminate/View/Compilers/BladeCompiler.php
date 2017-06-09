@@ -84,6 +84,13 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected $echoFormat = 'e(%s)';
 
     /**
+     * Array of opening and closing tags for var_dump echos.
+     *
+     * @var string
+     */
+    protected $vardumpTags = ['{##', '##}'];
+
+    /**
      * Array of footer lines to be added to template.
      *
      * @var array
