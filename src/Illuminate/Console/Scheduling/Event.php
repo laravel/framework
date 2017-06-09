@@ -3,9 +3,9 @@
 namespace Illuminate\Console\Scheduling;
 
 use Closure;
+use DateTime;
 use Carbon\Carbon;
 use Cron\CronExpression;
-use DateTime;
 use GuzzleHttp\Client as HttpClient;
 use Illuminate\Contracts\Mail\Mailer;
 use Symfony\Component\Process\Process;
@@ -662,6 +662,4 @@ class Event
 
         return Carbon::instance($nextDue);
     }
-
-
 }

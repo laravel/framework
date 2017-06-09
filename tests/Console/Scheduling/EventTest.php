@@ -59,8 +59,8 @@ class EventTest extends TestCase
     public function testNextDue()
     {
         $event = new Event(m::mock('Illuminate\Console\Scheduling\Mutex'), 'php -i');
-        $event->dailyAt("10:15");
+        $event->dailyAt('10:15');
 
-        $this->assertSame("10:15:00", $event->nextDue()->toTimeString());
+        $this->assertSame('10:15:00', $event->nextDue()->toTimeString());
     }
 }
