@@ -366,4 +366,26 @@ class Collection extends BaseCollection implements QueueableCollection
     {
         return $this->modelKeys();
     }
+
+    /**
+     * Get the connection of the entities being queued.
+     *
+     * @return string|null
+     */
+    public function getQueueableConnection()
+    {
+        if ($this->count() === 0) {
+            return;
+        }
+
+        $connection = $this->first()->getConnectionName();
+
+        $this->each(function ($model) use ($connection) {
+            if ($model->getConnectionName() !== $connection) {
+                throw new LogicException('Queueing collections with multiple model connections is not supported.');
+            }
+        });
+
+        return $connection;
+    }
 }

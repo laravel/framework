@@ -18,7 +18,7 @@ class MailMailerTest extends TestCase
     {
         unset($_SERVER['__mailer.test']);
         $mailer = $this->getMockBuilder('Illuminate\Mail\Mailer')->setMethods(['createMessage'])->setConstructorArgs($this->getMocks())->getMock();
-        $message = m::mock('Swift_Mime_Message');
+        $message = m::mock('Swift_Mime_SimpleMessage');
         $mailer->expects($this->once())->method('createMessage')->will($this->returnValue($message));
         $view = m::mock('StdClass');
         $mailer->getViewFactory()->shouldReceive('make')->once()->with('foo', ['data', 'message' => $message])->andReturn($view);
@@ -38,7 +38,7 @@ class MailMailerTest extends TestCase
     {
         unset($_SERVER['__mailer.test']);
         $mailer = $this->getMockBuilder('Illuminate\Mail\Mailer')->setMethods(['createMessage'])->setConstructorArgs($this->getMocks())->getMock();
-        $message = m::mock('Swift_Mime_Message');
+        $message = m::mock('Swift_Mime_SimpleMessage');
         $mailer->expects($this->once())->method('createMessage')->will($this->returnValue($message));
         $view = m::mock('StdClass');
         $mailer->getViewFactory()->shouldReceive('make')->never();
@@ -59,7 +59,7 @@ class MailMailerTest extends TestCase
     {
         unset($_SERVER['__mailer.test']);
         $mailer = $this->getMockBuilder('Illuminate\Mail\Mailer')->setMethods(['createMessage'])->setConstructorArgs($this->getMocks())->getMock();
-        $message = m::mock('Swift_Mime_Message');
+        $message = m::mock('Swift_Mime_SimpleMessage');
         $mailer->expects($this->once())->method('createMessage')->will($this->returnValue($message));
         $view = m::mock('StdClass');
         $mailer->getViewFactory()->shouldReceive('make')->once()->with('foo', ['data', 'message' => $message])->andReturn($view);
@@ -81,7 +81,7 @@ class MailMailerTest extends TestCase
     {
         unset($_SERVER['__mailer.test']);
         $mailer = $this->getMockBuilder('Illuminate\Mail\Mailer')->setMethods(['createMessage'])->setConstructorArgs($this->getMocks())->getMock();
-        $message = m::mock('Swift_Mime_Message');
+        $message = m::mock('Swift_Mime_SimpleMessage');
         $mailer->expects($this->once())->method('createMessage')->will($this->returnValue($message));
         $view = m::mock('StdClass');
         $mailer->getViewFactory()->shouldReceive('make')->once()->with('foo', ['data', 'message' => $message])->andReturn($view);

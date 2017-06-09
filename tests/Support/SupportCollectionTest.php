@@ -9,7 +9,6 @@ use ReflectionClass;
 use JsonSerializable;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Collection;
-use PHPUnit_Framework_Error_Notice;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 
@@ -228,15 +227,6 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals('bar', $c->offsetGet(1));
     }
 
-    /**
-     * @expectedException PHPUnit_Framework_Error_Notice
-     */
-    public function testArrayAccessOffsetGetOnNonExist()
-    {
-        $c = new Collection(['foo', 'bar']);
-        $c->offsetGet(1000);
-    }
-
     public function testArrayAccessOffsetSet()
     {
         $c = new Collection(['foo', 'foo']);
@@ -248,15 +238,12 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals('qux', $c[2]);
     }
 
-    /**
-     * @expectedException PHPUnit_Framework_Error_Notice
-     */
     public function testArrayAccessOffsetUnset()
     {
         $c = new Collection(['foo', 'bar']);
 
         $c->offsetUnset(1);
-        $c[1];
+        $this->assertFalse(isset($c[1]));
     }
 
     public function testForgetSingleKey()
@@ -581,6 +568,18 @@ class SupportCollectionTest extends TestCase
     {
         $c = new Collection(['id' => 1, 'first_word' => 'Hello']);
         $this->assertEquals(['first_word' => 'Hello'], $c->intersect(new Collection(['first_world' => 'Hello', 'last_word' => 'World']))->all());
+    }
+
+    public function testIntersectByKeysNull()
+    {
+        $c = new Collection(['name' => 'Mateus', 'age' => 18]);
+        $this->assertEquals([], $c->intersectByKeys(null)->all());
+    }
+
+    public function testIntersectByKeys()
+    {
+        $c = new Collection(['name' => 'Mateus', 'age' => 18]);
+        $this->assertEquals(['name' => 'Mateus'], $c->intersectByKeys(new Collection(['name' => 'Mateus', 'surname' => 'Guimaraes']))->all());
     }
 
     public function testUnique()
@@ -1208,6 +1207,18 @@ class SupportCollectionTest extends TestCase
             [3, 5, 4],
             $data->keys()->all()
         );
+    }
+
+    public function testMapInto()
+    {
+        $data = new Collection([
+            'first', 'second',
+        ]);
+
+        $data = $data->mapInto(TestCollectionMapIntoObject::class);
+
+        $this->assertEquals('first', $data[0]->value);
+        $this->assertEquals('second', $data[1]->value);
     }
 
     public function testNth()
@@ -2199,5 +2210,15 @@ class TestJsonSerializeObject implements JsonSerializable
     public function jsonSerialize()
     {
         return ['foo' => 'bar'];
+    }
+}
+
+class TestCollectionMapIntoObject
+{
+    public $value;
+
+    public function __construct($value)
+    {
+        $this->value = $value;
     }
 }

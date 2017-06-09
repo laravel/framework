@@ -399,7 +399,7 @@ class View implements ArrayAccess, ViewContract
             throw new BadMethodCallException("Method [$method] does not exist on view.");
         }
 
-        return $this->with(Str::snake(substr($method, 4)), $parameters[0]);
+        return $this->with(Str::camel(substr($method, 4)), $parameters[0]);
     }
 
     /**

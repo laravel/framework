@@ -40,7 +40,7 @@ trait InteractsWithAuthentication
      * @param  string|null  $guard
      * @return $this
      */
-    public function seeIsAuthenticated($guard = null)
+    public function assertAuthenticated($guard = null)
     {
         $this->assertTrue($this->isAuthenticated($guard), 'The user is not authenticated');
 
@@ -53,7 +53,7 @@ trait InteractsWithAuthentication
      * @param  string|null  $guard
      * @return $this
      */
-    public function dontSeeIsAuthenticated($guard = null)
+    public function assertGuest($guard = null)
     {
         $this->assertFalse($this->isAuthenticated($guard), 'The user is authenticated');
 
@@ -78,7 +78,7 @@ trait InteractsWithAuthentication
      * @param  string|null  $guard
      * @return $this
      */
-    public function seeIsAuthenticatedAs($user, $guard = null)
+    public function assertAuthenticatedAs($user, $guard = null)
     {
         $expected = $this->app->make('auth')->guard($guard)->user();
 
@@ -102,7 +102,7 @@ trait InteractsWithAuthentication
      * @param  string|null  $guard
      * @return $this
      */
-    public function seeCredentials(array $credentials, $guard = null)
+    public function assertCredentials(array $credentials, $guard = null)
     {
         $this->assertTrue(
             $this->hasCredentials($credentials, $guard), 'The given credentials are invalid.'
@@ -118,7 +118,7 @@ trait InteractsWithAuthentication
      * @param  string|null  $guard
      * @return $this
      */
-    public function dontSeeCredentials(array $credentials, $guard = null)
+    public function assertInvalidCredentials(array $credentials, $guard = null)
     {
         $this->assertFalse(
             $this->hasCredentials($credentials, $guard), 'The given credentials are valid.'

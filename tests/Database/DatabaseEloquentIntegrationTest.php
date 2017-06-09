@@ -479,7 +479,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $results = EloquentTestUser::has('friends')->get();
 
-        $this->assertEquals(1, count($results));
+        $this->assertCount(1, $results);
         $this->assertEquals('taylorotwell@gmail.com', $results->first()->email);
     }
 
@@ -492,7 +492,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $query->where('email', 'abigailotwell@gmail.com');
         })->get();
 
-        $this->assertEquals(1, count($results));
+        $this->assertCount(1, $results);
         $this->assertEquals('taylorotwell@gmail.com', $results->first()->email);
     }
 
@@ -504,7 +504,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $results = EloquentTestUser::has('friends.friends')->get();
 
-        $this->assertEquals(1, count($results));
+        $this->assertCount(1, $results);
         $this->assertEquals('taylorotwell@gmail.com', $results->first()->email);
     }
 
@@ -518,7 +518,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $query->where('email', 'foo@gmail.com');
         })->get();
 
-        $this->assertEquals(1, count($results));
+        $this->assertCount(1, $results);
         $this->assertEquals('taylorotwell@gmail.com', $results->first()->email);
     }
 
@@ -529,7 +529,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $results = EloquentTestUser::has('friendsOne')->get();
 
-        $this->assertEquals(1, count($results));
+        $this->assertCount(1, $results);
         $this->assertEquals('taylorotwell@gmail.com', $results->first()->email);
     }
 
@@ -541,7 +541,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $results = EloquentTestUser::has('friendsOne.friendsTwo')->get();
 
-        $this->assertEquals(1, count($results));
+        $this->assertCount(1, $results);
         $this->assertEquals('taylorotwell@gmail.com', $results->first()->email);
     }
 
@@ -552,7 +552,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $results = EloquentTestPost::has('parentPost')->get();
 
-        $this->assertEquals(1, count($results));
+        $this->assertCount(1, $results);
         $this->assertEquals('Child Post', $results->first()->name);
     }
 
@@ -574,7 +574,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $query->where('name', 'Parent Post');
         })->get();
 
-        $this->assertEquals(1, count($results));
+        $this->assertCount(1, $results);
         $this->assertEquals('Child Post', $results->first()->name);
     }
 
@@ -586,7 +586,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $results = EloquentTestPost::has('parentPost.parentPost')->get();
 
-        $this->assertEquals(1, count($results));
+        $this->assertCount(1, $results);
         $this->assertEquals('Child Post', $results->first()->name);
     }
 
@@ -600,7 +600,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $query->where('name', 'Grandparent Post');
         })->get();
 
-        $this->assertEquals(1, count($results));
+        $this->assertCount(1, $results);
         $this->assertEquals('Child Post', $results->first()->name);
     }
 
@@ -611,7 +611,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $results = EloquentTestPost::has('childPosts')->get();
 
-        $this->assertEquals(1, count($results));
+        $this->assertCount(1, $results);
         $this->assertEquals('Parent Post', $results->first()->name);
     }
 
@@ -624,7 +624,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $query->where('name', 'Child Post');
         })->get();
 
-        $this->assertEquals(1, count($results));
+        $this->assertCount(1, $results);
         $this->assertEquals('Parent Post', $results->first()->name);
     }
 
@@ -636,7 +636,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $results = EloquentTestPost::has('childPosts.childPosts')->get();
 
-        $this->assertEquals(1, count($results));
+        $this->assertCount(1, $results);
         $this->assertEquals('Grandparent Post', $results->first()->name);
     }
 
@@ -650,7 +650,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $query->where('name', 'Child Post');
         })->get();
 
-        $this->assertEquals(1, count($results));
+        $this->assertCount(1, $results);
         $this->assertEquals('Grandparent Post', $results->first()->name);
     }
 
@@ -675,7 +675,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $friend = $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
 
         EloquentTestUser::first()->friends()->chunk(2, function ($friends) use ($user, $friend) {
-            $this->assertEquals(1, count($friends));
+            $this->assertCount(1, $friends);
             $this->assertEquals('abigailotwell@gmail.com', $friends->first()->email);
             $this->assertEquals($user->id, $friends->first()->pivot->user_id);
             $this->assertEquals($friend->id, $friends->first()->pivot->friend_id);

@@ -898,11 +898,12 @@ if (! function_exists('str_slug')) {
      *
      * @param  string  $title
      * @param  string  $separator
+     * @param  string  $language
      * @return string
      */
-    function str_slug($title, $separator = '-')
+    function str_slug($title, $separator = '-', $language = 'en')
     {
-        return Str::slug($title, $separator);
+        return Str::slug($title, $separator, $language);
     }
 }
 
@@ -936,6 +937,40 @@ if (! function_exists('tap')) {
         $callback($value);
 
         return $value;
+    }
+}
+
+if (! function_exists('throw_if')) {
+    /**
+     * Throw the given exception if the given boolean is true.
+     *
+     * @param  bool  $boolean
+     * @param  \Throwable|string  $exception
+     * @param  array  ...$parameters
+     * @return void
+     */
+    function throw_if($boolean, $exception, ...$parameters)
+    {
+        if ($boolean) {
+            throw (is_string($exception) ? new $exception(...$parameters) : $exception);
+        }
+    }
+}
+
+if (! function_exists('throw_unless')) {
+    /**
+     * Throw the given exception unless the given boolean is true.
+     *
+     * @param  bool  $boolean
+     * @param  \Throwable|string  $exception
+     * @param  array  ...$parameters
+     * @return void
+     */
+    function throw_unless($boolean, $exception, ...$parameters)
+    {
+        if (! $boolean) {
+            throw (is_string($exception) ? new $exception(...$parameters) : $exception);
+        }
     }
 }
 

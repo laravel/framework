@@ -28,7 +28,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      *
      * @var string
      */
-    const VERSION = '5.4.25';
+    const VERSION = '5.5-dev';
 
     /**
      * The base path for the Laravel installation.
@@ -176,6 +176,10 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         $this->instance('app', $this);
 
         $this->instance(Container::class, $this);
+
+        $this->instance(PackageManifest::class, new PackageManifest(
+            new Filesystem, $this->basePath(), $this->getCachedPackagesPath()
+        ));
     }
 
     /**
@@ -545,8 +549,10 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function registerConfiguredProviders()
     {
+        $providers = $this->make(PackageManifest::class)->providers();
+
         (new ProviderRepository($this, new Filesystem, $this->getCachedServicesPath()))
-                    ->load($this->config['app.providers']);
+                    ->load(array_merge($providers, $this->config['app.providers']));
     }
 
     /**
@@ -692,13 +698,13 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     /**
      * Resolve the given type from the container.
      *
-     * (Overriding Container::makeWith)
+     * (Overriding Container::make)
      *
      * @param  string  $abstract
      * @param  array  $parameters
      * @return mixed
      */
-    public function makeWith($abstract, array $parameters)
+    public function make($abstract, array $parameters = [])
     {
         $abstract = $this->getAlias($abstract);
 
@@ -706,26 +712,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             $this->loadDeferredProvider($abstract);
         }
 
-        return parent::makeWith($abstract, $parameters);
-    }
-
-    /**
-     * Resolve the given type from the container.
-     *
-     * (Overriding Container::make)
-     *
-     * @param  string  $abstract
-     * @return mixed
-     */
-    public function make($abstract)
-    {
-        $abstract = $this->getAlias($abstract);
-
-        if (isset($this->deferredServices[$abstract])) {
-            $this->loadDeferredProvider($abstract);
-        }
-
-        return parent::make($abstract);
+        return parent::make($abstract, $parameters);
     }
 
     /**
@@ -855,6 +842,16 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     public function getCachedServicesPath()
     {
         return $this->bootstrapPath().'/cache/services.php';
+    }
+
+    /**
+     * Get the path to the cached packages.php file.
+     *
+     * @return string
+     */
+    public function getCachedPackagesPath()
+    {
+        return $this->bootstrapPath().'/cache/packages.php';
     }
 
     /**

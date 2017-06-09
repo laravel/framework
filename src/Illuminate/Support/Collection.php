@@ -62,7 +62,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Create a new collection by invoking the callback a given amount of times.
      *
      * @param  int  $amount
-     * @param  callable  $callback
+     * @param  callable|null  $callback
      * @return static
      */
     public static function times($amount, callable $callback = null)
@@ -126,7 +126,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return;
         }
 
-        $values = with(isset($key) ? $this->pluck($key) : $this)
+        $values = (isset($key) ? $this->pluck($key) : $this)
                     ->sort()->values();
 
         $middle = (int) ($count / 2);
@@ -622,7 +622,15 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function has($key)
     {
-        return $this->offsetExists($key);
+        $keys = is_array($key) ? $key : func_get_args();
+
+        foreach ($keys as $value) {
+            if (! $this->offsetExists($value)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -652,6 +660,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function intersect($items)
     {
         return new static(array_intersect($this->items, $this->getArrayableItems($items)));
+    }
+
+    /**
+     * Intersect the collection with the given items by key.
+     *
+     * @param  mixed  $items
+     * @return static
+     */
+    public function intersectByKeys($items)
+    {
+        return new static(array_intersect_key(
+            $this->items, $this->getArrayableItems($items)
+        ));
     }
 
     /**
@@ -798,6 +819,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function flatMap(callable $callback)
     {
         return $this->map($callback)->collapse();
+    }
+
+    /**
+     * Map the values into a new class.
+     *
+     * @param  string  $class
+     * @return static
+     */
+    public function mapInto($class)
+    {
+        return $this->map(function ($value, $key) use ($class) {
+            return new $class($value, $key);
+        });
     }
 
     /**
@@ -1054,7 +1088,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return $this->items[$keys];
         }
 
-        $keys = array_wrap($keys);
+        $keys = Arr::wrap($keys);
 
         return new static(array_intersect_key($this->items, array_flip($keys)));
     }

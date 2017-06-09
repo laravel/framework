@@ -54,27 +54,27 @@ class FoundationAuthenticationTest extends TestCase
         m::close();
     }
 
-    public function testSeeIsAuthenticated()
+    public function testAssertAuthenticated()
     {
         $this->mockGuard()
             ->shouldReceive('check')
             ->once()
             ->andReturn(true);
 
-        $this->seeIsAuthenticated();
+        $this->assertAuthenticated();
     }
 
-    public function testDontSeeIsAuthenticated()
+    public function testAssertGuest()
     {
         $this->mockGuard()
             ->shouldReceive('check')
             ->once()
             ->andReturn(false);
 
-        $this->dontSeeIsAuthenticated();
+        $this->assertGuest();
     }
 
-    public function testSeeIsAuthenticatedAs()
+    public function testAssertAuthenticatedAs()
     {
         $expected = m::mock(Authenticatable::class);
         $expected->shouldReceive('getAuthIdentifier')
@@ -89,7 +89,7 @@ class FoundationAuthenticationTest extends TestCase
         $user->shouldReceive('getAuthIdentifier')
             ->andReturn('1');
 
-        $this->seeIsAuthenticatedAs($user);
+        $this->assertAuthenticatedAs($user);
     }
 
     protected function setupProvider(array $credentials)
@@ -112,14 +112,14 @@ class FoundationAuthenticationTest extends TestCase
             ->andReturn($provider);
     }
 
-    public function testSeeCredentials()
+    public function testAssertCredentials()
     {
         $this->setupProvider($this->credentials);
 
-        $this->seeCredentials($this->credentials);
+        $this->assertCredentials($this->credentials);
     }
 
-    public function testDontSeeCredentials()
+    public function testAssertCredentialsMissing()
     {
         $credentials = [
             'email' => 'invalid',
@@ -128,6 +128,6 @@ class FoundationAuthenticationTest extends TestCase
 
         $this->setupProvider($credentials);
 
-        $this->dontSeeCredentials($credentials);
+        $this->assertInvalidCredentials($credentials);
     }
 }

@@ -177,7 +177,7 @@ class StartSession
             $response->headers->setCookie(new Cookie(
                 $session->getName(), $session->getId(), $this->getCookieExpirationDate(),
                 $config['path'], $config['domain'], Arr::get($config, 'secure', false),
-                Arr::get($config, 'http_only', true)
+                Arr::get($config, 'http_only', true), false, $config['same_site'] ?? null
             ));
         }
     }

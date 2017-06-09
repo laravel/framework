@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Routing;
 
 use stdClass;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use UnexpectedValueException;
@@ -101,7 +102,9 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('fred25', $router->dispatch(Request::create('fred', 'GET'))->getContent());
         $this->assertEquals('fred30', $router->dispatch(Request::create('fred/30', 'GET'))->getContent());
         $this->assertTrue($router->currentRouteNamed('foo'));
+        $this->assertTrue($router->currentRouteNamed('fo*'));
         $this->assertTrue($router->is('foo'));
+        $this->assertTrue($router->is('foo', 'bar'));
         $this->assertFalse($router->is('bar'));
 
         $router = $this->getRouter();
@@ -408,37 +411,37 @@ class RoutingRouteTest extends TestCase
 
         // Has one argument but receives two
         unset($_SERVER['__test.controller_callAction_parameters']);
-        $router->get(($str = str_random()).'/{one}/{two}', 'Illuminate\Tests\Routing\RouteTestAnotherControllerWithParameterStub@oneArgument');
+        $router->get(($str = Str::random()).'/{one}/{two}', 'Illuminate\Tests\Routing\RouteTestAnotherControllerWithParameterStub@oneArgument');
         $router->dispatch(Request::create($str.'/one/two', 'GET'));
         $this->assertEquals(['one' => 'one', 'two' => 'two'], $_SERVER['__test.controller_callAction_parameters']);
 
         // Has two arguments and receives two
         unset($_SERVER['__test.controller_callAction_parameters']);
-        $router->get(($str = str_random()).'/{one}/{two}', 'Illuminate\Tests\Routing\RouteTestAnotherControllerWithParameterStub@twoArguments');
+        $router->get(($str = Str::random()).'/{one}/{two}', 'Illuminate\Tests\Routing\RouteTestAnotherControllerWithParameterStub@twoArguments');
         $router->dispatch(Request::create($str.'/one/two', 'GET'));
         $this->assertEquals(['one' => 'one', 'two' => 'two'], $_SERVER['__test.controller_callAction_parameters']);
 
         // Has two arguments but with different names from the ones passed from the route
         unset($_SERVER['__test.controller_callAction_parameters']);
-        $router->get(($str = str_random()).'/{one}/{two}', 'Illuminate\Tests\Routing\RouteTestAnotherControllerWithParameterStub@differentArgumentNames');
+        $router->get(($str = Str::random()).'/{one}/{two}', 'Illuminate\Tests\Routing\RouteTestAnotherControllerWithParameterStub@differentArgumentNames');
         $router->dispatch(Request::create($str.'/one/two', 'GET'));
         $this->assertEquals(['one' => 'one', 'two' => 'two'], $_SERVER['__test.controller_callAction_parameters']);
 
         // Has two arguments with same name but argument order is reversed
         unset($_SERVER['__test.controller_callAction_parameters']);
-        $router->get(($str = str_random()).'/{one}/{two}', 'Illuminate\Tests\Routing\RouteTestAnotherControllerWithParameterStub@reversedArguments');
+        $router->get(($str = Str::random()).'/{one}/{two}', 'Illuminate\Tests\Routing\RouteTestAnotherControllerWithParameterStub@reversedArguments');
         $router->dispatch(Request::create($str.'/one/two', 'GET'));
         $this->assertEquals(['one' => 'one', 'two' => 'two'], $_SERVER['__test.controller_callAction_parameters']);
 
         // No route parameters while method has parameters
         unset($_SERVER['__test.controller_callAction_parameters']);
-        $router->get(($str = str_random()).'', 'Illuminate\Tests\Routing\RouteTestAnotherControllerWithParameterStub@oneArgument');
+        $router->get(($str = Str::random()).'', 'Illuminate\Tests\Routing\RouteTestAnotherControllerWithParameterStub@oneArgument');
         $router->dispatch(Request::create($str, 'GET'));
         $this->assertEquals([], $_SERVER['__test.controller_callAction_parameters']);
 
         // With model bindings
         unset($_SERVER['__test.controller_callAction_parameters']);
-        $router->get(($str = str_random()).'/{user}/{defaultNull?}/{team?}', [
+        $router->get(($str = Str::random()).'/{user}/{defaultNull?}/{team?}', [
             'middleware' => SubstituteBindings::class,
             'uses' => 'Illuminate\Tests\Routing\RouteTestAnotherControllerWithParameterStub@withModels',
         ]);
@@ -449,7 +452,7 @@ class RoutingRouteTest extends TestCase
         $this->assertInstanceOf('Illuminate\Http\Request', $values[0]);
         $this->assertEquals(1, $values[1]->value);
         $this->assertNull($values[2]);
-        $this->assertInstanceOf('Illuminate\Tests\Routing\RoutingTestTeamModel', $values[3]);
+        $this->assertNull($values[3]);
     }
 
     public function testLeadingParamDoesntReceiveForwardSlashOnEmptyPath()
@@ -496,6 +499,15 @@ class RoutingRouteTest extends TestCase
             return 'hello';
         }]);
         $this->assertEquals('hello', $router->dispatch(Request::create('http://api.baz.boom/foo/bar', 'GET'))->getContent());
+    }
+
+    public function testRouteDomainRegistration()
+    {
+        $router = $this->getRouter();
+        $route = $router->get('/foo/bar')->domain('api.foo.bar')->uses(function () {
+            return 'hello';
+        });
+        $this->assertEquals('hello', $router->dispatch(Request::create('http://api.foo.bar/foo/bar', 'GET'))->getContent());
     }
 
     public function testMatchesMethodAgainstRequests()
@@ -1252,7 +1264,7 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('taylor', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
-    public function testImplicitBindingsWithOptionalParameter()
+    public function testImplicitBindingsWithOptionalParameterWithExistingKeyInUri()
     {
         $phpunit = $this;
         $router = $this->getRouter();
@@ -1265,13 +1277,35 @@ class RoutingRouteTest extends TestCase
             },
         ]);
         $this->assertEquals('taylor', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
 
+    public function testImplicitBindingsWithOptionalParameterWithNoKeyInUri()
+    {
+        $phpunit = $this;
         $router = $this->getRouter();
-        $router->get('bar/{foo?}', function (RoutingTestUserModel $foo = null) use ($phpunit) {
-            $phpunit->assertInstanceOf(RoutingTestUserModel::class, $foo);
-            $phpunit->assertNull($foo->value);
-        });
-        $router->dispatch(Request::create('bar', 'GET'))->getContent();
+        $router->get('foo/{bar?}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (RoutingTestUserModel $bar = null) use ($phpunit) {
+                $phpunit->assertNull($bar);
+            },
+        ]);
+        $router->dispatch(Request::create('foo', 'GET'))->getContent();
+    }
+
+    /**
+     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    public function testImplicitBindingsWithOptionalParameterWithNonExistingKeyInUri()
+    {
+        $phpunit = $this;
+        $router = $this->getRouter();
+        $router->get('foo/{bar?}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (RoutingTestNonExistingUserModel $bar = null) use ($phpunit) {
+                $phpunit->fail('ModelNotFoundException was expected.');
+            },
+        ]);
+        $router->dispatch(Request::create('foo/nonexisting', 'GET'))->getContent();
     }
 
     public function testImplicitBindingThroughIOC()
@@ -1305,6 +1339,30 @@ class RoutingRouteTest extends TestCase
         ]);
 
         $this->assertEquals('hello', $router->dispatch(Request::create('foo/bar2', 'GET'))->getContent());
+    }
+
+    public function testResponseIsReturned()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/bar', function () {
+            return 'hello';
+        });
+
+        $response = $router->dispatch(Request::create('foo/bar', 'GET'));
+        $this->assertInstanceOf(\Illuminate\Http\Response::class, $response);
+        $this->assertNotInstanceOf(\Illuminate\Http\JsonResponse::class, $response);
+    }
+
+    public function testJsonResponseIsReturned()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/bar', function () {
+            return ['foo', 'bar'];
+        });
+
+        $response = $router->dispatch(Request::create('foo/bar', 'GET'));
+        $this->assertNotInstanceOf(\Illuminate\Http\Response::class, $response);
+        $this->assertInstanceOf(\Illuminate\Http\JsonResponse::class, $response);
     }
 
     protected function getRouter()
@@ -1599,6 +1657,18 @@ class RoutingTestTeamModel extends Model
 
 class RoutingTestExtendedUserModel extends RoutingTestUserModel
 {
+}
+
+class RoutingTestNonExistingUserModel extends RoutingTestUserModel
+{
+    public function first()
+    {
+    }
+
+    public function firstOrFail()
+    {
+        throw new \Illuminate\Database\Eloquent\ModelNotFoundException();
+    }
 }
 
 class ActionStub
