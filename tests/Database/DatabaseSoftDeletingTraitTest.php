@@ -19,7 +19,10 @@ class DatabaseSoftDeletingTraitTest extends TestCase
         // $model->shouldReceive('newQuery')->andReturn($query = m::mock('StdClass'));
         $model->shouldReceive('newQueryWithoutScopes')->andReturn($query = m::mock('StdClass'));
         $query->shouldReceive('where')->once()->with('id', 1)->andReturn($query);
-        $query->shouldReceive('update')->once()->with(['deleted_at' => 'date-time']);
+        $query->shouldReceive('update')->once()->with([
+            'deleted_at' => 'date-time',
+            'updated_at' => 'date-time',
+        ]);
         $model->delete();
 
         $this->assertInstanceOf('Carbon\Carbon', $model->deleted_at);
@@ -53,6 +56,7 @@ class DatabaseSoftDeletingTraitStub
 {
     use \Illuminate\Database\Eloquent\SoftDeletes;
     public $deleted_at;
+    public $updated_at;
 
     public function newQuery()
     {
@@ -92,5 +96,10 @@ class DatabaseSoftDeletingTraitStub
     public function fromDateTime()
     {
         return 'date-time';
+    }
+
+    public function getUpdatedAtColumn()
+    {
+        return defined('static::UPDATED_AT') ? static::UPDATED_AT : 'updated_at';
     }
 }
