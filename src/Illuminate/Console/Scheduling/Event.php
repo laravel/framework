@@ -625,6 +625,21 @@ class Event
     }
 
     /**
+     * Determine the next due date for an event.
+     *
+     * @param  \DateTime|string  $currentTime
+     * @param  int  $nth
+     * @param  bool  $allowCurrentDate
+     * @return \Carbon\Carbon
+     */
+    public function nextRunDate($currentTime = 'now', $nth = 0, $allowCurrentDate = false)
+    {
+        return Carbon::instance($nextDue = CronExpression::factory(
+            $this->getExpression()
+        )->getNextRunDate($currentTime, $nth, $allowCurrentDate));
+    }
+
+    /**
      * Get the Cron expression for the event.
      *
      * @return string
@@ -645,21 +660,5 @@ class Event
         $this->mutex = $mutex;
 
         return $this;
-    }
-
-    /**
-     * Determine next due date for Event.
-     * @param DateTime|string $currentTime Relative calculation date
-     * @param int $nth Number of matches to skip before returning a matching next run date
-     * @param bool $allowCurrentDate Return the current date if it matches the cron expression.
-     * @return Carbon
-     */
-    public function nextDue($currentTime = 'now', $nth = 0, $allowCurrentDate = false)
-    {
-        $nextDue = CronExpression::factory(
-            $this->getExpression()
-        )->getNextRunDate($currentTime, $nth, $allowCurrentDate);
-
-        return Carbon::instance($nextDue);
     }
 }
