@@ -30,6 +30,7 @@ trait CompilesEchos
             'compileRawEchos',
             'compileEscapedEchos',
             'compileRegularEchos',
+            'compileVardumpEcho'
         ];
     }
 
@@ -87,6 +88,24 @@ trait CompilesEchos
             $whitespace = empty($matches[3]) ? '' : $matches[3].$matches[3];
 
             return $matches[1] ? $matches[0] : "<?php echo e({$this->compileEchoDefaults($matches[2])}); ?>{$whitespace}";
+        };
+
+        return preg_replace_callback($pattern, $callback, $value);
+    }
+
+    /**
+     * Compile the "var_dump function with <pre/> tag for format output " echo statements.
+     *
+     * @param  string $value
+     * @return string
+     */
+    protected function compileVardumpEcho($value)
+    {
+        $pattern = sprintf('/(@)?%s\s*(.+?)\s*%s(\r?\n)?/s', $this->vardumpTags[0], $this->vardumpTags[1]);
+        $callback = function ($matches) {
+            $whitespace = empty($matches[3]) ? '' : $matches[3] . $matches[3];
+
+            return $matches[1] ? substr($matches[0], 1) : "<?php echo '<pre>', var_dump({$this->compileEchoDefaults($matches[2])}), '</pre>' ; ?>{$whitespace}";
         };
 
         return preg_replace_callback($pattern, $callback, $value);
