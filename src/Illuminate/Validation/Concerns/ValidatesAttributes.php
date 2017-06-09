@@ -478,7 +478,10 @@ trait ValidatesAttributes
             [1, 1], array_filter(sscanf($parameters['ratio'], '%f/%d'))
         );
 
-        return abs($numerator / $denominator - $width / $height) > 0.000001;
+        $maxDimension = max($width, $height);
+        $precision = $maxDimension / pow($maxDimension, 2);
+
+        return abs($numerator / $denominator - $width / $height) > $precision;
     }
 
     /**
