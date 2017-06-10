@@ -58,4 +58,27 @@ class PostgresBuilder extends Builder
             $this->grammar->compileGetAllTables($this->connection->getConfig('schema'))
         );
     }
+
+    /**
+     * Get the column listing for a given table.
+     *
+     * @param  string  $table
+     * @return array
+     */
+    public function getColumnListing($table)
+    {
+        if (is_array($schema = $this->connection->getConfig('schema'))) {
+            $schema = head($schema);
+        }
+
+        $schema = $schema ? $schema : 'public';
+
+        $table = $this->connection->getTablePrefix().$table;
+
+        $results = $this->connection->select(
+            $this->grammar->compileColumnListing(), [$schema, $table]
+        );
+
+        return $this->connection->getPostProcessor()->processColumnListing($results);
+    }
 }
