@@ -333,13 +333,13 @@ if (! function_exists('first_case')) {
     /**
      * It only takes first letter of the words in a sentence
      *
-     * @param  string  $sentence
-     * @param  bool
+     * @param  string  $value
+     * @param  bool $upperCase
      * @return string
      */
-    function first_case($value)
+    function first_case($value, $upperCase = false)
     {
-        return Str::first($value);
+        return Str::first($value, $upperCase);
     }
 }
 

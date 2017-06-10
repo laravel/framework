@@ -84,8 +84,8 @@ class Str
     /**
      * It only takes first letter of the words in a sentence
      *
-     * @param  string  $sentence
-     * @param  bool
+     * @param  string  $value
+     * @param  bool $upperCase
      * @return string
      */
     function first($value, $upperCase = false)
