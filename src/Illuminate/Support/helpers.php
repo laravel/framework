@@ -329,6 +329,20 @@ if (! function_exists('camel_case')) {
     }
 }
 
+if (! function_exists('first_case')) {
+    /**
+     * It only takes first letter of the words in a sentence
+     *
+     * @param  string  $sentence
+     * @param  bool
+     * @return string
+     */
+    function first_case($value)
+    {
+        return Str::first($value);
+    }
+}
+
 if (! function_exists('class_basename')) {
     /**
      * Get the class "basename" of the given object / class.
