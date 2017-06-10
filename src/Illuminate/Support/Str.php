@@ -97,7 +97,7 @@ class Str
             $letters .= static::substr($word, 0, 1);
         }
 
-        return $upperCase ? static:upper($letters) : $letters;
+        return $upperCase ? static::upper($letters) : $letters;
     }
 
     /**
