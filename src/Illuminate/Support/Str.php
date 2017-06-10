@@ -88,7 +88,7 @@ class Str
      * @param  bool
      * @return string
      */
-    function first($value, $upperCase = false): string
+    function first($value, $upperCase = false)
     {
         $letters  = '';
         $value    = (string) preg_replace('/\s+/', ' ', trim($value));
