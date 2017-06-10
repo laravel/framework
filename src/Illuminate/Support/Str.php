@@ -82,7 +82,7 @@ class Str
     }
 
     /**
-     * It only takes first letter of the words in a sentence
+     * It only takes first letter of the words in a sentence.
      *
      * @param  string  $value
      * @param  bool $upperCase
@@ -90,8 +90,8 @@ class Str
      */
     public static function first($value, $upperCase = false)
     {
-        $letters  = '';
-        $value    = (string) preg_replace(['/[!@#$%^&*\/]/', '/\s+/'], ['', ' '], trim($value));
+        $letters = '';
+        $value = (string) preg_replace(['/[!@#$%^&*\/]/', '/\s+/'], ['', ' '], trim($value));
 
         foreach(explode(' ', $value) as $word) {
             $letters .= static::substr($word, 0, 1);

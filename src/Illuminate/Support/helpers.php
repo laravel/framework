@@ -331,7 +331,7 @@ if (! function_exists('camel_case')) {
 
 if (! function_exists('first_case')) {
     /**
-     * It only takes first letter of the words in a sentence
+     * It only takes first letter of the words in a sentence.
      *
      * @param  string  $value
      * @param  bool $upperCase
