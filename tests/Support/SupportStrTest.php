@@ -230,6 +230,16 @@ class SupportStrTest extends TestCase
         $this->assertEquals('laravelPhpFramework', Str::camel('Laravel  -_-  php   -_-   framework   '));
     }
 
+    public function testFirst()
+    {
+        $this->assertEquals('lpf', Str::first('laravel php framework'));
+        $this->assertEquals('LPF', Str::first('laravel php framework', true));
+        $this->assertEquals('LPF', Str::first('Laravel PHP Framework'));
+        $this->assertEquals('LPf', Str::first('Laravel,       PHP  framework '));
+        $this->assertEquals('LPf', Str::first("Laravel,   \n    PHP  framework "));
+        $this->assertEquals('LPf', Str::first("Laravel,   \t    PHP  framework "));
+    }
+
     public function testSubstr()
     {
         $this->assertEquals('Ё', Str::substr('БГДЖИЛЁ', -1));
