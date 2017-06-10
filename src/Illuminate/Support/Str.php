@@ -91,7 +91,7 @@ class Str
     function first($value, $upperCase = false)
     {
         $letters  = '';
-        $value    = (string) preg_replace('/\s+/', ' ', trim($value));
+        $value    = (string) preg_replace(['/[!@#$%^&*\/]/', '/\s+/'], ['', ' '], trim($value));
 
         foreach(explode(' ', $value) as $word) {
             $letters .= static::substr($word, 0, 1);
