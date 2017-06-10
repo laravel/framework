@@ -93,7 +93,7 @@ class Str
         $letters = '';
         $value = (string) preg_replace(['/[!@#$%^&*\/]/', '/\s+/'], ['', ' '], trim($value));
 
-        foreach(explode(' ', $value) as $word) {
+        foreach (explode(' ', $value) as $word) {
             $letters .= static::substr($word, 0, 1);
         }
 
