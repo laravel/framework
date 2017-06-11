@@ -88,7 +88,7 @@ class Str
      * @param  bool $upperCase
      * @return string
      */
-    public static function first($value, $upperCase = false)
+    public static function acronym($value, $upperCase = false)
     {
         $letters = '';
         $value = (string) preg_replace(['/[!@#$%^&*\/]/', '/\s+/'], ['', ' '], trim($value));
