@@ -83,8 +83,7 @@ class PackageManifest
     }
 
     /**
-     * Ensure the manifest has been loaded into memory, and then
-     * returns it.
+     * Get the current package manifest.
      *
      * @return array
      */
