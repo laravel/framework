@@ -39,9 +39,7 @@ class Rule
      */
     public static function in($values)
     {
-        $values = is_array($values) ? $values : func_get_args();
-
-        return new Rules\In($values);
+        return new Rules\In(is_array($values) ? $values : func_get_args());
     }
 
     /**
@@ -52,9 +50,7 @@ class Rule
      */
     public static function notIn($values)
     {
-        $values = is_array($values) ? $values : func_get_args();
-
-        return new Rules\NotIn($values);
+        return new Rules\NotIn(is_array($values) ? $values : func_get_args());
     }
 
     /**
