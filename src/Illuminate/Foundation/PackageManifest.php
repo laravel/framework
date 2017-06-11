@@ -65,9 +65,7 @@ class PackageManifest
      */
     public function providers()
     {
-        $this->ensureManifestIsLoaded();
-
-        return collect($this->manifest)->flatMap(function ($configuration, $name) {
+        return collect($this->getManifest())->flatMap(function ($configuration, $name) {
             return (array) ($configuration['providers'] ?? []);
         })->filter()->all();
     }
@@ -79,33 +77,29 @@ class PackageManifest
      */
     public function aliases()
     {
-        $this->ensureManifestIsLoaded();
-
-        return collect($this->manifest)->flatMap(function ($configuration, $name) {
+        return collect($this->getManifest())->flatMap(function ($configuration, $name) {
             return (array) ($configuration['aliases'] ?? []);
         })->filter()->all();
     }
 
     /**
-     * Ensure the manifest has been loaded into memory.
+     * Ensure the manifest has been loaded into memory, and then
+     * returns it.
      *
-     * @return void
+     * @return array
      */
-    protected function ensureManifestIsLoaded()
+    protected function getManifest()
     {
         if (! is_null($this->manifest)) {
-            return;
+            return $this->manifest;
         }
 
         if (! file_exists($this->manifestPath)) {
             $this->build();
         }
 
-        if (file_exists($this->manifestPath)) {
-            $this->manifest = $this->files->getRequire($this->manifestPath);
-        } else {
-            $this->manifest = [];
-        }
+        return $this->manifest = file_exists($this->manifestPath) ?
+            $this->files->getRequire($this->manifestPath) : [];
     }
 
     /**
