@@ -62,12 +62,15 @@ class StartSession
         }
 
         $response = $next($request);
+        $content_type = $response->headers->get('content-type');
 
         // Again, if the session has been configured we will need to close out the session
         // so that the attributes may be persisted to some storage medium. We will also
         // add the session identifier cookie to the application response headers now.
         if ($this->sessionConfigured()) {
-            $this->storeCurrentUrl($request, $session);
+            if(starts_with($content_type, 'text/html')) {
+                $this->storeCurrentUrl($request, $session);
+            }
 
             $this->addCookieToResponse($response, $session);
         }
