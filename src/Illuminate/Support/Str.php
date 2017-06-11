@@ -82,6 +82,25 @@ class Str
     }
 
     /**
+     * It only takes first letter of the words in a sentence.
+     *
+     * @param  string  $value
+     * @param  bool $upperCase
+     * @return string
+     */
+    public static function acronym($value, $upperCase = false)
+    {
+        $letters = '';
+        $value = (string) preg_replace(['/[!@#$%^&*\/]/', '/\s+/'], ['', ' '], trim($value));
+
+        foreach (explode(' ', $value) as $word) {
+            $letters .= static::substr($word, 0, 1);
+        }
+
+        return $upperCase ? static::upper($letters) : $letters;
+    }
+
+    /**
      * Determine if a given string contains a given substring.
      *
      * @param  string  $haystack
