@@ -145,7 +145,6 @@ class MessageSelector
             case 'zh_SG':
             case 'zh_TW':
                 return 0;
-                break;
             case 'af':
             case 'af_ZA':
             case 'bn':
@@ -331,12 +330,12 @@ class MessageSelector
             case 'mg_MG':
             case 'nso':
             case 'nso_ZA':
-            case 'xbr':
             case 'ti':
             case 'ti_ER':
             case 'ti_ET':
             case 'wa':
             case 'wa_BE':
+            case 'xbr':
                 return (($number == 0) || ($number == 1)) ? 0 : 1;
             case 'be':
             case 'be_BY':
