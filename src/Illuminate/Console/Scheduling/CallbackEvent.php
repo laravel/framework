@@ -69,10 +69,10 @@ class CallbackEvent extends Event
         try {
             $response = $container->call($this->callback, $this->parameters);
         } finally {
+            parent::callAfterCallbacks($container);
+
             $this->removeMutex();
         }
-
-        parent::callAfterCallbacks($container);
 
         return $response;
     }
