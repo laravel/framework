@@ -85,8 +85,7 @@ class Collection extends BaseCollection implements QueueableCollection
 
         if ($key instanceof Model) {
             return parent::contains(function ($model) use ($key) {
-                return $model->getKey() == $key->getKey() &&
-                       get_class($model) == get_class($key);
+                return $model->is($key);
             });
         }
 

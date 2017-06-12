@@ -46,10 +46,16 @@ class DatabaseEloquentCollectionTest extends TestCase
     {
         $mockModel = m::mock('Illuminate\Database\Eloquent\Model');
         $mockModel->shouldReceive('getKey')->andReturn(1);
+        $mockModel->shouldReceive('is')->with($mockModel)->andReturn(true);
+        $mockModel->shouldReceive('is')->andReturn(false);
         $mockModel2 = m::mock('Illuminate\Database\Eloquent\Model');
         $mockModel2->shouldReceive('getKey')->andReturn(2);
+        $mockModel2->shouldReceive('is')->with($mockModel2)->andReturn(true);
+        $mockModel2->shouldReceive('is')->andReturn(false);
         $mockModel3 = m::mock('Illuminate\Database\Eloquent\Model');
         $mockModel3->shouldReceive('getKey')->andReturn(3);
+        $mockModel3->shouldReceive('is')->with($mockModel3)->andReturn(true);
+        $mockModel3->shouldReceive('is')->andReturn(false);
         $c = new Collection([$mockModel, $mockModel2]);
 
         $this->assertTrue($c->contains($mockModel));
@@ -61,8 +67,12 @@ class DatabaseEloquentCollectionTest extends TestCase
     {
         $mockModelFoo = m::namedMock('Foo', 'Illuminate\Database\Eloquent\Model');
         $mockModelFoo->shouldReceive('getKey')->andReturn(1);
+        $mockModelFoo->shouldReceive('is')->with($mockModelFoo)->andReturn(true);
+        $mockModelFoo->shouldReceive('is')->andReturn(false);
         $mockModelBar = m::namedMock('Bar', 'Illuminate\Database\Eloquent\Model');
         $mockModelBar->shouldReceive('getKey')->andReturn(1);
+        $mockModelBar->shouldReceive('is')->with($mockModelBar)->andReturn(true);
+        $mockModelBar->shouldReceive('is')->andReturn(false);
         $c = new Collection([$mockModelFoo]);
 
         $this->assertTrue($c->contains($mockModelFoo));
