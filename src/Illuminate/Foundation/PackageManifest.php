@@ -12,35 +12,35 @@ class PackageManifest
      *
      * @var \Illuminate\Filesystem\Filesystem
      */
-    public $files;
+    protected $files;
 
     /**
      * The base path.
      *
      * @var string
      */
-    public $basePath;
+    protected $basePath;
 
     /**
      * The vendor path.
      *
      * @var string
      */
-    public $vendorPath;
+    protected $vendorPath;
 
     /**
      * The manifest path.
      *
      * @var string|null
      */
-    public $manifestPath;
+    protected $manifestPath;
 
     /**
      * The loaded manifest array.
      *
      * @var array
      */
-    public $manifest;
+    protected $manifest;
 
     /**
      * Create a new package manifest instance.
@@ -83,25 +83,6 @@ class PackageManifest
     }
 
     /**
-     * Get the current package manifest.
-     *
-     * @return array
-     */
-    protected function getManifest()
-    {
-        if (! is_null($this->manifest)) {
-            return $this->manifest;
-        }
-
-        if (! file_exists($this->manifestPath)) {
-            $this->build();
-        }
-
-        return $this->manifest = file_exists($this->manifestPath) ?
-            $this->files->getRequire($this->manifestPath) : [];
-    }
-
-    /**
      * Build the manifest and write it to disk.
      *
      * @return void
@@ -121,6 +102,25 @@ class PackageManifest
         })->reject(function ($configuration, $package) use ($ignore, $ignoreAll) {
             return $ignoreAll || in_array($package, $ignore);
         })->filter()->all());
+    }
+
+    /**
+     * Get the current package manifest.
+     *
+     * @return array
+     */
+    protected function getManifest()
+    {
+        if (! is_null($this->manifest)) {
+            return $this->manifest;
+        }
+
+        if (! file_exists($this->manifestPath)) {
+            $this->build();
+        }
+
+        return $this->manifest = file_exists($this->manifestPath) ?
+            $this->files->getRequire($this->manifestPath) : [];
     }
 
     /**
