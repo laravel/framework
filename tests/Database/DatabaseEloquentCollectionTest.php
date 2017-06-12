@@ -57,6 +57,18 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertFalse($c->contains($mockModel3));
     }
 
+    public function testContainsIndicatesIfDiffentModelInArray()
+    {
+        $mockModelFoo = m::namedMock('Foo', 'Illuminate\Database\Eloquent\Model');
+        $mockModelFoo->shouldReceive('getKey')->andReturn(1);
+        $mockModelBar = m::namedMock('Bar', 'Illuminate\Database\Eloquent\Model');
+        $mockModelBar->shouldReceive('getKey')->andReturn(1);
+        $c = new Collection([$mockModelFoo]);
+
+        $this->assertTrue($c->contains($mockModelFoo));
+        $this->assertFalse($c->contains($mockModelBar));
+    }
+
     public function testContainsIndicatesIfKeyedModelInArray()
     {
         $mockModel = m::mock('Illuminate\Database\Eloquent\Model');
