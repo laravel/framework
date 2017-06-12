@@ -8,7 +8,7 @@ use Illuminate\Support\Traits\Macroable;
 
 class RequestGuard implements Guard
 {
-    use GuardHelpers,Macroable;
+    use GuardHelpers, Macroable;
 
     /**
      * The guard callback.
