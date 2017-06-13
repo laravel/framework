@@ -53,7 +53,6 @@ class RouteRegistrar
      * Create a new route registrar instance.
      *
      * @param  \Illuminate\Routing\Router  $router
-     * @return void
      */
     public function __construct(Router $router)
     {
@@ -96,7 +95,7 @@ class RouteRegistrar
     /**
      * Create a route group with shared attributes.
      *
-     * @param  \Closure  $callback
+     * @param  \Closure|string  $callback
      * @return void
      */
     public function group($callback)
