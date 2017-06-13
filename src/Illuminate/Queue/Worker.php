@@ -139,8 +139,6 @@ class Worker
                 $this->kill(1);
             });
 
-            // We need to set this everytime, because if we have a job with
-            // no timeout we need to clean the alarm of previous job.
             $timeout = $this->timeoutForJob($job, $options);
 
             pcntl_alarm($timeout > 0 ? $timeout + $options->sleep : 0);
