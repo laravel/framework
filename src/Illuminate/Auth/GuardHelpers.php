@@ -83,4 +83,17 @@ trait GuardHelpers
 
         return $this;
     }
+    
+     /**
+     * Set the current user to allow the mixed type
+     *
+     * @param  \Illuminate\Contracts\Auth\Authenticatable|mixed  $user
+     * @return $this
+     */
+    public function setUserMixed($user=null)
+    {
+        $this->user = $user;
+
+        return $this;
+    }
 }
