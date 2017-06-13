@@ -2,9 +2,7 @@
 
 namespace Illuminate\Queue;
 
-use Illuminate\Contracts\Queue\Queue as QueueContract;
-
-class NullQueue extends Queue implements QueueContract
+class NullQueue extends Queue
 {
     /**
      * Get the size of the queue.
