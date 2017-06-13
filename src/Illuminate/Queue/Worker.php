@@ -131,7 +131,6 @@ class Worker
      */
     protected function registerTimeoutHandler($job, WorkerOptions $options)
     {
-
         if ($this->supportsAsyncSignals()) {
             // We will register a signal handler for the alarm signal so that we can kill this
             // process if it is running too long because it has frozen. This uses the async
