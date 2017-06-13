@@ -55,4 +55,12 @@ class EventTest extends TestCase
         $event->appendOutputTo('/dev/null');
         $this->assertSame("php -i >> {$quote}/dev/null{$quote} 2>&1", $event->buildCommand());
     }
+
+    public function testNextRunDate()
+    {
+        $event = new Event(m::mock('Illuminate\Console\Scheduling\Mutex'), 'php -i');
+        $event->dailyAt('10:15');
+
+        $this->assertSame('10:15:00', $event->nextRunDate()->toTimeString());
+    }
 }
