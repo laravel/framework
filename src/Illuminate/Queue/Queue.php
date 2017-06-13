@@ -3,8 +3,9 @@
 namespace Illuminate\Queue;
 
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Queue\Queue as QueueContract;
 
-abstract class Queue
+abstract class Queue implements QueueContract
 {
     use InteractsWithTime;
 
