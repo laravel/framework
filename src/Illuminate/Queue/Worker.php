@@ -131,9 +131,8 @@ class Worker
      */
     protected function registerTimeoutHandler($job, WorkerOptions $options)
     {
-        $timeout = $this->timeoutForJob($job, $options);
 
-        if ($timeout > 0 && $this->supportsAsyncSignals()) {
+        if ($this->supportsAsyncSignals()) {
             // We will register a signal handler for the alarm signal so that we can kill this
             // process if it is running too long because it has frozen. This uses the async
             // signals supported in recent versions of PHP to accomplish it conveniently.
@@ -141,7 +140,11 @@ class Worker
                 $this->kill(1);
             });
 
-            pcntl_alarm($timeout + $options->sleep);
+            // We need to set this everytime, because if we have a job with
+            // no timeout we need to clean the alarm of previous job.
+            $timeout = $this->timeoutForJob($job, $options);
+
+            pcntl_alarm($timeout > 0 ? $timeout + $options->sleep : 0);
         }
     }
 
