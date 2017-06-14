@@ -1,0 +1,84 @@
+<?php
+
+namespace Illuminate\Cache;
+
+use Carbon\Carbon;
+use Illuminate\Contracts\Cache\LockTimeoutException;
+
+abstract class Lock
+{
+    /**
+     * Attempt to acquire the lock.
+     *
+     * @return bool
+     */
+    abstract public function acquire();
+
+    /**
+     * Attempt to acquire the lock.
+     *
+     * @param  callable|null  $callback
+     * @return bool
+     */
+    public function get($callback = null)
+    {
+        $result = $this->acquire();
+
+        if ($result && is_callable($callback)) {
+            return tap($callback(), function () {
+                $this->release();
+            });
+        }
+
+        return $result;
+    }
+
+    /**
+     * Attempt to acquire the lock while blocking indefinitely.
+     *
+     * @param  callable|null  $calback
+     * @return bool
+     */
+    public function block($callback = null)
+    {
+        while (! $this->acquire()) {
+            usleep(250 * 1000);
+        }
+
+        if (is_callable($callback)) {
+            return tap($callback(), function () {
+                $this->release();
+            });
+        }
+
+        return true;
+    }
+
+    /**
+     * Attempt to acquire the lock for the given number of seconds.
+     *
+     * @param  int  $seconds
+     * @param  callable|null  $callback
+     * @return bool
+     */
+    public function blockFor($seconds, $callback = null)
+    {
+        $starting = Carbon::now();
+
+        while (! $this->acquire()) {
+            usleep(250 * 1000);
+
+            if (Carbon::now()->subSeconds($seconds)->gte($starting)) {
+                throw new LockTimeoutException;
+            }
+        }
+
+        if (is_callable($callback)) {
+            return tap($callback(), function () {
+                $this->release();
+            });
+        }
+
+        return true;
+    }
+}

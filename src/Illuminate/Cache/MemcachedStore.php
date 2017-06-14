@@ -6,8 +6,9 @@ use Memcached;
 use Carbon\Carbon;
 use ReflectionMethod;
 use Illuminate\Contracts\Cache\Store;
+use Illuminate\Contracts\Cache\LockProvider;
 
-class MemcachedStore extends TaggableStore implements Store
+class MemcachedStore extends TaggableStore implements LockProvider, Store
 {
     /**
      * The Memcached instance.
@@ -168,6 +169,18 @@ class MemcachedStore extends TaggableStore implements Store
     public function forever($key, $value)
     {
         $this->put($key, $value, 0);
+    }
+
+    /**
+     * Get a lock instance.
+     *
+     * @param  string  $name
+     * @param  int  $seconds
+     * @return \Illuminate\Contracts\Cache\Lock
+     */
+    public function lock($name, $seconds = 0)
+    {
+        return new MemcachedLock($this->memcached, $this->prefix.$name, $seconds);
     }
 
     /**
