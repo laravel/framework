@@ -2,7 +2,6 @@
 
 namespace Illuminate\Cache;
 
-use Carbon\Carbon;
 use Illuminate\Contracts\Cache\Lock as LockContract;
 
 class RedisLock extends Lock implements LockContract
