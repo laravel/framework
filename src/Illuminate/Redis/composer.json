@@ -17,7 +17,7 @@
         "php": ">=7.0",
         "illuminate/contracts": "5.5.*",
         "illuminate/support": "5.5.*",
-        "predis/predis": "~1.0"
+        "predis/predis": "~1.1.1"
     },
     "autoload": {
         "psr-4": {
