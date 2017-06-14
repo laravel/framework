@@ -30,7 +30,6 @@ class CacheLockTest extends TestCase
         Cache::store('redis')->lock('foo')->release();
     }
 
-
     public function test_locks_can_run_callbacks()
     {
         Cache::store('memcached')->lock('foo')->release();
@@ -38,7 +37,6 @@ class CacheLockTest extends TestCase
             return 'taylor';
         }));
     }
-
 
     public function test_locks_can_block()
     {
@@ -52,7 +50,6 @@ class CacheLockTest extends TestCase
         Cache::store('memcached')->lock('foo', 1)->get();
         $this->assertTrue(Cache::store('memcached')->lock('foo', 10)->block());
 
-
         Cache::store('redis')->lock('foo')->release();
         Cache::store('redis')->lock('foo', 1)->get();
         $this->assertEquals('taylor', Cache::store('redis')->lock('foo', 10)->block(function () {
@@ -63,7 +60,6 @@ class CacheLockTest extends TestCase
         Cache::store('redis')->lock('foo', 1)->get();
         $this->assertTrue(Cache::store('redis')->lock('foo', 10)->block());
     }
-
 
     public function test_locks_can_block_for_seconds()
     {
@@ -77,7 +73,6 @@ class CacheLockTest extends TestCase
         Cache::store('memcached')->lock('foo')->release();
         $this->assertTrue(Cache::store('memcached')->lock('foo', 10)->blockFor(1));
 
-
         Cache::store('redis')->lock('foo')->release();
         $this->assertEquals('taylor', Cache::store('redis')->lock('foo', 10)->blockFor(1, function () {
             return 'taylor';
@@ -86,7 +81,6 @@ class CacheLockTest extends TestCase
         Cache::store('redis')->lock('foo')->release();
         $this->assertTrue(Cache::store('redis')->lock('foo', 10)->blockFor(1));
     }
-
 
     /**
      * @expectedException \Illuminate\Contracts\Cache\LockTimeoutException
