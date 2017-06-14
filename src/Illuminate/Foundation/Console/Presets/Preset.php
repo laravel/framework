@@ -41,7 +41,11 @@ class Preset
 
         file_put_contents(
             base_path('package.json'),
-            json_encode($packages, JSON_PRETTY_PRINT)
+            preg_replace(
+                '/^(  +?)\\1(?=[^ ])/m',
+                '$1',
+                json_encode($packages, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . PHP_EOL
+            )
         );
     }
 
