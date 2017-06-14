@@ -77,7 +77,7 @@
         "orchestra/testbench-core": "3.5.*",
         "pda/pheanstalk": "~3.0",
         "phpunit/phpunit": "~6.0",
-        "predis/predis": "~1.0",
+        "predis/predis": "^1.1.1",
         "symfony/css-selector": "~3.3",
         "symfony/dom-crawler": "~3.3"
     },
