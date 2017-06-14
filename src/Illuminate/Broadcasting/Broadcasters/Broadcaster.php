@@ -47,6 +47,7 @@ abstract class Broadcaster implements BroadcasterContract
      * @param  \Illuminate\Http\Request  $request
      * @param  string  $channel
      * @return mixed
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
     protected function verifyUserCanAccessChannel($request, $channel)
     {
@@ -140,6 +141,7 @@ abstract class Broadcaster implements BroadcasterContract
      * @param  mixed  $value
      * @param  array  $callbackParameters
      * @return mixed
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
     protected function resolveImplicitBindingIfPossible($key, $value, $callbackParameters)
     {
