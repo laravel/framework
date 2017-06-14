@@ -303,7 +303,7 @@ class Command extends SymfonyCommand
      *
      * @param  string  $question
      * @param  string  $default
-     * @param callable|null $validator
+     * @param  callable|null $validator
      * @return string
      */
     public function ask($question, $default = null, $validator = null)
