@@ -1,9 +1,25 @@
 # Release Notes for 5.4.x
 
-## [Unreleased]
+## v5.4.26 (2017-06-13)
+
+### Added
+- Added `Event::nextRunDate()` method ([#19537](https://github.com/laravel/framework/pull/19537), [09dd336](https://github.com/laravel/framework/commit/09dd336b5146afa9278064c2f7cd901f55e10fc0))
+- Added null safe operator `<=>` to query builder operators list ([#19539](https://github.com/laravel/framework/pull/19539))
+- Added `Macroable` trait to `RequestGuard` ([#19569](https://github.com/laravel/framework/pull/19569))
+
+### Changed
+- Touch `updated_at` timestamp when soft deleting ([#19538](https://github.com/laravel/framework/pull/19538))
+- Accept argument list in `Rule::in()` and `Rule::notIn()` ([#19555](https://github.com/laravel/framework/pull/19555))
+- Support checking for strings job names using `QueueFake` ([#19575](https://github.com/laravel/framework/pull/19575))
+- Improved image ratio validation precision ([#19542](https://github.com/laravel/framework/pull/19542))
 
 ### Fixed
 - Resume scheduled task if an error occurs ([#19419](https://github.com/laravel/framework/pull/19419))
+- Decode HTML entities in plain text emails ([#19518](https://github.com/laravel/framework/pull/19518))
+- Added missing locales to `MessageSelector::getPluralIndex()` ([#19562](https://github.com/laravel/framework/pull/19562))
+- Use strict check when object is passed to `Collection::contains()` ([#19568](https://github.com/laravel/framework/pull/19568))
+- Fixed jobs with a timeout of `0` ([#19586](https://github.com/laravel/framework/pull/19586))
+- Never pass `Throwable` to `stopWorkerIfLostConnection()` ([#19591](https://github.com/laravel/framework/pull/19591))
 
 
 ## v5.4.25 (2017-06-07)
