@@ -51,7 +51,7 @@ class RedisLock extends Lock implements LockContract
     {
         $result = $this->redis->setnx($this->name, 1);
 
-        if ($result === 1) {
+        if ($result === 1 && $this->seconds > 0) {
             $this->redis->expire($this->name, $this->seconds);
         }
 
