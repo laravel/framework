@@ -110,7 +110,7 @@ class FrequencyTest extends TestCase
 
     public function testQuarterly()
     {
-        $this->assertEquals('0 0 1 1-12/3 *', $this->event->quarterly()->getExpression());
+        $this->assertEquals('0 0 1 1-12/3 * *', $this->event->quarterly()->getExpression());
     }
 
     public function testFrequencyMacro()
