@@ -13,21 +13,13 @@ interface Lock
     public function get($callback = null);
 
     /**
-     * Attempt to acquire the lock while blocking indefinitely.
-     *
-     * @param  callable|null  $calback
-     * @return bool
-     */
-    public function block($callback = null);
-
-    /**
      * Attempt to acquire the lock for the given number of seconds.
      *
      * @param  int  $seconds
      * @param  callable|null  $callback
      * @return bool
      */
-    public function blockFor($seconds, $callback = null);
+    public function block($seconds, $callback = null);
 
     /**
      * Release the lock.

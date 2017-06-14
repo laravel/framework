@@ -40,51 +40,26 @@ class CacheLockTest extends TestCase
     }
 
 
-    public function test_locks_can_block()
-    {
-        Cache::store('memcached')->lock('foo')->release();
-        Cache::store('memcached')->lock('foo', 1)->get();
-        $this->assertEquals('taylor', Cache::store('memcached')->lock('foo', 10)->block(function () {
-            return 'taylor';
-        }));
-
-        Cache::store('memcached')->lock('foo')->release();
-        Cache::store('memcached')->lock('foo', 1)->get();
-        $this->assertTrue(Cache::store('memcached')->lock('foo', 10)->block());
-
-
-        Cache::store('redis')->lock('foo')->release();
-        Cache::store('redis')->lock('foo', 1)->get();
-        $this->assertEquals('taylor', Cache::store('redis')->lock('foo', 10)->block(function () {
-            return 'taylor';
-        }));
-
-        Cache::store('redis')->lock('foo')->release();
-        Cache::store('redis')->lock('foo', 1)->get();
-        $this->assertTrue(Cache::store('redis')->lock('foo', 10)->block());
-    }
-
-
     public function test_locks_can_block_for_seconds()
     {
         Carbon::setTestNow();
 
         Cache::store('memcached')->lock('foo')->release();
-        $this->assertEquals('taylor', Cache::store('memcached')->lock('foo', 10)->blockFor(1, function () {
+        $this->assertEquals('taylor', Cache::store('memcached')->lock('foo', 10)->block(1, function () {
             return 'taylor';
         }));
 
         Cache::store('memcached')->lock('foo')->release();
-        $this->assertTrue(Cache::store('memcached')->lock('foo', 10)->blockFor(1));
+        $this->assertTrue(Cache::store('memcached')->lock('foo', 10)->block(1));
 
 
         Cache::store('redis')->lock('foo')->release();
-        $this->assertEquals('taylor', Cache::store('redis')->lock('foo', 10)->blockFor(1, function () {
+        $this->assertEquals('taylor', Cache::store('redis')->lock('foo', 10)->block(1, function () {
             return 'taylor';
         }));
 
         Cache::store('redis')->lock('foo')->release();
-        $this->assertTrue(Cache::store('redis')->lock('foo', 10)->blockFor(1));
+        $this->assertTrue(Cache::store('redis')->lock('foo', 10)->block(1));
     }
 
 
@@ -97,7 +72,7 @@ class CacheLockTest extends TestCase
 
         Cache::store('memcached')->lock('foo')->release();
         Cache::store('memcached')->lock('foo', 5)->get();
-        $this->assertEquals('taylor', Cache::store('memcached')->lock('foo', 10)->blockFor(1, function () {
+        $this->assertEquals('taylor', Cache::store('memcached')->lock('foo', 10)->block(1, function () {
             return 'taylor';
         }));
     }
