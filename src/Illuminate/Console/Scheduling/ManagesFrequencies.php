@@ -283,7 +283,7 @@ trait ManagesFrequencies
         return $this->spliceIntoPosition(1, 0)
                     ->spliceIntoPosition(2, 0)
                     ->spliceIntoPosition(3, 1)
-                    ->spliceIntoPosition(4, '*/3');
+                    ->spliceIntoPosition(4, '1-12/3');
     }
 
     /**
