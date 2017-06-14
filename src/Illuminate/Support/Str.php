@@ -34,9 +34,10 @@ class Str
      *
      * @param  string  $subject
      * @param  string  $search
+     * @param  bool  $before
      * @return string
      */
-    public static function after($subject, $search)
+    public static function after($subject, $search, $before = false)
     {
         if ($search == '') {
             return $subject;
@@ -48,7 +49,9 @@ class Str
             return $subject;
         }
 
-        return substr($subject, $pos + strlen($search));
+        return $before
+            ? substr($subject, 0, $pos)
+            : substr($subject, $pos + strlen($search));
     }
 
     /**
@@ -64,6 +67,18 @@ class Str
         }
 
         return preg_replace('/[^\x20-\x7E]/u', '', $value);
+    }
+
+    /**
+     * Return the string before the given value.
+     *
+     * @param  string  $subject
+     * @param  string  $search
+     * @return string
+     */
+    public static function before($subject, $search)
+    {
+        return static::after($subject, $search, $before = true);
     }
 
     /**

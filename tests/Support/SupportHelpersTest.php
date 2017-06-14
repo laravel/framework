@@ -259,6 +259,13 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals('hannah', str_after('hannah', 'xxxx'));
     }
 
+    public function testStrBefore()
+    {
+        $this->assertEquals('foo', str_before('foobar', 'bar'));
+        $this->assertEquals('foo', str_before('foobbb', 'b'));
+        $this->assertEquals('foobar', str_before('foobar', 'xxxx'));
+    }
+
     public function testStrContains()
     {
         $this->assertTrue(Str::contains('taylor', 'ylo'));
