@@ -280,7 +280,7 @@ class FilesystemTest extends TestCase
         $size = 0;
 
         for ($i = 0; $i < 3; $i++) {
-            $size += file_put_contents($this->tempDir . "/foo_{$i}.txt", 'foo');
+            $size += file_put_contents($this->tempDir."/foo_{$i}.txt", 'foo');
         }
 
         $files = new Filesystem();

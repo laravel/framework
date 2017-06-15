@@ -318,7 +318,7 @@ class Filesystem
      */
     public function dirSize($path)
     {
-        if (!$this->isDirectory($path)) {
+        if (! $this->isDirectory($path)) {
             throw new \InvalidArgumentException("{$path} is not a directory");
         }
 
