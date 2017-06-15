@@ -4,6 +4,7 @@ namespace Illuminate\Filesystem;
 
 use ErrorException;
 use FilesystemIterator;
+use InvalidArgumentException;
 use Symfony\Component\Finder\Finder;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
@@ -308,6 +309,28 @@ class Filesystem
     public function size($path)
     {
         return filesize($path);
+    }
+
+    /**
+     * Get the size of a given directory.
+     *
+     * @param  string  $path
+     * @throws InvalidArgumentException
+     * @return int
+     */
+    public function dirSize($path)
+    {
+        if (! $this->isDirectory($path)) {
+            throw new InvalidArgumentException("{$path} is not a directory");
+        }
+
+        $size = 0;
+
+        foreach ($this->allFiles($path) as $file) {
+            $size += $file->getSize();
+        }
+
+        return $size;
     }
 
     /**
