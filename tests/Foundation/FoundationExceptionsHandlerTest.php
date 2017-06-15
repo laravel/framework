@@ -7,6 +7,7 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Config\Repository as Config;
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Foundation\Exceptions\Handler;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -61,6 +62,13 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->assertContains('"trace":', $response);
     }
 
+    public function testReturnsCustomResponseWhenExceptionImplementsResponsable()
+    {
+        $response = $this->handler->render($this->request, new CustomException)->getContent();
+
+        $this->assertSame('{"response":"My custom exception response"}', $response);
+    }
+
     public function testReturnsJsonWithoutStackTraceWhenAjaxRequestAndDebugFalseAndExceptionMessageIsMasked()
     {
         $this->config->shouldReceive('get')->with('app.debug', null)->once()->andReturn(false);
@@ -89,5 +97,13 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->assertNotContains('"file":', $response);
         $this->assertNotContains('"line":', $response);
         $this->assertNotContains('"trace":', $response);
+    }
+}
+
+class CustomException extends Exception implements Responsable
+{
+    public function toResponse()
+    {
+        return response()->json(['response' => 'My custom exception response']);
     }
 }
