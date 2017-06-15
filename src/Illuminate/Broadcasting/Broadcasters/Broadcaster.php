@@ -9,6 +9,7 @@ use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Routing\BindingRegistrar;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Illuminate\Contracts\Broadcasting\Broadcaster as BroadcasterContract;
 
 abstract class Broadcaster implements BroadcasterContract
@@ -47,7 +48,7 @@ abstract class Broadcaster implements BroadcasterContract
      * @param  \Illuminate\Http\Request  $request
      * @param  string  $channel
      * @return mixed
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
      */
     protected function verifyUserCanAccessChannel($request, $channel)
     {
@@ -63,7 +64,7 @@ abstract class Broadcaster implements BroadcasterContract
             }
         }
 
-        throw new HttpException(403);
+        throw new AccessDeniedHttpException;
     }
 
     /**
@@ -141,7 +142,7 @@ abstract class Broadcaster implements BroadcasterContract
      * @param  mixed  $value
      * @param  array  $callbackParameters
      * @return mixed
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
      */
     protected function resolveImplicitBindingIfPossible($key, $value, $callbackParameters)
     {
@@ -153,7 +154,7 @@ abstract class Broadcaster implements BroadcasterContract
             $model = $parameter->getClass()->newInstance();
 
             return $model->where($model->getRouteKeyName(), $value)->firstOr(function () {
-                throw new HttpException(403);
+                throw new AccessDeniedHttpException;
             });
         }
 
