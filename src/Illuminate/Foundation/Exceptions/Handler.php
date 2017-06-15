@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Exceptions;
 
 use Exception;
 use Whoops\Run as Whoops;
+use Illuminate\Support\Arr;
 use Psr\Log\LoggerInterface;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Router;
@@ -309,7 +310,7 @@ class Handler implements ExceptionHandlerContract
 
             $handler->handleUnconditionally(true);
             $handler->setApplicationPaths(
-                array_flip(array_except(
+                array_flip(Arr::except(
                     array_flip($files->directories(base_path())), [base_path('vendor')]
                 ))
             );
