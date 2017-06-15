@@ -127,7 +127,7 @@ class Collection extends BaseCollection implements QueueableCollection
      * Run a map over each of the items.
      *
      * @param  callable  $callback
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection|static
      */
     public function map(callable $callback)
     {
@@ -136,6 +136,17 @@ class Collection extends BaseCollection implements QueueableCollection
         return $result->contains(function ($item) {
             return ! $item instanceof Model;
         }) ? $result->toBase() : $result;
+    }
+
+    /**
+     * Reload a fresh model instance from the database for all the entities.
+     *
+     * @param  array|string  $with
+     * @return static
+     */
+    public function fresh($with = [])
+    {
+        return $this->map->fresh($with);
     }
 
     /**
