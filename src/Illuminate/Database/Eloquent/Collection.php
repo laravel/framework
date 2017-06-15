@@ -146,7 +146,17 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function fresh($with = [])
     {
-        return $this->map->fresh($with);
+        $model = $this->first();
+
+        $freshModels = $model->newQueryWithoutScopes()
+            ->with(is_string($with) ? func_get_args() : $with)
+            ->whereIn($model->getKeyName(), $this->modelKeys())
+            ->get()
+            ->getDictionary();
+
+        return $this->map(function ($model) use ($freshModels) {
+            return $model->exists ? $freshModels[$model->getKey()] : null;
+        });
     }
 
     /**

@@ -212,24 +212,6 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertInstanceOf(Collection::class, $cAfterMap);
     }
 
-    public function testFresh()
-    {
-        $one = m::mock('Illuminate\Database\Eloquent\Model');
-        $oneFresh = m::mock('Illuminate\Database\Eloquent\Model');
-        $one->shouldReceive('fresh')->andReturn($oneFresh);
-
-        $two = m::mock('Illuminate\Database\Eloquent\Model');
-        $twoFresh = m::mock('Illuminate\Database\Eloquent\Model');
-        $two->shouldReceive('fresh')->andReturn($twoFresh);
-
-        $c = new Collection([$one, $two]);
-
-        $cAfterFresh = $c->fresh();
-
-        $this->assertEquals(new Collection([$oneFresh, $twoFresh]), $cAfterFresh);
-        $this->assertInstanceOf(Collection::class, $cAfterFresh);
-    }
-
     public function testMappingToNonModelsReturnsABaseCollection()
     {
         $one = m::mock('Illuminate\Database\Eloquent\Model');
