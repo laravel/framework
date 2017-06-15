@@ -10,6 +10,7 @@ use Illuminate\Config\Repository as Config;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Foundation\Exceptions\Handler;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class FoundationExceptionsHandlerTest extends TestCase
 {
@@ -90,6 +91,21 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->request->shouldReceive('expectsJson')->once()->andReturn(true);
 
         $response = $this->handler->render($this->request, new HttpException(403, 'My custom error message'))->getContent();
+
+        $this->assertContains('"message": "My custom error message"', $response);
+        $this->assertNotContains('<!DOCTYPE html>', $response);
+        $this->assertNotContains('"message": "Server Error"', $response);
+        $this->assertNotContains('"file":', $response);
+        $this->assertNotContains('"line":', $response);
+        $this->assertNotContains('"trace":', $response);
+    }
+
+    public function testReturnsJsonWithoutStackTraceWhenAjaxRequestAndDebugFalseAndAccessDeniedHttpExceptionErrorIsShown()
+    {
+        $this->config->shouldReceive('get')->with('app.debug', null)->once()->andReturn(false);
+        $this->request->shouldReceive('expectsJson')->once()->andReturn(true);
+
+        $response = $this->handler->render($this->request, new AccessDeniedHttpException('My custom error message'))->getContent();
 
         $this->assertContains('"message": "My custom error message"', $response);
         $this->assertNotContains('<!DOCTYPE html>', $response);
