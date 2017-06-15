@@ -8,7 +8,6 @@ use Illuminate\Support\Str;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Routing\BindingRegistrar;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Illuminate\Contracts\Broadcasting\Broadcaster as BroadcasterContract;
 
