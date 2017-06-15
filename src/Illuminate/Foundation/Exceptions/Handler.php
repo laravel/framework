@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Exceptions;
 
 use Exception;
 use Whoops\Run as Whoops;
+use Illuminate\Support\Arr;
 use Psr\Log\LoggerInterface;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Router;
@@ -14,6 +15,7 @@ use Illuminate\Http\RedirectResponse;
 use Whoops\Handler\PrettyPageHandler;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -151,6 +153,8 @@ class Handler implements ExceptionHandlerContract
     {
         if (method_exists($e, 'render') && $response = $e->render($request)) {
             return Router::prepareResponse($request, $response);
+        } elseif ($e instanceof Responsable) {
+            return $e->toResponse();
         }
 
         $e = $this->prepareException($e);
@@ -306,7 +310,7 @@ class Handler implements ExceptionHandlerContract
 
             $handler->handleUnconditionally(true);
             $handler->setApplicationPaths(
-                array_flip(array_except(
+                array_flip(Arr::except(
                     array_flip($files->directories(base_path())), [base_path('vendor')]
                 ))
             );
