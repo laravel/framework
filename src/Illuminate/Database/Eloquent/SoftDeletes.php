@@ -62,13 +62,17 @@ trait SoftDeletes
 
         $time = $this->freshTimestamp();
 
-        $this->{$this->getDeletedAtColumn()} = $time;
-        $this->{$this->getUpdatedAtColumn()} = $time;
+        $columns = [$this->getDeletedAtColumn() => $this->fromDateTime($time)];
 
-        $query->update([
-            $this->getDeletedAtColumn() => $this->fromDateTime($time),
-            $this->getUpdatedAtColumn() => $this->fromDateTime($time),
-        ]);
+        $this->{$this->getDeletedAtColumn()} = $time;
+
+        if ($this->timestamps) {
+            $this->{$this->getUpdatedAtColumn()} = $time;
+
+            $columns[$this->getUpdatedAtColumn()] = $this->fromDateTime($time);
+        }
+
+        $query->update($columns);
     }
 
     /**
