@@ -1071,8 +1071,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testFreshMethodOnModel()
     {
-        \Carbon\Carbon::setTestNow('now');
-        $now = \Carbon\Carbon::getTestNow();
+        $now = \Carbon\Carbon::now();
+        \Carbon\Carbon::setTestNow($now);
 
         $storedUser1 = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
         $storedUser1->newQuery()->update(['email' => 'dev@mathieutu.ovh', 'name' => 'Mathieu TUDISCO']);
