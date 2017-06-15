@@ -284,7 +284,7 @@ class FilesystemTest extends TestCase
         }
 
         $files = new Filesystem();
-        $this->assertEquals($size, $files->dirSize($this->tempDir));
+        $this->assertSame($size, $files->dirSize($this->tempDir));
     }
 
     /**
