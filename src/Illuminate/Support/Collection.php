@@ -1303,6 +1303,34 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Sort the collection by key.
+     *
+     * @param  int  $options
+     * @param  bool  $descending
+     * @return static
+     */
+    public function sortByKey($options = SORT_REGULAR, $descending = false)
+    {
+        $items = $this->items;
+
+        $descending ? krsort($items, $options)
+                    : ksort($items, $options);
+
+        return new static($items);
+    }
+
+    /**
+     * Sort the collection in descending order by key.
+     *
+     * @param  int  $options
+     * @return static
+     */
+    public function sortByKeyDesc($options = SORT_REGULAR)
+    {
+        return $this->sortByKey($options, true);
+    }
+
+    /**
      * Splice a portion of the underlying collection array.
      *
      * @param  int  $offset
