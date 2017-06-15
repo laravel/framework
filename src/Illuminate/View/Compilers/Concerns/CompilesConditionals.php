@@ -98,4 +98,26 @@ trait CompilesConditionals
     {
         return '<?php endif; ?>';
     }
+    
+    /**
+     * Returns 'selected' if expression is true.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileSelectedIf($expression)
+    {
+        return "<?php echo {$expression} ? 'selected' : '' ?>";
+    }
+
+    /**
+     * Returns 'checked' if expression is true.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileCheckedIf($expression)
+    {
+        return "<?php echo {$expression} ? 'checked' : '' ?>";
+    }
 }
