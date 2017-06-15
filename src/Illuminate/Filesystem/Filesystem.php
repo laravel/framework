@@ -311,6 +311,27 @@ class Filesystem
     }
 
     /**
+     * Get the size of a given directory.
+     *
+     * @param  string  $path
+     * @return int
+     */
+    public function dirSize($path)
+    {
+        if (!$this->isDirectory($path)) {
+            throw new \InvalidArgumentException("{$path} is not a directory");
+        }
+
+        $size = 0;
+
+        foreach ($this->allFiles($path) as $file) {
+            $size += $file->getSize();
+        }
+
+        return $size;
+    }
+
+    /**
      * Get the file's last modification time.
      *
      * @param  string  $path
