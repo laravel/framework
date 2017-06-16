@@ -22,7 +22,6 @@ class Mix
      */
     public function mix($path, $manifestDirectory = '')
     {
-
         if ($this->disabled) {
             return $this->disabledPath();
         }
@@ -81,11 +80,11 @@ class Mix
     /**
      * Check if the HRM mode of Mix is enabled.
      *
-     * @return boolean
+     * @return bool
      */
     protected function hmrModeEnabled()
     {
-        return file_exists(public_path($this->manifestDirectory . '/hot'));
+        return file_exists(public_path($this->manifestDirectory.'/hot'));
     }
 
     /**
@@ -107,7 +106,7 @@ class Mix
      */
     protected function compiledPath()
     {
-        return new HtmlString($this->manifestDirectory . $this->getPathFromManifest());
+        return new HtmlString($this->manifestDirectory.$this->getPathFromManifest());
     }
 
     /**
@@ -131,7 +130,7 @@ class Mix
     {
         return $this->getManifest()->get($this->path, function () {
             throw new MixException(
-                "Unable to locate Mix file: {$this->path}. Please check your " .
+                "Unable to locate Mix file: {$this->path}. Please check your ".
                 'webpack.mix.js output paths and try again.'
             );
         });
@@ -146,8 +145,8 @@ class Mix
      */
     protected function getManifest()
     {
-        if (!$this->manifest) {
-            if (!file_exists($manifestPath = public_path($this->manifestDirectory . '/mix-manifest.json'))) {
+        if (! $this->manifest) {
+            if (! file_exists($manifestPath = public_path($this->manifestDirectory.'/mix-manifest.json'))) {
                 throw new MixException('The Mix manifest does not exist.');
             }
 
@@ -160,11 +159,11 @@ class Mix
     /**
      * Disable the mix function (in case of tests for example).
      *
-     * @param  boolean  $disabled
+     * @param  bool  $disabled
      * @return $this
-     *
      */
-    public function disable($disabled = true) {
+    public function disable($disabled = true)
+    {
         $this->disabled = $disabled;
 
         return $this;
@@ -173,14 +172,13 @@ class Mix
     /**
      * Enable the mix function (in case of it was disabled before).
      *
-     * @param  boolean  $enabled
+     * @param  bool  $enabled
      * @return $this
-     *
      */
-    public function enable($enabled = true) {
+    public function enable($enabled = true)
+    {
         $this->disable(! $enabled);
 
         return $this;
     }
-
 }

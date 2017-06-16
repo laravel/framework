@@ -2,17 +2,17 @@
 
 namespace Illuminate\Tests\View\Mix;
 
-use Illuminate\Support\HtmlString;
-use Illuminate\View\Mix\MixException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Support\HtmlString;
+use Illuminate\View\Mix\MixException;
 
 class MixTest extends TestCase
 {
     public function setUp()
     {
         app()->singleton('path.public', function () {
-            return __DIR__ . '/stubs/';
+            return __DIR__.'/stubs/';
         });
     }
 
