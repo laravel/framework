@@ -6,9 +6,29 @@ use Illuminate\Support\HtmlString;
 
 class Mix
 {
+    protected $path;
     protected $manifest;
     protected $manifestDirectory;
-    protected $path;
+    protected $disabled = false;
+
+    /**
+     * Get the path to a versioned Mix file or a simple message if mix is disabled.
+     *
+     * @param  string  $path
+     * @param  string  $manifestDirectory
+     * @return \Illuminate\Support\HtmlString
+     *
+     * @throws \Illuminate\View\Mix\MixException
+     */
+    public function mix($path, $manifestDirectory = '')
+    {
+
+        if ($this->disabled) {
+            return $this->disabledPath();
+        }
+
+        return $this->getRealPath($path, $manifestDirectory);
+    }
 
     /**
      * Get the path to a versioned Mix file.
@@ -19,7 +39,7 @@ class Mix
      *
      * @throws \Illuminate\View\Mix\MixException
      */
-    public function mix($path, $manifestDirectory = '')
+    protected function getRealPath($path, $manifestDirectory)
     {
         $this->init($path, $manifestDirectory);
 
@@ -35,6 +55,7 @@ class Mix
      *
      * @param  string  $path
      * @param  string  $manifestDirectory
+     * @return void
      */
     protected function init($path, $manifestDirectory)
     {
@@ -50,7 +71,7 @@ class Mix
      */
     protected function sanitize($path)
     {
-        if ($path && !starts_with($path, '/')) {
+        if ($path && ! starts_with($path, '/')) {
             $path = "/{$path}";
         }
 
@@ -88,6 +109,16 @@ class Mix
     }
 
     /**
+     * Get a message instead of the path when mix is disabled.
+     *
+     * @return \Illuminate\Support\HtmlString
+     */
+    protected function disabledPath()
+    {
+        return new HtmlString('Mix is disabled!');
+    }
+
+    /**
      * Get the path from the manifest file.
      *
      * @return string
@@ -122,6 +153,28 @@ class Mix
         }
 
         return $this->manifest;
+    }
+
+    /**
+     * Disable the mix function (in case of tests for example).
+     *
+     * @param  boolean  $disabled
+     * @return void
+     *
+     */
+    public function disable($disabled = true) {
+        $this->disabled = $disabled;
+    }
+
+    /**
+     * Enable the mix function (in case of it was disabled before).
+     *
+     * @param  boolean  $enabled
+     * @return void
+     *
+     */
+    public function enable($enabled = true) {
+        $this->disable(! $enabled);
     }
 
 }
