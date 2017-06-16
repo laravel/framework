@@ -143,7 +143,7 @@ trait ManagesLayouts
      */
     public function yieldContent($section, $default = '')
     {
-        $sectionContent = $default;
+        $sectionContent = e($default);
 
         if (isset($this->sections[$section])) {
             $sectionContent = $this->sections[$section];
