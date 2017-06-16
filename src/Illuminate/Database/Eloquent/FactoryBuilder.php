@@ -134,7 +134,7 @@ class FactoryBuilder
             $this->store($results);
         }
 
-        return $results;
+        return $results->fresh();
     }
 
     /**
