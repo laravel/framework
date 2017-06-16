@@ -7,6 +7,7 @@ use RuntimeException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Log\LogServiceProvider;
@@ -549,10 +550,15 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function registerConfiguredProviders()
     {
-        $providers = $this->make(PackageManifest::class)->providers();
+        $providers = Collection::make($this->config['app.providers'])
+                        ->partition(function ($provider) {
+                            return Str::startsWith($provider, 'Illuminate\\');
+                        });
+
+        $providers->splice(1, 0, [$this->make(PackageManifest::class)->providers()]);
 
         (new ProviderRepository($this, new Filesystem, $this->getCachedServicesPath()))
-                    ->load(array_merge($providers, $this->config['app.providers']));
+                    ->load($providers->collapse()->toArray());
     }
 
     /**
