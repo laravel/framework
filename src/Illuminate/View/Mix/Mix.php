@@ -129,7 +129,7 @@ class Mix
      */
     protected function getPathFromManifest()
     {
-        return data_get($this->getManifest(), $this->path, function () {
+        return $this->getManifest()->get($this->path, function () {
             throw new MixException(
                 "Unable to locate Mix file: {$this->path}. Please check your " .
                 'webpack.mix.js output paths and try again.'
@@ -140,7 +140,7 @@ class Mix
     /**
      * Load the manifest file.
      *
-     * @return array
+     * @return \Illuminate\Support\Collection
      *
      * @throws \Illuminate\View\Mix\MixException
      */
@@ -151,7 +151,7 @@ class Mix
                 throw new MixException('The Mix manifest does not exist.');
             }
 
-            $this->manifest = json_decode(file_get_contents($manifestPath), true);
+            $this->manifest = collect(json_decode(file_get_contents($manifestPath), true));
         }
 
         return $this->manifest;

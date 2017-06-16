@@ -23,7 +23,7 @@ class MixTest extends TestCase
 
     public function testMixMethodWhenDisabled()
     {
-        $this->assertEquals(new HTMLString('Mix is disabled!'), $this->getMix()->disable()->mix('foo'));
+        $this->assertEquals(new HTMLString('Mix is disabled!'), $this->getMix()->disable()->mix('foo.css'));
     }
 
     private function getMix()
@@ -35,24 +35,24 @@ class MixTest extends TestCase
     {
         $this->expectException(MixException::class);
         $this->expectExceptionMessage('The Mix manifest does not exist.');
-        $this->getMix()->mix('foo');
+        $this->getMix()->mix('foo.css');
     }
 
     public function testMixMethodThrowAnExceptionIfPathDoesNotExistInManifest()
     {
         $this->expectException(MixException::class);
-        $this->expectExceptionMessage('Unable to locate Mix file: /baz. Please check your webpack.mix.js output paths and try again.');
+        $this->expectExceptionMessage('Unable to locate Mix file: /baz.css. Please check your webpack.mix.js output paths and try again.');
 
-        $this->getMix()->mix('baz', 'compiled');
+        $this->getMix()->mix('baz.css', 'compiled');
     }
 
     public function testMixMethodWhenCompiled()
     {
-        $this->assertEquals(new HTMLString('/compiled/bar'), $this->getMix()->mix('foo', 'compiled'));
+        $this->assertEquals(new HTMLString('/compiled/bar.css'), $this->getMix()->mix('foo.css', 'compiled'));
     }
 
     public function testMixMethodWhenHMR()
     {
-        $this->assertEquals(new HTMLString('//localhost:8080/foo'), $this->getMix()->mix('foo', 'hmr'));
+        $this->assertEquals(new HTMLString('//localhost:8080/foo.css'), $this->getMix()->mix('foo.css', 'hmr'));
     }
 }
