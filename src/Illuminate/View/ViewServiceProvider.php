@@ -8,6 +8,7 @@ use Illuminate\View\Engines\FileEngine;
 use Illuminate\View\Engines\CompilerEngine;
 use Illuminate\View\Engines\EngineResolver;
 use Illuminate\View\Compilers\BladeCompiler;
+use Illuminate\View\Mix\Mix;
 
 class ViewServiceProvider extends ServiceProvider
 {
@@ -23,6 +24,8 @@ class ViewServiceProvider extends ServiceProvider
         $this->registerViewFinder();
 
         $this->registerEngineResolver();
+
+        $this->registerMix();
     }
 
     /**
@@ -131,6 +134,18 @@ class ViewServiceProvider extends ServiceProvider
 
         $resolver->register('blade', function () {
             return new CompilerEngine($this->app['blade.compiler']);
+        });
+    }
+
+    /**
+     * Register the Mix instance.
+     *
+     * @return void
+     */
+    public function registerMix()
+    {
+        $this->app->singleton('mix', function () {
+            return new Mix();
         });
     }
 }
