@@ -11,10 +11,8 @@ class SQLiteBuilder extends Builder
      */
     public function dropAllTables()
     {
-        $this->connection->select($this->grammar->compileEnableWriteableSchema());
+        unlink($this->connection->getDatabaseName());
 
-        $this->connection->select($this->grammar->compileDropAllTables());
-
-        $this->connection->select($this->grammar->compileDisableWriteableSchema());
+        touch($this->connection->getDatabaseName());
     }
 }
