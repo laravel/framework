@@ -102,6 +102,8 @@ class Mix
      * Get the full path to the compiled file.
      *
      * @return \Illuminate\Support\HtmlString
+     *
+     * @throws \Illuminate\View\Mix\MixException
      */
     protected function compiledPath()
     {
@@ -159,22 +161,26 @@ class Mix
      * Disable the mix function (in case of tests for example).
      *
      * @param  boolean  $disabled
-     * @return void
+     * @return $this
      *
      */
     public function disable($disabled = true) {
         $this->disabled = $disabled;
+
+        return $this;
     }
 
     /**
      * Enable the mix function (in case of it was disabled before).
      *
      * @param  boolean  $enabled
-     * @return void
+     * @return $this
      *
      */
     public function enable($enabled = true) {
         $this->disable(! $enabled);
+
+        return $this;
     }
 
 }
