@@ -964,7 +964,7 @@ trait HasAttributes
             if (! array_key_exists($key, $this->original)) {
                 $dirty[$key] = $value;
             } elseif ($value !== $this->original[$key] &&
-                    ! $this->originalIsNumericallyEquivalent($key)) {
+                    ! $this->originalIsEquivalent($key)) {
                 $dirty[$key] = $value;
             }
         }
@@ -973,22 +973,33 @@ trait HasAttributes
     }
 
     /**
-     * Determine if the new and old values for a given key are numerically equivalent.
+     * Determine if the new and old values for a given key are equivalent.
      *
      * @param  string  $key
      * @return bool
      */
-    protected function originalIsNumericallyEquivalent($key)
+    protected function originalIsEquivalent($key)
     {
         $current = $this->attributes[$key];
 
         $original = $this->original[$key];
 
-        // This method checks if the two values are numerically equivalent even if they
-        // are different types. This is in case the two values are not the same type
-        // we can do a fair comparison of the two values to know if this is dirty.
-        return is_numeric($current) && is_numeric($original)
-            && strcmp((string) $current, (string) $original) === 0;
+        if ($current === $original) {
+            return true;
+        }
+
+        if (is_null($current) || is_null($original)) {
+            return false;
+        }
+
+        if (in_array($key, $this->getDates()) || $this->isDateCastable($key)) {
+            return $this->asDateTime($current)->eq($this->asDateTime($original));
+        } elseif ($this->hasCast($key)) {
+            return $this->castAttribute($key, $current) === $this->castAttribute($key, $original);
+        } else {
+            return is_numeric($current) && is_numeric($original)
+                && strcmp((string) $current, (string) $original) === 0;
+        }
     }
 
     /**
