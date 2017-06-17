@@ -48,7 +48,7 @@ class MakeAuthCommand extends Command
     protected $tests = [
         'LoginTest.stub' => 'Feature/LoginTest.php',
         'RegisterTest.stub' => 'Feature/RegisterTest.php',
-        'ResetsPasswordTest.stub' => 'Feature/ResetsPasswordTest.php'
+        'ResetsPasswordTest.stub' => 'Feature/ResetsPasswordTest.php',
     ];
 
     /**
