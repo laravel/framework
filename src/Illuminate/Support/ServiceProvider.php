@@ -56,7 +56,7 @@ abstract class ServiceProvider
     {
         $config = $this->app['config']->get($key, []);
 
-        $this->app['config']->set($key,  $config + (require $path));
+        $this->app['config']->set($key, $config + (require $path));
     }
 
     /**
