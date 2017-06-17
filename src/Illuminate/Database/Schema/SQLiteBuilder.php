@@ -23,7 +23,7 @@ class SQLiteBuilder extends Builder
     }
 
     /**
-     * Delete the database file.
+     * Delete the database file & re-create it.
      *
      * @return void
      */
