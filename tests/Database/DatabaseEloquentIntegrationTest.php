@@ -1069,6 +1069,48 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertTrue($saved->is($retrieved));
     }
 
+    public function testFreshMethodOnModel()
+    {
+        $now = \Carbon\Carbon::now();
+        \Carbon\Carbon::setTestNow($now);
+
+        $storedUser1 = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $storedUser1->newQuery()->update(['email' => 'dev@mathieutu.ovh', 'name' => 'Mathieu TUDISCO']);
+        $freshStoredUser1 = $storedUser1->fresh();
+
+        $storedUser2 = EloquentTestUser::create(['id' => 2, 'email' => 'taylorotwell@gmail.com']);
+        $storedUser2->newQuery()->update(['email' => 'dev@mathieutu.ovh']);
+        $freshStoredUser2 = $storedUser2->fresh();
+
+        $notStoredUser = new EloquentTestUser(['id' => 3, 'email' => 'taylorotwell@gmail.com']);
+        $freshNotStoredUser = $notStoredUser->fresh();
+
+        $this->assertEquals(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'created_at' => $now, 'updated_at' => $now], $storedUser1->toArray());
+        $this->assertEquals(['id' => 1, 'name' => 'Mathieu TUDISCO', 'email' => 'dev@mathieutu.ovh', 'created_at' => $now, 'updated_at' => $now], $freshStoredUser1->toArray());
+        $this->assertInstanceOf(EloquentTestUser::class, $storedUser1);
+
+        $this->assertEquals(['id' => 2, 'email' => 'taylorotwell@gmail.com', 'created_at' => $now, 'updated_at' => $now], $storedUser2->toArray());
+        $this->assertEquals(['id' => 2, 'name' => null, 'email' => 'dev@mathieutu.ovh', 'created_at' => $now, 'updated_at' => $now], $freshStoredUser2->toArray());
+        $this->assertInstanceOf(EloquentTestUser::class, $storedUser2);
+
+        $this->assertEquals(['id' => 3, 'email' => 'taylorotwell@gmail.com'], $notStoredUser->toArray());
+        $this->assertEquals(null, $freshNotStoredUser);
+    }
+
+    public function testFreshMethodOnCollection()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'taylorotwell@gmail.com']);
+
+        $users = EloquentTestUser::all()
+            ->add(new EloquentTestUser(['id' => 3, 'email' => 'taylorotwell@gmail.com']));
+
+        EloquentTestUser::find(1)->update(['name' => 'Mathieu TUDISCO']);
+        EloquentTestUser::find(2)->update(['email' => 'dev@mathieutu.ovh']);
+
+        $this->assertEquals($users->map->fresh(), $users->fresh());
+    }
+
     /**
      * Helpers...
      */
