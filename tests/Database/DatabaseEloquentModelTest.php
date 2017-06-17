@@ -1503,6 +1503,51 @@ class DatabaseEloquentModelTest extends TestCase
         $model->getAttributes();
     }
 
+    public function testModelAttributesCastedNotDirty()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setDateFormat('Y-m-d H:i:s');
+        $model->intAttribute = '3';
+        $model->floatAttribute = '4.0';
+        $model->stringAttribute = 2.5;
+        $model->boolAttribute = 1;
+        $model->booleanAttribute = 0;
+        $model->objectAttribute = ['foo' => 'bar'];
+        $obj = new StdClass;
+        $obj->foo = 'bar';
+        $model->arrayAttribute = $obj;
+        $model->jsonAttribute = ['foo' => 'bar'];
+        $model->dateAttribute = '1969-07-20';
+        $model->datetimeAttribute = '1969-07-20 22:56:00';
+        $model->timestampAttribute = '1969-07-20 22:56:00';
+
+        $model->syncOriginal();
+
+        $model->intAttribute = $model->intAttribute;
+        $model->floatAttribute = $model->floatAttribute;
+        $model->stringAttribute = $model->stringAttribute;
+        $model->boolAttribute = $model->boolAttribute;
+        $model->booleanAttribute = $model->booleanAttribute;
+        $model->objectAttribute = $model->objectAttribute;
+        $model->arrayAttribute = $model->arrayAttribute;
+        $model->jsonAttribute = $model->jsonAttribute;
+        $model->dateAttribute = $model->dateAttribute;
+        $model->datetimeAttribute = $model->datetimeAttribute;
+        $model->timestampAttribute = $model->timestampAttribute;
+
+        $this->assertFalse($model->isDirty('intAttribute'));
+        $this->assertFalse($model->isDirty('floatAttribute'));
+        $this->assertFalse($model->isDirty('stringAttribute'));
+        $this->assertFalse($model->isDirty('boolAttribute'));
+        $this->assertFalse($model->isDirty('booleanAttribute'));
+        $this->assertFalse($model->isDirty('objectAttribute'));
+        $this->assertFalse($model->isDirty('arrayAttribute'));
+        $this->assertFalse($model->isDirty('jsonAttribute'));
+        $this->assertFalse($model->isDirty('dateAttribute'));
+        $this->assertFalse($model->isDirty('datetimeAttribute'));
+        $this->assertFalse($model->isDirty('timestampAttribute'));
+    }
+
     public function testUpdatingNonExistentModelFails()
     {
         $model = new EloquentModelStub;
