@@ -12,7 +12,7 @@ class SQLiteBuilder extends Builder
     public function dropAllTables()
     {
         if ($this->connection->getDatabaseName() != ':memory:') {
-            return $this->deleteDatabaseFile();
+            return $this->refreshDatabaseFile();
         }
 
         $this->connection->select($this->grammar->compileEnableWriteableSchema());
@@ -27,7 +27,7 @@ class SQLiteBuilder extends Builder
      *
      * @return void
      */
-    public function deleteDatabaseFile()
+    public function refreshDatabaseFile()
     {
         unlink($this->connection->getDatabaseName());
 
