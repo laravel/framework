@@ -54,7 +54,7 @@ class SendingMailNotificationsTest extends TestCase
 
     public function test_mail_is_sent()
     {
-        $notification = new TestMailNotification();
+        $notification = new TestMailNotification;
 
         $user = NotifiableUser::forceCreate([
             'email' => 'taylor@laravel.com',
@@ -90,7 +90,7 @@ class SendingMailNotificationsTest extends TestCase
 
     public function test_mail_is_sent_with_subject()
     {
-        $notification = new TestMailNotificationWithSubject();
+        $notification = new TestMailNotificationWithSubject;
 
         $user = NotifiableUser::forceCreate([
             'email' => 'taylor@laravel.com',
@@ -120,7 +120,7 @@ class SendingMailNotificationsTest extends TestCase
 
     public function test_mail_is_sent_using_mailable()
     {
-        $notification = new TestMailNotificationWithMailable();
+        $notification = new TestMailNotificationWithMailable;
 
         $user = NotifiableUser::forceCreate([
             'email' => 'taylor@laravel.com',

@@ -423,7 +423,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testFromDateTime()
     {
-        $model = new EloquentModelStub();
+        $model = new EloquentModelStub;
 
         $value = \Carbon\Carbon::parse('2015-04-17 22:59:01');
         $this->assertEquals('2015-04-17 22:59:01', $model->fromDateTime($value));

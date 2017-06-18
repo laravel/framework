@@ -525,7 +525,7 @@ class ContainerTest extends TestCase
     public function testCallWithCallableArray()
     {
         $container = new Container;
-        $stub = new ContainerTestCallStub();
+        $stub = new ContainerTestCallStub;
         $result = $container->call([$stub, 'work'], ['foo', 'bar']);
         $this->assertEquals(['foo', 'bar'], $result);
     }

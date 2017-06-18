@@ -10,7 +10,7 @@ class TransformsRequestTest extends TestCase
 {
     public function testLowerAgeAndAddBeer()
     {
-        $middleware = new ManipulateInput();
+        $middleware = new ManipulateInput;
         $request = new Request(
             [
                 'name' => 'Damian',
@@ -28,7 +28,7 @@ class TransformsRequestTest extends TestCase
 
     public function testAjaxLowerAgeAndAddBeer()
     {
-        $middleware = new ManipulateInput();
+        $middleware = new ManipulateInput;
         $request = new Request(
             [
                 'name' => 'Damian',

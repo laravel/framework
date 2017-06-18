@@ -138,7 +138,7 @@ class CacheMemcachedStoreTest extends TestCase
             $this->markTestSkipped('Memcached module not installed');
         }
 
-        $store = new MemcachedStore(new Memcached(), 'bar');
+        $store = new MemcachedStore(new Memcached, 'bar');
         $this->assertEquals('bar:', $store->getPrefix());
         $store->setPrefix('foo');
         $this->assertEquals('foo:', $store->getPrefix());

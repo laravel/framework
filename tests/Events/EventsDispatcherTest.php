@@ -230,7 +230,7 @@ class EventsDispatcherTest extends TestCase
 
         $d->makePartial()->shouldAllowMockingProtectedMethods();
 
-        $event = new BroadcastEvent();
+        $event = new BroadcastEvent;
 
         $this->assertTrue($d->shouldBroadcast([$event]));
     }
@@ -241,7 +241,7 @@ class EventsDispatcherTest extends TestCase
 
         $d->makePartial()->shouldAllowMockingProtectedMethods();
 
-        $event = new BroadcastFalseCondition();
+        $event = new BroadcastFalseCondition;
 
         $this->assertFalse($d->shouldBroadcast([$event]));
     }

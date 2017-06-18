@@ -31,7 +31,7 @@ class HttpResponseTest extends TestCase
         $this->assertEquals('{"foo":"bar"}', $response->getContent());
         $this->assertEquals('application/json', $response->headers->get('Content-Type'));
 
-        $response = new \Illuminate\Http\Response();
+        $response = new \Illuminate\Http\Response;
         $response->setContent(['foo' => 'bar']);
         $this->assertEquals('{"foo":"bar"}', $response->getContent());
         $this->assertEquals('application/json', $response->headers->get('Content-Type'));
@@ -62,7 +62,7 @@ class HttpResponseTest extends TestCase
 
     public function testHeader()
     {
-        $response = new \Illuminate\Http\Response();
+        $response = new \Illuminate\Http\Response;
         $this->assertNull($response->headers->get('foo'));
         $response->header('foo', 'bar');
         $this->assertEquals('bar', $response->headers->get('foo'));
@@ -74,7 +74,7 @@ class HttpResponseTest extends TestCase
 
     public function testWithCookie()
     {
-        $response = new \Illuminate\Http\Response();
+        $response = new \Illuminate\Http\Response;
         $this->assertCount(0, $response->headers->getCookies());
         $this->assertEquals($response, $response->withCookie(new \Symfony\Component\HttpFoundation\Cookie('foo', 'bar')));
         $cookies = $response->headers->getCookies();
@@ -86,7 +86,7 @@ class HttpResponseTest extends TestCase
     public function testGetOriginalContent()
     {
         $arr = ['foo' => 'bar'];
-        $response = new \Illuminate\Http\Response();
+        $response = new \Illuminate\Http\Response;
         $response->setContent($arr);
         $this->assertSame($arr, $response->getOriginalContent());
     }

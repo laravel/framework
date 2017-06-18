@@ -147,7 +147,7 @@ class FoundationTestResponseTest extends TestCase
 
     public function testCanBeCreatedFromBinaryFileResponses()
     {
-        $files = new Filesystem();
+        $files = new Filesystem;
         $tempDir = __DIR__.'/tmp';
         $files->makeDirectory($tempDir, 0755, false, true);
         $files->put($tempDir.'/file.txt', 'Hello World');
