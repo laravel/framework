@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Exception;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Model as Eloquent;
@@ -1108,6 +1109,9 @@ class DatabaseEloquentIntegrationTest extends TestCase
         EloquentTestUser::find(1)->update(['name' => 'Mathieu TUDISCO']);
         EloquentTestUser::find(2)->update(['email' => 'dev@mathieutu.ovh']);
 
+        $this->assertEquals($users->map->fresh(), $users->fresh());
+
+        $users = new Collection();
         $this->assertEquals($users->map->fresh(), $users->fresh());
     }
 

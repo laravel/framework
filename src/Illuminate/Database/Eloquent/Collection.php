@@ -146,6 +146,10 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function fresh($with = [])
     {
+        if ($this->isEmpty()) {
+            return new static;
+        }
+
         $model = $this->first();
 
         $freshModels = $model->newQueryWithoutScopes()
