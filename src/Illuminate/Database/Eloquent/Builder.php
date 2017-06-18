@@ -888,7 +888,7 @@ class Builder
         $builder = clone $this;
 
         foreach ($this->scopes as $identifier => $scope) {
-            if (!isset($builder->scopes[$identifier])) {
+            if (! isset($builder->scopes[$identifier])) {
                 continue;
             }
 
