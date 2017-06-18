@@ -57,7 +57,7 @@ class ListenerMakeCommand extends GeneratorCommand
             $this->laravel->getNamespace(),
             'Illuminate',
             '\\',
-        ]) {
+        ])) {
             $event = $this->laravel->getNamespace().'Events\\'.$event;
         }
 
