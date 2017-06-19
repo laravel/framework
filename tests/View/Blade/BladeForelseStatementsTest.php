@@ -1,21 +1,18 @@
 <?php
 
-namespace Illuminate\Tests\Blade;
+namespace Illuminate\Tests\View\Blade;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use Illuminate\View\Compilers\BladeCompiler;
 
-class BladeForelseStatementsTest extends TestCase
+
+
+
+class BladeForelseStatementsTest extends AbstractBladeTestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
+
 
     public function testForelseStatementsAreCompiled()
     {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+
         $string = '@forelse ($this->getUsers() as $user)
 breeze
 @empty
@@ -26,12 +23,12 @@ breeze
 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
 empty
 <?php endif; ?>';
-        $this->assertEquals($expected, $compiler->compileString($string));
+        $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
     public function testForelseStatementsAreCompiledWithUppercaseSyntax()
     {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+
         $string = '@forelse ($this->getUsers() AS $user)
 breeze
 @empty
@@ -42,12 +39,12 @@ breeze
 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
 empty
 <?php endif; ?>';
-        $this->assertEquals($expected, $compiler->compileString($string));
+        $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
     public function testForelseStatementsAreCompiledWithMultipleLine()
     {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+
         $string = '@forelse ([
 foo,
 bar,
@@ -64,12 +61,12 @@ breeze
 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
 empty
 <?php endif; ?>';
-        $this->assertEquals($expected, $compiler->compileString($string));
+        $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
     public function testNestedForelseStatementsAreCompiled()
     {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+
         $string = '@forelse ($this->getUsers() as $user)
 @forelse ($user->tags as $tag)
 breeze
@@ -88,11 +85,7 @@ tag empty
 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
 empty
 <?php endif; ?>';
-        $this->assertEquals($expected, $compiler->compileString($string));
+        $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
-    protected function getFiles()
-    {
-        return m::mock('Illuminate\Filesystem\Filesystem');
-    }
 }
