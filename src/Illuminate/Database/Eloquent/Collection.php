@@ -43,7 +43,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function load($relations)
     {
-        if (count($this->items) > 0) {
+        if ($this->isNotEmpty()) {
             if (is_string($relations)) {
                 $relations = func_get_args();
             }
@@ -371,7 +371,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function getQueueableClass()
     {
-        if ($this->count() === 0) {
+        if ($this->isEmpty()) {
             return;
         }
 
@@ -403,7 +403,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function getQueueableConnection()
     {
-        if ($this->count() === 0) {
+        if ($this->isEmpty()) {
             return;
         }
 
