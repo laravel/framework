@@ -10,7 +10,7 @@ class MixTest extends TestCase
     public function setUp()
     {
         app()->singleton('path.public', function () {
-            return __DIR__.'/stubs/';
+            return __DIR__;
         });
     }
 
@@ -34,7 +34,7 @@ class MixTest extends TestCase
      */
     public function testMixMethodThrowAnExceptionIfPathDoesNotExistInManifest()
     {
-        $this->getMix()->mix('baz.css', 'compiled');
+        $this->getMix()->mix('baz.css', 'fixtures');
     }
 
     /**
@@ -43,7 +43,7 @@ class MixTest extends TestCase
      */
     public function testMixMethodThrowAnExceptionIfManifestIsNotAProperJson()
     {
-        $this->getMix()->setManifestFilename('mix-manifest-wrong')->mix('foo.css', 'compiled');
+        $this->getMix()->setManifestFilename('mix-manifest-wrong')->mix('foo.css', 'fixtures');
     }
 
     public function testMixMethodWhenDisabled()
@@ -61,19 +61,27 @@ class MixTest extends TestCase
 
     public function testMixMethodWhenCompiled()
     {
-        $this->assertEquals(new HTMLString('/compiled/bar.css'), $this->getMix()->mix('foo.css', 'compiled'));
+        $this->assertEquals(new HTMLString('/fixtures/bar.css'), $this->getMix()->mix('foo.css', 'fixtures'));
     }
 
     public function testMixMethodWhenHMR()
     {
-        $this->assertEquals(new HTMLString('//localhost:8080/foo.css'), $this->getMix()->mix('foo.css', 'hmr'));
+        touch(public_path('hot'));
+
+        $this->assertEquals(new HTMLString('//localhost:8080/foo.css'), $this->getMix()->mix('foo.css'));
+
+        unlink(public_path('hot'));
     }
 
     public function testMixMethodWhenCustomHMR()
     {
+        touch(public_path('hot-custom'));
+
         $this->assertEquals(
             new HTMLString('//custom:uri/foo.css'),
-            $this->getMix()->setHmrFilename('hot-custom')->setHmrURI('//custom:uri')->mix('foo.css', 'hmr')
+            $this->getMix()->setHmrFilename('hot-custom')->setHmrURI('//custom:uri')->mix('foo.css')
         );
+
+        unlink(public_path('hot-custom'));
     }
 }
