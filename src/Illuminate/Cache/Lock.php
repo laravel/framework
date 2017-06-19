@@ -7,7 +7,6 @@ use Illuminate\Contracts\Cache\LockTimeoutException;
 
 abstract class Lock
 {
-
     /**
      * The name of the lock.
      *
