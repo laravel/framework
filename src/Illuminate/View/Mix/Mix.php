@@ -186,30 +186,31 @@ class Mix
      */
     protected function getManifest()
     {
-        if (! $this->manifest) {
-            if (! file_exists($manifestPath = public_path($this->manifestDirectory.$this->manifestFilename))) {
-                throw new MixException('The Mix manifest does not exist.');
-            }
-
-            $this->manifest = json_decode(file_get_contents($manifestPath), true);
-
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new MixException('The Mix manifest isn\'t a proper json file.');
-            }
+        if ($this->manifest) {
+            return $this->manifest;
         }
 
-        return $this->manifest;
+        if (!file_exists($manifestPath = public_path($this->manifestDirectory.$this->manifestFilename))) {
+            throw new MixException('The Mix manifest does not exist.');
+        }
+
+        $this->manifest = json_decode(file_get_contents($manifestPath), true);
+
+        if (json_last_error() === JSON_ERROR_NONE) {
+            return $this->manifest;
+        }
+
+        throw new MixException("The Mix manifest isn't a proper json file.");
     }
 
     /**
      * Disable the mix function (in case of tests for example).
      *
-     * @param  bool  $disabled
      * @return $this
      */
-    public function disable($disabled = true)
+    public function disable()
     {
-        $this->disabled = $disabled;
+        $this->disabled = true;
 
         return $this;
     }
@@ -217,12 +218,11 @@ class Mix
     /**
      * Enable the mix function (in case of it was disabled before).
      *
-     * @param  bool  $enabled
      * @return $this
      */
-    public function enable($enabled = true)
+    public function enable()
     {
-        $this->disabled = ! $enabled;
+        $this->disabled = false;
 
         return $this;
     }
@@ -246,7 +246,7 @@ class Mix
      *
      * @param  string  $manifestFilename
      *
-     * @return Mix
+     * @return $this
      */
     public function setManifestFilename($manifestFilename)
     {
@@ -260,7 +260,7 @@ class Mix
      *
      * @param  string  $hmrFilename
      *
-     * @return Mix
+     * @return $this
      */
     public function setHmrFilename($hmrFilename)
     {
