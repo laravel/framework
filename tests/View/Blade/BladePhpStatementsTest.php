@@ -1,36 +1,20 @@
 <?php
 
-namespace Illuminate\Tests\Blade;
+namespace Illuminate\Tests\View\Blade;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use Illuminate\View\Compilers\BladeCompiler;
-
-class BladePhpStatementsTest extends TestCase
+class BladePhpStatementsTest extends AbstractBladeTestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testPhpStatementsWithExpressionAreCompiled()
     {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = '@php($set = true)';
         $expected = '<?php ($set = true); ?>';
-        $this->assertEquals($expected, $compiler->compileString($string));
+        $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
     public function testPhpStatementsWithoutExpressionAreCompiled()
     {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = '@php';
         $expected = '<?php ';
-        $this->assertEquals($expected, $compiler->compileString($string));
-    }
-
-    protected function getFiles()
-    {
-        return m::mock('Illuminate\Filesystem\Filesystem');
+        $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 }
