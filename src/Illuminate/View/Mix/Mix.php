@@ -3,22 +3,65 @@
 namespace Illuminate\View\Mix;
 
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 
 class Mix
 {
+    /**
+     * The sanitized path to the asset.
+     *
+     * @var string
+     */
     protected $path;
+
+    /**
+     * The cached manifest.
+     *
+     * @var array
+     */
     protected $manifest;
+
+    /**
+     * The directory where the assets and the manifest file are.
+     *
+     * @var string
+     */
     protected $manifestDirectory;
+
+    /**
+     * The cache of mix state.
+     *
+     * @var bool
+     */
     protected $disabled = false;
 
     /**
-     * Get the path to a versioned Mix file or a simple message if mix is disabled.
+     * The URI of HMR server.
+     *
+     * @var string
+     */
+    protected $hmrURI = '//localhost:8080';
+
+    /**
+     * The name of file which prove that HMR is enabled.
+     *
+     * @var string
+     */
+    protected $hmrFilename = '/hot';
+
+    /**
+     * The name of Mix Manifest file.
+     *
+     * @var string
+     */
+    protected $manifestFilename = '/mix-manifest.json';
+
+    /**
+     * Get the path to a versioned Mix asset or a simple message if mix is disabled.
      *
      * @param  string  $path
      * @param  string  $manifestDirectory
      * @return \Illuminate\Support\HtmlString
-     *
-     * @throws \Illuminate\View\Mix\MixException
      */
     public function mix($path, $manifestDirectory = '')
     {
@@ -35,8 +78,6 @@ class Mix
      * @param  string  $path
      * @param  string  $manifestDirectory
      * @return \Illuminate\Support\HtmlString
-     *
-     * @throws \Illuminate\View\Mix\MixException
      */
     protected function getRealPath($path, $manifestDirectory)
     {
@@ -70,7 +111,7 @@ class Mix
      */
     protected function sanitize($path)
     {
-        if ($path && ! starts_with($path, '/')) {
+        if ($path && ! Str::startsWith($path, '/')) {
             $path = "/{$path}";
         }
 
@@ -84,7 +125,7 @@ class Mix
      */
     protected function hmrModeEnabled()
     {
-        return file_exists(public_path($this->manifestDirectory.'/hot'));
+        return file_exists(public_path($this->manifestDirectory.$this->hmrFilename));
     }
 
     /**
@@ -94,15 +135,13 @@ class Mix
      */
     protected function hmrPath()
     {
-        return new HtmlString("//localhost:8080{$this->path}");
+        return new HtmlString($this->hmrURI.$this->path);
     }
 
     /**
      * Get the full path to the compiled file.
      *
      * @return \Illuminate\Support\HtmlString
-     *
-     * @throws \Illuminate\View\Mix\MixException
      */
     protected function compiledPath()
     {
@@ -128,29 +167,35 @@ class Mix
      */
     protected function getPathFromManifest()
     {
-        return $this->getManifest()->get($this->path, function () {
+        if (! array_key_exists($this->path, $manifest = $this->getManifest())) {
             throw new MixException(
                 "Unable to locate Mix file: {$this->path}. Please check your ".
                 'webpack.mix.js output paths and try again.'
             );
-        });
+        }
+
+        return $manifest[$this->path];
     }
 
     /**
      * Load the manifest file.
      *
-     * @return \Illuminate\Support\Collection
+     * @return array
      *
      * @throws \Illuminate\View\Mix\MixException
      */
     protected function getManifest()
     {
         if (! $this->manifest) {
-            if (! file_exists($manifestPath = public_path($this->manifestDirectory.'/mix-manifest.json'))) {
+            if (! file_exists($manifestPath = public_path($this->manifestDirectory.$this->manifestFilename))) {
                 throw new MixException('The Mix manifest does not exist.');
             }
 
-            $this->manifest = collect(json_decode(file_get_contents($manifestPath), true));
+            $this->manifest = json_decode(file_get_contents($manifestPath), true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new MixException('The Mix manifest isn\'t a proper json file.');
+            }
         }
 
         return $this->manifest;
@@ -177,7 +222,49 @@ class Mix
      */
     public function enable($enabled = true)
     {
-        $this->disable(! $enabled);
+        $this->disabled = ! $enabled;
+
+        return $this;
+    }
+
+    /**
+     * Set the URI of HMR sever.
+     *
+     * @param  string  $hmrURI
+     *
+     * @return $this
+     */
+    public function setHmrURI($hmrURI)
+    {
+        $this->hmrURI = $hmrURI;
+
+        return $this;
+    }
+
+    /**
+     * Set the Mix Manifest filename.
+     *
+     * @param  string  $manifestFilename
+     *
+     * @return Mix
+     */
+    public function setManifestFilename($manifestFilename)
+    {
+        $this->manifestFilename = $this->sanitize($manifestFilename);
+
+        return $this;
+    }
+
+    /**
+     * Set the HMR hot filename.
+     *
+     * @param  string  $hmrFilename
+     *
+     * @return Mix
+     */
+    public function setHmrFilename($hmrFilename)
+    {
+        $this->hmrFilename = $this->sanitize($hmrFilename);
 
         return $this;
     }

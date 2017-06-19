@@ -64,6 +64,6 @@ class FoundationHelpersTest extends TestCase
             m::mock(\Illuminate\View\Mix\Mix::class)->shouldReceive('mix')->andReturn('bar')->getMock()
         );
 
-        $this->assertEquals('bar', mix('foo'));
+        $this->assertSame('bar', mix('foo'));
     }
 }

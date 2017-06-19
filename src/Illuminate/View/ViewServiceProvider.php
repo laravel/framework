@@ -145,7 +145,7 @@ class ViewServiceProvider extends ServiceProvider
     public function registerMix()
     {
         $this->app->singleton('mix', function () {
-            return new Mix();
+            return new Mix;
         });
     }
 }

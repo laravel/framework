@@ -522,8 +522,6 @@ if (! function_exists('mix')) {
      * @param  string  $path
      * @param  string  $manifestDirectory
      * @return \Illuminate\Support\HtmlString
-     *
-     * @throws \Illuminate\View\Mix\MixException
      */
     function mix($path, $manifestDirectory = '')
     {
