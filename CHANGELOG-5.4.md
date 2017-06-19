@@ -1,5 +1,17 @@
 # Release Notes for 5.4.x
 
+## v5.4.27 (2017-06-15)
+
+### Added
+- Added `Collection::diffAssoc()` method ([#19604](https://github.com/laravel/framework/pull/19604))
+
+### Changed
+- Updated PHPUnit whitelist ([#19609](https://github.com/laravel/framework/pull/19609))
+
+### Fixed
+- Update timestamps on soft delete only when they are used ([#19627](https://github.com/laravel/framework/pull/19627))
+
+
 ## v5.4.26 (2017-06-13)
 
 ### Added

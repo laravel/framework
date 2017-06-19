@@ -57,6 +57,7 @@ class DatabaseSoftDeletingTraitStub
     use \Illuminate\Database\Eloquent\SoftDeletes;
     public $deleted_at;
     public $updated_at;
+    public $timestamps = true;
 
     public function newQuery()
     {
