@@ -205,7 +205,7 @@ class Message
      * Create a Swift Attachment instance.
      *
      * @param  string  $file
-     * @return \Swift_Attachment
+     * @return \Swift_Mime_Attachment
      */
     protected function createAttachmentFromPath($file)
     {

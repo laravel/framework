@@ -88,7 +88,7 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * The route URL generator instance.
      *
-     * @var \Illuminate\Routing\RouteUrlGenerator
+     * @var \Illuminate\Routing\RouteUrlGenerator|null
      */
     protected $routeGenerator;
 

@@ -13,7 +13,7 @@ class Markdown
     /**
      * The view factory implementation.
      *
-     * @var \Illuminate\View\Factory
+     * @var \Illuminate\Contracts\View\Factory
      */
     protected $view;
 
