@@ -71,7 +71,7 @@ class DatabaseEloquentRelationTest extends TestCase
             return 'foo';
         });
 
-        $model = new EloquentRelationResetModelStub();
+        $model = new EloquentRelationResetModelStub;
         $relation = new EloquentRelationStub($model->newQuery(), $model);
 
         $result = $relation->foo();

@@ -201,6 +201,6 @@ class FailingSwiftMailerStub
 
     public function createMessage()
     {
-        return new \Swift_Message();
+        return new \Swift_Message;
     }
 }

@@ -54,7 +54,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
     {
         $this->expectException('InvalidArgumentException');
 
-        $job = new stdClass();
+        $job = new stdClass;
         $job->invalid = "\xc3\x28";
 
         $queue = $this->getMockForAbstractClass('Illuminate\Queue\Queue');

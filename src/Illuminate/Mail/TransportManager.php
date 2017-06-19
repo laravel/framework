@@ -104,7 +104,7 @@ class TransportManager extends Manager
      */
     protected function createMailDriver()
     {
-        return new MailTransport();
+        return new MailTransport;
     }
 
     /**

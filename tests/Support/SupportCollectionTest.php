@@ -98,7 +98,7 @@ class SupportCollectionTest extends TestCase
 
     public function testEmptyCollectionIsEmpty()
     {
-        $c = new Collection();
+        $c = new Collection;
 
         $this->assertTrue($c->isEmpty());
     }
@@ -1014,7 +1014,7 @@ class SupportCollectionTest extends TestCase
 
     public function testConstructMakeFromObject()
     {
-        $object = new stdClass();
+        $object = new stdClass;
         $object->foo = 'bar';
         $collection = Collection::make($object);
         $this->assertEquals(['foo' => 'bar'], $collection->all());
@@ -1031,7 +1031,7 @@ class SupportCollectionTest extends TestCase
         $collection = new Collection(null);
         $this->assertEquals([], $collection->all());
 
-        $collection = new Collection();
+        $collection = new Collection;
         $this->assertEquals([], $collection->all());
     }
 
@@ -1050,7 +1050,7 @@ class SupportCollectionTest extends TestCase
 
     public function testConstructMethodFromObject()
     {
-        $object = new stdClass();
+        $object = new stdClass;
         $object->foo = 'bar';
         $collection = new Collection($object);
         $this->assertEquals(['foo' => 'bar'], $collection->all());
@@ -1481,7 +1481,7 @@ class SupportCollectionTest extends TestCase
 
     public function testGettingSumFromEmptyCollection()
     {
-        $c = new Collection();
+        $c = new Collection;
         $this->assertEquals(0, $c->sum('foo'));
     }
 
@@ -1636,7 +1636,7 @@ class SupportCollectionTest extends TestCase
         $c = new Collection([1, 2, 3, 4, 5]);
         $this->assertEquals(5, $c->max());
 
-        $c = new Collection();
+        $c = new Collection;
         $this->assertNull($c->max());
     }
 
@@ -1660,7 +1660,7 @@ class SupportCollectionTest extends TestCase
         $c = new Collection([0, 1, 2, 3, 4]);
         $this->assertEquals(0, $c->min());
 
-        $c = new Collection();
+        $c = new Collection;
         $this->assertNull($c->min());
     }
 
@@ -1692,16 +1692,16 @@ class SupportCollectionTest extends TestCase
         $c = new Collection([1, 2, 3, 4, 5]);
         $this->assertEquals(3, $c->avg());
 
-        $c = new Collection();
+        $c = new Collection;
         $this->assertNull($c->avg());
     }
 
     public function testJsonSerialize()
     {
         $c = new Collection([
-            new TestArrayableObject(),
-            new TestJsonableObject(),
-            new TestJsonSerializeObject(),
+            new TestArrayableObject,
+            new TestJsonableObject,
+            new TestJsonSerializeObject,
             'baz',
         ]);
 
@@ -1859,13 +1859,13 @@ class SupportCollectionTest extends TestCase
 
     public function testMedianOnEmptyCollectionReturnsNull()
     {
-        $collection = new Collection();
+        $collection = new Collection;
         $this->assertNull($collection->median());
     }
 
     public function testModeOnNullCollection()
     {
-        $collection = new Collection();
+        $collection = new Collection;
         $this->assertNull($collection->mode());
     }
 
@@ -1978,7 +1978,7 @@ class SupportCollectionTest extends TestCase
 
     public function testSplitEmptyCollection()
     {
-        $collection = new Collection();
+        $collection = new Collection;
 
         $this->assertEquals(
             [],
@@ -2056,7 +2056,7 @@ class SupportCollectionTest extends TestCase
 
     public function testPartitionEmptyCollection()
     {
-        $collection = new Collection();
+        $collection = new Collection;
 
         $this->assertCount(2, $collection->partition(function () {
             return true;

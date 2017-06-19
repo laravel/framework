@@ -761,7 +761,7 @@ class RoutingRouteTest extends TestCase
             return $name;
         }]);
         $router->model('bar', 'Illuminate\Tests\Routing\RouteModelBindingNullStub', function ($value) {
-            return (new RouteModelBindingClosureStub())->findAlternate($value);
+            return (new RouteModelBindingClosureStub)->findAlternate($value);
         });
         $this->assertEquals('tayloralt', $router->dispatch(Request::create('foo/TAYLOR', 'GET'))->getContent());
     }
@@ -1667,7 +1667,7 @@ class RoutingTestNonExistingUserModel extends RoutingTestUserModel
 
     public function firstOrFail()
     {
-        throw new \Illuminate\Database\Eloquent\ModelNotFoundException();
+        throw new \Illuminate\Database\Eloquent\ModelNotFoundException;
     }
 }
 
