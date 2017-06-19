@@ -2,7 +2,6 @@
 
 namespace Illuminate\Cache;
 
-use Carbon\Carbon;
 use Illuminate\Contracts\Cache\LockTimeoutException;
 
 abstract class Lock
@@ -42,12 +41,12 @@ abstract class Lock
      */
     public function block($seconds, $callback = null)
     {
-        $starting = Carbon::now();
+        $starting = time();
 
         while (! $this->acquire()) {
             usleep(250 * 1000);
 
-            if (Carbon::now()->subSeconds($seconds)->gte($starting)) {
+            if (time() - $seconds >= $starting) {
                 throw new LockTimeoutException;
             }
         }
