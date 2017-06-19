@@ -8,6 +8,33 @@ use Illuminate\Contracts\Cache\LockTimeoutException;
 abstract class Lock
 {
     /**
+     * The name of the lock.
+     *
+     * @var string
+     */
+    protected $name;
+
+    /**
+     * The number of seconds the lock should be maintained.
+     *
+     * @var int
+     */
+    protected $seconds;
+
+    /**
+     * Create a new lock instance.
+     *
+     * @param  string  $name
+     * @param  int  $seconds
+     * @return void
+     */
+    public function __construct($name, $seconds)
+    {
+        $this->name = $name;
+        $this->seconds = $seconds;
+    }
+
+    /**
      * Attempt to acquire the lock.
      *
      * @return bool

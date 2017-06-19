@@ -14,20 +14,6 @@ class RedisLock extends Lock implements LockContract
     protected $redis;
 
     /**
-     * The name of the lock.
-     *
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * The number of seconds the lock should be maintained.
-     *
-     * @var int
-     */
-    protected $seconds;
-
-    /**
      * Create a new lock instance.
      *
      * @param  \Illuminate\Redis\Connections\Connection  $redis
@@ -37,9 +23,8 @@ class RedisLock extends Lock implements LockContract
      */
     public function __construct($redis, $name, $seconds)
     {
-        $this->name = $name;
+        parent::__construct($name, $seconds);
         $this->redis = $redis;
-        $this->seconds = $seconds;
     }
 
     /**
