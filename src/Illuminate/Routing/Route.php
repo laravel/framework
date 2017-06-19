@@ -526,7 +526,7 @@ class Route
      * Get or set the domain for the route.
      *
      * @param  string|null  $domain
-     * @return $this
+     * @return $this|string|null
      */
     public function domain($domain = null)
     {

@@ -15,7 +15,7 @@ class PhpRedisConnector
      *
      * @param  array  $config
      * @param  array  $options
-     * @return \Illuminate\Redis\PhpRedisConnection
+     * @return \Illuminate\Redis\Connections\PhpRedisConnection
      */
     public function connect(array $config, array $options)
     {
