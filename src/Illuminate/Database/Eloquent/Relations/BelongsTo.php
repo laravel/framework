@@ -128,7 +128,8 @@ class BelongsTo extends Relation
         }
 
         // If there are no keys that were not null we will just return an array with null
-        // so the query wont fail plus returns zero results, which should be what the developer expects.
+        // so this query wont fail plus returns zero results, which should be what the
+        // developer expects to happen in this situation. Otherwise we'll sort them.
         if (count($keys) === 0) {
             return [null];
         }
