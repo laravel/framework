@@ -3,7 +3,6 @@
 namespace Illuminate\Cache;
 
 use Carbon\Carbon;
-use Illuminate\Cache\LockTimeoutException;
 
 abstract class Lock
 {
