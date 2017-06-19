@@ -357,6 +357,12 @@ class DatabaseEloquentCollectionTest extends TestCase
         $c = new Collection([new TestEloquentCollectionModel, (object) ['id' => 'something']]);
         $c->getQueueableClass();
     }
+
+    public function testEmptyCollectionStayEmptyOnFresh()
+    {
+        $c = new Collection();
+        $this->assertEquals($c, $c->fresh());
+    }
 }
 
 class TestEloquentCollectionModel extends \Illuminate\Database\Eloquent\Model
