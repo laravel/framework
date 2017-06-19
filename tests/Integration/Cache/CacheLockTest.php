@@ -60,7 +60,7 @@ class CacheLockTest extends TestCase
     }
 
     /**
-     * @expectedException \Illuminate\Contracts\Cache\LockTimeoutException
+     * @expectedException \Illuminate\Cache\LockTimeoutException
      */
     public function test_locks_throw_timeout_if_block_expires()
     {

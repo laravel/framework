@@ -3,7 +3,6 @@
 namespace Illuminate\Cache;
 
 use Carbon\Carbon;
-use Illuminate\Contracts\Cache\LockTimeoutException;
 
 abstract class Lock
 {
@@ -39,6 +38,7 @@ abstract class Lock
      * @param  int  $seconds
      * @param  callable|null  $callback
      * @return bool
+     * @throws \Illuminate\Cache\LockTimeoutException
      */
     public function block($seconds, $callback = null)
     {
