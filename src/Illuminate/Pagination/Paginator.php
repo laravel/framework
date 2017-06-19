@@ -100,7 +100,7 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
      *
      * @param  string|null  $view
      * @param  array  $data
-     * @return string
+     * @return \Illuminate\Support\HtmlString
      */
     public function render($view = null, $data = [])
     {

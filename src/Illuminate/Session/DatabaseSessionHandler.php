@@ -137,7 +137,7 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
      *
      * @param  string  $sessionId
      * @param  string  $payload
-     * @return void
+     * @return bool|null
      */
     protected function performInsert($sessionId, $payload)
     {
