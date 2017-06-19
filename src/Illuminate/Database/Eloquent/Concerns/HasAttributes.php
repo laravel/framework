@@ -728,9 +728,10 @@ trait HasAttributes
      */
     public function fromDateTime($value)
     {
-        return $this->asDateTime($value)->format(
-            $this->getDateFormat()
-        );
+        return $value == null
+            ? $value : $this->asDateTime($value)->format(
+                $this->getDateFormat()
+            );
     }
 
     /**
