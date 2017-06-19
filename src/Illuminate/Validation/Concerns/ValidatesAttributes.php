@@ -339,7 +339,8 @@ trait ValidatesAttributes
 
         $date = date_parse($value);
 
-        return checkdate($date['month'], $date['day'], $date['year']);
+        return $date['error_count'] + $date['warning_count'] > 0 ? false : checkdate($date['month'], $date['day'],
+            $date['year']);
     }
 
     /**
