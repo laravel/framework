@@ -24,6 +24,7 @@ class MemcachedLock extends Lock implements LockContract
     public function __construct($memcached, $name, $seconds)
     {
         parent::__construct($name, $seconds);
+
         $this->memcached = $memcached;
     }
 

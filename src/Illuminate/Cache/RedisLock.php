@@ -24,6 +24,7 @@ class RedisLock extends Lock implements LockContract
     public function __construct($redis, $name, $seconds)
     {
         parent::__construct($name, $seconds);
+
         $this->redis = $redis;
     }
 
