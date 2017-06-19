@@ -14,20 +14,6 @@ class MemcachedLock extends Lock implements LockContract
     protected $memcached;
 
     /**
-     * The name of the lock.
-     *
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * The number of seconds the lock should be maintained.
-     *
-     * @var int
-     */
-    protected $seconds;
-
-    /**
      * Create a new lock instance.
      *
      * @param  \Memcached  $memcached
@@ -37,8 +23,7 @@ class MemcachedLock extends Lock implements LockContract
      */
     public function __construct($memcached, $name, $seconds)
     {
-        $this->name = $name;
-        $this->seconds = $seconds;
+        parent::__construct($name, $seconds);
         $this->memcached = $memcached;
     }
 
