@@ -2,8 +2,8 @@
 
 namespace Illuminate\View\Mix;
 
-use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
+use Illuminate\Support\HtmlString;
 
 class Mix
 {
