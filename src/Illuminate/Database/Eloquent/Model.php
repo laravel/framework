@@ -467,7 +467,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         // Check for any BelongsTo relations and save those first.
         foreach ($this->getRelations() as $method => $related) {
-            if (! ($this->$method() instanceof BelongsTo)) {
+            if (! method_exists($this, $method)
+                || ! ($this->$method() instanceof BelongsTo)
+                || ! ($related instanceof self)
+            ) {
                 continue;
             }
 
