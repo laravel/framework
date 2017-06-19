@@ -2,17 +2,10 @@
 
 namespace Illuminate\Tests\View\Blade;
 
-
-
-
-
 class BladeContinueStatementsTest extends AbstractBladeTestCase
 {
-
-
     public function testContinueStatementsAreCompiled()
     {
-
         $string = '@for ($i = 0; $i < 10; $i++)
 test
 @continue
@@ -26,7 +19,6 @@ test
 
     public function testContinueStatementsWithExpressionAreCompiled()
     {
-
         $string = '@for ($i = 0; $i < 10; $i++)
 test
 @continue(TRUE)
@@ -40,7 +32,6 @@ test
 
     public function testContinueStatementsWithArgumentAreCompiled()
     {
-
         $string = '@for ($i = 0; $i < 10; $i++)
 test
 @continue(2)
@@ -54,7 +45,6 @@ test
 
     public function testContinueStatementsWithSpacedArgumentAreCompiled()
     {
-
         $string = '@for ($i = 0; $i < 10; $i++)
 test
 @continue( 2 )
@@ -68,7 +58,6 @@ test
 
     public function testContinueStatementsWithFaultyArgumentAreCompiled()
     {
-
         $string = '@for ($i = 0; $i < 10; $i++)
 test
 @continue(-2)
@@ -79,5 +68,4 @@ test
 <?php endfor; ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
-
 }

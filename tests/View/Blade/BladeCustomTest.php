@@ -2,28 +2,20 @@
 
 namespace Illuminate\Tests\View\Blade;
 
-
-
-
-
 class BladeCustomTest extends AbstractBladeTestCase
 {
-
     public function testCustomPhpCodeIsCorrectlyHandled()
     {
-
         $this->assertEquals('<?php if($test): ?> <?php @show(\'test\'); ?> <?php endif; ?>', $this->compiler->compileString("@if(\$test) <?php @show('test'); ?> @endif"));
     }
 
     public function testMixingYieldAndEcho()
     {
-
         $this->assertEquals('<?php echo $__env->yieldContent(\'title\'); ?> - <?php echo e(Config::get(\'site.title\')); ?>', $this->compiler->compileString("@yield('title') - {{Config::get('site.title')}}"));
     }
 
     public function testCustomExtensionsAreCompiled()
     {
-
         $this->compiler->extend(function ($value) {
             return str_replace('foo', 'bar', $value);
         });
@@ -32,7 +24,6 @@ class BladeCustomTest extends AbstractBladeTestCase
 
     public function testCustomStatements()
     {
-
         $this->assertCount(0, $this->compiler->getCustomDirectives());
         $this->compiler->directive('customControl', function ($expression) {
             return "<?php echo custom_control({$expression}); ?>";
@@ -50,7 +41,6 @@ class BladeCustomTest extends AbstractBladeTestCase
 
     public function testCustomShortStatements()
     {
-
         $this->compiler->directive('customControl', function ($expression) {
             return '<?php echo custom_control(); ?>';
         });
@@ -62,7 +52,6 @@ class BladeCustomTest extends AbstractBladeTestCase
 
     public function testCustomExtensionOverwritesCore()
     {
-
         $this->compiler->directive('foreach', function ($expression) {
             return '<?php custom(); ?>';
         });
@@ -71,5 +60,4 @@ class BladeCustomTest extends AbstractBladeTestCase
         $expected = '<?php custom(); ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
-
 }

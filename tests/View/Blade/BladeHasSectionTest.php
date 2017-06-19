@@ -2,17 +2,10 @@
 
 namespace Illuminate\Tests\View\Blade;
 
-
-
-
-
 class BladeHasSectionTest extends AbstractBladeTestCase
 {
-
-
     public function testHasSectionStatementsAreCompiled()
     {
-
         $string = '@hasSection("section")
 breeze
 @endif';
@@ -21,5 +14,4 @@ breeze
 <?php endif; ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
-
 }

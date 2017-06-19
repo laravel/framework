@@ -2,17 +2,10 @@
 
 namespace Illuminate\Tests\View\Blade;
 
-
-
-
-
 class BladeForelseStatementsTest extends AbstractBladeTestCase
 {
-
-
     public function testForelseStatementsAreCompiled()
     {
-
         $string = '@forelse ($this->getUsers() as $user)
 breeze
 @empty
@@ -28,7 +21,6 @@ empty
 
     public function testForelseStatementsAreCompiledWithUppercaseSyntax()
     {
-
         $string = '@forelse ($this->getUsers() AS $user)
 breeze
 @empty
@@ -44,7 +36,6 @@ empty
 
     public function testForelseStatementsAreCompiledWithMultipleLine()
     {
-
         $string = '@forelse ([
 foo,
 bar,
@@ -66,7 +57,6 @@ empty
 
     public function testNestedForelseStatementsAreCompiled()
     {
-
         $string = '@forelse ($this->getUsers() as $user)
 @forelse ($user->tags as $tag)
 breeze
@@ -87,5 +77,4 @@ empty
 <?php endif; ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
-
 }

@@ -2,16 +2,10 @@
 
 namespace Illuminate\Tests\View\Blade;
 
-
-
-
-
 class BladeCanStatementsTest extends AbstractBladeTestCase
 {
-
     public function testCanStatementsAreCompiled()
     {
-
         $string = '@can (\'update\', [$post])
 breeze
 @elsecan(\'delete\', [$post])
@@ -24,5 +18,4 @@ sneeze
 <?php endif; ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
-
 }

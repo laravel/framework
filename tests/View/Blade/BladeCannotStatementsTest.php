@@ -2,16 +2,10 @@
 
 namespace Illuminate\Tests\View\Blade;
 
-
-
-
-
 class BladeCannotStatementsTest extends AbstractBladeTestCase
 {
-
     public function testCannotStatementsAreCompiled()
     {
-
         $string = '@cannot (\'update\', [$post])
 breeze
 @elsecannot(\'delete\', [$post])
@@ -24,5 +18,4 @@ sneeze
 <?php endif; ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
-
 }

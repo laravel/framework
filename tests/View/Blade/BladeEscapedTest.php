@@ -2,16 +2,10 @@
 
 namespace Illuminate\Tests\View\Blade;
 
-
-
-
-
 class BladeEscapedTest extends AbstractBladeTestCase
 {
-
     public function testEscapedWithAtDirectivesAreCompiled()
     {
-
         $this->assertEquals('@foreach', $this->compiler->compileString('@@foreach'));
         $this->assertEquals('@verbatim @continue @endverbatim', $this->compiler->compileString('@@verbatim @@continue @@endverbatim'));
         $this->assertEquals('@foreach($i as $x)', $this->compiler->compileString('@@foreach($i as $x)'));
@@ -22,5 +16,4 @@ class BladeEscapedTest extends AbstractBladeTestCase
             $i as $x
         )'));
     }
-
 }

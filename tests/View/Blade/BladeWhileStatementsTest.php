@@ -2,17 +2,10 @@
 
 namespace Illuminate\Tests\View\Blade;
 
-
-
-
-
 class BladeWhileStatementsTest extends AbstractBladeTestCase
 {
-
-
     public function testWhileStatementsAreCompiled()
     {
-
         $string = '@while ($foo)
 test
 @endwhile';
@@ -24,7 +17,6 @@ test
 
     public function testNestedWhileStatementsAreCompiled()
     {
-
         $string = '@while ($foo)
 @while ($bar)
 test
@@ -37,5 +29,4 @@ test
 <?php endwhile; ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
-
 }

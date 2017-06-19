@@ -2,18 +2,10 @@
 
 namespace Illuminate\Tests\View\Blade;
 
-
-
-
-
 class BladeEchoTest extends AbstractBladeTestCase
 {
-
-
     public function testEchosAreCompiled()
     {
-
-
         $this->assertEquals('<?php echo $name; ?>', $this->compiler->compileString('{!!$name!!}'));
         $this->assertEquals('<?php echo $name; ?>', $this->compiler->compileString('{!! $name !!}'));
         $this->assertEquals('<?php echo $name; ?>', $this->compiler->compileString('{!!
@@ -84,8 +76,6 @@ class BladeEchoTest extends AbstractBladeTestCase
 
     public function testEscapedWithAtEchosAreCompiled()
     {
-
-
         $this->assertEquals('{{$name}}', $this->compiler->compileString('@{{$name}}'));
         $this->assertEquals('{{ $name }}', $this->compiler->compileString('@{{ $name }}'));
         $this->assertEquals('{{
@@ -99,5 +89,4 @@ class BladeEchoTest extends AbstractBladeTestCase
             $this->compiler->compileString('@{{ $name }}
             '));
     }
-
 }

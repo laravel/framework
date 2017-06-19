@@ -2,16 +2,10 @@
 
 namespace Illuminate\Tests\View\Blade;
 
-
-
-
-
 class BladeForeachStatementsTest extends AbstractBladeTestCase
 {
-
     public function testForeachStatementsAreCompiled()
     {
-
         $string = '@foreach ($this->getUsers() as $user)
 test
 @endforeach';
@@ -23,7 +17,6 @@ test
 
     public function testForeachStatementsAreCompileWithUppercaseSyntax()
     {
-
         $string = '@foreach ($this->getUsers() AS $user)
 test
 @endforeach';
@@ -35,7 +28,6 @@ test
 
     public function testForeachStatementsAreCompileWithMultipleLine()
     {
-
         $string = '@foreach ([
 foo,
 bar,
@@ -53,7 +45,6 @@ test
 
     public function testNestedForeachStatementsAreCompiled()
     {
-
         $string = '@foreach ($this->getUsers() as $user)
 user info
 @foreach ($user->tags as $tag)
@@ -71,8 +62,6 @@ tag info
 
     public function testLoopContentHolderIsExtractedFromForeachStatements()
     {
-
-
         $string = '@foreach ($some_uSers1 as $user)';
         $expected = '<?php $__currentLoopData = $some_uSers1; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
@@ -93,6 +82,4 @@ tag info
         $expected = '<?php $__currentLoopData = $tasks; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $task): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
-
-
 }

@@ -2,17 +2,10 @@
 
 namespace Illuminate\Tests\View\Blade;
 
-
-
-
-
 class BladeVerbatimTest extends AbstractBladeTestCase
 {
-
-
     public function testVerbatimBlocksAreCompiled()
     {
-
         $string = '@verbatim {{ $a }} @if($b) {{ $b }} @endif @endverbatim';
         $expected = ' {{ $a }} @if($b) {{ $b }} @endif ';
         $this->assertEquals($expected, $this->compiler->compileString($string));
@@ -20,7 +13,6 @@ class BladeVerbatimTest extends AbstractBladeTestCase
 
     public function testVerbatimBlocksWithMultipleLinesAreCompiled()
     {
-
         $string = 'Some text
 @verbatim
     {{ $a }}
@@ -40,11 +32,8 @@ class BladeVerbatimTest extends AbstractBladeTestCase
 
     public function testMultipleVerbatimBlocksAreCompiled()
     {
-
         $string = '@verbatim {{ $a }} @endverbatim {{ $b }} @verbatim {{ $c }} @endverbatim';
         $expected = ' {{ $a }}  <?php echo e($b); ?>  {{ $c }} ';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
-
-
 }

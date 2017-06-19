@@ -2,17 +2,10 @@
 
 namespace Illuminate\Tests\View\Blade;
 
-
-
-
-
 class BladePushTest extends AbstractBladeTestCase
 {
-
-
     public function testPushIsCompiled()
     {
-
         $string = '@push(\'foo\')
 test
 @endpush';
@@ -21,5 +14,4 @@ test
 <?php $__env->stopPush(); ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
-
 }

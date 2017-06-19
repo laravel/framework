@@ -2,17 +2,10 @@
 
 namespace Illuminate\Tests\View\Blade;
 
-
-
-
-
 class BladeCommentsTest extends AbstractBladeTestCase
 {
-
-
     public function testCommentsAreCompiled()
     {
-
         $string = '{{--this is a comment--}}';
         $this->assertEmpty($this->compiler->compileString($string));
 
@@ -27,10 +20,8 @@ this is a comment
 
     public function testBladeCodeInsideCommentsIsNotCompiled()
     {
-
         $string = '{{-- @foreach() --}}';
 
         $this->assertEmpty($this->compiler->compileString($string));
     }
-
 }

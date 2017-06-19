@@ -2,16 +2,10 @@
 
 namespace Illuminate\Tests\View\Blade;
 
-
-
-
-
 class BladeBreakStatementsTest extends AbstractBladeTestCase
 {
-
     public function testBreakStatementsAreCompiled()
     {
-
         $string = '@for ($i = 0; $i < 10; $i++)
 test
 @break
@@ -25,7 +19,6 @@ test
 
     public function testBreakStatementsWithExpressionAreCompiled()
     {
-
         $string = '@for ($i = 0; $i < 10; $i++)
 test
 @break(TRUE)
@@ -39,7 +32,6 @@ test
 
     public function testBreakStatementsWithArgumentAreCompiled()
     {
-
         $string = '@for ($i = 0; $i < 10; $i++)
 test
 @break(2)
@@ -53,7 +45,6 @@ test
 
     public function testBreakStatementsWithSpacedArgumentAreCompiled()
     {
-
         $string = '@for ($i = 0; $i < 10; $i++)
 test
 @break( 2 )
@@ -67,7 +58,6 @@ test
 
     public function testBreakStatementsWithFaultyArgumentAreCompiled()
     {
-
         $string = '@for ($i = 0; $i < 10; $i++)
 test
 @break(-2)
@@ -78,5 +68,4 @@ test
 <?php endfor; ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
-
 }
