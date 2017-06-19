@@ -182,6 +182,13 @@ abstract class Job
     }
 
     /**
+     * Get the raw body of the job.
+     *
+     * @return string
+     */
+    abstract public function getRawBody();
+
+    /**
      * The number of times to attempt a job.
      *
      * @return int|null
