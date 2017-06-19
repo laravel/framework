@@ -465,6 +465,19 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function push()
     {
+        // Check for any BelongsTo relations and save those first.
+        foreach ($this->getRelations() as $method => $related) {
+            if (! ($this->$method() instanceof BelongsTo)) {
+                continue;
+            }
+
+            if (! $related->push()) {
+                return false;
+            }
+
+            $this->$method()->associate($related);
+        }
+
         if (! $this->save()) {
             return false;
         }
