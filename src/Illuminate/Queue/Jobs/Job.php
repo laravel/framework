@@ -57,6 +57,13 @@ abstract class Job
     protected $queue;
 
     /**
+     * Get the raw body of the job.
+     *
+     * @return string
+     */
+    abstract public function getRawBody();
+
+    /**
      * Fire the job.
      *
      * @return void
@@ -180,13 +187,6 @@ abstract class Job
     {
         return json_decode($this->getRawBody(), true);
     }
-
-    /**
-     * Get the raw body of the job.
-     *
-     * @return string
-     */
-    abstract public function getRawBody();
 
     /**
      * The number of times to attempt a job.
