@@ -362,7 +362,6 @@ class DatabaseEloquentCollectionTest extends TestCase
     {
         $c = new Collection();
         $this->assertEquals($c, $c->fresh());
-
     }
 }
 
