@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Foundation;
 
 use Exception;
 use Mockery as m;
+use Psr\Log\LoggerInterface;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Config\Repository as Config;
@@ -47,6 +48,15 @@ class FoundationExceptionsHandlerTest extends TestCase
     public function tearDown()
     {
         m::close();
+    }
+
+    public function testHandlerReportsExceptionAsContext()
+    {
+        $logger = m::mock(LoggerInterface::class);
+        $this->container->instance(LoggerInterface::class, $logger);
+        $logger->shouldReceive('error')->withArgs(['Exception message', m::hasKey('exception')]);
+
+        $this->handler->report(new \RuntimeException('Exception message'));
     }
 
     public function testReturnsJsonWithStackTraceWhenAjaxRequestAndDebugTrue()
