@@ -51,7 +51,7 @@ trait ResetsPasswords
         // the application's home authenticated view. If there is an error we can
         // redirect them back to where they came from with their error message.
         return $response == Password::PASSWORD_RESET
-                    ? $this->sendResetResponse($response)
+                    ? $this->sendResetResponse($request, $response)
                     : $this->sendResetFailedResponse($request, $response);
     }
 
@@ -115,13 +115,28 @@ trait ResetsPasswords
     /**
      * Get the response for a successful password reset.
      *
-     * @param  string  $response
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string $response
+     *
      * @return \Illuminate\Http\RedirectResponse
      */
-    protected function sendResetResponse($response)
+    protected function sendResetResponse($request, $response)
     {
-        return redirect($this->redirectPath())
-                            ->with('status', trans($response));
+        return $this->authenticated($request, $this->guard()->user())
+            ?: redirect($this->redirectPath())
+                ->with('status', trans($response));
+    }
+
+    /**
+     * The user has been authenticated.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  mixed  $user
+     * @return mixed
+     */
+    protected function authenticated(Request $request, $user)
+    {
+        //
     }
 
     /**
