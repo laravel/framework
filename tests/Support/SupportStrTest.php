@@ -46,6 +46,7 @@ class SupportStrTest extends TestCase
 
     public function testStringAsciiWithSpecificLocale()
     {
+        $this->assertSame('h H sht SHT a A y Y', Str::ascii('х Х щ Щ ъ Ъ ь Ь', 'bg'));
         $this->assertSame('ae oe ue AE OE UE', Str::ascii('ä ö ü Ä Ö Ü', 'de'));
     }
 
