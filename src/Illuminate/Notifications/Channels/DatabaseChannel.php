@@ -4,8 +4,9 @@ namespace Illuminate\Notifications\Channels;
 
 use RuntimeException;
 use Illuminate\Notifications\Notification;
+use Illuminate\Contracts\Notifications\Channel as ChannelContract;
 
-class DatabaseChannel
+class DatabaseChannel implements ChannelContract
 {
     /**
      * Send the given notification.

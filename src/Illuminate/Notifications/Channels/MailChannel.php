@@ -8,8 +8,9 @@ use Illuminate\Mail\Markdown;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Notifications\Notification;
+use Illuminate\Contracts\Notifications\Channel as ChannelContract;
 
-class MailChannel
+class MailChannel implements ChannelContract
 {
     /**
      * The mailer implementation.

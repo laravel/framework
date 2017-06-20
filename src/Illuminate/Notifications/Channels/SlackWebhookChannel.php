@@ -7,8 +7,9 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\SlackMessage;
 use Illuminate\Notifications\Messages\SlackAttachment;
 use Illuminate\Notifications\Messages\SlackAttachmentField;
+use Illuminate\Contracts\Notifications\Channel as ChannelContract;
 
-class SlackWebhookChannel
+class SlackWebhookChannel implements ChannelContract
 {
     /**
      * The HTTP client instance.
