@@ -1057,6 +1057,52 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Put an item after specified key.
+     *
+     * @param int|string $needle
+     * @param int|string $key
+     * @param mixed $value
+     * @return $this
+     */
+    public function putAfter($needle, $key, $value)
+    {
+        if ($this->offsetExists($needle)) {
+            $this->items = array_merge(
+                array_slice($this->items, 0, array_search($needle, array_keys($this->items)) - 1, true),
+                [$key => $value],
+                array_slice($this->items, array_search($needle, array_keys($this->items)) - 1, null,true)
+            );
+        } else {
+            $this->put($key, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Put an item before specified key.
+     *
+     * @param int|string $needle
+     * @param int|string $key
+     * @param mixed $value
+     * @return $this
+     */
+    public function putBefore($needle, $key, $value)
+    {
+        if ($this->offsetExists($needle)) {
+            $this->items = array_merge(
+                array_slice($this->items, 0, array_search($needle, array_keys($this->items)) - 2, true),
+                [$key => $value],
+                array_slice($this->items, array_search($needle, array_keys($this->items)) - 2, null,true)
+            );
+        } else {
+            $this->put($key, $value);
+        }
+
+        return $this;
+    }
+
+    /**
      * Get one or more items randomly from the collection.
      *
      * @param  int|null  $amount
