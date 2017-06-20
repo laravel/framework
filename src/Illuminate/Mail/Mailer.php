@@ -208,9 +208,11 @@ class Mailer implements MailerContract, MailQueueContract
             $this->setGlobalTo($message);
         }
 
-        $this->sendSwiftMessage($message->getSwiftMessage());
+        if ($this->shouldSendMessage($swiftMessage = $message->getSwiftMessage())) {
+            $this->sendSwiftMessage($swiftMessage);
 
-        $this->dispatchSentEvent($message);
+            $this->dispatchSentEvent($message);
+        }
     }
 
     /**
@@ -432,10 +434,6 @@ class Mailer implements MailerContract, MailQueueContract
      */
     protected function sendSwiftMessage($message)
     {
-        if (! $this->shouldSendMessage($message)) {
-            return;
-        }
-
         try {
             return $this->swift->send($message, $this->failedRecipients);
         } finally {
