@@ -88,26 +88,9 @@ class AliasLoader
      */
     protected function loadFacade($alias)
     {
-        require $this->ensureFacadeExists($alias);
-    }
-
-    /**
-     * Ensure that the given alias has an existing real-time facade class.
-     *
-     * @param  string  $alias
-     * @return string
-     */
-    protected function ensureFacadeExists($alias)
-    {
-        if (file_exists($path = storage_path('framework/cache/facade-'.sha1($alias).'.php'))) {
-            return $path;
-        }
-
-        file_put_contents($path, $this->formatFacadeStub(
+        eval('?>' . $this->formatFacadeStub(
             $alias, file_get_contents(__DIR__.'/stubs/facade.stub')
         ));
-
-        return $path;
     }
 
     /**
