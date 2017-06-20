@@ -525,7 +525,7 @@ if (! function_exists('mix')) {
      */
     function mix($path, $manifestDirectory = '')
     {
-        return app('mix')->mix($path, $manifestDirectory);
+        return app('mix')->resolve($path, $manifestDirectory);
     }
 }
 

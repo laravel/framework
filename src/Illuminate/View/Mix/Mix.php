@@ -63,7 +63,7 @@ class Mix
      * @param  string  $manifestDirectory
      * @return \Illuminate\Support\HtmlString
      */
-    public function mix($path, $manifestDirectory = '')
+    public function resolve($path, $manifestDirectory = '')
     {
         if ($this->disabled) {
             return $this->disabledPath();
@@ -190,7 +190,7 @@ class Mix
             return $this->manifest;
         }
 
-        if (!file_exists($manifestPath = public_path($this->manifestDirectory.$this->manifestFilename))) {
+        if (! file_exists($manifestPath = public_path($this->manifestDirectory.$this->manifestFilename))) {
             throw new MixException('The Mix manifest does not exist.');
         }
 
