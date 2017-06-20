@@ -25,6 +25,7 @@ class NotificationSlackChannelTest extends TestCase
         $channel = new \Illuminate\Notifications\Channels\SlackWebhookChannel(
             $http = Mockery::mock('GuzzleHttp\Client')
         );
+        $this->assertInstanceOf(\Illuminate\Contracts\Notifications\Channel::class, $channel);
 
         $http->shouldReceive('post')->with('url', $payload);
 

@@ -7,8 +7,9 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Events\BroadcastNotificationCreated;
+use Illuminate\Contracts\Notifications\Channel as ChannelContract;
 
-class BroadcastChannel
+class BroadcastChannel implements ChannelContract
 {
     /**
      * The event dispatcher.

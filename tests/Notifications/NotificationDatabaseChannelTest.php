@@ -29,6 +29,7 @@ class NotificationDatabaseChannelTest extends TestCase
         ]);
 
         $channel = new DatabaseChannel;
+        $this->assertInstanceOf(\Illuminate\Contracts\Notifications\Channel::class, $channel);
         $channel->send($notifiable, $notification);
     }
 }
