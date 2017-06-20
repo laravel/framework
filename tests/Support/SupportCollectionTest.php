@@ -97,6 +97,36 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals('bar', $c->first());
     }
 
+    public function testPutAfterInsertNewItemAfterSpecifiedKey()
+    {
+        $c = new Collection(['foo_key' => 'foo', 'bar_key' => 'bar']);
+
+        $result = ['foo_key' => 'foo', 'baz_key' => 'baz', 'bar_key' => 'bar'];
+
+        $this->assertSame($result, $c->putAfter('foo_key', 'baz_key', 'baz')->all());
+
+        $c = new Collection(['foo', 'bar']);
+
+        $result = ['foo', 'baz', 'bar'];
+
+        $this->assertSame($result, $c->putBefore(1, 1, 'baz')->all());
+    }
+
+    public function testPutBeforeInsertNewItemBeforeSpecifiedKey()
+    {
+        $c = new Collection(['foo_key' => 'foo', 'bar_key' => 'bar']);
+
+        $result = ['baz_key' => 'baz', 'foo_key' => 'foo', 'bar_key' => 'bar'];
+
+        $this->assertSame($result, $c->putBefore('foo_key', 'baz_key', 'baz')->all());
+
+        $c = new Collection(['foo', 'bar']);
+
+        $result = ['foo', 'baz', 'bar'];
+
+        $this->assertSame($result, $c->putBefore(1, 2, 'baz')->all());
+    }
+
     public function testEmptyCollectionIsEmpty()
     {
         $c = new Collection();
