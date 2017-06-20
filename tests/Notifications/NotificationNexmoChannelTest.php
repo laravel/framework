@@ -22,6 +22,7 @@ class NotificationNexmoChannelTest extends TestCase
         $channel = new \Illuminate\Notifications\Channels\NexmoSmsChannel(
             $nexmo = Mockery::mock(\Nexmo\Client::class), '4444444444'
         );
+        $this->assertInstanceOf(\Illuminate\Contracts\Notifications\Channel::class, $channel);
 
         $nexmo->shouldReceive('message->send')->with([
             'type' => 'text',

@@ -53,6 +53,7 @@ class NotificationBroadcastChannelTest extends TestCase
             return $event->connection == 'sync';
         }));
         $channel = new BroadcastChannel($events);
+        $this->assertInstanceOf(\Illuminate\Contracts\Notifications\Channel::class, $channel);
         $channel->send($notifiable, $notification);
     }
 }
