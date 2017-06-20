@@ -491,7 +491,7 @@ class Str
      *
      * Note: Adapted from Stringy\Stringy.
      *
-     * @see https://github.com/danielstjules/Stringy/blob/3.0.1/LICENSE.txt
+     * @see https://github.com/danielstjules/Stringy/blob/3.1.0/LICENSE.txt
      *
      * @return array
      */
@@ -515,7 +515,7 @@ class Str
             '8'    => ['⁸', '₈', '۸', '８'],
             '9'    => ['⁹', '₉', '۹', '９'],
             'a'    => ['à', 'á', 'ả', 'ã', 'ạ', 'ă', 'ắ', 'ằ', 'ẳ', 'ẵ', 'ặ', 'â', 'ấ', 'ầ', 'ẩ', 'ẫ', 'ậ', 'ā', 'ą', 'å', 'α', 'ά', 'ἀ', 'ἁ', 'ἂ', 'ἃ', 'ἄ', 'ἅ', 'ἆ', 'ἇ', 'ᾀ', 'ᾁ', 'ᾂ', 'ᾃ', 'ᾄ', 'ᾅ', 'ᾆ', 'ᾇ', 'ὰ', 'ά', 'ᾰ', 'ᾱ', 'ᾲ', 'ᾳ', 'ᾴ', 'ᾶ', 'ᾷ', 'а', 'أ', 'အ', 'ာ', 'ါ', 'ǻ', 'ǎ', 'ª', 'ა', 'अ', 'ا', 'ａ', 'ä'],
-            'b'    => ['б', 'β', 'Ъ', 'Ь', 'ب', 'ဗ', 'ბ', 'ｂ'],
+            'b'    => ['б', 'β', 'ب', 'ဗ', 'ბ', 'ｂ'],
             'c'    => ['ç', 'ć', 'č', 'ĉ', 'ċ', 'ｃ'],
             'd'    => ['ď', 'ð', 'đ', 'ƌ', 'ȡ', 'ɖ', 'ɗ', 'ᵭ', 'ᶁ', 'ᶑ', 'д', 'δ', 'د', 'ض', 'ဍ', 'ဒ', 'დ', 'ｄ'],
             'e'    => ['é', 'è', 'ẻ', 'ẽ', 'ẹ', 'ê', 'ế', 'ề', 'ể', 'ễ', 'ệ', 'ë', 'ē', 'ę', 'ě', 'ĕ', 'ė', 'ε', 'έ', 'ἐ', 'ἑ', 'ἒ', 'ἓ', 'ἔ', 'ἕ', 'ὲ', 'έ', 'е', 'ё', 'э', 'є', 'ə', 'ဧ', 'ေ', 'ဲ', 'ე', 'ए', 'إ', 'ئ', 'ｅ'],
@@ -625,7 +625,7 @@ class Str
      *
      * Note: Adapted from Stringy\Stringy.
      *
-     * @see https://github.com/danielstjules/Stringy/blob/3.0.1/LICENSE.txt
+     * @see https://github.com/danielstjules/Stringy/blob/3.1.0/LICENSE.txt
      *
      * @param  string  $language
      * @return array|null
@@ -636,6 +636,10 @@ class Str
 
         if (! isset($languageSpecific)) {
             $languageSpecific = [
+                'bg' => [
+                    ['х', 'Х', 'щ', 'Щ', 'ъ', 'Ъ', 'ь', 'Ь'],
+                    ['h', 'H', 'sht', 'SHT', 'a', 'А', 'y', 'Y'],
+                ],
                 'de' => [
                     ['ä',  'ö',  'ü',  'Ä',  'Ö',  'Ü'],
                     ['ae', 'oe', 'ue', 'AE', 'OE', 'UE'],
