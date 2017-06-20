@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('styles')
+<!-- <link rel="stylesheet" href="{{ asset('/path/to/extend.css') }}"> -->
+@stop
+
 @section('content')
 <div class="container">
     <div class="row">
@@ -15,3 +19,7 @@
     </div>
 </div>
 @endsection
+
+@section('scripts')
+<!-- <script src="{{ asset('/path/to/extend.js') }}"></script> -->
+@stop
