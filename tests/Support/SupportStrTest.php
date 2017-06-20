@@ -42,7 +42,11 @@ class SupportStrTest extends TestCase
     {
         $this->assertEquals('@', Str::ascii('@'));
         $this->assertEquals('u', Str::ascii('ü'));
-        $this->assertEquals('ue', Str::ascii('ü', 'de'));
+    }
+
+    public function testStringAsciiWithSpecificLocale()
+    {
+        $this->assertSame('ae oe ue AE OE UE', Str::ascii('ä ö ü Ä Ö Ü', 'de'));
     }
 
     public function testStartsWith()
