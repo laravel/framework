@@ -590,6 +590,18 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['first_word' => 'Hello'], $c->intersect(new Collection(['first_world' => 'Hello', 'last_word' => 'World']))->all());
     }
 
+    public function testIntersectKeyNull()
+    {
+        $c = new Collection(['id' => 1, 'first_word' => 'Hello']);
+        $this->assertEquals([], $c->intersectKey(null)->all());
+    }
+
+    public function testIntersectKeyCollection()
+    {
+        $c = new Collection(['id' => 1, 'first_word' => 'Hello']);
+        $this->assertEquals(['first_word' => 'Hello'], $c->intersectKey(new Collection(['first_word' => 'Hello', 'last_word' => 'World']))->all());
+    }
+
     public function testUnique()
     {
         $c = new Collection(['Hello', 'World', 'World']);
