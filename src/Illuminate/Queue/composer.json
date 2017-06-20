@@ -18,6 +18,7 @@
         "illuminate/console": "5.4.*",
         "illuminate/container": "5.4.*",
         "illuminate/contracts": "5.4.*",
+        "illuminate/database": "5.4.*",
         "illuminate/filesystem": "5.4.*",
         "illuminate/support": "5.4.*",
         "nesbot/carbon": "~1.20",
