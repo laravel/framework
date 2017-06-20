@@ -7,16 +7,14 @@ use Illuminate\Support\HtmlString;
 
 class MixTest extends TestCase
 {
+    protected $mix;
+
     public function setUp()
     {
         app()->singleton('path.public', function () {
             return __DIR__;
         });
-    }
-
-    private function getMix()
-    {
-        return new \Illuminate\View\Mix\Mix;
+        $this->mix = new \Illuminate\View\Mix\Mix;
     }
 
     /**
@@ -25,7 +23,7 @@ class MixTest extends TestCase
      */
     public function testMixMethodThrowAnExceptionIfMixManifestDoesNotExist()
     {
-        $this->getMix()->mix('foo.css');
+        $this->mix->mix('foo.css');
     }
 
     /**
@@ -34,7 +32,7 @@ class MixTest extends TestCase
      */
     public function testMixMethodThrowAnExceptionIfPathDoesNotExistInManifest()
     {
-        $this->getMix()->mix('baz.css', 'fixtures');
+        $this->mix->mix('baz.css', 'fixtures');
     }
 
     /**
@@ -43,32 +41,33 @@ class MixTest extends TestCase
      */
     public function testMixMethodThrowAnExceptionIfManifestIsNotAProperJson()
     {
-        $this->getMix()->setManifestFilename('mix-manifest-wrong')->mix('foo.css', 'fixtures');
+        $this->mix->setManifestFilename('mix-manifest-wrong')->mix('foo.css', 'fixtures');
     }
 
     public function testMixMethodWhenDisabled()
     {
-        $this->assertEquals(new HTMLString('Mix is disabled!'), $this->getMix()->disable()->mix('foo.css'));
+        $this->assertEquals(new HTMLString('Mix is disabled!'), $this->mix->disable()->mix('foo.css'));
     }
 
     /**
      * @expectedException \Illuminate\View\Mix\MixException
+     * @expectedExceptionMessage The Mix manifest does not exist.
      */
     public function testMixMethodWhenReEnabled()
     {
-        $this->getMix()->disable()->enable()->mix('foo.css');
+        $this->mix->disable()->enable()->mix('foo.css');
     }
 
     public function testMixMethodWhenCompiled()
     {
-        $this->assertEquals(new HTMLString('/fixtures/bar.css'), $this->getMix()->mix('foo.css', 'fixtures'));
+        $this->assertEquals(new HTMLString('/fixtures/bar.css'), $this->mix->mix('foo.css', 'fixtures'));
     }
 
     public function testMixMethodWhenHMR()
     {
         touch(public_path('hot'));
 
-        $this->assertEquals(new HTMLString('//localhost:8080/foo.css'), $this->getMix()->mix('foo.css'));
+        $this->assertEquals(new HTMLString('//localhost:8080/foo.css'), $this->mix->mix('foo.css'));
 
         unlink(public_path('hot'));
     }
@@ -79,7 +78,7 @@ class MixTest extends TestCase
 
         $this->assertEquals(
             new HTMLString('//custom:uri/foo.css'),
-            $this->getMix()->setHmrFilename('hot-custom')->setHmrURI('//custom:uri')->mix('foo.css')
+            $this->mix->setHmrFilename('hot-custom')->setHmrURI('//custom:uri')->mix('foo.css')
         );
 
         unlink(public_path('hot-custom'));
