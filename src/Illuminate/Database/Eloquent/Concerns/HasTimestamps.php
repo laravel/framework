@@ -40,7 +40,7 @@ trait HasTimestamps
     {
         $time = $this->freshTimestamp();
 
-        if ($column) {
+        if ($column && $this->isDateAttribute($column)) {
             $this->{$column} = $time;
         }
 
