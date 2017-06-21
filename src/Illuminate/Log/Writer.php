@@ -349,7 +349,9 @@ class Writer implements LogContract, PsrLoggerInterface
      */
     protected function getDefaultFormatter()
     {
-        return new LineFormatter(null, null, true, true);
+        $lineFormatter = new LineFormatter(null, null, true, true);
+        $lineFormatter->includeStacktraces();
+        return $lineFormatter;
     }
 
     /**
