@@ -45,19 +45,15 @@ class Arr
      */
     public static function collapse($array)
     {
-        $results = [];
-
-        foreach ($array as $values) {
+        return array_reduce($array, function ($results, $values) {
             if ($values instanceof Collection) {
                 $values = $values->all();
             } elseif (! is_array($values)) {
-                continue;
+                return $results;
             }
 
-            $results = array_merge($results, $values);
-        }
-
-        return $results;
+            return array_merge($results, $values);
+        }, []);
     }
 
     /**
