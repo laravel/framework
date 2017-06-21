@@ -1,5 +1,25 @@
 # Release Notes for 5.4.x
 
+## [Unreleased]
+
+### Added
+- Added `avg()` and `average()` as higher order proxies ([#19628](https://github.com/laravel/framework/pull/19628))
+- Added `fresh()` method to Eloquent collection ([#19616](https://github.com/laravel/framework/pull/19616), [#19671](https://github.com/laravel/framework/pull/19671))
+- Added ability to remove a global scope with another global scope ([#19657](https://github.com/laravel/framework/pull/19657))
+- Added `Collection::intersectKey()` method ([#19683](https://github.com/laravel/framework/pull/19683))
+- Support setting queue name via `broadcastQueue()` method ([#19703](https://github.com/laravel/framework/pull/19703), [#19708](https://github.com/laravel/framework/pull/19708))
+
+### Changed
+- Escape default value passed to `@yield` directive ([#19643](https://github.com/laravel/framework/pull/19643))
+- Support passing multiple fields to `different` validation rule ([#19637](https://github.com/laravel/framework/pull/19637))
+- Only dispatch the `MessageSent` event if mails should be sent ([#19690](https://github.com/laravel/framework/pull/19690))
+
+### Fixed
+- Fixed `BelongsTo` bug with incrementing keys ([#19631](https://github.com/laravel/framework/pull/19631))
+- Fixed PDO return value bug in `unprepared()` ([#19667](https://github.com/laravel/framework/pull/19667))
+- Don't use `event()` helper in `Http\Kernel` ([#19688](https://github.com/laravel/framework/pull/19688))
+
+
 ## v5.4.27 (2017-06-15)
 
 ### Added
