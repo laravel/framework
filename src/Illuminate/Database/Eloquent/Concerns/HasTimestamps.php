@@ -16,7 +16,7 @@ trait HasTimestamps
     /**
      * Update the model's update timestamp.
      *
-     * @param  mixed  $column
+     * @param  string|null  $column
      * @return bool
      */
     public function touch($column = null)
@@ -33,7 +33,7 @@ trait HasTimestamps
     /**
      * Update the creation and update timestamps.
      *
-     * @param  mixed  $column
+     * @param  string|null  $column
      * @return void
      */
     protected function updateTimestamps($column = null)
