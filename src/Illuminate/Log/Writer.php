@@ -351,6 +351,7 @@ class Writer implements LogContract, PsrLoggerInterface
     {
         $lineFormatter = new LineFormatter(null, null, true, true);
         $lineFormatter->includeStacktraces();
+
         return $lineFormatter;
     }
 
