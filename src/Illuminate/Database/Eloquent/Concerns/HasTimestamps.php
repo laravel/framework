@@ -16,15 +16,16 @@ trait HasTimestamps
     /**
      * Update the model's update timestamp.
      *
+     * @param  string|null  $column
      * @return bool
      */
-    public function touch()
+    public function touch($column = null)
     {
         if (! $this->usesTimestamps()) {
             return false;
         }
 
-        $this->updateTimestamps();
+        $this->updateTimestamps($column);
 
         return $this->save();
     }
@@ -32,11 +33,16 @@ trait HasTimestamps
     /**
      * Update the creation and update timestamps.
      *
+     * @param  string|null  $column
      * @return void
      */
-    protected function updateTimestamps()
+    protected function updateTimestamps($column = null)
     {
         $time = $this->freshTimestamp();
+
+        if ($column && $this->isDateAttribute($column)) {
+            $this->{$column} = $time;
+        }
 
         if (! $this->isDirty(static::UPDATED_AT)) {
             $this->setUpdatedAt($time);
