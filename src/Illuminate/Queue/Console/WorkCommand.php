@@ -64,6 +64,10 @@ class WorkCommand extends Command
      */
     public function fire()
     {
+        if ($this->option('daemon')) {
+            @trigger_error('The --daemon argument is deprecated.', E_USER_DEPRECATED);
+        }
+
         if ($this->downForMaintenance() && $this->option('once')) {
             return $this->worker->sleep($this->option('sleep'));
         }

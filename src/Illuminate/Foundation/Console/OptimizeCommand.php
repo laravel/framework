@@ -29,7 +29,7 @@ class OptimizeCommand extends Command
      */
     public function fire()
     {
-        //
+        @trigger_error('The optimize command is deprecated.', E_USER_DEPRECATED);
     }
 
     /**
@@ -40,7 +40,7 @@ class OptimizeCommand extends Command
     protected function getOptions()
     {
         return [
-            ['force', null, InputOption::VALUE_NONE, 'Force the compiled class file to be written (deprecated).'],
+            ['force', null, InputOption::VALUE_NONE, 'Force the compiled class file to be written.'],
 
             ['psr', null, InputOption::VALUE_NONE, 'Do not optimize Composer dump-autoload.'],
         ];
