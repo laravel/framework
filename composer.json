@@ -22,7 +22,7 @@
         "erusev/parsedown": "~1.6",
         "filp/whoops": "~2.0",
         "league/flysystem": "~1.0",
-        "monolog/monolog": "~1.11",
+        "monolog/monolog": "~1.12",
         "mtdowling/cron-expression": "~1.0",
         "nesbot/carbon": "~1.20",
         "ramsey/uuid": "~3.0",
