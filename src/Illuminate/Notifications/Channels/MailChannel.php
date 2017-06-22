@@ -47,11 +47,11 @@ class MailChannel
      */
     public function send($notifiable, Notification $notification)
     {
-        if (! $notifiable->routeNotificationFor('mail')) {
+        $message = $notification->toMail($notifiable);
+
+        if (! $notifiable->routeNotificationFor('mail') && ! $message instanceof Mailable) {
             return;
         }
-
-        $message = $notification->toMail($notifiable);
 
         if ($message instanceof Mailable) {
             return $message->send($this->mailer);
