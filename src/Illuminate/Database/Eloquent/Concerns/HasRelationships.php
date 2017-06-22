@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\CustomRelation;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 trait HasRelationships
@@ -42,6 +43,19 @@ trait HasRelationships
         'belongsToMany', 'morphToMany', 'morphedByMany',
         'guessBelongsToManyRelation', 'findFirstMethodThatIsntRelation',
     ];
+
+    /**
+     * Define a custom relationship.
+     *
+     * @param \Illuminate\Database\Eloquent\Model $custom
+     * @return \Illuminate\Database\Eloquent\Relations\CustomRelation
+     */
+    public function customRelation(Model $custom)
+    {
+        $query = $custom->newQuery();
+
+        return new CustomRelation($query, $this, $custom);
+    }
 
     /**
      * Define a one-to-one relationship.
