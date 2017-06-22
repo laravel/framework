@@ -9,6 +9,15 @@ use Illuminate\Database\Eloquent\Collection;
 class BelongsTo extends Relation
 {
     /**
+     * Indicates if a default model instance should be used.
+     *
+     * Alternatively, may be a Closure or array.
+     *
+     * @var \Closure|array|bool
+     */
+    protected $withDefault;
+
+    /**
      * The child model instance of the relation.
      */
     protected $child;
@@ -72,7 +81,7 @@ class BelongsTo extends Relation
      */
     public function getResults()
     {
-        return $this->query->first();
+        return $this->query->first() ?: $this->getDefaultFor($this->parent);
     }
 
     /**
@@ -149,10 +158,37 @@ class BelongsTo extends Relation
     public function initRelation(array $models, $relation)
     {
         foreach ($models as $model) {
-            $model->setRelation($relation, null);
+            $model->setRelation($relation, $this->getDefaultFor($model));
         }
 
         return $models;
+    }
+
+    /**
+     * Get the default value for this relation.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    protected function getDefaultFor(Model $model)
+    {
+        //return nothing if the user doesn't say to
+        if (! $this->withDefault) {
+            return;
+        }
+
+        //no need to set any attributes on this
+        $instance = $this->related->newInstance();
+
+        if (is_callable($this->withDefault)) {
+            return call_user_func($this->withDefault, $instance) ?: $instance;
+        }
+
+        if (is_array($this->withDefault)) {
+            $instance->forceFill($this->withDefault);
+        }
+
+        return $instance;
     }
 
     /**
@@ -341,5 +377,18 @@ class BelongsTo extends Relation
     public function getRelation()
     {
         return $this->relation;
+    }
+
+    /**
+     * Return a new model instance in case the relationship does not exist.
+     *
+     * @param  \Closure|array|bool  $callback
+     * @return $this
+     */
+    public function withDefault($callback = true)
+    {
+        $this->withDefault = $callback;
+
+        return $this;
     }
 }
