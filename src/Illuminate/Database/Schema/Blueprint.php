@@ -900,13 +900,14 @@ class Blueprint
     /**
      * Add the proper columns for a polymorphic table.
      *
-     * @param  string  $name
+     * @param  string       $name
      * @param  string|null  $indexName
+     * @param  string       $idType
      * @return void
      */
-    public function morphs($name, $indexName = null)
+    public function morphs($name, $indexName = null, $idType = 'unsignedInteger')
     {
-        $this->unsignedInteger("{$name}_id");
+        $this->$idType("{$name}_id");
 
         $this->string("{$name}_type");
 
@@ -916,13 +917,14 @@ class Blueprint
     /**
      * Add nullable columns for a polymorphic table.
      *
-     * @param  string  $name
+     * @param  string       $name
      * @param  string|null  $indexName
+     * @param  string       $idType
      * @return void
      */
-    public function nullableMorphs($name, $indexName = null)
+    public function nullableMorphs($name, $indexName = null, $idType = 'unsignedInteger')
     {
-        $this->unsignedInteger("{$name}_id")->nullable();
+        $this->$idType("{$name}_id")->nullable();
 
         $this->string("{$name}_type")->nullable();
 
