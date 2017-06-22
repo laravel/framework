@@ -52,7 +52,7 @@ class MixTest extends TestCase
 
     public function testMixMethodWhenDisabled()
     {
-        $this->assertEquals(new HTMLString('Mix is disabled!'), $this->mix->disable()->resolve('foo.css'));
+        $this->assertEquals(new HtmlString('Mix is disabled!'), $this->mix->disable()->resolve('foo.css'));
     }
 
     /**
@@ -66,14 +66,14 @@ class MixTest extends TestCase
 
     public function testMixMethodWhenCompiled()
     {
-        $this->assertEquals(new HTMLString('/fixtures/bar.css'), $this->mix->resolve('foo.css', 'fixtures'));
+        $this->assertEquals(new HtmlString('/fixtures/bar.css'), $this->mix->resolve('foo.css', 'fixtures'));
     }
 
     public function testMixMethodWhenHMR()
     {
         touch(public_path('hot'));
 
-        $this->assertEquals(new HTMLString('//localhost:8080/foo.css'), $this->mix->resolve('foo.css'));
+        $this->assertEquals(new HtmlString('//localhost:8080/foo.css'), $this->mix->resolve('foo.css'));
 
         unlink(public_path('hot'));
     }
@@ -83,7 +83,7 @@ class MixTest extends TestCase
         touch(public_path('hot-custom'));
 
         $this->assertEquals(
-            new HTMLString('//custom:uri/foo.css'),
+            new HtmlString('//custom:uri/foo.css'),
             $this->mix->setHmrFilename('hot-custom')->setHmrURI('//custom:uri')->resolve('foo.css')
         );
 
