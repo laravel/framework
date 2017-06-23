@@ -364,7 +364,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
         });
 
         $this->directive('end'.$name, function () {
-            return "<?php endif; ?>";
+            return '<?php endif; ?>';
         });
     }
 
