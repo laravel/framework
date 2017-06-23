@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Auth;
 
-use StdClass;
+use stdClass;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Auth\Access\Gate;
@@ -369,7 +369,7 @@ class AccessGateTestPolicy
 
     public function updateDash($user, AccessGateTestDummy $dummy)
     {
-        return $user instanceof StdClass;
+        return $user instanceof stdClass;
     }
 }
 

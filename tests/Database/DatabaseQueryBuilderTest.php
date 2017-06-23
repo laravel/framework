@@ -1939,7 +1939,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->shouldReceive('forPage')->once()->with(3, 2)->andReturnSelf();
         $builder->shouldReceive('get')->times(3)->andReturn($chunk1, $chunk2, $chunk3);
 
-        $callbackAssertor = m::mock('StdClass');
+        $callbackAssertor = m::mock('stdClass');
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk2);
         $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk3);
@@ -1960,7 +1960,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->shouldReceive('forPage')->once()->with(2, 2)->andReturnSelf();
         $builder->shouldReceive('get')->times(2)->andReturn($chunk1, $chunk2);
 
-        $callbackAssertor = m::mock('StdClass');
+        $callbackAssertor = m::mock('stdClass');
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk2);
 
@@ -1980,7 +1980,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->shouldReceive('forPage')->never()->with(2, 2);
         $builder->shouldReceive('get')->times(1)->andReturn($chunk1);
 
-        $callbackAssertor = m::mock('StdClass');
+        $callbackAssertor = m::mock('stdClass');
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
         $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk2);
 
@@ -2000,7 +2000,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->shouldReceive('forPage')->once()->with(1, 0)->andReturnSelf();
         $builder->shouldReceive('get')->times(1)->andReturn($chunk);
 
-        $callbackAssertor = m::mock('StdClass');
+        $callbackAssertor = m::mock('stdClass');
         $callbackAssertor->shouldReceive('doSomething')->never();
 
         $builder->chunk(0, function ($results) use ($callbackAssertor) {
@@ -2021,7 +2021,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 11, 'someIdField')->andReturnSelf();
         $builder->shouldReceive('get')->times(3)->andReturn($chunk1, $chunk2, $chunk3);
 
-        $callbackAssertor = m::mock('StdClass');
+        $callbackAssertor = m::mock('stdClass');
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk2);
         $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk3);
@@ -2042,7 +2042,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 2, 'someIdField')->andReturnSelf();
         $builder->shouldReceive('get')->times(2)->andReturn($chunk1, $chunk2);
 
-        $callbackAssertor = m::mock('StdClass');
+        $callbackAssertor = m::mock('stdClass');
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk2);
 
@@ -2060,7 +2060,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->shouldReceive('forPageAfterId')->once()->with(0, 0, 'someIdField')->andReturnSelf();
         $builder->shouldReceive('get')->times(1)->andReturn($chunk);
 
-        $callbackAssertor = m::mock('StdClass');
+        $callbackAssertor = m::mock('stdClass');
         $callbackAssertor->shouldReceive('doSomething')->never();
 
         $builder->chunkById(0, function ($results) use ($callbackAssertor) {
@@ -2079,7 +2079,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 10, 'table.id')->andReturnSelf();
         $builder->shouldReceive('get')->times(2)->andReturn($chunk1, $chunk2);
 
-        $callbackAssertor = m::mock('StdClass');
+        $callbackAssertor = m::mock('stdClass');
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
         $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk2);
 

@@ -12,7 +12,7 @@ class ViewEngineResolverTest extends TestCase
     {
         $resolver = new \Illuminate\View\Engines\EngineResolver;
         $resolver->register('foo', function () {
-            return new StdClass;
+            return new stdClass;
         });
         $result = $resolver->resolve('foo');
 

@@ -30,7 +30,7 @@ class DatabaseEloquentRelationTest extends TestCase
         $builder = m::mock(Builder::class);
         $parent = m::mock(Model::class);
         $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
-        $builder->shouldReceive('getModel')->andReturn($related = m::mock(\StdClass::class));
+        $builder->shouldReceive('getModel')->andReturn($related = m::mock(\stdClass::class));
         $builder->shouldReceive('whereNotNull');
         $builder->shouldReceive('where');
         $relation = new HasOne($builder, $parent, 'foreign_key', 'id');

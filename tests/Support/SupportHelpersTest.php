@@ -329,8 +329,8 @@ class SupportHelpersTest extends TestCase
 
     public function testObjectGet()
     {
-        $class = new StdClass;
-        $class->name = new StdClass;
+        $class = new stdClass;
+        $class->name = new stdClass;
         $class->name->first = 'Taylor';
 
         $this->assertEquals('Taylor', object_get($class, 'name.first'));

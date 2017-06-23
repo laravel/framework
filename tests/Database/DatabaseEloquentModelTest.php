@@ -377,7 +377,7 @@ class DatabaseEloquentModelTest extends TestCase
         ];
         $model = new EloquentDateModelStub;
         \Illuminate\Database\Eloquent\Model::setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
-        $resolver->shouldReceive('connection')->andReturn($mockConnection = m::mock('StdClass'));
+        $resolver->shouldReceive('connection')->andReturn($mockConnection = m::mock('stdClass'));
         $mockConnection->shouldReceive('getQueryGrammar')->andReturn($mockConnection);
         $mockConnection->shouldReceive('getDateFormat')->andReturn('Y-m-d H:i:s');
         $instance = $model->newInstance($timestamps);
@@ -393,7 +393,7 @@ class DatabaseEloquentModelTest extends TestCase
         ];
         $model = new EloquentDateModelStub;
         \Illuminate\Database\Eloquent\Model::setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
-        $resolver->shouldReceive('connection')->andReturn($mockConnection = m::mock('StdClass'));
+        $resolver->shouldReceive('connection')->andReturn($mockConnection = m::mock('stdClass'));
         $mockConnection->shouldReceive('getQueryGrammar')->andReturn($mockConnection);
         $mockConnection->shouldReceive('getDateFormat')->andReturn('Y-m-d H:i:s');
         $instance = $model->newInstance($timestamps);
@@ -1369,7 +1369,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->syncOriginalAttribute('id');
         $model->foo = 2;
 
-        $model->shouldReceive('newQuery')->andReturn($query = m::mock('StdClass'));
+        $model->shouldReceive('newQuery')->andReturn($query = m::mock('stdClass'));
         $query->shouldReceive('where')->andReturn($query);
         $query->shouldReceive('increment');
 
@@ -1424,7 +1424,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->boolAttribute = 1;
         $model->booleanAttribute = 0;
         $model->objectAttribute = ['foo' => 'bar'];
-        $obj = new StdClass;
+        $obj = new stdClass;
         $obj->foo = 'bar';
         $model->arrayAttribute = $obj;
         $model->jsonAttribute = ['foo' => 'bar'];
@@ -1546,7 +1546,7 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = new EloquentModelCastingStub;
         $model->objectAttribute = ['foo' => "b\xF8r"];
-        $obj = new StdClass;
+        $obj = new stdClass;
         $obj->foo = "b\xF8r";
         $model->arrayAttribute = $obj;
         $model->jsonAttribute = ['foo' => "b\xF8r"];
@@ -1839,7 +1839,7 @@ class EloquentModelDestroyStub extends Model
     {
         $mock = m::mock('Illuminate\Database\Eloquent\Builder');
         $mock->shouldReceive('whereIn')->once()->with('id', [1, 2, 3])->andReturn($mock);
-        $mock->shouldReceive('get')->once()->andReturn([$model = m::mock('StdClass')]);
+        $mock->shouldReceive('get')->once()->andReturn([$model = m::mock('stdClass')]);
         $model->shouldReceive('delete')->once();
 
         return $mock;

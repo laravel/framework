@@ -661,7 +661,7 @@ class SupportCollectionTest extends TestCase
 
     public function testCollapse()
     {
-        $data = new Collection([[$object1 = new StdClass], [$object2 = new StdClass]]);
+        $data = new Collection([[$object1 = new stdClass], [$object2 = new stdClass]]);
         $this->assertEquals([$object1, $object2], $data->collapse()->all());
     }
 
