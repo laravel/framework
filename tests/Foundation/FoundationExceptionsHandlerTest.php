@@ -27,7 +27,7 @@ class FoundationExceptionsHandlerTest extends TestCase
     {
         $this->config = m::mock(Config::class);
 
-        $this->request = m::mock('StdClass');
+        $this->request = m::mock('stdClass');
 
         $this->container = Container::setInstance(new Container);
 

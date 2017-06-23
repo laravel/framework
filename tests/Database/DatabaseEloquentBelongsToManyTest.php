@@ -149,7 +149,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
         $query->shouldReceive('insert')->once()->with([['user_id' => 1, 'role_id' => 2, 'foo' => 'bar']])->andReturn(true);
-        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('stdClass'));
         $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
         $relation->expects($this->once())->method('touchIfTouching');
 
@@ -167,7 +167,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
                 ['user_id' => 1, 'role_id' => 3, 'baz' => 'boom', 'foo' => 'bar'],
             ]
         )->andReturn(true);
-        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('stdClass'));
         $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
         $relation->expects($this->once())->method('touchIfTouching');
 
@@ -186,7 +186,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
                 ['user_id' => 1, 'role_id' => 3],
             ]
         )->andReturn(true);
-        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('stdClass'));
         $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
         $relation->expects($this->once())->method('touchIfTouching');
 
@@ -206,7 +206,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
         $query->shouldReceive('insert')->once()->with([['user_id' => 1, 'role_id' => 2, 'foo' => 'bar', 'created_at' => 'time', 'updated_at' => 'time']])->andReturn(true);
-        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('stdClass'));
         $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
         $relation->getParent()->shouldReceive('freshTimestamp')->once()->andReturn('time');
         $relation->expects($this->once())->method('touchIfTouching');
@@ -221,7 +221,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
         $query->shouldReceive('insert')->once()->with([['user_id' => 1, 'role_id' => 2, 'foo' => 'bar', 'custom_created_at' => 'time', 'custom_updated_at' => 'time']])->andReturn(true);
-        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('stdClass'));
         $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
         $relation->getParent()->shouldReceive('freshTimestamp')->once()->andReturn('time');
         $relation->expects($this->once())->method('touchIfTouching');
@@ -236,7 +236,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
         $query->shouldReceive('insert')->once()->with([['user_id' => 1, 'role_id' => 2, 'foo' => 'bar', 'created_at' => 'time']])->andReturn(true);
-        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('stdClass'));
         $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
         $relation->getParent()->shouldReceive('freshTimestamp')->once()->andReturn('time');
         $relation->expects($this->once())->method('touchIfTouching');
@@ -251,7 +251,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
         $query->shouldReceive('insert')->once()->with([['user_id' => 1, 'role_id' => 2, 'foo' => 'bar', 'updated_at' => 'time']])->andReturn(true);
-        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('stdClass'));
         $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
         $relation->getParent()->shouldReceive('freshTimestamp')->once()->andReturn('time');
         $relation->expects($this->once())->method('touchIfTouching');
@@ -267,7 +267,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
         $query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
         $query->shouldReceive('whereIn')->once()->with('role_id', [1, 2, 3]);
         $query->shouldReceive('delete')->once()->andReturn(true);
-        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('stdClass'));
         $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
         $relation->expects($this->once())->method('touchIfTouching');
 
@@ -282,7 +282,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
         $query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
         $query->shouldReceive('whereIn')->once()->with('role_id', [1]);
         $query->shouldReceive('delete')->once()->andReturn(true);
-        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('stdClass'));
         $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
         $relation->expects($this->once())->method('touchIfTouching');
 
@@ -297,7 +297,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
         $query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
         $query->shouldReceive('whereIn')->once()->with('role_id', [1, 2, 3]);
         $query->shouldReceive('delete')->once()->andReturn(true);
-        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('stdClass'));
         $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
         $relation->expects($this->once())->method('touchIfTouching');
 
@@ -318,7 +318,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
         $query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
         $query->shouldReceive('whereIn')->never();
         $query->shouldReceive('delete')->once()->andReturn(true);
-        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('stdClass'));
         $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
         $relation->expects($this->once())->method('touchIfTouching');
 
@@ -328,28 +328,28 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
     public function testFirstMethod()
     {
         $relation = m::mock('Illuminate\Database\Eloquent\Relations\BelongsToMany[get]', $this->getRelationArguments());
-        $relation->shouldReceive('get')->once()->andReturn(new \Illuminate\Database\Eloquent\Collection([new StdClass]));
+        $relation->shouldReceive('get')->once()->andReturn(new \Illuminate\Database\Eloquent\Collection([new stdClass]));
         $relation->shouldReceive('take')->with(1)->once()->andReturn($relation);
 
-        $this->assertInstanceOf(StdClass::class, $relation->first());
+        $this->assertInstanceOf(stdClass::class, $relation->first());
     }
 
     public function testFindMethod()
     {
         $relation = m::mock('Illuminate\Database\Eloquent\Relations\BelongsToMany[first]', $this->getRelationArguments());
-        $relation->shouldReceive('first')->once()->andReturn(new StdClass);
+        $relation->shouldReceive('first')->once()->andReturn(new stdClass);
         $relation->shouldReceive('where')->with('roles.id', '=', 'foo')->once()->andReturn($relation);
 
         $related = $relation->getRelated();
         $related->shouldReceive('getQualifiedKeyName')->once()->andReturn('roles.id');
 
-        $this->assertInstanceOf(StdClass::class, $relation->find('foo'));
+        $this->assertInstanceOf(stdClass::class, $relation->find('foo'));
     }
 
     public function testFindManyMethod()
     {
         $relation = m::mock('Illuminate\Database\Eloquent\Relations\BelongsToMany[get]', $this->getRelationArguments());
-        $relation->shouldReceive('get')->once()->andReturn(new Collection([new StdClass, new StdClass]));
+        $relation->shouldReceive('get')->once()->andReturn(new Collection([new stdClass, new stdClass]));
         $relation->shouldReceive('whereIn')->with('roles.id', ['foo', 'bar'])->once()->andReturn($relation);
 
         $related = $relation->getRelated();
@@ -358,13 +358,13 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
         $result = $relation->findMany(['foo', 'bar']);
 
         $this->assertCount(2, $result);
-        $this->assertInstanceOf(StdClass::class, $result->first());
+        $this->assertInstanceOf(stdClass::class, $result->first());
     }
 
     public function testCreateMethodCreatesNewModelAndInsertsAttachmentRecord()
     {
         $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['attach'])->setConstructorArgs($this->getRelationArguments())->getMock();
-        $relation->getRelated()->shouldReceive('newInstance')->once()->andReturn($model = m::mock('StdClass'))->with(['attributes']);
+        $relation->getRelated()->shouldReceive('newInstance')->once()->andReturn($model = m::mock('stdClass'))->with(['attributes']);
         $model->shouldReceive('save')->once();
         $model->shouldReceive('getKey')->andReturn('foo');
         $relation->expects($this->once())->method('attach')->with('foo', ['joining']);
@@ -409,29 +409,29 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
     public function testFindOrNewMethodFindsModel()
     {
         $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['find'])->setConstructorArgs($this->getRelationArguments())->getMock();
-        $relation->expects($this->once())->method('find')->with('foo')->will($this->returnValue($model = m::mock('StdClass')));
+        $relation->expects($this->once())->method('find')->with('foo')->will($this->returnValue($model = m::mock('stdClass')));
         $relation->getRelated()->shouldReceive('newInstance')->never();
 
-        $this->assertInstanceOf(StdClass::class, $relation->findOrNew('foo'));
+        $this->assertInstanceOf(stdClass::class, $relation->findOrNew('foo'));
     }
 
     public function testFindOrNewMethodReturnsNewModel()
     {
         $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['find'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $relation->expects($this->once())->method('find')->with('foo')->will($this->returnValue(null));
-        $relation->getRelated()->shouldReceive('newInstance')->once()->andReturn($model = m::mock('StdClass'));
+        $relation->getRelated()->shouldReceive('newInstance')->once()->andReturn($model = m::mock('stdClass'));
 
-        $this->assertInstanceOf(StdClass::class, $relation->findOrNew('foo'));
+        $this->assertInstanceOf(stdClass::class, $relation->findOrNew('foo'));
     }
 
     public function testFirstOrNewMethodFindsFirstModel()
     {
         $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['where'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $relation->expects($this->once())->method('where')->with(['foo'])->will($this->returnValue($relation->getQuery()));
-        $relation->getQuery()->shouldReceive('first')->once()->andReturn($model = m::mock('StdClass'));
+        $relation->getQuery()->shouldReceive('first')->once()->andReturn($model = m::mock('stdClass'));
         $relation->getRelated()->shouldReceive('newInstance')->never();
 
-        $this->assertInstanceOf(StdClass::class, $relation->firstOrNew(['foo']));
+        $this->assertInstanceOf(stdClass::class, $relation->firstOrNew(['foo']));
     }
 
     public function testFirstOrNewMethodReturnsNewModel()
@@ -439,19 +439,19 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
         $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['where'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $relation->expects($this->once())->method('where')->with(['foo'])->will($this->returnValue($relation->getQuery()));
         $relation->getQuery()->shouldReceive('first')->once()->andReturn(null);
-        $relation->getRelated()->shouldReceive('newInstance')->once()->andReturn($model = m::mock('StdClass'));
+        $relation->getRelated()->shouldReceive('newInstance')->once()->andReturn($model = m::mock('stdClass'));
 
-        $this->assertInstanceOf(StdClass::class, $relation->firstOrNew(['foo']));
+        $this->assertInstanceOf(stdClass::class, $relation->firstOrNew(['foo']));
     }
 
     public function testFirstOrCreateMethodFindsFirstModel()
     {
         $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['where', 'create'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $relation->expects($this->once())->method('where')->with(['foo'])->will($this->returnValue($relation->getQuery()));
-        $relation->getQuery()->shouldReceive('first')->once()->andReturn($model = m::mock('StdClass'));
+        $relation->getQuery()->shouldReceive('first')->once()->andReturn($model = m::mock('stdClass'));
         $relation->expects($this->never())->method('create')->with(['foo'])->will($this->returnValue(null));
 
-        $this->assertInstanceOf(StdClass::class, $relation->firstOrCreate(['foo']));
+        $this->assertInstanceOf(stdClass::class, $relation->firstOrCreate(['foo']));
     }
 
     public function testFirstOrCreateMethodReturnsNewModel()
@@ -459,21 +459,21 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
         $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['where', 'create'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $relation->expects($this->once())->method('where')->with(['foo'])->will($this->returnValue($relation->getQuery()));
         $relation->getQuery()->shouldReceive('first')->once()->andReturn(null);
-        $relation->expects($this->once())->method('create')->with(['foo'])->will($this->returnValue($model = m::mock('StdClass')));
+        $relation->expects($this->once())->method('create')->with(['foo'])->will($this->returnValue($model = m::mock('stdClass')));
 
-        $this->assertInstanceOf(StdClass::class, $relation->firstOrCreate(['foo']));
+        $this->assertInstanceOf(stdClass::class, $relation->firstOrCreate(['foo']));
     }
 
     public function testUpdateOrCreateMethodFindsFirstModelAndUpdates()
     {
         $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['where', 'create'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $relation->expects($this->once())->method('where')->with(['foo'])->will($this->returnValue($relation->getQuery()));
-        $relation->getQuery()->shouldReceive('first')->once()->andReturn($model = m::mock('StdClass'));
+        $relation->getQuery()->shouldReceive('first')->once()->andReturn($model = m::mock('stdClass'));
         $model->shouldReceive('fill')->once();
         $model->shouldReceive('save')->once();
         $relation->expects($this->never())->method('create')->with(['foo'])->will($this->returnValue(null));
 
-        $this->assertInstanceOf(StdClass::class, $relation->updateOrCreate(['foo']));
+        $this->assertInstanceOf(stdClass::class, $relation->updateOrCreate(['foo']));
     }
 
     public function testUpdateOrCreateMethodReturnsNewModel()
@@ -481,9 +481,9 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
         $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['where', 'create'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $relation->expects($this->once())->method('where')->with(['bar'])->will($this->returnValue($relation->getQuery()));
         $relation->getQuery()->shouldReceive('first')->once()->andReturn(null);
-        $relation->expects($this->once())->method('create')->with(['foo'])->will($this->returnValue($model = m::mock('StdClass')));
+        $relation->expects($this->once())->method('create')->with(['foo'])->will($this->returnValue($model = m::mock('stdClass')));
 
-        $this->assertInstanceOf(StdClass::class, $relation->updateOrCreate(['bar'], ['foo']));
+        $this->assertInstanceOf(stdClass::class, $relation->updateOrCreate(['bar'], ['foo']));
     }
 
     /**
@@ -495,7 +495,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
         $query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
-        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('stdClass'));
         $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
         $query->shouldReceive('pluck')->once()->with('role_id')->andReturn(new BaseCollection([1, 2, 3]));
         $relation->expects($this->once())->method('attach')->with($this->equalTo('x'), $this->equalTo([]), $this->equalTo(false));
@@ -520,7 +520,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
         $query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
-        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('stdClass'));
         $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
         $query->shouldReceive('pluck')->once()->with('role_id')->andReturn(new BaseCollection([1, 2, 3]));
         $relation->expects($this->once())->method('attach')->with($this->equalTo(4), $this->equalTo(['foo' => 'bar']), $this->equalTo(false));
@@ -537,7 +537,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
         $query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
-        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('stdClass'));
         $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
         $query->shouldReceive('pluck')->once()->with('role_id')->andReturn(new BaseCollection([1, 2, 3]));
         $relation->expects($this->once())->method('attach')->with($this->equalTo(4), $this->equalTo(['foo' => 'bar']), $this->equalTo(false));
@@ -556,7 +556,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
         $relation->getRelated()->shouldReceive('getQualifiedKeyName')->andReturn('table.id');
         $relation->getQuery()->shouldReceive('select')->once()->with('table.id')->andReturn($relation->getQuery());
         $relation->getQuery()->shouldReceive('pluck')->once()->with('id')->andReturn([1, 2, 3]);
-        $relation->getRelated()->shouldReceive('newQuery')->once()->andReturn($query = m::mock('StdClass'));
+        $relation->getRelated()->shouldReceive('newQuery')->once()->andReturn($query = m::mock('stdClass'));
         $query->shouldReceive('whereIn')->once()->with('id', [1, 2, 3])->andReturn($query);
         $query->shouldReceive('update')->once()->with(['updated_at' => '100']);
 
@@ -572,7 +572,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
         $query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
-        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('stdClass'));
         $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
         $query->shouldReceive('pluck')->once()->with('role_id')->andReturn(new BaseCollection([1, 2, 3]));
         $relation->expects($this->once())->method('attach')->with($this->equalTo(['x' => []]), $this->equalTo([]), $this->equalTo(false));
@@ -597,7 +597,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
         $query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
-        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('stdClass'));
         $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
         $query->shouldReceive('pluck')->once()->with('role_id')->andReturn(new BaseCollection([1, 2, 3]));
         $relation->expects($this->once())->method('attach')->with($this->equalTo(['x' => []]), $this->equalTo([]), $this->equalTo(false));
@@ -614,7 +614,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
         $query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
-        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('stdClass'));
         $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
         $query->shouldReceive('pluck')->once()->with('role_id')->andReturn(new BaseCollection([1, 2, 3]));
         $relation->expects($this->once())->method('attach')->with($this->equalTo([4 => ['foo' => 'bar']]), [], $this->equalTo(false));
@@ -641,7 +641,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
         $query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
-        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('stdClass'));
         $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
         $query->shouldReceive('pluck')->once()->with('role_id')->andReturn(new BaseCollection([1, 2, 3]));
 
@@ -660,7 +660,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
         $query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
-        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('stdClass'));
         $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
         $query->shouldReceive('pluck')->once()->with('role_id')->andReturn(new BaseCollection([1, 2, 3]));
 

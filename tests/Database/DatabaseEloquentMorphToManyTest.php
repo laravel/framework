@@ -31,7 +31,7 @@ class DatabaseEloquentMorphToManyTest extends TestCase
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('taggables')->andReturn($query);
         $query->shouldReceive('insert')->once()->with([['taggable_id' => 1, 'taggable_type' => get_class($relation->getParent()), 'tag_id' => 2, 'foo' => 'bar']])->andReturn(true);
-        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('stdClass'));
         $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
         $relation->expects($this->once())->method('touchIfTouching');
 
@@ -47,7 +47,7 @@ class DatabaseEloquentMorphToManyTest extends TestCase
         $query->shouldReceive('where')->once()->with('taggable_type', get_class($relation->getParent()))->andReturn($query);
         $query->shouldReceive('whereIn')->once()->with('tag_id', [1, 2, 3]);
         $query->shouldReceive('delete')->once()->andReturn(true);
-        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('stdClass'));
         $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
         $relation->expects($this->once())->method('touchIfTouching');
 
@@ -63,7 +63,7 @@ class DatabaseEloquentMorphToManyTest extends TestCase
         $query->shouldReceive('where')->once()->with('taggable_type', get_class($relation->getParent()))->andReturn($query);
         $query->shouldReceive('whereIn')->never();
         $query->shouldReceive('delete')->once()->andReturn(true);
-        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('stdClass'));
         $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
         $relation->expects($this->once())->method('touchIfTouching');
 
