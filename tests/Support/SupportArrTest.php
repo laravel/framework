@@ -399,6 +399,17 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['emails' => ['joe@example.com' => 'Joe', 'jane@localhost' => 'Jane']], $array);
     }
 
+    public function testRandom()
+    {
+        $number1 = Arr::random(range(1, 1000));
+        $number2 = Arr::random(range(1, 1000));
+        $number3 = Arr::random(range(1, 1000));
+
+        $this->assertNotSame($number1, $number2);
+
+        $this->assertEquals('bar', Arr::random(['foo' => 'bar']));
+    }
+
     public function testSet()
     {
         $array = ['products' => ['desk' => ['price' => 100]]];
