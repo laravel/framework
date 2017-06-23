@@ -399,6 +399,14 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['emails' => ['joe@example.com' => 'Joe', 'jane@localhost' => 'Jane']], $array);
     }
 
+    public function testRandom()
+    {
+        $randomValue = Arr::random(['foo', 'bar', 'baz']);
+
+        $this->assertInternalType('string', $randomValue);
+        $this->assertContains($randomValue, ['foo', 'bar', 'baz']);
+    }
+
     public function testSet()
     {
         $array = ['products' => ['desk' => ['price' => 100]]];
