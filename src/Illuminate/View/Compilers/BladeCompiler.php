@@ -31,11 +31,16 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * All custom "directive" handlers.
      *
-     * This was implemented as a more usable "extend" in 5.1.
-     *
      * @var array
      */
     protected $customDirectives = [];
+
+    /**
+     * All custom "condition" handlers.
+     *
+     * @var array
+     */
+    protected $conditions = [];
 
     /**
      * The file currently being compiled.
