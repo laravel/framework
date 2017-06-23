@@ -401,13 +401,10 @@ class SupportArrTest extends TestCase
 
     public function testRandom()
     {
-        $number1 = Arr::random(range(1, 1000));
-        $number2 = Arr::random(range(1, 1000));
-        $number3 = Arr::random(range(1, 1000));
+        $randomValue = Arr::random(['foo', 'bar', 'baz']);
 
-        $this->assertNotSame($number1, $number2);
-
-        $this->assertEquals('bar', Arr::random(['foo' => 'bar']));
+        $this->assertInternalType('string', $randomValue);
+        $this->assertContains($randomValue, ['foo', 'bar', 'baz']);
     }
 
     public function testSet()
