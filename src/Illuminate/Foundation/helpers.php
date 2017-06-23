@@ -598,7 +598,7 @@ if (! function_exists('public_path')) {
      */
     function public_path($path = '')
     {
-        return app()->make('path.public').($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return app()->make('path.public').($path ? DIRECTORY_SEPARATOR.ltrim($path, DIRECTORY_SEPARATOR) : $path);
     }
 }
 
