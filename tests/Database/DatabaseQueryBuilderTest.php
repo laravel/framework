@@ -189,6 +189,65 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 2, 1 => 'foo'], $builder->getBindings());
     }
 
+    public function testUnlessCallback()
+    {
+        $callback = function ($query, $condition) {
+            $this->assertFalse($condition);
+
+            $query->where('id', '=', 1);
+        };
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->unless(false, $callback)->where('email', 'foo');
+        $this->assertEquals('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->unless(true, $callback)->where('email', 'foo');
+        $this->assertEquals('select * from "users" where "email" = ?', $builder->toSql());
+    }
+
+    public function testUnlessCallbackWithReturn()
+    {
+        $callback = function ($query, $condition) {
+            $this->assertFalse($condition);
+
+            return $query->where('id', '=', 1);
+        };
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->unless(false, $callback)->where('email', 'foo');
+        $this->assertEquals('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->unless(true, $callback)->where('email', 'foo');
+        $this->assertEquals('select * from "users" where "email" = ?', $builder->toSql());
+    }
+
+    public function testUnlessCallbackWithDefault()
+    {
+        $callback = function ($query, $condition) {
+            $this->assertEquals($condition, 0);
+
+            $query->where('id', '=', 1);
+        };
+
+        $default = function ($query, $condition) {
+            $this->assertEquals($condition, 'truthy');
+
+            $query->where('id', '=', 2);
+        };
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->unless(0, $callback, $default)->where('email', 'foo');
+        $this->assertEquals('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 'foo'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->unless('truthy', $callback, $default)->where('email', 'foo');
+        $this->assertEquals('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
+        $this->assertEquals([0 => 2, 1 => 'foo'], $builder->getBindings());
+    }
+
     public function testTapCallback()
     {
         $callback = function ($query) {
