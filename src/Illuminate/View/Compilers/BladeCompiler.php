@@ -358,6 +358,25 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Register a custom directive representing an if statement
+     * 
+     * @param  string   $name
+     * @param  callable $condition
+     * @return void
+     */
+    public function if($name, callable $condition)
+    {
+        $this->directive($name, function (...$args) use ($condition) {
+            $condition = (int) (true === $condition(...$args));
+            return "<?php if ($condition): ?>";
+        });
+
+        $this->directive('end'.$name, function () {
+            return "<?php endif; ?>";
+        });
+    }
+
+    /**
      * Get the list of custom directives.
      *
      * @return array

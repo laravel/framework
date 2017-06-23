@@ -91,6 +91,38 @@ class ViewBladeCompilerTest extends TestCase
         }}'));
     }
 
+    public function testItGeneratesAnIfBlock()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+
+        $compiler->if('foo', function () {
+            return 'John' == 'Mateus';
+        });
+
+        $this->assertArrayHasKey('foo', $compiler->getCustomDirectives());
+        $this->assertArrayHasKey('endfoo', $compiler->getCustomDirectives());
+        $this->assertEquals("<?php if (0): ?>", $compiler->getCustomDirectives()['foo']());
+        $this->assertEquals("<?php endif; ?>", $compiler->getCustomDirectives()['endfoo']());
+
+        $compiler->if('foo', function () {
+            return 'John' == 'John';
+        });
+
+        $this->assertEquals("<?php if (1): ?>", $compiler->getCustomDirectives()['foo']());
+    }
+
+    public function testItGeneratesAnIfBlockWithAnArgument()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+
+        $compiler->if('foo', function ($name) {
+            return 'Mateus' == $name;
+        });
+
+        $this->assertEquals("<?php if (0): ?>", $compiler->getCustomDirectives()['foo']('John'));
+        $this->assertEquals("<?php if (1): ?>", $compiler->getCustomDirectives()['foo']('Mateus'));
+    }
+
     protected function getFiles()
     {
         return m::mock('Illuminate\Filesystem\Filesystem');
