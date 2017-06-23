@@ -49,7 +49,8 @@ class MailChannel
     {
         $message = $notification->toMail($notifiable);
 
-        if (! $notifiable->routeNotificationFor('mail') && ! $message instanceof Mailable) {
+        if (! $notifiable->routeNotificationFor('mail') &&
+            ! $message instanceof Mailable) {
             return;
         }
 
@@ -57,9 +58,26 @@ class MailChannel
             return $message->send($this->mailer);
         }
 
-        $this->mailer->send($this->buildView($message), $message->data(), function ($mailMessage) use ($notifiable, $notification, $message) {
+        $this->mailer->send(
+            $this->buildView($message),
+            $message->data(),
+            $this->messageBuilder($notifiable, $notification, $message)
+        );
+    }
+
+    /**
+     * Get the mailer Closure for the message.
+     *
+     * @param  mixed  $notifiable
+     * @param  \Illuminate\Notifications\Notification  $notification
+     * @param  \Illuminate\Notifications\Messages\MailMessage  $message
+     * @return \Closure
+     */
+    protected function messageBuilder($notifiable, $notification, $message)
+    {
+        return function ($mailMessage) use ($notifiable, $notification, $message) {
             $this->buildMessage($mailMessage, $notifiable, $notification, $message);
-        });
+        };
     }
 
     /**
