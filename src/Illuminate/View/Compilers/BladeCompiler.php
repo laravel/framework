@@ -38,6 +38,14 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected $customDirectives = [];
 
     /**
+     * All custom directives conditions, used
+     * by the "if" and "check" methods
+     * 
+     * @var array
+     */
+    protected $conditions = [];
+
+    /**
      * The file currently being compiled.
      *
      * @var string
@@ -350,7 +358,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * Register an "if" statement directive.
      *
      * @param  string  $name
-     * @param  \Closrue  $callback
+     * @param  \Closure  $callback
      * @return void
      */
     public function if($name, Closure $callback)
