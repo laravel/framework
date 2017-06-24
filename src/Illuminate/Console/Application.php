@@ -1,7 +1,5 @@
 <?php
-
 namespace Illuminate\Console;
-
 use Closure;
 use Illuminate\Contracts\Events\Dispatcher;
 use Symfony\Component\Process\ProcessUtils;
@@ -13,7 +11,6 @@ use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Illuminate\Contracts\Console\Application as ApplicationContract;
-
 class Application extends SymfonyApplication implements ApplicationContract
 {
     /**
@@ -22,21 +19,18 @@ class Application extends SymfonyApplication implements ApplicationContract
      * @var \Illuminate\Contracts\Container\Container
      */
     protected $laravel;
-
     /**
      * The output from the previous command.
      *
      * @var \Symfony\Component\Console\Output\BufferedOutput
      */
     protected $lastOutput;
-
     /**
      * The console application bootstrappers.
      *
      * @var array
      */
     protected static $bootstrappers = [];
-
     /**
      * Create a new Artisan console application.
      *
@@ -48,16 +42,12 @@ class Application extends SymfonyApplication implements ApplicationContract
     public function __construct(Container $laravel, Dispatcher $events, $version)
     {
         parent::__construct('Laravel Framework', $version);
-
         $this->laravel = $laravel;
         $this->setAutoExit(false);
         $this->setCatchExceptions(false);
-
         $events->dispatch(new Events\ArtisanStarting($this));
-
         $this->bootstrap();
     }
-
     /**
      * Determine the proper PHP executable.
      *
@@ -67,7 +57,6 @@ class Application extends SymfonyApplication implements ApplicationContract
     {
         return ProcessUtils::escapeArgument((new PhpExecutableFinder)->find(false));
     }
-
     /**
      * Determine the proper Artisan executable.
      *
@@ -77,7 +66,6 @@ class Application extends SymfonyApplication implements ApplicationContract
     {
         return defined('ARTISAN_BINARY') ? ProcessUtils::escapeArgument(ARTISAN_BINARY) : 'artisan';
     }
-
     /**
      * Format the given command as a fully-qualified executable command.
      *
@@ -88,7 +76,6 @@ class Application extends SymfonyApplication implements ApplicationContract
     {
         return sprintf('%s %s %s', static::phpBinary(), static::artisanBinary(), $string);
     }
-
     /**
      * Register a console "starting" bootstrapper.
      *
@@ -99,7 +86,6 @@ class Application extends SymfonyApplication implements ApplicationContract
     {
         static::$bootstrappers[] = $callback;
     }
-
     /**
      * Bootstrap the console application.
      *
@@ -108,10 +94,9 @@ class Application extends SymfonyApplication implements ApplicationContract
     protected function bootstrap()
     {
         foreach (static::$bootstrappers as $bootstrapper) {
-            $bootstrapper($this);
-        }
-    }
-
+    $bootstrapper($this);
+}
+}
     /*
      * Clear the console application bootstrappers.
      *
@@ -121,7 +106,6 @@ class Application extends SymfonyApplication implements ApplicationContract
     {
         static::$bootstrappers = [];
     }
-
     /**
      * Run an Artisan console command by name.
      *
@@ -133,18 +117,12 @@ class Application extends SymfonyApplication implements ApplicationContract
     public function call($command, array $parameters = [], $outputBuffer = null)
     {
         $parameters = collect($parameters)->prepend($command);
-
         $this->lastOutput = $outputBuffer ?: new BufferedOutput;
-
         $this->setCatchExceptions(false);
-
         $result = $this->run(new ArrayInput($parameters->toArray()), $this->lastOutput);
-
         $this->setCatchExceptions(true);
-
         return $result;
     }
-
     /**
      * Get the output for the last run command.
      *
@@ -154,7 +132,6 @@ class Application extends SymfonyApplication implements ApplicationContract
     {
         return $this->lastOutput ? $this->lastOutput->fetch() : '';
     }
-
     /**
      * Add a command to the console.
      *
@@ -164,12 +141,10 @@ class Application extends SymfonyApplication implements ApplicationContract
     public function add(SymfonyCommand $command)
     {
         if ($command instanceof Command) {
-            $command->setLaravel($this->laravel);
-        }
-
-        return $this->addToParent($command);
-    }
-
+    $command->setLaravel($this->laravel);
+}
+return $this->addToParent($command);
+}
     /**
      * Add the command to the parent instance.
      *
@@ -180,7 +155,6 @@ class Application extends SymfonyApplication implements ApplicationContract
     {
         return parent::add($command);
     }
-
     /**
      * Add a command, resolving through the application.
      *
@@ -191,7 +165,6 @@ class Application extends SymfonyApplication implements ApplicationContract
     {
         return $this->add($this->laravel->make($command));
     }
-
     /**
      * Resolve an array of commands through the application.
      *
@@ -201,14 +174,11 @@ class Application extends SymfonyApplication implements ApplicationContract
     public function resolveCommands($commands)
     {
         $commands = is_array($commands) ? $commands : func_get_args();
-
         foreach ($commands as $command) {
-            $this->resolve($command);
-        }
-
-        return $this;
-    }
-
+    $this->resolve($command);
+}
+return $this;
+}
     /**
      * Get the default input definitions for the applications.
      *
@@ -222,7 +192,6 @@ class Application extends SymfonyApplication implements ApplicationContract
             $definition->addOption($this->getEnvironmentOption());
         });
     }
-
     /**
      * Get the global environment option for the definition.
      *
@@ -231,10 +200,8 @@ class Application extends SymfonyApplication implements ApplicationContract
     protected function getEnvironmentOption()
     {
         $message = 'The environment the command should run under';
-
         return new InputOption('--env', null, InputOption::VALUE_OPTIONAL, $message);
-    }
-
+}
     /**
      * Get the Laravel application instance.
      *
