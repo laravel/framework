@@ -213,10 +213,7 @@ class Writer implements LogContract, PsrLoggerInterface
     public function useLineNumbers($level = 'debug')
     {
         // Note that the '3' is so that the information about Laravel call
-        // stack is skipped. Specifically the following calls are skipped:
-        // Illuminate\Log\Writer@writeLog
-        // Illuminate\Log\Writer@info
-        // Illuminate\Foundation\helpers@info
+        // stack is skipped. Works as expected with all log level messages.
     
         $this->monolog->pushProcessor(new IntrospectionProcessor($this->parseLevel($level), [], 3));
     }
