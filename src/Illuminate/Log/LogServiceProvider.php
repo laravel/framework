@@ -57,8 +57,7 @@ class LogServiceProvider extends ServiceProvider
      */
     protected function configureHandler(Writer $log)
     {
-        $logLineLevel = $this->logLineLevel();
-        if ($logLineLevel) {
+        if ($logLineLevel = $this->logLineLevel()) {
             $log->useLineNumbers($logLineLevel);
         }
         $this->{'configure'.ucfirst($this->handler()).'Handler'}($log);
@@ -150,10 +149,8 @@ class LogServiceProvider extends ServiceProvider
     protected function logLineLevel()
     {
         if ($this->app->bound('config')) {
-            return $this->app->make('config')->get('app.log_line_level', null);
+            return $this->app->make('config')->get('app.log_line_level');
         }
-
-        return null;
     }
 
     /**
