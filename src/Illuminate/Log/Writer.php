@@ -15,6 +15,7 @@ use Monolog\Handler\RotatingFileHandler;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
+use Monolog\Processor\IntrospectionProcessor;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
 use Illuminate\Contracts\Logging\Log as LogContract;
 
@@ -202,6 +203,24 @@ class Writer implements LogContract, PsrLoggerInterface
 
         $this->monolog->{$level}($message, $context);
     }
+
+    /**
+     * Register a handler to output line numbers and call information with log statements.
+     *
+     * @param  string  $level
+     * @return void
+     */
+    public function useLineNumbers($level = 'debug')
+    {
+        // Note that the '3' is so that the information about Laravel call
+        // stack is skipped. Specifically the following calls are skipped:
+        // Illuminate\Log\Writer@writeLog
+        // Illuminate\Log\Writer@info
+        // Illuminate\Foundation\helpers@info
+    
+        $this->monolog->pushProcessor(new IntrospectionProcessor($this->parseLevel($level), [], 3));
+    }
+
 
     /**
      * Register a file log handler.
