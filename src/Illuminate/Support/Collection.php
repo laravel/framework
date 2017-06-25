@@ -11,6 +11,7 @@ use CachingIterator;
 use JsonSerializable;
 use IteratorAggregate;
 use InvalidArgumentException;
+use Illuminate\Support\Debug\Dumper;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
@@ -260,7 +261,13 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function dump()
     {
-        dump($this->all());
+        (new static(func_get_args()))
+            ->push($this)
+            ->each(function ($item) {
+                (new Dumper)->dump($item);
+            });
+
+        return $this;
     }
 
     /**
