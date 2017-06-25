@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Validation\FailureFormatters\FailureFormatter;
 use Illuminate\Contracts\Validation\Factory as FactoryContract;
 
 class Factory implements FactoryContract
@@ -23,6 +24,13 @@ class Factory implements FactoryContract
      * @var \Illuminate\Validation\PresenceVerifierInterface
      */
     protected $verifier;
+
+    /**
+     * The Failure Formatter implementation.
+     *
+     * @var \Illuminate\Validation\FailureFormatters\FailureFormatter
+     */
+    protected $failureFormatter;
 
     /**
      * The IoC container instance.
@@ -76,7 +84,7 @@ class Factory implements FactoryContract
     /**
      * Create a new Validator factory instance.
      *
-     * @param  \Illuminate\Contracts\Translation\Translator $translator
+     * @param  \Illuminate\Contracts\Translation\Translator  $translator
      * @param  \Illuminate\Contracts\Container\Container  $container
      * @return void
      */
@@ -103,6 +111,10 @@ class Factory implements FactoryContract
         $validator = $this->resolve(
             $data, $rules, $messages, $customAttributes
         );
+
+        if (! is_null($this->failureFormatter)) {
+            $validator->setFailureFormatter($this->failureFormatter);
+        }
 
         if (! is_null($this->verifier)) {
             $validator->setPresenceVerifier($this->verifier);
@@ -279,5 +291,15 @@ class Factory implements FactoryContract
     public function setPresenceVerifier(PresenceVerifierInterface $presenceVerifier)
     {
         $this->verifier = $presenceVerifier;
+    }
+
+    /**
+     * Set the Failure Formatter implementation.
+     *
+     * @param  \Illuminate\Validation\FailureFormatters\FailureFormatter  $failureFormatter
+     */
+    public function setFailureFormatter(FailureFormatter $failureFormatter)
+    {
+        $this->failureFormatter = $failureFormatter;
     }
 }
