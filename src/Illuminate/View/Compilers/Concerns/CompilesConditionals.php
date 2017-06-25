@@ -5,6 +5,13 @@ namespace Illuminate\View\Compilers\Concerns;
 trait CompilesConditionals
 {
     /**
+     * Identifier for the first case in switch statement
+     *
+     * @var bool
+     */
+    protected $firstCaseInSwitch = true;
+
+    /**
      * Compile the has-section statements into valid PHP.
      *
      * @param  string  $expression
@@ -97,5 +104,51 @@ trait CompilesConditionals
     protected function compileEndIsset()
     {
         return '<?php endif; ?>';
+    }
+
+    /**
+     * Compile the switch statements into valid PHP.
+     *
+     * @param  string  $variable
+     * @return string
+     */
+    protected function compileSwitch($variable)
+    {
+        return "<?php switch ({$variable}): ";
+    }
+
+    /**
+     * Compile the case statements into valid PHP.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function compileCase($value)
+    {
+        if ($this->firstCaseInSwitch) {
+            $this->firstCaseInSwitch = false;
+            return "case{$value}: ?>";
+        }
+        return "<?php case{$value}: ?>";
+    }
+
+    /**
+     * Compile the default statements in switch case into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileDefault()
+    {
+        return "<?php default: ?>";
+    }
+
+    /**
+     * Compile the end switch statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileEndSwitch()
+    {
+        return "<?php endswitch; ?>";
     }
 }
