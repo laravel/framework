@@ -9,7 +9,7 @@ trait CompilesConditionals
      *
      * @var bool
      */
-    protected $firstCaseInSwitch = true;
+    protected $firstCaseInSwitch;
 
     /**
      * Compile the has-section statements into valid PHP.
@@ -114,6 +114,8 @@ trait CompilesConditionals
      */
     protected function compileSwitch($variable)
     {
+        $this->firstCaseInSwitch = true;
+
         return "<?php switch ({$variable}): ";
     }
 
