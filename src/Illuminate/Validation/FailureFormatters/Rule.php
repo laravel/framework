@@ -20,4 +20,5 @@ class Rule extends FailureFormatter
     {
         return Str::snake($rule);
     }
+
 }

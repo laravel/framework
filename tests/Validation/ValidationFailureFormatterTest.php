@@ -6,10 +6,8 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Validation\Factory;
 use Illuminate\Contracts\Translation\Translator as TranslatorInterface;
-use Illuminate\Validation\FailureFormatters\{
-    Rule as RuleFailureFormatter,
-    Message as MessageFailureFormatter
-};
+use Illuminate\Validation\FailureFormatters\Rule as RuleFailureFormatter;
+use Illuminate\Validation\FailureFormatters\Message as MessageFailureFormatter;
 
 class ValidationFailureFormatterTest extends TestCase
 {
@@ -81,4 +79,5 @@ class ValidationFailureFormatterTest extends TestCase
             $validator->messages()->toArray()
         );
     }
+
 }

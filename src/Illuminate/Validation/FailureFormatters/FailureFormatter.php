@@ -16,4 +16,5 @@ abstract class FailureFormatter
      * @return string
      */
     abstract public function message(Validator $validator, $attribute, $rule, $parameters);
+
 }

@@ -21,4 +21,5 @@ class Message extends FailureFormatter
             $validator->getMessage($attribute, $rule), $attribute, $rule, $parameters
         );
     }
+
 }
