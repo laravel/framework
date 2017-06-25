@@ -115,7 +115,7 @@ trait CompilesConditionals
     protected function compileSwitch($variable)
     {
         $this->firstCaseInSwitch = true;
-        
+
         return "<?php switch ({$variable}): ";
     }
 
