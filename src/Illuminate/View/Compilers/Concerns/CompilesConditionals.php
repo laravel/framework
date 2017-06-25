@@ -5,7 +5,7 @@ namespace Illuminate\View\Compilers\Concerns;
 trait CompilesConditionals
 {
     /**
-     * Identifier for the first case in switch statement
+     * Identifier for the first case in switch statement.
      *
      * @var bool
      */
@@ -139,7 +139,7 @@ trait CompilesConditionals
      */
     protected function compileDefault()
     {
-        return "<?php default: ?>";
+        return '<?php default: ?>';
     }
 
     /**
@@ -149,6 +149,6 @@ trait CompilesConditionals
      */
     protected function compileEndSwitch()
     {
-        return "<?php endswitch; ?>";
+        return '<?php endswitch; ?>';
     }
 }
