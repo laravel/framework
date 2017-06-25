@@ -127,8 +127,10 @@ trait CompilesConditionals
     {
         if ($this->firstCaseInSwitch) {
             $this->firstCaseInSwitch = false;
+
             return "case{$value}: ?>";
         }
+        
         return "<?php case{$value}: ?>";
     }
 
