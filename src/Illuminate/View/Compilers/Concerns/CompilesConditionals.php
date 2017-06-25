@@ -130,7 +130,7 @@ trait CompilesConditionals
 
             return "case{$value}: ?>";
         }
-        
+
         return "<?php case{$value}: ?>";
     }
 
