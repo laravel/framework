@@ -252,7 +252,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         dd($this->all());
     }
-    
+
     /**
      * Dump the collection.
      *
