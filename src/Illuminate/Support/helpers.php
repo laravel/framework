@@ -500,6 +500,21 @@ if (! function_exists('data_set')) {
     }
 }
 
+if (! function_exists('vd')) {
+    /**
+     * Dump the passed variables.
+     *
+     * @param  mixed
+     * @return void
+     */
+    function vd(...$args)
+    {
+        foreach ($args as $x) {
+            (new Dumper)->dump($x);
+        }
+    }
+}
+
 if (! function_exists('dd')) {
     /**
      * Dump the passed variables and end the script.
