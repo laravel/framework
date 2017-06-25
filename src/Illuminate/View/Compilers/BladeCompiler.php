@@ -38,9 +38,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected $customDirectives = [];
 
     /**
-     * All custom directives conditions, used
-     * by the "if" and "check" methods
-     * 
+     * All custom "if" directives.
+     *
      * @var array
      */
     protected $conditions = [];
