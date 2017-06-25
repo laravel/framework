@@ -252,6 +252,16 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         dd($this->all());
     }
+    
+    /**
+     * Dump the collection.
+     *
+     * @return void
+     */
+    public function dump()
+    {
+        dump($this->all());
+    }
 
     /**
      * Get the items in the collection that are not present in the given items.
