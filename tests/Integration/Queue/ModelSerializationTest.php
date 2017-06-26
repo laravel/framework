@@ -123,6 +123,65 @@ class ModelSerializationTest extends TestCase
 
         unserialize($serialized);
     }
+
+    /**
+     * @test
+     * @expectedException Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    public function test_exception_is_thrown_if_model_not_found_and_continuing()
+    {
+        $user = ModelSerializationTestUser::create([
+            'email' => 'mohamed@laravel.com',
+        ]);
+
+        $job = new ModelSerializationTestDiscardClass($user);
+        $job->continueForMissingModels();
+        $serialized = serialize($job);
+
+        $user->delete();
+
+        $unSerialized = unserialize($serialized);
+    }
+
+    /**
+     * @test
+     */
+    public function test_delete_method_is_called_if_instructed_to_discard()
+    {
+        $user = ModelSerializationTestUser::create([
+            'email' => 'mohamed@laravel.com',
+        ]);
+
+        $job = new ModelSerializationTestDiscardClass($user);
+        $job->discardForMissingModels();
+        $serialized = serialize($job);
+
+        $user->delete();
+
+        $unSerialized = unserialize($serialized);
+
+        $this->assertTrue($unSerialized->deleted);
+    }
+
+    /**
+     * @test
+     */
+    public function test_fail_method_is_called_if_instructed_to_fail()
+    {
+        $user = ModelSerializationTestUser::create([
+            'email' => 'mohamed@laravel.com',
+        ]);
+
+        $job = new ModelSerializationTestDiscardClass($user);
+        $job->failForMissingModels();
+        $serialized = serialize($job);
+
+        $user->delete();
+
+        $unSerialized = unserialize($serialized);
+
+        $this->assertTrue($unSerialized->failed);
+    }
 }
 
 class ModelSerializationTestUser extends Model
@@ -141,5 +200,34 @@ class ModelSerializationTestClass
     public function __construct($user)
     {
         $this->user = $user;
+    }
+
+    public function fail()
+    {
+        //
+    }
+}
+
+class ModelSerializationTestDiscardClass
+{
+    use \Illuminate\Queue\SerializesModels;
+
+    public $user;
+    public $deleted = false;
+    public $failed = false;
+
+    public function __construct($user)
+    {
+        $this->user = $user;
+    }
+
+    public function delete()
+    {
+        $this->deleted = true;
+    }
+
+    public function fail($e)
+    {
+        $this->failed = true;
     }
 }
