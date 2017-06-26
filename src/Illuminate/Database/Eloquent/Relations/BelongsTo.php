@@ -172,12 +172,10 @@ class BelongsTo extends Relation
      */
     protected function getDefaultFor(Model $model)
     {
-        //return nothing if the user doesn't say to
         if (! $this->withDefault) {
             return;
         }
 
-        //no need to set any attributes on this
         $instance = $this->related->newInstance();
 
         if (is_callable($this->withDefault)) {
@@ -330,6 +328,19 @@ class BelongsTo extends Relation
     }
 
     /**
+     * Return a new model instance in case the relationship does not exist.
+     *
+     * @param  \Closure|array|bool  $callback
+     * @return $this
+     */
+    public function withDefault($callback = true)
+    {
+        $this->withDefault = $callback;
+
+        return $this;
+    }
+
+    /**
      * Get the foreign key of the relationship.
      *
      * @return string
@@ -377,18 +388,5 @@ class BelongsTo extends Relation
     public function getRelation()
     {
         return $this->relation;
-    }
-
-    /**
-     * Return a new model instance in case the relationship does not exist.
-     *
-     * @param  \Closure|array|bool  $callback
-     * @return $this
-     */
-    public function withDefault($callback = true)
-    {
-        $this->withDefault = $callback;
-
-        return $this;
     }
 }
