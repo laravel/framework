@@ -355,7 +355,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * Register an "if" statement directive.
      *
      * @param  string  $name
-     * @param  \Closrue  $callback
+     * @param  \Closure  $callback
      * @return void
      */
     public function if($name, Closure $callback)
@@ -369,7 +369,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
         });
 
         $this->directive('end'.$name, function () {
-            return "<?php endif; ?>";
+            return '<?php endif; ?>';
         });
     }
 
