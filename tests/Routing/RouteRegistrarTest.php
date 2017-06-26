@@ -212,7 +212,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testUserCanRegisterApiResource()
     {
-        $this->router->apiResource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub');
+        $this->router->apiResource('users', \Illuminate\Tests\Routing\RouteRegistrarControllerStub::class);
 
         $this->assertCount(5, $this->router->getRoutes());
 
