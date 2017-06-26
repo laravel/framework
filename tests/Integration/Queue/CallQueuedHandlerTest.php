@@ -1,7 +1,6 @@
 <?php
 
 use Orchestra\Testbench\TestCase;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * @group integration
@@ -25,7 +24,6 @@ class CallQueuedHandlerTest extends TestCase
             'command' => serialize(new CallQueuedHandlerTestJob),
         ]);
 
-
         $this->assertTrue(CallQueuedHandlerTestJob::$handled);
     }
 
@@ -47,7 +45,6 @@ class CallQueuedHandlerTest extends TestCase
         $instance->call($job, [
             'command' => serialize(new CallQueuedHandlerTestJob),
         ]);
-
 
         $this->assertFalse(CallQueuedHandlerTestJob::$handled);
     }
