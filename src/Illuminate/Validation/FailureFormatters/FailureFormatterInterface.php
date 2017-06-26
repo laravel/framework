@@ -4,7 +4,7 @@ namespace Illuminate\Validation\FailureFormatters;
 
 use Illuminate\Contracts\Validation\Validator;
 
-abstract class FailureFormatter
+interface FailureFormatterInterface
 {
     /**
      * Get formatted message.
@@ -15,6 +15,5 @@ abstract class FailureFormatter
      * @param  array   $parameters
      * @return string
      */
-    abstract public function message(Validator $validator, $attribute, $rule, $parameters);
-
+    public function message(Validator $validator, $attribute, $rule, $parameters);
 }

@@ -79,5 +79,4 @@ class ValidationFailureFormatterTest extends TestCase
             $validator->messages()->toArray()
         );
     }
-
 }

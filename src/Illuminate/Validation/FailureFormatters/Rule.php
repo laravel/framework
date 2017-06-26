@@ -5,7 +5,7 @@ namespace Illuminate\Validation\FailureFormatters;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Validation\Validator;
 
-class Rule extends FailureFormatter
+class Rule implements FailureFormatterInterface
 {
     /**
      * Get formatted message.
@@ -20,5 +20,4 @@ class Rule extends FailureFormatter
     {
         return Str::snake($rule);
     }
-
 }

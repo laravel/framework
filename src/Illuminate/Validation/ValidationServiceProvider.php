@@ -22,6 +22,8 @@ class ValidationServiceProvider extends ServiceProvider
     {
         $this->registerPresenceVerifier();
 
+        $this->registerFailureFormatter();
+
         $this->registerValidationFactory();
     }
 
@@ -42,6 +44,8 @@ class ValidationServiceProvider extends ServiceProvider
                 $validator->setPresenceVerifier($app['validation.presence']);
             }
 
+            $validator->setFailureFormatter($app['validation.failure_formatter']);
+
             return $validator;
         });
     }
@@ -59,6 +63,22 @@ class ValidationServiceProvider extends ServiceProvider
     }
 
     /**
+     * Register failure formatter.
+     *
+     * @return void
+     */
+    protected function registerFailureFormatter()
+    {
+        $this->app->singleton('validation.failure_formatter', function ($app) {
+            $defaultFormatter = $app['config']['validation']['default_failure_formatter'];
+
+            $formatter = $app['config']['validation']['failure_formatters'][$defaultFormatter];
+
+            return new $formatter;
+        });
+    }
+
+    /**
      * Get the services provided by the provider.
      *
      * @return array
@@ -66,7 +86,7 @@ class ValidationServiceProvider extends ServiceProvider
     public function provides()
     {
         return [
-            'validator', 'validation.presence',
+            'validator', 'validation.presence', 'validation.failure_formatter'
         ];
     }
 }

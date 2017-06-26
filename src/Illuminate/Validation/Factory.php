@@ -6,8 +6,8 @@ use Closure;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Translation\Translator;
-use Illuminate\Validation\FailureFormatters\FailureFormatter;
 use Illuminate\Contracts\Validation\Factory as FactoryContract;
+use Illuminate\Validation\FailureFormatters\FailureFormatterInterface;
 
 class Factory implements FactoryContract
 {
@@ -28,7 +28,7 @@ class Factory implements FactoryContract
     /**
      * The Failure Formatter implementation.
      *
-     * @var \Illuminate\Validation\FailureFormatters\FailureFormatter
+     * @var \Illuminate\Validation\FailureFormatters\FailureFormatterInterface
      */
     protected $failureFormatter;
 
@@ -296,9 +296,9 @@ class Factory implements FactoryContract
     /**
      * Set the Failure Formatter implementation.
      *
-     * @param  \Illuminate\Validation\FailureFormatters\FailureFormatter  $failureFormatter
+     * @param  \Illuminate\Validation\FailureFormatters\FailureFormatterInterface  $failureFormatter
      */
-    public function setFailureFormatter(FailureFormatter $failureFormatter)
+    public function setFailureFormatter(FailureFormatterInterface $failureFormatter)
     {
         $this->failureFormatter = $failureFormatter;
     }

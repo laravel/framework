@@ -13,8 +13,8 @@ use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Validation\ImplicitRule;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
-use Illuminate\Validation\FailureFormatters\FailureFormatter;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
+use Illuminate\Validation\FailureFormatters\FailureFormatterInterface;
 use Illuminate\Validation\FailureFormatters\Message as MessageFailureFormatter;
 
 class Validator implements ValidatorContract
@@ -46,7 +46,7 @@ class Validator implements ValidatorContract
     /**
      * The Failure Formatter implementation.
      *
-     * @var \Illuminate\Validation\FailureFormatters\FailureFormatter
+     * @var \Illuminate\Validation\FailureFormatters\FailureFormatterInterface
      */
     protected $failureFormatter;
 
@@ -1069,10 +1069,10 @@ class Validator implements ValidatorContract
     /**
      * Set Failure Formatter implementation.
      *
-     * @param  \Illuminate\Validation\FailureFormatters\FailureFormatter  $failureFormatter
+     * @param  \Illuminate\Validation\FailureFormatters\FailureFormatterInterface  $failureFormatter
      * @return void
      */
-    public function setFailureFormatter(FailureFormatter $failureFormatter)
+    public function setFailureFormatter(FailureFormatterInterface $failureFormatter)
     {
         $this->failureFormatter = $failureFormatter;
     }
