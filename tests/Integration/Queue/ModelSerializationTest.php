@@ -146,14 +146,14 @@ class ModelSerializationTest extends TestCase
     /**
      * @test
      */
-    public function test_delete_method_is_called_if_instructed_to_discard()
+    public function test_delete_method_is_called_if_instructed_to_delete()
     {
         $user = ModelSerializationTestUser::create([
             'email' => 'mohamed@laravel.com',
         ]);
 
         $job = new ModelSerializationTestDiscardClass($user);
-        $job->discardForMissingModels();
+        $job->deleteForMissingModels();
         $serialized = serialize($job);
 
         $user->delete();

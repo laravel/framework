@@ -15,7 +15,7 @@ trait SerializesModels
      *
      * @var bool
      */
-    protected $discardForMissingModels = false;
+    protected $deleteForMissingModels = false;
 
     /**
      * Indicates that the job should fail for missing models.
@@ -29,9 +29,9 @@ trait SerializesModels
      *
      * @var bool
      */
-    public function discardForMissingModels()
+    public function deleteForMissingModels()
     {
-        $this->discardForMissingModels = true;
+        $this->deleteForMissingModels = true;
 
         return $this;
     }
@@ -55,7 +55,7 @@ trait SerializesModels
      */
     public function continueForMissingModels()
     {
-        $this->discardForMissingModels = false;
+        $this->deleteForMissingModels = false;
         $this->failForMissingModels = false;
 
         return $this;
@@ -94,7 +94,7 @@ trait SerializesModels
                     $this->getPropertyValue($property)
                 ));
             } catch (ModelNotFoundException $e) {
-                if (isset($this->discardForMissingModels) && $this->discardForMissingModels) {
+                if (isset($this->deleteForMissingModels) && $this->deleteForMissingModels) {
                     return $this->delete();
                 }
 
