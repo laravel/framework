@@ -583,7 +583,7 @@ if (! function_exists('mix')) {
             return new HtmlString("//localhost:8080{$path}");
         }
 
-        if (in_array($manifestKey, $manifests)){
+        if (in_array($manifestKey, $manifests)) {
             $manifest = $manifests[$manifestKey];
         } else {
             if (! file_exists($manifestPath = public_path($manifestDirectory.'/mix-manifest.json'))) {
