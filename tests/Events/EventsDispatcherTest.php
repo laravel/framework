@@ -42,8 +42,8 @@ class EventsDispatcherTest extends TestCase
 
     public function testContainerResolutionOfEventHandlers()
     {
-        $d = new Dispatcher($container = m::mock('Illuminate\Container\Container'));
-        $container->shouldReceive('make')->once()->with('FooHandler')->andReturn($handler = m::mock('stdClass'));
+        $d = new Dispatcher($container = m::mock(\Illuminate\Container\Container::class));
+        $container->shouldReceive('make')->once()->with('FooHandler')->andReturn($handler = m::mock(\stdClass::class));
         $handler->shouldReceive('onFooEvent')->once()->with('foo', 'bar');
         $d->listen('foo', 'FooHandler@onFooEvent');
         $d->fire('foo', ['foo', 'bar']);
@@ -51,8 +51,8 @@ class EventsDispatcherTest extends TestCase
 
     public function testContainerResolutionOfEventHandlersWithDefaultMethods()
     {
-        $d = new Dispatcher($container = m::mock('Illuminate\Container\Container'));
-        $container->shouldReceive('make')->once()->with('FooHandler')->andReturn($handler = m::mock('stdClass'));
+        $d = new Dispatcher($container = m::mock(\Illuminate\Container\Container::class));
+        $container->shouldReceive('make')->once()->with('FooHandler')->andReturn($handler = m::mock(\stdClass::class));
         $handler->shouldReceive('handle')->once()->with('foo', 'bar');
         $d->listen('foo', 'FooHandler');
         $d->fire('foo', ['foo', 'bar']);
@@ -170,11 +170,11 @@ class EventsDispatcherTest extends TestCase
     public function testQueuedEventHandlersAreQueued()
     {
         $d = new Dispatcher;
-        $queue = m::mock('Illuminate\Contracts\Queue\Queue');
+        $queue = m::mock(\Illuminate\Contracts\Queue\Queue::class);
 
         $queue->shouldReceive('connection')->once()->with(null)->andReturnSelf();
 
-        $queue->shouldReceive('pushOn')->once()->with(null, m::type('Illuminate\Events\CallQueuedListener'));
+        $queue->shouldReceive('pushOn')->once()->with(null, m::type(\Illuminate\Events\CallQueuedListener::class));
 
         $d->setQueueResolver(function () use ($queue) {
             return $queue;
@@ -188,7 +188,7 @@ class EventsDispatcherTest extends TestCase
     {
         unset($_SERVER['__event.test']);
         $d = new Dispatcher;
-        $d->listen('Illuminate\Tests\Events\ExampleEvent', function () {
+        $d->listen(\Illuminate\Tests\Events\ExampleEvent::class, function () {
             $_SERVER['__event.test'] = 'baz';
         });
         $d->fire(new ExampleEvent);
@@ -200,7 +200,7 @@ class EventsDispatcherTest extends TestCase
     {
         unset($_SERVER['__event.test']);
         $d = new Dispatcher;
-        $d->listen('Illuminate\Tests\Events\SomeEventInterface', function () {
+        $d->listen(\Illuminate\Tests\Events\SomeEventInterface::class, function () {
             $_SERVER['__event.test'] = 'bar';
         });
         $d->fire(new AnotherEvent);
@@ -212,10 +212,10 @@ class EventsDispatcherTest extends TestCase
     {
         unset($_SERVER['__event.test']);
         $d = new Dispatcher;
-        $d->listen('Illuminate\Tests\Events\AnotherEvent', function () {
+        $d->listen(\Illuminate\Tests\Events\AnotherEvent::class, function () {
             $_SERVER['__event.test1'] = 'fooo';
         });
-        $d->listen('Illuminate\Tests\Events\SomeEventInterface', function () {
+        $d->listen(\Illuminate\Tests\Events\SomeEventInterface::class, function () {
             $_SERVER['__event.test2'] = 'baar';
         });
         $d->fire(new AnotherEvent);
