@@ -22,6 +22,7 @@ class RepositoryTest extends TestCase
         $this->repository = new Repository($this->config = [
             'foo' => 'bar',
             'bar' => 'baz',
+            'baz' => 'bat',
             'null' => null,
             'associate' => [
                 'x' => 'xxx',
@@ -54,6 +55,56 @@ class RepositoryTest extends TestCase
     public function testGet()
     {
         $this->assertSame('bar', $this->repository->get('foo'));
+    }
+
+    public function testGetWithArrayOfKeys()
+    {
+        $this->assertSame([
+            'foo' => 'bar',
+            'bar' => 'baz',
+            'none' => null,
+        ], $this->repository->get([
+            'foo',
+            'bar',
+            'none',
+        ]));
+
+        $this->assertSame([
+            'x' => [
+                'y' => 'default',
+            ],
+            'bar' => 'baz',
+            'baz' => 'bat',
+        ], $this->repository->get([
+            'x.y' => 'default',
+            'bar' => 'default',
+            'baz',
+        ]));
+    }
+
+    public function testGetMany()
+    {
+        $this->assertSame([
+            'foo' => 'bar',
+            'bar' => 'baz',
+            'none' => null,
+        ], $this->repository->getMany([
+            'foo',
+            'bar',
+            'none',
+        ]));
+
+        $this->assertSame([
+            'x' => [
+                'y' => 'default',
+            ],
+            'bar' => 'baz',
+            'baz' => 'bat',
+        ], $this->repository->getMany([
+            'x.y' => 'default',
+            'bar' => 'default',
+            'baz',
+        ]));
     }
 
     public function testGetWithDefault()
