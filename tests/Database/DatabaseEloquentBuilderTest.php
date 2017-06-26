@@ -45,7 +45,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testFindOrNewMethodModelNotFound()
     {
         $model = $this->getMockModel();
-        $model->shouldReceive('findOrNew')->once()->andReturn(m::mock('Illuminate\Database\Eloquent\Model'));
+        $model->shouldReceive('findOrNew')->once()->andReturn(m::mock(\Illuminate\Database\Eloquent\Model::class));
 
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[first]', [$this->getMockQueryBuilder()]);
         $builder->setModel($model);
@@ -55,7 +55,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $result = $model->findOrNew('bar', ['column']);
         $findResult = $builder->find('bar', ['column']);
         $this->assertNull($findResult);
-        $this->assertInstanceOf('Illuminate\Database\Eloquent\Model', $result);
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Model::class, $result);
     }
 
     /**
@@ -183,7 +183,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->shouldReceive('forPage')->once()->with(3, 2)->andReturnSelf();
         $builder->shouldReceive('get')->times(3)->andReturn($chunk1, $chunk2, $chunk3);
 
-        $callbackAssertor = m::mock('stdClass');
+        $callbackAssertor = m::mock(\stdClass::class);
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk2);
         $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk3);
@@ -204,7 +204,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->shouldReceive('forPage')->once()->with(2, 2)->andReturnSelf();
         $builder->shouldReceive('get')->times(2)->andReturn($chunk1, $chunk2);
 
-        $callbackAssertor = m::mock('stdClass');
+        $callbackAssertor = m::mock(\stdClass::class);
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk2);
 
@@ -224,7 +224,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->shouldReceive('forPage')->never()->with(2, 2);
         $builder->shouldReceive('get')->times(1)->andReturn($chunk1);
 
-        $callbackAssertor = m::mock('stdClass');
+        $callbackAssertor = m::mock(\stdClass::class);
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
         $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk2);
 
@@ -244,7 +244,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->shouldReceive('forPage')->once()->with(1, 0)->andReturnSelf();
         $builder->shouldReceive('get')->times(1)->andReturn($chunk);
 
-        $callbackAssertor = m::mock('stdClass');
+        $callbackAssertor = m::mock(\stdClass::class);
         $callbackAssertor->shouldReceive('doSomething')->never();
 
         $builder->chunk(0, function ($results) use ($callbackAssertor) {
@@ -265,7 +265,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 11, 'someIdField')->andReturnSelf();
         $builder->shouldReceive('get')->times(3)->andReturn($chunk1, $chunk2, $chunk3);
 
-        $callbackAssertor = m::mock('stdClass');
+        $callbackAssertor = m::mock(\stdClass::class);
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk2);
         $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk3);
@@ -286,7 +286,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 2, 'someIdField')->andReturnSelf();
         $builder->shouldReceive('get')->times(2)->andReturn($chunk1, $chunk2);
 
-        $callbackAssertor = m::mock('stdClass');
+        $callbackAssertor = m::mock(\stdClass::class);
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk2);
 
@@ -304,7 +304,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->shouldReceive('forPageAfterId')->once()->with(0, 0, 'someIdField')->andReturnSelf();
         $builder->shouldReceive('get')->times(1)->andReturn($chunk);
 
-        $callbackAssertor = m::mock('stdClass');
+        $callbackAssertor = m::mock(\stdClass::class);
         $callbackAssertor->shouldReceive('doSomething')->never();
 
         $builder->chunkById(0, function ($results) use ($callbackAssertor) {
@@ -367,9 +367,9 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         unset($_SERVER['__test.builder']);
         $builder = new \Illuminate\Database\Eloquent\Builder(new \Illuminate\Database\Query\Builder(
-            m::mock('Illuminate\Database\ConnectionInterface'),
-            m::mock('Illuminate\Database\Query\Grammars\Grammar'),
-            m::mock('Illuminate\Database\Query\Processors\Processor')
+            m::mock(\Illuminate\Database\ConnectionInterface::class),
+            m::mock(\Illuminate\Database\Query\Grammars\Grammar::class),
+            m::mock(\Illuminate\Database\Query\Processors\Processor::class)
         ));
         $builder->macro('fooBar', function ($builder) {
             $_SERVER['__test.builder'] = $builder;
@@ -427,7 +427,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->setEagerLoads(['orders' => function ($query) {
             $_SERVER['__eloquent.constrain'] = $query;
         }]);
-        $relation = m::mock('stdClass');
+        $relation = m::mock(\stdClass::class);
         $relation->shouldReceive('addEagerConstraints')->once()->with(['models']);
         $relation->shouldReceive('initRelation')->once()->with(['models'], 'orders')->andReturn(['models']);
         $relation->shouldReceive('getEager')->once()->andReturn(['results']);
@@ -444,8 +444,8 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->setModel($this->getMockModel());
-        $builder->getModel()->shouldReceive('orders')->once()->andReturn($relation = m::mock('stdClass'));
-        $relationQuery = m::mock('stdClass');
+        $builder->getModel()->shouldReceive('orders')->once()->andReturn($relation = m::mock(\stdClass::class));
+        $relationQuery = m::mock(\stdClass::class);
         $relation->shouldReceive('getQuery')->andReturn($relationQuery);
         $relationQuery->shouldReceive('with')->once()->with(['lines' => null, 'lines.details' => null]);
         $builder->setEagerLoads(['orders' => null, 'orders.lines' => null, 'orders.lines.details' => null]);
@@ -457,13 +457,13 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->setModel($this->getMockModel());
-        $builder->getModel()->shouldReceive('orders')->once()->andReturn($relation = m::mock('stdClass'));
-        $builder->getModel()->shouldReceive('ordersGroups')->once()->andReturn($groupsRelation = m::mock('stdClass'));
+        $builder->getModel()->shouldReceive('orders')->once()->andReturn($relation = m::mock(\stdClass::class));
+        $builder->getModel()->shouldReceive('ordersGroups')->once()->andReturn($groupsRelation = m::mock(\stdClass::class));
 
-        $relationQuery = m::mock('stdClass');
+        $relationQuery = m::mock(\stdClass::class);
         $relation->shouldReceive('getQuery')->andReturn($relationQuery);
 
-        $groupRelationQuery = m::mock('stdClass');
+        $groupRelationQuery = m::mock(\stdClass::class);
         $groupsRelation->shouldReceive('getQuery')->andReturn($groupRelationQuery);
         $groupRelationQuery->shouldReceive('with')->once()->with(['lines' => null, 'lines.details' => null]);
 
@@ -534,7 +534,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->getQuery()->shouldReceive('foobar')->once()->andReturn('foo');
 
-        $this->assertInstanceOf('Illuminate\Database\Eloquent\Builder', $builder->foobar());
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Builder::class, $builder->foobar());
 
         $builder = $this->getBuilder();
         $builder->getQuery()->shouldReceive('insert')->once()->with(['bar'])->andReturn('foo');
@@ -555,7 +555,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testNestedWhere()
     {
-        $nestedQuery = m::mock('Illuminate\Database\Eloquent\Builder');
+        $nestedQuery = m::mock(\Illuminate\Database\Eloquent\Builder::class);
         $nestedRawQuery = $this->getMockQueryBuilder();
         $nestedQuery->shouldReceive('getQuery')->once()->andReturn($nestedRawQuery);
         $model = $this->getMockModel()->makePartial();
@@ -877,8 +877,8 @@ class DatabaseEloquentBuilderTest extends TestCase
         $processorClass = 'Illuminate\Database\Query\Processors\\'.$database.'Processor';
         $grammar = new $grammarClass;
         $processor = new $processorClass;
-        $connection = m::mock('Illuminate\Database\ConnectionInterface', ['getQueryGrammar' => $grammar, 'getPostProcessor' => $processor]);
-        $resolver = m::mock('Illuminate\Database\ConnectionResolverInterface', ['connection' => $connection]);
+        $connection = m::mock(\Illuminate\Database\ConnectionInterface::class, ['getQueryGrammar' => $grammar, 'getPostProcessor' => $processor]);
+        $resolver = m::mock(\Illuminate\Database\ConnectionResolverInterface::class, ['connection' => $connection]);
         $class = get_class($model);
         $class::setConnectionResolver($resolver);
     }
@@ -890,7 +890,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     protected function getMockModel()
     {
-        $model = m::mock('Illuminate\Database\Eloquent\Model');
+        $model = m::mock(\Illuminate\Database\Eloquent\Model::class);
         $model->shouldReceive('getKeyName')->andReturn('foo');
         $model->shouldReceive('getTable')->andReturn('foo_table');
         $model->shouldReceive('getQualifiedKeyName')->andReturn('foo_table.foo');
@@ -900,7 +900,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     protected function getMockQueryBuilder()
     {
-        $query = m::mock('Illuminate\Database\Query\Builder');
+        $query = m::mock(\Illuminate\Database\Query\Builder::class);
         $query->shouldReceive('from')->with('foo_table');
 
         return $query;
@@ -960,17 +960,17 @@ class EloquentBuilderTestModelParentStub extends \Illuminate\Database\Eloquent\M
 {
     public function foo()
     {
-        return $this->belongsTo('Illuminate\Tests\Database\EloquentBuilderTestModelCloseRelatedStub');
+        return $this->belongsTo(\Illuminate\Tests\Database\EloquentBuilderTestModelCloseRelatedStub::class);
     }
 
     public function address()
     {
-        return $this->belongsTo('Illuminate\Tests\Database\EloquentBuilderTestModelCloseRelatedStub', 'foo_id');
+        return $this->belongsTo(\Illuminate\Tests\Database\EloquentBuilderTestModelCloseRelatedStub::class, 'foo_id');
     }
 
     public function activeFoo()
     {
-        return $this->belongsTo('Illuminate\Tests\Database\EloquentBuilderTestModelCloseRelatedStub', 'foo_id')->where('active', true);
+        return $this->belongsTo(\Illuminate\Tests\Database\EloquentBuilderTestModelCloseRelatedStub::class, 'foo_id')->where('active', true);
     }
 }
 
@@ -978,12 +978,12 @@ class EloquentBuilderTestModelCloseRelatedStub extends \Illuminate\Database\Eloq
 {
     public function bar()
     {
-        return $this->hasMany('Illuminate\Tests\Database\EloquentBuilderTestModelFarRelatedStub');
+        return $this->hasMany(\Illuminate\Tests\Database\EloquentBuilderTestModelFarRelatedStub::class);
     }
 
     public function baz()
     {
-        return $this->hasMany('Illuminate\Tests\Database\EloquentBuilderTestModelFarRelatedStub');
+        return $this->hasMany(\Illuminate\Tests\Database\EloquentBuilderTestModelFarRelatedStub::class);
     }
 }
 
@@ -997,31 +997,31 @@ class EloquentBuilderTestModelSelfRelatedStub extends \Illuminate\Database\Eloqu
 
     public function parentFoo()
     {
-        return $this->belongsTo('Illuminate\Tests\Database\EloquentBuilderTestModelSelfRelatedStub', 'parent_id', 'id', 'parent');
+        return $this->belongsTo(\Illuminate\Tests\Database\EloquentBuilderTestModelSelfRelatedStub::class, 'parent_id', 'id', 'parent');
     }
 
     public function childFoo()
     {
-        return $this->hasOne('Illuminate\Tests\Database\EloquentBuilderTestModelSelfRelatedStub', 'parent_id', 'id');
+        return $this->hasOne(\Illuminate\Tests\Database\EloquentBuilderTestModelSelfRelatedStub::class, 'parent_id', 'id');
     }
 
     public function childFoos()
     {
-        return $this->hasMany('Illuminate\Tests\Database\EloquentBuilderTestModelSelfRelatedStub', 'parent_id', 'id', 'children');
+        return $this->hasMany(\Illuminate\Tests\Database\EloquentBuilderTestModelSelfRelatedStub::class, 'parent_id', 'id', 'children');
     }
 
     public function parentBars()
     {
-        return $this->belongsToMany('Illuminate\Tests\Database\EloquentBuilderTestModelSelfRelatedStub', 'self_pivot', 'child_id', 'parent_id', 'parent_bars');
+        return $this->belongsToMany(\Illuminate\Tests\Database\EloquentBuilderTestModelSelfRelatedStub::class, 'self_pivot', 'child_id', 'parent_id', 'parent_bars');
     }
 
     public function childBars()
     {
-        return $this->belongsToMany('Illuminate\Tests\Database\EloquentBuilderTestModelSelfRelatedStub', 'self_pivot', 'parent_id', 'child_id', 'child_bars');
+        return $this->belongsToMany(\Illuminate\Tests\Database\EloquentBuilderTestModelSelfRelatedStub::class, 'self_pivot', 'parent_id', 'child_id', 'child_bars');
     }
 
     public function bazes()
     {
-        return $this->hasMany('Illuminate\Tests\Database\EloquentBuilderTestModelFarRelatedStub', 'foreign_key', 'id', 'bar');
+        return $this->hasMany(\Illuminate\Tests\Database\EloquentBuilderTestModelFarRelatedStub::class, 'foreign_key', 'id', 'bar');
     }
 }

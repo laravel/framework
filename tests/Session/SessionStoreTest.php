@@ -344,7 +344,7 @@ class SessionStoreTest extends TestCase
 
     public function getSession()
     {
-        $reflection = new ReflectionClass('Illuminate\Session\Store');
+        $reflection = new ReflectionClass(\Illuminate\Session\Store::class);
 
         return $reflection->newInstanceArgs($this->getMocks());
     }

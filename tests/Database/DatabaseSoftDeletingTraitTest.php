@@ -14,10 +14,10 @@ class DatabaseSoftDeletingTraitTest extends TestCase
 
     public function testDeleteSetsSoftDeletedColumn()
     {
-        $model = m::mock('Illuminate\Tests\Database\DatabaseSoftDeletingTraitStub');
+        $model = m::mock(\Illuminate\Tests\Database\DatabaseSoftDeletingTraitStub::class);
         $model->shouldDeferMissing();
-        // $model->shouldReceive('newQuery')->andReturn($query = m::mock('stdClass'));
-        $model->shouldReceive('newQueryWithoutScopes')->andReturn($query = m::mock('stdClass'));
+        // $model->shouldReceive('newQuery')->andReturn($query = m::mock(\stdClass::class));
+        $model->shouldReceive('newQueryWithoutScopes')->andReturn($query = m::mock(\stdClass::class));
         $query->shouldReceive('where')->once()->with('id', 1)->andReturn($query);
         $query->shouldReceive('update')->once()->with([
             'deleted_at' => 'date-time',
@@ -30,7 +30,7 @@ class DatabaseSoftDeletingTraitTest extends TestCase
 
     public function testRestore()
     {
-        $model = m::mock('Illuminate\Tests\Database\DatabaseSoftDeletingTraitStub');
+        $model = m::mock(\Illuminate\Tests\Database\DatabaseSoftDeletingTraitStub::class);
         $model->shouldDeferMissing();
         $model->shouldReceive('fireModelEvent')->with('restoring')->andReturn(true);
         $model->shouldReceive('save')->once();
@@ -43,7 +43,7 @@ class DatabaseSoftDeletingTraitTest extends TestCase
 
     public function testRestoreCancel()
     {
-        $model = m::mock('Illuminate\Tests\Database\DatabaseSoftDeletingTraitStub');
+        $model = m::mock(\Illuminate\Tests\Database\DatabaseSoftDeletingTraitStub::class);
         $model->shouldDeferMissing();
         $model->shouldReceive('fireModelEvent')->with('restoring')->andReturn(false);
         $model->shouldReceive('save')->never();

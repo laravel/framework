@@ -23,7 +23,7 @@ class CacheMutexTest extends TestCase
     {
         parent::setUp();
 
-        $this->cacheRepository = m::mock('Illuminate\Contracts\Cache\Repository');
+        $this->cacheRepository = m::mock(\Illuminate\Contracts\Cache\Repository::class);
         $this->cacheMutex = new CacheMutex($this->cacheRepository);
     }
 

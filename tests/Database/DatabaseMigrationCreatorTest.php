@@ -67,8 +67,8 @@ class DatabaseMigrationCreatorTest extends TestCase
 
     protected function getCreator()
     {
-        $files = m::mock('Illuminate\Filesystem\Filesystem');
+        $files = m::mock(\Illuminate\Filesystem\Filesystem::class);
 
-        return $this->getMockBuilder('Illuminate\Database\Migrations\MigrationCreator')->setMethods(['getDatePrefix'])->setConstructorArgs([$files])->getMock();
+        return $this->getMockBuilder(\Illuminate\Database\Migrations\MigrationCreator::class)->setMethods(['getDatePrefix'])->setConstructorArgs([$files])->getMock();
     }
 }

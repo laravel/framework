@@ -16,7 +16,7 @@ class DatabaseMigrationResetCommandTest extends TestCase
 
     public function testResetCommandCallsMigratorWithProperArguments()
     {
-        $command = new ResetCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
+        $command = new ResetCommand($migrator = m::mock(\Illuminate\Database\Migrations\Migrator::class));
         $app = new ApplicationDatabaseResetStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
@@ -31,7 +31,7 @@ class DatabaseMigrationResetCommandTest extends TestCase
 
     public function testResetCommandCanBePretended()
     {
-        $command = new ResetCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
+        $command = new ResetCommand($migrator = m::mock(\Illuminate\Database\Migrations\Migrator::class));
         $app = new ApplicationDatabaseResetStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);

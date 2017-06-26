@@ -12,7 +12,7 @@ abstract class AbstractBladeTestCase extends TestCase
 
     public function setUp()
     {
-        $this->compiler = new BladeCompiler(m::mock('Illuminate\Filesystem\Filesystem'), __DIR__);
+        $this->compiler = new BladeCompiler(m::mock(\Illuminate\Filesystem\Filesystem::class), __DIR__);
         parent::setUp();
     }
 

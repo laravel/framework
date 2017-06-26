@@ -181,7 +181,7 @@ class RouteRegistrarTest extends TestCase
     public function testCanRegisterResource()
     {
         $this->router->middleware('resource-middleware')
-                     ->resource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub');
+                     ->resource('users', \Illuminate\Tests\Routing\RouteRegistrarControllerStub::class);
 
         $this->seeResponse('deleted', Request::create('users/1', 'DELETE'));
         $this->seeMiddleware('resource-middleware');
@@ -189,7 +189,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testCanLimitMethodsOnRegisteredResource()
     {
-        $this->router->resource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
+        $this->router->resource('users', \Illuminate\Tests\Routing\RouteRegistrarControllerStub::class)
                      ->only('index', 'show', 'destroy');
 
         $this->assertCount(3, $this->router->getRoutes());
@@ -201,7 +201,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testCanExcludeMethodsOnRegisteredResource()
     {
-        $this->router->resource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
+        $this->router->resource('users', \Illuminate\Tests\Routing\RouteRegistrarControllerStub::class)
                      ->except(['index', 'create', 'store', 'show', 'edit']);
 
         $this->assertCount(2, $this->router->getRoutes());
@@ -222,13 +222,13 @@ class RouteRegistrarTest extends TestCase
 
     public function testCanNameRoutesOnRegisteredResource()
     {
-        $this->router->resource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
+        $this->router->resource('users', \Illuminate\Tests\Routing\RouteRegistrarControllerStub::class)
                      ->only('create', 'store')->names([
                          'create' => 'user.build',
                          'store' => 'user.save',
                      ]);
 
-        $this->router->resource('posts', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
+        $this->router->resource('posts', \Illuminate\Tests\Routing\RouteRegistrarControllerStub::class)
                     ->only('create', 'destroy')
                     ->name('create', 'posts.make')
                     ->name('destroy', 'posts.remove');
@@ -241,10 +241,10 @@ class RouteRegistrarTest extends TestCase
 
     public function testCanOverrideParametersOnRegisteredResource()
     {
-        $this->router->resource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
+        $this->router->resource('users', \Illuminate\Tests\Routing\RouteRegistrarControllerStub::class)
                      ->parameters(['users' => 'admin_user']);
 
-        $this->router->resource('posts', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
+        $this->router->resource('posts', \Illuminate\Tests\Routing\RouteRegistrarControllerStub::class)
                      ->parameter('posts', 'topic');
 
         $this->assertContains('admin_user', $this->router->getRoutes()->getByName('users.show')->uri);
@@ -253,10 +253,10 @@ class RouteRegistrarTest extends TestCase
 
     public function testCanSetMiddlewareOnRegisteredResource()
     {
-        $this->router->resource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
-                     ->middleware('Illuminate\Tests\Routing\RouteRegistrarMiddlewareStub');
+        $this->router->resource('users', \Illuminate\Tests\Routing\RouteRegistrarControllerStub::class)
+                     ->middleware(\Illuminate\Tests\Routing\RouteRegistrarMiddlewareStub::class);
 
-        $this->seeMiddleware('Illuminate\Tests\Routing\RouteRegistrarMiddlewareStub');
+        $this->seeMiddleware(\Illuminate\Tests\Routing\RouteRegistrarMiddlewareStub::class);
     }
 
     public function testCanSetRouteName()

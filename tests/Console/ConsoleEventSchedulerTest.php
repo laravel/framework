@@ -14,10 +14,10 @@ class ConsoleEventSchedulerTest extends TestCase
 
         $container = \Illuminate\Container\Container::getInstance();
 
-        $container->instance('Illuminate\Console\Scheduling\Mutex', m::mock('Illuminate\Console\Scheduling\CacheMutex'));
+        $container->instance(\Illuminate\Console\Scheduling\Mutex::class, m::mock(\Illuminate\Console\Scheduling\CacheMutex::class));
 
         $container->instance(
-            'Illuminate\Console\Scheduling\Schedule', $this->schedule = new Schedule(m::mock('Illuminate\Console\Scheduling\Mutex'))
+            \Illuminate\Console\Scheduling\Schedule::class, $this->schedule = new Schedule(m::mock(\Illuminate\Console\Scheduling\Mutex::class))
         );
     }
 
