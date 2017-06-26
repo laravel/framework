@@ -4,6 +4,7 @@ namespace Illuminate\Queue;
 
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class CallQueuedHandler
 {
@@ -34,9 +35,15 @@ class CallQueuedHandler
      */
     public function call(Job $job, array $data)
     {
-        $command = $this->setJobInstanceIfNecessary(
-            $job, unserialize($data['command'])
-        );
+        try {
+            $command = $this->setJobInstanceIfNecessary(
+                $job, unserialize($data['command'])
+            );
+        } catch (ModelNotFoundException $e) {
+            return FailingJob::handle(
+                $job->getConnectionName(), $job, $e
+            );
+        }
 
         $this->dispatcher->dispatchNow(
             $command, $handler = $this->resolveHandler($job, $command)
