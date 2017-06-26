@@ -27,7 +27,7 @@ class FoundationExceptionsHandlerTest extends TestCase
     {
         $this->config = m::mock(Config::class);
 
-        $this->request = m::mock('stdClass');
+        $this->request = m::mock(\stdClass::class);
 
         $this->container = Container::setInstance(new Container);
 
@@ -35,7 +35,7 @@ class FoundationExceptionsHandlerTest extends TestCase
             return $this->config;
         });
 
-        $this->container->singleton('Illuminate\Contracts\Routing\ResponseFactory', function () {
+        $this->container->singleton(\Illuminate\Contracts\Routing\ResponseFactory::class, function () {
             return new \Illuminate\Routing\ResponseFactory(
                 m::mock(\Illuminate\Contracts\View\Factory::class),
                 m::mock(\Illuminate\Routing\Redirector::class)
