@@ -4,6 +4,7 @@ namespace Illuminate\Support\Traits;
 
 use Closure;
 use BadMethodCallException;
+use Illuminate\Contracts\Support\Macro;
 
 trait Macroable
 {
@@ -17,11 +18,12 @@ trait Macroable
     /**
      * Register a custom macro.
      *
-     * @param  string    $name
-     * @param  callable  $macro
+     * @param  string $name
+     * @param  \Illuminate\Contracts\Support\Macro|callable $macro
+     *
      * @return void
      */
-    public static function macro($name, callable $macro)
+    public static function macro($name, $macro)
     {
         static::$macros[$name] = $macro;
     }
@@ -74,10 +76,16 @@ trait Macroable
             throw new BadMethodCallException("Method {$method} does not exist.");
         }
 
-        if (static::$macros[$method] instanceof Closure) {
-            return call_user_func_array(static::$macros[$method]->bindTo($this, static::class), $parameters);
+        $macro = static::$macros[$method];
+
+        if (is_string($macro) && is_a($macro, Macro::class, true)) {
+            $macro = (new $macro)->handle();
         }
 
-        return call_user_func_array(static::$macros[$method], $parameters);
+        if ($macro instanceof Closure) {
+            return call_user_func_array($macro->bindTo($this, static::class), $parameters);
+        }
+
+        return call_user_func_array($macro, $parameters);
     }
 }
