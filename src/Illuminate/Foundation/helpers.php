@@ -550,8 +550,9 @@ if (! function_exists('mix')) {
                 throw new Exception('The Mix manifest does not exist.');
             }
 
-            $manifest = json_decode(file_get_contents($manifestPath), true);
-            $manifests[$manifestKey] = $manifest;
+            $manifests[$manifestKey] = $manifest = json_decode(
+                file_get_contents($manifestPath), true
+            );
         }
 
         if (! array_key_exists($path, $manifest)) {
