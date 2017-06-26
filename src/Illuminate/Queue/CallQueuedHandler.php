@@ -38,9 +38,11 @@ class CallQueuedHandler
             $job, unserialize($data['command'])
         );
 
-        $this->dispatcher->dispatchNow(
-            $command, $handler = $this->resolveHandler($job, $command)
-        );
+        if (! $job->isDeleted() && ! $job->hasFailed()) {
+            $this->dispatcher->dispatchNow(
+                $command, $handler = $this->resolveHandler($job, $command)
+            );
+        }
 
         if (! $job->hasFailed() && ! $job->isReleased()) {
             $this->ensureNextJobInChainIsDispatched($command);
