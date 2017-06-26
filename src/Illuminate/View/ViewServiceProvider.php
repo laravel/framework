@@ -2,6 +2,7 @@
 
 namespace Illuminate\View;
 
+use Illuminate\View\Mix\Mix;
 use Illuminate\View\Engines\PhpEngine;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Engines\FileEngine;
@@ -23,6 +24,8 @@ class ViewServiceProvider extends ServiceProvider
         $this->registerViewFinder();
 
         $this->registerEngineResolver();
+
+        $this->registerMix();
     }
 
     /**
@@ -131,6 +134,18 @@ class ViewServiceProvider extends ServiceProvider
 
         $resolver->register('blade', function () {
             return new CompilerEngine($this->app['blade.compiler']);
+        });
+    }
+
+    /**
+     * Register the Mix instance.
+     *
+     * @return void
+     */
+    public function registerMix()
+    {
+        $this->app->singleton('mix', function () {
+            return new Mix;
         });
     }
 }
