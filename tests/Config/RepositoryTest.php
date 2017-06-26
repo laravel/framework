@@ -32,6 +32,9 @@ class RepositoryTest extends TestCase
                 'aaa',
                 'zzz',
             ],
+            'x' => [
+                'z' => 'zoo',
+            ],
         ]);
 
         parent::setUp();
@@ -70,13 +73,13 @@ class RepositoryTest extends TestCase
         ]));
 
         $this->assertSame([
-            'x' => [
-                'y' => 'default',
-            ],
+            'x.y' => 'default',
+            'x.z' => 'zoo',
             'bar' => 'baz',
             'baz' => 'bat',
         ], $this->repository->get([
             'x.y' => 'default',
+            'x.z' => 'default',
             'bar' => 'default',
             'baz',
         ]));
@@ -95,13 +98,13 @@ class RepositoryTest extends TestCase
         ]));
 
         $this->assertSame([
-            'x' => [
-                'y' => 'default',
-            ],
+            'x.y' => 'default',
+            'x.z' => 'zoo',
             'bar' => 'baz',
             'baz' => 'bat',
         ], $this->repository->getMany([
             'x.y' => 'default',
+            'x.z' => 'default',
             'bar' => 'default',
             'baz',
         ]));
