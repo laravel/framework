@@ -3,7 +3,7 @@
 namespace DummyNamespace;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\FreshDatabase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class DummyClass extends TestCase
 {
