@@ -153,6 +153,10 @@ trait CompilesConditionals
      */
     protected function compileEndSwitch()
     {
+        if (! $this->firstCaseInSwitch) {
+            $this->firstCaseInSwitch = true;
+        }
+
         return '<?php endswitch; ?>';
     }
 }
