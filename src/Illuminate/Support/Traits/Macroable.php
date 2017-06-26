@@ -19,7 +19,7 @@ trait Macroable
      * Register a custom macro.
      *
      * @param  string $name
-     * @param  \Illuminate\Contracts\Support\Macro|callable $macro
+     * @param  \Illuminate\Contracts\Support\Macro|callable  $macro
      *
      * @return void
      */

@@ -7,7 +7,7 @@ interface Macro
     /**
      * Return the callable macro.
      *
-     * @return callable
+     * @return  callable
      */
     public function handle();
 }
