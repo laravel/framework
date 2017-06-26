@@ -70,9 +70,11 @@ class ValidationServiceProvider extends ServiceProvider
     protected function registerFailureFormatter()
     {
         $this->app->singleton('validation.failure_formatter', function ($app) {
-            $defaultFormatter = $app['config']['validation']['default_failure_formatter'];
+            $config = $app['config'];
 
-            $formatter = $app['config']['validation']['failure_formatters'][$defaultFormatter];
+            $defaultFormatter = $config->get('validation.default_failure_formatter');
+
+            $formatter = $config->get('validation.failure_formatters'.$defaultFormatter);
 
             return new $formatter;
         });
