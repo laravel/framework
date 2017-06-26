@@ -97,6 +97,25 @@ trait BuildsQueries
     }
 
     /**
+     * Apply the callback's query changes if the given "value" is false.
+     *
+     * @param  mixed  $value
+     * @param  callable  $callback
+     * @param  callable  $default
+     * @return mixed
+     */
+    public function unless($value, $callback, $default = null)
+    {
+        if (! $value) {
+            return $callback($this, $value) ?: $this;
+        } elseif ($default) {
+            return $default($this, $value) ?: $this;
+        }
+
+        return $this;
+    }
+
+    /**
      * Create a new length-aware paginator instance.
      *
      * @param  \Illuminate\Support\Collection  $items
@@ -117,7 +136,6 @@ trait BuildsQueries
      * Create a new simple paginator instance.
      *
      * @param  \Illuminate\Support\Collection  $items
-     * @param  int $total
      * @param  int $perPage
      * @param  int $currentPage
      * @param  array  $options

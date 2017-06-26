@@ -227,9 +227,16 @@ class Mailer implements MailerContract, MailQueueContract
             $this->setGlobalTo($message);
         }
 
-        $this->sendSwiftMessage($message->getSwiftMessage());
+        // Next we will determine if the message should be send. We give the developer
+        // one final chance to stop this message and then we will send it to all of
+        // its recipients. We will then fire the sent event for the sent message.
+        $swiftMessage = $message->getSwiftMessage();
 
-        $this->dispatchSentEvent($message);
+        if ($this->shouldSendMessage($swiftMessage)) {
+            $this->sendSwiftMessage($swiftMessage);
+
+            $this->dispatchSentEvent($message);
+        }
     }
 
     /**
@@ -441,10 +448,6 @@ class Mailer implements MailerContract, MailQueueContract
      */
     protected function sendSwiftMessage($message)
     {
-        if (! $this->shouldSendMessage($message)) {
-            return;
-        }
-
         try {
             return $this->swift->send($message, $this->failedRecipients);
         } finally {

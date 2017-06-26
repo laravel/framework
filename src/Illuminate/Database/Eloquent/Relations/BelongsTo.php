@@ -9,6 +9,15 @@ use Illuminate\Database\Eloquent\Collection;
 class BelongsTo extends Relation
 {
     /**
+     * Indicates if a default model instance should be used.
+     *
+     * Alternatively, may be a Closure or array.
+     *
+     * @var \Closure|array|bool
+     */
+    protected $withDefault;
+
+    /**
      * The child model instance of the relation.
      */
     protected $child;
@@ -72,7 +81,7 @@ class BelongsTo extends Relation
      */
     public function getResults()
     {
-        return $this->query->first();
+        return $this->query->first() ?: $this->getDefaultFor($this->parent);
     }
 
     /**
@@ -127,11 +136,11 @@ class BelongsTo extends Relation
             }
         }
 
-        // If there are no keys that were not null we will just return an array with either
-        // null or 0 in (depending on if incrementing keys are in use) so the query wont
-        // fail plus returns zero results, which should be what the developer expects.
+        // If there are no keys that were not null we will just return an array with null
+        // so this query wont fail plus returns zero results, which should be what the
+        // developer expects to happen in this situation. Otherwise we'll sort them.
         if (count($keys) === 0) {
-            return [$this->relationHasIncrementingId() ? 0 : null];
+            return [null];
         }
 
         sort($keys);
@@ -149,10 +158,35 @@ class BelongsTo extends Relation
     public function initRelation(array $models, $relation)
     {
         foreach ($models as $model) {
-            $model->setRelation($relation, null);
+            $model->setRelation($relation, $this->getDefaultFor($model));
         }
 
         return $models;
+    }
+
+    /**
+     * Get the default value for this relation.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    protected function getDefaultFor(Model $model)
+    {
+        if (! $this->withDefault) {
+            return;
+        }
+
+        $instance = $this->related->newInstance();
+
+        if (is_callable($this->withDefault)) {
+            return call_user_func($this->withDefault, $instance) ?: $instance;
+        }
+
+        if (is_array($this->withDefault)) {
+            $instance->forceFill($this->withDefault);
+        }
+
+        return $instance;
     }
 
     /**
@@ -291,6 +325,19 @@ class BelongsTo extends Relation
     {
         return $this->related->getIncrementing() &&
                                 $this->related->getKeyType() === 'int';
+    }
+
+    /**
+     * Return a new model instance in case the relationship does not exist.
+     *
+     * @param  \Closure|array|bool  $callback
+     * @return $this
+     */
+    public function withDefault($callback = true)
+    {
+        $this->withDefault = $callback;
+
+        return $this;
     }
 
     /**

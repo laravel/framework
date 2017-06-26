@@ -245,6 +245,19 @@ if (! function_exists('array_pull')) {
     }
 }
 
+if (! function_exists('array_random')) {
+    /**
+     * Get a random value from an array.
+     *
+     * @param  array   $array
+     * @return mixed
+     */
+    function array_random($array)
+    {
+        return Arr::random($array);
+    }
+}
+
 if (! function_exists('array_set')) {
     /**
      * Set an array item to a given value using "dot" notation.

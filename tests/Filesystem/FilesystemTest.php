@@ -371,7 +371,7 @@ class FilesystemTest extends TestCase
                 $files->put($this->tempDir.'/file.txt', $content, true);
                 $read = $files->get($this->tempDir.'/file.txt', true);
 
-                exit(($read === $content) ? 1 : 0);
+                exit(strlen($read) === strlen($content) ? 1 : 0);
             }
         }
 

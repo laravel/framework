@@ -5,9 +5,11 @@ namespace Illuminate\Tests\Database;
 use Exception;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
 
@@ -90,6 +92,14 @@ class DatabaseEloquentIntegrationTest extends TestCase
                 $table->morphs('imageable');
                 $table->string('name');
                 $table->timestamps();
+            });
+
+            $this->schema($connection)->create('soft_deleted_users', function ($table) {
+                $table->increments('id');
+                $table->string('name')->nullable();
+                $table->string('email');
+                $table->timestamps();
+                $table->softDeletes();
             });
         }
 
@@ -1013,6 +1023,14 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertNotNull($user->fresh());
     }
 
+    public function testGlobalScopeCanBeRemovedByOtherGlobalScope()
+    {
+        $user = EloquentTestUserWithGlobalScopeRemovingOtherScope::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $user->delete();
+
+        $this->assertNotNull(EloquentTestUserWithGlobalScopeRemovingOtherScope::find($user->id));
+    }
+
     public function testForPageAfterIdCorrectlyPaginates()
     {
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
@@ -1225,6 +1243,24 @@ class EloquentTestUserWithOmittingGlobalScope extends EloquentTestUser
         static::addGlobalScope(function ($builder) {
             $builder->where('email', '!=', 'taylorotwell@gmail.com');
         });
+    }
+}
+
+class EloquentTestUserWithGlobalScopeRemovingOtherScope extends Eloquent
+{
+    use SoftDeletes;
+
+    protected $table = 'soft_deleted_users';
+
+    protected $guarded = [];
+
+    public static function boot()
+    {
+        static::addGlobalScope(function ($builder) {
+            $builder->withoutGlobalScope(SoftDeletingScope::class);
+        });
+
+        parent::boot();
     }
 }
 
