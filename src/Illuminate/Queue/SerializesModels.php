@@ -15,24 +15,24 @@ trait SerializesModels
      *
      * @var bool
      */
-    protected $deleteForMissingModels = false;
+    protected $deleteWhenMissingModels = false;
 
     /**
      * Indicates that the job should fail for missing models.
      *
      * @var bool
      */
-    protected $failForMissingModels = true;
+    protected $failWhenMissingModels = true;
 
     /**
      * Indicate that the job should be deleted for missing models.
      *
      * @var bool
      */
-    public function deleteForMissingModels()
+    public function deleteWhenMissingModels()
     {
-        $this->deleteForMissingModels = true;
-        $this->failForMissingModels = false;
+        $this->deleteWhenMissingModels = true;
+        $this->failWhenMissingModels = false;
 
         return $this;
     }
@@ -42,10 +42,10 @@ trait SerializesModels
      *
      * @var bool
      */
-    public function failForMissingModels()
+    public function failWhenMissingModels()
     {
-        $this->deleteForMissingModels = false;
-        $this->failForMissingModels = true;
+        $this->deleteWhenMissingModels = false;
+        $this->failWhenMissingModels = true;
 
         return $this;
     }
@@ -55,10 +55,10 @@ trait SerializesModels
      *
      * @var bool
      */
-    public function continueForMissingModels()
+    public function continueWhenMissingModels()
     {
-        $this->deleteForMissingModels = false;
-        $this->failForMissingModels = false;
+        $this->deleteWhenMissingModels = false;
+        $this->failWhenMissingModels = false;
 
         return $this;
     }
@@ -96,11 +96,11 @@ trait SerializesModels
                     $this->getPropertyValue($property)
                 ));
             } catch (ModelNotFoundException $e) {
-                if (isset($this->deleteForMissingModels) && $this->deleteForMissingModels) {
+                if (isset($this->deleteWhenMissingModels) && $this->deleteWhenMissingModels) {
                     return $this->delete();
                 }
 
-                if (isset($this->failForMissingModels) && $this->failForMissingModels) {
+                if (isset($this->failWhenMissingModels) && $this->failWhenMissingModels) {
                     return $this->fail($e);
                 }
 

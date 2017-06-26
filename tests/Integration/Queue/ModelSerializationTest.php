@@ -135,7 +135,7 @@ class ModelSerializationTest extends TestCase
         ]);
 
         $job = new ModelSerializationTestDiscardClass($user);
-        $job->continueForMissingModels();
+        $job->continueWhenMissingModels();
         $serialized = serialize($job);
 
         $user->delete();
@@ -153,7 +153,7 @@ class ModelSerializationTest extends TestCase
         ]);
 
         $job = new ModelSerializationTestDiscardClass($user);
-        $job->deleteForMissingModels();
+        $job->deleteWhenMissingModels();
         $serialized = serialize($job);
 
         $user->delete();
@@ -173,7 +173,7 @@ class ModelSerializationTest extends TestCase
         ]);
 
         $job = new ModelSerializationTestDiscardClass($user);
-        $job->failForMissingModels();
+        $job->failWhenMissingModels();
         $serialized = serialize($job);
 
         $user->delete();
