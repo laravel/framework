@@ -41,7 +41,7 @@ class EncryptCookiesTest extends TestCase
     public function testSetCookieEncryption()
     {
         $this->router->get($this->setCookiePath, [
-            'middleware' => 'Illuminate\Tests\Cookie\Middleware\EncryptCookiesTestMiddleware',
+            'middleware' => \Illuminate\Tests\Cookie\Middleware\EncryptCookiesTestMiddleware::class,
             'uses' => 'Illuminate\Tests\Cookie\Middleware\EncryptCookiesTestController@setCookies',
         ]);
 
@@ -58,7 +58,7 @@ class EncryptCookiesTest extends TestCase
     public function testQueuedCookieEncryption()
     {
         $this->router->get($this->queueCookiePath, [
-            'middleware' => ['Illuminate\Tests\Cookie\Middleware\EncryptCookiesTestMiddleware', 'Illuminate\Tests\Cookie\Middleware\AddQueuedCookiesToResponseTestMiddleware'],
+            'middleware' => [\Illuminate\Tests\Cookie\Middleware\EncryptCookiesTestMiddleware::class, \Illuminate\Tests\Cookie\Middleware\AddQueuedCookiesToResponseTestMiddleware::class],
             'uses' => 'Illuminate\Tests\Cookie\Middleware\EncryptCookiesTestController@queueCookies',
         ]);
 
