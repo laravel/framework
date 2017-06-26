@@ -32,6 +32,7 @@ trait SerializesModels
     public function deleteForMissingModels()
     {
         $this->deleteForMissingModels = true;
+        $this->failForMissingModels = false;
 
         return $this;
     }
@@ -43,6 +44,7 @@ trait SerializesModels
      */
     public function failForMissingModels()
     {
+        $this->deleteForMissingModels = false;
         $this->failForMissingModels = true;
 
         return $this;
