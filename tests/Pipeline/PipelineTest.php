@@ -17,7 +17,7 @@ class PipelineTest extends TestCase
 
         $result = (new Pipeline(new \Illuminate\Container\Container))
                     ->send('foo')
-                    ->through(['Illuminate\Tests\Pipeline\PipelineTestPipeOne', $pipeTwo])
+                    ->through([\Illuminate\Tests\Pipeline\PipelineTestPipeOne::class, $pipeTwo])
                     ->then(function ($piped) {
                         return $piped;
                     });
@@ -123,7 +123,7 @@ class PipelineTest extends TestCase
     {
         $pipelineInstance = new Pipeline(new \Illuminate\Container\Container);
         $result = $pipelineInstance->send('data')
-            ->through('Illuminate\Tests\Pipeline\PipelineTestPipeOne')
+            ->through(\Illuminate\Tests\Pipeline\PipelineTestPipeOne::class)
             ->via('differentMethod')
             ->then(function ($piped) {
                 return $piped;
@@ -137,7 +137,7 @@ class PipelineTest extends TestCase
     public function testPipelineThrowsExceptionOnResolveWithoutContainer()
     {
         (new Pipeline)->send('data')
-            ->through('Illuminate\Tests\Pipeline\PipelineTestPipeOne')
+            ->through(\Illuminate\Tests\Pipeline\PipelineTestPipeOne::class)
             ->then(function ($piped) {
                 return $piped;
             });
