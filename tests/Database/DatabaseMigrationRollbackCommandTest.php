@@ -16,7 +16,7 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
 
     public function testRollbackCommandCallsMigratorWithProperArguments()
     {
-        $command = new RollbackCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
+        $command = new RollbackCommand($migrator = m::mock(\Illuminate\Database\Migrations\Migrator::class));
         $app = new ApplicationDatabaseRollbackStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
@@ -30,7 +30,7 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
 
     public function testRollbackCommandCallsMigratorWithStepOption()
     {
-        $command = new RollbackCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
+        $command = new RollbackCommand($migrator = m::mock(\Illuminate\Database\Migrations\Migrator::class));
         $app = new ApplicationDatabaseRollbackStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
@@ -44,7 +44,7 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
 
     public function testRollbackCommandCanBePretended()
     {
-        $command = new RollbackCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
+        $command = new RollbackCommand($migrator = m::mock(\Illuminate\Database\Migrations\Migrator::class));
         $app = new ApplicationDatabaseRollbackStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
@@ -58,7 +58,7 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
 
     public function testRollbackCommandCanBePretendedWithStepOption()
     {
-        $command = new RollbackCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
+        $command = new RollbackCommand($migrator = m::mock(\Illuminate\Database\Migrations\Migrator::class));
         $app = new ApplicationDatabaseRollbackStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);

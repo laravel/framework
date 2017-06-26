@@ -41,12 +41,12 @@ class DatabaseEloquentMorphToTest extends TestCase
 
     public function testAssociateMethodSetsForeignKeyAndTypeOnModel()
     {
-        $parent = m::mock('Illuminate\Database\Eloquent\Model');
+        $parent = m::mock(\Illuminate\Database\Eloquent\Model::class);
         $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
 
         $relation = $this->getRelationAssociate($parent);
 
-        $associate = m::mock('Illuminate\Database\Eloquent\Model');
+        $associate = m::mock(\Illuminate\Database\Eloquent\Model::class);
         $associate->shouldReceive('getKey')->once()->andReturn(1);
         $associate->shouldReceive('getMorphClass')->once()->andReturn('Model');
 
@@ -59,7 +59,7 @@ class DatabaseEloquentMorphToTest extends TestCase
 
     public function testDissociateMethodDeletesUnsetsKeyAndTypeOnModel()
     {
-        $parent = m::mock('Illuminate\Database\Eloquent\Model');
+        $parent = m::mock(\Illuminate\Database\Eloquent\Model::class);
         $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
 
         $relation = $this->getRelation($parent);
@@ -73,9 +73,9 @@ class DatabaseEloquentMorphToTest extends TestCase
 
     protected function getRelationAssociate($parent)
     {
-        $builder = m::mock('Illuminate\Database\Eloquent\Builder');
+        $builder = m::mock(\Illuminate\Database\Eloquent\Builder::class);
         $builder->shouldReceive('where')->with('relation.id', '=', 'foreign.value');
-        $related = m::mock('Illuminate\Database\Eloquent\Model');
+        $related = m::mock(\Illuminate\Database\Eloquent\Model::class);
         $related->shouldReceive('getKey')->andReturn(1);
         $related->shouldReceive('getTable')->andReturn('relation');
         $builder->shouldReceive('getModel')->andReturn($related);
@@ -85,9 +85,9 @@ class DatabaseEloquentMorphToTest extends TestCase
 
     public function getRelation($parent = null, $builder = null)
     {
-        $builder = $builder ?: m::mock('Illuminate\Database\Eloquent\Builder');
+        $builder = $builder ?: m::mock(\Illuminate\Database\Eloquent\Builder::class);
         $builder->shouldReceive('where')->with('relation.id', '=', 'foreign.value');
-        $related = m::mock('Illuminate\Database\Eloquent\Model');
+        $related = m::mock(\Illuminate\Database\Eloquent\Model::class);
         $related->shouldReceive('getKeyName')->andReturn('id');
         $related->shouldReceive('getTable')->andReturn('relation');
         $builder->shouldReceive('getModel')->andReturn($related);
