@@ -86,7 +86,7 @@ class ValidationServiceProvider extends ServiceProvider
     public function provides()
     {
         return [
-            'validator', 'validation.presence', 'validation.failure_formatter'
+            'validator', 'validation.presence', 'validation.failure_formatter',
         ];
     }
 }
