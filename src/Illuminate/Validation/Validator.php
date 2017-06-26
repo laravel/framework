@@ -2,7 +2,6 @@
 
 namespace Illuminate\Validation;
 
-use Closure;
 use RuntimeException;
 use BadMethodCallException;
 use Illuminate\Support\Arr;
@@ -15,6 +14,8 @@ use Illuminate\Contracts\Validation\ImplicitRule;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
+use Illuminate\Validation\FailureFormatters\FailureFormatterInterface;
+use Illuminate\Validation\FailureFormatters\Message as MessageFailureFormatter;
 
 class Validator implements ValidatorContract
 {
@@ -41,6 +42,13 @@ class Validator implements ValidatorContract
      * @var \Illuminate\Validation\PresenceVerifierInterface
      */
     protected $presenceVerifier;
+
+    /**
+     * The Failure Formatter implementation.
+     *
+     * @var \Illuminate\Validation\FailureFormatters\FailureFormatterInterface
+     */
+    protected $failureFormatter;
 
     /**
      * The failed validation rules.
@@ -203,6 +211,8 @@ class Validator implements ValidatorContract
         $this->customMessages = $messages;
         $this->data = $this->parseData($data);
         $this->customAttributes = $customAttributes;
+
+        $this->failureFormatter = new MessageFailureFormatter;
 
         $this->setRules($rules);
     }
@@ -575,9 +585,10 @@ class Validator implements ValidatorContract
      */
     protected function addFailure($attribute, $rule, $parameters)
     {
-        $this->messages->add($attribute, $this->makeReplacements(
-            $this->getMessage($attribute, $rule), $attribute, $rule, $parameters
-        ));
+        $this->messages->add(
+            $attribute,
+            $this->failureFormatter->message($this, $attribute, $rule, $parameters)
+        );
 
         $this->failedRules[$attribute][$rule] = $parameters;
     }
@@ -1053,6 +1064,17 @@ class Validator implements ValidatorContract
     public function setPresenceVerifier(PresenceVerifierInterface $presenceVerifier)
     {
         $this->presenceVerifier = $presenceVerifier;
+    }
+
+    /**
+     * Set Failure Formatter implementation.
+     *
+     * @param  \Illuminate\Validation\FailureFormatters\FailureFormatterInterface  $failureFormatter
+     * @return void
+     */
+    public function setFailureFormatter(FailureFormatterInterface $failureFormatter)
+    {
+        $this->failureFormatter = $failureFormatter;
     }
 
     /**

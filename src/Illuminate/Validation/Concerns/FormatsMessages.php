@@ -18,7 +18,7 @@ trait FormatsMessages
      * @param  string  $rule
      * @return string
      */
-    protected function getMessage($attribute, $rule)
+    public function getMessage($attribute, $rule)
     {
         $inlineMessage = $this->getFromLocalArray(
             $attribute, $lowerRule = Str::snake($rule)
