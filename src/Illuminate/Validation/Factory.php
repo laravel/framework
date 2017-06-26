@@ -297,6 +297,7 @@ class Factory implements FactoryContract
      * Set the Failure Formatter implementation.
      *
      * @param  \Illuminate\Validation\FailureFormatters\FailureFormatterInterface  $failureFormatter
+     * @return void
      */
     public function setFailureFormatter(FailureFormatterInterface $failureFormatter)
     {
