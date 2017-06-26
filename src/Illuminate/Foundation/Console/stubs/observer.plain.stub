@@ -1,0 +1,107 @@
+<?php
+
+namespace DummyNamespace;
+
+class DummyClass
+{
+
+    /**
+     * Listen to the Model creating event.
+     *
+     * @return void
+     */
+    public function creating()
+    {
+        //
+    }
+
+    /**
+     * Listen to the Model created event.
+     *
+     * @return void
+     */
+    public function created()
+    {
+        //
+    }
+
+    /**
+     * Listen to the Model updating event.
+     *
+     * @return void
+     */
+    public function updating()
+    {
+        //
+    }
+
+    /**
+     * Listen to the Model updated event.
+     *
+     * @return void
+     */
+    public function updated()
+    {
+        //
+    }
+
+    /**
+     * Listen to the Model saving event.
+     *
+     * @return void
+     */
+    public function saving()
+    {
+        //
+    }
+
+    /**
+     * Listen to the Model saved event.
+     *
+     * @return void
+     */
+    public function saved()
+    {
+        //
+    }
+
+    /**
+     * Listen to the Model deleting event.
+     *
+     * @return void
+     */
+    public function deleting()
+    {
+        //
+    }
+
+    /**
+     * Listen to the Model deleted event.
+     *
+     * @return void
+     */
+    public function deleted()
+    {
+        //
+    }
+
+    /**
+     * Listen to the Model restoring event.
+     *
+     * @return void
+     */
+    public function restoring()
+    {
+        //
+    }
+
+    /**
+     * Listen to the Model restored event.
+     *
+     * @return void
+     */
+    public function restored()
+    {
+        //
+    }
+}
