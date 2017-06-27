@@ -2,11 +2,11 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
-use Illuminate\Support\Carbon;
 use LogicException;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection as BaseCollection;

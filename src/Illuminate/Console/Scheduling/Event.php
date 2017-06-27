@@ -3,8 +3,8 @@
 namespace Illuminate\Console\Scheduling;
 
 use Closure;
-use Illuminate\Support\Carbon;
 use Cron\CronExpression;
+use Illuminate\Support\Carbon;
 use GuzzleHttp\Client as HttpClient;
 use Illuminate\Contracts\Mail\Mailer;
 use Symfony\Component\Process\Process;
