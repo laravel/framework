@@ -17,7 +17,8 @@
         "php": ">=7.0",
         "ext-mbstring": "*",
         "doctrine/inflector": "~1.0",
-        "illuminate/contracts": "5.5.*"
+        "illuminate/contracts": "5.5.*",
+        "nesbot/carbon": "^1.20"
     },
     "replace": {
         "tightenco/collect": "self.version"
