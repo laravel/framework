@@ -3,6 +3,8 @@
 namespace Illuminate\Support\Traits;
 
 use Closure;
+use ReflectionClass;
+use ReflectionMethod;
 use BadMethodCallException;
 use Illuminate\Contracts\Support\Macro;
 
@@ -19,13 +21,32 @@ trait Macroable
      * Register a custom macro.
      *
      * @param  string $name
-     * @param  \Illuminate\Contracts\Support\Macro|callable  $macro
+     * @param  object|callable  $macro
      *
      * @return void
      */
     public static function macro($name, $macro)
     {
         static::$macros[$name] = $macro;
+    }
+
+    /**
+     * Mix another object into the class.
+     *
+     * @param  object  $mixin
+     * @return void
+     */
+    public static function mixin($mixin)
+    {
+        $methods = (new ReflectionClass($mixin))->getMethods(
+            ReflectionMethod::IS_PUBLIC | ReflectionMethod::IS_PROTECTED
+        );
+
+        foreach ($methods as $method) {
+            $method->setAccessible(true);
+
+            static::macro($method->name, $method->invoke($mixin));
+        }
     }
 
     /**
@@ -77,10 +98,6 @@ trait Macroable
         }
 
         $macro = static::$macros[$method];
-
-        if (is_string($macro) && is_a($macro, Macro::class, true)) {
-            $macro = (new $macro)->handle();
-        }
 
         if ($macro instanceof Closure) {
             return call_user_func_array($macro->bindTo($this, static::class), $parameters);
