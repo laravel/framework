@@ -114,7 +114,7 @@ class UrlGenerator implements UrlGeneratorContract
     {
         return $this->request->fullUrl();
     }
-    
+
     /**
      * Get the full URL for the current request with the added query string parameters.
      *
@@ -124,7 +124,7 @@ class UrlGenerator implements UrlGeneratorContract
     {
         return $this->request->fullUrlWithQuery($query);
     }
-    
+
     /**
      * Get the current URL for the request.
      *
