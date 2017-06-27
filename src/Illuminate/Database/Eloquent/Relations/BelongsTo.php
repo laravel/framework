@@ -5,17 +5,11 @@ namespace Illuminate\Database\Eloquent\Relations;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
 
 class BelongsTo extends Relation
 {
-    /**
-     * Indicates if a default model instance should be used.
-     *
-     * Alternatively, may be a Closure or array.
-     *
-     * @var \Closure|array|bool
-     */
-    protected $withDefault;
+    use SupportsDefaultModels;
 
     /**
      * The child model instance of the relation.
@@ -165,31 +159,6 @@ class BelongsTo extends Relation
     }
 
     /**
-     * Get the default value for this relation.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return \Illuminate\Database\Eloquent\Model|null
-     */
-    protected function getDefaultFor(Model $model)
-    {
-        if (! $this->withDefault) {
-            return;
-        }
-
-        $instance = $this->related->newInstance();
-
-        if (is_callable($this->withDefault)) {
-            return call_user_func($this->withDefault, $instance) ?: $instance;
-        }
-
-        if (is_array($this->withDefault)) {
-            $instance->forceFill($this->withDefault);
-        }
-
-        return $instance;
-    }
-
-    /**
      * Match the eagerly loaded results to their parents.
      *
      * @param  array   $models
@@ -328,16 +297,14 @@ class BelongsTo extends Relation
     }
 
     /**
-     * Return a new model instance in case the relationship does not exist.
+     * Make a new related instance for the given model.
      *
-     * @param  \Closure|array|bool  $callback
-     * @return $this
+     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @return \Illuminate\Database\Eloquent\Model
      */
-    public function withDefault($callback = true)
+    protected function newRelatedInstanceFor(Model $parent)
     {
-        $this->withDefault = $callback;
-
-        return $this;
+        return $this->related->newInstance();
     }
 
     /**
