@@ -296,6 +296,21 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
+     * Create a redirect from one route to another.
+     *
+     * @param string $url
+     * @param string $destination
+     * @param int $status
+     * @return Route
+     */
+    public function redirect($url, $destination, $status = 301)
+    {
+        return $this->any($url, '\Illuminate\Routing\RedirectController')
+            ->defaults('destination', $destination)
+            ->defaults('status', $status);
+    }
+
+    /**
      * Update the group stack with the given attributes.
      *
      * @param  array  $attributes
