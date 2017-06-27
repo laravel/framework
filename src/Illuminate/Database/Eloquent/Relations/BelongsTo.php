@@ -308,6 +308,33 @@ class BelongsTo extends Relation
     }
 
     /**
+     * Return true if the relation is inverse, false otherwise.
+     *
+     * @return bool
+     */
+    public function isInverse()
+    {
+        return true;
+    }
+
+    /**
+     * Associate a model to its relative and then push the model.
+     *
+     * @param Model $model
+     * @return bool
+     */
+    public function push(Model $model)
+    {
+        if (! $model->push()) {
+            return false;
+        }
+
+        $this->associate($model);
+
+        return true;
+    }
+
+    /**
      * Get the foreign key of the relationship.
      *
      * @return string

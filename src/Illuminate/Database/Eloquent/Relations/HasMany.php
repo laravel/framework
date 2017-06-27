@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 
 class HasMany extends HasOneOrMany
@@ -43,5 +44,18 @@ class HasMany extends HasOneOrMany
     public function match(array $models, Collection $results, $relation)
     {
         return $this->matchMany($models, $results, $relation);
+    }
+
+    /**
+     * Associate a model to its relative and then push the model.
+     *
+     * @param Model $model
+     * @return bool
+     */
+    public function push(Model $model)
+    {
+        $model->setAttribute($this->getForeignKeyName(), $this->parent->getKey());
+
+        return $model->push();
     }
 }
