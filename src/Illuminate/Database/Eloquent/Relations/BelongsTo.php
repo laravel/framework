@@ -5,17 +5,11 @@ namespace Illuminate\Database\Eloquent\Relations;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\Concerns\HasDefault;
 
 class BelongsTo extends Relation
 {
-    /**
-     * Indicates if a default model instance should be used.
-     *
-     * Alternatively, may be a Closure or array.
-     *
-     * @var \Closure|array|bool
-     */
-    protected $withDefault;
+    use HasDefault;
 
     /**
      * The child model instance of the relation.
@@ -165,31 +159,6 @@ class BelongsTo extends Relation
     }
 
     /**
-     * Get the default value for this relation.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return \Illuminate\Database\Eloquent\Model|null
-     */
-    protected function getDefaultFor(Model $model)
-    {
-        if (! $this->withDefault) {
-            return;
-        }
-
-        $instance = $this->related->newInstance();
-
-        if (is_callable($this->withDefault)) {
-            return call_user_func($this->withDefault, $instance) ?: $instance;
-        }
-
-        if (is_array($this->withDefault)) {
-            $instance->forceFill($this->withDefault);
-        }
-
-        return $instance;
-    }
-
-    /**
      * Match the eagerly loaded results to their parents.
      *
      * @param  array   $models
@@ -328,19 +297,6 @@ class BelongsTo extends Relation
     }
 
     /**
-     * Return a new model instance in case the relationship does not exist.
-     *
-     * @param  \Closure|array|bool  $callback
-     * @return $this
-     */
-    public function withDefault($callback = true)
-    {
-        $this->withDefault = $callback;
-
-        return $this;
-    }
-
-    /**
      * Get the foreign key of the relationship.
      *
      * @return string
@@ -388,5 +344,16 @@ class BelongsTo extends Relation
     public function getRelation()
     {
         return $this->relation;
+    }
+
+    /**
+     * Make a new related instance for the given model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    protected function newRelatedInstanceFor(Model $parent)
+    {
+        return $this->related->newInstance();
     }
 }
