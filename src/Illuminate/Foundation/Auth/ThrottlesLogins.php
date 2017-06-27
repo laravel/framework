@@ -101,22 +101,22 @@ trait ThrottlesLogins
     {
         return app(RateLimiter::class);
     }
-    
+
     /**
-     * Get the max attempts value.
+     * Get the maximum number of attempts to allow.
      *
      * @return int
-     */ 
+     */
     public function maxAttempts()
     {
         return property_exists($this,'maxAttempts') ? $this->maxAttempts : 5;
     }
-    
+
     /**
-     * Get the decay minutes value.
+     * Get the number of minutes to throttle for.
      *
      * @return int
-     */ 
+     */
     public function decayMinutes()
     {
         return property_exists($this,'decayMinutes') ? $this->decayMinutes : 1;
