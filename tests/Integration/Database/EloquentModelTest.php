@@ -39,7 +39,7 @@ class EloquentModelTest extends TestCase
         ]);
 
         $user->fill([
-            'nullable_date' => $now = \Carbon\Carbon::now(),
+            'nullable_date' => $now = \Illuminate\Support\Carbon::now(),
         ]);
         $this->assertTrue($user->isDirty('nullable_date'));
 

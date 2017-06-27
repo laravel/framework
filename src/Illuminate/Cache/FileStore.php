@@ -3,7 +3,7 @@
 namespace Illuminate\Cache;
 
 use Exception;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Filesystem\Filesystem;

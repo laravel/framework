@@ -2,7 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use LogicException;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
@@ -656,7 +656,7 @@ trait HasAttributes
      * Return a timestamp as DateTime object with time set to 00:00:00.
      *
      * @param  mixed  $value
-     * @return \Carbon\Carbon
+     * @return \Illuminate\Support\Carbon
      */
     protected function asDate($value)
     {
@@ -667,7 +667,7 @@ trait HasAttributes
      * Return a timestamp as DateTime object.
      *
      * @param  mixed  $value
-     * @return \Carbon\Carbon
+     * @return \Illuminate\Support\Carbon
      */
     protected function asDateTime($value)
     {

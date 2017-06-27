@@ -2,7 +2,7 @@
 
 namespace Illuminate\Session;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use SessionHandlerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Illuminate\Contracts\Cookie\QueueingFactory as CookieJar;

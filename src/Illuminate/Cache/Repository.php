@@ -5,7 +5,7 @@ namespace Illuminate\Cache;
 use Closure;
 use DateTime;
 use ArrayAccess;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use BadMethodCallException;
 use Illuminate\Cache\Events\CacheHit;
 use Illuminate\Contracts\Cache\Store;

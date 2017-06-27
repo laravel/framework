@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Connection;
 use Illuminate\Pagination\Paginator;

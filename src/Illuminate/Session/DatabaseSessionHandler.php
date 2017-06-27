@@ -2,7 +2,7 @@
 
 namespace Illuminate\Session;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Arr;
 use SessionHandlerInterface;
 use Illuminate\Contracts\Auth\Guard;

@@ -2,7 +2,7 @@
 
 namespace Illuminate\Queue;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use DateTimeInterface;
 
 trait InteractsWithTime

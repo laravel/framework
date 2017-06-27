@@ -569,8 +569,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testAggregatedValuesOfDatetimeField()
     {
-        EloquentTestUser::create(['id' => 1, 'email' => 'test1@test.test', 'created_at' => '2016-08-10 09:21:00', 'updated_at' => \Carbon\Carbon::now()]);
-        EloquentTestUser::create(['id' => 2, 'email' => 'test2@test.test', 'created_at' => '2016-08-01 12:00:00', 'updated_at' => \Carbon\Carbon::now()]);
+        EloquentTestUser::create(['id' => 1, 'email' => 'test1@test.test', 'created_at' => '2016-08-10 09:21:00', 'updated_at' => \Illuminate\Support\Carbon::now()]);
+        EloquentTestUser::create(['id' => 2, 'email' => 'test2@test.test', 'created_at' => '2016-08-01 12:00:00', 'updated_at' => \Illuminate\Support\Carbon::now()]);
 
         $this->assertEquals('2016-08-10 09:21:00', EloquentTestUser::max('created_at'));
         $this->assertEquals('2016-08-01 12:00:00', EloquentTestUser::min('created_at'));
@@ -1090,8 +1090,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testFreshMethodOnModel()
     {
-        $now = \Carbon\Carbon::now();
-        \Carbon\Carbon::setTestNow($now);
+        $now = \Illuminate\Support\Carbon::now();
+        \Illuminate\Support\Carbon::setTestNow($now);
 
         $storedUser1 = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
         $storedUser1->newQuery()->update(['email' => 'dev@mathieutu.ovh', 'name' => 'Mathieu TUDISCO']);
