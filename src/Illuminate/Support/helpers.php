@@ -600,6 +600,26 @@ if (! function_exists('env')) {
     }
 }
 
+if (! function_exists('isset_env')) {
+    /**
+     * Checks if the value of an environment variable is set.
+     *
+     * @param  string  $key
+     * @return mixed
+     * @throws \Exception
+     */
+    function isset_env($key)
+    {
+        $value = getenv($key);
+
+        if (empty($value)) {
+            throw new Exception("Please set the {$key} in the env file");
+        }
+
+        return $value;
+    }
+}
+
 if (! function_exists('head')) {
     /**
      * Get the first element of an array. Useful for method chaining.
