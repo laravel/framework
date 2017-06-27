@@ -5,11 +5,11 @@ namespace Illuminate\Database\Eloquent\Relations;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Relations\Concerns\HasDefault;
+use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
 
 class BelongsTo extends Relation
 {
-    use HasDefault;
+    use SupportsDefaultModels;
 
     /**
      * The child model instance of the relation.
@@ -297,6 +297,17 @@ class BelongsTo extends Relation
     }
 
     /**
+     * Make a new related instance for the given model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    protected function newRelatedInstanceFor(Model $parent)
+    {
+        return $this->related->newInstance();
+    }
+
+    /**
      * Get the foreign key of the relationship.
      *
      * @return string
@@ -344,16 +355,5 @@ class BelongsTo extends Relation
     public function getRelation()
     {
         return $this->relation;
-    }
-
-    /**
-     * Make a new related instance for the given model.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @return \Illuminate\Database\Eloquent\Model
-     */
-    protected function newRelatedInstanceFor(Model $parent)
-    {
-        return $this->related->newInstance();
     }
 }

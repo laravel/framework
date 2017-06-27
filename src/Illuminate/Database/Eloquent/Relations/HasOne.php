@@ -4,11 +4,11 @@ namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Relations\Concerns\HasDefault;
+use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
 
 class HasOne extends HasOneOrMany
 {
-    use HasDefault;
+    use SupportsDefaultModels;
 
     /**
      * Get the results of the relationship.
@@ -57,7 +57,8 @@ class HasOne extends HasOneOrMany
      */
     public function newRelatedInstanceFor(Model $parent)
     {
-        return $this->related->newInstance()
-            ->setAttribute($this->getForeignKeyName(), $parent->{$this->localKey});
+        return $this->related->newInstance()->setAttribute(
+            $this->getForeignKeyName(), $parent->{$this->localKey}
+        );
     }
 }
