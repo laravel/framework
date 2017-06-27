@@ -118,6 +118,7 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Get the full URL for the current request with the added query string parameters.
      *
+     * @param  array  $query
      * @return string
      */
     public function fullWithQuery(array $query)
