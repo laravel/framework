@@ -37,6 +37,7 @@ class CallQueuedHandlerTest extends TestCase
 
         $job = Mockery::mock('Illuminate\Contracts\Queue\Job');
         $job->shouldReceive('getConnectionName')->andReturn('connection');
+        $job->shouldReceive('resolveName')->andReturn(__CLASS__);
         $job->shouldReceive('markAsFailed')->once();
         $job->shouldReceive('isDeleted')->andReturn(false);
         $job->shouldReceive('delete')->once();
@@ -47,6 +48,27 @@ class CallQueuedHandlerTest extends TestCase
         ]);
 
         Event::assertDispatched(JobFailed::class);
+    }
+
+    public function test_job_is_deleted_if_has_delete_property()
+    {
+        Event::fake();
+
+        $instance = new Illuminate\Queue\CallQueuedHandler(new Illuminate\Bus\Dispatcher(app()));
+
+        $job = Mockery::mock('Illuminate\Contracts\Queue\Job');
+        $job->shouldReceive('getConnectionName')->andReturn('connection');
+        $job->shouldReceive('resolveName')->andReturn(CallQueuedHandlerExceptionThrower::class);
+        $job->shouldReceive('markAsFailed')->never();
+        $job->shouldReceive('isDeleted')->andReturn(false);
+        $job->shouldReceive('delete')->once();
+        $job->shouldReceive('failed')->never();
+
+        $instance->call($job, [
+            'command' => serialize(new CallQueuedHandlerExceptionThrower),
+        ]);
+
+        Event::assertNotDispatched(JobFailed::class);
     }
 }
 
@@ -64,6 +86,8 @@ class CallQueuedHandlerTestJob
 
 class CallQueuedHandlerExceptionThrower
 {
+    public $deleteWhenMissingModels = true;
+
     public function handle()
     {
         //
