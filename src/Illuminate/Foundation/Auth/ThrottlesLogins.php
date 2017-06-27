@@ -19,7 +19,7 @@ trait ThrottlesLogins
     protected function hasTooManyLoginAttempts(Request $request)
     {
         return $this->limiter()->tooManyAttempts(
-            $this->throttleKey($request), 5, 1
+            $this->throttleKey($request), $this->maxAttempts(), $this->decayMinutes()
         );
     }
 
@@ -100,5 +100,25 @@ trait ThrottlesLogins
     protected function limiter()
     {
         return app(RateLimiter::class);
+    }
+    
+    /**
+     * Get the max attempts value.
+     *
+     * @return int
+     */ 
+    public function maxAttempts()
+    {
+        return property_exists($this,'maxAttempts') ? $this->maxAttempts : 5;
+    }
+    
+    /**
+     * Get the decay minutes value.
+     *
+     * @return int
+     */ 
+    public function decayMinutes()
+    {
+        return property_exists($this,'decayMinutes') ? $this->decayMinutes : 1;
     }
 }
