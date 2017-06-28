@@ -1581,6 +1581,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         ) {
             return new self($this->items[$key]);
         }
+
         return $this->items[$key];
     }
 
