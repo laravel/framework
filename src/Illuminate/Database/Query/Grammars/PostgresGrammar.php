@@ -66,7 +66,7 @@ class PostgresGrammar extends Grammar
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function compileInsert(Builder $query, array $values)
     {
