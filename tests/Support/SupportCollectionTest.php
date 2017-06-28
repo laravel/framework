@@ -2153,6 +2153,11 @@ class SupportCollectionTest extends TestCase
 
         $this->assertSame(['michael', 'tom', 'taylor'], $collection->toArray());
     }
+
+    public function testAccessingNestedArrayableObject() {
+        $this->assertEquals('bar',collect(new TestArrayableObject())['foo']);
+        $this->assertEquals('bar',collect([new TestArrayableObject()])[0]['foo']);
+    }
 }
 
 class TestSupportCollectionHigherOrderItem
