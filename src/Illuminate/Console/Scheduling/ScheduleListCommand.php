@@ -47,18 +47,16 @@ class ScheduleListCommand extends Command
     {
         $order = 1;
         foreach ($this->schedule->events() as $event) {
-
             if (! $event->filtersPass($this->laravel)) {
                 continue;
             }
 
             $next = $event->nextRunDate();
 
-            $nextInfo = "{$order}. ".$event->getSummaryForDisplay()." will run next time at ".$next->toDateTimeString();
+            $nextInfo = "{$order}. ".$event->getSummaryForDisplay().' will run next time at '.$next->toDateTimeString();
 
             $this->info($nextInfo);
             $order++;
         }
-
     }
 }
