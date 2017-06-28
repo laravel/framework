@@ -3,6 +3,8 @@
 namespace Illuminate\Tests\Routing;
 
 use stdClass;
+use Mockery as m;
+use Illuminate\View\View;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
@@ -23,6 +25,11 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 
 class RoutingRouteTest extends TestCase
 {
+    public function tearDown()
+    {
+        m::close();
+    }
+
     public function testBasicDispatchingOfRoutes()
     {
         $router = $this->getRouter();
@@ -1363,6 +1370,30 @@ class RoutingRouteTest extends TestCase
         $response = $router->dispatch(Request::create('foo/bar', 'GET'));
         $this->assertNotInstanceOf(\Illuminate\Http\Response::class, $response);
         $this->assertInstanceOf(\Illuminate\Http\JsonResponse::class, $response);
+    }
+
+    public function testRoutesActionParamCanBePassedAView()
+    {
+        $router = $this->getRouter();
+
+        $view = new View(
+            m::mock('Illuminate\View\Factory'),
+            m::mock('Illuminate\View\Engines\EngineInterface'),
+            'view',
+            'path',
+            ['foo' => 'bar']
+        );
+
+        $view->getFactory()->shouldReceive('incrementRender')->once()->ordered();
+        $view->getFactory()->shouldReceive('callComposer')->once()->ordered()->with($view);
+        $view->getFactory()->shouldReceive('getShared')->once()->andReturn(['shared' => 'foo']);
+        $view->getEngine()->shouldReceive('get')->once()->with('path', ['foo' => 'bar', 'shared' => 'foo'])->andReturn('mocked contents of the view...');
+        $view->getFactory()->shouldReceive('decrementRender')->once()->ordered();
+        $view->getFactory()->shouldReceive('flushStateIfDoneRendering')->once();
+
+        $router->get('foo/bar', $view);
+
+        $this->assertEquals('mocked contents of the view...', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
     }
 
     protected function getRouter()
