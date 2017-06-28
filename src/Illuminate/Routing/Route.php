@@ -643,21 +643,6 @@ class Route
     }
 
     /**
-     * Sets the view that will be used as the action for the route.
-     *
-     * @param string $view
-     * @return $this
-     */
-    public function view($view)
-    {
-        $this->action['uses'] = function () use ($view) {
-            return view($view);
-        };
-
-        return $this;
-    }
-
-    /**
      * Set the handler for the route.
      *
      * @param  \Closure|string  $action
