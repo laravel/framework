@@ -477,6 +477,8 @@ trait HasAttributes
             case 'array':
             case 'json':
                 return $this->fromJson($value);
+            case 'unserialize':
+                return $this->fromSerialize($value);
             case 'collection':
                 return new BaseCollection($this->fromJson($value));
             case 'date':
@@ -651,6 +653,26 @@ trait HasAttributes
     public function fromJson($value, $asObject = false)
     {
         return json_decode($value, ! $asObject);
+    }
+
+    /**
+     * Decode the given array back into an array.
+     * @param  string $value
+     * @return array
+     */
+    public function fromSerialize($value)
+    {
+        return unserialize($value);
+    }
+
+    /**
+     * Decode the given array back into an array.
+     * @param  array $value
+     * @return string
+     */
+    public function asSerialize($value)
+    {
+        return serialize($value);
     }
 
     /**
