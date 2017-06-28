@@ -11,6 +11,7 @@ use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -377,6 +378,13 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     protected function createRoute($methods, $uri, $action)
     {
+        // If the route action is a view then turn in into a callable function returning it.
+        if ($action instanceof View) {
+            $action = function () use ($action) {
+                return $action;
+            };
+        }
+
         // If the route is routing to a controller we will parse the route action into
         // an acceptable array format before registering it and creating this route
         // instance itself. We need to build the Closure that will call this out.
