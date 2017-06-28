@@ -2154,11 +2154,12 @@ class SupportCollectionTest extends TestCase
         $this->assertSame(['michael', 'tom', 'taylor'], $collection->toArray());
     }
 
-    public function testAccessingNestedCollectableObject() {
+    public function testAccessingNestedCollectableObject()
+    {
         $Collection = collect([
             new TestArrayableObject(),
             new TestJsonableObject(),
-            new TestJsonSerializeObject()
+            new TestJsonSerializeObject(),
         ]);
         $this->assertEquals('bar', $Collection[0]['foo']);
         $this->assertEquals('bar', $Collection[1]['foo']);

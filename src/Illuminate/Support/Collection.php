@@ -1571,7 +1571,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         if (
             is_object($this->items[$key]) &&
-            !$this->items[$key] instanceof self &&
+            ! $this->items[$key] instanceof self &&
             (
                 $this->items[$key] instanceof Arrayable ||
                 $this->items[$key] instanceof Jsonable ||
