@@ -643,7 +643,7 @@ class Route
     }
 
     /**
-     * Sets the view that will be used as the action for the route
+     * Sets the view that will be used as the action for the route.
      *
      * @param string $view
      * @return $this
