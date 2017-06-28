@@ -2,8 +2,8 @@
 
 namespace Illuminate\Cookie;
 
-use Carbon\Carbon;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Contracts\Cookie\QueueingFactory as JarContract;
 

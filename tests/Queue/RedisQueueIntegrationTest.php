@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Queue;
 
 use Mockery as m;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Queue\RedisQueue;
 use Illuminate\Container\Container;

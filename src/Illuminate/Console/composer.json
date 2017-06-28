@@ -17,7 +17,6 @@
         "php": ">=7.0",
         "illuminate/contracts": "5.5.*",
         "illuminate/support": "5.5.*",
-        "nesbot/carbon": "~1.20",
         "symfony/console": "~3.3"
     },
     "autoload": {

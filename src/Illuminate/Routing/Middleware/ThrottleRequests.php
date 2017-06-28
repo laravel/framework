@@ -3,7 +3,7 @@
 namespace Illuminate\Routing\Middleware;
 
 use Closure;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Illuminate\Cache\RateLimiter;
 use Symfony\Component\HttpFoundation\Response;
 

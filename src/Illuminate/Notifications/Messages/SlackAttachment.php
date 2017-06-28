@@ -2,7 +2,7 @@
 
 namespace Illuminate\Notifications\Messages;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 
 class SlackAttachment
 {

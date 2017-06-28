@@ -2,7 +2,7 @@
 
 namespace Illuminate\Cache;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Illuminate\Contracts\Cache\Repository as Cache;
 
 class RateLimiter

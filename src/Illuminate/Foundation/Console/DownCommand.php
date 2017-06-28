@@ -2,7 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
 
 class DownCommand extends Command

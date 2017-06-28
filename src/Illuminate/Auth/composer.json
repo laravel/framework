@@ -18,8 +18,7 @@
         "illuminate/contracts": "5.5.*",
         "illuminate/http": "5.5.*",
         "illuminate/queue": "5.5.*",
-        "illuminate/support": "5.5.*",
-        "nesbot/carbon": "~1.20"
+        "illuminate/support": "5.5.*"
     },
     "autoload": {
         "psr-4": {
