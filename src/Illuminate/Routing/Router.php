@@ -215,6 +215,21 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
+     * Create a redirect from one URI to another.
+     *
+     * @param string  $uri
+     * @param string  $destination
+     * @param int  $status
+     * @return \Illuminate\Routing\Route
+     */
+    public function redirect($uri, $destination, $status = 301)
+    {
+        return $this->any($uri, '\Illuminate\Routing\RedirectController')
+                ->defaults('destination', $destination)
+                ->defaults('status', $status);
+    }
+
+    /**
      * Register a new route with the given verbs.
      *
      * @param  array|string  $methods
@@ -293,21 +308,6 @@ class Router implements RegistrarContract, BindingRegistrar
         $this->loadRoutes($routes);
 
         array_pop($this->groupStack);
-    }
-
-    /**
-     * Create a redirect from one route to another.
-     *
-     * @param string $url
-     * @param string $destination
-     * @param int $status
-     * @return Route
-     */
-    public function redirect($url, $destination, $status = 301)
-    {
-        return $this->any($url, '\Illuminate\Routing\RedirectController')
-            ->defaults('destination', $destination)
-            ->defaults('status', $status);
     }
 
     /**
