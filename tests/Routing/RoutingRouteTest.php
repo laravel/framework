@@ -1365,6 +1365,19 @@ class RoutingRouteTest extends TestCase
         $this->assertInstanceOf(\Illuminate\Http\JsonResponse::class, $response);
     }
 
+    public function testRouteRedirect()
+    {
+        $router = $this->getRouter();
+        $router->get('contact_us', function () {
+            throw new \Exception('Route should not be reachable.');
+        });
+        $router->redirect('contact_us', 'contact', 302);
+
+        $response = $router->dispatch(Request::create('contact_us', 'GET'));
+        $this->assertTrue($response->isRedirect('contact'));
+        $this->assertEquals(302, $response->getStatusCode());
+    }
+
     protected function getRouter()
     {
         $container = new Container;
