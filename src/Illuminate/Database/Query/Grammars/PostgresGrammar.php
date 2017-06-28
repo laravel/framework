@@ -66,6 +66,18 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * @inheritdoc
+     */
+    public function compileInsert(Builder $query, array $values)
+    {
+        $table = $this->wrapTable($query->from);
+
+        return empty($values)
+                ? "insert into {$table} DEFAULT VALUES"
+                : parent::compileInsert($query, $values);
+    }
+
+    /**
      * Compile an insert and get ID statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -80,20 +92,6 @@ class PostgresGrammar extends Grammar
         }
 
         return $this->compileInsert($query, $values).' returning '.$this->wrap($sequence);
-    }
-    
-    /**
-     * @inheritdoc
-     */
-    public function compileInsert(Builder $query, array $values)
-    {
-        $table = $this->wrapTable($query->from);
-
-        if (empty($values)) {
-            return "insert into $table DEFAULT VALUES";
-        }
-
-        return parent::compileInsert($query, $values);
     }
 
     /**
