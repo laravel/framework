@@ -1579,7 +1579,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
                 $this->items[$key] instanceof Traversable
             )
         ) {
-            return new self($this->getArrayableItems($this->items[$key]));
+            return new self($this->items[$key]);
         }
         return $this->items[$key];
     }
