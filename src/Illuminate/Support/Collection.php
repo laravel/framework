@@ -1569,6 +1569,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function offsetGet($key)
     {
+        if (
+            is_object($this->items[$key]) &&
+            ! $this->items[$key] instanceof self &&
+            (
+                $this->items[$key] instanceof Arrayable ||
+                $this->items[$key] instanceof Jsonable ||
+                $this->items[$key] instanceof JsonSerializable ||
+                $this->items[$key] instanceof Traversable
+            )
+        ) {
+            return new self($this->items[$key]);
+        }
+
         return $this->items[$key];
     }
 
