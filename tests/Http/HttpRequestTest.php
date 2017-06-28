@@ -317,6 +317,12 @@ class HttpRequestTest extends TestCase
         $this->assertEquals([], $request->except('age', 'name'));
     }
 
+    public function testNullableMethod()
+    {
+        $request = Request::create('/', 'GET', ['string' => 'Taylor', 'empty_string' => '', 'empty_array' => []]);
+        $this->assertEquals(['string' => 'Taylor', 'empty_string' => null, 'empty_array' => null], $request->nullable('string', 'empty_string', 'empty_array'));
+    }
+
     public function testQueryMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor']);

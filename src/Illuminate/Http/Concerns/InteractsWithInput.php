@@ -222,6 +222,25 @@ trait InteractsWithInput
     }
 
     /**
+     * Get a subset containing the provided keys and nullify empty inputs.
+     *
+     * @param  array|mixed  $keys
+     * @return array
+     */
+    public function nullable($keys)
+    {
+        $keys = is_array($keys) ? $keys : func_get_args();
+
+        $results = $this->all();
+
+        return array_map(function ($value) {
+            $value = is_array($value) ? $value : trim($value);
+
+            return ! empty($value) ? $value : null;
+        }, Arr::only($results, $keys));
+    }
+
+    /**
      * Retrieve a query string item from the request.
      *
      * @param  string  $key
