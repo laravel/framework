@@ -1,6 +1,6 @@
 <?php
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Cache;
 

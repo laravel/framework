@@ -21,7 +21,6 @@
         "illuminate/database": "5.5.*",
         "illuminate/filesystem": "5.5.*",
         "illuminate/support": "5.5.*",
-        "nesbot/carbon": "~1.20",
         "symfony/debug": "~3.3",
         "symfony/process": "~3.3"
     },

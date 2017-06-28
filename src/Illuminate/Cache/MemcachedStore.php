@@ -3,8 +3,8 @@
 namespace Illuminate\Cache;
 
 use Memcached;
-use Carbon\Carbon;
 use ReflectionMethod;
+use Illuminate\Support\Carbon;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Cache\LockProvider;
 
