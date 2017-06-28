@@ -808,7 +808,7 @@ class MySqlGrammar extends Grammar
     protected function modifyComment(Blueprint $blueprint, Fluent $column)
     {
         if (! is_null($column->comment)) {
-            return " comment '".$column->comment."'";
+            return " comment '".addslashes($column->comment)."'";
         }
     }
 
