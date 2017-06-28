@@ -363,7 +363,7 @@ class Event
     {
         $this->ensureOutputIsBeingCapturedForEmail();
 
-        $addresses = is_array($addresses) ? $addresses : func_get_args();
+        $addresses = is_array($addresses) ? $addresses : [$addresses];
 
         return $this->then(function (Mailer $mailer) use ($addresses, $onlyIfOutputExists) {
             $this->emailOutput($mailer, $addresses, $onlyIfOutputExists);
