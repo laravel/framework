@@ -3,6 +3,8 @@
 namespace Illuminate\Routing\Middleware;
 
 use Closure;
+use RuntimeException;
+use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Illuminate\Cache\RateLimiter;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,13 +34,15 @@ class ThrottleRequests
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
-     * @param  int  $maxAttempts
+     * @param  int|string  $maxAttempts
      * @param  float|int  $decayMinutes
      * @return mixed
      */
     public function handle($request, Closure $next, $maxAttempts = 60, $decayMinutes = 1)
     {
         $key = $this->resolveRequestSignature($request);
+
+        $maxAttempts = $this->resolveMaxAttempts($request, $maxAttempts);
 
         if ($this->limiter->tooManyAttempts($key, $maxAttempts, $decayMinutes)) {
             return $this->buildResponse($key, $maxAttempts);
@@ -55,14 +59,40 @@ class ThrottleRequests
     }
 
     /**
+     * Resolve the number of attempts if the user is authenticated or not.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int|string  $maxAttempts
+     * @return int
+     */
+    protected function resolveMaxAttempts($request, $maxAttempts)
+    {
+        if (Str::contains($maxAttempts, '|')) {
+            $parts = explode('|', $maxAttempts, 2);
+            $maxAttempts = $parts[$request->user() ? 1 : 0];
+        }
+
+        return (int) $maxAttempts;
+    }
+
+    /**
      * Resolve request signature.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return string
+     * @throws \RuntimeException
      */
     protected function resolveRequestSignature($request)
     {
-        return $request->fingerprint();
+        if ($user = $request->user()) {
+            return sha1($user->getAuthIdentifier());
+        }
+
+        if ($route = $request->route()) {
+            return sha1($route->getDomain().'|'.$request->ip());
+        }
+
+        throw new RuntimeException('Unable to generate the request signature. Route unavailable.');
     }
 
     /**
