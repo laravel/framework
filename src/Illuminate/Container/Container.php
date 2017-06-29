@@ -1240,6 +1240,6 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function has($id)
     {
-        return $this->getConcrete($id) != $id;
+        return $this->bound($id);
     }
 }
