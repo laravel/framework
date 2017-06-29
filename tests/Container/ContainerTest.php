@@ -974,7 +974,7 @@ class ContainerTest extends TestCase
     {
         $container = new Container;
         $container->bind('Illuminate\Tests\Container\IContainerContractStub', 'Illuminate\Tests\Container\ContainerImplementationStub');
-        $this->assertEquals(true, $container->has('Illuminate\Tests\Container\IContainerContractStub'));
+        $this->assertTrue($container->has('Illuminate\Tests\Container\IContainerContractStub'));
     }
 
     public function testContainerCanBindAnyWord()
