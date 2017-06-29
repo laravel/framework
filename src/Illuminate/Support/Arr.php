@@ -441,12 +441,19 @@ class Arr
     /**
      * Get a random value from an array.
      *
-     * @param  array   $array
+     * @param  array  $array
+     * @param  int    $num
      * @return mixed
      */
-    public static function random($array)
+    public static function random($array, $num = 1)
     {
-        return $array[array_rand($array)];
+        if ($num == 1) {
+            return $array[array_rand($array)];
+        }
+
+        $keys = array_rand($array, $num);
+
+        return array_values(static::only($array, $keys));
     }
 
     /**
