@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use ArrayAccess;
+use InvalidArgumentException;
 use Illuminate\Support\Traits\Macroable;
 
 class Arr
@@ -444,9 +445,15 @@ class Arr
      * @param  array  $array
      * @param  int    $amount
      * @return mixed
+     *
+     * @throws \InvalidArgumentException
      */
     public static function random($array, $amount = 1)
     {
+        if ($amount > ($count = count($array))) {
+            throw new InvalidArgumentException("You requested {$amount} items, but there are only {$count} items in the array.");
+        }
+
         if ($amount == 1) {
             return $array[array_rand($array)];
         }
