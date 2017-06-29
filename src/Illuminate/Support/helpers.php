@@ -249,12 +249,13 @@ if (! function_exists('array_random')) {
     /**
      * Get a random value from an array.
      *
-     * @param  array   $array
+     * @param  array  $array
+     * @param  int|null  $num
      * @return mixed
      */
-    function array_random($array)
+    function array_random($array, $num = null)
     {
-        return Arr::random($array);
+        return Arr::random($array, $num);
     }
 }
 

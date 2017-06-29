@@ -728,7 +728,7 @@ class Builder
      * Save a new model and return the instance.
      *
      * @param  array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \Illuminate\Database\Eloquent\Model|$this
      */
     public function create(array $attributes = [])
     {
@@ -741,7 +741,7 @@ class Builder
      * Save a new model and return the instance. Allow mass-assignment.
      *
      * @param  array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \Illuminate\Database\Eloquent\Model|$this
      */
     public function forceCreate(array $attributes)
     {

@@ -1127,21 +1127,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      *
      * @throws \InvalidArgumentException
      */
-    public function random($amount = 1)
+    public function random($amount = null)
     {
-        if ($amount > ($count = $this->count())) {
-            throw new InvalidArgumentException("You requested {$amount} items, but there are only {$count} items in the collection.");
+        if (($requested = $amount ?: 1) > ($count = $this->count())) {
+            throw new InvalidArgumentException(
+                "You requested {$requested} items, but there are only {$count} items in the collection."
+            );
         }
 
-        $keys = array_rand($this->items, $amount);
-
-        if (count(func_get_args()) == 0) {
-            return $this->items[$keys];
+        if (is_null($amount)) {
+            return Arr::random($this->items);
         }
 
-        $keys = Arr::wrap($keys);
-
-        return new static(array_intersect_key($this->items, array_flip($keys)));
+        return new static(Arr::random($this->items, $amount));
     }
 
     /**
