@@ -27,7 +27,7 @@ class EventGenerateCommand extends Command
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
         $provider = $this->laravel->getProvider(EventServiceProvider::class);
 

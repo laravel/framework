@@ -26,7 +26,7 @@ class ForgetFailedCommand extends Command
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
         if ($this->laravel['queue.failer']->forget($this->argument('id'))) {
             $this->info('Failed job deleted successfully!');

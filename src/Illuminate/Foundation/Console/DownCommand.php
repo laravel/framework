@@ -27,7 +27,7 @@ class DownCommand extends Command
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
         file_put_contents(
             $this->laravel->storagePath().'/framework/down',

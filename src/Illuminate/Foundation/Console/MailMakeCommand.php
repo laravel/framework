@@ -33,7 +33,7 @@ class MailMakeCommand extends GeneratorCommand
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
         if (parent::fire() === false) {
             return;
