@@ -45,10 +45,8 @@ trait ThrottlesLogins
         $seconds = $this->limiter()->availableIn(
             $this->throttleKey($request)
         );
-
-        $message = Lang::get('auth.throttle', ['seconds' => $seconds]);
-
-        $errors = [$this->username() => $message];
+        
+        $errors = [$this->username() => trans('auth.throttle',['seconds' => $seconds])];
 
         if ($request->expectsJson()) {
             return response()->json($errors, 423);
