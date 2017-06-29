@@ -442,16 +442,16 @@ class Arr
      * Get a random value from an array.
      *
      * @param  array  $array
-     * @param  int    $num
+     * @param  int    $amount
      * @return mixed
      */
-    public static function random($array, $num = 1)
+    public static function random($array, $amount = 1)
     {
-        if ($num == 1) {
+        if ($amount == 1) {
             return $array[array_rand($array)];
         }
 
-        $keys = array_rand($array, $num);
+        $keys = array_rand($array, $amount);
 
         $results = [];
 
