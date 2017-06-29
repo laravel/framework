@@ -15,7 +15,7 @@ trait BuildsQueries
      * @param  callable  $callback
      * @return bool
      */
-    public function chunk($count, callable $callback)
+    public function chunk($count, callable $callback, $forDelete = false)
     {
         $this->enforceOrderBy();
 
@@ -25,7 +25,7 @@ trait BuildsQueries
             // We'll execute the query for the given page and get the results. If there are
             // no results we can just break and return from here. When there are results
             // we will call the callback with the current chunk of these results here.
-            $results = $this->forPage($page, $count)->get();
+            $results = $this->forPage($forDelete ? 0 : $page, $count)->get();
 
             $countResults = $results->count();
 
@@ -46,6 +46,18 @@ trait BuildsQueries
         } while ($countResults == $count);
 
         return true;
+    }
+
+    /**
+     * Chunk the results of the query for a deletion loop.
+     *
+     * @param  int  $count
+     * @param  callable  $callback
+     * @return bool
+     */
+    public function chunkForDelete($count, callable $callback)
+    {
+        return $this->chunk($count, $callback, true);
     }
 
     /**
