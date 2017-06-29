@@ -139,7 +139,7 @@ class SparkPostTransport extends Transport
     /**
      * Get the transmission options being used by the transport.
      *
-     * @return string
+     * @return array
      */
     public function getOptions()
     {

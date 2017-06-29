@@ -71,7 +71,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
      *
      * @param  string  $view
      * @param  array  $data
-     * @return string
+     * @return \Illuminate\Support\HtmlString
      */
     public function links($view = null, $data = [])
     {
@@ -83,7 +83,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
      *
      * @param  string  $view
      * @param  array  $data
-     * @return \Illuminate\Support\HtmlString
+     * @return string
      */
     public function render($view = null, $data = [])
     {
