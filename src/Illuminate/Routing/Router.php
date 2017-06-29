@@ -230,6 +230,19 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
+     * Register a new route that returns a view.
+     *
+     * @param string $uri
+     * @param string $view
+     * @return \Illuminate\Routing\Route
+     */
+    public function view($uri, $view)
+    {
+        return $this->get($uri, '\Illuminate\Routing\ViewController')
+            ->defaults('view', $view);
+    }
+
+    /**
      * Register a new route with the given verbs.
      *
      * @param  array|string  $methods
