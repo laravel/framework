@@ -453,7 +453,13 @@ class Arr
 
         $keys = array_rand($array, $num);
 
-        return array_values(static::only($array, $keys));
+        $results = [];
+
+        foreach ($keys as $key) {
+            $results[] = $array[$key];
+        }
+
+        return $results;
     }
 
     /**
