@@ -1080,7 +1080,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function random($amount = null)
     {
         if (($requested = $amount ?: 1) > ($count = $this->count())) {
-            throw new InvalidArgumentException("You requested {$requested} items, but there are only {$count} items in the collection.");
+            throw new InvalidArgumentException(
+                "You requested {$requested} items, but there are only {$count} items in the collection."
+            );
         }
 
         if (is_null($amount)) {

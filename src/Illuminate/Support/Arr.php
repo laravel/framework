@@ -451,7 +451,9 @@ class Arr
     public static function random($array, $amount = null)
     {
         if (($requested = $amount ?: 1) > ($count = count($array))) {
-            throw new InvalidArgumentException("You requested {$requested} items, but there are only {$count} items in the array.");
+            throw new InvalidArgumentException(
+                "You requested {$requested} items, but there are only {$count} items in the array."
+            );
         }
 
         if (is_null($amount)) {
@@ -460,13 +462,9 @@ class Arr
 
         $keys = array_rand($array, $amount);
 
-        if ($amount == 1) {
-            $keys = [$keys];
-        }
-
         $results = [];
 
-        foreach ($keys as $key) {
+        foreach ((array) $keys as $key) {
             $results[] = $array[$key];
         }
 
