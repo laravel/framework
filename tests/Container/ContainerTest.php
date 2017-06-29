@@ -969,6 +969,22 @@ class ContainerTest extends TestCase
         $container->bind('Illuminate\Tests\Container\IContainerContractStub', 'Illuminate\Tests\Container\ContainerImplementationStub');
         $this->assertInstanceOf(ContainerDependentStub::class, $container->build(ContainerDependentStub::class));
     }
+
+    public function testContainerKnowsEntry()
+    {
+        $container = new Container;
+        $container->bind('Illuminate\Tests\Container\IContainerContractStub', 'Illuminate\Tests\Container\ContainerImplementationStub');
+        $this->assertEquals(true, $container->has('Illuminate\Tests\Container\IContainerContractStub'));
+    }
+
+    /**
+     * @expectedException \Illuminate\Container\EntryNotFoundException
+     */
+    public function testUnknownEntry()
+    {
+        $container = new Container;
+        $container->get('Taylor');
+    }
 }
 
 class ContainerConcreteStub

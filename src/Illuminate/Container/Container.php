@@ -5,6 +5,8 @@ namespace Illuminate\Container;
 use Closure;
 use ArrayAccess;
 use LogicException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use ReflectionClass;
 use ReflectionParameter;
 use Illuminate\Contracts\Container\BindingResolutionException;
@@ -1222,4 +1224,26 @@ class Container implements ArrayAccess, ContainerContract
     {
         $this[$key] = $value;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function get($id)
+    {
+        if ($this->has($id)) {
+            return $this->resolve($id);
+        }
+
+        throw new EntryNotFoundException();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function has($id)
+    {
+        return $this->getConcrete($id) != $id;
+    }
+
+
 }
