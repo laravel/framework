@@ -55,7 +55,7 @@ class SeederMakeCommand extends GeneratorCommand
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
         parent::fire();
 

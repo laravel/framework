@@ -977,6 +977,13 @@ class ContainerTest extends TestCase
         $this->assertEquals(true, $container->has('Illuminate\Tests\Container\IContainerContractStub'));
     }
 
+    public function testContainerCanBindAnyWord()
+    {
+        $container = new Container;
+        $container->bind('Taylor', stdClass::class);
+        $this->assertInstanceOf(stdClass::class, $container->get('Taylor'));
+    }
+
     /**
      * @expectedException \Illuminate\Container\EntryNotFoundException
      */

@@ -27,7 +27,7 @@ class RetryCommand extends Command
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
         foreach ($this->getJobIds() as $id) {
             $job = $this->laravel['queue.failer']->find($id);

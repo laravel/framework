@@ -65,7 +65,7 @@ class AppNameCommand extends Command
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
         $this->currentRoot = trim($this->laravel->getNamespace(), '\\');
 
