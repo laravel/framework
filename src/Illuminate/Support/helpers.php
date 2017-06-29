@@ -253,12 +253,8 @@ if (! function_exists('array_random')) {
      * @param  int|null  $num
      * @return mixed
      */
-    function array_random($array, $num = 1)
+    function array_random($array, $num = null)
     {
-        if (count(func_get_args()) == 1) {
-            return Arr::random($array);
-        }
-
         return Arr::random($array, $num);
     }
 }
