@@ -980,7 +980,7 @@ class ContainerTest extends TestCase
     /**
      * @expectedException \Illuminate\Container\EntryNotFoundException
      */
-    public function testUnknownEntry()
+    public function testUnknownEntryThrowsException()
     {
         $container = new Container;
         $container->get('Taylor');

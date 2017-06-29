@@ -5,8 +5,6 @@ namespace Illuminate\Container;
 use Closure;
 use ArrayAccess;
 use LogicException;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use ReflectionClass;
 use ReflectionParameter;
 use Illuminate\Contracts\Container\BindingResolutionException;
@@ -1226,7 +1224,7 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
-     * @inheritdoc
+     *  {@inheritdoc}
      */
     public function get($id)
     {
@@ -1238,12 +1236,10 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
-     * @inheritdoc
+     *  {@inheritdoc}
      */
     public function has($id)
     {
         return $this->getConcrete($id) != $id;
     }
-
-
 }
