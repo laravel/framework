@@ -250,11 +250,15 @@ if (! function_exists('array_random')) {
      * Get a random value from an array.
      *
      * @param  array  $array
-     * @param  int    $num
+     * @param  int|null  $num
      * @return mixed
      */
     function array_random($array, $num = 1)
     {
+        if (count(func_get_args()) == 1) {
+            return Arr::random($array);
+        }
+
         return Arr::random($array, $num);
     }
 }

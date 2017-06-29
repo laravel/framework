@@ -443,7 +443,7 @@ class Arr
      * Get a random value from an array.
      *
      * @param  array  $array
-     * @param  int    $amount
+     * @param  int|null  $amount
      * @return mixed
      *
      * @throws \InvalidArgumentException
@@ -454,11 +454,15 @@ class Arr
             throw new InvalidArgumentException("You requested {$amount} items, but there are only {$count} items in the array.");
         }
 
-        if ($amount == 1) {
+        if (count(func_get_args()) == 1) {
             return $array[array_rand($array)];
         }
 
         $keys = array_rand($array, $amount);
+
+        if ($amount == 1) {
+            $keys = [$keys];
+        }
 
         $results = [];
 
