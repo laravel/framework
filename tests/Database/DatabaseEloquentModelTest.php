@@ -1376,6 +1376,7 @@ class DatabaseEloquentModelTest extends TestCase
         $obj = new StdClass;
         $obj->foo = 'bar';
         $model->arrayAttribute = $obj;
+        $model->unserializeAttribute = 'a:1:{s:3:"foo";s:3:"bar";}';
         $model->jsonAttribute = ['foo' => 'bar'];
         $model->dateAttribute = '1969-07-20';
         $model->datetimeAttribute = '1969-07-20 22:56:00';
@@ -1389,12 +1390,15 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertInternalType('object', $model->objectAttribute);
         $this->assertInternalType('array', $model->arrayAttribute);
         $this->assertInternalType('array', $model->jsonAttribute);
+        $this->assertInternalType('array', $model->unserializeAttribute);
         $this->assertTrue($model->boolAttribute);
         $this->assertFalse($model->booleanAttribute);
         $this->assertEquals($obj, $model->objectAttribute);
         $this->assertEquals(['foo' => 'bar'], $model->arrayAttribute);
         $this->assertEquals(['foo' => 'bar'], $model->jsonAttribute);
         $this->assertEquals('{"foo":"bar"}', $model->jsonAttributeValue());
+        $this->assertEquals(['foo' => 'bar'], $model->unserializeAttribute);
+        $this->assertEquals('a:1:{s:3:"foo";s:3:"bar";}', $model->unserializeAttributeValue());
         $this->assertInstanceOf('Carbon\Carbon', $model->dateAttribute);
         $this->assertInstanceOf('Carbon\Carbon', $model->datetimeAttribute);
         $this->assertEquals('1969-07-20', $model->dateAttribute->toDateString());
@@ -1415,6 +1419,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals($obj, $arr['objectAttribute']);
         $this->assertEquals(['foo' => 'bar'], $arr['arrayAttribute']);
         $this->assertEquals(['foo' => 'bar'], $arr['jsonAttribute']);
+        $this->assertEquals(['foo' => 'bar'], $arr['unserializeAttribute']);
         $this->assertEquals('1969-07-20 00:00:00', $arr['dateAttribute']);
         $this->assertEquals('1969-07-20 22:56:00', $arr['datetimeAttribute']);
         $this->assertEquals(-14173440, $arr['timestampAttribute']);
@@ -1910,6 +1915,7 @@ class EloquentModelCastingStub extends Model
         'objectAttribute' => 'object',
         'arrayAttribute' => 'array',
         'jsonAttribute' => 'json',
+        'unserializeAttribute' => 'unserialize',
         'dateAttribute' => 'date',
         'datetimeAttribute' => 'datetime',
         'timestampAttribute' => 'timestamp',
@@ -1918,6 +1924,11 @@ class EloquentModelCastingStub extends Model
     public function jsonAttributeValue()
     {
         return $this->attributes['jsonAttribute'];
+    }
+
+    public function unserializeAttributeValue()
+    {
+        return $this->attributes['unserializeAttribute'];
     }
 }
 
