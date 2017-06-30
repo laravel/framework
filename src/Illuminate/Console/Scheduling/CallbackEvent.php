@@ -101,6 +101,8 @@ class CallbackEvent extends Event
                 "A scheduled event name is required to prevent overlapping. Use the 'name' method before 'withoutOverlapping'."
             );
         }
+        
+        $this->withoutOverlapping = true;
 
         return $this->skip(function () {
             return $this->mutex->exists($this);
