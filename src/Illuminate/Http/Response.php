@@ -7,6 +7,7 @@ use JsonSerializable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Renderable;
+use stdClass;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
 
 class Response extends BaseResponse
@@ -60,6 +61,7 @@ class Response extends BaseResponse
                $content instanceof Jsonable ||
                $content instanceof ArrayObject ||
                $content instanceof JsonSerializable ||
+               $content instanceof stdClass ||
                is_array($content);
     }
 
