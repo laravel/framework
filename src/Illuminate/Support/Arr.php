@@ -380,6 +380,10 @@ class Arr
             } else {
                 $itemKey = data_get($item, $key);
 
+                if (gettype($itemKey) === 'object') {
+                    $itemKey = (string) $itemKey;
+                }
+
                 $results[$itemKey] = $itemValue;
             }
         }
