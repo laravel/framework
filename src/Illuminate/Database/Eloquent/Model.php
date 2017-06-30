@@ -13,7 +13,7 @@ use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Query\Builder as QueryBuilder;
-use Illuminate\Database\Eloquent\Relations\PushableRelation;
+use Illuminate\Database\Eloquent\Relations\RelationPusher;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 /**
@@ -469,42 +469,18 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function push()
     {
-        list($inverseRelations, $relations) = collect($this->relations)
-            ->mapWithKeys(function ($model, $name) {
-                return [
-                    $name => method_exists($this, $name) ? $this->$name() : new PushableRelation(),
-                ];
-            })->partition->isInverse();
+        // To sync all of the relationships to the database, it's important to split the inverse
+        // and the non-inverse ones, so we can: save the parents first, associate them to the
+        // main model (assign foreign keys), save the main model and then save the children.
+        list($inverse, $nonInverse) = collect($this->relations)
+            ->map(function ($models, $name) {
+                return new RelationPusher(
+                    $name, $models, method_exists($this, $name) ? $this->$name() : null
+                );
+            })
+            ->partition->isInverse();
 
-        // To sync all of the relationships to the database, we will simply spin through
-        // the relationships and save each model via this "push" method, which allows
-        // us to recurse into all of these nested relations for the model instance.
-        return $this->pushRelations($inverseRelations)
-            && $this->save()
-            && $this->pushRelations($relations);
-    }
-
-    /**
-     * Save the given relations.
-     *
-     * @param  \Illuminate\Support\Collection  $relations
-     * @return  bool
-     */
-    protected function pushRelations($relations)
-    {
-        foreach ($relations as $name => $relation) {
-            $models = $this->relations[$name];
-
-            $models = $models instanceof Collection ? $models->all() : [$models];
-
-            foreach (array_filter($models) as $model) {
-                if (! $relation->push($model)) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
+        return $inverse->every->push() && $this->save() && $nonInverse->every->push();
     }
 
     /**
