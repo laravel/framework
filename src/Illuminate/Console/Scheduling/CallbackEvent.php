@@ -104,6 +104,8 @@ class CallbackEvent extends Event
             );
         }
 
+        $this->withoutOverlapping = true;
+
         return $this->skip(function () {
             return $this->mutex->exists($this);
         });
