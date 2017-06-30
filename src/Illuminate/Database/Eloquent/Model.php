@@ -473,6 +473,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // and the non-inverse ones, so we can: save the parents first, associate them to the
         // main model (assign foreign keys), save the main model and then save the children.
         list($inverse, $nonInverse) = collect($this->relations)
+            ->filter()
             ->map(function ($models, $name) {
                 return new RelationPusher(
                     $name, $models, method_exists($this, $name) ? $this->$name() : null

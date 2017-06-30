@@ -64,8 +64,32 @@ class RelationPusher
         // If there is a relationship object available, let's push the model(s)
         // through this object, since the relation can contain extra logic to
         // associate relatives, otherwise just push the model(s) directly.
-        return $this->models->filter()->every(function ($model) {
-            return $this->relation ? $this->relation->push($model) : $model->push();
+        return $this->relation
+            ? $this->pushThroughRelation()
+            : $this->pushModelsDirectly();
+    }
+
+    /**
+     * Save the models using the relationship object.
+     *
+     * @return bool
+     */
+    protected function pushThroughRelation()
+    {
+        return $this->models->every(function ($model) {
+            return $this->relation->push($model);
+        });
+    }
+
+    /**
+     * Push models directly (without using a relationship object).
+     *
+     * @return bool
+     */
+    protected function pushModelsDirectly()
+    {
+        return $this->models->every(function ($model) {
+            return $model->push();
         });
     }
 }
