@@ -17,6 +17,7 @@ class ViewController extends Controller
      * Create a new view controller instance.
      *
      * @param \Illuminate\Contracts\View\Factory $view
+     * @return void
      */
     public function __construct(ViewFactory $view)
     {
