@@ -1,6 +1,6 @@
 # Release Notes for 5.4.x
 
-## v5.4.30 (2017-06-30)
+## v5.4.28 (2017-06-30)
 
 ### Added
 - Added `avg()` and `average()` as higher order proxies ([#19628](https://github.com/laravel/framework/pull/19628))
