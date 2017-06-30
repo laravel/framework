@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use stdClass;
 use ArrayObject;
+use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Collection;
@@ -368,6 +369,15 @@ class SupportArrTest extends TestCase
             'Taylor' => ['name' => 'Taylor', 'role' => 'developer'],
             'Abigail' => ['name' => 'Abigail', 'role' => 'developer'],
         ], $test2);
+    }
+
+    public function testPluckWithCarbonKeys()
+    {
+        $array = [
+            ['start' => new Carbon('2017-07-25 00:00:00'), 'end' => new Carbon('2017-07-30 00:00:00')],
+        ];
+        $array = Arr::pluck($array, 'end', 'start');
+        $this->assertEquals(['2017-07-25 00:00:00' => '2017-07-30 00:00:00'], $array);
     }
 
     public function testPrepend()
