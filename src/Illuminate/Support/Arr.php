@@ -380,7 +380,7 @@ class Arr
             } else {
                 $itemKey = data_get($item, $key);
 
-                if (gettype($itemKey) === 'object') {
+                if (is_object($itemKey)) {
                     $itemKey = (string) $itemKey;
                 }
 
