@@ -36,7 +36,7 @@ class ModelMakeCommand extends GeneratorCommand
      */
     public function handle()
     {
-        if (parent::fire() === false) {
+        if (parent::handle() === false) {
             return;
         }
 
