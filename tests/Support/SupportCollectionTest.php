@@ -2046,25 +2046,6 @@ class SupportCollectionTest extends TestCase
         ]);
 
         $this->assertCount(1, $e->filterByAdminUser);
-
-        $e = new Collection([
-            new class {
-                public $name = 'Alex';
-
-                public function admin_user() {
-                    return true;
-                }
-            },
-            new class {
-                public $name = 'John';
-
-                public function admin_user() {
-                    return false;
-                }
-            }
-        ]);
-
-        $this->assertCount(1, $e->filterByAdminUser);
     }
 
     public function testHigherOrderCollectionMap()
