@@ -253,9 +253,7 @@ class Handler implements ExceptionHandlerContract
      */
     protected function convertExceptionToResponse(Exception $e)
     {
-        $headers = $this->isHttpException($e) ? $e->getHeaders() : [];
-
-        $statusCode = $this->isHttpException($e) ? $e->getStatusCode() : 500;
+        list($headers, $status) = $this->getExceptionAttributes($e);
 
         try {
             $content = config('app.debug')
@@ -266,7 +264,7 @@ class Handler implements ExceptionHandlerContract
         }
 
         return SymfonyResponse::create(
-            $content, $statusCode, $headers
+            $content, $status, $headers
         );
     }
 
@@ -366,6 +364,21 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
+     * Get the exception attributes.
+     *
+     * @param \Exception $e
+     * @return array
+     */
+    protected function getExceptionAttributes(Exception $e)
+    {
+        if ($this->isHttpException($e)) {
+            return [$e->getHeaders(), $e->getStatusCode()];
+        }
+
+        return [[], 500];
+    }
+
+    /**
      * Prepare a JSON response for the given exception.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -374,9 +387,7 @@ class Handler implements ExceptionHandlerContract
      */
     protected function prepareJsonResponse($request, Exception $e)
     {
-        $status = $this->isHttpException($e) ? $e->getStatusCode() : 500;
-
-        $headers = $this->isHttpException($e) ? $e->getHeaders() : [];
+        list($headers, $status) = $this->getExceptionAttributes($e);
 
         return new JsonResponse(
             $this->convertExceptionToArray($e), $status, $headers,
