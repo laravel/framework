@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Validation;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Validation\Factory;
-use Illuminate\Validation\Validator;
 use Illuminate\Contracts\Translation\Translator;
 
 class ValidationErrorsAdd extends TestCase

@@ -255,7 +255,7 @@ class Validator implements ValidatorContract
      */
     public function passes()
     {
-        if (!$this->messages) {
+        if (! $this->messages) {
             $this->messages = new MessageBag;
         }
 
