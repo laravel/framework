@@ -27,12 +27,12 @@ class CacheMutex implements Mutex
     /**
      * Attempt to obtain a mutex for the given event.
      *
-     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @param  \Illuminate\Console\Scheduling\Event|CallbackEvent  $event
      * @return bool
      */
     public function create(Event $event)
     {
-        return $this->cache->add($event->mutexName(), true, 1440);
+        return $this->cache->add($event->mutexName(), true, $event->mutexDeadline);
     }
 
     /**

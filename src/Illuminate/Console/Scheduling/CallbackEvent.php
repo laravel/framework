@@ -23,6 +23,13 @@ class CallbackEvent extends Event
     protected $parameters;
 
     /**
+     * Mutex deadline in minutes.
+     *
+     * @var int
+     */
+    public $mutexDeadline;
+
+    /**
      * Create a new event instance.
      *
      * @param  \Illuminate\Console\Scheduling\Mutex  $mutex
@@ -90,11 +97,10 @@ class CallbackEvent extends Event
     /**
      * Do not allow the event to overlap each other.
      *
+     * @param int $mutexDeadline
      * @return $this
-     *
-     * @throws \LogicException
      */
-    public function withoutOverlapping()
+    public function withoutOverlapping($mutexDeadline = 1440)
     {
         if (! isset($this->description)) {
             throw new LogicException(
@@ -103,6 +109,7 @@ class CallbackEvent extends Event
         }
 
         $this->withoutOverlapping = true;
+        $this->mutexDeadline = $mutexDeadline;
 
         return $this->skip(function () {
             return $this->mutex->exists($this);
