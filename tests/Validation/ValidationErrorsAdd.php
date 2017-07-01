@@ -11,7 +11,7 @@ class ValidationErrorsAdd extends TestCase
 {
     public function testFailsCalledAfterErrorsAddDoesNotReturnTrue()
     {
-    	$translator = m::mock(Translator::class);
+        $translator = m::mock(Translator::class);
         $factory = new Factory($translator);
         $validator = $factory->make(['foo' => 'bar'], ['baz' => 'boom']);
 
