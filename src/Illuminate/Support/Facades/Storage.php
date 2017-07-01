@@ -13,15 +13,18 @@ class Storage extends Facade
      * Replace the given disk with a local, testing disk.
      *
      * @param  string  $disk
+     * @param  bool $doesntWantsOldFiles
      * @return void
      */
-    public static function fake($disk)
+    public static function fake($disk, $doesntWantsOldFiles = true)
     {
-        (new Filesystem)->cleanDirectory(
-            $root = storage_path('framework/testing/disks/'.$disk)
-        );
+        $rootPath = storage_path('framework/testing/disks/' . $disk);
 
-        static::set($disk, self::createLocalDriver(['root' => $root]));
+        if ($doesntWantsOldFiles) {
+            (new Filesystem)->cleanDirectory($rootPath);
+        }
+
+        static::set($disk, self::createLocalDriver(['root' => $rootPath]));
     }
 
     /**
