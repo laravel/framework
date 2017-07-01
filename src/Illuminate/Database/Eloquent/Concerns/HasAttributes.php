@@ -666,16 +666,6 @@ trait HasAttributes
     }
 
     /**
-     * Decode the given array back into an array.
-     * @param  array $value
-     * @return string
-     */
-    public function asSerialize($value)
-    {
-        return serialize($value);
-    }
-
-    /**
      * Return a timestamp as DateTime object with time set to 00:00:00.
      *
      * @param  mixed  $value
