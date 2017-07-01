@@ -1384,7 +1384,7 @@ class RoutingRouteTest extends TestCase
     {
         $container = new Container;
         $factory = m::mock('Illuminate\View\Factory');
-        $factory->shouldReceive('make')->once()->with('pages.contact')->andReturn('Contact us');
+        $factory->shouldReceive('make')->once()->with('pages.contact', ['foo' => 'bar'])->andReturn('Contact us');
         $router = new Router(new Dispatcher, $container);
         $container->bind(ViewFactory::class, function () use ($factory) {
             return $factory;
@@ -1393,7 +1393,7 @@ class RoutingRouteTest extends TestCase
             return $router;
         });
 
-        $router->view('contact', 'pages.contact');
+        $router->view('contact', 'pages.contact', ['foo' => 'bar']);
 
         $this->assertEquals('Contact us', $router->dispatch(Request::create('contact', 'GET'))->getContent());
     }
