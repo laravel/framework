@@ -255,7 +255,9 @@ class Validator implements ValidatorContract
      */
     public function passes()
     {
-        $this->messages = new MessageBag;
+        if (!$this->messages) {
+            $this->messages = new MessageBag;
+        }
 
         // We'll spin through each rule, validating the attributes attached to that
         // rule. Any error messages will be added to the containers with each of
