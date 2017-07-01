@@ -1693,6 +1693,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         static::$proxies[] = $method;
     }
 
+    public function getProxies()
+    {
+        return static::$proxies;
+    }
+
     /**
      * Dynamically access collection proxies.
      *
@@ -1704,7 +1709,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function __get($key)
     {
         if (! in_array($key, static::$proxies)) {
-            throw new Exception("Property [{$key}] does not exist on this collection instance.");
+            if (!starts_with($key, Str::cartesian(static::$proxies, ['On', 'By', 'Then']))) {
+                throw new Exception("Property [{$key}] does not exist on this collection instance.");
+            }
+
+            return ReadableHigherOrderCollectionProxy::perform($this, $key);
         }
 
         return new HigherOrderCollectionProxy($this, $key);
