@@ -1988,6 +1988,90 @@ class SupportCollectionTest extends TestCase
         );
     }
 
+    public function testReadableHigherOrderFilter()
+    {
+        $c = new Collection([
+            new class {
+                public $name = 'Alex';
+
+                public function active() {
+                    return true;
+                }
+            },
+            new class {
+                public $name = 'John';
+
+                public function active() {
+                    return false;
+                }
+            }
+        ]);
+
+        $this->assertCount(1, $c->filterByActive);
+
+        $d = new Collection([
+            new class {
+                public $name = 'Alex';
+
+                public function adminUser() {
+                    return true;
+                }
+            },
+            new class {
+                public $name = 'John';
+
+                public function adminUser() {
+                    return false;
+                }
+            }
+        ]);
+
+        $this->assertCount(1, $d->filterByAdminUser);
+
+        $e = new Collection([
+            new class {
+                public $name = 'Alex';
+
+                public function admin_user() {
+                    return true;
+                }
+            },
+            new class {
+                public $name = 'John';
+
+                public function admin_user() {
+                    return false;
+                }
+            }
+        ]);
+
+        $this->assertCount(1, $e->filterByAdminUser);
+    }
+
+    public function testCustomFillerReadableHigherOrderFilter()
+    {
+        Collection::filler('BecauseOf');
+
+        $c = new Collection([
+            new class {
+                public $name = 'Alex';
+
+                public function active() {
+                    return true;
+                }
+            },
+            new class {
+                public $name = 'John';
+
+                public function active() {
+                    return false;
+                }
+            }
+        ]);
+
+        $this->assertCount(1, $c->filterBecauseOfActive);
+    }
+
     public function testHigherOrderCollectionMap()
     {
         $person1 = (object) ['name' => 'Taylor'];

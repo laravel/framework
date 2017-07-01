@@ -259,6 +259,29 @@ class SupportStrTest extends TestCase
         $this->assertEquals('Мама', Str::ucfirst('мама'));
         $this->assertEquals('Мама мыла раму', Str::ucfirst('мама мыла раму'));
     }
+
+    public function testCartesian()
+    {
+        $one = [
+            'Hello',
+            'Hola',
+            'Hi',
+        ];
+
+        $two = [
+            'World',
+            'Universe',
+        ];
+
+        $this->assertEquals([
+            'HelloWorld',
+            'HelloUniverse',
+            'HolaWorld',
+            'HolaUniverse',
+            'HiWorld',
+            'HiUniverse',
+        ], Str::cartesian($one, $two));
+    }
 }
 
 class StringableObjectStub

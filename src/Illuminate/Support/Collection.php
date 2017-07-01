@@ -38,6 +38,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     ];
 
     /**
+     * The fillers to sandwich between a proxy and a method call.
+     *
+     * @var array
+     */
+    protected static $proxy_fillers = [
+        'On',
+        'By',
+        'Then',
+    ];
+
+    /**
      * Create a new collection.
      *
      * @param  mixed  $items
@@ -1694,6 +1705,37 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Add a filler word to the list of proxy fillers.
+     *
+     * @param  string  $filler
+     * @return void
+     */
+    public static function filler($filler)
+    {
+        static::$proxy_fillers[] = $filler;
+    }
+
+    /**
+     * Get the list of proxy methods supported.
+     *
+     * @return array
+     */
+    public function getProxies()
+    {
+        return static::$proxies;
+    }
+
+    /**
+     * Get the list of proxy filler words supported.
+     *
+     * @return array
+     */
+    public function getFillers()
+    {
+        return static::$proxy_fillers;
+    }
+
+    /**
      * Dynamically access collection proxies.
      *
      * @param  string  $key
@@ -1704,7 +1746,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function __get($key)
     {
         if (! in_array($key, static::$proxies)) {
-            throw new Exception("Property [{$key}] does not exist on this collection instance.");
+            if (!starts_with($key, Str::cartesian(static::$proxies, static::$proxy_fillers))) {
+                throw new Exception("Property [{$key}] does not exist on this collection instance.");
+            }
+
+            return ReadableHigherOrderCollectionProxy::perform($this, $key);
         }
 
         return new HigherOrderCollectionProxy($this, $key);

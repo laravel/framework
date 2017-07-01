@@ -649,4 +649,17 @@ class Str
 
         return $languageSpecific[$language] ?? null;
     }
+
+    public static function cartesian($left, $right)
+    {
+        $results = [];
+
+        foreach ($left as $lhs) {
+            foreach ($right as $rhs) {
+                $results[] = $lhs . $rhs;
+            }
+        }
+
+        return $results;
+    }
 }
