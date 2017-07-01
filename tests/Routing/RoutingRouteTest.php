@@ -1123,13 +1123,13 @@ class RoutingRouteTest extends TestCase
         $router = $this->getRouter();
         $router->resource('prefix/foo.bar', 'FooController');
 
-        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.index'));
-        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.show'));
-        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.create'));
-        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.store'));
-        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.edit'));
-        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.update'));
-        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.destroy'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('prefix.foo.bar.index'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('prefix.foo.bar.show'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('prefix.foo.bar.create'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('prefix.foo.bar.store'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('prefix.foo.bar.edit'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('prefix.foo.bar.update'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('prefix.foo.bar.destroy'));
 
         $router = $this->getRouter();
         $router->resource('foo', 'FooController', ['names' => [
