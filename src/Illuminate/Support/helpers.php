@@ -1022,3 +1022,16 @@ if (! function_exists('with')) {
         return $object;
     }
 }
+
+if (! function_exists('path')) {
+    /**
+     * Return the given path.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    function path($path = '')
+    {
+        return $path ? DIRECTORY_SEPARATOR . ltrim($path, DIRECTORY_SEPARATOR) : '';
+    }
+}
