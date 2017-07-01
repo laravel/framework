@@ -313,17 +313,19 @@ class SupportCollectionTest extends TestCase
             new class {
                 public $name = 'Alex';
 
-                public function active() {
+                public function active()
+                {
                     return true;
                 }
             },
             new class {
                 public $name = 'John';
 
-                public function active() {
+                public function active()
+                {
                     return false;
                 }
-            }
+            },
         ]);
 
         $this->assertCount(1, $c->filter->active());
