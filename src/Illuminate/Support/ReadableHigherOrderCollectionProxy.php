@@ -70,16 +70,12 @@ class ReadableHigherOrderCollectionProxy
      */
     public function __call($method, $parameters)
     {
-        try {
-            return $this->collection->{$this->method}(function ($value) use ($method, $parameters) {
-                return $value->{$method}(...$parameters);
-            });
-        } catch(\Throwable $t) {
-            $method = Str::snake($method);
+        return $this->collection->{$this->method}(function ($value) use ($method, $parameters) {
+            if (!method_exists($value, $method)) {
+                $method = Str::snake($method);
+            }
 
-            return $this->collection->{$this->method}(function ($value) use ($method, $parameters) {
-                return $value->{$method}(...$parameters);
-            });
-        }
+            return $value->{$method}(...$parameters);
+        });
     }
 }
