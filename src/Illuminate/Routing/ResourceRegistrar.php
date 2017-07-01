@@ -388,6 +388,10 @@ class ResourceRegistrar
         // the resource action. Otherwise we'll just use an empty string for here.
         $prefix = isset($options['as']) ? $options['as'].'.' : '';
 
+        if (empty($prefix) && ! empty($options['prefix'])) {
+            $prefix = isset($options['prefix']) ? $options['prefix'].'.' : '';
+        }
+
         return trim(sprintf('%s%s.%s', $prefix, $name, $method), '.');
     }
 

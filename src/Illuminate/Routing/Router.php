@@ -271,6 +271,10 @@ class Router implements RegistrarContract, BindingRegistrar
             $registrar = new ResourceRegistrar($this);
         }
 
+        if (empty($options['prefix']) && ! empty($this->getLastGroupPrefix())) {
+            $options['prefix'] = $this->getLastGroupPrefix();
+        }
+
         return new PendingResourceRegistration(
             $registrar, $name, $controller, $options
         );
