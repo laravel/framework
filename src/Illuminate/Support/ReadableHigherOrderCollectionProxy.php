@@ -41,7 +41,7 @@ class ReadableHigherOrderCollectionProxy
             }
         }
 
-        $method = str_replace(Str::cartesian($collection->getProxies(), ['On', 'By', 'Then']), '', $method);
+        $method = str_replace(Str::cartesian($collection->getProxies(), $collection->getFillers()), '', $method);
 
         $partial = new ReadableHigherOrderCollectionProxy($collection, $action);
 

@@ -2048,6 +2048,30 @@ class SupportCollectionTest extends TestCase
         $this->assertCount(1, $e->filterByAdminUser);
     }
 
+    public function testCustomFillerReadableHigherOrderFilter()
+    {
+        Collection::filler('BecauseOf');
+
+        $c = new Collection([
+            new class {
+                public $name = 'Alex';
+
+                public function active() {
+                    return true;
+                }
+            },
+            new class {
+                public $name = 'John';
+
+                public function active() {
+                    return false;
+                }
+            }
+        ]);
+
+        $this->assertCount(1, $c->filterBecauseOfActive);
+    }
+
     public function testHigherOrderCollectionMap()
     {
         $person1 = (object) ['name' => 'Taylor'];
