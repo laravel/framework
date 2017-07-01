@@ -307,6 +307,28 @@ class SupportCollectionTest extends TestCase
         })->all());
     }
 
+    public function testHigherOrderFilter()
+    {
+        $c = new Collection([
+            new class {
+                public $name = 'Alex';
+
+                public function active() {
+                    return true;
+                }
+            },
+            new class {
+                public $name = 'John';
+
+                public function active() {
+                    return false;
+                }
+            }
+        ]);
+
+        $this->assertCount(1, $c->filter->active());
+    }
+
     public function testWhere()
     {
         $c = new Collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
