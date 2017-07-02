@@ -65,6 +65,13 @@ class Event
     public $withoutOverlapping = false;
 
     /**
+     * Mutex deadline in minutes.
+     *
+     * @var int
+     */
+    public $expiresAt;
+
+    /**
      * Indicates if the command should run in background.
      *
      * @var bool
