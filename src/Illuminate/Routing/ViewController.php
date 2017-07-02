@@ -7,16 +7,16 @@ use Illuminate\Contracts\View\Factory as ViewFactory;
 class ViewController extends Controller
 {
     /**
-     * The view factory instance.
+     * The view factory implementation.
      *
      * @var \Illuminate\Contracts\View\Factory
      */
     protected $view;
 
     /**
-     * Create a new view controller instance.
+     * Create a new controller instance.
      *
-     * @param \Illuminate\Contracts\View\Factory $view
+     * @param  \Illuminate\Contracts\View\Factory  $view
      * @return void
      */
     public function __construct(ViewFactory $view)
@@ -27,8 +27,8 @@ class ViewController extends Controller
     /**
      * Invoke the controller method.
      *
-     * @param string $view
-     * @param array $data
+     * @param  string  $view
+     * @param  array  $data
      * @return \Illuminate\Contracts\View\View
      */
     public function __invoke($view, $data)
