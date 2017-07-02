@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Illuminate\Cache\RateLimiter;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ThrottleRequests
 {
@@ -45,7 +46,7 @@ class ThrottleRequests
         $maxAttempts = $this->resolveMaxAttempts($request, $maxAttempts);
 
         if ($this->limiter->tooManyAttempts($key, $maxAttempts, $decayMinutes)) {
-            return $this->buildResponse($key, $maxAttempts);
+            $this->buildException($key, $maxAttempts);
         }
 
         $this->limiter->hit($key, $decayMinutes);
@@ -95,23 +96,24 @@ class ThrottleRequests
     }
 
     /**
-     * Create a 'too many attempts' response.
+     * Create a 'too many attempts' exception.
      *
      * @param  string  $key
      * @param  int  $maxAttempts
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return void
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
-    protected function buildResponse($key, $maxAttempts)
+    protected function buildException($key, $maxAttempts)
     {
-        $response = new Response('Too Many Attempts.', 429);
-
         $retryAfter = $this->limiter->availableIn($key);
 
-        return $this->addHeaders(
-            $response, $maxAttempts,
+        $headers = $this->getHeaders(
+            $maxAttempts,
             $this->calculateRemainingAttempts($key, $maxAttempts, $retryAfter),
             $retryAfter
         );
+
+        throw new HttpException(429, 'Too Many Attempts.', null, $headers);
     }
 
     /**
@@ -125,6 +127,23 @@ class ThrottleRequests
      */
     protected function addHeaders(Response $response, $maxAttempts, $remainingAttempts, $retryAfter = null)
     {
+        $response->headers->add(
+            $this->getHeaders($maxAttempts, $remainingAttempts, $retryAfter)
+        );
+
+        return $response;
+    }
+
+    /**
+     * Get the limit headers information.
+     *
+     * @param  int  $maxAttempts
+     * @param  int  $remainingAttempts
+     * @param  int|null  $retryAfter
+     * @return array
+     */
+    protected function getHeaders($maxAttempts, $remainingAttempts, $retryAfter = null)
+    {
         $headers = [
             'X-RateLimit-Limit' => $maxAttempts,
             'X-RateLimit-Remaining' => $remainingAttempts,
@@ -135,9 +154,7 @@ class ThrottleRequests
             $headers['X-RateLimit-Reset'] = Carbon::now()->getTimestamp() + $retryAfter;
         }
 
-        $response->headers->add($headers);
-
-        return $response;
+        return $headers;
     }
 
     /**
