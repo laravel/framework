@@ -10,18 +10,40 @@ use Illuminate\Filesystem\Filesystem;
 class Storage extends Facade
 {
     /**
+     * Tells the fake method whether to clean the working directory.
+     *
+     * @var boolean
+     */
+    protected static $doesntWantOldFiles = true;
+
+    /**
+     * Keeps the testing files.
+     *
+     * @return self
+     */
+    public static function withOldFiles()
+    {
+        static::$doesntWantOldFiles = false;
+
+        return new static;
+    }
+
+    /**
      * Replace the given disk with a local, testing disk.
      *
      * @param  string  $disk
+     *
      * @return void
      */
     public static function fake($disk)
     {
-        (new Filesystem)->cleanDirectory(
-            $root = storage_path('framework/testing/disks/'.$disk)
-        );
+        $rootPath = storage_path('framework/testing/disks/' . $disk);
 
-        static::set($disk, self::createLocalDriver(['root' => $root]));
+        if (static::$doesntWantOldFiles) {
+            (new Filesystem)->cleanDirectory($rootPath);
+        }
+
+        static::set($disk, self::createLocalDriver(['root' => $rootPath]));
     }
 
     /**
