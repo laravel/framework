@@ -5,10 +5,13 @@ namespace Illuminate\Database\Schema;
 use Closure;
 use Illuminate\Support\Fluent;
 use Illuminate\Database\Connection;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Database\Schema\Grammars\Grammar;
 
 class Blueprint
 {
+    use Macroable;
+
     /**
      * The table the blueprint describes.
      *
