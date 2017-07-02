@@ -67,7 +67,17 @@ class SupportArrTest extends TestCase
         );
 
         // With 1 empty dimension
+        $this->assertEquals([], Arr::crossJoin([], ['a', 'b'], ['I', 'II', 'III']));
         $this->assertEquals([], Arr::crossJoin([1, 2], [], ['I', 'II', 'III']));
+        $this->assertEquals([], Arr::crossJoin([1, 2], ['a', 'b'], []));
+
+        // With empty arrays
+        $this->assertEquals([], Arr::crossJoin([], [], []));
+        $this->assertEquals([], Arr::crossJoin([], []));
+        $this->assertEquals([], Arr::crossJoin([]));
+
+        // Not really a proper usage, still, test for preserving BC
+        $this->assertEquals([[]], Arr::crossJoin());
     }
 
     public function testDivide()
