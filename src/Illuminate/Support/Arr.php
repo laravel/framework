@@ -73,12 +73,15 @@ class Arr
 
         foreach ($arrays as $index => $array) {
             $append = [];
+
             foreach ($results as $product) {
                 foreach ($array as $item) {
                     $product[$index] = $item;
+
                     $append[] = $product;
                 }
             }
+
             $results = $append;
         }
 
