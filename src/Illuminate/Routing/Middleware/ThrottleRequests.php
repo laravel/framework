@@ -38,6 +38,7 @@ class ThrottleRequests
      * @param  int|string  $maxAttempts
      * @param  float|int  $decayMinutes
      * @return mixed
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
     public function handle($request, Closure $next, $maxAttempts = 60, $decayMinutes = 1)
     {
@@ -46,7 +47,7 @@ class ThrottleRequests
         $maxAttempts = $this->resolveMaxAttempts($request, $maxAttempts);
 
         if ($this->limiter->tooManyAttempts($key, $maxAttempts, $decayMinutes)) {
-            $this->buildException($key, $maxAttempts);
+            throw $this->buildException($key, $maxAttempts);
         }
 
         $this->limiter->hit($key, $decayMinutes);
@@ -100,8 +101,7 @@ class ThrottleRequests
      *
      * @param  string  $key
      * @param  int  $maxAttempts
-     * @return void
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @return \Symfony\Component\HttpKernel\Exception\HttpException
      */
     protected function buildException($key, $maxAttempts)
     {
@@ -113,7 +113,7 @@ class ThrottleRequests
             $retryAfter
         );
 
-        throw new HttpException(429, 'Too Many Attempts.', null, $headers);
+        return new HttpException(429, 'Too Many Attempts.', null, $headers);
     }
 
     /**
