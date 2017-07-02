@@ -6,9 +6,11 @@ use Closure;
 use Illuminate\Support\Fluent;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Grammars\Grammar;
+use Illuminate\Support\Traits\Macroable;
 
 class Blueprint
 {
+    use Macroable;
     /**
      * The table the blueprint describes.
      *
