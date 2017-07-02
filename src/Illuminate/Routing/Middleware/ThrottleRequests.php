@@ -68,8 +68,7 @@ class ThrottleRequests
     protected function resolveMaxAttempts($request, $maxAttempts)
     {
         if (Str::contains($maxAttempts, '|')) {
-            $parts = explode('|', $maxAttempts, 2);
-            $maxAttempts = $parts[$request->user() ? 1 : 0];
+            $maxAttempts = explode('|', $maxAttempts, 2)[$request->user() ? 1 : 0];
         }
 
         return (int) $maxAttempts;
