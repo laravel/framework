@@ -6,7 +6,6 @@ use DateTime;
 use stdClass;
 use Exception;
 use Mockery as m;
-use LogicException;
 use ReflectionClass;
 use DateTimeImmutable;
 use DateTimeInterface;

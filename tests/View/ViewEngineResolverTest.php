@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\View;
 
 use stdClass;
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 class ViewEngineResolverTest extends TestCase
