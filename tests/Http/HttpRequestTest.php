@@ -656,7 +656,8 @@ class HttpRequestTest extends TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Session store not set on request.
      */
     public function testSessionMethod()
     {
@@ -687,7 +688,8 @@ class HttpRequestTest extends TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Unable to generate fingerprint. Route unavailable.
      */
     public function testFingerprintWithoutRoute()
     {

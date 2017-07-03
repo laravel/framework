@@ -382,7 +382,7 @@ class ViewFactoryTest extends TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testExceptionIsThrownForUnknownExtension()
     {
@@ -392,7 +392,7 @@ class ViewFactoryTest extends TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException \Exception
      * @expectedExceptionMessage section exception message
      */
     public function testExceptionsInSectionsAreThrown()
@@ -412,7 +412,7 @@ class ViewFactoryTest extends TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Cannot end a section without first starting one.
      */
     public function testExtraStopSectionCallThrowsException()
@@ -425,7 +425,7 @@ class ViewFactoryTest extends TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Cannot end a section without first starting one.
      */
     public function testExtraAppendSectionCallThrowsException()

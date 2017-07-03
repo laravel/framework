@@ -563,7 +563,8 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
     }
 
     /**
-     * @expectedException BadMethodCallException
+     * @expectedException \BadMethodCallException
+     * @expectedExceptionMessage Call to undefined method Illuminate\Database\Query\Builder::thisMethodDoesNotExist()
      */
     public function testMorphToWithBadMethodCall()
     {

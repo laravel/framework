@@ -170,6 +170,7 @@ class RouteRegistrarTest extends TestCase
 
     /**
      * @expectedException \BadMethodCallException
+     * @expectedExceptionMessage Method [missing] does not exist.
      */
     public function testRegisteringNonApprovedAttributesThrows()
     {

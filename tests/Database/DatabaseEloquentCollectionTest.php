@@ -351,6 +351,7 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     /**
      * @expectedException \LogicException
+     * @expectedExceptionMessage Queueing collections with multiple model types is not supported.
      */
     public function testQueueableCollectionImplementationThrowsExceptionOnMultipleModelTypes()
     {

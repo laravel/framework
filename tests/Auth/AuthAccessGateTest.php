@@ -13,7 +13,8 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 class GateTest extends TestCase
 {
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Callback must be a callable or a 'Class@method'
      */
     public function test_gate_throws_exception_on_invalid_callback_type()
     {
@@ -276,6 +277,7 @@ class GateTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Auth\Access\AuthorizationException
+     * @expectedExceptionMessage You are not an admin.
      */
     public function test_authorize_throws_unauthorized_exception()
     {

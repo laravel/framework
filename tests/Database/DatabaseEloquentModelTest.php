@@ -918,6 +918,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Database\Eloquent\MassAssignmentException
+     * @expectedExceptionMessage name
      */
     public function testGlobalGuarded()
     {
@@ -1294,7 +1295,8 @@ class DatabaseEloquentModelTest extends TestCase
     }
 
     /**
-     * @expectedException LogicException
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Illuminate\Tests\Database\EloquentModelStub::incorrectRelationStub must return a relationship instance.
      */
     public function testGetModelAttributeMethodThrowsExceptionIfNotRelation()
     {
@@ -1541,6 +1543,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Database\Eloquent\JsonEncodingException
+     * @expectedExceptionMessage Unable to encode attribute [objectAttribute] for model [Illuminate\Tests\Database\EloquentModelCastingStub] to JSON: Malformed UTF-8 characters, possibly incorrectly encoded.
      */
     public function testModelAttributeCastingFailsOnUnencodableData()
     {

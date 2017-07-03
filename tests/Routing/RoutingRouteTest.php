@@ -481,6 +481,7 @@ class RoutingRouteTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @expectedExceptionMessage
      */
     public function testRoutesDontMatchNonMatchingPathsWithLeadingOptionals()
     {
@@ -493,6 +494,7 @@ class RoutingRouteTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @expectedExceptionMessage
      */
     public function testRoutesDontMatchNonMatchingDomain()
     {
@@ -733,6 +735,7 @@ class RoutingRouteTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @expectedExceptionMessage No query results for model [Illuminate\Tests\Routing\RouteModelBindingNullStub].
      */
     public function testModelBindingWithNullReturn()
     {
@@ -987,7 +990,8 @@ class RoutingRouteTest extends TestCase
     }
 
     /**
-     * @expectedException UnexpectedValueException
+     * @expectedException \UnexpectedValueException
+     * @expectedExceptionMessage Invalid route action: [Illuminate\Tests\Routing\RouteTestControllerStub].
      */
     public function testInvalidActionException()
     {
@@ -1296,6 +1300,7 @@ class RoutingRouteTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @expectedExceptionMessage
      */
     public function testImplicitBindingsWithOptionalParameterWithNonExistingKeyInUri()
     {

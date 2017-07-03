@@ -35,7 +35,8 @@ class FoundationHelpersTest extends TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException \Exception
+     * @expectedExceptionMessage You must specify an expiration time when setting a value in the cache.
      */
     public function testCacheThrowsAnExceptionIfAnExpirationIsNotProvided()
     {

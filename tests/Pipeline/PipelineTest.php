@@ -133,6 +133,7 @@ class PipelineTest extends TestCase
 
     /**
      * @expectedException \RuntimeException
+     * @expectedExceptionMessage A container instance has not been passed to the Pipeline.
      */
     public function testPipelineThrowsExceptionOnResolveWithoutContainer()
     {

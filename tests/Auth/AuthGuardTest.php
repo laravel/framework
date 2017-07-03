@@ -168,6 +168,7 @@ class AuthGuardTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Auth\AuthenticationException
+     * @expectedExceptionMessage Unauthenticated.
      */
     public function testAuthenticateThrowsWhenUserIsNull()
     {

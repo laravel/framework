@@ -66,6 +66,7 @@ class ValidationValidatorTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Validation\ValidationException
+     * @expectedExceptionMessage The given data failed to pass validation.
      */
     public function testValidateThrowsOnFail()
     {
@@ -2599,7 +2600,8 @@ class ValidationValidatorTest extends TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Validation rule required_if requires at least 2 parameters.
      */
     public function testExceptionThrownOnIncorrectParameterCount()
     {

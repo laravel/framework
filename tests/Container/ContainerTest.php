@@ -493,7 +493,8 @@ class ContainerTest extends TestCase
     }
 
     /**
-     * @expectedException ReflectionException
+     * @expectedException \ReflectionException
+     * @expectedExceptionMessage Function ContainerTestCallStub() does not exist
      */
     public function testCallWithAtSignBasedClassReferencesWithoutMethodThrowsException()
     {
@@ -986,6 +987,7 @@ class ContainerTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Container\EntryNotFoundException
+     * @expectedExceptionMessage
      */
     public function testUnknownEntryThrowsException()
     {

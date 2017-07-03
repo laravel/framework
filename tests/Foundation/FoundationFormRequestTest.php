@@ -37,6 +37,7 @@ class FoundationFormRequestTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Validation\ValidationException
+     * @expectedExceptionMessage The given data failed to pass validation.
      */
     public function test_validate_throws_when_validation_fails()
     {
@@ -49,6 +50,7 @@ class FoundationFormRequestTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Auth\Access\AuthorizationException
+     * @expectedExceptionMessage This action is unauthorized.
      */
     public function test_validate_method_throws_when_authorization_fails()
     {
