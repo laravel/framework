@@ -3,9 +3,9 @@
 namespace Illuminate\Session\Middleware;
 
 use Closure;
-use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Session\SessionManager;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Session\CookieSessionHandler;
@@ -177,7 +177,7 @@ class StartSession
             $response->headers->setCookie(new Cookie(
                 $session->getName(), $session->getId(), $this->getCookieExpirationDate(),
                 $config['path'], $config['domain'], Arr::get($config, 'secure', false),
-                Arr::get($config, 'http_only', true)
+                Arr::get($config, 'http_only', true), false, $config['same_site'] ?? null
             ));
         }
     }

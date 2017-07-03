@@ -35,4 +35,20 @@ class MySqlBuilder extends Builder
 
         return $this->connection->getPostProcessor()->processColumnListing($results);
     }
+
+    /**
+     * Drop all tables from the database.
+     *
+     * @return void
+     */
+    public function dropAllTables()
+    {
+        $this->disableForeignKeyConstraints();
+
+        foreach ($this->connection->select('SHOW TABLES') as $table) {
+            $this->drop(get_object_vars($table)[key($table)]);
+        }
+
+        $this->enableForeignKeyConstraints();
+    }
 }

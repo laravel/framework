@@ -18,7 +18,7 @@ class RouteCollectionTest extends TestCase
     {
         parent::setUp();
 
-        $this->routeCollection = new RouteCollection();
+        $this->routeCollection = new RouteCollection;
     }
 
     public function testRouteCollectionCanBeConstructed()

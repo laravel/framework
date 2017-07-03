@@ -14,7 +14,7 @@ class CacheMemcachedStoreTest extends TestCase
             $this->markTestSkipped('Memcached module not installed');
         }
 
-        $memcache = $this->getMockBuilder('StdClass')->setMethods(['get', 'getResultCode'])->getMock();
+        $memcache = $this->getMockBuilder('stdClass')->setMethods(['get', 'getResultCode'])->getMock();
         $memcache->expects($this->once())->method('get')->with($this->equalTo('foo:bar'))->will($this->returnValue(null));
         $memcache->expects($this->once())->method('getResultCode')->will($this->returnValue(1));
         $store = new MemcachedStore($memcache, 'foo');
@@ -27,7 +27,7 @@ class CacheMemcachedStoreTest extends TestCase
             $this->markTestSkipped('Memcached module not installed');
         }
 
-        $memcache = $this->getMockBuilder('StdClass')->setMethods(['get', 'getResultCode'])->getMock();
+        $memcache = $this->getMockBuilder('stdClass')->setMethods(['get', 'getResultCode'])->getMock();
         $memcache->expects($this->once())->method('get')->will($this->returnValue('bar'));
         $memcache->expects($this->once())->method('getResultCode')->will($this->returnValue(0));
         $store = new MemcachedStore($memcache);
@@ -40,7 +40,7 @@ class CacheMemcachedStoreTest extends TestCase
             $this->markTestSkipped('Memcached module not installed');
         }
 
-        $memcache = $this->getMockBuilder('StdClass')->setMethods(['getMulti', 'getResultCode'])->getMock();
+        $memcache = $this->getMockBuilder('stdClass')->setMethods(['getMulti', 'getResultCode'])->getMock();
         $memcache->expects($this->once())->method('getMulti')->with(
             ['foo:foo', 'foo:bar', 'foo:baz']
         )->will($this->returnValue([
@@ -63,12 +63,12 @@ class CacheMemcachedStoreTest extends TestCase
             $this->markTestSkipped('Memcached module not installed');
         }
 
-        \Carbon\Carbon::setTestNow($now = \Carbon\Carbon::now());
+        \Illuminate\Support\Carbon::setTestNow($now = \Illuminate\Support\Carbon::now());
         $memcache = $this->getMockBuilder('Memcached')->setMethods(['set'])->getMock();
         $memcache->expects($this->once())->method('set')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo($now->timestamp + 60));
         $store = new MemcachedStore($memcache);
         $store->put('foo', 'bar', 1);
-        \Carbon\Carbon::setTestNow();
+        \Illuminate\Support\Carbon::setTestNow();
     }
 
     public function testIncrementMethodProperlyCallsMemcache()
@@ -138,7 +138,7 @@ class CacheMemcachedStoreTest extends TestCase
             $this->markTestSkipped('Memcached module not installed');
         }
 
-        $store = new MemcachedStore(new Memcached(), 'bar');
+        $store = new MemcachedStore(new Memcached, 'bar');
         $this->assertEquals('bar:', $store->getPrefix());
         $store->setPrefix('foo');
         $this->assertEquals('foo:', $store->getPrefix());

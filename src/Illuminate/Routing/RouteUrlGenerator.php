@@ -111,7 +111,7 @@ class RouteUrlGenerator
      */
     protected function getRouteDomain($route, &$parameters)
     {
-        return $route->domain() ? $this->formatDomain($route, $parameters) : null;
+        return $route->getDomain() ? $this->formatDomain($route, $parameters) : null;
     }
 
     /**
@@ -124,7 +124,7 @@ class RouteUrlGenerator
     protected function formatDomain($route, &$parameters)
     {
         return $this->addPortToDomain(
-            $this->getRouteScheme($route).$route->domain()
+            $this->getRouteScheme($route).$route->getDomain()
         );
     }
 

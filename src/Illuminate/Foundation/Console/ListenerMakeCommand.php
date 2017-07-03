@@ -34,13 +34,13 @@ class ListenerMakeCommand extends GeneratorCommand
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
         if (! $this->option('event')) {
             return $this->error('Missing required option: --event');
         }
 
-        parent::fire();
+        parent::handle();
     }
 
     /**
@@ -53,8 +53,11 @@ class ListenerMakeCommand extends GeneratorCommand
     {
         $event = $this->option('event');
 
-        if (! Str::startsWith($event, $this->laravel->getNamespace()) &&
-            ! Str::startsWith($event, 'Illuminate')) {
+        if (! Str::startsWith($event, [
+            $this->laravel->getNamespace(),
+            'Illuminate',
+            '\\',
+        ])) {
             $event = $this->laravel->getNamespace().'Events\\'.$event;
         }
 

@@ -16,7 +16,7 @@ class DatabaseConnectionTest extends TestCase
     public function testSettingDefaultCallsGetDefaultGrammar()
     {
         $connection = $this->getMockConnection();
-        $mock = m::mock('StdClass');
+        $mock = m::mock('stdClass');
         $connection->expects($this->once())->method('getDefaultQueryGrammar')->will($this->returnValue($mock));
         $connection->useDefaultQueryGrammar();
         $this->assertEquals($mock, $connection->getQueryGrammar());
@@ -25,7 +25,7 @@ class DatabaseConnectionTest extends TestCase
     public function testSettingDefaultCallsGetDefaultPostProcessor()
     {
         $connection = $this->getMockConnection();
-        $mock = m::mock('StdClass');
+        $mock = m::mock('stdClass');
         $connection->expects($this->once())->method('getDefaultPostProcessor')->will($this->returnValue($mock));
         $connection->useDefaultPostProcessor();
         $this->assertEquals($mock, $connection->getPostProcessor());
@@ -225,6 +225,7 @@ class DatabaseConnectionTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Database\QueryException
+     * @expectedExceptionMessage Deadlock found when trying to get lock (SQL: )
      */
     public function testTransactionMethodRetriesOnDeadlock()
     {
@@ -256,6 +257,7 @@ class DatabaseConnectionTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Database\QueryException
+     * @expectedExceptionMessage server has gone away (SQL: foo)
      */
     public function testOnLostConnectionPDOIsNotSwappedWithinATransaction()
     {
@@ -309,6 +311,7 @@ class DatabaseConnectionTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Database\QueryException
+     * @expectedExceptionMessage  (SQL: ) (SQL: )
      */
     public function testRunMethodNeverRetriesIfWithinTransaction()
     {

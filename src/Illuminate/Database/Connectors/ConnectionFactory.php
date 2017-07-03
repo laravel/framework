@@ -138,7 +138,7 @@ class ConnectionFactory
     protected function getReadWriteConfig(array $config, $type)
     {
         return isset($config[$type][0])
-                        ? $config[$type][array_rand($config[$type])]
+                        ? Arr::random($config[$type])
                         : $config[$type];
     }
 
@@ -200,7 +200,7 @@ class ConnectionFactory
      */
     protected function parseHosts(array $config)
     {
-        $hosts = array_wrap($config['host']);
+        $hosts = Arr::wrap($config['host']);
 
         if (empty($hosts)) {
             throw new InvalidArgumentException('Database hosts array is empty.');

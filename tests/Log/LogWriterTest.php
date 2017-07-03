@@ -66,7 +66,8 @@ class LogWriterTest extends TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Events dispatcher has not been set.
      */
     public function testListenShortcutFailsWithNoDispatcher()
     {

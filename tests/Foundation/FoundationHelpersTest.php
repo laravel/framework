@@ -16,10 +16,10 @@ class FoundationHelpersTest extends TestCase
     public function testCache()
     {
         $app = new Application;
-        $app['cache'] = $cache = m::mock('StdClass');
+        $app['cache'] = $cache = m::mock('stdClass');
 
         // 1. cache()
-        $this->assertInstanceOf('StdClass', cache());
+        $this->assertInstanceOf('stdClass', cache());
 
         // 2. cache(['foo' => 'bar'], 1);
         $cache->shouldReceive('put')->once()->with('foo', 'bar', 1);
@@ -35,7 +35,8 @@ class FoundationHelpersTest extends TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException \Exception
+     * @expectedExceptionMessage You must specify an expiration time when setting a value in the cache.
      */
     public function testCacheThrowsAnExceptionIfAnExpirationIsNotProvided()
     {

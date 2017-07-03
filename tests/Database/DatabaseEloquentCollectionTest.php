@@ -154,7 +154,7 @@ class DatabaseEloquentCollectionTest extends TestCase
     public function testLoadMethodEagerLoadsGivenRelationships()
     {
         $c = $this->getMockBuilder('Illuminate\Database\Eloquent\Collection')->setMethods(['first'])->setConstructorArgs([['foo']])->getMock();
-        $mockItem = m::mock('StdClass');
+        $mockItem = m::mock('stdClass');
         $c->expects($this->once())->method('first')->will($this->returnValue($mockItem));
         $mockItem->shouldReceive('newQuery')->once()->andReturn($mockItem);
         $mockItem->shouldReceive('with')->with(['bar', 'baz'])->andReturn($mockItem);
@@ -351,11 +351,18 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     /**
      * @expectedException \LogicException
+     * @expectedExceptionMessage Queueing collections with multiple model types is not supported.
      */
     public function testQueueableCollectionImplementationThrowsExceptionOnMultipleModelTypes()
     {
         $c = new Collection([new TestEloquentCollectionModel, (object) ['id' => 'something']]);
         $c->getQueueableClass();
+    }
+
+    public function testEmptyCollectionStayEmptyOnFresh()
+    {
+        $c = new Collection();
+        $this->assertEquals($c, $c->fresh());
     }
 }
 

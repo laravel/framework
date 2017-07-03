@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Queue;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Queue\DatabaseQueue;

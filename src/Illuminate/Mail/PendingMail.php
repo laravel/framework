@@ -9,7 +9,7 @@ class PendingMail
     /**
      * The mailer instance.
      *
-     * @var array
+     * @var \Illuminate\Mail\Mailer
      */
     protected $mailer;
 

@@ -407,7 +407,7 @@ class Route
      */
     protected function compileParameterNames()
     {
-        preg_match_all('/\{(.*?)\}/', $this->domain().$this->uri, $matches);
+        preg_match_all('/\{(.*?)\}/', $this->getDomain().$this->uri, $matches);
 
         return array_map(function ($m) {
             return trim($m, '?');
@@ -523,11 +523,28 @@ class Route
     }
 
     /**
+     * Get or set the domain for the route.
+     *
+     * @param  string|null  $domain
+     * @return $this|string|null
+     */
+    public function domain($domain = null)
+    {
+        if (is_null($domain)) {
+            return $this->getDomain();
+        }
+
+        $this->action['domain'] = $domain;
+
+        return $this;
+    }
+
+    /**
      * Get the domain defined for the route.
      *
      * @return string|null
      */
-    public function domain()
+    public function getDomain()
     {
         return isset($this->action['domain'])
                 ? str_replace(['http://', 'https://'], '', $this->action['domain']) : null;
@@ -605,14 +622,24 @@ class Route
     }
 
     /**
-     * Determine whether the route's name matches the given name.
+     * Determine whether the route's name matches the given patterns.
      *
-     * @param  string  $name
+     * @param  dynamic  $patterns
      * @return bool
      */
-    public function named($name)
+    public function named(...$patterns)
     {
-        return $this->getName() === $name;
+        if (is_null($routeName = $this->getName())) {
+            return false;
+        }
+
+        foreach ($patterns as $pattern) {
+            if (Str::is($pattern, $routeName)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -665,7 +692,7 @@ class Route
      */
     public function getActionMethod()
     {
-        return array_last(explode('@', $this->getActionName()));
+        return Arr::last(explode('@', $this->getActionName()));
     }
 
     /**

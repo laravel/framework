@@ -2,17 +2,46 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
+use Illuminate\Support\Arr;
 use PHPUnit\Framework\Assert as PHPUnit;
 use Illuminate\Contracts\Events\Dispatcher;
 
 class EventFake implements Dispatcher
 {
     /**
-     * All of the events that have been dispatched keyed by type.
+     * The original event dispatcher.
+     *
+     * @var \Illuminate\Contracts\Events\Dispatcher
+     */
+    protected $dispatcher;
+
+    /**
+     * The event types that should be intercepted instead of dispatched.
+     *
+     * @var array
+     */
+    protected $eventsToFake;
+
+    /**
+     * All of the events that have been intercepted keyed by type.
      *
      * @var array
      */
     protected $events = [];
+
+    /**
+     * Create a new event fake instance.
+     *
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
+     * @param  array|string  $eventsToFake
+     * @return void
+     */
+    public function __construct(Dispatcher $dispatcher, $eventsToFake = [])
+    {
+        $this->dispatcher = $dispatcher;
+
+        $this->eventsToFake = Arr::wrap($eventsToFake);
+    }
 
     /**
      * Assert if an event was dispatched based on a truth-test callback.
@@ -159,7 +188,22 @@ class EventFake implements Dispatcher
     {
         $name = is_object($event) ? get_class($event) : (string) $event;
 
-        $this->events[$name][] = func_get_args();
+        if ($this->shouldFakeEvent($name)) {
+            $this->events[$name][] = func_get_args();
+        } else {
+            $this->dispatcher->dispatch($event, $payload, $halt);
+        }
+    }
+
+    /**
+     * Determine if an event should be faked or actually dispatched.
+     *
+     * @param  string  $eventName
+     * @return bool
+     */
+    protected function shouldFakeEvent($eventName)
+    {
+        return empty($this->eventsToFake) || in_array($eventName, $this->eventsToFake);
     }
 
     /**

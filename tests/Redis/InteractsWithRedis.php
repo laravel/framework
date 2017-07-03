@@ -72,4 +72,13 @@ trait InteractsWithRedis
 
         return $providers;
     }
+
+    public function ifRedisAvailable($callback)
+    {
+        $this->setUpRedis();
+
+        $callback();
+
+        $this->tearDownRedis();
+    }
 }

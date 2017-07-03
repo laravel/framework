@@ -113,7 +113,9 @@ class BroadcastManager implements FactoryContract
 
         $queue = null;
 
-        if (isset($event->broadcastQueue)) {
+        if (method_exists($event, 'broadcastQueue')) {
+            $queue = $event->broadcastQueue();
+        } elseif (isset($event->broadcastQueue)) {
             $queue = $event->broadcastQueue;
         } elseif (isset($event->queue)) {
             $queue = $event->queue;

@@ -202,6 +202,18 @@ class FormRequest extends Request implements ValidatesWhenResolved
     }
 
     /**
+     * Get the validated data from the request.
+     *
+     * @return array
+     */
+    public function validated()
+    {
+        return $this->only(array_keys(
+            $this->container->call([$this, 'rules'])
+        ));
+    }
+
+    /**
      * Get custom messages for validator errors.
      *
      * @return array

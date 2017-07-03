@@ -2,7 +2,7 @@
 
 namespace Illuminate\Notifications\Messages;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 
 class SlackAttachment
 {
@@ -61,6 +61,13 @@ class SlackAttachment
      * @var string
      */
     public $imageUrl;
+
+    /**
+     * The attachment's thumb url.
+     *
+     * @var string
+     */
+    public $thumbUrl;
 
     /**
      * The attachment's footer.
@@ -196,6 +203,19 @@ class SlackAttachment
     public function image($url)
     {
         $this->imageUrl = $url;
+
+        return $this;
+    }
+
+    /**
+     * Set the URL to the attachment thumbnail.
+     *
+     * @param  string  $url
+     * @return $this
+     */
+    public function thumb($url)
+    {
+        $this->thumbUrl = $url;
 
         return $this;
     }

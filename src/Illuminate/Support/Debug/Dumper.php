@@ -16,7 +16,7 @@ class Dumper
     public function dump($value)
     {
         if (class_exists(CliDumper::class)) {
-            $dumper = 'cli' === PHP_SAPI ? new CliDumper : new HtmlDumper;
+            $dumper = in_array(PHP_SAPI, ['cli', 'phpdbg']) ? new CliDumper : new HtmlDumper;
 
             $dumper->dump((new VarCloner)->cloneVar($value));
         } else {

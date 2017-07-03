@@ -375,9 +375,15 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(1, $parameters, 'different');
 
-        $other = Arr::get($this->data, $parameters[0]);
+        foreach ($parameters as $parameter) {
+            $other = Arr::get($this->data, $parameter);
 
-        return isset($other) && $value !== $other;
+            if (is_null($other) || $value === $other) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -699,7 +705,7 @@ trait ValidatesAttributes
      */
     public function guessColumnForQuery($attribute)
     {
-        if (in_array($attribute, array_collapse($this->implicitAttributes))
+        if (in_array($attribute, Arr::collapse($this->implicitAttributes))
                 && ! is_numeric($last = last(explode('.', $attribute)))) {
             return $last;
         }

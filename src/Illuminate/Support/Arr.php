@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use ArrayAccess;
+use InvalidArgumentException;
 use Illuminate\Support\Traits\Macroable;
 
 class Arr
@@ -436,6 +437,38 @@ class Arr
         static::forget($array, $key);
 
         return $value;
+    }
+
+    /**
+     * Get a random value from an array.
+     *
+     * @param  array  $array
+     * @param  int|null  $amount
+     * @return mixed
+     *
+     * @throws \InvalidArgumentException
+     */
+    public static function random($array, $amount = null)
+    {
+        if (($requested = $amount ?: 1) > ($count = count($array))) {
+            throw new InvalidArgumentException(
+                "You requested {$requested} items, but there are only {$count} items in the array."
+            );
+        }
+
+        if (is_null($amount)) {
+            return $array[array_rand($array)];
+        }
+
+        $keys = array_rand($array, $amount);
+
+        $results = [];
+
+        foreach ((array) $keys as $key) {
+            $results[] = $array[$key];
+        }
+
+        return $results;
     }
 
     /**

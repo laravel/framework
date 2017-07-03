@@ -30,7 +30,7 @@ class KeyGenerateCommand extends Command
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
         $key = $this->generateRandomKey();
 

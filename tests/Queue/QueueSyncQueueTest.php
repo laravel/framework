@@ -56,6 +56,11 @@ class SyncQueueTestEntity implements \Illuminate\Contracts\Queue\QueueableEntity
     {
         return 1;
     }
+
+    public function getQueueableConnection()
+    {
+        return null;
+    }
 }
 
 class SyncQueueTestHandler
@@ -70,7 +75,7 @@ class FailingSyncQueueTestHandler
 {
     public function fire($job, $data)
     {
-        throw new Exception();
+        throw new Exception;
     }
 
     public function failed()

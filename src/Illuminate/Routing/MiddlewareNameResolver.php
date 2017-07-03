@@ -12,7 +12,7 @@ class MiddlewareNameResolver
      * @param  string  $name
      * @param  array  $map
      * @param  array  $middlewareGroups
-     * @return string|array
+     * @return \Closure|string|array
      */
     public static function resolve($name, $map, $middlewareGroups)
     {

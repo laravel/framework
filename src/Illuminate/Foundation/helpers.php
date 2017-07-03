@@ -5,6 +5,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Foundation\Bus\PendingDispatch;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Contracts\View\Factory as ViewFactory;
@@ -371,11 +372,25 @@ if (! function_exists('dispatch')) {
      * Dispatch a job to its appropriate handler.
      *
      * @param  mixed  $job
-     * @return mixed
+     * @return \Illuminate\Foundation\Bus\PendingDispatch
      */
     function dispatch($job)
     {
-        return app(Dispatcher::class)->dispatch($job);
+        return new PendingDispatch($job);
+    }
+}
+
+if (! function_exists('dispatch_now')) {
+    /**
+     * Dispatch a command to its appropriate handler in the current process.
+     *
+     * @param  mixed  $job
+     * @param  mixed  $handler
+     * @return mixed
+     */
+    function dispatch_now($job, $handler = null)
+    {
+        return app(Dispatcher::class)->dispatchNow($job, $handler);
     }
 }
 
@@ -526,6 +541,44 @@ if (! function_exists('mix')) {
     function mix($path, $manifestDirectory = '')
     {
         return app('mix')->resolve($path, $manifestDirectory);
+
+        // old function :
+        static $manifests = [];
+
+        if (! starts_with($path, '/')) {
+            $path = "/{$path}";
+        }
+
+        if ($manifestDirectory && ! starts_with($manifestDirectory, '/')) {
+            $manifestDirectory = "/{$manifestDirectory}";
+        }
+
+        $manifestKey = $manifestDirectory ? $manifestDirectory : '/';
+
+        if (file_exists(public_path($manifestDirectory.'/hot'))) {
+            return new HtmlString("//localhost:8080{$path}");
+        }
+
+        if (in_array($manifestKey, $manifests)) {
+            $manifest = $manifests[$manifestKey];
+        } else {
+            if (! file_exists($manifestPath = public_path($manifestDirectory.'/mix-manifest.json'))) {
+                throw new Exception('The Mix manifest does not exist.');
+            }
+
+            $manifests[$manifestKey] = $manifest = json_decode(
+                file_get_contents($manifestPath), true
+            );
+        }
+
+        if (! array_key_exists($path, $manifest)) {
+            throw new Exception(
+                "Unable to locate Mix file: {$path}. Please check your ".
+                'webpack.mix.js output paths and try again.'
+            );
+        }
+
+        return new HtmlString($manifestDirectory.$manifest[$path]);
     }
 }
 
@@ -567,7 +620,7 @@ if (! function_exists('public_path')) {
      */
     function public_path($path = '')
     {
-        return app()->make('path.public').($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return app()->make('path.public').($path ? DIRECTORY_SEPARATOR.ltrim($path, DIRECTORY_SEPARATOR) : $path);
     }
 }
 
@@ -609,7 +662,9 @@ if (! function_exists('request')) {
             return app('request')->only($key);
         }
 
-        return data_get(app('request')->all(), $key, $default);
+        $value = app('request')->__get($key);
+
+        return is_null($value) ? value($default) : $value;
     }
 }
 
