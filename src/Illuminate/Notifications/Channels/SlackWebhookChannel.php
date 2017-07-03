@@ -81,6 +81,7 @@ class SlackWebhookChannel
     {
         return collect($message->attachments)->map(function ($attachment) use ($message) {
             return array_filter([
+                'callback_id' => $attachment->callbackId,
                 'color' => $attachment->color ?: $message->color(),
                 'fallback' => $attachment->fallback,
                 'fields' => $this->fields($attachment),
