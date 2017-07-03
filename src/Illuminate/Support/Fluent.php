@@ -4,11 +4,16 @@ namespace Illuminate\Support;
 
 use ArrayAccess;
 use JsonSerializable;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 
 class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
 {
+    use Macroable {
+        Macroable::__call as macroCall;
+    }
+
     /**
      * All of the attributes set on the container.
      *
@@ -136,10 +141,14 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
      *
      * @param  string  $method
      * @param  array   $parameters
-     * @return $this
+     * @return mixed|$this
      */
     public function __call($method, $parameters)
     {
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
+        }
+
         $this->attributes[$method] = count($parameters) > 0 ? $parameters[0] : true;
 
         return $this;
