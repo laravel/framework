@@ -39,7 +39,11 @@ class RouteAction
             $action['uses'] = static::findCallable($action);
         }
 
-        if (is_string($action['uses']) && ! Str::contains($action['uses'], '@')) {
+        if (! is_string($action['uses']) || static::actionReferencesView($action['uses'])) {
+            return $action;
+        }
+
+        if (! static::actionReferencesControllerMethod($action['uses'])) {
             $action['uses'] = static::makeInvokable($action['uses']);
         }
 
@@ -70,6 +74,32 @@ class RouteAction
         return Arr::first($action, function ($value, $key) {
             return is_callable($value) && is_numeric($key);
         });
+    }
+
+    /**
+     * Determine whether an action references a view.
+     *
+     * @param  mixed  $action
+     * @return bool
+     */
+    public static function actionReferencesView($action)
+    {
+        if (! is_string($action)) {
+            return false;
+        }
+
+        return Str::startsWith($action, 'view:');
+    }
+
+    /**
+     * Determine whether an action references a controller method.
+     *
+     * @param  string  $action
+     * @return bool
+     */
+    protected static function actionReferencesControllerMethod($action)
+    {
+        return Str::contains($action, '@');
     }
 
     /**

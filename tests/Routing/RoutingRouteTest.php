@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Routing;
 
+use Mockery;
 use stdClass;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
@@ -16,14 +17,23 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Auth\Middleware\Authorize;
 use Illuminate\Routing\ResourceRegistrar;
 use Illuminate\Contracts\Routing\Registrar;
+use Illuminate\View\Factory as ViewFactory;
 use Illuminate\Auth\Middleware\Authenticate;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Contracts\View\Factory as ViewFactoryContract;
 
 class RoutingRouteTest extends TestCase
 {
     public function testBasicDispatchingOfRoutes()
     {
+        $viewFactory = $this->getViewFactory();
+        $router = $this->getRouter();
+        $router->view('foo/bar', 'hello');
+        $request = Request::create('foo/bar', 'GET');
+        $viewFactory->shouldReceive('make')->once()->with('hello', Mockery::hasKey('request'));
+        $router->dispatch($request);
+
         $router = $this->getRouter();
         $router->get('foo/bar', function () {
             return 'hello';
@@ -1309,7 +1319,7 @@ class RoutingRouteTest extends TestCase
 
     protected function getRouter()
     {
-        $container = new Container;
+        $container = Container::getInstance();
 
         $router = new Router(new Dispatcher, $container);
 
@@ -1318,6 +1328,22 @@ class RoutingRouteTest extends TestCase
         });
 
         return $router;
+    }
+
+    protected function getViewFactory()
+    {
+        $container = Container::getInstance();
+
+        $viewFactory = Mockery::mock(ViewFactory::class);
+
+        $container->singleton(
+            ViewFactoryContract::class,
+            function () use ($viewFactory) {
+                return $viewFactory;
+            }
+        );
+
+        return $viewFactory;
     }
 }
 
