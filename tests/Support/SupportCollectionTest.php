@@ -902,21 +902,29 @@ class SupportCollectionTest extends TestCase
 
     public function testImplodeNice()
     {
+        // With key provided, returns imploded values at that key
         $data = new Collection([['name' => 'taylor', 'email' => 'foo'], ['name' => 'dayle', 'email' => 'bar'], ['name' => 'shawn', 'email' => 'baz']]);
         $this->assertEquals('foo, bar, and baz', $data->implodeNice('email'));
         $this->assertEquals('foo; bar; and baz', $data->implodeNice('email', ';'));
         $this->assertEquals('foo; bar; and, finally, baz', $data->implodeNice('email', ';','and, finally,'));
 
+        // Empty collection returns null
+        $data = new Collection([]);
+        $this->assertEquals(null, $data->implodeNice(''));
+
+        // Single item returns the only item as string
         $data = new Collection(['taylor']);
         $this->assertEquals('taylor', $data->implodeNice(''));
         $this->assertEquals('taylor', $data->implodeNice(','));
         $this->assertEquals('taylor', $data->implodeNice(',', 'and, finally,'));
 
+        // Two items are returned with no glue (only conjunction)
         $data = new Collection(['taylor', 'dayle']);
         $this->assertEquals('taylor and dayle', $data->implodeNice(''));
         $this->assertEquals('taylor and dayle', $data->implodeNice(','));
         $this->assertEquals('taylor and, finally, dayle', $data->implodeNice(',', 'and, finally,'));
 
+        // Three or more items are imploded with glue and conjunction 
         $data = new Collection(['taylor', 'dayle', 'shawn']);
         $this->assertEquals('taylor dayle and shawn', $data->implodeNice(''));
         $this->assertEquals('taylor, dayle, and shawn', $data->implodeNice(','));

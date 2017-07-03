@@ -692,7 +692,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             $values = $this->items;
         }
 
-        if (count($values) == 1) {
+        if (count($values) <= 1) {
             return array_shift($values);
         }
 
