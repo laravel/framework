@@ -2,7 +2,7 @@
 
 namespace Illuminate\Contracts\Console;
 
-interface Kernel
+interface Kernel extends Application
 {
     /**
      * Handle an incoming console command.
@@ -12,15 +12,6 @@ interface Kernel
      * @return int
      */
     public function handle($input, $output = null);
-
-    /**
-     * Run an Artisan console command by name.
-     *
-     * @param  string  $command
-     * @param  array  $parameters
-     * @return int
-     */
-    public function call($command, array $parameters = []);
 
     /**
      * Queue an Artisan console command by name.
@@ -37,11 +28,4 @@ interface Kernel
      * @return array
      */
     public function all();
-
-    /**
-     * Get the output for the last run command.
-     *
-     * @return string
-     */
-    public function output();
 }
