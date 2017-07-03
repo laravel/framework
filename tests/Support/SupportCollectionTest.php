@@ -272,6 +272,13 @@ class SupportCollectionTest extends TestCase
         $this->assertTrue(isset($c['name']));
     }
 
+    public function testClear()
+    {
+        $c = new Collection($values = ['foo' => 'bar', 'bar' => 'baz']);
+        $this->assertSame($values, $c->all());
+        $this->assertSame([], $c->clear()->all());
+    }
+
     public function testCountable()
     {
         $c = new Collection(['foo', 'bar']);
