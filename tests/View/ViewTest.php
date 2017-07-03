@@ -164,7 +164,8 @@ class ViewTest extends TestCase
     }
 
     /**
-     * @expectedException BadMethodCallException
+     * @expectedException \BadMethodCallException
+     * @expectedExceptionMessage Method [badMethodCall] does not exist on view.
      */
     public function testViewBadMethod()
     {

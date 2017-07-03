@@ -104,7 +104,7 @@ class ModelSerializationTest extends TestCase
 
     /**
      * @test
-     * @expectedException LogicException
+     * @expectedException \LogicException
      * @expectedExceptionMessage  Queueing collections with multiple model connections is not supported.
      */
     public function it_fails_if_models_on_multi_connections()

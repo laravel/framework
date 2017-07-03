@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\View;
 
 use stdClass;
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 class ViewEngineResolverTest extends TestCase
@@ -20,7 +19,7 @@ class ViewEngineResolverTest extends TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testResolverThrowsExceptionOnUnknownEngine()
     {

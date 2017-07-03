@@ -75,7 +75,7 @@ class HttpJsonResponseTest extends TestCase
     }
 
     /**
-     * @expectedException        \InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Type is not supported
      */
     public function testJsonErrorResource()
