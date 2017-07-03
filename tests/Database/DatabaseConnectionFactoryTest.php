@@ -73,7 +73,8 @@ class DatabaseConnectionFactoryTest extends TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage A driver must be specified.
      */
     public function testIfDriverIsntSetExceptionIsThrown()
     {
@@ -82,7 +83,8 @@ class DatabaseConnectionFactoryTest extends TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Unsupported driver [foo]
      */
     public function testExceptionIsThrownOnUnsupportedDriver()
     {

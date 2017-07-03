@@ -225,6 +225,7 @@ class DatabaseConnectionTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Database\QueryException
+     * @expectedExceptionMessage Deadlock found when trying to get lock (SQL: )
      */
     public function testTransactionMethodRetriesOnDeadlock()
     {
@@ -256,6 +257,7 @@ class DatabaseConnectionTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Database\QueryException
+     * @expectedExceptionMessage server has gone away (SQL: foo)
      */
     public function testOnLostConnectionPDOIsNotSwappedWithinATransaction()
     {
@@ -309,6 +311,7 @@ class DatabaseConnectionTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Database\QueryException
+     * @expectedExceptionMessage  (SQL: ) (SQL: )
      */
     public function testRunMethodNeverRetriesIfWithinTransaction()
     {

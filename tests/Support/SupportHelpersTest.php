@@ -721,7 +721,7 @@ class SupportHelpersTest extends TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      */
     public function testThrow()
     {
@@ -729,7 +729,7 @@ class SupportHelpersTest extends TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      * @expectedExceptionMessage Test Message
      */
     public function testThrowWithString()

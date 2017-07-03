@@ -1789,7 +1789,8 @@ class DatabaseQueryBuilderTest extends TestCase
     }
 
     /**
-     * @expectedException BadMethodCallException
+     * @expectedException \BadMethodCallException
+     * @expectedExceptionMessage Call to undefined method Illuminate\Database\Query\Builder::noValidMethodHere()
      */
     public function testBuilderThrowsExpectedExceptionWithUndefinedMethod()
     {

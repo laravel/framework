@@ -941,7 +941,7 @@ class SupportCollectionTest extends TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testRandomThrowsAnErrorWhenRequestingMoreItemsThanAreAvailable()
     {
@@ -1827,7 +1827,7 @@ class SupportCollectionTest extends TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testRandomThrowsAnExceptionUsingAmountBiggerThanCollectionSize()
     {
