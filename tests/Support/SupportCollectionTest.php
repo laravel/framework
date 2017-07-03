@@ -900,6 +900,29 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals('taylor,dayle', $data->implode(','));
     }
 
+    public function testImplodeNice()
+    {
+        $data = new Collection([['name' => 'taylor', 'email' => 'foo'], ['name' => 'dayle', 'email' => 'bar'], ['name' => 'shawn', 'email' => 'baz']]);
+        $this->assertEquals('foo, bar, and baz', $data->implodeNice('email'));
+        $this->assertEquals('foo; bar; and baz', $data->implodeNice('email', ';'));
+        $this->assertEquals('foo; bar; and, finally, baz', $data->implodeNice('email', ';','and, finally,'));
+
+        $data = new Collection(['taylor']);
+        $this->assertEquals('taylor', $data->implodeNice(''));
+        $this->assertEquals('taylor', $data->implodeNice(','));
+        $this->assertEquals('taylor', $data->implodeNice(',', 'and, finally,'));
+
+        $data = new Collection(['taylor', 'dayle']);
+        $this->assertEquals('taylor and dayle', $data->implodeNice(''));
+        $this->assertEquals('taylor and dayle', $data->implodeNice(','));
+        $this->assertEquals('taylor and, finally, dayle', $data->implodeNice(',', 'and, finally,'));
+
+        $data = new Collection(['taylor', 'dayle', 'shawn']);
+        $this->assertEquals('taylor dayle and shawn', $data->implodeNice(''));
+        $this->assertEquals('taylor, dayle, and shawn', $data->implodeNice(','));
+        $this->assertEquals('taylor, dayle, and, finally, shawn', $data->implodeNice(',', 'and, finally,'));
+    }
+
     public function testTake()
     {
         $data = new Collection(['taylor', 'dayle', 'shawn']);
