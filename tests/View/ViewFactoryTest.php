@@ -231,6 +231,29 @@ class ViewFactoryTest extends TestCase
         $this->assertEquals('hi', $factory->yieldContent('foo'));
     }
 
+    public function testBasicSectionDefault()
+    {
+        $factory = $this->getFactory();
+        $factory->startSection('foo', 'hi');
+        $this->assertEquals('hi', $factory->yieldContent('foo'));
+    }
+
+    public function testBasicSectionDefaultIsEscaped()
+    {
+        $factory = $this->getFactory();
+        $factory->startSection('foo', '<p>hi</p>');
+        $this->assertEquals('&lt;p&gt;hi&lt;/p&gt;', $factory->yieldContent('foo'));
+    }
+
+    public function testBasicSectionDefaultViewIsNotEscapedTwice()
+    {
+        $factory = $this->getFactory();
+        $view = m::mock('Illuminate\View\View');
+        $view->shouldReceive('__toString')->once()->andReturn('<p>hi</p>&lt;p&gt;already escaped&lt;/p&gt;');
+        $factory->startSection('foo', $view);
+        $this->assertEquals('<p>hi</p>&lt;p&gt;already escaped&lt;/p&gt;', $factory->yieldContent('foo'));
+    }
+
     public function testSectionExtending()
     {
         $placeholder = \Illuminate\View\Factory::parentPlaceholder('foo');
