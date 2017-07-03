@@ -123,6 +123,18 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
+     * Register a new view route with the router.
+     *
+     * @param  string  $uri
+     * @param  string  $view
+     * @return \Illuminate\Routing\Route
+     */
+    public function view($uri, $view)
+    {
+        return $this->get($uri, "view:$view");
+    }
+
+    /**
      * Register a new GET route with the router.
      *
      * @param  string  $uri
@@ -369,10 +381,14 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     protected function createRoute($methods, $uri, $action)
     {
+        if (RouteAction::actionReferencesView($action)) {
+            $action = ['uses' => $action];
+        }
+
         // If the route is routing to a controller we will parse the route action into
         // an acceptable array format before registering it and creating this route
         // instance itself. We need to build the Closure that will call this out.
-        if ($this->actionReferencesController($action)) {
+        elseif ($this->actionReferencesController($action)) {
             $action = $this->convertToControllerAction($action);
         }
 

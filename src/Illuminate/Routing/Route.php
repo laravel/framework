@@ -14,6 +14,7 @@ use Illuminate\Routing\Matching\HostValidator;
 use Illuminate\Routing\Matching\MethodValidator;
 use Illuminate\Routing\Matching\SchemeValidator;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Contracts\View\Factory as ViewFactory;
 
 class Route
 {
@@ -156,6 +157,10 @@ class Route
         $this->container = $this->container ?: new Container;
 
         try {
+            if ($this->isView()) {
+                return $this->container->call([$this, 'executeView']);
+            }
+
             if ($this->isControllerAction()) {
                 return $this->runController();
             }
@@ -167,13 +172,23 @@ class Route
     }
 
     /**
+     * Checks whether the route's action is a view.
+     *
+     * @return bool
+     */
+    protected function isView()
+    {
+        return RouteAction::actionReferencesView($this->action['uses']);
+    }
+
+    /**
      * Checks whether the route's action is a controller.
      *
      * @return bool
      */
     protected function isControllerAction()
     {
-        return is_string($this->action['uses']);
+        return is_string($this->action['uses']) && ! $this->isView();
     }
 
     /**
@@ -202,6 +217,20 @@ class Route
         return (new ControllerDispatcher($this->container))->dispatch(
             $this, $this->getController(), $this->getControllerMethod()
         );
+    }
+
+    /**
+     * Run the route action and return the response.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function executeView(ViewFactory $viewFactory, Request $request)
+    {
+        $view = substr($this->action['uses'], strlen('view:'));
+
+        $data = compact('request') + $this->parameters;
+
+        return $viewFactory->make($view, $data);
     }
 
     /**
