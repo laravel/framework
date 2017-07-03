@@ -680,7 +680,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $first = $this->first();
 
         if (is_array($first) || is_object($first)) {
-            // Collection values are arrays, so get the values for the given key 
+            // Collection values are arrays, so get the values for the given key
             $values = $this->pluck($value)->all();
         } else {
             // Collection values are not arrays, so implode all collection values
@@ -688,7 +688,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
                 // Shift inputs, since $values is implicit
                 $conjunction = $glue;
             }
-            $glue   = $value;
+            $glue = $value;
             $values = $this->items;
         }
 
@@ -701,7 +701,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         $lastItem = array_pop($values);
-        return implode("$glue ", $values) . "{$glue} {$conjunction} " . $lastItem;
+        return implode("$glue ", $values)."{$glue} {$conjunction} ".$lastItem;
     }
 
     /**

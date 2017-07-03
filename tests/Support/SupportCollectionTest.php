@@ -906,7 +906,7 @@ class SupportCollectionTest extends TestCase
         $data = new Collection([['name' => 'taylor', 'email' => 'foo'], ['name' => 'dayle', 'email' => 'bar'], ['name' => 'shawn', 'email' => 'baz']]);
         $this->assertEquals('foo, bar, and baz', $data->implodeNice('email'));
         $this->assertEquals('foo; bar; and baz', $data->implodeNice('email', ';'));
-        $this->assertEquals('foo; bar; and, finally, baz', $data->implodeNice('email', ';','and, finally,'));
+        $this->assertEquals('foo; bar; and, finally, baz', $data->implodeNice('email', ';', 'and, finally,'));
 
         // Empty collection returns null
         $data = new Collection([]);
@@ -924,7 +924,7 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals('taylor and dayle', $data->implodeNice(','));
         $this->assertEquals('taylor and, finally, dayle', $data->implodeNice(',', 'and, finally,'));
 
-        // Three or more items are imploded with glue and conjunction 
+        // Three or more items are imploded with glue and conjunction
         $data = new Collection(['taylor', 'dayle', 'shawn']);
         $this->assertEquals('taylor dayle and shawn', $data->implodeNice(''));
         $this->assertEquals('taylor, dayle, and shawn', $data->implodeNice(','));
