@@ -274,6 +274,31 @@ trait ManagesFrequencies
     }
 
     /**
+     * Schedule the event to run on the last day of the month at a given time.
+     *
+     * @param  string  $time
+     * @return $this
+     */
+    public function endOfMonth($time = '0:0')
+    {
+        return $this->dailyAt($time)->when($this->isEndOfMonth());
+    }
+
+    /**
+     * Schedule the event to run on the last day of the month.
+     *
+     * @return \Closure
+     */
+    private function isEndOfMonth()
+    {
+        return function () {
+            $now = Carbon::now();
+
+            return $now->day == $now->daysInMonth;
+        };
+    }
+
+    /**
      * Schedule the event to run quarterly.
      *
      * @return $this
