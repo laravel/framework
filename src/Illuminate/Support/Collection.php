@@ -701,6 +701,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         $lastItem = array_pop($values);
+        
         return implode("$glue ", $values)."{$glue} {$conjunction} ".$lastItem;
     }
 
