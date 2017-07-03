@@ -633,7 +633,7 @@ class Event
      */
     public function nextRunDate($currentTime = 'now', $nth = 0, $allowCurrentDate = false)
     {
-        return Carbon::instance($nextDue = CronExpression::factory(
+        return Carbon::instance(CronExpression::factory(
             $this->getExpression()
         )->getNextRunDate($currentTime, $nth, $allowCurrentDate));
     }

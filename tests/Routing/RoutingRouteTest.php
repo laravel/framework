@@ -40,17 +40,17 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
 
         $router = $this->getRouter();
-        $route = $router->get('foo/bar', ['domain' => 'api.{name}.bar', function ($name) {
+        $router->get('foo/bar', ['domain' => 'api.{name}.bar', function ($name) {
             return $name;
         }]);
-        $route = $router->get('foo/bar', ['domain' => 'api.{name}.baz', function ($name) {
+        $router->get('foo/bar', ['domain' => 'api.{name}.baz', function ($name) {
             return $name;
         }]);
         $this->assertEquals('taylor', $router->dispatch(Request::create('http://api.taylor.bar/foo/bar', 'GET'))->getContent());
         $this->assertEquals('dayle', $router->dispatch(Request::create('http://api.dayle.baz/foo/bar', 'GET'))->getContent());
 
         $router = $this->getRouter();
-        $route = $router->get('foo/{age}', ['domain' => 'api.{name}.bar', function ($name, $age) {
+        $router->get('foo/{age}', ['domain' => 'api.{name}.bar', function ($name, $age) {
             return $name.$age;
         }]);
         $this->assertEquals('taylor25', $router->dispatch(Request::create('http://api.taylor.bar/foo/25', 'GET'))->getContent());
@@ -110,7 +110,7 @@ class RoutingRouteTest extends TestCase
         $this->assertFalse($router->is('bar'));
 
         $router = $this->getRouter();
-        $route = $router->get('foo/{file}', function ($file) {
+        $router->get('foo/{file}', function ($file) {
             return $file;
         });
         $this->assertEquals('oxygen%20', $router->dispatch(Request::create('http://test.com/foo/oxygen%2520', 'GET'))->getContent());
@@ -513,7 +513,7 @@ class RoutingRouteTest extends TestCase
     public function testRoutesDontMatchNonMatchingDomain()
     {
         $router = $this->getRouter();
-        $route = $router->get('foo/bar', ['domain' => 'api.foo.bar', function () {
+        $router->get('foo/bar', ['domain' => 'api.foo.bar', function () {
             return 'hello';
         }]);
         $this->assertEquals('hello', $router->dispatch(Request::create('http://api.baz.boom/foo/bar', 'GET'))->getContent());
@@ -522,7 +522,7 @@ class RoutingRouteTest extends TestCase
     public function testRouteDomainRegistration()
     {
         $router = $this->getRouter();
-        $route = $router->get('/foo/bar')->domain('api.foo.bar')->uses(function () {
+        $router->get('/foo/bar')->domain('api.foo.bar')->uses(function () {
             return 'hello';
         });
         $this->assertEquals('hello', $router->dispatch(Request::create('http://api.foo.bar/foo/bar', 'GET'))->getContent());
