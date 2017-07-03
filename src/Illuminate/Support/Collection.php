@@ -668,6 +668,44 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Concatenate values of a given key as formatted English string, with a conjunction before the final item.
+     *
+     * @param  string  $value
+     * @param  string  $glue
+     * @param  string  $conjunction
+     * @return string
+     */
+    public function implodeNice($value, $glue = ',', $conjunction = 'and')
+    {
+        $first = $this->first();
+
+        if (is_array($first) || is_object($first)) {
+            // Collection values are arrays, so get the values for the given key
+            $values = $this->pluck($value)->all();
+        } else {
+            // Collection values are not arrays, so implode all collection values
+            if ($glue != ',') {
+                // Shift inputs, since $values is implicit
+                $conjunction = $glue;
+            }
+            $glue = $value;
+            $values = $this->items;
+        }
+
+        if (count($values) <= 1) {
+            return array_shift($values);
+        }
+
+        if (count($values) == 2) {
+            return implode(" {$conjunction} ", $values);
+        }
+
+        $lastItem = array_pop($values);
+
+        return implode("$glue ", $values)."{$glue} {$conjunction} ".$lastItem;
+    }
+
+    /**
      * Intersect the collection with the given items.
      *
      * @param  mixed  $items
