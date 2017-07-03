@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Routing;
 
+use DateTime;
 use stdClass;
 use Mockery as m;
 use Illuminate\Support\Str;
@@ -153,6 +154,20 @@ class RoutingRouteTest extends TestCase
             return 'closure';
         }]);
         $this->assertEquals('closure', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+    }
+
+    public function testNotModifiedResponseIsProperlyReturned()
+    {
+        $router = $this->getRouter();
+        $router->get('test', function () {
+            return (new Response('test', 304, ['foo' => 'bar']))->setLastModified(new DateTime);
+        });
+
+        $response = $router->dispatch(Request::create('test', 'GET'));
+        $this->assertSame(304, $response->getStatusCode());
+        $this->assertEmpty($response->getContent());
+        $this->assertSame('bar', $response->headers->get('foo'));
+        $this->assertNull($response->getLastModified());
     }
 
     public function testClosureMiddleware()
