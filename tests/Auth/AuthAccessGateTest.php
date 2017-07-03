@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Auth;
 
 use stdClass;
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Container\Container;

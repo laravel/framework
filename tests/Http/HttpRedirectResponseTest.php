@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Http;
 
 use Mockery as m;
-use BadMethodCallException;
 use Illuminate\Http\Request;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Http\RedirectResponse;
