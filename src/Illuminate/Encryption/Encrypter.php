@@ -60,6 +60,17 @@ class Encrypter implements EncrypterContract
     }
 
     /**
+     * Create a new encryption key for the given cipher.
+     *
+     * @param  string  $cipher
+     * @return string
+     */
+    public static function generateKey($cipher)
+    {
+        return random_bytes($cipher == 'AES-128-CBC' ? 16 : 32);
+    }
+
+    /**
      * Encrypt the given value.
      *
      * @param  mixed  $value
