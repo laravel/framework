@@ -63,7 +63,7 @@ class PhpRedisConnection extends Connection
     }
 
     /**
-     * Removes the first count occurences of the value element from the list.
+     * Removes the first count occurrences of the value element from the list.
      *
      * @param  string  $key
      * @param  int  $count
