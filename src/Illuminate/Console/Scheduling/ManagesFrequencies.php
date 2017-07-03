@@ -294,7 +294,7 @@ trait ManagesFrequencies
         return function () {
             $now = Carbon::now();
 
-            return $now->day() == $now->daysInMonth();
+            return $now->day == $now->daysInMonth;
         };
     }
 
