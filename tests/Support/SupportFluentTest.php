@@ -84,6 +84,16 @@ class SupportFluentTest extends TestCase
         $this->assertInstanceOf('Illuminate\Support\Fluent', $fluent->programmer());
     }
 
+    public function testFluentIsMacroable()
+    {
+        Fluent::macro('count', function () {
+            return count($this->getAttributes());
+        });
+
+        $fluent = new Fluent(['foo' => 'bar', 'baz' => 'qux']);
+        $this->assertSame(2, $fluent->count());
+    }
+
     public function testIssetMagicMethod()
     {
         $array = ['name' => 'Taylor', 'age' => 25];
