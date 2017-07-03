@@ -665,7 +665,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals('select "id", (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
-    public function testWithCountAndContraintsAndHaving()
+    public function testWithCountAndConstraintsAndHaving()
     {
         $model = new EloquentBuilderTestModelParentStub;
 
@@ -696,7 +696,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals('select "eloquent_builder_test_model_parent_stubs".*, (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_bar_count", (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
-    public function testHasWithContraintsAndHavingInSubquery()
+    public function testHasWithConstraintsAndHavingInSubquery()
     {
         $model = new EloquentBuilderTestModelParentStub;
 
@@ -709,7 +709,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['baz', 'qux', 'quuux'], $builder->getBindings());
     }
 
-    public function testHasWithContraintsWithOrWhereAndHavingInSubquery()
+    public function testHasWithConstraintsWithOrWhereAndHavingInSubquery()
     {
         $model = new EloquentBuilderTestModelParentStub;
 
@@ -739,7 +739,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['baz', 'quuuuuux', 'qux', 'quuux'], $builder->getBindings());
     }
 
-    public function testHasWithContraintsAndHavingInSubqueryWithCount()
+    public function testHasWithConstraintsAndHavingInSubqueryWithCount()
     {
         $model = new EloquentBuilderTestModelParentStub;
 
