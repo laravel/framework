@@ -10,7 +10,7 @@ class MixTest extends TestCase
     /**
      * The Mix instance to test.
      *
-     * @var \Illuminate\View\Mix\Mix
+     * @var Mix
      */
     protected $mix;
 
@@ -20,12 +20,12 @@ class MixTest extends TestCase
             return __DIR__;
         });
 
-        $this->mix = new \Illuminate\View\Mix\Mix;
+        $this->mix = new Mix;
     }
 
     /**
      * @expectedException \Illuminate\View\Mix\MixException
-     * @expectedExceptionMessage The Mix manifest does not exist.
+     * @expectedExceptionMessageRegExp #The Mix manifest .+/mix-manifest.json does not exist.#
      */
     public function testMixMethodThrowAnExceptionIfMixManifestDoesNotExist()
     {
@@ -34,7 +34,7 @@ class MixTest extends TestCase
 
     /**
      * @expectedException \Illuminate\View\Mix\MixException
-     * @expectedExceptionMessage Unable to locate Mix file: /baz.css. Please check your webpack.mix.js output paths and try again.
+     * @expectedExceptionMessage Unable to locate the file: /baz.css. Please check your webpack.mix.js output paths and try again.
      */
     public function testMixMethodThrowAnExceptionIfPathDoesNotExistInManifest()
     {
@@ -43,7 +43,7 @@ class MixTest extends TestCase
 
     /**
      * @expectedException \Illuminate\View\Mix\MixException
-     * @expectedExceptionMessage The Mix manifest isn't a proper json file.
+     * @expectedExceptionMessageRegExp #The Mix manifest .+/mix-manifest-wrong isn't a proper json file.#
      */
     public function testMixMethodThrowAnExceptionIfManifestIsNotAProperJson()
     {
@@ -57,7 +57,7 @@ class MixTest extends TestCase
 
     /**
      * @expectedException \Illuminate\View\Mix\MixException
-     * @expectedExceptionMessage The Mix manifest does not exist.
+     * @expectedExceptionMessageRegExp #The Mix manifest .+/mix-manifest.json does not exist.#
      */
     public function testMixMethodWhenReEnabled()
     {
@@ -88,5 +88,33 @@ class MixTest extends TestCase
         );
 
         unlink(public_path('hot-custom'));
+    }
+
+    public function testManifestsAreCached()
+    {
+        $this->assertSame([], $this->mix->getCachedManifests());
+
+        $this->mix->resolve('foo.css', 'fixtures');
+        $this->assertSame([
+            public_path('fixtures/mix-manifest.json') => ['/foo.css' => '/bar.css'],
+        ], $this->mix->getCachedManifests());
+
+        $this->mix->setManifestFilename('mix-manifest-bis.json')->resolve('foo-bis.css', 'fixtures');
+        $this->assertSame([
+            public_path('fixtures/mix-manifest.json') => ['/foo.css' => '/bar.css'],
+            public_path('fixtures/mix-manifest-bis.json') => ['/foo-bis.css' => '/bar-bis.css'],
+        ], $this->mix->getCachedManifests());
+    }
+}
+
+class Mix extends \Illuminate\View\Mix\Mix {
+    /**
+     * Expose publicly the protected var cachedManifests
+     *
+     * @return array
+     */
+    public function getCachedManifests()
+    {
+        return $this->cachedManifests;
     }
 }

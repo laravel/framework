@@ -15,11 +15,11 @@ class Mix
     protected $path;
 
     /**
-     * The cached manifest.
+     * The cached manifests.
      *
      * @var array
      */
-    protected $manifest;
+    protected $cachedManifests = [];
 
     /**
      * The directory where the assets and the manifest file are.
@@ -73,6 +73,16 @@ class Mix
     }
 
     /**
+     * Get a message instead of the path when mix is disabled.
+     *
+     * @return \Illuminate\Support\HtmlString
+     */
+    protected function disabledPath()
+    {
+        return new HtmlString('Mix is disabled!');
+    }
+
+    /**
      * Get the path to a versioned Mix file.
      *
      * @param  string  $path
@@ -84,10 +94,10 @@ class Mix
         $this->init($path, $manifestDirectory);
 
         if ($this->hmrModeEnabled()) {
-            return $this->hmrPath();
+            return $this->getHmrPath();
         }
 
-        return $this->compiledPath();
+        return $this->getCompiledPath();
     }
 
     /**
@@ -111,7 +121,7 @@ class Mix
      */
     protected function sanitize($path)
     {
-        if ($path && ! Str::startsWith($path, '/')) {
+        if (! Str::startsWith($path, '/')) {
             $path = "/{$path}";
         }
 
@@ -133,7 +143,7 @@ class Mix
      *
      * @return \Illuminate\Support\HtmlString
      */
-    protected function hmrPath()
+    protected function getHmrPath()
     {
         return new HtmlString($this->hmrURI.$this->path);
     }
@@ -143,19 +153,9 @@ class Mix
      *
      * @return \Illuminate\Support\HtmlString
      */
-    protected function compiledPath()
+    protected function getCompiledPath()
     {
         return new HtmlString($this->manifestDirectory.$this->getPathFromManifest());
-    }
-
-    /**
-     * Get a message instead of the path when mix is disabled.
-     *
-     * @return \Illuminate\Support\HtmlString
-     */
-    protected function disabledPath()
-    {
-        return new HtmlString('Mix is disabled!');
     }
 
     /**
@@ -167,40 +167,55 @@ class Mix
      */
     protected function getPathFromManifest()
     {
-        if (! array_key_exists($this->path, $manifest = $this->getManifest())) {
-            throw new MixException(
-                "Unable to locate Mix file: {$this->path}. Please check your ".
-                'webpack.mix.js output paths and try again.'
-            );
+        $manifest = $this->getManifest();
+
+        if (array_key_exists($this->path, $manifest)) {
+            return $manifest[$this->path];
         }
 
-        return $manifest[$this->path];
+        throw new MixException(
+            "Unable to locate the file: $this->path. Please check your ".
+            'webpack.mix.js output paths and try again.'
+        );
     }
 
     /**
      * Load the manifest file.
      *
      * @return array
-     *
-     * @throws \Illuminate\View\Mix\MixException
      */
     protected function getManifest()
     {
-        if ($this->manifest) {
-            return $this->manifest;
+        $manifestPath = public_path($this->manifestDirectory . $this->manifestFilename);
+
+        if (! array_key_exists($manifestPath, $this->cachedManifests)) {
+            $this->cacheNewManifest($manifestPath);
         }
 
-        if (! file_exists($manifestPath = public_path($this->manifestDirectory.$this->manifestFilename))) {
-            throw new MixException('The Mix manifest does not exist.');
+        return $this->cachedManifests[$manifestPath];
+    }
+
+    /**
+     * Cache a new manifest file.
+     *
+     * @param  string  $manifestPath
+     * @return void
+     *
+     * @throws \Illuminate\View\Mix\MixException
+     */
+    protected function cacheNewManifest($manifestPath)
+    {
+        if (! file_exists($manifestPath)) {
+            throw new MixException("The Mix manifest $manifestPath does not exist.");
         }
 
-        $this->manifest = json_decode(file_get_contents($manifestPath), true);
+        $manifest = json_decode(file_get_contents($manifestPath), true);
 
-        if (json_last_error() === JSON_ERROR_NONE) {
-            return $this->manifest;
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new MixException("The Mix manifest $manifestPath isn't a proper json file.");
         }
 
-        throw new MixException("The Mix manifest isn't a proper json file.");
+        $this->cachedManifests[$manifestPath] = $manifest;
     }
 
     /**
