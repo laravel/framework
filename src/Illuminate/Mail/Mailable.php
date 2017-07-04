@@ -242,9 +242,8 @@ class Mailable implements MailableContract, Renderable
      */
     protected function buildMarkdownText($markdown, $data)
     {
-        return isset($this->textView)
-                ? $this->textView
-                : $markdown->renderText($this->markdown, $data);
+        return $this->textView
+                ?? $markdown->renderText($this->markdown, $data);
     }
 
     /**
@@ -473,7 +472,7 @@ class Mailable implements MailableContract, Renderable
             $recipient = $this->normalizeRecipient($recipient);
 
             $this->{$property}[] = [
-                'name' => isset($recipient->name) ? $recipient->name : null,
+                'name' => $recipient->name ?? null,
                 'address' => $recipient->email,
             ];
         }
@@ -529,7 +528,7 @@ class Mailable implements MailableContract, Renderable
         );
 
         $expected = [
-            'name' => isset($expected->name) ? $expected->name : null,
+            'name' => $expected->name ?? null,
             'address' => $expected->email,
         ];
 

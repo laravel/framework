@@ -75,7 +75,7 @@ class CacheManager implements FactoryContract
      */
     protected function get($name)
     {
-        return isset($this->stores[$name]) ? $this->stores[$name] : $this->resolve($name);
+        return $this->stores[$name] ?? $this->resolve($name);
     }
 
     /**

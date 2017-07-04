@@ -158,7 +158,7 @@ class BroadcastManager implements FactoryContract
      */
     protected function get($name)
     {
-        return isset($this->drivers[$name]) ? $this->drivers[$name] : $this->resolve($name);
+        return $this->drivers[$name] ?? $this->resolve($name);
     }
 
     /**

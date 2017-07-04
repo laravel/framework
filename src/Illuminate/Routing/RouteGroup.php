@@ -45,7 +45,7 @@ class RouteGroup
                     : trim($new['namespace'], '\\');
         }
 
-        return isset($old['namespace']) ? $old['namespace'] : null;
+        return $old['namespace'] ?? null;
     }
 
     /**
@@ -72,8 +72,8 @@ class RouteGroup
     protected static function formatWhere($new, $old)
     {
         return array_merge(
-            isset($old['where']) ? $old['where'] : [],
-            isset($new['where']) ? $new['where'] : []
+            $old['where'] ?? [],
+            $new['where'] ?? []
         );
     }
 

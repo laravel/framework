@@ -116,8 +116,8 @@ abstract class Queue
         return [
             'displayName' => $this->getDisplayName($job),
             'job' => 'Illuminate\Queue\CallQueuedHandler@call',
-            'maxTries' => isset($job->tries) ? $job->tries : null,
-            'timeout' => isset($job->timeout) ? $job->timeout : null,
+            'maxTries' => $job->tries ?? null,
+            'timeout' => $job->timeout ?? null,
             'data' => [
                 'commandName' => get_class($job),
                 'command' => serialize(clone $job),

@@ -154,8 +154,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         // only one level deep so we do not need to do any fancy searching through it.
         $this->load('*', '*', $locale);
 
-        $line = isset($this->loaded['*']['*'][$locale][$key])
-                    ? $this->loaded['*']['*'][$locale][$key] : null;
+        $line = $this->loaded['*']['*'][$locale][$key] ?? null;
 
         // If we can't find a translation for the JSON key, we will attempt to translate it
         // using the typical translation file. This way developers can always just use a

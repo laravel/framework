@@ -378,7 +378,7 @@ class Router implements RegistrarContract, BindingRegistrar
         if (! empty($this->groupStack)) {
             $last = end($this->groupStack);
 
-            return isset($last['prefix']) ? $last['prefix'] : '';
+            return $last['prefix'] ?? '';
         }
 
         return '';
@@ -521,7 +521,7 @@ class Router implements RegistrarContract, BindingRegistrar
     protected function addWhereClausesToRoute($route)
     {
         $route->where(array_merge(
-            $this->patterns, isset($route->getAction()['where']) ? $route->getAction()['where'] : []
+            $this->patterns, $route->getAction()['where'] ?? []
         ));
 
         return $route;
@@ -1027,7 +1027,7 @@ class Router implements RegistrarContract, BindingRegistrar
 
         $action = $this->current()->getAction();
 
-        return isset($action['controller']) ? $action['controller'] : null;
+        return $action['controller'] ?? null;
     }
 
     /**
