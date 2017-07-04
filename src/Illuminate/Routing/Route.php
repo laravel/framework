@@ -745,7 +745,7 @@ class Route
     public function middleware($middleware = null)
     {
         if (is_null($middleware)) {
-            return (array) Arr::get($this->action, 'middleware', []);
+            return (array) ($this->action['middleware'] ?? []);
         }
 
         if (is_string($middleware)) {
@@ -753,7 +753,7 @@ class Route
         }
 
         $this->action['middleware'] = array_merge(
-            (array) Arr::get($this->action, 'middleware', []), $middleware
+            (array) ($this->action['middleware'] ?? []), $middleware
         );
 
         return $this;

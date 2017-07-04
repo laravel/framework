@@ -147,9 +147,9 @@ class FilesystemManager implements FactoryContract
      */
     public function createLocalDriver(array $config)
     {
-        $permissions = isset($config['permissions']) ? $config['permissions'] : [];
+        $permissions = $config['permissions'] ?? [];
 
-        $links = Arr::get($config, 'links') === 'skip'
+        $links = ($config['links'] ?? null) === 'skip'
             ? LocalAdapter::SKIP_LINKS
             : LocalAdapter::DISALLOW_LINKS;
 
@@ -239,7 +239,7 @@ class FilesystemManager implements FactoryContract
      */
     protected function getRackspaceContainer(Rackspace $client, array $config)
     {
-        $urlType = Arr::get($config, 'url_type');
+        $urlType = $config['url_type'] ?? null;
 
         $store = $client->objectStoreService('cloudFiles', $config['region'], $urlType);
 

@@ -135,9 +135,9 @@ class Migrator
         // each migration's execution. We will also extract a few of the options.
         $batch = $this->repository->getNextBatchNumber();
 
-        $pretend = Arr::get($options, 'pretend', false);
+        $pretend = $options['pretend'] ?? false;
 
-        $step = Arr::get($options, 'step', false);
+        $step = $options['step'] ?? false;
 
         // Once we have the array of migrations, we will spin through them and run the
         // migrations "up" so the changes are made to the databases. We'll then log
@@ -217,7 +217,7 @@ class Migrator
      */
     protected function getMigrationsForRollback(array $options)
     {
-        if (($steps = Arr::get($options, 'step', 0)) > 0) {
+        if (($steps = $options['step'] ?? 0) > 0) {
             return $this->repository->getMigrations($steps);
         } else {
             return $this->repository->getLast();
@@ -248,7 +248,7 @@ class Migrator
 
             $this->runDown(
                 $files[$migration->migration],
-                $migration, Arr::get($options, 'pretend', false)
+                $migration, $options['pretend'] ?? false
             );
         }
 

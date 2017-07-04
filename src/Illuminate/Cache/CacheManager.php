@@ -164,9 +164,9 @@ class CacheManager implements FactoryContract
 
         $memcached = $this->app['memcached.connector']->connect(
             $config['servers'],
-            Arr::get($config, 'persistent_id'),
-            Arr::get($config, 'options', []),
-            array_filter(Arr::get($config, 'sasl', []))
+            $config['persistent_id'] ?? null,
+            $config['options'] ?? [],
+            array_filter($config['sasl'] ?? [])
         );
 
         return $this->repository(new MemcachedStore($memcached, $prefix));
@@ -192,7 +192,7 @@ class CacheManager implements FactoryContract
     {
         $redis = $this->app['redis'];
 
-        $connection = Arr::get($config, 'connection', 'default');
+        $connection = $config['connection'] ?? 'default';
 
         return $this->repository(new RedisStore($redis, $this->getPrefix($config), $connection));
     }
@@ -205,7 +205,7 @@ class CacheManager implements FactoryContract
      */
     protected function createDatabaseDriver(array $config)
     {
-        $connection = $this->app['db']->connection(Arr::get($config, 'connection'));
+        $connection = $this->app['db']->connection($config['connection'] ?? null);
 
         return $this->repository(
             new DatabaseStore(
@@ -241,7 +241,7 @@ class CacheManager implements FactoryContract
      */
     protected function getPrefix(array $config)
     {
-        return Arr::get($config, 'prefix') ?: $this->app['config']['cache.prefix'];
+        return $config['prefix'] ?? $this->app['config']['cache.prefix'];
     }
 
     /**

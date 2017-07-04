@@ -47,7 +47,7 @@ class FileStore implements Store
      */
     public function get($key)
     {
-        return Arr::get($this->getPayload($key), 'data');
+        return $this->getPayload($key)['data'] ?? null;
     }
 
     /**

@@ -195,7 +195,7 @@ abstract class Job
      */
     public function maxTries()
     {
-        return Arr::get($this->payload(), 'maxTries');
+        return $this->payload()['maxTries'] ?? null;
     }
 
     /**
@@ -205,7 +205,7 @@ abstract class Job
      */
     public function timeout()
     {
-        return Arr::get($this->payload(), 'timeout');
+        return $this->payload()['timeout'] ?? null;
     }
 
     /**

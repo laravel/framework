@@ -57,7 +57,7 @@ class RouteGroup
      */
     protected static function formatPrefix($new, $old)
     {
-        $old = Arr::get($old, 'prefix');
+        $old = $old['prefix'] ?? null;
 
         return isset($new['prefix']) ? trim($old, '/').'/'.trim($new['prefix'], '/') : $old;
     }
@@ -87,7 +87,7 @@ class RouteGroup
     protected static function formatAs($new, $old)
     {
         if (isset($old['as'])) {
-            $new['as'] = $old['as'].Arr::get($new, 'as', '');
+            $new['as'] = $old['as'].($new['as'] ?? '');
         }
 
         return $new;

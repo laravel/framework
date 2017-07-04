@@ -228,9 +228,7 @@ trait QueriesRelationships
      */
     public function mergeConstraintsFrom(Builder $from)
     {
-        $whereBindings = Arr::get(
-            $from->getQuery()->getRawBindings(), 'where', []
-        );
+        $whereBindings = $from->getQuery()->getRawBindings()['where'] ?? [];
 
         // Here we have some other query that we want to merge the where constraints from. We will
         // copy over any where constraints on the query as well as remove any global scopes the

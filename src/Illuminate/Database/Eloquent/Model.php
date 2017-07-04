@@ -555,7 +555,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $this->syncOriginal();
 
-        if (Arr::get($options, 'touch', true)) {
+        if ($options['touch'] ?? true) {
             $this->touchOwners();
         }
     }
