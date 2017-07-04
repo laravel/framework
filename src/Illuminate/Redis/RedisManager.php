@@ -2,7 +2,6 @@
 
 namespace Illuminate\Redis;
 
-use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Illuminate\Contracts\Redis\Factory;
 

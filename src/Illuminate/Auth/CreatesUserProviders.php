@@ -2,7 +2,6 @@
 
 namespace Illuminate\Auth;
 
-use Illuminate\Support\Arr;
 use InvalidArgumentException;
 
 trait CreatesUserProviders

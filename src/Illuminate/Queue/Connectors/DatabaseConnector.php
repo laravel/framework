@@ -2,7 +2,6 @@
 
 namespace Illuminate\Queue\Connectors;
 
-use Illuminate\Support\Arr;
 use Illuminate\Queue\DatabaseQueue;
 use Illuminate\Database\ConnectionResolverInterface;
 

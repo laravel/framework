@@ -3,7 +3,6 @@
 namespace Illuminate\Cache;
 
 use Closure;
-use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Cache\Factory as FactoryContract;

@@ -4,7 +4,6 @@ namespace Illuminate\Database\Connectors;
 
 use PDO;
 use Exception;
-use Illuminate\Support\Arr;
 use Doctrine\DBAL\Driver\PDOConnection;
 use Illuminate\Database\DetectsLostConnections;
 

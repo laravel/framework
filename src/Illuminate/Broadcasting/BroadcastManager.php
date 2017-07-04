@@ -4,7 +4,6 @@ namespace Illuminate\Broadcasting;
 
 use Pusher;
 use Closure;
-use Illuminate\Support\Arr;
 use Psr\Log\LoggerInterface;
 use InvalidArgumentException;
 use Illuminate\Broadcasting\Broadcasters\LogBroadcaster;
