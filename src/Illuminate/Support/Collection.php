@@ -130,7 +130,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $values = (isset($key) ? $this->pluck($key) : $this)
                     ->sort()->values();
 
-        $middle = (int) ($count / 2);
+        $middle = intdiv($count, 2);
 
         if ($count % 2) {
             return $values->get($middle);
