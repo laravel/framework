@@ -107,9 +107,10 @@ class MixTest extends TestCase
     }
 }
 
-class Mix extends \Illuminate\View\Mix\Mix {
+class Mix extends \Illuminate\View\Mix\Mix
+{
     /**
-     * Expose publicly the protected var cachedManifests
+     * Expose publicly the protected var cachedManifests.
      *
      * @return array
      */

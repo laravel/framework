@@ -171,7 +171,7 @@ class Mix
      */
     protected function getManifest($manifestDirectory)
     {
-        $manifestPath = public_path($manifestDirectory . $this->manifestFilename);
+        $manifestPath = public_path($manifestDirectory.$this->manifestFilename);
 
         if (! array_key_exists($manifestPath, $this->cachedManifests)) {
             $this->cacheNewManifest($manifestPath);
