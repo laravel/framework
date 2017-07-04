@@ -591,6 +591,18 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Clear the instance.
+     *
+     * @return $this
+     */
+    public function clear()
+    {
+        $this->items = [];
+
+        return $this;
+    }
+
+    /**
      * Get an item from the collection by key.
      *
      * @param  mixed  $key
