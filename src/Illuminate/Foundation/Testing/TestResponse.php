@@ -204,7 +204,7 @@ class TestResponse
      */
     public function assertSeeText($value)
     {
-        PHPUnit::assertContains($value, strip_tags($this->getContent()));
+        PHPUnit::assertContains(e($value), strip_tags($this->getContent()));
 
         return $this;
     }
