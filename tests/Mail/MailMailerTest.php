@@ -99,6 +99,46 @@ class MailMailerTest extends TestCase
         unset($_SERVER['__mailer.test']);
     }
 
+    public function testMailerSendSendsMessageWhenConditionFulfilled()
+    {
+        unset($_SERVER['__mailer.test']);
+        $mailer = $this->getMockBuilder('Illuminate\Mail\Mailer')->setMethods(['createMessage'])->setConstructorArgs($this->getMocks())->getMock();
+        $message = m::mock('Swift_Mime_SimpleMessage');
+        $mailer->expects($this->once())->method('createMessage')->will($this->returnValue($message));
+        $view = m::mock('stdClass');
+        $mailer->getViewFactory()->shouldReceive('make')->once()->with('foo', ['data', 'message' => $message])->andReturn($view);
+        $view->shouldReceive('render')->once()->andReturn('rendered.view');
+        $message->shouldReceive('setBody')->once()->with('rendered.view', 'text/html');
+        $message->shouldReceive('setFrom')->never();
+        $this->setSwiftMailer($mailer);
+        $message->shouldReceive('getSwiftMessage')->once()->andReturn($message);
+        $mailer->getSwiftMailer()->shouldReceive('send')->once()->with($message, []);
+        $mailer->when(true)->send('foo', ['data'], function ($m) {
+            $_SERVER['__mailer.test'] = $m;
+        });
+        unset($_SERVER['__mailer.test']);
+    }
+
+    public function testMailerSendDoesNotSendMessageWhenConditionIsNotFulfilled()
+    {
+        unset($_SERVER['__mailer.test']);
+        $mailer = $this->getMockBuilder('Illuminate\Mail\Mailer')->setMethods(['createMessage'])->setConstructorArgs($this->getMocks())->getMock();
+        $message = m::mock('Swift_Mime_SimpleMessage');
+        $mailer->expects($this->never())->method('createMessage');
+        $view = m::mock('stdClass');
+        $mailer->getViewFactory()->shouldNotReceive('make');
+        $view->shouldNotReceive('render');
+        $message->shouldNotReceive('setBody');
+        $message->shouldNotReceive('setFrom');
+        $this->setSwiftMailer($mailer);
+        $message->shouldNotReceive('getSwiftMessage');
+        $mailer->getSwiftMailer()->shouldNotReceive('send');
+        $mailer->when(false)->send('foo', ['data'], function ($m) {
+            $_SERVER['__mailer.test'] = $m;
+        });
+        unset($_SERVER['__mailer.test']);
+    }
+
     public function testGlobalFromIsRespectedOnAllMessages()
     {
         unset($_SERVER['__mailer.test']);

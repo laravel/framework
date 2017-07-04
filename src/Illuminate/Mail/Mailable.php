@@ -114,6 +114,10 @@ class Mailable implements MailableContract, Renderable
      */
     public function send(MailerContract $mailer)
     {
+        if (method_exists($this, 'when')) {
+            $mailer->when($this->when());
+        }
+
         Container::getInstance()->call([$this, 'build']);
 
         $mailer->send($this->buildView(), $this->buildViewData(), function ($message) {
