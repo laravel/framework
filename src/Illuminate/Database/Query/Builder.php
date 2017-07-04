@@ -2106,11 +2106,7 @@ class Builder
         // in the same order for the record. We need to make sure this is the case
         // so there are not any errors or problems when inserting these records.
         else {
-            foreach ($values as $key => $value) {
-                ksort($value);
-
-                $values[$key] = $value;
-            }
+            array_map('ksort', $values);
         }
 
         // Finally, we will run this query against the database connection and return
