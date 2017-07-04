@@ -15,7 +15,7 @@ class FilesystemServiceProvider extends ServiceProvider
     {
         $this->registerNativeFilesystem();
 
-        $this->registerFlysystem();
+        $this->registerFilesystem();
     }
 
     /**
@@ -35,7 +35,7 @@ class FilesystemServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function registerFlysystem()
+    protected function registerFilesystem()
     {
         $this->registerManager();
 
