@@ -8,25 +8,11 @@ use Illuminate\Support\HtmlString;
 class Mix
 {
     /**
-     * The sanitized path to the asset.
-     *
-     * @var string
-     */
-    protected $path;
-
-    /**
      * The cached manifests.
      *
      * @var array
      */
     protected $cachedManifests = [];
-
-    /**
-     * The directory where the assets and the manifest file are.
-     *
-     * @var string
-     */
-    protected $manifestDirectory;
 
     /**
      * The cache of mix state.
@@ -69,7 +55,10 @@ class Mix
             return $this->disabledPath();
         }
 
-        return $this->getRealPath($path, $manifestDirectory);
+        return $this->getRealPath(
+            $this->sanitize($path),
+            $this->sanitize($manifestDirectory)
+        );
     }
 
     /**
@@ -91,26 +80,11 @@ class Mix
      */
     protected function getRealPath($path, $manifestDirectory)
     {
-        $this->init($path, $manifestDirectory);
-
-        if ($this->hmrModeEnabled()) {
-            return $this->getHmrPath();
+        if ($this->hmrModeEnabled($manifestDirectory)) {
+            return $this->getHmrPath($path);
         }
 
-        return $this->getCompiledPath();
-    }
-
-    /**
-     * Set a sanitized version of assets.
-     *
-     * @param  string  $path
-     * @param  string  $manifestDirectory
-     * @return void
-     */
-    protected function init($path, $manifestDirectory)
-    {
-        $this->path = $this->sanitize($path);
-        $this->manifestDirectory = $this->sanitize($manifestDirectory);
+        return $this->getCompiledPath($manifestDirectory, $path);
     }
 
     /**
@@ -131,50 +105,59 @@ class Mix
     /**
      * Check if the HRM mode of Mix is enabled.
      *
+     * @param  string  $manifestDirectory
+     *
      * @return bool
      */
-    protected function hmrModeEnabled()
+    protected function hmrModeEnabled($manifestDirectory)
     {
-        return file_exists(public_path($this->manifestDirectory.$this->hmrFilename));
+        return file_exists(public_path($manifestDirectory.$this->hmrFilename));
     }
 
     /**
      * Get the full path to the file through the HMR server.
      *
+     * @param  string  $path
+     *
      * @return \Illuminate\Support\HtmlString
      */
-    protected function getHmrPath()
+    protected function getHmrPath($path)
     {
-        return new HtmlString($this->hmrURI.$this->path);
+        return new HtmlString($this->hmrURI.$path);
     }
 
     /**
      * Get the full path to the compiled file.
      *
+     * @param  string  $manifestDirectory
+     * @param  string  $path
+     *
      * @return \Illuminate\Support\HtmlString
      */
-    protected function getCompiledPath()
+    protected function getCompiledPath($manifestDirectory, $path)
     {
-        return new HtmlString($this->manifestDirectory.$this->getPathFromManifest());
+        return new HtmlString($manifestDirectory.$this->getPathFromManifest($manifestDirectory, $path));
     }
 
     /**
      * Get the path from the manifest file.
      *
-     * @return string
+     * @param  string  $manifestDirectory
+     * @param  string  $path
      *
+     * @return string
      * @throws \Illuminate\View\Mix\MixException
      */
-    protected function getPathFromManifest()
+    protected function getPathFromManifest($manifestDirectory, $path)
     {
-        $manifest = $this->getManifest();
+        $manifest = $this->getManifest($manifestDirectory);
 
-        if (array_key_exists($this->path, $manifest)) {
-            return $manifest[$this->path];
+        if (array_key_exists($path, $manifest)) {
+            return $manifest[$path];
         }
 
         throw new MixException(
-            "Unable to locate the file: $this->path. Please check your ".
+            "Unable to locate the file: $path. Please check your ".
             'webpack.mix.js output paths and try again.'
         );
     }
@@ -182,11 +165,13 @@ class Mix
     /**
      * Load the manifest file.
      *
+     * @param  string  $manifestDirectory
+     *
      * @return array
      */
-    protected function getManifest()
+    protected function getManifest($manifestDirectory)
     {
-        $manifestPath = public_path($this->manifestDirectory . $this->manifestFilename);
+        $manifestPath = public_path($manifestDirectory . $this->manifestFilename);
 
         if (! array_key_exists($manifestPath, $this->cachedManifests)) {
             $this->cacheNewManifest($manifestPath);
