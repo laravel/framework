@@ -54,6 +54,19 @@ class FoundationTestResponseTest extends TestCase
         $response->assertSeeText('foobar');
     }
 
+    public function testAssertSeeTextWithQuotes()
+    {
+        $baseResponse = tap(new Response, function ($response) {
+            $response->setContent(\Mockery::mock(View::class, [
+                'render' => "<strong>Foo&#039;s</strong>",
+            ]));
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        $response->assertSeeText("Foo's");
+    }
+
     public function testAssertHeader()
     {
         $baseResponse = tap(new Response, function ($response) {
