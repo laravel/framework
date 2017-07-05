@@ -20,7 +20,7 @@
         "illuminate/contracts": "5.5.*",
         "illuminate/support": "5.5.*",
         "psr/log": "~1.0",
-        "swiftmailer/swiftmailer": "~5.4",
+        "swiftmailer/swiftmailer": "~6.0",
         "tijsverkoyen/css-to-inline-styles": "~2.2"
     },
     "autoload": {
