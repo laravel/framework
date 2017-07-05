@@ -21,12 +21,12 @@ class NotificationDatabaseChannelTest extends TestCase
         $notification->id = 1;
         $notifiable = Mockery::mock();
 
-        $notifiable->shouldReceive('routeNotificationFor->create')->with([
+        $notifiable->shouldReceive('routeNotificationFor->make')->with([
             'id' => 1,
             'type' => get_class($notification),
             'data' => ['invoice_id' => 1],
             'read_at' => null,
-        ]);
+        ])->andReturnSelf()->shouldReceive('save');
 
         $channel = new DatabaseChannel;
         $channel->send($notifiable, $notification);

@@ -16,12 +16,18 @@ class DatabaseChannel
      */
     public function send($notifiable, Notification $notification)
     {
-        return $notifiable->routeNotificationFor('database')->create([
+        $model = $notifiable->routeNotificationFor('database')->make([
             'id' => $notification->id,
             'type' => get_class($notification),
             'data' => $this->getData($notifiable, $notification),
             'read_at' => null,
         ]);
+
+        if (method_exists($notification, 'modifyDatabaseModel')) {
+            $notification->modifyDatabaseModel($model, $notifiable);
+        }
+
+        return $model->save();
     }
 
     /**
