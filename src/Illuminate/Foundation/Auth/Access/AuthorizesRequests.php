@@ -67,7 +67,7 @@ trait AuthorizesRequests
     {
         $map = $this->resourceAbilityMap();
 
-        return isset($map[$ability]) ? $map[$ability] : $ability;
+        return $map[$ability] ?? $ability;
     }
 
     /**

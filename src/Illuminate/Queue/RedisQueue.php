@@ -2,7 +2,6 @@
 
 namespace Illuminate\Queue;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Queue\Jobs\RedisJob;
 use Illuminate\Contracts\Redis\Factory as Redis;
@@ -95,7 +94,7 @@ class RedisQueue extends Queue implements QueueContract
     {
         $this->getConnection()->rpush($this->getQueue($queue), $payload);
 
-        return Arr::get(json_decode($payload, true), 'id');
+        return json_decode($payload, true)['id'] ?? null;
     }
 
     /**
@@ -126,7 +125,7 @@ class RedisQueue extends Queue implements QueueContract
             $this->getQueue($queue).':delayed', $this->availableAt($delay), $payload
         );
 
-        return Arr::get(json_decode($payload, true), 'id');
+        return json_decode($payload, true)['id'] ?? null;
     }
 
     /**

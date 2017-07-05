@@ -38,7 +38,7 @@ class MiddlewareNameResolver
         } else {
             list($name, $parameters) = array_pad(explode(':', $name, 2), 2, null);
 
-            return (isset($map[$name]) ? $map[$name] : $name).
+            return ($map[$name] ?? $name).
                    (! is_null($parameters) ? ':'.$parameters : '');
         }
     }

@@ -4,7 +4,6 @@ namespace Illuminate\Broadcasting;
 
 use Pusher;
 use Closure;
-use Illuminate\Support\Arr;
 use Psr\Log\LoggerInterface;
 use InvalidArgumentException;
 use Illuminate\Broadcasting\Broadcasters\LogBroadcaster;
@@ -158,7 +157,7 @@ class BroadcastManager implements FactoryContract
      */
     protected function get($name)
     {
-        return isset($this->drivers[$name]) ? $this->drivers[$name] : $this->resolve($name);
+        return $this->drivers[$name] ?? $this->resolve($name);
     }
 
     /**
@@ -211,7 +210,7 @@ class BroadcastManager implements FactoryContract
     {
         return new PusherBroadcaster(
             new Pusher($config['key'], $config['secret'],
-            $config['app_id'], Arr::get($config, 'options', []))
+            $config['app_id'], $config['options'] ?? [])
         );
     }
 
@@ -224,7 +223,7 @@ class BroadcastManager implements FactoryContract
     protected function createRedisDriver(array $config)
     {
         return new RedisBroadcaster(
-            $this->app->make('redis'), Arr::get($config, 'connection')
+            $this->app->make('redis'), $config['connection'] ?? null
         );
     }
 

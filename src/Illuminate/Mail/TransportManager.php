@@ -146,7 +146,7 @@ class TransportManager extends Manager
         $config = $this->app['config']->get('services.sparkpost', []);
 
         return new SparkPostTransport(
-            $this->guzzle($config), $config['secret'], Arr::get($config, 'options', [])
+            $this->guzzle($config), $config['secret'], $config['options'] ?? []
         );
     }
 
@@ -179,7 +179,7 @@ class TransportManager extends Manager
     protected function guzzle($config)
     {
         return new HttpClient(Arr::add(
-            Arr::get($config, 'guzzle', []), 'connect_timeout', 60
+            $config['guzzle'] ?? [], 'connect_timeout', 60
         ));
     }
 

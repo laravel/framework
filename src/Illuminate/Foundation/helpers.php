@@ -228,7 +228,7 @@ if (! function_exists('cache')) {
         }
 
         if (is_string($arguments[0])) {
-            return app('cache')->get($arguments[0], isset($arguments[1]) ? $arguments[1] : null);
+            return app('cache')->get($arguments[0], $arguments[1] ?? null);
         }
 
         if (! is_array($arguments[0])) {
@@ -476,7 +476,7 @@ if (! function_exists('factory')) {
         $arguments = func_get_args();
 
         if (isset($arguments[1]) && is_string($arguments[1])) {
-            return $factory->of($arguments[0], $arguments[1])->times(isset($arguments[2]) ? $arguments[2] : null);
+            return $factory->of($arguments[0], $arguments[1])->times($arguments[2] ?? null);
         } elseif (isset($arguments[1])) {
             return $factory->of($arguments[0])->times($arguments[1]);
         } else {

@@ -3,7 +3,6 @@
 namespace Illuminate\Mail;
 
 use Parsedown;
-use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
@@ -41,8 +40,8 @@ class Markdown
     public function __construct(ViewFactory $view, array $options = [])
     {
         $this->view = $view;
-        $this->theme = Arr::get($options, 'theme', 'default');
-        $this->loadComponentsFrom(Arr::get($options, 'paths', []));
+        $this->theme = $options['theme'] ?? 'default';
+        $this->loadComponentsFrom($options['paths'] ?? []);
     }
 
     /**

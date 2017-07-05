@@ -279,7 +279,7 @@ class Dispatcher implements DispatcherContract
      */
     public function getListeners($eventName)
     {
-        $listeners = isset($this->listeners[$eventName]) ? $this->listeners[$eventName] : [];
+        $listeners = $this->listeners[$eventName] ?? [];
 
         $listeners = array_merge(
             $listeners, $this->getWildcardListeners($eventName)
@@ -445,10 +445,10 @@ class Dispatcher implements DispatcherContract
         list($listener, $job) = $this->createListenerAndJob($class, $method, $arguments);
 
         $connection = $this->resolveQueue()->connection(
-            isset($listener->connection) ? $listener->connection : null
+            $listener->connection ?? null
         );
 
-        $queue = isset($listener->queue) ? $listener->queue : null;
+        $queue = $listener->queue ?? null;
 
         isset($listener->delay)
                     ? $connection->laterOn($queue, $listener->delay, $job)
@@ -482,8 +482,8 @@ class Dispatcher implements DispatcherContract
     protected function propagateListenerOptions($listener, $job)
     {
         return tap($job, function ($job) use ($listener) {
-            $job->tries = isset($listener->tries) ? $listener->tries : null;
-            $job->timeout = isset($listener->timeout) ? $listener->timeout : null;
+            $job->tries = $listener->tries ?? null;
+            $job->timeout = $listener->timeout ?? null;
         });
     }
 

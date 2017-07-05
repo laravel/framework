@@ -2,7 +2,6 @@
 
 namespace Illuminate\Auth;
 
-use Illuminate\Support\Arr;
 use InvalidArgumentException;
 
 trait CreatesUserProviders
@@ -27,8 +26,9 @@ trait CreatesUserProviders
         $provider = $provider ?: $this->getDefaultUserProvider();
 
         $config = $this->app['config']['auth.providers.'.$provider];
+        $driver = $config['driver'] ?? null;
 
-        if (isset($this->customProviderCreators[$driver = Arr::get($config, 'driver')])) {
+        if (isset($this->customProviderCreators[$driver])) {
             return call_user_func(
                 $this->customProviderCreators[$driver], $this->app, $config
             );

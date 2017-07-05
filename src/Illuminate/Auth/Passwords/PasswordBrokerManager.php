@@ -2,7 +2,6 @@
 
 namespace Illuminate\Auth\Passwords;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Contracts\Auth\PasswordBrokerFactory as FactoryContract;
@@ -70,7 +69,7 @@ class PasswordBrokerManager implements FactoryContract
         // aggregate service of sorts providing a convenient interface for resets.
         return new PasswordBroker(
             $this->createTokenRepository($config),
-            $this->app['auth']->createUserProvider(Arr::get($config, 'provider'))
+            $this->app['auth']->createUserProvider($config['provider'] ?? null)
         );
     }
 
@@ -88,7 +87,7 @@ class PasswordBrokerManager implements FactoryContract
             $key = base64_decode(substr($key, 7));
         }
 
-        $connection = isset($config['connection']) ? $config['connection'] : null;
+        $connection = $config['connection'] ?? null;
 
         return new DatabaseTokenRepository(
             $this->app['db']->connection($connection),

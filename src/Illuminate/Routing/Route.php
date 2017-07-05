@@ -557,7 +557,7 @@ class Route
      */
     public function getPrefix()
     {
-        return isset($this->action['prefix']) ? $this->action['prefix'] : null;
+        return $this->action['prefix'] ?? null;
     }
 
     /**
@@ -605,7 +605,7 @@ class Route
      */
     public function getName()
     {
-        return isset($this->action['as']) ? $this->action['as'] : null;
+        return $this->action['as'] ?? null;
     }
 
     /**
@@ -682,7 +682,7 @@ class Route
      */
     public function getActionName()
     {
-        return isset($this->action['controller']) ? $this->action['controller'] : 'Closure';
+        return $this->action['controller'] ?? 'Closure';
     }
 
     /**
@@ -745,7 +745,7 @@ class Route
     public function middleware($middleware = null)
     {
         if (is_null($middleware)) {
-            return (array) Arr::get($this->action, 'middleware', []);
+            return (array) ($this->action['middleware'] ?? []);
         }
 
         if (is_string($middleware)) {
@@ -753,7 +753,7 @@ class Route
         }
 
         $this->action['middleware'] = array_merge(
-            (array) Arr::get($this->action, 'middleware', []), $middleware
+            (array) ($this->action['middleware'] ?? []), $middleware
         );
 
         return $this;
