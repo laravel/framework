@@ -243,11 +243,15 @@ class Migrator
         // repository already returns these migration's names in reverse order.
         foreach ($migrations as $migration) {
             $migration = (object) $migration;
+            
+            if (! $file = Arr::get($files, $migration->migration)) {
+                continue;
+            }
 
-            $rolledBack[] = $files[$migration->migration];
+            $rolledBack[] = $file;
 
             $this->runDown(
-                $files[$migration->migration],
+                $file,
                 $migration, Arr::get($options, 'pretend', false)
             );
         }
