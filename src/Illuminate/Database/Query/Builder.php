@@ -1718,9 +1718,10 @@ class Builder
      * @param  array  $columns
      * @param  string  $pageName
      * @param  int|null  $page
+     * @param  array  $options (query, fragment)
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function paginate($perPage = 15, $columns = ['*'], $pageName = 'page', $page = null)
+    public function paginate($perPage = 15, $columns = ['*'], $pageName = 'page', $page = null, $options = [])
     {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
@@ -1728,10 +1729,12 @@ class Builder
 
         $results = $total ? $this->forPage($page, $perPage)->get($columns) : collect();
 
-        return $this->paginator($results, $total, $perPage, $page, [
+        $options += [
             'path' => Paginator::resolveCurrentPath(),
             'pageName' => $pageName,
-        ]);
+        ];
+
+        return $this->paginator($results, $total, $perPage, $page, $options);
     }
 
     /**
@@ -1743,18 +1746,21 @@ class Builder
      * @param  array  $columns
      * @param  string  $pageName
      * @param  int|null  $page
+     * @param  array  $options (query, fragment)
      * @return \Illuminate\Contracts\Pagination\Paginator
      */
-    public function simplePaginate($perPage = 15, $columns = ['*'], $pageName = 'page', $page = null)
+    public function simplePaginate($perPage = 15, $columns = ['*'], $pageName = 'page', $page = null, $options = [])
     {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
         $this->skip(($page - 1) * $perPage)->take($perPage + 1);
 
-        return $this->simplePaginator($this->get($columns), $perPage, $page, [
+        $options += [
             'path' => Paginator::resolveCurrentPath(),
             'pageName' => $pageName,
-        ]);
+        ];
+
+        return $this->simplePaginator($this->get($columns), $perPage, $page, $options);
     }
 
     /**
