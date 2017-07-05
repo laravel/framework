@@ -1721,7 +1721,7 @@ class Builder
      * @param  array  $options (query, fragment)
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function paginate($perPage = 15, $columns = ['*'], $pageName = 'page', $page = null, array $options = [])
+    public function paginate($perPage = 15, $columns = ['*'], $pageName = 'page', $page = null, $options = [])
     {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
@@ -1749,7 +1749,7 @@ class Builder
      * @param  array  $options (query, fragment)
      * @return \Illuminate\Contracts\Pagination\Paginator
      */
-    public function simplePaginate($perPage = 15, $columns = ['*'], $pageName = 'page', $page = null, array $options = [])
+    public function simplePaginate($perPage = 15, $columns = ['*'], $pageName = 'page', $page = null, $options = [])
     {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 

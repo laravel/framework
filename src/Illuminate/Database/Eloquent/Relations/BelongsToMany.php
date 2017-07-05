@@ -556,7 +556,7 @@ class BelongsToMany extends Relation
      * @param  array  $options (query, fragment)
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null, array $options = [])
+    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null, $options = [])
     {
         $this->query->addSelect($this->shouldSelect($columns));
 
@@ -575,7 +575,7 @@ class BelongsToMany extends Relation
      * @param  array  $options (query, fragment)
      * @return \Illuminate\Contracts\Pagination\Paginator
      */
-    public function simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null, array $options = [])
+    public function simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null, $options = [])
     {
         $this->query->addSelect($this->shouldSelect($columns));
 
