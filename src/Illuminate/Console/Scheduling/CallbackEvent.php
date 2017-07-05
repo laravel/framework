@@ -90,7 +90,7 @@ class CallbackEvent extends Event
     /**
      * Do not allow the event to overlap each other.
      *
-     * @param int $expiresAt
+     * @param  int  $expiresAt
      * @return $this
      */
     public function withoutOverlapping($expiresAt = 1440)
@@ -102,6 +102,7 @@ class CallbackEvent extends Event
         }
 
         $this->withoutOverlapping = true;
+
         $this->expiresAt = $expiresAt;
 
         return $this->skip(function () {

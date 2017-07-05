@@ -65,11 +65,11 @@ class Event
     public $withoutOverlapping = false;
 
     /**
-     * Mutex deadline in minutes.
+     * The amount of time the mutex should be valid.
      *
      * @var int
      */
-    public $expiresAt;
+    public $expiresAt = 1440;
 
     /**
      * Indicates if the command should run in background.
