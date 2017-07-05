@@ -76,6 +76,13 @@ class Mailer implements MailerContract, MailQueueContract
     protected $failedRecipients = [];
 
     /**
+     * Condition to send the email.
+     *
+     * @var bool
+     */
+    protected $when = true;
+
+    /**
      * Create a new Mailer instance.
      *
      * @param  \Illuminate\Contracts\View\Factory  $views
@@ -206,6 +213,11 @@ class Mailer implements MailerContract, MailQueueContract
             return $this->sendMailable($view);
         }
 
+        // Cancel the email if condition is not fulfilled
+        if (! $this->when) {
+            return;
+        }
+
         // First we need to parse the view, which could either be a string or an array
         // containing both an HTML and plain text versions of the view which should
         // be used when sending an e-mail. We will extract both of them out here.
@@ -325,8 +337,8 @@ class Mailer implements MailerContract, MailQueueContract
     protected function renderView($view, $data)
     {
         return $view instanceof Htmlable
-                        ? $view->toHtml()
-                        : $this->views->make($view, $data)->render();
+                ? $view->toHtml()
+                : $this->views->make($view, $data)->render();
     }
 
     /**
