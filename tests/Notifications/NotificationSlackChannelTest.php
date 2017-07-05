@@ -155,6 +155,41 @@ class NotificationSlackChannelTest extends TestCase
             ]
         );
     }
+
+    public function testCorrectPayloadWithActionButtonsIsSentToSlack()
+    {
+        $this->validatePayload(
+            new NotificationSlackChannelWithActionButtonsTestNotification,
+            [
+                'json' => [
+                    'text' => 'Content',
+                    'attachments' => [
+                        [
+                            'title' => 'Laravel',
+                            'text' => 'Attachment Content',
+                            'title_link' => 'https://laravel.com',
+                            'callback_id' => 'laravel_123',
+                            'actions' => [
+                                [
+                                    'name' => 'laravel',
+                                    'style' => 'danger',
+                                    'text' => 'Cancel',
+                                    'type' => 'button',
+                                    'value' => 'laravel-cancel'
+                                ],
+                                [
+                                    'name' => 'laravel',
+                                    'text' => 'Okay',
+                                    'type' => 'button',
+                                    'value' => 'laravel-okay'
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]
+        );
+    }
 }
 
 class NotificationSlackChannelTestNotifiable
@@ -253,3 +288,33 @@ class NotificationSlackChannelWithAttachmentFieldBuilderTestNotification extends
             });
     }
 }
+
+class NotificationSlackChannelWithActionButtonsTestNotification extends Notification
+{
+    public function toSlack($notifiable)
+    {
+        return (new SlackMessage)
+            ->content('Content')
+            ->attachment(function ($attachment) {
+                $attachment->title('Laravel', 'https://laravel.com')
+                    ->content('Attachment Content')
+                    ->callbackId('laravel_123')
+                    ->actions([
+                        [
+                            'name' => 'laravel',
+                            'style' => 'danger',
+                            'text' => 'Cancel',
+                            'type' => 'button',
+                            'value' => 'laravel-cancel'
+                        ],
+                        [
+                            'name' => 'laravel',
+                            'text' => 'Okay',
+                            'type' => 'button',
+                            'value' => 'laravel-okay'
+                        ],
+                    ]);
+            });
+    }
+}
+
