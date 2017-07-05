@@ -56,6 +56,7 @@ class ViewFactoryTest extends TestCase
             $this->assertEquals($data[$arg['key']], $arg['value']);
             $this->assertArrayHasKey('loop', $arg);
             $this->assertTrue($arg['loop'] instanceof \stdClass);
+
             return true;
         }))->andReturn($mockView1 = m::mock('StdClass'));
 
@@ -64,6 +65,7 @@ class ViewFactoryTest extends TestCase
             $this->assertEquals($data[$arg['key']], $arg['value']);
             $this->assertArrayHasKey('loop', $arg);
             $this->assertTrue($arg['loop'] instanceof \stdClass);
+
             return true;
         }))->andReturn($mockView2 = m::mock('StdClass'));
 
