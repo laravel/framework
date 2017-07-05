@@ -48,12 +48,29 @@ class ViewFactoryTest extends TestCase
     public function testRenderEachCreatesViewForEachItemInArray()
     {
         $factory = m::mock('Illuminate\View\Factory[make]', $this->getFactoryArgs());
-        $factory->shouldReceive('make')->once()->with('foo', ['key' => 'bar', 'value' => 'baz'])->andReturn($mockView1 = m::mock('StdClass'));
-        $factory->shouldReceive('make')->once()->with('foo', ['key' => 'breeze', 'value' => 'boom'])->andReturn($mockView2 = m::mock('StdClass'));
+
+        $data = ['bar' => 'baz', 'breeze' => 'boom'];
+
+        $factory->shouldReceive('make')->once()->with('foo', m::on(function ($arg) use ($data) {
+            $this->assertArrayHasKey($arg['key'], $data);
+            $this->assertEquals($data[$arg['key']], $arg['value']);
+            $this->assertArrayHasKey('loop', $arg);
+            $this->assertTrue($arg['loop'] instanceof \stdClass);
+            return true;
+        }))->andReturn($mockView1 = m::mock('StdClass'));
+
+        $factory->shouldReceive('make')->once()->with('foo', m::on(function ($arg) use ($data) {
+            $this->assertArrayHasKey($arg['key'], $data);
+            $this->assertEquals($data[$arg['key']], $arg['value']);
+            $this->assertArrayHasKey('loop', $arg);
+            $this->assertTrue($arg['loop'] instanceof \stdClass);
+            return true;
+        }))->andReturn($mockView2 = m::mock('StdClass'));
+
         $mockView1->shouldReceive('render')->once()->andReturn('dayle');
         $mockView2->shouldReceive('render')->once()->andReturn('rees');
 
-        $result = $factory->renderEach('foo', ['bar' => 'baz', 'breeze' => 'boom'], 'value');
+        $result = $factory->renderEach('foo', $data, 'value');
 
         $this->assertEquals('daylerees', $result);
     }
