@@ -176,7 +176,7 @@ trait HasAttributes
             );
 
             // If the attribute cast was a date or a datetime, we will serialize the date as
-            // a string. This allows the developers to customize hwo dates are serialized
+            // a string. This allows the developers to customize how dates are serialized
             // into an array without affecting how they are persisted into the storage.
             if ($attributes[$key] &&
                 ($value === 'date' || $value === 'datetime')) {
