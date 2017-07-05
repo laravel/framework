@@ -91,7 +91,7 @@ class SlackAttachment
     public $timestamp;
 
     /**
-     * The attachment's callback ID
+     * The attachment's callback ID.
      *
      * @var string
      */
@@ -291,7 +291,7 @@ class SlackAttachment
     }
 
     /**
-     * Set the callback ID
+     * Set the callback ID.
      *
      * @param  $callbackId
      * @return $this

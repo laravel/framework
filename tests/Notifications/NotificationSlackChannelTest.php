@@ -175,13 +175,13 @@ class NotificationSlackChannelTest extends TestCase
                                     'style' => 'danger',
                                     'text' => 'Cancel',
                                     'type' => 'button',
-                                    'value' => 'laravel-cancel'
+                                    'value' => 'laravel-cancel',
                                 ],
                                 [
                                     'name' => 'laravel',
                                     'text' => 'Okay',
                                     'type' => 'button',
-                                    'value' => 'laravel-okay'
+                                    'value' => 'laravel-okay',
                                 ],
                             ],
                         ],
@@ -305,13 +305,13 @@ class NotificationSlackChannelWithActionButtonsTestNotification extends Notifica
                             'style' => 'danger',
                             'text' => 'Cancel',
                             'type' => 'button',
-                            'value' => 'laravel-cancel'
+                            'value' => 'laravel-cancel',
                         ],
                         [
                             'name' => 'laravel',
                             'text' => 'Okay',
                             'type' => 'button',
-                            'value' => 'laravel-okay'
+                            'value' => 'laravel-okay',
                         ],
                     ]);
             });
