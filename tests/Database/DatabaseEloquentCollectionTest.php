@@ -60,7 +60,7 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertFalse($c->contains($mockModel3));
     }
 
-    public function testContainsIndicatesIfDiffentModelInArray()
+    public function testContainsIndicatesIfDifferentModelInArray()
     {
         $mockModelFoo = m::namedMock('Foo', 'Illuminate\Database\Eloquent\Model');
         $mockModelFoo->shouldReceive('is')->with($mockModelFoo)->andReturn(true);

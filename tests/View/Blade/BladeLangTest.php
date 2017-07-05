@@ -4,7 +4,7 @@ namespace Illuminate\Tests\View\Blade;
 
 class BladeLangTest extends AbstractBladeTestCase
 {
-    public function testStatementThatContainsNonConsecutiveParanthesisAreCompiled()
+    public function testStatementThatContainsNonConsecutiveParenthesisAreCompiled()
     {
         $string = "Foo @lang(function_call('foo(blah)')) bar";
         $expected = "Foo <?php echo app('translator')->getFromJson(function_call('foo(blah)')); ?> bar";

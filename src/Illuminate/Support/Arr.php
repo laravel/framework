@@ -69,13 +69,23 @@ class Arr
      */
     public static function crossJoin(...$arrays)
     {
-        return array_reduce($arrays, function ($results, $array) {
-            return static::collapse(array_map(function ($parent) use ($array) {
-                return array_map(function ($item) use ($parent) {
-                    return array_merge($parent, [$item]);
-                }, $array);
-            }, $results));
-        }, [[]]);
+        $results = [[]];
+
+        foreach ($arrays as $index => $array) {
+            $append = [];
+
+            foreach ($results as $product) {
+                foreach ($array as $item) {
+                    $product[$index] = $item;
+
+                    $append[] = $product;
+                }
+            }
+
+            $results = $append;
+        }
+
+        return $results;
     }
 
     /**
@@ -379,6 +389,10 @@ class Arr
                 $results[] = $itemValue;
             } else {
                 $itemKey = data_get($item, $key);
+
+                if (is_object($itemKey) && method_exists($itemKey, '__toString')) {
+                    $itemKey = (string) $itemKey;
+                }
 
                 $results[$itemKey] = $itemValue;
             }

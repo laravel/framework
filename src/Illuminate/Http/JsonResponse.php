@@ -75,7 +75,7 @@ class JsonResponse extends BaseJsonResponse
     }
 
     /**
-     * Determine if an error occured during JSON encoding.
+     * Determine if an error occurred during JSON encoding.
      *
      * @param  int  $jsonError
      * @return bool

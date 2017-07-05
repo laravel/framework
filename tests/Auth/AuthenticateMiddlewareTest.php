@@ -112,7 +112,7 @@ class AuthenticateMiddlewareTest extends TestCase
         return $this->fail();
     }
 
-    public function testMultipleDriversAuthenticatedUdatesDefault()
+    public function testMultipleDriversAuthenticatedUpdatesDefault()
     {
         $this->registerAuthDriver('default', false);
 

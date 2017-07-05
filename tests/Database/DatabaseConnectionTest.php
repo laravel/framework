@@ -180,7 +180,7 @@ class DatabaseConnectionTest extends TestCase
         $connection->beginTransaction();
     }
 
-    public function testCommitedFiresEventsIfSet()
+    public function testCommittedFiresEventsIfSet()
     {
         $pdo = $this->createMock('Illuminate\Tests\Database\DatabaseConnectionTestMockPDO');
         $connection = $this->getMockConnection(['getName'], $pdo);

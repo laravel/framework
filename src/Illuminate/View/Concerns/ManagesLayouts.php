@@ -3,6 +3,7 @@
 namespace Illuminate\View\Concerns;
 
 use InvalidArgumentException;
+use Illuminate\Contracts\View\View;
 
 trait ManagesLayouts
 {
@@ -41,7 +42,7 @@ trait ManagesLayouts
                 $this->sectionStack[] = $section;
             }
         } else {
-            $this->extendSection($section, e($content));
+            $this->extendSection($section, $content instanceof View ? $content : e($content));
         }
     }
 
@@ -143,7 +144,7 @@ trait ManagesLayouts
      */
     public function yieldContent($section, $default = '')
     {
-        $sectionContent = e($default);
+        $sectionContent = $default instanceof View ? $default : e($default);
 
         if (isset($this->sections[$section])) {
             $sectionContent = $this->sections[$section];

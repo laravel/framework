@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use stdClass;
 use ArrayObject;
+use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Collection;
@@ -38,25 +39,25 @@ class SupportArrTest extends TestCase
     public function testCrossJoin()
     {
         // Single dimension
-        $this->assertEquals(
+        $this->assertSame(
             [[1, 'a'], [1, 'b'], [1, 'c']],
             Arr::crossJoin([1], ['a', 'b', 'c'])
         );
 
         // Square matrix
-        $this->assertEquals(
+        $this->assertSame(
             [[1, 'a'], [1, 'b'], [2, 'a'], [2, 'b']],
             Arr::crossJoin([1, 2], ['a', 'b'])
         );
 
         // Rectangular matrix
-        $this->assertEquals(
+        $this->assertSame(
             [[1, 'a'], [1, 'b'], [1, 'c'], [2, 'a'], [2, 'b'], [2, 'c']],
             Arr::crossJoin([1, 2], ['a', 'b', 'c'])
         );
 
         // 3D matrix
-        $this->assertEquals(
+        $this->assertSame(
             [
                 [1, 'a', 'I'], [1, 'a', 'II'], [1, 'a', 'III'],
                 [1, 'b', 'I'], [1, 'b', 'II'], [1, 'b', 'III'],
@@ -67,7 +68,17 @@ class SupportArrTest extends TestCase
         );
 
         // With 1 empty dimension
-        $this->assertEquals([], Arr::crossJoin([1, 2], [], ['I', 'II', 'III']));
+        $this->assertSame([], Arr::crossJoin([], ['a', 'b'], ['I', 'II', 'III']));
+        $this->assertSame([], Arr::crossJoin([1, 2], [], ['I', 'II', 'III']));
+        $this->assertSame([], Arr::crossJoin([1, 2], ['a', 'b'], []));
+
+        // With empty arrays
+        $this->assertSame([], Arr::crossJoin([], [], []));
+        $this->assertSame([], Arr::crossJoin([], []));
+        $this->assertSame([], Arr::crossJoin([]));
+
+        // Not really a proper usage, still, test for preserving BC
+        $this->assertSame([[]], Arr::crossJoin());
     }
 
     public function testDivide()
@@ -368,6 +379,15 @@ class SupportArrTest extends TestCase
             'Taylor' => ['name' => 'Taylor', 'role' => 'developer'],
             'Abigail' => ['name' => 'Abigail', 'role' => 'developer'],
         ], $test2);
+    }
+
+    public function testPluckWithCarbonKeys()
+    {
+        $array = [
+            ['start' => new Carbon('2017-07-25 00:00:00'), 'end' => new Carbon('2017-07-30 00:00:00')],
+        ];
+        $array = Arr::pluck($array, 'end', 'start');
+        $this->assertEquals(['2017-07-25 00:00:00' => '2017-07-30 00:00:00'], $array);
     }
 
     public function testPrepend()
