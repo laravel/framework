@@ -375,13 +375,14 @@ class HasManyThrough extends Relation
      * @param  array  $columns
      * @param  string  $pageName
      * @param  int  $page
+     * @param  array  $options (query, fragment)
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
+    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null, array $options = [])
     {
         $this->query->addSelect($this->shouldSelect($columns));
 
-        return $this->query->paginate($perPage, $columns, $pageName, $page);
+        return $this->query->paginate($perPage, $columns, $pageName, $page, $options);
     }
 
     /**
@@ -391,13 +392,14 @@ class HasManyThrough extends Relation
      * @param  array  $columns
      * @param  string  $pageName
      * @param  int|null  $page
+     * @param  array  $options (query, fragment)
      * @return \Illuminate\Contracts\Pagination\Paginator
      */
-    public function simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
+    public function simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null, array $options = [])
     {
         $this->query->addSelect($this->shouldSelect($columns));
 
-        return $this->query->simplePaginate($perPage, $columns, $pageName, $page);
+        return $this->query->simplePaginate($perPage, $columns, $pageName, $page, $options);
     }
 
     /**

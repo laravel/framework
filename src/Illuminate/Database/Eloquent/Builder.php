@@ -678,11 +678,12 @@ class Builder
      * @param  array  $columns
      * @param  string  $pageName
      * @param  int|null  $page
+     * @param  array  $options (query, fragment)
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      *
      * @throws \InvalidArgumentException
      */
-    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
+    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null, array $options = [])
     {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
@@ -692,10 +693,12 @@ class Builder
                                     ? $this->forPage($page, $perPage)->get($columns)
                                     : $this->model->newCollection();
 
-        return $this->paginator($results, $total, $perPage, $page, [
+        $options += [
             'path' => Paginator::resolveCurrentPath(),
             'pageName' => $pageName,
-        ]);
+        ];
+
+        return $this->paginator($results, $total, $perPage, $page, $options);
     }
 
     /**
@@ -705,9 +708,10 @@ class Builder
      * @param  array  $columns
      * @param  string  $pageName
      * @param  int|null  $page
+     * @param  array  $options (query, fragment)
      * @return \Illuminate\Contracts\Pagination\Paginator
      */
-    public function simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
+    public function simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null, array $options = [])
     {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
@@ -718,10 +722,12 @@ class Builder
         // paginator instances for these results with the given page and per page.
         $this->skip(($page - 1) * $perPage)->take($perPage + 1);
 
-        return $this->simplePaginator($this->get($columns), $perPage, $page, [
+        $options += [
             'path' => Paginator::resolveCurrentPath(),
             'pageName' => $pageName,
-        ]);
+        ];
+
+        return $this->simplePaginator($this->get($columns), $perPage, $page, $options);
     }
 
     /**
