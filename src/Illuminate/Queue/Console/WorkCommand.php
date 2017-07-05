@@ -54,6 +54,8 @@ class WorkCommand extends Command
         parent::__construct();
 
         $this->worker = $worker;
+
+        $this->ignoreValidationErrors();
     }
 
     /**
