@@ -41,4 +41,28 @@ trait Authorizable
     {
         return $this->cant($ability, $arguments);
     }
+
+    /**
+     * Determine if the entity has any of the given ability.
+     *
+     * @param  iterable  $abilities
+     * @param  array|mixed  $arguments
+     * @return bool
+     */
+    public function canAny($abilities, $arguments = [])
+    {
+        return app(Gate::class)->forUser($this)->checkAny($abilities, $arguments);
+    }
+
+    /**
+     * Determine if the entity has every given ability.
+     *
+     * @param  iterable     $abilities
+     * @param  array|mixed  $arguments
+     * @return bool
+     */
+    public function canEvery($abilities, $arguments = [])
+    {
+        return app(Gate::class)->forUser($this)->checkEvery($abilities, $arguments);
+    }
 }

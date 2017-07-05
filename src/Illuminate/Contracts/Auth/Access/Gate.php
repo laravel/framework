@@ -74,6 +74,24 @@ interface Gate
     public function check($ability, $arguments = []);
 
     /**
+     * Determine if any of the given ability should be granted.
+     *
+     * @param  iterable  $abilities
+     * @param  array|mixed  $arguments
+     * @return bool
+     */
+    public function checkAny($abilities, $arguments = []);
+
+    /**
+     * Determine if every of the given ability should be granted.
+     *
+     * @param  iterable  $abilities
+     * @param  array|mixed  $arguments
+     * @return bool
+     */
+    public function checkEvery($abilities, $arguments = []);
+
+    /**
      * Determine if the given ability should be granted for the current user.
      *
      * @param  string  $ability
