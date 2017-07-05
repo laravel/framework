@@ -25,27 +25,32 @@ abstract class Seeder
     /**
      * Seed the given connection from the given path.
      *
-     * @param  string  $class
+     * @param  array|string  $class
+     * @param  bool  $silent
      * @return void
      */
-    public function call($class)
+    public function call($class, $silent = false)
     {
-        if (isset($this->command)) {
-            $this->command->getOutput()->writeln("<info>Seeding:</info> $class");
-        }
+        $classes = is_array($class) ? $class : (array) $class;
 
-        $this->resolve($class)->__invoke();
+        foreach ($classes as $class) {
+            if ($silent === false && isset($this->command)) {
+                $this->command->getOutput()->writeln("<info>Seeding:</info> $class");
+            }
+
+            $this->resolve($class)->__invoke();
+        }
     }
 
     /**
      * Silently seed the given connection from the given path.
      *
-     * @param  string  $class
+     * @param  array|string  $class
      * @return void
      */
     public function callSilent($class)
     {
-        $this->resolve($class)->__invoke();
+        $this->call($class, true);
     }
 
     /**
