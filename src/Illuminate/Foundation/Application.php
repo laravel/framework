@@ -1126,7 +1126,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             'url'                  => [\Illuminate\Routing\UrlGenerator::class, \Illuminate\Contracts\Routing\UrlGenerator::class],
             'validator'            => [\Illuminate\Validation\Factory::class, \Illuminate\Contracts\Validation\Factory::class],
             'view'                 => [\Illuminate\View\Factory::class, \Illuminate\Contracts\View\Factory::class],
-        ] as $key => $aliases){
+        ] as $key => $aliases) {
             foreach ($aliases as $alias) {
                 $this->alias($key, $alias);
             }
