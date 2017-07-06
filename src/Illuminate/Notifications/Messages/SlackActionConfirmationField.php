@@ -5,35 +5,35 @@ namespace Illuminate\Notifications\Messages;
 class SlackActionConfirmationField
 {
     /**
-     * The title field of the confirmation field.
+     * The title field of the pop up confirmation window.
      *
      * @var string
      */
     protected $title;
 
     /**
-     * The content of the confirmation field.
+     * The details of the consequences of performing an action.
      *
      * @var string
      */
     protected $content;
 
     /**
-     * The ok text of the confirmation field.
+     * The text label for the button to continue with an action.
      *
      * @var string
      */
-    protected $okText;
+    protected $okText = 'Okay';
 
     /**
-     * The dismiss text of the confirmation field.
+     * The text label for the button to cancel the action.
      *
      * @var string
      */
-    protected $dismissText;
+    protected $dismissText = 'Cancel';
 
     /**
-     * Set the title of the field.
+     * Set the title of the confirmation window.
      *
      * @param  string  $title
      * @return $this
@@ -46,7 +46,7 @@ class SlackActionConfirmationField
     }
 
     /**
-     * Set the text of the field.
+     * Set the content of the confirmation window.
      *
      * @param  string  $content
      * @return $this
@@ -59,7 +59,7 @@ class SlackActionConfirmationField
     }
 
     /**
-     * Set the text of the field.
+     * Set the text of the okay button.
      *
      * @param  string  $okText
      * @return $this
@@ -72,7 +72,7 @@ class SlackActionConfirmationField
     }
 
     /**
-     * Set the text of the field.
+     * Set the text of the dismiss button.
      *
      * @param  string  $dismissText
      * @return $this
@@ -85,7 +85,7 @@ class SlackActionConfirmationField
     }
 
     /**
-     * Get the array representation of the attachment field.
+     * Get the array representation of the confirmation window.
      *
      * @return array
      */

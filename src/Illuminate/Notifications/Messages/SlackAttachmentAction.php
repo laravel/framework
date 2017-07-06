@@ -7,77 +7,83 @@ use Closure;
 class SlackAttachmentAction
 {
     /**
-     * The name field of the attachment action.
+     * The specific name of the action to be performed.
      *
      * @var string
      */
     protected $name;
 
     /**
-     * The content of the attachment action.
+     * The user-facing content for the message button or menu representing this action.
      *
      * @var string
      */
     protected $content;
 
     /**
-     * The type of the attachment action.
+     * The type of action. Can be either "button" or "select".
      *
      * @var string
      */
     protected $type = 'button';
 
     /**
-     * The value of the attachment action.
+     * The specific identifier for the action.
      *
      * @var string
      */
     protected $value;
 
     /**
-     * The action's confirmation fields.
+     * The optional confirmation fields to be shown
+     * be shown when an action button is clicked.
      *
      * @var array
      */
     protected $confirmationFields;
 
     /**
-     * The style of the attachment action.
+     * The style of the attachment action. Useful for
+     * emphasizing a primary or dangerous action.
      *
      * @var string
      */
     protected $style = 'default';
 
     /**
-     * The options of the attachment action.
+     * The individual options to appear in a message menu.
      *
      * @var array
      */
     protected $options;
 
     /**
-     * The option groups of the attachment action.
+     * An alternate, semi-hierarchal way to list available options in a
+     * message menu. This replaces and supersedes the options array.
      *
      * @var array
      */
     protected $optionGroups;
 
     /**
-     * The minimum query length of the attachment action.
-     *
-     * @var int
-     */
-    protected $minQueryLength = 1;
-
-    /**
-     * The data source of the attachment action.
+     * The data source of the attachment's actions.
+     * Can be "static", "users", "channels", "conversations", or "external".
      *
      * @var string
      */
     protected $dataSource = 'static';
 
     /**
-     * Set the name of the field.
+     * If present, Slack will wait until the specified number of characters are
+     * entered before sending a request to your app's external suggestions
+     * API endpoint. Only applies when data_source is set to external.
+     *
+     * @var int
+     */
+    protected $minQueryLength = 1;
+
+    /**
+     * Set the name of the action.
      *
      * @param  string $name
      *
@@ -91,7 +97,7 @@ class SlackAttachmentAction
     }
 
     /**
-     * Set the content of the field.
+     * Set the content of the action.
      *
      * @param  string $content
      *
@@ -105,7 +111,7 @@ class SlackAttachmentAction
     }
 
     /**
-     * Set the type of the field.
+     * Set the type of the action.
      *
      * @param  string $type
      *
@@ -119,7 +125,7 @@ class SlackAttachmentAction
     }
 
     /**
-     * Set the value of the field.
+     * Set the value of the action.
      *
      * @param  string $value
      *
@@ -163,7 +169,7 @@ class SlackAttachmentAction
     }
 
     /**
-     * Set the style of the field.
+     * Set the style of the action.
      *
      * @param  string $style
      *
@@ -177,7 +183,7 @@ class SlackAttachmentAction
     }
 
     /**
-     * Set the options of the field.
+     * Set the options of the action.
      *
      * @param  array $options
      *
@@ -191,7 +197,7 @@ class SlackAttachmentAction
     }
 
     /**
-     * Set the options of the field.
+     * Set the options of the action.
      *
      * @param  array $optionGroups
      *
@@ -205,21 +211,7 @@ class SlackAttachmentAction
     }
 
     /**
-     * Set the minimum query length of the field.
-     *
-     * @param  int $minQueryLength
-     *
-     * @return $this
-     */
-    public function minQueryLength($minQueryLength)
-    {
-        $this->minQueryLength = $minQueryLength;
-
-        return $this;
-    }
-
-    /**
-     * Set the data source of the field.
+     * Set the data source of the action.
      *
      * @param  string $dataSource
      *
@@ -233,7 +225,21 @@ class SlackAttachmentAction
     }
 
     /**
-     * Get the array representation of the attachment field.
+     * Set the minimum query length of the action.
+     *
+     * @param  int $minQueryLength
+     *
+     * @return $this
+     */
+    public function minQueryLength($minQueryLength)
+    {
+        $this->minQueryLength = $minQueryLength;
+
+        return $this;
+    }
+
+    /**
+     * Get the array representation of the attachment action.
      *
      * @return array
      */
