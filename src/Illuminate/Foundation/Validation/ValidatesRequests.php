@@ -33,9 +33,7 @@ trait ValidatesRequests
             $validator = $this->getValidationFactory()->make($request->all(), $validator);
         }
 
-        if ($validator->fails()) {
-            $this->throwValidationException($request, $validator);
-        }
+        $validator->validate();
 
         return $request->only(array_keys($validator->getRules()));
     }
@@ -51,11 +49,9 @@ trait ValidatesRequests
      */
     public function validate(Request $request, array $rules, array $messages = [], array $customAttributes = [])
     {
-        $validator = $this->getValidationFactory()->make($request->all(), $rules, $messages, $customAttributes);
-
-        if ($validator->fails()) {
-            $this->throwValidationException($request, $validator);
-        }
+        $this->getValidationFactory()
+             ->make($request->all(), $rules, $messages, $customAttributes)
+             ->validate();
 
         return $request->only(array_keys($rules));
     }
@@ -95,51 +91,6 @@ trait ValidatesRequests
         call_user_func($callback);
 
         $this->validatesRequestErrorBag = null;
-    }
-
-    /**
-     * Throw the failed validation exception.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Contracts\Validation\Validator  $validator
-     * @return void
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
-    protected function throwValidationException(Request $request, $validator)
-    {
-        throw new ValidationException($validator, $this->buildFailedValidationResponse(
-            $request, $this->formatValidationErrors($validator)
-        ));
-    }
-
-    /**
-     * Create the response for when a request fails validation.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  array  $errors
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    protected function buildFailedValidationResponse(Request $request, array $errors)
-    {
-        if ($request->expectsJson()) {
-            return new JsonResponse($errors, 422);
-        }
-
-        return redirect()->to($this->getRedirectUrl())
-                        ->withInput($request->input())
-                        ->withErrors($errors, $this->errorBag());
-    }
-
-    /**
-     * Format the validation errors to be returned.
-     *
-     * @param  \Illuminate\Contracts\Validation\Validator  $validator
-     * @return array
-     */
-    protected function formatValidationErrors(Validator $validator)
-    {
-        return $validator->errors()->getMessages();
     }
 
     /**
