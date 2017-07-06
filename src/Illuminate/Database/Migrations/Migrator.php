@@ -251,8 +251,8 @@ class Migrator
             $rolledBack[] = $file;
 
             $this->runDown(
-                $file,
-                $migration, Arr::get($options, 'pretend', false)
+                $file, $migration,
+                Arr::get($options, 'pretend', false)
             );
         }
 
