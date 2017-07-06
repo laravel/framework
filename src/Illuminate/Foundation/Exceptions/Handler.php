@@ -208,17 +208,33 @@ class Handler implements ExceptionHandlerContract
             return $e->response;
         }
 
-        $errors = $e->validator->errors()->getMessages();
-
-        if ($request->expectsJson()) {
-            return response()->json([
-                'message' => $e->getMessage(), 'errors' => $errors,
-            ], 422);
+        if (method_exists($this, 'invalid')) {
+            return $this->invalid($request, $e);
         }
 
-        return redirect()->back()->withInput(
-            $request->input()
-        )->withErrors($errors, $e->errorBag);
+        if ($request->expectsJson()) {
+            return response()->json(
+                $this->formatValidationResponse($e)
+            );
+        }
+
+        return redirect()->back()->withInput($request->input())->withErrors(
+            $e->validator->errors()->getMessages(), $e->errorBag
+        );
+    }
+
+    /**
+     * Format the validation JSON response payload.
+     *
+     * @param  \Illuminate\Validation\ValidationException  $e
+     * @return array
+     */
+    protected function formatValidationResponse(ValidationException $e)
+    {
+        return [
+            'message' => $e->getMessage(),
+            'errors' => $e->validator->errors()->getMessages(),
+        ];
     }
 
     /**
