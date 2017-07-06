@@ -218,7 +218,7 @@ class Handler implements ExceptionHandlerContract
 
         return redirect()->back()->withInput(
             $request->input()
-        )->withErrors($errors);
+        )->withErrors($errors, $e->errorBag);
     }
 
     /**

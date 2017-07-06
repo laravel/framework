@@ -4,16 +4,10 @@ namespace Illuminate\Foundation\Validation;
 
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Validation\Factory;
+use Illuminate\Validation\ValidationException;
 
 trait ValidatesRequests
 {
-    /**
-     * The default error bag.
-     *
-     * @var string
-     */
-    protected $validatesRequestErrorBag;
-
     /**
      * Run the validation routine against the given validator.
      *
@@ -66,27 +60,13 @@ trait ValidatesRequests
      */
     public function validateWithBag($errorBag, Request $request, array $rules, array $messages = [], array $customAttributes = [])
     {
-        $this->withErrorBag($errorBag, function () use ($request, $rules, $messages, $customAttributes) {
-            $this->validate($request, $rules, $messages, $customAttributes);
-        });
+        try {
+            return $this->validate($request, $rules, $messages, $customAttributes);
+        } catch (ValidationException $e) {
+            $e->errorBag = $errorBag;
 
-        return $request->only(array_keys($rules));
-    }
-
-    /**
-     * Execute a Closure within with a given error bag set as the default bag.
-     *
-     * @param  string  $errorBag
-     * @param  callable  $callback
-     * @return void
-     */
-    protected function withErrorBag($errorBag, callable $callback)
-    {
-        $this->validatesRequestErrorBag = $errorBag;
-
-        call_user_func($callback);
-
-        $this->validatesRequestErrorBag = null;
+            throw $e;
+        }
     }
 
     /**
