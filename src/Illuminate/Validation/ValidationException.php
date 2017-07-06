@@ -21,7 +21,7 @@ class ValidationException extends Exception
     public $response;
 
     /**
-     * The error bag used.
+     * The default error bag.
      *
      * @var string
      */
