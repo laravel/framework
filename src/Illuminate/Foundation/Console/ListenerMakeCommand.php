@@ -30,20 +30,6 @@ class ListenerMakeCommand extends GeneratorCommand
     protected $type = 'Listener';
 
     /**
-     * Execute the console command.
-     *
-     * @return void
-     */
-    public function handle()
-    {
-        if (! $this->option('event')) {
-            return $this->error('Missing required option: --event');
-        }
-
-        parent::handle();
-    }
-
-    /**
      * Build the class with the given name.
      *
      * @param  string  $name
@@ -78,9 +64,13 @@ class ListenerMakeCommand extends GeneratorCommand
     protected function getStub()
     {
         if ($this->option('queued')) {
-            return __DIR__.'/stubs/listener-queued.stub';
+            return $this->option('event')
+                        ? __DIR__.'/stubs/listener-queued.stub'
+                        : __DIR__.'/stubs/listener-queued-duck.stub';
         } else {
-            return __DIR__.'/stubs/listener.stub';
+            return $this->option('event')
+                        ? __DIR__.'/stubs/listener.stub'
+                        : __DIR__.'/stubs/listener-duck.stub';
         }
     }
 
@@ -114,7 +104,7 @@ class ListenerMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['event', 'e', InputOption::VALUE_REQUIRED, 'The event class being listened for.'],
+            ['event', 'e', InputOption::VALUE_OPTIONAL, 'The event class being listened for.'],
 
             ['queued', null, InputOption::VALUE_NONE, 'Indicates the event listener should be queued.'],
         ];

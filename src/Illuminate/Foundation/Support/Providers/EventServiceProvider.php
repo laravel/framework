@@ -15,6 +15,13 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [];
 
     /**
+     * The event listeners for the application.
+     *
+     * @var array
+     */
+    protected $listeners = [];
+
+    /**
      * The subscriber classes to register.
      *
      * @var array
@@ -54,12 +61,24 @@ class EventServiceProvider extends ServiceProvider
      */
     public function listens()
     {
-        return array_merge_recursive(collect($this->listeners)->flatMap(function ($listener) {
+        return array_merge_recursive(collect($this->listeners)->filter(function ($listener) {
+            return class_exists($listener, false);
+        })->flatMap(function ($listener) {
             return collect($listener::$hears)->map(function ($event) use ($listener) {
                 return ['event' => $event, 'listeners' => [$listener]];
             })->all();
         })->groupBy('event')->map(function ($listeners) {
             return $listeners->pluck('listeners')->flatten(1)->all();
         })->all(), $this->listen);
+    }
+
+    /**
+     * Get all of the registered listeners.
+     *
+     * @return array
+     */
+    public function listeners()
+    {
+        return $this->listeners;
     }
 }

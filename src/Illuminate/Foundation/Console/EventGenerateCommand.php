@@ -29,13 +29,36 @@ class EventGenerateCommand extends Command
      */
     public function handle()
     {
-        $provider = $this->laravel->getProvider(EventServiceProvider::class);
+        $this->makeDynamicListeners(
+            $provider = $this->laravel->getProvider(EventServiceProvider::class)
+        );
 
         foreach ($provider->listens() as $event => $listeners) {
             $this->makeEventAndListeners($event, $listeners);
         }
 
         $this->info('Events and listeners generated successfully!');
+    }
+
+    /**
+     * Generate the dynamic listeners which have "hears" properties.
+     *
+     * @param  object  $provider
+     * @return void
+     */
+    protected function makeDynamicListeners($provider)
+    {
+        foreach ($provider->listeners() as $listener) {
+            if (! class_exists($listener)) {
+                $this->makeListeners(null, [$listener]);
+
+                continue;
+            }
+
+            foreach ($listener::$hears as $event) {
+                $this->makeEventAndListeners($event, [$listener]);
+            }
+        }
     }
 
     /**
@@ -68,7 +91,9 @@ class EventGenerateCommand extends Command
         foreach ($listeners as $listener) {
             $listener = preg_replace('/@.+$/', '', $listener);
 
-            $this->callSilent('make:listener', ['name' => $listener, '--event' => $event]);
+            $this->callSilent('make:listener', array_filter(
+                ['name' => $listener, '--event' => $event]
+            ));
         }
     }
 }
