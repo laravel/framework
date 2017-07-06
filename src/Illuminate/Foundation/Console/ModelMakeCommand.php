@@ -36,7 +36,7 @@ class ModelMakeCommand extends GeneratorCommand
      */
     public function fire()
     {
-        if (parent::fire() === false) {
+        if (parent::fire() === false && !$this->option('force')) {
             return;
         }
 
@@ -114,7 +114,9 @@ class ModelMakeCommand extends GeneratorCommand
 
             ['controller', 'c', InputOption::VALUE_NONE, 'Create a new controller for the model.'],
 
-            ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller'],
+            ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller.'],
+
+            ['force', 'f', InputOption::VALUE_NONE, 'Force the generator to continue execution even if the model already exists.'],
         ];
     }
 }

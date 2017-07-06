@@ -35,7 +35,7 @@ class MailMakeCommand extends GeneratorCommand
      */
     public function fire()
     {
-        if (parent::fire() === false) {
+        if (parent::fire() === false && !$this->option('force')) {
             return;
         }
 
@@ -109,6 +109,8 @@ class MailMakeCommand extends GeneratorCommand
     {
         return [
             ['markdown', 'm', InputOption::VALUE_OPTIONAL, 'Create a new Markdown template for the mailable.'],
+
+            ['force', 'f', InputOption::VALUE_NONE, 'Force the generator to continue execution even if the mail already exists.'],
         ];
     }
 }
