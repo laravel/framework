@@ -110,13 +110,13 @@ class ModelMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
+            ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the model already exists.'],
+
             ['migration', 'm', InputOption::VALUE_NONE, 'Create a new migration file for the model.'],
 
             ['controller', 'c', InputOption::VALUE_NONE, 'Create a new controller for the model.'],
 
             ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller.'],
-
-            ['force', 'f', InputOption::VALUE_NONE, 'Force the generator to continue execution even if the model already exists.'],
         ];
     }
 }

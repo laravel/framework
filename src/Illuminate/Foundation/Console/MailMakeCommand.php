@@ -108,9 +108,9 @@ class MailMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['markdown', 'm', InputOption::VALUE_OPTIONAL, 'Create a new Markdown template for the mailable.'],
+            ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the mailable already exists.'],
 
-            ['force', 'f', InputOption::VALUE_NONE, 'Force the generator to continue execution even if the mail already exists.'],
+            ['markdown', 'm', InputOption::VALUE_OPTIONAL, 'Create a new Markdown template for the mailable.'],
         ];
     }
 }
