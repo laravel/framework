@@ -26,10 +26,9 @@ class Storage extends Facade
     }
 
     /**
-     * Replace the given disk with a local testing persistent disk.
+     * Replace the given disk with a persistent local testing disk.
      *
      * @param  string  $disk
-     *
      * @return void
      */
     public static function persistentFake($disk)
