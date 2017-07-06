@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation\Validation;
 
 use Illuminate\Http\Request;
-use Illuminate\Routing\UrlGenerator;
 use Illuminate\Contracts\Validation\Factory;
 
 trait ValidatesRequests
@@ -88,16 +87,6 @@ trait ValidatesRequests
         call_user_func($callback);
 
         $this->validatesRequestErrorBag = null;
-    }
-
-    /**
-     * Get the key to be used for the view error bag.
-     *
-     * @return string
-     */
-    protected function errorBag()
-    {
-        return $this->validatesRequestErrorBag ?: 'default';
     }
 
     /**
