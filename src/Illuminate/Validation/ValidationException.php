@@ -21,7 +21,7 @@ class ValidationException extends Exception
     public $response;
 
     /**
-     * The default error bag.
+     * The name of the error bag.
      *
      * @var string
      */
@@ -40,8 +40,8 @@ class ValidationException extends Exception
         parent::__construct('The given data failed to pass validation.');
 
         $this->response = $response;
-        $this->validator = $validator;
         $this->errorBag = $errorBag;
+        $this->validator = $validator;
     }
 
     /**

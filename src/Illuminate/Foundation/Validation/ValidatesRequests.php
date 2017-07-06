@@ -25,7 +25,9 @@ trait ValidatesRequests
 
         $validator->validate();
 
-        return $request->only(array_keys($validator->getRules()));
+        return $request->only(
+            array_keys($validator->getRules())
+        );
     }
 
     /**
@@ -37,7 +39,8 @@ trait ValidatesRequests
      * @param  array  $customAttributes
      * @return array
      */
-    public function validate(Request $request, array $rules, array $messages = [], array $customAttributes = [])
+    public function validate(Request $request, array $rules,
+                             array $messages = [], array $customAttributes = [])
     {
         $this->getValidationFactory()
              ->make($request->all(), $rules, $messages, $customAttributes)
@@ -58,7 +61,8 @@ trait ValidatesRequests
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function validateWithBag($errorBag, Request $request, array $rules, array $messages = [], array $customAttributes = [])
+    public function validateWithBag($errorBag, Request $request, array $rules,
+                                    array $messages = [], array $customAttributes = [])
     {
         try {
             return $this->validate($request, $rules, $messages, $customAttributes);
