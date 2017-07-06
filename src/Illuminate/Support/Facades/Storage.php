@@ -34,7 +34,7 @@ class Storage extends Facade
     public static function persistentFake($disk)
     {
         static::set($disk, self::createLocalDriver([
-            'root' => storage_path('framework/testing/disks/' . $disk)
+            'root' => storage_path('framework/testing/disks/'.$disk),
         ]));
     }
 
