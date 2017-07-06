@@ -101,16 +101,6 @@ trait ValidatesRequests
     }
 
     /**
-     * Get the URL we should redirect to.
-     *
-     * @return string
-     */
-    protected function getRedirectUrl()
-    {
-        return app(UrlGenerator::class)->previous();
-    }
-
-    /**
      * Get a validation factory instance.
      *
      * @return \Illuminate\Contracts\Validation\Factory
