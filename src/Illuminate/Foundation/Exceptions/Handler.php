@@ -214,7 +214,7 @@ class Handler implements ExceptionHandlerContract
 
         if ($request->expectsJson()) {
             return response()->json(
-                $this->formatValidationResponse($e)
+                $this->formatValidationResponse($e), 422
             );
         }
 
