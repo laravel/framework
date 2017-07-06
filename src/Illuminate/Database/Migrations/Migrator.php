@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Migrations;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Filesystem\Filesystem;
@@ -243,11 +244,15 @@ class Migrator
         foreach ($migrations as $migration) {
             $migration = (object) $migration;
 
-            $rolledBack[] = $files[$migration->migration];
+            if (! $file = Arr::get($files, $migration->migration)) {
+                continue;
+            }
+
+            $rolledBack[] = $file;
 
             $this->runDown(
-                $files[$migration->migration],
-                $migration, $options['pretend'] ?? false
+                $file, $migration,
+                $options['pretend'] ?? false
             );
         }
 
