@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Testing;
 
 use Mockery;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Console\Application as Artisan;
@@ -147,6 +148,10 @@ abstract class TestCase extends BaseTestCase
 
         if (class_exists('Mockery')) {
             Mockery::close();
+        }
+
+        if (class_exists(Carbon::class)) {
+            Carbon::setTestNow();
         }
 
         $this->afterApplicationCreatedCallbacks = [];
