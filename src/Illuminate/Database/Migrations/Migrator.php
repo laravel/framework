@@ -244,10 +244,14 @@ class Migrator
         foreach ($migrations as $migration) {
             $migration = (object) $migration;
 
-            $rolledBack[] = $files[$migration->migration];
+            if (! $file = Arr::get($files, $migration->migration)) {
+                continue;
+            }
+
+            $rolledBack[] = $file;
 
             $this->runDown(
-                $files[$migration->migration],
+                $file,
                 $migration, Arr::get($options, 'pretend', false)
             );
         }
