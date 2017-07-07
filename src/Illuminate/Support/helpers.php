@@ -748,20 +748,6 @@ if (! function_exists('starts_with')) {
     }
 }
 
-if (! function_exists('str_before')) {
-    /**
-     * Return the remainder of a string before a given value.
-     *
-     * @param  string  $subject
-     * @param  string  $search
-     * @return string
-     */
-    function str_before($subject, $search)
-    {
-        return Str::before($subject, $search);
-    }
-}
-
 if (! function_exists('str_after')) {
     /**
      * Return the remainder of a string after a given value.
@@ -773,6 +759,20 @@ if (! function_exists('str_after')) {
     function str_after($subject, $search)
     {
         return Str::after($subject, $search);
+    }
+}
+
+if (! function_exists('str_before')) {
+    /**
+     * Get the portion of a string before a given value.
+     *
+     * @param  string  $subject
+     * @param  string  $search
+     * @return string
+     */
+    function str_before($subject, $search)
+    {
+        return Str::before($subject, $search);
     }
 }
 
