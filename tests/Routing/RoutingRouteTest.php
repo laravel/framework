@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Routing;
 
 use DateTime;
 use stdClass;
-use Mockery as m;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
@@ -20,7 +19,6 @@ use Illuminate\Routing\ResourceRegistrar;
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Auth\Middleware\Authenticate;
 use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 
 class RoutingRouteTest extends TestCase
@@ -1397,24 +1395,6 @@ class RoutingRouteTest extends TestCase
         $response = $router->dispatch(Request::create('contact_us', 'GET'));
         $this->assertTrue($response->isRedirect('contact'));
         $this->assertEquals(302, $response->getStatusCode());
-    }
-
-    public function testRouteView()
-    {
-        $container = new Container;
-        $factory = m::mock('Illuminate\View\Factory');
-        $factory->shouldReceive('make')->once()->with('pages.contact', ['foo' => 'bar'])->andReturn('Contact us');
-        $router = new Router(new Dispatcher, $container);
-        $container->bind(ViewFactory::class, function () use ($factory) {
-            return $factory;
-        });
-        $container->singleton(Registrar::class, function () use ($router) {
-            return $router;
-        });
-
-        $router->view('contact', 'pages.contact', ['foo' => 'bar']);
-
-        $this->assertEquals('Contact us', $router->dispatch(Request::create('contact', 'GET'))->getContent());
     }
 
     protected function getRouter()
