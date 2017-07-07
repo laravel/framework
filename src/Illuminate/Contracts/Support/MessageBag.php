@@ -85,6 +85,13 @@ interface MessageBag extends Arrayable
     public function isEmpty();
 
     /**
+     * Determine if the message bag has any messages.
+     *
+     * @return bool
+     */
+    public function isNotEmpty();
+
+    /**
      * Get the number of messages in the container.
      *
      * @return int
