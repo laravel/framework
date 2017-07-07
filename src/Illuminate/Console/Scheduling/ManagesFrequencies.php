@@ -53,7 +53,7 @@ trait ManagesFrequencies
     private function inTimeInterval($startTime, $endTime)
     {
         return function () use ($startTime, $endTime) {
-            $now = Carbon::now()->getTimestamp();
+            $now = Carbon::now($this->timezone)->getTimestamp();
 
             return $now >= strtotime($startTime) && $now <= strtotime($endTime);
         };
