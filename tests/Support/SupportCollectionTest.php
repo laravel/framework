@@ -831,6 +831,15 @@ class SupportCollectionTest extends TestCase
         );
     }
 
+    public function testChunkWithFalsePreserveKeys()
+    {
+        $data = new Collection([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        $data = $data->chunk(3, false);
+
+        $this->assertEquals([4, 5, 6], $data[1]->toArray());
+        $this->assertEquals([10], $data[3]->toArray());
+    }
+
     public function testEvery()
     {
         $c = new Collection([]);
