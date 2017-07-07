@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Routing;
 
 use DateTime;
 use stdClass;
-use Mockery as m;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
@@ -20,7 +19,6 @@ use Illuminate\Routing\ResourceRegistrar;
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Auth\Middleware\Authenticate;
 use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 
 class RoutingRouteTest extends TestCase
