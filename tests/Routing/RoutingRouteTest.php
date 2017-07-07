@@ -1435,6 +1435,24 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('Hello Taylor!', $router->dispatch(Request::create('hello/Taylor', 'GET'))->getContent());
     }
 
+    public function testRouteViewWithOptionalParameters()
+    {
+        $container = new Container;
+        $factory = m::mock('Illuminate\View\Factory');
+        $router = new Router(new Dispatcher, $container);
+        $container->bind(ViewFactory::class, function () use ($factory) {
+            return $factory;
+        });
+        $container->singleton(Registrar::class, function () use ($router) {
+            return $router;
+        });
+
+        $router->view('hello/{name?}', 'pages.greeting', ['name' => 'He-Who-Must-Not-Be-Named']);
+
+        $factory->shouldReceive('make')->once()->with('pages.greeting', m::subset(['name' => 'He-Who-Must-Not-Be-Named']))->andReturn('Hello He-Who-Must-Not-Be-Named!');
+        $this->assertEquals('Hello He-Who-Must-Not-Be-Named!', $router->dispatch(Request::create('hello', 'GET'))->getContent());
+    }
+
     protected function getRouter()
     {
         $container = new Container;
