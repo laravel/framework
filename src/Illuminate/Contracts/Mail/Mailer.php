@@ -5,6 +5,22 @@ namespace Illuminate\Contracts\Mail;
 interface Mailer
 {
     /**
+     * Begin the process of mailing a mailable class instance.
+     *
+     * @param  mixed  $users
+     * @return \Illuminate\Mail\PendingMail
+     */
+    public function to($users);
+
+    /**
+     * Begin the process of mailing a mailable class instance.
+     *
+     * @param  mixed  $users
+     * @return \Illuminate\Mail\PendingMail
+     */
+    public function bcc($users);
+
+    /**
      * Send a new message when only a raw text part.
      *
      * @param  string  $text
