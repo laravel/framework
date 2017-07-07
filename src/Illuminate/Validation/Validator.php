@@ -255,8 +255,8 @@ class Validator implements ValidatorContract
      */
     public function passes()
     {
-        if (! $this->messages) {
-            $this->messages = new MessageBag;
+        if ($this->messages) {
+            return $this->messages->isEmpty();
         }
 
         // We'll spin through each rule, validating the attributes attached to that
