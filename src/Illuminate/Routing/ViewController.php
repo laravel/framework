@@ -16,7 +16,7 @@ class ViewController extends Controller
 
     /**
      * The default data for the view.
-     * 
+     *
      * @var array;
      */
     protected $data;
@@ -46,7 +46,7 @@ class ViewController extends Controller
         $view = $route->defaults['view'];
         $data = $route->defaults['data'];
 
-        $data = array_merge($this->data, $data);
+        $data = array_merge($data, $this->data);
 
         return $this->view->make($view, $data);
     }
