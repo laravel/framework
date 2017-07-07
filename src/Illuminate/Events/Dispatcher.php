@@ -426,10 +426,28 @@ class Dispatcher implements DispatcherContract
     protected function createQueuedHandlerCallable($class, $method)
     {
         return function () use ($class, $method) {
-            $this->queueHandler($class, $method, array_map(function ($a) {
+            $arguments = array_map(function ($a) {
                 return is_object($a) ? clone $a : $a;
-            }, func_get_args()));
+            }, func_get_args());
+
+            if ($this->mayQueueHandler($class, $arguments)) {
+                $this->queueHandler($class, $method, $arguments);;
+            }
         };
+    }
+
+    /**
+     * Determine if the event handler may be pushed to queue.
+     *
+     * @param  string  $class
+     * @param  array  $arguments
+     * @return bool
+     */
+    protected function mayQueueHandler($class, $arguments)
+    {
+        return ! method_exists($class, 'shouldPushToQueue') ? false
+                    : (new ReflectionClass($class))->newInstanceWithoutConstructor()
+                        ->shouldPushToQueue($arguments[0]);
     }
 
     /**
