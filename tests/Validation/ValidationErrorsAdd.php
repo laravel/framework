@@ -15,10 +15,10 @@ class ValidationErrorsAdd extends TestCase
         $factory = new Factory($translator);
         $validator = $factory->make(['foo' => 'bar'], ['baz' => 'boom']);
 
-        $this->assertEquals(false, $validator->fails());
+        $this->assertFalse($validator->fails());
 
         $validator->errors()->add('foo', 'bar');
 
-        $this->assertEquals(true, $validator->fails());
+        $this->assertTrue($validator->fails());
     }
 }
