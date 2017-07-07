@@ -1399,24 +1399,6 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals(302, $response->getStatusCode());
     }
 
-    public function testRouteView()
-    {
-        $container = new Container;
-        $factory = m::mock('Illuminate\View\Factory');
-        $factory->shouldReceive('make')->once()->with('pages.contact', ['foo' => 'bar'])->andReturn('Contact us');
-        $router = new Router(new Dispatcher, $container);
-        $container->bind(ViewFactory::class, function () use ($factory) {
-            return $factory;
-        });
-        $container->singleton(Registrar::class, function () use ($router) {
-            return $router;
-        });
-
-        $router->view('contact', 'pages.contact', ['foo' => 'bar']);
-
-        $this->assertEquals('Contact us', $router->dispatch(Request::create('contact', 'GET'))->getContent());
-    }
-
     protected function getRouter()
     {
         $container = new Container;
