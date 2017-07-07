@@ -259,6 +259,8 @@ class Validator implements ValidatorContract
             return $this->messages->isEmpty();
         }
 
+        $this->messages = new MessageBag;
+
         // We'll spin through each rule, validating the attributes attached to that
         // rule. Any error messages will be added to the containers with each of
         // the other error messages, returning true if we don't have messages.
