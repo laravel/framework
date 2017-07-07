@@ -53,10 +53,13 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
      *
      * @param  string  $key
      * @param  string  $message
+     * @param  mixed   ...$args
      * @return $this
      */
-    public function add($key, $message)
+    public function add($key, $message, ...$args)
     {
+        $message = sprintf($message, ...$args);
+
         if ($this->isUnique($key, $message)) {
             $this->messages[$key][] = $message;
         }
