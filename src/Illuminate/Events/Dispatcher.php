@@ -445,7 +445,7 @@ class Dispatcher implements DispatcherContract
      */
     protected function mayQueueHandler($class, $arguments)
     {
-        return ! method_exists($class, 'shouldPushToQueue') ? false
+        return ! method_exists($class, 'shouldPushToQueue') ? true
                     : (new ReflectionClass($class))->newInstanceWithoutConstructor()
                         ->shouldPushToQueue($arguments[0]);
     }
