@@ -1403,7 +1403,7 @@ class RoutingRouteTest extends TestCase
     {
         $container = new Container;
         $factory = m::mock('Illuminate\View\Factory');
-        $factory->shouldReceive('make')->once()->with('pages.contact', ['foo' => 'bar'])->andReturn('Contact us');
+        $factory->shouldReceive('make')->once()->with('pages.contact', m::subset(['foo' => 'bar']))->andReturn('Contact us');
         $router = new Router(new Dispatcher, $container);
         $container->bind(ViewFactory::class, function () use ($factory) {
             return $factory;
@@ -1415,6 +1415,24 @@ class RoutingRouteTest extends TestCase
         $router->view('contact', 'pages.contact', ['foo' => 'bar']);
 
         $this->assertEquals('Contact us', $router->dispatch(Request::create('contact', 'GET'))->getContent());
+    }
+
+    public function testRouteViewWithParameters()
+    {
+        $container = new Container;
+        $factory = m::mock('Illuminate\View\Factory');
+        $factory->shouldReceive('make')->once()->with('pages.greeting', m::subset(['name' => 'Taylor']))->andReturn('Hello Taylor!');
+        $router = new Router(new Dispatcher, $container);
+        $container->bind(ViewFactory::class, function () use ($factory) {
+            return $factory;
+        });
+        $container->singleton(Registrar::class, function () use ($router) {
+            return $router;
+        });
+
+        $router->view('hello/{name}', 'pages.greeting');
+
+        $this->assertEquals('Hello Taylor!', $router->dispatch(Request::create('hello/Taylor', 'GET'))->getContent());
     }
 
     protected function getRouter()
