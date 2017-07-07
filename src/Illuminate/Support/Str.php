@@ -30,6 +30,28 @@ class Str
     protected static $studlyCache = [];
 
     /**
+     * Return the remainder of a string before a given value.
+     *
+     * @param  string  $subject
+     * @param  string  $search
+     * @return string
+     */
+    public static function before($subject, $search)
+    {
+        if ($search == '') {
+            return $subject;
+        }
+
+        $pos = strpos($subject, $search);
+
+        if ($pos === false) {
+            return $subject;
+        }
+
+        return substr($subject, 0, $pos);
+    }
+
+    /**
      * Return the remainder of a string after a given value.
      *
      * @param  string  $subject
