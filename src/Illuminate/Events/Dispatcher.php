@@ -431,7 +431,7 @@ class Dispatcher implements DispatcherContract
             }, func_get_args());
 
             if ($this->mayQueueHandler($class, $arguments)) {
-                $this->queueHandler($class, $method, $arguments);;
+                $this->queueHandler($class, $method, $arguments);
             }
         };
     }
