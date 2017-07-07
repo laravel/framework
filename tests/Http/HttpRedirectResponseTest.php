@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Http;
 
 use Mockery as m;
-use BadMethodCallException;
 use Illuminate\Http\Request;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Http\RedirectResponse;
@@ -121,7 +120,8 @@ class HttpRedirectResponseTest extends TestCase
     }
 
     /**
-     * @expectedException BadMethodCallException
+     * @expectedException \BadMethodCallException
+     * @expectedExceptionMessage Method [doesNotExist] does not exist on Redirect.
      */
     public function testMagicCallException()
     {

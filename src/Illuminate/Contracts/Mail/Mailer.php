@@ -8,15 +8,15 @@ interface Mailer
      * Send a new message when only a raw text part.
      *
      * @param  string  $text
-     * @param  \Closure|string  $callback
-     * @return int
+     * @param  mixed  $callback
+     * @return void
      */
     public function raw($text, $callback);
 
     /**
      * Send a new message using a view.
      *
-     * @param  string|array  $view
+     * @param  string|array|MailableContract  $view
      * @param  array  $data
      * @param  \Closure|string  $callback
      * @return void

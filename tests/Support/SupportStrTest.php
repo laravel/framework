@@ -38,6 +38,18 @@ class SupportStrTest extends TestCase
         $this->assertEquals($nbsp, Str::words($nbsp));
     }
 
+    public function testStringAscii()
+    {
+        $this->assertEquals('@', Str::ascii('@'));
+        $this->assertEquals('u', Str::ascii('ü'));
+    }
+
+    public function testStringAsciiWithSpecificLocale()
+    {
+        $this->assertSame('h H sht SHT a A y Y', Str::ascii('х Х щ Щ ъ Ъ ь Ь', 'bg'));
+        $this->assertSame('ae oe ue AE OE UE', Str::ascii('ä ö ü Ä Ö Ü', 'de'));
+    }
+
     public function testStartsWith()
     {
         $this->assertTrue(Str::startsWith('jason', 'jas'));
@@ -108,6 +120,7 @@ class SupportStrTest extends TestCase
         $this->assertEquals('hello-world', Str::slug('hello-world'));
         $this->assertEquals('hello-world', Str::slug('hello_world'));
         $this->assertEquals('hello_world', Str::slug('hello_world', '_'));
+        $this->assertEquals('user-at-host', Str::slug('user@host'));
     }
 
     public function testFinish()
@@ -160,14 +173,6 @@ class SupportStrTest extends TestCase
         $this->assertEquals(11, Str::length('foo bar baz'));
     }
 
-    public function testQuickRandom()
-    {
-        $randomInteger = random_int(1, 100);
-        $this->assertEquals($randomInteger, strlen(Str::quickRandom($randomInteger)));
-        $this->assertInternalType('string', Str::quickRandom());
-        $this->assertEquals(16, strlen(Str::quickRandom()));
-    }
-
     public function testRandom()
     {
         $this->assertEquals(16, strlen(Str::random()));
@@ -212,6 +217,8 @@ class SupportStrTest extends TestCase
         // ensure cache keys don't overlap
         $this->assertEquals('laravel__php__framework', Str::snake('LaravelPhpFramework', '__'));
         $this->assertEquals('laravel_php_framework_', Str::snake('LaravelPhpFramework_', '_'));
+        $this->assertEquals('laravel_php_framework', Str::snake('laravel php Framework'));
+        $this->assertEquals('laravel_php_frame_work', Str::snake('laravel php FrameWork'));
     }
 
     public function testStudly()

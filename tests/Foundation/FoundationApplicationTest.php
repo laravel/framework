@@ -16,11 +16,11 @@ class FoundationApplicationTest extends TestCase
     public function testSetLocaleSetsLocaleAndFiresLocaleChangedEvent()
     {
         $app = new Application;
-        $app['config'] = $config = m::mock('StdClass');
+        $app['config'] = $config = m::mock('stdClass');
         $config->shouldReceive('set')->once()->with('app.locale', 'foo');
-        $app['translator'] = $trans = m::mock('StdClass');
+        $app['translator'] = $trans = m::mock('stdClass');
         $trans->shouldReceive('setLocale')->once()->with('foo');
-        $app['events'] = $events = m::mock('StdClass');
+        $app['events'] = $events = m::mock('stdClass');
         $events->shouldReceive('dispatch')->once()->with(m::type('Illuminate\Foundation\Events\LocaleUpdated'));
 
         $app->setLocale('foo');
@@ -63,8 +63,8 @@ class FoundationApplicationTest extends TestCase
         $this->assertTrue($app->bound('foo'));
         $one = $app->make('foo');
         $two = $app->make('foo');
-        $this->assertInstanceOf('StdClass', $one);
-        $this->assertInstanceOf('StdClass', $two);
+        $this->assertInstanceOf('stdClass', $one);
+        $this->assertInstanceOf('stdClass', $two);
         $this->assertSame($one, $two);
     }
 
@@ -83,7 +83,7 @@ class FoundationApplicationTest extends TestCase
         $app = new Application;
         $app->setDeferredServices(['foo' => 'Illuminate\Tests\Foundation\ApplicationDeferredServiceProviderCountStub']);
         $obj = $app->make('foo');
-        $this->assertInstanceOf('StdClass', $obj);
+        $this->assertInstanceOf('stdClass', $obj);
         $this->assertSame($obj, $app->make('foo'));
         $this->assertEquals(1, ApplicationDeferredServiceProviderCountStub::$count);
     }
@@ -193,7 +193,7 @@ class ApplicationDeferredSharedServiceProviderStub extends \Illuminate\Support\S
     public function register()
     {
         $this->app->singleton('foo', function () {
-            return new \StdClass;
+            return new \stdClass;
         });
     }
 }
@@ -206,7 +206,7 @@ class ApplicationDeferredServiceProviderCountStub extends \Illuminate\Support\Se
     public function register()
     {
         static::$count++;
-        $this->app['foo'] = new \StdClass;
+        $this->app['foo'] = new \stdClass;
     }
 }
 

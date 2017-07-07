@@ -47,7 +47,7 @@ abstract class GeneratorCommand extends Command
      *
      * @return bool|null
      */
-    public function fire()
+    public function handle()
     {
         $name = $this->qualifyClass($this->getNameInput());
 
@@ -123,7 +123,7 @@ abstract class GeneratorCommand extends Command
      */
     protected function getPath($name)
     {
-        $name = str_replace_first($this->rootNamespace(), '', $name);
+        $name = Str::replaceFirst($this->rootNamespace(), '', $name);
 
         return $this->laravel['path'].'/'.str_replace('\\', '/', $name).'.php';
     }

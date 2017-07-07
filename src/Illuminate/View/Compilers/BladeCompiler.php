@@ -2,6 +2,7 @@
 
 namespace Illuminate\View\Compilers;
 
+use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
@@ -30,11 +31,16 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * All custom "directive" handlers.
      *
-     * This was implemented as a more usable "extend" in 5.1.
-     *
      * @var array
      */
     protected $customDirectives = [];
+
+    /**
+     * All custom "condition" handlers.
+     *
+     * @var array
+     */
+    protected $conditions = [];
 
     /**
      * The file currently being compiled.
@@ -343,6 +349,40 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function getExtensions()
     {
         return $this->extensions;
+    }
+
+    /**
+     * Register an "if" statement directive.
+     *
+     * @param  string  $name
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function if($name, Closure $callback)
+    {
+        $this->conditions[$name] = $callback;
+
+        $this->directive($name, function ($expression) use ($name) {
+            return $expression
+                    ? "<?php if (\Illuminate\Support\Facades\Blade::check('{$name}', {$expression})): ?>"
+                    : "<?php if (\Illuminate\Support\Facades\Blade::check('{$name}')): ?>";
+        });
+
+        $this->directive('end'.$name, function () {
+            return '<?php endif; ?>';
+        });
+    }
+
+    /**
+     * Check the result of a condition.
+     *
+     * @param  string  $name
+     * @param  array  $parameters
+     * @return bool
+     */
+    public function check($name, ...$parameters)
+    {
+        return call_user_func($this->conditions[$name], ...$parameters);
     }
 
     /**

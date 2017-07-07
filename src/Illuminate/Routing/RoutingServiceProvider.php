@@ -133,7 +133,7 @@ class RoutingServiceProvider extends ServiceProvider
     protected function registerPsrResponse()
     {
         $this->app->bind(ResponseInterface::class, function ($app) {
-            return new PsrResponse();
+            return new PsrResponse;
         });
     }
 

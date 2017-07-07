@@ -38,19 +38,25 @@ class MorphToMany extends BelongsToMany
      * @param  \Illuminate\Database\Eloquent\Model  $parent
      * @param  string  $name
      * @param  string  $table
-     * @param  string  $foreignKey
+     * @param  string  $foreignPivotKey
+     * @param  string  $relatedPivotKey
+     * @param  string  $parentKey
      * @param  string  $relatedKey
      * @param  string  $relationName
      * @param  bool  $inverse
      * @return void
      */
-    public function __construct(Builder $query, Model $parent, $name, $table, $foreignKey, $relatedKey, $relationName = null, $inverse = false)
+    public function __construct(Builder $query, Model $parent, $name, $table, $foreignPivotKey,
+                                $relatedPivotKey, $parentKey, $relatedKey, $relationName = null, $inverse = false)
     {
         $this->inverse = $inverse;
         $this->morphType = $name.'_type';
         $this->morphClass = $inverse ? $query->getModel()->getMorphClass() : $parent->getMorphClass();
 
-        parent::__construct($query, $parent, $table, $foreignKey, $relatedKey, $relationName);
+        parent::__construct(
+            $query, $parent, $table, $foreignPivotKey,
+            $relatedPivotKey, $parentKey, $relatedKey, $relationName
+        );
     }
 
     /**
@@ -133,7 +139,7 @@ class MorphToMany extends BelongsToMany
         $pivot = $using ? $using::fromRawAttributes($this->parent, $attributes, $this->table, $exists)
                         : new MorphPivot($this->parent, $attributes, $this->table, $exists);
 
-        $pivot->setPivotKeys($this->foreignKey, $this->relatedKey)
+        $pivot->setPivotKeys($this->foreignPivotKey, $this->relatedPivotKey)
               ->setMorphType($this->morphType)
               ->setMorphClass($this->morphClass);
 

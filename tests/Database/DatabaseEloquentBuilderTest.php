@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
-use StdClass;
+use stdClass;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Builder;
@@ -155,7 +155,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testValueMethodWithModelFound()
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[first]', [$this->getMockQueryBuilder()]);
-        $mockModel = new StdClass;
+        $mockModel = new stdClass;
         $mockModel->name = 'foo';
         $builder->shouldReceive('first')->with(['name'])->andReturn($mockModel);
 
@@ -183,7 +183,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->shouldReceive('forPage')->once()->with(3, 2)->andReturnSelf();
         $builder->shouldReceive('get')->times(3)->andReturn($chunk1, $chunk2, $chunk3);
 
-        $callbackAssertor = m::mock('StdClass');
+        $callbackAssertor = m::mock('stdClass');
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk2);
         $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk3);
@@ -204,7 +204,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->shouldReceive('forPage')->once()->with(2, 2)->andReturnSelf();
         $builder->shouldReceive('get')->times(2)->andReturn($chunk1, $chunk2);
 
-        $callbackAssertor = m::mock('StdClass');
+        $callbackAssertor = m::mock('stdClass');
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk2);
 
@@ -224,7 +224,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->shouldReceive('forPage')->never()->with(2, 2);
         $builder->shouldReceive('get')->times(1)->andReturn($chunk1);
 
-        $callbackAssertor = m::mock('StdClass');
+        $callbackAssertor = m::mock('stdClass');
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
         $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk2);
 
@@ -244,7 +244,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->shouldReceive('forPage')->once()->with(1, 0)->andReturnSelf();
         $builder->shouldReceive('get')->times(1)->andReturn($chunk);
 
-        $callbackAssertor = m::mock('StdClass');
+        $callbackAssertor = m::mock('stdClass');
         $callbackAssertor->shouldReceive('doSomething')->never();
 
         $builder->chunk(0, function ($results) use ($callbackAssertor) {
@@ -265,7 +265,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 11, 'someIdField')->andReturnSelf();
         $builder->shouldReceive('get')->times(3)->andReturn($chunk1, $chunk2, $chunk3);
 
-        $callbackAssertor = m::mock('StdClass');
+        $callbackAssertor = m::mock('stdClass');
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk2);
         $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk3);
@@ -286,7 +286,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 2, 'someIdField')->andReturnSelf();
         $builder->shouldReceive('get')->times(2)->andReturn($chunk1, $chunk2);
 
-        $callbackAssertor = m::mock('StdClass');
+        $callbackAssertor = m::mock('stdClass');
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk2);
 
@@ -304,7 +304,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->shouldReceive('forPageAfterId')->once()->with(0, 0, 'someIdField')->andReturnSelf();
         $builder->shouldReceive('get')->times(1)->andReturn($chunk);
 
-        $callbackAssertor = m::mock('StdClass');
+        $callbackAssertor = m::mock('stdClass');
         $callbackAssertor->shouldReceive('doSomething')->never();
 
         $builder->chunkById(0, function ($results) use ($callbackAssertor) {
@@ -474,7 +474,8 @@ class DatabaseEloquentBuilderTest extends TestCase
     }
 
     /**
-     * @expectedException Illuminate\Database\Eloquent\RelationNotFoundException
+     * @expectedException \Illuminate\Database\Eloquent\RelationNotFoundException
+     * @expectedExceptionMessage Call to undefined relationship [invalid] on model [Mockery_18_Illuminate_Database_Eloquent_Model].
      */
     public function testGetRelationThrowsException()
     {
@@ -684,7 +685,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder = $model->withCount('foo as foo_bar');
 
-        $this->assertEquals('select "eloquent_builder_test_model_parent_stubs".*, (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_bar_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $this->assertEquals('select "eloquent_builder_test_model_parent_stubs".*, (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_bar" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
     public function testWithCountMultipleAndPartialRename()
@@ -693,7 +694,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder = $model->withCount(['foo as foo_bar', 'foo']);
 
-        $this->assertEquals('select "eloquent_builder_test_model_parent_stubs".*, (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_bar_count", (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $this->assertEquals('select "eloquent_builder_test_model_parent_stubs".*, (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_bar", (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
     public function testHasWithConstraintsAndHavingInSubquery()

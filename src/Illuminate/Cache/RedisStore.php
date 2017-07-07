@@ -166,6 +166,18 @@ class RedisStore extends TaggableStore implements Store
     }
 
     /**
+     * Get a lock instance.
+     *
+     * @param  string  $name
+     * @param  int  $seconds
+     * @return \Illuminate\Contracts\Cache\Lock
+     */
+    public function lock($name, $seconds = 0)
+    {
+        return new RedisLock($this->connection(), $this->prefix.$name, $seconds);
+    }
+
+    /**
      * Remove an item from the cache.
      *
      * @param  string  $key

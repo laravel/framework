@@ -38,7 +38,7 @@ class FoundationProviderRepositoryTest extends TestCase
         $repo->shouldReceive('shouldRecompile')->once()->andReturn(true);
 
         // foo mock is just a deferred provider
-        $repo->shouldReceive('createProvider')->once()->with('foo')->andReturn($fooMock = m::mock('StdClass'));
+        $repo->shouldReceive('createProvider')->once()->with('foo')->andReturn($fooMock = m::mock('stdClass'));
         $fooMock->shouldReceive('isDeferred')->once()->andReturn(true);
         $fooMock->shouldReceive('provides')->once()->andReturn(['foo.provides1', 'foo.provides2']);
         $fooMock->shouldReceive('when')->once()->andReturn([]);

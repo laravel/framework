@@ -2,7 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
 
 class DownCommand extends Command
@@ -27,7 +27,7 @@ class DownCommand extends Command
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
         file_put_contents(
             $this->laravel->storagePath().'/framework/down',

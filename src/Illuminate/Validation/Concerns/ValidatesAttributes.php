@@ -630,7 +630,7 @@ trait ValidatesAttributes
      */
     protected function getUniqueIds($parameters)
     {
-        $idColumn = isset($parameters[3]) ? $parameters[3] : 'id';
+        $idColumn = $parameters[3] ?? 'id';
 
         return [$idColumn, $this->prepareUniqueId($parameters[2])];
     }
@@ -705,7 +705,7 @@ trait ValidatesAttributes
      */
     public function guessColumnForQuery($attribute)
     {
-        if (in_array($attribute, array_collapse($this->implicitAttributes))
+        if (in_array($attribute, Arr::collapse($this->implicitAttributes))
                 && ! is_numeric($last = last(explode('.', $attribute)))) {
             return $last;
         }

@@ -8,11 +8,12 @@ use BadMethodCallException;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Contracts\Queue\Factory as Queue;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
 
-class Mailable implements MailableContract
+class Mailable implements MailableContract, Renderable
 {
     /**
      * The person the message is from.
@@ -160,6 +161,20 @@ class Mailable implements MailableContract
     }
 
     /**
+     * Render the mailable into a view.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function render()
+    {
+        Container::getInstance()->call([$this, 'build']);
+
+        return Container::getInstance()->make('mailer')->render(
+            $this->buildView(), $this->buildViewData()
+        );
+    }
+
+    /**
      * Build the view for the message.
      *
      * @return array|string
@@ -187,6 +202,10 @@ class Mailable implements MailableContract
     protected function buildMarkdownView()
     {
         $markdown = Container::getInstance()->make(Markdown::class);
+
+        if (isset($this->theme)) {
+            $markdown->theme($this->theme);
+        }
 
         $data = $this->buildViewData();
 
@@ -223,9 +242,8 @@ class Mailable implements MailableContract
      */
     protected function buildMarkdownText($markdown, $data)
     {
-        return isset($this->textView)
-                ? $this->textView
-                : $markdown->renderText($this->markdown, $data);
+        return $this->textView
+                ?? $markdown->renderText($this->markdown, $data);
     }
 
     /**
@@ -454,7 +472,7 @@ class Mailable implements MailableContract
             $recipient = $this->normalizeRecipient($recipient);
 
             $this->{$property}[] = [
-                'name' => isset($recipient->name) ? $recipient->name : null,
+                'name' => $recipient->name ?? null,
                 'address' => $recipient->email,
             ];
         }
@@ -510,7 +528,7 @@ class Mailable implements MailableContract
         );
 
         $expected = [
-            'name' => isset($expected->name) ? $expected->name : null,
+            'name' => $expected->name ?? null,
             'address' => $expected->email,
         ];
 

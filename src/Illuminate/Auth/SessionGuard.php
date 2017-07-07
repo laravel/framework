@@ -461,7 +461,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     protected function queueRecallerCookie(AuthenticatableContract $user)
     {
         $this->getCookieJar()->queue($this->createRecaller(
-            $user->getAuthIdentifier().'|'.$user->getRememberToken()
+            $user->getAuthIdentifier().'|'.$user->getRememberToken().'|'.$user->getAuthPassword()
         ));
     }
 
@@ -700,27 +700,6 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     public function getSession()
     {
         return $this->session;
-    }
-
-    /**
-     * Get the user provider used by the guard.
-     *
-     * @return \Illuminate\Contracts\Auth\UserProvider
-     */
-    public function getProvider()
-    {
-        return $this->provider;
-    }
-
-    /**
-     * Set the user provider used by the guard.
-     *
-     * @param  \Illuminate\Contracts\Auth\UserProvider  $provider
-     * @return void
-     */
-    public function setProvider(UserProvider $provider)
-    {
-        $this->provider = $provider;
     }
 
     /**
