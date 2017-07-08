@@ -430,24 +430,26 @@ class Dispatcher implements DispatcherContract
                 return is_object($a) ? clone $a : $a;
             }, func_get_args());
 
-            if ($this->mayQueueHandler($class, $arguments)) {
+            if ($this->handlerWantsToBeQueued($class, $arguments)) {
                 $this->queueHandler($class, $method, $arguments);
             }
         };
     }
 
     /**
-     * Determine if the event handler may be pushed to queue.
+     * Determine if the event handler wants to be queued.
      *
      * @param  string  $class
      * @param  array  $arguments
      * @return bool
      */
-    protected function mayQueueHandler($class, $arguments)
+    protected function handlerWantsToBeQueued($class, $arguments)
     {
-        return ! method_exists($class, 'shouldPushToQueue') ? true
-                    : (new ReflectionClass($class))->newInstanceWithoutConstructor()
-                        ->shouldPushToQueue($arguments[0]);
+        if (method_exists($class, 'shouldQueue')) {
+            return $this->container->make($class)->shouldQueue($arguments[0]);
+        }
+
+        return true;
     }
 
     /**
