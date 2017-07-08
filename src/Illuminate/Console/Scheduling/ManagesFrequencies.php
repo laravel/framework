@@ -53,13 +53,11 @@ trait ManagesFrequencies
     private function inTimeInterval($startTime, $endTime)
     {
         return function () use ($startTime, $endTime) {
-            
             return Carbon::now($this->timezone)->between(
                 Carbon::parse($startTime, $this->timezone),
                 Carbon::parse($endTime, $this->timezone),
                 true
             );
-            
         };
     }
 
