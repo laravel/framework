@@ -38,7 +38,7 @@ class PolicyMakeCommand extends GeneratorCommand
     protected function buildClass($name)
     {
         $stub = parent::buildClass($name);
-        
+
         $stub = $this->replaceUserModelNamespace($stub);
 
         $model = $this->option('model');
@@ -62,17 +62,17 @@ class PolicyMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Get the default namespace for the user model
+     * Get the default namespace for the user model.
      *
      * @return string
      */
     public function getDefaultUserNamespace()
     {
-        return $this->rootNamespace() . 'User';
+        return $this->rootNamespace().'User';
     }
 
     /**
-     * Get the real namespace for the user model
+     * Get the real namespace for the user model.
      *
      * @return string
      */
