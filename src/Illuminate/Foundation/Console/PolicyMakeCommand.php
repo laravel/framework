@@ -50,7 +50,7 @@ class PolicyMakeCommand extends GeneratorCommand
      * Replace the user model for the given stub.
      *
      * @param  string  $stub
-     * @return string  mixed
+     * @return string
      */
     protected function replaceUserModelNamespace($stub)
     {
