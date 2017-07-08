@@ -57,4 +57,14 @@ class FoundationHelpersTest extends TestCase
 
         unlink(public_path($file));
     }
+
+    public function testMixMethod()
+    {
+        app()->instance(
+            'mix',
+            m::mock(\Illuminate\View\Mix\Mix::class)->shouldReceive('resolve')->andReturn('bar')->getMock()
+        );
+
+        $this->assertSame('bar', mix('foo'));
+    }
 }
