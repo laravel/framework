@@ -62,7 +62,7 @@ class FactoryMakeCommand extends GeneratorCommand
     {
         $name = str_replace(
             ['\\', '/'], '', $this->argument('name')
-        ).'Factory';
+        );
 
         return $this->laravel->databasePath()."/factories/{$name}.php";
     }
