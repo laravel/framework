@@ -54,8 +54,10 @@ trait ManagesFrequencies
     {
         return function () use ($startTime, $endTime) {
             $now = Carbon::now($this->timezone)->getTimestamp();
+            $start = Carbon::parse($startTime, $this->timezone)->getTimestamp();
+            $end = Carbon::parse($endTime, $this->timezone)->getTimestamp();
 
-            return $now >= strtotime($startTime) && $now <= strtotime($endTime);
+            return $now >= $start && $now <= $end;
         };
     }
 
