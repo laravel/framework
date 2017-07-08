@@ -182,6 +182,8 @@ class Factory implements FactoryContract
                     $view, ['key' => $key, $iterator => $value, 'loop' => $this->getLastLoop()]
                 )->render();
             }
+
+            $this->resetLoopStack();
         }
 
         // If there is no data in the array, we will render the contents of the empty
