@@ -93,6 +93,7 @@ class ConsoleScheduledEventTest extends TestCase
         Carbon::setTestNow(Carbon::now()->startOfDay()->addHours(9));
 
         $event = new Event(m::mock('Illuminate\Console\Scheduling\Mutex'), 'php foo');
+        $event->timezone('UTC');
         $this->assertTrue($event->between('8:00', '10:00')->filtersPass($app));
         $this->assertTrue($event->between('9:00', '9:00')->filtersPass($app));
         $this->assertFalse($event->between('10:00', '11:00')->filtersPass($app));
