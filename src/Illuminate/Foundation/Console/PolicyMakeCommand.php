@@ -54,7 +54,7 @@ class PolicyMakeCommand extends GeneratorCommand
      */
     protected function replaceUserModelNamespace($stub)
     {
-        return str_replace('App\User', config('auth.providers.users.model'), $stub);
+        return str_replace($this->rootNamespace().'User', config('auth.providers.users.model'), $stub);
     }
 
     /**
