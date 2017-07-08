@@ -64,7 +64,7 @@ class EventServiceProvider extends ServiceProvider
         return array_merge_recursive(collect($this->listeners)->filter(function ($listener) {
             return class_exists($listener, false);
         })->flatMap(function ($listener) {
-            return collect($listener::$hears)->map(function ($event) use ($listener) {
+            return collect($listener::$listensFor)->map(function ($event) use ($listener) {
                 return ['event' => $event, 'listeners' => [$listener]];
             })->all();
         })->groupBy('event')->map(function ($listeners) {

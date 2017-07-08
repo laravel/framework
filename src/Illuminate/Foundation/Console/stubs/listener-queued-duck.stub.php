@@ -14,7 +14,7 @@ class DummyClass implements ShouldQueue
      *
      * @var array
      */
-    public static $hears = [
+    public static $listensFor = [
         //
     ];
 

@@ -41,7 +41,7 @@ class EventGenerateCommand extends Command
     }
 
     /**
-     * Generate the dynamic listeners which have "hears" properties.
+     * Generate the dynamic listeners which have "listensFor" properties.
      *
      * @param  object  $provider
      * @return void
@@ -55,7 +55,7 @@ class EventGenerateCommand extends Command
                 continue;
             }
 
-            foreach ($listener::$hears as $event) {
+            foreach ($listener::$listensFor as $event) {
                 $this->makeEventAndListeners($event, [$listener]);
             }
         }
