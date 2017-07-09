@@ -87,4 +87,14 @@ trait ManagesLoops
     {
         return $this->loopsStack;
     }
+
+    /**
+     * Reset the loop stack.
+     *
+     * @return void
+     */
+    public function resetLoopStack()
+    {
+        $this->loopsStack = [];
+    }
 }
