@@ -1044,6 +1044,28 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $collection->all());
     }
 
+    public function testWrapCollection()
+    {
+        $collection = Collection::wrap(new Collection(['foo']));
+        $this->assertSame($collection, $collection);
+
+        $collection = Collection::wrap('foo');
+        $this->assertEquals(['foo'], $collection->all());
+
+        $collection = Collection::wrap(new TestArrayableObject);
+        $this->assertEquals(['foo' => 'bar'], $collection->first()->toArray());
+    }
+
+    public function testUnwrapCollection()
+    {
+        $collection = new Collection(['foo']);
+        $this->assertEquals(['foo'], Collection::unwrap($collection));
+
+        $this->assertEquals(['foo'], Collection::unwrap(['foo']));
+
+        $this->assertEquals('foo', Collection::unwrap('foo'));
+    }
+
     public function testConstructMethod()
     {
         $collection = new Collection('foo');
