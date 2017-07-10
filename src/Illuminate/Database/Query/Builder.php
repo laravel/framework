@@ -369,6 +369,36 @@ class Builder
     }
 
     /**
+     * Add a join clause to the query using a sub query.
+     *
+     * @param        $query
+     * @param        $as
+     * @param        $first
+     * @param        $operator
+     * @param        $second
+     * @param string $type
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function joinSub($query, $as, $first, $operator, $second, $type = 'inner')
+    {
+        if ($query instanceof Closure)
+        {
+            $callback = $query;
+
+            $callback($query = $this->newQuery());
+        }
+
+        $table = new Expression(
+            '(' . $query->toSql() . ') as ' . $this->grammar->wrap($as)
+        );
+
+        $this->mergeBindings($query);
+
+        return $this->join($table, $first, $operator, $second, $type);
+    }
+
+    /**
      * Add a "join where" clause to the query.
      *
      * @param  string  $table
@@ -412,6 +442,22 @@ class Builder
     }
 
     /**
+     * Add a left join clause to the query using a sub query.
+     *
+     * @param $query
+     * @param $as
+     * @param $first
+     * @param $operator
+     * @param $second
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function leftJoinSub($query, $as, $first, $operator, $second)
+    {
+        return $this->joinSub($query, $as, $first, $operator, $second, 'left');
+    }
+
+    /**
      * Add a right join to the query.
      *
      * @param  string  $table
@@ -437,6 +483,22 @@ class Builder
     public function rightJoinWhere($table, $first, $operator, $second)
     {
         return $this->joinWhere($table, $first, $operator, $second, 'right');
+    }
+
+    /**
+     * Add a right join clause to the query using a sub query.
+     *
+     * @param $query
+     * @param $as
+     * @param $first
+     * @param $operator
+     * @param $second
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function rightJoinSub($query, $as, $first, $operator, $second)
+    {
+        return $this->joinSub($query, $as, $first, $operator, $second, 'right');
     }
 
     /**

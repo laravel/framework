@@ -1101,6 +1101,52 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['admin'], $builder->getBindings());
     }
 
+    public function testBasicJoinRaw()
+    {
+        $builder = $this->getBuilder();
+        $sub = $this->getBuilder();
+        $sub->select('*')
+            ->from('contracts')
+            ->where('role', '=', 'admin');
+
+        $builder->select('*')
+                ->from('users')
+                ->joinSub($sub, 'contracts', 'users.id', '=', 'contracts.id');
+
+        $this->assertEquals('select * from "users" inner join (select * from "contracts" where "role" = ?) as "contracts" on "users"."id" = "contracts"."id"', $builder->toSql());
+        $this->assertEquals(['admin'], $builder->getBindings());
+    }
+
+    public function testBasicLeftJoinRaw(){
+        $builder = $this->getBuilder();
+        $sub = $this->getBuilder();
+        $sub->select('*')
+            ->from('contracts')
+            ->where('role', '=', 'admin');
+
+        $builder->select('*')
+                ->from('users')
+                ->leftJoinSub($sub, 'contracts', 'users.id', '=', 'contracts.id');
+
+        $this->assertEquals('select * from "users" left join (select * from "contracts" where "role" = ?) as "contracts" on "users"."id" = "contracts"."id"', $builder->toSql());
+        $this->assertEquals(['admin'], $builder->getBindings());
+    }
+
+    public function testBasicRightJoinRaw(){
+        $builder = $this->getBuilder();
+        $sub = $this->getBuilder();
+        $sub->select('*')
+            ->from('contracts')
+            ->where('role', '=', 'admin');
+
+        $builder->select('*')
+                ->from('users')
+                ->rightJoinSub($sub, 'contracts', 'users.id', '=', 'contracts.id');
+
+        $this->assertEquals('select * from "users" right join (select * from "contracts" where "role" = ?) as "contracts" on "users"."id" = "contracts"."id"', $builder->toSql());
+        $this->assertEquals(['admin'], $builder->getBindings());
+    }
+
     public function testRawExpressionsInSelect()
     {
         $builder = $this->getBuilder();
