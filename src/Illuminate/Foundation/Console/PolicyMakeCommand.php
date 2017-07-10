@@ -39,9 +39,46 @@ class PolicyMakeCommand extends GeneratorCommand
     {
         $stub = parent::buildClass($name);
 
+        $stub = $this->replaceUserModelNamespace($stub);
+
         $model = $this->option('model');
 
         return $model ? $this->replaceModel($stub, $model) : $stub;
+    }
+
+    /**
+     * Replace the user model namespace for the given stub.
+     *
+     * @param  string  $stub
+     * @return string
+     */
+    protected function replaceUserModelNamespace($stub)
+    {
+        if ($this->getDefaultUserNamespace() != $this->getRealUserNamespace()) {
+            return str_replace($this->getDefaultUserNamespace(), $this->getRealUserNamespace(), $stub);
+        }
+
+        return $stub;
+    }
+
+    /**
+     * Get the default namespace for the user model.
+     *
+     * @return string
+     */
+    public function getDefaultUserNamespace()
+    {
+        return $this->rootNamespace().'User';
+    }
+
+    /**
+     * Get the real namespace for the user model.
+     *
+     * @return string
+     */
+    public function getRealUserNamespace()
+    {
+        return config('auth.providers.users.model');
     }
 
     /**
