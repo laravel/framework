@@ -1549,6 +1549,7 @@ class ValidationValidatorTest extends TestCase
 
         $trans = $this->getIlluminateArrayTranslator();
         $closure = function () {
+            //
         };
         $v = new Validator($trans, [['email' => 'foo', 'type' => 'bar']], [
             '*.email' => (new Unique('users'))->where($closure),
@@ -3318,6 +3319,7 @@ class ValidationValidatorTest extends TestCase
 
     public function testInlineMessagesMayUseAsteriskForEachRules()
     {
+        //
     }
 
     public function testUsingSettersWithImplicitRules()

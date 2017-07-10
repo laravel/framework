@@ -394,5 +394,6 @@ class DatabaseConnectionTestMockPDO extends PDO
 {
     public function __construct()
     {
+        //
     }
 }

@@ -378,6 +378,7 @@ class RoutingRouteTest extends TestCase
     public function testNonGreedyMatches()
     {
         $route = new Route('GET', 'images/{id}.{ext}', function () {
+            //
         });
 
         $request1 = Request::create('images/1.png', 'GET');
@@ -396,6 +397,7 @@ class RoutingRouteTest extends TestCase
 
         // Test parameter() default value
         $route = new Route('GET', 'foo/{foo?}', function () {
+            //
         });
 
         $request3 = Request::create('foo', 'GET');
@@ -533,11 +535,13 @@ class RoutingRouteTest extends TestCase
          */
         $request = Request::create('foo/bar', 'GET');
         $route = new Route('GET', 'foo/{bar}', function () {
+            //
         });
         $this->assertTrue($route->matches($request));
 
         $request = Request::create('foo/bar', 'GET');
         $route = new Route('GET', 'foo', function () {
+            //
         });
         $this->assertFalse($route->matches($request));
 
@@ -546,11 +550,13 @@ class RoutingRouteTest extends TestCase
          */
         $request = Request::create('foo/bar', 'GET');
         $route = new Route('GET', 'foo/{bar}', function () {
+            //
         });
         $this->assertTrue($route->matches($request));
 
         $request = Request::create('foo/bar', 'POST');
         $route = new Route('GET', 'foo', function () {
+            //
         });
         $this->assertFalse($route->matches($request));
 
@@ -559,11 +565,13 @@ class RoutingRouteTest extends TestCase
          */
         $request = Request::create('http://something.foo.com/foo/bar', 'GET');
         $route = new Route('GET', 'foo/{bar}', ['domain' => '{foo}.foo.com', function () {
+            //
         }]);
         $this->assertTrue($route->matches($request));
 
         $request = Request::create('http://something.bar.com/foo/bar', 'GET');
         $route = new Route('GET', 'foo/{bar}', ['domain' => '{foo}.foo.com', function () {
+            //
         }]);
         $this->assertFalse($route->matches($request));
 
@@ -572,16 +580,19 @@ class RoutingRouteTest extends TestCase
          */
         $request = Request::create('https://foo.com/foo/bar', 'GET');
         $route = new Route('GET', 'foo/{bar}', ['https', function () {
+            //
         }]);
         $this->assertTrue($route->matches($request));
 
         $request = Request::create('https://foo.com/foo/bar', 'GET');
         $route = new Route('GET', 'foo/{bar}', ['https', 'baz' => true, function () {
+            //
         }]);
         $this->assertTrue($route->matches($request));
 
         $request = Request::create('http://foo.com/foo/bar', 'GET');
         $route = new Route('GET', 'foo/{bar}', ['https', function () {
+            //
         }]);
         $this->assertFalse($route->matches($request));
 
@@ -590,16 +601,19 @@ class RoutingRouteTest extends TestCase
          */
         $request = Request::create('https://foo.com/foo/bar', 'GET');
         $route = new Route('GET', 'foo/{bar}', ['http', function () {
+            //
         }]);
         $this->assertFalse($route->matches($request));
 
         $request = Request::create('http://foo.com/foo/bar', 'GET');
         $route = new Route('GET', 'foo/{bar}', ['http', function () {
+            //
         }]);
         $this->assertTrue($route->matches($request));
 
         $request = Request::create('http://foo.com/foo/bar', 'GET');
         $route = new Route('GET', 'foo/{bar}', ['baz' => true, function () {
+            //
         }]);
         $this->assertTrue($route->matches($request));
     }
@@ -608,18 +622,21 @@ class RoutingRouteTest extends TestCase
     {
         $request = Request::create('foo/123', 'GET');
         $route = new Route('GET', 'foo/{bar}', function () {
+            //
         });
         $route->where('bar', '[0-9]+');
         $this->assertTrue($route->matches($request));
 
         $request = Request::create('foo/123abc', 'GET');
         $route = new Route('GET', 'foo/{bar}', function () {
+            //
         });
         $route->where('bar', '[0-9]+');
         $this->assertFalse($route->matches($request));
 
         $request = Request::create('foo/123abc', 'GET');
         $route = new Route('GET', 'foo/{bar}', ['where' => ['bar' => '[0-9]+'], function () {
+            //
         }]);
         $route->where('bar', '[0-9]+');
         $this->assertFalse($route->matches($request));
@@ -629,30 +646,35 @@ class RoutingRouteTest extends TestCase
          */
         $request = Request::create('foo/123', 'GET');
         $route = new Route('GET', 'foo/{bar?}', function () {
+            //
         });
         $route->where('bar', '[0-9]+');
         $this->assertTrue($route->matches($request));
 
         $request = Request::create('foo/123', 'GET');
         $route = new Route('GET', 'foo/{bar?}', ['where' => ['bar' => '[0-9]+'], function () {
+            //
         }]);
         $route->where('bar', '[0-9]+');
         $this->assertTrue($route->matches($request));
 
         $request = Request::create('foo/123', 'GET');
         $route = new Route('GET', 'foo/{bar?}/{baz?}', function () {
+            //
         });
         $route->where('bar', '[0-9]+');
         $this->assertTrue($route->matches($request));
 
         $request = Request::create('foo/123/foo', 'GET');
         $route = new Route('GET', 'foo/{bar?}/{baz?}', function () {
+            //
         });
         $route->where('bar', '[0-9]+');
         $this->assertTrue($route->matches($request));
 
         $request = Request::create('foo/123abc', 'GET');
         $route = new Route('GET', 'foo/{bar?}', function () {
+            //
         });
         $route->where('bar', '[0-9]+');
         $this->assertFalse($route->matches($request));
@@ -661,6 +683,7 @@ class RoutingRouteTest extends TestCase
     public function testDotDoesNotMatchEverything()
     {
         $route = new Route('GET', 'images/{id}.{ext}', function () {
+            //
         });
 
         $request1 = Request::create('images/1.png', 'GET');
@@ -1183,6 +1206,7 @@ class RoutingRouteTest extends TestCase
 
         $request = Request::create('http://foo.com/foo/bar', 'GET');
         $route = new Route('GET', 'foo/bar', ['http', function () {
+            //
         }]);
 
         $_SERVER['__router.request'] = null;
@@ -1465,22 +1489,27 @@ class RouteTestAnotherControllerWithParameterStub extends Controller
 
     public function oneArgument($one)
     {
+        //
     }
 
     public function twoArguments($one, $two)
     {
+        //
     }
 
     public function differentArgumentNames($bar, $baz)
     {
+        //
     }
 
     public function reversedArguments($two, $one)
     {
+        //
     }
 
     public function withModels(Request $request, RoutingTestUserModel $user, $defaultNull = null, RoutingTestTeamModel $team = null)
     {
+        //
     }
 }
 
@@ -1608,6 +1637,7 @@ class RouteModelBindingNullStub
 
     public function first()
     {
+        //
     }
 }
 
@@ -1689,12 +1719,14 @@ class RoutingTestTeamModel extends Model
 
 class RoutingTestExtendedUserModel extends RoutingTestUserModel
 {
+    //
 }
 
 class RoutingTestNonExistingUserModel extends RoutingTestUserModel
 {
     public function first()
     {
+        //
     }
 
     public function firstOrFail()

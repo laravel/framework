@@ -77,6 +77,7 @@ class ViewFactoryTest extends TestCase
         $factory = $this->getFactory();
 
         $resolver = function () {
+            //
         };
 
         $factory->getFinder()->shouldReceive('addExtension')->once()->with('foo');

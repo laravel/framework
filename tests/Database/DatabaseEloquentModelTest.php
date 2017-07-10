@@ -1688,10 +1688,12 @@ class EloquentTestObserverStub
 {
     public function creating()
     {
+        //
     }
 
     public function saved()
     {
+        //
     }
 }
 
@@ -1889,6 +1891,7 @@ class EloquentModelWithoutRelationStub extends Model
 
 class EloquentModelWithoutTableStub extends Model
 {
+    //
 }
 
 class EloquentModelBootingTestStub extends Model
@@ -1933,30 +1936,37 @@ class EloquentModelGetMutatorsStub extends Model
 
     public function getFirstNameAttribute()
     {
+        //
     }
 
     public function getMiddleNameAttribute()
     {
+        //
     }
 
     public function getLastNameAttribute()
     {
+        //
     }
 
     public function doNotgetFirstInvalidAttribute()
     {
+        //
     }
 
     public function doNotGetSecondInvalidAttribute()
     {
+        //
     }
 
     public function doNotgetThirdInvalidAttributeEither()
     {
+        //
     }
 
     public function doNotGetFourthInvalidAttributeEither()
     {
+        //
     }
 }
 
@@ -2013,6 +2023,7 @@ class EloquentModelNonIncrementingStub extends \Illuminate\Database\Eloquent\Mod
 
 class EloquentNoConnectionModelStub extends EloquentModelStub
 {
+    //
 }
 
 class EloquentDifferentConnectionModelStub extends EloquentModelStub
@@ -2022,6 +2033,7 @@ class EloquentDifferentConnectionModelStub extends EloquentModelStub
 
 class EloquentModelSavingEventStub
 {
+    //
 }
 
 class EloquentModelEventObjectStub extends \Illuminate\Database\Eloquent\Model

@@ -50,6 +50,7 @@ class AuthPasswordBrokerTest extends TestCase
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(['foo'])->andReturn($user = m::mock('Illuminate\Contracts\Auth\CanResetPassword'));
         $mocks['tokens']->shouldReceive('create')->once()->with($user)->andReturn('token');
         $callback = function () {
+            //
         };
         $user->shouldReceive('sendPasswordResetNotification')->with('token');
 
@@ -62,6 +63,7 @@ class AuthPasswordBrokerTest extends TestCase
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(['creds'])->andReturn(null);
 
         $this->assertEquals(PasswordBroker::INVALID_USER, $broker->reset(['creds'], function () {
+            //
         }));
     }
 
@@ -72,6 +74,7 @@ class AuthPasswordBrokerTest extends TestCase
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock('Illuminate\Contracts\Auth\CanResetPassword'));
 
         $this->assertEquals(PasswordBroker::INVALID_PASSWORD, $broker->reset($creds, function () {
+            //
         }));
     }
 
@@ -82,6 +85,7 @@ class AuthPasswordBrokerTest extends TestCase
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock('Illuminate\Contracts\Auth\CanResetPassword'));
 
         $this->assertEquals(PasswordBroker::INVALID_PASSWORD, $broker->reset($creds, function () {
+            //
         }));
     }
 
@@ -92,6 +96,7 @@ class AuthPasswordBrokerTest extends TestCase
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock('Illuminate\Contracts\Auth\CanResetPassword'));
 
         $this->assertEquals(PasswordBroker::INVALID_PASSWORD, $broker->reset($creds, function () {
+            //
         }));
     }
 
@@ -105,6 +110,7 @@ class AuthPasswordBrokerTest extends TestCase
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock('Illuminate\Contracts\Auth\CanResetPassword'));
 
         $this->assertEquals(PasswordBroker::INVALID_PASSWORD, $broker->reset($creds, function () {
+            //
         }));
     }
 
@@ -117,6 +123,7 @@ class AuthPasswordBrokerTest extends TestCase
         $mocks['tokens']->shouldReceive('exists')->with($user, 'token')->andReturn(false);
 
         $this->assertEquals(PasswordBroker::INVALID_TOKEN, $broker->reset($creds, function () {
+            //
         }));
     }
 

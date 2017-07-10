@@ -301,4 +301,5 @@ class DatabaseEloquentMorphTest extends TestCase
 
 class EloquentMorphResetModelStub extends \Illuminate\Database\Eloquent\Model
 {
+    //
 }

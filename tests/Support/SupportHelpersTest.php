@@ -740,6 +740,7 @@ class SupportHelpersTest extends TestCase
 
 trait SupportTestTraitOne
 {
+    //
 }
 
 trait SupportTestTraitTwo
@@ -754,6 +755,7 @@ class SupportTestClassOne
 
 class SupportTestClassTwo extends SupportTestClassOne
 {
+    //
 }
 
 class SupportTestArrayAccess implements ArrayAccess

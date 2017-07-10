@@ -136,6 +136,7 @@ class EventsDispatcherTest extends TestCase
         $this->assertFalse($d->hasListeners('foo'));
 
         $d->listen('foo', function () {
+            //
         });
         $this->assertTrue($d->hasListeners('foo'));
     }
@@ -146,6 +147,7 @@ class EventsDispatcherTest extends TestCase
         $this->assertFalse($d->hasListeners('foo.*'));
 
         $d->listen('foo.*', function () {
+            //
         });
         $this->assertTrue($d->hasListeners('foo.*'));
     }
@@ -251,6 +253,7 @@ class TestDispatcherQueuedHandler implements \Illuminate\Contracts\Queue\ShouldQ
 {
     public function handle()
     {
+        //
     }
 }
 
@@ -258,6 +261,7 @@ class TestDispatcherQueuedHandlerCustomQueue implements \Illuminate\Contracts\Qu
 {
     public function handle()
     {
+        //
     }
 
     public function queue($queue, $handler, array $payload)
