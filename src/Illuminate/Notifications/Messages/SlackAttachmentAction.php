@@ -253,7 +253,7 @@ class SlackAttachmentAction
 
         // If set to null, Slack will show a generic confirmation window even if we have no data set.
         // Due to this, we only want to set the confirm attribute if we actually want a confirmation.
-        if($confirmation = $this->confirmArray()) {
+        if ($confirmation = $this->confirmArray()) {
             $action['confirm'] = $confirmation;
         }
 
@@ -261,18 +261,18 @@ class SlackAttachmentAction
     }
 
     /**
-    * Format the attachment's action confirmation windows.
-    *
-    * @return array
-    */
-   protected function confirmArray()
-   {
-       if ($this->confirmation instanceof SlackActionConfirmationField) {
-           return $this->confirmation->toArray();
-       }
+     * Get the array representation of the attachment action.
+     *
+     * @return array
+     */
+    protected function confirmArray()
+    {
+        if ($this->confirmation instanceof SlackActionConfirmationField) {
+            return $this->confirmation->toArray();
+        }
 
-       return $this->confirmation;
-   }
+        return $this->confirmation;
+    }
 
     /**
      * Format the actions's options.

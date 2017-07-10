@@ -180,11 +180,11 @@ class NotificationSlackChannelTest extends TestCase
                                         'title' => 'Are You Sure?',
                                         'text' => 'Are you sure you want to cancel?',
                                         'ok_text' => 'Yes, Cancel',
-                                        'dismiss_text' => 'Dismiss'
+                                        'dismiss_text' => 'Dismiss',
                                     ],
                                     'options' => null,
                                     'min_query_length' => 1,
-                                    'data_source' => 'static'
+                                    'data_source' => 'static',
                                 ],
                                 [
                                     'name' => 'laravel',
@@ -235,7 +235,7 @@ class NotificationSlackChannelTest extends TestCase
                                         ],
                                     ],
                                     'min_query_length' => 5,
-                                    'data_source' => 'external'
+                                    'data_source' => 'external',
                                 ],
                                 [
                                     'name' => 'laravel',
@@ -245,7 +245,7 @@ class NotificationSlackChannelTest extends TestCase
                                     'style' => 'default',
                                     'options' => null,
                                     'min_query_length' => 1,
-                                    'data_source' => 'static'
+                                    'data_source' => 'static',
                                 ],
                             ],
                         ],
@@ -364,17 +364,17 @@ class NotificationSlackChannelWithActionButtonsTestNotification extends Notifica
                     ->content('Attachment Content')
                     ->callbackId('laravel_123')
                     ->action(function ($action) {
-                       $action->name('laravel')
-                              ->text('Cancel')
-                              ->style('danger')
-                              ->type('button')
-                              ->value('laravel-cancel')
-                              ->confirmation(function($confirm) {
-                                  $confirm->title('Are You Sure?')
-                                          ->content('Are you sure you want to cancel?')
-                                          ->okText('Yes, Cancel')
-                                          ->dismissText('Dismiss');
-                              });
+                        $action->name('laravel')
+                               ->text('Cancel')
+                               ->style('danger')
+                               ->type('button')
+                               ->value('laravel-cancel')
+                               ->confirmation(function ($confirm) {
+                                   $confirm->title('Are You Sure?')
+                                           ->content('Are you sure you want to cancel?')
+                                           ->okText('Yes, Cancel')
+                                           ->dismissText('Dismiss');
+                               });
                     })
                     ->action(function ($action) {
                         $action->name('laravel')
@@ -397,21 +397,21 @@ class NotificationSlackChannelWithActionMenusTestNotification extends Notificati
                     ->content('Attachment Content')
                     ->callbackId('laravel_123')
                     ->action(function ($action) {
-                       $action->name('laravel')
-                              ->text('Cancel')
-                              ->style('danger')
-                              ->type('select')
-                              ->value('laravel-cancel')
-                              ->minQueryLength(5)
-                              ->dataSource('external')
-                              ->option(function($option) {
-                                $option->text('First Option')
-                                        ->value('first_option');
-                              })
-                              ->option(function($option) {
-                                  $option->text('Second Option')
-                                         ->value('second_option');
-                              });
+                        $action->name('laravel')
+                               ->text('Cancel')
+                               ->style('danger')
+                               ->type('select')
+                               ->value('laravel-cancel')
+                               ->minQueryLength(5)
+                               ->dataSource('external')
+                               ->option(function ($option) {
+                                   $option->text('First Option')
+                                          ->value('first_option');
+                               })
+                               ->option(function ($option) {
+                                   $option->text('Second Option')
+                                          ->value('second_option');
+                               });
                     })
                     ->action(function ($action) {
                         $action->name('laravel')
