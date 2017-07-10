@@ -119,13 +119,9 @@ class Str
      */
     public static function contains($haystack, $needles)
     {
-        foreach ((array) $needles as $needle) {
-            if ($needle != '' && mb_strpos($haystack, $needle) !== false) {
-                return true;
-            }
-        }
-
-        return false;
+        return Collection::make($needles)->oneOf(function ($needle) use ($haystack) {
+            return $needle != '' && mb_strpos($haystack, $needle) !== false;
+        });
     }
 
     /**
@@ -137,13 +133,9 @@ class Str
      */
     public static function endsWith($haystack, $needles)
     {
-        foreach ((array) $needles as $needle) {
-            if (substr($haystack, -strlen($needle)) === (string) $needle) {
-                return true;
-            }
-        }
-
-        return false;
+        return Collection::make($needles)->oneOf(function ($needle) use ($haystack) {
+            return substr($haystack, -strlen($needle)) === (string) $needle;
+        });
     }
 
     /**
@@ -456,13 +448,9 @@ class Str
      */
     public static function startsWith($haystack, $needles)
     {
-        foreach ((array) $needles as $needle) {
-            if ($needle != '' && substr($haystack, 0, strlen($needle)) === (string) $needle) {
-                return true;
-            }
-        }
-
-        return false;
+        return Collection::make($needles)->oneOf(function ($needle) use ($haystack) {
+            return $needle != '' && substr($haystack, 0, strlen($needle)) === (string) $needle;
+        });
     }
 
     /**

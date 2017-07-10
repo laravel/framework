@@ -842,6 +842,35 @@ class SupportCollectionTest extends TestCase
         );
     }
 
+    public function testOneOf()
+    {
+        $collection = new Collection;
+        $this->assertFalse($collection->oneOf('key', 'value'));
+        $this->assertFalse($collection->oneOf(function () {
+            return false;
+        }));
+
+        $collection = new Collection([['age' => 18], ['age' => 20], ['age' => 20]]);
+        $this->assertTrue($collection->oneOf('age', 18));
+        $this->assertTrue($collection->oneOf('age', '>=', 18));
+        $this->assertTrue($collection->oneOf(function ($item) {
+            return $item['age'] >= 18;
+        }));
+        $this->assertTrue($collection->oneOf(function ($item) {
+            return $item['age'] >= 20;
+        }));
+
+        $collection = new Collection([null, 'not-null']);
+        $this->assertTrue($collection->oneOf(function ($item) {
+            return $item === null;
+        }));
+
+        $collection = new Collection([['active' => false], ['active' => false], ['active' => true]]);
+        $this->assertTrue($collection->oneOf('active'));
+        $this->assertTrue($collection->oneOf->active);
+        $this->assertTrue($collection->push(['active' => true])->oneOf->active);
+    }
+
     public function testEvery()
     {
         $c = new Collection([]);
