@@ -146,6 +146,7 @@ class FoundationApplicationTest extends TestCase
     {
         $app = new Application;
         $closure = function () {
+            //
         };
         $app->afterLoadingEnvironment($closure);
         $this->assertArrayHasKey(0, $app['events']->getListeners('bootstrapped: Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables'));
@@ -156,6 +157,7 @@ class FoundationApplicationTest extends TestCase
     {
         $app = new Application;
         $closure = function () {
+            //
         };
         $app->beforeBootstrapping('Illuminate\Foundation\Bootstrap\RegisterFacades', $closure);
         $this->assertArrayHasKey(0, $app['events']->getListeners('bootstrapping: Illuminate\Foundation\Bootstrap\RegisterFacades'));
@@ -166,6 +168,7 @@ class FoundationApplicationTest extends TestCase
     {
         $app = new Application;
         $closure = function () {
+            //
         };
         $app->afterBootstrapping('Illuminate\Foundation\Bootstrap\RegisterFacades', $closure);
         $this->assertArrayHasKey(0, $app['events']->getListeners('bootstrapped: Illuminate\Foundation\Bootstrap\RegisterFacades'));

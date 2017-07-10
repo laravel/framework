@@ -110,6 +110,7 @@ class BusDispatcherTest extends TestCase
 
 class BusInjectionStub
 {
+    //
 }
 
 class BusDispatcherBasicCommand
@@ -143,6 +144,7 @@ class BusDispatcherTestSpecificQueueAndDelayCommand implements \Illuminate\Contr
 
 class StandAloneCommand
 {
+    //
 }
 
 class StandAloneHandler

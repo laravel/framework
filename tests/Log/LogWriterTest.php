@@ -73,6 +73,7 @@ class LogWriterTest extends TestCase
     {
         $writer = new Writer($monolog = m::mock('Monolog\Logger'));
         $writer->listen(function () {
+            //
         });
     }
 

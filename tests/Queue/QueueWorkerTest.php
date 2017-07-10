@@ -267,6 +267,7 @@ class WorkerFakeJob
     public function __construct($callback = null)
     {
         $this->callback = $callback ?: function () {
+            //
         };
     }
 

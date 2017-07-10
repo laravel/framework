@@ -95,21 +95,26 @@ class EloquentRelationStub extends Relation
 {
     public function addConstraints()
     {
+        //
     }
 
     public function addEagerConstraints(array $models)
     {
+        //
     }
 
     public function initRelation(array $models, $relation)
     {
+        //
     }
 
     public function match(array $models, \Illuminate\Database\Eloquent\Collection $results, $relation)
     {
+        //
     }
 
     public function getResults()
     {
+        //
     }
 }

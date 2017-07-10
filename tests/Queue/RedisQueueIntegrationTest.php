@@ -353,5 +353,6 @@ class RedisQueueIntegrationTestJob
 
     public function handle()
     {
+        //
     }
 }

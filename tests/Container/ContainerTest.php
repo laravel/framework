@@ -390,11 +390,13 @@ class ContainerTest extends TestCase
 
         $container = new Container;
         $container->bind('foo', function () {
+            //
         });
         $container->rebinding('foo', function () {
             $_SERVER['__test.rebind'] = true;
         });
         $container->bind('foo', function () {
+            //
         });
 
         $this->assertTrue($_SERVER['__test.rebind']);
@@ -406,11 +408,13 @@ class ContainerTest extends TestCase
 
         $container = new Container;
         $container->instance('foo', function () {
+            //
         });
         $container->rebinding('foo', function () {
             $_SERVER['__test.rebind'] = true;
         });
         $container->instance('foo', function () {
+            //
         });
 
         $this->assertTrue($_SERVER['__test.rebind']);
@@ -425,6 +429,7 @@ class ContainerTest extends TestCase
             $_SERVER['__test.rebind'] = true;
         });
         $container->instance('foo', function () {
+            //
         });
 
         $this->assertFalse($_SERVER['__test.rebind']);
@@ -997,18 +1002,22 @@ class ContainerTest extends TestCase
 
 class ContainerConcreteStub
 {
+    //
 }
 
 interface IContainerContractStub
 {
+    //
 }
 
 class ContainerImplementationStub implements IContainerContractStub
 {
+    //
 }
 
 class ContainerImplementationStubTwo implements IContainerContractStub
 {
+    //
 }
 
 class ContainerDependentStub

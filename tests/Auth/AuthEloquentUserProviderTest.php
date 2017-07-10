@@ -72,4 +72,5 @@ class AuthEloquentUserProviderTest extends TestCase
 
 class EloquentProviderUserStub
 {
+    //
 }
