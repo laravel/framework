@@ -76,7 +76,7 @@ class CallbackEvent extends Event
     }
 
     /**
-     * Remove the mutex file from disk.
+     * Clear the mutex for the event.
      *
      * @return void
      */
