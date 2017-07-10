@@ -34,7 +34,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     protected static $proxies = [
         'average', 'avg', 'contains', 'each', 'every', 'filter', 'first', 'flatMap',
-        'map', 'partition', 'reject', 'sortBy', 'sortByDesc', 'sum',
+        'map', 'oneOf', 'partition', 'reject', 'sortBy', 'sortByDesc', 'sum',
     ];
 
     /**
@@ -331,6 +331,36 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         return $this->each(function ($chunk) use ($callback) {
             return $callback(...$chunk);
         });
+    }
+
+    /**
+     * Determine if at least one of the items in the collection pass the given test.
+     *
+     * @param  string|callable  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function oneOf($key, $operator = null, $value = null)
+    {
+        if (func_num_args() === 1) {
+            $callback = $this->valueRetriever($key);
+
+            foreach ($this->items as $k => $v) {
+                if ($callback($v, $k)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        if (func_num_args() === 2) {
+            $value = $operator;
+            $operator = '=';
+        }
+
+        return $this->oneOf($this->operatorForWhere($key, $operator, $value));
     }
 
     /**
