@@ -141,7 +141,7 @@ class Worker
 
             $timeout = $this->timeoutForJob($job, $options);
 
-            pcntl_alarm($timeout > 0 ? $timeout + $options->sleep : 0);
+            pcntl_alarm($timeout > 0 ? $timeout : 0);
         }
     }
 
