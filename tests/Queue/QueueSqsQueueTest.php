@@ -4,17 +4,13 @@ namespace Illuminate\Tests\Queue;
 
 use Aws\Result;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 
 class QueueSqsQueueTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function setUp()
     {
+        parent::setUp();
         // Use Mockery to mock the SqsClient
         $this->sqs = m::mock('Aws\Sqs\SqsClient');
 

@@ -3,17 +3,12 @@
 namespace Illuminate\Tests\Cache;
 
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Foundation\Application;
 use Illuminate\Cache\Console\ClearCommand;
 
 class ClearCommandTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testClearWithNoStoreArgument()
     {
         $command = new ClearCommandTestStub(

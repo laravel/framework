@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Database;
 use stdClass;
 use Mockery as m;
 use ReflectionClass;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as BaseCollection;
@@ -14,11 +14,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class DatabaseEloquentBelongsToManyTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testModelsAreProperlyHydrated()
     {
         $model1 = new EloquentBelongsToManyModelStub;

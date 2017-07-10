@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -15,7 +15,7 @@ class DatabaseEloquentMorphTest extends TestCase
     {
         Relation::morphMap([], false);
 
-        m::close();
+        parent::tearDown();
     }
 
     public function testMorphOneSetsProperConstraints()

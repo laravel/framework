@@ -4,17 +4,12 @@ namespace Illuminate\Tests\Bus;
 
 use Mockery as m;
 use Illuminate\Bus\Dispatcher;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Config\Repository as Config;
 
 class BusDispatcherTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testCommandsThatShouldQueueIsQueued()
     {
         $container = new Container;

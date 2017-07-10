@@ -3,17 +3,12 @@
 namespace Illuminate\Tests\Database;
 
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Migrations\DatabaseMigrationRepository;
 
 class DatabaseMigrationRepositoryTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testGetRanMigrationsListMigrationsByPackage()
     {
         $repo = $this->getRepository();

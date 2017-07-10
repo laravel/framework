@@ -4,16 +4,11 @@ namespace Illuminate\Tests\Cache;
 
 use Exception;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Cache\DatabaseStore;
 
 class CacheDatabaseStoreTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testNullIsReturnedWhenItemNotFound()
     {
         $store = $this->getStore();

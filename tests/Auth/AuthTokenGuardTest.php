@@ -5,16 +5,11 @@ namespace Illuminate\Tests\Auth;
 use Mockery;
 use Illuminate\Http\Request;
 use Illuminate\Auth\TokenGuard;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Contracts\Auth\UserProvider;
 
 class AuthTokenGuardTest extends TestCase
 {
-    public function tearDown()
-    {
-        Mockery::close();
-    }
-
     public function testUserCanBeRetrievedByQueryStringVariable()
     {
         $provider = Mockery::mock(UserProvider::class);

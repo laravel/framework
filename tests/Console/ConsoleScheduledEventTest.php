@@ -4,31 +4,11 @@ namespace Illuminate\Tests\Console;
 
 use Mockery as m;
 use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Console\Scheduling\Event;
 
 class ConsoleScheduledEventTest extends TestCase
 {
-    /**
-     * The default configuration timezone.
-     *
-     * @var string
-     */
-    protected $defaultTimezone;
-
-    public function setUp()
-    {
-        $this->defaultTimezone = date_default_timezone_get();
-        date_default_timezone_set('UTC');
-    }
-
-    public function tearDown()
-    {
-        date_default_timezone_set($this->defaultTimezone);
-        Carbon::setTestNow(null);
-        m::close();
-    }
-
     public function testBasicCronCompilation()
     {
         $app = m::mock('Illuminate\Foundation\Application[isDownForMaintenance,environment]');
@@ -90,7 +70,7 @@ class ConsoleScheduledEventTest extends TestCase
         $app = m::mock('Illuminate\Foundation\Application[isDownForMaintenance,environment]');
         $app->shouldReceive('isDownForMaintenance')->andReturn(false);
         $app->shouldReceive('environment')->andReturn('production');
-        Carbon::setTestNow(Carbon::now()->startOfDay()->addHours(9));
+        $this->now->startOfDay()->addHours(9);
 
         $event = new Event(m::mock('Illuminate\Console\Scheduling\Mutex'), 'php foo');
         $event->timezone('UTC');

@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -12,11 +12,6 @@ class DatabaseEloquentBelongsToTest extends TestCase
     protected $builder;
 
     protected $related;
-
-    public function tearDown()
-    {
-        m::close();
-    }
 
     public function testBelongsToWithDefault()
     {

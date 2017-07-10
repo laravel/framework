@@ -4,26 +4,11 @@ namespace Illuminate\Tests\Auth;
 
 use Mockery as m;
 use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Auth\Passwords\DatabaseTokenRepository;
 
 class AuthDatabaseTokenRepositoryTest extends TestCase
 {
-    public function setup()
-    {
-        parent::setup();
-
-        Carbon::setTestNow(Carbon::now());
-    }
-
-    public function tearDown()
-    {
-        parent::tearDown();
-
-        m::close();
-        Carbon::setTestNow(null);
-    }
-
     public function testCreateInsertsNewRecordIntoTable()
     {
         $repo = $this->getRepo();

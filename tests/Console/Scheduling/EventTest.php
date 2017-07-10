@@ -3,16 +3,11 @@
 namespace Illuminate\Tests\Console\Scheduling;
 
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Console\Scheduling\Event;
 
 class EventTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testBuildCommand()
     {
         $quote = (DIRECTORY_SEPARATOR == '\\') ? '"' : "'";

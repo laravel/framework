@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Foundation;
 use Exception;
 use Mockery as m;
 use Psr\Log\LoggerInterface;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Contracts\Support\Responsable;
@@ -25,6 +25,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     public function setUp()
     {
+        parent::setUp();
         $this->config = m::mock(Config::class);
 
         $this->request = m::mock('stdClass');
@@ -43,11 +44,6 @@ class FoundationExceptionsHandlerTest extends TestCase
         });
 
         $this->handler = new Handler($this->container);
-    }
-
-    public function tearDown()
-    {
-        m::close();
     }
 
     public function testHandlerReportsExceptionAsContext()

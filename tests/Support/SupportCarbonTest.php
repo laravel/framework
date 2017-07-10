@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 
 class SupportCarbonTest extends TestCase
 {
@@ -12,13 +12,6 @@ class SupportCarbonTest extends TestCase
         parent::setUp();
 
         Carbon::setTestNow(Carbon::create(2017, 6, 27, 13, 14, 15));
-    }
-
-    public function tearDown()
-    {
-        Carbon::setTestNow();
-
-        parent::tearDown();
     }
 
     public function testCarbonIsMacroableWhenNotCalledStatically()

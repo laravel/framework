@@ -4,15 +4,10 @@ namespace Illuminate\Tests\Database;
 
 use PDO;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 
 class DatabaseConnectorTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testOptionResolution()
     {
         $connector = new \Illuminate\Database\Connectors\Connector;

@@ -3,15 +3,10 @@
 namespace Illuminate\Tests\Console;
 
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 
 class ConsoleApplicationTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testAddSetsLaravelInstance()
     {
         $app = $this->getMockConsole(['addToParent']);

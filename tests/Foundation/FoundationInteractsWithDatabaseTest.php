@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Foundation;
 
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase;
@@ -21,11 +21,6 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     public function setUp()
     {
         $this->connection = m::mock(Connection::class);
-    }
-
-    public function tearDown()
-    {
-        m::close();
     }
 
     public function testSeeInDatabaseFindsResults()

@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Foundation;
 
 use Exception;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Routing\Redirector;
 use Illuminate\Container\Container;
 use Illuminate\Routing\UrlGenerator;
@@ -21,9 +21,9 @@ class FoundationFormRequestTest extends TestCase
 
     public function tearDown()
     {
-        m::close();
-
         $this->mocks = [];
+
+        parent::tearDown();
     }
 
     public function test_validated_method_returns_the_validated_data()

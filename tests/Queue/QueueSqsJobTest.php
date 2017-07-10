@@ -3,12 +3,14 @@
 namespace Illuminate\Tests\Queue;
 
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 
 class QueueSqsJobTest extends TestCase
 {
     public function setUp()
     {
+        parent::setUp();
+
         $this->key = 'AMAZONSQSKEY';
         $this->secret = 'AmAz0n+SqSsEcReT+aLpHaNuM3R1CsTr1nG';
         $this->service = 'sqs';
@@ -43,11 +45,6 @@ class QueueSqsJobTest extends TestCase
             'MessageId' => $this->mockedMessageId,
             'Attributes' => ['ApproximateReceiveCount' => 1],
         ];
-    }
-
-    public function tearDown()
-    {
-        m::close();
     }
 
     public function testFireProperlyCallsTheJobHandler()

@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Validation;
 
 use Illuminate\Validation\Rule;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Validation\Rules\In;
 
 class ValidationInRuleTest extends TestCase

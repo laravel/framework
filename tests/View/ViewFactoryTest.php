@@ -5,15 +5,10 @@ namespace Illuminate\Tests\View;
 use Mockery as m;
 use ReflectionFunction;
 use Illuminate\View\Factory;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 
 class ViewFactoryTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testMakeCreatesNewViewInstanceWithProperPathAndEngine()
     {
         unset($_SERVER['__test.view']);

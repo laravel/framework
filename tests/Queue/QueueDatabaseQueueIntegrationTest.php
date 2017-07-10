@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Queue;
 
 use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Queue\DatabaseQueue;
 use Illuminate\Database\Schema\Blueprint;
@@ -29,6 +29,7 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
 
     public function setUp()
     {
+        parent::setUp();
         $db = new DB;
 
         $db->addConnection([
@@ -97,6 +98,7 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
      */
     public function tearDown()
     {
+        parent::tearDown();
         $this->schema()->drop('jobs');
     }
 

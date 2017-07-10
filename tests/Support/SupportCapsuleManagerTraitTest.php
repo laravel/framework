@@ -3,18 +3,13 @@
 namespace Illuminate\Tests\Support;
 
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Support\Traits\CapsuleManagerTrait;
 
 class SupportCapsuleManagerTraitTest extends TestCase
 {
     use CapsuleManagerTrait;
-
-    public function tearDown()
-    {
-        m::close();
-    }
 
     public function testSetupContainerForCapsule()
     {

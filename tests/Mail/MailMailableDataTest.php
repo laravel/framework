@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Mail;
 
 use Illuminate\Mail\Mailable;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 
 class MailMailableDataTest extends TestCase
 {

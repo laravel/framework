@@ -4,15 +4,10 @@ namespace Illuminate\Tests\Log;
 
 use Mockery as m;
 use Illuminate\Log\Writer;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 
 class LogWriterTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testFileHandlerCanBeAdded()
     {
         $writer = new Writer($monolog = m::mock('Monolog\Logger'));

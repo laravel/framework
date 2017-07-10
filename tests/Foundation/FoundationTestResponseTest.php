@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Foundation;
 
 use JsonSerializable;
 use Illuminate\Http\Response;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Contracts\View\View;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\TestResponse;

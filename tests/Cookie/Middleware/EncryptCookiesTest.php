@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Cookie\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Router;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Cookie\CookieJar;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Routing\Controller;

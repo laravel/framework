@@ -5,18 +5,13 @@ namespace Illuminate\Tests\Http;
 use Mockery as m;
 use JsonSerializable;
 use Illuminate\Http\Request;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 
 class HttpResponseTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testJsonResponsesAreConvertedAndHeadersAreSet()
     {
         $response = new \Illuminate\Http\Response(new ArrayableStub);

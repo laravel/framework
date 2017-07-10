@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Auth;
 use stdClass;
 use Mockery as m;
 use Illuminate\Http\Request;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Auth\RequestGuard;
 use Illuminate\Container\Container;
@@ -18,13 +18,9 @@ class AuthenticateMiddlewareTest extends TestCase
 {
     protected $auth;
 
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function setUp()
     {
+        parent::setUp();
         $container = Container::setInstance(new Container);
 
         $this->auth = new AuthManager($container);

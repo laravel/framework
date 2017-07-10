@@ -3,15 +3,10 @@
 namespace Illuminate\Tests\Foundation;
 
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 
 class FoundationProviderRepositoryTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testServicesAreRegisteredWhenManifestIsNotRecompiled()
     {
         $app = m::mock('Illuminate\Foundation\Application');

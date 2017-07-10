@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Routing;
 
 use ArrayIterator;
 use Illuminate\Routing\Route;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Routing\RouteCollection;
 
 class RouteCollectionTest extends TestCase

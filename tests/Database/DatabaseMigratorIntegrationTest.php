@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Support\Str;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\Capsule\Manager as DB;
@@ -20,6 +20,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
      */
     public function setUp()
     {
+        parent::setUp();
         $this->db = $db = new DB;
 
         $db->addConnection([
@@ -46,6 +47,8 @@ class DatabaseMigratorIntegrationTest extends TestCase
 
     public function tearDown()
     {
+        parent::tearDown();
+
         \Illuminate\Support\Facades\Facade::clearResolvedInstances();
         \Illuminate\Support\Facades\Facade::setFacadeApplication(null);
     }

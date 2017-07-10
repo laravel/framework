@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -16,6 +16,7 @@ class DatabaseEloquentPolymorphicRelationsIntegrationTest extends TestCase
      */
     public function setUp()
     {
+        parent::setUp();
         $db = new DB;
 
         $db->addConnection([
@@ -60,6 +61,8 @@ class DatabaseEloquentPolymorphicRelationsIntegrationTest extends TestCase
      */
     public function tearDown()
     {
+        parent::tearDown();
+
         foreach (['default'] as $connection) {
             $this->schema($connection)->drop('posts');
             $this->schema($connection)->drop('images');

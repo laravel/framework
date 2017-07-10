@@ -5,15 +5,10 @@ namespace Illuminate\Tests\Queue;
 use stdClass;
 use Mockery as m;
 use ReflectionClass;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 
 class QueueDatabaseQueueUnitTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testPushProperlyPushesJobOntoDatabase()
     {
         $queue = $this->getMockBuilder('Illuminate\Queue\DatabaseQueue')->setMethods(['currentTime'])->setConstructorArgs([$database = m::mock('Illuminate\Database\Connection'), 'table', 'default'])->getMock();

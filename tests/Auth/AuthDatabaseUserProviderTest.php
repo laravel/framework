@@ -3,16 +3,11 @@
 namespace Illuminate\Tests\Auth;
 
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Auth\DatabaseUserProvider;
 
 class AuthDatabaseUserProviderTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testRetrieveByIDReturnsUserWhenUserIsFound()
     {
         $conn = m::mock('Illuminate\Database\Connection');

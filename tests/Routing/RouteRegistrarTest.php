@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Routing;
 use Mockery as m;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 
@@ -21,11 +21,6 @@ class RouteRegistrarTest extends TestCase
         parent::setUp();
 
         $this->router = new Router(m::mock(Dispatcher::class), Container::getInstance());
-    }
-
-    public function tearDown()
-    {
-        m::close();
     }
 
     public function testCanRegisterGetRouteWithClosureAction()

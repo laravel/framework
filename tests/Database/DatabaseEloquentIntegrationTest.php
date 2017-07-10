@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use Exception;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Capsule\Manager as DB;
@@ -22,6 +22,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
      */
     public function setUp()
     {
+        parent::setUp();
         $db = new DB;
 
         $db->addConnection([
@@ -115,6 +116,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
      */
     public function tearDown()
     {
+        parent::tearDown();
+
         foreach (['default', 'second_connection'] as $connection) {
             $this->schema($connection)->drop('users');
             $this->schema($connection)->drop('friends');
@@ -1092,9 +1095,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testFreshMethodOnModel()
     {
-        $now = \Illuminate\Support\Carbon::now();
-        \Illuminate\Support\Carbon::setTestNow($now);
-
         $storedUser1 = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
         $storedUser1->newQuery()->update(['email' => 'dev@mathieutu.ovh', 'name' => 'Mathieu TUDISCO']);
         $freshStoredUser1 = $storedUser1->fresh();
@@ -1106,12 +1106,12 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $notStoredUser = new EloquentTestUser(['id' => 3, 'email' => 'taylorotwell@gmail.com']);
         $freshNotStoredUser = $notStoredUser->fresh();
 
-        $this->assertEquals(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'created_at' => $now, 'updated_at' => $now], $storedUser1->toArray());
-        $this->assertEquals(['id' => 1, 'name' => 'Mathieu TUDISCO', 'email' => 'dev@mathieutu.ovh', 'created_at' => $now, 'updated_at' => $now], $freshStoredUser1->toArray());
+        $this->assertEquals(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'created_at' => $this->now, 'updated_at' => $this->now], $storedUser1->toArray());
+        $this->assertEquals(['id' => 1, 'name' => 'Mathieu TUDISCO', 'email' => 'dev@mathieutu.ovh', 'created_at' => $this->now, 'updated_at' => $this->now], $freshStoredUser1->toArray());
         $this->assertInstanceOf(EloquentTestUser::class, $storedUser1);
 
-        $this->assertEquals(['id' => 2, 'email' => 'taylorotwell@gmail.com', 'created_at' => $now, 'updated_at' => $now], $storedUser2->toArray());
-        $this->assertEquals(['id' => 2, 'name' => null, 'email' => 'dev@mathieutu.ovh', 'created_at' => $now, 'updated_at' => $now], $freshStoredUser2->toArray());
+        $this->assertEquals(['id' => 2, 'email' => 'taylorotwell@gmail.com', 'created_at' => $this->now, 'updated_at' => $this->now], $storedUser2->toArray());
+        $this->assertEquals(['id' => 2, 'name' => null, 'email' => 'dev@mathieutu.ovh', 'created_at' => $this->now, 'updated_at' => $this->now], $freshStoredUser2->toArray());
         $this->assertInstanceOf(EloquentTestUser::class, $storedUser2);
 
         $this->assertEquals(['id' => 3, 'email' => 'taylorotwell@gmail.com'], $notStoredUser->toArray());

@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Config;
 
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Config\Repository;
 
 class RepositoryTest extends TestCase

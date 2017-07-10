@@ -6,7 +6,7 @@ use stdClass;
 use ArrayObject;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Support\Collection;
 
 class SupportArrTest extends TestCase

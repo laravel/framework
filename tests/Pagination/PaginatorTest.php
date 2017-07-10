@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Pagination;
 
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Pagination\Paginator;
 
 class PaginatorTest extends TestCase

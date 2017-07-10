@@ -2,16 +2,10 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 
 class FoundationEnvironmentDetectorTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testClosureCanBeUsedForCustomEnvironmentDetection()
     {
         $env = new \Illuminate\Foundation\EnvironmentDetector;

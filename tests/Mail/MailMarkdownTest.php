@@ -2,15 +2,10 @@
 
 namespace Illuminate\Tests\Mail;
 
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 
 class MailMarkdownTest extends TestCase
 {
-    public function tearDown()
-    {
-        \Mockery::close();
-    }
-
     public function testRenderFunctionReturnsHtml()
     {
         $viewFactory = \Mockery::mock('Illuminate\View\Factory');

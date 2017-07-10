@@ -3,15 +3,10 @@
 namespace Illuminate\Tests\Database;
 
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 
 class DatabaseProcessorTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testInsertGetIdProcessing()
     {
         $pdo = $this->createMock('Illuminate\Tests\Database\ProcessorTestPDOStub');

@@ -2,18 +2,20 @@
 
 namespace Illuminate\Tests\Pagination;
 
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class LengthAwarePaginatorTest extends TestCase
 {
     public function setUp()
     {
+        parent::setUp();
         $this->p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2);
     }
 
     public function tearDown()
     {
+        parent::tearDown();
         unset($this->p);
     }
 

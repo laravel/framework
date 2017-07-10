@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Mockery as m;
 use ReflectionProperty;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Connectors\ConnectionFactory;
 
@@ -14,6 +14,8 @@ class DatabaseConnectionFactoryTest extends TestCase
 
     public function setUp()
     {
+        parent::setUp();
+
         $this->db = new DB;
 
         $this->db->addConnection([
@@ -32,11 +34,6 @@ class DatabaseConnectionFactoryTest extends TestCase
         ], 'read_write');
 
         $this->db->setAsGlobal();
-    }
-
-    public function tearDown()
-    {
-        m::close();
     }
 
     public function testConnectionCanBeCreated()

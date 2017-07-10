@@ -3,17 +3,12 @@
 namespace Illuminate\Tests\Events;
 
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 class EventsDispatcherTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testBasicEventExecution()
     {
         unset($_SERVER['__event.test']);

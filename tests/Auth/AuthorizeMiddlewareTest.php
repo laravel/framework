@@ -6,7 +6,7 @@ use stdClass;
 use Mockery as m;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
@@ -20,11 +20,6 @@ class AuthorizeMiddlewareTest extends TestCase
 {
     protected $container;
     protected $user;
-
-    public function tearDown()
-    {
-        m::close();
-    }
 
     public function setUp()
     {

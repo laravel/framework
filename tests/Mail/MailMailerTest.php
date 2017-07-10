@@ -4,16 +4,11 @@ namespace Illuminate\Tests\Mail;
 
 use Mockery as m;
 use Illuminate\Mail\Mailer;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Support\HtmlString;
 
 class MailMailerTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testMailerSendSendsMessageWithProperViewContent()
     {
         unset($_SERVER['__mailer.test']);

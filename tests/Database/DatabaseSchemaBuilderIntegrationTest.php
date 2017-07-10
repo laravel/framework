@@ -1,6 +1,6 @@
 <?php
 
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Database\Capsule\Manager as DB;
 
 class DatabaseSchemaBuilderIntegrationTest extends TestCase
@@ -14,6 +14,7 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
      */
     public function setUp()
     {
+        parent::setUp();
         $this->db = $db = new DB;
 
         $db->addConnection([
@@ -30,6 +31,7 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
 
     public function tearDown()
     {
+        parent::tearDown();
         Illuminate\Support\Facades\Facade::clearResolvedInstances();
         Illuminate\Support\Facades\Facade::setFacadeApplication(null);
     }
