@@ -2,8 +2,6 @@
 
 namespace Illuminate\Notifications\Messages;
 
-use Closure;
-
 class SlackAttachmentAction
 {
     /**
@@ -11,36 +9,36 @@ class SlackAttachmentAction
      *
      * @var string
      */
-    protected $name;
+    public $name;
 
     /**
      * The user-facing content for the message button or menu representing this action.
      *
      * @var string
      */
-    protected $content;
+    public $content;
 
     /**
      * The type of action. Can be either "button" or "select".
      *
      * @var string
      */
-    protected $type = 'button';
+    public $type = 'button';
 
     /**
      * The specific identifier for the action.
      *
      * @var string
      */
-    protected $value;
+    public $value;
 
     /**
-     * The optional confirmation fields to be shown
+     * The optional confirmation window to be shown
      * be shown when an action button is clicked.
      *
      * @var array
      */
-    protected $confirmationFields;
+    public $confirmation;
 
     /**
      * The style of the attachment action. Useful for
@@ -48,22 +46,14 @@ class SlackAttachmentAction
      *
      * @var string
      */
-    protected $style = 'default';
+    public $style = 'default';
 
     /**
      * The individual options to appear in a message menu.
      *
      * @var array
      */
-    protected $options;
-
-    /**
-     * An alternate, semi-hierarchal way to list available options in a
-     * message menu. This replaces and supersedes the options array.
-     *
-     * @var array
-     */
-    protected $optionGroups;
+    public $options;
 
     /**
      * The data source of the attachment's actions.
@@ -71,7 +61,7 @@ class SlackAttachmentAction
      *
      * @var string
      */
-    protected $dataSource = 'static';
+    public $dataSource = 'static';
 
     /**
      * If present, Slack will wait until the specified number of characters are
@@ -80,7 +70,7 @@ class SlackAttachmentAction
      *
      * @var int
      */
-    protected $minQueryLength = 1;
+    public $minQueryLength = 1;
 
     /**
      * Set the name of the action.
@@ -139,31 +129,26 @@ class SlackAttachmentAction
     }
 
     /**
-     * Add a confirmation field for the action.
+     * Add a confirmation window for the action.
      *
-     * @param  \Closure $callback
-     *
-     * @return $this
-     */
-    public function confirmationField(Closure $callback)
-    {
-        $this->confirmationFields[] = $confirmationField = new SlackActionConfirmationField();
-
-        $callback($confirmationField);
-
-        return $this;
-    }
-
-    /**
-     * Set the confirmation fields of the action.
-     *
-     * @param  array $confirmationFields
+     * @param  \Closure|string  $title
+     * @param  array  $content
      *
      * @return $this
      */
-    public function confirmationFields(array $confirmationFields)
+    public function confirmation($title, $content = [])
     {
-        $this->confirmationFields = $confirmationFields;
+        if (is_callable($title)) {
+            $callback = $title;
+
+            $callback($confirmation = new SlackActionConfirmationField);
+
+            $this->confirmation = $confirmation;
+
+            return $this;
+        }
+
+        $this->confirmation = $content;
 
         return $this;
     }
@@ -185,13 +170,24 @@ class SlackAttachmentAction
     /**
      * Set the options of the action.
      *
-     * @param  array $options
+     * @param  \Closure|string  $title
+     * @param  array  $content
      *
      * @return $this
      */
-    public function options($options)
+    public function option($title, $content = [])
     {
-        $this->options = $options;
+        if (is_callable($title)) {
+            $callback = $title;
+
+            $callback($option = new SlackActionOption);
+
+            $this->options[] = $option;
+
+            return $this;
+        }
+
+        $this->options[$title] = $content;
 
         return $this;
     }
@@ -199,13 +195,12 @@ class SlackAttachmentAction
     /**
      * Set the options of the action.
      *
-     * @param  array $optionGroups
-     *
+     * @param  array  $options
      * @return $this
      */
-    public function optionGroups($optionGroups)
+    public function options(array $options)
     {
-        $this->optionGroups = $optionGroups;
+        $this->options = $options;
 
         return $this;
     }
@@ -245,17 +240,53 @@ class SlackAttachmentAction
      */
     public function toArray()
     {
-        return [
+        $action = [
             'name'             => $this->name,
             'text'             => $this->content,
             'type'             => $this->type,
             'value'            => $this->value,
-            'confirm'          => $this->confirmationFields,
             'style'            => $this->style,
-            'options'          => $this->options,
-            'option_groups'    => $this->optionGroups,
+            'options'          => $this->optionsArray(),
             'min_query_length' => $this->minQueryLength,
             'data_source'      => $this->dataSource,
         ];
+
+        // If set to null, Slack will show a generic confirmation window even if we have no data set.
+        // Due to this, we only want to set the confirm attribute if we actually want a confirmation.
+        if($confirmation = $this->confirmArray()) {
+            $action['confirm'] = $confirmation;
+        }
+
+        return $action;
+    }
+
+    /**
+    * Format the attachment's action confirmation windows.
+    *
+    * @return array
+    */
+   protected function confirmArray()
+   {
+       if ($this->confirmation instanceof SlackActionConfirmationField) {
+           return $this->confirmation->toArray();
+       }
+
+       return $this->confirmation;
+   }
+
+    /**
+     * Format the actions's options.
+     *
+     * @return array
+     */
+    protected function optionsArray()
+    {
+        return collect($this->options)->map(function ($value) {
+            if ($value instanceof SlackActionOption) {
+                return $value->toArray();
+            }
+
+            return $value;
+        })->values()->all();
     }
 }
