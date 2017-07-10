@@ -194,7 +194,7 @@ class NotificationSlackChannelTest extends TestCase
                                     'style' => 'default',
                                     'options' => null,
                                     'min_query_length' => 1,
-                                    'data_source' => 'static'
+                                    'data_source' => 'static',
                                 ],
                             ],
                         ],
