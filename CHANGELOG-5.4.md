@@ -1,5 +1,26 @@
 # Release Notes for 5.4.x
 
+## [Unreleased]
+
+### Added
+- Added `ManagesFrequencies::twiceMonthly()` method ([#19874](https://github.com/laravel/framework/pull/19874))
+- Added `RouteCollection::getRoutesByName()` method ([#19901](https://github.com/laravel/framework/pull/19901))
+- Added `$expiresAt` parameter to `CallbackEvent::withoutOverlapping()` ([#19861](https://github.com/laravel/framework/pull/19861))
+- Support keeping old files when testing uploads ([#19859](https://github.com/laravel/framework/pull/19859))
+- Added `--force` option to `make:mail`, `make:model` and `make:notification` ([#19932](https://github.com/laravel/framework/pull/19932))
+
+### Changed
+- Support object items in `Arr::pluck()` ([#19838](https://github.com/laravel/framework/pull/19838), [#19845](https://github.com/laravel/framework/pull/19845))
+- `MessageBag` interface now extends `Arrayable` ([#19849](https://github.com/laravel/framework/pull/19849))
+- Made `Blueprint` macroable ([#19862](https://github.com/laravel/framework/pull/19862))
+- Improved performace for `Arr::crossJoin()` ([#19864](https://github.com/laravel/framework/pull/19864))
+
+### Fixed
+- Don't re-escape a `View` instance passed as the default value to `@yield` or `@section` directives ([#19884](https://github.com/laravel/framework/pull/19884))
+- Make sure migration file is loaded before trying to rollback ([#19922](https://github.com/laravel/framework/pull/19922))
+- Fixed caching issue in `mix()` ([#19968](https://github.com/laravel/framework/pull/19968))
+
+
 ## v5.4.28 (2017-06-30)
 
 ### Added
