@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Support;
 use stdClass;
 use ArrayAccess;
 use Mockery as m;
+use Carbon\Carbon;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 
@@ -716,6 +717,15 @@ class SupportHelpersTest extends TestCase
         $mock = m::mock();
         $mock->shouldReceive('foo')->once()->andReturn('bar');
         $this->assertEquals($mock, tap($mock)->foo());
+    }
+
+    public function testNow()
+    {
+        Carbon::setTestNow(Carbon::now());
+
+        $this->assertTrue(
+            Carbon::now()->eq(now())
+        );
     }
 }
 

@@ -1,5 +1,6 @@
 <?php
 
+use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
@@ -637,6 +638,18 @@ if (! function_exists('last')) {
     function last($array)
     {
         return end($array);
+    }
+}
+
+if (! function_exists('now')) {
+    /**
+     * Get the current time as Carbon instance.
+     *
+     * @return Carbon\Carbon
+     */
+    function now()
+    {
+        return Carbon::now();
     }
 }
 
