@@ -69,7 +69,7 @@ class ModelMakeCommand extends GeneratorCommand
     {
         $this->call('make:factory', [
             'name' => $this->argument('name').'Factory',
-            'model' => $this->argument('name')
+            'model' => $this->argument('name'),
         ]);
     }
 

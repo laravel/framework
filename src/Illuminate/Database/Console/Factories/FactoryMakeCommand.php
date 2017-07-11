@@ -76,9 +76,7 @@ class FactoryMakeCommand extends GeneratorCommand
     {
         return [
             parent::getArguments()[0],
-            ['model', InputArgument::OPTIONAL, 'The name of the model to create']
+            ['model', InputArgument::OPTIONAL, 'The name of the model to create'],
         ];
     }
-
-
 }
