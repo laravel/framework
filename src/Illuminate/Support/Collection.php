@@ -1079,9 +1079,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function random($amount = null)
     {
-        try{
+        try {
             return Arr::random($this->items, $amount);
-        } catch(InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             throw new InvalidArgumentException(
                 "You requested {$requested} items, but there are only {$count} items in the collection.",
                 $e->getCode(),
