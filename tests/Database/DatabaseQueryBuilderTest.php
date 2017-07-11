@@ -1101,7 +1101,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['admin'], $builder->getBindings());
     }
 
-    public function testBasicJoinRaw()
+    public function testBasicJoinWithSubQuery()
     {
         $builder = $this->getBuilder();
         $sub = $this->getBuilder();
@@ -1111,13 +1111,29 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder->select('*')
                 ->from('users')
-                ->joinSub($sub, 'contracts', 'users.id', '=', 'contracts.id');
+                ->join($sub, 'users.id', '=', 'contracts.id');
 
         $this->assertEquals('select * from "users" inner join (select * from "contracts" where "role" = ?) as "contracts" on "users"."id" = "contracts"."id"', $builder->toSql());
         $this->assertEquals(['admin'], $builder->getBindings());
     }
 
-    public function testBasicLeftJoinRaw(){
+    public function testExplicitJoinWithSubQuery()
+    {
+        $builder = $this->getBuilder();
+        $sub = $this->getBuilder();
+        $sub->select('*')
+            ->from('contracts')
+            ->where('role', '=', 'admin');
+
+        $builder->select('*')
+            ->from('users')
+            ->joinSub($sub, 'foo', 'users.id', '=', 'foo.id');
+
+        $this->assertEquals('select * from "users" inner join (select * from "contracts" where "role" = ?) as "foo" on "users"."id" = "foo"."id"', $builder->toSql());
+        $this->assertEquals(['admin'], $builder->getBindings());
+    }
+
+    public function testBasicLeftJoinWithSubQuery(){
         $builder = $this->getBuilder();
         $sub = $this->getBuilder();
         $sub->select('*')
@@ -1126,13 +1142,28 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder->select('*')
                 ->from('users')
-                ->leftJoinSub($sub, 'contracts', 'users.id', '=', 'contracts.id');
+                ->leftJoin($sub, 'users.id', '=', 'contracts.id');
 
         $this->assertEquals('select * from "users" left join (select * from "contracts" where "role" = ?) as "contracts" on "users"."id" = "contracts"."id"', $builder->toSql());
         $this->assertEquals(['admin'], $builder->getBindings());
     }
 
-    public function testBasicRightJoinRaw(){
+    public function testExplicitLeftJoinWithSubQuery(){
+        $builder = $this->getBuilder();
+        $sub = $this->getBuilder();
+        $sub->select('*')
+            ->from('contracts')
+            ->where('role', '=', 'admin');
+
+        $builder->select('*')
+            ->from('users')
+            ->leftJoinSub($sub, 'foo', 'users.id', '=', 'foo.id');
+
+        $this->assertEquals('select * from "users" left join (select * from "contracts" where "role" = ?) as "foo" on "users"."id" = "foo"."id"', $builder->toSql());
+        $this->assertEquals(['admin'], $builder->getBindings());
+    }
+
+    public function testBasicRightJoinWithSubQuery(){
         $builder = $this->getBuilder();
         $sub = $this->getBuilder();
         $sub->select('*')
@@ -1141,11 +1172,63 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder->select('*')
                 ->from('users')
-                ->rightJoinSub($sub, 'contracts', 'users.id', '=', 'contracts.id');
+                ->rightJoin($sub, 'users.id', '=', 'contracts.id');
 
         $this->assertEquals('select * from "users" right join (select * from "contracts" where "role" = ?) as "contracts" on "users"."id" = "contracts"."id"', $builder->toSql());
         $this->assertEquals(['admin'], $builder->getBindings());
     }
+
+    public function testExplicitRightJoinWithSubQuery(){
+        $builder = $this->getBuilder();
+        $sub = $this->getBuilder();
+        $sub->select('*')
+            ->from('contracts')
+            ->where('role', '=', 'admin');
+
+        $builder->select('*')
+            ->from('users')
+            ->rightJoinSub($sub, 'foo', 'users.id', '=', 'foo.id');
+
+        $this->assertEquals('select * from "users" right join (select * from "contracts" where "role" = ?) as "foo" on "users"."id" = "foo"."id"', $builder->toSql());
+        $this->assertEquals(['admin'], $builder->getBindings());
+    }
+
+    public function testBasicJoinSubWithClosure(){
+        $builder = $this->getBuilder();
+        $builder->select('*')
+                ->from('users')
+                ->join(function($q){
+                    $q->select('*')->from('contracts')->where('role', '=', 'admin');
+                }, 'users.id', '=', 'contracts.id');
+
+        $this->assertEquals('select * from "users" inner join (select * from "contracts" where "role" = ?) as "contracts" on "users"."id" = "contracts"."id"', $builder->toSql());
+        $this->assertEquals(['admin'], $builder->getBindings());
+    }
+
+    public function testLeftJoinSubWithClosure(){
+        $builder = $this->getBuilder();
+        $builder->select('*')
+            ->from('users')
+            ->leftJoin(function($q){
+                $q->select('*')->from('contracts')->where('role', '=', 'admin');
+            }, 'users.id', '=', 'contracts.id');
+
+        $this->assertEquals('select * from "users" left join (select * from "contracts" where "role" = ?) as "contracts" on "users"."id" = "contracts"."id"', $builder->toSql());
+        $this->assertEquals(['admin'], $builder->getBindings());
+    }
+
+    public function testRightJoinSubWithClosure(){
+        $builder = $this->getBuilder();
+        $builder->select('*')
+            ->from('users')
+            ->rightJoin(function($q){
+                $q->select('*')->from('contracts')->where('role', '=', 'admin');
+            }, 'users.id', '=', 'contracts.id');
+
+        $this->assertEquals('select * from "users" right join (select * from "contracts" where "role" = ?) as "contracts" on "users"."id" = "contracts"."id"', $builder->toSql());
+        $this->assertEquals(['admin'], $builder->getBindings());
+    }
+
 
     public function testRawExpressionsInSelect()
     {
