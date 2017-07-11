@@ -2,6 +2,8 @@
 
 namespace Illuminate\Notifications;
 
+use Illuminate\Contracts\Notifications\Dispatcher;
+
 class InstantNotifiable
 {
     /**
@@ -10,6 +12,17 @@ class InstantNotifiable
      * @var array
      */
     public $routes;
+
+    /**
+     * Send the given notification.
+     *
+     * @param  mixed  $instance
+     * @return void
+     */
+    public function notify($instance)
+    {
+        app(Dispatcher::class)->send($this, $instance);
+    }
 
     /**
      * Get the notification routing information for the given driver.
