@@ -23,6 +23,13 @@ abstract class HasOneOrMany extends Relation
     protected $localKey;
 
     /**
+     * The inverse side of the relationship.
+     *
+     * @var string
+     */
+    protected $inverseSide;
+
+    /**
      * The count of self joins.
      *
      * @var int
@@ -44,6 +51,19 @@ abstract class HasOneOrMany extends Relation
         $this->foreignKey = $foreignKey;
 
         parent::__construct($query, $parent);
+    }
+
+    /**
+     * Set the inverse side of the relationship.
+     *
+     * @param  string  $name
+     * @return $this
+     */
+    public function inversedBy($name)
+    {
+        $this->inverseSide = $name;
+
+        return $this;
     }
 
     /**

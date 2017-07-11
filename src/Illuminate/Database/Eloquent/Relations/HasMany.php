@@ -13,7 +13,15 @@ class HasMany extends HasOneOrMany
      */
     public function getResults()
     {
-        return $this->query->get();
+        $results = $this->query->get();
+
+        if ($this->inverseSide) {
+            $results->each(function ($model) {
+                $model->setRelation($this->inverseSide, $this->parent);
+            });
+        }
+
+        return $results;
     }
 
     /**
