@@ -49,7 +49,7 @@ class FactoryMakeCommand extends GeneratorCommand
 
         return str_replace(
             'DummyModel', $model, parent::buildClass($name)
-        );
+        ).'Factory';
     }
 
     /**
