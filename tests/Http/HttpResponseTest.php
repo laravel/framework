@@ -91,6 +91,14 @@ class HttpResponseTest extends TestCase
         $this->assertSame($arr, $response->getOriginalContent());
     }
 
+    public function testGetOriginalContentRetrievesTheFirstOriginalContent()
+    {
+        $previousResponse = new \Illuminate\Http\Response(['foo' => 'bar']);
+        $response = new \Illuminate\Http\Response($previousResponse);
+
+        $this->assertSame(['foo' => 'bar'], $response->getOriginalContent());
+    }
+
     public function testSetAndRetrieveStatusCode()
     {
         $response = new \Illuminate\Http\Response('foo');

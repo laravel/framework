@@ -49,7 +49,9 @@ trait ResponseTrait
      */
     public function getOriginalContent()
     {
-        return $this->original;
+        $original = $this->original;
+
+        return $original instanceof self ? $original->{__FUNCTION__}() : $original;
     }
 
     /**
