@@ -73,4 +73,23 @@ class BladeCustomTest extends AbstractBladeTestCase
 <?php endif; ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
+
+    public function testCustomConditionsWithClass()
+    {
+        $this->compiler->if('customClass', \Illuminate\Tests\View\Blade\CustomCondition::class);
+
+        $string = '@customClass($user)
+@endcustomClass';
+        $expected = '<?php if (\Illuminate\Support\Facades\Blade::check(\'customClass\', $user)): ?>
+<?php endif; ?>';
+        $this->assertSame($expected, $this->compiler->compileString($string));
+    }
+}
+
+class CustomCondition
+{
+    public function handle($user)
+    {
+        return true;
+    }
 }
