@@ -37,6 +37,7 @@ class SlackWebhookChannel
      */
     public function send($notifiable, Notification $notification)
     {
+        dd($notifiable->routeNotificationFor('slack'));
         if (! $url = $notifiable->routeNotificationFor('slack')) {
             return;
         }
