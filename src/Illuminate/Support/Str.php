@@ -38,7 +38,7 @@ class Str
      */
     public static function after($subject, $search)
     {
-        return $search ? array_reverse(explode($search, $subject, 2))[0] : $subject;
+        return $search == "" ? $subject : array_reverse(explode($search, $subject, 2))[0];
     }
 
     /**
@@ -72,7 +72,7 @@ class Str
      */
     public static function before($subject, $search)
     {
-        return $search ? explode($search, $subject)[0] : $subject;
+        return $search == "" ? $subject : explode($search, $subject)[0];
     }
 
     /**
