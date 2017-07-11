@@ -65,11 +65,25 @@ trait InteractsWithPivotTable
      * Sync the intermediate tables with a list of IDs without detaching.
      *
      * @param  \Illuminate\Database\Eloquent\Collection|array  $ids
+     * @param  bool   $updating
      * @return array
      */
-    public function syncWithoutDetaching($ids)
+    public function syncWithoutDetaching($ids, $updating = true)
     {
-        return $this->sync($ids, false);
+        return $this->sync($ids, false, $updating);
+    }
+
+    /**
+     * Sync the intermediate tables with a list of IDs without updating additional data,
+     * if the record exists already.
+     *
+     * @param  \Illuminate\Database\Eloquent\Collection|array  $ids
+     * @param  bool   $detaching
+     * @return array
+     */
+    public function syncWithoutUpdating($ids, $detaching = true)
+    {
+        return $this->sync($ids, $detaching, false);
     }
 
     /**
@@ -77,9 +91,10 @@ trait InteractsWithPivotTable
      *
      * @param  \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|array  $ids
      * @param  bool   $detaching
+     * @param  bool   $updating
      * @return array
      */
-    public function sync($ids, $detaching = true)
+    public function sync($ids, $detaching = true, $updating = true)
     {
         $changes = [
             'attached' => [], 'detached' => [], 'updated' => [],
@@ -109,7 +124,7 @@ trait InteractsWithPivotTable
         // touching until after the entire operation is complete so we don't fire a
         // ton of touch operations until we are totally done syncing the records.
         $changes = array_merge(
-            $changes, $this->attachNew($records, $current, false)
+            $changes, $this->attachNew($records, $current, false, $updating)
         );
 
         // Once we have finished attaching or detaching the records, we will see if we
@@ -148,7 +163,7 @@ trait InteractsWithPivotTable
      * @param  bool   $touch
      * @return array
      */
-    protected function attachNew(array $records, array $current, $touch = true)
+    protected function attachNew(array $records, array $current, $touch = true, $updating = true)
     {
         $changes = ['attached' => [], 'updated' => []];
 
@@ -165,7 +180,7 @@ trait InteractsWithPivotTable
             // Now we'll try to update an existing pivot record with the attributes that were
             // given to the method. If the model is actually updated we will add it to the
             // list of updated pivot records so we return them back out to the consumer.
-            elseif (count($attributes) > 0 &&
+            elseif (count($attributes) > 0 && $updating &&
                 $this->updateExistingPivot($id, $attributes, $touch)) {
                 $changes['updated'][] = $this->castKey($id);
             }
