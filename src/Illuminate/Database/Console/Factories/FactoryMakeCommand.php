@@ -49,7 +49,7 @@ class FactoryMakeCommand extends GeneratorCommand
         $model = $this->qualifyClass($this->argument('name'));
 
         if ($this->argument('model')) {
-            $model = $this->qualifyClass($this->argument("model"));
+            $model = $this->qualifyClass($this->argument('model'));
         }
 
         return str_replace(
