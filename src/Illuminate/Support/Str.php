@@ -38,13 +38,7 @@ class Str
      */
     public static function after($subject, $search)
     {
-        if ($search == '') {
-            return $subject;
-        }
-
-        $pieces = explode($search, $subject, 2);
-
-        return end($pieces);
+        return $search ? array_reverse(explode($search, $subject, 2))[0] : $subject;
     }
 
     /**
