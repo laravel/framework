@@ -1239,6 +1239,18 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Divides the underlying collection array by a denominator.
+     *
+     * @param  int  $denominator
+     * @return static
+     */
+    public function divide($denominator)
+    {
+        return $this->chunk(
+            ceil(count($this->items) / $denominator));
+    }
+
+    /**
      * Sort through each item with a callback.
      *
      * @param  callable|null  $callback
