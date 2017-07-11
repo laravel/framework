@@ -49,7 +49,7 @@ class FactoryMakeCommand extends GeneratorCommand
 
         return str_replace(
             'DummyModel', $model, parent::buildClass($name)
-        ).'Factory';
+        );
     }
 
     /**
@@ -62,7 +62,7 @@ class FactoryMakeCommand extends GeneratorCommand
     {
         $name = str_replace(
             ['\\', '/'], '', $this->argument('name')
-        );
+        ).'Factory';
 
         return $this->laravel->databasePath()."/factories/{$name}.php";
     }
