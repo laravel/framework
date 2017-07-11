@@ -38,17 +38,7 @@ class Str
      */
     public static function after($subject, $search)
     {
-        if ($search == '') {
-            return $subject;
-        }
-
-        $pos = strpos($subject, $search);
-
-        if ($pos === false) {
-            return $subject;
-        }
-
-        return substr($subject, $pos + strlen($search));
+        return $search ? array_reverse(explode($search, $subject, 2))[0] : $subject;
     }
 
     /**
@@ -82,17 +72,7 @@ class Str
      */
     public static function before($subject, $search)
     {
-        if ($search == '') {
-            return $subject;
-        }
-
-        $pos = strpos($subject, $search);
-
-        if ($pos === false) {
-            return $subject;
-        }
-
-        return substr($subject, 0, $pos);
+        return $search ? explode($search, $subject)[0] : $subject;
     }
 
     /**
