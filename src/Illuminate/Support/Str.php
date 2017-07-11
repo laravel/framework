@@ -42,13 +42,9 @@ class Str
             return $subject;
         }
 
-        $pos = strpos($subject, $search);
+        $pieces = explode($search, $subject, 2);
 
-        if ($pos === false) {
-            return $subject;
-        }
-
-        return substr($subject, $pos + strlen($search));
+        return end($pieces);
     }
 
     /**
@@ -82,17 +78,7 @@ class Str
      */
     public static function before($subject, $search)
     {
-        if ($search == '') {
-            return $subject;
-        }
-
-        $pos = strpos($subject, $search);
-
-        if ($pos === false) {
-            return $subject;
-        }
-
-        return substr($subject, 0, $pos);
+        return empty($search) ? $subject : explode($search, $subject)[0];
     }
 
     /**
