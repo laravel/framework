@@ -2,13 +2,13 @@
 
 use Orchestra\Testbench\TestCase;
 use Illuminate\Notifications\Notification;
-use Illuminate\Notifications\InstantNotifiable;
+use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Support\Facades\Notification as NotificationFacade;
 
 /**
  * @group integration
  */
-class SendingNotificationsViaInstantNotifiableTest extends TestCase
+class SendingNotificationsViaAnonymousNotifiableTest extends TestCase
 {
     public $mailer;
 
@@ -19,13 +19,13 @@ class SendingNotificationsViaInstantNotifiableTest extends TestCase
 
     public function test_mail_is_sent()
     {
-        $notifiable = (new InstantNotifiable())
-            ->addRoute('enzo', 'testchannel')
-            ->addRoute('enzo@deepblue.com', 'anothertestchannel');
+        $notifiable = (new AnonymousNotifiable())
+            ->route('testchannel', 'enzo')
+            ->route('anothertestchannel', 'enzo@deepblue.com');
 
         NotificationFacade::send(
             $notifiable,
-            new TestMailNotificationForInstantNotifiable()
+            new TestMailNotificationForAnonymousNotifiable()
         );
 
         $this->assertEquals([
@@ -34,7 +34,7 @@ class SendingNotificationsViaInstantNotifiableTest extends TestCase
     }
 }
 
-class TestMailNotificationForInstantNotifiable extends Notification
+class TestMailNotificationForAnonymousNotifiable extends Notification
 {
     public function via($notifiable)
     {
