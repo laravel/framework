@@ -51,10 +51,12 @@ trait InteractsWithExceptionHandling
             public function render($request, Exception $e)
             {
                 if ($e instanceof NotFoundHttpException) {
-                    throw new NotFoundHttpException("{$request->method()} {$request->url()}", null, $e->getCode());
-                } else {
-                    throw $e;
+                    throw new NotFoundHttpException(
+                        "{$request->method()} {$request->url()}", null, $e->getCode()
+                    );
                 }
+
+                throw $e;
             }
 
             public function renderForConsole($output, Exception $e)
