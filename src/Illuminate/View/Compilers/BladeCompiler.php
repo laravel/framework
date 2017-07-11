@@ -355,11 +355,16 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * Register an "if" statement directive.
      *
      * @param  string  $name
-     * @param  \Closure  $callback
+     * @param  callable  $callback
+     * @param  array  $arguments
      * @return void
      */
-    public function if($name, Closure $callback)
+    public function if($name, $callback, $arguments = [])
     {
+        if (is_string($callback)) {
+            $callback = call_user_func([new $callback, 'handle'], $arguments);
+        }
+
         $this->conditions[$name] = $callback;
 
         $this->directive($name, function ($expression) use ($name) {
