@@ -29,17 +29,27 @@ class SoftDeletedInDatabase extends PHPUnit_Framework_Constraint
     protected $data;
 
     /**
+     * The name of the column used to indicate soft deletion status.
+     *
+     * @var string
+     */
+    protected $columnName;
+
+    /**
      * Create a new constraint instance.
      *
      * @param  \Illuminate\Database\Connection  $database
      * @param  array  $data
+     * @param  string  $columName
      * @return void
      */
-    public function __construct(Connection $database, array $data)
+    public function __construct(Connection $database, array $data, $columnName)
     {
         $this->data = $data;
 
         $this->database = $database;
+
+        $this->columnName = $columnName;
     }
 
     /**
@@ -51,7 +61,9 @@ class SoftDeletedInDatabase extends PHPUnit_Framework_Constraint
     public function matches($table)
     {
         return $this->database->table($table)
-                ->where($this->data)->whereNotNull('deleted_at')->count() > 0;
+                ->where($this->data)
+                ->whereNotNull($this->columnName)
+                ->count() > 0;
     }
 
     /**
