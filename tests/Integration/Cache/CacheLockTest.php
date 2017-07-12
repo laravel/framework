@@ -12,6 +12,15 @@ class CacheLockTest extends TestCase
 {
     use InteractsWithRedis;
 
+    public function setup()
+    {
+        parent::setUp();
+
+        if (! class_exists(Memcached::class)) {
+            $this->markTestSkipped('Memcached module not installed');
+        }
+    }
+
     public function test_memcached_locks_can_be_acquired_and_released()
     {
         Cache::store('memcached')->lock('foo')->release();
