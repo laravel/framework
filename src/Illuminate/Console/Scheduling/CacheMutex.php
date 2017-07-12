@@ -56,6 +56,8 @@ class CacheMutex implements Mutex
      */
     public function forget(Event $event)
     {
-        $this->cache->forget($event->mutexName());
+        $this->cache->put(
+            $event->mutexName(), true, 0.125
+        );
     }
 }
