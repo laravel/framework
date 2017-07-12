@@ -355,7 +355,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * Register an "if" statement directive.
      *
      * @param  string  $name
-     * @param  \Closure  $callback
+     * @param  callable  $callback
      * @return void
      */
     public function if($name, callable $callback)
