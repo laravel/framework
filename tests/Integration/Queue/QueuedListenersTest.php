@@ -34,7 +34,6 @@ class QueuedListenersTestEvent
 {
 }
 
-
 class QueuedListenersTestListenerShouldQueue implements ShouldQueue
 {
     public function shouldQueue()
