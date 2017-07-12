@@ -75,7 +75,7 @@ class CacheMutexTest extends TestCase
     {
         $cacheMutex = $this->cacheMutex;
 
-        $this->cacheRepository->shouldReceive('forget');
+        $this->cacheRepository->shouldReceive('put');
 
         $event = new Event($this->cacheMutex, 'command');
 
