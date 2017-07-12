@@ -50,7 +50,6 @@ class SoftDeletedInDatabase extends PHPUnit_Framework_Constraint
         $this->database = $database;
 
         $this->columnName = $columnName;
-
     }
 
     /**
