@@ -2,7 +2,7 @@
 
 namespace Illuminate\Broadcasting\Broadcasters;
 
-use Pusher;
+use Pusher\Pusher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Broadcasting\BroadcastException;
@@ -13,14 +13,14 @@ class PusherBroadcaster extends Broadcaster
     /**
      * The Pusher SDK instance.
      *
-     * @var \Pusher
+     * @var Pusher
      */
     protected $pusher;
 
     /**
      * Create a new broadcaster instance.
      *
-     * @param  \Pusher  $pusher
+     * @param  Pusher  $pusher
      * @return void
      */
     public function __construct(Pusher $pusher)
@@ -112,7 +112,7 @@ class PusherBroadcaster extends Broadcaster
     /**
      * Get the Pusher SDK instance.
      *
-     * @return \Pusher
+     * @return Pusher
      */
     public function getPusher()
     {
