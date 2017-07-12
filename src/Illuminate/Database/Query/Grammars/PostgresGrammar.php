@@ -236,6 +236,14 @@ class PostgresGrammar extends Grammar
     {
         return ['truncate '.$this->wrapTable($query->from).' restart identity' => []];
     }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function getDateFormat()
+    {
+        return 'Y-m-d H:i:s.u';
+    }
 
     /**
      * Wrap a single string in keyword identifiers.
