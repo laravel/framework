@@ -50,12 +50,13 @@ trait InteractsWithDatabase
      * @param  string  $table
      * @param  array  $data
      * @param  string  $connection
+     * @param  string  $columnName
      * @return $this
      */
-    protected function assertSoftDeleted($table, array $data, $connection = null)
+    protected function assertSoftDeleted($table, array $data, $connection = null, $columnName = 'deleted_at')
     {
         $this->assertThat(
-            $table, new SoftDeletedInDatabase($this->getConnection($connection), $data)
+            $table, new SoftDeletedInDatabase($this->getConnection($connection), $data, $columnName)
         );
 
         return $this;

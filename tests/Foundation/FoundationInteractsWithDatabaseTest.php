@@ -107,6 +107,13 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertSoftDeleted($this->table, $this->data);
     }
 
+    public function testSeeSoftDeletedInDatabaseWithCustomColumnFindsResults()
+    {
+        $this->mockCountBuilder(1, 'custom_deleted_at');
+
+        $this->assertSoftDeleted($this->table, $this->data, null, 'custom_deleted_at');
+    }
+
     /**
      * @expectedException \PHPUnit_Framework_ExpectationFailedException
      * @expectedExceptionMessage The table is empty.
@@ -120,13 +127,13 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertSoftDeleted($this->table, $this->data);
     }
 
-    protected function mockCountBuilder($countResult)
+    protected function mockCountBuilder($countResult, $columnName = 'deleted_at')
     {
         $builder = m::mock(Builder::class);
 
         $builder->shouldReceive('where')->with($this->data)->andReturnSelf();
 
-        $builder->shouldReceive('whereNotNull')->with('deleted_at')->andReturnSelf();
+        $builder->shouldReceive('whereNotNull')->with($columnName)->andReturnSelf();
 
         $builder->shouldReceive('count')->andReturn($countResult);
 
